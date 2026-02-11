@@ -105,10 +105,10 @@ class Manifest implements IStrategy
         /* A nice heading for this manifest
          */
         $this->log->info(sprintf(
-            '    Manifest for TimetableAllocation nodes for %s and Weeks %s-%s.',
-            $year,
+            '    Manifest for TimetableAllocation nodes in Weeks %s-%s of %s',
             $pastThreshold,
-            $futureThreshold
+            $futureThreshold,
+            $year
         ));
 
         $this->log->info('');
