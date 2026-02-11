@@ -831,7 +831,6 @@ class Validation
         // Validate this item.
         $errorsStruct = $this->validateBookingFromPostData($item, $bookingDetailsForItem, $existingBooking);
 
-        // If clashes are allowed on the booking, and all validation errors are clash errors...
         $clashBookingStartDatesAsKeys = [];
         if (count($errorsStruct) > 0) {
             // Remember the start dates of clash bookings.
