@@ -911,7 +911,7 @@ class DataSource
             }
         }
 
-        $this->mapper->getEventPropagator()->propagate($sessionUser, $verb, $object, $this->mapper, $diff);
+        $this->mapper->propagateWithPropagator($sessionUser, $verb, $object, $diff);
         return true;
     }
 

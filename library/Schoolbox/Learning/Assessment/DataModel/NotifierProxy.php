@@ -153,12 +153,11 @@ class NotifierProxy
                 $planModel->getParticipants()->setOffset($participant->getUser()->getId(), $participantModel);
             }
 
-            $this->planMapper->getEventPropagator()->propagate(
+            $this->planMapper->propagateWithPropagator(
                 $effector,
                 $action,
                 $planModel,
-                $this->planMapper,
-                $diff
+                $diff,
             );
         }
     }
