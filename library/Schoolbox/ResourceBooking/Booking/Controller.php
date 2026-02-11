@@ -429,12 +429,6 @@ class Controller extends Base
                         $startDatetime->getDateTimeObject(),
                         $endDatetime->getDateTimeObject()
                     );
-                    // Filter out the booking being updated from $conflictingBookings.
-                    $conflictingBookings = $conflictingBookings->filter(
-                        function (Model $bookingConflicted) use ($booking) {
-                            return $bookingConflicted->getId() !== $booking->getId();
-                        }
-                    );
                     foreach ($conflictingBookings as $conflictingBooking) {
                         $conflictingBooking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_REJECTED));
                         $bookingsToReject->add($conflictingBooking);
