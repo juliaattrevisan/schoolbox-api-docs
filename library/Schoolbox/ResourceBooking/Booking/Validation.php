@@ -102,6 +102,20 @@ class Validation
     private \Schoolbox\External\Event\Mapper $eventMapper;
 
     /**
+     * cache key for $this->conflictingBookings
+     * Format:
+     * $resource->getId() _ $startDate->getTimestamp() _ $endDate->getTimestamp() _ ($existingBooking ? $existingBooking->getId() : '')
+     */
+    private const CONFLICTING_BOOKINGS_CACHE_KEY = "%s_%s_%s_%s";
+
+    /**
+     * cache array if we are calling the validation multiple times, to avoid multiple calls to the database for the same data
+     * we can always break the cache if needed
+     * @var Collection|Model[]
+     */
+    private array|Collection $conflictingBookings = [];
+
+    /**
      * @param User                             $user
      * @param BookingMapper                    $bookingMapper
      * @param StatusMapper                     $statusMapper
@@ -454,46 +468,8 @@ class Validation
     ): array {
         $errors = [];
 
-        // Only check approved bookings. Wow, the calendar population method
-        // can do exactly that!
-        // I do however want to allow a booking to start at the same time
-        // that the previous booking ended.
-        // (We may need to implement a down time between bookings.)
         /** @var Collection|Model[] $conflictingBookings */
-        $conflictingBookings = $this->getConflictingBookings($resource, $startDate, $endDate);
-
-        // Conflicting bookings could include the existing booking.
-        // Remove it, because a booking can't conflict with itself!
-        // Also remove any items in the same series, because bookings can't
-        // conflict with bookings in the same series (they're all offset at the
-        // same time)
-        // There may be rare occurrences where they can (a booking that is so
-        // long it overlaps the next item in series!), but I'm not going to
-        // worry about those.
-        if ($existingBooking instanceof Model) {
-            $existingId = $existingBooking->getId();
-
-            if ($existingId) {
-                $existingSeriesId    = $existingBooking->getEvent()->getSeriesId();
-                $conflictingBookings = $conflictingBookings->filter(
-                    /**
-                     * @param Model $item
-                     * @return bool
-                     */
-                    function ($item) use ($existingId, $existingSeriesId) {
-                        /** @var Model $item */
-                        if ($item->getId() == $existingId) {
-                            return false;
-                        }
-                        if (!empty($existingSeriesId) && $item->getEvent()->getSeriesId() == $existingSeriesId) {
-                            return false;
-                        }
-
-                        return true;
-                    }
-                );
-            }
-        }
+        $conflictingBookings = $this->getConflictingBookings($resource, $startDate, $endDate, $existingBooking, true);
 
         // Anything still in list of conflicts? We have a conflict
         if (count($conflictingBookings)) {
@@ -550,19 +526,65 @@ class Validation
      * @param Item\Model $resource
      * @param DateTime   $startDate
      * @param DateTime   $endDate
-     *
+     * @param Model|null $existingBooking
+     * @param bool       $breakCache // should we hit the db to find all booking, or use the cached ones?
      * @return Collection|Model[]
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    private function getConflictingBookings(Item\Model $resource, DateTime $startDate, DateTime $endDate)
+    private function getConflictingBookings(Item\Model $resource, DateTime $startDate, DateTime $endDate, ?Model $existingBooking = null, bool $breakCache = false): Collection|array
     {
-        return $this->getBookingMapper()->findForResource(
-            [$resource->getId()],
-            $startDate->getTimestamp() + 1,
-            $endDate->getTimestamp() - 1,
-            [Status\Model::STATUS_APPROVED]
-        );
+        // booking cache is a sum of the data of the function params
+        $cacheKey = sprintf(self::CONFLICTING_BOOKINGS_CACHE_KEY, $resource->getId(), $startDate->getTimestamp(), $endDate->getTimestamp(), $existingBooking ? $existingBooking->getId() : '');
+
+        if (!isset($this->conflictingBookings[$cacheKey]) || $breakCache) {
+            // Only check approved bookings. Wow, the calendar population method
+            // can do exactly that!
+            // I do however want to allow a booking to start at the same time
+            // that the previous booking ended.
+            // (We may need to implement a down time between bookings.)
+            $this->conflictingBookings[$cacheKey] = $this->getBookingMapper()->findForResource(
+                [$resource->getId()],
+                $startDate->getTimestamp() + 1,
+                $endDate->getTimestamp() - 1,
+                [Status\Model::STATUS_APPROVED]
+            );
+        }
+
+        $conflictingBookings = $this->conflictingBookings[$cacheKey];
+
+        // Conflicting bookings could include the existing booking.
+        // Remove it, because a booking can't conflict with itself!
+        // Also remove any items in the same series, because bookings can't
+        // conflict with bookings in the same series (they're all offset at the
+        // same time)
+        // There may be rare occurrences where they can (a booking that is so
+        // long it overlaps the next item in series!), but I'm not going to
+        // worry about those.
+        if ($existingBooking instanceof Model) {
+            $existingId = $existingBooking->getId();
+
+            if ($existingId) {
+                $existingSeriesId    = $existingBooking->getEvent()->getSeriesId();
+                $conflictingBookings = $conflictingBookings->filter(
+                /**
+                 * @param Model $item
+                 * @return bool
+                 */
+                    function ($item) use ($existingId, $existingSeriesId) {
+                        /** @var Model $item */
+                        if ($item->getId() == $existingId) {
+                            return false;
+                        }
+                        if (!empty($existingSeriesId) && $item->getEvent()->getSeriesId() == $existingSeriesId) {
+                            return false;
+                        }
+
+                        return true;
+                    }
+                );
+            }
+        }
+
+        return $conflictingBookings;
     }
 
     /**
@@ -583,10 +605,8 @@ class Validation
         $timetableRoom = (new \Calendar_Api_EventType_SudsTimetable_Room(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->eventMapper, $roomCodes))
             ->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1);
 
-        $timetableRoom->merge((new TimetableRoom(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->externalTimetableHandler, $roomCodes))
+        return $timetableRoom->merge((new TimetableRoom(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->externalTimetableHandler, $roomCodes))
             ->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1));
-
-        return $timetableRoom;
     }
 
     /**
@@ -968,5 +988,37 @@ class Validation
         }
 
         return BookingStatusModel::STATUS_PENDING;
+    }
+
+
+    /**
+     * fetch all clash events and timetable events that clash with the bookings
+     *
+     * based off @see \Schoolbox\ResourceBooking\Booking\Validation::validateForClashes
+     * @param Item\Model $resource
+     * @param DateTime   $startDate
+     * @param DateTime   $endDate
+     * @param Model|null $existingBooking
+     * @return Collection
+     */
+    public function getClashEvents(
+        Item\Model $resource,
+        DateTime $startDate,
+        DateTime $endDate,
+        ?Model $existingBooking = null
+    ): Collection {
+        $conflictingBookings = new Collection();
+        $conflictingBookings = $conflictingBookings->merge($this->getConflictingBookings($resource, $startDate, $endDate, $existingBooking));
+
+        if (strlen($resource->getRoomCode() ?? '') > 0) {
+            // Check if there's a timetabled class here, too.
+            $conflictingBookings = $conflictingBookings->merge($this->getTimetableRoomEvents(
+                $resource->getRoomCode(),
+                $startDate,
+                $endDate
+            ));
+        }
+
+        return $conflictingBookings;
     }
 }

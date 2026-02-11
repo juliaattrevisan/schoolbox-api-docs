@@ -19,6 +19,7 @@ namespace Schoolbox\ResourceBooking\Booking;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
+use Calendar\Event\Type\EventInterface;
 use External_Timetable;
 use Monolog\Logger;
 use Psr\Container\ContainerExceptionInterface;
@@ -254,6 +255,7 @@ class Notifier extends AbstractModuleNotifier
         );
 
         $clashErrors = [];
+        $clashEvents = [];
         if (in_array($event, ['created', 'updated'])) {
             // If the event has been created or updated, check for clashes with existing approved events.
             // This allows the notification message to be modified to alert the moderator of the clashes.
@@ -281,6 +283,16 @@ class Notifier extends AbstractModuleNotifier
                     $endDateTimeAlaressObj->getDateTimeObject(), // We need a different kind of date object.
                     $object
                 );
+
+                if (!empty($clashErrors)) {
+                    // only grab clash events if there were clashes...
+                    $clashEvents = $this->validation->getClashEvents(
+                        $object->getResource(),
+                        $startDateTimeAlaressObj->getDateTimeObject(), // We need a different kind of date object.
+                        $endDateTimeAlaressObj->getDateTimeObject(), // We need a different kind of date object.
+                        $object
+                    );
+                }
             }
         }
 
@@ -332,6 +344,25 @@ class Notifier extends AbstractModuleNotifier
             $bob->setParam('owner', new UserParam($owner, UserParam::STACKING_APPEND, 'you'));
         }
         $envelope->targetToUser($owner, $bob->build());
+
+
+        // if clash exists, we need to notify both you and the other clash users
+        if (count($clashErrors) !== 0) {
+            if (!$isOwnerEffector) {
+                $bob->setParam('owner', new UserParam($owner));
+            }
+            $bob->setAllowSelfSend(true);
+            $envelope->targetToUser($user, $bob->build());
+
+            // fetch clash owners
+            /** @var Model|EventInterface $clashEvent */
+            foreach ($clashEvents as $clashEvent) {
+                if ($clashEvent instanceof Model) {
+                    // we can only notify the owner of other resource bookings, NOT timetable, they MAY not have an owner
+                    $envelope->targetToUser($clashEvent->getEvent()->getOwner(), $bob->build());
+                }
+            }
+        }
 
         // Send a message to all the moderators of the object
         foreach ($object->getResource()->getModeratorList() as $moderator) {

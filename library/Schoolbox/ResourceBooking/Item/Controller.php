@@ -151,7 +151,7 @@ class Controller extends Base
         $data = $resources->map(function (Model $item) {
             return [
                 'id'   => $item->getId(),
-                'name' => $item->getName(),
+                'name' => sprintf("%s%s", $item->getName(), $item->getRoomCode() ? " [{$item->getRoomCode()}]" : ''),
             ];
         });
         $data->reindex();
