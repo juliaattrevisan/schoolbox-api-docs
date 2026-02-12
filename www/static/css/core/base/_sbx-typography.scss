@@ -10,22 +10,7 @@
 }
 
 body {
-    // Override body background to use lighter shade of accent color
-    background: var(--body-background);
-    --body-background: hsla(
-        var(--body-background-h),
-        var(--body-background-s),
-        var(--body-background-l),
-        var(--body-background-a)
-    );
-
-    --body-background-a: 1;
-    --body-background-h: 204;
-    --body-background-l: 96%;
-    --body-background-s: 49%;
-
     font-family: var(--sbx-font-primary) !important;
-
     // to prevent barcode/vjs/view file modal icons override
     & *:not(.barcode-39, button.vjs-control, [class*=" lg-"]) {
         font-family: var(--sbx-font-primary) !important;
