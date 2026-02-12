@@ -19,6 +19,10 @@ use Predis\Connection\ConnectionInterface;
  * Wrapper around a Redis client.
  *
  * Should be extended by other Redis clients, for special usages.
+ *
+ * Unfortunately must be shelved due to a vagary of Symfony's cache: it attempts
+ * to re-construct an instance of whatever class it receives, and assumes it
+ * accepts the same constructor parameters as `\Predis\Client`.
  */
 class ClientWrapper implements ClientInterface
 {

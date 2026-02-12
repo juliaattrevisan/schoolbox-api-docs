@@ -10,7 +10,7 @@
 
 namespace Alaress;
 
-use Alaress\Redis\AutoRefreshClientWrapper;
+use Alaress\Redis\AutoRefreshClient;
 use Predis;
 
 class Redis
@@ -210,9 +210,7 @@ class Redis
             $parameters = parse_url($parameters);
             $parameters['persistent'] = true;
         }
-        $this->setClient(
-            new AutoRefreshClientWrapper(new Predis\Client($parameters, $options)),
-        );
+        $this->setClient(new AutoRefreshClient($parameters, $options));
         $this->instanceId = $instanceId;
         return $this;
     }
