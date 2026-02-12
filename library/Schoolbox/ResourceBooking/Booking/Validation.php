@@ -865,7 +865,7 @@ class Validation
         if (count($errorsStruct) > 0) {
             // Remember the start dates of clash bookings.
             // Note clash errors always use the Validation::START_PERIOD_ERRORS key (see Validation->validateForClashes()).
-            foreach ($errorsStruct[self::START_PERIOD_ERRORS] as $startDate => $errors) {
+            foreach ($errorsStruct[self::START_PERIOD_ERRORS] ?? [] as $startDate => $errors) {
                 $clashBookingStartDatesAsKeys[$startDate] = null;
             }
 
