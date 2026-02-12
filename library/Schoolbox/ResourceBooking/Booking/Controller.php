@@ -416,10 +416,10 @@ class Controller extends Base
                         array_key_exists($bookingStartDateTime->getDatabaseDate(), $clashBookingStartDatesAsKeys)
                     );
                     $bookingStatusId = $validation->getNewStatusIdForBooking(
-                        $booking,
-                        $thisBookingHasClashes,
-                        $this->getUser(),
-                        $overrideValidation,
+                        booking: $booking,
+                        isClash: $thisBookingHasClashes,
+                        user: $this->getUser(),
+                        overrideValidation: $overrideValidation,
                     );
                     $booking->setStatus($this->getStatusMapper()->createModel($bookingStatusId));
                 } else {
