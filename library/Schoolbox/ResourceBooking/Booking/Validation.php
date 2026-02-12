@@ -317,7 +317,6 @@ class Validation
     {
         $errors = [];
         $now    = new DateTime();
-        $startDate->format('Y-m-d H:i');
 
         if ($startDate->format('Y-m-d H:i') < $now->format('Y-m-d H:i')) {
             $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
