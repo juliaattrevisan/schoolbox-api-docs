@@ -5761,12 +5761,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Booking/Series.php
 
 		-
-			message: '#^Call to method DateTime\:\:format\(\) on a separate line has no effect\.$#'
-			identifier: method.resultUnused
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Validation.php
-
-		-
 			message: '#^Method Schoolbox\\ResourceBooking\\Item\\Model\:\:addModerator\(\) should return \$this\(Schoolbox\\ResourceBooking\\Item\\Model\) but returns iterable\<Schoolbox\\User\>&Schoolbox\\Collection\.$#'
 			identifier: return.type
 			count: 1
