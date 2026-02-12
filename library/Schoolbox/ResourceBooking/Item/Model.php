@@ -347,6 +347,7 @@ class Model implements ISoftDeletable, JsonSerializable
      */
     public function setModeratorList($moderatorList)
     {
+        $this->isUserModeratorCache = []; // Clear the isUserModeratorCache.
         $this->moderatorList = $moderatorList;
         return $this;
     }
@@ -365,6 +366,7 @@ class Model implements ISoftDeletable, JsonSerializable
      */
     public function addModerator($moderator)
     {
+        $this->isUserModeratorCache = []; // Clear the isUserModeratorCache.
         return $this->getModeratorList()->add($moderator);
     }
 
