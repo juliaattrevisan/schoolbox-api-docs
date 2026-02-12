@@ -101,7 +101,6 @@ class Classes implements IStrategy
      * @param Watchlist $watcher
      * @param array $watchlist
      * @param Mapper $eventMapper
-     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      * @param ClassEntryMapper $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param \Alaress_Date_Format $fromDate
@@ -114,7 +113,6 @@ class Classes implements IStrategy
         private Watchlist $watcher,
         private array $watchlist,
         private \Schoolbox\External\Event\Mapper $eventMapper,
-        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         private ClassEntryMapper $classEntryMapper,
         private ClassInvolvementMapper $classInvolvementMapper,
         private \Alaress_Date_Format $fromDate,
@@ -528,38 +526,9 @@ class Classes implements IStrategy
         $teacherExternalId = trim((string)$class['teachers'][0]['id']);
         $name = trim((string)$class['teachers'][0]['name']);
 
-        $this->saveInvolvement($event, $classEntry, $name, $teacherExternalId);
-    }
-
-
-    /**
-     * Save teacher involvement for a class and apply staff overrides on the event.
-     *
-     * NOTE: Callers must ensure this is only executed once per guid. This method will:
-     *  - create class enrolment for the teacher (via saveEnrolment)
-     *  - write staff overrides (CLEAR_STAFF then ADD) if running in perform mode
-     *
-     * @param Model      $event
-     * @param ClassEntry $classEntry
-     * @param string     $name
-     * @param string     $externalId
-     *
-     * @throws Exception
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
-     */
-    private function saveInvolvement(
-        Model $event,
-        ClassEntry $classEntry,
-        string $name,
-        string $externalId
-    ): void {
-        // Ensure the teacher is enrolled against the class entry.
-        $this->saveEnrolment($event, $classEntry, $name, $externalId);
-
-        $this->log->debug(sprintf(
+        $this->log->info(sprintf(
             'Creating new class teacher involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
-            $externalId,
+            $teacherExternalId,
             $name,
             $event->getTitle(),
             $event->getDay(),
@@ -568,30 +537,7 @@ class Classes implements IStrategy
             $event->getFinishAt()->getDatabase()
         ));
 
-        // In dry-run mode the event may not have an id.
-        if (!$this->perform) {
-            return;
-        }
-
-        $eventId = $event->getId();
-        if ($eventId === null) {
-            return;
-        }
-
-        $clearOverride = $this->overridesMapper->createModel()
-            ->setEventId($eventId)
-            ->setExternalId(null)
-            ->setAction(\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF)
-            ->setSequence(1);
-
-        $involvementOverride = $this->overridesMapper->createModel()
-            ->setEventId($eventId)
-            ->setExternalId($externalId)
-            ->setAction(\Schoolbox\External\Event\Overrides\Model::ADD)
-            ->setSequence(2);
-
-        $this->overridesMapper->save($clearOverride);
-        $this->overridesMapper->save($involvementOverride);
+        $this->saveEnrolment($event, $classEntry, $name, $teacherExternalId);
     }
 
     /**

@@ -192,7 +192,6 @@ class Factory
                     $watcher,
                     $this->watchlist,
                     $this->eventMapper,
-                    $this->overridesMapper,
                     $this->classEntryMapper,
                     $this->classInvolvementMapper,
                     $from,
