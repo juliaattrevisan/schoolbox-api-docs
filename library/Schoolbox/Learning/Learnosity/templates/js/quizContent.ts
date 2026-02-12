@@ -216,10 +216,10 @@ const authorAppCallback = {
     errorListener: function (error) {
         console.error(error);
 
-        let errorElement = document.createElement("div");
+        const errorElement = document.createElement("div");
         errorElement.classList.add("alert-box", "warning");
         errorElement.innerHTML = "<p>There was a problem loading this quiz.</p>";
-        errorElement.innerHTML += "<p>" + error.message + "</p>";
+        errorElement.innerHTML += `<p>${error.message ?? "Unknown error"}</p>`;
 
         const learnosityElement = document.getElementById("learnosity-author") || document.querySelector(".lrn-author");
 
