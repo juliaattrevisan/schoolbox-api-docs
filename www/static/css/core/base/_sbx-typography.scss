@@ -1,6 +1,9 @@
 /**
  * Typography style tweaks
  * Scope: UI Uplift
+ * Here we are primarily adding a new display font,
+ * adjusting font sizes for better readability,
+ * and setting the minimum font size to be 14px
  */
 
 @import url("https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..700;1,300..700&display=swap");
@@ -17,15 +20,41 @@ body {
     }
 }
 
-// Subheader styles
-.subheader {
+// Provide greater contrast and readability to subheaders
+.sbx-body .subheader {
     color: var(--sbx-color-text-primary);
-    font-size: var(--sbx-font-size-l);
     font-weight: var(--sbx-font-weight-heading);
     text-transform: capitalize;
 }
 
-// Meta styles
-.meta {
+// Enlarge a bit specifically those subheaders that sit outside islands
+.sbx-body h2.subheader {
+    font-size: var(--sbx-font-size-l);
+}
+
+// Enlarge a bit and remove italic for readability
+.sbx-body .meta {
+    font-size: var(--sbx-font-size-xs);
     font-style: normal;
+}
+
+// Enlarge font-size for greater readability
+.sbx-body p,
+.sbx-body ul,
+.sbx-body ol,
+.sbx-body dl,
+.sbx-body blockquote {
+    font-size: var(--sbx-font-size-s);
+}
+
+// Enlarge for greater readability
+.sbx-body small {
+    font-size: var(--sbx-font-size-xs);
+}
+
+// Provide greater contrast and readability to labels
+.sbx-body .label {
+    font-size: var(--sbx-font-size-xs);
+    font-weight: var(--sbx-font-weight-normal);
+    text-transform: capitalize;
 }
