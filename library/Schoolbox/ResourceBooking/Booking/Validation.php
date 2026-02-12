@@ -111,9 +111,9 @@ class Validation
     /**
      * cache array if we are calling the validation multiple times, to avoid multiple calls to the database for the same data
      * we can always break the cache if needed
-     * @var Collection|Model[]
+     * @var array<string, Collection<BookingModel>>
      */
-    private array|Collection $conflictingBookings = [];
+    private array $conflictingBookings = [];
 
     /**
      * @param User                             $user
