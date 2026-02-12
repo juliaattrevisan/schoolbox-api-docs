@@ -434,8 +434,8 @@ class Validation
      */
     public function validateChangeStatus(Model $booking, int $status): array
     {
-        $bookingStartAt = $booking->getBookingStartAt() ?? $booking->getEvent()->getStartDatetime();
-        $bookingEndAt = $booking->getBookingEndAt() ?? $booking->getEvent()->getEndDatetime();
+        $bookingStartAt = $booking->getBookingStartAt() ?? $booking->getEvent()->getStartDateTime();
+        $bookingEndAt = $booking->getBookingEndAt() ?? $booking->getEvent()->getEndDateTime();
 
         if ($bookingStartAt === null) {
             // This should never happen since we fall back to event start/end dates, but handle this theoretical case.
@@ -1005,14 +1005,14 @@ class Validation
             foreach ($resourceById as $resourceId => $resource) {
                 $periodsOfApprovedBookings = $periodsOfApprovedBookingsByResourceId[$resourceId] ?? [];
                 foreach ($periodsOfApprovedBookings as $period) {
-                    if ($period['startDatetime']->gt($event->getEndDatetime())) {
+                    if ($period['startDatetime']->gt($event->getEndDateTime())) {
                         // The $periods are sorted by start datetime ascending, so we can be sure that no other periods will clash with event.
                         break;
                     }
 
                     if (
-                        $period['startDatetime']->lt($event->getEndDatetime()) &&
-                        $period['endDatetime']->gt($event->getStartDatetime())
+                        $period['startDatetime']->lt($event->getEndDateTime()) &&
+                        $period['endDatetime']->gt($event->getStartDateTime())
                     ) {
                         if (!array_key_exists($eventId, $isClashByResourceIdByEventId)) {
                             $isClashByResourceIdByEventId[$eventId] = [];
@@ -1047,8 +1047,8 @@ class Validation
     ): int {
         $resource = $booking->getResource();
 
-        $bookingStartAt = $booking->getBookingStartAt() ?? $booking->getEvent()->getStartDatetime();
-        $bookingEndAt = $booking->getBookingEndAt() ?? $booking->getEvent()->getEndDatetime();
+        $bookingStartAt = $booking->getBookingStartAt() ?? $booking->getEvent()->getStartDateTime();
+        $bookingEndAt = $booking->getBookingEndAt() ?? $booking->getEvent()->getEndDateTime();
 
         if ($bookingStartAt === null || $bookingEndAt === null) {
             // This should never happen since we fall back to event start/end dates, but handle this theoretical case.
