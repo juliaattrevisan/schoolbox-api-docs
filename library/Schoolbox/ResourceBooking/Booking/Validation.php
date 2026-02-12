@@ -228,7 +228,7 @@ class Validation
         if (!($existingBooking instanceof BookingModel)) {
             // new booking: Validate related and recurrent bookings
             $campus = null;
-            if ($postData['campus'] > 0) {
+            if (($postData['campus'] ?? null) !== null) {
                 $campus = $this->getCampusMapper()->findById($postData['campus']);
             }
             /** @var Campus $campus */
