@@ -486,17 +486,18 @@ class Controller extends Base
     /**
      * Expands $bookingList with a booking for each item in $relatedItems.
      *
-     * @param Collection|Model[] $bookingList
-     * @param array              $relatedItems
+     * @param GenericCollection<Model> $bookingList
+     * @param array                    $relatedItems
      *
-     * @return Collection
+     * @return GenericCollection
+     * @throws MapperException
      */
-    protected function getBookingsForRelatedItems(Collection $bookingList, $relatedItems)
+    protected function getBookingsForRelatedItems(GenericCollection $bookingList, array $relatedItems): GenericCollection
     {
         if (empty($relatedItems)) {
             return $bookingList;
         }
-        $newList = new Collection();
+        $newList = new GenericCollection(Model::class);
         foreach ($bookingList as $booking) {
             foreach ($booking->getResource()->getRelatedResourceList() as $relatedResource) {
                 if (array_key_exists($relatedResource->getId(), $relatedItems)) {
@@ -523,14 +524,15 @@ class Controller extends Base
     /**
      * Saves each item in a list of bookings into a set of bookings for related items.
      *
+     * @param GenericCollection<Model> $bookingList
+     * @param array                    $relatedItems
+     *
+     * @return GenericCollection<Model>
+     * @throws MapperException
      * @todo make this a mapper method
      *
-     * @param Collection|Model[] $bookingList
-     * @param array              $relatedItems
-     *
-     * @return Collection
      */
-    protected function saveBookingsForRelatedItems(Collection $bookingList, $relatedItems)
+    protected function saveBookingsForRelatedItems(GenericCollection $bookingList, array $relatedItems): GenericCollection
     {
         $newList = $this->getBookingsForRelatedItems($bookingList, $relatedItems);
         $this->bookingMapper->save($newList);
@@ -541,7 +543,7 @@ class Controller extends Base
     /**
      * Saves each item in a list of bookings into a series of bookings.
      *
-     * @param Collection|Model[] $bookingList
+     * @param GenericCollection<Model> $bookingList
      * @param string $recurrenceRule
      * @param DateTime $repeatUntil
      * @param array  $clashBookingStartDatesAsKeys array<string, null>
@@ -552,18 +554,18 @@ class Controller extends Base
      *               The format of the dates is expected to be YYYY-MM-DD.
      * @param ?int $campusId
      *
-     * @return Collection
+     * @return GenericCollection<Model>
      * @throws MapperException
      * @todo make this a mapper method
      */
     protected function saveBookingsForRecurrences(
-        Collection $bookingList,
+        GenericCollection $bookingList,
         string $recurrenceRule,
         DateTime $repeatUntil,
         array $clashBookingStartDatesAsKeys,
         $campusId = null,
-    ): Collection {
-        $newList = new Collection();
+    ): GenericCollection {
+        $newList = new GenericCollection(Model::class);
         $campus = null;
         if ($campusId) {
             $campus = $this->getCampusMapper()->findById($campusId);
