@@ -1076,7 +1076,7 @@ class Validation
         }
 
         // This check is done separately since it is not included in $this->validateSimpleRules().
-        if ($resource->getCurrentTermRestriction()) {
+        if (!$overrideValidation && $resource->getCurrentTermRestriction()) {
             $errors = array_merge_recursive(
                 $errors,
                 $this->validateCurrentTermRestriction($bookingEndAt->getDateTimeObject(), $this->getCurrentTerm())
