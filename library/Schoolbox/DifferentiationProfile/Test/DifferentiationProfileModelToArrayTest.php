@@ -108,6 +108,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
             '_links'   => [
                 'profile' => null,
             ],
+            'campus' => null,
         ];
 
         $pastoralActive = new PastoralModel()
