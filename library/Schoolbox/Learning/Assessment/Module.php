@@ -498,8 +498,8 @@ class Module extends BaseModule
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
         } catch (MapperException\Deleted $e) {
             throw new MapperException\Deleted(
-                'Activity was deleted. Please ensure the activity ' .
-                'still exists and contact your support if the problem persists.'
+                'This activity has been deleted. Please refresh the page. ' .
+                'If you believe this is an error, contact your support team.'
             );
         } catch (MapperException $e) {
             // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
@@ -534,8 +534,8 @@ class Module extends BaseModule
             $assessmentImpl = $this->getAssessmentMapperProxy()->findById($params['assessmentImplId']);
         } catch (MapperException\Deleted $e) {
             throw new MapperException\Deleted(
-                'Activity was deleted. Please ensure the activity ' .
-                'still exists and contact your support if the problem persists.'
+                'This activity has been deleted. Please refresh the page. ' .
+                'If you believe this is an error, contact your support team.'
             );
         } catch (MapperException $e) {
             // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
