@@ -1,0 +1,192 @@
+import { Meta, ColorItem } from "@storybook/addon-docs/blocks";
+
+<Meta title="Design Tokens/Colours" />
+
+# Colours
+
+These are the colours currently avaiable as CSS custom properties. As we continue to migrate from Foundation/SASS vars to CSS custom properties, we will be adding more colours to this list.
+It's also likely that we will review whether we still require features such as the contrasting colours and complex derived colours.
+Ideally we would like to reduce the number of colours we have to maintain and also entirely remove any dependencies on SASS for colour purposes.
+
+## Skin configuration options
+
+The following colours are configurable by schools via the admin system. The following colours currently match those used in the demo data, visible at: https://demo.schoolbox.com.au/login/
+
+<ColorItem title="Top Menu Icon Colour" colors={{ "--navigation-foreground": "rgb(255, 255, 255)" }} />
+<ColorItem title="Top Menu Background Colour" colors={{ "--navigation-background": "rgb(0, 102, 176)" }} />
+<ColorItem title="Top Menu Hover Colour" colors={{ "--navigation-hover": "rgb(0, 158, 178)" }} />
+<ColorItem
+    title="Side Menu and Notification Panel Text Colour"
+    colors={{ "--off-canvas-foreground": "rgb(0, 102, 176)" }}
+/>
+<ColorItem
+    title="Side Menu and Notification Panel Background Colour"
+    colors={{ "--off-canvas-background": "rgb(255, 255, 255)" }}
+/>
+<ColorItem title="Side Menu Hover Colour" colors={{ "--off-canvas-hover": "rgb(229, 239, 247)" }} />
+<ColorItem title="User Account Menu Text Colour" colors={{ "--accounts-menu-foreground": "rgb(0, 102, 176)" }} />
+<ColorItem
+    title="User Account Menu Background Colour"
+    colors={{ "--accounts-menu-background": "rgb(255, 255, 255)" }}
+/>
+<ColorItem title="User Account Menu Hover Colour" colors={{ "--accounts-menu-hover": "rgb(229, 239, 247)" }} />
+<ColorItem
+    title="Primary Interactive Content Foreground Colour"
+    colors={{ "--content-ui-foreground": "rgb(0, 102, 176)" }}
+/>
+<ColorItem
+    title="Primary Interactive Content Background Colour"
+    colors={{ "--content-ui-background": "rgb(178, 209, 231)" }}
+/>
+<ColorItem title="Primary Interactive Content Hover Colour" colors={{ "--content-ui-hover": "rgb(204, 224, 239)" }} />
+<ColorItem
+    title="Primary Interactive Content Selected-State Colour"
+    colors={{ "--content-ui-selected": "rgb(204, 249, 233)" }}
+/>
+<ColorItem title="Form Submit Button Text Colour" colors={{ "--content-ui-submit-foreground": "rgb(255, 255, 255)" }} />
+<ColorItem
+    title="Form Submit Button Background Colour"
+    colors={{ "--content-ui-submit-background": "rgb(0, 158, 178)" }}
+/>
+<ColorItem
+    title="Secondary Interactive Content Foreground Colour"
+    colors={{ "--accent-foreground": "rgb(0, 102, 176)" }}
+/>
+<ColorItem
+    title="Secondary Interactive Content Background Colour"
+    colors={{ "--accent-background": "rgb(229, 239, 247)" }}
+/>
+<ColorItem title="Secondary Interactive Content Hover Colour" colors={{ "--accent-hover": "rgb(242, 247, 251)" }} />
+<ColorItem title="Side Menu Logo Background Colour" colors={{ "--logo-background": "rgb(255, 255, 255)" }} />
+<ColorItem title="Body Background Colour" colors={{ "--body-background": "rgb(229, 239, 247)" }} />
+<ColorItem title="Login Background Colour" colors={{ "--login-form-background": "rgba(0, 102, 176, 0.65)" }} />
+<ColorItem title="Form Input Border Colour" colors={{ "--form-border-colour": "rgb(76, 148, 200)" }} />
+<ColorItem title="Form Input Hover Colour " colors={{ "--form-bg-hover-colour": "rgb(242, 247, 251)" }} />
+
+The SASS variables are defined in `www/static/css/foundation/utils/_variables.scss`, as
+they were before CSS variables: however, their value is now set to the CSS
+variable instead of to an overridable colour value.
+
+The CSS variables are created by `www/css/core/skin.css.php`, as are the
+contrasting colours and complex derived colours.
+
+## Contrasting colours
+
+Each config option also has CSS and SASS variables for a contrasting colour (used
+as a legible text colour for backgrounds with this colour value): these have the
+same name as the base CSS/SASS variable, suffixed by `-contrast`.
+
+Contrasting colours are separate from the base variables because there is no
+way to calculate whether a colour is "light" or "dark" (and then choose a colour
+based on that calculation) using CSS alone.
+
+Instead, they are calculated using `\Alaress\Color\Transformer::calculateTextColor`:
+this method calculates the colour's [relative luminance](https://en.wikipedia.org/wiki/Relative_luminance),
+and then returns a contrasting light or dark colour based on that.
+
+## Complex derived colours
+
+The following colours are derived from skin configuration options, but their
+calculations do not map easily to calculations that CSS supports:
+
+<ColorItem
+    title="Body Foreground"
+    subtitle="Color for text not within islands. Body Background Color, passed through `\Alaress\Color\Transformer::calculateForegroundColor`"
+    colors={{ "--body-foreground": "rgb(149, 155, 161)" }}
+/>
+<ColorItem
+    title="Body Foreground H1"
+    subtitle="Color for H1 heading not with islands. Passed through `\Alaress\Color\Transformer::calculateForegroundColor`, but contrasts more heavily"
+    colors={{ "--body-foreground-h1": "rgb(34, 36, 37)" }}
+/>
+<ColorItem
+    title="Navigation Foreground Highlight"
+    subtitle="Color for top menu icon when selected. Top Menu Background Color, passed through `\Alaress\Color\Transformer::calculateForegroundColor` and then `\Alaress\Color\Transformer::calculateTextColor`"
+    colors={{ "--navigation-foreground-highlight": "rgb(255, 255, 255)" }}
+/>
+
+`\Alaress\Color\Transformer::calculateForegroundColor` performs several steps
+for calculating a colour:
+
+- determines a base foreground from a background, using `calculateTextColor`
+- layers that colour onto the background colour at a given opacity
+- boosts saturation of that colour by a given amount
+
+## Unconfigurable
+
+<ColorItem
+    title="Foreground colour"
+    subtitle="Used as the islands background"
+    colors={{ "--color-foreground-primary": "rgb(255, 255, 255)" }}
+/>
+<ColorItem title="Primary Text Colour" colors={{ "--color-text-primary": "rgb(0, 0, 0)" }} />
+<ColorItem title="Loading Colour" colors={{ "--loading-colour": "rgb(235, 234, 234);" }} />
+
+## Manipulating colours based on CSS variables
+
+Each CSS variable defined above also has variables defined for each of its
+channel values:
+
+- RGB channels: CSS variable name, suffixed by `-r`, `-g`, `-b`
+- HSL channels: CSS variable name, suffixed by `-h`, `-s`, `-l`
+- Alpha channel: CSS variable name, suffixed by `-a`
+
+e.g. CSS var `--body-foreground` will have corresponding vars:
+
+- `--body-foreground-r`
+- `--body-foreground-g`
+- `--body-foreground-b`
+- `--body-foreground-h`
+- `--body-foreground-s`
+- `--body-foreground-l`
+- `--body-foreground-a`
+
+### CSS colour manipulation functions
+
+The new functions in `www/static/css/foundation/utils/_functions.scss` rely upon the
+existence of these variables to be able to create new colour definitions based on
+CSS variables.
+
+Given a CSS variable definition (e.g. `var(--body-background)`), they will
+create a new colour definition using the `rgba()` or `hsla()` CSS colour formats,
+performing adjustments on individual channels using `calc()`.
+
+e.g. `css-tint(var(--body-foreground), 10%)` will create:
+
+```
+rgba(
+    calc(var(--body-foreground-r) + (255 - var(--body-foreground-r)) * 0.1),
+    calc(var(--body-foreground-g) + (255 - var(--body-foreground-g)) * 0.1),
+    calc(var(--body-foreground-b) + (255 - var(--body-foreground-b)) * 0.1),
+    var(--body-foreground-a)
+)
+```
+
+Note that these functions require the use of Sass vars.
+
+#### `css-tint($colourVar, $percent)`
+
+Creates a colour that is `$colourVar`, `$percent` closer toward white.
+
+#### `css-shade($colourVar, $percent)`
+
+Creates a colour that is `$colourVar`, `$percent` closer toward black.
+
+#### `css-lighten($colourVar, $percent)`
+
+Creates a colour that is `$colourVar`, with its lightness channel increased `$percent`.
+
+#### `css-darken($colourVar, $percent)`
+
+Creates a colour that is `$colourVar`, with its lightness channel reduced `$percent`.
+
+#### `css-adjust-colour($colourVar, $hue: null, $saturation: null, $lightness: null, $alpha: null)`
+
+Creates a colour that is `$colourVar`, with its HSLA channels adjusted by the given amounts.
+
+#### `css-scale-colour($colourVar, $hue: null, $saturation: null, $lightness: null, $alpha: null)`
+
+Creates a colour that is `$colourVar`, with its HSLA channels scaled by the given percentages.
+
+Percentages greater than 0% scale the value toward the highest possible value;
+less than 0% toward the lowest possible value.
