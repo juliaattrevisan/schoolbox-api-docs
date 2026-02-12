@@ -79,3 +79,9 @@
         }
     }
 }
+
+// Remove extra margin/padding added to radio labels in forms.scss
+.sbx-body input[type="radio"]:not(.plain) + label {
+    margin: 0 !important;
+    padding: 0 !important;
+}
