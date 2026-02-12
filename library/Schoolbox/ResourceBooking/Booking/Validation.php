@@ -623,7 +623,7 @@ class Validation
                 $booking,
             );
 
-            $allConflictingBookings->merge($conflictingBookings);
+            $allConflictingBookings = $allConflictingBookings->merge($conflictingBookings);
         }
 
         return $allConflictingBookings;
