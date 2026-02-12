@@ -100,6 +100,7 @@
     "jiti": "~2.6.1",
     "mysql2": "~3.14.1",
     "prettier": "~3.5.3",
+    "remark-gfm": "^4.0.1",
     "sass": "~1.77.6",
     "sass-loader": "~16.0.1",
     "storybook": "~10.2.8",

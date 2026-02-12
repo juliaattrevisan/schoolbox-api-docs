@@ -6,6 +6,7 @@
 import { pluginVue } from "@rsbuild/plugin-vue";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
+import remarkGfm from "remark-gfm";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -14,7 +15,18 @@ const __dirname = dirname(__filename);
 const config = {
     stories: ["../stories/**/*.mdx", "../stories/**/*.stories.@(js|ts)"],
     staticDirs: ["../stories/assets"],
-    addons: ["@storybook/addon-docs"],
+    addons: [
+        {
+            name: "@storybook/addon-docs",
+            options: {
+                mdxPluginOptions: {
+                    mdxCompileOptions: {
+                        remarkPlugins: [remarkGfm],
+                    },
+                },
+            },
+        },
+    ],
     framework: "storybook-vue3-rsbuild",
     rsbuildFinal: async (config) => {
         /**
