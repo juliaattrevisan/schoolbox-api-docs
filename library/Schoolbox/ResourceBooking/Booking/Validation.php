@@ -600,6 +600,37 @@ class Validation
     }
 
     /**
+     * @param GenericCollection<BookingModel> $bookings
+     * @return GenericCollection<BookingModel>
+     */
+    public function getConflictingBookingsForSetOfBookings(GenericCollection $bookings): GenericCollection
+    {
+        // Find all clashing bookings and set their status to STATUS_REJECTED.
+        $allConflictingBookings = new GenericCollection(BookingModel::class);
+
+        foreach ($bookings as $booking) {
+            $startDatetime = $booking->getBookingStartAt() ?? $booking->getEvent()->getStartDateTime();
+            $endDatetime = $booking->getBookingEndAt() ?? $booking->getEvent()->getEndDateTime();
+
+            if ($startDatetime === null || $endDatetime === null) {
+                // Handle this theoretical error case to prevent warnings below.
+                continue;
+            }
+
+            $conflictingBookings = $this->getConflictingBookings(
+                $booking->getResource(),
+                $startDatetime->getDateTimeObject(),
+                $endDatetime->getDateTimeObject(),
+                $booking,
+            );
+
+            $allConflictingBookings->merge($conflictingBookings);
+        }
+
+        return $allConflictingBookings;
+    }
+
+    /**
      * Get all events for a room in specified period
      *
      * @param string $roomCode

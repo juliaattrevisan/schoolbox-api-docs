@@ -413,28 +413,9 @@ class Controller extends Base
             }
 
             if ($isTimeChanged && $overrideValidation) {
-                // Find all clashing bookings and set their status to STATUS_REJECTED.
-                $bookingsToReject = new GenericCollection(Model::class);
-                /** @var Model $booking */
-                foreach ($bookingList as $booking) {
-                    $startDatetime = $booking->getBookingStartAt() ?? $booking->getEvent()->getStartDateTime();
-                    $endDatetime = $booking->getBookingEndAt() ?? $booking->getEvent()->getEndDateTime();
-
-                    if ($startDatetime === null || $endDatetime === null) {
-                        // Handle this theoretical error case to prevent warnings below.
-                        continue;
-                    }
-
-                    $conflictingBookings = $validation->getConflictingBookings(
-                        $booking->getResource(),
-                        $startDatetime->getDateTimeObject(),
-                        $endDatetime->getDateTimeObject(),
-                        $booking,
-                    );
-                    foreach ($conflictingBookings as $conflictingBooking) {
-                        $conflictingBooking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_REJECTED));
-                        $bookingsToReject->add($conflictingBooking);
-                    }
+                $bookingsToReject = $validation->getConflictingBookingsForSetOfBookings($bookingList);
+                foreach ($bookingsToReject as $bookingToReject) {
+                    $bookingToReject->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_REJECTED));
                 }
                 // Add them to the $bookingList so all modified bookings can be saved in one step below.
                 $bookingList = $bookingList->merge($bookingsToReject);
