@@ -174,7 +174,7 @@ class TimetableUsers
                  * overrides when processing the event list.
                  */
                 $query = "
-                    SELECT se.id, se.code, seuo.*
+                    SELECT se.id, se.code, seou.external_id, seou.action, seou.seqeunce
                     FROM {$this->eventMapper->getTable()} se
                     INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
                     WHERE se.code = :classCode
@@ -324,7 +324,7 @@ class TimetableUsers
                  * no longer has a secondary ordering on `sequence`.
                  */
                 $query = "
-                    SELECT se.code, se.title, se.id, seuo.*
+                    SELECT se.code, se.title, se.id, seou.external_id, seou.action, seou.seqeunce
                     FROM {$this->eventMapper->getTable()} se
                     INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
                     WHERE se.classification = :classification
@@ -605,7 +605,7 @@ class TimetableUsers
                  * no longer has a secondary ordering on `sequence`.
                  */
                 $query = "
-                    SELECT se.id AS eventId, se.code, seuo.*
+                    SELECT se.id AS eventId, se.code, seou.external_id, seou.action, seou.seqeunce
                     FROM {$this->eventMapper->getTable()} se
                     INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
                     WHERE se.classification = :classification
