@@ -114,6 +114,11 @@ class Model implements ISoftDeletable, JsonSerializable
      */
     protected bool $allowClashBookings = false;
 
+    /**
+     * @var array<int, bool> Whether the user is a moderator of this resource booking item, indexed by userId.
+     */
+    private array $isUserModeratorCache = [];
+
     public function __construct()
     {
         $this->setImage(new Storage\Model());
@@ -484,28 +489,38 @@ class Model implements ISoftDeletable, JsonSerializable
      * they may act as a moderator for any item: @see canUserModerateThisItem.
      *
      * @param User $user
+     * @param bool $breakCache
      * @return bool
      */
-    public function isUserModerator(User $user): bool
+    public function isUserModerator(User $user, bool $breakCache = false): bool
     {
-        foreach ($user->getAccessList() as $access) {
-            if (
-                $access->getService() == UserAccess::SERVICE_RESOURCE_BOOKING
-                && $access->getAccessLevel() == UserAccess::ACCESS_FULL
-            ) {
-                return true;
-            }
-        }
+        if ($breakCache || !array_key_exists($user->getId(), $this->isUserModeratorCache)) {
+            $isUserModerator = false;
 
-        // if there are no moderators, do not attempt to iterate through the null
-        if (null !== $this->getModeratorList()) {
-            foreach ($this->getModeratorList() as $moderator) {
-                if ($moderator->getId() == $user->getId()) {
-                    return true;
+            foreach ($user->getAccessList() as $access) {
+                if (
+                    $access->getService() == UserAccess::SERVICE_RESOURCE_BOOKING
+                    && $access->getAccessLevel() == UserAccess::ACCESS_FULL
+                ) {
+                    $isUserModerator = true;
+                    break;
                 }
             }
+
+            // if there are no moderators, do not attempt to iterate through the null
+            if (null !== $this->getModeratorList()) {
+                foreach ($this->getModeratorList() as $moderator) {
+                    if ($moderator->getId() == $user->getId()) {
+                        $isUserModerator = true;
+                        break;
+                    }
+                }
+            }
+
+            $this->isUserModeratorCache[$user->getId()] = $isUserModerator;
         }
-        return false;
+
+        return $this->isUserModeratorCache[$user->getId()];
     }
 
     /**

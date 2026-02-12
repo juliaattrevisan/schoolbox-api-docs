@@ -1114,11 +1114,7 @@ class Validation
         }
 
         if (
-            // TODO: Note the call to isUserModerator() involves a database query.
-            //       Modify either this function or that function so that no database operations are required,
-            //       or so that results of database queries are cached to speed up repeated calls.
-            //       This should be done because this function is called from within a loop.
-            $resource->isUserModerator($user)
+            $resource->isUserModerator($user) // Note this function caches its results.
             && (int)$event->getAuthor()->getId() === (int)$user->getId()
         ) {
             /* If you're a Moderator and can moderate this request,
