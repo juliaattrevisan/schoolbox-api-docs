@@ -531,7 +531,8 @@ class Validation
     }
 
     /**
-     * Get all bookings for a resource in a window
+     * Get all bookings for a resource in a window.
+     * Results of this function are cached, so repeated calls with the same parameters are cheap.
      *
      * @param Item\Model $resource
      * @param DateTime   $startDate
