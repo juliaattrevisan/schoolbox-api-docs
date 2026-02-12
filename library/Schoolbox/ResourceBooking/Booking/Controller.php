@@ -433,7 +433,10 @@ class Controller extends Base
                 $bookingList->add($booking);
             }
 
-            if ($isTimeChanged && $overrideValidation) {
+            if ($overrideValidation) {
+                // Note this must be done even if the booking times are unchanged.
+                // E.g. A user updates a pending booking that overlaps an approved booking, and chooses to override validation.
+
                 $bookingsToReject = $validation->getConflictingBookingsForSetOfBookings($bookingList);
                 foreach ($bookingsToReject as $bookingToReject) {
                     $bookingToReject->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_REJECTED));
