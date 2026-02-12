@@ -1,4 +1,13 @@
--- Add system prompt configuration for text generation
+-- re sequence ai-services
+update config set sequence = 2 where name = 'ai_text_chat';
+update config set sequence = 3 where name = 'ai_lessonplan';
+update config set sequence = 4 where name = 'ai_dialogagent';
+update config set sequence = 5 where name = 'ai_differentiation';
+update config set sequence = 6 where name = 'ai_image_generation';
+update config set sequence = 7 where name = 'ai_learning_activity_customisation';
+update config set sequence = 8 where name = 'ai_moderation_key';
+
+-- Add new Ai Moderation Agent configuration
 INSERT INTO
     config (
     `name`,
@@ -32,10 +41,5 @@ VALUES (
            'false',
            'false',
            'ai-services',
-           (
-               SELECT MAX(sequence) + 1
-               FROM config c
-               WHERE
-                   c.module = "ai-services"
-           )
+           1
        );
