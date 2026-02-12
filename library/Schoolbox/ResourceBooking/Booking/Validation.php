@@ -627,7 +627,7 @@ class Validation
             $allConflictingBookings = $allConflictingBookings->merge($conflictingBookings);
         }
 
-        return $allConflictingBookings;
+        return $allConflictingBookings->getUnique('id'); // Return a de-duplicated collection of bookings.
     }
 
     /**
