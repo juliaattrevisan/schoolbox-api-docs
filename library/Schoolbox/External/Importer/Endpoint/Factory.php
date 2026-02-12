@@ -155,7 +155,7 @@ class Factory implements IFactory
          * (use a locally-stored file path)
          */
         $composites = match ($type) {
-            self::ISAMS => (new IsamsEndpoint\Factory(
+            self::ISAMS => new IsamsEndpoint\Factory(
                 $this->validStrats,
                 $this->logger,
                 $this->perform,
@@ -181,9 +181,9 @@ class Factory implements IFactory
                 ClassPeriodMapper::getInstance()->disableCache(),
                 TimetablePeriodMapper::getInstance()->disableCache(),
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
-            ))->produce(),
+            )->produce(),
 
-            self::KAMAR => (new KamarEndpoint\Factory(
+            self::KAMAR => new KamarEndpoint\Factory(
                 $this->validStrats,
                 $this->logger,
                 $this->perform,
@@ -203,9 +203,9 @@ class Factory implements IFactory
                 ClassEntryMapper::getInstance()->disableCache(),
                 ClassInvolvementMapper::getInstance()->disableCache(),
                 ClassPeriodMapper::getInstance()->disableCache()
-            ))->produce(),
+            )->produce(),
 
-            self::SENTRAL => (new SentralEndpoint\Factory(
+            self::SENTRAL => new SentralEndpoint\Factory(
                 $this->validStrats,
                 $this->logger,
                 $this->perform,
@@ -229,9 +229,9 @@ class Factory implements IFactory
                 TimetablePeriodMapper::getInstance()->disableCache(),
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache(),
                 StorageMapper::getInstance()->disableCache(),
-            ))->produce(),
+            )->produce(),
 
-            self::TASS_API => (new TassApiEndpoint\Factory(
+            self::TASS_API => new TassApiEndpoint\Factory(
                 $this->validStrats,
                 $this->logger,
                 $this->perform,
@@ -260,9 +260,9 @@ class Factory implements IFactory
                 ClassPeriodMapper::getInstance()->disableCache(),
                 TimetablePeriodMapper::getInstance()->disableCache(),
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
-            ))->produce(),
+            )->produce(),
 
-            self::COMPASS => (new CompassEndpoint\Factory(
+            self::COMPASS => new CompassEndpoint\Factory(
                 $this->validStrats,
                 $this->logger,
                 $this->perform,
@@ -286,9 +286,9 @@ class Factory implements IFactory
                 ClassPeriodMapper::getInstance()->disableCache(),
                 TimetablePeriodMapper::getInstance()->disableCache(),
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
-            ))->produce(),
+            )->produce(),
 
-            self::WONDE => (new WondeEndpoint\Factory(
+            self::WONDE => new WondeEndpoint\Factory(
                 $this->validStrats,
                 $this->logger,
                 $this->perform,
@@ -310,9 +310,9 @@ class Factory implements IFactory
                 ClassPeriodMapper::getInstance()->disableCache(),
                 TimetablePeriodMapper::getInstance()->disableCache(),
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
-            ))->produce(),
+            )->produce(),
 
-            self::VERACROSS => (new VeracrossEndpoint\Factory(
+            self::VERACROSS => new VeracrossEndpoint\Factory(
                 $this->validStrats,
                 $this->logger,
                 $this->perform,
@@ -320,7 +320,6 @@ class Factory implements IFactory
                 $this->key,
                 $this->watchlist,
                 Loader::getInstance()->get('photo_sis_import'),
-                Loader::getInstance()->get('date_timezone'),
                 /* Profile pieces
                  */
                 UserProfile\Mapper::getInstance()->disableCache(),
@@ -337,9 +336,9 @@ class Factory implements IFactory
                 ClassPeriodMapper::getInstance()->disableCache(),
                 TimetablePeriodMapper::getInstance()->disableCache(),
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
-            ))->produce(),
+            )->produce(),
 
-            self::CIVICA => (new CivicaEndpoint\Factory(
+            self::CIVICA => new CivicaEndpoint\Factory(
                 $this->validStrats,
                 $this->logger,
                 $this->perform,
@@ -362,7 +361,7 @@ class Factory implements IFactory
                 ClassPeriodMapper::getInstance()->disableCache(),
                 TimetablePeriodMapper::getInstance()->disableCache(),
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
-            ))->produce(),
+            )->produce(),
 
             /* Use manual csv imports
              */
@@ -371,7 +370,7 @@ class Factory implements IFactory
 
         /* Always look for liss payloads and add their data if we can
          */
-        $lissComposites = (new LissEndpoint\Factory(
+        $lissComposites = new LissEndpoint\Factory(
             $this->logger,
             $this->perform,
             $this->lissAdditiveMode,
@@ -388,7 +387,7 @@ class Factory implements IFactory
             ClassPeriodMapper::getInstance()->disableCache(),
             TimetablePeriodMapper::getInstance()->disableCache(),
             \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
-        ))->produce();
+        )->produce();
 
         $composites = $composites->merge($lissComposites);
 

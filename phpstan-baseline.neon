@@ -3031,12 +3031,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Status.php
 
 		-
-			message: '#^Property Schoolbox\\External\\Connector\\Veracross\\Base\\Endpoint\\TimetableCalendar\\Classes\:\:\$timezone is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: library/Schoolbox/External/Connector/Veracross/Base/Endpoint/TimetableCalendar/Classes.php
-
-		-
 			message: '#^Strict comparison using \!\=\= between '''' and non\-falsy\-string will always evaluate to true\.$#'
 			identifier: notIdentical.alwaysTrue
 			count: 1
