@@ -222,14 +222,14 @@ class Controller extends Base
         $bookingList = null;
         $code = self::HTTP_STATUS_CODE_OK;
 
-        if (empty($errors)) {
-            // Only users allowed to moderate this item may override validation.
-            // Determine this in the same way as is done in Validation->validateBookingFromPostData().
-            $overrideValidation = (
-                !empty($this->requestPost->get('override_validation')) &&
-                $item->canUserModerateThisItem($this->user)
-            );
+        // Only users allowed to moderate this item may override validation.
+        // Determine this in the same way as is done in Validation->validateBookingFromPostData().
+        $overrideValidation = (
+            !empty($this->requestPost->get('override_validation')) &&
+            $item->canUserModerateThisItem($this->user)
+        );
 
+        if (empty($errors)) {
             // Get the event that all bookings are based off of.
             $event = $this->getBaseEvent();
             $event->setStartDateTime(Alaress_Date_Format::newLocal($this->requestPost['startDate']));
@@ -319,7 +319,11 @@ class Controller extends Base
                 [
                     'item' => $bookingList,
                     'errors' => $errors,
-                    'bookedPendingBecauseClashes' => count($clashBookingStartDatesAsKeys) > 0,
+                    'bookedPendingBecauseClashes' => (
+                        // If overrideValidation was used, bookings will have been made despite the clashes.
+                        // The clashing bookings will have been found and rejected.
+                        !$overrideValidation && count($clashBookingStartDatesAsKeys) > 0
+                    ),
                     'returnUrl' => (string)$returnUrl,
                 ],
             )->withStatus($code);
@@ -344,6 +348,13 @@ class Controller extends Base
         if ($item->getEvent()->getVariant() === Event::VARIANT_EVENT) {
             throw new SchoolboxException("Bookings linked to events cannot be updated by this method.");
         }
+
+        // Only users allowed to moderate this item may override validation.
+        // Determine this in the same way as is done in Validation->validateBookingFromPostData().
+        $overrideValidation = (
+            !empty($this->requestPost->get('override_validation')) &&
+            $item->getResource()->canUserModerateThisItem($this->user)
+        );
 
         $validation = new Validation(
             $this->getUser(),
@@ -390,13 +401,6 @@ class Controller extends Base
             );
 
             $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
-
-            // Only users allowed to moderate this item may override validation.
-            // Determine this in the same way as is done in Validation->validateBookingFromPostData().
-            $overrideValidation = (
-                !empty($this->requestPost->get('override_validation')) &&
-                $item->getResource()->canUserModerateThisItem($this->user)
-            );
 
             // Save the whole series
             $bookingList = new GenericCollection(Model::class);
@@ -478,7 +482,11 @@ class Controller extends Base
                 [
                     'item' => $item,
                     'errors' => $errors,
-                    'bookedPendingBecauseClashes' => count($clashBookingStartDatesAsKeys) > 0,
+                    'bookedPendingBecauseClashes' => (
+                        // If overrideValidation was used, bookings will have been made despite the clashes.
+                        // The clashing bookings will have been found and rejected.
+                        !$overrideValidation && count($clashBookingStartDatesAsKeys) > 0
+                    ),
                     'returnUrl' => $returnUrl,
                 ],
             )->withStatus($code);
