@@ -299,7 +299,7 @@ class Controller extends Base
             ],
             [
                 'key' => 'created_at',
-                'title' => 'Date (Created)',
+                'title' => 'Created Date',
                 'type' => 'DateTime',
                 'isSortable' => true,
             ],
