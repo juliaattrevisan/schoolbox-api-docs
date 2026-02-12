@@ -20,17 +20,16 @@ use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Collection;
+use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 use Schoolbox\ResourceBooking\Booking\Model as BookingModel;
+use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatusModel;
+use Schoolbox\ResourceBooking\Item;
+use Schoolbox\ResourceBooking\Item\Mapper as ResourceMapper;
 use Schoolbox\ResourceBooking\Item\Model as BookingItemModel;
 use Schoolbox\ResourceBooking\Item\ModerationType\Model as BookingModerationTypeModel;
 use Schoolbox\User;
-use Schoolbox\Collection;
-use Schoolbox\ResourceBooking\Item;
-use Schoolbox\ResourceBooking\Item\Mapper as ResourceMapper;
-use Schoolbox\ResourceBooking\Booking\Model as Booking;
-use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
-use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Campus;
@@ -161,7 +160,7 @@ class Validation
      *            'related_item' => array of ['resource_id' => int, 'notes' => string]
      *            'repeat' => (E.g. 'daily', 'weekly', etc.  See the create.twig form)
      *        ]
-     * @param Booking|null $existingBooking If provided, this is the booking that is being updated.
+     * @param BookingModel|null $existingBooking If provided, this is the booking that is being updated.
      *                                      Leave it out of conflict checks.
      * @return array<string, array<string, array<string>>> Example:
      *         [
@@ -189,7 +188,7 @@ class Validation
     public function validateBookingFromPostData(
         Item\Model $resource,
         Values|array $postData,
-        ?Booking $existingBooking = null
+        ?BookingModel $existingBooking = null
     ): array {
         // Check:
         // Beginning and end of booking are valid datetime
@@ -226,7 +225,7 @@ class Validation
 
         $series = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
 
-        if (!($existingBooking instanceof Booking)) {
+        if (!($existingBooking instanceof BookingModel)) {
             // new booking: Validate related and recurrent bookings
             $campus = null;
             if ($postData['campus'] > 0) {
