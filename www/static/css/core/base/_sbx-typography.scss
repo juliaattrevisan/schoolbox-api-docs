@@ -20,8 +20,8 @@ body {
 // Subheader styles
 .subheader {
     color: var(--sbx-color-text-primary);
-    font-family: var(--sbx-font-primary);
-    font-weight: 600;
+    font-size: var(--sbx-font-size-l);
+    font-weight: var(--sbx-font-weight-heading);
     text-transform: capitalize;
 }
 
