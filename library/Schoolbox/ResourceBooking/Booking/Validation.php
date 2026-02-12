@@ -866,7 +866,12 @@ class Validation
             // Remember the start dates of clash bookings.
             // Note clash errors always use the Validation::START_PERIOD_ERRORS key (see Validation->validateForClashes()).
             foreach ($errorsStruct[self::START_PERIOD_ERRORS] ?? [] as $startDate => $errors) {
-                $clashBookingStartDatesAsKeys[$startDate] = null;
+                foreach ($errors as $error) {
+                    if (in_array($error, [self::ERROR_CONFLICT, self::ERROR_TIMETABLED_CLASS], true)) {
+                        $clashBookingStartDatesAsKeys[$startDate] = null;
+                        break;
+                    }
+                }
             }
 
             // If clash bookings are allowed, or
