@@ -32,7 +32,7 @@ function onFilterChange(accessType) {
     <div class="filters">
         <div class="checklist">
             <label class="title">Filter:</label>
-            <ul class="option-list">
+            <ul class="option-list l-flex">
                 <li>
                     <input
                         type="checkbox"

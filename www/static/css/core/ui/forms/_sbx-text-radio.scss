@@ -70,7 +70,6 @@
     .option-list {
         li {
             display: flex;
-
             &:has(input[type="radio"] + label) {
                 align-items: flex-start;
                 white-space: normal;

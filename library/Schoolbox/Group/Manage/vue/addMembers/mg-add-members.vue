@@ -77,7 +77,7 @@ const addButtonText = window.Vue.computed(() => (addMembersStore.isProcessing ? 
                     <div class="filters">
                         <div class="checklist">
                             <label class="title">From:</label>
-                            <ul class="option-list">
+                            <ul class="option-list l-flex">
                                 <li>
                                     <input
                                         type="radio"
