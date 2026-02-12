@@ -243,7 +243,7 @@ class Controller extends Base
                 // Set status to pending because this booking has a clash.
                 $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
             }
-            $bookingList = new Collection();
+            $bookingList = new GenericCollection(Model::class);
             $bookingList->add($booking);
 
             // Expand into bookings for recurrence
@@ -275,6 +275,23 @@ class Controller extends Base
             if (!empty($relatedItems)) {
                 $bookingList = $this->getBookingsForRelatedItems($bookingList, $relatedItems);
             }
+
+            // Only users allowed to moderate this item may override validation.
+            // Determine this in the same way as is done in Validation->validateBookingFromPostData().
+            $overrideValidation = (
+                !empty($this->requestPost->get('override_validation')) &&
+                $item->canUserModerateThisItem($this->user)
+            );
+
+            if ($overrideValidation) {
+                $bookingsToReject = $validation->getConflictingBookingsForSetOfBookings($bookingList);
+                foreach ($bookingsToReject as $bookingToReject) {
+                    $bookingToReject->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_REJECTED));
+                }
+                // Add them to the $bookingList so all modified bookings can be saved in one step below.
+                $bookingList = $bookingList->merge($bookingsToReject);
+            }
+
             $this->bookingMapper->save($bookingList);
         } else {
             $code = self::HTTP_STATUS_CODE_BAD_REQUEST;
