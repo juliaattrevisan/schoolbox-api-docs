@@ -141,9 +141,12 @@ https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non
 
 ### Restarting services
 
-Sometimes, a service may need to be restarted: for example, when a notifier's
-definition changes the `schoolbox-scheduled` service needs to restart in order
-to recognise those changes.
+Sometimes, a service may need to be restarted in order to recognise changes to
+its configuration. For example:
+* when a notifier's definition changes, the `schoolbox-scheduled` service needs
+  to restart
+* when a service's configuration (e.g. PHP config files) changes, the
+  `schoolbox-cli` and `schoolbox-frankenphp` services need to restart
 
 ```shell
 # view a list of services
