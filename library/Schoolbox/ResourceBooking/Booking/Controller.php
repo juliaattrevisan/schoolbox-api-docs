@@ -612,10 +612,10 @@ class Controller extends Base
                     $newBooking = clone $booking;
                     $newBooking->setEvent($event);
                     $newBooking->setStatus(
-                        $event->getStartDateTime() === null
-                        ? Status\Model::STATUS_PENDING // Event start datetimes should always be set.  But if not, just use STATUS_PENDING.
-                        : $this->getStatusMapper()->createModel(
-                            $validation->getNewStatusIdForBooking(
+                        $this->getStatusMapper()->createModel(
+                            $event->getStartDateTime() === null
+                            ? Status\Model::STATUS_PENDING // Event start datetimes should always be set.  But if not, just use STATUS_PENDING.
+                            : $validation->getNewStatusIdForBooking(
                                 booking: $newBooking,
                                 isClash: array_key_exists($event->getStartDateTime()->getDatabaseDate(), $clashBookingStartDatesAsKeys),
                                 user: $this->getUser(),
@@ -715,12 +715,11 @@ class Controller extends Base
             ->setBookingEndAt(null);   // Null here means 'the booking end time is the event end time'.
 
         $bookingStartDatetime = $event->getStartDateTime();
-
         $booking->setStatus(
-            $bookingStartDatetime === null
-            ? Status\Model::STATUS_PENDING
-            : $this->getStatusMapper()->createModel(
-                $validation->getNewStatusIdForBooking(
+            $this->getStatusMapper()->createModel(
+                $bookingStartDatetime === null
+                ? Status\Model::STATUS_PENDING
+                : $validation->getNewStatusIdForBooking(
                     booking: $booking,
                     isClash: array_key_exists($bookingStartDatetime->getDatabaseDate(), $clashBookingStartDatesAsKeys),
                     user: $this->getUser(),
