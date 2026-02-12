@@ -38,7 +38,7 @@ function onGenerateSelected(): void {
 
 <template>
     <div class="l-flex-col l-pad-s l-gap-m">
-        <div class="l-flex-row l-flex--no-wrap l-gap-m">
+        <div class="l-flex-row l-flex--no-wrap l-flex--align-start l-gap-m">
             <user-photo :user="props.user" render="small" />
             <div class="l-flex-col l-flex--justify-center l-gap-s f-no-margins">
                 <a v-if="props.user._links?.profile" :href="props.user._links!.profile" title="View Profile">
@@ -52,9 +52,9 @@ function onGenerateSelected(): void {
                 <p v-if="props.user.yearLevel || (props.user.campus && props.user.campus.length)" class="meta">
                     <template v-if="props.user.yearLevel">
                         {{ locale.year.translate(false, true) }} {{ props.user.yearLevel.name }}</template
-                    >
-                    <template v-if="props.user.campus && props.user.campus.length">
-                        <span v-for="(campus, index) in props.user.campus" :key="campus.id">
+                    ><template v-if="props.user.campus && props.user.campus.length"
+                        ><template v-if="props.user.yearLevel">, </template
+                        ><span v-for="(campus, index) in props.user.campus" :key="campus.id">
                             {{ campus.name }} Student<span v-if="index < props.user.campus.length - 1">, </span>
                         </span>
                     </template>
