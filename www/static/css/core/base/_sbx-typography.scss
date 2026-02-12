@@ -51,7 +51,8 @@ body {
 
 // Enlarge for greater readability
 .sbx-body small,
-.sbx-body table tr td {
+.sbx-body table tr td,
+.f-dropdown .separator {
     font-size: var(--sbx-font-size-xs);
 }
 
