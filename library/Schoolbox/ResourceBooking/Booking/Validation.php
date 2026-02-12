@@ -577,10 +577,10 @@ class Validation
             if ($existingId) {
                 $existingSeriesId    = $existingBooking->getEvent()->getSeriesId();
                 $conflictingBookings = $conflictingBookings->filter(
-                /**
-                 * @param Model $item
-                 * @return bool
-                 */
+                    /**
+                     * @param Model $item
+                     * @return bool
+                     */
                     function ($item) use ($existingId, $existingSeriesId) {
                         /** @var Model $item */
                         if ($item->getId() == $existingId) {
