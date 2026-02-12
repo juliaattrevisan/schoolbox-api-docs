@@ -1093,38 +1093,6 @@ class Controller extends Base
     }
 
     /**
-     * Return the status to be set for a new booking that does not clash with any existing booking.
-     * Note bookings that clash with existing bookings should be given status 'pending'.
-     *
-     * @param Model $booking
-     * @return int
-     */
-    private function getStatusIdForNonClashBooking(Model $booking): int
-    {
-        $resource = $booking->getResource();
-        $event = $booking->getEvent();
-
-        // What about the resource? If it's an open resource, confirm the
-        // booking immediately.
-        if ($resource->getModerationType()->getId() === Item\ModerationType\Model::TYPE_OPEN) {
-            return Status\Model::STATUS_APPROVED;
-        }
-
-        if (
-            $resource->isUserModerator($this->getUser())
-            && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()
-        ) {
-            /* If you're a Moderator and can moderate this request,
-             * and you created the booking in the first place,
-             * set it to Approved - otherwise you'll end up approving your own request anyway
-             */
-            return Status\Model::STATUS_APPROVED;
-        }
-
-        return Status\Model::STATUS_PENDING;
-    }
-
-    /**
      * @param  \Schoolbox\ResourceBooking\Booking\Mapper $bookingMapper
      *
      * @return $this
