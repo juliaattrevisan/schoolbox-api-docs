@@ -348,6 +348,7 @@ class Controller extends Base
             $item
                 ->setName($this->requestPost['name'])
                 ->setNotes($this->requestPost['notes']);
+            // Note related bookings are included in $bookingSeries.
             $bookingSeries = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
             $series = $bookingSeries->getUpdatedSeries(
                 $item,
