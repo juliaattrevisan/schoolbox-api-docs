@@ -505,8 +505,7 @@ class Controller extends Base
         array $clashBookingStartDatesAsKeys,
         Validation $validation,
         bool $overrideValidation,
-    ): GenericCollection
-    {
+    ): GenericCollection {
         if (empty($relatedItems)) {
             return $bookingList;
         }
@@ -701,8 +700,7 @@ class Controller extends Base
         array $clashBookingStartDatesAsKeys,
         Validation $validation,
         bool $overrideValidation,
-    ): Model
-    {
+    ): Model {
         $booking = new Model();
         $booking
             ->setEvent($event)
