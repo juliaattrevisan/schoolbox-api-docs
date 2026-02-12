@@ -479,7 +479,7 @@ class Validation
         $errors = [];
 
         /** @var Collection|Model[] $conflictingBookings */
-        $conflictingBookings = $this->getConflictingBookings($resource, $startDate, $endDate, $existingBooking, true);
+        $conflictingBookings = $this->getConflictingBookings($resource, $startDate, $endDate, $existingBooking);
 
         // Anything still in list of conflicts? We have a conflict
         if (count($conflictingBookings)) {
