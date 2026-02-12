@@ -4,13 +4,13 @@
  # if there are more participants to load, it also renders a load more button with the appropriate data attributes for fetching the next chunk.
  #
  # @param ?Project/Model $assessment    Project Model of course level assessment, or null if this is a class level assessment
- # @param array $aImpl                  array of assessment implementations with associated participants chunk, assessment object, and participant stats
- #   'aImpls'            [
+ # @param array $aImpl                  array for the class assessment with associated participants chunk, assessment object, and participant stats
+ #    [
  #       'assessment'       IAssessable
  #       'participantStats' ParticipantStatistics[] Indexed by user.id
  #       'participantCount' int Total number of participants in the class (not just in this chunk)
  #       'participantCursor' int Cursor for pagination, indicating the offset for the next chunk of participants to load
- #   ][]
+ #   ]
  # @param bool $isSpecification         Whether to show classes as groups (course level), or just a flat list (class level)
 #}
 
@@ -35,7 +35,7 @@
             </div>
 
             {# initially created SA-13616
-             # projects are a unique space where we can hit a project cache or manually caculate the results.
+             # projects are a unique space where we can hit a project cache or manually calculate the results.
              # projects do NOT have Submission States, and null is a valid option (no score, not attempted)
              #}
             {% set publishedHumanReadableMark = participant.humanReadableMark(true) ?? null %}
