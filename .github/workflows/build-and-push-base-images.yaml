@@ -331,6 +331,6 @@ jobs:
     with:
       workflow_name: ${{ github.workflow }}
       status: ${{ (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')) && 'failure' || 'success' }}
-      ref_name: ${{ env.BASE_BRANCH }}
+      ref_name: ${{ github.head_ref || github.ref_name }}
       run_url: ${{ format('{0}/{1}/actions/runs/{2}', github.server_url, github.repository, github.run_id) }}
     secrets: inherit

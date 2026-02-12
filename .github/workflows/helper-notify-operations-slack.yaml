@@ -1,4 +1,4 @@
-name: Notify #operations Slack channel
+name: "Notify #operations Slack channel"
 
 on:
   workflow_call:
@@ -49,7 +49,7 @@ jobs:
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
-      - name: Send Slack message to #operations
+      - name: "Send Slack message to #operations"
         env:
           STATUS: ${{ inputs.status }}
           WORKFLOW_NAME: ${{ inputs.workflow_name }}
