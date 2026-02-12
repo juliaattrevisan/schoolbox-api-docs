@@ -120,10 +120,6 @@ class Factory
         $from = \Alaress_Date_Format::now()->addWeeks(self::FROM)->startOfWeek();
         $to = \Alaress_Date_Format::now()->addWeeks(self::TO)->endofWeek();
 
-        /* Decide a timezone for all the UTC dates sis gives to us
-         */
-        $timezone = new \DateTimeZone($this->timezone);
-
         /* Spawn an Api instance
          */
         $api = new Api(host: $this->host, apiKey: $this->key, logger: $this->log);
@@ -199,7 +195,6 @@ class Factory
                     $this->overridesMapper,
                     $this->classEntryMapper,
                     $this->classInvolvementMapper,
-                    $timezone,
                     $from,
                     $to
                 ))

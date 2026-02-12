@@ -86,6 +86,13 @@ class Classes implements IStrategy
 
 
     /**
+     * Cache for events created/reused by guid.
+     *
+     * @var array<string, Model>
+     */
+    private array $eventsByGuid = [];
+
+    /**
      * Constructor.
      *
      * @param LoggerInterface $log
@@ -97,7 +104,6 @@ class Classes implements IStrategy
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      * @param ClassEntryMapper $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
-     * @param \DateTimeZone $timezone
      * @param \Alaress_Date_Format $fromDate
      * @param \Alaress_Date_Format $toDate
      */
@@ -111,7 +117,6 @@ class Classes implements IStrategy
         private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         private ClassEntryMapper $classEntryMapper,
         private ClassInvolvementMapper $classInvolvementMapper,
-        private \DateTimeZone $timezone,
         private \Alaress_Date_Format $fromDate,
         private \Alaress_Date_Format $toDate
     ) {
@@ -123,7 +128,11 @@ class Classes implements IStrategy
 
 
     /**
-     * @return void
+     * Import timetable classes and persist them as sis_event records with the "timetable" classification.
+     *
+     * The import batches students by class instance (guid) so each event and staff involvement is only
+     * written once, then student enrolments are attached.
+     *
      * @throws DebugBarException
      * @throws Exception
      * @throws \JsonException
@@ -141,69 +150,36 @@ class Classes implements IStrategy
             $this->toDate
         ));
 
-        /* Get a list of guys
-         */
         $userLookup = (new Users($this->watcher, $this->watchlist, $this->eventMapper))->generate();
-
-        /* Start with an enrolments-first philosophy.
-         * The list of enrolments informs us which internal_class_ids we care about.
-         *
-         * If a watchlist contains external ids, only obtain a list of enrolments
-         * for each of the external ids (person ids) provided. This limits the amount
-         * of classes and meeting times we need to prefetch and remember.
-         *
-         * Otherwise, don't apply a person_id limiter on the enrolments.
-         */
         $enrolmentsLookup = (new Enrolments($this->api, $this->watchlist, $this->log))->generate();
-
-        /* Once you have all the enrolments, find all the internal_class_id values.
-         * Use these internal_class_id to prefilter classes:list to the ones we need.
-         *
-         * This results in a list of classes that are relevant to the enrolments we prefetched.
-         */
         $classesLookup = (new ClassIndex($this->api, $this->watchlist, $enrolmentsLookup, $this->log))->generate();
 
-        /* Each class needs its meeting times which we can obtain with academics.classes.meeting_times:list
-         * and precompile that into each class.
-         *
-         * Only get meeting times between these two dates
-         */
         $startDate = $this->fromDate->getDatabaseDate();
         $endDate = $this->toDate->getDatabaseDate();
 
-        $meetingTimesLookup = (new MeetingTimesConcurrent($this->api, array_keys($classesLookup), $this->log))->generate($startDate, $endDate);
+        $meetingTimesLookup = (new MeetingTimesConcurrent($this->api, array_keys($classesLookup), $this->log))
+            ->generate($startDate, $endDate);
 
-        /* At the end of all this you should have a:
-         *   - a lookup of enrolments which tells you a person and the internal_class_ids they're in
-         *   - a lookup of classes + their meeting times
-         *
-         * ...which should allow you to craft the entire timetable for every relevant person
-         * without needing api spam to veracross
-         */
-        $compiler = new Compiler($enrolmentsLookup, $classesLookup, $meetingTimesLookup);
+        $studentsByClassId = $this->buildStudentsByClassId($enrolmentsLookup);
+        $eventsToPersist = $this->buildEventsToPersist($meetingTimesLookup, $studentsByClassId, $classesLookup);
 
-        /* TODO Chunk users to keep memory usage down; atm retaining the entire universe
-         */
-        foreach ($userLookup as $externalId => $user) {
-            $this->log->info(sprintf(
-                'Compiling timetable data for %s %s (%s) - this might take a little while',
-                $user['firstname'],
-                $user['lastname'],
-                $externalId
-            ));
+        foreach ($eventsToPersist as $guid => $payload) {
+            $classInfo = $payload['info'];
+            $classInstance = $payload['instance'];
+            $classId = $payload['classId'];
 
-            $timetable = $compiler->compile((string)$externalId);
+            $event = $this->getOrCreateEventByGuid($guid, $classInfo, $classInstance);
+            $classEntry = $this->createClassEntry($classInfo, $event);
 
-            /* A student's timetable is a set of enrolments for their classes
-             */
-            foreach ($timetable as $classEnrolment) {
-                $this->processClass((string)$externalId, $classEnrolment, $userLookup);
+            $this->applyTeacherInvolvement($classInfo, $event, $classEntry);
+
+            foreach (array_keys($studentsByClassId[$classId]) as $studentExternalId) {
+                $name = $this->getUserDisplayName($userLookup, (string)$studentExternalId);
+                $this->saveEnrolment($event, $classEntry, $name, (string)$studentExternalId);
             }
         }
 
         $end = microtime(true);
-
-        $this->log->info('');
 
         $this->log->debug(sprintf(
             'Timetable import duration: %s seconds.',
@@ -211,82 +187,188 @@ class Classes implements IStrategy
         ));
     }
 
+    /**
+     * Reverse index of class id => set of student external ids.
+     *
+     * @param array $enrolmentsLookup
+     * @return array<string, array<string, bool>>
+     */
+    private function buildStudentsByClassId(array $enrolmentsLookup): array
+    {
+        $studentsByClassId = [];
+
+        foreach ($enrolmentsLookup as $externalId => $enrolmentsByClass) {
+            foreach ($enrolmentsByClass as $classId => $_enrolment) {
+                $studentsByClassId[(string)$classId][(string)$externalId] = true;
+            }
+        }
+
+        return $studentsByClassId;
+    }
 
     /**
-     * For each class, process the lessons and apply student/staff involvements
-     * Ignore lessons that occur outside the [$from, $to] window
+     * Build a guid-keyed list of class instances to persist.
      *
-     * @param string $externalId
-     * @param array  $classEnrolment
-     * @param array  $userLookup
-     * @return void
+     * Students are NOT attached here; they are expanded from $studentsByClassId at persist time.
+     *
+     * @param array $meetingTimesLookup
+     * @param array<string, array<string, bool>> $studentsByClassId
+     * @param array $classesLookup
+     * @return array<string, array{info: array, instance: array, classId: string}>
+     */
+    private function buildEventsToPersist(array $meetingTimesLookup, array $studentsByClassId, array $classesLookup): array
+    {
+        $eventsToPersist = [];
+
+        foreach ($meetingTimesLookup as $classId => $meetingTimes) {
+            $classId = (string)$classId;
+
+            if (!isset($studentsByClassId[$classId], $classesLookup[$classId])) {
+                continue;
+            }
+
+            $classInfo = $this->buildClassInfo($classId, $classesLookup);
+
+            foreach ($meetingTimes as $classInstance) {
+                $guid = $this->buildGuid($classInfo, $classInstance);
+
+                $eventsToPersist[$guid] ??= [
+                    'info' => $classInfo,
+                    'instance' => $classInstance,
+                    'classId' => $classId,
+                ];
+            }
+        }
+
+        return $eventsToPersist;
+    }
+
+    /**
+     * Build a friendly display name for logging.
+     */
+    private function getUserDisplayName(array $userLookup, string $externalId): string
+    {
+        $firstname = $userLookup[$externalId]['firstname'] ?? '';
+        $lastname = $userLookup[$externalId]['lastname'] ?? '';
+
+        $name = trim(sprintf('%s %s', $firstname, $lastname));
+
+        return $name !== '' ? $name : $externalId;
+    }
+
+    /**
+     * Build the class info structure expected by createEvent() and applyTeacherInvolvement().
+     *
+     * This is derived from classes:list payload (via ClassIndex), avoiding enrolments-derived metadata.
+     *
+     * @param string $classId
+     * @param array  $classesLookup
+     * @return array{internal_class_id:string, name:string, code:mixed, teachers:array<int, array{id:mixed, name:string}>}
+     */
+    private function buildClassInfo(string $classId, array $classesLookup): array
+    {
+        $classRecord = $classesLookup[$classId] ?? [];
+
+        $name = trim((string)($classRecord['description'] ?? ''));
+        $code = $classRecord['class_id'] ?? null;
+
+        $teachers = [];
+        $primaryTeacher = $classRecord['primary_teacher'] ?? null;
+        if (is_array($primaryTeacher) && isset($primaryTeacher['id'])) {
+            $teacherName = trim((string)($primaryTeacher['name'] ?? ''));
+
+            $teachers = [
+                [
+                    'id' => $primaryTeacher['id'],
+                    'name' => $teacherName,
+                ],
+            ];
+        }
+
+        return [
+            'internal_class_id' => $classId,
+            'name' => $name,
+            'code' => $code,
+            'teachers' => $teachers,
+        ];
+    }
+
+
+    /* NOTE: Legacy per-student processing helpers removed.
+     * The import now batches by guid and persists each class instance once.
+     */
+
+    /**
+     * Build a stable identifier representing a specific class instance.
+     *
+     * @param array $class         Class info array containing internal_class_id.
+     * @param array $classInstance Class instance array containing start/end ADF objects.
+     */
+    private function buildGuid(array $class, array $classInstance): string
+    {
+        return sprintf(
+            '%s_%s_%s',
+            $class['internal_class_id'],
+            $classInstance['start']->getDatabase(),
+            $classInstance['end']->getDatabase()
+        );
+    }
+
+    /**
+     * Create (or reuse) an event per guid to avoid repeated DB work across many students.
+     *
+     * @param string $guid
+     * @param array  $class
+     * @param array  $classInstance
+     *
      * @throws DebugBarException
      * @throws Exception
      * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function processClass(string $externalId, array $classEnrolment, array $userLookup): void
+    private function getOrCreateEventByGuid(string $guid, array $class, array $classInstance): Model
     {
-        foreach ($classEnrolment['schedule'] as $classInstance) {
-            /* Info about a class is actually a subset of $enrolment:
-             *
-                $class = array_intersect_key($enrolment, [
-                    'internal_class_id' => true,
-                    'name' => true,
-                    'code' => true,
-                ]);
-             *
-             * But to save this mundane step, there's a $classEnrolment['info'] node specifically
-             * for these data
-             */
-
-            /* Save sis_event record
-             */
-            $event = $this->createEvent($classEnrolment['info'], $classInstance);
-
-            /* Save sis_class record
-             */
-            $classEntry = $this->createClassEntry($classEnrolment['info'], $event);
-
-            /* Save the involvements
-             */
-            $this->createInvolvements($externalId, $classEnrolment['info'], $event, $classEntry, $userLookup);
+        if (isset($this->eventsByGuid[$guid])) {
+            return $this->eventsByGuid[$guid];
         }
+
+        $event = $this->createEvent($class, $classInstance, $guid);
+        $this->eventsByGuid[$guid] = $event;
+
+        return $event;
     }
 
-
     /**
-     * Create a new SUDS Timetable Event with all the class and lesson pieces
+     * Create a SUDS Timetable Event with all the class and lesson pieces.
      *
-     * @param array $class
-     * @param array $classInstance
-     * @return Model
-     * @throws Exception
+     * If an event already exists for the given guid, it will be reused (and selectively updated/saved).
+     *
+     * @param array       $class
+     * @param array       $classInstance
+     * @param string|null $guid Optional guid; if omitted it will be built from class + instance time window.
+     *
      * @throws DebugBarException
+     * @throws Exception
      * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
     private function createEvent(
         array $class,
-        array $classInstance
+        array $classInstance,
+        ?string $guid = null
     ): Model {
         /* Fill in these vars as usual
          */
-        $classCode = (new ClassCode($this->log))->generate(trim((string)$class['code']));
+        $classCode = new ClassCode($this->log)->generate(trim((string)$class['code']));
         $day = trim((string)$classInstance['day']['description']);
         $detail = null;
 
         /* Arbitrarily manufacture a guid for now, which represents
          * a class whose instance is happening at a particular time
          */
-        $guid = sprintf(
-            '%s_%s_%s',
-            $class['internal_class_id'],
-            $classInstance['start']->getDatabase(),
-            $classInstance['end']->getDatabase()
-        );
+        $guid = $guid ?? $this->buildGuid($class, $classInstance);
 
         /* Put a Session Time in here, in accordance with Haines' feature request
          * I *think* this might be the $classInstance['block'] but could be wrong.
@@ -391,11 +473,13 @@ class Classes implements IStrategy
 
 
     /**
-     * Create (or reuse) a ClassEntry corresponding to $event
+     * Create (or reuse) a ClassEntry corresponding to an event.
      *
-     * @param array $class
+     * Cached by event code so the DB write only happens once per class code.
+     *
+     * @param array $class Class info array.
      * @param Model $event
-     * @return ClassEntry
+     *
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
@@ -419,63 +503,49 @@ class Classes implements IStrategy
         return $classEntry;
     }
 
-
     /**
-     * Save all the involvements for a given $class
+     * Apply teacher involvement and staff overrides for a timetable event.
      *
-     * @param string     $studentExternalId
+     * This is expected to be executed once per event (guid) by the import pipeline.
+     *
      * @param array      $class
      * @param Model      $event
      * @param ClassEntry $classEntry
-     * @param array      $userLookup
-     * @return void
+     *
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function createInvolvements(
-        string $studentExternalId,
+    private function applyTeacherInvolvement(
         array $class,
         Model $event,
-        ClassEntry $classEntry,
-        array $userLookup
+        ClassEntry $classEntry
     ): void {
-        /* Save the teacher's involvement
-         * atm there's only one teacher per class, but it's possible there might be more somewhere
-         */
+        if (!isset($class['teachers'][0])) {
+            return;
+        }
+
         $teacherExternalId = trim((string)$class['teachers'][0]['id']);
         $name = trim((string)$class['teachers'][0]['name']);
 
-        /* TODO Figure out overrides to put into saveStaffInvolvement
-         *  So far, no distinction has yet been made for Overrides to exist
-         */
         $this->saveInvolvement($event, $classEntry, $name, $teacherExternalId);
-
-        /* Save the student's enrolment
-         *
-         * In case you pick a guy that isn't known in the db, you can still proceed
-         */
-        $name = sprintf(
-            '%s %s',
-            $userLookup[$studentExternalId]['firstname'] ?? '',
-            $userLookup[$studentExternalId]['lastname'] ?? '',
-        );
-
-        $this->saveEnrolment($event, $classEntry, $name, $studentExternalId);
     }
 
 
     /**
-     * Save staff involvement as an override, which allows each class
-     * to have different teachers depending on their associated sis_event
+     * Save teacher involvement for a class and apply staff overrides on the event.
+     *
+     * NOTE: Callers must ensure this is only executed once per guid. This method will:
+     *  - create class enrolment for the teacher (via saveEnrolment)
+     *  - write staff overrides (CLEAR_STAFF then ADD) if running in perform mode
      *
      * @param Model      $event
      * @param ClassEntry $classEntry
      * @param string     $name
      * @param string     $externalId
-     * @return void
+     *
+     * @throws Exception
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
     private function saveInvolvement(
@@ -484,13 +554,11 @@ class Classes implements IStrategy
         string $name,
         string $externalId
     ): void {
+        // Ensure the teacher is enrolled against the class entry.
         $this->saveEnrolment($event, $classEntry, $name, $externalId);
 
-        /* We use the Overrides system to specify a particular person's involvement
-         * in a particular sis_event instance, rather than being associated with all
-         */
         $this->log->debug(sprintf(
-            'Creating new class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+            'Creating new class teacher involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
             $externalId,
             $name,
             $event->getTitle(),
@@ -500,38 +568,42 @@ class Classes implements IStrategy
             $event->getFinishAt()->getDatabase()
         ));
 
-        /* For specific teaching, execute CLEAR_STAFF to disregard the usual guy
-         * and add the guy teaching this particular instance (even though they
-         * might end up being the same person sometimes)
-         */
+        // In dry-run mode the event may not have an id.
+        if (!$this->perform) {
+            return;
+        }
+
+        $eventId = $event->getId();
+        if ($eventId === null) {
+            return;
+        }
+
         $clearOverride = $this->overridesMapper->createModel()
-            ->setEventId($event->getId())
+            ->setEventId($eventId)
             ->setExternalId(null)
             ->setAction(\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF)
             ->setSequence(1);
 
         $involvementOverride = $this->overridesMapper->createModel()
-            ->setEventId($event->getId())
+            ->setEventId($eventId)
             ->setExternalId($externalId)
             ->setAction(\Schoolbox\External\Event\Overrides\Model::ADD)
             ->setSequence(2);
 
-        if ($this->perform) {
-            $this->overridesMapper->save($clearOverride);
-            $this->overridesMapper->save($involvementOverride);
-        }
+        $this->overridesMapper->save($clearOverride);
+        $this->overridesMapper->save($involvementOverride);
     }
 
-
     /**
-     * Save an involvement for user $externalId, whose name is $name,
-     * for the sis_event $event
+     * Save a class enrolment for the given class entry.
+     *
+     * Uses an in-memory cache per (classEntryId, externalId) to prevent duplicate writes.
      *
      * @param Model      $event
      * @param ClassEntry $classEntry
-     * @param string     $name
+     * @param string     $name Human-friendly name used for logging.
      * @param string     $externalId
-     * @return void
+     *
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
@@ -542,38 +614,45 @@ class Classes implements IStrategy
         string $name,
         string $externalId
     ): void {
-        if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
-            $this->log->info(sprintf(
-                'Reusing previous class enrolment for %s (%s) in timetable event %s - %s, %s, %s-%s',
-                $name,
-                $externalId,
-                $event->getTitle(),
-                $event->getDay(),
-                $event->getPeriod(),
-                $event->getStartAt()->getDatabase(),
-                $event->getFinishAt()->getDatabase()
-            ));
-        } else {
-            $classInvolvement = $this->classInvolvementMapper->createModel()
-                ->setClass($classEntry)
-                ->setExternalId($externalId);
-
-            if ($this->perform) {
-                $this->classInvolvementMapper->save($classInvolvement);
-            }
-
-            $this->classInvolvements[$classEntry->getId()][$externalId] = true;
-
-            $this->log->info(sprintf(
-                'Creating new class enrolment for %s (%s) in timetable event %s - %s, %s, %s-%s',
-                $name,
-                $externalId,
-                $event->getTitle(),
-                $event->getDay(),
-                $event->getPeriod(),
-                $event->getStartAt()->getDatabase(),
-                $event->getFinishAt()->getDatabase()
-            ));
+        // Name can be blank if user lookup didn't contain that person; fall back for clarity in logs.
+        $displayName = trim($name);
+        if ($displayName === '') {
+            $displayName = $externalId;
         }
+
+        if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
+            $this->log->debug(sprintf(
+                'Reusing previous class enrolment for %s (%s) in timetable event %s - %s, %s, %s-%s',
+                $displayName,
+                $externalId,
+                $event->getTitle(),
+                $event->getDay(),
+                $event->getPeriod(),
+                $event->getStartAt()->getDatabase(),
+                $event->getFinishAt()->getDatabase()
+            ));
+            return;
+        }
+
+        $classInvolvement = $this->classInvolvementMapper->createModel()
+            ->setClass($classEntry)
+            ->setExternalId($externalId);
+
+        if ($this->perform) {
+            $this->classInvolvementMapper->save($classInvolvement);
+        }
+
+        $this->classInvolvements[$classEntry->getId()][$externalId] = true;
+
+        $this->log->info(sprintf(
+            'Creating new class enrolment for %s (%s) in timetable event %s - %s, %s, %s-%s',
+            $displayName,
+            $externalId,
+            $event->getTitle(),
+            $event->getDay(),
+            $event->getPeriod(),
+            $event->getStartAt()->getDatabase(),
+            $event->getFinishAt()->getDatabase()
+        ));
     }
 }
