@@ -322,13 +322,14 @@ Data:
                             return response.text();
                         })
                         .then(function(data) {
-                            let el = event.target.parentNode;
-                            if (el && data) {
+                            let el = event.target.parentNode,
+                                    participateList = el.parentNode;
+                            if (el && participateList && data) {
                                 // toaster
                                 toast.toastTimeout({text: 'Loaded.', css: 'success'});
-                                el.innerHTML = data;
+                                el.outerHTML = data;
                                 // re-enable the load more button (if one exists. it may not...)
-                                $(el).find('[data-click-load-more]').on('click', loadMoreParticipants);
+                                $(participateList).find('[data-click-load-more]').on('click', loadMoreParticipants);
                             } else {
                                 // toaster
                                 toast.toastTimeout({text: 'Unable to load more participants.', css: 'alert'});
