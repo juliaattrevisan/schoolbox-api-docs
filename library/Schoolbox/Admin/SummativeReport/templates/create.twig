@@ -251,56 +251,47 @@
         document.querySelectorAll('[data-summary-worktype-show]').forEach(function(checkboxShow) {
             checkboxShow.addEventListener('change', function() {
                 let workTypeId = this.dataset.summaryWorktypeShow;
-                // if checked, enable the row
+
+                const grades = document.querySelector('[data-summary-worktype-grades="'+workTypeId+'"]');
+                const comments = document.querySelector('[data-summary-worktype-comments="'+workTypeId+'"]');
+                const rubrics = document.querySelector('[data-summary-worktype-rubrics="'+workTypeId+'"]');
+                const graph = document.querySelector('[data-summary-worktype-graph="'+workTypeId+'"]');
+
                 if (this.checked) {
-                    document.querySelector('[data-summary-worktype-grades="'+workTypeId+'"]').disabled = false;
-                    document.querySelector('[data-summary-worktype-comments="'+workTypeId+'"]').disabled = false;
-                    document.querySelector('[data-summary-worktype-rubrics="'+workTypeId+'"]').disabled = false;
-
-                    /* Depends on the Distribution Graph checkbox being ticked
-                     */
-                    if (document.querySelector('#report-summary-show-cohort').checked) {
-                        document.querySelector('[data-summary-worktype-graph="' + workTypeId + '"]').disabled = false;
-                    }
+                    grades.disabled = false;
+                    comments.disabled = false;
+                    rubrics.disabled = false;
+                    graph.disabled = false;
                 } else {
-                    document.querySelector('[data-summary-worktype-grades="'+workTypeId+'"]').disabled = true;
-                    document.querySelector('[data-summary-worktype-comments="'+workTypeId+'"]').disabled = true;
-                    document.querySelector('[data-summary-worktype-rubrics="'+workTypeId+'"]').disabled = true;
-
-                    /* Depends on the Distribution Graph checkbox being ticked
-                     */
-                    if (document.querySelector('#report-summary-show-cohort').checked) {
-                        document.querySelector('[data-summary-worktype-graph="'+workTypeId+'"]').disabled = true;
-                    }
+                    grades.checked = false; grades.disabled = true;
+                    comments.checked = false; comments.disabled = true;
+                    rubrics.checked = false; rubrics.disabled = true;
+                    graph.checked = false; graph.disabled = true;
                 }
-            })
+            });
         });
+
         document.querySelectorAll('[data-class-worktype-show]').forEach(function(checkboxShow) {
             checkboxShow.addEventListener('change', function() {
                 let workTypeId = this.dataset.classWorktypeShow;
-                // if checked, enable the row
+
+                const grades = document.querySelector('[data-class-worktype-grades="'+workTypeId+'"]');
+                const comments = document.querySelector('[data-class-worktype-comments="'+workTypeId+'"]');
+                const rubrics = document.querySelector('[data-class-worktype-rubrics="'+workTypeId+'"]');
+                const graph = document.querySelector('[data-class-worktype-graph="'+workTypeId+'"]');
+
                 if (this.checked) {
-                    document.querySelector('[data-class-worktype-grades="'+workTypeId+'"]').disabled = false;
-                    document.querySelector('[data-class-worktype-comments="'+workTypeId+'"]').disabled = false;
-                    document.querySelector('[data-class-worktype-rubrics="'+workTypeId+'"]').disabled = false;
-
-                    /* Depends on the Distribution Graph checkbox being ticked
-                     */
-                    if (document.querySelector('#report-class-show-cohort').checked) {
-                        document.querySelector('[data-class-worktype-graph="' + workTypeId + '"]').disabled = false;
-                    }
+                    grades.disabled = false;
+                    comments.disabled = false;
+                    rubrics.disabled = false;
+                    graph.disabled = false;
                 } else {
-                    document.querySelector('[data-class-worktype-grades="'+workTypeId+'"]').disabled = true;
-                    document.querySelector('[data-class-worktype-comments="'+workTypeId+'"]').disabled = true;
-                    document.querySelector('[data-class-worktype-rubrics="'+workTypeId+'"]').disabled = true;
-
-                    /* Depends on the Distribution Graph checkbox being ticked
-                     */
-                    if (document.querySelector('#report-class-show-cohort').checked) {
-                        document.querySelector('[data-class-worktype-graph="' + workTypeId + '"]').disabled = true;
-                    }
+                    grades.checked = false; grades.disabled = true;
+                    comments.checked = false; comments.disabled = true;
+                    rubrics.checked = false; rubrics.disabled = true;
+                    graph.checked = false; graph.disabled = true;
                 }
-            })
+            });
         });
 
         // if enabling the subject overview, we should allow the user to enter a title to search for
@@ -313,39 +304,6 @@
                 document.querySelector('#search-subject-overview').classList.add('hidden');
             }
         });
-
-        /* Graph checkbox disabled state depends on Show Distribution Graph checkbox
-         */
-        document.querySelector('#report-summary-show-cohort').addEventListener('change', function() {
-            initialiseGraphCheckboxes('summary');
-        });
-
-        document.querySelector('#report-class-show-cohort').addEventListener('change', function() {
-            initialiseGraphCheckboxes('class');
-        });
-
-
-        /* Detect initial conditions
-         */
-        initialiseGraphCheckboxes('summary');
-        initialiseGraphCheckboxes('class');
-
-        /**
-         * Graph checkbox disabled state depends on Show Distribution Graph checkbox
-         *
-         * @param type  "summary" or "class" depending on the section
-         */
-        function initialiseGraphCheckboxes(type) {
-            if (document.querySelector('#report-' + type + '-show-cohort').checked) {
-                document.querySelectorAll('[data-' + type + '-worktype-graph]').forEach(function(element) {
-                    element.removeAttribute('disabled');
-                });
-            } else {
-                document.querySelectorAll('[data-' + type + '-worktype-graph]').forEach(function(element) {
-                    element.setAttribute('disabled', 'true');
-                });
-            }
-        }
 
 
         /* Detect initial conditions
@@ -542,11 +500,6 @@
                                         <label for="report-summary-show-overall-grade" class="checkbox-label">Show overall grade</label>
                                     </li>
                                     <li>
-                                        <input name="summary[cohort]" type="hidden" value="0" />
-                                        <input id="report-summary-show-cohort" name="summary[cohort]" type="checkbox" value="1" {% if options.summary.cohort ?? false %}checked="checked"{% endif %} />
-                                        <label for="report-summary-show-cohort" class="checkbox-label">Show cohort/class distribution graph</label>
-                                    </li>
-                                    <li>
                                         <input name="summary[classCode]" type="hidden" value="0" />
                                         <input id="report-summary-show-class-code" name="summary[classCode]" type="checkbox" value="1" {% if options.summary.classCode ?? true %}checked="checked"{% endif %} />
                                         <label for="report-summary-show-class-code" class="checkbox-label">Show class code</label>
@@ -566,7 +519,7 @@
                                     <th>Grade</th>
                                     <th>Comment</th>
                                     <th>Rubric</th>
-                                    <th>Graph</th>
+                                    <th>Distribution Graph</th>
                                 </tr>
                                 {% for worktype in worktypesSummary %}
                                 <tr data-summary-worktype-id="{{ worktype.id }}">
@@ -663,11 +616,6 @@
                                         <label for="report-class-show-overall-grade" class="checkbox-label">Show overall grade</label>
                                     </li>
                                     <li>
-                                        <input name="class[cohort]" type="hidden" value="0" />
-                                        <input id="report-class-show-cohort" name="class[cohort]" type="checkbox" value="1" {% if options.class.cohort ?? false %}checked="checked"{% endif %} />
-                                        <label for="report-class-show-cohort" class="checkbox-label">Show cohort/class distribution graph</label>
-                                    </li>
-                                    <li>
                                         <input name="class[classCode]" type="hidden" value="0" />
                                         <input id="report-class-show-class-code" name="class[classCode]" type="checkbox" value="1" {% if options.class.classCode ?? true %}checked="checked"{% endif %} />
                                         <label for="report-class-show-class-code" class="checkbox-label">Show class code</label>
@@ -697,7 +645,7 @@
                                     <th>Grade</th>
                                     <th>Comment</th>
                                     <th>Rubric</th>
-                                    <th>Graph</th>
+                                    <th>Distribution Graph</th>
                                 </tr>
                                 {% for worktype in worktypesClass %}
                                     <tr data-class-worktype-id="{{ worktype.id }}">
