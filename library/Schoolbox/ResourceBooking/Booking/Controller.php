@@ -412,7 +412,7 @@ class Controller extends Base
                 $bookingList->add($booking);
             }
 
-            if ($overrideValidation) {
+            if ($isTimeChanged && $overrideValidation) {
                 // Find all clashing bookings and set their status to STATUS_REJECTED.
                 $bookingsToReject = new GenericCollection(Model::class);
                 /** @var Model $booking */
