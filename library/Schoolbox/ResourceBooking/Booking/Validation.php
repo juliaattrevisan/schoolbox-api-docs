@@ -602,9 +602,9 @@ class Validation
      * Find and return all bookings that conflict with the given set of bookings.
      *
      * @param GenericCollection<BookingModel> $bookings
-     * @return GenericCollection<BookingModel>
+     * @return Collection
      */
-    public function getConflictingBookingsForSetOfBookings(GenericCollection $bookings): GenericCollection
+    public function getConflictingBookingsForSetOfBookings(GenericCollection $bookings): Collection
     {
         $allConflictingBookings = new GenericCollection(BookingModel::class);
 
