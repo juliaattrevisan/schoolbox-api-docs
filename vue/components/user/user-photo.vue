@@ -161,4 +161,13 @@ const srcBase = window.Vue.computed(() => `/portrait.php?${userParameter.value}`
         max-height: 32px;
     }
 }
+
+/**
+ * Prevent the image from scaling when out of proportion when a parent container
+ * is using display flex
+ */
+img {
+    flex-shrink: 0;
+    object-fit: contain;
+}
 </style>
