@@ -598,12 +598,13 @@ class Validation
     }
 
     /**
+     * Find and return all bookings that conflict with the given set of bookings.
+     *
      * @param GenericCollection<BookingModel> $bookings
      * @return GenericCollection<BookingModel>
      */
     public function getConflictingBookingsForSetOfBookings(GenericCollection $bookings): GenericCollection
     {
-        // Find all clashing bookings and set their status to STATUS_REJECTED.
         $allConflictingBookings = new GenericCollection(BookingModel::class);
 
         foreach ($bookings as $booking) {
