@@ -1,0 +1,66 @@
+/**
+ *  Input radio element
+ */
+.sbx-input-radio {
+    -webkit-appearance: none; // Add if not using autoprefixer
+    appearance: none; // Remove most all native input styles
+    background-color: var(--sbx-color-foreground-primary); // For iOS < 15
+    border: var(--sbx-size-form-element-border-width) solid var(--sbx-color-accent);
+    border-radius: 50%;
+    color: var(--sbx-color-accent);
+    cursor: pointer;
+    display: grid;
+    height: 1.875rem !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
+    margin: 0 !important; // Not removed via appearance // ^foundation-fixes^ - won't need !important once _forms.scss is removed
+    min-height: auto !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    opacity: 1 !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
+    place-content: center;
+    position: static !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    transform: translateY(-0.075em);
+    width: 1.875rem !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
+    &:hover:not(:disabled) {
+        // We don't want the hover effect on input elements, as there's potential for reduced contrast on elements
+        background: var(
+            --sbx-color-foreground-primary
+        ) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+        color: var(--sbx-color-text-primary) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+        border-color: var(--sbx-color-accent) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    }
+    &::before {
+        background-color: CanvasText; // Windows High Contrast Mode, to ensure the tick is visible https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors
+        border-radius: 50%;
+        box-shadow: inset 1rem 1rem var(--sbx-color-accent); // using box-shadow will allow the tick to be visible when printed
+        content: "";
+        height: 1rem;
+        transform: scale(0);
+        transition: var(--sbx-animation-form-input-change) transform ease-in-out;
+        width: 1rem;
+    }
+    &:checked::before {
+        // When the checkbox is checked, show the tick
+        transform: scale(1);
+    }
+    &:focus {
+        @include form-input-focus;
+    }
+    &:focus:not(:focus-visible) {
+        @include form-input-focus-not-visible;
+    }
+    &:disabled {
+        @include form-input-disabled;
+    }
+    &--intermediate::before {
+        clip-path: polygon(100% 35%, 100% 60%, 0% 60%, 0% 35%);
+        transform: scale(1);
+    }
+}
+
+.sbx-input-radio[type="radio"] + label {
+    cursor: pointer;
+    display: unset; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    margin: 0; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    vertical-align: baseline; // ^foundation-fixes^ - won't need  once _forms.scss is removed
+}
+.sbx-input-radio.error {
+    border: var(--sbx-size-form-element-border-width) solid var(--sbx-color-alert);
+}

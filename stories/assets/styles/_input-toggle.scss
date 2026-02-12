@@ -1,0 +1,81 @@
+/**
+ *   A toggle component, primarily referenced from https://kittygiraudel.com/2021/04/05/an-accessible-toggle/
+ */
+.c-toggle {
+    cursor: pointer;
+    display: inline-flex;
+    flex-direction: column;
+    gap: var(--spacing-s);
+    position: relative;
+    &__input {
+        // hide the input, but fill up the space so it can be clicked
+        height: 100%;
+        margin: 0 !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+        opacity: 0;
+        position: absolute;
+        width: 100%;
+        &:checked + .c-toggle__display {
+            background-color: var(--sbx-color-accent);
+        }
+        &:checked + .c-toggle__display::before {
+            transform: translate(100%, -50%);
+        }
+        &:focus + .c-toggle__display {
+            outline: 3px solid var(--sbx-color-accent);
+            outline-offset: 2px;
+        }
+        &:focus:not(:focus-visible) + .c-toggle__display {
+            @include form-input-focus-not-visible;
+        }
+        &:disabled + .c-toggle__display {
+            @include form-input-disabled;
+        }
+    }
+    &__display {
+        --offset: 0.25rem;
+        --diameter: 1.5rem;
+        align-items: center;
+        background-color: var(--color-foreground-primary);
+        border: 1px solid var(--sbx-color-accent);
+        border-radius: var(--sbx-border-radius-normal);
+        box-sizing: content-box;
+        display: inline-flex;
+        height: calc(var(--diameter) + var(--offset) * 2);
+        justify-content: space-around;
+        position: relative;
+        transition: calc(var(--animation-form-input-change) * 2) transform;
+        width: calc(var(--diameter) * 2 + var(--offset) * 2);
+        &::before {
+            // the toggle
+            background-color: var(--color-foreground-primary);
+            border: 1px solid var(--sbx-color-accent);
+            border-radius: 50%;
+            box-sizing: border-box;
+            content: "";
+            height: var(--diameter);
+            left: var(--offset);
+            position: absolute;
+            top: 50%;
+            transform: translate(0, -50%);
+            transition: inherit;
+            width: var(--diameter);
+            will-change: transform;
+            z-index: var(--sbx-depth-default);
+        }
+    }
+    &--inline {
+        // so the label sits to the right of the toggle rather than above
+        align-items: center;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}
+
+[dir="rtl"] .c-toggle__display::before {
+    left: auto;
+    right: var(--offset);
+}
+
+[dir="rtl"] .c-toggle__input:checked + .c-toggle__display::before {
+    transform: translate(-100%, -50%);
+}

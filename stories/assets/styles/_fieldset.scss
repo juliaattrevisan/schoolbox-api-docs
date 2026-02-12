@@ -1,0 +1,14 @@
+/**
+ *   For <fieldset> elements, which are used to group related elements in a form.
+ */
+.c-fieldset {
+    border: none;
+    margin: 0; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    padding: 0;
+    &__container {
+        // this is used so the __legend can have flex applied
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-s);
+    }
+}

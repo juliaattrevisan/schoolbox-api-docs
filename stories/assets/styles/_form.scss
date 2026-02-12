@@ -1,0 +1,93 @@
+/**
+ * New styles for form elements
+ * Will eventually replace `www/static/css/core/ui/forms/_forms.scss`
+ */
+
+/**
+ * Any custom properties specific to forms
+ */
+:root {
+    --sbx-animation-form-input-change: 100ms; // used to animate input changes like toggle switch, checkbox, radio etc
+    --sbx-color-form-disabled-background: #edecec;
+    --sbx-size-form-element-border-width: 1px;
+}
+
+/**
+ *  Shared form input focus styles
+ */
+@mixin form-input-focus {
+    background: var(--sbx-color-foreground-primary); // ^foundation-fixes^ - won't need once _forms.scss is removed
+    border-color: var(--sbx-color-accent);
+    outline: calc(var(--sbx-size-form-element-border-width) + 2px) solid var(--sbx-color-accent);
+    outline-offset: calc(var(--sbx-size-form-element-border-width) + 1px);
+}
+
+/**
+ *  So the focus is not active on mouse click
+ */
+@mixin form-input-focus-not-visible {
+    outline: 0;
+}
+
+/**
+ *  Shared form input disabled styles
+ */
+@mixin form-input-disabled {
+    background-color: var(--sbx-color-foreground-secondary);
+    color: var(--sbx-color-text-secondary) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    cursor: not-allowed;
+    pointer-events: auto; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    & + label {
+        opacity: 1 !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --sbx-animation-form-input-change: 0ms;
+    }
+}
+
+/**
+ *  Some tweaks to the color input so it blends in with the rest of the form elements
+ *  on the skin configurer
+ */
+input[type="color"] {
+    background-color: var(--sbx-color-foreground-primary);
+    border-color: var(--sbx-color-accent);
+    border-radius: var(--roundness-form-elements);
+}
+
+/**
+ *  So the hr also changes on the skin configurer
+ */
+hr {
+    border-color: var(--sbx-color-text-secondary);
+}
+
+/**
+ *  Tweaks to make the range slider more inline with draft styles,
+ *  eventually this should be added into the proper range slider styles
+ */
+.c-input-range {
+    &__input::-webkit-slider-runnable-track {
+        background-color: var(--sbx-color-foreground-primary);
+        border: var(--sbx-size-form-element-border-width) solid var(--sbx-color-accent);
+    }
+    &__input::-webkit-slider-thumb {
+        background-color: var(--sbx-color-accent);
+    }
+    &__input:focus-visible::-webkit-slider-thumb {
+        outline: 3px solid var(--sbx-color-accent);
+    }
+}
+
+@import "fieldset";
+@import "label";
+@import "hint";
+@import "input-text";
+@import "input-checkbox";
+@import "input-toggle";
+@import "input-radio";
+@import "select";
+@import "form-element";

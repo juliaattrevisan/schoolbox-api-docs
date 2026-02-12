@@ -1,0 +1,10 @@
+/**
+ *   To provide additional context or guidance to users, use a hint. Hints are typically used to provide additional information about a form field, such as the expected format of the input or the purpose of the field.
+ */
+.c-hint {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1rem;
+}
