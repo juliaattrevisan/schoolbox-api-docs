@@ -150,8 +150,13 @@ body.login input[type="checkbox"]:not(.plain) + label:before {
 .sbx-body input[type="checkbox"]:not(.plain) + label,
 .sbx-body input[type="checkbox"]:not(.plain) + label.checkbox-label,
 body.login input[type="checkbox"]:not(.plain) + label {
-    margin: 0 !important;
-    padding: 0 !important;
+    margin: 0;
+    padding: 0;
+}
+
+// add some spacing between the checkbox and label in the participant group settings
+.sbx-body [data-participant-group] .checkbox-label {
+    margin-top: var(--sbx-size-s);
 }
 
 // Fix alignment of checklist filters when linked to a label on the left
