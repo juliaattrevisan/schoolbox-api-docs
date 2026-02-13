@@ -13,6 +13,7 @@ use Alaress\Sentry\Tracing\Tracer;
 use Predis\Client;
 use Predis\Command\CommandInterface;
 use Predis\CommunicationException;
+use Schoolbox\Url\Uri;
 
 /**
  * Extension of Redis client, which:
@@ -24,6 +25,35 @@ class AutoRefreshClient extends Client
     private const int MAX_ATTEMPTS = 3;
 
     /**
+     * Instrument connection.
+     *
+     * For some reason this is not called when connecting to Redis, though?
+     * It needs to be called manually.
+     *
+     * @return void
+     */
+    public function connect(): void
+    {
+        $url = new Uri()
+            ->withHost($this->getConnection()->getParameters()->host ?? '')
+            ->withPort($this->getConnection()->getParameters()->port ?? null)
+            ->withPath($this->getConnection()->getParameters()->database ?? '')
+            ->withScheme($this->getConnection()->getParameters()->scheme ?? '');
+        Tracer::getDefaultTrace()->runWithinSpan(
+            parent::connect(...),
+            sprintf('connect %s', $url->__toString()),
+            'db.redis.connect',
+            'auto.db',
+            data: [
+                  'db.system.name' => 'redis',
+                  'db.namespace'   => $this->getConnection()->getParameters()->database,
+                  'server.address' => $this->getConnection()->getParameters()->host,
+                  'server.port'    => $this->getConnection()->getParameters()->port,
+            ],
+        );
+    }
+
+    /**
      * Defer to recursive attempt function
      *
      * @param CommandInterface $command
@@ -31,6 +61,11 @@ class AutoRefreshClient extends Client
      */
     public function executeCommand(CommandInterface $command): mixed
     {
+        // Trace connection?
+        if (!$this->isConnected()) {
+            $this->connect();
+        }
+
         // Data from https://opentelemetry.io/docs/specs/semconv/db/redis/
         $queryText = $command->getId() . ' ' . implode(' ', $command->getArguments());
         return Tracer::getDefaultTrace()->runWithinSpan(
@@ -54,6 +89,11 @@ class AutoRefreshClient extends Client
         // db.operation.batch.size:             batch is not known
         // db.stored_procedure.name:            stored proc is not known
         // network.peer.{address,port}:         how different to server.{address,port}?
+        //
+        // Regarding errors:
+        // The Redis client actually does not throw an exception on malformed
+        // query, thus making it futile to attempt to determine what type of
+        // error the last request returned.
     }
 
     /**
