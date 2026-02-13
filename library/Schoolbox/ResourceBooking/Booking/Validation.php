@@ -397,6 +397,8 @@ class Validation
     /**
      * This function groups the simplest validation rule checks into one function to
      * avoid repetition when all those functions need to be called from multiple places.
+     * Another reason these tests are grouped together is that if any of these tests fail for
+     * the first booking in a series, they will also fail for all later bookings in the series.
      *
      * @param Item\Model $resource
      * @param DateTime   $startDate
