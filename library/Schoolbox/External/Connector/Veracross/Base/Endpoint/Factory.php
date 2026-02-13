@@ -65,7 +65,6 @@ class Factory
      * @param string $key
      * @param array $watchlist
      * @param bool $includePhoto
-     * @param string $timezone
      * @param Mapper $baseProfileMapper
      * @param UserProfile\Student\Mapper $studentProfileMapper
      * @param UserProfile\Parent\Mapper $parentProfileMapper
@@ -87,7 +86,6 @@ class Factory
         #[SensitiveParameter] private string $key,
         private array $watchlist,
         private bool $includePhoto,
-        private string $timezone,
         /* Profile pieces */
         private UserProfile\Mapper $baseProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
@@ -111,7 +109,6 @@ class Factory
      * @throws UnexpectedValueException
      * @throws \DomainException
      * @throws InvalidArgumentException
-     * @throws \DateInvalidTimeZoneException
      */
     public function produce(): GenericCollection
     {
@@ -119,10 +116,6 @@ class Factory
          */
         $from = \Alaress_Date_Format::now()->addWeeks(self::FROM)->startOfWeek();
         $to = \Alaress_Date_Format::now()->addWeeks(self::TO)->endofWeek();
-
-        /* Decide a timezone for all the UTC dates sis gives to us
-         */
-        $timezone = new \DateTimeZone($this->timezone);
 
         /* Spawn an Api instance
          */
@@ -196,10 +189,8 @@ class Factory
                     $watcher,
                     $this->watchlist,
                     $this->eventMapper,
-                    $this->overridesMapper,
                     $this->classEntryMapper,
                     $this->classInvolvementMapper,
-                    $timezone,
                     $from,
                     $to
                 ))

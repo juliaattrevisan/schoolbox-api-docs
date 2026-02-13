@@ -628,6 +628,10 @@ class Profile implements IStrategy
                 }
             }
         }
+
+        /* Unset lookups that we no longer need
+         */
+        unset($languageLookup, $alertLookup, $photoLookup, $parentLookup, $relationshipLookup, $emergencyContactsLookup, $contactInfoLookup, $payloads);
     }
 
 
@@ -920,6 +924,10 @@ class Profile implements IStrategy
                 }
             }
         }
+
+        /* Unset lookups that we no longer need
+         */
+        unset($contactInfoLookup, $photoLookup, $staffLookup);
     }
 
 

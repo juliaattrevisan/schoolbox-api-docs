@@ -136,6 +136,7 @@ class ClassIndex
         return array_intersect_key($record, [
             'class_id' => true,
             'description' => true,
+            'primary_teacher' => true,
             'room' => true,
         ]);
     }
