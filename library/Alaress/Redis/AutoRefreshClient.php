@@ -18,7 +18,7 @@ use Schoolbox\Url\Uri;
 /**
  * Extension of Redis client, which:
  * * attempts a command multiple times before giving up
- * * traces
+ * * sends traces on connect and query to Sentry
  */
 class AutoRefreshClient extends Client
 {
@@ -44,12 +44,7 @@ class AutoRefreshClient extends Client
             sprintf('connect %s', $url->__toString()),
             'db.redis.connect',
             'auto.db',
-            data: [
-                  'db.system.name' => 'redis',
-                  'db.namespace'   => $this->getConnection()->getParameters()->database,
-                  'server.address' => $this->getConnection()->getParameters()->host,
-                  'server.port'    => $this->getConnection()->getParameters()->port,
-            ],
+            $this->getBaseSpanData(),
         );
     }
 
@@ -61,7 +56,9 @@ class AutoRefreshClient extends Client
      */
     public function executeCommand(CommandInterface $command): mixed
     {
-        // Trace connection?
+        // Need to connect if have not done so already:
+        // this class' connect method is not called manually, I am guessing the
+        // internal connection object's connect method is called.
         if (!$this->isConnected()) {
             $this->connect();
         }
@@ -73,12 +70,8 @@ class AutoRefreshClient extends Client
             $queryText,
             'db.redis',
             'auto.db.redis',
-            [
-                'db.system.name'    => 'redis',
+            $this->getBaseSpanData() + [
                 'db.operation.name' => $command->getId(),
-                'db.namespace'      => $this->getConnection()->getParameters()->database,
-                'server.address'    => $this->getConnection()->getParameters()->host,
-                'server.port'       => $this->getConnection()->getParameters()->port,
                 'db.query.text'     => $queryText,
             ],
         );
@@ -116,5 +109,20 @@ class AutoRefreshClient extends Client
             // recurse
             return $this->tryCommand($command, $retries - 1);
         }
+    }
+
+    /**
+     * Get base data for a Sentry span.
+     *
+     * @return array
+     */
+    private function getBaseSpanData(): array
+    {
+        return [
+            'db.system.name' => 'redis',
+            'db.namespace'   => $this->getConnection()->getParameters()->database,
+            'server.address' => $this->getConnection()->getParameters()->host,
+            'server.port'    => $this->getConnection()->getParameters()->port,
+        ];
     }
 }
