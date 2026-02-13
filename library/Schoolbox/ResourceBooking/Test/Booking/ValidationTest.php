@@ -479,50 +479,69 @@ class ValidationTest extends TestCase
      */
     public static function providerSeriesValidateForConflicts()
     {
+        $booking1Id = 1;
+        $booking2Id = 2;
+        $booking3Id = 3;
+        $booking4Id = 4;
+        $booking5Id = 11;
+        $booking6Id = 12;
+        $booking7Id = 13;
+        $booking8Id = 21;
+        $series1Id = 10;
+        $series2Id = 10;
+        $event1Id = 101;
+        $event2Id = 102;
+        $event3Id = 103;
+        $event4Id = 104;
+        $event5Id = 111;
+        $event6Id = 112;
+        $event7Id = 113;
+        $event8Id = 221;
+
         // Single booking
         $existingBooking = new Booking\Model()
-                    ->setId(1)
-                    ->setEvent(new Event()->setId(101));
+                    ->setId($booking1Id)
+                    ->setEvent(new Event()->setId($event1Id));
 
         // Recursive booking
         $existingBookingEventInSeries = new Booking\Model()
-                    ->setId(1)
-                    ->setEvent(new Event()->setId(101)->setSeriesId(10));
+                    ->setId($booking1Id)
+                    ->setEvent(new Event()->setId($event1Id)->setSeriesId($series1Id));
 
         // Conflicting bookings, same Series as $existingBooking
         $conflictingBookingsSameSeries3 = new Collection()
             ->add(
                 new Booking\Model()
-                    ->setId(2)
-                    ->setEvent(new Event()->setId(102)->setSeriesId(10))
+                    ->setId($booking2Id)
+                    ->setEvent(new Event()->setId($event2Id)->setSeriesId($series1Id))
             )
             ->add(
                 new Booking\Model()
-                    ->setId(3)
-                    ->setEvent(new Event()->setId(103)->setSeriesId(10))
+                    ->setId($booking3Id)
+                    ->setEvent(new Event()->setId($event3Id)->setSeriesId($series1Id))
             )
             ->add(
                 new Booking\Model()
-                    ->setId(4)
-                    ->setEvent(new Event()->setId(104)->setSeriesId(10))
+                    ->setId($booking4Id)
+                    ->setEvent(new Event()->setId($event4Id)->setSeriesId($series1Id))
             );
 
         // Conflicting bookings, some other Series
         $conflictingBookingsOtherSeries3 = new Collection()
             ->add(
                 new Booking\Model()
-                    ->setId(11)
-                    ->setEvent(new Event()->setId(111)->setSeriesId(20))
+                    ->setId($booking5Id)
+                    ->setEvent(new Event()->setId($event5Id)->setSeriesId($series2Id))
             )
             ->add(
                 new Booking\Model()
-                    ->setId(12)
-                    ->setEvent(new Event()->setId(112)->setSeriesId(20))
+                    ->setId($booking6Id)
+                    ->setEvent(new Event()->setId($event6Id)->setSeriesId($series2Id))
             )
             ->add(
                 new Booking\Model()
-                    ->setId(13)
-                    ->setEvent(new Event()->setId(113)->setSeriesId(20))
+                    ->setId($booking7Id)
+                    ->setEvent(new Event()->setId($event7Id)->setSeriesId($series2Id))
             );
 
         // No conflicting bookings
@@ -532,16 +551,16 @@ class ValidationTest extends TestCase
         $conflictingBookings1 = new Collection()
             ->add(
                 new Booking\Model()
-                    ->setId(21)
-                    ->setEvent(new Event()->setId(221))
+                    ->setId($booking8Id)
+                    ->setEvent(new Event()->setId($event8Id))
             );
 
         // Conflicting bookings, different Id
         $conflictingBookingsSameId = new Collection()
             ->add(
                 new Booking\Model()
-                    ->setId(1)
-                    ->setEvent(new Event()->setId(101))
+                    ->setId($booking1Id)
+                    ->setEvent(new Event()->setId($event1Id))
             );
 
         return [
