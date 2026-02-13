@@ -280,7 +280,9 @@ class Redis
         $returnValue           = null;
         $requiresRecache       = false;
         $requiresRecalculation = false;
-        if (isset($result)) {
+        if (!isset($result)) {
+            $requiresRecalculation = true;
+        } else {
             // Decompress the result:
             // otherwise, mark it as requiring recache (but not recomputation)
             if (str_starts_with($result, self::COMPRESSED_PAYLOAD_PREFIX)) {
