@@ -2,6 +2,7 @@
   "name": "schoolbox",
   "version": "26.1.0",
   "author": "Schoolbox Pty Ltd",
+  "type": "module",
   "description": "Refer to 'External dependency list' in Confluence for more info on the dependencies below",
   "dependencies": {
     "@andxor/jquery-ui-touch-punch-fix": "~1.0.2",
