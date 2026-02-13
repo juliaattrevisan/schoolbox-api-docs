@@ -767,15 +767,19 @@ class ValidationTest extends TestCase
         ?string $minReservationTime = null,
         ?string $maxReservationTime = null
     ): void {
+        $user1Id = 123;
+        $user2Id = 999;
+        $resource1Id = 456;
+
         // Create user
         $user = new User();
-        $user->setId(123);
+        $user->setId($user1Id);
 
         $validation = $this->createValidation($user);
 
         // Create resource with moderation type
         $resource = new Item\Model();
-        $resource->setId(456);
+        $resource->setId($resource1Id);
         $moderationTypeModel = new Item\ModerationType\Model();
         $moderationTypeModel->setId($moderationType);
         $resource->setModerationType($moderationTypeModel);
@@ -803,7 +807,7 @@ class ValidationTest extends TestCase
             ->onlyMethods(['isUserModerator'])
             ->getMock();
         $resource->method('isUserModerator')->willReturn($userIsModerator);
-        $resource->setId(456);
+        $resource->setId($resource1Id);
         $resource->setModerationType($moderationTypeModel);
         $resource->setAllowClashBookings($allowClashBookings);
         $resource->setMinLeadTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
@@ -831,7 +835,7 @@ class ValidationTest extends TestCase
 
         // Set author
         $author = new User();
-        $author->setId($userIsAuthor ? 123 : 999);
+        $author->setId($userIsAuthor ? $user1Id: $user2Id);
         $event->setAuthor($author);
 
         // Create booking
