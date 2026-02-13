@@ -50,6 +50,11 @@ class Redis
     public const FUNCTION_CALL_CACHE_PREFIX = 'fc';
 
     /**
+     * String with which a compressed payload will be prefixed.
+     */
+    private const string COMPRESSED_PAYLOAD_PREFIX = 'gz:';
+
+    /**
      * @var self
      */
     protected static $instance;
@@ -272,33 +277,55 @@ class Redis
         }
 
         // Was a result returned? If so unserialize it
+        $returnValue           = null;
+        $requiresRecache       = false;
+        $requiresRecalculation = false;
         if (isset($result)) {
+            // Decompress the result:
+            // otherwise, mark it as requiring recache (but not recomputation)
+            if (str_starts_with($result, self::COMPRESSED_PAYLOAD_PREFIX)) {
+                $result = gzuncompress(substr($result, strlen(self::COMPRESSED_PAYLOAD_PREFIX)));
+            } else {
+                $requiresRecache = true;
+            }
+
+            // short-circuit if serialized result is legitimately false
             if ($result === 'b:0;') {
-                // short-circuit if serialized result is legitimately false
-                return false;
+                $returnValue = false;
             }
 
             // Results should now always be serialized before storage.
             $unserializedResult = unserialize($result);
             if ($unserializedResult !== false) {
-                return $unserializedResult;
-            }
-        }
-
-        // No result fetched, or non-comprehensible? recalculate, and then cache
-        $result = call_user_func($callback, $params);
-        try {
-            if ($timeout > 0) {
-                $redis->setex($key, $timeout, serialize($result));
+                $returnValue = $unserializedResult;
             } else {
-                $redis->set($key, serialize($result));
+                $requiresRecalculation = true;
             }
-        } catch (Predis\PredisException $e) {
-            trigger_error(sprintf('Redis exception when writing cache: "%s"', $e->getMessage()), E_USER_WARNING);
-            // otherwise continue
         }
 
-        return $result;
+        // No result fetched, or non-comprehensible? recalculate:
+        // recache will always be required
+        if ($requiresRecalculation) {
+            $returnValue = call_user_func($callback, $params);
+        }
+
+        // Recache if result recalculated, or needs to be recached because the
+        // fetched result was not compressed
+        if ($requiresRecalculation || $requiresRecache) {
+            try {
+                $serializedValue = self::COMPRESSED_PAYLOAD_PREFIX . gzcompress(serialize($returnValue));
+                if ($timeout > 0) {
+                    $redis->setex($key, $timeout, $serializedValue);
+                } else {
+                    $redis->set($key, $serializedValue);
+                }
+            } catch (Predis\PredisException $e) {
+                trigger_error(sprintf('Redis exception when writing cache: "%s"', $e->getMessage()), E_USER_WARNING);
+                // otherwise continue
+            }
+        }
+
+        return $returnValue;
     }
 
     /**
