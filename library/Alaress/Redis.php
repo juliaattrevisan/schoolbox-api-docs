@@ -271,18 +271,21 @@ class Redis
             // otherwise continue
         }
 
-        // Was a result returned? If so deserialize it
+        // Was a result returned? If so unserialize it
         if (isset($result)) {
+            if ($result === 'b:0;') {
+                // short-circuit if serialized result is legitimately false
+                return false;
+            }
+
             // Results should now always be serialized before storage.
-            // Older results might not be, though.
             $unserializedResult = unserialize($result);
-            if ($unserializedResult !== false || $result === 'b:0;') {
-                // if serialized result is legitimately boolean false
+            if ($unserializedResult !== false) {
                 return $unserializedResult;
             }
         }
 
-        // No result fetched? recalculate, and then cache
+        // No result fetched, or non-comprehensible? recalculate, and then cache
         $result = call_user_func($callback, $params);
         try {
             if ($timeout > 0) {
