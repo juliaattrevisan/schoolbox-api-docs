@@ -927,7 +927,7 @@ class Profile implements IStrategy
 
         /* Unset lookups that we no longer need
          */
-        unset ($contactInfoLookup, $photoLookup, $staffLookup);
+        unset($contactInfoLookup, $photoLookup, $staffLookup);
     }
 
 
