@@ -5,7 +5,7 @@
         "esModuleInterop": true, // resolves potential transpile issues: https://www.typescriptlang.org/tsconfig#esModuleInterop
         "forceConsistentCasingInFileNames": true, // When this option is set, TypeScript will issue an error if a program tries to include a file by a casing different from the casing on disk.
         "jsx": "preserve", // to link methods/properies in Vue <template> to <script> in Single File Components
-        "moduleResolution": "node",
+        "moduleResolution": "node16", // Use Node.js-style module resolution, which mimics the way modules are resolved in Node.js. This is the recommended setting for most projects.
         "paths": {
             "@schoolboxLearningMomentEvidence/*": ["library/Schoolbox/Learning/Moment/vue/*"],
             "@schoolboxCurriculum/*": ["library/Schoolbox/Curriculum/templates/*"],

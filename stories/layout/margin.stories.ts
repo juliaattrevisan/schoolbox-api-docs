@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/vue3";
+import type { Meta, StoryObj } from "storybook-vue3-rsbuild";
 import StorybookSlot from "../../vue/components/storybook-slot.vue";
 
 /**

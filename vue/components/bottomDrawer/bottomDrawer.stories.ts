@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/vue3";
+import type { Meta, StoryObj } from "storybook-vue3-rsbuild";
 import BottomDrawer from "./bottom-drawer.vue";
 
 /**
