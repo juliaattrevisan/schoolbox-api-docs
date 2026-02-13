@@ -943,8 +943,8 @@ class ValidationTest extends TestCase
                     ],
                 ],
                 'expectedIsClashByBookingId' => [
-                    $booking1Id => true,  // Clashes with resource $resource1Id's booking.
-                    $booking2Id => false, // No clash with resource 200's booking.
+                    $booking1Id => true,  // Clashes with resource1's booking.
+                    $booking2Id => false, // No clash with resource2's booking.
                 ],
             ],
             'no approved bookings for resource' => [
@@ -1062,14 +1062,20 @@ class ValidationTest extends TestCase
      */
     public static function providerCheckForClashesIfResourceBookingsAddedToEvents(): array
     {
+        $resource1Id = 100;
+        $resource2Id = 200;
+        $event1Id = 1;
+        $event2Id = 2;
+        $event3Id = 3;
+
         return [
             "no clashes - resource booking at event time doesn't overlap with approved bookings" => [
                 'events' => [
-                    ['id' => 1, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
                 ],
-                'resourceIds' => [100],
+                'resourceIds' => [$resource1Id],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T12:00:00+00:00', 'endDatetime' => '2077-01-01T13:00:00+00:00'],
                         ['startDatetime' => '2077-01-01T14:00:00+00:00', 'endDatetime' => '2077-01-01T15:00:00+00:00'],
                     ],
@@ -1080,53 +1086,53 @@ class ValidationTest extends TestCase
             ],
             'single clash - resource booking at event time overlaps with approved booking' => [
                 'events' => [
-                    ['id' => 2, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
                 ],
-                'resourceIds' => [100],
+                'resourceIds' => [$resource1Id],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
                     ],
                 ],
                 'expectedIsClashByResourceIdByEventId' => [
-                    2 => [100 => true],
+                    $event1Id => [$resource1Id => true],
                 ],
             ],
             'resource booking at event time would completely contain approved booking' => [
                 'events' => [
-                    ['id' => 3, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T14:00:00+00:00'],
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T14:00:00+00:00'],
                 ],
-                'resourceIds' => [100],
+                'resourceIds' => [$resource1Id],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T11:00:00+00:00', 'endDatetime' => '2077-01-01T12:00:00+00:00'],
                     ],
                 ],
                 'expectedIsClashByResourceIdByEventId' => [
-                    3 => [100 => true],
+                    $event1Id => [$resource1Id => true],
                 ],
             ],
             'approved booking would completely contain resource booking at event time' => [
                 'events' => [
-                    ['id' => 4, 'startDate' => '2077-01-01T11:00:00+00:00', 'endDate' => '2077-01-01T12:00:00+00:00'],
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T11:00:00+00:00', 'endDate' => '2077-01-01T12:00:00+00:00'],
                 ],
-                'resourceIds' => [100],
+                'resourceIds' => [$resource1Id],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T10:00:00+00:00', 'endDatetime' => '2077-01-01T14:00:00+00:00'],
                     ],
                 ],
                 'expectedIsClashByResourceIdByEventId' => [
-                    4 => [100 => true],
+                    $event1Id => [$resource1Id => true],
                 ],
             ],
             'resource booking at event time ends exactly when approved booking starts - no clash' => [
                 'events' => [
-                    ['id' => 5, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
                 ],
-                'resourceIds' => [100],
+                'resourceIds' => [$resource1Id],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T11:00:00+00:00', 'endDatetime' => '2077-01-01T12:00:00+00:00'],
                     ],
                 ],
@@ -1136,11 +1142,11 @@ class ValidationTest extends TestCase
             ],
             'resource booking at event time starts exactly when approved booking ends - no clash' => [
                 'events' => [
-                    ['id' => 6, 'startDate' => '2077-01-01T12:00:00+00:00', 'endDate' => '2077-01-01T13:00:00+00:00'],
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T12:00:00+00:00', 'endDate' => '2077-01-01T13:00:00+00:00'],
                 ],
-                'resourceIds' => [100],
+                'resourceIds' => [$resource1Id],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T10:00:00+00:00', 'endDatetime' => '2077-01-01T12:00:00+00:00'],
                     ],
                 ],
@@ -1150,48 +1156,48 @@ class ValidationTest extends TestCase
             ],
             "multiple events - resource bookings at some event times clash, others don't" => [
                 'events' => [
-                    ['id' => 7, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
-                    ['id' => 8, 'startDate' => '2077-01-01T12:00:00+00:00', 'endDate' => '2077-01-01T13:00:00+00:00'],
-                    ['id' => 9, 'startDate' => '2077-01-01T15:00:00+00:00', 'endDate' => '2077-01-01T16:00:00+00:00'],
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $event2Id, 'startDate' => '2077-01-01T12:00:00+00:00', 'endDate' => '2077-01-01T13:00:00+00:00'],
+                    ['id' => $event3Id, 'startDate' => '2077-01-01T15:00:00+00:00', 'endDate' => '2077-01-01T16:00:00+00:00'],
                 ],
-                'resourceIds' => [100],
+                'resourceIds' => [$resource1Id],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
                         ['startDatetime' => '2077-01-01T14:00:00+00:00', 'endDatetime' => '2077-01-01T15:30:00+00:00'],
                     ],
                 ],
                 'expectedIsClashByResourceIdByEventId' => [
-                    7 => [100 => true], // Resource booking at event 7 time would clash with first approved booking.
-                    9 => [100 => true], // Resource booking at event 9 time would clash with second approved booking.
-                    // Resource booking at event 8 time has no clashes, so it's not in the result.
+                    $event1Id => [$resource1Id => true], // Resource booking at event1 time would clash with first approved booking.
+                    $event3Id => [$resource1Id => true], // Resource booking at event3 time would clash with second approved booking.
+                    // Resource booking at event2 time has no clashes, so it's not in the result.
                 ],
             ],
             'multiple resources - booking one resource would clash, booking another would not' => [
                 'events' => [
-                    ['id' => 10, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
                 ],
-                'resourceIds' => [100, 200],
+                'resourceIds' => [$resource1Id, $resource2Id],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
                     ],
-                    200 => [
+                    $resource2Id => [
                         ['startDatetime' => '2077-01-01T12:00:00+00:00', 'endDatetime' => '2077-01-01T13:00:00+00:00'],
                     ],
                 ],
                 'expectedIsClashByResourceIdByEventId' => [
-                    10 => [100 => true], // Booking resource 100 at event time would clash.
-                    // Booking resource 200 at event time has no clash, so it's not in the result.
+                    $event1Id => [$resource1Id => true], // Booking resource1 at event time would clash.
+                    // Booking resource2 at event time has no clash, so it's not in the result.
                 ],
             ],
             'no approved bookings for resource - no clashes when booking resource at event time' => [
                 'events' => [
-                    ['id' => 11, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
                 ],
-                'resourceIds' => [100],
+                'resourceIds' => [$resource1Id],
                 'approvedBookingPeriods' => [
-                    // No approved bookings for resource 100.
+                    // No approved bookings for resource1.
                 ],
                 'expectedIsClashByResourceIdByEventId' => [
                     // No clashes expected, so the result should be empty.
@@ -1199,11 +1205,11 @@ class ValidationTest extends TestCase
             ],
             'early exit optimization - all approved bookings start after event end' => [
                 'events' => [
-                    ['id' => 12, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
                 ],
-                'resourceIds' => [100],
+                'resourceIds' => [$resource1Id],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T12:00:00+00:00', 'endDatetime' => '2077-01-01T13:00:00+00:00'],
                         ['startDatetime' => '2077-01-01T14:00:00+00:00', 'endDatetime' => '2077-01-01T15:00:00+00:00'],
                         ['startDatetime' => '2077-01-01T16:00:00+00:00', 'endDatetime' => '2077-01-01T17:00:00+00:00'],
@@ -1215,21 +1221,21 @@ class ValidationTest extends TestCase
             ],
             'multiple events and multiple resources - different clash results for different combinations' => [
                 'events' => [
-                    ['id' => 13, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
-                    ['id' => 14, 'startDate' => '2077-01-01T13:00:00+00:00', 'endDate' => '2077-01-01T14:00:00+00:00'],
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $event2Id, 'startDate' => '2077-01-01T13:00:00+00:00', 'endDate' => '2077-01-01T14:00:00+00:00'],
                 ],
-                'resourceIds' => [100, 200],
+                'resourceIds' => [$resource1Id, $resource2Id],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
                     ],
-                    200 => [
+                    $resource2Id => [
                         ['startDatetime' => '2077-01-01T13:30:00+00:00', 'endDatetime' => '2077-01-01T14:30:00+00:00'],
                     ],
                 ],
                 'expectedIsClashByResourceIdByEventId' => [
-                    13 => [100 => true], // Booking resource 100 at event 13 time would clash.
-                    14 => [200 => true], // Booking resource 200 at event 14 time would clash.
+                    $event1Id => [$resource1Id => true], // Booking resource1 at event1 time would clash.
+                    $event2Id => [$resource2Id => true], // Booking resource2 at event2 time would clash.
                 ],
             ],
         ];
