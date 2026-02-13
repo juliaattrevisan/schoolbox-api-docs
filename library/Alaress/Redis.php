@@ -263,34 +263,38 @@ class Redis
         $redis = $this->client;
         $key   = $this->getRedisKey($base_key, $params);
 
-        // Would use Redis hashes, but individual keys don't have expiry.
-        $is_result_called = false;
-        $result           = null;
+        $result = null;
         try {
             $result = $redis->get($key);
-            if (!isset($result)) {
-                $is_result_called = true;
-                $result           = call_user_func($callback, $params);
-                if ($timeout > 0) {
-                    $redis->setex($key, $timeout, serialize($result));
-                } else {
-                    $redis->set($key, serialize($result));
-                }
-            } else {
-                // Results should now always be serialized before storage.
-                // Older results might not be, though.
-                $unserializedResult = unserialize($result);
-                if ($unserializedResult !== false || $result === 'b:0;') {
-                    // if serialized result is legitimately boolean false
-                    $result = $unserializedResult;
-                }
-            }
         } catch (Predis\PredisException $e) {
-            trigger_error(sprintf('Redis exception: "%s"', $e->getMessage()), E_USER_WARNING);
-            if (!$is_result_called) {
-                $result = call_user_func($callback, $params);
+            trigger_error(sprintf('Redis exception when reading: "%s"', $e->getMessage()), E_USER_WARNING);
+            // otherwise continue
+        }
+
+        // Was a result returned? If so deserialize it
+        if (isset($result)) {
+            // Results should now always be serialized before storage.
+            // Older results might not be, though.
+            $unserializedResult = unserialize($result);
+            if ($unserializedResult !== false || $result === 'b:0;') {
+                // if serialized result is legitimately boolean false
+                return $unserializedResult;
             }
         }
+
+        // No result fetched? recalculate, and then cache
+        $result = call_user_func($callback, $params);
+        try {
+            if ($timeout > 0) {
+                $redis->setex($key, $timeout, serialize($result));
+            } else {
+                $redis->set($key, serialize($result));
+            }
+        } catch (Predis\PredisException $e) {
+            trigger_error(sprintf('Redis exception when writing cache: "%s"', $e->getMessage()), E_USER_WARNING);
+            // otherwise continue
+        }
+
         return $result;
     }
 
