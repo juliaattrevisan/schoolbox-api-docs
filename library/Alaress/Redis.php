@@ -268,9 +268,9 @@ class Redis
         $redis = $this->client;
         $key   = $this->getRedisKey($base_key, $params);
 
-        $result = null;
+        $cachedValue = null;
         try {
-            $result = $redis->get($key);
+            $cachedValue = $redis->get($key);
         } catch (Predis\PredisException $e) {
             trigger_error(sprintf('Redis exception when reading: "%s"', $e->getMessage()), E_USER_WARNING);
             // otherwise continue
@@ -280,29 +280,36 @@ class Redis
         $returnValue           = null;
         $requiresRecache       = false;
         $requiresRecalculation = false;
-        if (!isset($result)) {
+        if (!isset($cachedValue)) {
             $requiresRecalculation = true;
         } else {
             // Decompress the result:
-            // otherwise, mark it as requiring recache (but not recomputation)
-            if (str_starts_with($result, self::COMPRESSED_PAYLOAD_PREFIX)) {
-                $result = gzuncompress(substr($result, strlen(self::COMPRESSED_PAYLOAD_PREFIX)));
+            // otherwise, mark it as requiring recache (but not recalculation)
+            if (str_starts_with($cachedValue, self::COMPRESSED_PAYLOAD_PREFIX)) {
+                $serializedValue = gzuncompress(substr($cachedValue, strlen(self::COMPRESSED_PAYLOAD_PREFIX)));
             } else {
+                $serializedValue = $cachedValue;
                 $requiresRecache = true;
             }
 
+            // Raw result is no longer needed, thus it can be freed
+            unset($cachedValue);
+
             // short-circuit if serialized result is legitimately false
-            if ($result === 'b:0;') {
+            if ($serializedValue === 'b:0;') {
                 $returnValue = false;
             }
 
-            // Results should now always be serialized before storage.
-            $unserializedResult = unserialize($result);
-            if ($unserializedResult !== false) {
-                $returnValue = $unserializedResult;
+            // Results should now always be serialized before storage
+            $unserializedValue = unserialize($serializedValue);
+            if ($unserializedValue !== false) {
+                $returnValue = $unserializedValue;
             } else {
                 $requiresRecalculation = true;
             }
+
+            // Can free both serialized and unserialized value
+            unset($serializedValue, $unserializedValue);
         }
 
         // No result fetched, or non-comprehensible? recalculate:
