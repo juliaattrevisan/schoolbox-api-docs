@@ -4,6 +4,7 @@
  */
 
 import { pluginVue } from "@rsbuild/plugin-vue";
+import { pluginSass } from '@rsbuild/plugin-sass';
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import remarkGfm from "remark-gfm";
@@ -63,10 +64,10 @@ const config = {
         config.resolve.alias["@css"] = resolve(__dirname, "../www/static/css");
         config.resolve.alias["@library"] = resolve(__dirname, "../library");
         /**
-         * Add in the plugin to compile Vue files.
+         * Add in the plugin to compile Vue files and handle SCSS.
          */
         config.plugins = config.plugins || [];
-        config.plugins.push(pluginVue());
+        config.plugins.push(pluginVue(), pluginSass());
         return config;
     },
 };

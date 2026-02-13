@@ -18,11 +18,11 @@ import theme from "./theme";
 // import { ClientTable } from "v-tables-3-select-rows";
 // import { createPinia } from "pinia";
 import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount, nextTick, defineCustomElement } from "vue"; // as Vue is now stored globally, provide reference to these functions so storybook can still run without browser context
-import SbxPopOut from "@schoolboxVue/components/popOut/sbx-pop-out.ce.vue";
+// import SbxPopOut from "@schoolboxVue/components/popOut/sbx-pop-out.ce.vue";
 import SbxIcon from "@schoolboxVue/components/icon/sbx-icon.ce.vue";
-import SbxFreeStyle from "@schoolboxVue/components/generic/sbx-free-style.ce.vue";
-import SbxLabel from "@schoolboxVue/components/label/sbx-label.ce.vue";
-import SbxLabelPastoralPoints from "@schoolboxVue/components/label/sbx-label-pastoral-points.ce.vue";
+// import SbxFreeStyle from "@schoolboxVue/components/generic/sbx-free-style.ce.vue";
+// import SbxLabel from "@schoolboxVue/components/label/sbx-label.ce.vue";
+// import SbxLabelPastoralPoints from "@schoolboxVue/components/label/sbx-label-pastoral-points.ce.vue";
 
 window.Vue = {};
 window.Vue.ref = ref;
@@ -50,16 +50,16 @@ window.Vue.defineCustomElement = defineCustomElement;
  * hoisted to the top of the file, and window.Vue is not defined at that point
  */
 export function register() {
-    const SbxPopOutCE = window.Vue.defineCustomElement(SbxPopOut);
-    window.customElements.define("sbx-pop-out", SbxPopOutCE);
+    // const SbxPopOutCE = window.Vue.defineCustomElement(SbxPopOut);
+    // window.customElements.define("sbx-pop-out", SbxPopOutCE);
     const SbxIconCE = window.Vue.defineCustomElement(SbxIcon);
     window.customElements.define("sbx-icon", SbxIconCE);
-    const SbxFreeStyleCE = window.Vue.defineCustomElement(SbxFreeStyle);
-    window.customElements.define("sbx-free-style", SbxFreeStyleCE);
-    const SbxLabelCE = window.Vue.defineCustomElement(SbxLabel);
-    window.customElements.define("sbx-label", SbxLabelCE);
-    const SbxLabelPastoralPointsCE = window.Vue.defineCustomElement(SbxLabelPastoralPoints);
-    window.customElements.define("sbx-label-pastoral-points", SbxLabelPastoralPointsCE);
+    // const SbxFreeStyleCE = window.Vue.defineCustomElement(SbxFreeStyle);
+    // window.customElements.define("sbx-free-style", SbxFreeStyleCE);
+    // const SbxLabelCE = window.Vue.defineCustomElement(SbxLabel);
+    // window.customElements.define("sbx-label", SbxLabelCE);
+    // const SbxLabelPastoralPointsCE = window.Vue.defineCustomElement(SbxLabelPastoralPoints);
+    // window.customElements.define("sbx-label-pastoral-points", SbxLabelPastoralPointsCE);
 }
 register();
 
