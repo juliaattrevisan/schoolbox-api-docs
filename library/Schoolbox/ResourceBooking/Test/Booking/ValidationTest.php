@@ -351,23 +351,30 @@ class ValidationTest extends TestCase
      */
     public static function providerRoomValidateForConflicts()
     {
-        $conflictingBookings3 = new Collection()
-            ->add(new Booking\Model()->setId(11))
-            ->add(new Booking\Model()->setId(12))
-            ->add(new Booking\Model()->setId(13));
-
-        $conflictingBookings1 = new Collection()
-            ->add(new Booking\Model()->setId(11));
+        $event1Id = 11;
+        $event2Id = 12;
+        $event3Id = 13;
+        $event4Id = 111;
+        $event5Id = 112;
+        $event6Id = 113;
 
         $conflictingBookings0 = new Collection();
 
+        $conflictingBookings1 = new Collection()
+            ->add(new Booking\Model()->setId($event1Id));
+
+        $conflictingBookings3 = new Collection()
+            ->add(new Booking\Model()->setId($event1Id))
+            ->add(new Booking\Model()->setId($event2Id))
+            ->add(new Booking\Model()->setId($event3Id));
+
         $roomEvents3 = new Collection()
-            ->add(new Event()->setId(111))
-            ->add(new Event()->setId(112))
-            ->add(new Event()->setId(113));
+            ->add(new Event()->setId($event4Id))
+            ->add(new Event()->setId($event5Id))
+            ->add(new Event()->setId($event6Id));
 
         $roomEvents1 = new Collection()
-            ->add(new Event()->setId(111));
+            ->add(new Event()->setId($event4Id));
 
         $roomEvents0 = new Collection();
 
