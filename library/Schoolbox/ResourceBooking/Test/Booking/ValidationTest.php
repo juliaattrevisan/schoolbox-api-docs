@@ -825,146 +825,152 @@ class ValidationTest extends TestCase
      */
     public static function providerCheckForClashesIfResourceBookingsMoved(): array
     {
+        $resource1Id = 100;
+        $resource2Id = 200;
+        $booking1Id = 1;
+        $booking2Id = 2;
+        $booking3Id = 3;
+
         return [
             "no clashes - booking times don't overlap" => [
                 'movedBookings' => [
-                    ['id' => 1, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
                 ],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T12:00:00+00:00', 'endDatetime' => '2077-01-01T13:00:00+00:00'],
                         ['startDatetime' => '2077-01-01T14:00:00+00:00', 'endDatetime' => '2077-01-01T15:00:00+00:00'],
                     ],
                 ],
                 'expectedIsClashByBookingId' => [
-                    1 => false,
+                    $booking1Id => false,
                 ],
             ],
             'single clash - booking overlaps with one approved booking' => [
                 'movedBookings' => [
-                    ['id' => 2, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
                 ],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
                     ],
                 ],
                 'expectedIsClashByBookingId' => [
-                    2 => true,
+                    $booking1Id => true,
                 ],
             ],
             'booking completely contains approved booking' => [
                 'movedBookings' => [
-                    ['id' => 3, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T14:00:00+00:00'],
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T14:00:00+00:00'],
                 ],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T11:00:00+00:00', 'endDatetime' => '2077-01-01T12:00:00+00:00'],
                     ],
                 ],
                 'expectedIsClashByBookingId' => [
-                    3 => true,
+                    $booking1Id => true,
                 ],
             ],
             'approved booking completely contains moved booking' => [
                 'movedBookings' => [
-                    ['id' => 4, 'resourceId' => 100, 'startDate' => '2077-01-01T11:00:00+00:00', 'endDate' => '2077-01-01T12:00:00+00:00'],
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T11:00:00+00:00', 'endDate' => '2077-01-01T12:00:00+00:00'],
                 ],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T10:00:00+00:00', 'endDatetime' => '2077-01-01T14:00:00+00:00'],
                     ],
                 ],
                 'expectedIsClashByBookingId' => [
-                    4 => true,
+                    $booking1Id => true,
                 ],
             ],
             'booking ends exactly when approved booking starts - no clash' => [
                 'movedBookings' => [
-                    ['id' => 5, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
                 ],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T11:00:00+00:00', 'endDatetime' => '2077-01-01T12:00:00+00:00'],
                     ],
                 ],
                 'expectedIsClashByBookingId' => [
-                    5 => false,
+                    $booking1Id => false,
                 ],
             ],
             'booking starts exactly when approved booking ends - no clash' => [
                 'movedBookings' => [
-                    ['id' => 6, 'resourceId' => 100, 'startDate' => '2077-01-01T12:00:00+00:00', 'endDate' => '2077-01-01T13:00:00+00:00'],
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T12:00:00+00:00', 'endDate' => '2077-01-01T13:00:00+00:00'],
                 ],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T10:00:00+00:00', 'endDatetime' => '2077-01-01T12:00:00+00:00'],
                     ],
                 ],
                 'expectedIsClashByBookingId' => [
-                    6 => false,
+                    $booking1Id => false,
                 ],
             ],
             "multiple bookings - some clash and some don't" => [
                 'movedBookings' => [
-                    ['id' => 7, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
-                    ['id' => 8, 'resourceId' => 100, 'startDate' => '2077-01-01T12:00:00+00:00', 'endDate' => '2077-01-01T13:00:00+00:00'],
-                    ['id' => 9, 'resourceId' => 100, 'startDate' => '2077-01-01T15:00:00+00:00', 'endDate' => '2077-01-01T16:00:00+00:00'],
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $booking2Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T12:00:00+00:00', 'endDate' => '2077-01-01T13:00:00+00:00'],
+                    ['id' => $booking3Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T15:00:00+00:00', 'endDate' => '2077-01-01T16:00:00+00:00'],
                 ],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
                         ['startDatetime' => '2077-01-01T14:00:00+00:00', 'endDatetime' => '2077-01-01T15:30:00+00:00'],
                     ],
                 ],
                 'expectedIsClashByBookingId' => [
-                    7 => true,  // Clashes with first approved booking.
-                    8 => false, // No clash.
-                    9 => true,  // Clashes with second approved booking.
+                    $booking1Id => true,  // Clashes with first approved booking.
+                    $booking2Id => false, // No clash.
+                    $booking3Id => true,  // Clashes with second approved booking.
                 ],
             ],
             'multiple resources - different clash results per resource' => [
                 'movedBookings' => [
-                    ['id' => 10, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
-                    ['id' => 11, 'resourceId' => 200, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $booking2Id, 'resourceId' => $resource2Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
                 ],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
                     ],
-                    200 => [
+                    $resource2Id => [
                         ['startDatetime' => '2077-01-01T12:00:00+00:00', 'endDatetime' => '2077-01-01T13:00:00+00:00'],
                     ],
                 ],
                 'expectedIsClashByBookingId' => [
-                    10 => true,  // Clashes with resource 100's booking.
-                    11 => false, // No clash with resource 200's booking.
+                    $booking1Id => true,  // Clashes with resource $resource1Id's booking.
+                    $booking2Id => false, // No clash with resource 200's booking.
                 ],
             ],
             'no approved bookings for resource' => [
                 'movedBookings' => [
-                    ['id' => 12, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
                 ],
                 'approvedBookingPeriods' => [
-                    // No approved bookings for resource 100.
+                    // No approved bookings for resource $resource1Id.
                 ],
                 'expectedIsClashByBookingId' => [
-                    12 => false,
+                    $booking1Id => false,
                 ],
             ],
             'early exit optimization - sorted periods with start time after booking end' => [
                 'movedBookings' => [
-                    ['id' => 13, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
                 ],
                 'approvedBookingPeriods' => [
-                    100 => [
+                    $resource1Id => [
                         ['startDatetime' => '2077-01-01T12:00:00+00:00', 'endDatetime' => '2077-01-01T13:00:00+00:00'],
                         ['startDatetime' => '2077-01-01T14:00:00+00:00', 'endDatetime' => '2077-01-01T15:00:00+00:00'],
                         ['startDatetime' => '2077-01-01T16:00:00+00:00', 'endDatetime' => '2077-01-01T17:00:00+00:00'],
                     ],
                 ],
                 'expectedIsClashByBookingId' => [
-                    13 => false, // Should exit early at first period since it starts after booking end.
+                    $booking1Id => false, // Should exit early at first period since it starts after booking end.
                 ],
             ],
             // Note we cannot test whether the moved bookings themselves are removed from the set of bookings
