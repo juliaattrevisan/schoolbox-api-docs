@@ -22,7 +22,17 @@ use Schoolbox\Url\Uri;
  */
 class AutoRefreshClient extends Client
 {
+    /**
+     * Command executions may be attempted up to 3 times before being rejected.
+     */
     private const int MAX_ATTEMPTS = 3;
+
+    /**
+     * Cached connection parameters.
+     *
+     * @var array{host: string, port:int|null, database: string, scheme: string}|null
+     */
+    private ?array $connectionParams = null;
 
     /**
      * Instrument connection.
@@ -34,11 +44,12 @@ class AutoRefreshClient extends Client
      */
     public function connect(): void
     {
+        $connectionParams = $this->getConnectionParams();
         $url = new Uri()
-            ->withHost($this->getConnection()->getParameters()->host ?? '')
-            ->withPort($this->getConnection()->getParameters()->port ?? null)
-            ->withPath($this->getConnection()->getParameters()->database ?? '')
-            ->withScheme($this->getConnection()->getParameters()->scheme ?? '');
+            ->withHost($connectionParams['host'])
+            ->withPort($connectionParams['port'])
+            ->withPath($connectionParams['database'])
+            ->withScheme($connectionParams['scheme']);
         Tracer::getDefaultTrace()->runWithinSpan(
             parent::connect(...),
             sprintf('connect %s', $url->__toString()),
@@ -112,17 +123,33 @@ class AutoRefreshClient extends Client
     }
 
     /**
+     * Get connection parameters, caching if not yet fetched.
+     *
+     * @return array{host: string, port:int|null, database: string, scheme: string}
+     */
+    private function getConnectionParams(): array
+    {
+        return $this->connectionParams ??= [
+            'host'     => $this->getConnection()->getParameters()->host ?? '',
+            'port'     => $this->getConnection()->getParameters()->port ?? null,
+            'database' => $this->getConnection()->getParameters()->database ?? '',
+            'scheme'   => $this->getConnection()->getParameters()->scheme ?? '',
+        ];
+    }
+
+    /**
      * Get base data for a Sentry span.
      *
      * @return array
      */
     private function getBaseSpanData(): array
     {
+        $connectionParams = $this->getConnectionParams();
         return [
             'db.system.name' => 'redis',
-            'db.namespace'   => $this->getConnection()->getParameters()->database,
-            'server.address' => $this->getConnection()->getParameters()->host,
-            'server.port'    => $this->getConnection()->getParameters()->port,
+            'db.namespace'   => $connectionParams['database'],
+            'server.address' => $connectionParams['host'],
+            'server.port'    => $connectionParams['port'],
         ];
     }
 }
