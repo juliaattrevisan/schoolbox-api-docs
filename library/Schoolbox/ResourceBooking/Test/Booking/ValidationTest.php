@@ -835,7 +835,7 @@ class ValidationTest extends TestCase
 
         // Set author
         $author = new User();
-        $author->setId($userIsAuthor ? $user1Id: $user2Id);
+        $author->setId($userIsAuthor ? $user1Id : $user2Id);
         $event->setAuthor($author);
 
         // Create booking
