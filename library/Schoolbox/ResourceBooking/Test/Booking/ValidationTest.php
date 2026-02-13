@@ -488,7 +488,7 @@ class ValidationTest extends TestCase
         $booking7Id = 13;
         $booking8Id = 21;
         $series1Id = 10;
-        $series2Id = 10;
+        $series2Id = 20;
         $event1Id = 101;
         $event2Id = 102;
         $event3Id = 103;
@@ -504,6 +504,7 @@ class ValidationTest extends TestCase
                     ->setEvent(new Event()->setId($event1Id));
 
         // Recursive booking
+        // #
         $existingBookingEventInSeries = new Booking\Model()
                     ->setId($booking1Id)
                     ->setEvent(new Event()->setId($event1Id)->setSeriesId($series1Id));
@@ -527,6 +528,7 @@ class ValidationTest extends TestCase
             );
 
         // Conflicting bookings, some other Series
+        // #
         $conflictingBookingsOtherSeries3 = new Collection()
             ->add(
                 new Booking\Model()
