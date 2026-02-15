@@ -978,17 +978,16 @@ class Controller extends ConfigController
         if ($student->getDisplayGradeGraph() || $viewer->getRole()->isStaff()) {
             /* Compile a whitelist of worktypes that we want to include on the boxplots
              */
-            $workTypeWhitelist = [];
+            $summaryWorkTypeWhitelist = [];
 
             foreach ($optionsPayload['summary']['workType'] as $worktypeId => $worktype) {
                 if ($worktype['graph'] ?? false) {
-                    $workTypeWhitelist[] = $worktypeId;
+                    $summaryWorkTypeWhitelist[] = $worktypeId;
                 }
             }
 
-            if ($optionsPayload['summary']['cohort']) {
+            if (!empty($summaryWorkTypeWhitelist)) {
                 foreach ($folders as $folder) {
-                    // if the folder is empty, then don't attempt to generate a graph for it
                     if (!isset($summaryAssessments[$folder->getId()])) {
                         continue;
                     }
@@ -1006,23 +1005,22 @@ class Controller extends ConfigController
                         $viewer,
                         $term,
                         $gradeHelper,
-                        $workTypeWhitelist
+                        $summaryWorkTypeWhitelist
                     );
                 }
             }
 
-            if ($optionsPayload['class']['cohort']) {
+            if (!empty($classWorkTypeWhitelist)) {
                 /* Compile a whitelist of worktypes that we want to include on the boxplots
                  */
-                $workTypeWhitelist = [];
-
+                $classWorkTypeWhitelist = [];
                 foreach ($optionsPayload['class']['workType'] as $worktypeId => $worktype) {
                     if ($worktype['graph'] ?? false) {
-                        $workTypeWhitelist[] = $worktypeId;
+                        $classWorkTypeWhitelist[] = $worktypeId;
                     }
                 }
 
-                foreach ($folders as $folder) {
+                 foreach ($folders as $folder) {
                     // if the folder is empty, then don't attempt to generate a graph for it
                     if (!isset($classAssessments[$folder->getId()])) {
                         continue;
@@ -1041,7 +1039,7 @@ class Controller extends ConfigController
                         $viewer,
                         $term,
                         $gradeHelper,
-                        $workTypeWhitelist
+                        $classWorkTypeWhitelist
                     );
                 }
             }
