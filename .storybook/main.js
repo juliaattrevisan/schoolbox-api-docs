@@ -1,6 +1,7 @@
 /**
  * Storybook configuration for Vue 3 using Rsbuild.
- * This file sets up Storybook to work with Vue 3 components, including SCSS support and custom path aliases.
+ * This file sets up Storybook to work with Vue 3 components,
+ * including SCSS support and custom path aliases.
  */
 
 import { pluginVue } from "@rsbuild/plugin-vue";
@@ -12,7 +13,6 @@ import remarkGfm from "remark-gfm";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-/** @type { import('storybook-vue3-rsbuild').StorybookConfig } */
 const config = {
     stories: ["../stories/**/*.mdx", "../stories/**/*.stories.@(js|ts)"],
     staticDirs: ["../stories/assets"],
@@ -31,29 +31,6 @@ const config = {
     framework: "storybook-vue3-rsbuild",
     rsbuildFinal: async (config) => {
         /**
-         * Configure SCSS processing via Rsbuild's tools.rspack
-         * Rsbuild has built-in SCSS support when sass is installed,
-         * but we configure it explicitly here for custom loader options.
-         */
-        config.tools = config.tools || {};
-        config.tools.rspack = config.tools.rspack || {};
-        config.tools.rspack.module = config.tools.rspack.module || {};
-        config.tools.rspack.module.rules = config.tools.rspack.module.rules || [];
-        config.tools.rspack.module.rules.push({
-            test: /\.scss$/,
-            use: [
-                "style-loader",
-                {
-                    loader: "css-loader",
-                    options: {
-                        url: false, // don't validate image urls as they error
-                    },
-                },
-                "sass-loader",
-            ],
-            include: resolve(__dirname, "../"),
-        });
-        /**
          * Add in the required aliases
          */
         config.resolve.alias["@js"] = resolve(__dirname, "../www/static/js");
@@ -64,7 +41,7 @@ const config = {
         config.resolve.alias["@css"] = resolve(__dirname, "../www/static/css");
         config.resolve.alias["@library"] = resolve(__dirname, "../library");
         /**
-         * Add in the plugin to compile Vue files and handle SCSS.
+         * Add in the plugins to compile Vue files and handle SCSS.
          */
         config.plugins = config.plugins || [];
         config.plugins.push(pluginVue(), pluginSass());
