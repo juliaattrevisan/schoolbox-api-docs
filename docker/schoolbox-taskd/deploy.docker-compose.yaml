@@ -7,7 +7,6 @@
 
 services:
   schoolbox-taskd:
-    container_name: schoolbox-taskd
     depends_on:
       redis-storage:
         condition: service_healthy

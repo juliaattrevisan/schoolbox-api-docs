@@ -32,26 +32,28 @@ if [[ $errors == "1" ]]; then
     exit 1
 fi
 
+# Need to pass timezone as an env arg to provision
+env_args="-e CONFIG_DATE_TIMEZONE=${TIMEZONE}"
+
 # If _not_ debugging provisioning:
 # run all of these commands with an empty Xdebug config (no IDE key), so that
 # they do not trigger breakpoints.
-env_args=''
 case "${PROVISION_DEBUG_ENABLE}" in
     1 | true | yes | on)
         ;;
     *)
-        env_args='-e XDEBUG_CONFIG=""'
+        env_args+=' -e XDEBUG_CONFIG='
         ;;
 esac
 
 # Run the provision script in the schoolbox-cli container
-docker exec -it $env_args -u root schoolbox-cli tools/docker-provision.sh $provision_args
+"$(dirname "$0")/compose" exec -it $env_args -u root schoolbox-cli tools/docker-provision.sh $provision_args
 
 # Is the second env in action?
 # If so, re-run the provision script for INSTANCE_ID=docker2
 case "${SECOND_INSTANCE_ENABLE}" in
     1 | true | yes | on)
-        docker exec -it -e INSTANCE_ID=docker2 $env_args -u root schoolbox-cli tools/docker-provision.sh --install-instance-only
+        "$(dirname "$0")/compose" exec -it -e INSTANCE_ID=docker2 $env_args -u root schoolbox-cli tools/docker-provision.sh --install-instance-only
         ;;
 esac
 
@@ -66,11 +68,11 @@ esac
 case "${LTI_DEVKIT_ENABLE}" in
     1 | true | yes | on)
         # Current location of devkit is hardcoded, as is its hostname
-        PUBLIC_KEY=$(docker exec -it $env_args schoolbox-cli tools/instance-mariadb.sh \
+        PUBLIC_KEY=$("$(dirname "$0")/compose" exec -it $env_args schoolbox-cli tools/instance-mariadb.sh \
             --skip-column-names --batch --raw \
             -e "SELECT value FROM config WHERE name='jwt_public_key'" \
             | sed -e 's/[[:space:]]*$//' )
-        DEPLOYMENT_ID=$(docker exec -it $env_args schoolbox-cli "tools/provision/create-devkit-lti-tool.php" \
+        DEPLOYMENT_ID=$("$(dirname "$0")/compose" exec -it $env_args schoolbox-cli "tools/provision/create-devkit-lti-tool.php" \
             --key "$(cat ../devkit-lti1p3/config/keys/public.key)" \
             --host "http://devkit-lti1p3.localhost:${LTI_DEVKIT_PUBLISHED_PORT}" \
             | sed -e 's/[[:space:]]*$//' )

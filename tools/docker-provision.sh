@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
 # Provisions the Docker environment: port of `vagrant-provision.sh`
 
+# Variables which must be provided in docker-consts.sh
 declare SITE_ROOT
 declare CACHE_DIR
 declare REQUIRED_CONSTS=(SITE_ROOT CACHE_DIR)
 
+# Variables which must be provided directly via env vars
+declare CONFIG_DATE_TIMEZONE
 declare INSTANCE_ID
+declare REQUIRED_ENV_VARS=(CONFIG_DATE_TIMEZONE INSTANCE_ID)
+
+# Variables which must be provided in the config files
+# docker.env and docker.default.env
 declare DATA_SOURCE
 declare DATA_FILENAME
 declare CERTIFICATE_SOURCE
@@ -13,13 +20,12 @@ declare EXTERNAL_DB
 declare EXTERNAL_DB_HOST
 declare EXTERNAL_DB_DB
 declare INSTANCE_REGISTRY_URL
-declare INSTANCE_REGISTRY_API_KEY
 declare ARTIFACT_SOURCE
 declare REQUIRED_CONFIGS=(\
   DATA_SOURCE DATA_FILENAME \
   CERTIFICATE_SOURCE \
   EXTERNAL_DB EXTERNAL_DB_HOST EXTERNAL_DB_DB \
-  INSTANCE_REGISTRY_URL INSTANCE_REGISTRY_API_KEY \
+  INSTANCE_REGISTRY_URL \
   ARTIFACT_SOURCE \
 )
 
@@ -59,7 +65,20 @@ function load_consts() {
   # SITE_ROOT is not yet defined, so assume this script is running in what will
   # eventually be SITE_ROOT
   source ./tools/docker-consts.sh
+}
 
+function verify_env_vars() {
+  log "Verifying env vars:"
+  local return=1
+  verify_args "${REQUIRED_ENV_VARS[@]}"
+  if [ $? -eq 0 ]; then
+    error "Not all required env vars defined: exiting"
+    exit 1
+  fi
+  echo ""
+}
+
+function verify_consts() {
   log "Verifying constants:"
   local return=1
   verify_args "${REQUIRED_CONSTS[@]}"
@@ -78,7 +97,7 @@ function load_consts() {
   echo ""
 }
 
-function load_config() {
+function load_and_verify_config() {
   # Global vars: load from .ini files
   source "${SITE_ROOT}/docker.default.env"
   if [ -f "${SITE_ROOT}/docker.env" ]; then
@@ -103,15 +122,6 @@ function setup_aws_sso() {
   else
     log "Logged in to AWS: continuing"
   fi
-}
-
-function create_ir_config_file() {
-  log "Creating instance registry configuration";
-  echo -e \
-    "{\n" \
-    "  \"instance_registry_url_override\": \"${INSTANCE_REGISTRY_URL}\",\n" \
-    "  \"instance_registry_api_token\": \"${INSTANCE_REGISTRY_API_KEY}\"\n" \
-    "}" > /etc/schoolbox/instance-registry.json
 }
 
 function cleanup_cache_dir() {
@@ -365,6 +375,7 @@ function install_instance() {
     --config eotc_enabled "'1'" \
     --config etherpad_host "'http://schoolbox-etherpad:9001'" \
     --config etherpad_api_token "'test'" \
+    --config date_timezone "'${CONFIG_DATE_TIMEZONE}'" \
     --config external_type "'$EXTERNAL_DB'" \
     --config external_db_db "'$EXTERNAL_DB_DB'" \
     --config external_db_host "'$EXTERNAL_DB_HOST'" \
@@ -418,19 +429,6 @@ function install_instance() {
   log "Loading all demo data complete";
 }
 
-function create_cron_config_file() {
-  log "Creating cron configuration";
-  local timezone;
-  timezone=$("$SITE_ROOT"/tools/instance-mariadb.sh -NBe "select value from config where name = 'date_timezone'")
-  # Hardcode UPS run time to 22:00 for now, I suppose?
-  echo "${INSTANCE_ID};${timezone};22:00;/var/log/schoolbox/${INSTANCE_ID}" > /etc/schoolbox/cron_config.ini
-}
-
-function create_crontab_files() {
-  log "Creating crontab files";
-  cloud-rebuild-cronjobs --is-primary-host 1 --instance "${INSTANCE_ID}"
-}
-
 function post_install() {
   log "Removing system maintenance mode";
   if "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
@@ -455,7 +453,9 @@ function post_install() {
 
 function main() {
   load_consts
-  load_config
+  verify_env_vars
+  verify_consts
+  load_and_verify_config
   setup_aws_sso
 
   # Should the setup of everything be skipped?
@@ -479,8 +479,6 @@ function main() {
   fi
 
   if [[ $install_instance_only == "0" ]]; then
-    create_ir_config_file
-
     cleanup_cache_dir
     download_secrets
     download_certs
@@ -497,8 +495,6 @@ function main() {
   add_rabbitmq_vhost
   create_data_dirs
   install_instance
-  create_cron_config_file
-  create_crontab_files
   post_install
 }
 

@@ -9,6 +9,7 @@ services:
       SYNERGETIC_PASSWORD_ENCRYPTION_KEY: ${SYNERGETIC_PASSWORD_ENCRYPTION_KEY:-}
       SYNERGETIC_PASSWORD_ENCRYPTION_IV: ${SYNERGETIC_PASSWORD_ENCRYPTION_IV:-}
     restart: always
+    pull_policy: always
     build:
       context: ./schoolbox-frankenphp
       dockerfile: deploy-image.Dockerfile
@@ -30,7 +31,6 @@ services:
     volumes:
       - storage:/var/lib/schoolbox/docker/storage
       - storage2:/var/lib/schoolbox/docker2/storage
-      - schoolbox-config:/etc/schoolbox
     # After building: create data dirs, and make mount writable by www-data
     post_start:
       - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker/
@@ -41,3 +41,8 @@ services:
         user: root
       - command: /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/docker2/ www-data
         user: root
+    configs:
+      - source: frankenphp-caddy
+        target: /etc/frankenphp/
+      - source: schoolbox
+        target: /etc/schoolbox

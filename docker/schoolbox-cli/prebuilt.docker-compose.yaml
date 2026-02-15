@@ -4,14 +4,15 @@
 # The schoolbox-cli container is intended for running command-line processes:
 # * command-line tools
 # * updates
-# * cron tasks
+# * cron tasks, via the service's overridden command
 #
 # Basically, anything which we haven't yet figured out how to migrate into its
 # own container will go here for now.
 
 services:
   schoolbox-cli:
-    container_name: schoolbox-cli
+    pull_policy: always
+    command: cron -f -L 15
     restart: always
     image: ${SCHOOLBOX_CLI_IMAGE}
     environment:
@@ -30,7 +31,6 @@ services:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
       - storage2:/var/lib/schoolbox/docker2/storage
-      - schoolbox-config:/etc/schoolbox
       - caddy-ssl:/etc/nginx/certs/
       - aws-config:/root/.aws
     # Add host.docker.internal as an alias back to the host machine, so that
@@ -47,5 +47,12 @@ services:
         user: root
       - command: /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/docker2/ www-data
         user: root
-      - command: /etc/init.d/cron start
-        user: root
+    configs:
+      - source: frankenphp-php
+        target: /usr/local/etc/php/conf.d/01-base-settings.ini
+      - source: frankenphp-php-env
+        target: /usr/local/etc/php/conf.d/02-env-settings.ini
+      - source: schoolbox-cli-php
+        target: /usr/local/etc/php/conf.d/03-cli-settings.ini
+      - source: schoolbox
+        target: /etc/schoolbox

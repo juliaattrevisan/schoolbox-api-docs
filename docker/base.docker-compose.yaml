@@ -12,12 +12,10 @@ services:
   # In the dev environment, forwards requests to a `schoolbox-frankenphp`
   # container.
   caddy:
-    container_name: caddy
     restart: always
     build:
       context: ./caddy
     volumes:
-      - caddy-config:/etc/caddy
       - caddy-ssl:/etc/nginx/certs/
     ports:
       - "${HTTP_PUBLISHED_PORT}:80"
@@ -27,12 +25,14 @@ services:
       default:
         aliases:
           - docker.dev.schoolbox.cloud
+    configs:
+      - source: caddy
+        target: /etc/caddy/
 
   # Database services:
   # these are containers only in a development environment, they won't be on
   # staging or production envs.
   mariadb:
-    container_name: mariadb
     build:
       context: ./mariadb
       args:
@@ -51,7 +51,6 @@ services:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 1
 
   redis-storage:
-    container_name: redis-storage
     build:
       context: ./redis-storage
       args:
@@ -68,7 +67,6 @@ services:
       - "${REDIS_STORAGE_PUBLISHED_PORT}:6379"
 
   redis-cache:
-    container_name: redis-cache
     build:
       context: ./redis-cache
       args:
@@ -85,7 +83,6 @@ services:
       - "${REDIS_CACHE_PUBLISHED_PORT}:6379"
 
   rabbitmq:
-    container_name: rabbitmq
     build:
       context: ./rabbitmq
       args:
@@ -104,7 +101,6 @@ services:
   # Not-yet-essential services:
   # These will be implemented as separate containers (if they aren't already).
   schoolbox-digestd:
-    container_name: schoolbox-digestd
     pull_policy: never
     depends_on:
       mariadb:
@@ -127,12 +123,19 @@ services:
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
-      - schoolbox-config:/etc/schoolbox
     extra_hosts:
       - host.docker.internal:host-gateway
+    configs:
+      - source: frankenphp-php
+        target: /usr/local/etc/php/conf.d/01-base-settings.ini
+      - source: frankenphp-php-env
+        target: /usr/local/etc/php/conf.d/02-env-settings.ini
+      - source: schoolbox-cli-php
+        target: /usr/local/etc/php/conf.d/03-cli-settings.ini
+      - source: schoolbox
+        target: /etc/schoolbox
 
   schoolbox-scheduled:
-    container_name: schoolbox-scheduled
     pull_policy: never
     depends_on:
       mariadb:
@@ -155,12 +158,19 @@ services:
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
-      - schoolbox-config:/etc/schoolbox
     extra_hosts:
       - host.docker.internal:host-gateway
+    configs:
+      - source: frankenphp-php
+        target: /usr/local/etc/php/conf.d/01-base-settings.ini
+      - source: frankenphp-php-env
+        target: /usr/local/etc/php/conf.d/02-env-settings.ini
+      - source: schoolbox-cli-php
+        target: /usr/local/etc/php/conf.d/03-cli-settings.ini
+      - source: schoolbox
+        target: /etc/schoolbox
 
   schoolbox-mobiled:
-    container_name: schoolbox-mobiled
     pull_policy: never
     depends_on:
       mariadb:
@@ -183,14 +193,21 @@ services:
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
-      - schoolbox-config:/etc/schoolbox
     extra_hosts:
       - host.docker.internal:host-gateway
+    configs:
+      - source: frankenphp-php
+        target: /usr/local/etc/php/conf.d/01-base-settings.ini
+      - source: frankenphp-php-env
+        target: /usr/local/etc/php/conf.d/02-env-settings.ini
+      - source: schoolbox-cli-php
+        target: /usr/local/etc/php/conf.d/03-cli-settings.ini
+      - source: schoolbox
+        target: /etc/schoolbox
 
   # Second instance's notif daemons:
   # These are the same as above, but use the second instance ID instead.
   schoolbox2-digestd:
-    container_name: schoolbox2-digestd
     pull_policy: never
     depends_on:
       mariadb:
@@ -212,14 +229,21 @@ services:
     volumes:
       - code:/usr/share/schoolbox
       - storage2:/var/lib/schoolbox/docker2/storage
-      - schoolbox-config:/etc/schoolbox
     extra_hosts:
       - host.docker.internal:host-gateway
     profiles:
       - second-instance
+    configs:
+      - source: frankenphp-php
+        target: /usr/local/etc/php/conf.d/01-base-settings.ini
+      - source: frankenphp-php-env
+        target: /usr/local/etc/php/conf.d/02-env-settings.ini
+      - source: schoolbox-cli-php
+        target: /usr/local/etc/php/conf.d/03-cli-settings.ini
+      - source: schoolbox
+        target: /etc/schoolbox
 
   schoolbox2-scheduled:
-    container_name: schoolbox2-scheduled
     pull_policy: never
     depends_on:
       mariadb:
@@ -241,14 +265,21 @@ services:
     volumes:
       - code:/usr/share/schoolbox
       - storage2:/var/lib/schoolbox/docker2/storage
-      - schoolbox-config:/etc/schoolbox
     extra_hosts:
       - host.docker.internal:host-gateway
     profiles:
       - second-instance
+    configs:
+      - source: frankenphp-php
+        target: /usr/local/etc/php/conf.d/01-base-settings.ini
+      - source: frankenphp-php-env
+        target: /usr/local/etc/php/conf.d/02-env-settings.ini
+      - source: schoolbox-cli-php
+        target: /usr/local/etc/php/conf.d/03-cli-settings.ini
+      - source: schoolbox
+        target: /etc/schoolbox
 
   schoolbox2-mobiled:
-    container_name: schoolbox2-mobiled
     pull_policy: never
     depends_on:
       mariadb:
@@ -270,14 +301,21 @@ services:
     volumes:
       - code:/usr/share/schoolbox
       - storage2:/var/lib/schoolbox/docker2/storage
-      - schoolbox-config:/etc/schoolbox
     extra_hosts:
       - host.docker.internal:host-gateway
     profiles:
       - second-instance
+    configs:
+      - source: frankenphp-php
+        target: /usr/local/etc/php/conf.d/01-base-settings.ini
+      - source: frankenphp-php-env
+        target: /usr/local/etc/php/conf.d/02-env-settings.ini
+      - source: schoolbox-cli-php
+        target: /usr/local/etc/php/conf.d/03-cli-settings.ini
+      - source: schoolbox
+        target: /etc/schoolbox
 
   schoolbox-socketd:
-    container_name: schoolbox-socketd
     pull_policy: never
     depends_on:
       mariadb:
@@ -301,13 +339,20 @@ services:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
       - storage2:/var/lib/schoolbox/docker2/storage
-      - schoolbox-config:/etc/schoolbox
     extra_hosts:
       - host.docker.internal:host-gateway
+    configs:
+      - source: frankenphp-php
+        target: /usr/local/etc/php/conf.d/01-base-settings.ini
+      - source: frankenphp-php-env
+        target: /usr/local/etc/php/conf.d/02-env-settings.ini
+      - source: schoolbox-cli-php
+        target: /usr/local/etc/php/conf.d/03-cli-settings.ini
+      - source: schoolbox
+        target: /etc/schoolbox
 
   # This has the devkit mounted
   devkit-lti1p3-nginx:
-    container_name: devkit-lti1p3-nginx
     depends_on:
       redis-cache:
         condition: service_healthy
@@ -327,7 +372,6 @@ services:
       - lti
 
   devkit-lti1p3-phpfpm:
-    container_name: devkit-lti1p3-phpfpm
     depends_on:
       redis-cache:
         condition: service_healthy
@@ -352,11 +396,9 @@ services:
       - host.docker.internal:host-gateway
 
   schoolbox-gotenberg:
-    container_name: schoolbox-gotenberg
     image: gotenberg/gotenberg:8
 
   schoolbox-etherpad:
-    container_name: schoolbox-etherpad
     depends_on:
       redis-storage:
         condition: service_healthy
@@ -367,16 +409,13 @@ services:
     env_file: ./schoolbox-etherpad/default.env
 
   presidio-analyzer:
-    container_name: presidio-analyzer
     build:
       context: ./presidio-analyzer
 
   presidio-anonymizer:
-    container_name: presidio-anonymizer
     image: mcr.microsoft.com/presidio-anonymizer
 
   clamav:
-    container_name: clamav
     build:
       context: ./clamav
     volumes:
@@ -384,7 +423,6 @@ services:
 
   mailcatcher:
     image: schickling/mailcatcher
-    container_name: mailcatcher
     ports:
       - "${MAILCATCHER_UI_PUBLISHED_PORT}:1080"
     restart: always
@@ -427,21 +465,6 @@ volumes:
       o: bind
       device: ../data/docker2/storage
 
-  # Volumes for config
-  schoolbox-config:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./schoolbox/config
-
-  caddy-config:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./caddy/config
-
   caddy-ssl:
     driver: local
     driver_opts:
@@ -458,3 +481,24 @@ volumes:
 
   # Volume for ClamAV signatures
   clamav-data:
+
+# Configs may be folders, but if they are they will override existing contents:
+# thus, PHP configs must be single files.
+# Config files are read from the argument to `--with-config-file-scan-dir`,
+# but this is provided at compile time: it can only be configured as an env.
+configs:
+  caddy:
+    file: ./caddy/config/
+  schoolbox:
+    # Cron config should be built in docker/up, and timezone should come from
+    # docker.env or from host:
+    # readlink /etc/localtime | sed 's/\/usr\/share\/zoneinfo\///'
+    file: ./schoolbox/config
+  frankenphp-caddy:
+    file: ./base-images/php-frankenphp/config/frankenphp/
+  frankenphp-php:
+    file: ./base-images/php-frankenphp/config/php/01-base-settings.ini
+  frankenphp-php-env:
+    file: ./base-images/php-frankenphp/config/php/${ENV}/02-env-settings.ini
+  schoolbox-cli-php:
+    file: ./schoolbox-cli/config/php/03-cli-settings.ini

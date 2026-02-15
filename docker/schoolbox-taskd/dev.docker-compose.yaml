@@ -6,7 +6,6 @@ services:
   # Local taskd definition:
   # must assume that taskd is in a sibling folder named `taskd`
   schoolbox-taskd:
-    container_name: schoolbox-taskd
     depends_on:
       redis-storage:
         condition: service_healthy
