@@ -4,9 +4,8 @@
         "baseUrl": "./", // base directory of where import is referenced from
         "esModuleInterop": true, // resolves potential transpile issues: https://www.typescriptlang.org/tsconfig#esModuleInterop
         "forceConsistentCasingInFileNames": true, // When this option is set, TypeScript will issue an error if a program tries to include a file by a casing different from the casing on disk.
-        "jsx": "preserve", // to link methods/properies in Vue <template> to <script> in Single File Components
-        "module": "node16", // Set to match moduleResolution: https://www.typescriptlang.org/tsconfig#module
-        "moduleResolution": "node16", // Use Node.js-style module resolution, which mimics the way modules are resolved in Node.js. This is the recommended setting for most projects.
+        "jsx": "preserve", // to link methods/properties in Vue <template> to <script> in Single File Components
+        "moduleResolution": "node",
         "paths": {
             "@schoolboxLearningMomentEvidence/*": ["library/Schoolbox/Learning/Moment/vue/*"],
             "@schoolboxCurriculum/*": ["library/Schoolbox/Curriculum/templates/*"],
@@ -20,7 +19,7 @@
             "@js/*": ["www/static/js/*"],
         },
         "skipLibCheck": true, // Skip type checking of declaration file:  https://www.typescriptlang.org/tsconfig#skipLibCheck
-        "strict": true, // The strict flag enables a wide range of type checking behavior that results in stronger guarantees of program correctness.
+        "strict": true, // The strict flag enables a wide range of type checking behaviour that results in stronger guarantees of program correctness.
         "target": "es2022" // Modern browsers support all ES6 features, so ES6 is a good choice.
     },
     "exclude": [ // Specifies an array of filenames or patterns that should be skipped when resolving include.
