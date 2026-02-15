@@ -1020,7 +1020,7 @@ class Controller extends ConfigController
                     }
                 }
 
-                 foreach ($folders as $folder) {
+                foreach ($folders as $folder) {
                     // if the folder is empty, then don't attempt to generate a graph for it
                     if (!isset($classAssessments[$folder->getId()])) {
                         continue;
