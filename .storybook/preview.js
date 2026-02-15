@@ -1,10 +1,8 @@
 /**
  * preview.js provides any extra scaffolding for all our stories, further info at: https://storybook.js.org/docs/react/configure/overview#configure-story-rendering
  * for us we are:
- *  pulling in all our CSS,
- *  MSW (https://storybook.js.org/addons/msw-storybook-addon) to be able to load dummy data into stories
- *  v-tables-3-select-rows so we can use it in stories
- *  adding window.Vue references as we load Vue globally in our vendors.js file in Schoolbox browser context
+ * pulling in all our CSS,and adding window.Vue references as we load Vue
+ * globally in our vendors.js file in Schoolbox browser context
  */
 
 import "!style-loader!css-loader!sass-loader!../www/static/css/core/core.scss"; //add in the base styles
