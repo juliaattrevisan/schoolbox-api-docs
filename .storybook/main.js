@@ -1,50 +1,51 @@
-const path = require("path");
-module.exports = {
-    addons: [
-        "@storybook/addon-a11y",
-        "@storybook/addon-actions",
-        "@storybook/addon-essentials",
-        "@storybook/addon-interactions",
-        "@storybook/addon-links",
-        "@storybook/addon-storysource",
-        "@storybook/addon-mdx-gfm",
-        "@storybook/addon-webpack5-compiler-swc",
-        "@storybook/addon-designs",
-    ],
-    features: {
-        postcss: false,
-    },
-    framework: {
-        name: "@storybook/vue3-webpack5",
-        options: { builder: {} },
-    },
-    staticDirs: ["../stories/assets"],
-    stories: [
-        "../stories/**/*.mdx",
-        "../stories/**/*.stories.@(js|ts)",
-        "../vue/components/**/*.mdx",
-        "../vue/components/**/*.stories.@(js|ts)",
-    ],
-    webpackFinal: async (config, { configType }) => {
-        // Add in the required matched rules from rspack.common.js
-        config.module.rules.push({
-            test: /\.scss$/,
-            use: ["style-loader", "css-loader", "sass-loader"],
-            include: path.resolve(__dirname, "../"),
-        });
-        config.resolve.alias["@js"] = path.resolve(__dirname, "../www/static/js");
-        config.resolve.alias["@schoolboxVue"] = path.resolve(__dirname, "../vue");
-        config.resolve.alias["@schoolboxBadge"] = path.resolve(__dirname, "../library/Schoolbox/Learning/Badge/");
-        config.resolve.alias["@schoolboxLibrary"] = path.resolve(__dirname, "../library/Schoolbox");
-        config.resolve.alias["@schoolboxCurriculum"] = path.resolve(
-            __dirname,
-            "../library/Schoolbox/Curriculum/templates/",
-        );
-        config.resolve.alias["@css"] = path.resolve(__dirname, "../www/static/css");
-        config.resolve.alias["@library"] = path.resolve(__dirname, "../library");
+/**
+ * Storybook configuration for Vue 3 using Rsbuild.
+ * This file sets up Storybook to work with Vue 3 components,
+ * including SCSS support and custom path aliases.
+ */
 
-        // Return the altered config
+import { pluginVue } from "@rsbuild/plugin-vue";
+import { pluginSass } from "@rsbuild/plugin-sass";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
+import remarkGfm from "remark-gfm";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const config = {
+    stories: ["../stories/**/*.mdx", "../stories/**/*.stories.@(js|ts)"],
+    staticDirs: ["../stories/assets"],
+    addons: [
+        {
+            name: "@storybook/addon-docs",
+            options: {
+                mdxPluginOptions: {
+                    mdxCompileOptions: {
+                        remarkPlugins: [remarkGfm],
+                    },
+                },
+            },
+        },
+    ],
+    framework: "storybook-vue3-rsbuild",
+    rsbuildFinal: async (config) => {
+        /**
+         * Add in the required aliases
+         */
+        config.resolve.alias["@js"] = resolve(__dirname, "../www/static/js");
+        config.resolve.alias["@schoolboxVue"] = resolve(__dirname, "../vue");
+        config.resolve.alias["@schoolboxBadge"] = resolve(__dirname, "../library/Schoolbox/Learning/Badge/");
+        config.resolve.alias["@schoolboxLibrary"] = resolve(__dirname, "../library/Schoolbox");
+        config.resolve.alias["@schoolboxCurriculum"] = resolve(__dirname, "../library/Schoolbox/Curriculum/templates/");
+        config.resolve.alias["@css"] = resolve(__dirname, "../www/static/css");
+        config.resolve.alias["@library"] = resolve(__dirname, "../library");
+        /**
+         * Add in the plugins to compile Vue files and handle SCSS.
+         */
+        config.plugins = config.plugins || [];
+        config.plugins.push(pluginVue(), pluginSass());
         return config;
     },
-    docs: {},
 };
+export default config;

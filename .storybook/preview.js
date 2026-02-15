@@ -1,23 +1,16 @@
 /**
  * preview.js provides any extra scaffolding for all our stories, further info at: https://storybook.js.org/docs/react/configure/overview#configure-story-rendering
  * for us we are:
- *  pulling in all our CSS,
- *  MSW (https://storybook.js.org/addons/msw-storybook-addon) to be able to load dummy data into stories
- *  v-tables-3-select-rows so we can use it in stories
- *  adding window.Vue references as we load Vue globally in our vendors.js file in Schoolbox browser context
+ * pulling in all our CSS,and adding window.Vue references as we load Vue
+ * globally in our vendors.js file in Schoolbox browser context
  */
 
 import "!style-loader!css-loader!sass-loader!../www/static/css/core/core.scss"; //add in the base styles
 import "../stories/assets/skin.css"; //and then also the default Schoolbox skin
 import "!style-loader!css-loader!sass-loader!../stories/assets/styles/styles.scss"; // add in any other styles we want to use in storybook only
 import "!style-loader!css-loader!sass-loader!../www/static/css/core/sbx-core.scss"; //add in the new advanced UI styles
-import { themes } from "@storybook/theming";
 import DocumentationTemplate from "./DocumentationTemplate.mdx"; // so we can use our own custom documentation template
 import theme from "./theme";
-import { initialize, mswLoader } from "msw-storybook-addon"; //to be able to load mock data into stories
-import { setup } from "@storybook/vue3"; // so can add in v-tables-3-select-rows and pinia
-import { ClientTable } from "v-tables-3-select-rows";
-import { createPinia } from "pinia";
 import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount, nextTick, defineCustomElement } from "vue"; // as Vue is now stored globally, provide reference to these functions so storybook can still run without browser context
 import SbxPopOut from "@schoolboxVue/components/popOut/sbx-pop-out.ce.vue";
 import SbxIcon from "@schoolboxVue/components/icon/sbx-icon.ce.vue";
@@ -34,16 +27,6 @@ window.Vue.onUnmounted = onUnmounted;
 window.Vue.onBeforeUnmount = onBeforeUnmount;
 window.Vue.nextTick = nextTick;
 window.Vue.defineCustomElement = defineCustomElement;
-
-initialize({
-    // Initialize MSW
-    onUnhandledRequest: "bypass", // If you want MSW to bypass unhandled requests and not do anything
-});
-
-setup((app) => {
-    app.use(ClientTable); // so can use v-tables-3-select-rows in stories
-    app.use(createPinia()); // so can use pinia in stories
-});
 
 /**
  * Register all web components here
@@ -65,7 +48,6 @@ export function register() {
 register();
 
 const preview = {
-    loaders: [mswLoader], // so we can load mock data into stories
     parameters: {
         backgrounds: {
             default: "demo",
