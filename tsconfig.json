@@ -36,6 +36,7 @@
         "vagrantcache",
         "vendor",
         "www/static/js/bundle",
+        "stories" // The latest Storybook and the storybook-vue3-rsbuild import is conflicting with our current moduleResolution, so just ignore for now
     ],
     "include": [ // Specifies an array of filenames or patterns where ts files could exist
         "library/Schoolbox/**/*",
