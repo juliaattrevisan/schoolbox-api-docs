@@ -59,6 +59,7 @@
     "vuejs-paginate-next": "~1.0.2"
   },
   "devDependencies": {
+    "@babel/preset-env": "~7.29.0",
     "@eslint-community/eslint-plugin-eslint-comments": "~4.6.0",
     "@eslint/js": "~9.39.2",
     "@happy-dom/jest-environment": "~18.0.1",

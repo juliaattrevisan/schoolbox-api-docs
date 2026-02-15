@@ -197,6 +197,7 @@ export default defineConfig([
         "**/updates",
         "**/vagrantcache",
         "**/vendor",
+        "**/stories",
         "www/static/js/bundle",
         "www/static/js/pdf/pdfjs",
     ]),

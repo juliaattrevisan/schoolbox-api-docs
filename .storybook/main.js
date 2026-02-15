@@ -5,7 +5,7 @@
  */
 
 import { pluginVue } from "@rsbuild/plugin-vue";
-import { pluginSass } from '@rsbuild/plugin-sass';
+import { pluginSass } from "@rsbuild/plugin-sass";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import remarkGfm from "remark-gfm";
