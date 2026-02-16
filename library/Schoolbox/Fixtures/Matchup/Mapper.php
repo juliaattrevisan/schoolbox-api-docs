@@ -555,7 +555,7 @@ class Mapper extends BaseMapper
         // create a new event, and send it to the scheduler, but only when the
         // transaction is done
         $this->database->onPersist(
-            fn () => $this->propagateWithPropagator($sessionUser, $verb, $object, $diff),
+            fn () => $this->propagate($sessionUser, $verb, $object, $diff),
         );
 
         return true;

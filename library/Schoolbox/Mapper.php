@@ -4358,7 +4358,7 @@ abstract class Mapper implements IMapper
         // create a new event, and send it to the scheduler, but only when the
         // transaction is done
         $this->database->onPersist(
-            fn () => $this->propagateWithPropagator($sessionUser, $verb, $object, $diff),
+            fn () => $this->propagate($sessionUser, $verb, $object, $diff),
         );
 
         return true;
@@ -4379,10 +4379,11 @@ abstract class Mapper implements IMapper
      * @param object     $object  The object for which the event is triggered.
      * @param array|null $diff    Any difference between the current and
      *                            previous state of `$object`.
-     * @return void `propagate` alleges to return a string, but always seems to
-     *              return null: can't really trust it so return nothing.
+     * @return void `$this->getEventPropagator()->propagate()` alleges to return
+     *              a string, but always seems to return null: can't really
+     *              trust it so return nothing.
      */
-    public function propagateWithPropagator(User $subject, string $verb, object $object, ?array $diff = null): void
+    public function propagate(User $subject, string $verb, object $object, ?array $diff = null): void
     {
         try {
             $this->getEventPropagator()->propagate($subject, $verb, $object, $this, $diff);

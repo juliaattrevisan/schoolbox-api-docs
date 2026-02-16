@@ -153,7 +153,7 @@ class NotifierProxy
                 $planModel->getParticipants()->setOffset($participant->getUser()->getId(), $participantModel);
             }
 
-            $this->planMapper->propagateWithPropagator(
+            $this->planMapper->propagate(
                 $effector,
                 $action,
                 $planModel,

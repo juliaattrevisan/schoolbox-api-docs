@@ -570,7 +570,7 @@ class Announcements
             $this->newsMapper->save($article);
             $this->newsMapper->restoreNotification();
 
-            $this->newsMapper->propagateWithPropagator(
+            $this->newsMapper->propagate(
                 $author,
                 Mapper::METHOD_UPDATE,
                 $article,
