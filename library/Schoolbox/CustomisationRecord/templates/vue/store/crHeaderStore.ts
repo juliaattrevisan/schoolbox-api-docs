@@ -15,11 +15,19 @@ export const useHeaderStore = defineStore(`headerStore`, () => {
      */
     function init($header: Header[]): void {
         header.value = [
-            ...$header.map((h) => ({
-                ...h,
-                width: 300,
-                isSticky: h.key === "user",
-            })),
+            ...$header.map((h) => {
+                let width = 300;
+                if (h.key === "user") {
+                    width = 250;
+                } else if (h.key === "created_at") {
+                    width = 150;
+                }
+                return {
+                    ...h,
+                    width,
+                    isSticky: h.key === "user",
+                };
+            }),
         ];
     }
 
