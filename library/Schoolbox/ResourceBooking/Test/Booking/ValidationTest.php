@@ -663,6 +663,10 @@ class ValidationTest extends TestCase
     public static function providerGetNewStatusIdForBooking()
     {
         return [
+            // Notes:
+            //  * We do not need to test scenarios where managed bookings are created or updated by users who are not
+            //    moderators.  That is because since managed bookings can only be created and updated by moderators,
+            //    The tested function will never run in those scenarios.
             'valid booking, no clash, open resource' => [
                 'startDate' => '2027-01-01T10:00:00+00:00',
                 'endDate' => '2027-01-01T11:00:00+00:00',
