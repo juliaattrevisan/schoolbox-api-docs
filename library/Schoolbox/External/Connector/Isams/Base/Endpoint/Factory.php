@@ -163,9 +163,9 @@ class Factory
                     $this->relationshipMapper,
                 ));
 
-                /* Only try to process photos if Load Photos From SIS was activated in admin,
-                 * and if you're doing the profile segment of a segregated import
-                 */
+            /* Only try to process photos if Load Photos From SIS was activated in admin,
+             * and if you're doing the profile segment of a segregated import
+             */
             if ($this->includePhoto) {
                 $bus
                     ->add(new Profile\Images\Prepare(
@@ -221,6 +221,13 @@ class Factory
                     $this->eventMapper
                 ));
         }
+
+        /* Diagnostic manifest to interpret nodes in the xml
+         */
+        $bus->add(new Manifest(
+            $this->log,
+            $api
+        ));
 
         return $bus;
     }
