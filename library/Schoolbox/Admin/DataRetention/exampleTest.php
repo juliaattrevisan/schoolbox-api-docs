@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * example strategy, clear things from the cmsLog older than 2 years
+ *
  * Justin Clarke <justin.clarke@schoolbox.education>
  * @copyright Copyright 2025, Schoolbox Pty Ltd
  * @link      https://schoolbox.education/
@@ -11,35 +13,51 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\DataRetention;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\UserMapper;
 
 class exampleTest implements IStrategy
 {
-    public function __construct(private LoggerInterface $log, private bool $perform, private UserMapper $userMapper)
+    public function __construct(private LoggerInterface $log, private bool $perform, private \Schoolbox\CMS\Log\Mapper $cmsLog, private string $retentionPeriod)
     {
     }
 
     public function process(): void
     {
-        $database = $this->userMapper->getDatabase();
+        $database = $this->cmsLog->getDatabase();
         $deleteCount = 0;
 
-        // find how many users exist
-        $statement = $database->query('SELECT COUNT(*) FROM user');
-        $statement->execute();
+        $deleteOlderThan = (\Alaress_Date_Format::newNaturalDate(sprintf("%s", $this->retentionPeriod)))->getDatabase();
 
-        $this->log->info('Found ' . $statement->fetchColumn() . ' users');
+        // find how cmsLog Entries are stored in the database
+        $query = "
+            SELECT COUNT(*)
+            FROM cmsLog
+            WHERE time < :old
+        ";
 
-        // if perform is true, delete all users
+        $statement = $database->prepare($query);
+        $statement->execute([
+                'old'   => $deleteOlderThan,
+            ]);
+
+        $this->log->info('Found ' . $statement->fetchColumn() . ' logs to delete');
+
+        // if perform is true, delete logs older than the retention period
         if ($this->perform) {
-            $this->log->info('Deleting all users');
-            // delete statement
-            $deleteCount++;
+            $this->log->info('Deleting logs older than ' . $deleteOlderThan);
+            $deleteQuery = "
+                DELETE FROM cmsLog
+                WHERE time < :old
+            ";
+            $statement = $database->prepare($deleteQuery);
+            $statement->execute([
+                    'old'   => $deleteOlderThan,
+                ]);
+            $deleteCount = $statement->rowCount();
         } else {
-            $this->log->info('Would have deleted all users');
+            $this->log->info('Would have deleted older than ' . $deleteOlderThan);
         }
 
-        // log the number of users deleted
-        $this->log->info('Deleted ' . $deleteCount . ' users');
+        // log the number of log entries deleted
+        $this->log->info('Deleted ' . $deleteCount . ' Log Entries');
     }
 }

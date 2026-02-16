@@ -12,8 +12,8 @@ namespace Schoolbox\Admin\DataRetention;
 
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
+use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\UserMapper;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -104,8 +104,10 @@ HELP;
         // build the bus for all the data retention tasks
         $bus = new GenericCollection(IStrategy::class);
 
-        // add bus for example test
-        $bus->add(new exampleTest($logger, $this->perform(), UserMapper::getInstance()));
+        // add bus for example test // clear things from the cmsLog older than 2 years
+//        $cmsLogRetentionPeriod = $this->getConfig()->get('dataRetention_cmsLogRetentionPeriod');
+        $cmsLogRetentionPeriod = '-2 years';  // example data retention period get from the config table
+        $bus->add(new exampleTest($logger, $this->perform(), CMSLogMapper::getInstance(), $cmsLogRetentionPeriod));
 
         // if we have functions, run them
         if (count($bus) > 0) {
@@ -118,8 +120,6 @@ HELP;
                 $lock->refresh();
             }
         }
-
-
 
         exit(CliKernelAbstract::EXIT_STATUS_OK);
     }
