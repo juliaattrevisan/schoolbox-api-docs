@@ -48,10 +48,6 @@
         & > .content li {
             box-shadow: none !important;
             padding: 0 !important;
-
-            & [data-component-palette] {
-                padding: 1rem 2rem;
-            }
         }
     }
 }
