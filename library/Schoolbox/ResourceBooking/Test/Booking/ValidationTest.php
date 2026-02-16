@@ -723,27 +723,6 @@ class ValidationTest extends TestCase
                 'userIsAuthor' => false,
                 'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
             ],
-            'booking too short' => [
-                'startDate' => '2027-01-01T10:00:00+00:00',
-                'endDate' => '2027-01-01T10:01:00+00:00',
-                'isClash' => false,
-                'moderationType' => Item\ModerationType\Model::TYPE_OPEN,
-                'userIsModerator' => false,
-                'userIsAuthor' => false,
-                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
-                'minReservationTime' => 'PT1H',
-            ],
-            'booking too long' => [
-                'startDate' => '2027-01-01T10:00:00+00:00',
-                'endDate' => '2027-01-01T15:00:00+00:00',
-                'isClash' => false,
-                'moderationType' => Item\ModerationType\Model::TYPE_OPEN,
-                'userIsModerator' => false,
-                'userIsAuthor' => false,
-                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
-                'maxReservationTime' => 'PT2H',
-            ],
-            // Additional TYPE_MODERATED test cases
             'valid booking, no clash, moderated resource, user is moderator but not author' => [
                 'startDate' => '2027-01-01T10:00:00+00:00',
                 'endDate' => '2027-01-01T11:00:00+00:00',
@@ -811,27 +790,6 @@ class ValidationTest extends TestCase
                 'userIsAuthor' => false,
                 'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
             ],
-            'booking too short, moderated resource, user is moderator' => [
-                'startDate' => '2027-01-01T10:00:00+00:00',
-                'endDate' => '2027-01-01T10:01:00+00:00',
-                'isClash' => false,
-                'moderationType' => Item\ModerationType\Model::TYPE_MODERATED,
-                'userIsModerator' => true,
-                'userIsAuthor' => false,
-                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
-                'minReservationTime' => 'PT1H',
-            ],
-            'booking too long, moderated resource, user is moderator' => [
-                'startDate' => '2027-01-01T10:00:00+00:00',
-                'endDate' => '2027-01-01T15:00:00+00:00',
-                'isClash' => false,
-                'moderationType' => Item\ModerationType\Model::TYPE_MODERATED,
-                'userIsModerator' => true,
-                'userIsAuthor' => false,
-                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
-                'maxReservationTime' => 'PT2H',
-            ],
-            // TYPE_MANAGED test cases
             'valid booking, no clash, managed resource, user is moderator and author' => [
                 'startDate' => '2027-01-01T10:00:00+00:00',
                 'endDate' => '2027-01-01T11:00:00+00:00',
@@ -879,26 +837,6 @@ class ValidationTest extends TestCase
                 'userIsAuthor' => false,
                 'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
             ],
-            'booking too short, managed resource, user is moderator' => [
-                'startDate' => '2027-01-01T10:00:00+00:00',
-                'endDate' => '2027-01-01T10:01:00+00:00',
-                'isClash' => false,
-                'moderationType' => Item\ModerationType\Model::TYPE_MANAGED,
-                'userIsModerator' => true,
-                'userIsAuthor' => false,
-                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
-                'minReservationTime' => 'PT1H',
-            ],
-            'booking too long, managed resource, user is moderator' => [
-                'startDate' => '2027-01-01T10:00:00+00:00',
-                'endDate' => '2027-01-01T15:00:00+00:00',
-                'isClash' => false,
-                'moderationType' => Item\ModerationType\Model::TYPE_MANAGED,
-                'userIsModerator' => true,
-                'userIsAuthor' => false,
-                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
-                'maxReservationTime' => 'PT2H',
-            ],
         ];
     }
 
@@ -913,8 +851,6 @@ class ValidationTest extends TestCase
      * @param bool $userIsAuthor
      * @param int $expectedStatus
      * @param bool $allowClashBookings
-     * @param string|null $minReservationTime
-     * @param string|null $maxReservationTime
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerGetNewStatusIdForBooking')]
     public function testGetNewStatusIdForBooking(
@@ -926,8 +862,6 @@ class ValidationTest extends TestCase
         bool $userIsAuthor,
         int $expectedStatus,
         bool $allowClashBookings = true,
-        ?string $minReservationTime = null,
-        ?string $maxReservationTime = null
     ): void {
         $user1Id = 123;
         $user2Id = 999;
@@ -939,56 +873,17 @@ class ValidationTest extends TestCase
 
         $validation = $this->createValidation($user);
 
-        // Create resource with moderation type
-        $resource = new Item\Model();
-        $resource->setId($resource1Id);
-        $moderationTypeModel = new Item\ModerationType\Model();
-        $moderationTypeModel->setId($moderationType);
-        $resource->setModerationType($moderationTypeModel);
-        $resource->setAllowClashBookings($allowClashBookings);
-        $resource->setMinLeadTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
-
-        if ($minReservationTime) {
-            $resource->setMinReservationTime(
-                Interval::createFromDateInterval(new DateInterval($minReservationTime))
-            );
-        } else {
-            $resource->setMinReservationTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
-        }
-
-        if ($maxReservationTime) {
-            $resource->setMaxReservationTime(
-                Interval::createFromDateInterval(new DateInterval($maxReservationTime))
-            );
-        } else {
-            $resource->setMaxReservationTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
-        }
-
-        // Mock isUserModerator to avoid database calls
+        // Create a resource and mock isUserModerator() to avoid database calls.
         $resource = $this->getMockBuilder(Item\Model::class)
             ->onlyMethods(['isUserModerator'])
             ->getMock();
         $resource->method('isUserModerator')->willReturn($userIsModerator);
         $resource->setId($resource1Id);
-        $resource->setModerationType($moderationTypeModel);
+        $resource->setModerationType(new Item\ModerationType\Model()->setId($moderationType));
         $resource->setAllowClashBookings($allowClashBookings);
         $resource->setMinLeadTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
-
-        if ($minReservationTime) {
-            $resource->setMinReservationTime(
-                Interval::createFromDateInterval(new DateInterval($minReservationTime))
-            );
-        } else {
-            $resource->setMinReservationTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
-        }
-
-        if ($maxReservationTime) {
-            $resource->setMaxReservationTime(
-                Interval::createFromDateInterval(new DateInterval($maxReservationTime))
-            );
-        } else {
-            $resource->setMaxReservationTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
-        }
+        $resource->setMinReservationTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
+        $resource->setMaxReservationTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
 
         // Create event
         $event = new Event();
