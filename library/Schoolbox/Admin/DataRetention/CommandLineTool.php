@@ -113,8 +113,8 @@ HELP;
 
         // add bus for cmsLogExample // clear things from the cmsLog older than 1 year (possible options are 1 Day, 30 Days, 365 Days, <null>)
 //        $cmsLogRetentionPeriod = $this->getConfig()->get('dataRetention_cmsLogRetentionPeriod');
-        $cmsLogRetentionPeriod = '365';  // example data retention period get from the config table
-        $bus->add(new cmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $cmsLogRetentionPeriod));
+//        $cmsLogRetentionPeriod = '365';  // example data retention period get from the config table
+//        $bus->add(new cmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $cmsLogRetentionPeriod));
 
         // if we have functions, run them
         if (count($bus) > 0) {
@@ -131,6 +131,8 @@ HELP;
                 // refresh lock, depending on the data retention queries this may have taken a while...
                 $lock->refresh();
             }
+        } else {
+            $logger->notice('No data retention strategies to run');
         }
 
         exit(CliKernelAbstract::EXIT_STATUS_OK);
