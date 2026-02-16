@@ -399,7 +399,7 @@ class EventRecurrenceMapper
         } catch (MapperException $e) {
             return false;
         }
-        $this->eventMapper->getEventPropagator()->propagate($sessionUser, $verb, $object, $this->eventMapper, $diff);
+        $this->eventMapper->propagate($sessionUser, $verb, $object, $diff);
         return true;
     }
 

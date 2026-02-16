@@ -13,6 +13,8 @@ namespace Schoolbox\Fixtures\Matchup;
 use OutOfBoundsException;
 use PDO;
 use PDOStatement;
+use PhpAmqpLib\Exception\AMQPIOException;
+use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
@@ -545,15 +547,16 @@ class Mapper extends BaseMapper
             return false;
         }
 
+        // The only difference in this method is the diff which is passed to
+        // `propagate`:
+        // otherwise, it's exactly the same as its parent.
         $diff = $previous && ($verb != self::METHOD_DELETE) ? $this->diffForNotification($object, $previous) : null;
 
-        // create a new event, and send it to the scheduler
-        try {
-            $this->getEventPropagator()->propagate($sessionUser, $verb, $object, $this, $diff);
-        } catch (\ErrorException $e) {
-            //Unable to connect to notification system
-            return false;
-        }
+        // create a new event, and send it to the scheduler, but only when the
+        // transaction is done
+        $this->database->onPersist(
+            fn () => $this->propagate($sessionUser, $verb, $object, $diff),
+        );
 
         return true;
     }

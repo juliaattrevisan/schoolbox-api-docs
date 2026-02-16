@@ -9,6 +9,8 @@
 
 namespace Alaress\Async\Broker;
 
+use PhpAmqpLib\Exception\AMQPRuntimeException;
+
 /**
  * The Broker is a cohesive interface for publishing data to a brokering server and accepting Consumers
  * that are capable of processing payloads that are delivered to them.
@@ -26,19 +28,25 @@ interface IBroker
     /**
      * Subscribe the given consumer to this broker's queue.
      *
-     * @param IConsumer $consumer
+     * @param IConsumer $consumer An object which may read from a queue.
      * @return void
      */
     public function registerConsumer(IConsumer $consumer): void;
 
 
     /**
-     * Publish the given payload to this broker's queue.
+     * Publish the given payload to this broker's queue, declaring the queue if
+     * it isn't already declared.
      *
-     * @param mixed    $serializable
-     * @param array    $context
-     * @param int|null $ttl
+     * @param mixed    $serializable Any message which may be pushed to a queue.
+     * @param array    $context      Any context for what is being pushed: e.g.
+     *                               the message's namespace, the instance from
+     *                               which it was raised, the user which
+     *                               triggered it.
+     * @param int|null $ttl          How long should the message exist in the
+     *                               queue unprocessed, before it is purged?
      * @return void
+     * @throws AMQPRuntimeException if the queue cannot be declared
      */
     public function publish(mixed $serializable, array $context = [], ?int $ttl = null): void;
 }

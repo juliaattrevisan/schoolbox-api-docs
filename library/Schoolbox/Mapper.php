@@ -294,10 +294,10 @@ abstract class Mapper implements IMapper
     /** @var IMonitor */
     protected $monitor;
 
-    /** @var Propagator */
+    /** @var IPropagator */
     protected $propagator;
 
-    /** @var Propagator */
+    /** @var IPropagator|null */
     private $propagatorSuppressed;
 
     /**
@@ -4355,17 +4355,49 @@ abstract class Mapper implements IMapper
 
         $diff = $previous && ($verb != self::METHOD_DELETE) ? $this->diff($object, $previous) : null;
 
-        // create a new event, and send it to the scheduler
-        try {
-            $this->database->onPersist(function () use ($sessionUser, $verb, $object, $diff): void {
-                $this->getEventPropagator()->propagate($sessionUser, $verb, $object, $this, $diff);
-            });
-        } catch (\ErrorException $e) {
-            //Unable to connect to notification system
-            return false;
-        }
+        // create a new event, and send it to the scheduler, but only when the
+        // transaction is done
+        $this->database->onPersist(
+            fn () => $this->propagate($sessionUser, $verb, $object, $diff),
+        );
 
         return true;
+    }
+
+    /**
+     * Convenience method for propagating events using this mapper's
+     * propagator.
+     *
+     * Should be used instead of `$this->getEventPropagator()->propagate()`, as
+     * this handles exceptions and suppression of further notifications.
+     *
+     * If an exception is caught whilst attempting to do so: catch that
+     * exception, and suppress further notifications.
+     *
+     * @param User       $subject The user which propagated the event.
+     * @param string     $verb    The event's action.
+     * @param object     $object  The object for which the event is triggered.
+     * @param array|null $diff    Any difference between the current and
+     *                            previous state of `$object`.
+     * @return void `$this->getEventPropagator()->propagate()` alleges to return
+     *              a string, but always seems to return null: can't really
+     *              trust it so return nothing.
+     */
+    public function propagate(User $subject, string $verb, object $object, ?array $diff = null): void
+    {
+        try {
+            $this->getEventPropagator()->propagate($subject, $verb, $object, $this, $diff);
+        } catch (\ErrorException | AMQPIOException | AMQPRuntimeException $e) {
+            // The exceptions caught in `getEventPropagator` must be caught here
+            // as well, now that the queue is not connected to until actually
+            // propagating an event.
+            // Anyway: suppress notifications for now.
+            $this->suppressNotification();
+            trigger_error(
+                sprintf('Could not propagate event to AMQP instance: %s', $e->getMessage()),
+                E_USER_WARNING,
+            );
+        }
     }
 
     /**
