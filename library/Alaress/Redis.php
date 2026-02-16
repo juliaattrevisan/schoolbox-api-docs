@@ -300,17 +300,17 @@ class Redis
             // Raw result is no longer needed, thus it can be freed
             unset($cachedValue);
 
-            // short-circuit if serialized result is legitimately false
+            // short-circuit unserialization if value is legitimately false:
+            // otherwise, if it fails to unserialize then recalculate
             if ($serializedValue === 'b:0;') {
                 $returnValue = false;
-            }
-
-            // Results should now always be serialized before storage
-            $unserializedValue = unserialize($serializedValue);
-            if ($unserializedValue !== false) {
-                $returnValue = $unserializedValue;
             } else {
-                $requiresRecalculation = true;
+                $unserializedValue = unserialize($serializedValue);
+                if ($unserializedValue !== false) {
+                    $returnValue = $unserializedValue;
+                } else {
+                    $requiresRecalculation = true;
+                }
             }
 
             // Can free both serialized and unserialized value
