@@ -747,7 +747,7 @@ class ValidationTest extends TestCase
                 'moderationType' => Item\ModerationType\Model::TYPE_MODERATED,
                 'userIsModerator' => true,
                 'userIsAuthor' => false,
-                'expectedStatus' => Booking\Status\Model::STATUS_PENDING,
+                'expectedStatus' => Booking\Status\Model::STATUS_APPROVED,
             ],
             'valid booking, no clash, moderated resource, user is author but not moderator' => [
                 'startDate' => '2027-01-01T10:00:00+00:00',
@@ -844,7 +844,7 @@ class ValidationTest extends TestCase
                 'moderationType' => Item\ModerationType\Model::TYPE_MANAGED,
                 'userIsModerator' => true,
                 'userIsAuthor' => false,
-                'expectedStatus' => Booking\Status\Model::STATUS_PENDING,
+                'expectedStatus' => Booking\Status\Model::STATUS_APPROVED,
             ],
             'valid booking, no clash, managed resource, user is author but not moderator' => [
                 'startDate' => '2027-01-01T10:00:00+00:00',
@@ -853,7 +853,7 @@ class ValidationTest extends TestCase
                 'moderationType' => Item\ModerationType\Model::TYPE_MANAGED,
                 'userIsModerator' => false,
                 'userIsAuthor' => true,
-                'expectedStatus' => Booking\Status\Model::STATUS_PENDING,
+                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
             ],
             'valid booking, no clash, managed resource, user is not moderator' => [
                 'startDate' => '2027-01-01T10:00:00+00:00',
@@ -862,7 +862,7 @@ class ValidationTest extends TestCase
                 'moderationType' => Item\ModerationType\Model::TYPE_MANAGED,
                 'userIsModerator' => false,
                 'userIsAuthor' => false,
-                'expectedStatus' => Booking\Status\Model::STATUS_PENDING,
+                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
             ],
             'booking with clash, managed resource, user is moderator, clashes allowed' => [
                 'startDate' => '2027-01-01T10:00:00+00:00',
@@ -891,7 +891,7 @@ class ValidationTest extends TestCase
                 'moderationType' => Item\ModerationType\Model::TYPE_MANAGED,
                 'userIsModerator' => false,
                 'userIsAuthor' => false,
-                'expectedStatus' => Booking\Status\Model::STATUS_PENDING,
+                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
                 'allowClashBookings' => true,
             ],
             'booking with clash, managed resource, user is not moderator, clashes not allowed' => [
