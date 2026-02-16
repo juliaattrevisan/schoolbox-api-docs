@@ -71,7 +71,7 @@ SYNOPSIS
     ./tools/dataRetention/process.php [OPTION]...
 
 DESCRIPTION
-    This tool checks for soft deleted data that matches a specific data retention criteria, and deletes it.
+    This tool hard deletes, or permanently removes, any soft-deleted records that fulfil the specific data retention criteria.
 
 
 OPTIONS
