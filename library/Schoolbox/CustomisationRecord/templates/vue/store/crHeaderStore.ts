@@ -18,6 +18,7 @@ export const useHeaderStore = defineStore(`headerStore`, () => {
             ...$header.map((h) => ({
                 ...h,
                 width: 300,
+                isSticky: h.key === "user",
             })),
         ];
     }
