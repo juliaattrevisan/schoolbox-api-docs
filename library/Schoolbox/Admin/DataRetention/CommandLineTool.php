@@ -99,6 +99,13 @@ HELP;
         try {
             $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TIME);
         } catch (\RuntimeException $e) {
+            $logger->error(
+                sprintf(
+                    'Failed to acquire process lock "%s": %s',
+                    self::LOCK_NAME,
+                    $e->getMessage(),
+                ),
+            );
             return;
         }
         register_shutdown_function(fn () => $this->releaseLock($lock));
