@@ -55,6 +55,14 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     props.moveTo,
 );
 
+/**
+ * Temporary Sonar UI check to update styles as this component is within
+ * the Shadow DOM so can't access the .sbx-body class on the parent document
+ */
+const hasSBXBody = window.Vue.computed(() => {
+    return document.body.classList.contains("sbx-body");
+});
+
 // To help acceptance tests know when the component is ready and can be interacted with
 // keep the data-test attribute off until it is mounted
 const isReady = window.Vue.ref(false);
@@ -72,6 +80,7 @@ window.Vue.onMounted(() => {
             'sbx-button--icon-only': !props.buttonText,
             'sbx-button--block': props.isFullWidth,
             'sbx-button--component-action': props.isComponentAction,
+            'sbx-body': hasSBXBody,
         }"
         :title="currentLabel"
         :aria-label="currentLabel"
@@ -193,6 +202,25 @@ window.Vue.onMounted(() => {
                 // don't show a hover if it's disabled
                 background-color: transparent;
             }
+        }
+    }
+    /**
+    * Override styles for Sonar UI
+    */
+    &--component-action.sbx-body {
+        background: var(--sbx-color-foreground-primary);
+        border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+        border-radius: var(--sbx-config-field-roundness);
+        color: var(--sbx-color-accent);
+        font-size: var(--sbx-font-size-s);
+        font-weight: var(--sbx-font-weight-normal);
+        text-transform: capitalize;
+        &:hover {
+            background-color: var(
+                --sbx-color-foreground-primary
+            ); // ^foundation-fixes^ - remove the use of --content-ui-hover
+            color: var(--sbx-color-accent); // ^foundation-fixes^ - remove the change of text colour on hover
+            filter: brightness(1.1);
         }
     }
 }
