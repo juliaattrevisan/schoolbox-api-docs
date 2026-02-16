@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\DataRetention;
 
 /**
- * Interface IInterface
+ * Interface IStrategy
  *
  * Every data retention class must provide this method
  *

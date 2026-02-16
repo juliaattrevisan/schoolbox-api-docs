@@ -66,7 +66,7 @@ class CommandLineTool extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
             echo <<<HELP
 NAME
-    ./tools/dataRetention/process.php - hard deleted data that matches specified data retention criteria and has already been soft deleted
+    ./tools/dataRetention/process.php - hard deletes data that matches specified data retention criteria and has already been soft deleted
 
 SYNOPSIS
     ./tools/dataRetention/process.php [OPTION]...
