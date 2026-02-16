@@ -23,4 +23,10 @@ interface IStrategy
      * find and remove all soft deleted data
      */
     public function process(): void;
+
+    /**
+     * a human readable label for this strategy, used in the admin interface
+     * @return string
+     */
+    public function getRetentionLabel(): string;
 }

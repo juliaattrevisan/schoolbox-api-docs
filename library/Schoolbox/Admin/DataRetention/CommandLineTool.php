@@ -43,8 +43,6 @@ class CommandLineTool extends CliTool\App
     public function getShortOpts(): array
     {
         return [
-            CliTool\Kernel::OPT_SHORT_PERFORM,  // hidden deep in the code is this option, raising it here so its more visible that it does actually exist
-            CliKernelAbstract::OPT_SHORT_VERBOSITY,  // hidden deep in the code is this option, raising it here so its more visible that it does actually exist
             self::OPT_SHORT_HELP,
         ];
     }
@@ -55,7 +53,6 @@ class CommandLineTool extends CliTool\App
     public function getLongOpts(): array
     {
         return [
-            CliTool\Kernel::OPT_LONG_PERFORM,  // hidden deep in the code is this option, raising it here so its more visible that it does actually exist
             self::OPT_LONG_HELP,
         ];
     }
@@ -111,6 +108,7 @@ HELP;
 
 
         // build the bus for all the data retention tasks
+        /** @var GenericCollection<IStrategy> $bus */
         $bus = new GenericCollection(IStrategy::class);
 
         // add bus for cmsLogExample // clear things from the cmsLog older than 2 years
@@ -121,8 +119,13 @@ HELP;
         // if we have functions, run them
         if (count($bus) > 0) {
             $logger->info('Running data retention strategies');
-            foreach ($bus as $strategy) {
-                $logger->info(sprintf('Running %s', get_class($strategy)));
+            /**
+             * @var IStrategy $strategy
+             */
+            foreach ($bus as $busNumber => $strategy) {
+                // log a helpful counter to know where we are up to
+                $logger->notice(sprintf("[%s/%s] Running %s", $busNumber + 1, count($bus), $strategy->getRetentionLabel()));
+
                 $strategy->process();
 
                 // refresh lock, depending on the data retention queries this may have taken a while...
@@ -142,6 +145,6 @@ HELP;
     private function releaseLock(LockInterface $lock): void
     {
         $lock->release();
-        $this->getLogger()->info('Data Retention cleanup complete: released process lock');
+        $this->getLogger()->notice('Data Retention cleanup complete: released process lock');
     }
 }

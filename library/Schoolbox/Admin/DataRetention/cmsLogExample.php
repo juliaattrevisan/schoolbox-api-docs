@@ -29,6 +29,9 @@ class cmsLogExample implements IStrategy
     {
     }
 
+    /**
+     * @inheritDoc
+     */
     public function process(): void
     {
         if ('' === $this->retentionPeriod) {
@@ -49,7 +52,7 @@ class cmsLogExample implements IStrategy
             WHERE time < :old
         ";
 
-        $statement = $this->database->getDatabase()->prepare($query);
+        $statement = $this->database->prepare($query);
         $statement->execute([
                 'old'   => $deleteOlderThan,
             ]);
@@ -63,7 +66,7 @@ class cmsLogExample implements IStrategy
                 DELETE FROM cmsLog
                 WHERE time < :old
             ";
-            $statement = $this->database->getDatabase()->prepare($deleteQuery);
+            $statement = $this->database->prepare($deleteQuery);
             $statement->execute([
                     'old'   => $deleteOlderThan,
                 ]);
@@ -74,5 +77,13 @@ class cmsLogExample implements IStrategy
 
         // log the number of log entries deleted
         $this->log->info('Deleted ' . $deleteCount . ' Log Entries');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getRetentionLabel(): string
+    {
+        return 'CMSLog Retention - This is an example strategy';
     }
 }
