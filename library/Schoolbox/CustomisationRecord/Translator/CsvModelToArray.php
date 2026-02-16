@@ -28,6 +28,14 @@ class CsvModelToArray
             $context = $plan->getAssessment()->getContextProject()->getAssessmentModel()->getContextUnitImplementation();
         }
 
+        $folder = $context?->getFolder();
+        $className = $folder?->getTitle();
+        $codes = $folder?->getCodes();
+        if ($codes && $codes->count() > 0) {
+            $codeStrings = array_map(fn($code) => $code->getCode(), $codes->getAll());
+            $className .= ' (' . implode(', ', $codeStrings) . ')';
+        }
+
         return [
             'created_at' => $participant->getCreatedAt()->getShort(),
             'user' => implode(', ', [
@@ -38,7 +46,7 @@ class CsvModelToArray
             'original_activity' => $originalActivity->getTitle(),
             'type' => $plan->getCustomisationType(),
             'unit' => $context?->getTitle(),
-            'class' => $context?->getFolder()?->getTitle()
+            'class' => $className
         ];
     }
 }
