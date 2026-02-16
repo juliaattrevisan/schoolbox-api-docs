@@ -49,6 +49,10 @@ body {
     font-size: var(--sbx-font-size-s);
 }
 
+.sbx-body label {
+    font-weight: var(--sbx-font-weight-active);
+}
+
 // Enlarge for greater readability
 .sbx-body small,
 .sbx-body table tr td,
