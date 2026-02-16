@@ -1938,19 +1938,26 @@ class Mapper extends AbstractFolderMapper implements ILocator
         if (!$parentFolder->hasCourseSpecification()) {
             $courseSpecMapper = CourseSpecification\Mapper::getInstance();
 
-            /* Find the most recently deleted course spec, in case of broken data from yesteryear...
+            /* Find a previously deleted course spec; there was a time when we had broken course hierarchies (nested
+             * courses by accident) but the UNIQUE index on folder_id should have addressed that. A folder_id can only
+             * be associated with zero or exactly one course spec.
              */
-            $courseSpec = $courseSpecMapper->findByColumn('folder_id', $parentFolder->getId(), [
-                'deleted' => true,
-                'order' => [
-                    'deleted_at' => 'DESC'
-                ]
-            ])->first();
+            try {
+                $courseSpec = $courseSpecMapper->findOneByColumn('folder_id', $parentFolder->getId(), [
+                    'deleted' => true,
+                    'order' => [
+                        'deleted_at' => 'DESC'
+                    ]
+                ]);
 
-            if ($courseSpec?->isDeleted()) {
-                $courseSpec->setDeletedAt(null);
+                if ($courseSpec->isDeleted()) {
+                    $courseSpec->setDeletedAt(null);
 
-                $courseSpecMapper->save($courseSpec);
+                    $courseSpecMapper->save($courseSpec);
+                }
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                /* No previously-assigned course spec was here: nothing to do, except continue normally
+                 */
             }
         }
 
