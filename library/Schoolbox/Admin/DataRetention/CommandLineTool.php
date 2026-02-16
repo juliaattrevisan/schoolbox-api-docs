@@ -24,18 +24,18 @@ class CommandLineTool extends CliTool\App
     /**
      * The name of the lock this tool acquires.
      */
-    public const LOCK_NAME = 'dataRetention';
+    public const string LOCK_NAME = 'dataRetention';
 
     /**
-     * By default, the lock will be held for 1 hour.
+     * By default, the lock will be held for 90 seconds.
      */
-    private const LOCK_TIME = 60 * 60;
+    private const int LOCK_TIME = 90;
 
     /**
      * Print help
      */
-    private const OPT_SHORT_HELP = 'h';
-    private const OPT_LONG_HELP  = 'help';
+    private const string OPT_SHORT_HELP = 'h';
+    private const string OPT_LONG_HELP  = 'help';
 
 
     /**

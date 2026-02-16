@@ -16,12 +16,17 @@ use Psr\Log\LoggerInterface;
 
 class cmsLogExample implements IStrategy
 {
-    public function __construct(private LoggerInterface $log, private bool $perform, private \Schoolbox\CMS\Log\Mapper $cmsLog, private string $retentionPeriod)
+    public function __construct(private LoggerInterface $log, private bool $perform, private \Schoolbox\CMS\Log\Mapper $cmsLog, private string $retentionPeriod = '')
     {
     }
 
     public function process(): void
     {
+        if ('' === $this->retentionPeriod) {
+            $this->log->info('No retention period set, skipping');
+            return;
+        }
+
         $database = $this->cmsLog->getDatabase();
         $deleteCount = 0;
 
