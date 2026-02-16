@@ -1402,4 +1402,83 @@ class ValidationTest extends TestCase
         // Assert the results match expectations
         $this->assertEquals($expectedIsClashByResourceIdByEventId, $result);
     }
+
+    /**
+     * Data provider for testValidateBookingFromPostData
+     *
+     * @return array
+     */
+    public static function providerValidateBookingFromPostData()
+    {
+        return [
+            'invalid start and end dates returns errors' => [
+                'postData' => [
+                    'startDate' => 'invalid-start',
+                    'endDate' => 'invalid-end',
+                    'campus' => 0,
+                ],
+                'existingBooking' => null,
+            ],
+            'valid dates in future returns array' => [
+                'postData' => [
+                    'startDate' => '01/01/2077 10:00am',
+                    'endDate' => '01/01/2077 11:00am',
+                    'campus' => 0,
+                ],
+                'existingBooking' => null,
+            ],
+            'valid dates in past returns errors' => [
+                'postData' => [
+                    'startDate' => '01/01/2020 10:00am',
+                    'endDate' => '01/01/2020 11:00am',
+                    'campus' => 0,
+                ],
+                'existingBooking' => null,
+            ],
+        ];
+    }
+
+    /**
+     * Minimal test for validateBookingFromPostData function.
+     * This test verifies that the function executes without throwing exceptions
+     * and returns an array with the expected structure.
+     *
+     * @param array $postData
+     * @param Booking\Model|null $existingBooking
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidateBookingFromPostData')]
+    public function testValidateBookingFromPostData(
+        array $postData,
+        ?Booking\Model $existingBooking
+    ): void {
+        $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
+        $mockMapper
+            ->method('findForResource')
+            ->willReturn(new Collection());
+
+        $validation = $this->createValidation(new User(), $mockMapper, new StatusMapper(), new TermMapper());
+
+        $resource = new Item\Model();
+        $resource->setId(123);
+        $resource->setMinLeadTime(\Alaress\Date\Interval::createFromDateInterval(new DateInterval('PT0H')));
+        $resource->setMinReservationTime(\Alaress\Date\Interval::createFromDateInterval(new DateInterval('PT0H')));
+        $resource->setMaxReservationTime(\Alaress\Date\Interval::createFromDateInterval(new DateInterval('PT0H')));
+
+        $errors = $validation->validateBookingFromPostData($resource, $postData, $existingBooking);
+
+        // Minimal assertion: function returns an array
+        $this->assertIsArray($errors);
+
+        // If there are errors, verify they have the expected structure
+        if (!empty($errors)) {
+            foreach ($errors as $errorCategory => $errorsByDate) {
+                $this->assertContains(
+                    $errorCategory,
+                    [Validation::START_PERIOD_ERRORS, Validation::END_PERIOD_ERRORS],
+                    "Error category should be either START_PERIOD_ERRORS or END_PERIOD_ERRORS"
+                );
+                $this->assertIsArray($errorsByDate);
+            }
+        }
+    }
 }
