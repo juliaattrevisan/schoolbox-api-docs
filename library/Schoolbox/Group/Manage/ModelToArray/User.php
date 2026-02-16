@@ -42,6 +42,7 @@ class User extends ModelToArray
             'lastName'      => $user->getLastname(),
             'fullName'      => $user->getFullName(),
             'role'          => $user->getRole()->getName(),
+            'roleType'      => $user->getRole()->getType(),
             'isStaff'       => $user->getRole()->isStaff(),
             'campus'        => implode(', ', $user->getCampusCollection()->getPropertyValues('name')),
             'yearLevel'     => $user->getYear() ? $user->getYear()->getLongName($this->l10n->translate('year', false, true)) : "",
