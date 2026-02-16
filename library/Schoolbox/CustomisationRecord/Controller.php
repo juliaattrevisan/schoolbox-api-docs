@@ -268,9 +268,40 @@ class Controller extends Base
         /** @var Filter\Filters\CustomisationRecord\Finder $finder */
         $finder = Filter\Filters\CustomisationRecord\Finder::getInstance($this->filterMapper, $this->mapper);
 
+        $orderBy = $this->requestQuery->get('sortBy', Cursor::CURSOR_DEFAULT_ORDER_BY);
+        $order = strtolower($this->requestQuery->get('order', $this->mapper::SORT_ORDER_ASC));
+
+        $sortOrder = match ($orderBy) {
+            Cursor::CURSOR_ORDER_BY_CREATED_AT => [
+                Cursor::CURSOR_ORDER_BY_CREATED_AT_COLUMN => $order,
+                'participant.id' => $order,
+            ],
+            Cursor::CURSOR_ORDER_BY_CLASS_NAME => [
+                Cursor::CURSOR_ORDER_BY_CLASS_NAME_COLUMN => $order,
+                'participant.id' => $order,
+            ],
+            Cursor::CURSOR_ORDER_BY_UNIT_NAME => [
+                Cursor::CURSOR_ORDER_BY_UNIT_NAME_COLUMN => $order,
+                'participant.id' => $order,
+            ],
+            Cursor::CURSOR_ORDER_BY_CUSTOMISATION_TYPE => [
+                Cursor::CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN => $order,
+                'participant.id' => $order,
+            ],
+            /* Default to sorting by user's name
+             */
+            default => [
+                'u.lastname'    => $order,
+                'u.chosen_name' => $order,
+                'participant.id'  => $order,
+            ]
+        };
+
         $cursor = new Cursor(
             $finder,
             $dynamicFilters,
+            $orderBy,
+            $sortOrder,
         );
 
         $records = $cursor->retrieveResults(null);
