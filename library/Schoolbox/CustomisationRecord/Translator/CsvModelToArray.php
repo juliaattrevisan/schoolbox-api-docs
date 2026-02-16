@@ -2,16 +2,8 @@
 
 namespace Schoolbox\CustomisationRecord\Translator;
 
-use Alaress\Authorizer\Authorizer;
-use Alaress\Authorizer\GetRouteIfAuthorized;
-use Aura\Router\Generator;
 use Schoolbox\Assessment\Participant\Model;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplModel;
-use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
-use Schoolbox\Mapper\Exception\Deleted;
-use Schoolbox\User;
-use Schoolbox\User\Translator\ModelToArray as UserModelToArray;
 
 class CsvModelToArray
 {
