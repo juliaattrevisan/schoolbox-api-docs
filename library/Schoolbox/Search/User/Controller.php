@@ -48,8 +48,6 @@ use Timetable_ColourMapper;
 use Twig\Environment;
 use Twig\Error\Error;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
-use Schoolbox\DifferentiationProfile\AdjustmentCategories\Model as AdjustmentCategoriesModel;
-use Schoolbox\DifferentiationProfile\AdjustmentLevels\Model as AdjustmentLevelsModel;
 
 /**
  * The controller for the mock version of the search API.
@@ -468,25 +466,6 @@ class Controller extends BaseController
             ) {
                 $isPrimaryCarer = true;
             }
-        }
-
-
-
-        $protectStudentContacts = $this->getConfigLoader()->get('protect_student_contacts');
-
-        switch ($protectStudentContacts) {
-            case Access::VISIBILITY_EVERYONE: // Everyone
-                break;
-            case Access::VISIBILITY_STAFF: // Staff Only
-                if (!$this->getUser()->getRole()->isStaff()) {
-                    $hideContacts = true;
-                }
-                break;
-            case Access::VISIBILITY_STAFF_PARENT: // Staff & Parents Only
-                if (!$this->getUser()->getRole()->isStaff() && !$this->getUser()->getRole()->isParent()) {
-                    $hideContacts = true;
-                }
-                break;
         }
 
         $allTeacherIds = [];
