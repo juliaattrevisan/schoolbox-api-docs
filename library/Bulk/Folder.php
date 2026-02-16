@@ -329,7 +329,8 @@ class Bulk_Folder
 
         // Folder Sequence
         $folderSequence = $sequenceColumnIndex >= 0 ? trim($row[$sequenceColumnIndex] ?? '') : '';
-        if (!empty($folderSequence) && !ctype_digit($folderSequence)) {
+        // Note negative sequence values must be accepted.  This is documented on Schoolbox Help.
+        if (!empty($folderSequence) && !preg_match('/^-?\d+$/', $folderSequence)) {
             $warnings[] = "Sequence value '$folderSequence' is not an integer";
             $folderSequence = '';
         }
