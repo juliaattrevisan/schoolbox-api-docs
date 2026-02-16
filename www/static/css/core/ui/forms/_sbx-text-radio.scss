@@ -70,7 +70,6 @@
     .option-list {
         li {
             display: flex;
-
             &:has(input[type="radio"] + label) {
                 align-items: flex-start;
                 white-space: normal;
@@ -78,4 +77,15 @@
             }
         }
     }
+}
+
+// Remove extra margin/padding added to radio labels in forms.scss
+.sbx-body input[type="radio"]:not(.plain) + label {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+// Keep radio buttons hidden within rubrics, as the label is what's used to trigger the radio selection, and the radio itself is not needed visually
+.sbx-body .rubric input[type="radio"] {
+    display: none;
 }

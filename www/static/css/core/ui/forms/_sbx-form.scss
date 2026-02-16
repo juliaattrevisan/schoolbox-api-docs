@@ -21,7 +21,6 @@
     color: var(--sbx-color-text-secondary) !important;
     cursor: not-allowed;
     pointer-events: auto;
-
     & + label {
         opacity: 1 !important;
     }
@@ -38,10 +37,6 @@
 .sbx-body.body.login input[type="checkbox"]:not(.plain) + label {
     font-weight: normal !important;
     vertical-align: text-bottom !important;
-}
-.sbx-body label.checkbox-label {
-    margin: 0 1rem 0 0.5rem !important;
-    padding: 0 !important;
 }
 
 .sbx-body .option-list .columns:has(input + label),

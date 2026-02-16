@@ -112,7 +112,7 @@ body.login input[type="checkbox"]:not(.plain) + label:before {
 .sbx-body ul.filters {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-s);
     list-style: none;
     justify-content: end;
 }
@@ -128,7 +128,7 @@ body.login input[type="checkbox"]:not(.plain) + label:before {
 }
 
 // Add vertical spacing between checkboxes
-.sbx-body .option-list {
+.sbx-body .option-list:not([class*="l-flex"]) {
     display: flex;
     flex-direction: column;
     gap: var(--sbx-size-s);
@@ -139,6 +139,7 @@ body.login input[type="checkbox"]:not(.plain) + label:before {
 .sbx-body .option-list li {
     align-items: flex-start;
     display: flex;
+    gap: var(--sbx-size-s);
 }
 .sbx-body .option-list input[type="checkbox"] {
     align-self: center;
@@ -146,10 +147,16 @@ body.login input[type="checkbox"]:not(.plain) + label:before {
 }
 
 // Remove extra margin/padding added to checkbox labels in forms.scss
+.sbx-body input[type="checkbox"]:not(.plain) + label,
 .sbx-body input[type="checkbox"]:not(.plain) + label.checkbox-label,
 body.login input[type="checkbox"]:not(.plain) + label {
-    margin: 0 !important;
-    padding: 0 !important;
+    margin: 0;
+    padding: 0;
+}
+
+// add some spacing between the checkbox and label in the participant group settings
+.sbx-body [data-participant-group] .checkbox-label {
+    margin-top: var(--sbx-size-s);
 }
 
 // Fix alignment of checklist filters when linked to a label on the left

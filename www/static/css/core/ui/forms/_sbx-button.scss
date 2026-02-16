@@ -74,6 +74,7 @@
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-config-field-roundness);
     color: var(--sbx-color-accent);
+    text-transform: capitalize;
     &:hover,
     &:active {
         background-color: var(
