@@ -12,7 +12,6 @@ namespace Schoolbox\Admin\DataRetention;
 
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
-use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
 use Schoolbox\GenericCollection;
 use Symfony\Component\Lock\LockInterface;
 
@@ -27,9 +26,9 @@ class CommandLineTool extends CliTool\App
     public const string LOCK_NAME = 'dataRetention';
 
     /**
-     * By default, the lock will be held for 90 seconds.
+     * By default, the lock will be held for 30 seconds.
      */
-    private const int LOCK_TIME = 90;
+    private const int LOCK_TIME = 30;
 
     /**
      * Print help
@@ -117,7 +116,7 @@ HELP;
         // add bus for cmsLogExample // clear things from the cmsLog older than 2 years
 //        $cmsLogRetentionPeriod = $this->getConfig()->get('dataRetention_cmsLogRetentionPeriod');
         $cmsLogRetentionPeriod = '-2 years';  // example data retention period get from the config table
-        $bus->add(new cmsLogExample($logger, $this->perform(), CMSLogMapper::getInstance(), $cmsLogRetentionPeriod));
+        $bus->add(new cmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $cmsLogRetentionPeriod));
 
         // if we have functions, run them
         if (count($bus) > 0) {

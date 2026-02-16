@@ -12,11 +12,20 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\DataRetention;
 
+use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Lock\LockInterface;
 
 class cmsLogExample implements IStrategy
 {
-    public function __construct(private LoggerInterface $log, private bool $perform, private \Schoolbox\CMS\Log\Mapper $cmsLog, private string $retentionPeriod = '')
+    /**
+     * @param LoggerInterface $log
+     * @param bool            $perform
+     * @param IConnector      $database
+     * @param LockInterface   $lock
+     * @param string          $retentionPeriod
+     */
+    public function __construct(private LoggerInterface $log, private bool $perform, private IConnector $database, private LockInterface $lock, private string $retentionPeriod = '')
     {
     }
 
@@ -27,7 +36,8 @@ class cmsLogExample implements IStrategy
             return;
         }
 
-        $database = $this->cmsLog->getDatabase();
+        $this->lock->refresh();
+
         $deleteCount = 0;
 
         $deleteOlderThan = (\Alaress_Date_Format::newNaturalDate(sprintf("%s", $this->retentionPeriod)))->getDatabase();
@@ -39,7 +49,7 @@ class cmsLogExample implements IStrategy
             WHERE time < :old
         ";
 
-        $statement = $database->prepare($query);
+        $statement = $this->database->getDatabase()->prepare($query);
         $statement->execute([
                 'old'   => $deleteOlderThan,
             ]);
@@ -53,7 +63,7 @@ class cmsLogExample implements IStrategy
                 DELETE FROM cmsLog
                 WHERE time < :old
             ";
-            $statement = $database->prepare($deleteQuery);
+            $statement = $this->database->getDatabase()->prepare($deleteQuery);
             $statement->execute([
                     'old'   => $deleteOlderThan,
                 ]);
