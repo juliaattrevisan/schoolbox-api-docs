@@ -164,3 +164,8 @@ body.login input[type="checkbox"]:not(.plain) + label {
     align-items: center;
     display: flex;
 }
+
+// Keep checkbox buttons hidden within rubrics, as the label is what's used to trigger the checkbox selection, and the checkbox itself is not needed visually
+.sbx-body .rb input[type="checkbox"] {
+    display: none;
+}
