@@ -48,7 +48,7 @@ function onViewMoreClick(): void {
 <template>
     <div class="show-more-container" :data-visible="showViewMoreGradient">
         <button
-            class="button"
+            class="button sbx-button--smaller"
             :data-test="`lg-view-more-button-${props.rowId}-${props.headerKey}`"
             :data-visible="showViewMoreInner"
             :tabindex="showViewMoreInner ? 0 : -1"

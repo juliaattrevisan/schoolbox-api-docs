@@ -74,6 +74,7 @@
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-config-field-roundness);
     color: var(--sbx-color-accent);
+    font-size: var(--sbx-font-size-s);
     text-transform: capitalize;
     &:hover,
     &:active {
@@ -107,6 +108,14 @@
  */
 .sbx-body .sub-nav li.active a {
     font-weight: bold;
+}
+
+/**
+ * Make some buttons smaller for better visual hierarchy, can be considered 'tertiary' buttons
+ * currently only used for the 'View more' buttons in Unit planner/ Manage DP page
+ */
+.sbx-body .sbx-button--smaller {
+    font-size: var(--sbx-font-size-xs);
 }
 
 /**
