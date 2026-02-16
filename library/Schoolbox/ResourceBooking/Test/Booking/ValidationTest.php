@@ -1481,4 +1481,84 @@ class ValidationTest extends TestCase
             }
         }
     }
+
+    /**
+     * Data provider for testValidateChangeStatus
+     *
+     * @return array
+     */
+    public static function providerValidateChangeStatus()
+    {
+        return [
+            'status approved with no clashes' => [
+                'status' => Booking\Status\Model::STATUS_APPROVED,
+                'hasConflictingBookings' => false,
+                'expectedErrorCount' => 0,
+            ],
+            'status approved with clashes' => [
+                'status' => Booking\Status\Model::STATUS_APPROVED,
+                'hasConflictingBookings' => true,
+                'expectedErrorCount' => 1,
+            ],
+            'status pending returns no errors' => [
+                'status' => Booking\Status\Model::STATUS_PENDING,
+                'hasConflictingBookings' => false,
+                'expectedErrorCount' => 0,
+            ],
+            'status rejected returns no errors' => [
+                'status' => Booking\Status\Model::STATUS_REJECTED,
+                'hasConflictingBookings' => false,
+                'expectedErrorCount' => 0,
+            ],
+        ];
+    }
+
+    /**
+     * Minimal test for validateChangeStatus function.
+     * This test verifies that the function executes without throwing exceptions
+     * and returns the expected error count based on the status and clash state.
+     *
+     * @param int $status
+     * @param bool $hasConflictingBookings
+     * @param int $expectedErrorCount
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidateChangeStatus')]
+    public function testValidateChangeStatus(
+        int $status,
+        bool $hasConflictingBookings,
+        int $expectedErrorCount
+    ): void {
+        // Create mock mapper
+        $conflictingBookings = $hasConflictingBookings
+            ? new Collection()->add(new Booking\Model()->setId(999))
+            : new Collection();
+
+        $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
+        $mockMapper
+            ->method('findForResource')
+            ->willReturn($conflictingBookings);
+
+        $validation = $this->createValidation(new User(), $mockMapper, new StatusMapper(), new TermMapper());
+
+        // Create a booking
+        $resource = new Item\Model();
+        $resource->setId(123);
+
+        $event = new Event();
+        $event->setStartDateTime(new \Alaress_Date_Format('2077-01-01T10:00:00+00:00', \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+        $event->setEndDateTime(new \Alaress_Date_Format('2077-01-01T11:00:00+00:00', \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+
+        $booking = new Booking\Model();
+        $booking->setId(456);
+        $booking->setResource($resource);
+        $booking->setEvent($event);
+
+        // Test the function
+        $errors = $validation->validateChangeStatus($booking, $status);
+
+        // Verify the result
+        $this->assertIsArray($errors);
+        $errorsFlattened = $validation->getAllErrorStringsAsFlatArray($errors);
+        $this->assertCount($expectedErrorCount, $errorsFlattened);
+    }
 }
