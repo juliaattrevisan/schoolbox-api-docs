@@ -44,6 +44,8 @@ class CommandLineTool extends CliTool\App
     public function getShortOpts(): array
     {
         return [
+            CliTool\Kernel::OPT_SHORT_PERFORM,  // hidden deep in the code is this option, raising it here so its more visible that it does actually exist
+            CliKernelAbstract::OPT_SHORT_VERBOSITY,  // hidden deep in the code is this option, raising it here so its more visible that it does actually exist
             self::OPT_SHORT_HELP,
         ];
     }
@@ -54,6 +56,7 @@ class CommandLineTool extends CliTool\App
     public function getLongOpts(): array
     {
         return [
+            CliTool\Kernel::OPT_LONG_PERFORM,  // hidden deep in the code is this option, raising it here so its more visible that it does actually exist
             self::OPT_LONG_HELP,
         ];
     }
