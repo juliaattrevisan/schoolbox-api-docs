@@ -676,6 +676,15 @@ class ValidationTest extends TestCase
                 'userIsAuthor' => false,
                 'expectedStatus' => Booking\Status\Model::STATUS_APPROVED,
             ],
+            'valid booking, clash, open resource' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => true,
+                'moderationType' => Item\ModerationType\Model::TYPE_OPEN,
+                'userIsModerator' => false,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_PENDING,
+            ],
             'valid booking, no clash, moderated resource, user is moderator and author' => [
                 'startDate' => '2027-01-01T10:00:00+00:00',
                 'endDate' => '2027-01-01T11:00:00+00:00',
