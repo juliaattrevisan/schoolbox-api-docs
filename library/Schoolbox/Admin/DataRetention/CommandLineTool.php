@@ -104,10 +104,10 @@ HELP;
         // build the bus for all the data retention tasks
         $bus = new GenericCollection(IStrategy::class);
 
-        // add bus for example test // clear things from the cmsLog older than 2 years
+        // add bus for cmsLogExample // clear things from the cmsLog older than 2 years
 //        $cmsLogRetentionPeriod = $this->getConfig()->get('dataRetention_cmsLogRetentionPeriod');
         $cmsLogRetentionPeriod = '-2 years';  // example data retention period get from the config table
-        $bus->add(new exampleTest($logger, $this->perform(), CMSLogMapper::getInstance(), $cmsLogRetentionPeriod));
+        $bus->add(new cmsLogExample($logger, $this->perform(), CMSLogMapper::getInstance(), $cmsLogRetentionPeriod));
 
         // if we have functions, run them
         if (count($bus) > 0) {

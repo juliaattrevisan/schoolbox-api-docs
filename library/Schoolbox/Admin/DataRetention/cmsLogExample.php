@@ -14,7 +14,7 @@ namespace Schoolbox\Admin\DataRetention;
 
 use Psr\Log\LoggerInterface;
 
-class exampleTest implements IStrategy
+class cmsLogExample implements IStrategy
 {
     public function __construct(private LoggerInterface $log, private bool $perform, private \Schoolbox\CMS\Log\Mapper $cmsLog, private string $retentionPeriod)
     {
