@@ -7,6 +7,7 @@ import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
+import CursorPagination from "@schoolboxVue/components/pagination/cursor-pagination.vue";
 import LazyGrid from "@schoolboxVue/components/grid/lazyGrid/lazy-grid.vue";
 import type { Header, Routes, BasicType } from "@schoolboxVue/components/grid/lazyGrid/types/lazyGridTypes";
 import LgUserCell from "@schoolboxVue/components/grid/lazyGrid/cellTypes/lg-user-cell.vue";
@@ -67,6 +68,14 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
                 </template>
             </lazy-grid>
             <loading-table v-if="rowsStore.isMoreLoading" :rows="5" row-height="3rem" />
+            <cursor-pagination
+                :url="rowsStore.url"
+                :metadata="rowsStore.payload.metadata"
+                :limit="rowsStore.limit"
+                :is-loading="rowsStore.isNewLoading || rowsStore.isMoreLoading"
+                @previous="rowsStore.onPaginate"
+                @next="rowsStore.onPaginate"
+            />
         </div>
         <template v-if="props.routes.exportCsv">
             <teleport to="#download-csv-container">
