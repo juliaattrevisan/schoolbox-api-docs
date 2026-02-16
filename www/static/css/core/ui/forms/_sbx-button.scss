@@ -202,14 +202,15 @@
 }
 
 /**
- * Dropdown list buttons
+ * Dropdown list buttons, ensure they use the correct background colour
  */
 .sbx-body .f-dropdown,
-.sbx-body .f-dropdown li {
+.sbx-body .f-dropdown li,
+.sbx-body .f-dropdown button {
     background-color: var(--sbx-color-foreground-primary);
 }
 
-//added to fix some styling issue
+// Ensure the colour is the accent colour
 .sbx-body.f-dropdown li :is(a, button),
 .sbx-body .f-dropdown li :is(a, button)::before {
     color: var(--sbx-color-accent);
