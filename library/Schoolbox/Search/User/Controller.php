@@ -453,21 +453,9 @@ class Controller extends BaseController
             }
         }
 
-        // Determine whether current user is student's parent, and if not if they
-        // are related in some other way.
-
-        $isParentOfStudent = $this->getUser()->isParentOf($student);
-        $isPrimaryCarer    = false;
-        if ($isParentOfStudent && !empty($contactList)) {
-            // Only the primary parent will see emergency contact information
-            if (
-                $contactList[0]['StudentContactID'] == $this->getUser()->getExternalId()
-                || $contactList[0]['StudentContactSpouseID'] == $this->getUser()->getExternalId()
-            ) {
-                $isPrimaryCarer = true;
-            }
-        }
-
+        /* Get a list of teacher identifiers from pretty much every teacher involved with this student somehow;
+         * these are used to derive a list of teacher emails which facilitates the Email All Teachers function
+         */
         $allTeacherIds = [];
 
         foreach ($subjects as $subject) {
@@ -548,12 +536,9 @@ class Controller extends BaseController
         $sharedCampuses = $this->getUser()->getCampusCollection()->intersect($student->getCampusCollection());
 
         /* Further restrict access to profile tabs more than just by availability and visibility (which is what $tabs is right now)
-         *
-         * Anyway, from the docblocks, it seems that $isPrimaryCarer was supposed to restrict *which parent(s)* could see
-         * emergency contacts. SA-12147 rewrote the whole page so I'm not entirely sure of its history anymore.
          */
         $hasContacts = count($contacts) > 0;
-        $hasEmergencyContacts = $isPrimaryCarer && (count($externalUser['data']['roleTypes']['tabs']['emergencyContacts']) > 0);
+        $hasEmergencyContacts = count($externalUser['data']['roleTypes']['tabs']['emergencyContacts']) > 0;
 
         /* (For all role types) If any of these fail, the tab should never exist */
         $tabConstraintsBase = [
@@ -665,9 +650,6 @@ class Controller extends BaseController
                  * heuristic beyond Availability/Visibility concepts
                  */
                 'showEmail' => $showEmails,
-                /* Somehow this is important
-                 */
-                'isPrimaryCarer' => $isPrimaryCarer,
                 /* A set of contacts (if any) for this student
                  */
                 'contacts' => $contacts,
