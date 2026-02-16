@@ -21,6 +21,7 @@ use Alaress\Async\Stomp\IClient;
 use Alaress\Async\Stomp\IFrame;
 use Alaress\Async\Stomp\Implementation\Stream\Connection;
 use Alaress\Sentry\Tracing\Tracer;
+use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Predis\ClientInterface;
 use Sentry\Tracing\SpanStatus;
 
@@ -126,10 +127,7 @@ class Broker implements IBroker
 
 
     /**
-     * @param mixed      $serializable anything that can be serialized
-     * @param array|null $context
-     * @param int|null   $ttl
-     * @return void
+     * @inheritdoc
      */
     public function publish(mixed $serializable, ?array $context = null, ?int $ttl = null): void
     {
@@ -150,7 +148,11 @@ class Broker implements IBroker
         // (via the default exchange):
         // defer this check until the message is about to be published, so that
         // an AMQP connection is created only when necessary.
-        $this->amqp->declareQueue($this->queue);
+        try {
+            $this->amqp->declareQueue($this->queue);
+        } catch (\RuntimeException $e) {
+            throw new AmqpRuntimeException($e->getMessage(), $e->getCode(), $e);
+        }
 
         // ...then advise AMQP to pick it up (on the default exchange)
         $this->amqp->publish(
