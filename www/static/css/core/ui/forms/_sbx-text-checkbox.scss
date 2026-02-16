@@ -160,7 +160,7 @@ body.login input[type="checkbox"]:not(.plain) + label {
 }
 
 // Fix alignment of checklist filters when linked to a label on the left
-.sbx-body .filters .checklist {
+.sbx-body .filters .option-list {
     align-items: center;
     display: flex;
 }
