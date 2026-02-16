@@ -111,9 +111,9 @@ HELP;
         /** @var GenericCollection<IStrategy> $bus */
         $bus = new GenericCollection(IStrategy::class);
 
-        // add bus for cmsLogExample // clear things from the cmsLog older than 2 years
+        // add bus for cmsLogExample // clear things from the cmsLog older than 1 year (possible options are 1 Day, 30 Days, 365 Days, <null>)
 //        $cmsLogRetentionPeriod = $this->getConfig()->get('dataRetention_cmsLogRetentionPeriod');
-        $cmsLogRetentionPeriod = '-2 years';  // example data retention period get from the config table
+        $cmsLogRetentionPeriod = '365';  // example data retention period get from the config table
         $bus->add(new cmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $cmsLogRetentionPeriod));
 
         // if we have functions, run them

@@ -19,13 +19,14 @@ use Symfony\Component\Lock\LockInterface;
 class cmsLogExample implements IStrategy
 {
     /**
-     * @param LoggerInterface $log
-     * @param bool            $perform
-     * @param IConnector      $database
-     * @param LockInterface   $lock
-     * @param string          $retentionPeriod
+     * @param null|LoggerInterface  $log
+     * @param bool                  $perform
+     * @param IConnector            $database
+     * @param LockInterface         $lock
+     * @param string                $retentionPeriod // configured by admin with planned options 1 Day, 30 Days, 365 Days, <null> (null is do NOT hard delete this)
+     * @return void
      */
-    public function __construct(private LoggerInterface $log, private bool $perform, private IConnector $database, private LockInterface $lock, private string $retentionPeriod = '')
+    public function __construct(private ?LoggerInterface $log, private bool $perform, private IConnector $database, private LockInterface $lock, private string $retentionPeriod = '')
     {
     }
 
@@ -43,7 +44,7 @@ class cmsLogExample implements IStrategy
 
         $deleteCount = 0;
 
-        $deleteOlderThan = (\Alaress_Date_Format::newNaturalDate(sprintf("%s", $this->retentionPeriod)))->getDatabase();
+        $deleteOlderThan = (\Alaress_Date_Format::newNaturalDate(sprintf("-%s days", $this->retentionPeriod)))->getDatabase();
 
         // find how cmsLog Entries are stored in the database
         $query = "
