@@ -4387,7 +4387,7 @@ abstract class Mapper implements IMapper
     {
         try {
             $this->getEventPropagator()->propagate($subject, $verb, $object, $this, $diff);
-        } catch (\ErrorException | AMQPIOException | AMQPRuntimeException | \RuntimeException $e) {
+        } catch (\ErrorException | AMQPIOException | AMQPRuntimeException $e) {
             // The exceptions caught in `getEventPropagator` must be caught here
             // as well, now that the queue is not connected to until actually
             // propagating an event.
