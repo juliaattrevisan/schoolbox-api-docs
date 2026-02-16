@@ -55,6 +55,11 @@ class Redis
     private const string COMPRESSED_PAYLOAD_PREFIX = 'gz:';
 
     /**
+     * The compression ratio to use for compressing payloads.
+     */
+    private const int COMPRESSION_RATIO = 9;
+
+    /**
      * @var self
      */
     protected static $instance;
@@ -321,12 +326,21 @@ class Redis
         // Recache if result recalculated, or needs to be recached because the
         // fetched result was not compressed
         if ($requiresRecalculation || $requiresRecache) {
+            $serializedValue = serialize($returnValue);
+            $cachedValue     = gzcompress($serializedValue, self::COMPRESSION_RATIO);
+            if ($cachedValue === false) {
+                // Compression failed?
+                // just store the uncompressed value, I guess
+                $cachedValue = $serializedValue;
+            } else {
+                $cachedValue = self::COMPRESSED_PAYLOAD_PREFIX . $serializedValue;
+            }
+
             try {
-                $serializedValue = self::COMPRESSED_PAYLOAD_PREFIX . gzcompress(serialize($returnValue));
                 if ($timeout > 0) {
-                    $redis->setex($key, $timeout, $serializedValue);
+                    $redis->setex($key, $timeout, $cachedValue);
                 } else {
-                    $redis->set($key, $serializedValue);
+                    $redis->set($key, $cachedValue);
                 }
             } catch (Predis\PredisException $e) {
                 trigger_error(sprintf('Redis exception when writing cache: "%s"', $e->getMessage()), E_USER_WARNING);
