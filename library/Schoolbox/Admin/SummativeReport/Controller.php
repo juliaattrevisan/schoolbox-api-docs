@@ -978,17 +978,16 @@ class Controller extends ConfigController
         if ($student->getDisplayGradeGraph() || $viewer->getRole()->isStaff()) {
             /* Compile a whitelist of worktypes that we want to include on the boxplots
              */
-            $workTypeWhitelist = [];
+            $summaryWorkTypeWhitelist = [];
 
             foreach ($optionsPayload['summary']['workType'] as $worktypeId => $worktype) {
                 if ($worktype['graph'] ?? false) {
-                    $workTypeWhitelist[] = $worktypeId;
+                    $summaryWorkTypeWhitelist[] = $worktypeId;
                 }
             }
 
-            if ($optionsPayload['summary']['cohort']) {
+            if (!empty($summaryWorkTypeWhitelist)) {
                 foreach ($folders as $folder) {
-                    // if the folder is empty, then don't attempt to generate a graph for it
                     if (!isset($summaryAssessments[$folder->getId()])) {
                         continue;
                     }
@@ -1006,31 +1005,28 @@ class Controller extends ConfigController
                         $viewer,
                         $term,
                         $gradeHelper,
-                        $workTypeWhitelist
+                        $summaryWorkTypeWhitelist
                     );
                 }
             }
-
-            if ($optionsPayload['class']['cohort']) {
-                /* Compile a whitelist of worktypes that we want to include on the boxplots
-                 */
-                $workTypeWhitelist = [];
-
-                foreach ($optionsPayload['class']['workType'] as $worktypeId => $worktype) {
-                    if ($worktype['graph'] ?? false) {
-                        $workTypeWhitelist[] = $worktypeId;
-                    }
+            $classWorkTypeWhitelist = [];
+            foreach ($optionsPayload['class']['workType'] as $worktypeId => $worktype) {
+                if ($worktype['graph'] ?? false) {
+                    $classWorkTypeWhitelist[] = $worktypeId;
                 }
+            }
 
+            if (!empty($classWorkTypeWhitelist)) {
                 foreach ($folders as $folder) {
-                    // if the folder is empty, then don't attempt to generate a graph for it
                     if (!isset($classAssessments[$folder->getId()])) {
                         continue;
                     }
-                    // for each folder build and work with that markbook and assessments
                     $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
-                    //markbooks need to be spawned again for each folder, as class could have a different collection of worktypes to summary
-                    $filteredMarkbook                     = (new Markbook($classAssessments[$folder->getId()], $overallMarkScheme, $this->getUser()))->sortAssessables(new AssessmentComparator($student));
+                    $filteredMarkbook  = (new Markbook(
+                        $classAssessments[$folder->getId()],
+                        $overallMarkScheme,
+                        $this->getUser()
+                    ))->sortAssessables(new AssessmentComparator($student));
                     $allGraphs['class'][$folder->getId()] = $this->generateCohortGraph(
                         $classAssessments[$folder->getId()],
                         $folder,
@@ -1041,7 +1037,7 @@ class Controller extends ConfigController
                         $viewer,
                         $term,
                         $gradeHelper,
-                        $workTypeWhitelist
+                        $classWorkTypeWhitelist
                     );
                 }
             }
