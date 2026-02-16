@@ -1951,9 +1951,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
                 ]);
 
                 if ($courseSpec->isDeleted()) {
-                    $courseSpec->setDeletedAt(null);
-
-                    $courseSpecMapper->save($courseSpec);
+                    $courseSpecMapper->restoreSoftDeleted($courseSpec);
                 }
             } catch (\Schoolbox\Mapper\Exception $e) {
                 /* No previously-assigned course spec was here: nothing to do, except continue normally
