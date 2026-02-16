@@ -557,7 +557,7 @@ class Mapper extends BaseMapper
         $this->database->onPersist(function () use ($sessionUser, $verb, $object, $diff): void {
             try {
                 $this->getEventPropagator()->propagate($sessionUser, $verb, $object, $this, $diff);
-            } catch (\ErrorException | AMQPIOException | AMQPRuntimeException $e) {
+            } catch (\ErrorException | AMQPIOException | AMQPRuntimeException | \RuntimeException $e) {
                 // The exceptions caught in `getEventPropagator` must be caught here
                 // as well, now that the queue is not connected to until actually
                 // propagating an event.
