@@ -1928,6 +1928,32 @@ class Mapper extends AbstractFolderMapper implements ILocator
             }
         }
 
+        /* Check if the $parentFolder had a deleted course spec associated with it. If it did, resurrect it; otherwise
+         * we end up trying to re-insert a course spec. I'm not sure we are *supposed* to reset subject_code and uuid
+         * in this workflow: I'm not actually sure what it means when a user drags a unit from one place to another
+         * place that had a previously-deleted course spec: I don't know why it was deleted in the first place.
+         *
+         * A soft-deleted course spec won't turn up in the joins, so you kind of have to check manually
+         */
+        if (!$parentFolder->hasCourseSpecification()) {
+            $courseSpecMapper = CourseSpecification\Mapper::getInstance();
+
+            /* Find the most recently deleted course spec, in case of broken data from yesteryear...
+             */
+            $courseSpec = $courseSpecMapper->findByColumn('folder_id', $parentFolder->getId(), [
+                'deleted' => true,
+                'order' => [
+                    'deleted_at' => 'DESC'
+                ]
+            ])->first();
+
+            if ($courseSpec?->isDeleted()) {
+                $courseSpec->setDeletedAt(null);
+
+                $courseSpecMapper->save($courseSpec);
+            }
+        }
+
         $folderMapper->save($movedFolder->setParent($parentFolder)->setUpdatedBy($this->getSessionUser()->getId()));
     }
 
