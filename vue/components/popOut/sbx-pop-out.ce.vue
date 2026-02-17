@@ -189,7 +189,8 @@ window.Vue.onMounted(() => {
 .sbx-button--component-action {
     background-color: transparent;
     font-weight: 600;
-    font-size: calc(var(1rem) * 1px - 2px);
+    font-size: calc((1rem) - 2px);
+    height: auto;
     height: auto;
     line-height: 1.5rem;
     margin: 0;
