@@ -531,7 +531,7 @@ class Csv extends Base
     {
         $actualHeaders = [];
         foreach ($headerColumns as $index => $column) {
-            $actualHeaders[strtolower($column)][] = $index;
+            $actualHeaders[trim(strtolower($column))][] = $index;
         }
         return $actualHeaders;
     }
