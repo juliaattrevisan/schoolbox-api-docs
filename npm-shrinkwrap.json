@@ -27,15 +27,15 @@
         "@fullcalendar/vue3": "~6.1.20",
         "@melloware/coloris": "~0.25.0",
         "@microsoft/immersive-reader-sdk": "~1.4.0",
-        "@vueuse/components": "^14.2.1",
-        "@vueuse/core": "^14.2.1",
-        "@vueuse/integrations": "^14.2.1",
+        "@vueuse/components": "~14.2.1",
+        "@vueuse/core": "~14.2.1",
+        "@vueuse/integrations": "~14.2.1",
         "ckeditor5": "~45.2.1",
         "ckeditor5-premium-features": "~45.2.1",
         "clipboard": "~2.0.11",
         "datatables.net": "~1.13.8",
         "datatables.net-fixedcolumns": "~4.3.0",
-        "dayjs": "~1.11.13",
+        "dayjs": "^1.11.19",
         "dropzone": "~6.0.0-beta.2",
         "firebase": "~12.9.0",
         "flatpickr": "~4.6.13",
@@ -60,7 +60,7 @@
         "ts-ebml": "~3.0.1",
         "v-tables-3-select-rows": "~0.4.9",
         "videojs-record": "~4.8.0",
-        "vue": "^3.5.28",
+        "vue": "~3.5.28",
         "vuejs-paginate-next": "~1.0.2"
       },
       "devDependencies": {
@@ -15434,9 +15434,10 @@
       }
     },
     "node_modules/dayjs": {
-      "version": "1.11.13",
-      "resolved": "https://registry.npmjs.org/dayjs/-/dayjs-1.11.13.tgz",
-      "integrity": "sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg=="
+      "version": "1.11.19",
+      "resolved": "https://registry.npmjs.org/dayjs/-/dayjs-1.11.19.tgz",
+      "integrity": "sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw==",
+      "license": "MIT"
     },
     "node_modules/de-indent": {
       "version": "1.0.2",
@@ -41424,9 +41425,9 @@
       }
     },
     "dayjs": {
-      "version": "1.11.13",
-      "resolved": "https://registry.npmjs.org/dayjs/-/dayjs-1.11.13.tgz",
-      "integrity": "sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg=="
+      "version": "1.11.19",
+      "resolved": "https://registry.npmjs.org/dayjs/-/dayjs-1.11.19.tgz",
+      "integrity": "sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw=="
     },
     "de-indent": {
       "version": "1.0.2",
