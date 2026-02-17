@@ -125,6 +125,7 @@ class ListController extends Web\Controller\Base
         protected UnitSpecificationMapper $unitSpecificationMapper,
         private RosettaStone $rosettaStone,
         protected \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
+        BreadcrumbFactory $bakery,
         private ?UrlFactory $urlFactory = null,
         private ?string $learnosityVersion = null,
         #[\SensitiveParameter] private ?string $learnosityConsumerKey = null,
@@ -134,6 +135,7 @@ class ListController extends Web\Controller\Base
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapper($assessmentMapper);
         $this->setAccess($access);
+        $this->bakery = $bakery;
     }
 
 
@@ -654,10 +656,7 @@ class ListController extends Web\Controller\Base
         $data['contextType'] = AssessmentContextType::objectToString($context) . 's';
         $data['baseContextType'] = AssessmentContextType::objectToString($context->getBaseContext()) . 's';
         $data['context']     = $context;
-        $data['breadcrumbs'] = [
-            ['Learning', $this->routeGenerator->generate('learning.getClasses')],
-            [$context->getFolder()->getTitle(), "/homepage/{$context->getFolder()->getId()}"],
-        ];
+        $data['breadcrumbs'] = $this->getBakery()->produceFromContext($context, null, $this->getUser());
         if ($context instanceof Project) {
             $data['breadcrumbs'][] = [
                 $context->getTitle(),

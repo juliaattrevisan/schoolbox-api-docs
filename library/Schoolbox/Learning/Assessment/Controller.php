@@ -161,6 +161,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $unitSpecificationMapper,
             $rosettaStone,
             $this->projectResultCacheMapper,
+            $this->bakery,
             $urlFactory,
             $learnosityVersion,
             $learnosityConsumerKey,
