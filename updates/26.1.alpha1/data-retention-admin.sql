@@ -1,16 +1,10 @@
+### (hard code the id to ConfigMapper::TYPE_DATA_RETENTION)
+SET
+    @dataRetention_config_id = 25;
+
 ### create new dataRetention area
 INSERT INTO lu_config_type (id, type, sequence)
-VALUES (25, 'DataRetention', 24);
-
-SET
-@dataRetention_config_id = (
-        SELECT id
-        FROM lu_config_type
-        WHERE
-            type = 'DataRetention'
-    );
-
-
+VALUES (@dataRetention_config_id, 'DataRetention', 24);
 
 INSERT INTO config (`name`, `title`, `description`, `field_id`,  `type_id`, `options`, `editable`, `hidden`, `required`, `module`, sequence)
 VALUES (
