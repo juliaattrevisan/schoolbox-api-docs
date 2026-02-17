@@ -20,7 +20,7 @@ use Schoolbox\Config\ConfigMapper;
 class Controller extends ConfigController
 {
     /**
-     * show canvas settings page, and import logs
+     * show data retention settings page
      */
     public function getSettings(): void
     {
