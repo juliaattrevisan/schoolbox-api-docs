@@ -103,6 +103,7 @@ function onSortSelected(key: string): void {
         border-color: var(--body-background);
         border-style: solid;
         border-width: 1px 0 1px 0; // Unless overridden below
+        font-size: 0.8125rem;
         overflow-wrap: anywhere;
         text-wrap: wrap;
         &:not(:last-child) {
