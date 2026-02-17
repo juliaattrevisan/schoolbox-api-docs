@@ -43,6 +43,7 @@ class CacheFunctionCallTest extends TestCase
                     if ($this->mustHit) {
                         throw new \OutOfBoundsException(sprintf('Key "%s" does not exist', $key));
                     }
+                    $this->storeCachedValue($key, $this->cachedValue, null);
                     return $this->cachedValue;
                 }
                 return $this->cachedValues[$key];
