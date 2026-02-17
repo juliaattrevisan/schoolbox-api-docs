@@ -657,18 +657,6 @@ class ListController extends Web\Controller\Base
         $data['baseContextType'] = AssessmentContextType::objectToString($context->getBaseContext()) . 's';
         $data['context']     = $context;
         $data['breadcrumbs'] = $this->getBakery()->produceFromContext($context, null, $this->getUser());
-        if ($context instanceof Project) {
-            $data['breadcrumbs'][] = [
-                $context->getTitle(),
-                $this->routeGenerator->generate(
-                    'learningAssessment.getStatus',
-                    [
-                        'assessment'   => $context,
-                        'assessmentId' => $context->getId(),
-                    ]
-                ),
-            ];
-        }
 
         $this->response = $this->responseFromTemplate('@learningAssessment/create.twig', $data);
     }
