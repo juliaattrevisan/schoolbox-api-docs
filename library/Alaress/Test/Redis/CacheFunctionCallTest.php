@@ -21,10 +21,13 @@ class CacheFunctionCallTest extends TestCase
     public function testCacheFunctionCallCompression(
         mixed $expected,
         ?string $cachedValue,
-        mixed $compressedValue,
+        mixed $uncompressedValue,
     ): void {
         // Mock Redis client
-        $redis = new class ($cachedValue, $compressedValue) extends Redis {
+        $redis = new class (
+            $cachedValue,
+            $uncompressedValue,
+        ) extends Redis {
             private array $cachedValues = [];
             public function __construct(private ?string $cachedValue, private mixed $uncompressedValue)
             {
@@ -80,23 +83,23 @@ class CacheFunctionCallTest extends TestCase
         ];
         yield 'cached, serialized but uncompressed' => [
             'q',
-            null,
             serialize('q'),
+            null,
         ];
         yield 'cached, serialized and compressed' => [
             'q',
-            null,
             'gz:' . gzcompress(serialize('q')),
+            null,
         ];
         yield 'cached, uncompressed and malformed' => [
             'q',
-            null,
             'zzzzz',
+            null,
         ];
         yield 'cached, compressed and malformed' => [
             'q',
-            null,
             'gz:' . gzcompress('zzzzz'),
+            null,
         ];
     }
 }

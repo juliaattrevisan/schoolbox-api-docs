@@ -377,18 +377,16 @@ class Redis
         // Raw result is no longer needed, thus it can be freed
         unset($cachedValue);
 
-        if (!$requiresRecache) {
-            // short-circuit unserialization if value is legitimately false:
-            // otherwise, if it fails to unserialize then recalculate
-            if ($serializedValue === 'b:0;') {
-                $returnValue = false;
+        // short-circuit unserialization if value is legitimately false:
+        // otherwise, if it fails to unserialize then recalculate
+        if ($serializedValue === 'b:0;') {
+            $returnValue = false;
+        } else {
+            $unserializedValue = unserialize($serializedValue);
+            if ($unserializedValue !== false) {
+                $returnValue = $unserializedValue;
             } else {
-                $unserializedValue = unserialize($serializedValue);
-                if ($unserializedValue !== false) {
-                    $returnValue = $unserializedValue;
-                } else {
-                    $requiresRecalculation = true;
-                }
+                $requiresRecalculation = true;
             }
         }
 
