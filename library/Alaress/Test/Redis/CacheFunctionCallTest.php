@@ -89,6 +89,11 @@ class CacheFunctionCallTest extends TestCase
             null,
             null,
         ];
+        yield 'cached, malformed' => [
+            'q',
+            'q',
+            null,
+        ];
         yield 'cached, serialized but uncompressed' => [
             'q',
             serialize('q'),
@@ -108,6 +113,16 @@ class CacheFunctionCallTest extends TestCase
             'q',
             'gz:' . gzcompress('zzzzz'),
             null,
+        ];
+        yield 'not cached, uncompression worked as expected' => [
+            'q',
+            null,
+            serialize('q'),
+        ];
+        yield 'not cached, uncompression failed' => [
+            'q',
+            null,
+            false,
         ];
     }
 }
