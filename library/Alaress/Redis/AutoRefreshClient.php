@@ -150,7 +150,7 @@ class AutoRefreshClient extends Client
     {
         $connectionParams = $this->getConnectionParams();
         return [
-            'db.system.name' => 'redis',
+            'db.system'      => 'redis',
             'db.namespace'   => $connectionParams['database'],
             'server.address' => $connectionParams['host'],
             'server.port'    => $connectionParams['port'],
