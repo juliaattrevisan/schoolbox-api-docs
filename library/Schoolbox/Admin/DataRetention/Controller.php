@@ -67,6 +67,6 @@ class Controller extends ConfigController
      */
     private function buildConfigPredicate(): Builder
     {
-        return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_TYPE, 24);
+        return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_TYPE, ConfigMapper::TYPE_DATA_RETENTION);
     }
 }

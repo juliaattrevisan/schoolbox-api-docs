@@ -95,6 +95,7 @@ class ConfigMapper extends Mapper
     public const TYPE_SAML          = 21;
     public const TYPE_AI            = 22;
     public const TYPE_CANVAS        = 23;
+    public const int TYPE_DATA_RETENTION = 25;
 
     // Technically these should be prefixed with 'NAME_', but it gets a bit verbose for little extra clarity
     public const _GLOBAL_MODERATION              = 'global_moderation';
@@ -459,6 +460,13 @@ class ConfigMapper extends Mapper
 
     // Storage cleanup settings
     public const NAME_STORAGE_CLEANUP_ENABLED = 'storage_cleanup_enabled';
+
+    // Data Retention Settings
+    public const string NAME_DATA_RETENTION_EPORTFOLIO = 'dataRetention_ePortfolio';
+    public const string NAME_DATA_RETENTION_LEARNINGMOMENTS = 'dataRetention_LearningMoments';
+    public const string NAME_DATA_RETENTION_MYFILES = 'dataRetention_MyFiles';
+    public const string NAME_DATA_RETENTION_CMS = 'dataRetention_CMS';
+    public const string NAME_DATA_RETENTION_STUDENTSUBMISSIONS = 'dataRetention_StudentSubmissions';
 
 
     // Debug settings
