@@ -380,7 +380,7 @@ class Redis
         // (but not recalculation)
         if (str_starts_with($cachedValue, self::COMPRESSED_PAYLOAD_PREFIX)) {
             $compressedValue = substr($cachedValue, strlen(self::COMPRESSED_PAYLOAD_PREFIX));
-            $serializedValue = gzuncompress($compressedValue);
+            $serializedValue = $this->uncompressValue($compressedValue);
             if ($serializedValue === false) {
                 // Could not compress: just return an error state
                 return [false, true, true];
@@ -424,7 +424,7 @@ class Redis
     private function encodeCalculatedValue(mixed $calculatedValue): string
     {
         $serializedValue = serialize($calculatedValue);
-        $cachedValue     = gzcompress($serializedValue, self::COMPRESSION_RATIO);
+        $cachedValue     = $this->compressValue($serializedValue);
         if ($cachedValue === false) {
             // Compression failed?
             // just store the uncompressed value, I guess
@@ -433,5 +433,27 @@ class Redis
             $cachedValue = self::COMPRESSED_PAYLOAD_PREFIX . $serializedValue;
         }
         return $cachedValue;
+    }
+
+    /**
+     * Compress `$value` if possible.
+     *
+     * @param string $value
+     * @return string|false The compressed value, or false if failed.
+     */
+    private function compressValue(string $value): string|false
+    {
+        return gzcompress($value, self::COMPRESSION_RATIO);
+    }
+
+    /**
+     * Uncompress `$value` if possible.
+     *
+     * @param string $value
+     * @return false|string
+     */
+    private function uncompressValue(string $value): string|false
+    {
+        return gzuncompress($value);
     }
 }
