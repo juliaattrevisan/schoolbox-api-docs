@@ -288,10 +288,19 @@ class Redis
         if (!isset($cachedValue)) {
             $requiresRecalculation = true;
         } else {
-            // Decompress the result:
-            // otherwise, mark it as requiring recache (but not recalculation)
+            // Attempt to decompress the result:
+            // if it's not compressed, or it fails to decompress, mark it as
+            // requiring recache (but not recalculation)
             if (str_starts_with($cachedValue, self::COMPRESSED_PAYLOAD_PREFIX)) {
-                $serializedValue = gzuncompress(substr($cachedValue, strlen(self::COMPRESSED_PAYLOAD_PREFIX)));
+                $compressedValue = substr($cachedValue, strlen(self::COMPRESSED_PAYLOAD_PREFIX));
+                $serializedValue = gzuncompress($compressedValue);
+                if ($serializedValue === false) {
+                    // Don't attempt to unserialize:
+                    // this is just an error state
+                    $requiresRecache       = true;
+                    $requiresRecalculation = true;
+                }
+                unset($compressedValue);
             } else {
                 $serializedValue = $cachedValue;
                 $requiresRecache = true;
@@ -300,16 +309,18 @@ class Redis
             // Raw result is no longer needed, thus it can be freed
             unset($cachedValue);
 
-            // short-circuit unserialization if value is legitimately false:
-            // otherwise, if it fails to unserialize then recalculate
-            if ($serializedValue === 'b:0;') {
-                $returnValue = false;
-            } else {
-                $unserializedValue = unserialize($serializedValue);
-                if ($unserializedValue !== false) {
-                    $returnValue = $unserializedValue;
+            if (!$requiresRecache) {
+                // short-circuit unserialization if value is legitimately false:
+                // otherwise, if it fails to unserialize then recalculate
+                if ($serializedValue === 'b:0;') {
+                    $returnValue = false;
                 } else {
-                    $requiresRecalculation = true;
+                    $unserializedValue = unserialize($serializedValue);
+                    if ($unserializedValue !== false) {
+                        $returnValue = $unserializedValue;
+                    } else {
+                        $requiresRecalculation = true;
+                    }
                 }
             }
 
