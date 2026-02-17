@@ -151,6 +151,10 @@ class Factory
              * becomes clickable. None of the other assessment types do this, so the studentId
              * has never actually been needed; this route was never visible in that usage
              */
+
+            // We have already dealt with cases UnitSpecification and UnitImplementation above, so get breadcrumbs up to unitSpec level recursively.
+            $trail = $this->produceFromAssessment($context, $user);
+
             if ($assessment instanceof LessonPlan\Model) {
                 $trail->add([$context->getTitle(), $this->routeGenerator->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId(), 'studentId' => $user->getId()])]);
             } else {
