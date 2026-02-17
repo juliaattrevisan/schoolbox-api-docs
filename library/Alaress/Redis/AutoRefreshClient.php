@@ -75,7 +75,11 @@ class AutoRefreshClient extends Client
         }
 
         // Data from https://opentelemetry.io/docs/specs/semconv/db/redis/
-        $queryText = $command->getId() . ' ' . implode(' ', $command->getArguments());
+        $queryText = sprintf(
+            '%s %s',
+            $command->getId(),
+            implode(' ', array_map($this->formatForQueryText(...), $command->getArguments())),
+        );
         return Tracer::getDefaultTrace()->runWithinSpan(
             fn () => $this->tryCommand($command, self::MAX_ATTEMPTS),
             $queryText,
@@ -151,5 +155,29 @@ class AutoRefreshClient extends Client
             'server.address' => $connectionParams['host'],
             'server.port'    => $connectionParams['port'],
         ];
+    }
+
+    /**
+     * Attempt to format whatever `$argument` is, for use in a Sentry span
+     * description.
+     *
+     * @param mixed $argument
+     * @return string
+     */
+    private function formatForQueryText(mixed $argument): string
+    {
+        if (is_bool($argument)) {
+            return $argument ? 'true' : 'false';
+        }
+        if (is_scalar($argument)) {
+            return (string)$argument;
+        }
+        if (is_array($argument)) {
+            return sprintf('array{%d}', count($argument));
+        }
+        if (is_object($argument)) {
+            return sprintf('object{%s}', get_class($argument));
+        }
+        return '';
     }
 }
