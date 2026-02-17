@@ -435,23 +435,23 @@ class Tracer
      *
      * @see startSpan for description of other parameters.
      *
-     * @param callable                           $callable
-     * @param string|null                        $description
-     * @param string|null                        $operation
-     * @param string|null                        $origin
-     * @param array                              $data
-     * @param (callable(mixed): array)|null      $onSuccess If provided, a callable which runs on success:
-     *                                                      it takes the result of `$callable`, and returns data to add
-     *                                                      to the span.
-     *  @param (callable(Throwable): array)|null $onFailure If provided, a callable which runs on failure:
-     *                                                      it takes what `$callable` threw, and returns data to add to
-     *                                                      the span.
+     * @param callable                          $callable
+     * @param string                            $description
+     * @param string|null                       $operation
+     * @param string|null                       $origin
+     * @param array                             $data
+     * @param (callable(mixed): array)|null     $onSuccess If provided, a callable which runs on success:
+     *                                                     it takes the result of `$callable`, and returns data to add
+     *                                                     to the span.
+     * @param (callable(Throwable): array)|null $onFailure If provided, a callable which runs on failure:
+     *                                                     it takes what `$callable` threw, and returns data to add to
+     *                                                     the span.
      * @return mixed Returns whatever `$callable` does when run.
      * @throws Throwable May throw whatever `$callable` may.
      */
     public function runWithinSpan(
         callable $callable,
-        ?string $description = null,
+        string $description,
         ?string $operation = null,
         ?string $origin = null,
         array $data = [],
