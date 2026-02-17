@@ -48,7 +48,8 @@
     .alert-box .close,
     .eotc-status .close,
     .alert-box-icon .close,
-    .selected-item {
+    .selected-item,
+    .selected-nodes-container {
         border-radius: var(--sbx-config-field-roundness) !important;
     }
 }
