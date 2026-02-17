@@ -285,7 +285,7 @@
              * also aupon resization
              */
             if ($(".cke_maximized").length) {
-                $(window).resize(function () {
+                $(window).on("resize", function () {
                     resizePicker();
                 });
 

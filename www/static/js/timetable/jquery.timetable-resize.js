@@ -3,7 +3,7 @@
      * Timeout on resize end
      */
     $.fn.timetableTimeout = function () {
-        $(window).resize(function () {
+        $(window).on("resize", function () {
             if (this.resizeTimeout) {
                 clearTimeout(this.resizeTimeout);
             }

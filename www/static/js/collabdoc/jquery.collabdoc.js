@@ -39,7 +39,7 @@
 
             /* Resized dimensions
              */
-            $(window).resize(function () {
+            $(window).on("resize", function () {
                 $(config.element).css({
                     width: config.width,
                     height: $(window).height() * 0.66,

@@ -20,7 +20,7 @@
 
         /* Set up listeners
          */
-        $(window).resize(function () {
+        $(window).on("resize", function () {
             if ($(this).resizeTimeout) {
                 clearTimeout($(this).resizeTimeout);
             }
