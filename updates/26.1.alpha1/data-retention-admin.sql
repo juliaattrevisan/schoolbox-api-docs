@@ -16,7 +16,17 @@ INSERT INTO config (`name`, `title`, `description`, `field_id`,  `type_id`, `opt
 VALUES (
            'dataRetention_ePortfolio',
            'Retention Period for ePortfolio',
-           'How long should soft deleted ePortfolios be retained?',
+           'Soft-deleted ePortfolio data will be permanently removed after this period.
+Leave empty to retain data indefinitely.
+
+ePortfolio data includes:
+- ePortfolio page
+- ePortfolio blogs
+- ePortfolio blog comments
+- ePortfolio blog images
+- ePortfolio filelists
+- ePortfolio permissions
+- ePortfolio components',
            (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
            @dataRetention_config_id,
            '1;1 Day:30;30 Days:365;365 Days',
@@ -29,7 +39,12 @@ VALUES (
        (
            'dataRetention_LearningMoments',
            'Retention Period for Learning Moments',
-           'How long should soft deleted Learning Moments be retained?',
+           'Soft-deleted Learning Moments data will be permanently removed after this period.
+Leave empty to retain data indefinitely.
+
+Learning Moments data includes:
+- Learning Moments
+- Learning Moment Evidence',
            (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
            @dataRetention_config_id,
            '1;1 Day:30;30 Days:365;365 Days',
@@ -42,7 +57,12 @@ VALUES (
        (
            'dataRetention_MyFiles',
            'Retention Period for My Files',
-           'How long should soft deleted My Files be retained?',
+           'Soft-deleted My Files data will be permanently removed after this period.
+Leave empty to retain data indefinitely.
+
+My Files data includes:
+- My Folders
+- My Files',
            (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
            @dataRetention_config_id,
            '1;1 Day:30;30 Days:365;365 Days',
@@ -55,7 +75,21 @@ VALUES (
        (
            'dataRetention_CMS',
            'Retention Period for Resources (CMS)',
-           'How long should soft deleted Resources (CMS) be retained?',
+           'Soft-deleted Resources (CMS) data will be permanently removed after this period.
+Leave empty to retain data indefinitely.
+
+Resources (CMS) data includes:
+- Resource folder
+- Resource folder contents including, but not limited to,
+  - Blogs
+  - Chats
+  - Files
+  - Homepages
+  - Links
+  - Polls
+  - Text boxes
+  - User groups
+  - Wikis',
            (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
            @dataRetention_config_id,
            '1;1 Day:30;30 Days:365;365 Days',
@@ -68,7 +102,15 @@ VALUES (
        (
            'dataRetention_StudentSubmissions',
            'Retention Period for Student Submissions',
-           'How long should soft deleted Student Submissions be retained?',
+           'Soft-deleted Student Submission data will be permanently removed after this period.
+Leave empty to retain data indefinitely.
+
+Student Submission data includes:
+- Student Submissions
+- Student Submission Files
+  - Kami Documents
+  - Plagscan Documents
+  - Turnitin Reports',
            (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
            @dataRetention_config_id,
            '1;1 Day:30;30 Days:365;365 Days',
