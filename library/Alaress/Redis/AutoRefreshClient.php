@@ -19,6 +19,15 @@ use Schoolbox\Url\Uri;
  * Extension of Redis client, which:
  * * attempts a command multiple times before giving up
  * * sends traces on connect and query to Sentry
+ *
+ * The Sentry traces were originally implemented in a wrapper class around the
+ * Redis client. However, that idea had to be shelved due to a vagary of
+ * Symfony's cache:
+ * * it attempts to re-construct an instance of whatever class it receives,
+ *   assuming it accepts the same constructor parameters as the Redis client
+ * * the wrapper does not, it accepts a Redis client itself
+ *
+ * The wrappers have been removed in the same commit as this message was added.
  */
 class AutoRefreshClient extends Client
 {
