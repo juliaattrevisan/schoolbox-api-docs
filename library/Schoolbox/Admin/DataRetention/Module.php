@@ -16,9 +16,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Mapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
