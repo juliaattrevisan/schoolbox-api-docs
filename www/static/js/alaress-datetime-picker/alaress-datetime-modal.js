@@ -108,10 +108,10 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         });
 
         // Attach week cycle functionality to prev & next buttons
-        $byTimetable.find("[data-tt-next]").click(function () {
+        $byTimetable.find("[data-tt-next]").on("click", function () {
             changeCycle($(this), false);
         });
-        $byTimetable.find("[data-tt-prev]").click(function () {
+        $byTimetable.find("[data-tt-prev]").on("click", function () {
             changeCycle($(this), true);
         });
 
@@ -730,7 +730,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
             $pickerResponseDueWork.append(html);
 
-            $pickerResponse.find("[data-show-full-due]").click(function () {
+            $pickerResponse.find("[data-show-full-due]").on("click", function () {
                 var listDiv = $(this).data("show-full-due");
                 $(this).parents("[data-adtp-top-due]").addClass("hide");
                 $("#" + listDiv).removeClass("hide");
@@ -738,7 +738,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 $("[data-due-work-title]").text(dictTop5Loaded);
             });
 
-            $pickerResponse.find("[data-hide-full-due]").click(function () {
+            $pickerResponse.find("[data-hide-full-due]").on("click", function () {
                 var listDiv = $(this).data("hide-full-due");
                 $pickerResponseDueWork.find("[data-adtp-top-due]").removeClass("hide");
                 $("#" + listDiv).addClass("hide");

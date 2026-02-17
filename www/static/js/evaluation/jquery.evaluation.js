@@ -10,7 +10,7 @@
     $.fn.evaluation.initNavigators = function () {
         /* Submit all the questions before switching between sections
          */
-        $("[data-evaluation-navigator]").click(function (event) {
+        $("[data-evaluation-navigator]").on("click", function (event) {
             event.preventDefault();
             $(this).attr("disabled", "disabled").attr("readonly", "readonly");
 
@@ -25,7 +25,7 @@
          * submits all the questionForm elements. This causes, in particular,
          * Matching Pairs to remain untouched resulting in NULL values.
          */
-        $("[data-evaluation-finish]").click(function (event) {
+        $("[data-evaluation-finish]").on("click", function (event) {
             event.preventDefault();
             var $finishButton = $(this);
             $finishButton.attr("disabled", "disabled").attr("readonly", "readonly");

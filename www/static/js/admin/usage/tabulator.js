@@ -57,7 +57,7 @@
          */
         function applySortorder() {
             $.each(config.element.find("[data-control]"), function (index, element) {
-                $(element).click(function (event) {
+                $(element).on("click", function (event) {
                     event.preventDefault();
                     var order = "ASC";
 
@@ -86,7 +86,7 @@
          */
         function applyPaginator() {
             $.each(config.element.find("li a"), function (index, element) {
-                $(element).click(function (event) {
+                $(element).on("click", function (event) {
                     event.preventDefault();
 
                     config.element.usageTabulator({

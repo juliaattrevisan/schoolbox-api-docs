@@ -943,7 +943,7 @@
         function initExpandAll() {
             $(config.element)
                 .find("[data-expand-all]")
-                .click(function (event) {
+                .on("click", function (event) {
                     var parentCollapsed = $(this).attr("data-collapse-state") === "collapsed";
 
                     if (parentCollapsed) {

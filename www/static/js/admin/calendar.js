@@ -39,7 +39,7 @@ var calendar = {
     initAdd: function () {
         var self = this;
 
-        $(this.options.addConfig).click(function () {
+        $(this.options.addConfig).on("click", function () {
             /* Only add if all inputs are filled
              * Jump to latest input field when trying to add while you have an empty input
              *
@@ -69,7 +69,7 @@ var calendar = {
      */
     initRemove: function () {
         window.self = this;
-        $(window.self.options.removeConfig).click(function () {
+        $(window.self.options.removeConfig).on("click", function () {
             window.id = $(this)
                 .attr("id")
                 .toString()

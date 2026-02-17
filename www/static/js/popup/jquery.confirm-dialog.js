@@ -47,7 +47,7 @@
             //  submit method)
             var input = $('<input type="submit" />').attr("name", el.attr("name")).val(el.val());
             form.append(input);
-            input.click().remove();
+            input.trigger("click").remove();
         }
     };
 

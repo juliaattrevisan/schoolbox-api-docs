@@ -61,7 +61,7 @@
          * to spawn the currently active (visible) tab
          */
         function tabActivator() {
-            $("[" + config.activator + "]").click(function () {
+            $("[" + config.activator + "]").on("click", function () {
                 config.onTabOpen($(this));
 
                 /* Tab corresponding to this activator

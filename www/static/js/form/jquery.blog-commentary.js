@@ -48,7 +48,7 @@
             component
                 .find("[data-toggle]")
                 .unbind("click")
-                .click(function () {
+                .on("click", function () {
                     $("#" + $(this).data("toggle")).toggleClass("hide");
                 });
 
@@ -58,7 +58,7 @@
             component
                 .find("[data-interaction=showcomments]")
                 .unbind("click")
-                .click(function (event) {
+                .on("click", function (event) {
                     event.preventDefault();
 
                     var button = $(this),

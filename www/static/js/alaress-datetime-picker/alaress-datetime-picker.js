@@ -276,7 +276,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     }
 
     // Create click event to open the modal for the element
-    $datepickerButton.click(function () {
+    $datepickerButton.on("click", function () {
         var originalValue;
 
         if (element.val().length > 0) {
@@ -341,7 +341,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                     var $datePicker = $("#byDate-" + pickerId),
                         $timetablePicker = $("#byTimetable-" + pickerId);
 
-                    $datePicker.find(".picker-submit").click(function () {
+                    $datePicker.find(".picker-submit").on("click", function () {
                         if ($("#hideTime" + pickerId).is(":checked")) {
                             setValue(element, options, true, true);
                         } else {
@@ -374,7 +374,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                         $modal.foundation("reveal", "close");
                     });
 
-                    $timetablePicker.find("[data-adtp-tt-submit]").click(function () {
+                    $timetablePicker.find("[data-adtp-tt-submit]").on("click", function () {
                         var newDate = dayjs($(this).attr("data-timetable-value"));
                         var selectedCampus = $timetablePicker.find("[data-adtp-tt-campus]").val();
                         var timetableAllDay = false;

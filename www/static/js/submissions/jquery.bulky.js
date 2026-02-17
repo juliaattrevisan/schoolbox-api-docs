@@ -259,7 +259,7 @@
                 // checkboxes are rebuilt every time the modal opens, the select-all checkbox is not.
                 $selectAllCheckbox.prop("checked", opt.defaultState).removeClass("indeterminate");
 
-                $selectAllCheckbox.click(setupActionButton);
+                $selectAllCheckbox.on("click", setupActionButton);
             }
         });
 

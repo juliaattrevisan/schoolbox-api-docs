@@ -69,7 +69,7 @@ String.prototype.format = function () {
             }, this.options.base_freq * 1000);
 
             /* Attach events */
-            this.options.send_el.click(function (event) {
+            this.options.send_el.on("click", function (event) {
                 var $body_el = $self.options.body_el;
 
                 event.preventDefault();
@@ -307,7 +307,7 @@ String.prototype.format = function () {
                                     .attr("title", "Unmute");
                             }
 
-                            $mute_el.click(function ($event) {
+                            $mute_el.on("click", function ($event) {
                                 $event.preventDefault();
 
                                 var $user_id = $(this).parent().data("user_id");

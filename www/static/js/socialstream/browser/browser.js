@@ -197,7 +197,7 @@ try {
                 $j.each(allNavigators, function (index, element) {
                     $j(element)
                         .find("a")
-                        .click(function (event) {
+                        .on("click", function (event) {
                             event.preventDefault();
                             loadNode($j(this).attr("rel"));
                         });
@@ -210,7 +210,7 @@ try {
                 $j.each(allFiles, function (index, element) {
                     $j(element)
                         .find("a")
-                        .click(function (event) {
+                        .on("click", function (event) {
                             var self, url, name, meta;
 
                             event.preventDefault();
@@ -236,7 +236,7 @@ try {
                 /* event handlers for selecting a folder to use
                  * Very similar to file event handler, but filename is contained in a data element instead.
                  */
-                container.find(config.useFolderSelector).click(function (event) {
+                container.find(config.useFolderSelector).on("click", function (event) {
                     event.preventDefault();
 
                     var self = $j(this),

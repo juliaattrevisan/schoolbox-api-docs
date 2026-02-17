@@ -127,7 +127,7 @@ $(function () {
         $debugBar.find(".phpdebugbar-indicator").first().before($html);
 
         // Toggle twig template names showing on click of the button
-        $("#showTwigNames").click(function () {
+        $("#showTwigNames").on("click", function () {
             if ($(".twigName").attr("hidden")) {
                 $(".twigName").removeAttr("hidden");
             } else {

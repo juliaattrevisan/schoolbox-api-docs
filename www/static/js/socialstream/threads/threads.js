@@ -35,7 +35,7 @@
 
         /* Allow View More to load more stuff
          */
-        config.viewMoreLink.click(function () {
+        config.viewMoreLink.on("click", function () {
             stream();
         });
 
@@ -208,7 +208,7 @@
                 config.element
                     .find("[data-socialstream-delete]")
                     .unbind("click")
-                    .click(function (event) {
+                    .on("click", function (event) {
                         event.preventDefault();
 
                         var element = $(this);
