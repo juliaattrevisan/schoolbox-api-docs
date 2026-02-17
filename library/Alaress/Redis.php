@@ -270,7 +270,6 @@ class Redis
             return call_user_func($callback, $params);
         }
 
-        $redis = $this->client;
         $key         = $this->getRedisKey($base_key, $params);
         $cachedValue = $this->fetchCachedValue($key);
 
@@ -414,7 +413,7 @@ class Redis
             // just store the uncompressed value, I guess
             $cachedValue = $serializedValue;
         } else {
-            $cachedValue = self::COMPRESSED_PAYLOAD_PREFIX . $serializedValue;
+            $cachedValue = self::COMPRESSED_PAYLOAD_PREFIX . $cachedValue;
         }
         return $cachedValue;
     }
@@ -425,7 +424,7 @@ class Redis
      * @param string $value
      * @return string|false The compressed value, or false if failed.
      */
-    private function compressValue(string $value): string|false
+    protected function compressValue(string $value): string|false
     {
         return gzcompress($value, self::COMPRESSION_RATIO);
     }
@@ -436,7 +435,7 @@ class Redis
      * @param string $value
      * @return false|string
      */
-    private function uncompressValue(string $value): string|false
+    protected function uncompressValue(string $value): string|false
     {
         return gzuncompress($value);
     }
@@ -447,7 +446,7 @@ class Redis
      * @param string $key The key to fetch from.
      * @return string|null
      */
-    private function fetchCachedValue(string $key): ?string
+    protected function fetchCachedValue(string $key): ?string
     {
         $cachedValue = null;
         try {
@@ -467,7 +466,7 @@ class Redis
      * @param int|null $timeout Timeout in seconds, or null if no timeout.
      * @return void
      */
-    private function storeCachedValue(string $key, string $value, ?int $timeout): void
+    protected function storeCachedValue(string $key, string $value, ?int $timeout): void
     {
         try {
             if ($timeout > 0) {
