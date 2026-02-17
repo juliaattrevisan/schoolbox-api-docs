@@ -21,12 +21,4 @@
     </div>
 </template>
 
-<style lang="scss" scoped>
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
-
-@import "../../../stories/assets/styles/_form.scss";
-</style>
+<style scoped></style>

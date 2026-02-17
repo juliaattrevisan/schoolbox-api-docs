@@ -1793,26 +1793,27 @@ function alertInvalidIconName(): false {
     </span>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .sbx-icon {
     align-items: center;
     color: v-bind(color);
     height: v-bind(computedSize);
-    vertical-align: middle; // Ensure the icon is vertically centered when used inline with text
+    vertical-align: middle; /* Ensure the icon is vertically centered when used inline with text */
     display: flex;
     justify-content: center;
     width: v-bind(computedSize);
-    &__svg {
-        fill: currentColor;
-        height: v-bind(computedSize);
-        width: v-bind(computedSize);
-    }
+}
+
+.sbx-icon__svg {
+    fill: currentColor;
+    height: v-bind(computedSize);
+    width: v-bind(computedSize);
 }
 
 ::slotted(svg) {
     fill: currentColor;
     height: v-bind(computedSize);
-    vertical-align: middle; // Ensure the icon is vertically centered when used inline with text
+    vertical-align: middle; /* Ensure the icon is vertically centered when used inline with text */
     width: v-bind(computedSize);
 }
 </style>
