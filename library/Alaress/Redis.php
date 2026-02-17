@@ -281,55 +281,16 @@ class Redis
             // otherwise continue
         }
 
-        // Was a result returned? If so unserialize it
-        $returnValue           = null;
-        $requiresRecache       = false;
-        $requiresRecalculation = false;
+        // Was a result returned? If so decode it
         if (!isset($cachedValue)) {
+            $returnValue           = null;
+            $requiresRecache       = true;
             $requiresRecalculation = true;
         } else {
-            // Attempt to decompress the result:
-            // if it's not compressed, or it fails to decompress, mark it as
-            // requiring recache (but not recalculation)
-            if (str_starts_with($cachedValue, self::COMPRESSED_PAYLOAD_PREFIX)) {
-                $compressedValue = substr($cachedValue, strlen(self::COMPRESSED_PAYLOAD_PREFIX));
-                $serializedValue = gzuncompress($compressedValue);
-                if ($serializedValue === false) {
-                    // Don't attempt to unserialize:
-                    // this is just an error state
-                    $requiresRecache       = true;
-                    $requiresRecalculation = true;
-                }
-                unset($compressedValue);
-            } else {
-                $serializedValue = $cachedValue;
-                $requiresRecache = true;
-            }
-
-            // Raw result is no longer needed, thus it can be freed
-            unset($cachedValue);
-
-            if (!$requiresRecache) {
-                // short-circuit unserialization if value is legitimately false:
-                // otherwise, if it fails to unserialize then recalculate
-                if ($serializedValue === 'b:0;') {
-                    $returnValue = false;
-                } else {
-                    $unserializedValue = unserialize($serializedValue);
-                    if ($unserializedValue !== false) {
-                        $returnValue = $unserializedValue;
-                    } else {
-                        $requiresRecalculation = true;
-                    }
-                }
-            }
-
-            // Can free both serialized and unserialized value
-            unset($serializedValue, $unserializedValue);
+            [$returnValue, $requiresRecache, $requiresRecalculation] = $this->decodeCachedValue($cachedValue);
         }
 
-        // No result fetched, or non-comprehensible? recalculate:
-        // recache will always be required
+        // No result fetched, or non-comprehensible? recalculate
         if ($requiresRecalculation) {
             $returnValue = call_user_func($callback, $params);
         }
@@ -406,5 +367,59 @@ class Redis
             $base_key,
             hash('sha256', serialize($params)),
         );
+    }
+
+    /**
+     * Decode the cached value into a final value.
+     *
+     * @param string $cachedValue
+     * @return array{0: mixed, 1: bool, 2: bool} 0: the decoded value, or false if it couldn't be decoded
+     *                                           1: does the value need to be recached? Always true if it must be
+     *                                              recalculated.
+     *                                           2: does the value need to be recalculated?
+     */
+    private function decodeCachedValue(string $cachedValue): array
+    {
+        $returnValue           = null;
+        $requiresRecache       = false;
+        $requiresRecalculation = false;
+
+        // Attempt to decompress the result:
+        // if it's not compressed, mark it as requiring recache
+        // (but not recalculation)
+        if (str_starts_with($cachedValue, self::COMPRESSED_PAYLOAD_PREFIX)) {
+            $compressedValue = substr($cachedValue, strlen(self::COMPRESSED_PAYLOAD_PREFIX));
+            $serializedValue = gzuncompress($compressedValue);
+            if ($serializedValue === false) {
+                // Could not compress: just return an error state
+                return [false, true, true];
+            }
+            unset($compressedValue);
+        } else {
+            $serializedValue = $cachedValue;
+            $requiresRecache = true;
+        }
+
+        // Raw result is no longer needed, thus it can be freed
+        unset($cachedValue);
+
+        if (!$requiresRecache) {
+            // short-circuit unserialization if value is legitimately false:
+            // otherwise, if it fails to unserialize then recalculate
+            if ($serializedValue === 'b:0;') {
+                $returnValue = false;
+            } else {
+                $unserializedValue = unserialize($serializedValue);
+                if ($unserializedValue !== false) {
+                    $returnValue = $unserializedValue;
+                } else {
+                    $requiresRecalculation = true;
+                }
+            }
+        }
+
+        // Can free both serialized and unserialized value
+        unset($serializedValue, $unserializedValue);
+        return [$returnValue, $requiresRecache, $requiresRecalculation,];
     }
 }
