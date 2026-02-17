@@ -50,6 +50,16 @@ class Redis
     public const FUNCTION_CALL_CACHE_PREFIX = 'fc';
 
     /**
+     * String with which a compressed payload will be prefixed.
+     */
+    private const string COMPRESSED_PAYLOAD_PREFIX = 'gz:';
+
+    /**
+     * The compression ratio to use for compressing payloads.
+     */
+    private const int COMPRESSION_RATIO = 9;
+
+    /**
      * @var self
      */
     protected static $instance;
@@ -260,38 +270,31 @@ class Redis
             return call_user_func($callback, $params);
         }
 
-        $redis = $this->client;
-        $key   = $this->getRedisKey($base_key, $params);
+        $key         = $this->getRedisKey($base_key, $params);
+        $cachedValue = $this->fetchCachedValue($key);
 
-        // Would use Redis hashes, but individual keys don't have expiry.
-        $is_result_called = false;
-        $result           = null;
-        try {
-            $result = $redis->get($key);
-            if (!isset($result)) {
-                $is_result_called = true;
-                $result           = call_user_func($callback, $params);
-                if ($timeout > 0) {
-                    $redis->setex($key, $timeout, serialize($result));
-                } else {
-                    $redis->set($key, serialize($result));
-                }
-            } else {
-                // Results should now always be serialized before storage.
-                // Older results might not be, though.
-                $unserializedResult = unserialize($result);
-                if ($unserializedResult !== false || $result === 'b:0;') {
-                    // if serialized result is legitimately boolean false
-                    $result = $unserializedResult;
-                }
-            }
-        } catch (Predis\PredisException $e) {
-            trigger_error(sprintf('Redis exception: "%s"', $e->getMessage()), E_USER_WARNING);
-            if (!$is_result_called) {
-                $result = call_user_func($callback, $params);
-            }
+        // Was a result returned? If so decode it
+        if (!isset($cachedValue)) {
+            $returnValue           = null;
+            $requiresRecache       = true;
+            $requiresRecalculation = true;
+        } else {
+            [$returnValue, $requiresRecache, $requiresRecalculation] = $this->decodeCachedValue($cachedValue);
         }
-        return $result;
+
+        // No result fetched, or non-comprehensible? recalculate
+        if ($requiresRecalculation) {
+            $returnValue = call_user_func($callback, $params);
+        }
+
+        // Recache if result recalculated, or needs to be recached because the
+        // fetched result was not compressed
+        if ($requiresRecalculation || $requiresRecache) {
+            $cachedValue = $this->encodeCalculatedValue($returnValue);
+            $this->storeCachedValue($key, $cachedValue, $timeout);
+        }
+
+        return $returnValue;
     }
 
     /**
@@ -338,5 +341,140 @@ class Redis
             $base_key,
             hash('sha256', serialize($params)),
         );
+    }
+
+    /**
+     * Decode the cached value into a final value.
+     *
+     * @param string $cachedValue
+     * @return array{0: mixed, 1: bool, 2: bool} 0: the decoded value, or false if it couldn't be decoded
+     *                                           1: does the value need to be recached? Always true if it must be
+     *                                              recalculated.
+     *                                           2: does the value need to be recalculated?
+     */
+    private function decodeCachedValue(string $cachedValue): array
+    {
+        $returnValue           = null;
+        $requiresRecache       = false;
+        $requiresRecalculation = false;
+
+        // Attempt to decompress the result:
+        // if it's not compressed, mark it as requiring recache
+        // (but not recalculation)
+        if (str_starts_with($cachedValue, self::COMPRESSED_PAYLOAD_PREFIX)) {
+            $compressedValue = substr($cachedValue, strlen(self::COMPRESSED_PAYLOAD_PREFIX));
+            $serializedValue = $this->uncompressValue($compressedValue);
+            if ($serializedValue === false) {
+                // Could not compress: just return an error state
+                return [false, true, true];
+            }
+            unset($compressedValue);
+        } else {
+            $serializedValue = $cachedValue;
+            $requiresRecache = true;
+        }
+
+        // Raw result is no longer needed, thus it can be freed
+        unset($cachedValue);
+
+        // short-circuit unserialization if value is legitimately false:
+        // otherwise, if it fails to unserialize then recalculate
+        if ($serializedValue === 'b:0;') {
+            $returnValue = false;
+        } else {
+            $unserializedValue = unserialize($serializedValue);
+            if ($unserializedValue !== false) {
+                $returnValue = $unserializedValue;
+            } else {
+                $requiresRecalculation = true;
+            }
+        }
+
+        // Can free both serialized and unserialized value
+        unset($serializedValue, $unserializedValue);
+        return [$returnValue, $requiresRecache, $requiresRecalculation,];
+    }
+
+    /**
+     * Encode the value once it's been calculated, compressing if possible.
+     *
+     * @param mixed $calculatedValue The value which was calculated from
+     *                               `cacheFunctionCall`.
+     * @return string
+     */
+    private function encodeCalculatedValue(mixed $calculatedValue): string
+    {
+        $serializedValue = serialize($calculatedValue);
+        $cachedValue     = $this->compressValue($serializedValue);
+        if ($cachedValue === false) {
+            // Compression failed?
+            // just store the uncompressed value, I guess
+            $cachedValue = $serializedValue;
+        } else {
+            $cachedValue = self::COMPRESSED_PAYLOAD_PREFIX . $cachedValue;
+        }
+        return $cachedValue;
+    }
+
+    /**
+     * Compress `$value` if possible.
+     *
+     * @param string $value
+     * @return string|false The compressed value, or false if failed.
+     */
+    protected function compressValue(string $value): string|false
+    {
+        return gzcompress($value, self::COMPRESSION_RATIO);
+    }
+
+    /**
+     * Uncompress `$value` if possible.
+     *
+     * @param string $value
+     * @return false|string
+     */
+    protected function uncompressValue(string $value): string|false
+    {
+        return gzuncompress($value);
+    }
+
+    /**
+     * Fetch the cached value for the given key.
+     *
+     * @param string $key The key to fetch from.
+     * @return string|null
+     */
+    protected function fetchCachedValue(string $key): ?string
+    {
+        $cachedValue = null;
+        try {
+            $cachedValue = $this->client->get($key);
+        } catch (Predis\PredisException $e) {
+            trigger_error(sprintf('Redis exception when reading: "%s"', $e->getMessage()), E_USER_WARNING);
+            // otherwise continue
+        }
+        return $cachedValue;
+    }
+
+    /**
+     * Store the value within a key, with an optional timeout.
+     *
+     * @param string   $key     The key to store into.
+     * @param string   $value   The value to store.
+     * @param int|null $timeout Timeout in seconds, or null if no timeout.
+     * @return void
+     */
+    protected function storeCachedValue(string $key, string $value, ?int $timeout): void
+    {
+        try {
+            if ($timeout > 0) {
+                $this->client->setex($key, $timeout, $value);
+            } else {
+                $this->client->set($key, $value);
+            }
+        } catch (Predis\PredisException $e) {
+            trigger_error(sprintf('Redis exception when writing cache: "%s"', $e->getMessage()), E_USER_WARNING);
+            // otherwise continue
+        }
     }
 }
