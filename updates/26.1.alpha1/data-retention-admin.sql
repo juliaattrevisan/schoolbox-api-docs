@@ -46,7 +46,7 @@ Learning Moments data includes:
            'false',
            'false',
            'settings',
-           1
+           2
        ),
        (
            'dataRetention_MyFiles',
@@ -64,7 +64,7 @@ My Files data includes:
            'false',
            'false',
            'settings',
-           1
+           3
        ),
        (
            'dataRetention_CMS',
@@ -91,7 +91,7 @@ Resources (CMS) data includes:
            'false',
            'false',
            'settings',
-           1
+           4
        ),
        (
            'dataRetention_StudentSubmissions',
@@ -112,5 +112,5 @@ Student Submission data includes:
            'false',
            'false',
            'settings',
-           1
+           5
        );
