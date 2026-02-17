@@ -5779,12 +5779,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Test/Booking/ValidationTest.php
 
 		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\ResourceBooking\\Booking\\Mapper is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Test/Booking/ValidationTest.php
-
-		-
 			message: '#^Variable \$courseSpec might not be defined\.$#'
 			identifier: variable.undefined
 			count: 2

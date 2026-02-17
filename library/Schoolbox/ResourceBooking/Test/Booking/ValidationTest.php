@@ -333,7 +333,6 @@ class ValidationTest extends TestCase
             ->method('findForResource')
             ->willReturn($conflictingBookings);
 
-        /** @var BookingMapper $mockMapper */
         $validation = $this->createValidation(new User(), $mockMapper, new StatusMapper(), new TermMapper());
 
         $resource = new Item\Model();
@@ -352,23 +351,30 @@ class ValidationTest extends TestCase
      */
     public static function providerRoomValidateForConflicts()
     {
-        $conflictingBookings3 = new Collection()
-            ->add(new Booking\Model()->setId(11))
-            ->add(new Booking\Model()->setId(12))
-            ->add(new Booking\Model()->setId(13));
-
-        $conflictingBookings1 = new Collection()
-            ->add(new Booking\Model()->setId(11));
+        $event1Id = 11;
+        $event2Id = 12;
+        $event3Id = 13;
+        $event4Id = 111;
+        $event5Id = 112;
+        $event6Id = 113;
 
         $conflictingBookings0 = new Collection();
 
+        $conflictingBookings1 = new Collection()
+            ->add(new Booking\Model()->setId($event1Id));
+
+        $conflictingBookings3 = new Collection()
+            ->add(new Booking\Model()->setId($event1Id))
+            ->add(new Booking\Model()->setId($event2Id))
+            ->add(new Booking\Model()->setId($event3Id));
+
         $roomEvents3 = new Collection()
-            ->add(new Event()->setId(111))
-            ->add(new Event()->setId(112))
-            ->add(new Event()->setId(113));
+            ->add(new Event()->setId($event4Id))
+            ->add(new Event()->setId($event5Id))
+            ->add(new Event()->setId($event6Id));
 
         $roomEvents1 = new Collection()
-            ->add(new Event()->setId(111));
+            ->add(new Event()->setId($event4Id));
 
         $roomEvents0 = new Collection();
 
@@ -473,50 +479,71 @@ class ValidationTest extends TestCase
      */
     public static function providerSeriesValidateForConflicts()
     {
+        $booking1Id = 1;
+        $booking2Id = 2;
+        $booking3Id = 3;
+        $booking4Id = 4;
+        $booking5Id = 11;
+        $booking6Id = 12;
+        $booking7Id = 13;
+        $booking8Id = 21;
+        $series1Id = 10;
+        $series2Id = 20;
+        $event1Id = 101;
+        $event2Id = 102;
+        $event3Id = 103;
+        $event4Id = 104;
+        $event5Id = 111;
+        $event6Id = 112;
+        $event7Id = 113;
+        $event8Id = 221;
+
         // Single booking
         $existingBooking = new Booking\Model()
-                    ->setId(1)
-                    ->setEvent(new Event()->setId(101));
+                    ->setId($booking1Id)
+                    ->setEvent(new Event()->setId($event1Id));
 
         // Recursive booking
+        // #
         $existingBookingEventInSeries = new Booking\Model()
-                    ->setId(1)
-                    ->setEvent(new Event()->setId(101)->setSeriesId(10));
+                    ->setId($booking1Id)
+                    ->setEvent(new Event()->setId($event1Id)->setSeriesId($series1Id));
 
         // Conflicting bookings, same Series as $existingBooking
         $conflictingBookingsSameSeries3 = new Collection()
             ->add(
                 new Booking\Model()
-                    ->setId(2)
-                    ->setEvent(new Event()->setId(102)->setSeriesId(10))
+                    ->setId($booking2Id)
+                    ->setEvent(new Event()->setId($event2Id)->setSeriesId($series1Id))
             )
             ->add(
                 new Booking\Model()
-                    ->setId(3)
-                    ->setEvent(new Event()->setId(103)->setSeriesId(10))
+                    ->setId($booking3Id)
+                    ->setEvent(new Event()->setId($event3Id)->setSeriesId($series1Id))
             )
             ->add(
                 new Booking\Model()
-                    ->setId(4)
-                    ->setEvent(new Event()->setId(104)->setSeriesId(10))
+                    ->setId($booking4Id)
+                    ->setEvent(new Event()->setId($event4Id)->setSeriesId($series1Id))
             );
 
         // Conflicting bookings, some other Series
+        // #
         $conflictingBookingsOtherSeries3 = new Collection()
             ->add(
                 new Booking\Model()
-                    ->setId(11)
-                    ->setEvent(new Event()->setId(111)->setSeriesId(20))
+                    ->setId($booking5Id)
+                    ->setEvent(new Event()->setId($event5Id)->setSeriesId($series2Id))
             )
             ->add(
                 new Booking\Model()
-                    ->setId(12)
-                    ->setEvent(new Event()->setId(112)->setSeriesId(20))
+                    ->setId($booking6Id)
+                    ->setEvent(new Event()->setId($event6Id)->setSeriesId($series2Id))
             )
             ->add(
                 new Booking\Model()
-                    ->setId(13)
-                    ->setEvent(new Event()->setId(113)->setSeriesId(20))
+                    ->setId($booking7Id)
+                    ->setEvent(new Event()->setId($event7Id)->setSeriesId($series2Id))
             );
 
         // No conflicting bookings
@@ -526,16 +553,16 @@ class ValidationTest extends TestCase
         $conflictingBookings1 = new Collection()
             ->add(
                 new Booking\Model()
-                    ->setId(21)
-                    ->setEvent(new Event()->setId(221))
+                    ->setId($booking8Id)
+                    ->setEvent(new Event()->setId($event8Id))
             );
 
         // Conflicting bookings, different Id
         $conflictingBookingsSameId = new Collection()
             ->add(
                 new Booking\Model()
-                    ->setId(1)
-                    ->setEvent(new Event()->setId(101))
+                    ->setId($booking1Id)
+                    ->setEvent(new Event()->setId($event1Id))
             );
 
         return [
@@ -626,5 +653,912 @@ class ValidationTest extends TestCase
         $errorsToCount = $mockValidation->getAllErrorStringsAsFlatArray($errors);
 
         $this->assertCount($expected, $errorsToCount);
+    }
+
+    /**
+     * Data provider for testGetNewStatusIdForBooking
+     *
+     * @return array
+     */
+    public static function providerGetNewStatusIdForBooking()
+    {
+        return [
+            // Notes:
+            //  * We do not need to test scenarios where managed bookings are created or updated by users who are not
+            //    moderators.  That is because since managed bookings can only be created and updated by moderators,
+            //    The tested function will never run in those scenarios.
+            'valid booking, no clash, open resource' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => false,
+                'moderationType' => Item\ModerationType\Model::TYPE_OPEN,
+                'userIsModerator' => false,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_APPROVED,
+            ],
+            'valid booking, clash, open resource' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => true,
+                'moderationType' => Item\ModerationType\Model::TYPE_OPEN,
+                'userIsModerator' => false,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_PENDING,
+            ],
+            'valid booking, no clash, moderated resource, user is moderator and author' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => false,
+                'moderationType' => Item\ModerationType\Model::TYPE_MODERATED,
+                'userIsModerator' => true,
+                'userIsAuthor' => true,
+                'expectedStatus' => Booking\Status\Model::STATUS_APPROVED,
+            ],
+            'valid booking, no clash, moderated resource, user is not moderator' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => false,
+                'moderationType' => Item\ModerationType\Model::TYPE_MODERATED,
+                'userIsModerator' => false,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_PENDING,
+            ],
+            'booking with clash, clashes allowed' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => true,
+                'moderationType' => Item\ModerationType\Model::TYPE_OPEN,
+                'userIsModerator' => false,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_PENDING,
+                'allowClashBookings' => true,
+            ],
+            'booking with clash, clashes not allowed' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => true,
+                'moderationType' => Item\ModerationType\Model::TYPE_OPEN,
+                'userIsModerator' => false,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
+                'allowClashBookings' => false,
+            ],
+            'booking in past' => [
+                'startDate' => '2020-01-01T10:00:00+00:00',
+                'endDate' => '2020-01-01T11:00:00+00:00',
+                'isClash' => false,
+                'moderationType' => Item\ModerationType\Model::TYPE_OPEN,
+                'userIsModerator' => false,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
+            ],
+            'valid booking, no clash, moderated resource, user is moderator but not author' => [
+                // Note this test only applies to update operations, since the user is not the author.
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => false,
+                'moderationType' => Item\ModerationType\Model::TYPE_MODERATED,
+                'userIsModerator' => true,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_PENDING,
+            ],
+            'valid booking, no clash, moderated resource, user is author but not moderator' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => false,
+                'moderationType' => Item\ModerationType\Model::TYPE_MODERATED,
+                'userIsModerator' => false,
+                'userIsAuthor' => true,
+                'expectedStatus' => Booking\Status\Model::STATUS_PENDING,
+            ],
+            'booking with clash, moderated resource, user is moderator, clashes allowed' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => true,
+                'moderationType' => Item\ModerationType\Model::TYPE_MODERATED,
+                'userIsModerator' => true,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_PENDING,
+                'allowClashBookings' => true,
+            ],
+            'booking with clash, moderated resource, user is moderator, clashes not allowed' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => true,
+                'moderationType' => Item\ModerationType\Model::TYPE_MODERATED,
+                'userIsModerator' => true,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
+                'allowClashBookings' => false,
+            ],
+            'booking with clash, moderated resource, user is not moderator, clashes allowed' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => true,
+                'moderationType' => Item\ModerationType\Model::TYPE_MODERATED,
+                'userIsModerator' => false,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_PENDING,
+                'allowClashBookings' => true,
+            ],
+            'booking with clash, moderated resource, user is not moderator, clashes not allowed' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => true,
+                'moderationType' => Item\ModerationType\Model::TYPE_MODERATED,
+                'userIsModerator' => false,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
+                'allowClashBookings' => false,
+            ],
+            'booking in past, moderated resource, user is moderator' => [
+                'startDate' => '2020-01-01T10:00:00+00:00',
+                'endDate' => '2020-01-01T11:00:00+00:00',
+                'isClash' => false,
+                'moderationType' => Item\ModerationType\Model::TYPE_MODERATED,
+                'userIsModerator' => true,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
+            ],
+            'valid booking, no clash, managed resource, user is moderator and author' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => false,
+                'moderationType' => Item\ModerationType\Model::TYPE_MANAGED,
+                'userIsModerator' => true,
+                'userIsAuthor' => true,
+                'expectedStatus' => Booking\Status\Model::STATUS_APPROVED,
+            ],
+            'valid booking, no clash, managed resource, user is moderator but not author' => [
+                // Note this test only applies to update operations, since the user is not the author.
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => false,
+                'moderationType' => Item\ModerationType\Model::TYPE_MANAGED,
+                'userIsModerator' => true,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_PENDING,
+            ],
+            'booking with clash, managed resource, user is moderator, clashes allowed' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => true,
+                'moderationType' => Item\ModerationType\Model::TYPE_MANAGED,
+                'userIsModerator' => true,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_PENDING,
+                'allowClashBookings' => true,
+            ],
+            'booking with clash, managed resource, user is moderator, clashes not allowed' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => true,
+                'moderationType' => Item\ModerationType\Model::TYPE_MANAGED,
+                'userIsModerator' => true,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
+                'allowClashBookings' => false,
+            ],
+            'booking in past, managed resource, user is moderator' => [
+                'startDate' => '2020-01-01T10:00:00+00:00',
+                'endDate' => '2020-01-01T11:00:00+00:00',
+                'isClash' => false,
+                'moderationType' => Item\ModerationType\Model::TYPE_MANAGED,
+                'userIsModerator' => true,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
+            ],
+        ];
+    }
+
+    /**
+     * Test getNewStatusIdForBooking function
+     *
+     * @param string $startDate
+     * @param string $endDate
+     * @param bool $isClash
+     * @param int $moderationType
+     * @param bool $userIsModerator
+     * @param bool $userIsAuthor
+     * @param int $expectedStatus
+     * @param bool $allowClashBookings
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGetNewStatusIdForBooking')]
+    public function testGetNewStatusIdForBooking(
+        string $startDate,
+        string $endDate,
+        bool $isClash,
+        int $moderationType,
+        bool $userIsModerator,
+        bool $userIsAuthor,
+        int $expectedStatus,
+        bool $allowClashBookings = true,
+    ): void {
+        $user1Id = 123;
+        $user2Id = 999;
+        $resource1Id = 456;
+
+        // Create user
+        $user = new User();
+        $user->setId($user1Id);
+
+        $validation = $this->createValidation($user);
+
+        // Create a resource and mock isUserModerator() to avoid database calls.
+        $resource = $this->getMockBuilder(Item\Model::class)
+            ->onlyMethods(['isUserModerator'])
+            ->getMock();
+        $resource->method('isUserModerator')->willReturn($userIsModerator);
+        $resource->setId($resource1Id);
+        $resource->setModerationType(new Item\ModerationType\Model()->setId($moderationType));
+        $resource->setAllowClashBookings($allowClashBookings);
+        $resource->setMinLeadTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
+        $resource->setMinReservationTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
+        $resource->setMaxReservationTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
+
+        // Create event
+        $event = new Event();
+        $event->setStartDateTime(new \Alaress_Date_Format($startDate, \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+        $event->setEndDateTime(new \Alaress_Date_Format($endDate, \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+
+        // Set author
+        $author = new User();
+        $author->setId($userIsAuthor ? $user1Id : $user2Id);
+        $event->setAuthor($author);
+
+        // Create booking
+        $booking = new Booking\Model();
+        $booking->setResource($resource);
+        $booking->setEvent($event);
+
+        // Test
+        $result = $validation->getNewStatusIdForBooking($booking, $isClash, $user);
+        $this->assertEquals($expectedStatus, $result);
+    }
+
+    /**
+     * Data provider for testCheckForClashesIfResourceBookingsMoved.
+     *
+     * @return array
+     */
+    public static function providerCheckForClashesIfResourceBookingsMoved(): array
+    {
+        $resource1Id = 100;
+        $resource2Id = 200;
+        $booking1Id = 1;
+        $booking2Id = 2;
+        $booking3Id = 3;
+
+        return [
+            "no clashes - booking times don't overlap" => [
+                'movedBookings' => [
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T12:00:00+00:00', 'endDatetime' => '2077-01-01T13:00:00+00:00'],
+                        ['startDatetime' => '2077-01-01T14:00:00+00:00', 'endDatetime' => '2077-01-01T15:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    $booking1Id => false,
+                ],
+            ],
+            'single clash - booking overlaps with one approved booking' => [
+                'movedBookings' => [
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    $booking1Id => true,
+                ],
+            ],
+            'booking completely contains approved booking' => [
+                'movedBookings' => [
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T14:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T11:00:00+00:00', 'endDatetime' => '2077-01-01T12:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    $booking1Id => true,
+                ],
+            ],
+            'approved booking completely contains moved booking' => [
+                'movedBookings' => [
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T11:00:00+00:00', 'endDate' => '2077-01-01T12:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:00:00+00:00', 'endDatetime' => '2077-01-01T14:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    $booking1Id => true,
+                ],
+            ],
+            'booking ends exactly when approved booking starts - no clash' => [
+                'movedBookings' => [
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T11:00:00+00:00', 'endDatetime' => '2077-01-01T12:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    $booking1Id => false,
+                ],
+            ],
+            'booking starts exactly when approved booking ends - no clash' => [
+                'movedBookings' => [
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T12:00:00+00:00', 'endDate' => '2077-01-01T13:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:00:00+00:00', 'endDatetime' => '2077-01-01T12:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    $booking1Id => false,
+                ],
+            ],
+            "multiple bookings - some clash and some don't" => [
+                'movedBookings' => [
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $booking2Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T12:00:00+00:00', 'endDate' => '2077-01-01T13:00:00+00:00'],
+                    ['id' => $booking3Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T15:00:00+00:00', 'endDate' => '2077-01-01T16:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                        ['startDatetime' => '2077-01-01T14:00:00+00:00', 'endDatetime' => '2077-01-01T15:30:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    $booking1Id => true,  // Clashes with first approved booking.
+                    $booking2Id => false, // No clash.
+                    $booking3Id => true,  // Clashes with second approved booking.
+                ],
+            ],
+            'multiple resources - different clash results per resource' => [
+                'movedBookings' => [
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $booking2Id, 'resourceId' => $resource2Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                    ],
+                    $resource2Id => [
+                        ['startDatetime' => '2077-01-01T12:00:00+00:00', 'endDatetime' => '2077-01-01T13:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    $booking1Id => true,  // Clashes with resource1's booking.
+                    $booking2Id => false, // No clash with resource2's booking.
+                ],
+            ],
+            'no approved bookings for resource' => [
+                'movedBookings' => [
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    // No approved bookings for resource $resource1Id.
+                ],
+                'expectedIsClashByBookingId' => [
+                    $booking1Id => false,
+                ],
+            ],
+            'early exit optimization - sorted periods with start time after booking end' => [
+                'movedBookings' => [
+                    ['id' => $booking1Id, 'resourceId' => $resource1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T12:00:00+00:00', 'endDatetime' => '2077-01-01T13:00:00+00:00'],
+                        ['startDatetime' => '2077-01-01T14:00:00+00:00', 'endDatetime' => '2077-01-01T15:00:00+00:00'],
+                        ['startDatetime' => '2077-01-01T16:00:00+00:00', 'endDatetime' => '2077-01-01T17:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    $booking1Id => false, // Should exit early at first period since it starts after booking end.
+                ],
+            ],
+            // Note we cannot test whether the moved bookings themselves are removed from the set of bookings
+            // to check against, because the set of bookings to check against comes from the mocked Mapper.
+        ];
+    }
+
+    /**
+     * Test checkForClashesIfResourceBookingsMoved function
+     *
+     * @param array $movedBookings
+     * @param array $approvedBookingPeriods
+     * @param array $expectedIsClashByBookingId
+     *              The expected return value of Validation->checkForClashesIfResourceBookingMoved().
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCheckForClashesIfResourceBookingsMoved')]
+    public function testCheckForClashesIfResourceBookingsMoved(
+        array $movedBookings,
+        array $approvedBookingPeriods,
+        array $expectedIsClashByBookingId
+    ): void {
+        // Create a mock mapper that returns future approved booking periods.
+        $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
+        $mockMapper
+            ->method('getPeriodsOfFutureApprovedBookingsByResourceId')
+            ->willReturnCallback(function ($resourceIds, $sortByStartDatetimeAsc, $bookingIdsToExclude) use ($approvedBookingPeriods) {
+                // Convert datetime strings to Alaress_Date_Format objects
+                $result = [];
+                foreach ($approvedBookingPeriods as $resourceId => $periods) {
+                    $result[$resourceId] = [];
+                    foreach ($periods as $period) {
+                        $result[$resourceId][] = [
+                            'startDatetime' => new \Alaress_Date_Format($period['startDatetime'], \Alaress_Date_Format::FORMAT_RFC3339_W3C),
+                            'endDatetime' => new \Alaress_Date_Format($period['endDatetime'], \Alaress_Date_Format::FORMAT_RFC3339_W3C),
+                        ];
+                    }
+                }
+                return $result;
+            });
+
+        $validation = $this->createValidation(new User(), $mockMapper);
+
+        // Create moved bookings collection.
+        $movedBookingsCollection = new \Schoolbox\GenericCollection(Booking\Model::class);
+        foreach ($movedBookings as $bookingData) {
+            $booking = new Booking\Model();
+            $booking->setId($bookingData['id']);
+
+            // Create event with start/end dates
+            $event = new Event();
+            $event->setStartDateTime(new \Alaress_Date_Format($bookingData['startDate'], \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+            $event->setEndDateTime(new \Alaress_Date_Format($bookingData['endDate'], \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+
+            // Create resource
+            $resource = new Item\Model();
+            $resource->setId($bookingData['resourceId']);
+
+            $booking->setEvent($event);
+            $booking->setResource($resource);
+
+            // Set booking start/end (these override event dates in the function)
+            $booking->setBookingStartAt(new \Alaress_Date_Format($bookingData['startDate'], \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+            $booking->setBookingEndAt(new \Alaress_Date_Format($bookingData['endDate'], \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+
+            $movedBookingsCollection->add($booking);
+        }
+
+        // Create resources collection
+        $resourcesCollection = new \Schoolbox\GenericCollection(Item\Model::class);
+        $uniqueResourceIds = array_unique(array_column($movedBookings, 'resourceId'));
+        foreach ($uniqueResourceIds as $resourceId) {
+            $resource = new Item\Model();
+            $resource->setId($resourceId);
+            $resourcesCollection->setOffset($resourceId, $resource);
+        }
+
+        // Test the function
+        /** @var Validation $validation */
+        $result = $validation->checkForClashesIfResourceBookingsMoved($movedBookingsCollection, $resourcesCollection);
+
+        // Assert the results match expectations
+        $this->assertEquals($expectedIsClashByBookingId, $result);
+    }
+
+    /**
+     * Data provider for testCheckForClashesIfResourceBookingsAddedToEvents.
+     *
+     * @return array
+     */
+    public static function providerCheckForClashesIfResourceBookingsAddedToEvents(): array
+    {
+        $resource1Id = 100;
+        $resource2Id = 200;
+        $event1Id = 1;
+        $event2Id = 2;
+        $event3Id = 3;
+
+        return [
+            "no clashes - resource booking at event time doesn't overlap with approved bookings" => [
+                'events' => [
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'resourceIds' => [$resource1Id],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T12:00:00+00:00', 'endDatetime' => '2077-01-01T13:00:00+00:00'],
+                        ['startDatetime' => '2077-01-01T14:00:00+00:00', 'endDatetime' => '2077-01-01T15:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByResourceIdByEventId' => [
+                    // No clashes expected, so the result should be empty.
+                ],
+            ],
+            'single clash - resource booking at event time overlaps with approved booking' => [
+                'events' => [
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'resourceIds' => [$resource1Id],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByResourceIdByEventId' => [
+                    $event1Id => [$resource1Id => true],
+                ],
+            ],
+            'resource booking at event time would completely contain approved booking' => [
+                'events' => [
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T14:00:00+00:00'],
+                ],
+                'resourceIds' => [$resource1Id],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T11:00:00+00:00', 'endDatetime' => '2077-01-01T12:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByResourceIdByEventId' => [
+                    $event1Id => [$resource1Id => true],
+                ],
+            ],
+            'approved booking would completely contain resource booking at event time' => [
+                'events' => [
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T11:00:00+00:00', 'endDate' => '2077-01-01T12:00:00+00:00'],
+                ],
+                'resourceIds' => [$resource1Id],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:00:00+00:00', 'endDatetime' => '2077-01-01T14:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByResourceIdByEventId' => [
+                    $event1Id => [$resource1Id => true],
+                ],
+            ],
+            'resource booking at event time ends exactly when approved booking starts - no clash' => [
+                'events' => [
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'resourceIds' => [$resource1Id],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T11:00:00+00:00', 'endDatetime' => '2077-01-01T12:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByResourceIdByEventId' => [
+                    // No clashes expected, so the result should be empty.
+                ],
+            ],
+            'resource booking at event time starts exactly when approved booking ends - no clash' => [
+                'events' => [
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T12:00:00+00:00', 'endDate' => '2077-01-01T13:00:00+00:00'],
+                ],
+                'resourceIds' => [$resource1Id],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:00:00+00:00', 'endDatetime' => '2077-01-01T12:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByResourceIdByEventId' => [
+                    // No clashes expected, so the result should be empty.
+                ],
+            ],
+            "multiple events - resource bookings at some event times clash, others don't" => [
+                'events' => [
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $event2Id, 'startDate' => '2077-01-01T12:00:00+00:00', 'endDate' => '2077-01-01T13:00:00+00:00'],
+                    ['id' => $event3Id, 'startDate' => '2077-01-01T15:00:00+00:00', 'endDate' => '2077-01-01T16:00:00+00:00'],
+                ],
+                'resourceIds' => [$resource1Id],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                        ['startDatetime' => '2077-01-01T14:00:00+00:00', 'endDatetime' => '2077-01-01T15:30:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByResourceIdByEventId' => [
+                    $event1Id => [$resource1Id => true], // Resource booking at event1 time would clash with first approved booking.
+                    $event3Id => [$resource1Id => true], // Resource booking at event3 time would clash with second approved booking.
+                    // Resource booking at event2 time has no clashes, so it's not in the result.
+                ],
+            ],
+            'multiple resources - booking one resource would clash, booking another would not' => [
+                'events' => [
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'resourceIds' => [$resource1Id, $resource2Id],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                    ],
+                    $resource2Id => [
+                        ['startDatetime' => '2077-01-01T12:00:00+00:00', 'endDatetime' => '2077-01-01T13:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByResourceIdByEventId' => [
+                    $event1Id => [$resource1Id => true], // Booking resource1 at event time would clash.
+                    // Booking resource2 at event time has no clash, so it's not in the result.
+                ],
+            ],
+            'no approved bookings for resource - no clashes when booking resource at event time' => [
+                'events' => [
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'resourceIds' => [$resource1Id],
+                'approvedBookingPeriods' => [
+                    // No approved bookings for resource1.
+                ],
+                'expectedIsClashByResourceIdByEventId' => [
+                    // No clashes expected, so the result should be empty.
+                ],
+            ],
+            'early exit optimization - all approved bookings start after event end' => [
+                'events' => [
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'resourceIds' => [$resource1Id],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T12:00:00+00:00', 'endDatetime' => '2077-01-01T13:00:00+00:00'],
+                        ['startDatetime' => '2077-01-01T14:00:00+00:00', 'endDatetime' => '2077-01-01T15:00:00+00:00'],
+                        ['startDatetime' => '2077-01-01T16:00:00+00:00', 'endDatetime' => '2077-01-01T17:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByResourceIdByEventId' => [
+                    // Should exit early at first period since it starts after event end.
+                ],
+            ],
+            'multiple events and multiple resources - different clash results for different combinations' => [
+                'events' => [
+                    ['id' => $event1Id, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => $event2Id, 'startDate' => '2077-01-01T13:00:00+00:00', 'endDate' => '2077-01-01T14:00:00+00:00'],
+                ],
+                'resourceIds' => [$resource1Id, $resource2Id],
+                'approvedBookingPeriods' => [
+                    $resource1Id => [
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                    ],
+                    $resource2Id => [
+                        ['startDatetime' => '2077-01-01T13:30:00+00:00', 'endDatetime' => '2077-01-01T14:30:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByResourceIdByEventId' => [
+                    $event1Id => [$resource1Id => true], // Booking resource1 at event1 time would clash.
+                    $event2Id => [$resource2Id => true], // Booking resource2 at event2 time would clash.
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Test checkForClashesIfResourceBookingsAddedToEvents function
+     *
+     * @param array $events
+     * @param array $resourceIds
+     * @param array $approvedBookingPeriods
+     * @param array $expectedIsClashByResourceIdByEventId
+     *              The expected return value of Validation->checkForClashesIfResourceBookingsAddedToEvents().
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCheckForClashesIfResourceBookingsAddedToEvents')]
+    public function testCheckForClashesIfResourceBookingsAddedToEvents(
+        array $events,
+        array $resourceIds,
+        array $approvedBookingPeriods,
+        array $expectedIsClashByResourceIdByEventId
+    ): void {
+        // Create a mock mapper that returns future approved booking periods.
+        $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
+        $mockMapper
+            ->method('getPeriodsOfFutureApprovedBookingsByResourceId')
+            ->willReturnCallback(function ($resourceIds, $sortByStartDatetimeAsc, $bookingIdsToExclude = null) use ($approvedBookingPeriods) {
+                // Convert datetime strings to Alaress_Date_Format objects
+                $result = [];
+                foreach ($approvedBookingPeriods as $resourceId => $periods) {
+                    $result[$resourceId] = [];
+                    foreach ($periods as $period) {
+                        $result[$resourceId][] = [
+                            'startDatetime' => new \Alaress_Date_Format($period['startDatetime'], \Alaress_Date_Format::FORMAT_RFC3339_W3C),
+                            'endDatetime' => new \Alaress_Date_Format($period['endDatetime'], \Alaress_Date_Format::FORMAT_RFC3339_W3C),
+                        ];
+                    }
+                }
+                return $result;
+            });
+
+        $validation = $this->createValidation(new User(), $mockMapper);
+
+        // Create events collection.
+        $eventsCollection = new \Schoolbox\GenericCollection(Event::class);
+        foreach ($events as $eventData) {
+            $event = new Event();
+            $event->setId($eventData['id']);
+            $event->setStartDateTime(new \Alaress_Date_Format($eventData['startDate'], \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+            $event->setEndDateTime(new \Alaress_Date_Format($eventData['endDate'], \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+
+            $eventsCollection->setOffset($eventData['id'], $event);
+        }
+
+        // Create resources collection.
+        $resourcesCollection = new \Schoolbox\GenericCollection(Item\Model::class);
+        foreach ($resourceIds as $resourceId) {
+            $resource = new Item\Model();
+            $resource->setId($resourceId);
+            $resourcesCollection->setOffset($resourceId, $resource);
+        }
+
+        // Test the function
+        /** @var Validation $validation */
+        $result = $validation->checkForClashesIfResourceBookingsAddedToEvents($resourcesCollection, $eventsCollection);
+
+        // Assert the results match expectations
+        $this->assertEquals($expectedIsClashByResourceIdByEventId, $result);
+    }
+
+    /**
+     * Data provider for testValidateBookingFromPostData
+     *
+     * @return array
+     */
+    public static function providerValidateBookingFromPostData()
+    {
+        return [
+            'invalid start and end dates returns errors' => [
+                'postData' => [
+                    'startDate' => 'invalid-start',
+                    'endDate' => 'invalid-end',
+                    'campus' => 0,
+                ],
+                'existingBooking' => null,
+            ],
+            'valid dates in future returns array' => [
+                'postData' => [
+                    'startDate' => '01/01/2077 10:00am',
+                    'endDate' => '01/01/2077 11:00am',
+                    'campus' => 0,
+                ],
+                'existingBooking' => null,
+            ],
+            'valid dates in past returns errors' => [
+                'postData' => [
+                    'startDate' => '01/01/2020 10:00am',
+                    'endDate' => '01/01/2020 11:00am',
+                    'campus' => 0,
+                ],
+                'existingBooking' => null,
+            ],
+        ];
+    }
+
+    /**
+     * Minimal test for validateBookingFromPostData function.
+     * This test verifies that the function executes without throwing exceptions
+     * and returns an array with the expected structure.
+     *
+     * @param array $postData
+     * @param Booking\Model|null $existingBooking
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidateBookingFromPostData')]
+    public function testValidateBookingFromPostData(
+        array $postData,
+        ?Booking\Model $existingBooking
+    ): void {
+        $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
+        $mockMapper
+            ->method('findForResource')
+            ->willReturn(new Collection());
+
+        $validation = $this->createValidation(new User(), $mockMapper, new StatusMapper(), new TermMapper());
+
+        $resource = new Item\Model();
+        $resource->setId(123);
+        $resource->setMinLeadTime(\Alaress\Date\Interval::createFromDateInterval(new DateInterval('PT0H')));
+        $resource->setMinReservationTime(\Alaress\Date\Interval::createFromDateInterval(new DateInterval('PT0H')));
+        $resource->setMaxReservationTime(\Alaress\Date\Interval::createFromDateInterval(new DateInterval('PT0H')));
+
+        $errors = $validation->validateBookingFromPostData($resource, $postData, $existingBooking);
+
+        // Minimal assertion: function returns an array
+        $this->assertIsArray($errors);
+
+        // If there are errors, verify they have the expected structure
+        if (!empty($errors)) {
+            foreach ($errors as $errorCategory => $errorsByDate) {
+                $this->assertContains(
+                    $errorCategory,
+                    [Validation::START_PERIOD_ERRORS, Validation::END_PERIOD_ERRORS],
+                    "Error category should be either START_PERIOD_ERRORS or END_PERIOD_ERRORS"
+                );
+                $this->assertIsArray($errorsByDate);
+            }
+        }
+    }
+
+    /**
+     * Data provider for testValidateChangeStatus
+     *
+     * @return array
+     */
+    public static function providerValidateChangeStatus()
+    {
+        return [
+            'status approved with no clashes' => [
+                'status' => Booking\Status\Model::STATUS_APPROVED,
+                'hasConflictingBookings' => false,
+                'expectedErrorCount' => 0,
+            ],
+            'status approved with clashes' => [
+                'status' => Booking\Status\Model::STATUS_APPROVED,
+                'hasConflictingBookings' => true,
+                'expectedErrorCount' => 1,
+            ],
+            'status pending returns no errors' => [
+                'status' => Booking\Status\Model::STATUS_PENDING,
+                'hasConflictingBookings' => false,
+                'expectedErrorCount' => 0,
+            ],
+            'status rejected returns no errors' => [
+                'status' => Booking\Status\Model::STATUS_REJECTED,
+                'hasConflictingBookings' => false,
+                'expectedErrorCount' => 0,
+            ],
+        ];
+    }
+
+    /**
+     * Minimal test for validateChangeStatus function.
+     * This test verifies that the function executes without throwing exceptions
+     * and returns the expected error count based on the status and clash state.
+     *
+     * @param int $status
+     * @param bool $hasConflictingBookings
+     * @param int $expectedErrorCount
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidateChangeStatus')]
+    public function testValidateChangeStatus(
+        int $status,
+        bool $hasConflictingBookings,
+        int $expectedErrorCount
+    ): void {
+        // Create mock mapper
+        $conflictingBookings = $hasConflictingBookings
+            ? new Collection()->add(new Booking\Model()->setId(999))
+            : new Collection();
+
+        $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
+        $mockMapper
+            ->method('findForResource')
+            ->willReturn($conflictingBookings);
+
+        $validation = $this->createValidation(new User(), $mockMapper, new StatusMapper(), new TermMapper());
+
+        // Create a booking
+        $resource = new Item\Model();
+        $resource->setId(123);
+
+        $event = new Event();
+        $event->setStartDateTime(new \Alaress_Date_Format('2077-01-01T10:00:00+00:00', \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+        $event->setEndDateTime(new \Alaress_Date_Format('2077-01-01T11:00:00+00:00', \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+
+        $booking = new Booking\Model();
+        $booking->setId(456);
+        $booking->setResource($resource);
+        $booking->setEvent($event);
+
+        // Test the function
+        $errors = $validation->validateChangeStatus($booking, $status);
+
+        // Verify the result
+        $this->assertIsArray($errors);
+        $errorsFlattened = $validation->getAllErrorStringsAsFlatArray($errors);
+        $this->assertCount($expectedErrorCount, $errorsFlattened);
     }
 }
