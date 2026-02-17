@@ -24,6 +24,7 @@ module.exports = merge(common, {
                     "./node_modules/vue/dist/vue.global.js",
                     // jQuery
                     "./node_modules/jquery/dist/jquery.js",
+                    "./node_modules/jquery-migrate/dist/jquery-migrate.js",
                     "./node_modules/jquery-validation/dist/jquery.validate.js",
                     // jQuery UI
                     "./node_modules/jquery-ui/dist/jquery-ui.js",

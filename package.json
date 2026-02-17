@@ -40,6 +40,7 @@
     "highcharts-vue": "~2.0.1",
     "intro.js": "~2.9.3",
     "jquery": "~4.0.0",
+    "jquery-migrate": "~4.0.2",
     "jquery-ui": "~1.14.2",
     "jquery-validation": "~1.22.0",
     "lightgallery": "~2.8.3",
