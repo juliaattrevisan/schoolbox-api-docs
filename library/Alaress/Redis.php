@@ -271,15 +271,8 @@ class Redis
         }
 
         $redis = $this->client;
-        $key   = $this->getRedisKey($base_key, $params);
-
-        $cachedValue = null;
-        try {
-            $cachedValue = $redis->get($key);
-        } catch (Predis\PredisException $e) {
-            trigger_error(sprintf('Redis exception when reading: "%s"', $e->getMessage()), E_USER_WARNING);
-            // otherwise continue
-        }
+        $key         = $this->getRedisKey($base_key, $params);
+        $cachedValue = $this->fetchCachedValue($key);
 
         // Was a result returned? If so decode it
         if (!isset($cachedValue)) {
@@ -299,16 +292,7 @@ class Redis
         // fetched result was not compressed
         if ($requiresRecalculation || $requiresRecache) {
             $cachedValue = $this->encodeCalculatedValue($returnValue);
-            try {
-                if ($timeout > 0) {
-                    $redis->setex($key, $timeout, $cachedValue);
-                } else {
-                    $redis->set($key, $cachedValue);
-                }
-            } catch (Predis\PredisException $e) {
-                trigger_error(sprintf('Redis exception when writing cache: "%s"', $e->getMessage()), E_USER_WARNING);
-                // otherwise continue
-            }
+            $this->storeCachedValue($key, $cachedValue, $timeout);
         }
 
         return $returnValue;
@@ -455,5 +439,45 @@ class Redis
     private function uncompressValue(string $value): string|false
     {
         return gzuncompress($value);
+    }
+
+    /**
+     * Fetch the cached value for the given key.
+     *
+     * @param string $key The key to fetch from.
+     * @return string|null
+     */
+    private function fetchCachedValue(string $key): ?string
+    {
+        $cachedValue = null;
+        try {
+            $cachedValue = $this->client->get($key);
+        } catch (Predis\PredisException $e) {
+            trigger_error(sprintf('Redis exception when reading: "%s"', $e->getMessage()), E_USER_WARNING);
+            // otherwise continue
+        }
+        return $cachedValue;
+    }
+
+    /**
+     * Store the value within a key, with an optional timeout.
+     *
+     * @param string   $key     The key to store into.
+     * @param string   $value   The value to store.
+     * @param int|null $timeout Timeout in seconds, or null if no timeout.
+     * @return void
+     */
+    private function storeCachedValue(string $key, string $value, ?int $timeout): void
+    {
+        try {
+            if ($timeout > 0) {
+                $this->client->setex($key, $timeout, $value);
+            } else {
+                $this->client->set($key, $value);
+            }
+        } catch (Predis\PredisException $e) {
+            trigger_error(sprintf('Redis exception when writing cache: "%s"', $e->getMessage()), E_USER_WARNING);
+            // otherwise continue
+        }
     }
 }
