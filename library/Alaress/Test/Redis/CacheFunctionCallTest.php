@@ -29,6 +29,7 @@ class CacheFunctionCallTest extends TestCase
             $uncompressedValue,
         ) extends Redis {
             private array $cachedValues = [];
+            private bool $mustHit = false;
             public function __construct(private ?string $cachedValue, private mixed $uncompressedValue)
             {
             }
@@ -38,34 +39,38 @@ class CacheFunctionCallTest extends TestCase
             }
             protected function fetchCachedValue(string $key): ?string
             {
-                return array_key_exists($key, $this->cachedValues)
-                    ? $this->cachedValues[$key]
-                    : $this->cachedValue;
+                if (!array_key_exists($key, $this->cachedValues)) {
+                    if ($this->mustHit) {
+                        throw new \OutOfBoundsException(sprintf('Key "%s" does not exist', $key));
+                    }
+                    return $this->cachedValue;
+                }
+                return $this->cachedValues[$key];
             }
             protected function storeCachedValue(string $key, string $value, ?int $timeout): void
             {
                 $this->cachedValues[$key] = $value;
             }
+            public function setMustHit(bool $mustHit): self
+            {
+                $this->mustHit = $mustHit;
+                return $this;
+            }
         };
 
         // Test initial call (with cache miss)
+        $key = 'key';
         $this->assertSame(
             $expected,
-            $redis->cacheFunctionCall(
-                'get',
-                fn () => $expected,
-                [],
-            ),
+            $redis->cacheFunctionCall($key, fn () => $expected, []),
         );
 
-        // Test again, but verify cache hit
+        $redis->setMustHit(true);
+
+        // Test again, but verify cache hit somehow
         $this->assertSame(
             $expected,
-            $redis->cacheFunctionCall(
-                'get',
-                fn () => $expected,
-                [],
-            ),
+            $redis->cacheFunctionCall($key, fn () => $expected, []),
         );
     }
 
