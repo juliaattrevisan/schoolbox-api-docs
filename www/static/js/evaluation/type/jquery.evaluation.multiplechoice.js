@@ -43,7 +43,7 @@
          * Save response upon change
          */
         function initChange() {
-            config.questionForm.find("input").change(function () {
+            config.questionForm.find("input").on("change", function () {
                 $(this).parent().toggleClass("evaluation-selected");
 
                 $.fn.evaluationMultipleChoice.saveOne(config.questionForm);

@@ -31,7 +31,7 @@
          * Initialise tiny
          */
         function initChange() {
-            config.questionForm.find("textarea").change(function () {
+            config.questionForm.find("textarea").on("change", function () {
                 $.fn.evaluationShort.saveOne(config.questionForm);
             });
         }

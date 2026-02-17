@@ -19,7 +19,7 @@
             unitId    = $checkbox.attr('data-unit-id');
 
         // Toggle date fields
-        $checkbox.change(function () {
+        $checkbox.on('change', function () {
             if ($checkbox.prop('checked') && !$checkbox.prop('disabled')) {
                 $('#unit-' + unitId + '-dates').removeAttr('hidden');
             } else {
@@ -27,7 +27,7 @@
             }
         });
 
-        $checkbox.change(); // Run function on page load (required because Firefox remembers selected checkboxes).
+        $checkbox.trigger('change'); // Run function on page load (required because Firefox remembers selected checkboxes).
 
         // Warn user they are about to clobber previous interactions
         {% if enableReimport %}

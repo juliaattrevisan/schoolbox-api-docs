@@ -99,12 +99,12 @@ $(document).ready(function () {
 function initDynamicValidationTriggers() {
     if ($("#useRubric").is(":checked")) {
         // on change of mark range setting
-        $("#useMarkRange").change(function () {
+        $("#useMarkRange").on("change", function () {
             reValidate();
         });
 
         // Attach listener to run monotonicity validation on a descriptor row every time one of the contained descriptor values change
-        $("[data-descriptor-value]").change(function () {
+        $("[data-descriptor-value]").on("change", function () {
             var $changedDescriptor = $(this);
             var $closestDescRow = $changedDescriptor
                 .closest("[data-descriptor]")
@@ -128,7 +128,7 @@ function initDynamicValidationTriggers() {
         });
 
         // on change of checked indicators
-        $("[data-criterion-name]").change(function () {
+        $("[data-criterion-name]").on("change", function () {
             var $indicatorCheckbox = $(this);
             if ($indicatorCheckbox.is(":checked")) {
                 // Show any errors for the indicator itself

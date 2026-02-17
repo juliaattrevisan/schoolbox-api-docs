@@ -232,7 +232,7 @@
         {% endif %}
 
 
-        $("#useMarkRange").change(function() {
+        $("#useMarkRange").on('change', function() {
             if ($("#useMarkRange").is(":checked")) {
                 $("td[data-descriptor] input").prop("placeholder", "Maximum points");
             } else {
@@ -292,7 +292,7 @@
         // Show/hide group marks based upon mark-per-group (NOT capability)
         // Only show the group mark if at least one criterion is selected
         // in the group
-        $("#capability-markType").change(toggleGroupMaxValues);
+        $("#capability-markType").on('change', toggleGroupMaxValues);
         $('#rubric-attachable').on('change', 'input[data-criterion-name]', toggleGroupMaxValues);
     });
 </script>

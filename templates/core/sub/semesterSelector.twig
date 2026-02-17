@@ -13,7 +13,7 @@ Usage: include 'sub/semesterSelector.twig
         var $semesterSelector = $('#context-selector-semester');
         var $options = $semesterSelector.find('option');
         {# Wire up context selector #}
-        $semesterSelector.change(function () {
+        $semesterSelector.on('change', function () {
             window.location.href = $semesterSelector.find(':selected').data('href');
         });
         {# Wire up next/previous term buttons #}

@@ -54,7 +54,7 @@ Usages:
                 {
                     event.preventDefault();
                     {# Have to manually call the change event as it doesn't trigger on scripted value updates #}
-                    $('#course_spec_id').val($(this).attr('data-course-id')).change();
+                    $('#course_spec_id').val($(this).attr('data-course-id')).trigger('change');
                     $('[data-course-selector]').html($(this).attr('data-course-name'));
                     $('#course-selector-modal').foundation('reveal', 'close');
                 });

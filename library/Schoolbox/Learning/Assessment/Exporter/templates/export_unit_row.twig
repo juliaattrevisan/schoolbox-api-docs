@@ -14,7 +14,7 @@
         const courseId = $checkbox.attr('data-course-id');
 
         // Toggle date fields
-        $checkbox.change(function () {
+        $checkbox.on('change', function () {
             const datesContainer = $('#course-' + courseId + '-dates');
 
             if ($checkbox.prop('checked') && !$checkbox.prop('disabled')) {
@@ -26,7 +26,7 @@
             }
         });
 
-        $checkbox.change(); // Run function on page load.
+        $checkbox.trigger('change'); // Run function on page load.
     });
 </script>
 

@@ -68,7 +68,7 @@
                 }
             };
             var repeatSelector = config.element.find("select[name=repeat]");
-            repeatSelector.change(showRepeats);
+            repeatSelector.on("change", showRepeats);
             showRepeats.apply(repeatSelector);
         }
 

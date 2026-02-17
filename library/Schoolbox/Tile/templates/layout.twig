@@ -52,7 +52,7 @@
         });
 
         // Updater for tile shape and layout
-        form.find(':input[data-function="update-layout"]').change(function() {
+        form.find(':input[data-function="update-layout"]').on('change', function() {
 
             /* Only update layout if the values supplied were valid
              */
@@ -125,7 +125,7 @@
         });
 
         // Update x and y input based on selected shape
-        form.find(':input[name="tile_shape"]').change(function() {
+        form.find(':input[name="tile_shape"]').on('change', function() {
             switch (this.value) {
                 case 'landscape':
                     xInput.val(16);
@@ -148,7 +148,7 @@
                     yInput.val(2);
                     break;
             }
-            yInput.change();
+            yInput.trigger('change');
         });
 
         // Sortability
@@ -256,7 +256,7 @@
 
         // Trigger change event on page load in case browser has remembered the selected option from a prior visit.
         // (Firefox does this.  To test, select a different tile_shape option then refresh the page without saving.)
-        form.find(':input[name="tile_shape"]').change();
+        form.find(':input[name="tile_shape"]').trigger('change');
     });
 })(jQuery);
 </script>

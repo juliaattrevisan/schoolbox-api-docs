@@ -9,7 +9,7 @@
     <div class="admin-content">
         <script>
             $(function() {
-                $('[data-checkbox-inherit]').change(function(event) {
+                $('[data-checkbox-inherit]').on('change', function(event) {
                     if ($(event.target).prop('checked')) {
                         $('#permissions').addClass('hide');
                     } else {

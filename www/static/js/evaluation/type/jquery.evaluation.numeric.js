@@ -45,7 +45,7 @@
                 allow: "e./-",
             });
 
-            config.questionForm.find("input").change(function () {
+            config.questionForm.find("input").on("change", function () {
                 /* For typing
                  */
                 $(this).numeric({
@@ -54,7 +54,7 @@
 
                 /* Clean copy/paste
                  */
-                $(this).change(function () {
+                $(this).on("change", function () {
                     var str = $(this)
                         .val()
                         .toString()

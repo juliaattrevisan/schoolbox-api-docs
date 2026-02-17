@@ -45,7 +45,7 @@
         function initChange() {
             /* Remove all selected classes and reapply just one
              */
-            config.questionForm.find("input").change(function () {
+            config.questionForm.find("input").on("change", function () {
                 config.questionForm.find("input").parent().removeClass("evaluation-selected");
                 $(this).parent().addClass("evaluation-selected");
 

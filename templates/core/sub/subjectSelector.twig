@@ -14,7 +14,7 @@ Usage: include 'sub/subjectSelector.twig
         var $subjectSelector = $('#context-selector-subject');
 
         {# Wire up context selector #}
-        $subjectSelector.change(function() {
+        $subjectSelector.on('change', function() {
             window.location.href = $subjectSelector.find(':selected').data('href');
         });
     });

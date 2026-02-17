@@ -39,7 +39,7 @@
                 }
             });
 
-            config.questionForm.find("input").change(function () {
+            config.questionForm.find("input").on("change", function () {
                 $.fn.evaluationExact.saveOne(config.questionForm);
             });
         }

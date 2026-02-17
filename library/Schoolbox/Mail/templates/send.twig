@@ -164,7 +164,7 @@
             }
         });
 
-        $('input[type=radio][name=separator]').change(function() {
+        $('input[type=radio][name=separator]').on('change', function() {
 
             var text = $('#copy-email-text').text();
             var replaceText = '';

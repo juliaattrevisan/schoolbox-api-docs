@@ -14,7 +14,7 @@ Usage: include 'sub/semesterSelector.twig
         let $semesterSelector = $('#context-selector-semester');
 
         {# Wire up context selector #}
-        $semesterSelector.change(function () {
+        $semesterSelector.on('change', function () {
             window.location.href = $semesterSelector.find(':selected').data('href');
         });
 

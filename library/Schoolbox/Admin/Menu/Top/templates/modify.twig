@@ -159,7 +159,7 @@
 
         {# Icon preview#}
 
-        $('[data-icon]').change(function() {
+        $('[data-icon]').on('change', function() {
             $('#icon').attr('class', 'size-32 icon-' + $('#icon-select').val())
         });
 
@@ -193,22 +193,22 @@
             $('#campus-all').prop('checked', true);
         }
 
-        $('[data-campus]').change(function() {
+        $('[data-campus]').on('change', function() {
             $('#campus-all').prop('checked', false);
         });
 
-        $('#campus-all').change(function() {
+        $('#campus-all').on('change', function() {
             var status = $(this).prop('checked');
             $('[data-campus]').each(function() {
                 $(this).prop('checked', status);
             });
         });
 
-        $('[data-role]').change(function() {
+        $('[data-role]').on('change', function() {
             $('#role-all').prop('checked', false);
         });
 
-        $('#role-all').change(function() {
+        $('#role-all').on('change', function() {
             var status = $(this).prop('checked');
             $('[data-role]').each(function() {
                 $(this).prop('checked', status);

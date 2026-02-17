@@ -12,7 +12,7 @@
 <script>
     $(function() {
         {# When a different response is selected from dropdown, navigate to its URL #}
-        $('#response-selector').change(function(event) {
+        $('#response-selector').on('change', function(event) {
             event.preventDefault();
             window.location.href = $(this).find('option:selected').attr('data-url');
         });

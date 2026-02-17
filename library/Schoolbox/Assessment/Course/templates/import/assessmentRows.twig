@@ -23,7 +23,7 @@
     $(function () {
 
         // Reveal 'use unit date' if input value differs form the unit date value
-        $('#import_assessments').find('[data-datepicker]').change(function() {
+        $('#import_assessments').find('[data-datepicker]').on('change', function() {
             var $useUnitDate = $(this).parent().next('[data-course-unit-date]');
             if ($(this).val() !== $useUnitDate.attr('data-course-unit-date')) {
                 $useUnitDate.removeClass('hide');

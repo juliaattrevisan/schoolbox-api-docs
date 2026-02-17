@@ -670,7 +670,7 @@
                 return groupMax;
             }
 
-            $("[data-group-max-value]").change(function() {
+            $("[data-group-max-value]").on('change', function() {
                 var groupIdentifier = $(this).closest("[data-group]").attr("data-group");
                 var $closestAssignButton = $(this).next("[data-use-criterion-values]");
                 if (! ($(this).val() == calculateGroupTotal(groupIdentifier)) ) {

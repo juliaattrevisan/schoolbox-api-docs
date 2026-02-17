@@ -91,7 +91,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         renderTimetableAllDay();
 
         // Listen for changes to campus
-        timetable.campus.change(function () {
+        timetable.campus.on("change", function () {
             resetCycles(
                 $("#byTimetable-" + twigVars.id)
                     .find("[data-adtp-tt-submit]")
@@ -103,7 +103,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         });
 
         // Listen for changes to term
-        timetable.term.change(function () {
+        timetable.term.on("change", function () {
             buildCycles();
         });
 
@@ -126,14 +126,14 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         $byTimetable.find("[data-tt-day].active").trigger("click");
 
         // Catch period select change
-        $byTimetable.find("[data-adtp-tt-period]").change(function () {
+        $byTimetable.find("[data-adtp-tt-period]").on("change", function () {
             updateTimeControls($(this));
         });
     }
 
     // If input value gets changed from outside, reset the timetable picker
 
-    $picker.change(function () {
+    $picker.on("change", function () {
         if (isInputValueValid()) {
             resetCalendar();
             if (twigVars.timetable) {

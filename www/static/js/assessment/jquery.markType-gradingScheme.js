@@ -42,7 +42,7 @@
 
         /* Populate the grade scale modal on scheme change
          */
-        config.gradingSchemeSelect.change(populateScaleModal);
+        config.gradingSchemeSelect.on("change", populateScaleModal);
 
         /* Handle sync mode
          */
