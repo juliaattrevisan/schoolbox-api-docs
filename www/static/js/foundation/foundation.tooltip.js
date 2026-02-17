@@ -339,7 +339,7 @@
                       }).join(" ")
                     : "";
 
-            return $.trim(filtered);
+            return filtered.trim();
         },
 
         convert_to_touch: function ($target) {

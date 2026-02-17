@@ -552,9 +552,9 @@
         /* Trim perhaps-adjacent spaces to test for numeric representation
          * This rule might also be used for percentage, so remove that symbol too
          */
-        parts[0] = $.trim(parts[0].replace("%", ""));
+        parts[0] = parts[0].trim().replace("%", "");
 
-        if ($.isNumeric(parts[0])) {
+        if (!isNaN(parseInt(parts[0]))) {
             var numerator = parseInt(parts[0]);
             var denominator = $(element).attr("data-validation-limit");
 
@@ -597,9 +597,9 @@
         /* Trim perhaps-adjacent spaces to test for numeric representation
          * This rule might also be used for percentage, so remove that symbol too
          */
-        val = $.trim(val.replace("%", ""));
+        val = val.trim().replace("%", "");
 
-        if ($.isNumeric(val)) {
+        if (!isNaN(parseInt(val))) {
             var numerator = parseInt(val);
             var denominator = $(element).attr("data-validation-limit");
 
