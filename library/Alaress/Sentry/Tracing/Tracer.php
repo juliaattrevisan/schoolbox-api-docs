@@ -435,28 +435,42 @@ class Tracer
      *
      * @see startSpan for description of other parameters.
      *
-     * @param callable    $callable
-     * @param string|null $description
-     * @param string|null $operation
-     * @param string|null $origin
-     * @param array       $data
+     * @param callable                          $callable
+     * @param string                            $description
+     * @param string|null                       $operation
+     * @param string|null                       $origin
+     * @param array                             $data
+     * @param (callable(mixed): array)|null     $onSuccess If provided, a callable which runs on success:
+     *                                                     it takes the result of `$callable`, and returns data to add
+     *                                                     to the span.
+     * @param (callable(Throwable): array)|null $onFailure If provided, a callable which runs on failure:
+     *                                                     it takes what `$callable` threw, and returns data to add to
+     *                                                     the span.
      * @return mixed Returns whatever `$callable` does when run.
      * @throws Throwable May throw whatever `$callable` may.
      */
     public function runWithinSpan(
         callable $callable,
-        ?string $description = null,
+        string $description,
         ?string $operation = null,
         ?string $origin = null,
         array $data = [],
+        ?callable $onSuccess = null,
+        ?callable $onFailure = null,
     ): mixed {
         $this->startSpan($description, $operation, $origin, null, $data);
         try {
             $result = $callable();
-            $this->finishSpan(status: SpanStatus::ok());
+            $this->finishSpan(
+                status: SpanStatus::ok(),
+                data:   is_callable($onSuccess) ? $onSuccess($result) : [],
+            );
             return $result;
         } catch (Throwable $e) {
-            $this->finishSpan(status: SpanStatus::internalError());
+            $this->finishSpan(
+                status: SpanStatus::internalError(),
+                data:   is_callable($onFailure) ? $onFailure($e) : [],
+            );
             throw $e;
         }
     }
@@ -465,19 +479,20 @@ class Tracer
      * Finish any existing span, reverting the Sentry hub back to tracking the
      * current transaction.
      *
-     * @param float|null      $endTimestamp When the span is to be recorded as
-     *                                      having finished.
-     * @param SpanStatus|null $status       The status to set on the span once
-     *                                      it has finished.
+     * @param float|null      $endTimestamp When the span is to be recorded as having finished.
+     * @param SpanStatus|null $status       The status to set on the span once it has finished.
+     * @param array           $data         Any data to add to the span now that it has finished.
+     *                                      Memory usage data will automatically be added, if not overridden by this
+     *                                      parameter.
      *
      * @return void
      */
-    public function finishSpan(?float $endTimestamp = null, ?SpanStatus $status = null): void
+    public function finishSpan(?float $endTimestamp = null, ?SpanStatus $status = null, array $data = []): void
     {
         $spanContext = new SpanContext();
         $spanContext->setEndTimestamp($endTimestamp ?? microtime(true));
         $spanContext->setStatus($status);
-        $spanContext->setData(MemoryHelper::buildEndSpanData());
+        $spanContext->setData($data + MemoryHelper::buildEndSpanData());
         $this->stackChanges[] = new Operation\Pop($spanContext);
     }
 
