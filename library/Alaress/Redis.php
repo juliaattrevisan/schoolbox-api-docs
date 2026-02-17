@@ -298,16 +298,7 @@ class Redis
         // Recache if result recalculated, or needs to be recached because the
         // fetched result was not compressed
         if ($requiresRecalculation || $requiresRecache) {
-            $serializedValue = serialize($returnValue);
-            $cachedValue     = gzcompress($serializedValue, self::COMPRESSION_RATIO);
-            if ($cachedValue === false) {
-                // Compression failed?
-                // just store the uncompressed value, I guess
-                $cachedValue = $serializedValue;
-            } else {
-                $cachedValue = self::COMPRESSED_PAYLOAD_PREFIX . $serializedValue;
-            }
-
+            $cachedValue = $this->encodeCalculatedValue($returnValue);
             try {
                 if ($timeout > 0) {
                     $redis->setex($key, $timeout, $cachedValue);
@@ -421,5 +412,26 @@ class Redis
         // Can free both serialized and unserialized value
         unset($serializedValue, $unserializedValue);
         return [$returnValue, $requiresRecache, $requiresRecalculation,];
+    }
+
+    /**
+     * Encode the value once it's been calculated, compressing if possible.
+     *
+     * @param mixed $calculatedValue The value which was calculated from
+     *                               `cacheFunctionCall`.
+     * @return string
+     */
+    private function encodeCalculatedValue(mixed $calculatedValue): string
+    {
+        $serializedValue = serialize($calculatedValue);
+        $cachedValue     = gzcompress($serializedValue, self::COMPRESSION_RATIO);
+        if ($cachedValue === false) {
+            // Compression failed?
+            // just store the uncompressed value, I guess
+            $cachedValue = $serializedValue;
+        } else {
+            $cachedValue = self::COMPRESSED_PAYLOAD_PREFIX . $serializedValue;
+        }
+        return $cachedValue;
     }
 }
