@@ -27,7 +27,7 @@ export const useHeaderStore = defineStore(`headerStore`, () => {
         header.value = [
             {
                 id: 0,
-                title: "Student",
+                title: "Name",
                 width: 250,
                 isSticky: true,
                 isSortable: true,
