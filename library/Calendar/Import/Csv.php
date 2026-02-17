@@ -555,6 +555,6 @@ class Csv extends Base
             return array_map(fn($value) => $row[$value], $headerColumns[$columnName] ?? []);
         }
 
-        return isset($headerColumns[$columnName]) ? $row[$headerColumns[$columnName][0]] : '';
+        return isset($headerColumns[$columnName]) ? trim($row[$headerColumns[$columnName][0]]) : '';
     }
 }
