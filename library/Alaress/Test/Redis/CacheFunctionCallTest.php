@@ -25,6 +25,7 @@ class CacheFunctionCallTest extends TestCase
     ): void {
         // Mock Redis client
         $redis = new class ($cachedValue, $compressedValue) extends Redis {
+            private array $cachedValues = [];
             public function __construct(private ?string $cachedValue, private mixed $uncompressedValue)
             {
             }
@@ -34,13 +35,27 @@ class CacheFunctionCallTest extends TestCase
             }
             protected function fetchCachedValue(string $key): ?string
             {
-                return $this->cachedValue;
+                return array_key_exists($key, $this->cachedValues)
+                    ? $this->cachedValues[$key]
+                    : $this->cachedValue;
             }
             protected function storeCachedValue(string $key, string $value, ?int $timeout): void
             {
+                $this->cachedValues[$key] = $value;
             }
         };
 
+        // Test initial call (with cache miss)
+        $this->assertSame(
+            $expected,
+            $redis->cacheFunctionCall(
+                'get',
+                fn () => $expected,
+                [],
+            ),
+        );
+
+        // Test again, but verify cache hit
         $this->assertSame(
             $expected,
             $redis->cacheFunctionCall(
