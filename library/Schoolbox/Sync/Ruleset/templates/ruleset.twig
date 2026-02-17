@@ -19,7 +19,7 @@ set upsConfig = {
     $(function() {
         $('#ruleset').ups();
 
-        $('[data-perform-update]').click(function(e) {
+        $('[data-perform-update]').on('click', function(e) {
             e.preventDefault();
 
             $(this).confirmDialog({

@@ -42,7 +42,7 @@
 
             <script>
                 $(function() {
-                    $('#similarity-preview-{{ latestResponse.id }}').click(function() {
+                    $('#similarity-preview-{{ latestResponse.id }}').on('click', function() {
                         /* Close all other joyrides before starting the next one
                          * because foundation is buggy
                          */

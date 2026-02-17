@@ -96,7 +96,7 @@
             {# Setup click events #}
 
             function updateGroupPermissionsClick() {
-                $('[data-delete-visibility="group"]').click(function (e) {
+                $('[data-delete-visibility="group"]').on('click', function (e) {
                     e.preventDefault();
 
                     let row = $(this).closest('tr');
@@ -185,7 +185,7 @@
                 updateVisibility();
             }
 
-            $('[data-group-add]').click(function(e) {
+            $('[data-group-add]').on('click', function(e) {
                 e.preventDefault();
 
                 let groupId = $(this).attr('data-group-add');

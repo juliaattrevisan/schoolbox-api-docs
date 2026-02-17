@@ -215,7 +215,7 @@
        {# of the radio buttons to whichever value was 'checked' on page load. So, we need to update the #}
        {# check attribute in the DOM for all radio buttons in the clicked group #}
         function setRadioButtonListener (row) {
-            $(row).find('.radio-label').click(function () {
+            $(row).find('.radio-label').on('click', function () {
                 let clickedElement = $("#" + $(this).attr('for'));
                 let elementName = clickedElement.attr('name');
                 let radioGroupSelector = 'input[name*="' + elementName + '"]';

@@ -151,7 +151,7 @@
 
         {% if record.id != '' %}
 
-        $('[data-delete]').click(function (e) {
+        $('[data-delete]').on('click', function (e) {
             e.preventDefault();
 
             $(this).confirmDialog({

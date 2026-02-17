@@ -17,7 +17,7 @@ Usage: include 'sub/semesterSelector.twig
             window.location.href = $semesterSelector.find(':selected').data('href');
         });
         {# Wire up next/previous term buttons #}
-        $("[data-semester-switch]").click(function (e) {
+        $("[data-semester-switch]").on('click', function (e) {
             e.preventDefault();
             var index = $semesterSelector.prop('selectedIndex');
             var newIndex = 'next' === $(this).data('semester-switch') ? index - 1 : index + 1;

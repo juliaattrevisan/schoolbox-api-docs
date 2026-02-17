@@ -164,7 +164,7 @@
             {# Setup click events #}
 
             function updateRolePermissionsClick() {
-                $('[data-delete-visibility="role"]').click(function (e) {
+                $('[data-delete-visibility="role"]').on('click', function (e) {
                     e.preventDefault();
 
                     let row = $(this).closest('tr');
@@ -265,7 +265,7 @@
                 updateVisibility();
             }
 
-            $('[data-role-add]').click(function (e) {
+            $('[data-role-add]').on('click', function (e) {
                 e.preventDefault();
 
                 let roleId = $(this).attr('data-role-add');

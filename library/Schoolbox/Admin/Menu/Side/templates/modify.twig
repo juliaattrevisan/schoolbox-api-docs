@@ -2,7 +2,7 @@
     $(function () {
         var form = $('form#itemForm');
 
-        $('[data-submit]').click(function () {
+        $('[data-submit]').on('click', function () {
             form.alaressValidate({
                 ignore: ':disabled',
                 rules: {

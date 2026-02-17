@@ -97,7 +97,7 @@
 
         {% if folder.id %}
 
-            $('[data-interaction="delete"]').click(function(event) {
+            $('[data-interaction="delete"]').on('click', function(event) {
                 event.preventDefault();
                 $(this).confirmDialog({
                     text: 'Are you sure you wish to delete this folder?',
@@ -124,7 +124,7 @@
                 });
             });
 
-            $('[data-reset-homepage-content]').click(function(event) {
+            $('[data-reset-homepage-content]').on('click', function(event) {
                 event.preventDefault();
 
                 let element = $(this);

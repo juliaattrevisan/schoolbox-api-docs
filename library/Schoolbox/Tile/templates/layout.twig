@@ -170,7 +170,7 @@
         });
 
         // Delete buttons
-        tileList.find('[data-tile] [data-role="delete"]').click(function(event) {
+        tileList.find('[data-tile] [data-role="delete"]').on('click', function(event) {
             event.preventDefault();
             var element     = $(this);
             var deletedTile = element.closest('[data-tile]');

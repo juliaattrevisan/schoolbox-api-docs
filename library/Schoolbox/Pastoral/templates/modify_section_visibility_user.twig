@@ -133,7 +133,7 @@
             };
 
             function updateUserPermissionClickEvents() {
-                $('[data-delete-visibility="user"]').click(function (e) {
+                $('[data-delete-visibility="user"]').on('click', function (e) {
                     e.preventDefault();
 
                     let row = $(this).closest('tr');

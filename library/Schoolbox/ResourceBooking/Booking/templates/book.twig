@@ -282,16 +282,16 @@ $(function() {
 
     // On submission attempt: clear list of errors
     form.find('#resource-booking-save')
-        .click(function() {
+        .on('click', function() {
             errors = {};
             form.valid()
         })
-        .click(function() {
+        .on('click', function() {
             // Record that I clicked Save
             form.data('action', 'save')
         });
     form.find('#resource-booking-cancel')
-        .click(function() {
+        .on('click', function() {
             // Record that I clicked Cancel
             form.data('action', 'cancel')
         });
