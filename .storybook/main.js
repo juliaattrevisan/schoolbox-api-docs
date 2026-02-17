@@ -1,11 +1,10 @@
 /**
  * Storybook configuration for Vue 3 using Rsbuild.
  * This file sets up Storybook to work with Vue 3 components,
- * including SCSS support and custom path aliases.
+ * and adds custom path aliases.
  */
 
 import { pluginVue } from "@rsbuild/plugin-vue";
-import { pluginSass } from "@rsbuild/plugin-sass";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import remarkGfm from "remark-gfm";
@@ -44,7 +43,7 @@ const config = {
          * Add in the plugins to compile Vue files and handle SCSS.
          */
         config.plugins = config.plugins || [];
-        config.plugins.push(pluginVue(), pluginSass());
+        config.plugins.push(pluginVue());
         return config;
     },
 };

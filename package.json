@@ -66,7 +66,6 @@
     "@pinia/testing": "~1.0.2",
     "@playwright/test": "~1.53.1",
     "@rsbuild/core": "~1.7.3",
-    "@rsbuild/plugin-sass": "~1.5.0",
     "@rsbuild/plugin-vue": "~1.2.6",
     "@rspack/cli": "~1.6.5",
     "@rspack/core": "~1.6.5",
