@@ -34,7 +34,7 @@
                 $input.val($selection.data('selection'));
 
                 //Hacky way to remove error message - could not find alternative
-                $input.click();
+                $input.trigger("click");
                 $input.blur();
 
                 modal.foundation('reveal', 'close');
