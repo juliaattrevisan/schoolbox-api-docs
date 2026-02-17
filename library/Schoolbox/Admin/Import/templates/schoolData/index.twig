@@ -190,7 +190,7 @@
 
         /* Live Update as per UPS implementation
          */
-        $('[data-perform-update]').click(function(e) {
+        $('[data-perform-update]').on('click', function(e) {
             e.preventDefault();
 
             let strats = $(this).attr('data-perform-update');

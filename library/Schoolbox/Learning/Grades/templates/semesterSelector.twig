@@ -23,7 +23,7 @@ Usage: include 'sub/semesterSelector.twig
             $('[data-semester-switch]').addClass('disabled');
         } else {
             {# Wire up next/previous term buttons #}
-            $("[data-semester-switch]").click(function (e) {
+            $("[data-semester-switch]").on('click', function (e) {
                 e.preventDefault();
 
                 let $options = $semesterSelector.children();

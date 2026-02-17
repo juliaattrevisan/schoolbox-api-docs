@@ -117,7 +117,7 @@
                                         });
                                         //preview in new window at specific size
                                         $(function() {
-                                            $('[data-preview]').click(function(event) {
+                                            $('[data-preview]').on('click', function(event) {
                                                 event.preventDefault();
 
                                                 window.open($(this).attr('href'),'1396330261396','width=950,height=800,toolbar=0,menubar=0,location=0,status=1,scrollbars=1,resizable=0,left=0,top=0');

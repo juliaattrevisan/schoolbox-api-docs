@@ -28,7 +28,7 @@
                 folderId: '{{ subject.id }}'
             }
         });
-        $('[data-print]').click(function () {
+        $('[data-print]').on('click', function () {
             window.print();
             $('#container').highcharts().reflow();
         });

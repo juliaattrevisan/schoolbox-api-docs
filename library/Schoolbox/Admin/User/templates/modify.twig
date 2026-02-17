@@ -871,7 +871,7 @@
 
         {# Confirm change of superuser status #}
 
-        $('input[data-role="superuser"]').click(function (event) {
+        $('input[data-role="superuser"]').on('click', function (event) {
             event.preventDefault();
             $(this).confirmDialog({
                 text: 'Change this user\'s superuser status?',
@@ -887,7 +887,7 @@
 
         {# Confirm change of enabled flag#}
 
-        $('input[data-role="enabled"]').click(function (event) {
+        $('input[data-role="enabled"]').on('click', function (event) {
             event.preventDefault();
             $(this).confirmDialog({
                 text: 'Change this user\'s account status?',
@@ -899,7 +899,7 @@
 
         {# Delete user #}
 
-        $('[data-delete]').click(function (event) {
+        $('[data-delete]').on('click', function (event) {
             event.preventDefault();
 
             var action = $(this).data('action');
@@ -917,7 +917,7 @@
 
         {# Delete linked user #}
 
-        $('[data-delete-linked]').click(function (event) {
+        $('[data-delete-linked]').on('click', function (event) {
             event.preventDefault();
 
             var linkedId = $(this).data('delete-linked');
@@ -936,7 +936,7 @@
 
         {# Delete group #}
 
-        $('[data-delete-group]').click(function (event) {
+        $('[data-delete-group]').on('click', function (event) {
             event.preventDefault();
 
             var folderId = $(this).data('delete-group');
@@ -956,7 +956,7 @@
         {# Delete token #}
         //make the function reusable so we can call after adding a new token
         let tokenDelete = function () {
-            $('[data-delete-token]').click(function (event) {
+            $('[data-delete-token]').on('click', function (event) {
                 event.preventDefault();
 
                 let tokenId = $(this).data('delete-token');
@@ -979,7 +979,7 @@
 
         {# Delete permission #}
 
-        $('[data-delete-permission]').click(function (event) {
+        $('[data-delete-permission]').on('click', function (event) {
             event.preventDefault();
 
             var sid = $(this).data('delete-permission');

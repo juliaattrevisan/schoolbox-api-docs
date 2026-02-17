@@ -4,7 +4,7 @@
 
         var comp = $('#component{{ componentInstanceId }}');
 
-        $('[data-interaction="deletecomment"]').click(function(event) {
+        $('[data-interaction="deletecomment"]').on('click', function(event) {
 
             event.preventDefault();
             var commentId = $(event.target).attr('data-comment-id');

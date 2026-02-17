@@ -7,7 +7,7 @@
 
 <script>
     $(function () {
-        $('[data-report-dashboard]').click(function () {
+        $('[data-report-dashboard]').on('click', function () {
             $.post('{{ routeLookup('pastoralReportBuilder.postReportDashboardModify') }}', {
                 reportId: $(this).attr('data-report-dashboard'),
                 display: $(this).prop('checked') === true ? 1 : 0
@@ -77,7 +77,7 @@
 
 <script>
     $(function () {
-        $('[data-delete]').click(function (e) {
+        $('[data-delete]').on('click', function (e) {
             e.preventDefault();
 
             var li = $(this).closest('li');

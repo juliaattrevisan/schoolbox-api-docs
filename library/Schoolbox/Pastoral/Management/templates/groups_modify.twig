@@ -226,7 +226,7 @@
         {# Wire up delete buttons #}
 
         window.updateDeleteEvents = function () {
-            $('[data-member-delete]').click(function (e) {
+            $('[data-member-delete]').on('click', function (e) {
                 e.preventDefault();
                 window.memberDelete($(this));
             });
@@ -253,7 +253,7 @@
         {# Submit form #}
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
-        $('[data-save]').click(function (e) {
+        $('[data-save]').on('click', function (e) {
 
             e.preventDefault();
 

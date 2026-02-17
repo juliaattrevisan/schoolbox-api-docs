@@ -713,7 +713,7 @@
         }
 
         // Overwrite any custom mark in the capability mark field with the scaled mark calculated from descriptor values
-        $("[data-use-descriptor-values]").click(function(e) {
+        $("[data-use-descriptor-values]").on('click', function(e) {
             var $button               = $(this),
                 $gradeInput           = $button.siblings('[data-group-mark]'),
                 rubricId              = $button.closest('[data-group-summary]').attr('data-rubric-id'),

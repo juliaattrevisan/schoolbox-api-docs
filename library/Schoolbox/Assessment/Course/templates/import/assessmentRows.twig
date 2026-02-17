@@ -34,7 +34,7 @@
         });
 
         // Copy unit date into the field
-        $('[data-course-unit-date]').click(function() {
+        $('[data-course-unit-date]').on('click', function() {
             var date = $(this).attr('data-course-unit-date');
             var $input = $(this).prevAll('.input-group').find('input');
 
@@ -55,7 +55,7 @@
 
 <script>
     $(function() {
-        $('[data-warn-removal]').click(function(e) {
+        $('[data-warn-removal]').on('click', function(e) {
             if (!$(e.target).prop('checked')) {
                 e.preventDefault();
                 $(this).confirmDialog({

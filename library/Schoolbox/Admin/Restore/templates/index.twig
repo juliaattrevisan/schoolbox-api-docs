@@ -3,7 +3,7 @@
     $(function() {
         var $toast = $('[data-toast]');
 
-        $('[data-restore]').click(function(event) {
+        $('[data-restore]').on('click', function(event) {
             event.preventDefault();
             let object = $(event.target).attr('data-restore-type'),
                 href = $(event.target).attr('data-restore-href');

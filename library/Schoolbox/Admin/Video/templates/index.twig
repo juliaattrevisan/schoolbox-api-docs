@@ -39,7 +39,7 @@
                 });
             }
         });
-        $('[data-delete]').click(function (e) {
+        $('[data-delete]').on('click', function (e) {
             e.preventDefault();
             var deleteId = $(this).data('delete');
             var row = $(this).closest('tr');

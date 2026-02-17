@@ -31,7 +31,7 @@
         var route = '{{ selfAcknowledgeRoute }}';
         if (route) {
             var toast = $('[data-toast]');
-            $('[data-action-self-reflect]').click(function(e) {
+            $('[data-action-self-reflect]').on('click', function(e) {
                 e.preventDefault();
                 var $this = $(this);
                 $this.confirmDialog({

@@ -10,7 +10,7 @@
 {% set awardRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardAchieve', {awardId: award.id, award: award}) %}
 <script>
     $(function () {
-        $('[data-delete-evidence]').click(function (e) {
+        $('[data-delete-evidence]').on('click', function (e) {
             e.preventDefault();
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete the evidence from this {{ award.status }}?',
@@ -23,7 +23,7 @@
                 }
             });
         });
-        $('[data-award-goal]').click(function (e) {
+        $('[data-award-goal]').on('click', function (e) {
             e.preventDefault();
             $.post('{{ awardRoute }}', {}).done(function (response) {
                 if (response.viewUrl !== 'undefined') {

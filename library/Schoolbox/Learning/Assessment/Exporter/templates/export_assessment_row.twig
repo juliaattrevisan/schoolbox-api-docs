@@ -31,7 +31,7 @@
 
         // Warn user they are about to clobber previous interactions
         {% if enableReimport %}
-        $('[data-warn-destructive-export]').click(function(e) {
+        $('[data-warn-destructive-export]').on('click', function(e) {
             var $checkbox               = $(this),
                 countResponses          = $checkbox.data('countResponses'),
                 countSubmittedResponses = $checkbox.data('countSubmittedResponses'),

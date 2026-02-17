@@ -1,6 +1,6 @@
 <script>
     $(function(){
-        $('[data-import-logs]').click(function(e) {
+        $('[data-import-logs]').on('click', function(e) {
             e.preventDefault();
             window.location.href = '{{ routeLookup('adminImportPastoral.getLog') }}';
         });

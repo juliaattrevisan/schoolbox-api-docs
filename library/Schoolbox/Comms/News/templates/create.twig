@@ -247,7 +247,7 @@
             var unpublishVerb = 'Unpublish';
             $('#audience-selectize-group').remove();
 
-            $unpublishButton.click(function(event) {
+            $unpublishButton.on('click', function(event) {
                 event.preventDefault();
 
                 var $element = $(this);

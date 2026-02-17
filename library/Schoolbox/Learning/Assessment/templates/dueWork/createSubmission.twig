@@ -84,7 +84,7 @@ Data:
         };
         let $submitButton = $("[data-action-save]");
 
-       $('#saveDraftButton').click(function (e) {
+       $('#saveDraftButton').on('click', function (e) {
             // Trigger autosave when the button is clicked
             autosaveAjaxSubmit();
 
@@ -273,19 +273,19 @@ Data:
             };
 
         // Confirm dialog accept/reject
-        $acceptButton.click(function (event) {
+        $acceptButton.on('click', function (event) {
             disableButtons();
             $acceptButton.text(submittingText);
             event.preventDefault();
             submitForm();
         });
-        $rejectButton.click(function (event) {
+        $rejectButton.on('click', function (event) {
             event.preventDefault();
             $confirmDialog.foundation('reveal', 'close');
         });
 
         // Submit form
-        $submitButton.click(function (e) {
+        $submitButton.on('click', function (e) {
             e.preventDefault();
             if (!allowSubmit()) {
                 // prevent submission without SOMETHING to submit
@@ -307,7 +307,7 @@ Data:
         });
 
         // Disable ckeditor and attachzone if 'submitted in person' checked
-        $('#editor-submittedInPerson').click(function (element) {
+        $('#editor-submittedInPerson').on('click', function (element) {
             if(this.checked){
                 $('#submission-upload').hide('slow');
                 $('[name="{{ attachzone.fileVar }}"]').attr('disabled', true);

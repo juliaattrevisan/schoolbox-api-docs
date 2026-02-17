@@ -155,7 +155,7 @@ $(function() {
     });
 
     // logic for removing inputs
-    form.find('[data-role="remove-criterion"]').click(function(e) {
+    form.find('[data-role="remove-criterion"]').on('click', function(e) {
         e.preventDefault();
         let self          = $(this),
             container     = self.closest('[data-rubric-criterion-row]'),
@@ -177,7 +177,7 @@ $(function() {
         }
     });
 
-    $('[data-interaction="show-example-criteria"]').click(function(e) {
+    $('[data-interaction="show-example-criteria"]').on('click', function(e) {
         e.preventDefault();
         $('[data-role="example-criteria"]').foundation('reveal', 'open');
     });
