@@ -107,9 +107,9 @@ export default {
             </select>
         </div>
         <div class="filters__column">
-            <div class="checklist">
+            <div class="checklist l-flex-col">
                 <label>Status</label>
-                <ul class="option-list">
+                <ul class="option-list l-flex">
                     <li>
                         <input
                             type="checkbox"

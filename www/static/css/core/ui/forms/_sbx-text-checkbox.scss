@@ -49,13 +49,6 @@
     &:checked::before {
         transform: scale(1);
     }
-    /**
-    * We don't always use a label with a checkbox
-    * so ensure empty labels don't impact the display flow
-    */
-    & + label:empty {
-        display: none;
-    }
 
     /* focus / disabled use shared mixins like text input */
     &:focus {
@@ -67,6 +60,19 @@
         @include sbx-form.form-input-disabled;
         cursor: not-allowed;
         pointer-events: none;
+    }
+
+    & + label {
+        cursor: pointer;
+        font-weight: var(--sbx-font-weight-normal);
+    }
+
+    /**
+    * We don't always use a label with a checkbox
+    * so ensure empty labels don't impact the display flow
+    */
+    & + label:empty {
+        display: none;
     }
 }
 /* indeterminate state */
@@ -159,8 +165,7 @@ body.login input[type="checkbox"]:not(.plain) + label {
     margin-top: var(--sbx-size-s);
 }
 
-// Fix alignment of checklist filters when linked to a label on the left
-.sbx-body .filters .checklist {
-    align-items: center;
-    display: flex;
+// Keep checkbox buttons hidden within rubrics, as the label is what's used to trigger the checkbox selection, and the checkbox itself is not needed visually
+.sbx-body .rb input[type="checkbox"] {
+    display: none;
 }

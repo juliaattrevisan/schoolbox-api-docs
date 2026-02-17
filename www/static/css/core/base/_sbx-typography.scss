@@ -45,8 +45,13 @@ body {
 .sbx-body dl,
 .sbx-body blockquote,
 .sbx-body label,
+.sbx-body div,
 .sbx-body table tr th {
     font-size: var(--sbx-font-size-s);
+}
+
+.sbx-body label {
+    font-weight: var(--sbx-font-weight-active);
 }
 
 // Enlarge for greater readability
