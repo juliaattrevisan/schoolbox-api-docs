@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { cloneDeep } from "lodash";
+import { cloneDeep } from "es-toolkit";
 import { until } from "@vueuse/core";
 import locale from "@js/terminology/rosettaStone";
 import { keysOf } from "@js/util/arrayUtils";

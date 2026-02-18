@@ -1,6 +1,6 @@
 // import Swiper bundle with all modules installed
 import { Swiper } from "swiper/bundle";
-import { merge } from "lodash";
+import { merge } from "es-toolkit";
 import type { SwiperOptions } from "node_modules/swiper/types/swiper-options";
 
 // import styles bundle

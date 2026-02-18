@@ -3,7 +3,7 @@
  * To search the currently selected curriculum node
  */
 
-import { debounce } from "lodash";
+import { debounce } from "es-toolkit";
 import { useViewNodesStore } from "../viewNodes/store/mcViewNodesStore";
 import { useSearchStore, DEBOUNCE_AMOUNT } from "../store/mcSearchStore";
 

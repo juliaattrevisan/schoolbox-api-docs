@@ -4,7 +4,7 @@
  */
 
 import type { Ref, ComputedRef } from "vue";
-import { uniqBy } from "lodash";
+import { uniqBy } from "es-toolkit";
 
 export type Item = {
     id: number;

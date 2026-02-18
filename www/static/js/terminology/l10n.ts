@@ -2,7 +2,7 @@
  * Utilities to help with managing terminology
  * This file creates a model for localisation objects that effectively aligns with library/Schoolbox/L10n/Model.php
  */
-import { startCase, lowerFirst } from "lodash";
+import { startCase, lowerFirst } from "es-toolkit";
 
 /**
  * The localisation object expected from the backend

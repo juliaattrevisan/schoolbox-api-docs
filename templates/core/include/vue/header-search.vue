@@ -4,7 +4,7 @@
  * It is currently used to search for users and prompt a full search,
  * providing the option to be redirected to the search page.
  */
-import { debounce } from "lodash";
+import { debounce } from "es-toolkit";
 import { vOnClickOutside } from "@vueuse/components";
 import SearchInput from "@schoolboxVue/components/search/search-input.vue";
 

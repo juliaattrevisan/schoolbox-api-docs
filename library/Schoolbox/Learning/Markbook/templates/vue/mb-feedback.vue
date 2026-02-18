@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { cloneDeep } from "lodash";
+import { cloneDeep } from "es-toolkit";
 import locale from "@js/terminology/rosettaStone";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import CommentField from "@schoolboxLibrary/Learning/Assessment/templates/dueWork/vue/comment-field.vue";

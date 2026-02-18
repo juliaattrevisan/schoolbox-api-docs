@@ -7,7 +7,7 @@
  * To search for members to add
  */
 
-import { debounce } from "lodash";
+import { debounce } from "es-toolkit";
 import { useAddMembersStore } from "../store/mgAddMembersStore";
 import { useSearchStore, DEBOUNCE_AMOUNT } from "../store/mgSearchStore";
 import FromTypes from "./mgAddMembersFromTypes";

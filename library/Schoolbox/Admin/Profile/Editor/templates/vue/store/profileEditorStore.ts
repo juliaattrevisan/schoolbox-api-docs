@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { cloneDeep } from "lodash";
+import { cloneDeep } from "es-toolkit";
 import type { ProfileEditorRoleType, ProfileEditorPayload, ProfileEditorConfig } from "../types/profileEditorTypes";
 import { fetchProfileEditorEndpoint } from "./profileEditorUtils";
 

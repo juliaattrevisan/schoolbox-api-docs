@@ -2,7 +2,7 @@
  * Basic DOM manipulation utilities
  */
 
-import { escape } from "lodash";
+import { escape } from "es-toolkit";
 import { escapeRegExp } from "@js/util/jsUtils";
 
 /**

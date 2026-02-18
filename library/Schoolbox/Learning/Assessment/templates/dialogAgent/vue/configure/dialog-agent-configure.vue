@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { cloneDeep } from "lodash";
+import { cloneDeep } from "es-toolkit";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import { sbProps } from "@js/util/sbx/pageUtils";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";

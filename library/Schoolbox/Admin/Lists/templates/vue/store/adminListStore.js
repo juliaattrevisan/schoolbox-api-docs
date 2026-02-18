@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { cloneDeep, orderBy } from "lodash";
+import { cloneDeep, orderBy } from "es-toolkit";
 
 export const useAdminListStore = defineStore("main", {
     state: () => ({
