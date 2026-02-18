@@ -53,8 +53,8 @@
         "locutus": "~2.0.32",
         "mediaelement": "~7.1.0",
         "pinia": "~3.0.4",
-        "qrcode.vue": "^3.8.0",
-        "sanitize-html": "~2.17.0",
+        "qrcode.vue": "~3.8.0",
+        "sanitize-html": "^2.17.1",
         "sortablejs": "~1.15.6",
         "swiper": "~11.2.8",
         "tinycolor2": "~1.6.0",
@@ -26139,9 +26139,9 @@
       "dev": true
     },
     "node_modules/sanitize-html": {
-      "version": "2.17.0",
-      "resolved": "https://registry.npmjs.org/sanitize-html/-/sanitize-html-2.17.0.tgz",
-      "integrity": "sha512-dLAADUSS8rBwhaevT12yCezvioCA+bmUTPH/u57xKPT8d++voeYE6HeluA/bPbQ15TwDBG2ii+QZIEmYx8VdxA==",
+      "version": "2.17.1",
+      "resolved": "https://registry.npmjs.org/sanitize-html/-/sanitize-html-2.17.1.tgz",
+      "integrity": "sha512-ehFCW+q1a4CSOWRAdX97BX/6/PDEkCqw7/0JXZAGQV57FQB3YOkTa/rrzHPeJ+Aghy4vZAFfWMYyfxIiB7F/gw==",
       "license": "MIT",
       "dependencies": {
         "deepmerge": "^4.2.2",
@@ -49137,9 +49137,9 @@
       "dev": true
     },
     "sanitize-html": {
-      "version": "2.17.0",
-      "resolved": "https://registry.npmjs.org/sanitize-html/-/sanitize-html-2.17.0.tgz",
-      "integrity": "sha512-dLAADUSS8rBwhaevT12yCezvioCA+bmUTPH/u57xKPT8d++voeYE6HeluA/bPbQ15TwDBG2ii+QZIEmYx8VdxA==",
+      "version": "2.17.1",
+      "resolved": "https://registry.npmjs.org/sanitize-html/-/sanitize-html-2.17.1.tgz",
+      "integrity": "sha512-ehFCW+q1a4CSOWRAdX97BX/6/PDEkCqw7/0JXZAGQV57FQB3YOkTa/rrzHPeJ+Aghy4vZAFfWMYyfxIiB7F/gw==",
       "requires": {
         "deepmerge": "^4.2.2",
         "escape-string-regexp": "^4.0.0",
