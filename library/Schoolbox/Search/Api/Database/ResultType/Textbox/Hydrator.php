@@ -101,7 +101,7 @@ class Hydrator extends BaseHydrator
 
             // The $textboxRootFolder is the folder on which the textbox was originally created.
             // It is the folder on whose 'Manage Textboxes' page the textbox will appear.
-            $textboxRootFolder = $textbox->getCategory();
+            $textboxRootFolder = $textbox->getFolder();
 
             // The user's access level to the textbox depends on the page to which the textbox is most closely associated.
             // If the textbox is in a component, the page in which the component has been placed is identified by $folderId.
@@ -221,7 +221,7 @@ class Hydrator extends BaseHydrator
                 'textbox',
                 $this->truncateAroundKeyword($keyword, $textboxBodyTextOnly) ?? $this->truncate($textboxBodyTextOnly),
                 null,
-                [$textbox->getCategory(),], // Context: textbox's folder
+                [$textbox->getFolder(),], // Context: textbox's folder
                 $this->getSearchResultLinks($textbox, $viewer)
             );
         }
@@ -306,7 +306,7 @@ class Hydrator extends BaseHydrator
     {
         $links = [];
 
-        $textboxFolder = $textbox->getCategory();
+        $textboxFolder = $textbox->getFolder();
 
         $route = 'textbox.getIndexForFolder';
         $params = ['folderId' => $textboxFolder->getId(), 'folder' => $textboxFolder];

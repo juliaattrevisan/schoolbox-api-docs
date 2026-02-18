@@ -55,10 +55,10 @@ class Component_Config_TextboxSearch extends Component_Config_Abstract
              */
         }
 
-        if ($firstUsageComponentId && $textbox->getCategory()->getId()) {
+        if ($firstUsageComponentId && $textbox->getFolder()->getId()) {
             /* Construct urls if there is a component instance which displays this textbox
              */
-            $viewUrl = "/homepage/{$textbox->getCategory()->getId()}#component{$firstUsageComponentId}";
+            $viewUrl = "/homepage/{$textbox->getFolder()->getId()}#component{$firstUsageComponentId}";
         } else {
             /* Otherwise, you've linked to a textbox which no longer gets used in any components
              * and you don't have an explicit means to view or edit its contents
