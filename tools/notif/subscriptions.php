@@ -73,8 +73,6 @@ try {
         {
             $this->log   = $log;
 
-            $this->deprecationNotice("SA-19334");
-
             /** @var ReadCache $subscriptionCache */
             $subscriptionCache = $di->get('subscriptionCache.readonly');
             $subscriptionCache->setLog($log);
@@ -102,8 +100,6 @@ try {
             } catch (InvalidArgumentException | OverflowException $e) {
                 $log->alert($e->getMessage(), [ 'exception' => $e ]);
             }
-
-            $this->deprecationNotice("SA-19334");
         }
 
 
