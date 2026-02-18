@@ -6127,6 +6127,18 @@ parameters:
 			path: tools/custom/wgs/pastoral-import.php
 
 		-
+			message: '#^Constant Schoolbox\\Application\\CliTool\\App@anonymous/tools/mq/list\-redis\-routes\.php\:21\:\:TTL_NOT_SET is unused\.$#'
+			identifier: classConstant.unused
+			count: 1
+			path: tools/mq/list-redis-routes.php
+
+		-
+			message: '#^Call to function method_exists\(\) with Schoolbox\\Realtime\\Schedule\\Trigger\\InstantTriggerInterface and ''getModuleNotifier'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: tools/mq/list-redis.php
+
+		-
 			message: '#^Argument of an invalid type DateInterval supplied for foreach, only iterables are supported\.$#'
 			identifier: foreach.nonIterable
 			count: 1
