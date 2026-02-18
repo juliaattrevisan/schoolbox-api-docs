@@ -317,8 +317,8 @@ test.describe("Unit Planner Tests", () => {
         })) as number | null;
         expect(romeoUnitFolderId).not.toBeNull();
 
-        const textBoxID = (await db.grabFromDatabase("textBox", "textBoxID", {
-            categoryID: romeoUnitFolderId,
+        const textBoxID = (await db.grabFromDatabase("textbox", "id", {
+            folder_id: romeoUnitFolderId,
             heading: overviewColumnLabel,
         })) as number | null;
 
@@ -340,7 +340,7 @@ test.describe("Unit Planner Tests", () => {
             }
 
             baseTester.isGoingTo(`delete the textbox with ID ${textBoxID}`);
-            await db.dontHaveInDatabase("textBox", {
+            await db.dontHaveInDatabase("textbox", {
                 textBoxID,
             });
 

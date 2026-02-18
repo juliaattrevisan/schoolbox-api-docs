@@ -205,7 +205,7 @@ OR ml.name        LIKE :keyword
             LEFT JOIN folder clink ON l.category = clink.id
             LEFT JOIN my_file mf   ON cl.objectID = mf.id AND cl.object = 'myFile'
             LEFT JOIN my_folder ml ON cl.objectID = ml.id AND cl.object = 'myFolder'
-            LEFT JOIN textBox t   ON cl.objectID = t.textBoxId AND cl.object = 'content'
+            LEFT JOIN textbox t   ON cl.objectID = t.id AND cl.object = 'content'
         ";
 
         // Get count separately from data

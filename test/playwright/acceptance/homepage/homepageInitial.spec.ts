@@ -296,7 +296,7 @@ test.describe("Homepage Initial Tests", () => {
 
         await db.updateInDatabase("blog", { deleted_at: "2020-01-15 11:22:34" }, { "heading like": "Test Blog Title" });
         await db.updateInDatabase(
-            "textBox",
+            "textbox",
             { deleted_at: "2020-01-15 11:22:34" },
             { "heading like": "Test Text Box Title" },
         );

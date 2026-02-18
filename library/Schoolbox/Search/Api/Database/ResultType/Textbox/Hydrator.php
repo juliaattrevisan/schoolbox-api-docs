@@ -83,7 +83,7 @@ class Hydrator extends BaseHydrator
         }
 
         // Find the matching textboxes for later lookup.
-        $textboxes = $this->textboxMapper->findByColumn('textBoxID', $textboxIds);
+        $textboxes = $this->textboxMapper->findByColumn('id', $textboxIds);
 
         // Get config info for each component instance for later lookup.
         $configByComponentInstanceId = $this->getConfigByComponentInstanceId($componentInstanceIds);

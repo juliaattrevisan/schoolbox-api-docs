@@ -74,7 +74,7 @@ class IndexBuilder extends BaseBuilder
     {
         if ($subject instanceof Textbox\Model) {
             return [
-                $baseQuery . ' AND tb.textBoxID = :id',
+                $baseQuery . ' AND tb.id = :id',
                 $baseParams + ['id' => $subject->getId()],
             ];
         }
@@ -112,7 +112,7 @@ class IndexBuilder extends BaseBuilder
         //    So that is the heading we must use for the search index.
         $queryString = "
             SELECT
-            CONCAT(tb.textBoxID, '-', ci.id, '-', f.id) AS id,
+            CONCAT(tb.id, '-', ci.id, '-', f.id) AS id,
             f.id AS folder_id,
             COALESCE(
                 IF(cci_componentname.value = '', NULL, cci_componentname.value),
@@ -133,7 +133,7 @@ class IndexBuilder extends BaseBuilder
                 cci_textbox.component_config_definition_id = ccd_textbox.id AND
                 cci_textbox.component_instance_id = ci.id
             )
-            JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci_textbox.value
+            JOIN textbox tb ON CAST(tb.id AS NCHAR)=cci_textbox.value
             JOIN component_config_definition ccd_componentname ON (
                 ccd_componentname.component_definition_id = cd.id AND
                 ccd_componentname.key = :componentConfigComponentNameKey
@@ -191,19 +191,19 @@ class IndexBuilder extends BaseBuilder
         // Pass 2: textboxes without a component
         $queryString = "
             SELECT
-                CONCAT(tb.textBoxID, '--') AS id,
+                CONCAT(tb.id, '--') AS id,
                 tb.heading AS title,
                 tb.updated_at AS date,
                 tb.created_by AS created_by,
                 tb.body AS fulltext_index
-            FROM textBox tb
+            FROM textbox tb
             LEFT JOIN component_config_instance cci2 ON (
                 cci2.component_config_definition_id = (
                     SELECT id
                     FROM component_config_definition ccd2
                     WHERE ccd2.key = :homepageComponentKey
                 ) AND
-                cci2.value = CAST(tb.textBoxID AS NCHAR)
+                cci2.value = CAST(tb.id AS NCHAR)
             )
             WHERE tb.deleted_at IS NULL
             AND cci2.id IS NULL
@@ -301,10 +301,10 @@ class IndexBuilder extends BaseBuilder
 
         // Set up textbox and component exists query
         $textboxExistsQueryString = "
-            SELECT textBoxID
-            FROM textBox
+            SELECT id
+            FROM textbox
             WHERE deleted_at IS NULL
-            AND textBoxID = :textboxId
+            AND id = :textboxId
         ";
         $textboxExistsParams  = [];
         $textboxExistsQuery   = $this->connector->prepareQuery($textboxExistsQueryString);

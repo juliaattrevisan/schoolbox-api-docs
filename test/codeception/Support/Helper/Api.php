@@ -804,7 +804,7 @@ class Api extends \Codeception\Module
     public function getExistingTextBox(): \Schoolbox\Resource\Textbox\Model
     {
         $db         = $this->getDbModule();
-        $textBoxIds = $db->grabColumnFromDatabase('textBox', 'textBoxID', ['deleted_at' => null]);
+        $textBoxIds = $db->grabColumnFromDatabase('textbox', 'id', ['deleted_at' => null]);
         /** @var \Schoolbox\Resource\Textbox\Model $textBox */
         $textBox = TextBoxMapper::getInstance()->findById($textBoxIds[0]);
         return $textBox;

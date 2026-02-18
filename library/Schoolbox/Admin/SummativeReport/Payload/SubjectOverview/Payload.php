@@ -43,7 +43,7 @@ class Payload
                                 :homepageDefaultComponentHeading
                         ) AS componentHeading,
                         cci_textbox.component_instance_id AS componentID,
-                        tb.textBoxID AS textboxID,
+                        tb.id AS textboxID,
                         tb.body AS textboxBody ,
                         tb.updated_at AS updated_at
                     FROM component_definition cd
@@ -57,8 +57,8 @@ class Payload
                                 cci_textbox.component_config_definition_id = ccd_textbox.id AND
                                 cci_textbox.component_instance_id = ci.id
                             )
-                         LEFT JOIN textBox tb ON (
-                                CAST(tb.textBoxID AS NCHAR)=cci_textbox.value AND
+                         LEFT JOIN textbox tb ON (
+                                CAST(tb.id AS NCHAR)=cci_textbox.value AND
                                 tb.deleted_at IS NULL
                             )
                          JOIN component_config_definition ccd_componentname ON (

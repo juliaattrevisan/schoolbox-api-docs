@@ -110,7 +110,7 @@ class LogMapper extends Mapper
         $this->hasJoin('text', array(
             'mapper'    => Textbox\Mapper::class,
             'this_key'  => 'objectId',
-            'other_key' => 'textBoxID'
+            'other_key' => 'id'
         ));
     }
 

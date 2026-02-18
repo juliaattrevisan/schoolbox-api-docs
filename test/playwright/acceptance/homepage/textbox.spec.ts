@@ -101,8 +101,8 @@ test.describe("Textbox Tests", () => {
         tester.isGoingTo("Create another 2 text boxes");
         await manageAll.clickManageAll();
         await manageAll.clickCreateTextBox();
-        const textBoxCount = await db.countInDatabase("textBox", {
-            categoryID: homepageId,
+        const textBoxCount = await db.countInDatabase("textbox", {
+            folder_id: homepageId,
         });
         await manageAll.typeTextBoxHeading(textBoxCount, "Second Text Box");
         await manageAll.typeTextBoxContent(textBoxCount, "Test");
@@ -233,17 +233,17 @@ test.describe("Textbox Tests", () => {
         await api.deleteFoldersByName(db, "Test TextBox Homepage");
 
         await db.updateInDatabase(
-            "textBox",
+            "textbox",
             { deleted_at: "2022-01-15 11:22:34" },
             { heading: "Test Text Box Title", deleted_at: null },
         );
         await db.updateInDatabase(
-            "textBox",
+            "textbox",
             { deleted_at: "2022-01-15 11:22:34" },
             { heading: "Second Text Box", deleted_at: null },
         );
         await db.updateInDatabase(
-            "textBox",
+            "textbox",
             { deleted_at: "2022-01-15 11:22:34" },
             { heading: "Third Text Box", deleted_at: null },
         );
