@@ -48,7 +48,7 @@
     "locutus": "~2.0.32",
     "mediaelement": "~7.1.0",
     "pinia": "~3.0.4",
-    "qrcode.vue": "~3.6.0",
+    "qrcode.vue": "~3.8.0",
     "sanitize-html": "~2.17.0",
     "sortablejs": "~1.15.6",
     "swiper": "~11.2.8",
