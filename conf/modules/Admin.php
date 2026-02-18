@@ -160,5 +160,9 @@ class Admin extends ModuleLoader
         /* Learner Profiles
          */
         $this->loadModule($di, \Schoolbox\Admin\DifferentiationProfiles\Module::class, '/adminv2/differentiation/differentiation-profiles');
+
+        /* Data Retention
+         */
+        $this->loadModule($di, \Schoolbox\Admin\DataRetention\Module::class, '/adminv2/data-retention');
     }
 }

@@ -416,6 +416,7 @@ class Controller extends ConfigController
                     'Document Management' => "/adminv2/setting/lms/$typeEncoded",      // E.g. /adminv2/setting/lms/LMS%20Policy
                     'Pastoral Care'       => "/adminv2/setting/pastoral/$typeEncoded", // E.g. /adminv2/setting/pastoral/Pastoral%20Care
                     'Canvas'              => "/adminv2/canvas",
+                    'DataRetention'       => "/adminv2/data-retention",
                     default               => "/adminv2/setting/$typeEncoded",          // E.g. /adminv2/setting/Modules
                 };
 

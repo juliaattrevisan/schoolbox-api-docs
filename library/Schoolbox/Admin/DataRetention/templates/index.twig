@@ -1,0 +1,28 @@
+{##
+ # Configure your Data Retention Settings here.
+ #
+ # @param string pageCurrent
+ # @param array configContext
+ # @param array allBreadcrumbs
+#}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div id='option-container'>
+            <div class="small-12 island">
+                <section class="content">
+                    <h2 class="subheader">Data Retention Periods</h2>
+                    These settings define how long soft-deleted data is retained before being permanently removed. Retention periods apply globally and only affect data that has already been deleted. Leaving a field empty will retain the data indefinitely. Once a retention period has elapsed, data may be permanently removed as part of scheduled cleanup processes.
+                </section>
+            </div>
+
+            {% include '@settings/moduleConfig.twig' with configContext only %}
+        </div>
+    </div>
+</div>

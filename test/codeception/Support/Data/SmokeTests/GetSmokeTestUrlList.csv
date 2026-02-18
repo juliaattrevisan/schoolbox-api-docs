@@ -55,6 +55,7 @@ Admin,System Settings Policy,/adminv2/setting/Policy
 Admin,System Settings Proxy,/adminv2/setting/Proxy
 Admin,System Settings SAML,/adminv2/setting/SAML
 Admin,System Settings Security,/adminv2/setting/Security
+Admin,System Settings - Data Retention,/adminv2/data-retention
 Admin,System Settings Site,/adminv2/setting/Site
 Admin,Review registered push apps,/adminv2/notifications/puush
 Admin,Review role list,/adminv2/lists

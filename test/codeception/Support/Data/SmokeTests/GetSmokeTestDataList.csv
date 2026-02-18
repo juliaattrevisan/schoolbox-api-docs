@@ -514,6 +514,10 @@ Admin,"System Settings SAML",Superuser,/adminv2/setting/SAML,200
 Admin,"System Settings SAML",Teacher,/adminv2/setting/SAML,401
 Admin,"System Settings SAML",Student,/adminv2/setting/SAML,401
 Admin,"System Settings SAML",Parent,/adminv2/setting/SAML,401
+Admin,"System Settings Data Retention",Superuser,/adminv2/data-retention,200
+Admin,"System Settings Data Retention",Teacher,/adminv2/data-retention,401
+Admin,"System Settings Data Retention",Student,/adminv2/data-retention,401
+Admin,"System Settings Data Retention",Parent,/adminv2/data-retention,401
 Admin,"System Settings Security",Superuser,/adminv2/setting/Security,200
 Admin,"System Settings Security",Teacher,/adminv2/setting/Security,401
 Admin,"System Settings Security",Student,/adminv2/setting/Security,401

@@ -913,6 +913,11 @@ class Subnav
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_SECURITY] ?? []) > 0,
                         'description' => 'Control security related to authentication, logins and embedding of 3rd party content.',
                     ],
+                    '/adminv2/data-retention' => [
+                        'name'        => 'Settings - Data Retention',
+                        'visible'     => true,
+                        'description' => 'Configure how long different types of soft-deleted data is retained before being permanently removed.',
+                    ],
                     '/adminv2/setting/Site' => [
                         'name'        => 'Site',
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_SITE] ?? []) > 0,
