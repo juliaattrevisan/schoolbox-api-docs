@@ -114,7 +114,7 @@ HELP;
         // add bus for cmsLogExample // clear things from the cmsLog older than 1 year (possible options are 1 Day, 30 Days, 365 Days, <null>)
 //        $cmsLogRetentionPeriod = $this->getConfig()->get('dataRetention_cmsLogRetentionPeriod');
 //        $cmsLogRetentionPeriod = '365';  // example data retention period get from the config table
-        $bus->add(new CmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig()));
+//        $bus->add(new CmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig()));
 
         // if we have functions, run them
         if (count($bus) > 0) {
