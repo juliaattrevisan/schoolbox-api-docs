@@ -37,6 +37,7 @@
         "datatables.net-fixedcolumns": "~4.3.0",
         "dayjs": "~1.11.19",
         "dropzone": "~6.0.0-beta.2",
+        "es-toolkit": "^1.44.0",
         "firebase": "~12.9.0",
         "flatpickr": "~4.6.13",
         "focus-trap": "~8.0.0",
@@ -48,7 +49,7 @@
         "jquery-migrate": "~4.0.2",
         "jquery-ui": "~1.14.2",
         "jquery-validation": "~1.22.1",
-        "lightgallery": "^2.9.0",
+        "lightgallery": "~2.9.0",
         "locutus": "~2.0.32",
         "lodash": "~4.17.21",
         "mediaelement": "~7.0.7",
@@ -2971,6 +2972,16 @@
         "es-toolkit": "1.32.0"
       }
     },
+    "node_modules/@ckeditor/ckeditor5-ai/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
+    },
     "node_modules/@ckeditor/ckeditor5-alignment": {
       "version": "45.2.1",
       "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-alignment/-/ckeditor5-alignment-45.2.1.tgz",
@@ -3009,6 +3020,16 @@
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
       }
+    },
+    "node_modules/@ckeditor/ckeditor5-autosave/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@ckeditor/ckeditor5-basic-styles": {
       "version": "45.2.1",
@@ -3086,6 +3107,16 @@
         "es-toolkit": "1.32.0"
       }
     },
+    "node_modules/@ckeditor/ckeditor5-ckbox/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
+    },
     "node_modules/@ckeditor/ckeditor5-ckfinder": {
       "version": "45.2.1",
       "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-ckfinder/-/ckeditor5-ckfinder-45.2.1.tgz",
@@ -3113,6 +3144,16 @@
         "@ckeditor/ckeditor5-widget": "45.2.1",
         "es-toolkit": "1.32.0"
       }
+    },
+    "node_modules/@ckeditor/ckeditor5-clipboard/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@ckeditor/ckeditor5-cloud-services": {
       "version": "45.2.1",
@@ -3185,6 +3226,16 @@
         "es-toolkit": "1.32.0"
       }
     },
+    "node_modules/@ckeditor/ckeditor5-comments/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
+    },
     "node_modules/@ckeditor/ckeditor5-core": {
       "version": "45.2.1",
       "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-core/-/ckeditor5-core-45.2.1.tgz",
@@ -3197,6 +3248,16 @@
         "@ckeditor/ckeditor5-watchdog": "45.2.1",
         "es-toolkit": "1.32.0"
       }
+    },
+    "node_modules/@ckeditor/ckeditor5-core/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@ckeditor/ckeditor5-document-outline": {
       "version": "45.2.1",
@@ -3214,6 +3275,16 @@
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
       }
+    },
+    "node_modules/@ckeditor/ckeditor5-document-outline/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@ckeditor/ckeditor5-easy-image": {
       "version": "45.2.1",
@@ -3242,6 +3313,16 @@
         "es-toolkit": "1.32.0"
       }
     },
+    "node_modules/@ckeditor/ckeditor5-editor-balloon/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
+    },
     "node_modules/@ckeditor/ckeditor5-editor-classic": {
       "version": "45.2.1",
       "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-editor-classic/-/ckeditor5-editor-classic-45.2.1.tgz",
@@ -3255,6 +3336,16 @@
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
       }
+    },
+    "node_modules/@ckeditor/ckeditor5-editor-classic/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@ckeditor/ckeditor5-editor-decoupled": {
       "version": "45.2.1",
@@ -3270,6 +3361,16 @@
         "es-toolkit": "1.32.0"
       }
     },
+    "node_modules/@ckeditor/ckeditor5-editor-decoupled/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
+    },
     "node_modules/@ckeditor/ckeditor5-editor-inline": {
       "version": "45.2.1",
       "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-editor-inline/-/ckeditor5-editor-inline-45.2.1.tgz",
@@ -3284,6 +3385,16 @@
         "es-toolkit": "1.32.0"
       }
     },
+    "node_modules/@ckeditor/ckeditor5-editor-inline/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
+    },
     "node_modules/@ckeditor/ckeditor5-editor-multi-root": {
       "version": "45.2.1",
       "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-editor-multi-root/-/ckeditor5-editor-multi-root-45.2.1.tgz",
@@ -3297,6 +3408,16 @@
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
       }
+    },
+    "node_modules/@ckeditor/ckeditor5-editor-multi-root/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@ckeditor/ckeditor5-email": {
       "version": "45.2.1",
@@ -3331,6 +3452,16 @@
         "fuzzysort": "3.1.0"
       }
     },
+    "node_modules/@ckeditor/ckeditor5-emoji/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
+    },
     "node_modules/@ckeditor/ckeditor5-engine": {
       "version": "45.2.1",
       "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-engine/-/ckeditor5-engine-45.2.1.tgz",
@@ -3340,6 +3471,16 @@
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "es-toolkit": "1.32.0"
       }
+    },
+    "node_modules/@ckeditor/ckeditor5-engine/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@ckeditor/ckeditor5-enter": {
       "version": "45.2.1",
@@ -3427,6 +3568,16 @@
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
       }
+    },
+    "node_modules/@ckeditor/ckeditor5-find-and-replace/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@ckeditor/ckeditor5-font": {
       "version": "45.2.1",
@@ -3546,6 +3697,16 @@
         "es-toolkit": "1.32.0"
       }
     },
+    "node_modules/@ckeditor/ckeditor5-html-support/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
+    },
     "node_modules/@ckeditor/ckeditor5-icons": {
       "version": "45.2.1",
       "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-icons/-/ckeditor5-icons-45.2.1.tgz",
@@ -3571,6 +3732,16 @@
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
       }
+    },
+    "node_modules/@ckeditor/ckeditor5-image/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@ckeditor/ckeditor5-import-word": {
       "version": "45.2.1",
@@ -3635,6 +3806,16 @@
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
       }
+    },
+    "node_modules/@ckeditor/ckeditor5-link/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@ckeditor/ckeditor5-list": {
       "version": "45.2.1",
@@ -3717,6 +3898,16 @@
         "es-toolkit": "1.32.0"
       }
     },
+    "node_modules/@ckeditor/ckeditor5-mention/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
+    },
     "node_modules/@ckeditor/ckeditor5-merge-fields": {
       "version": "45.2.1",
       "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-merge-fields/-/ckeditor5-merge-fields-45.2.1.tgz",
@@ -3733,6 +3924,16 @@
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
       }
+    },
+    "node_modules/@ckeditor/ckeditor5-merge-fields/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@ckeditor/ckeditor5-minimap": {
       "version": "45.2.1",
@@ -3758,6 +3959,16 @@
         "es-toolkit": "1.32.0",
         "protobufjs": "7.5.0"
       }
+    },
+    "node_modules/@ckeditor/ckeditor5-operations-compressor/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@ckeditor/ckeditor5-operations-compressor/node_modules/protobufjs": {
       "version": "7.5.0",
@@ -3811,6 +4022,16 @@
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
       }
+    },
+    "node_modules/@ckeditor/ckeditor5-pagination/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@ckeditor/ckeditor5-paragraph": {
       "version": "45.2.1",
@@ -3873,6 +4094,16 @@
         "es-toolkit": "1.32.0"
       }
     },
+    "node_modules/@ckeditor/ckeditor5-real-time-collaboration/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
+    },
     "node_modules/@ckeditor/ckeditor5-remove-format": {
       "version": "45.2.1",
       "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-remove-format/-/ckeditor5-remove-format-45.2.1.tgz",
@@ -3920,6 +4151,16 @@
         "es-toolkit": "1.32.0",
         "luxon": "3.5.0"
       }
+    },
+    "node_modules/@ckeditor/ckeditor5-revision-history/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@ckeditor/ckeditor5-select-all": {
       "version": "45.2.1",
@@ -4031,6 +4272,16 @@
         "es-toolkit": "1.32.0"
       }
     },
+    "node_modules/@ckeditor/ckeditor5-style/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
+    },
     "node_modules/@ckeditor/ckeditor5-table": {
       "version": "45.2.1",
       "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-table/-/ckeditor5-table-45.2.1.tgz",
@@ -4047,6 +4298,16 @@
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
       }
+    },
+    "node_modules/@ckeditor/ckeditor5-table/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@ckeditor/ckeditor5-template": {
       "version": "45.2.1",
@@ -4105,6 +4366,16 @@
         "es-toolkit": "1.32.0"
       }
     },
+    "node_modules/@ckeditor/ckeditor5-track-changes/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
+    },
     "node_modules/@ckeditor/ckeditor5-typing": {
       "version": "45.2.1",
       "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-typing/-/ckeditor5-typing-45.2.1.tgz",
@@ -4116,6 +4387,16 @@
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "es-toolkit": "1.32.0"
       }
+    },
+    "node_modules/@ckeditor/ckeditor5-typing/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@ckeditor/ckeditor5-ui": {
       "version": "45.2.1",
@@ -4152,6 +4433,16 @@
       "resolved": "https://registry.npmjs.org/color-name/-/color-name-1.1.4.tgz",
       "integrity": "sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==",
       "license": "MIT"
+    },
+    "node_modules/@ckeditor/ckeditor5-ui/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@ckeditor/ckeditor5-undo": {
       "version": "45.2.1",
@@ -4204,6 +4495,16 @@
         "es-toolkit": "1.32.0"
       }
     },
+    "node_modules/@ckeditor/ckeditor5-utils/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
+    },
     "node_modules/@ckeditor/ckeditor5-watchdog": {
       "version": "45.2.1",
       "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-watchdog/-/ckeditor5-watchdog-45.2.1.tgz",
@@ -4216,6 +4517,16 @@
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "es-toolkit": "1.32.0"
       }
+    },
+    "node_modules/@ckeditor/ckeditor5-watchdog/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@ckeditor/ckeditor5-widget": {
       "version": "45.2.1",
@@ -4233,6 +4544,16 @@
         "es-toolkit": "1.32.0"
       }
     },
+    "node_modules/@ckeditor/ckeditor5-widget/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
+    },
     "node_modules/@ckeditor/ckeditor5-word-count": {
       "version": "45.2.1",
       "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-word-count/-/ckeditor5-word-count-45.2.1.tgz",
@@ -4245,6 +4566,16 @@
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
       }
+    },
+    "node_modules/@ckeditor/ckeditor5-word-count/node_modules/es-toolkit": {
+      "version": "1.32.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "license": "MIT",
+      "workspaces": [
+        "docs",
+        "benchmarks"
+      ]
     },
     "node_modules/@codemirror/autocomplete": {
       "version": "6.18.6",
@@ -16255,9 +16586,10 @@
       }
     },
     "node_modules/es-toolkit": {
-      "version": "1.32.0",
-      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
-      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q==",
+      "version": "1.44.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.44.0.tgz",
+      "integrity": "sha512-6penXeZalaV88MM3cGkFZZfOoLGWshWWfdy0tWw/RlVVyhvMaWSBTOvXNeiW3e5FwdS5ePW0LGEu17zT139ktg==",
+      "license": "MIT",
       "workspaces": [
         "docs",
         "benchmarks"
@@ -32364,6 +32696,13 @@
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-alignment": {
@@ -32400,6 +32739,13 @@
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-basic-styles": {
@@ -32471,6 +32817,13 @@
         "blurhash": "2.0.5",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-ckfinder": {
@@ -32497,6 +32850,13 @@
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "@ckeditor/ckeditor5-widget": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-cloud-services": {
@@ -32564,6 +32924,13 @@
         "ckeditor5": "45.2.1",
         "ckeditor5-collaboration": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-core": {
@@ -32576,6 +32943,13 @@
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "@ckeditor/ckeditor5-watchdog": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-document-outline": {
@@ -32592,6 +32966,13 @@
         "@ckeditor/ckeditor5-widget": "45.2.1",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-easy-image": {
@@ -32617,6 +32998,13 @@
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-editor-classic": {
@@ -32630,6 +33018,13 @@
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-editor-decoupled": {
@@ -32643,6 +33038,13 @@
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-editor-inline": {
@@ -32656,6 +33058,13 @@
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-editor-multi-root": {
@@ -32669,6 +33078,13 @@
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-email": {
@@ -32700,6 +33116,13 @@
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0",
         "fuzzysort": "3.1.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-engine": {
@@ -32709,6 +33132,13 @@
       "requires": {
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-enter": {
@@ -32790,6 +33220,13 @@
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-font": {
@@ -32900,6 +33337,13 @@
         "@ckeditor/ckeditor5-widget": "45.2.1",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-icons": {
@@ -32924,6 +33368,13 @@
         "@ckeditor/ckeditor5-widget": "45.2.1",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-import-word": {
@@ -32984,6 +33435,13 @@
         "@ckeditor/ckeditor5-widget": "45.2.1",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-list": {
@@ -33060,6 +33518,13 @@
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-merge-fields": {
@@ -33076,6 +33541,13 @@
         "@ckeditor/ckeditor5-widget": "45.2.1",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-minimap": {
@@ -33101,6 +33573,11 @@
         "protobufjs": "7.5.0"
       },
       "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        },
         "protobufjs": {
           "version": "7.5.0",
           "resolved": "https://registry.npmjs.org/protobufjs/-/protobufjs-7.5.0.tgz",
@@ -33147,6 +33624,13 @@
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-paragraph": {
@@ -33204,6 +33688,13 @@
         "ckeditor5": "45.2.1",
         "ckeditor5-collaboration": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-remove-format": {
@@ -33249,6 +33740,13 @@
         "ckeditor5-collaboration": "45.2.1",
         "es-toolkit": "1.32.0",
         "luxon": "3.5.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-select-all": {
@@ -33352,6 +33850,13 @@
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-table": {
@@ -33368,6 +33873,13 @@
         "@ckeditor/ckeditor5-widget": "45.2.1",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-template": {
@@ -33422,6 +33934,13 @@
         "ckeditor5": "45.2.1",
         "ckeditor5-collaboration": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-typing": {
@@ -33433,6 +33952,13 @@
         "@ckeditor/ckeditor5-engine": "45.2.1",
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-ui": {
@@ -33464,6 +33990,11 @@
           "version": "1.1.4",
           "resolved": "https://registry.npmjs.org/color-name/-/color-name-1.1.4.tgz",
           "integrity": "sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA=="
+        },
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
         }
       }
     },
@@ -33512,6 +34043,13 @@
       "requires": {
         "@ckeditor/ckeditor5-ui": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-watchdog": {
@@ -33524,6 +34062,13 @@
         "@ckeditor/ckeditor5-engine": "45.2.1",
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-widget": {
@@ -33539,6 +34084,13 @@
         "@ckeditor/ckeditor5-ui": "45.2.1",
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@ckeditor/ckeditor5-word-count": {
@@ -33551,6 +34103,13 @@
         "@ckeditor/ckeditor5-utils": "45.2.1",
         "ckeditor5": "45.2.1",
         "es-toolkit": "1.32.0"
+      },
+      "dependencies": {
+        "es-toolkit": {
+          "version": "1.32.0",
+          "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
+          "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+        }
       }
     },
     "@codemirror/autocomplete": {
@@ -42030,9 +42589,9 @@
       }
     },
     "es-toolkit": {
-      "version": "1.32.0",
-      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.32.0.tgz",
-      "integrity": "sha512-ZfSfHP1l6ubgW/B/FRtqb9bYdMvI6jizbOSfbwwJNcOQ1QE6TFsC3jpQkZ900uUPSR3t3SU5Ds7UWKnYz+uP8Q=="
+      "version": "1.44.0",
+      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.44.0.tgz",
+      "integrity": "sha512-6penXeZalaV88MM3cGkFZZfOoLGWshWWfdy0tWw/RlVVyhvMaWSBTOvXNeiW3e5FwdS5ePW0LGEu17zT139ktg=="
     },
     "es6-promisify": {
       "version": "6.1.1",
