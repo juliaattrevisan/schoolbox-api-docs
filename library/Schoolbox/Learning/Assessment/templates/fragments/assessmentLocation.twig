@@ -13,7 +13,7 @@
             $locationReveal.on('click', '[data-submit]', function (e) {
                 e.preventDefault();
                 $(this).text('Working...');
-                $(this).attr('readonly', 'readonly')
+                $(this).prop('readonly', true)
                 let jstree = $('#location-tree').jstree();
                 let selected = jstree.get_selected(true);
                 if (selected.length !== 1 || selected[0]['id'] === 'undefined') {

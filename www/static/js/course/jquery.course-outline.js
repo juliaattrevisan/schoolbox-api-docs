@@ -105,7 +105,7 @@
                     $("[data-sortable-hidden]").slideUp();
                 },
             });
-            task_list.unbind("sortstop.courseInstance").bind("sortstop.courseInstance", function (event, ui) {
+            task_list.off("sortstop.courseInstance").on("sortstop.courseInstance", function (event, ui) {
                 // Calculate ordering of all items
                 var unit = ui.item.closest("[data-unit]");
                 var form = unit.find("form.reorder_form");

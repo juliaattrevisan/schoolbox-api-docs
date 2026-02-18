@@ -129,7 +129,7 @@ $(function() {
 
         // Set loading text on submit button
         var originalButtonText = $button.val();
-        $button.attr("disabled", true);
+        $button.prop("disabled", true);
         $button.val('Working...');
 
         // If we are re-submitting after having got an error the first time, hide the error message on submit

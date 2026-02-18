@@ -310,8 +310,8 @@ Data:
         $('#editor-submittedInPerson').on('click', function (element) {
             if(this.checked){
                 $('#submission-upload').hide('slow');
-                $('[name="{{ attachzone.fileVar }}"]').attr('disabled', true);
-                $('#editor-body').attr('disabled', true);
+                $('[name="{{ attachzone.fileVar }}"]').prop('disabled', true);
+                $('#editor-body').prop('disabled', true);
                 if (window.sbProps.editors['editor-body']?.getData().length || $('[name="{{ attachzone.fileVar }}"]').val()) {
                     $('#submit-warning').show('slow');
                 } else {
@@ -320,8 +320,8 @@ Data:
             } else {
                 $('#submit-warning').hide('slow');
                 $('#submission-upload').show('slow');
-                $('[name="{{ attachzone.fileVar }}"]').attr('disabled', false);
-                $('#editor-body').attr('disabled', false);
+                $('[name="{{ attachzone.fileVar }}"]').prop('disabled', false);
+                $('#editor-body').prop('disabled', false);
             }
         });
 

@@ -457,7 +457,7 @@
         // for iframe communication
 
         $(window)
-            .unbind("message")
+            .off("message")
             .on("message", function (e) {
                 var message,
                     modal = singletonModal,

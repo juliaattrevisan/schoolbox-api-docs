@@ -840,7 +840,7 @@
                      # Tried to find a shorter way to do this with option:visible:first but it didn't work; idk why
                     #}
                     if (!preselected) {
-                        option.attr('selected', 'selected');
+                        option.prop('selected', true);
                         preselected = true;
                     }
                 }

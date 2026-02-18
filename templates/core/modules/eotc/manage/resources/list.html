@@ -79,7 +79,7 @@
     $(function() {
 
         const $submitButton = $('[data-bookitemform]').find('input[type=submit]');
-        $submitButton.attr("disabled", "disabled");
+        $submitButton.prop("disabled", true);
 
         $('[data-resourcebookingsuggest]').selectizeSelector({
             ajax: {
@@ -98,7 +98,7 @@
             if (items.length > 0) {
                 $submitButton.removeAttr("disabled");
             } else {
-                $submitButton.attr("disabled", "disabled");
+                $submitButton.prop("disabled", true);
             }
         });
 

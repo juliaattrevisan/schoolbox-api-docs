@@ -391,7 +391,7 @@
         }
 
         $(window)
-            .unbind("message")
+            .off("message")
             .on("message", function (event) {
                 var message;
 

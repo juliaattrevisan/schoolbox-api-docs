@@ -111,8 +111,8 @@
                 {# Handle clicks on confirm popup buttons. #}
                 {# We bind click handlers here so we can pass $buttonClicked to postSobo() directly. #}
                 {# Because we bind here, we first unbind to avoid binding the same function again each time the 'No' or 'Yes' button is clicked. #}
-                $('#confirm-dialog [data-yes]').unbind('click').on('click', function () {postSobo($buttonClicked, true );});
-                $('#confirm-dialog [data-no]' ).unbind('click').on('click', function () {postSobo($buttonClicked, false);});
+                $('#confirm-dialog [data-yes]').off('click').on('click', function () {postSobo($buttonClicked, true );});
+                $('#confirm-dialog [data-no]' ).off('click').on('click', function () {postSobo($buttonClicked, false);});
             } else {
                 postSobo($buttonClicked, false); {# Submission was not confirmed to be on-time. #}
             }
@@ -131,7 +131,7 @@
 
             $toast.toastActivate({text: 'Marking submission as received...'});
             $button.html('Working...');
-            $button.attr('disabled', '');
+            $button.prop('disabled', true);
 
             $.post($button.attr('href'), {'submissionWasOnTime': submissionWasOnTime})
             .done(function (response) {

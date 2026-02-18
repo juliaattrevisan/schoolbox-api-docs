@@ -207,7 +207,7 @@
 
                 config.element
                     .find("[data-socialstream-delete]")
-                    .unbind("click")
+                    .off("click")
                     .on("click", function (event) {
                         event.preventDefault();
 

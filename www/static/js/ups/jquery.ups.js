@@ -161,7 +161,7 @@
 
                 saveRules($rule)
                     .done(function (data, textStatus, jqXHR) {
-                        $rule.find(config.validInputTypes).attr("disabled", false);
+                        $rule.find(config.validInputTypes).prop("disabled", false);
                         $rule.find("option").removeAttr("disabled");
                         $rule.find("option").not("[value]").prop("disabled", true);
                         $label.toastTimeout({
@@ -176,7 +176,7 @@
                         });
                     });
 
-                $rule.find(config.validInputTypes).attr("disabled", true);
+                $rule.find(config.validInputTypes).prop("disabled", true);
             });
             refreshSaveRulesetButtonAvailability();
         }
@@ -200,7 +200,7 @@
 
                 saveRules($rules)
                     .done(function (data, textStatus, jqXHR) {
-                        $(config.element).find(config.validInputTypes).attr("disabled", false);
+                        $(config.element).find(config.validInputTypes).prop("disabled", false);
                         $(config.element).find("option").removeAttr("disabled");
                         $(config.element).find("option").not("[value]").prop("disabled", true);
                         $label.toastTimeout({
@@ -215,7 +215,7 @@
                         });
                     });
 
-                $(config.element).find(config.validInputTypes).attr("disabled", true);
+                $(config.element).find(config.validInputTypes).prop("disabled", true);
             });
             refreshSaveRulesetButtonAvailability();
         }
@@ -249,7 +249,7 @@
             // Add each Rule
             $rules.each(function (idx, elem) {
                 var $rule = $(elem);
-                $rule.find(config.validInputTypes).attr("disabled", false);
+                $rule.find(config.validInputTypes).prop("disabled", false);
                 $rule.find("option").removeAttr("disabled");
 
                 var ruleData = $rule.find(config.validInputTypes).serializeArray();
@@ -735,7 +735,7 @@
                      */
                     if (option.hasAttribute("value")) {
                         if ($.inArray($(option).val(), used) > -1) {
-                            $(option).attr("disabled", "disabled");
+                            $(option).prop("disabled", true);
                         } else {
                             $(option).removeAttr("disabled");
                         }

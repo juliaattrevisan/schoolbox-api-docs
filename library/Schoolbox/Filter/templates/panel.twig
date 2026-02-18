@@ -558,20 +558,20 @@ Usage:
          * Disable panel inputs
          */
         function enableInputs() {
-            $submitButton.attr('disabled', false);
-            $clearAllBtn.attr('disabled', false);
-            $resetToDefaultsBtn.attr('disabled', false);
-            $optionInputs.filter(':not([data-disabled],[data-modal-search-input])').attr('disabled', false);
+            $submitButton.prop('disabled', false);
+            $clearAllBtn.prop('disabled', false);
+            $resetToDefaultsBtn.prop('disabled', false);
+            $optionInputs.filter(':not([data-disabled],[data-modal-search-input])').prop('disabled', false);
         }
 
         /**
          * Disable panel inputs
          */
         function disableInputs() {
-            $submitButton.attr('disabled', true);
-            $clearAllBtn.attr('disabled', true);
-            $resetToDefaultsBtn.attr('disabled', true);
-            $optionInputs.attr('disabled', true);
+            $submitButton.prop('disabled', true);
+            $clearAllBtn.prop('disabled', true);
+            $resetToDefaultsBtn.prop('disabled', true);
+            $optionInputs.prop('disabled', true);
         }
 
         /**

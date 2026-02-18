@@ -212,7 +212,7 @@
                 let roleModalButtons = $("[data-reveal-id='modal-role']");
 
                 if ($("[data-role-add]:not(.hide)").length === 0) {
-                    roleModalButtons.attr('disabled', 'true');
+                    roleModalButtons.prop('disabled', true);
                 } else {
                     roleModalButtons.removeAttr('disabled');
                 }
@@ -253,7 +253,7 @@
 
                     //Check the correct box
                     let selector = 'input[name = "role['+roleId+']"][value ="'+permission+'"]';
-                    permissionListRoles.find(selector).attr("checked", "checked");
+                    permissionListRoles.find(selector).prop("checked", true);
                     setRadioButtonListener('[data-role-id="' + roleId + '"]', commentCheckbox);
                     applyLock(['roles'], locked);
                 }

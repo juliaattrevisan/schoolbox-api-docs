@@ -789,7 +789,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             calendar.render();
         }
 
-        $modal.find("[data-collapser]").unbind().collapsable();
+        $modal.find("[data-collapser]").off().collapsable();
     }
 
     /**

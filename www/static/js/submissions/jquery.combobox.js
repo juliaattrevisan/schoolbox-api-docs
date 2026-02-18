@@ -208,9 +208,9 @@
         },
 
         hide: function () {
-            jQuery("html").unbind("keydown", this.keypressHandler);
-            jQuery("html").unbind("click", this.htmlClickHandler);
-            this.selectorElement.unbind("click");
+            jQuery("html").off("keydown", this.keypressHandler);
+            jQuery("html").off("click", this.htmlClickHandler);
+            this.selectorElement.off("click");
             this.unselect();
             this.selectorElement.hide();
         },

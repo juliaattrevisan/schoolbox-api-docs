@@ -40,7 +40,7 @@
             // as the browser blocks async file downloads.
             // @see https://stackoverflow.com/questions/1106377/detect-when-browser-receives-file-download
             var $downloadButton = $(this);
-            $downloadButton.attr("disabled", true);
+            $downloadButton.prop("disabled", true);
             kamiExport.options.toast.toastActivate({ text: "Requesting export..." });
             checkDownloadFinished($downloadButton, $downloadButton.attr("token"), 1000, 0, kamiExport.options.timeout);
         });
@@ -129,7 +129,7 @@
         deleteCookie(cookieNameToken);
         deleteCookie(cookieNameStatus);
         updateDownloadToken($downloadButton);
-        $downloadButton.attr("disabled", false);
+        $downloadButton.prop("disabled", false);
     }
 
     /**

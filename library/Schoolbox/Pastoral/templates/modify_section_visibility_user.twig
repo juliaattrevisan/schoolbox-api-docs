@@ -121,7 +121,7 @@
 
                     //Check the correct box
                     let selector = 'input[name = "user['+user.id+']"][value ="'+permission+'"]';
-                    $(permissionListUsers).find(selector).attr("checked", "checked");
+                    $(permissionListUsers).find(selector).prop("checked", true);
                     setRadioButtonListener('[data-user-id="' + user.id + '"]');
                     applyLock(['users'], locked);
                 }

@@ -12,7 +12,7 @@
          */
         $("[data-evaluation-navigator]").on("click", function (event) {
             event.preventDefault();
-            $(this).attr("disabled", "disabled").attr("readonly", "readonly");
+            $(this).prop("disabled", true).prop("readonly", true);
 
             $.fn.evaluation.saveAll($(this).attr("href"));
 
@@ -28,7 +28,7 @@
         $("[data-evaluation-finish]").on("click", function (event) {
             event.preventDefault();
             var $finishButton = $(this);
-            $finishButton.attr("disabled", "disabled").attr("readonly", "readonly");
+            $finishButton.prop("disabled", true).prop("readonly", true);
             var href = $finishButton.data("href");
 
             $finishButton.confirmDialog({

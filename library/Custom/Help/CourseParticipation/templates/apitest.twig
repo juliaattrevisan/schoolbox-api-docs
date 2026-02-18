@@ -129,7 +129,7 @@
             var host   = $hostname.val();
             var server = getServer();
 
-            $host.attr('disabled', true);
+            $host.prop('disabled', true);
 
             $ul.html('<p>Getting a fresh digest for ' + schoolCode + ' from ' + host + '&hellip;</p>');
 
@@ -146,12 +146,12 @@
 
                 }).fail(function (xhr, status, reason) {
                     $ul.html('<p>Enrolment fetch failed: '+reason+'. <button data-load-users value="' + schoolCode + '">Try again</button></p>');
-                    $host.attr('disabled', false);
+                    $host.prop('disabled', false);
                 });
 
             }).fail(function (xhr, status, reason) {
                 $ul.html('<p>Digest fetch failed: '+reason+'. <button data-load-users value="' + schoolCode + '">Try again</button></p>');
-                $host.attr('disabled', false);
+                $host.prop('disabled', false);
             });
         }
 

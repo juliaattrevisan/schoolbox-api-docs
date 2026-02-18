@@ -143,8 +143,8 @@
 
                 {# Subtracting one for the dummy clone row #}
 
-                if ($("[data-group-add]:not(.hide)").length === 0) {
-                    groupModalButtons.attr('disabled', 'true');
+                if ($"[data-group-add]:not(.hide)").length === 0) {
+                    groupModalButtons.prop('disabled', true);
                 } else {
                     groupModalButtons.removeAttr('disabled');
                 }
@@ -175,7 +175,7 @@
                     applyLock(['groups'], locked);
                     //Check the correct box
                     let selector = 'input[name = "group['+groupId+']"][value ="'+permission+'"]';
-                    $(permissionListGroups).find(selector).attr("checked", "checked");
+                    $(permissionListGroups).find(selector).prop("checked", true);
                 }
 
                 $(this).addClass('hide');

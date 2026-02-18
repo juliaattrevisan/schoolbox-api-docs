@@ -62,12 +62,12 @@
                     var isFirstSemester = selected.next().length === 0;
                     var isLastSemester = selected.prev().length === 0;
                     if (isFirstSemester) {
-                        previousLink.attr("disabled", "");
+                        previousLink.prop("disabled", true);
                     } else {
                         previousLink.removeAttr("disabled");
                     }
                     if (isLastSemester) {
-                        nextLink.attr("disabled", "");
+                        nextLink.prop("disabled", true);
                     } else {
                         nextLink.removeAttr("disabled");
                     }

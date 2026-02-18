@@ -128,7 +128,7 @@
         function initPaginators(start, max) {
             /* Clear events for paginator buttons
              */
-            config.paginators.unbind("click");
+            config.paginators.off("click");
 
             /* "Next" availability
              */

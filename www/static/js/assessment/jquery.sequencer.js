@@ -91,8 +91,8 @@
                 // re-enable all sequencers in this series
                 sequencers.children().removeAttr("disabled");
 
-                sequencers.eq(0).children(self.backButtons.join(",")).attr("disabled", "disabled");
-                sequencers.eq(-1).children(self.forwardButtons.join(",")).attr("disabled", "disabled");
+                sequencers.eq(0).children(self.backButtons.join(",")).prop("disabled", true);
+                sequencers.eq(-1).children(self.forwardButtons.join(",")).prop("disabled", true);
             });
         });
     };

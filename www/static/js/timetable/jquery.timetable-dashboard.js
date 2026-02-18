@@ -55,7 +55,7 @@
 
             /* Wait till resizing actually stops before resizing everything
              */
-            $(window).bind("resizeEnd", function () {
+            $(window).on("resizeEnd", function () {
                 timetable.timetableResize();
             });
         }

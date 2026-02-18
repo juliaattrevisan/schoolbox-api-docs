@@ -47,7 +47,7 @@
              */
             component
                 .find("[data-toggle]")
-                .unbind("click")
+                .off("click")
                 .on("click", function () {
                     $("#" + $(this).data("toggle")).toggleClass("hide");
                 });
@@ -57,7 +57,7 @@
             component.find("[data-thread]").hide();
             component
                 .find("[data-interaction=showcomments]")
-                .unbind("click")
+                .off("click")
                 .on("click", function (event) {
                     event.preventDefault();
 

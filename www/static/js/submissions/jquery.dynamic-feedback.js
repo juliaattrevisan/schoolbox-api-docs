@@ -259,7 +259,7 @@
             // We can safely clear this timeout now that we're publishing
             window.clearTimeout(commentBoxTimeouts[commentBoxId]);
 
-            $btnPublish.attr("disabled", "disabled").text(config.publishingText);
+            $btnPublish.prop("disabled", true).text(config.publishingText);
 
             $(config.formSaveLabel).toastActivate({
                 text: config.publishingText,
@@ -471,7 +471,7 @@
                 data: $form.serializeArray(),
             };
 
-            $actionBar.find("[data-draft]").attr("disabled", "disabled");
+            $actionBar.find("[data-draft]").prop("disabled", true);
             $btnDrafted.text("Saving...").removeClass("saving-error");
 
             $(config.formSaveLabel).toastActivate({
