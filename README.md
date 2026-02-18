@@ -176,7 +176,6 @@ For full information on the build process of making a APT package and deploying 
   * [QA](./docs/charter/qa.md)
   * [Glossary](./docs/charter/glossary.md)
 * Core Modules:
-  * [Bell Daemon](./tools/notif/bell/README.md)
   * [Curriculum](./library/Schoolbox/Curriculum/README.md)
   * [EOTC](./www/modules/eotc/README.md)
   * [Notifications](./docs/notifications/README.md)

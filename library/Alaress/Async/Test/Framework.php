@@ -109,7 +109,7 @@ class Framework
 
         $this->log->warning("Freezing hell over");
 
-        foreach (['schedule','route','socket','digest','bell'] as $d) {
+        foreach (['schedule','route','socket','digest'] as $d) {
             $killswitch = "service $service-{$d}d stop 2>&1";
             $log->debug("Stop $d daemon: " . trim(shell_exec("$killswitch")));
         }

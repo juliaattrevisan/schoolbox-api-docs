@@ -37,11 +37,3 @@ for daemon in digestd scheduled mobiled; do
         systemctl start "schoolbox-cloud-$daemon@$instance_id"
     done
 done
-
-# Start schoolbox-belld only if already enabled
-for instance_id in $instance_list; do
-    if [ "$(systemctl is-enabled schoolbox-cloud-belld@"$instance_id" 2>/dev/null)" = "enabled" ]; then
-        echo "starting schoolbox-cloud-belld@$instance_id"
-        systemctl start  schoolbox-cloud-belld@"$instance_id"
-    fi
-done
