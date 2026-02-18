@@ -511,6 +511,13 @@ class Controller extends Base
             return;
         }
 
+        // Check if this is a hardcoded table - skip save operations
+        if (isset($tableData[$table]['hardcoded']) && $tableData[$table]['hardcoded']) {
+            // TODO: Implement actual save functionality when database structure is ready
+            $this->response = $this->responseAsJson(['result' => false, 'message' => 'Save functionality not yet implemented for this table.']);
+            return;
+        }
+
         // Reformat to rows to field -> values
         if ($this->requestPost['rows']) {
             $fieldValues = $this->processRows($tableData[$table]['fields'], $this->requestPost['rows']);
@@ -644,30 +651,38 @@ class Controller extends Base
         $post = $this->requestPost;
 
         $tableData = $this->getTableData();
-        $mapperName = $tableData[$table]['mapper'];
 
-        if (class_exists($mapperName)) {
-            /** @var Mapper $mapper */
-            $mapper = $mapperName::getInstance();
-            try {
-                $record = $mapper->findById($post['id']);
-                $result = $mapper->delete($record);
-            } catch (MapperException) {
-                // Something failed in the mapper: noop
+        // Check if this is a hardcoded table - skip delete operations
+        if (isset($tableData[$table]['hardcoded']) && $tableData[$table]['hardcoded']) {
+            // TODO: Implement actual delete functionality when database connection is ready
+            $result = false;
+            $responseData = ['result' => $result, 'message' => 'Delete functionality not yet implemented for this table.'];
+        } else {
+            $mapperName = $tableData[$table]['mapper'];
 
-                // Deletion _can_ raise UnexpectedValueException
-                /** @phpstan-ignore-next-line */
-            } catch (UnexpectedValueException) {
-                // Something else unexpected happened, likely thrown by a
-                // pre-delete: noop
+            if (class_exists($mapperName)) {
+                /** @var Mapper $mapper */
+                $mapper = $mapperName::getInstance();
+                try {
+                    $record = $mapper->findById($post['id']);
+                    $result = $mapper->delete($record);
+                } catch (MapperException) {
+                    // Something failed in the mapper: noop
+
+                    // Deletion _can_ raise UnexpectedValueException
+                    /** @phpstan-ignore-next-line */
+                } catch (UnexpectedValueException) {
+                    // Something else unexpected happened, likely thrown by a
+                    // pre-delete: noop
+                }
             }
-        }
 
-        $responseData = ['result' => $result];
+            $responseData = ['result' => $result];
 
-        // Did deletion fail, and a message is defined to display on failure?
-        if (!$result && isset($tableData[$table]['deleteFailMsg'])) {
-            $responseData['message'] = $tableData[$table]['deleteFailMsg'];
+            // Did deletion fail, and a message is defined to display on failure?
+            if (!$result && isset($tableData[$table]['deleteFailMsg'])) {
+                $responseData['message'] = $tableData[$table]['deleteFailMsg'];
+            }
         }
 
         $this->response = $this->responseAsJson($responseData);
@@ -1739,6 +1754,48 @@ class Controller extends Base
             ]
         ];
 
+        // TODO: Remove after DB connection - SA-21926
+        // For now, hardcoded data for frontend demonstration
+        $return['qualification'] = [
+            'title'             => 'Qualifications',
+            'hardcoded'         => true, // Flag to indicate this is hardcoded
+            'delete'            => true,
+            'showId'            => true,
+            'sortable'          => true, // Enable drag and drop functionality
+            'deleteFailMsg'     => 'This qualification cannot be deleted as it may be in use.',
+            'data'              => [
+                ['id' => 1, 'name' => 'DP Year 1', 'systemPurpose' => 'DIPLOMA'],
+                ['id' => 2, 'name' => 'DP Year 2', 'systemPurpose' => 'ANTICIPATED'],
+                ['id' => 3, 'name' => 'VCE', 'systemPurpose' => 'COURSE'],
+            ],
+            'fields'            => [
+                'id' => [
+                    'caption'   => 'ID',
+                    'width'     => 1,
+                    'readonly'  => true,
+                ],
+                'name'          => [
+                    'caption'   => 'Name',
+                    'width'     => 5,
+                    'maxLength' => 64,
+                    'mandatory' => true,
+                    'default'   => '',
+                ],
+                'systemPurpose' => [
+                    'caption'   => 'System Purpose',
+                    'width'     => 4,
+                    'mandatory' => false,
+                    'nullable'  => true,
+                    'nullable_label' => 'Not Selected',
+                    'lookup'    => [
+                        ['key' => 'DIPLOMA', 'value' => 'Diploma Programme Year 2 [DIPLOMA]'],
+                        ['key' => 'ANTICIPATED', 'value' => 'Diploma Programme Year 1 [ANTICIPATED]'],
+                        ['key' => 'COURSE', 'value' => 'Diploma Course [COURSE]'],
+                    ],
+                ],
+            ]
+        ];
+
         return $return;
     }
 
@@ -1764,72 +1821,82 @@ class Controller extends Base
             return;
         }
 
-        /** @var Mapper $mapper */
-        $mapper     = new $tables[$table]['mapper']();
-        $model_name = $mapper->getModel();
-        $prototype  = new $model_name();
-
-        $reflect    = new ReflectionClass($prototype);
-        $properties = $reflect->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE);
-
         $records = [];
 
-        // Go through every row in the current lookup table
-
-        if (isset($tables[$table]['findAllMethod'])) {
-            $finder = $tables[$table]['findAllMethod'];
-            $rows   = $mapper->$finder();
-        } elseif (isset($tables[$table]['sort'])) {
-            $rows = $mapper->findAll(['order' => [$tables[$table]['sort'] => 'ASC']]);
-        } elseif ($prototype instanceof Sequential) {
-            // Sequential: just use whatever ordering is defined in getDefaultOrderByParams
-            $rows                       = $mapper->findAll();
-            $tables[$table]['sortable'] = true;
+        // Check if this is a hardcoded table (no mapper needed) Todo: Remove after DB connection
+        if (isset($tables[$table]['hardcoded']) && $tables[$table]['hardcoded']) {
+            // Use hardcoded data directly
+            foreach ($tables[$table]['data'] as $row) {
+                $id = $row['id'];
+                $records[$id] = $row;
+            }
         } else {
-            $orderArr = [$mapper->getIdentifierColumn() => 'ASC'];
-            $rows     = $mapper->findAll(['order' => $orderArr]);
-        }
+            // Use mapper for database tables
+            /** @var Mapper $mapper */
+            $mapper     = new $tables[$table]['mapper']();
+            $model_name = $mapper->getModel();
+            $prototype  = new $model_name();
 
-        foreach ($rows as $row) {
-            // Go through every property available
+            $reflect    = new ReflectionClass($prototype);
+            $properties = $reflect->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE);
 
-            foreach ($properties as $prop) {
-                // We only want to display fields that are listed in the 'fields' array
+            // Go through every row in the current lookup table
 
-                if (isset($tables[$table]['fields'][$prop->getName()])) {
-                    // And they have to have a getId() column (or a manually defined getter function for the column)
+            if (isset($tables[$table]['findAllMethod'])) {
+                $finder = $tables[$table]['findAllMethod'];
+                $rows   = $mapper->$finder();
+            } elseif (isset($tables[$table]['sort'])) {
+                $rows = $mapper->findAll(['order' => [$tables[$table]['sort'] => 'ASC']]);
+            } elseif ($prototype instanceof Sequential) {
+                // Sequential: just use whatever ordering is defined in getDefaultOrderByParams
+                $rows                       = $mapper->findAll();
+                $tables[$table]['sortable'] = true;
+            } else {
+                $orderArr = [$mapper->getIdentifierColumn() => 'ASC'];
+                $rows     = $mapper->findAll(['order' => $orderArr]);
+            }
 
-                    if ($reflect->hasMethod('getId') || isset($tables[$table]['fields']['id']['getter'])) {
-                        // And only if there is a mapper function to retrieve its value
+            foreach ($rows as $row) {
+                // Go through every property available
 
-                        if (isset($tables[$table]['fields'][$prop->getName()]['getter'])) {
-                            $getter = $tables[$table]['fields'][$prop->getName()]['getter'];
-                        } else {
-                            $getter = $mapper->getGetMethodName($prop->getName());
-                        }
+                foreach ($properties as $prop) {
+                    // We only want to display fields that are listed in the 'fields' array
 
-                        if ($reflect->hasMethod($getter)) {
-                            if (isset($tables[$table]['fields']['id']['getter'])) {
-                                $idGetter = $tables[$table]['fields']['id']['getter'];
+                    if (isset($tables[$table]['fields'][$prop->getName()])) {
+                        // And they have to have a getId() column (or a manually defined getter function for the column)
+
+                        if ($reflect->hasMethod('getId') || isset($tables[$table]['fields']['id']['getter'])) {
+                            // And only if there is a mapper function to retrieve its value
+
+                            if (isset($tables[$table]['fields'][$prop->getName()]['getter'])) {
+                                $getter = $tables[$table]['fields'][$prop->getName()]['getter'];
                             } else {
-                                $idGetter = 'getId';
+                                $getter = $mapper->getGetMethodName($prop->getName());
                             }
 
-                            $id = $row->$idGetter();
+                            if ($reflect->hasMethod($getter)) {
+                                if (isset($tables[$table]['fields']['id']['getter'])) {
+                                    $idGetter = $tables[$table]['fields']['id']['getter'];
+                                } else {
+                                    $idGetter = 'getId';
+                                }
 
-                            if (!isset($records[$id])) {
-                                $records[$id] = [];
+                                $id = $row->$idGetter();
+
+                                if (!isset($records[$id])) {
+                                    $records[$id] = [];
+                                }
+
+                                $value = $row->$getter();
+
+                                // If we get an object back, we really want its ID
+
+                                if (is_object($value)) {
+                                    $value = $value->getId();
+                                }
+
+                                $records[$id][$prop->getName()] = $value;
                             }
-
-                            $value = $row->$getter();
-
-                            // If we get an object back, we really want its ID
-
-                            if (is_object($value)) {
-                                $value = $value->getId();
-                            }
-
-                            $records[$id][$prop->getName()] = $value;
                         }
                     }
                 }
