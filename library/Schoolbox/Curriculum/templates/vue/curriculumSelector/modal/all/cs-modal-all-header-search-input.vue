@@ -3,7 +3,7 @@
  * To search the currently selected curriculum node
  */
 
-import debounce from "lodash/debounce";
+import { debounce } from "lodash";
 import { useModalSearchStore, DEBOUNCE_AMOUNT } from "../../store/csModalSearchStore";
 import { useModalViewNodesStore } from "../../store/csModalViewNodesStore";
 

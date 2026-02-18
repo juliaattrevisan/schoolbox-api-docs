@@ -10,7 +10,7 @@
  */
 
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer";
-import debounce from "lodash/debounce";
+import { debounce } from "lodash";
 const props = defineProps({
     formId: {
         //the id of the form to listen to changes to

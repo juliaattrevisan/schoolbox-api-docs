@@ -3,7 +3,7 @@
  * Currently assumes that the query string is identified with the key "query"
  */
 
-import debounce from "lodash/debounce";
+import { debounce } from "lodash";
 import type { Ref } from "vue";
 import { isAbortError } from "@js/util/errorUtils";
 import type { SearchSelectItem } from "./types/SearchSelectItem";

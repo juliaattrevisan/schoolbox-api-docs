@@ -7,7 +7,7 @@
  * To search for codes or select the browse button to open the modal
  */
 
-import debounce from "lodash/debounce";
+import { debounce } from "lodash";
 import { useStore } from "./store/curriculumSelectorStore";
 import { useSharedStore } from "./store/csSharedStore";
 import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
