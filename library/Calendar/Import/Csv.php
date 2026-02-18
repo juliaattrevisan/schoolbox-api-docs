@@ -495,7 +495,7 @@ class Csv extends Base
                         }
                         $isSuccess = true;
                     }
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     //noop
                 }
             }
