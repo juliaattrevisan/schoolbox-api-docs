@@ -28,10 +28,10 @@ class Component_Config_Textbox extends Component_Config_Abstract
         $altSource = $component instanceof Component_ControllerAbstract ? $component->getConfig('src') : null;
 
         if (is_numeric($altSource) && $altSource) {
-            $allTextboxes = $textboxMapper->findByColumn('categoryID', $altSource);
+            $allTextboxes = $textboxMapper->findByColumn('folder_id', $altSource);
         } else {
             $allTextboxes = $this->getContext()
-                ? $textboxMapper->findByColumn('categoryID', $this->getContext()->getId())
+                ? $textboxMapper->findByColumn('folder_id', $this->getContext()->getId())
                 : new \Schoolbox\Collection();
         }
 
