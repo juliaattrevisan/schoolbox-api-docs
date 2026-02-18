@@ -16,7 +16,7 @@ use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockInterface;
 
-class cmsLogExample implements IStrategy
+class CmsLogExample implements IStrategy
 {
     /**
      * @param null|LoggerInterface  $log
