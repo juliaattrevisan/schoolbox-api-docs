@@ -415,6 +415,23 @@ class Subnav
                     ],
                 ],
             ],
+            '/adminv2/international-baccalaureate' => [
+                'name'       => 'Intl. Baccalaureate',
+                'visible'    => $userIsSuperuser, // Todo: Add IB permission
+                'searchable' => false,
+                'children'   => [
+                    '/adminv2/international-baccalaureate/configuration' => [
+                        'name'        => 'DP Subject Configuration',
+                        'visible'     => true,
+                        'description' => 'Configure DP subject config.',
+                    ],
+                    '/adminv2/international-baccalaureate/registrations' => [
+                        'name'        => 'Registration Reports',
+                        'visible'     => true,
+                        'description' => 'View International Baccalaureate student registration reports.',
+                    ],
+                ],
+            ],
             '/adminv2/lms' => [
                 'name'       => 'LMS',
                 'visible'    => $userIsSuperuser || $userHasServicePermissionLms,
@@ -555,23 +572,6 @@ class Subnav
                         'name'        => 'Summative Reports',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_SUMMATIVE_REPORT_ENABLED),
                         'description' => 'Configure a batch of student summative reports to be printed to PDF for reporting purposes.',
-                    ],
-                ],
-            ],
-            '/adminv2/international-baccalaureate' => [
-                'name'       => 'Intl. Baccalaureate',
-                'visible'    => $userIsSuperuser, // Todo: Add IB permission
-                'searchable' => false,
-                'children'   => [
-                    '/adminv2/international-baccalaureate/configuration' => [
-                        'name'        => 'DP Subject Configuration',
-                        'visible'     => true,
-                        'description' => 'Configure DP subject config.',
-                    ],
-                    '/adminv2/international-baccalaureate/registrations' => [
-                        'name'        => 'Registration Reports',
-                        'visible'     => true,
-                        'description' => 'View International Baccalaureate student registration reports.',
                     ],
                 ],
             ],
