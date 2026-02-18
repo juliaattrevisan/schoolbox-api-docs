@@ -81,7 +81,6 @@ class Inspector extends CliTool\App
         TransmitTool::TURNITIN_LOCK_NAME => 'Turnitin File Transmitter (./tools/turnitin/transmit.php)',
         ReportTool::TURNITIN_LOCK_NAME   => 'Turnitin Report Generator (./tools/turnitin/report.php)',
         RetrofitTool::TURNITIN_LOCK_NAME => 'Turnitin File Retrofitter (./tools/turnitin/retrofit.php)',
-        CleanserTool::TURNITIN_LOCK_NAME => 'Turnitin Group Cleanser (./tools/turnitin/cleanser.php)',
         HistoricalTool::TURNITIN_LOCK_NAME => 'Turnitin Historical (./tools/turnitin/historical.php)',
 
         /* Canvas Announcements Importer
