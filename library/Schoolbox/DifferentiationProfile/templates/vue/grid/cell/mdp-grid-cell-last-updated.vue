@@ -4,6 +4,7 @@
  */
 
 import { ProfileStatus, type Profile } from "../../../js/types/manageDifferentiationProfilesTypes";
+import locale from "@js/terminology/rosettaStone";
 
 const props = defineProps<{
     profile: Profile;
@@ -33,18 +34,25 @@ function formatDateShort(dateString: string | null): string | null {
             v-if="props.profile.status?.includes(ProfileStatus.OUT_OF_DATE)"
             text="Out of date"
             sentiment="warning"
+            :title="`Since the ${locale.differentiationProfile.proper()} was last updated, there has been updates to linked ${locale.pastoralCare.proper()} records. The ${locale.differentiationProfile.proper()} may require updating.`"
         ></sbx-label>
         <sbx-label
             v-if="props.profile.status?.includes(ProfileStatus.EXPIRED)"
             text="Expired"
             sentiment="alert"
+            :title="`All linked ${locale.pastoralCare.proper()} records have expired. Create new or update the expiry of linked records to reactivate the ${locale.differentiationProfile.proper()}.`"
         ></sbx-label>
         <sbx-label
             v-if="props.profile.status?.includes(ProfileStatus.UNPOPULATED)"
             text="Unpopulated"
             sentiment="neutral"
+            :title="`Linked records exist but the ${locale.differentiationProfile.proper()} has not been populated with any data.`"
         ></sbx-label>
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+sbx-label {
+    cursor: default;
+}
+</style>
