@@ -43,7 +43,7 @@
     "jquery-migrate": "~4.0.2",
     "jquery-ui": "~1.14.2",
     "jquery-validation": "~1.22.1",
-    "lightgallery": "~2.8.3",
+    "lightgallery": "~2.9.0",
     "locutus": "~2.0.32",
     "lodash": "~4.17.21",
     "mediaelement": "~7.0.7",
