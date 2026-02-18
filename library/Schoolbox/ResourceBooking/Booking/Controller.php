@@ -225,7 +225,7 @@ class Controller extends Base
         // Only users allowed to moderate this item may override validation.
         // Determine this in the same way as is done in Validation->validateBookingFromPostData().
         $overrideValidation = (
-            !empty($this->requestPost->get('override_validation')) &&
+            $this->requestPost->get('override_validation') &&
             $item->canUserModerateThisItem($this->user)
         );
 
@@ -352,7 +352,7 @@ class Controller extends Base
         // Only users allowed to moderate this item may override validation.
         // Determine this in the same way as is done in Validation->validateBookingFromPostData().
         $overrideValidation = (
-            !empty($this->requestPost->get('override_validation')) &&
+            $this->requestPost->get('override_validation') &&
             $item->getResource()->canUserModerateThisItem($this->user)
         );
 
