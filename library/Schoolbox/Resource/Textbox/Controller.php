@@ -63,7 +63,7 @@ class Controller extends Base
      */
     public function createTextboxInFolder(Folder\Model $folder): void
     {
-        $model = $this->persistTextbox($this->mapper->createModel()->setCategory($folder));
+        $model = $this->persistTextbox($this->mapper->createModel()->setFolder($folder));
         $model->setCreatedAt(\Alaress_Date_Format::now());
         $model->setCreatedBy($this->getUser()->getId());
         $this->mapper->save($model);
@@ -83,7 +83,7 @@ class Controller extends Base
      */
     public function createTextboxInFolderAndComponent(Folder\Model $folder, Component_Instance $component): void
     {
-        $model = $this->persistTextbox($this->mapper->createModel()->setCategory($folder));
+        $model = $this->persistTextbox($this->mapper->createModel()->setFolder($folder));
         $model->setCreatedAt(\Alaress_Date_Format::now());
         $model->setCreatedBy($this->getUser()->getId());
         $this->mapper->save($model);
@@ -228,7 +228,7 @@ class Controller extends Base
     {
         $tuples = $this->requestPost['textbox'] ?? [];
 
-        $textboxes = $this->mapper->findByColumn('textboxID', array_keys($tuples))->indexBy('id');
+        $textboxes = $this->mapper->findByColumn('id', array_keys($tuples))->indexBy('id');
 
         /* Update heading for every textbox requested
          *

@@ -69,7 +69,7 @@ class Notifier extends ResourceNotifier
         $resourceId = $resource->getId();
 
         try {
-            $category = $this->folderMapper->findById($resource->getCategory()->getId());
+            $folder = $this->folderMapper->findById($resource->getFolder()->getId());
         } catch (Mapper\Exception $e) {
             return $envelope;
         }
@@ -77,12 +77,12 @@ class Notifier extends ResourceNotifier
         $bob = new Builder();
 
         $heading = $this->getResourceName($resource);
-        $href    = "/homepage/" . $category->getId() . "/#textbox" . $resourceId;
+        $href    = "/homepage/" . $folder->getId() . "/#textbox" . $resourceId;
 
         $bob->setTitle(":author $action content in :homepage \":heading\"")
             ->setParams([
                 'author'   => new UserParam($effector),
-                'homepage' => new CategoryParam($category),
+                'homepage' => new CategoryParam($folder),
                 'heading'  => new Param($heading, $href, ParameterInterface::STACKING_APPEND),
             ])
             ->setIcon($this->getUserIcon($effector))
@@ -93,7 +93,7 @@ class Notifier extends ResourceNotifier
             ->setMeta(['time' => \Alaress_Date_Format::now()->getUnixTimeStamp()])
             ->addFilter('roletype', [$roletype]);
 
-        $envelope->broadcastToCategory($category, $this->getAccessLevel($resource), $bob->build());
+        $envelope->broadcastToCategory($folder, $this->getAccessLevel($resource), $bob->build());
 
         return $envelope;
     }
