@@ -75,7 +75,7 @@
     border-radius: var(--sbx-config-field-roundness);
     color: var(--sbx-color-accent);
     font-size: var(--sbx-font-size-s);
-    text-transform: capitalize;
+    text-transform: none;
     &:hover,
     &:active {
         background-color: var(
@@ -207,7 +207,7 @@
     background-color: var(--sbx-color-foreground-primary);
     color: var(--sbx-color-text-secondary);
     font-weight: bold;
-    text-transform: capitalize;
+    text-transform: none;
 }
 
 /**
