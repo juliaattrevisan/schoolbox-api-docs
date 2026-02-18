@@ -55,8 +55,8 @@
         "pinia": "~3.0.4",
         "qrcode.vue": "~3.8.0",
         "sanitize-html": "~2.17.1",
-        "sortablejs": "^1.15.7",
-        "swiper": "~11.2.8",
+        "sortablejs": "~1.15.7",
+        "swiper": "^12.1.2",
         "tinycolor2": "~1.6.0",
         "ts-ebml": "~3.0.1",
         "v-tables-3-select-rows": "~0.4.9",
@@ -27997,9 +27997,9 @@
       }
     },
     "node_modules/swiper": {
-      "version": "11.2.8",
-      "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.2.8.tgz",
-      "integrity": "sha512-S5FVf6zWynPWooi7pJ7lZhSUe2snTzqLuUzbd5h5PHUOhzgvW0bLKBd2wv0ixn6/5o9vwc/IkQT74CRcLJQzeg==",
+      "version": "12.1.2",
+      "resolved": "https://registry.npmjs.org/swiper/-/swiper-12.1.2.tgz",
+      "integrity": "sha512-4gILrI3vXZqoZh71I1PALqukCFgk+gpOwe1tOvz5uE9kHtl2gTDzmYflYCwWvR4LOvCrJi6UEEU+gnuW5BtkgQ==",
       "funding": [
         {
           "type": "patreon",
@@ -50362,9 +50362,9 @@
       "integrity": "sha512-AS9WORVV/vk520ZHxGTlQzyDBizp/h6WyAYUbKhze/kwvQr43DwJpkIIPBomsUyKqN7N+h1deF92N9PmW+o+9A=="
     },
     "swiper": {
-      "version": "11.2.8",
-      "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.2.8.tgz",
-      "integrity": "sha512-S5FVf6zWynPWooi7pJ7lZhSUe2snTzqLuUzbd5h5PHUOhzgvW0bLKBd2wv0ixn6/5o9vwc/IkQT74CRcLJQzeg=="
+      "version": "12.1.2",
+      "resolved": "https://registry.npmjs.org/swiper/-/swiper-12.1.2.tgz",
+      "integrity": "sha512-4gILrI3vXZqoZh71I1PALqukCFgk+gpOwe1tOvz5uE9kHtl2gTDzmYflYCwWvR4LOvCrJi6UEEU+gnuW5BtkgQ=="
     },
     "sync-child-process": {
       "version": "1.0.2",
