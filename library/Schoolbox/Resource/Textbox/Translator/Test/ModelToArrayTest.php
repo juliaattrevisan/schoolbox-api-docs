@@ -51,7 +51,7 @@ class ModelToArrayTest extends TestCase
                 ->setId(1)
                 ->setBody('<p>Text box 1</p>')
                 ->setHeading('Text box A')
-                ->setCategory((new FolderModel())->setId(1)),
+                ->setFolder((new FolderModel())->setId(1)),
             true,
             true,
             [
@@ -73,7 +73,7 @@ class ModelToArrayTest extends TestCase
                 ->setId(2)
                 ->setBody('<p>Text box 2</p>')
                 ->setHeading('Text box B')
-                ->setCategory((new FolderModel())->setId(2)),
+                ->setFolder((new FolderModel())->setId(2)),
             false,
             false,
             [
@@ -95,7 +95,7 @@ class ModelToArrayTest extends TestCase
                 ->setId(3)
                 ->setBody('<p>Text box 3</p>')
                 ->setHeading('Text box C')
-                ->setCategory((new FolderModel())->setId(3)),
+                ->setFolder((new FolderModel())->setId(3)),
             true,
             false,
             [
@@ -117,7 +117,7 @@ class ModelToArrayTest extends TestCase
                 ->setId(4)
                 ->setBody('<p>Text box 4</p>')
                 ->setHeading('Text box D')
-                ->setCategory((new FolderModel())->setId(4)),
+                ->setFolder((new FolderModel())->setId(4)),
             false,
             true,
             [

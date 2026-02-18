@@ -36,10 +36,10 @@ class Result extends Base
         $query = "
             SELECT
                 {$mapper->getColumnString('t')},
-                {$mapper->getJoinMapper('category')->getColumnString('c')}
+                {$mapper->getJoinMapper('folder')->getColumnString('f')}
             FROM
                 `{$mapper->getTable()}` `t`
-                INNER JOIN {$mapper->getJoinSql('category', 't', 'c')}
+                INNER JOIN {$mapper->getJoinSql('folder', 't', 'f')}
             WHERE
                 t.deleted_at IS NULL AND
                 `heading` LIKE :like
@@ -55,11 +55,11 @@ class Result extends Base
 
         $collection = $mapper->createCollection();
 
-        foreach ($this->buildSearchResult($stmt, $user, 'c.id', $sanitiser->getOffset(), $sanitiser->getPageLimit()) as $row) {
+        foreach ($this->buildSearchResult($stmt, $user, 'f.id', $sanitiser->getOffset(), $sanitiser->getPageLimit()) as $row) {
             $textbox  = $mapper->hydrate($row, 't');
-            $category = $mapper->hydrateJoin($row, 'category', 'c');
+            $folder = $mapper->hydrateJoin($row, 'folder', 'f');
 
-            $textbox->setCategory($category);
+            $textbox->setFolder($folder);
 
             $collection->add($textbox);
         }
@@ -83,10 +83,10 @@ class Result extends Base
 
         $query = "
             SELECT
-                c.id
+                f.id
             FROM
                 `{$mapper->getTable()}` `t`
-                INNER JOIN {$mapper->getJoinSql('category', 't', 'c')}
+                INNER JOIN {$mapper->getJoinSql('folder', 't', 'f')}
             WHERE
                 t.deleted_at IS NULL AND
                 `heading` LIKE :like

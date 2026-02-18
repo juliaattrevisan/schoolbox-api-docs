@@ -155,7 +155,7 @@ class Notifier extends ResourceNotifier
      */
     protected function getResourceCategory($resource): Folder
     {
-        return $resource->getCategory();
+        return $resource->getFolder();
     }
 
 
@@ -204,7 +204,7 @@ class Notifier extends ResourceNotifier
             return false;
         }
         try {
-            $folderAccess = $this->access->getFolderAccess($currentUser, $resource->getCategory()->getId());
+            $folderAccess = $this->access->getFolderAccess($currentUser, $resource->getFolder()->getId());
         } catch (MapperException) {
             $this->log->warning("Failed to get access for folder:{$resource->getId()} user {$currentUser->getId()}");
             return false;
@@ -232,7 +232,7 @@ class Notifier extends ResourceNotifier
             $collapsed           = (int)$configs->offsetGet('collapse')?->getValue() === 1;
             $noTitle             = (int)$configs->offsetGet('showComponentTitle')?->getValue() === 0;
             /** @var Component_Instance $component */
-            if ($component->getIdentifier() === $resource->getCategory()->getId() && !($collapsed && $noTitle)) {
+            if ($component->getIdentifier() === $resource->getFolder()->getId() && !($collapsed && $noTitle)) {
                 return true;
             }
         }

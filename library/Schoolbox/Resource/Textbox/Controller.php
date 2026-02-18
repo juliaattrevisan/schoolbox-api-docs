@@ -284,7 +284,7 @@ class Controller extends Base
             foreach ($allTextboxes->getResult() as $currentTextbox) {
                 $arrayToReturn[] = array(
                     'id'   => $currentTextbox->getId(),
-                    'name' => "{$currentTextbox->getCategory()->getName()}: {$currentTextbox->getHeading()}",
+                    'name' => "{$currentTextbox->getFolder()->getName()}: {$currentTextbox->getHeading()}",
                 );
             }
         }
