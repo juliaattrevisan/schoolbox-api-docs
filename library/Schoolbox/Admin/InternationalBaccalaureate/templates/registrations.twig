@@ -1,0 +1,22 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+
+        <div class="content-body">
+            <h1>Registration Reports</h1>
+            <p>This page will contain International Baccalaureate student registration reports.</p>
+
+            <div class="alert alert-info">
+                <i class="fa fa-info-circle"></i>
+                Pending
+            </div>
+        </div>
+
+    </div>
+</div>

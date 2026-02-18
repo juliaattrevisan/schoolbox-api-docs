@@ -1,0 +1,106 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<script>
+    /* when the tab changes, update the URL hash */
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.location.hash) {
+            document.querySelector(`[data-tab] a[href="${window.location.hash}"]`).click();
+        }
+        document.querySelectorAll('[data-tab] a').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                window.location.hash = this.getAttribute('href').replace('#', '');
+            });
+        });
+    });
+</script>
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 island">
+            <h1>DP Subject Configuration</h1>
+            <p>Configure International Baccalaureate Diploma Programme subjects by area.</p>
+
+            <dl class="tabs" data-tab>
+                <dd class="active"><a href="#general">General</a></dd>
+                <dd><a href="#studies-language-literature">Studies in Language and Literature</a></dd>
+                <dd><a href="#language-acquisition">Language Acquisition</a></dd>
+                <dd><a href="#individuals-societies">Individuals and Societies</a></dd>
+                <dd><a href="#sciences">Sciences</a></dd>
+                <dd><a href="#mathematics">Mathematics</a></dd>
+                <dd><a href="#arts">The Arts</a></dd>
+                <dd><a href="#core">Core</a></dd>
+            </dl>
+
+            <section class="content tabs-content">
+                <div class="content active" id="general">
+                    <h2>General Configuration</h2>
+                    <div class="alert alert-info">
+                        <i class="fa fa-info-circle"></i>
+                        Pending
+                    </div>
+                </div>
+
+                <div class="content" id="studies-language-literature">
+                    <h2>Studies in Language and Literature</h2>
+                    <div class="alert alert-info">
+                        <i class="fa fa-info-circle"></i>
+                        Pending
+                    </div>
+                </div>
+
+                <div class="content" id="language-acquisition">
+                    <h2>Language Acquisition</h2>
+                    <div class="alert alert-info">
+                        <i class="fa fa-info-circle"></i>
+                        Pending
+                    </div>
+                </div>
+
+                <div class="content" id="individuals-societies">
+                    <h2>Individuals and Societies</h2>
+                    <div class="alert alert-info">
+                        <i class="fa fa-info-circle"></i>
+                        Pending
+                    </div>
+                </div>
+
+                <div class="content" id="sciences">
+                    <h2>Sciences</h2>
+                    <div class="alert alert-info">
+                        <i class="fa fa-info-circle"></i>
+                        Pending
+                    </div>
+                </div>
+
+                <div class="content" id="mathematics">
+                    <h2>Mathematics</h2>
+                    <div class="alert alert-info">
+                        <i class="fa fa-info-circle"></i>
+                        Pending
+                    </div>
+                </div>
+
+                <div class="content" id="arts">
+                    <h2>The Arts</h2>
+                    <div class="alert alert-info">
+                        <i class="fa fa-info-circle"></i>
+                        Pending
+                    </div>
+                </div>
+
+                <div class="content" id="core">
+                    <h2>Core</h2>
+                    <div class="alert alert-info">
+                        <i class="fa fa-info-circle"></i>
+                        Pending
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>

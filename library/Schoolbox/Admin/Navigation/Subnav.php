@@ -558,6 +558,23 @@ class Subnav
                     ],
                 ],
             ],
+            '/adminv2/international-baccalaureate' => [
+                'name'       => 'Intl. Baccalaureate',
+                'visible'    => $userIsSuperuser, // Todo: Add IB permission
+                'searchable' => false,
+                'children'   => [
+                    '/adminv2/international-baccalaureate/configuration' => [
+                        'name'        => 'DP Subject Configuration',
+                        'visible'     => true,
+                        'description' => 'Configure DP subject config.',
+                    ],
+                    '/adminv2/international-baccalaureate/registrations' => [
+                        'name'        => 'Registration Reports',
+                        'visible'     => true,
+                        'description' => 'View International Baccalaureate student registration reports.',
+                    ],
+                ],
+            ],
             '/adminv2/setting/Modules' => [
                 'name'       => 'Modules',
                 'visible'    => $userIsSuperuser,
