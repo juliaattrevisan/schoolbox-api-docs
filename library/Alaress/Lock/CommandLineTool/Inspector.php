@@ -132,6 +132,9 @@ class Inspector extends CliTool\App
 
         // Storage cleanup
         \Schoolbox\Resource\Storage\GC\CommandLineTool::LOCK_NAME => 'Storage Cleanup tool (./tools/gc-storage.php)',
+
+        // Data Retention, hard delete things that were soft deleted
+        \Schoolbox\Admin\DataRetention\CommandLineTool::LOCK_NAME => 'Data Retention Cleanup tool (./tools/dataRetention/process.php)',
     ];
 
 
