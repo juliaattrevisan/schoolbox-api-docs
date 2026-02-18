@@ -15,7 +15,6 @@ use External\Canvas\Importer\Cli\AnnouncementsTool;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Calendar\Cli\TrimmerTool;
 use Schoolbox\Clipboard\Cli\ImporterTool;
 use Schoolbox\External\Importer\Endpoint\Scheduler;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\ErrorRequeuer;
@@ -27,7 +26,6 @@ use Schoolbox\Learning\Learnosity\Importer\Cli\PollProcessingTool;
 use Schoolbox\Learning\Learnosity\Importer\Cli\ResetFailedTool;
 use Schoolbox\Learning\Learnosity\Importer\Cli\RestartPendingTool;
 use Schoolbox\Learning\Learnosity\Helper;
-use Schoolbox\Learning\Turnitin\Cli\CleanserTool;
 use Schoolbox\Learning\Turnitin\Cli\TransmitTool;
 use Schoolbox\Learning\Turnitin\Cli\ReportTool;
 use Schoolbox\Learning\Turnitin\Cli\GroupTool;
@@ -94,10 +92,6 @@ class Inspector extends CliTool\App
         /* Expired Storage Removal Tool
          */
         ExpiryTool::EXPIRED_STORAGE_REMOVAL_LOCK_NAME => 'Expired Storage Removal Tool (./tools/storage/expired-storage-removal.php)',
-
-        /* Dead Event Trimmer
-         */
-        TrimmerTool::LOCK_NAME => 'Dead Event Trimmer Tool (./tools/calendar/trimmer.php)',
 
         /* Learnosity Migration
          */
