@@ -115,6 +115,7 @@ HELP;
 //        $cmsLogRetentionPeriod = $this->getConfig()->get('dataRetention_cmsLogRetentionPeriod');
 //        $cmsLogRetentionPeriod = '365';  // example data retention period get from the config table
 //        $bus->add(new CmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig()));
+        $bus->add(new MomentsRetention($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig()));
 
         // if we have functions, run them
         if (count($bus) > 0) {
