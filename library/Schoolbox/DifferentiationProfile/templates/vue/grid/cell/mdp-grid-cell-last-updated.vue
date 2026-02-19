@@ -51,8 +51,4 @@ function formatDateShort(dateString: string | null): string | null {
     </div>
 </template>
 
-<style scoped>
-sbx-label {
-    cursor: default;
-}
-</style>
+<style></style>
