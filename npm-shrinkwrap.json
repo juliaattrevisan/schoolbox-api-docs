@@ -73,8 +73,8 @@
         "@playwright/test": "~1.53.1",
         "@rsbuild/core": "~1.7.3",
         "@rsbuild/plugin-vue": "~1.2.6",
-        "@rspack/cli": "^1.7.6",
-        "@rspack/core": "^1.7.6",
+        "@rspack/cli": "~1.7.6",
+        "@rspack/core": "~1.7.6",
         "@storybook/addon-docs": "~10.2.8",
         "@stylistic/eslint-plugin": "~5.7.0",
         "@testing-library/jest-dom": "~6.6.3",
@@ -89,7 +89,7 @@
         "@types/tinycolor2": "~1.4.6",
         "@vue/test-utils": "~2.4.6",
         "@vue/vue3-jest": "~29.2.6",
-        "css-loader": "~7.1.2",
+        "css-loader": "^7.1.4",
         "eslint": "~9.39.2",
         "eslint-config-airbnb-extended": "~3.0.0",
         "eslint-config-prettier": "~10.1.8",
@@ -15302,19 +15302,20 @@
       }
     },
     "node_modules/css-loader": {
-      "version": "7.1.2",
-      "resolved": "https://registry.npmjs.org/css-loader/-/css-loader-7.1.2.tgz",
-      "integrity": "sha512-6WvYYn7l/XEGN8Xu2vWFt9nVzrCn39vKyTEFf/ExEyoksJjjSZV/0/35XPlMbpnr6VGhZIUg5yJrL8tGfes/FA==",
+      "version": "7.1.4",
+      "resolved": "https://registry.npmjs.org/css-loader/-/css-loader-7.1.4.tgz",
+      "integrity": "sha512-vv3J9tlOl04WjiMvHQI/9tmIrCxVrj6PFbHemBB1iihpeRbi/I4h033eoFIhwxBBqLhI0KYFS7yvynBFhIZfTw==",
       "dev": true,
+      "license": "MIT",
       "dependencies": {
         "icss-utils": "^5.1.0",
-        "postcss": "^8.4.33",
+        "postcss": "^8.4.40",
         "postcss-modules-extract-imports": "^3.1.0",
         "postcss-modules-local-by-default": "^4.0.5",
         "postcss-modules-scope": "^3.2.0",
         "postcss-modules-values": "^4.0.0",
         "postcss-value-parser": "^4.2.0",
-        "semver": "^7.5.4"
+        "semver": "^7.6.3"
       },
       "engines": {
         "node": ">= 18.12.0"
@@ -15324,7 +15325,7 @@
         "url": "https://opencollective.com/webpack"
       },
       "peerDependencies": {
-        "@rspack/core": "0.x || 1.x",
+        "@rspack/core": "0.x || ^1.0.0 || ^2.0.0-0",
         "webpack": "^5.27.0"
       },
       "peerDependenciesMeta": {
@@ -15337,13 +15338,11 @@
       }
     },
     "node_modules/css-loader/node_modules/semver": {
-      "version": "7.5.4",
-      "resolved": "https://registry.npmjs.org/semver/-/semver-7.5.4.tgz",
-      "integrity": "sha512-1bCSESV6Pv+i21Hvpxp3Dx+pSD8lIPt8uVjRrxAUt/nbswYc+tK6Y2btiULjd4+fnq15PX+nqQDC7Oft7WkwcA==",
+      "version": "7.7.4",
+      "resolved": "https://registry.npmjs.org/semver/-/semver-7.7.4.tgz",
+      "integrity": "sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA==",
       "dev": true,
-      "dependencies": {
-        "lru-cache": "^6.0.0"
-      },
+      "license": "ISC",
       "bin": {
         "semver": "bin/semver.js"
       },
@@ -41366,29 +41365,26 @@
       }
     },
     "css-loader": {
-      "version": "7.1.2",
-      "resolved": "https://registry.npmjs.org/css-loader/-/css-loader-7.1.2.tgz",
-      "integrity": "sha512-6WvYYn7l/XEGN8Xu2vWFt9nVzrCn39vKyTEFf/ExEyoksJjjSZV/0/35XPlMbpnr6VGhZIUg5yJrL8tGfes/FA==",
+      "version": "7.1.4",
+      "resolved": "https://registry.npmjs.org/css-loader/-/css-loader-7.1.4.tgz",
+      "integrity": "sha512-vv3J9tlOl04WjiMvHQI/9tmIrCxVrj6PFbHemBB1iihpeRbi/I4h033eoFIhwxBBqLhI0KYFS7yvynBFhIZfTw==",
       "dev": true,
       "requires": {
         "icss-utils": "^5.1.0",
-        "postcss": "^8.4.33",
+        "postcss": "^8.4.40",
         "postcss-modules-extract-imports": "^3.1.0",
         "postcss-modules-local-by-default": "^4.0.5",
         "postcss-modules-scope": "^3.2.0",
         "postcss-modules-values": "^4.0.0",
         "postcss-value-parser": "^4.2.0",
-        "semver": "^7.5.4"
+        "semver": "^7.6.3"
       },
       "dependencies": {
         "semver": {
-          "version": "7.5.4",
-          "resolved": "https://registry.npmjs.org/semver/-/semver-7.5.4.tgz",
-          "integrity": "sha512-1bCSESV6Pv+i21Hvpxp3Dx+pSD8lIPt8uVjRrxAUt/nbswYc+tK6Y2btiULjd4+fnq15PX+nqQDC7Oft7WkwcA==",
-          "dev": true,
-          "requires": {
-            "lru-cache": "^6.0.0"
-          }
+          "version": "7.7.4",
+          "resolved": "https://registry.npmjs.org/semver/-/semver-7.7.4.tgz",
+          "integrity": "sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA==",
+          "dev": true
         }
       }
     },
