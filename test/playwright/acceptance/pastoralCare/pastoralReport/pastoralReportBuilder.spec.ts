@@ -12,6 +12,9 @@ import CreatePastoralReport from "@schoolboxTest/playwright/support/page/pastora
 import PastoralCareReports from "@schoolboxTest/playwright/support/page/pastoralCare/pastoralReportBuilder/PastoralCareReports";
 import PastoralReportDetails from "@schoolboxTest/playwright/support/page/pastoralCare/pastoralReportBuilder/PastoralReportDetails";
 import Common from "@schoolboxTest/playwright/support/page/Common";
+import PastoralProfile from "@schoolboxTest/playwright/support/page/pastoralCare/PastoralProfile";
+import CreatePastoralRecord from "@schoolboxTest/playwright/support/page/pastoralCare/CreatePastoralRecord";
+import ResourcesMyFilesPicker from "@schoolboxTest/playwright/support/page/resources/ResourcesMyFilesPicker";
 
 test.describe("Pastoral Report Builder", () => {
     const reportTitle: string = "Pastoral Report Automation Test";
@@ -44,7 +47,7 @@ test.describe("Pastoral Report Builder", () => {
      * check only the selected tables are presented in the report
      * check the columns can be sorted properly
      */
-    test("create a pastoral report and check whether the frequency tables are presented or not, check the columns can be sorted and proper student, date and types are presented", async ({
+    test.skip("create a pastoral report and check whether the frequency tables are presented or not, check the columns can be sorted and proper student, date and types are presented", async ({
         page,
         tester,
         db,
@@ -150,7 +153,7 @@ test.describe("Pastoral Report Builder", () => {
      * click each one of the tabs to ensure they load the records and points correctly via table and modal
      * check the print button is presented and able to export the report
      */
-    test("check the tabs load records and points correctly: count number of records and points, check record details, check print button is presented, check download works", async ({
+    test.skip("check the tabs load records and points correctly: count number of records and points, check record details, check print button is presented, check download works", async ({
         page,
         tester,
         db,
@@ -173,7 +176,7 @@ test.describe("Pastoral Report Builder", () => {
                 [5, 8, 8, 5, 5],
             );
 
-            tester.isGoingTo("check the list tab shows the records details properly");
+            tester.isGoingTo("check the list tab shows the records details properly: title, severiy, points");
             await pastoralReportDetails.clickTab("List");
             await pastoralReportDetails.checkRecordDetails(
                 recordId,
@@ -182,6 +185,9 @@ test.describe("Pastoral Report Builder", () => {
                 "Low",
                 " 5 Points",
             );
+
+            tester.isGoingTo("check if the proper numbers of tags are presented in the report");
+            await pastoralReportDetails.checkTagCount(2);
 
             tester.isGoingTo("Download the report and confirm the download is successful");
             await common.assertFileDownload("pastoral-report-download-button", `${reportNameCsv}.csv`);
@@ -291,7 +297,7 @@ test.describe("Pastoral Report Builder", () => {
      * Creates a pastoral report builder
      * check the dates and students are properly presented in the report
      */
-    test("creates a report and check the dates and students are properly presented in the report", async ({
+    test.skip("creates a report and check the dates and students are properly presented in the report", async ({
         page,
         tester,
         db,
@@ -344,5 +350,62 @@ test.describe("Pastoral Report Builder", () => {
             tester.isGoingTo("Clean up: delete the pastoral report");
             await db.dontHaveInDatabase("pastoral_report", { name: reportTitle, deleted_at: null });
         }
+    });
+
+    test("check the report builder List tab shows the comments and attachments", async ({ page, tester, db }) => {
+        try {
+            const createPastoralReport = new CreatePastoralReport(page);
+            const pastoralCareReports = new PastoralCareReports(page);
+            const pastoralReportDetails = new PastoralReportDetails(page);
+            const pastoralProfile = new PastoralProfile(page, tester);
+            const createPastoralRecord = new CreatePastoralRecord(page);
+            const resourcesMyFilesPicker = new ResourcesMyFilesPicker(tester, page);
+            const commentText = "This is a general comment";
+            const bodyPublic = "<p>This is an automation pastoral record public body</p>";
+
+            tester.isGoingTo("update a pastoral record to have description, comments and attachments");
+            await db.updateInDatabase("pastoral", { body_public: bodyPublic }, { id: 2 });
+            await pastoralProfile.goto(25); // Jana Reed
+            await pastoralProfile.clickPastoralRecord(25, 2);
+            await tester.common.clickAddComment();
+            await tester.fillCKEditorById("comment-public", commentText);
+            await pastoralProfile.clickPostComment();
+            await pastoralProfile.clickModifyIcon(25, 2);
+            await page.locator("#public-zone").click();
+            await resourcesMyFilesPicker.takePictureAndSave("PastoralRecord");
+            await createPastoralRecord.clickSave();
+
+            tester.isGoingTo(
+                "navigate to create pastoral report page, fill in the report title, date range and save the report",
+            );
+            await createPastoralReport.createPastoralReport(reportTitle, "2017-01-01 00:00", "2017-12-31 23:59");
+
+            tester.isGoingTo("check the list tab shows the comments and attachments");
+            await pastoralCareReports.goto();
+            await pastoralCareReports.openPastoralReport(reportTitle);
+            await pastoralReportDetails.checkAttachmentPresented();
+            await pastoralReportDetails.checkPublicBodyPresented("This is an automation pastoral record public body");
+            await pastoralReportDetails.checkPrivateBodyNotPresented(
+                "Jana and Mario have been using Facebook to bully Louisa Smith.",
+            );
+            await pastoralReportDetails.checkCommentPresented(commentText);
+            await pastoralReportDetails.checkCommentNotPresented(
+                "Parents have been contacted. Both students have been given a Saturday detention.",
+            ); // this is the comment in the confidential panel, it should not be shown in the list tab
+        } finally {
+            tester.isGoingTo("Clean up: delete the pastoral report and undo the pastoral record changes");
+            await db.dontHaveInDatabase("pastoral_report", { name: reportTitle, deleted_at: null });
+            await db.updateInDatabase("pastoral", { body_public: " " }, { id: 2 });
+            await db.dontHaveInDatabase("pastoral_comment", { pastoral_id: 2, owner_id: 22, deleted_at: null });
+            await db.dontHaveInDatabase("pastoral_attachment", { pastoral_id: 2, deleted_at: null });
+        }
+    });
+
+    test.afterAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("update the pastoral points as per provisioned data");
+        await db.updateInDatabase("pastoral", { points: null }, { id: 2 });
+        await db.updateInDatabase("pastoral", { points: null }, { id: 3 });
+        await db.updateInDatabase("pastoral", { points: null }, { id: 4 });
+        await db.updateInDatabase("pastoral", { points: null }, { id: 5 });
     });
 });

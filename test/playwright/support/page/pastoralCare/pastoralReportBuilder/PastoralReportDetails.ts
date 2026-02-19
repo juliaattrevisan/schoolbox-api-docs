@@ -300,4 +300,57 @@ export default class PastoralReportDetails {
             await expect(dateLocator).not.toBeVisible();
         }
     }
+
+    /**
+     * check the number of tags presented in the report
+     * @param tagCount - The expected number of tags presented in the report
+     */
+    async checkTagCount(tagCount: number): Promise<void> {
+        const tagLocator = this.page.locator(`a[href^="/pastoral/report/results/tag/"]`);
+        await expect(tagLocator).toHaveCount(tagCount);
+    }
+
+    /**
+     * check the public body of the pastoral record is presented in the report
+     * @param expectedBody - The expected public body text of the pastoral record
+     */
+    async checkPublicBodyPresented(expectedBody: string): Promise<void> {
+        const bodyLocator = this.page.locator(`div[data-test="pr-list"]`, { hasText: expectedBody });
+        await expect(bodyLocator).toBeVisible();
+    }
+
+    /**
+     * check the private body of the pastoral record is not presented in the report
+     * @param expectedBody - The expected private body text of the pastoral record
+     */
+    async checkPrivateBodyNotPresented(expectedBody: string): Promise<void> {
+        const bodyLocator = this.page.locator(`div[data-test="pr-list"]`, { hasText: expectedBody });
+        await expect(bodyLocator).not.toBeVisible();
+    }
+
+    /**
+     * check the pastoral attachment is presented in the report
+     */
+    async checkAttachmentPresented(): Promise<void> {
+        const attachmentLocator = this.page.getByTestId(`pastoral-record-attachment`);
+        await expect(attachmentLocator).toBeVisible();
+    }
+
+    /**
+     * check the pastoral record comment is presented in the report
+     * @param expectedComment - The expected comment text
+     */
+    async checkCommentPresented(expectedComment: string): Promise<void> {
+        const commentLocator = this.page.locator(`ul.information-list.reply`, { hasText: expectedComment });
+        await expect(commentLocator).toBeVisible();
+    }
+
+    /**
+     * check the pastoral record comment is not presented in the report
+     * @param expectedComment - The expected comment text
+     */
+    async checkCommentNotPresented(expectedComment: string): Promise<void> {
+        const commentLocator = this.page.locator(`ul.information-list.reply`, { hasText: expectedComment });
+        await expect(commentLocator).not.toBeVisible();
+    }
 }
