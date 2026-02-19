@@ -36,6 +36,7 @@ class UserAccess implements IModel
     public const int SERVICE_LMS = 14;
     public const int SERVICE_IMPERSONATOR = 15; // Note SERVICE_IMPERSONATOR is special, in that it requires a roleId to be set in userAccess.sid.
     public const int SERVICE_DIFFERENTIATION = 16;
+    public const int SERVICE_IB_COORDINATOR = 17;
 
     /**
      * Services that do not have service identifiers (sid) use this value
@@ -140,6 +141,7 @@ class UserAccess implements IModel
             self::SERVICE_LMS,
             self::SERVICE_IMPERSONATOR,
             self::SERVICE_DIFFERENTIATION,
+            self::SERVICE_IB_COORDINATOR,
         ];
     }
 
