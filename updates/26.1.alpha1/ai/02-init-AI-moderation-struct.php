@@ -29,7 +29,7 @@ $app = new class extends CliTool\App {
         // insert new config into DB: but only for a particular set of modules
         // (image generation is migrated in the next step)
         $modulesToMigrate = [
-            Helper::FEATURE_AI_MODERATION_AGENT             => ConfigMapper::NAME_AI_MODERATIONAGENT,
+            Helper::FEATURE_AI_MODERATION_AGENT             => ConfigMapper::NAME_AI_MODERATION_AGENT,
         ];
         foreach ($modulesToMigrate as $module => $moduleKey) {
             $newConfig = $this->migrate(

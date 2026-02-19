@@ -7,7 +7,7 @@ update config set sequence = 6 where name = 'ai_image_generation';
 update config set sequence = 7 where name = 'ai_learning_activity_customisation';
 update config set sequence = 8 where name = 'ai_moderation_key';
 
--- Add new Ai Moderation Agent configuration
+-- Add new AI Moderation Agent configuration
 INSERT INTO
     config (
     `name`,
@@ -22,8 +22,8 @@ INSERT INTO
     sequence
 )
 VALUES (
-           'ai_moderationagent',
-           'Ai Moderation Agent',
+           'ai_moderation_agent',
+           'AI Moderation Agent',
            '',
            (
                SELECT id
