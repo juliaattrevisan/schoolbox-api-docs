@@ -25,10 +25,13 @@
     <div class="l-flex-col l-gap-m">
         <div class="l-flex-row l-flex--justify-space f-no-margins">
             <h1>Manage {{ locale.differentiationProfile.plural }}</h1>
-            <a href="{{ routeLookup('customisationRecord.viewRecords') }}" class="button l-flex l-flex l-gap-s" title="View Customisation Records">
-                <sbx-icon name="group"></sbx-icon>
-                View Customisation Records
-            </a>
+            {% set viewRecordsRoute = routeLookupIfAuthorized('customisationRecord.viewRecords') %}
+            {% if viewRecordsRoute %}
+                <a href="{{ viewRecordsRoute }}" class="button l-flex l-gap-s" title="View Customisation Records">
+                    <sbx-icon name="group"></sbx-icon>
+                    View Customisation Records
+                </a>
+            {% endif %}
         </div>
         <div>
             {% include '@filters/panel.twig' with {
