@@ -554,8 +554,8 @@
          */
         parts[0] = parts[0].trim().replace("%", "");
 
-        if (!isNaN(parseInt(parts[0]))) {
-            var numerator = parseInt(parts[0]);
+        if (!isNaN(parseFloat(parts[0])) && isFinite(parseFloat(parts[0]))) {
+            var numerator = parseFloat(parts[0]);
             var denominator = $(element).attr("data-validation-limit");
 
             return numerator >= 0 && numerator <= denominator;
@@ -599,8 +599,8 @@
          */
         val = val.trim().replace("%", "");
 
-        if (!isNaN(parseInt(val))) {
-            var numerator = parseInt(val);
+        if (!isNaN(parseFloat(val)) && isFinite(parseFloat(val))) {
+            var numerator = parseFloat(val);
             var denominator = $(element).attr("data-validation-limit");
 
             return numerator >= 0 && numerator <= denominator;

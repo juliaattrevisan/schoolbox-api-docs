@@ -191,7 +191,6 @@ window.Vue.onMounted(() => {
     font-weight: 600;
     font-size: calc((1rem) - 2px);
     height: auto;
-    height: auto;
     line-height: 1.5rem;
     margin: 0;
     padding: var(--spacing-s);
