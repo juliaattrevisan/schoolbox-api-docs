@@ -74,6 +74,13 @@ class MomentsRetention implements IStrategy
             ]);
 
         $toDelete = $statement->fetch();
+
+        // if no entries exit early
+        if (empty($toDelete['moments'])) {
+            $this->log->notice('No moments to delete');
+            return;
+        }
+
         $this->log->info(sprintf("Found '%s' moments to delete", $toDelete['moments']));
         $this->log->info(sprintf("With '%s' moment_evidence to delete", $toDelete['evidence']));
         $this->log->info(sprintf("With '%s' moment_folders to delete", $toDelete['folders']));
@@ -99,6 +106,7 @@ class MomentsRetention implements IStrategy
             while ($row = $statement->fetch()) {
                 $deleteIds[] = $row['id'];
             }
+
             // log how many chunks we will delete
             $chunkCount = ceil(count($deleteIds) / self::CHUNK_SIZE);
             $this->log->notice(sprintf("Deleting '%s' moments broken into '%s' chunks", count($deleteIds), $chunkCount));
