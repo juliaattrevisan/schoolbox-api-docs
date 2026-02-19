@@ -22,6 +22,8 @@ use Symfony\Component\Lock\LockInterface;
 
 class MomentsRetention implements IStrategy
 {
+    private const CHUNK_SIZE = 1000; // how many things to delete at once
+
     /**
      * @param null|LoggerInterface  $log
      * @param bool                  $perform
@@ -97,33 +99,49 @@ class MomentsRetention implements IStrategy
             while ($row = $statement->fetch()) {
                 $deleteIds[] = $row['id'];
             }
+            // log how many chunks we will delete
+            $chunkCount = ceil(count($deleteIds) / self::CHUNK_SIZE);
+            $this->log->notice(sprintf("Deleting '%s' moments broken into '%s' chunks", count($deleteIds), $chunkCount));
 
-            $delPlaceholders = Builder::getArrayPlaceholders($deleteIds, 'moment_id');
-            $delParams = Builder::getArrayParameters($deleteIds, 'moment_id');
+            // chunk things into self::CHUNK_SIZE
+            foreach (array_chunk($deleteIds, self::CHUNK_SIZE) as $chunkId => $chunkIds) {
+                // log the chunk we are working on
+                $this->log->notice(sprintf("[%s/%s] Processing chunk", $chunkId + 1, $chunkCount));
 
-            // unlink evidence
-            $statementEvidence = $this->database->prepare("DELETE FROM moment_evidence WHERE moment_id IN {$delPlaceholders}");
-            $statementEvidence->execute($delParams);
+                $delPlaceholders = Builder::getArrayPlaceholders($chunkIds, 'moment_id');
+                $delParams       = Builder::getArrayParameters($chunkIds, 'moment_id');
 
-            // unlink folders
-            $statementFolder = $this->database->prepare("DELETE FROM moment_folder WHERE moment_id IN {$delPlaceholders}");
-            $statementFolder->execute($delParams);
+                // unlink evidence
+                $statementEvidence = $this->database->prepare("DELETE FROM moment_evidence WHERE moment_id IN {$delPlaceholders}");
+                $statementEvidence->execute($delParams);
 
-            // unlink tags
-            $statementTag = $this->database->prepare("DELETE FROM moment_tag WHERE moment_id IN {$delPlaceholders}");
-            $statementTag->execute($delParams);
+                // unlink folders
+                $statementFolder = $this->database->prepare("DELETE FROM moment_folder WHERE moment_id IN {$delPlaceholders}");
+                $statementFolder->execute($delParams);
 
-            // delete the moments
-            $statementMoment = $this->database->prepare("DELETE FROM moment WHERE id IN {$delPlaceholders}");
-            $statementMoment->execute($delParams);
+                // unlink tags
+                $statementTag = $this->database->prepare("DELETE FROM moment_tag WHERE moment_id IN {$delPlaceholders}");
+                $statementTag->execute($delParams);
 
-            $this->log->notice(sprintf(
-                "Deleted '%s' moments, '%s' moment_evidence, '%s' moment_folders and '%s' moment_tags",
-                $statementMoment->rowCount(),
-                $statementEvidence->rowCount(),
-                $statementFolder->rowCount(),
-                $statementTag->rowCount()
-            ));
+                // delete the moments
+                $statementMoment = $this->database->prepare("DELETE FROM moment WHERE id IN {$delPlaceholders}");
+                $statementMoment->execute($delParams);
+
+                $this->log->notice(
+                    sprintf(
+                        "Deleted '%s' moments, '%s' moment_evidence, '%s' moment_folders and '%s' moment_tags",
+                        $statementMoment->rowCount(),
+                        $statementEvidence->rowCount(),
+                        $statementFolder->rowCount(),
+                        $statementTag->rowCount()
+                    )
+                );
+
+                // if we have more chunks, refresh the lock
+                if ($chunkId < $chunkCount - 1) {
+                    $this->lock->refresh();
+                }
+            }
         } else {
             $this->log->info('Would have deleted older than ' . $deleteOlderThan);
         }
