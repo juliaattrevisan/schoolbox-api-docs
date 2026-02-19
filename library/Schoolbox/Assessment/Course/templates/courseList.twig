@@ -63,36 +63,45 @@ Usage:
         <li class="active"><span>Courses</span></li>
     </ul>
 {% endif %}
+<div class="course-list-page">
+    <div class="row actions-small-1">
+        <div class="list-item">
+            <div class="small-12 column">
+                <h1>Course List</h1>
+            </div>
+        </div>
+        {% if hasAdd %}
+            <nav>
+                <a href="{{ routeLookup('course.newCourse') }}" class="icon-add" data-test="course-list-icon-add"></a>
+                {# intellischool anlytics, hide if it is not setup, both routes, have the same perms (settings) #}
+                {% set intellischoolCohortUrl = routeLookupIfAuthorized('intellischool.getCohortProfile') %}
+                {% if intellischoolCohortUrl %}
+                    <a href="{{ intellischoolCohortUrl }}" title="Cohort Analytics" class="icon-intellischool"></a>
+                {% endif %}
+            </nav>
+        {% endif %}
+    </div>
 
-<div class="row actions-small-1">
-    <div class="list-item">
+    <div class="row">
         <div class="small-12 column">
-            <h1>Course List</h1>
+            <label for="course-search" class="t-visually-hidden">Search Courses</label>
+            <input id="course-search" type="text" class='course-selector-loader' value="" placeholder="Search for a course" data-course-selector-filter />
         </div>
     </div>
-    {% if hasAdd %}
-        <nav>
-            <a href="{{ routeLookup('course.newCourse') }}" class="icon-add" data-test="course-list-icon-add"></a>
-            {# intellischool anlytics, hide if it is not setup, both routes, have the same perms (settings) #}
-            {% set intellischoolCohortUrl = routeLookupIfAuthorized('intellischool.getCohortProfile') %}
-            {% if intellischoolCohortUrl %}
-                <a href="{{ intellischoolCohortUrl }}" title="Cohort Analytics" class="icon-intellischool"></a>
-            {% endif %}
-        </nav>
-    {% endif %}
-</div>
-
-<div class="row">
-    <div class="small-12 column">
-        <label for="course-search" class="t-visually-hidden">Search Courses</label>
-        <input id="course-search" type="text" class='course-selector-loader' value="" placeholder="Search for a course" data-course-selector-filter />
+    <div class="row" id="course-selector-results">
+        {# This is the default results when modal opens, this will get replaced by 'courseListResults.twig' after an AJAX #}
+        {% include '@course/courseListResults.twig' %}
     </div>
-</div>
-<div class="row" id="course-selector-results">
-    {# This is the default results when modal opens, this will get replaced by 'courseListResults.twig' after an AJAX #}
-    {% include '@course/courseListResults.twig' %}
 </div>
 
 {% if hasClose %}
     <a class="close-reveal-modal">&#215;</a>
 {% endif %}
+
+<style>
+/* Ensure the page can scroll when the 3-dot overflow menu is not clipped on small screens */
+.course-list-page {
+    min-height: 100vh;
+    padding-bottom: 350px;
+}
+</style>
