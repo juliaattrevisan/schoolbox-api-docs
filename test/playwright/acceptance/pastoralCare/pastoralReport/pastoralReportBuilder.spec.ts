@@ -47,7 +47,7 @@ test.describe("Pastoral Report Builder", () => {
      * check only the selected tables are presented in the report
      * check the columns can be sorted properly
      */
-    test.skip("create a pastoral report and check whether the frequency tables are presented or not, check the columns can be sorted and proper student, date and types are presented", async ({
+    test("create a pastoral report and check whether the frequency tables are presented or not, check the columns can be sorted and proper student, date and types are presented", async ({
         page,
         tester,
         db,
@@ -153,7 +153,7 @@ test.describe("Pastoral Report Builder", () => {
      * click each one of the tabs to ensure they load the records and points correctly via table and modal
      * check the print button is presented and able to export the report
      */
-    test.skip("check the tabs load records and points correctly: count number of records and points, check record details, check print button is presented, check download works", async ({
+    test("check the tabs load records and points correctly: count number of records and points, check record details, check print button is presented, check download works", async ({
         page,
         tester,
         db,
@@ -297,7 +297,7 @@ test.describe("Pastoral Report Builder", () => {
      * Creates a pastoral report builder
      * check the dates and students are properly presented in the report
      */
-    test.skip("creates a report and check the dates and students are properly presented in the report", async ({
+    test("creates a report and check the dates and students are properly presented in the report", async ({
         page,
         tester,
         db,
@@ -352,7 +352,11 @@ test.describe("Pastoral Report Builder", () => {
         }
     });
 
-    test("check the report builder List tab shows the comments and attachments", async ({ page, tester, db }) => {
+    test("check the report builder List tab and modal shows the comments and attachments", async ({
+        page,
+        tester,
+        db,
+    }) => {
         try {
             const createPastoralReport = new CreatePastoralReport(page);
             const pastoralCareReports = new PastoralCareReports(page);
@@ -360,17 +364,19 @@ test.describe("Pastoral Report Builder", () => {
             const pastoralProfile = new PastoralProfile(page, tester);
             const createPastoralRecord = new CreatePastoralRecord(page);
             const resourcesMyFilesPicker = new ResourcesMyFilesPicker(tester, page);
+            const recordId = 2; // Ms Jana Reed: Cyber Bullying
+            const studentId = 25; // Jana Reed
             const commentText = "This is a general comment";
             const bodyPublic = "<p>This is an automation pastoral record public body</p>";
 
             tester.isGoingTo("update a pastoral record to have description, comments and attachments");
-            await db.updateInDatabase("pastoral", { body_public: bodyPublic }, { id: 2 });
-            await pastoralProfile.goto(25); // Jana Reed
-            await pastoralProfile.clickPastoralRecord(25, 2);
+            await db.updateInDatabase("pastoral", { body_public: bodyPublic }, { id: recordId });
+            await pastoralProfile.goto(studentId); // Jana Reed
+            await pastoralProfile.clickPastoralRecord(studentId, recordId);
             await tester.common.clickAddComment();
             await tester.fillCKEditorById("comment-public", commentText);
             await pastoralProfile.clickPostComment();
-            await pastoralProfile.clickModifyIcon(25, 2);
+            await pastoralProfile.clickModifyIcon(studentId, recordId);
             await page.locator("#public-zone").click();
             await resourcesMyFilesPicker.takePictureAndSave("PastoralRecord");
             await createPastoralRecord.clickSave();
@@ -392,6 +398,33 @@ test.describe("Pastoral Report Builder", () => {
             await pastoralReportDetails.checkCommentNotPresented(
                 "Parents have been contacted. Both students have been given a Saturday detention.",
             ); // this is the comment in the confidential panel, it should not be shown in the list tab
+
+            tester.isGoingTo(
+                "check the Student by Type tab and check if the modal shows the title, description, comments, severity, tags",
+            );
+            await pastoralReportDetails.clickTab("Student by Type");
+            await pastoralReportDetails.clickCell({ trIndex: 4, tdIndex: 2 }); // Jana Reed row (number 4) clicking the total points column
+            await pastoralReportDetails.checkModalRecordDetails(
+                recordId,
+                studentId,
+                "Ms Jana Reed: Cyber Bullying ",
+                "Critical",
+                " 1 Point",
+            );
+            await pastoralReportDetails.checkTagCount(1);
+            await pastoralReportDetails.checkCommentPresented(commentText);
+            await pastoralReportDetails.checkCommentNotPresented(
+                "Parents have been contacted. Both students have been given a Saturday detention.",
+            ); // this is the comment in the confidential panel, it should not be shown in the modal as well
+            await pastoralReportDetails.checkAttachmentPresented();
+            await pastoralReportDetails.checkModalPublicBodyPresented(
+                "This is an automation pastoral record public body",
+            );
+            await pastoralReportDetails.checkModalPrivateBodyNotPresented(
+                "Jana and Mario have been using Facebook to bully Louisa Smith.",
+            ); // this is the description in the confidential panel, it should not be shown in the modal as well
+            await pastoralReportDetails.clickRecordInListTab(recordId, studentId);
+            await expect(page).toHaveURL(new RegExp(`.*/pastoral/student/${studentId}/record/${recordId}$`));
         } finally {
             tester.isGoingTo("Clean up: delete the pastoral report and undo the pastoral record changes");
             await db.dontHaveInDatabase("pastoral_report", { name: reportTitle, deleted_at: null });

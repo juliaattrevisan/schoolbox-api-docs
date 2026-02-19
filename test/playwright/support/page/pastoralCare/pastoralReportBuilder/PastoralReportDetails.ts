@@ -188,6 +188,65 @@ export default class PastoralReportDetails {
     }
 
     /**
+     * locates the modal and check the record details in the modal are correct
+     * @param expectedTitle - The expected text presented to the record in the modal
+     */
+    async checkModalRecordDetails1(expectedTitle: string[]): Promise<void> {
+        const modalTableLocator = this.page.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_TABLE_RECORD);
+        await expect(modalTableLocator).toContainText(expectedTitle);
+    }
+
+    /**
+     * check the modal is presenting the proper title, severity and number of points
+     * @param recordId - The id of the record
+     * @param studentId - The id of the student
+     * @param expectedTitle - The expected title of the record
+     * @param expectedSeverity - The expected severity of the record: Low, Critical, Medium, High
+     * @param expectedPoints - The expected number of points of the record
+     */
+    async checkModalRecordDetails(
+        recordId: number,
+        studentId: number,
+        expectedTitle: string,
+        expectedSeverity: string,
+        expectedPoints: string,
+    ): Promise<void> {
+        const modalTableLocator = this.page.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_TABLE_RECORD);
+        const rowLocator = modalTableLocator.locator(`#record${recordId}`);
+        await expect(rowLocator.locator(`a[href="/pastoral/student/${studentId}/record/${recordId}"]`)).toContainText(
+            expectedTitle,
+        );
+        await expect(rowLocator.locator(`span[title="${expectedSeverity}"]`)).toBeVisible();
+        await expect(rowLocator.locator(`a[href="/pastoral/student/${studentId}/record/${recordId}"]`)).toContainText(
+            ` ${expectedPoints}`,
+        );
+        await expect(rowLocator.locator("p.meta")).toBeVisible();
+        await expect(rowLocator.locator("img")).toBeVisible();
+    }
+
+    /**
+     * check the public body of the pastoral record is presented in the modal
+     * @param expectedBody - The expected public body text of the pastoral record
+     */
+    async checkModalPublicBodyPresented(expectedBody: string): Promise<void> {
+        const bodyLocator = this.page.locator(`div[data-test="pr-table-modal-records"]`, {
+            hasText: expectedBody,
+        });
+        await expect(bodyLocator).toBeVisible();
+    }
+
+    /**
+     * check the private body of the pastoral record is not presented in the modal
+     * @param expectedBody - The expected private body text of the pastoral record
+     */
+    async checkModalPrivateBodyNotPresented(expectedBody: string): Promise<void> {
+        const bodyLocator = this.page.locator(`div[data-test="pr-table-modal-records"]`, {
+            hasText: expectedBody,
+        });
+        await expect(bodyLocator).not.toBeVisible();
+    }
+
+    /**
      * check the cell in the table is showing the proper number of records
      * @param tableLocator - Object with trIndex (row number) and tdIndex (column number) to locate the cell
      * @param tableLocator.trIndex - The row number in the table
