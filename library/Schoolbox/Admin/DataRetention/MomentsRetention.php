@@ -60,11 +60,15 @@ class MomentsRetention implements IStrategy
                 count(distinct moment.id) AS moments,
                 count(moment_evidence.moment_id) AS evidence,
                 count(moment_folder.moment_id) AS folders,
-                count(moment_tag.moment_id) AS tags
+                count(moment_tag.moment_id) AS tags,
+                count(discussion_thread.id) AS threads,
+                count(discussion_thread_comment.discussion_thread_id) AS comments
             FROM moment
              LEFT JOIN moment_evidence ON moment.id = moment_evidence.moment_id
              LEFT JOIN moment_folder ON moment.id = moment_folder.moment_id
              LEFT JOIN moment_tag ON moment.id = moment_tag.moment_id
+             LEFT JOIN discussion_thread ON moment.discussion_thread_id = discussion_thread.id
+             LEFT JOIN discussion_thread_comment ON moment.discussion_thread_id = discussion_thread_comment.discussion_thread_id
             WHERE moment.deleted_at < :old
         ";
 
@@ -85,13 +89,16 @@ class MomentsRetention implements IStrategy
         $this->log->info(sprintf("With '%s' moment_evidence to delete", $toDelete['evidence']));
         $this->log->info(sprintf("With '%s' moment_folders to delete", $toDelete['folders']));
         $this->log->info(sprintf("With '%s' moment_tags to delete", $toDelete['tags']));
+        $this->log->info(sprintf("With '%s' discussion_threads to delete", $toDelete['threads']));
+        $this->log->info(sprintf("With '%s' discussion_thread_comments to delete", $toDelete['comments']));
 
         // if perform is true, delete learning moments older than the retention period
         if ($this->perform) {
             $this->log->info('Deleting learning moments older than ' . $deleteOlderThan);
             $query = "
             SELECT
-                id
+                id,
+                discussion_thread_id
             FROM moment
             WHERE moment.deleted_at < :old
         ";
@@ -103,8 +110,12 @@ class MomentsRetention implements IStrategy
 
             // collate ids to delete
             $deleteIds = [];
+            $discussionThreadIds = [];
             while ($row = $statement->fetch()) {
-                $deleteIds[] = $row['id'];
+                $deleteIds[] = [
+                    'id' => $row['id'],
+                    'discussion_thread_id' => $row['discussion_thread_id'] // may exist, may be null, we need this to delete the discussion thread and comments if it exists
+                ];
             }
 
             // log how many chunks we will delete
@@ -112,12 +123,19 @@ class MomentsRetention implements IStrategy
             $this->log->notice(sprintf("Deleting '%s' moments broken into '%s' chunks", count($deleteIds), $chunkCount));
 
             // chunk things into self::CHUNK_SIZE
-            foreach (array_chunk($deleteIds, self::CHUNK_SIZE) as $chunkId => $chunkIds) {
+            foreach (array_chunk($deleteIds, self::CHUNK_SIZE) as $chunkId => $chunk) {
                 // log the chunk we are working on
                 $this->log->notice(sprintf("[%s/%s] Processing chunk", $chunkId + 1, $chunkCount));
 
+                // extract the ids and the discussion threads from the chunk
+                $chunkIds = array_column($chunk, 'id');
+                $discussionThreadIds = array_column($chunk, 'discussion_thread_id');
+
                 $delPlaceholders = Builder::getArrayPlaceholders($chunkIds, 'moment_id');
                 $delParams       = Builder::getArrayParameters($chunkIds, 'moment_id');
+
+                $discussionPlaceholders = Builder::getArrayPlaceholders($discussionThreadIds, 'moment_id');
+                $discussionParams       = Builder::getArrayParameters($discussionThreadIds, 'moment_id');
 
                 // unlink evidence
                 $statementEvidence = $this->database->prepare("DELETE FROM moment_evidence WHERE moment_id IN {$delPlaceholders}");
@@ -135,13 +153,23 @@ class MomentsRetention implements IStrategy
                 $statementMoment = $this->database->prepare("DELETE FROM moment WHERE id IN {$delPlaceholders}");
                 $statementMoment->execute($delParams);
 
+                // delete the discussion thread comments
+                $statementComment = $this->database->prepare("DELETE FROM discussion_thread_comment WHERE discussion_thread_id IN {$discussionPlaceholders}");
+                $statementComment->execute($discussionParams);
+
+                // delete the discussion threads
+                $statementThread = $this->database->prepare("DELETE FROM discussion_thread WHERE id IN {$discussionPlaceholders}");
+                $statementThread->execute($discussionParams);
+
                 $this->log->notice(
                     sprintf(
-                        "Deleted '%s' moments, '%s' moment_evidence, '%s' moment_folders and '%s' moment_tags",
+                        "Deleted '%s' moments, '%s' moment_evidence, '%s' moment_folders, '%s' moment_tags '%s' discussion_threads, '%s' discussion_thread_comments",
                         $statementMoment->rowCount(),
                         $statementEvidence->rowCount(),
                         $statementFolder->rowCount(),
-                        $statementTag->rowCount()
+                        $statementTag->rowCount(),
+                        $statementThread->rowCount(),
+                        $statementComment->rowCount()
                     )
                 );
 
