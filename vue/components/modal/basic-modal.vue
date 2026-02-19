@@ -6,7 +6,7 @@
 
 import { useTemplateRef } from "vue";
 import { onKeyStroke } from "@vueuse/core";
-import { useFocusTrap } from "@vueuse/integrations/useFocusTrap";
+import { useFocusTrap } from "@vueuse/integrations";
 
 interface Props {
     hasBackgroundClick?: boolean; // Whether to close the modal on background click (clicking outside the modal)
