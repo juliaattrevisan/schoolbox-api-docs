@@ -6,7 +6,7 @@
 
 import { useTemplateRef } from "vue";
 import { onKeyStroke } from "@vueuse/core";
-import { useFocusTrap } from "@vueuse/integrations";
+// import { useFocusTrap } from "@vueuse/integrations";
 
 interface Props {
     hasBackgroundClick?: boolean; // Whether to close the modal on background click (clicking outside the modal)
@@ -35,16 +35,16 @@ if (props.hasFocusTrap) {
      * For example if the light gallery preview is used within the modal,
      * which requires outside clicks to function
      */
-    const { activate, deactivate } = useFocusTrap(modalEl, { allowOutsideClick: props.allowOutsideClick });
+    // const { activate, deactivate } = useFocusTrap(modalEl, { allowOutsideClick: props.allowOutsideClick });
     /**
      * Keep focus within the modal when it's open
      */
     window.Vue.watch(isOpen, async (newIsOpen) => {
         if (newIsOpen) {
             await window.Vue.nextTick(); // to ensure the modal is rendered before activating the focus trap
-            activate();
+            // activate();
         } else {
-            deactivate();
+            // deactivate();
         }
     });
 }

@@ -7,7 +7,6 @@
 import { gsap, CustomEase, CustomBounce } from "gsap/all";
 import type GSAPTimeline from "gsap";
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- The plugins import as <any> so we need to ignore this
 gsap.registerPlugin(CustomEase, CustomBounce); // Register the custom plugins otherwise they won't work
 
 const emit = defineEmits<{
@@ -81,7 +80,6 @@ function onCakeAnimated(): void {
  */
 function animateCake(): void {
     // create a custom bounce ease for the cake slices landing
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- The plugin is imported as <any> so we need to ignore this
     CustomBounce.create("myBounce", {
         strength: 0.1,
         squash: 0.3,

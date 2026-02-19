@@ -49,10 +49,10 @@ const debounceSearch = debounce(async () => {
  */
 window.Vue.watch(
     () => searchStore.query,
-    async () => {
+    () => {
         if (searchStore.isActive) {
             searchStore.enableSearch();
-            await debounceSearch();
+            void debounceSearch();
         }
     },
 );
