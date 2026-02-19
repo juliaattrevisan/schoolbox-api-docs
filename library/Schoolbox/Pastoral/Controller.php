@@ -25,12 +25,10 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
-use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
-use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
 use Schoolbox\Pastoral\Audience\ColorHelper;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
@@ -58,7 +56,6 @@ use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Pastoral\ClassReport\Cursor as Cursor;
 
 class Controller extends Base
 {
@@ -293,7 +290,6 @@ class Controller extends Base
      */
     public function getFlag(User $student): void
     {
-
         /**
          * This is a quick pull to copy/paste based on getStudent,
          * but it'll need to be done properly with the cursor in: SA-21304

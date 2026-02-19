@@ -57,6 +57,7 @@ const emit = defineEmits<{
 <template>
     <button
         v-if="props.isButton"
+        type="button"
         class="sbx-label-button"
         :title="props.title"
         @click="emit('select', { href: props.href, title: props.title })"

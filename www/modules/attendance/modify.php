@@ -463,7 +463,8 @@ if ($class) {
          * Only render the pastoral flags if pastoral is enabled,
          * the user has access and the config to show attendance flags is on
          */
-        if ($configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
+        if (
+            $configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
             && $_SESSION['user']->getRole()->getAccessPastoral()
             && $configLoader->get(ConfigMapper::NAME_SHOW_ATTENDANCE_FLAGS)
         ) {
