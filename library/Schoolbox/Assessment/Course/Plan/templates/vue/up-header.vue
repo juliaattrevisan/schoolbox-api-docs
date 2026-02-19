@@ -6,17 +6,13 @@
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import locale from "@js/terminology/rosettaStone";
 import { useAddUnitsStore } from "./store/unitPlannerAddUnitsStore";
+import type { Routes } from "./unitPlannerTypes";
 
 interface Props {
     courseTitle: string;
     courseId: number;
     folderId: number;
-    routeCurriculumCoverage: string | null;
-    routeImportIntoClasses: string | null;
-    routeNewUnits: string | null;
-    routeModifyCourse: string | null;
-    routeCourseMarkbook: string | null;
-    routeLearningAnalytics: string | null;
+    routes: Routes;
 }
 const props = defineProps<Props>();
 
@@ -36,7 +32,7 @@ function onPrintSelected(): void {
             <h1>Unit Planner - {{ props.courseTitle }}</h1>
             <div class="l-flex-row l-gap-s">
                 <button
-                    v-if="routeNewUnits"
+                    v-if="routes.newUnits"
                     class="button icon-add"
                     data-test="unit-planner-create-units"
                     @click.prevent="addStore.prompt()"
@@ -57,11 +53,11 @@ function onPrintSelected(): void {
     </div>
     <ul id="unit-dropdown" class="f-dropdown" data-dropdown-content aria-hidden="true">
         <li class="separator">Actions</li>
-        <li v-if="props.routeImportIntoClasses">
+        <li v-if="props.routes.importIntoClasses">
             <a
                 class="icon-import"
                 :data-test="`up-header-${props.courseId}-import-link`"
-                :href="getReturnUrl(props.routeImportIntoClasses!)"
+                :href="getReturnUrl(props.routes.importIntoClasses!)"
                 >Import into {{ locale.class.translate(true, true) }}</a
             >
         </li>
@@ -77,20 +73,20 @@ function onPrintSelected(): void {
                 >Assessment Calendar</a
             >
         </li>
-        <li v-if="routeCourseMarkbook">
-            <a :href="`${props.routeCourseMarkbook}`" class="icon-curriculum">Course Markbook</a>
+        <li v-if="routes.courseMarkbook">
+            <a :href="`${props.routes.courseMarkbook}`" class="icon-curriculum">Course Markbook</a>
         </li>
-        <li v-if="routeCurriculumCoverage">
-            <a :href="`${props.routeCurriculumCoverage}?courseId=${props.courseId}`" class="icon-report"
+        <li v-if="routes.curriculumCoverage">
+            <a :href="`${props.routes.curriculumCoverage}?courseId=${props.courseId}`" class="icon-report"
                 >Curriculum Coverage</a
             >
         </li>
-        <li v-if="routeLearningAnalytics">
-            <a :href="`${props.routeLearningAnalytics}`" class="icon-poll">Learning Analytics</a>
+        <li v-if="routes.learningAnalytics">
+            <a :href="`${props.routes.learningAnalytics}`" class="icon-poll">Learning Analytics</a>
         </li>
-        <li v-if="routeModifyCourse" class="separator">Manage</li>
-        <li v-if="routeModifyCourse">
-            <a :href="`${props.routeModifyCourse}?${getReturnUrl()}`" class="icon-modify">Modify Course</a>
+        <li v-if="routes.modifyCourse" class="separator">Manage</li>
+        <li v-if="routes.modifyCourse">
+            <a :href="`${props.routes.modifyCourse}?${getReturnUrl()}`" class="icon-modify">Modify Course</a>
         </li>
     </ul>
 </template>
