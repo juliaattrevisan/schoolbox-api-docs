@@ -8,8 +8,9 @@ export default class ClassList {
 
     static readonly URL = "/learning/class/{classId}";
 
-    static readonly SELECTOR_FLAG_LABEL =
-        'sbx-label[href="/pastoral/student/{studentId}?type={typeId}&subtype={subtypeId}"]';
+    static readonly DATA_TEST_STUDENT_PROFILE_FLAGS = "pastoral-flags-{studentId}";
+
+    static readonly DATA_TEST_PROFILE_FLAG = "pastoral-flags-{typeId}-{subtypeId}";
 
     constructor(page: Page, tester: AcceptanceTester) {
         this.page = page;
@@ -32,10 +33,14 @@ export default class ClassList {
      * @returns - The locator for the flag label
      */
     getFlagLabel(studentId: number, typeId: number, subtypeId: number): Locator {
-        return this.page.locator(
-            ClassList.SELECTOR_FLAG_LABEL.replace("{studentId}", studentId.toString())
-                .replace("{typeId}", typeId.toString())
-                .replace("{subtypeId}", subtypeId.toString()),
+        const student = this.page.getByTestId(
+            ClassList.DATA_TEST_STUDENT_PROFILE_FLAGS.replace("{studentId}", studentId.toString()),
+        );
+        return student.getByTestId(
+            ClassList.DATA_TEST_PROFILE_FLAG.replace("{typeId}", typeId.toString()).replace(
+                "{subtypeId}",
+                subtypeId.toString(),
+            ),
         );
     }
 }

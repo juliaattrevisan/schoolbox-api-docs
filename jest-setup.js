@@ -16,6 +16,7 @@ import {
     nextTick,
     defineCustomElement,
     useTemplateRef,
+    provide,
 } from "vue";
 window.Vue = {};
 window.Vue.ref = ref;
@@ -27,6 +28,7 @@ window.Vue.onBeforeUnmount = onBeforeUnmount;
 window.Vue.nextTick = nextTick;
 window.Vue.defineCustomElement = defineCustomElement;
 window.Vue.useTemplateRef = useTemplateRef;
+window.Vue.provide = provide;
 
 /**
  * Assign defaults to sbProps to prevent errors in tests

@@ -29,7 +29,6 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
-use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
 use Schoolbox\Pastoral\Audience\ColorHelper;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
@@ -279,6 +278,75 @@ class Controller extends Base
             ],
             $student->getFullName(),
         );
+    }
+
+    /**
+     * Display an individual students pastoral flag
+     *
+     * @param User $student
+     *
+     * @throws MapperException
+     * @throws RouteNotFound
+     */
+    public function getFlag(User $student): void
+    {
+        /**
+         * This is a quick pull to copy/paste based on getStudent,
+         * but it'll need to be done properly with the cursor in: SA-21304
+         */
+
+        $get = $this->requestQuery;
+
+        $user = $this->getUser();
+
+        $typeId    = (isset($get['type']) && is_numeric($get['type'])) ? (int)$get['type'] : null;
+        $subtypeId = (isset($get['subtype']) && is_numeric($get['subtype'])) ? (int)$get['subtype'] : null;
+
+        $records = $this->pastoralDataSource->findRecords($user, $student, $typeId, $subtypeId, null, null, null, false);
+
+        $data = $records->map($this->pastoralTranslator)->reindex();
+
+        $this->response = $this->responseAsJson([
+            'data'     => [
+                'results' => $data,
+            ],
+            'metadata' => [
+                'count'  => count($data),
+                'cursor' => [
+                    'next'    => null,
+                    'current' => null,
+                ],
+            ],
+        ]);
+
+        /**
+         * This was an initial attempt to use the class report cursor
+         * but I'm parking now as it'll be revisited in: SA-21304
+         */
+
+        // $cursor  = new Cursor(
+        //     $this->pastoralDataSource,
+        //     $this->getUser(),
+        //     $student,
+        //     [],
+        //     'created',
+        //     10,
+        // );
+
+        // $records = $cursor->retrieveResults('');
+
+        // $this->response = $this->responseAsJson([
+        //     'data'     => [
+        //         'results' => $records->map($this->pastoralTranslator),
+        //     ],
+        //     'metadata' => [
+        //         'count'  => $cursor->retrieveResultCount(),
+        //         'cursor' => [
+        //             'current' => $cursor->current($records),
+        //             'next'    => $cursor->next($records),
+        //         ],
+        //     ],
+        // ]);
     }
 
     /**

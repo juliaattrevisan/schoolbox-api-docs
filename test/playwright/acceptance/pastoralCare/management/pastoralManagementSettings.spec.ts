@@ -5,6 +5,7 @@ import PastoralExpiry from "@schoolboxTest/playwright/support/page/pastoralCare/
 import Common from "@schoolboxTest/playwright/support/page/Common";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
 import ClassList from "@schoolboxTest/playwright/support/page/homepage/pages/ClassList";
+import StudentParticipation from "@schoolboxTest/playwright/support/page/studentParticipation/StudentParticipation";
 
 /**
  * navigate to pastoral care management settings
@@ -23,6 +24,7 @@ test.describe("Pastoral Care - Management Settings", () => {
     let common: Common;
     let profilePage: ProfilePage;
     let classList: ClassList;
+    let studentParticipation: StudentParticipation;
 
     test.beforeEach(async ({ page, tester }) => {
         pastoralProfile = new PastoralProfile(page, tester);
@@ -203,6 +205,8 @@ test.describe("Pastoral Care - Management Settings", () => {
         createPastoralRecord = new CreatePastoralRecord(page);
         profilePage = new ProfilePage(tester, page);
         classList = new ClassList(page, tester);
+        studentParticipation = new StudentParticipation(tester, page);
+
         const studentId = 6;
         const pastoralTitle = "Automation Test Pastoral Record Flag and colour";
         const pastoralTitle2 = "Automation Test Pastoral Record Flag without colour";
@@ -241,7 +245,7 @@ test.describe("Pastoral Care - Management Settings", () => {
         await expect(classList.getFlagLabel(6, 1, 1)).toContainText("1");
         tester.isGoingTo("Visit the student participation page for an activity to check the flag is visible");
         await page.goto("/learning/assessments/550/participation");
-        await expect(classList.getFlagLabel(6, 1, 1)).toBeVisible();
+        await expect(studentParticipation.getFlagLabel(6, 1, 1)).toBeVisible();
         // create another record to check the flag count increments
         await createPastoralRecord.createPastoralRecord(studentId, pastoralTitle4, "1", "1");
         await profilePage.goto(studentId);
@@ -250,7 +254,7 @@ test.describe("Pastoral Care - Management Settings", () => {
         await page.goto(`/learning/class/55`);
         await expect(classList.getFlagLabel(6, 1, 1)).toContainText("2");
         await page.goto("/learning/assessments/550/participation");
-        await expect(classList.getFlagLabel(6, 1, 1)).toContainText("2");
+        await expect(studentParticipation.getFlagLabel(6, 1, 1)).toContainText("2");
         // delete a record and check if the flag count decrements
         tester.isGoingTo("delete a record and check if the flag count decrements");
         await pastoralProfile.goto(studentId);
@@ -264,7 +268,7 @@ test.describe("Pastoral Care - Management Settings", () => {
         await page.goto(`/learning/class/55`);
         await expect(classList.getFlagLabel(6, 1, 1)).toContainText("1");
         await page.goto("/learning/assessments/550/participation");
-        await expect(classList.getFlagLabel(6, 1, 1)).toContainText("1");
+        await expect(studentParticipation.getFlagLabel(6, 1, 1)).toContainText("1");
         // via pastoral management settings remove the flag and save - check the flag is no longer presented
         tester.isGoingTo(
             "via pastoral management settings remove the flag and save - check the flag is no longer presented",
@@ -279,7 +283,7 @@ test.describe("Pastoral Care - Management Settings", () => {
         await page.goto(`/learning/class/55`);
         await expect(classList.getFlagLabel(6, 1, 1)).not.toBeVisible();
         await page.goto("/learning/assessments/550/participation");
-        await expect(classList.getFlagLabel(6, 1, 1)).not.toBeVisible();
+        await expect(studentParticipation.getFlagLabel(6, 1, 1)).not.toBeVisible();
     });
 
     /**

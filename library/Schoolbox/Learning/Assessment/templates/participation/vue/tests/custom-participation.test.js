@@ -40,6 +40,16 @@ const defaultProps = {
         getAssessmentParticipationCopyActivity: "",
         includeInExistingCustomisation: "",
     },
+    assessmentType: "dueWork",
+    pastoralConfig: {
+        pastoralPointEnabled: true,
+        pastoralActionEnable: true,
+        pastoralSeverity: true,
+    },
+    pastoralRoutes: {
+        getStudentRecord: "",
+        getReportTags: "",
+    },
     assessmentId: 0,
     customisations: [],
 };

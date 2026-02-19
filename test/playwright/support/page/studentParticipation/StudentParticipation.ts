@@ -3,7 +3,7 @@
  * Handles exclusion and inclusion of students in assessment participation
  */
 
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import Common from "@schoolboxTest/playwright/support/page/Common";
@@ -22,6 +22,10 @@ export default class StudentParticipation {
     static readonly DATA_TEST_POP_OUT_PARTICIPANT_BUTTON = "sbx-pop-out-participant-{userId}-button";
 
     static readonly DATA_TEST_MARKBOOK_CELL = "markbook-cell-{activityId}-{userId}";
+
+    static readonly DATA_TEST_STUDENT_PROFILE_FLAGS = "pastoral-flags-{studentId}";
+
+    static readonly DATA_TEST_PROFILE_FLAG = "pastoral-flags-{typeId}-{subtypeId}";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -231,5 +235,24 @@ export default class StudentParticipation {
         this.tester.isGoingTo(`Verify there is a span element that includes the set due date '${expectedDueDate}'`);
         const dueDateSpan = this.page.locator(`span:text-is("${expectedDueDate}")`);
         expect(dueDateSpan).toBeDefined();
+    }
+
+    /**
+     * Returns a flag label locator
+     * @param studentId - The student id
+     * @param typeId - The pastoral type id
+     * @param subtypeId - The pastoral subtype id
+     * @returns - The locator for the flag label
+     */
+    getFlagLabel(studentId: number, typeId: number, subtypeId: number): Locator {
+        const student = this.page.getByTestId(
+            StudentParticipation.DATA_TEST_STUDENT_PROFILE_FLAGS.replace("{studentId}", studentId.toString()),
+        );
+        return student.getByTestId(
+            StudentParticipation.DATA_TEST_PROFILE_FLAG.replace("{typeId}", typeId.toString()).replace(
+                "{subtypeId}",
+                subtypeId.toString(),
+            ),
+        );
     }
 }

@@ -272,12 +272,12 @@ class DataSource
      * @param User $student Student being viewed
      * @param int|null $typeId Filter the records with a pastoral type, if not null
      * @param int|null $subtypeId
-     * @param int $offset
-     * @param int $limit
+     * @param int|null $offset
+     * @param int|null $limit
      * @param User|null $linkedStudent Returns the records linked to this student only, if provided
      * @return GenericCollection
      */
-    public function findRecords(User $viewer, User $student, ?int $typeId, ?int $subtypeId, int $offset, int $limit, ?User $linkedStudent, ?bool $showArchived = true): GenericCollection
+    public function findRecords(User $viewer, User $student, ?int $typeId, ?int $subtypeId, ?int $offset, ?int $limit, ?User $linkedStudent, ?bool $showArchived = true): GenericCollection
     {
         return $this->findRawRecords($viewer, $student, $typeId, $subtypeId, $offset, $limit, $linkedStudent, null, $showArchived);
     }

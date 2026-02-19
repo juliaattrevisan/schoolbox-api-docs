@@ -10,13 +10,14 @@ import { useSelectedList } from "@schoolboxVue/composables/form/useSelectedList"
 import type { User } from "@schoolboxLibrary/types/User";
 import ViewDpModal from "@schoolboxLibrary/DifferentiationProfile/templates/vue/view-dp-modal.vue";
 import { ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_TASK } from "@schoolboxAssessment/Types/assessmentTypes";
+import type { Routes as PastoralRoutes, Config } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
 import CpParticipant from "./cp-participant.vue";
 import CpBottomDrawer from "./cp-bottom-drawer.vue";
 import CpIncludeInExistingModal from "./cp-include-in-existing-modal.vue";
 import CpConfirmModifyModal from "./cp-confirm-modify-modal.vue";
 import CpSuggestedCustomisationModal from "./cp-suggested-customisation-modal.vue";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
-import { useGetStudentPastoralCounts } from "./composable/useGetStudentPastoralCounts";
+import { useGetPastoralFlags } from "./composable/useGetPastoralFlags";
 import { useExcludeParticipant } from "./composable/useExcludeParticipant";
 import { useIncludeParticipant } from "./composable/useIncludeParticipant";
 import { useIncludeInExisting } from "./composable/useIncludeInExisting";
@@ -30,7 +31,15 @@ const props = defineProps<{
     assessmentId: number;
     assessmentType: string;
     customisations: (Plan | CustomisedPlan)[];
+    pastoralConfig: Config;
+    pastoralRoutes: PastoralRoutes;
 }>();
+
+/**
+ * To pass through to the pastoral-records-modal that displays when a flag is selected
+ */
+window.Vue.provide("pastoralConfig", props.pastoralConfig);
+window.Vue.provide("pastoralRoutes", props.pastoralRoutes);
 
 /**
  * Handle selection of participants via checkboxes
@@ -50,9 +59,9 @@ const canSuggestCustomisation = window.Vue.computed(() => {
 });
 
 /**
- * Get student pastoral counts
+ * Get student pastoral flags
  */
-const { loadError, studentPastoralCounts } = useGetStudentPastoralCounts(
+const { loadError, pastoralFlags } = useGetPastoralFlags(
     props.pastoralEnabled,
     props.routes.getStudentsPastoralCountsUrl,
     () => allParticipants.value,
@@ -148,7 +157,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
                         v-model:selected-list="selectedList"
                         :participant="participant"
                         :show-checkboxes="showCheckboxes"
-                        :student-pastoral-counts="studentPastoralCounts"
+                        :pastoral-flags="pastoralFlags"
                         :routes="props.routes"
                         :assessment-id="props.assessmentId"
                         :can-suggest-customisation="canSuggestCustomisation"

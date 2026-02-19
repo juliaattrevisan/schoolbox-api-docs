@@ -5,14 +5,15 @@
 
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import locale from "@js/terminology/rosettaStone";
-import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
+import type { PastoralFlag } from "@schoolboxLibrary/Pastoral/types/PastoralFlag";
+import PastoralFlags from "@schoolboxLibrary/Pastoral/vue/flags/pastoral-flags.vue";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
 import { hasCustomisation } from "../js/util/participantUtils";
 
 const props = defineProps<{
     participant: Participant;
     showCheckboxes: boolean;
-    studentPastoralCounts: Record<string, StudentPastoralCountBadge[]>;
+    pastoralFlags: Record<string, PastoralFlag[]>;
     routes: Routes;
     assessmentId: number;
     canSuggestCustomisation: boolean | undefined;
@@ -114,18 +115,13 @@ function onOpenIncludeInExistingModal(): void {
                     {{ props.participant.user.preferredName || props.participant.user.firstname }}
                     {{ props.participant.user.pronoun || "" }}
                 </template>
-                <div class="l-flex-row l-gap-xs">
-                    <sbx-label
-                        v-for="studentBadge in studentPastoralCounts[props.participant.user.id]"
-                        :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
-                        :title="studentBadge.title"
-                        :text="studentBadge.count.toString()"
-                        :icon="studentBadge.icon"
-                        :background-color="studentBadge.bgColor"
-                        :text-color="studentBadge.fgColor"
-                        :href="studentBadge.destinationUrl"
-                    />
-                </div>
+                <pastoral-flags
+                    v-if="
+                        pastoralFlags[props.participant.user.id] && pastoralFlags[props.participant.user.id].length > 0
+                    "
+                    :user-id="props.participant.user.id"
+                    :flags="props.pastoralFlags[props.participant.user.id]"
+                />
             </div>
         </td>
         <td v-if="props.differentiationEnabled">

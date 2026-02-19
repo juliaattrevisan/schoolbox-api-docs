@@ -136,6 +136,7 @@ class ModelToArray
                                           ),
             'commentsPrivate'    => $model->getComments()->filterBy('private', true)->map($this->commentTranslator),
             'commentsPublic'     => $model->getComments()->filterBy('private', false)->map($this->commentTranslator),
+            'comments'           => $model->getComments()->filterBy('private', false)->map($this->commentTranslator),
 
             // Actions
             'recordActions'      => $model->getRecordActions()->map(
@@ -151,6 +152,8 @@ class ModelToArray
             ),
 
             // Excluded for now: access, related records, revisions
+
+            'owner' => $this->translateUser($model->getOwner()),
 
             // Ownership, last modifying user and time
             'createdBy' => $this->translateUser($model->getOwner()),

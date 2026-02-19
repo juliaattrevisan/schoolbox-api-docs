@@ -11,7 +11,7 @@ export default class ProfilePage {
 
     static readonly DATA_TEST_PROFILE_NAME = "user-profile-name";
 
-    static readonly DATA_TEST_PROFILE_FLAG = "student-profile-pastoral-flag-{typeId}-{subtypeId}";
+    static readonly DATA_TEST_PROFILE_FLAG = "pastoral-flags-{typeId}-{subtypeId}";
 
     static readonly SELECTOR_PROFILE_TAB = `a[href="#tab-{tabName}"]`;
 
