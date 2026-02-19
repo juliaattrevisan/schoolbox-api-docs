@@ -38,6 +38,6 @@ module.exports = {
             },
         ],
     },
-    transformIgnorePatterns: ["node_modules/(?!(gsap)/)"], // which files shall be transformed by Babel: https://jestjs.io/docs/tutorial-react-native#transformignorepatterns-customization
+    transformIgnorePatterns: ["node_modules/(?!(gsap|@vueuse)/)"], // which files shall be transformed by Babel: https://jestjs.io/docs/tutorial-react-native#transformignorepatterns-customization
     verbose: true, // Indicates whether each individual test should be reported during the run. All errors will also still be shown on the bottom after execution. Note that if there is only one test file being run it will default to true.
 };
