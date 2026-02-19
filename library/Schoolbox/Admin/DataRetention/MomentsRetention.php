@@ -153,11 +153,11 @@ class MomentsRetention implements IStrategy
                 $statementMoment = $this->database->prepare("DELETE FROM moment WHERE id IN {$delPlaceholders}");
                 $statementMoment->execute($delParams);
 
-                // delete the discussion thread comments
+                // delete the discussion thread comments // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads comments that were not... but they do match to the moment...
                 $statementComment = $this->database->prepare("DELETE FROM discussion_thread_comment WHERE discussion_thread_id IN {$discussionPlaceholders}");
                 $statementComment->execute($discussionParams);
 
-                // delete the discussion threads
+                // delete the discussion threads // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads that were not... but they do match to the moment...
                 $statementThread = $this->database->prepare("DELETE FROM discussion_thread WHERE id IN {$discussionPlaceholders}");
                 $statementThread->execute($discussionParams);
 
