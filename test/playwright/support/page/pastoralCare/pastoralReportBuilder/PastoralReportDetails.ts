@@ -158,74 +158,47 @@ export default class PastoralReportDetails {
     }
 
     /**
-     * for one or more report tabs
-     * clicks a report tab, clicks one or more cells in the report table to open the modal, checks the number of records presented in the modal opened, close the modal
-     * @param tabNames - The names of the tabs: "List", "Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week",
-     * @param rowNumbers - The row to locate in the table: 1 for first row, 2 for second row, etc
-     * @param tableCells - The table cell columns to click in the located rows
-     * @param expectedCounts - The expected number of records in the modal for each tab
+     * clicks a cell in the table in the pastoral report table and checks the modal open
+     * @param tableLocator - Object with trIndex (row number) and tdIndex (column number) to locate the cell
+     * @param tableLocator.trIndex - The row number in the table
+     * @param tableLocator.tdIndex - The column number in the table
      */
-    async clickTabAndCheckModalRecordCounts(
-        tabNames: string[],
-        rowNumbers: number[],
-        tableCells: string[],
-        expectedCounts: number[],
-    ): Promise<void> {
-        for (let i = 0; i < tabNames.length; i += 1) {
-            const tabName = tabNames[i];
-            const rowNumber = rowNumbers[i];
-            const tableCell = tableCells[i];
-            const expectedCount = expectedCounts[i];
-            const tabLocator = this.page.getByTestId(
-                PastoralReportDetails.DATA_TEST_PASTORAL_TAB.replace("{tabName}", tabName),
-            );
-            await tabLocator.click();
+    async clickCell(tableLocator: { trIndex: number; tdIndex: number }): Promise<void> {
+        // const row = this.page.locator(`table tbody tr:nth-child(${rowNumber})`);
+        // await row.getByTestId(`pr-table-data-cell-${tableCell}`).click();
 
-            // finds the row and clicks a cell column in that row
-            const row = this.page.locator(`table tbody tr:nth-child(${rowNumber})`);
-            await row.getByTestId(`pr-table-data-cell-${tableCell}`).click();
+        const tableCellLocator = this.page.locator(
+            `table tbody tr:nth-child(${tableLocator.trIndex}) td:nth-child(${tableLocator.tdIndex})`,
+        );
+        await tableCellLocator.click();
 
-            // by clicking the cell, a modal opens - locating the modal and counting the records rows
-            const modalTableLocator = this.page.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_TABLE_RECORD);
-            await expect(modalTableLocator.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_RECORDS_ROWS)).toHaveCount(
-                expectedCount,
-            );
-
-            // closing the modal
-            const closeButton = this.page.getByTestId(PastoralReportDetails.DATA_TEST_CLOSE_MODAL_BUTTON);
-            await closeButton.click();
-        }
+        const modalLocator = this.page.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_TABLE_RECORD);
+        await expect(modalLocator).toBeVisible();
     }
 
     /**
-     * for one or more report tabs
-     * clicks a report tab, check the number of records is presented properly in the table
-     * @param tabNames - The names of the tabs: "List", "Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week",
-     * @param rowNumbers - The row to locate in the table: 1 for first row, 2 for second row, etc
-     * @param tableCells - The table cell columns to click in the located rows
-     * @param expectedCounts - The expected number of records in the modal for each tab
+     * locates the modal and checks the number of records rows in the modal
+     * @param expectedCount - The expected number of records in the modal
      */
-    async checkRowCounts(
-        tabNames: string[],
-        rowNumbers: number[],
-        tableCells: string[],
-        expectedCounts: string[],
-    ): Promise<void> {
-        for (let i = 0; i < tabNames.length; i += 1) {
-            const tabName = tabNames[i];
-            const rowNumber = rowNumbers[i];
-            const tableCell = tableCells[i];
-            const expectedCount = expectedCounts[i];
+    async checkModalRowRecordCount(expectedCount: number): Promise<void> {
+        const modalTableLocator = this.page.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_TABLE_RECORD);
+        await expect(modalTableLocator.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_RECORDS_ROWS)).toHaveCount(
+            expectedCount,
+        );
+    }
 
-            const tabLocator = this.page.getByTestId(
-                PastoralReportDetails.DATA_TEST_PASTORAL_TAB.replace("{tabName}", tabName),
-            );
-            await tabLocator.click();
-
-            // finds the row and locate a cell column in that row - checks the correct number is presented
-            const row = this.page.locator(`table tbody tr:nth-child(${rowNumber})`);
-            await expect(row.getByTestId(`pr-table-data-cell-${tableCell}`)).toHaveText(expectedCount);
-        }
+    /**
+     * check the cell in the table is showing the proper number of records
+     * @param tableLocator - Object with trIndex (row number) and tdIndex (column number) to locate the cell
+     * @param tableLocator.trIndex - The row number in the table
+     * @param tableLocator.tdIndex - The column number in the table
+     * @param expectedCount - The expected number of records in the cell
+     */
+    async checkRecordCount(tableLocator: { trIndex: number; tdIndex: number }, expectedCount: number): Promise<void> {
+        const tableCellLocator = this.page.locator(
+            `table tbody tr:nth-child(${tableLocator.trIndex}) td:nth-child(${tableLocator.tdIndex})`,
+        );
+        await expect(tableCellLocator).toHaveText(expectedCount.toString());
     }
 
     /**
@@ -268,63 +241,63 @@ export default class PastoralReportDetails {
     }
 
     /**
-     * for one or more report tabs
-     * clicks the report tab, counts the number of data test sort buttons, check whether some type or dates are presented or not
-     * @param tabNames - The names of the tabs: "List", "Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week",
-     * @param expectedSortButtonCounts - The expected number of sort buttons in each tab
-     * @param typesToCheckPresent - The types to check are presented in each tab: eg: 1 for Award/Achievement, 7 for Behavioural Issues, etc
-     * @param typesToCheckNotPresent - The types to check are not presented in each tab: eg: 1 for Award/Achievement, 7 for Behavioural Issues, etc
+     * check the number of headers that are presented on the table in a report tab
+     * @param expectedCount - The expected number of headers in the table
+     */
+    async checkHeaderCount(expectedCount: number): Promise<void> {
+        const sortButtonsLocator = this.page.getByTestId(/^pr-table-header-sort-button/);
+        await expect(sortButtonsLocator).toHaveCount(expectedCount);
+    }
+
+    /**
+     * check if the header is presented in the table in a report tab
+     * @param typesPresent - The types to check are presented in each tab: eg: 1 for Award/Achievement, 7 for Behavioural Issues, etc
+     */
+    async checkHeaderPresented(typesPresent: string[]): Promise<void> {
+        for (const type of typesPresent) {
+            const typeLocator = this.page.getByTestId(
+                PastoralReportDetails.DATA_TEST_SORT_BUTTON.replace("{headerName}", `count_subtype_${type}`),
+            );
+            await expect(typeLocator).toBeVisible();
+        }
+    }
+
+    /**
+     * check if the header is not presented in the table in a report tab
+     * @param typesPresent - The types to check are presented in each tab: eg: 1 for Award/Achievement, 7 for Behavioural Issues, etc
+     */
+    async checkHeaderNotPresented(typesPresent: string[]): Promise<void> {
+        for (const type of typesPresent) {
+            const typeLocator = this.page.getByTestId(
+                PastoralReportDetails.DATA_TEST_SORT_BUTTON.replace("{headerName}", `count_subtype_${type}`),
+            );
+            await expect(typeLocator).not.toBeVisible();
+        }
+    }
+
+    /**
+     * check the date header is presented in the table in a report tab
      * @param dateToCheckPresent - The dates to check are presented in each tab: eg: oct_2017, week_2, etc
+     */
+    async checkDateHeaderPresented(dateToCheckPresent: string[]): Promise<void> {
+        for (const date of dateToCheckPresent) {
+            const dateLocator = this.page.getByTestId(
+                PastoralReportDetails.DATA_TEST_SORT_BUTTON.replace("{headerName}", date),
+            );
+            await expect(dateLocator).toBeVisible();
+        }
+    }
+
+    /**
+     * check the date header is not presented in the table in a report tab
      * @param dateToCheckNotPresent - The dates to check are not presented in each tab: eg: oct_2017, week_2, etc
      */
-    async checkSortButtonsAndTypesDatesPresence(
-        tabNames: string[],
-        expectedSortButtonCounts: number[],
-        typesToCheckPresent: string[][],
-        typesToCheckNotPresent: string[][],
-        dateToCheckPresent: string[][],
-        dateToCheckNotPresent: string[][],
-    ): Promise<void> {
-        for (let i = 0; i < tabNames.length; i += 1) {
-            const tabName = tabNames[i];
-            const expectedSortButtonCount = expectedSortButtonCounts[i];
-            const typesPresent = typesToCheckPresent[i];
-            const typesNotPresent = typesToCheckNotPresent[i];
-            const datePresent = dateToCheckPresent[i];
-            const dateNotPresent = dateToCheckNotPresent[i];
-
-            const tabLocator = this.page.getByTestId(
-                PastoralReportDetails.DATA_TEST_PASTORAL_TAB.replace("{tabName}", tabName),
+    async checkDateHeaderNotPresented(dateToCheckNotPresent: string[]): Promise<void> {
+        for (const date of dateToCheckNotPresent) {
+            const dateLocator = this.page.getByTestId(
+                PastoralReportDetails.DATA_TEST_SORT_BUTTON.replace("{headerName}", date),
             );
-            await tabLocator.click();
-            const sortButtonsLocator = this.page.getByTestId(/^pr-table-header-sort-button/);
-            await expect(sortButtonsLocator).toHaveCount(expectedSortButtonCount);
-
-            for (const type of typesPresent) {
-                const typeLocator = this.page.getByTestId(
-                    PastoralReportDetails.DATA_TEST_SORT_BUTTON.replace("{headerName}", `count_subtype_${type}`),
-                );
-                await expect(typeLocator).toBeVisible();
-            }
-
-            for (const type of typesNotPresent) {
-                const typeLocator = this.page.getByTestId(
-                    PastoralReportDetails.DATA_TEST_SORT_BUTTON.replace("{headerName}", `count_subtype_${type}`),
-                );
-                await expect(typeLocator).not.toBeVisible();
-            }
-            for (const date of datePresent) {
-                const dateLocator = this.page.getByTestId(
-                    PastoralReportDetails.DATA_TEST_SORT_BUTTON.replace("{headerName}", date),
-                );
-                await expect(dateLocator).toBeVisible();
-            }
-            for (const date of dateNotPresent) {
-                const dateLocator = this.page.getByTestId(
-                    PastoralReportDetails.DATA_TEST_SORT_BUTTON.replace("{headerName}", date),
-                );
-                await expect(dateLocator).not.toBeVisible();
-            }
+            await expect(dateLocator).not.toBeVisible();
         }
     }
 }
