@@ -36,9 +36,9 @@ class CmsLogExample implements IStrategy
      */
     public function process(): void
     {
-        $retentionPeriod = $this->config->get('dataRetention_cmsLogRetentionPeriod'); // configured by admin with planned options 1 Day, 30 Days, 365 Days, <null> (null is do NOT hard delete this)
+        $retentionPeriod = (string)$this->config->get('dataRetention_cmsLogRetentionPeriod'); // configured by admin with planned options 1 Day, 30 Days, 365 Days, <null> (null is do NOT hard delete this)
         if ('' === $retentionPeriod) {
-            $this->log->info('No retention period set, skipping');
+            $this->log->notice('No retention period set, skipping');
             return;
         }
 
