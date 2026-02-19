@@ -126,10 +126,10 @@ export function useQuerySearch(
      */
     window.Vue.watch(
         () => query.value,
-        async () => {
+        () => {
             if (isActive.value) {
                 enableSearch();
-                await debounceSearch();
+                void debounceSearch();
             } else if (!requiresQuery) {
                 // bring up the default results if we don't need a query
                 void search();
