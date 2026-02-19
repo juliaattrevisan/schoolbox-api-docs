@@ -52,7 +52,7 @@ export function useSelected($selected: Ref<Item[]> | undefined = undefined): {
      */
     function add(toAdd: Item | Item[]): void {
         let currentSelected = selected.value; // get the current selected list to modify
-        const itemsToAdd = Array.isArray(toAdd) ? uniqBy(toAdd, "id") : [toAdd]; // ensure the items are unique
+        const itemsToAdd = Array.isArray(toAdd) ? uniqBy(toAdd, (item) => item.id) : [toAdd]; // ensure the items are unique
         itemsToAdd.forEach((itemToAdd) => {
             const exists = selected.value.find((selectedItem) => selectedItem.id === itemToAdd.id); // check if the item already exists, preventing duplicates
             if (!exists) {
