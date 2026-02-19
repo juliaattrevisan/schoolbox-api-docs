@@ -47,6 +47,14 @@ function onPrintSelected(): void {
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="small-12 columns">
+            <ul class="meta">
+                <li class="icon-quiz">Formative Assessment Task</li>
+                <li class="icon-staff-students">Grades visible to staff and students</li>
+            </ul>
+        </div>
+    </div>
     <ul id="unit-dropdown" class="f-dropdown" data-dropdown-content aria-hidden="true">
         <li class="separator">Actions</li>
         <li v-if="props.routeImportIntoClasses">
