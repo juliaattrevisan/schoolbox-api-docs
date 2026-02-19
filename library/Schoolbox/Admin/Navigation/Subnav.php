@@ -171,6 +171,9 @@ class Subnav
             $userHasServicePermissionTimetable ||
             $userHasServicePermissionDifferentiationProfile
         );
+        $userHasServicePermissionIBCoordinator = (
+            $this->user->hasServicePermission(UserAccess::SERVICE_IB_COORDINATOR, UserAccess::ACCESS_FULL)
+        );
 
         /* Keys of this array uniquely identify a page and its subpages
          * Used to preselect menu options so users have a sense of where they are
@@ -417,7 +420,7 @@ class Subnav
             ],
             '/adminv2/international-baccalaureate' => [
                 'name'       => 'Intl. Baccalaureate',
-                'visible'    => $userIsSuperuser, // Todo: Add IB permission
+                'visible'    => $userIsSuperuser || $userHasServicePermissionIBCoordinator,
                 'searchable' => false,
                 'children'   => [
                     '/adminv2/international-baccalaureate/configuration' => [
