@@ -164,7 +164,7 @@ export const getRecordScreenOptions = () => {
  */
 export const getRecordPhotoOptions = () => {
     const options = getDefaultVideojsRecordOptions();
-    (options.width = 1280),
+    ((options.width = 1280),
         (options.height = 960),
         (options.plugins = {
             record: {
@@ -177,7 +177,7 @@ export const getRecordPhotoOptions = () => {
                 },
                 debug: IS_DEBUG_MODE,
             },
-        });
+        }));
     return options;
 };
 

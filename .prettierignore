@@ -10,5 +10,9 @@
 **/www/static/js/bundle
 **/www/static/js/pdf/pdfjs
 **/www/static/js/vendors
+**/stories/assets/
+**/test/playwright/_output/
 **/resources/icon_font_raw
 stories/assets/mockServiceWorker.js
+www/static/js/fullcalendar/schoolbox-fullcalendar.min.js
+www/static/js/signature/jquery.signaturepad.min.js
