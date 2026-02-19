@@ -41,7 +41,7 @@ class MomentsRetention implements IStrategy
      */
     public function process(): void
     {
-        $retentionPeriod = (string)$this->config->get(ConfigMapper::NAME_DATA_RETENTION_LEARNINGMOMENTS); // configured by admin with planned options 1 Day, 30 Days, 365 Days, <null> (null is do NOT hard delete this)
+        $retentionPeriod = (string)$this->config->get(ConfigMapper::NAME_DATA_RETENTION_LEARNINGMOMENTS); // configured by admin with planned options 1;1 Day:30;30 Days:365;365 Days and <null> (null is do NOT hard delete this)
         if ('' === $retentionPeriod) {
             $this->log->notice('No retention period set, skipping');
             return;
@@ -137,7 +137,7 @@ class MomentsRetention implements IStrategy
                 $discussionPlaceholders = Builder::getArrayPlaceholders($discussionThreadIds, 'moment_id');
                 $discussionParams       = Builder::getArrayParameters($discussionThreadIds, 'moment_id');
 
-                // unlink evidence
+                // unlink evidence // the Garbage Collector will take care of the actual files, we just need to remove the database records
                 $statementEvidence = $this->database->prepare("DELETE FROM moment_evidence WHERE moment_id IN {$delPlaceholders}");
                 $statementEvidence->execute($delParams);
 
