@@ -24,7 +24,7 @@ body {
 .sbx-body .subheader {
     color: var(--sbx-color-text-primary);
     font-weight: var(--sbx-font-weight-heading);
-    text-transform: capitalize;
+    text-transform: none;
 }
 
 // Enlarge a bit specifically those subheaders that sit outside islands
@@ -65,5 +65,5 @@ body {
 .sbx-body .label {
     font-size: var(--sbx-font-size-xs);
     font-weight: var(--sbx-font-weight-normal);
-    text-transform: capitalize;
+    text-transform: none;
 }
