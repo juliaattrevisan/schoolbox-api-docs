@@ -229,7 +229,7 @@ module.exports = {
         // Curriculum
         manageCurriculum: "./library/Schoolbox/Curriculum/templates/vue/manageCurriculum/manageCurriculum.ts",
         curriculumSelector: "./library/Schoolbox/Curriculum/templates/vue/curriculumSelector/curriculumSelector.ts",
-        assessmentCodes: "./library/Schoolbox/Curriculum/templates/vue/assessmentCodes/assessmentCodes.ts",
+        curriculumCodes: "./library/Schoolbox/Curriculum/templates/vue/curriculumCodes/curriculumCodes.ts",
         overviewComponent: "./library/Schoolbox/Curriculum/templates/vue/overviewComponent/overviewComponent.ts",
         curriculumCoverage: "./library/Schoolbox/Curriculum/Reports/templates/vue/curriculumCoverage.ts",
 
