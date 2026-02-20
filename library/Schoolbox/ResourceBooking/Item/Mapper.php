@@ -448,23 +448,6 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Is the user a moderator of this item?
-     *
-     * @param int $itemId
-     * @param int $userId
-     * @return bool
-     * @throws BaseMapper\DefinitionException
-     */
-    public function isUserModerator($itemId, $userId)
-    {
-        $list = $this->getJoinMapper('moderator')->findByColumnList(
-            ['resource_id' => $itemId, 'moderator_id' => $userId],
-            ['limit' => 1]
-        );
-        return count($list) >= 1;
-    }
-
-    /**
      * Finds items for which $moderatorId is a moderator.
      *
      * This only fetches items that the user is a directly defined moderator -
