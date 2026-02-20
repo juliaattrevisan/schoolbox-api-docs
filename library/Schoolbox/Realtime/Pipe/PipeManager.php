@@ -236,49 +236,50 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         $socketKeyForConnection = Pipe::getSocketKeyForConnection($conn);
         $pipe                   = $this->pipes->getPipeBySocketKey($socketKeyForConnection);
 
+        // Before attempting to unregister the pipe:
+        // clear whatever transactions are on the pipe
+        $instanceId = null;
+        $userId     = null;
+        $pipeId     = null;
         if ($pipe) {
             $instanceId = $pipe->getInstanceId();
             $userId     = $pipe->getUserId();
             $pipeId     = $pipe->getSocketKey();
-
-            // Clean up the pushTransaction for this specific pipe
-            if ($userId !== null) {
-                unset($this->pushTransactions[$instanceId][$userId][$pipeId]);
-
-                // Clean up empty parent arrays
-                if (empty($this->pushTransactions[$instanceId][$userId])) {
-                    unset($this->pushTransactions[$instanceId][$userId]);
-                }
-                if (empty($this->pushTransactions[$instanceId])) {
-                    unset($this->pushTransactions[$instanceId]);
-                }
-            }
-
-            $this->pipes->unregisterPipe($socketKeyForConnection);
-
-            // If this was the last pipe for this user, clean up user-level resources
-            if ($userId !== null && $this->pipes->userPipeCount($instanceId, $userId) === 0) {
-                // Cancel the user's inactivity timer
-                if (
-                    isset($this->userTimeouts[$instanceId][$userId])
-                    && $this->userTimeouts[$instanceId][$userId] instanceof TimerInterface
-                ) {
-                    $this->reactLoop->cancelTimer($this->userTimeouts[$instanceId][$userId]);
-                    unset($this->userTimeouts[$instanceId][$userId]);
-
-                    if (empty($this->userTimeouts[$instanceId])) {
-                        unset($this->userTimeouts[$instanceId]);
-                    }
-                }
-
-                // Remove the user's subscription
-                $this->subscriptionManager->removeSubscription($instanceId, $userId);
-            }
-
-            $pipe->close();
-        } else {
-            $this->pipes->unregisterPipe($socketKeyForConnection);
         }
+
+        // Clean up the pushTransaction for this specific pipe
+        if (isset($instanceId, $userId, $pipeId)) {
+            unset($this->pushTransactions[$instanceId][$userId][$pipeId]);
+            if (empty($this->pushTransactions[$instanceId][$userId])) {
+                unset($this->pushTransactions[$instanceId][$userId]);
+            }
+            if (empty($this->pushTransactions[$instanceId])) {
+                unset($this->pushTransactions[$instanceId]);
+            }
+        }
+
+        // Always unregister the pipe
+        $this->pipes->unregisterPipe($socketKeyForConnection);
+
+        // If this was the last pipe for this user:
+        // clean up any inactivity timeouts
+        if (isset($instanceId, $userId) && $this->pipes->userPipeCount($instanceId, $userId) === 0) {
+            if (
+                isset($this->userTimeouts[$instanceId][$userId])
+                && $this->userTimeouts[$instanceId][$userId] instanceof TimerInterface
+            ) {
+                $this->reactLoop->cancelTimer($this->userTimeouts[$instanceId][$userId]);
+                unset($this->userTimeouts[$instanceId][$userId]);
+                if (empty($this->userTimeouts[$instanceId])) {
+                    unset($this->userTimeouts[$instanceId]);
+                }
+            }
+
+            $this->subscriptionManager->removeSubscription($instanceId, $userId);
+        }
+
+        // Finally close the pipe
+        $pipe?->close();
     }
 
     /**
