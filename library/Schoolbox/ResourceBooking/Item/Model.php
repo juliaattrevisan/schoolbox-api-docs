@@ -466,6 +466,19 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
+     * Cached version of $this->canUserUserModerateThisItem().
+     * @param User $user
+     * @return bool
+     *
+     * @see isUserModerator.
+     *      * Repeated calls with the same user will return the same result cheaply.
+     */
+    public function canUserModerateThisItemCached(User $user): bool
+    {
+        return $user->isSuperuser() || $this->isUserModeratorCached($user);
+    }
+
+    /**
      * Is this user allowed to moderate this item?
      *
      * They can if:
@@ -475,9 +488,25 @@ class Model implements ISoftDeletable, JsonSerializable
      * @param User $user
      * @return bool
      */
-    public function canUserModerateThisItem(User $user)
+    public function canUserModerateThisItem(User $user): bool
     {
         return $user->isSuperuser() || $this->isUserModerator($user);
+    }
+
+    /**
+     * Cached version of $this->isUserModerator().
+     * Repeated calls with the same user will return the same result cheaply.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function isUserModeratorCached(User $user): bool
+    {
+        if (!array_key_exists($user->getId(), $this->isUserModeratorCache)) {
+            $this->isUserModeratorCache[$user->getId()] = $this->isUserModerator($user);
+        }
+
+        return $this->isUserModeratorCache[$user->getId()];
     }
 
     /**
@@ -491,38 +520,33 @@ class Model implements ISoftDeletable, JsonSerializable
      * they may act as a moderator for any item: @see canUserModerateThisItem.
      *
      * @param User $user
-     * @param bool $breakCache
      * @return bool
      */
-    public function isUserModerator(User $user, bool $breakCache = false): bool
+    public function isUserModerator(User $user): bool
     {
-        if ($breakCache || !array_key_exists($user->getId(), $this->isUserModeratorCache)) {
-            $isUserModerator = false;
+        $isUserModerator = false;
 
-            foreach ($user->getAccessList() as $access) {
-                if (
-                    $access->getService() == UserAccess::SERVICE_RESOURCE_BOOKING
-                    && $access->getAccessLevel() == UserAccess::ACCESS_FULL
-                ) {
+        foreach ($user->getAccessList() as $access) {
+            if (
+                $access->getService() == UserAccess::SERVICE_RESOURCE_BOOKING
+                && $access->getAccessLevel() == UserAccess::ACCESS_FULL
+            ) {
+                $isUserModerator = true;
+                break;
+            }
+        }
+
+        // if there are no moderators, do not attempt to iterate through the null
+        if (null !== $this->getModeratorList()) {
+            foreach ($this->getModeratorList() as $moderator) {
+                if ($moderator->getId() == $user->getId()) {
                     $isUserModerator = true;
                     break;
                 }
             }
-
-            // if there are no moderators, do not attempt to iterate through the null
-            if (null !== $this->getModeratorList()) {
-                foreach ($this->getModeratorList() as $moderator) {
-                    if ($moderator->getId() == $user->getId()) {
-                        $isUserModerator = true;
-                        break;
-                    }
-                }
-            }
-
-            $this->isUserModeratorCache[$user->getId()] = $isUserModerator;
         }
 
-        return $this->isUserModeratorCache[$user->getId()];
+        return $isUserModerator;
     }
 
     /**
