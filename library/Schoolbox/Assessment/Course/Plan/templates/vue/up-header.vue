@@ -52,7 +52,10 @@ function onPrintSelected(): void {
                     <sbx-icon name="network"></sbx-icon>Subject Code: {{ props.course.subjectCode }}
                 </li>
                 <li v-if="props.curriculumNodes.length > 0" class="meta l-flex-row l-gap-s">
-                    <curriculum-codes :nodes="props.curriculumNodes" />
+                    <sbx-icon name="curriculum"></sbx-icon>
+                    <div>
+                        <curriculum-codes :nodes="props.curriculumNodes" />
+                    </div>
                 </li>
             </ul>
         </div>
