@@ -19,6 +19,7 @@ import ActivitiesListDeleteModal from "./activities-list/activities-list-delete-
 
 interface Props {
     courseId: number;
+    courseSubjectCode: string | null;
     folderId: number;
     courseTitle: string;
     units: Unit[];
@@ -154,6 +155,7 @@ window.Vue.onUnmounted(() => {
     <up-header
         :course-title="props.courseTitle"
         :course-id="store.courseId"
+        :course-subject-code="props.courseSubjectCode"
         :folder-id="props.folderId"
         :routes="props.routes"
     />

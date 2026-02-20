@@ -11,6 +11,7 @@ import type { Routes } from "./unitPlannerTypes";
 interface Props {
     courseTitle: string;
     courseId: number;
+    courseSubjectCode: string | null;
     folderId: number;
     routes: Routes;
 }
@@ -45,9 +46,10 @@ function onPrintSelected(): void {
     </div>
     <div class="row">
         <div class="small-12 columns">
-            <ul class="meta">
-                <li class="icon-quiz">Formative Assessment Task</li>
-                <li class="icon-staff-students">Grades visible to staff and students</li>
+            <ul class="l-mar--0-left">
+                <li v-if="props.courseSubjectCode" class="meta l-flex-row l-gap-s">
+                    <sbx-icon name="network"></sbx-icon>Subject Code: {{ props.courseSubjectCode }}
+                </li>
             </ul>
         </div>
     </div>

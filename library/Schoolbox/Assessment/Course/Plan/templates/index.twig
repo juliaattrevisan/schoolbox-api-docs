@@ -7,6 +7,7 @@
     {% set routeLearningAnalytics = routeLookupIfAuthorized('learningAnalytics.course', { courseSpec: course, courseSpecId: course.id}) %}
     <unit-planner
         :course-id="{{ course.id }}"
+        :course-subject-code="{{ course.subjectCode ? course.subjectCode|json_encode : 'null' }}"
         :folder-id="{{ course.folder.id }}"
         course-title="{{ course.title }}"
         :units="{{ units |json_encode }}"
