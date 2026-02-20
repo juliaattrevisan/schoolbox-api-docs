@@ -495,7 +495,7 @@ class Csv extends Base
                         }
                         $isSuccess = true;
                     }
-                } catch (\Throwable $e) {
+                } catch (\Exception $e) {
                     //noop
                 }
             }
@@ -531,7 +531,7 @@ class Csv extends Base
     {
         $actualHeaders = [];
         foreach ($headerColumns as $index => $column) {
-            $actualHeaders[trim(strtolower($column))][] = $index;
+            $actualHeaders[strtolower($column)][] = $index;
         }
         return $actualHeaders;
     }
@@ -555,6 +555,6 @@ class Csv extends Base
             return array_map(fn($value) => $row[$value], $headerColumns[$columnName] ?? []);
         }
 
-        return isset($headerColumns[$columnName]) ? trim($row[$headerColumns[$columnName][0]]) : '';
+        return isset($headerColumns[$columnName]) ? $row[$headerColumns[$columnName][0]] : '';
     }
 }
