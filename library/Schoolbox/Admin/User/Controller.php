@@ -213,8 +213,8 @@ class Controller extends Base
                 'moderate' => true
             ]
         ],
-        UserAccess::SERVICE_IB_COORDINATOR => [
-            'name' => 'IB Coordinator',
+        UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
+            'name' => 'Fixtures',
             'identifier' => self::IDENTIFIER_NONE,
             'availability' => [
                 'read' => false,
@@ -222,8 +222,8 @@ class Controller extends Base
                 'moderate' => true
             ]
         ],
-        UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
-            'name' => 'Fixtures',
+        UserAccess::SERVICE_IB_COORDINATOR => [
+            'name' => 'IB Coordinator',
             'identifier' => self::IDENTIFIER_NONE,
             'availability' => [
                 'read' => false,
