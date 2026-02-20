@@ -423,7 +423,8 @@ class ConfigMapper extends Mapper
     public const string NAME_AI_DIFFERENTIATION = 'ai_differentiation';
     public const string NAME_AI_IMAGE_GENERATION = 'ai_image_generation';
     public const string NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION = 'ai_learning_activity_customisation';
-    public const string NAME_AI_MODERATION_KEY = 'ai_moderation_key';
+    public const string NAME_AI_MODERATION_KEY   = 'ai_moderation_key';
+    public const string NAME_AI_MODERATION_AGENT = 'ai_moderation_agent';
 
     // Presedio (anonymisation service, used by AI clients)
     public const string NAME_PRESIDIO_ANALYSIS_HOST = 'presidio_analysis_host';

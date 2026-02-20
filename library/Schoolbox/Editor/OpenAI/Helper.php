@@ -64,6 +64,13 @@ class Helper
     public const string FEATURE_LEARNING_ACTIVITY_CUSTOMISATION = 'learningactivitycustomisation';
 
     /**
+     * SA-21768
+     * Moderation of AI interactions
+     * automatic moderation agent, to flag ai interactions that require moderation (human inspection and approval, or investigation)
+     */
+    public const string FEATURE_AI_MODERATION_AGENT = 'aimoderationagent';
+
+    /**
      * When an image is omitted from the request/response, we replace the base64 data with this const
      */
     private const IMAGE_DATA_OMITTED = 'omitted';

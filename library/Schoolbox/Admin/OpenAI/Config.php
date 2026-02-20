@@ -26,6 +26,7 @@ class Config
         Helper::FEATURE_DIALOGAGENT                     => ConfigMapper::NAME_AI_DIALOGAGENT,
         Helper::FEATURE_IMAGE                           => ConfigMapper::NAME_AI_IMAGE_GENERATION,
         Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION => ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION,
+        Helper::FEATURE_AI_MODERATION_AGENT             => ConfigMapper::NAME_AI_MODERATION_AGENT,
     ];
 
     public const array PROVIDERS = [
@@ -426,6 +427,12 @@ class Config
                 'section' => self::SECTION_OPENAI,
             ];
             unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
+        }
+
+        if ($feature === Helper::FEATURE_AI_MODERATION_AGENT) {
+            // Ai Moderation agent:
+            // * remove generation system prompt
+            unset($formInputs[self::FIELD_SYSTEM_PROMPT]);
         }
 
         return $formInputs;
