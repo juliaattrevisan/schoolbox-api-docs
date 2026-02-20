@@ -11,6 +11,7 @@
             title: course.title,
             subjectCode: course.subjectCode
         }|json_encode }}"
+        :curriculum-nodes="{{ curriculumNodes |json_encode }}"
         :folder-id="{{ course.folder.id }}"
         :units="{{ units |json_encode }}"
         :template="{{ template |json_encode }}"

@@ -5,6 +5,7 @@
 import type { Ref } from "vue";
 import type { Template as EditorTemplate } from "@js/editor/types/editorTypes";
 import DummyInlineEditor from "@schoolboxVue/components/ckeditor/dummy-inline-editor.vue";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import type { Unit, UnitTemplate, Routes, Course } from "./unitPlannerTypes";
@@ -19,6 +20,7 @@ import ActivitiesListDeleteModal from "./activities-list/activities-list-delete-
 
 interface Props {
     course: Course;
+    curriculumNodes: Node[];
     folderId: number;
     units: Unit[];
     template: UnitTemplate; // the course framework template that units are linked to
@@ -150,7 +152,12 @@ window.Vue.onUnmounted(() => {
 
 <template>
     <dummy-inline-editor v-if="store.units.some((u) => u.textboxes._routes.createTextbox !== null)" />
-    <up-header :course="props.course" :folder-id="props.folderId" :routes="props.routes" />
+    <up-header
+        :course="props.course"
+        :curriculum-nodes="props.curriculumNodes"
+        :folder-id="props.folderId"
+        :routes="props.routes"
+    />
     <up-empty-state v-if="store.units.length === 0" />
     <div v-else class="row">
         <div class="small-12 island">

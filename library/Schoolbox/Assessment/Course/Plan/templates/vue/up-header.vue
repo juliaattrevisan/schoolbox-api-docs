@@ -5,11 +5,14 @@
 
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import locale from "@js/terminology/rosettaStone";
+import type { Node } from "@schoolboxCurriculum/types/Node";
+import CurriculumCodes from "@schoolboxCurriculum/vue/curriculumCodes/curriculum-codes.vue";
 import { useAddUnitsStore } from "./store/unitPlannerAddUnitsStore";
 import type { Routes, Course } from "./unitPlannerTypes";
 
 interface Props {
     course: Course;
+    curriculumNodes: Node[];
     folderId: number;
     routes: Routes;
 }
@@ -47,6 +50,9 @@ function onPrintSelected(): void {
             <ul class="l-mar--0-left">
                 <li v-if="props.course.subjectCode" class="meta l-flex-row l-gap-s">
                     <sbx-icon name="network"></sbx-icon>Subject Code: {{ props.course.subjectCode }}
+                </li>
+                <li v-if="props.curriculumNodes.length > 0" class="meta l-flex-row l-gap-s">
+                    <curriculum-codes :nodes="props.curriculumNodes" />
                 </li>
             </ul>
         </div>
