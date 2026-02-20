@@ -114,11 +114,6 @@ class Model implements ISoftDeletable, JsonSerializable
      */
     protected bool $allowClashBookings = false;
 
-    /**
-     * @var array<int, bool> Whether the user is a moderator of this resource booking item, indexed by userId.
-     */
-    private array $isUserModeratorCache = [];
-
     public function __construct()
     {
         $this->setImage(new Storage\Model());
@@ -347,7 +342,6 @@ class Model implements ISoftDeletable, JsonSerializable
      */
     public function setModeratorList($moderatorList)
     {
-        $this->isUserModeratorCache = []; // Clear the isUserModeratorCache.
         $this->moderatorList = $moderatorList;
         return $this;
     }
@@ -366,7 +360,6 @@ class Model implements ISoftDeletable, JsonSerializable
      */
     public function addModerator($moderator)
     {
-        $this->isUserModeratorCache = []; // Clear the isUserModeratorCache.
         return $this->getModeratorList()->add($moderator);
     }
 
@@ -495,15 +488,12 @@ class Model implements ISoftDeletable, JsonSerializable
      */
     public function isUserModerator(User $user): bool
     {
-        $isUserModerator = false;
-
         foreach ($user->getAccessList() as $access) {
             if (
                 $access->getService() == UserAccess::SERVICE_RESOURCE_BOOKING
                 && $access->getAccessLevel() == UserAccess::ACCESS_FULL
             ) {
-                $isUserModerator = true;
-                break;
+                return true;
             }
         }
 
@@ -511,13 +501,11 @@ class Model implements ISoftDeletable, JsonSerializable
         if (null !== $this->getModeratorList()) {
             foreach ($this->getModeratorList() as $moderator) {
                 if ($moderator->getId() == $user->getId()) {
-                    $isUserModerator = true;
-                    break;
+                    return true;
                 }
             }
         }
-
-        return $isUserModerator;
+        return false;
     }
 
     /**

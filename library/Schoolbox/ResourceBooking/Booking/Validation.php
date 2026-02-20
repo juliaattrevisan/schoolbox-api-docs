@@ -1129,7 +1129,7 @@ class Validation
         }
 
         if (
-            $resource->isUserModerator($user) // Note this function caches its results.
+            $resource->isUserModerator($user)
             && (int)$event->getAuthor()->getId() === (int)$user->getId()
         ) {
             /* If you're a Moderator and can moderate this request,
