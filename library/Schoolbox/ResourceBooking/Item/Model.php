@@ -466,19 +466,6 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * Cached version of $this->canUserUserModerateThisItem().
-     * @param User $user
-     * @return bool
-     *
-     * @see isUserModerator.
-     *      * Repeated calls with the same user will return the same result cheaply.
-     */
-    public function canUserModerateThisItemCached(User $user): bool
-    {
-        return $user->isSuperuser() || $this->isUserModeratorCached($user);
-    }
-
-    /**
      * Is this user allowed to moderate this item?
      *
      * They can if:
@@ -491,22 +478,6 @@ class Model implements ISoftDeletable, JsonSerializable
     public function canUserModerateThisItem(User $user): bool
     {
         return $user->isSuperuser() || $this->isUserModerator($user);
-    }
-
-    /**
-     * Cached version of $this->isUserModerator().
-     * Repeated calls with the same user will return the same result cheaply.
-     *
-     * @param User $user
-     * @return bool
-     */
-    public function isUserModeratorCached(User $user): bool
-    {
-        if (!array_key_exists($user->getId(), $this->isUserModeratorCache)) {
-            $this->isUserModeratorCache[$user->getId()] = $this->isUserModerator($user);
-        }
-
-        return $this->isUserModeratorCache[$user->getId()];
     }
 
     /**
