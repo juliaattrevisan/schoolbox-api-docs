@@ -892,6 +892,12 @@ export const Default: Story = {
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
+                    <sbx-icon name="subject-code"></sbx-icon>
+                </div>
+                <p>subject-code</p>
+            </div>
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
                     <sbx-icon name="surveys"></sbx-icon>
                 </div>
                 <p>surveys</p>
