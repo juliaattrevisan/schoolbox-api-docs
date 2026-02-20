@@ -61,7 +61,7 @@ class SubscriptionManager implements ISubscriptionManager
      */
     public function userHasSubscription(string $instanceId, int $userId): bool
     {
-        return array_key_exists($userId, $this->subscriptions);
+        return isset($this->subscriptions[$instanceId][$userId]);
     }
 
     /**
@@ -87,6 +87,11 @@ class SubscriptionManager implements ISubscriptionManager
         }
         // unsetting this will call Subscription::__destruct, which will call unsubscribe()
         unset($this->subscriptions[$instanceId][$userId]);
+
+        // Clean up empty instance array to prevent memory accumulation
+        if (empty($this->subscriptions[$instanceId])) {
+            unset($this->subscriptions[$instanceId]);
+        }
 
         return true;
     }

@@ -235,7 +235,50 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         // all WS are RFC6455, we can safely assume there's a pipe to unregister
         $socketKeyForConnection = Pipe::getSocketKeyForConnection($conn);
         $pipe                   = $this->pipes->getPipeBySocketKey($socketKeyForConnection);
+
+        // Before attempting to unregister the pipe:
+        // clear whatever transactions are on the pipe
+        $instanceId = null;
+        $userId     = null;
+        $pipeId     = null;
+        if ($pipe) {
+            $instanceId = $pipe->getInstanceId();
+            $userId     = $pipe->getUserId();
+            $pipeId     = $pipe->getSocketKey();
+        }
+
+        // Clean up the pushTransaction for this specific pipe
+        if (isset($instanceId, $userId, $pipeId)) {
+            unset($this->pushTransactions[$instanceId][$userId][$pipeId]);
+            if (empty($this->pushTransactions[$instanceId][$userId])) {
+                unset($this->pushTransactions[$instanceId][$userId]);
+            }
+            if (empty($this->pushTransactions[$instanceId])) {
+                unset($this->pushTransactions[$instanceId]);
+            }
+        }
+
+        // Always unregister the pipe
         $this->pipes->unregisterPipe($socketKeyForConnection);
+
+        // If this was the last pipe for this user:
+        // clean up any inactivity timeouts
+        if (isset($instanceId, $userId) && $this->pipes->userPipeCount($instanceId, $userId) === 0) {
+            if (
+                isset($this->userTimeouts[$instanceId][$userId])
+                && $this->userTimeouts[$instanceId][$userId] instanceof TimerInterface
+            ) {
+                $this->reactLoop->cancelTimer($this->userTimeouts[$instanceId][$userId]);
+                unset($this->userTimeouts[$instanceId][$userId]);
+                if (empty($this->userTimeouts[$instanceId])) {
+                    unset($this->userTimeouts[$instanceId]);
+                }
+            }
+
+            $this->subscriptionManager->removeSubscription($instanceId, $userId);
+        }
+
+        // Finally close the pipe
         $pipe?->close();
     }
 
@@ -731,5 +774,13 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         }
 
         unset($this->userTimeouts[$instanceId][$userId], $this->pushTransactions[$instanceId][$userId]);
+
+        // Clean up empty parent arrays to prevent memory accumulation
+        if (empty($this->userTimeouts[$instanceId])) {
+            unset($this->userTimeouts[$instanceId]);
+        }
+        if (empty($this->pushTransactions[$instanceId])) {
+            unset($this->pushTransactions[$instanceId]);
+        }
     }
 }
