@@ -5,10 +5,11 @@
 
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import locale from "@js/terminology/rosettaStone";
+import type { Course } from "@schoolboxLibrary/types/Course";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import CurriculumCodes from "@schoolboxCurriculum/vue/curriculumCodes/curriculum-codes.vue";
 import { useAddUnitsStore } from "./store/unitPlannerAddUnitsStore";
-import type { Routes, Course } from "./unitPlannerTypes";
+import type { Routes } from "./unitPlannerTypes";
 
 interface Props {
     course: Course;

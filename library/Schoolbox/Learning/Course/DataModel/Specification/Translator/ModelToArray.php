@@ -40,7 +40,6 @@ class ModelToArray
         return [
             'id'          => $courseSpec->getId(),
             'title'       => $courseSpec->getTitle(),
-            'name'        => $courseSpec->getTitle(),
             'subjectCode' => $courseSpec->getSubjectCode(),
             'frameworkId' => $courseSpec->getTemplate()?->getId(),
             'folder'      => call_user_func($this->folderTranslator, $courseSpec->getFolder()),

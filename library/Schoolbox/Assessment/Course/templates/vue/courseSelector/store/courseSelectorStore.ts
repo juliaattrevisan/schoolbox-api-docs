@@ -3,17 +3,17 @@
  */
 
 import { defineStore } from "pinia";
-import type { Course } from "@schoolboxLibrary/types/Course";
+import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 
 export const useCourseSelectorStore = defineStore("courseSelectorStore", () => {
-    const selected = window.Vue.ref<Course[]>([]); // the selected courses
+    const selected = window.Vue.ref<SearchSelectItem[]>([]); // the selected courses
     const selectedIds = window.Vue.computed(() => selected.value.map((course) => course.id)); // the ids of the selected courses
 
     /**
      * Initialize the store, passing through the selected courses if set
      * @param $selected - the selected courses
      */
-    function init($selected: Course[] = []): void {
+    function init($selected: SearchSelectItem[] = []): void {
         selected.value = $selected;
     }
 

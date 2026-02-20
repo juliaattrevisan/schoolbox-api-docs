@@ -3,8 +3,8 @@
  * To help identify gaps in chosen curriculum areas
  */
 
-import type { Course } from "@schoolboxLibrary/types/Course";
 import type { Node } from "@schoolboxCurriculum/types/Node";
+import type { Course } from "@schoolboxLibrary/types/Course";
 import CcHeader from "./cc-header.vue";
 import CcInput from "./cc-input.vue";
 import CcReport from "./cc-report.vue";
@@ -23,6 +23,15 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+/**
+ * Remaps the Courses to have a name property instead of title,
+ * so they can be used in the SearchSelect component
+ */
+const selectedCoursesWithNames = props.selectedCourses.map((course) => ({
+    ...course,
+    name: course.title,
+}));
+
 useQueryStore().init(props.reportEndpoint); // pass through the report endpoint to the store
 usePopOutStore().init(props.usageEndpoint); // pass through the usage endpoint to the store
 useExportStore().init(props.exportEndpoint); // pass through the export endpoint to the store
@@ -34,7 +43,7 @@ useExportStore().init(props.exportEndpoint); // pass through the export endpoint
         <cc-input
             :courses-endpoint="props.coursesEndpoint"
             :curriculum-endpoint="props.curriculumEndpoint"
-            :selected-courses="props.selectedCourses"
+            :selected-courses="selectedCoursesWithNames"
             :selected-nodes="props.selectedNodes"
         />
         <cc-report />

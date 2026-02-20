@@ -5,10 +5,11 @@
 import type { Ref } from "vue";
 import type { Template as EditorTemplate } from "@js/editor/types/editorTypes";
 import DummyInlineEditor from "@schoolboxVue/components/ckeditor/dummy-inline-editor.vue";
+import type { Course } from "@schoolboxLibrary/types/Course";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
-import type { Unit, UnitTemplate, Routes, Course } from "./unitPlannerTypes";
+import type { Unit, UnitTemplate, Routes } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
 import UpHeader from "./up-header.vue";
 import UpAddUnitsModal from "./up-add-units-modal.vue";

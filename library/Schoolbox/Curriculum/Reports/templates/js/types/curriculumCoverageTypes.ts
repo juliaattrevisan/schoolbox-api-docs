@@ -47,7 +47,7 @@ export type UnitWithCurriculumNodeUsage = Pick<Unit, "id" | "name"> & {
 /**
  * A course that includes units with node usage counts
  */
-export type CourseWithCurriculumNodeUsage = Pick<Course, "id" | "name"> & {
+export type CourseWithCurriculumNodeUsage = Pick<Course, "id" | "title"> & {
     units: UnitWithCurriculumNodeUsage[];
     usage: {
         course: {
