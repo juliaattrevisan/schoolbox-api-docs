@@ -109,13 +109,10 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        $fileTempName    = sb_tempnam('cal');
-        $fp              = fopen($fileTempName, 'wb');
-        stream_copy_to_stream($this->filesystemProxy->readStream($file), $fp);
-        fclose($fp);
+        $fileLocalPath = $this->filesystemProxy->localPath($file);
 
         $bulkHandler = new Bulk_Calendar(
-            $fileTempName,
+            $fileLocalPath,
             null,
             $ownerId,
             [],
@@ -135,7 +132,7 @@ class Controller extends Base
                     ),
                 'allEvents' => $allEvents,
                 'userId' => $ownerId,
-                'csvFilePath' => $fileTempName,
+                'csvFilePath' => $fileLocalPath,
                 'returnUrl' => $this->requestQuery->get('returnUrl')
                     ?? $currentUrl,
             ]
