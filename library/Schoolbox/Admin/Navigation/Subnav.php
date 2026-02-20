@@ -989,6 +989,11 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Configure user roles within the system, the type of access they have and permissions.',
                     ],
+                    '/adminv2/lists/qualification' => [
+                        'name'        => 'Lists - Qualifications',
+                        'visible'     => true,
+                        'description' => 'Enable and configure the types of qualification that are offered at the school',
+                    ],
                     '/adminv2/lists/user-pronoun' => [
                         'name'        => 'Lists - User Pronouns',
                         'visible'     => true,
