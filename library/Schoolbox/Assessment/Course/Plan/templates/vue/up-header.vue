@@ -45,7 +45,7 @@ function onPrintSelected(): void {
             </div>
         </div>
     </div>
-    <div class="row">
+    <div v-if="props.course.subjectCode || props.curriculumNodes.length > 0" class="row">
         <div class="small-12 columns">
             <ul class="l-mar--0-left">
                 <li v-if="props.course.subjectCode" class="meta l-flex-row l-gap-s">
