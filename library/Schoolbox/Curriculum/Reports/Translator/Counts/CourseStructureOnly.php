@@ -45,13 +45,13 @@ class CourseStructureOnly
     {
         return [
             'id' => $model->getId(),
-            'name' => $model->getTitle(),
+            'title' => $model->getTitle(),
             'folder' => call_user_func($this->folderTranslator, $model->getFolder()),
             'units' => $this->courseUnitSpec[$model->getId()]?->map(
                 fn($unit) =>
                 [
                     'id' => $unit->getFolder()->getId(),
-                    'name' => $unit->getTitle(),
+                    'title' => $unit->getTitle(),
                     'folder' => call_user_func($this->folderTranslator, $unit->getFolder()),
                 ],
             )

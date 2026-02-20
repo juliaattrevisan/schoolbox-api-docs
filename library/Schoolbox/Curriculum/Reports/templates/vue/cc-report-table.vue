@@ -109,8 +109,8 @@ window.Vue.watch(bottom, (isAtBottom) => {
                             ><template v-else>{{ course.title }}</template>
                         </td>
                         <td v-for="unit in course.units" :key="unit.id" class="unit-column">
-                            <a v-if="unit.folder" :href="unit.folder._links.view">{{ unit.name }}</a
-                            ><template v-else>{{ unit.name }}</template>
+                            <a v-if="unit.folder" :href="unit.folder._links.view">{{ unit.title }}</a
+                            ><template v-else>{{ unit.title }}</template>
                         </td>
                         <td v-if="coursesStore.hasMultipleCourses" class="l-valign--bottom"><b>Total</b></td>
                     </template>
