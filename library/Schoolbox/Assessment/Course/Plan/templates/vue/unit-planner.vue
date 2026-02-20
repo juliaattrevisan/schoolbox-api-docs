@@ -7,7 +7,7 @@ import type { Template as EditorTemplate } from "@js/editor/types/editorTypes";
 import DummyInlineEditor from "@schoolboxVue/components/ckeditor/dummy-inline-editor.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
-import type { Unit, UnitTemplate, Routes } from "./unitPlannerTypes";
+import type { Unit, UnitTemplate, Routes, Course } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
 import UpHeader from "./up-header.vue";
 import UpAddUnitsModal from "./up-add-units-modal.vue";
@@ -18,10 +18,8 @@ import UpCurriculum from "./up-curriculum.vue";
 import ActivitiesListDeleteModal from "./activities-list/activities-list-delete-modal.vue";
 
 interface Props {
-    courseId: number;
-    courseSubjectCode: string | null;
+    course: Course;
     folderId: number;
-    courseTitle: string;
     units: Unit[];
     template: UnitTemplate; // the course framework template that units are linked to
     editorTemplates: EditorTemplate[]; // the editor templates available for insertion into textboxes
@@ -120,7 +118,7 @@ window.Vue.watch(
 );
 
 window.Vue.onBeforeMount(() => {
-    store.init(props.courseId, props.units, props.template, props.editorTemplates);
+    store.init(props.course.id, props.units, props.template, props.editorTemplates);
     dragStore.init(
         props.routes.folderSequence,
         unitPlannerContainerEl as Ref<HTMLElement>, // Override type as it will be defined here.
@@ -152,13 +150,7 @@ window.Vue.onUnmounted(() => {
 
 <template>
     <dummy-inline-editor v-if="store.units.some((u) => u.textboxes._routes.createTextbox !== null)" />
-    <up-header
-        :course-title="props.courseTitle"
-        :course-id="store.courseId"
-        :course-subject-code="props.courseSubjectCode"
-        :folder-id="props.folderId"
-        :routes="props.routes"
-    />
+    <up-header :course="props.course" :folder-id="props.folderId" :routes="props.routes" />
     <up-empty-state v-if="store.units.length === 0" />
     <div v-else class="row">
         <div class="small-12 island">

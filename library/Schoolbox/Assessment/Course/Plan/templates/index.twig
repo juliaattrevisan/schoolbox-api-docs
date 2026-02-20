@@ -6,10 +6,12 @@
     {% set routeCourseMarkbook = routeLookupIfAuthorized('courseMarkbook.getMarkbook', { courseSpec: course, courseSpecId: course.id}) %}
     {% set routeLearningAnalytics = routeLookupIfAuthorized('learningAnalytics.course', { courseSpec: course, courseSpecId: course.id}) %}
     <unit-planner
-        :course-id="{{ course.id }}"
-        :course-subject-code="{{ course.subjectCode ? course.subjectCode|json_encode : 'null' }}"
+        :course="{{ {
+            id: course.id,
+            title: course.title,
+            subjectCode: course.subjectCode
+        }|json_encode }}"
         :folder-id="{{ course.folder.id }}"
-        course-title="{{ course.title }}"
         :units="{{ units |json_encode }}"
         :template="{{ template |json_encode }}"
         {% if editorTemplates is defined %}

@@ -6,12 +6,10 @@
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import locale from "@js/terminology/rosettaStone";
 import { useAddUnitsStore } from "./store/unitPlannerAddUnitsStore";
-import type { Routes } from "./unitPlannerTypes";
+import type { Routes, Course } from "./unitPlannerTypes";
 
 interface Props {
-    courseTitle: string;
-    courseId: number;
-    courseSubjectCode: string | null;
+    course: Course;
     folderId: number;
     routes: Routes;
 }
@@ -30,7 +28,7 @@ function onPrintSelected(): void {
 <template>
     <div class="row actions-small-1 actions-medium-2">
         <div class="button-action small-12 columns">
-            <h1>Unit Planner - {{ props.courseTitle }}</h1>
+            <h1>Unit Planner - {{ props.course.title }}</h1>
             <div class="l-flex-row l-gap-s">
                 <button
                     v-if="routes.newUnits"
@@ -47,8 +45,8 @@ function onPrintSelected(): void {
     <div class="row">
         <div class="small-12 columns">
             <ul class="l-mar--0-left">
-                <li v-if="props.courseSubjectCode" class="meta l-flex-row l-gap-s">
-                    <sbx-icon name="network"></sbx-icon>Subject Code: {{ props.courseSubjectCode }}
+                <li v-if="props.course.subjectCode" class="meta l-flex-row l-gap-s">
+                    <sbx-icon name="network"></sbx-icon>Subject Code: {{ props.course.subjectCode }}
                 </li>
             </ul>
         </div>
@@ -58,7 +56,7 @@ function onPrintSelected(): void {
         <li v-if="props.routes.importIntoClasses">
             <a
                 class="icon-import"
-                :data-test="`up-header-${props.courseId}-import-link`"
+                :data-test="`up-header-${props.course.id}-import-link`"
                 :href="getReturnUrl(props.routes.importIntoClasses!)"
                 >Import into {{ locale.class.translate(true, true) }}</a
             >
@@ -71,7 +69,7 @@ function onPrintSelected(): void {
         </li>
         <li class="separator">Reports</li>
         <li>
-            <a :href="`/learning/assessment/calendar?course=${props.courseId}`" class="icon-calendar"
+            <a :href="`/learning/assessment/calendar?course=${props.course.id}`" class="icon-calendar"
                 >Assessment Calendar</a
             >
         </li>
@@ -79,7 +77,7 @@ function onPrintSelected(): void {
             <a :href="`${props.routes.courseMarkbook}`" class="icon-curriculum">Course Markbook</a>
         </li>
         <li v-if="routes.curriculumCoverage">
-            <a :href="`${props.routes.curriculumCoverage}?courseId=${props.courseId}`" class="icon-report"
+            <a :href="`${props.routes.curriculumCoverage}?courseId=${props.course.id}`" class="icon-report"
                 >Curriculum Coverage</a
             >
         </li>

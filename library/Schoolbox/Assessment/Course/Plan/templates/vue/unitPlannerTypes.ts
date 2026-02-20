@@ -130,3 +130,12 @@ export type Routes = {
     courseMarkbook: string | null;
     learningAnalytics: string | null;
 };
+
+/**
+ * Course information used by the Unit Planner
+ */
+export type Course = {
+    id: number;
+    title: string;
+    subjectCode: string | null;
+};
