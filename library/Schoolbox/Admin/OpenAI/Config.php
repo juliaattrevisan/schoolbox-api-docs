@@ -40,6 +40,11 @@ class Config
         "gpt-4o-mini",
         "gpt-4.1",
         "gpt-4.1-mini",
+        "gpt-5",
+        "gpt-5-mini",
+        "gpt-5-nano",
+        "gpt-5.2",
+        "gpt-5.2-pro",
     ];
 
     public const string OUTPUT_QUALITY_DEFAULT = 'low';
