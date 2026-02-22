@@ -41,7 +41,7 @@ class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected const NAME = 'Student';
+    protected const NAME = 'Name';
 
     /**
      * @inheritdoc
