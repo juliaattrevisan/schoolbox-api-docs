@@ -82,10 +82,12 @@
                     {% set additionalConstraints = {
                         'student': {
                             '_default': true,
-                            'email': showEmail
+                            'email': showEmail,
+                            'StudentForm': user.isShowTimetable,
                         },
                         'parent': {
                             '_default': true,
+                            'StudentForm': user.isShowTimetable,
                         },
                         'staff': {
                             '_default': USER.role.viewStudentProfile,
