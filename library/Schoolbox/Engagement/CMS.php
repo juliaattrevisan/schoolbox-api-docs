@@ -82,20 +82,4 @@ class CMS
         $statement->execute();
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
-
-    /* TODO This appears to be dead code as of 2016/06/28. Deliberately commented out for now.
-    public function totalFiles($role) {
-        $query = "SELECT COUNT(*) FROM file JOIN `user` ON file.owner=user.id
-                  WHERE group_id = :role AND deleted=0";
-        $statement = $this->database->prepare($query);
-        $statement->bindParam(':role', $action);
-
-        $statement->execute();
-        return $statement->fetchColumn(0);
-    }
-
-    public function totalLinks() {
-
-    }
-    */
 }
