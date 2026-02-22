@@ -51,7 +51,7 @@ class ValidUploadableFileTest extends TestCase
             ->setMime('text/plain')
             ->setMaxFileSize(1_000_000)
             ->setEnable(true)
-            ->setDeletedAt(Alaress_Date_Format::now());
+            ->setDeletedAt(null);
         $standardFile = (new Model())
             ->setExpiryAt(null)
             ->setMimetype($standardMimetype)
@@ -103,7 +103,7 @@ class ValidUploadableFileTest extends TestCase
             ->setMime('text/plain')
             ->setMaxFileSize(1_000_000)
             ->setEnable(true)
-            ->setDeletedAt(Alaress_Date_Format::now());
+            ->setDeletedAt(null);
         $standardFile = (new Model())
             ->setExpiryAt(null)
             ->setSize(1_000);
