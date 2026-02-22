@@ -19,6 +19,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\RoleMapper;
 
 class Module extends BaseModule
@@ -115,6 +116,7 @@ class Module extends BaseModule
             $this->injector->get('filesystem.storageProxy'),
             $this->getMapperFactory()->get(CampusMapper::class),
             $this->getMapperFactory()->get(RoleMapper::class),
+            $this->getMapperFactory()->get(StorageMapper::class),
         );
     }
 

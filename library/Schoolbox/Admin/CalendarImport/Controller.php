@@ -43,6 +43,7 @@ class Controller extends Base
      * @param FilesystemProxy  $filesystemProxy
      * @param CampusMapper     $campusMapper
      * @param RoleMapper       $roleMapper
+     * @param StorageMapper    $storageMapper
      */
     public function __construct(
         private ErrorMapper $errorMapper,
@@ -50,6 +51,7 @@ class Controller extends Base
         private FilesystemProxy $filesystemProxy,
         private CampusMapper $campusMapper,
         private RoleMapper $roleMapper,
+        private StorageMapper $storageMapper,
     ) {
     }
 
@@ -163,8 +165,7 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        $storageMapper = StorageMapper::getInstance();
-        $file = $storageMapper->findByHash($csvFileHash);
+        $file = $this->storageMapper->findByHash($csvFileHash);
 
         $bulkHandler = new Bulk_Calendar(
             $this->filesystemProxy->localPath($file),
