@@ -170,10 +170,15 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        $file = $this->storageMapper->findByHash($csvFileHash);
+        try {
+            $file = $this->storageMapper->findByHash($csvFileHash);
+            $localPathToFile = $this->filesystemProxy->localPath($file); // Get the local path to the file for use in Bulk_Calendar.
+        } catch (MapperException|FilesystemException) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
+        }
 
         $bulkHandler = new Bulk_Calendar(
-            $this->filesystemProxy->localPath($file), // Get the local path to the file for use in Bulk_Calendar.
+            $localPathToFile,
             null,
             $ownerId,
             [],
