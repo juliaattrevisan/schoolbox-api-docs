@@ -35,7 +35,7 @@ class WikiMapper extends Mapper implements FeedableMapperInterface
         $this->joins('latestRevision', RevisionMapper::class, 'revisionID', null, null, 'latestRevision', 'revision');
         $this->uses('slug', self::TYPE_STRING);
         $this->uses('created', self::TYPE_DATETIME);
-        $this->uses('deleted', self::TYPE_BOOL_ENUM, self::COLUMN_SOFTDELETE);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->uses('locked', self::TYPE_BOOL_ENUM);
     }
 
@@ -54,23 +54,23 @@ class WikiMapper extends Mapper implements FeedableMapperInterface
         $offset = (int)$offset;
 
         $stmt = $this->database->prepare("
-			SELECT
-				{$this->getColumnString('w')},
-				{$this->getJoinColumnString('category', 'c')},
-				{$this->getJoinColumnString('revision', 'r')},
-				{$this->getJoinMapper('revision')->getJoinColumnString('user', 'u')}
-			FROM
-				`{$this->getTable()}` `w`
-				LEFT JOIN {$this->getJoinSql('category', 'w', 'c')}
-				LEFT JOIN {$this->getJoinSql('revision', 'w', 'r', true)}
-				LEFT JOIN {$this->getJoinMapper('revision')->getJoinSql('user', 'r', 'u', true)}
-			WHERE
-				`c`.`id` = :cat_id
-				AND `w`.`created` < :time
-				AND `w`.`deleted` = 'false'
-			ORDER BY `w`.`created` DESC
-			LIMIT $offset, $limit
-		");
+            SELECT
+                {$this->getColumnString('w')},
+                {$this->getJoinColumnString('category', 'c')},
+                {$this->getJoinColumnString('revision', 'r')},
+                {$this->getJoinMapper('revision')->getJoinColumnString('user', 'u')}
+            FROM
+                `{$this->getTable()}` `w`
+                LEFT JOIN {$this->getJoinSql('category', 'w', 'c')}
+                LEFT JOIN {$this->getJoinSql('revision', 'w', 'r', true)}
+                LEFT JOIN {$this->getJoinMapper('revision')->getJoinSql('user', 'r', 'u', true)}
+            WHERE
+                `c`.`id` = :cat_id
+                AND `w`.`created` < :time
+                AND `w`.`deleted_at` IS NULL
+            ORDER BY `w`.`created` DESC
+            LIMIT $offset, $limit
+        ");
 
         $stmt->execute(array(
             'cat_id' => $categoryId,

@@ -34,7 +34,6 @@ if (is_ascii($heading)) {
 $pb = $wikiMapper->getPredicateBuilder();
 $pb->equals('categoryID', (int)($_POST['categoryID'] ?? 0))
     ->notEquals('wikiID', (int)($_POST['wikiID'] ?? 0))
-    ->equals('deleted', 'false')
     ->equals('slug', $potentialSlug);
 $count = $wikiMapper->countByPredicates($pb);
 

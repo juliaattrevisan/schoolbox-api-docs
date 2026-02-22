@@ -136,16 +136,6 @@ class Wiki implements ISoftDeletable
     }
 
 
-    /**
-     * Is this object deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted(): bool
-    {
-        return $this->deleted;
-    }
-
 
     /**
      * @param bool $locked
