@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\CalendarImport;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Calendar\Event\Type\EventBase;
+use League\Flysystem\FilesystemException;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\CampusMapper;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -20,6 +21,7 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\Url\Uri;
 use UnexpectedValueException;
@@ -109,10 +111,8 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        $fileLocalPath = $this->filesystemProxy->localPath($file);
-
         $bulkHandler = new Bulk_Calendar(
-            $fileLocalPath,
+            $this->filesystemProxy->localPath($file),
             null,
             $ownerId,
             [],
@@ -132,7 +132,7 @@ class Controller extends Base
                     ),
                 'allEvents' => $allEvents,
                 'userId' => $ownerId,
-                'csvFilePath' => $fileLocalPath,
+                'csvFileHash' => $file->getHash(),
                 'returnUrl' => $this->requestQuery->get('returnUrl')
                     ?? $currentUrl,
             ]
@@ -145,6 +145,8 @@ class Controller extends Base
      * @throws MapperException\Deleted
      * @throws RouteNotFound
      * @throws \Twig\Error\Error
+     * @throws FilesystemException
+     * @throws \Exception
      *
      * @since 25.0.0
      * @api   POST /adminv2/calendar/import/school-events/run
@@ -154,15 +156,18 @@ class Controller extends Base
         $this->extendExecutionTime(3600);
         $post = $this->requestPost;
 
-        $file = $post->get('csvFilePath');
+        $csvFileHash = $post->get('csvFileHash');
         $ownerId = $post->get('userId');
 
-        if (!$file) {
+        if (!$csvFileHash) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
+        $storageMapper = StorageMapper::getInstance();
+        $file = $storageMapper->findByHash($csvFileHash);
+
         $bulkHandler = new Bulk_Calendar(
-            $file,
+            $this->filesystemProxy->localPath($file),
             null,
             $ownerId,
             [],
