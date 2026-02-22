@@ -10,10 +10,13 @@
 namespace Schoolbox\Wiki;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 class Wiki implements ISoftDeletable
 {
+    use DeletedAtDate;
+
     /** @var int */
     protected $id;
 
@@ -28,9 +31,6 @@ class Wiki implements ISoftDeletable
 
     /** @var \Alaress_Date_Format */
     protected $created;
-
-    /** @var bool */
-    protected $deleted;
 
     /** @var bool */
     protected $locked;
@@ -133,26 +133,6 @@ class Wiki implements ISoftDeletable
     public function getCreated()
     {
         return $this->created;
-    }
-
-
-    /**
-     * @param bool $deleted
-     * @return self
-     */
-    public function setDeleted($deleted)
-    {
-        $this->deleted = $deleted;
-        return $this;
-    }
-
-
-    /**
-     * @return bool
-     */
-    public function getDeleted()
-    {
-        return $this->deleted;
     }
 
 

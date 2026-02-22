@@ -93,7 +93,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
             ->setLatestRevision(null)
             ->setCreated($now)
             ->setLocked(false)
-            ->setDeleted(false);
+            ->setDeletedAt(null);
 
         /* If the heading contains unicode it can't be used as a slug, so we
         use the wiki ID instead */
