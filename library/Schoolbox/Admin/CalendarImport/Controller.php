@@ -113,8 +113,14 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
+        // Copy the file to local storage for use in Bulk_Calendar.
+        // Note this local file will not be available in the next request to postRunCalendarImport(), because the next
+        // request may be served by a different Docker container.  That is why we pass the file's hash to the Twig
+        // template below.  This will allow postRunCalendarImport() to retrieve the file from storage, using the hash.
+        $localPathToFile = $this->filesystemProxy->localPath($file);
+
         $bulkHandler = new Bulk_Calendar(
-            $this->filesystemProxy->localPath($file),
+            $localPathToFile,
             null,
             $ownerId,
             [],
@@ -134,7 +140,7 @@ class Controller extends Base
                     ),
                 'allEvents' => $allEvents,
                 'userId' => $ownerId,
-                'csvFileHash' => $file->getHash(),
+                'csvFileHash' => $file->getHash(), // Pass file hash so the file can be retrieved at the next stage of the import.
                 'returnUrl' => $this->requestQuery->get('returnUrl')
                     ?? $currentUrl,
             ]
@@ -168,7 +174,7 @@ class Controller extends Base
         $file = $this->storageMapper->findByHash($csvFileHash);
 
         $bulkHandler = new Bulk_Calendar(
-            $this->filesystemProxy->localPath($file),
+            $this->filesystemProxy->localPath($file), // Copy the file to local storage for use in Bulk_Calendar.
             null,
             $ownerId,
             [],
