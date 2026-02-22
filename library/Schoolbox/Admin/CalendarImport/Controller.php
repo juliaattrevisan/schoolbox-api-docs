@@ -173,7 +173,7 @@ class Controller extends Base
         try {
             $file = $this->storageMapper->findByHash($csvFileHash);
             $localPathToFile = $this->filesystemProxy->localPath($file); // Get the local path to the file for use in Bulk_Calendar.
-        } catch (MapperException|FilesystemException) {
+        } catch (MapperException | FilesystemException) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
         }
 
