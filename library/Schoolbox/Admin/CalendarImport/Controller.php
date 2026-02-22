@@ -154,7 +154,6 @@ class Controller extends Base
      * @throws RouteNotFound
      * @throws \Twig\Error\Error
      * @throws FilesystemException
-     * @throws \Exception
      *
      * @since 25.0.0
      * @api   POST /adminv2/calendar/import/school-events/run
