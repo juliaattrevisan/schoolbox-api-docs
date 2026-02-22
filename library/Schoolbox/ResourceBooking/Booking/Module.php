@@ -11,12 +11,14 @@
 namespace Schoolbox\ResourceBooking\Booking;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Calendar;
+use Schoolbox\Calendar\Event;
 use Schoolbox\CampusMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
@@ -132,11 +134,25 @@ class Module extends BaseModule
         $isOwnerRule->setMapper($this->getMapper());
         $bookingEditRule = new Rule\Any($baseManageRule, $isOwnerRule, $isItemModeratorRule);
 
+        // if booking is calendar created, or resource created
+        $bookingEditNotCal = new Rule\All(
+            $bookingEditRule,
+            new Rule\Callback(function ($params) {
+                // Bookings linked to events of variant self::VARIANT_EVENT should be managed via the 'Modify Event' page.
+                // Also note this function modifies the parent event in ways that may be inappropriate for those events.
+                if ($params['item']->getEvent()->getVariant() === Event::VARIANT_EVENT) {
+                    throw new Unauthorized("Bookings linked to events cannot be updated by this method.");
+                }
+                return true;
+            })
+        );
+
         $this
             ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
             ->addRoutePermission($authorizer, ['book', 'createBooking'], $bookingCreateRule)
             ->addRoutePermission($authorizer, ['approve', 'reject', 'setPending', 'clashApprove'], $manageBookingRule)
-            ->addRoutePermission($authorizer, ['cancel', 'edit', 'update:post'], $bookingEditRule);
+            ->addRoutePermission($authorizer, ['cancel'], $bookingEditRule)
+            ->addRoutePermission($authorizer, ['cancel', 'edit', 'update:post'], $bookingEditNotCal);
     }
 
     /**
