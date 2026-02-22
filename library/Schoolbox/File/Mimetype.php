@@ -12,7 +12,7 @@ namespace Schoolbox\File;
 
 use Config;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 /**
  * Class Mimetype
@@ -20,6 +20,8 @@ use Schoolbox\Resource\Attachment\Zone;
  */
 class Mimetype implements ISoftDeletable
 {
+    use DeletedAtDate;
+
     /**
      * Allowed File id
      *
@@ -62,9 +64,6 @@ class Mimetype implements ISoftDeletable
      * @var int|null
      */
     protected ?int $maxFileSize = null;
-
-    /** @var bool */
-    protected ?bool $deleted = null;
 
     /**
      * Get icon class by deriving it from the iconFile
@@ -275,35 +274,6 @@ class Mimetype implements ISoftDeletable
         return $this->getEnable();
     }
 
-
-    /**
-     * @deprecated mapper compat method
-     *
-     * @return bool|null
-     */
-    public function getDeleted(): ?bool
-    {
-        return $this->isDeleted();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isDeleted(): bool
-    {
-        return $this->deleted;
-    }
-
-
-    /**
-     * @param bool $deleted
-     * @return $this
-     */
-    public function setDeleted(bool $deleted): self
-    {
-        $this->deleted = $deleted;
-        return $this;
-    }
 
     /**
      * Is this file streamable? (Audio and video are streamable, others are not)

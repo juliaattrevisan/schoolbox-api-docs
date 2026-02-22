@@ -28,45 +28,13 @@ class MimetypeMapper extends Schoolbox\Mapper
     {
         $this->hasTable('allowedFileTypes');
         $this->hasModel(Mimetype::class);
-
-        $this->hasMap(array(
-            'column'     => 'fileTypeId',
-            'property'   => 'id',
-            'type'       => self::TYPE_INTEGER,
-            'identifier' => true,
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'description',
-            'property'   => 'description',
-            'type'       => self::TYPE_STRING,
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'mime',
-            'property'   => 'mime',
-            'type'       => self::TYPE_STRING,
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'iconFile',
-            'property'   => 'iconFile',
-            'type'       => self::TYPE_STRING,
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'enable',
-            'property'   => 'enable',
-            'type'       => self::TYPE_BOOL_ENUM,
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'max_file_size',
-            'property'   => 'maxFileSize',
-            'type'       => self::TYPE_INTEGER,
-        ));
-
-        $this->uses('deleted', self::TYPE_BOOLEAN, self::COLUMN_SOFTDELETE);
+        $this->uses('fileTypeId', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->uses('description', self::TYPE_STRING);
+        $this->uses('mime', self::TYPE_STRING);
+        $this->uses('iconFile', self::TYPE_STRING);
+        $this->uses('enable', self::TYPE_BOOL_ENUM);
+        $this->uses('max_file_size', self::TYPE_INTEGER);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
     /**
@@ -97,11 +65,11 @@ class MimetypeMapper extends Schoolbox\Mapper
         // Copied from AllowedFile methods getExtension() and getMimetype()
         $extension = pathinfo($filename, PATHINFO_EXTENSION);
         $query = "
-			SELECT {$this->getColumnString('aft')}
-			FROM allowedFileExtension afe
-			LEFT JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
-			WHERE extension LIKE ?
-		";
+            SELECT {$this->getColumnString('aft')}
+            FROM allowedFileExtension afe
+            LEFT JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
+            WHERE extension LIKE ?
+        ";
         $statement = $this->database->prepare($query);
         $statement->execute(array($extension));
 

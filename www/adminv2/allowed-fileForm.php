@@ -107,7 +107,7 @@ $mime->setMime($_POST["mime"]);
 $mime->setIconFile($_POST["iconFile"]);
 $mime->setEnable($_POST["enable"] === 'true');
 $mime->setMaxFileSize($_POST["max_file_size"]);
-$mime->setDeleted(false);
+$mime->setDeletedAt(null);
 
 if (isset($_POST['fileTypeId']) && is_numeric($_POST['fileTypeId'])) {
     $mime->setId($_POST['fileTypeId']);
