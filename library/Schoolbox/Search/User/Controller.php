@@ -48,8 +48,6 @@ use Timetable_ColourMapper;
 use Twig\Environment;
 use Twig\Error\Error;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
-use Schoolbox\DifferentiationProfile\AdjustmentCategories\Model as AdjustmentCategoriesModel;
-use Schoolbox\DifferentiationProfile\AdjustmentLevels\Model as AdjustmentLevelsModel;
 
 /**
  * The controller for the mock version of the search API.
@@ -455,40 +453,9 @@ class Controller extends BaseController
             }
         }
 
-        // Determine whether current user is student's parent, and if not if they
-        // are related in some other way.
-
-        $isParentOfStudent = $this->getUser()->isParentOf($student);
-        $isPrimaryCarer    = false;
-        if ($isParentOfStudent && !empty($contactList)) {
-            // Only the primary parent will see emergency contact information
-            if (
-                $contactList[0]['StudentContactID'] == $this->getUser()->getExternalId()
-                || $contactList[0]['StudentContactSpouseID'] == $this->getUser()->getExternalId()
-            ) {
-                $isPrimaryCarer = true;
-            }
-        }
-
-
-
-        $protectStudentContacts = $this->getConfigLoader()->get('protect_student_contacts');
-
-        switch ($protectStudentContacts) {
-            case Access::VISIBILITY_EVERYONE: // Everyone
-                break;
-            case Access::VISIBILITY_STAFF: // Staff Only
-                if (!$this->getUser()->getRole()->isStaff()) {
-                    $hideContacts = true;
-                }
-                break;
-            case Access::VISIBILITY_STAFF_PARENT: // Staff & Parents Only
-                if (!$this->getUser()->getRole()->isStaff() && !$this->getUser()->getRole()->isParent()) {
-                    $hideContacts = true;
-                }
-                break;
-        }
-
+        /* Get a list of teacher identifiers from pretty much every teacher involved with this student somehow;
+         * these are used to derive a list of teacher emails which facilitates the Email All Teachers function
+         */
         $allTeacherIds = [];
 
         foreach ($subjects as $subject) {
@@ -569,12 +536,9 @@ class Controller extends BaseController
         $sharedCampuses = $this->getUser()->getCampusCollection()->intersect($student->getCampusCollection());
 
         /* Further restrict access to profile tabs more than just by availability and visibility (which is what $tabs is right now)
-         *
-         * Anyway, from the docblocks, it seems that $isPrimaryCarer was supposed to restrict *which parent(s)* could see
-         * emergency contacts. SA-12147 rewrote the whole page so I'm not entirely sure of its history anymore.
          */
         $hasContacts = count($contacts) > 0;
-        $hasEmergencyContacts = $isPrimaryCarer && (count($externalUser['data']['roleTypes']['tabs']['emergencyContacts']) > 0);
+        $hasEmergencyContacts = count($externalUser['data']['roleTypes']['tabs']['emergencyContacts']) > 0;
 
         /* (For all role types) If any of these fail, the tab should never exist */
         $tabConstraintsBase = [
@@ -686,9 +650,6 @@ class Controller extends BaseController
                  * heuristic beyond Availability/Visibility concepts
                  */
                 'showEmail' => $showEmails,
-                /* Somehow this is important
-                 */
-                'isPrimaryCarer' => $isPrimaryCarer,
                 /* A set of contacts (if any) for this student
                  */
                 'contacts' => $contacts,
