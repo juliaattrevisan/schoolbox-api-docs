@@ -729,13 +729,13 @@ window.Vue.onMounted(async () => {
                                         </div>
                                         <nav v-if="hasMenu(item.object)">
                                             <sbx-pop-out
-                                                :content-id="`evidence-${item.object.id}-dropdown`"
-                                                :data-test="`sbx-pop-out-evidence-${item.object.id}`"
+                                                :content-id="`learning-moment-${item.object.id}-popout`"
+                                                :data-test="`sbx-pop-out-learning-moment-${item.object.id}`"
                                             ></sbx-pop-out>
                                         </nav>
                                         <ul
                                             v-if="hasMenu(item.object)"
-                                            :id="'evidence-' + String(item.object.id) + '-dropdown'"
+                                            :id="'learning-moment-' + String(item.object.id) + '-popout'"
                                             class="f-dropdown"
                                             data-dropdown-content
                                         >
@@ -745,7 +745,7 @@ window.Vue.onMounted(async () => {
                                                     :href="getReturnUrl(item.object._links.modifyForm)"
                                                     class="icon-modify"
                                                     title="Modify"
-                                                    :data-test="`learning-moment-evidence-popout-option-modify-${item.object.id}`"
+                                                    :data-test="`learning-moment-popout-option-modify-${item.object.id}`"
                                                 >
                                                     Modify
                                                 </a>
@@ -755,7 +755,7 @@ window.Vue.onMounted(async () => {
                                                     v-if="item.object._links.delete"
                                                     class="icon-delete"
                                                     title="Delete"
-                                                    :data-test="`learning-moment-evidence-delete-${item.object.id}`"
+                                                    :data-test="`learning-moment-delete-${item.object.id}`"
                                                     @click.prevent="showDeleteModal(item)"
                                                 >
                                                     Delete
@@ -1203,7 +1203,7 @@ window.Vue.onMounted(async () => {
                     <a
                         id="confirm-delete-learning-moment"
                         class="button submit"
-                        data-test="learning-moment-evidence-delete-confirm"
+                        data-test="learning-moment-delete-confirm"
                         @click.prevent="deleteFeedItem(currentlyDeletingItem)"
                     >
                         Delete

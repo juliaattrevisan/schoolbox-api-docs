@@ -135,7 +135,7 @@ async function onDelete(): Promise<void> {
                     <a
                         id="confirm-delete-learning-moment"
                         class="button submit"
-                        data-test="learning-moment-evidence-delete-confirm"
+                        data-test="learning-moment-delete-confirm"
                         @click="onDelete"
                     >
                         Delete

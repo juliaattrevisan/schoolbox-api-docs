@@ -322,12 +322,12 @@ export default {
                                     v-if="comment._links.delete.auth"
                                     class="icon-delete"
                                     title="Delete comment"
-                                    data-test="learning-moment-evidence-delete-comment"
+                                    data-test="learning-moment-delete-comment"
                                     @click.prevent="showDeleteModal(index)"
                                 />
                             </nav>
                             <media-article
-                                data-test="learning-moment-evidence-comment-thread-comment"
+                                data-test="learning-moment-comment-thread-comment"
                                 :content="comment.content"
                             ></media-article>
                         </li>
@@ -351,7 +351,7 @@ export default {
                             <button
                                 @click.prevent="deleteComment(commentIndexToDelete)"
                                 class="button submit"
-                                data-test="learning-moment-evidence-delete-comment-confirm"
+                                data-test="learning-moment-delete-comment-confirm"
                             >
                                 Delete
                             </button>

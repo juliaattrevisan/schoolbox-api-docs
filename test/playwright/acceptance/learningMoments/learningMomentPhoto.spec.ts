@@ -95,11 +95,11 @@ test.describe("Learning Moment Photo Tests", () => {
 
         const commentText = "Well done. This is my first comment in this learning moment!";
         await tester.common.clickAddComment();
-        await learningMomentsPage.typeComment(commentText);
-        await learningMomentsPage.clickPostComment();
+        await activityFeed.typeMomentComment(commentText);
+        await activityFeed.clickMomentPostComment();
 
         tester.isGoingTo("check the comment is presented");
-        await learningMomentsPage.verifyComment(commentText);
+        await activityFeed.verifyMomentComment(commentText);
     });
 
     test("Learning Moment Modify", async ({ tester, page, db }) => {
@@ -131,8 +131,8 @@ test.describe("Learning Moment Photo Tests", () => {
         })) as number;
         expect(evidenceId).not.toBe(null);
 
-        await learningMomentsPage.clickDropdownMenu(evidenceId);
-        await learningMomentsPage.clickModifySubmenu(evidenceId);
+        await activityFeed.clickMomentDropdownMenu(evidenceId);
+        await activityFeed.clickMomentModifySubmenu(evidenceId);
 
         const updatedMomentBody = "This is a learning moments test to be modified updated";
         await learningMomentsPage.typeBody(updatedMomentBody);
@@ -169,16 +169,16 @@ test.describe("Learning Moment Photo Tests", () => {
 
         const commentText = "Well done. This is my first comment in this learning moment!";
         await tester.common.clickAddComment();
-        await learningMomentsPage.typeComment(commentText);
-        await learningMomentsPage.clickPostComment();
+        await activityFeed.typeMomentComment(commentText);
+        await activityFeed.clickMomentPostComment();
 
         tester.isGoingTo("check the comment is presented");
-        await learningMomentsPage.verifyComment(commentText);
-        await learningMomentsPage.clickCommentDeleteButton();
-        await learningMomentsPage.clickConfirmDeleteButton();
+        await activityFeed.verifyMomentComment(commentText);
+        await activityFeed.clickMomentCommentDeleteButton();
+        await activityFeed.clickMomentConfirmDeleteButton();
 
         tester.isGoingTo("check the comment is no longer presented and the count is zero");
-        await learningMomentsPage.verifyCommentCount(0);
+        await activityFeed.verifyMomentCommentCount(0);
     });
 
     test("Learning Moment Delete", async ({ tester, page, db }) => {
@@ -212,9 +212,9 @@ test.describe("Learning Moment Photo Tests", () => {
         })) as number;
         expect(evidenceId).not.toBe(null);
 
-        await learningMomentsPage.clickDropdownMenu(evidenceId);
-        await learningMomentsPage.clickLearningMomentDeleteButton(evidenceId);
-        await learningMomentsPage.clickLearningMomentConfirmDeleteButton();
+        await activityFeed.clickMomentDropdownMenu(evidenceId);
+        await activityFeed.clickMomentDeleteButton(evidenceId);
+        await activityFeed.clickMomentConfirmDeleteButton();
 
         tester.isGoingTo("check the text is no longer presented ");
         await activityFeed.verifyShareLearningMomentButtonExists(); // should have been returned to the activity feed
