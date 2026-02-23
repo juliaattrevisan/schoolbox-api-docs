@@ -1928,14 +1928,16 @@ class Mapper extends AbstractFolderMapper implements ILocator
             }
         }
 
-        /* Check if the $parentFolder had a deleted course spec associated with it. If it did, resurrect it; otherwise
+        /* If you're moving a unit (a folder with a unit spec):
+         *
+         * Check if the $parentFolder had a deleted course spec associated with it. If it did, resurrect it; otherwise
          * we end up trying to re-insert a course spec. I'm not sure we are *supposed* to reset subject_code and uuid
          * in this workflow: I'm not actually sure what it means when a user drags a unit from one place to another
          * place that had a previously-deleted course spec: I don't know why it was deleted in the first place.
          *
          * A soft-deleted course spec won't turn up in the joins, so you kind of have to check manually
          */
-        if (!$parentFolder->hasCourseSpecification()) {
+        if ($movedFolder->hasUnitSpecification() && !$parentFolder->hasCourseSpecification()) {
             $courseSpecMapper = CourseSpecification\Mapper::getInstance();
 
             /* Find a previously deleted course spec; there was a time when we had broken course hierarchies (nested
