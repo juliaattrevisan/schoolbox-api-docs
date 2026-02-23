@@ -12,7 +12,6 @@ namespace Schoolbox\OpenAi\Agent;
 use Html2Text\Html2Text;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
-use Schoolbox\Editor\OpenAI\Payload\ModelParser;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\User;
 
@@ -104,13 +103,10 @@ class CkEditorTextChat
 
         // GPT-5 doesn't support max_tokens at all, it is deprecated for other
         // models
-        $model = $this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? '';
-        if (version_compare(new ModelParser()->extractModelVersion($model), '5', '>=')) {
-            if (isset($payload['max_tokens'])) {
-                $maxTokens = $payload['max_tokens'];
-                unset($payload['max_tokens']);
-                $payload['max_completion_tokens'] = $maxTokens;
-            }
+        if (isset($payload['max_tokens'])) {
+            $maxTokens = $payload['max_tokens'];
+            unset($payload['max_tokens']);
+            $payload['max_completion_tokens'] = $maxTokens;
         }
 
         return $payload;
