@@ -357,7 +357,7 @@ const isFirstUnit = window.Vue.computed(() => {
     }
 
     .show-more-container {
-        background: linear-gradient(0deg, #fff 0%, #fff0 100%);
+        background: linear-gradient(0deg, var(--sbx-color-foreground-primary, #fff) 0%, #fff0 100%);
         display: flex;
         justify-content: end;
         opacity: 0;

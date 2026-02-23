@@ -27,17 +27,17 @@
     background: var(--sbx-color-accent);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-config-field-roundness);
-    color: var(--sbx-color-foreground-primary);
+    color: var(--sbx-color-accent-text);
     &:hover,
     &:active {
         background: var(--sbx-color-accent); // ^foundation-fixes^ - remove the use of --content-ui-hover
-        color: var(--sbx-color-foreground-primary); // ^foundation-fixes^ - remove the change of text colour on hover
+        color: var(--sbx-color-accent-text); // ^foundation-fixes^ - remove the change of text colour on hover
         filter: brightness(1.1);
     }
     &:focus {
         @include sbx-form.form-input-focus;
         background: var(--sbx-color-accent);
-        color: var(--sbx-color-foreground-primary);
+        color: var(--sbx-color-accent-text);
     }
     &:disabled,
     &.disabled {

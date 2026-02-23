@@ -7,6 +7,25 @@ body.sbx-body {
     background: var(--sbx-color-body-background);
 }
 
+.sbx-body .island section,
+.sbx-body table,
+.sbx-body table thead,
+.sbx-body .side-nav,
+.sbx-body .dzone,
+.sbx-body [data-component-palette],
+.sbx-body .c-island,
+.sbx-body .c-card,
+.sbx-body .clr-picker,
+.sbx-body textarea,
+.sbx-body .ck.ck-editor__main > .ck-editor__editable,
+.sbx-body .ck.ck-toolbar,
+.sbx-body .VueTables__search,
+.sbx-body .VueTables__wrapper,
+.sbx-body .VueTables__table-footer,
+.sbx-body .highcharts-background {
+    background: var(--sbx-color-foreground-primary);
+}
+
 .sbx-body .subheader {
     color: var(--sbx-color-text-primary);
 }
