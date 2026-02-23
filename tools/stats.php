@@ -421,8 +421,11 @@ $app = new class extends CliTool\App {
             'openai_model_gpt-4o-mini' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4o-mini%'",
             'openai_model_gpt-41' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1%' and model not like '%mini%'",
             'openai_model_gpt-41-mini' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1-mini%'",
-            'openai_model_gpt-5' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-5%' and model not like '%mini%'",
+            'openai_model_gpt-5' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-5%' and model not like '%mini%' and model not like '%nano%'",
             'openai_model_gpt-5-mini' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-5-mini%'",
+            'openai_model_gpt-5-nano' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-5-nano%'",
+            'openai_model_gpt-52' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-5.2%' and model not like '%pro%'",
+            'openai_model_gpt-52-pro' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-5.2-pro%'",
             'openai_model_unknown' => "
                 SELECT count(*) FROM openai_log WHERE
                 not (model like 'gpt-4o%') AND
@@ -430,7 +433,10 @@ $app = new class extends CliTool\App {
                 not (model like 'gpt-4o-mini%') AND
                 not (model like 'gpt-4.1-mini%') AND
                 not (model like 'gpt-5%') AND
-                not (model like 'gpt-5-mini%')
+                not (model like 'gpt-5-mini%') AND
+                not (model like 'gpt-5-nano%') AND
+                not (model like 'gpt-5.2%') AND
+                not (model like 'gpt-5.2-pro%')
                 ",
 
             // AI feature usage

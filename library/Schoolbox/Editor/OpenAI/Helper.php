@@ -55,7 +55,6 @@ class Helper
     public const string FEATURE_DIALOGAGENT = 'dialogagent';
     // Differentiation Profiles
     public const string FEATURE_DIFFERENTIATION = 'differentiation';
-
     /**
      * Learning Activity Customisation
      * Independent from FEATURE_DIFFERENTIATION, but usually follows it in a workflow
