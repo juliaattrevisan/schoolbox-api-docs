@@ -194,6 +194,6 @@ class LearningActivityCustomisation
                 'format' => $responseFormat
             ],
         ];
-        return $payload;
+        return new ModelParser()->filterPayload($payload, $model);
     }
 }
