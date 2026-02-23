@@ -7,11 +7,7 @@ export default class LearningMomentsPage {
 
     private page: Page;
 
-    static readonly URL = "/search/user/{student_id}";
-
     // Constants for data-test selectors
-    static readonly SHARE_LEARNING_MOMENTS_LINK = "learning-moment-evidence-share";
-
     static readonly TAKE_A_PHOTO_BUTTON = "learning-moment-evidence-share-takeAPhoto";
 
     static readonly TAKE_WRITE_SOMETHING = "learning-moment-evidence-share-writeSomething";
@@ -58,29 +54,6 @@ export default class LearningMomentsPage {
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
-    }
-
-    /**
-     * Gets url to create a learning moment for a student
-     * @param studentId - The student ID
-     * @returns - the URL
-     */
-    public static getStudentProfilePage(studentId: number): string {
-        return this.URL.replace("{student_id}", studentId.toString());
-    }
-
-    /**
-     * Click "Share a learning moment" link in the student profile page
-     */
-    async clickShareLearningMomentLink(): Promise<void> {
-        await this.page.getByTestId(LearningMomentsPage.SHARE_LEARNING_MOMENTS_LINK).click();
-    }
-
-    /**
-     * Verify the "Share a learning moment" link exists in the student profile page
-     */
-    async verifyShareLearningMomentLinkExists(): Promise<void> {
-        await expect(this.page.getByTestId(LearningMomentsPage.SHARE_LEARNING_MOMENTS_LINK)).toBeVisible();
     }
 
     /**

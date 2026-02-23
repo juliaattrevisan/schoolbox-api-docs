@@ -168,6 +168,20 @@ export default class ProfilePage {
     }
 
     /**
+     * Click the "Share a learning moment" button on profile page
+     */
+    async clickShareLearningMoment(): Promise<void> {
+        await this.page.getByTestId(ProfilePage.DATA_TEST_SHARE_LEARNING_MOMENT_BUTTON).click();
+    }
+
+    /**
+     * Verify the "Share a learning moment" button exists in the student profile page
+     */
+    async verifyShareLearningMomentButtonExists(): Promise<void> {
+        await expect(this.page.getByTestId(ProfilePage.DATA_TEST_SHARE_LEARNING_MOMENT_BUTTON)).toBeVisible();
+    }
+
+    /**
      * Verify if Share Learning Moments, Set Goals and Award Achievements buttons are visible on profile page
      */
     async checkProfileActionButtonsVisible(): Promise<void> {
