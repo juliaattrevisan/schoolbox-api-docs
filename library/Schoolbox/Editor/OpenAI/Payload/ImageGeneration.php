@@ -11,13 +11,6 @@ class ImageGeneration
     private const float TOP_P = 0.9;
     private const int MAX_OUTPUT_TOKENS = 20000;
 
-
-    /**
-     * Default model for image generation, if not configured:
-     * must be in the `gpt-image` family
-     */
-    public const string OPENAI_DEFAULT_IMAGE_MODEL = 'gpt-image-1';
-
     private const int PARTIAL_IMAGE_QTY = 3;
     private const string IMAGE_OUTPUT_FORMAT = 'png';
     private const string IMAGE_INPUT_DETAIL = 'auto';
