@@ -124,10 +124,16 @@ HELP;
              * @var IStrategy $strategy
              */
             foreach ($bus as $busNumber => $strategy) {
+                // cache a timestamp to keep track of how long the strat runs for
+                $start = microtime(true);
                 // log a helpful counter to know where we are up to
                 $logger->notice(sprintf("[%s/%s] Running %s", $busNumber + 1, count($bus), $strategy->getRetentionLabel()));
 
                 $strategy->process();
+
+                // log how long the strategy took to run
+                $duration = microtime(true) - $start;
+                $logger->notice(sprintf("[%s/%s] Finished %s in %ds", $busNumber + 1, count($bus), $strategy->getRetentionLabel(), $duration));
 
                 // refresh lock, depending on the data retention queries this may have taken a while...
                 $lock->refresh();
