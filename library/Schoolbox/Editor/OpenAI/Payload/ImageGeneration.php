@@ -156,6 +156,11 @@ class ImageGeneration
             ],
         ];
 
+        // GPT-5 doesn't support temperature and top_p
+        if (str_starts_with($this->textModel, 'gpt-5')) {
+            unset($payload['temperature'], $payload['top_p']);
+        }
+
         /** add prompt inputs if they are meaningful */
         $systemPrompt = strtr(self::PROMPT_SYSTEM_PERSONA, [
             '[CONFIG_OPENAI_IMAGE_SYSTEM_PROMPT]' => trim($this->systemPrompt),
