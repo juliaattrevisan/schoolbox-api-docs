@@ -1,13 +1,16 @@
 import type { Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
-import LearningMomentsShare from "./LearningMomentsShare";
+import LearningMomentShare from "./LearningMomentShare";
 
-export default class LearningMomentsPage {
+/**
+ * Support file for the learning moment modify page
+ */
+export default class LearningMomentModify {
     private tester: AcceptanceTester;
 
     private page: Page;
 
-    public readonly share: LearningMomentsShare;
+    public readonly share: LearningMomentShare;
 
     // Constants for data-test selectors
     static readonly DATA_TEST_EVIDENCE_DELETE = `mf-evidence-delete`;
@@ -22,7 +25,7 @@ export default class LearningMomentsPage {
         this.tester = tester;
         this.page = page;
 
-        this.share = new LearningMomentsShare(tester, page);
+        this.share = new LearningMomentShare(tester, page);
     }
 
     /**
@@ -30,7 +33,7 @@ export default class LearningMomentsPage {
      * TODO: This only works if there's 1 evidence attached, multiple will fail for now
      */
     async deleteEvidence(): Promise<void> {
-        await this.page.getByTestId(LearningMomentsPage.DATA_TEST_EVIDENCE_DELETE).click();
+        await this.page.getByTestId(LearningMomentModify.DATA_TEST_EVIDENCE_DELETE).click();
     }
 
     /**
@@ -38,7 +41,7 @@ export default class LearningMomentsPage {
      * @param text - The body to set
      */
     async typeBody(text: string): Promise<void> {
-        await this.tester.fillCKEditorById(LearningMomentsPage.ID_LEARNING_MOMENT_BODY_TEXTAREA, text);
+        await this.tester.fillCKEditorById(LearningMomentModify.ID_LEARNING_MOMENT_BODY_TEXTAREA, text);
     }
 
     /**
@@ -47,7 +50,7 @@ export default class LearningMomentsPage {
      */
     async setBodyEditorTemplate(templateTitle: string): Promise<void> {
         await this.tester.clickEditorTemplateCKEditor(
-            LearningMomentsPage.ID_LEARNING_MOMENT_BODY_TEXTAREA,
+            LearningMomentModify.ID_LEARNING_MOMENT_BODY_TEXTAREA,
             templateTitle,
         );
     }
@@ -56,7 +59,7 @@ export default class LearningMomentsPage {
      * Click the "Submit for approval" button
      */
     async clickSubmitForApproval(): Promise<void> {
-        await this.page.getByTestId(LearningMomentsPage.DATA_TEST_SUBMIT_FOR_APPROVAL_BUTTON).click();
+        await this.page.getByTestId(LearningMomentModify.DATA_TEST_SUBMIT_FOR_APPROVAL_BUTTON).click();
     }
 
     /**
@@ -64,6 +67,6 @@ export default class LearningMomentsPage {
      * If moderation is enabled, this could say "Approve" instead
      */
     async clickPublish(): Promise<void> {
-        await this.page.getByTestId(LearningMomentsPage.DATA_TEST_PUBLISH_BUTTON).click();
+        await this.page.getByTestId(LearningMomentModify.DATA_TEST_PUBLISH_BUTTON).click();
     }
 }

@@ -1,7 +1,7 @@
 import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
-import LearningMomentsShare from "@schoolboxTest/playwright/support/page/learningMoments/LearningMomentsShare";
+import LearningMomentShare from "@schoolboxTest/playwright/support/page/learningMoments/LearningMomentShare";
 import ProfilePage from "./ProfilePage";
 
 export default class ActivityFeed {
@@ -9,7 +9,7 @@ export default class ActivityFeed {
 
     private page: Page;
 
-    public readonly shareLearningModal: LearningMomentsShare;
+    public readonly shareLearningModal: LearningMomentShare;
 
     // Constants for data-test selectors
     static readonly SELECTOR_FEED_ITEM = ".activity-feed li.feed-item";
@@ -34,7 +34,7 @@ export default class ActivityFeed {
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
-        this.shareLearningModal = new LearningMomentsShare(tester, page);
+        this.shareLearningModal = new LearningMomentShare(tester, page);
     }
 
     /**

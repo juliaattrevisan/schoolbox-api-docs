@@ -7,7 +7,7 @@ import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceT
  * - homepage component
  * - learning moment modify form
  */
-export default class LearningMomentsShare {
+export default class LearningMomentShare {
     private tester: AcceptanceTester;
 
     private page: Page;
@@ -28,34 +28,34 @@ export default class LearningMomentsShare {
      * Click the "Take a photo" button
      */
     public async clickSharePhoto(): Promise<void> {
-        await this.page.getByTestId(LearningMomentsShare.DATA_TEST_SHARE_PHOTO).click();
+        await this.page.getByTestId(LearningMomentShare.DATA_TEST_SHARE_PHOTO).click();
     }
 
     /**
      * Click the "Record a video" button
      */
     public async clickShareVideo(): Promise<void> {
-        await this.page.getByTestId(LearningMomentsShare.DATA_TEST_SHARE_VIDEO).click();
+        await this.page.getByTestId(LearningMomentShare.DATA_TEST_SHARE_VIDEO).click();
     }
 
     /**
      * Click the "Record audio" button
      */
     public async clickShareAudio(): Promise<void> {
-        await this.page.getByTestId(LearningMomentsShare.DATA_TEST_SHARE_AUDIO).click();
+        await this.page.getByTestId(LearningMomentShare.DATA_TEST_SHARE_AUDIO).click();
     }
 
     /**
      * Click the "Upload file" button
      */
     public async clickShareFile(): Promise<void> {
-        await this.page.getByTestId(LearningMomentsShare.DATA_TEST_SHARE_FILE).click();
+        await this.page.getByTestId(LearningMomentShare.DATA_TEST_SHARE_FILE).click();
     }
 
     /**
      * Click the "Write something" button
      */
     public async clickShareText(): Promise<void> {
-        await this.page.getByTestId(LearningMomentsShare.DATA_TEST_SHARE_TEXT).click();
+        await this.page.getByTestId(LearningMomentShare.DATA_TEST_SHARE_TEXT).click();
     }
 }
