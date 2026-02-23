@@ -152,12 +152,6 @@ class ImageGeneration
             ],
         ];
 
-        // GPT-5 doesn't support temperature and top_p, however GPT-5.2 does,
-        // or at least does not error when you pass them
-        if (new ModelParser()->extractModelVersion($this->textModel) === '5') {
-            unset($payload['temperature'], $payload['top_p']);
-        }
-
         /** add prompt inputs if they are meaningful */
         $systemPrompt = strtr(self::PROMPT_SYSTEM_PERSONA, [
             '[CONFIG_OPENAI_IMAGE_SYSTEM_PROMPT]' => trim($this->systemPrompt),
@@ -196,7 +190,7 @@ class ImageGeneration
             $payload['previous_response_id'] = $previousResponseId;
         }
 
-        return $payload;
+        return new ModelParser()->filterPayload($payload, $this->textModel);
     }
 
     /**

@@ -314,12 +314,6 @@ class LessonPlan
             ]
         ];
 
-        // GPT-5 doesn't support temperature and top_p, however GPT-5.2 does,
-        // or at least does not error when you pass them
-        if (new ModelParser()->extractModelVersion($this->openAiModel) === '5') {
-            unset($payload['temperature'], $payload['top_p']);
-        }
-
         /* Add in the overarching text system prompt if available
          */
         if ('' !== $this->textSystemPrompt) {
@@ -329,7 +323,7 @@ class LessonPlan
             ]);
         }
 
-        return $payload;
+        return new ModelParser()->filterPayload($payload, $this->openAiModel);
     }
 
 

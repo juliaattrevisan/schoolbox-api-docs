@@ -64,4 +64,21 @@ class ModelParser
         $parts = explode('-', $model);
         return $parts[2] ?? null;
     }
+
+    /**
+     * Perform some common filters on the payload, as appropriate for the model.
+     *
+     * @param array  $payload
+     * @param string $model
+     * @return array
+     */
+    public function filterPayload(array $payload, string $model): array
+    {
+        // GPT-5 doesn't support temperature and top_p, however GPT-5.2 does,
+        // or at least does not error when you pass them
+        if ($this->extractModelVersion($model) === '5') {
+            unset($payload['temperature'], $payload['top_p']);
+        }
+        return $payload;
+    }
 }
