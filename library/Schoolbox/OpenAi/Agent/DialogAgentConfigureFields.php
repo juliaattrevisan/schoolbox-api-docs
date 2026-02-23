@@ -89,7 +89,7 @@ class DialogAgentConfigureFields
     private function parseResponse(Scenario $scenario, string $feedbackResponseData): array
     {
         $data         = json_decode($feedbackResponseData, true);
-        $relevantData = new ResponseParser()->extractRelevantData($data);
+        $relevantData = new ResponseParser()->extractContentText($data);
         if (!isset($relevantData)) {
             throw new SchoolboxException('Invalid response');
         }

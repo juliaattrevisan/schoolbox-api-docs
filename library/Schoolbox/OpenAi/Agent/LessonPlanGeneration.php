@@ -120,7 +120,7 @@ class LessonPlanGeneration
         // Some models may contain reasoning as their first output:
         // need to check each output to see if it actually contains text.
         // (For now, assume there's only one)
-        $relevantData = new ResponseParser()->extractRelevantData($data);
+        $relevantData = new ResponseParser()->extractContentText($data);
         if (!isset($relevantData)) {
             return [$data['output'] ?? null, 500];
         }
