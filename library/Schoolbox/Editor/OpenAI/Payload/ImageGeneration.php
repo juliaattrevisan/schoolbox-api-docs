@@ -161,7 +161,7 @@ class ImageGeneration
 
         // GPT-5 doesn't support temperature and top_p, however GPT-5.2 does,
         // or at least does not error when you pass them
-        if ($this->extractModelVersion() === 5) {
+        if (new ModelParser()->extractModelVersion($this->textModel) === '5') {
             unset($payload['temperature'], $payload['top_p']);
         }
 
@@ -230,38 +230,5 @@ class ImageGeneration
                 'required' => false,
             ],
         ];
-    }
-
-    /**
-     * Extract the version number from the model name.
-     *
-     * Assumes that the model name is either:
-     * * `gpt-${version}`
-     * * `gpt-${version}-${variant}`
-     *
-     * @return float|null
-     */
-    private function extractModelVersion(): ?float
-    {
-        $parts = explode('-', $this->textModel);
-        if (count($parts) >= 2) {
-            return filter_var($parts[1], FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
-        }
-        return null;
-    }
-
-    /**
-     * Extract the variant from the model name.
-     *
-     * Assumes that the model name is either:
-     * * `gpt-${version}`
-     * * `gpt-${version}-${variant}`
-     *
-     * @return string|null
-     */
-    private function extractModelVariant(): ?string
-    {
-        $parts = explode('-', $this->textModel);
-        return $parts[2] ?? null;
     }
 }
