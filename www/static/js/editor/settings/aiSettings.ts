@@ -5,7 +5,7 @@ interface SbxAIAssistantConfig {
         openAI: {
             apiUrl: string;
             requestParameters: {
-                max_tokens: number;
+                max_completion_tokens: number;
                 temperature: number;
                 top_p: number;
                 stream: boolean;
@@ -28,7 +28,7 @@ export function getAISettings(model: string): SbxAIAssistantConfig {
             openAI: {
                 apiUrl: "/openai",
                 requestParameters: {
-                    max_tokens: 10000,
+                    max_completion_tokens: 10000,
                     temperature: 1,
                     top_p: 1,
                     stream: true,
