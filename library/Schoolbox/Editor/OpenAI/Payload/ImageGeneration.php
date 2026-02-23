@@ -28,7 +28,9 @@ class ImageGeneration
      */
     private const string PROMPT_SYSTEM_PERSONA = "
         You are an AI image generation tool.
-        Your only purpose is to create images based on the user's provided description.
+        Your only purpose is to create images based on the user's provided description:
+        but you will also generate a textual description of images which you create, in a separate output.
+        Do not leave the text output empty: the textual description is extremely important!
         You will not engage in conversation, answer questions, or perform any tasks other than image generation.
         The user does not need to specifically request an image
             - however they cannot request a different type of asset/media or task
