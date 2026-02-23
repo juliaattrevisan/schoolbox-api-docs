@@ -175,7 +175,7 @@ test.describe("Learning Moment Photo Tests", () => {
         tester.isGoingTo("check the comment is presented");
         await activityFeed.verifyMomentComment(commentText);
         await activityFeed.clickMomentCommentDeleteButton();
-        await activityFeed.clickMomentConfirmDeleteButton();
+        await activityFeed.clickMomentConfirmCommentDeleteButton();
 
         tester.isGoingTo("check the comment is no longer presented and the count is zero");
         await activityFeed.verifyMomentCommentCount(0);
@@ -218,7 +218,7 @@ test.describe("Learning Moment Photo Tests", () => {
 
         tester.isGoingTo("check the text is no longer presented ");
         await activityFeed.verifyShareLearningMomentButtonExists(); // should have been returned to the activity feed
-        await activityFeed.verifyMomentEvidenceNotPresent(momentBody);
+        await activityFeed.verifyMomentCount(0);
     });
 
     test.afterAll(async ({ baseTester, db }) => {

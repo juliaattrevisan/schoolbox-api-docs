@@ -172,14 +172,21 @@ export default class ActivityFeed {
     }
 
     /**
+     * Verify the count of learning moments visible in the activity feed
+     * @param expectedCount - The expected number of learning moments
+     */
+    async verifyMomentCount(expectedCount: number): Promise<void> {
+        const anyLearningMomentBody = new RegExp(`${ActivityFeed.DATA_TEST_LEARNING_MOMENT_BODY}-\\d+`);
+        await expect(this.page.getByTestId(anyLearningMomentBody)).toHaveCount(expectedCount);
+    }
+
+    /**
      * Typing a comment for a learning moment
      * TODO: This assumes that we're commenting on the most recent learning moment, we should avoid using -0 at some point
      * @param text - The comment to type in the comment textarea
      */
     async typeMomentComment(text: string): Promise<void> {
-        const commentTextarea = this.page.getByTestId(
-            `${ActivityFeed.DATA_TEST_LEARNING_MOMENT_COMMENT_THREAD_COMMENT}-0`,
-        );
+        const commentTextarea = this.page.getByTestId(`${ActivityFeed.DATA_TEST_LEARNING_POST_COMMENT_TEXTAREA}-0`);
         await this.tester.fillCKEditorByLocator(commentTextarea, text);
     }
 
@@ -214,5 +221,12 @@ export default class ActivityFeed {
      */
     async clickMomentPostComment(): Promise<void> {
         await this.page.getByTestId(`${ActivityFeed.DATA_TEST_LEARNING_POST_COMMENT}-0`).click();
+    }
+
+    /**
+     * Click learning moment confirm comment Delete button within the modal dialog
+     */
+    async clickMomentConfirmCommentDeleteButton(): Promise<void> {
+        await this.page.getByTestId(ActivityFeed.DATA_TEST_LEARNING_MOMENT_COMMENT_CONFIRM_DELETE_BUTTON).click();
     }
 }
