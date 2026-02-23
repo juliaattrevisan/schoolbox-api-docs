@@ -47,6 +47,11 @@ class Config
         "gpt-5.2-pro",
     ];
 
+    public const array AI_IMAGE_MODELS = [
+        "gpt-image-1",
+        "gpt-image-1.5",
+    ];
+
     public const string OUTPUT_QUALITY_DEFAULT = 'low';
     public const array OUTPUT_QUALITY_OPTIONS = [
         'high',
@@ -64,6 +69,7 @@ class Config
     public const string FIELD_AI_MODERATION = 'ai_moderation';
     public const string FIELD_SYSTEM_PROMPT  = 'system_prompt';
     public const string FIELD_OUTPUT_QUALITY = 'output_quality';
+    public const string FIELD_IMAGE_MODEL = 'image_model';
 
     // field types
     public const string FIELD_TYPE_SELECT   = 'select';
@@ -423,11 +429,16 @@ class Config
 
         if ($feature === Helper::FEATURE_IMAGE) {
             // Image feature:
-            // * add output quality
+            // * add output quality and image model
             // * remove Azure option
             $formInputs[self::FIELD_OUTPUT_QUALITY] = [
                 'type'    => self::FIELD_TYPE_SELECT,
                 'options' => self::OUTPUT_QUALITY_OPTIONS,
+                'section' => self::SECTION_OPENAI,
+            ];
+            $formInputs[self::FIELD_IMAGE_MODEL] = [
+                'type'    => self::FIELD_TYPE_SELECT,
+                'options' => self::AI_IMAGE_MODELS,
                 'section' => self::SECTION_OPENAI,
             ];
             unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
