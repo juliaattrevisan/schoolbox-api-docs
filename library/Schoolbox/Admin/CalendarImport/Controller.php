@@ -153,7 +153,6 @@ class Controller extends Base
      * @throws MapperException\Deleted
      * @throws RouteNotFound
      * @throws \Twig\Error\Error
-     * @throws FilesystemException
      *
      * @since 25.0.0
      * @api   POST /adminv2/calendar/import/school-events/run
