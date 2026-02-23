@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -87,7 +88,6 @@ class Controller extends Base
      * @throws MapperException
      * @throws MapperException\Deleted
      * @throws RouteNotFound
-     * @throws \League\Flysystem\FilesystemException
      * @throws \Twig\Error\Error
      *
      * @since 25.0.0
@@ -109,15 +109,15 @@ class Controller extends Base
 
         try {
             $file = $collector->getFirst();
-        } catch (\Schoolbox\Resource\Exception $e) {
+
+            // Get the local path to the file for use in Bulk_Calendar.
+            // Note this local file may not be available in the next request to postRunCalendarImport(), because the next
+            // request may be served by a different Docker container.  That is why we pass the file's hash to the Twig
+            // template below.  This will allow postRunCalendarImport() to retrieve the file from storage, using the hash.
+            $localPathToFile = $this->filesystemProxy->localPath($file);
+        } catch (ResourceException | FilesystemException) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
-
-        // Get the local path to the file for use in Bulk_Calendar.
-        // Note this local file may not be available in the next request to postRunCalendarImport(), because the next
-        // request may be served by a different Docker container.  That is why we pass the file's hash to the Twig
-        // template below.  This will allow postRunCalendarImport() to retrieve the file from storage, using the hash.
-        $localPathToFile = $this->filesystemProxy->localPath($file);
 
         $bulkHandler = new Bulk_Calendar(
             $localPathToFile,
@@ -235,7 +235,6 @@ class Controller extends Base
      * @throws MapperException
      * @throws MapperException\Deleted
      * @throws RouteNotFound
-     * @throws \League\Flysystem\FilesystemException
      * @throws \Twig\Error\Error
      *
      * @since 25.0.0
@@ -257,16 +256,16 @@ class Controller extends Base
 
         try {
             $file = $collector->getFirst();
-        } catch (\Schoolbox\Resource\Exception $e) {
+
+            // Get the local path to the file for use in Bulk_Calendar.
+            // Note this local file may not be available in the next request to postRunCalendarGroupEventsImport(), because
+            // the next request may be served by a different Docker container.  That is why we pass the file's hash to the
+            // Twig template below.  This will allow postRunCalendarGroupEventsImport() to retrieve the file from storage,
+            // using the hash.
+            $localPathToFile = $this->filesystemProxy->localPath($file);
+        } catch (ResourceException | FilesystemException) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
-
-        // Get the local path to the file for use in Bulk_Calendar.
-        // Note this local file may not be available in the next request to postRunCalendarGroupEventsImport(), because
-        // the next request may be served by a different Docker container.  That is why we pass the file's hash to the
-        // Twig template below.  This will allow postRunCalendarGroupEventsImport() to retrieve the file from storage,
-        // using the hash.
-        $localPathToFile = $this->filesystemProxy->localPath($file);
 
         $bulkHandler = new Bulk_Calendar(
             $localPathToFile,
@@ -387,7 +386,6 @@ class Controller extends Base
      * @throws MapperException
      * @throws MapperException\Deleted
      * @throws RouteNotFound
-     * @throws \League\Flysystem\FilesystemException
      * @throws \Twig\Error\Error
      *
      * @since 25.0.0
@@ -411,16 +409,16 @@ class Controller extends Base
 
         try {
             $file = $collector->getFirst();
-        } catch (\Schoolbox\Resource\Exception $e) {
+
+            // Get the local path to the file for use in Bulk_Calendar.
+            // Note this local file may not be available in the next request to postRunCalendarVcalImportForm(), because the
+            // next request may be served by a different Docker container.  That is why we pass the file's hash to the Twig
+            // template below.  This will allow postRunCalendarVcalImportForm() to retrieve the file from storage, using the
+            // hash.
+            $localPathToFile = $this->filesystemProxy->localPath($file);
+        } catch (ResourceException | FilesystemException) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
-
-        // Get the local path to the file for use in Bulk_Calendar.
-        // Note this local file may not be available in the next request to postRunCalendarVcalImportForm(), because the
-        // next request may be served by a different Docker container.  That is why we pass the file's hash to the Twig
-        // template below.  This will allow postRunCalendarVcalImportForm() to retrieve the file from storage, using the
-        // hash.
-        $localPathToFile = $this->filesystemProxy->localPath($file);
 
         $bulkHandler = new Bulk_Calendar(
             $localPathToFile,
