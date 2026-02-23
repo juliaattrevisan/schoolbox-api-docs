@@ -40,12 +40,22 @@ const relevantRoutes = window.Vue.computed(() => {
             <button :disabled="mfStore.isSaving" @click="() => mfStore.reject()">Request update</button>
         </li>
         <li v-if="relevantRoutes.submit">
-            <button :disabled="mfStore.isSaving" class="submit" @click="() => mfStore.submitForm(false, 'submit')">
+            <button
+                :disabled="mfStore.isSaving"
+                class="submit"
+                data-test="learning-moment-submit-for-approval"
+                @click="() => mfStore.submitForm(false, 'submit')"
+            >
                 Submit for approval
             </button>
         </li>
         <li v-if="relevantRoutes.publish">
-            <button :disabled="mfStore.isSaving" class="submit" @click="() => mfStore.publish()">
+            <button
+                :disabled="mfStore.isSaving"
+                class="submit"
+                data-test="learning-moment-publish"
+                @click="() => mfStore.publish()"
+            >
                 {{ props.publishLabel }}
             </button>
         </li>

@@ -13,9 +13,9 @@ export default class LearningMomentsPage {
     // Constants for data-test selectors
     static readonly DATA_TEST_EVIDENCE_DELETE = `mf-evidence-delete`;
 
-    static readonly SUBMIT_BUTTON = "learning-moment-evidence-form-submit";
+    static readonly DATA_TEST_SUBMIT_FOR_APPROVAL_BUTTON = "learning-moment-submit-for-approval";
 
-    static readonly APPROVE_BUTTON = `button[class="submit"]`;
+    static readonly DATA_TEST_PUBLISH_BUTTON = "learning-moment-publish";
 
     static readonly COMMENT_DELETE_BUTTON = "learning-moment-evidence-delete-comment";
 
@@ -76,10 +76,18 @@ export default class LearningMomentsPage {
     }
 
     /**
-     * Click evidence submit button
+     * Click the "Submit for approval" button
      */
-    async clickSubmit(): Promise<void> {
-        await this.page.locator(LearningMomentsPage.APPROVE_BUTTON).click();
+    async clickSubmitForApproval(): Promise<void> {
+        await this.page.getByTestId(LearningMomentsPage.DATA_TEST_SUBMIT_FOR_APPROVAL_BUTTON).click();
+    }
+
+    /**
+     * Publish the learning moment
+     * If moderation is enabled, this could say "Approve" instead
+     */
+    async clickPublish(): Promise<void> {
+        await this.page.getByTestId(LearningMomentsPage.DATA_TEST_PUBLISH_BUTTON).click();
     }
 
     /**

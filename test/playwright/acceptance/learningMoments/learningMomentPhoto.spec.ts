@@ -57,7 +57,7 @@ test.describe("Learning Moment Photo Tests", () => {
         tester.isGoingTo("write a description");
         await learningMomentsPage.share.clickShareText();
         await learningMomentsPage.setBodyEditorTemplate(templateTitle);
-        await learningMomentsPage.clickSubmit();
+        await learningMomentsPage.clickPublish();
 
         tester.isGoingTo("check if the picture and text are presented in the student activity feed");
         await activityFeed.verifyShareLearningMomentButtonExists(); // should have been returned to the activity feed
@@ -87,7 +87,7 @@ test.describe("Learning Moment Photo Tests", () => {
         const momentBody = "This is a learning moments test to be commented";
         await learningMomentsPage.share.clickShareText();
         await learningMomentsPage.typeBody(momentBody);
-        await learningMomentsPage.clickSubmit();
+        await learningMomentsPage.clickPublish();
 
         tester.isGoingTo("check the learning moment is presented in the student activity feed and comment it");
         await activityFeed.verifyShareLearningMomentButtonExists(); // should have been returned to the activity feed
@@ -119,7 +119,7 @@ test.describe("Learning Moment Photo Tests", () => {
         const momentBody = "This is a learning moments test to be modified";
         await learningMomentsPage.share.clickShareText();
         await learningMomentsPage.typeBody(momentBody);
-        await learningMomentsPage.clickSubmit();
+        await learningMomentsPage.clickPublish();
 
         tester.isGoingTo("check the learning moment is presented in the student activity feed and getting it updated");
         await activityFeed.verifyShareLearningMomentButtonExists(); // should have been returned to the activity feed
@@ -139,7 +139,7 @@ test.describe("Learning Moment Photo Tests", () => {
         await learningMomentsPage.deleteEvidence();
         await learningMomentsPage.share.clickSharePhoto();
         await evidenceMediaRecording.takePhoto();
-        await learningMomentsPage.clickSubmit();
+        await learningMomentsPage.clickPublish();
 
         tester.isGoingTo("check the learning moment is presented in the student activity feed updated");
         await activityFeed.verifyShareLearningMomentButtonExists(); // should have been returned to the activity feed
@@ -161,7 +161,7 @@ test.describe("Learning Moment Photo Tests", () => {
         const momentBody = "This is a learning moments test to get comments deleted";
         await learningMomentsPage.share.clickShareText();
         await learningMomentsPage.typeBody(momentBody);
-        await learningMomentsPage.clickSubmit();
+        await learningMomentsPage.clickPublish();
 
         tester.isGoingTo("check the learning moment is presented in the student activity feed and adding a comment");
         await activityFeed.verifyShareLearningMomentButtonExists(); // should have been returned to the activity feed
@@ -198,7 +198,7 @@ test.describe("Learning Moment Photo Tests", () => {
         const momentBody = "This is a learning moments test to get deleted";
         await learningMomentsPage.share.clickShareText();
         await learningMomentsPage.typeBody(momentBody);
-        await learningMomentsPage.clickSubmit();
+        await learningMomentsPage.clickPublish();
 
         tester.isGoingTo("check the learning moment is presented in the student activity feed");
         await activityFeed.verifyShareLearningMomentButtonExists(); // should have been returned to the activity feed
