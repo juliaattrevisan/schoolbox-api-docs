@@ -56,7 +56,7 @@ blockquote p {
  *  tags but still wrap properly around the " mark
 **/
 blockquote {
-    border-left: 6px solid $base !important;
+    border-left: 6px solid $base;
     position: relative;
     padding-left: 2.5rem !important;
 

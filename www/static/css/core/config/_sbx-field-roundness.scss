@@ -49,7 +49,8 @@
     .eotc-status .close,
     .alert-box-icon .close,
     .selected-item,
-    .selected-nodes-container {
+    .selected-nodes-container,
+    blockquote {
         border-radius: var(--sbx-config-field-roundness) !important;
     }
 }

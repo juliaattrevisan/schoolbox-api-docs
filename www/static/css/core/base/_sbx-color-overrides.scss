@@ -11,13 +11,19 @@ body.sbx-body {
     color: var(--sbx-color-text-primary);
 }
 
-.sbx-body .empty-state {
+.sbx-body .empty-state,
+.sbx-body blockquote {
     background: var(--sbx-color-foreground-secondary);
-    color: var(--sbx-color-text-secondary);
+}
+
+.sbx-body blockquote {
+    border-left: 6px solid var(--sbx-color-text-secondary);
 }
 
 .sbx-body .empty-state p,
 .sbx-body .meta,
-.sbx-body [class^="icon-"] {
+.sbx-body [class^="icon-"],
+.sbx-body blockquote,
+.sbx-body blockquote:before {
     color: var(--sbx-color-text-secondary);
 }
