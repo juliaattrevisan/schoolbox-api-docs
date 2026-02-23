@@ -289,7 +289,7 @@ class Controller extends Base
                     ),
                 'allEvents' => $allEvents,
                 'userId' => $ownerId,
-                'csvFileHash' => $file->getHash(),
+                'csvFileHash' => $file->getHash(), // Pass file hash so the file can be retrieved at the next stage of the import.
                 'returnUrl' => $this->requestQuery->get('returnUrl')
                     ?? $currentUrl,
             ]
@@ -442,7 +442,7 @@ class Controller extends Base
                     ),
                 'allEvents' => $allEvents,
                 'userId' => $ownerId,
-                'icsFileHash' => $file->getHash(),
+                'icsFileHash' => $file->getHash(), // Pass file hash so the file can be retrieved at the next stage of the import.
                 'campusList' => json_encode($campusList),
                 'roleList' => json_encode($roleList),
                 'returnUrl' => $this->requestQuery->get('returnUrl')
