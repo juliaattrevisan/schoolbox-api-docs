@@ -20,12 +20,15 @@
         </li>
     {% endif %}
 
-    <li>
-        <a
-            href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}?returnUrl={{ returnUrl }}"
-            class="icon-modify"
-        >Modify{% if booking.clash %} Clash{% endif %} Booking</a>
-    </li>
+    {% set modifyRoute = routeLookupIfAuthorized('resourceBooking.edit', {id: event.booking.id, item: event.booking}) %}
+    {% if modifyRoute %}
+        <li>
+            <a
+                href="{{ modifyRoute }}?returnUrl={{ returnUrl }}"
+                class="icon-modify"
+            >Modify{% if booking.clash %} Clash{% endif %} Booking</a>
+        </li>
+    {% endif %}
 
     {% if booking.clash and booking.clash | length > 1 %}
         <li>
