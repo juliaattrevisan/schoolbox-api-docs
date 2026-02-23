@@ -4,6 +4,7 @@
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import LearningMomentsPage from "@schoolboxTest/playwright/support/page/learningMoments/LearningMomentsPage";
 import EditorTemplate from "@schoolboxTest/playwright/support/page/admin/design/EditorTemplates";
+import ActivityFeed from "@schoolboxTest/playwright/support/page/profilePage/ActivityFeed";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
 
 test.describe("Learning Moment Photo Tests", () => {
@@ -25,6 +26,7 @@ test.describe("Learning Moment Photo Tests", () => {
 
     test("Learning Moment Photo", async ({ tester, page }) => {
         const profilePage = new ProfilePage(tester, page);
+        const activityFeed = new ActivityFeed(tester, page);
         const learningMomentsPage = new LearningMomentsPage(tester, page);
         const editorTemplate = new EditorTemplate(page, tester);
 
@@ -40,7 +42,7 @@ test.describe("Learning Moment Photo Tests", () => {
 
         tester.isGoingTo("share a photo learning moment");
         await profilePage.goto(studentId);
-        await profilePage.clickShareLearningMoment();
+        await activityFeed.clickShareLearningMoment();
         await learningMomentsPage.clickTakeAPhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
 
@@ -57,23 +59,24 @@ test.describe("Learning Moment Photo Tests", () => {
         tester.isGoingTo("check if the picture and text are presented in the student activity feed");
         await learningMomentsPage.verifyEvidence("This is a learning moments test - take a photo");
         await learningMomentsPage.verifyEvidenceHasPhoto();
-        await profilePage.verifyShareLearningMomentButtonExists();
+        await activityFeed.verifyShareLearningMomentButtonExists();
 
         tester.isGoingTo("As Jana Reed check that student cannot see the template icon in the CKEditor");
         await tester.impersonate("Jana Reed");
         await profilePage.goto(studentId);
-        await profilePage.clickShareLearningMoment();
+        await activityFeed.clickShareLearningMoment();
         await learningMomentsPage.clickWriteSomethingButton();
         await tester.checkTemplateIconVisibility(false);
     });
 
     test("Learning Moment Comments", async ({ tester, page }) => {
         const profilePage = new ProfilePage(tester, page);
+        const activityFeed = new ActivityFeed(tester, page);
         const learningMomentsPage = new LearningMomentsPage(tester, page);
         await profilePage.goto(6);
 
         tester.isGoingTo("share a learning moment");
-        await profilePage.clickShareLearningMoment();
+        await activityFeed.clickShareLearningMoment();
         await learningMomentsPage.clickTakeAPhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
         await learningMomentsPage.clickWriteSomethingButton();
@@ -92,11 +95,12 @@ test.describe("Learning Moment Photo Tests", () => {
 
     test("Learning Moment Modify", async ({ tester, page, db }) => {
         const profilePage = new ProfilePage(tester, page);
+        const activityFeed = new ActivityFeed(tester, page);
         const learningMomentsPage = new LearningMomentsPage(tester, page);
         await profilePage.goto(45);
 
         tester.isGoingTo("share a learning moment");
-        await profilePage.clickShareLearningMoment();
+        await activityFeed.clickShareLearningMoment();
         await learningMomentsPage.clickTakeAPhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
         await learningMomentsPage.clickWriteSomethingButton();
@@ -129,11 +133,12 @@ test.describe("Learning Moment Photo Tests", () => {
 
     test("Learning Moment Delete Comment", async ({ tester, page }) => {
         const profilePage = new ProfilePage(tester, page);
+        const activityFeed = new ActivityFeed(tester, page);
         const learningMomentsPage = new LearningMomentsPage(tester, page);
         await profilePage.goto(60);
 
         tester.isGoingTo("share a learning moment");
-        await profilePage.clickShareLearningMoment();
+        await activityFeed.clickShareLearningMoment();
         await learningMomentsPage.clickTakeAPhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
         await learningMomentsPage.clickWriteSomethingButton();
@@ -159,11 +164,12 @@ test.describe("Learning Moment Photo Tests", () => {
 
     test("Learning Moment Delete", async ({ tester, page, db }) => {
         const profilePage = new ProfilePage(tester, page);
+        const activityFeed = new ActivityFeed(tester, page);
         const learningMomentsPage = new LearningMomentsPage(tester, page);
         await profilePage.goto(29);
 
         tester.isGoingTo("share a learning moment");
-        await profilePage.clickShareLearningMoment();
+        await activityFeed.clickShareLearningMoment();
         await learningMomentsPage.clickTakeAPhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
         await learningMomentsPage.clickWriteSomethingButton();
@@ -187,7 +193,7 @@ test.describe("Learning Moment Photo Tests", () => {
 
         tester.isGoingTo("check the text is no longer presented ");
         await learningMomentsPage.verifyEvidenceNotPresent("This is a learning moment test to get deleted");
-        await profilePage.verifyShareLearningMomentButtonExists();
+        await activityFeed.verifyShareLearningMomentButtonExists();
     });
 
     test.afterAll(async ({ baseTester, db }) => {
