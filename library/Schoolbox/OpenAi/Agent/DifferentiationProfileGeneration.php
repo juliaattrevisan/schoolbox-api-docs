@@ -104,7 +104,7 @@ class DifferentiationProfileGeneration
 
         $data = json_decode($response->getBody()->getContents(), true);
 
-        $relevantData = $data['output'][0]['content'][0]['text'] ?? null;
+        $relevantData = new ResponseParser()->extractContentText($data);
 
         if (!isset($relevantData)) {
             return [$data['output'] ?? null, 500];

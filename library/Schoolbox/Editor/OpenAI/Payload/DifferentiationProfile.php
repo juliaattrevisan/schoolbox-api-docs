@@ -145,7 +145,7 @@ class DifferentiationProfile
                 'format' => $responseFormat
             ],
         ];
-        return $payload;
+        return new ModelParser()->filterPayload($payload, $model);
     }
 
     /**
