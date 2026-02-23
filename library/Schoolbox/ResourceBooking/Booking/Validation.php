@@ -865,12 +865,14 @@ class Validation
         // Validate this item.
         $errorsStruct = $this->validateBookingFromPostData($item, $bookingDetailsForItem, $existingBooking);
 
-        // TODO: The results of $this->getConflictingBookings() are now cached so that repeated calls with the same
-        //       parameters are cheap.  Since $this->validateBookingFromPostData() above relies on that function
-        //       to detect clashes, we would now be better off making repeated calls to $this->getConflictingBookings()
-        //       instead of using $clashBookingStartDatesAsKeys to find clashing bookings.
-        //       Therefore we should remove $clashBookingStartDatesAsKeys, and modify affected code to instead use
-        //       $this->getConflictingBookings().
+        // Future refactor idea
+        // --------------------
+        // For anyone considering making changes to this function, note this function may not be necessary after some
+        // refactoring.  The results of $this->getConflictingBookings() are now cached so that repeated calls with the
+        // same parameters are cheap.  Since $this->validateBookingFromPostData() above relies on that function to
+        // detect clashes, we may now be better off making repeated calls to $this->getConflictingBookings() instead
+        // of using $clashBookingStartDatesAsKeys to find clashing bookings.
+        // Therefore, we could remove $clashBookingStartDatesAsKeys, and modify affected code to instead use $this->getConflictingBookings().
         $clashBookingStartDatesAsKeys = [];
         if (count($errorsStruct) > 0) {
             // Remember the start dates of clash bookings.
