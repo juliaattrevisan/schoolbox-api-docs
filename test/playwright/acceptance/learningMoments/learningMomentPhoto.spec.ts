@@ -6,6 +6,7 @@ import LearningMomentsPage from "@schoolboxTest/playwright/support/page/learning
 import EditorTemplate from "@schoolboxTest/playwright/support/page/admin/design/EditorTemplates";
 import ActivityFeed from "@schoolboxTest/playwright/support/page/profilePage/ActivityFeed";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
+import EvidenceMediaRecording from "@schoolboxTest/playwright/support/page/learningMoments/EvidenceMediaRecording";
 
 test.describe("Learning Moment Photo Tests", () => {
     /**
@@ -28,6 +29,7 @@ test.describe("Learning Moment Photo Tests", () => {
         const profilePage = new ProfilePage(tester, page);
         const activityFeed = new ActivityFeed(tester, page);
         const learningMomentsPage = new LearningMomentsPage(tester, page);
+        const evidenceMediaRecording = new EvidenceMediaRecording(tester, page);
         const editorTemplate = new EditorTemplate(page, tester);
 
         const studentId = 25;
@@ -43,13 +45,13 @@ test.describe("Learning Moment Photo Tests", () => {
         tester.isGoingTo("share a photo learning moment");
         await profilePage.goto(studentId);
         await activityFeed.clickShareLearningMoment();
-        await learningMomentsPage.share.clickSharePhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
+        await activityFeed.shareLearningModal.clickSharePhoto();
+        await evidenceMediaRecording.takePhoto();
 
         tester.isGoingTo("ensure I am able to delete the photo and then take the photo again");
         await learningMomentsPage.deletePhotoEvidence();
         await learningMomentsPage.share.clickSharePhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
+        await evidenceMediaRecording.takePhoto();
 
         tester.isGoingTo("write a description");
         await learningMomentsPage.share.clickShareText();
@@ -73,12 +75,14 @@ test.describe("Learning Moment Photo Tests", () => {
         const profilePage = new ProfilePage(tester, page);
         const activityFeed = new ActivityFeed(tester, page);
         const learningMomentsPage = new LearningMomentsPage(tester, page);
+        const evidenceMediaRecording = new EvidenceMediaRecording(tester, page);
         await profilePage.goto(6);
 
         tester.isGoingTo("share a learning moment");
         await activityFeed.clickShareLearningMoment();
-        await learningMomentsPage.share.clickSharePhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
+        await activityFeed.shareLearningModal.clickSharePhoto();
+        await evidenceMediaRecording.takePhoto();
+
         await learningMomentsPage.share.clickShareText();
         await learningMomentsPage.typeMediaEvidenceDescription("This is a learning moments test to be commented");
         await learningMomentsPage.clickSubmit();
@@ -97,12 +101,14 @@ test.describe("Learning Moment Photo Tests", () => {
         const profilePage = new ProfilePage(tester, page);
         const activityFeed = new ActivityFeed(tester, page);
         const learningMomentsPage = new LearningMomentsPage(tester, page);
+        const evidenceMediaRecording = new EvidenceMediaRecording(tester, page);
         await profilePage.goto(45);
 
         tester.isGoingTo("share a learning moment");
         await activityFeed.clickShareLearningMoment();
-        await learningMomentsPage.share.clickSharePhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
+        await activityFeed.shareLearningModal.clickSharePhoto();
+        await evidenceMediaRecording.takePhoto();
+
         await learningMomentsPage.share.clickShareText();
         await learningMomentsPage.typeMediaEvidenceDescription("This is a learning moments test to be modified");
         await learningMomentsPage.clickSubmit();
@@ -124,7 +130,7 @@ test.describe("Learning Moment Photo Tests", () => {
         );
         await learningMomentsPage.deletePhotoEvidence();
         await learningMomentsPage.share.clickSharePhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
+        await evidenceMediaRecording.takePhoto();
         await learningMomentsPage.clickSubmit();
 
         tester.isGoingTo("check the learning moment is presented in the student activity feed updated");
@@ -135,12 +141,13 @@ test.describe("Learning Moment Photo Tests", () => {
         const profilePage = new ProfilePage(tester, page);
         const activityFeed = new ActivityFeed(tester, page);
         const learningMomentsPage = new LearningMomentsPage(tester, page);
+        const evidenceMediaRecording = new EvidenceMediaRecording(tester, page);
         await profilePage.goto(60);
 
         tester.isGoingTo("share a learning moment");
         await activityFeed.clickShareLearningMoment();
-        await learningMomentsPage.share.clickSharePhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
+        await activityFeed.shareLearningModal.clickSharePhoto();
+        await evidenceMediaRecording.takePhoto();
         await learningMomentsPage.share.clickShareText();
         await learningMomentsPage.typeMediaEvidenceDescription(
             "This is a learning moments test to get comments deleted",
@@ -166,12 +173,13 @@ test.describe("Learning Moment Photo Tests", () => {
         const profilePage = new ProfilePage(tester, page);
         const activityFeed = new ActivityFeed(tester, page);
         const learningMomentsPage = new LearningMomentsPage(tester, page);
+        const evidenceMediaRecording = new EvidenceMediaRecording(tester, page);
         await profilePage.goto(29);
 
         tester.isGoingTo("share a learning moment");
         await activityFeed.clickShareLearningMoment();
-        await learningMomentsPage.share.clickSharePhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
+        await activityFeed.shareLearningModal.clickSharePhoto();
+        await evidenceMediaRecording.takePhoto();
         await learningMomentsPage.share.clickShareText();
         await learningMomentsPage.typeMediaEvidenceDescription("This is a learning moments test to get deleted");
         await learningMomentsPage.clickSubmit();

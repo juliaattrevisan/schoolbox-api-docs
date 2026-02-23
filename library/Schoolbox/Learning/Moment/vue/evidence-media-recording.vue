@@ -432,7 +432,12 @@ export default {
 </script>
 
 <template>
-    <div class="capture-media-container" ref="container" :style="{ height: targetHeight }">
+    <div
+        class="capture-media-container"
+        data-test="capture-media-container"
+        ref="container"
+        :style="{ height: targetHeight }"
+    >
         <record-photo
             v-if="recordMediaType === recordMediaTypes.PHOTO"
             :pre-recorded-data="preRecordedData ? preRecordedData : undefined"

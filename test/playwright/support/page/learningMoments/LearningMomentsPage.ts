@@ -11,12 +11,7 @@ export default class LearningMomentsPage {
     public readonly share: LearningMomentsShare;
 
     // Constants for data-test selectors
-    static readonly TAKE_A_PHOTO_BUTTON_EVIDENCE =
-        "button.vjs-camera-button.vjs-control.vjs-button.vjs-icon-photo-camera";
-
     static readonly DELETE_A_PHOTO = `a[title="Delete Evidence"]`;
-
-    static readonly DELETE_A_PHOTO_CONFIRM_BUTTON = "videojs-record-delete-button-confirm";
 
     static readonly SUBMIT_BUTTON = "learning-moment-evidence-form-submit";
 
@@ -58,24 +53,10 @@ export default class LearningMomentsPage {
     }
 
     /**
-     * Click "Take a photo" button on the create evidence page
-     */
-    async clickTakeAPhotoEvidence(): Promise<void> {
-        await this.page.locator(LearningMomentsPage.TAKE_A_PHOTO_BUTTON_EVIDENCE).click();
-    }
-
-    /**
      * Click "delete button to remove a photo already taken
      */
     async deletePhotoEvidence(): Promise<void> {
         await this.page.locator(LearningMomentsPage.DELETE_A_PHOTO).click();
-    }
-
-    /**
-     * Click "delete button to remove a photo already taken
-     */
-    async confirmDeletePhoto(): Promise<void> {
-        await this.page.getByTestId(LearningMomentsPage.DELETE_A_PHOTO_CONFIRM_BUTTON).click();
     }
 
     /**
