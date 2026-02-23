@@ -438,6 +438,9 @@ $app = new class extends CliTool\App {
                 not (model like 'gpt-5.2%') AND
                 not (model like 'gpt-5.2-pro%')
                 ",
+            'openai_image_model_gpt-image-1' => "SELECT count(*) FROM openai_log WHERE feature = 'image' AND JSON_VALUE(prompt, '$.tools[0].model') = 'gpt-image-1'",
+            'openai_image_model_gpt-image-15' => "SELECT count(*) FROM openai_log WHERE feature = 'image' AND JSON_VALUE(prompt, '$.tools[0].model') = 'gpt-image-1.5'",
+            'openai_image_model_unknown' => "SELECT count(*) FROM openai_log WHERE feature = 'image' AND JSON_VALUE(prompt, '$.tools[0].model') NOT IN ('gpt-image-1', 'gpt-image-1.5')",
 
             // AI feature usage
             'openai_chat' => "SELECT count(*) FROM openai_log WHERE feature = 'chat'",
