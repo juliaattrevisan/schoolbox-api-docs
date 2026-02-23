@@ -457,6 +457,7 @@ window.Vue.watch(
                                 class="icon-delete no-text"
                                 href="#"
                                 title="Delete Evidence"
+                                data-test="mf-evidence-delete"
                                 @click.prevent="
                                     deleteEvidence(mfStore.moment.evidence.findIndex((e) => e === evidence))
                                 "

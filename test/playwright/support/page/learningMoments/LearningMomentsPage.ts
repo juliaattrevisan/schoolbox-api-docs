@@ -11,7 +11,7 @@ export default class LearningMomentsPage {
     public readonly share: LearningMomentsShare;
 
     // Constants for data-test selectors
-    static readonly DELETE_A_PHOTO = `a[title="Delete Evidence"]`;
+    static readonly DATA_TEST_EVIDENCE_DELETE = `mf-evidence-delete`;
 
     static readonly SUBMIT_BUTTON = "learning-moment-evidence-form-submit";
 
@@ -35,11 +35,7 @@ export default class LearningMomentsPage {
 
     static readonly LEARNING_POST_COMMENT_TEXTAREA = "ckeditor-add-comment-textarea"; // Append "-[commentId]"
 
-    static readonly EVIDENCE_MEDIA_DESCRIPTION_TEXTAREA = "#mf-evidence-textarea";
-
-    static readonly EVIDENCE_BODY = "learning-moment-evidence-body";
-
-    static readonly EVIDENCE_MEDIA = "learning-moment-evidence-media";
+    static readonly ID_LEARNING_MOMENT_BODY_TEXTAREA = "mf-evidence-textarea";
 
     static readonly WRITE_SOMETHING_BUTTON = "a.icon-textbox.share-text";
 
@@ -53,10 +49,30 @@ export default class LearningMomentsPage {
     }
 
     /**
-     * Click "delete button to remove a photo already taken
+     * Delete the evidence present in the learning moment
+     * TODO: This only works if there's 1 evidence attached, multiple will fail for now
      */
-    async deletePhotoEvidence(): Promise<void> {
-        await this.page.locator(LearningMomentsPage.DELETE_A_PHOTO).click();
+    async deleteEvidence(): Promise<void> {
+        await this.page.getByTestId(LearningMomentsPage.DATA_TEST_EVIDENCE_DELETE).click();
+    }
+
+    /**
+     * Set the body of the learning moment (aka the "Write Something" evidence flow)
+     * @param text - The body to set
+     */
+    async typeBody(text: string): Promise<void> {
+        await this.tester.fillCKEditorById(LearningMomentsPage.ID_LEARNING_MOMENT_BODY_TEXTAREA, text);
+    }
+
+    /**
+     * Set the body of the learning moment to an editor template
+     * @param templateTitle - The title of the template to use
+     */
+    async setBodyEditorTemplate(templateTitle: string): Promise<void> {
+        await this.tester.clickEditorTemplateCKEditor(
+            LearningMomentsPage.ID_LEARNING_MOMENT_BODY_TEXTAREA,
+            templateTitle,
+        );
     }
 
     /**
@@ -68,13 +84,11 @@ export default class LearningMomentsPage {
 
     /**
      * Typing a comment
+     * @param text - The comment to type in the comment textarea
      */
-    async typeComment(): Promise<void> {
+    async typeComment(text: string): Promise<void> {
         const commentTextarea = this.page.getByTestId(`${LearningMomentsPage.LEARNING_POST_COMMENT_TEXTAREA}-0`);
-        await this.tester.fillCKEditorByLocator(
-            commentTextarea,
-            "Well done. This is my first comment in this learning moment!",
-        );
+        await this.tester.fillCKEditorByLocator(commentTextarea, text);
     }
 
     /**
@@ -91,15 +105,6 @@ export default class LearningMomentsPage {
      */
     async verifyCommentCount(expectedCount: number): Promise<void> {
         await expect(this.page.getByTestId(LearningMomentsPage.COMMENT_THREAD_COMMENT)).toHaveCount(expectedCount);
-    }
-
-    /**
-     * Typing a description for the media evidence
-     * @param description - The description to type
-     */
-    async typeMediaEvidenceDescription(description: string): Promise<void> {
-        const descriptionTextarea = this.page.locator(LearningMomentsPage.EVIDENCE_MEDIA_DESCRIPTION_TEXTAREA);
-        await this.tester.fillCKEditorByLocator(descriptionTextarea, description);
     }
 
     /**
@@ -154,30 +159,5 @@ export default class LearningMomentsPage {
      */
     async clickPostComment(): Promise<void> {
         await this.page.getByTestId(`${LearningMomentsPage.LEARNING_POST_COMMENT}-0`).click();
-    }
-
-    /**
-     * Verify the evidence for a learning moment
-     * @param body - The expected body of the evidence
-     */
-    async verifyEvidence(body: string): Promise<void> {
-        await expect(this.page.getByTestId(LearningMomentsPage.EVIDENCE_BODY).first()).toHaveText(body);
-    }
-
-    /**
-     * Verifies that the evidence for a learning moment is not present
-     * @param body - The expected body of the evidence that was deleted
-     */
-    async verifyEvidenceNotPresent(body: string): Promise<void> {
-        await expect(this.page.getByTestId(LearningMomentsPage.EVIDENCE_BODY).first()).not.toHaveText(body);
-    }
-
-    /**
-     * Verify a learning moment has an attached photo
-     */
-    async verifyEvidenceHasPhoto(): Promise<void> {
-        const mediaLocator = this.page.getByTestId(LearningMomentsPage.EVIDENCE_MEDIA);
-        await expect(mediaLocator).toBeVisible();
-        await expect(mediaLocator).toHaveAttribute("alt", "photo.jpeg");
     }
 }

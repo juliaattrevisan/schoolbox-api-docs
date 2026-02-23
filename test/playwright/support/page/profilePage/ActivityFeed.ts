@@ -14,6 +14,9 @@ export default class ActivityFeed {
     // Constants for data-test selectors
     static readonly SELECTOR_FEED_ITEM = ".activity-feed li.feed-item";
 
+    static readonly DATA_TEST_LEARNING_MOMENT_BODY = "learning-moment-body";
+    static readonly DATA_TEST_LEARNING_MOMENT_EVIDENCE_MEDIA = "learning-moment-evidence-media";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -86,5 +89,35 @@ export default class ActivityFeed {
         await expect(goalsFilter).toBeVisible();
         await expect(achievementsFilter).toBeVisible();
         await expect(feedbackFilter).toBeVisible();
+    }
+
+    /** LEARNING MOMENTS */
+
+    /**
+     * Verify the evidence for a learning moment
+     * TODO: This only verifies the most recent learning moment, we should avoid using .first() at some point
+     * @param body - The expected body of the evidence
+     */
+    async verifyMomentEvidence(body: string): Promise<void> {
+        await expect(this.page.getByTestId(ActivityFeed.DATA_TEST_LEARNING_MOMENT_BODY).first()).toHaveText(body);
+    }
+
+    /**
+     * Verifies that the evidence for a learning moment is not present
+     * TODO: This only verifies the most recent learning moment, we should avoid using .first() at some point
+     * @param body - The expected body of the evidence that was deleted
+     */
+    async verifyMomentEvidenceNotPresent(body: string): Promise<void> {
+        await expect(this.page.getByTestId(ActivityFeed.DATA_TEST_LEARNING_MOMENT_BODY).first()).not.toHaveText(body);
+    }
+
+    /**
+     * Verify a learning moment has an attached photo
+     * TODO: This assumes that only one learning moment has a photo attached
+     */
+    async verifyMomentEvidenceHasPhoto(): Promise<void> {
+        const mediaLocator = this.page.getByTestId(ActivityFeed.DATA_TEST_LEARNING_MOMENT_EVIDENCE_MEDIA);
+        await expect(mediaLocator).toBeVisible();
+        await expect(mediaLocator).toHaveAttribute("alt", "photo.jpeg");
     }
 }

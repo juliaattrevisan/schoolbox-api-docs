@@ -770,7 +770,7 @@ window.Vue.onMounted(async () => {
                                         <!-- Display moment body, with media players initialised -->
                                         <media-article
                                             v-if="item.object.body"
-                                            data-test="learning-moment-evidence-body"
+                                            data-test="learning-moment-body"
                                             :content="item.object.body"
                                         ></media-article>
 
