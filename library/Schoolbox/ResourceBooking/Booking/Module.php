@@ -138,7 +138,7 @@ class Module extends BaseModule
         $bookingEditNotCal = new Rule\All(
             $bookingEditRule,
             new Rule\Callback(function ($params) {
-                // Bookings linked to events of variant self::VARIANT_EVENT should be managed via the 'Modify Event' page.
+                // Bookings linked to events of variant Event::VARIANT_EVENT should be managed via the 'Modify Event' page.
                 // Also note this function modifies the parent event in ways that may be inappropriate for those events.
                 if ($params['item']->getEvent()->getVariant() === Event::VARIANT_EVENT) {
                     throw new Unauthorized("Bookings linked to events cannot be updated by this method.");
@@ -152,7 +152,7 @@ class Module extends BaseModule
             ->addRoutePermission($authorizer, ['book', 'createBooking'], $bookingCreateRule)
             ->addRoutePermission($authorizer, ['approve', 'reject', 'setPending', 'clashApprove'], $manageBookingRule)
             ->addRoutePermission($authorizer, ['cancel'], $bookingEditRule)
-            ->addRoutePermission($authorizer, ['cancel', 'edit', 'update:post'], $bookingEditNotCal);
+            ->addRoutePermission($authorizer, ['edit', 'update:post'], $bookingEditNotCal);
     }
 
     /**
