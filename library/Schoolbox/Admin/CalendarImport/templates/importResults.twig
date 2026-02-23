@@ -58,7 +58,7 @@
                     {% set runRoute = routeLookupIfAuthorized('adminCalendarImport.postRunCalendarImport') %}
                     <li>
                         <form class="top" enctype="multipart/form-data" method="post" data-disable-on-submit action="{{ runRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
-                            <input type="hidden" name="csvFilePath" value="{{ csvFilePath ?? null }}"/>
+                            <input type="hidden" name="csvFileHash" value="{{ csvFileHash ?? null }}"/>
                             <input type="hidden" name="userId" value="{{ userId ?? null }}"/>
                             <input type="submit" value="Import" />
                         </form>
