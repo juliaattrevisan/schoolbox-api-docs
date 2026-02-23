@@ -4,6 +4,8 @@
  * Here we are primarily adding a new display font,
  * adjusting font sizes for better readability,
  * and setting the minimum font size to be 14px
+ * Note that color adjustments are currently made in _sbx-color-overrides.scss
+ * to keep color and typography concerns separate
  */
 
 @import url("https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..700;1,300..700&display=swap");
@@ -22,7 +24,6 @@ body {
 
 // Provide greater contrast and readability to subheaders
 .sbx-body .subheader {
-    color: var(--sbx-color-text-primary);
     font-weight: var(--sbx-font-weight-heading);
     text-transform: none;
 }

@@ -6,3 +6,18 @@
 body.sbx-body {
     background: var(--sbx-color-body-background);
 }
+
+.sbx-body .subheader {
+    color: var(--sbx-color-text-primary);
+}
+
+.sbx-body .empty-state {
+    background: var(--sbx-color-foreground-secondary);
+    color: var(--sbx-color-text-secondary);
+}
+
+.sbx-body .empty-state p,
+.sbx-body .meta,
+.sbx-body [class^="icon-"] {
+    color: var(--sbx-color-text-secondary);
+}
