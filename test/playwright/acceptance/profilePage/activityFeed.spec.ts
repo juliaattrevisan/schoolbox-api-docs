@@ -2,7 +2,7 @@ import { test } from "@schoolboxTest/playwright/support/integrations";
 import ActivityFeed from "@schoolboxTest/playwright/support/page/profilePage/ActivityFeed";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
 
-test.describe("Profile Page - Buttons and Filters visibility", () => {
+test.describe("Activity Feed", () => {
     const studentJanaId = 25; // Assuming 25 is the user ID for student Jana Reed
 
     test.beforeEach(async ({ tester, page }) => {
