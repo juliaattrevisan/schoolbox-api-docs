@@ -43,16 +43,16 @@ test.describe("Learning Moment Photo Tests", () => {
         tester.isGoingTo("share a photo learning moment");
         await profilePage.goto(studentId);
         await activityFeed.clickShareLearningMoment();
-        await learningMomentsPage.clickTakeAPhoto();
+        await learningMomentsPage.share.clickSharePhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
 
         tester.isGoingTo("ensure I am able to delete the photo and then take the photo again");
         await learningMomentsPage.deletePhotoEvidence();
-        await learningMomentsPage.clickCameraIconButton();
+        await learningMomentsPage.share.clickSharePhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
 
         tester.isGoingTo("write a description");
-        await learningMomentsPage.clickWriteSomethingButton();
+        await learningMomentsPage.share.clickShareText();
         await tester.clickEditorTemplateCKEditor("mf-evidence-textarea", "Learning Moments Automation Template");
         await learningMomentsPage.clickSubmit();
 
@@ -65,7 +65,7 @@ test.describe("Learning Moment Photo Tests", () => {
         await tester.impersonate("Jana Reed");
         await profilePage.goto(studentId);
         await activityFeed.clickShareLearningMoment();
-        await learningMomentsPage.clickWriteSomethingButton();
+        await learningMomentsPage.share.clickShareText();
         await tester.checkTemplateIconVisibility(false);
     });
 
@@ -77,9 +77,9 @@ test.describe("Learning Moment Photo Tests", () => {
 
         tester.isGoingTo("share a learning moment");
         await activityFeed.clickShareLearningMoment();
-        await learningMomentsPage.clickTakeAPhoto();
+        await learningMomentsPage.share.clickSharePhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
-        await learningMomentsPage.clickWriteSomethingButton();
+        await learningMomentsPage.share.clickShareText();
         await learningMomentsPage.typeMediaEvidenceDescription("This is a learning moments test to be commented");
         await learningMomentsPage.clickSubmit();
 
@@ -101,9 +101,9 @@ test.describe("Learning Moment Photo Tests", () => {
 
         tester.isGoingTo("share a learning moment");
         await activityFeed.clickShareLearningMoment();
-        await learningMomentsPage.clickTakeAPhoto();
+        await learningMomentsPage.share.clickSharePhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
-        await learningMomentsPage.clickWriteSomethingButton();
+        await learningMomentsPage.share.clickShareText();
         await learningMomentsPage.typeMediaEvidenceDescription("This is a learning moments test to be modified");
         await learningMomentsPage.clickSubmit();
 
@@ -123,7 +123,7 @@ test.describe("Learning Moment Photo Tests", () => {
             "This is a learning moments test to be modified updated",
         );
         await learningMomentsPage.deletePhotoEvidence();
-        await learningMomentsPage.clickCameraIconButton();
+        await learningMomentsPage.share.clickSharePhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
         await learningMomentsPage.clickSubmit();
 
@@ -139,9 +139,9 @@ test.describe("Learning Moment Photo Tests", () => {
 
         tester.isGoingTo("share a learning moment");
         await activityFeed.clickShareLearningMoment();
-        await learningMomentsPage.clickTakeAPhoto();
+        await learningMomentsPage.share.clickSharePhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
-        await learningMomentsPage.clickWriteSomethingButton();
+        await learningMomentsPage.share.clickShareText();
         await learningMomentsPage.typeMediaEvidenceDescription(
             "This is a learning moments test to get comments deleted",
         );
@@ -170,9 +170,9 @@ test.describe("Learning Moment Photo Tests", () => {
 
         tester.isGoingTo("share a learning moment");
         await activityFeed.clickShareLearningMoment();
-        await learningMomentsPage.clickTakeAPhoto();
+        await learningMomentsPage.share.clickSharePhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
-        await learningMomentsPage.clickWriteSomethingButton();
+        await learningMomentsPage.share.clickShareText();
         await learningMomentsPage.typeMediaEvidenceDescription("This is a learning moments test to get deleted");
         await learningMomentsPage.clickSubmit();
 

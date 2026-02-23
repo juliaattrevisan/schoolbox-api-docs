@@ -1,17 +1,16 @@
 import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import LearningMomentsShare from "./LearningMomentsShare";
 
 export default class LearningMomentsPage {
     private tester: AcceptanceTester;
 
     private page: Page;
 
+    public readonly share: LearningMomentsShare;
+
     // Constants for data-test selectors
-    static readonly TAKE_A_PHOTO_BUTTON = "learning-moment-evidence-share-takeAPhoto";
-
-    static readonly TAKE_WRITE_SOMETHING = "learning-moment-evidence-share-writeSomething";
-
     static readonly TAKE_A_PHOTO_BUTTON_EVIDENCE =
         "button.vjs-camera-button.vjs-control.vjs-button.vjs-icon-photo-camera";
 
@@ -54,20 +53,8 @@ export default class LearningMomentsPage {
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
-    }
 
-    /**
-     * Click "Take a photo" button on the modal
-     */
-    async clickTakeAPhoto(): Promise<void> {
-        await this.page.getByTestId(LearningMomentsPage.TAKE_A_PHOTO_BUTTON).click();
-    }
-
-    /**
-     * Click "Write something" button on the modal
-     */
-    async clickWriteSomething(): Promise<void> {
-        await this.page.getByTestId(LearningMomentsPage.TAKE_WRITE_SOMETHING).click();
+        this.share = new LearningMomentsShare(tester, page);
     }
 
     /**
@@ -211,19 +198,5 @@ export default class LearningMomentsPage {
         const mediaLocator = this.page.getByTestId(LearningMomentsPage.EVIDENCE_MEDIA);
         await expect(mediaLocator).toBeVisible();
         await expect(mediaLocator).toHaveAttribute("alt", "photo.jpeg");
-    }
-
-    /**
-     * click write something button in the learning moments page
-     */
-    async clickWriteSomethingButton(): Promise<void> {
-        await this.page.locator(LearningMomentsPage.WRITE_SOMETHING_BUTTON).click();
-    }
-
-    /**
-     * click icon camera button in the learning moments page
-     */
-    async clickCameraIconButton(): Promise<void> {
-        await this.page.locator(LearningMomentsPage.CAMERA_BUTTON).click();
     }
 }

@@ -24,9 +24,9 @@ Usage:
                     data-action="shareLearningMoment"
                     data-moment-type="photo"
                     data-take-photo-button
-                    data-test="learning-moment-evidence-share-takeAPhoto"
                     href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=photo{% endif %}"
                     class="icon-camera share-photo"
+                    data-test="learning-moment-evidence-share-photo"
                     title="Take a photo"
                 >
                     Take a photo
@@ -37,6 +37,7 @@ Usage:
                     data-record-video-button
                     href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=video{% endif %}"
                     class="icon-video share-video"
+                    data-test="learning-moment-evidence-share-video"
                     title="Record a video"
                 >
                     Record a video
@@ -47,6 +48,7 @@ Usage:
                     data-record-audio-button
                     href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=audio{% endif %}"
                     class="icon-audio share-audio"
+                    data-test="learning-moment-evidence-share-audio"
                     title="Record audio"
                 >
                     Record audio
@@ -56,6 +58,7 @@ Usage:
                     data-moment-type="upload"
                     href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=upload{% endif %}"
                     class="icon-upload share-file"
+                    data-test="learning-moment-evidence-share-file"
                     title="Upload file"
                 >
                     Upload file
@@ -63,9 +66,9 @@ Usage:
                 <a
                     data-action="shareLearningMoment"
                     data-moment-type="text"
-                    data-test="learning-moment-evidence-share-writeSomething"
                     href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=text{% endif %}"
                     class="icon-textbox share-text"
+                    data-test="learning-moment-evidence-share-text"
                     title="Write something"
                 >
                     Write something

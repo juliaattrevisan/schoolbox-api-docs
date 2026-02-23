@@ -322,6 +322,7 @@ window.Vue.watch(
     <div class="share-work-buttons l-grid l-gap-m l-mar-m--bottom">
         <a
             class="icon-camera share-photo"
+            data-test="learning-moment-evidence-share-photo"
             :title="canAddEvidence ? 'Take a photo' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="(MediaType.PHOTO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.PHOTO)"
@@ -330,6 +331,7 @@ window.Vue.watch(
         </a>
         <a
             class="icon-video share-video"
+            data-test="learning-moment-evidence-share-video"
             :title="canAddEvidence ? 'Record a video' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="(MediaType.VIDEO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.VIDEO)"
@@ -338,6 +340,7 @@ window.Vue.watch(
         </a>
         <a
             class="icon-audio share-audio"
+            data-test="learning-moment-evidence-share-audio"
             :title="canAddEvidence ? 'Record audio' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="(MediaType.AUDIO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.AUDIO)"
@@ -346,6 +349,7 @@ window.Vue.watch(
         </a>
         <a
             class="icon-upload share-file"
+            data-test="learning-moment-evidence-share-file"
             :title="canAddEvidence ? 'Upload file' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="MediaType.UPLOAD === mediaType || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.UPLOAD)"
@@ -355,6 +359,7 @@ window.Vue.watch(
         <a
             v-if="!(showDescriptionEditor || MediaType.TEXT === mediaType)"
             class="icon-textbox share-text"
+            data-test="learning-moment-evidence-share-text"
             title="Write something"
             @click.prevent="changeMediaType(MediaType.TEXT, true)"
         >
