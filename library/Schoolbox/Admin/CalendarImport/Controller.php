@@ -262,13 +262,13 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        $fileTempName    = sb_tempnam('cal');
-        $fp              = fopen($fileTempName, 'wb');
-        stream_copy_to_stream($this->filesystemProxy->readStream($file), $fp);
-        fclose($fp);
+        // Note this local file may not be available in the next request to postRunGroupEventsImport(), because the next
+        // request may be served by a different Docker container.  That is why we pass the file's hash to the Twig
+        // template below.  This will allow postRunGroupEventsImport() to retrieve the file from storage, using the hash.
+        $localPathToFile = $this->filesystemProxy->localPath($file);
 
         $bulkHandler = new Bulk_Calendar(
-            $fileTempName,
+            $localPathToFile,
             null,
             $ownerId,
             [],
@@ -288,7 +288,7 @@ class Controller extends Base
                     ),
                 'allEvents' => $allEvents,
                 'userId' => $ownerId,
-                'csvFilePath' => $fileTempName,
+                'csvFileHash' => $file->getHash(),
                 'returnUrl' => $this->requestQuery->get('returnUrl')
                     ?? $currentUrl,
             ]
@@ -310,15 +310,22 @@ class Controller extends Base
         $this->extendExecutionTime(3600);
         $post = $this->requestPost;
 
-        $file = $post->get('csvFilePath');
+        $csvFileHash = $post->get('csvFileHash');
         $ownerId = $post->get('userId');
 
-        if (!$file) {
+        if (!$csvFileHash) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
+        try {
+            $file = $this->storageMapper->findByHash($csvFileHash);
+            $localPathToFile = $this->filesystemProxy->localPath($file); // Get the local path to the file for use in Bulk_Calendar.
+        } catch (MapperException | FilesystemException) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
+        }
+
         $bulkHandler = new Bulk_Calendar(
-            $file,
+            $localPathToFile,
             null,
             $ownerId,
             [],
