@@ -106,8 +106,10 @@ class ImageGeneration
         $model        = $this->config[Config::SECTION_OPENAI][Config::FIELD_MODEL]['value'] ?? '';
         $quality      = $this->config[Config::SECTION_OPENAI][Config::FIELD_OUTPUT_QUALITY]['value'] ?? Config::OUTPUT_QUALITY_DEFAULT;
         $systemPrompt = $this->config[Config::SECTION_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? '';
+        $imageModel   = $this->config[Config::SECTION_OPENAI][Config::FIELD_IMAGE_MODEL]['value'] ?? Config::IMAGE_MODEL_DEFAULT;
         $payloadGenerator = new PayloadGenerator(
             $model,
+            $imageModel,
             $systemPrompt,
             $quality,
         );

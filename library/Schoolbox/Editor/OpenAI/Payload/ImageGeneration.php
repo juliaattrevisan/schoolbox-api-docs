@@ -13,9 +13,10 @@ class ImageGeneration
 
 
     /**
-     * We always use this model for image generation, it's not configurable
+     * Default model for image generation, if not configured:
+     * must be in the `gpt-image` family
      */
-    public const string OPENAI_IMAGE_MODEL = 'gpt-image-1';
+    public const string OPENAI_DEFAULT_IMAGE_MODEL = 'gpt-image-1';
 
     private const int PARTIAL_IMAGE_QTY = 3;
     private const string IMAGE_OUTPUT_FORMAT = 'png';
@@ -84,11 +85,13 @@ class ImageGeneration
      * Constructor.
      *
      * @param string $textModel
+     * @param string $imageModel
      * @param string $systemPrompt
      * @param string $imageOutputQuality
      */
     public function __construct(
         private string $textModel,
+        private string $imageModel,
         private string $systemPrompt,
         private string $imageOutputQuality,
     ) {
@@ -131,7 +134,7 @@ class ImageGeneration
             'tools' => [
                 [
                     'type' => 'image_generation',
-                    'model' => self::OPENAI_IMAGE_MODEL,
+                    'model' => $this->imageModel,
                     'output_format' => self::IMAGE_OUTPUT_FORMAT,
                     'background' => 'auto',
                     'partial_images' => self::PARTIAL_IMAGE_QTY,
