@@ -32,6 +32,14 @@ use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 class Markbook
 {
     /**
+     * A list of assessments to operate upon
+     *
+     * @var GenericCollection<IAssessable>
+     */
+    private GenericCollection $assessments;
+
+
+    /**
      * Students that are a part of this markbook.
      *
      * @var Collection
@@ -56,33 +64,33 @@ class Markbook
     /**
      * Normalised (0.0 - 100.0) average mark for all assessments in this markbook
      *
-     * @var float
+     * @var null|float
      */
-    private float $normalisedMean;
+    private ?float $normalisedMean;
 
 
     /**
      * Normalised (0.0 - 100.0) average mark for all draft assessments in this markbook
      *
-     * @var float
+     * @var null|float
      */
-    private float $draftNormalisedMean;
+    private ?float $draftNormalisedMean;
 
 
     /**
      * Human readable weighted average mark for all assessments in this markbook
      *
-     * @var string
+     * @var null|string
      */
-    private string $weightedMean;
+    private ?string $weightedMean;
 
 
     /**
      * Human readable weighted average mark for all draft assessments in this markbook
      *
-     * @var string
+     * @var null|string
      */
-    private string $draftWeightedMean;
+    private ?string $draftWeightedMean;
 
 
     /**
@@ -140,14 +148,23 @@ class Markbook
      * @param array|null $folderIds A reductive filter that operates on $assessments: a set of folder ids
      */
     public function __construct(
-        private GenericCollection $assessments,
+        GenericCollection $assessments,
         private IMarkScheme $defaultMarkScheme,
         private User $viewingUser,
         private ?array $studentIds = null,
         private ?array $curriculumCodes = null,
         private ?array $folderIds = null
     ) {
-        $this->topLevelAssessments = $assessments->filter(function (IAssessable $assessment) {
+        /* Check if we had a specific set of $curriculumCodes to care about:
+         * if we did, and this activity doesn't use one of them, skip it
+         */
+        $this->assessments = $assessments->filter(function (IAssessable $assessment) {
+            return $this->isFilteredCurriculumCode($assessment->getCurriculumNodes()->getPropertyValues('code'));
+        });
+
+        /* Find all the Project instances within the set of $assessments that we might already have filtered out
+         */
+        $this->topLevelAssessments = $this->assessments->filter(function (IAssessable $assessment) {
             return !$assessment->getContext() instanceof Project;
         });
 
@@ -177,6 +194,34 @@ class Markbook
         }
 
         /* This person should be skipped
+         */
+        return false;
+    }
+
+
+    /**
+     * Check if we had a specific set of $curriculumCodes to care about: if we did, and this activity doesn't have at
+     * least one of them, skip this activity
+     *
+     * @param array $curriculumCodes
+     * @return bool
+     */
+    private function isFilteredCurriculumCode(array $curriculumCodes): bool
+    {
+        /* No specific curriculum codes to care about? Everything's included
+         */
+        if (null === $this->curriculumCodes || !count($this->curriculumCodes)) {
+            return true;
+        }
+
+        /* We only care about specific activities that share curriculum codes with the ones we're interested in:
+         * check for overlaps. If at least one activity curric code matches our curric code filter, we're in
+         */
+        if (count(array_intersect($curriculumCodes, $this->curriculumCodes))) {
+            return true;
+        }
+
+        /* This activity should be skipped
          */
         return false;
     }
@@ -587,36 +632,36 @@ class Markbook
 
 
     /**
-     * @return float
+     * @return float|null
      */
-    public function getNormalisedMean(): float
+    public function getNormalisedMean(): float|null
     {
         return $this->normalisedMean;
     }
 
 
     /**
-     * @return float
+     * @return float|null
      */
-    public function getDraftNormalisedMean(): float
+    public function getDraftNormalisedMean(): float|null
     {
         return $this->draftNormalisedMean;
     }
 
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getWeightedMean(): string
+    public function getWeightedMean(): ?string
     {
         return $this->weightedMean;
     }
 
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getDraftWeightedMean(): string
+    public function getDraftWeightedMean(): ?string
     {
         return $this->draftWeightedMean;
     }

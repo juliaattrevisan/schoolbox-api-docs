@@ -714,7 +714,7 @@ class Controller extends Base
         $markSchemeFactory = new Factory($this->getConfigLoader());
         $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
 
-        $markbook = new Markbook($assessments, $overallMarkScheme, $this->getUser());
+        $markbook = new Markbook($assessments, $overallMarkScheme, $this->getUser(), [13], ['AC9EAS104']);
         $markbook->sortAssessables();
         return $markbook;
     }
