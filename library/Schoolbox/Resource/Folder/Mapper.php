@@ -1928,6 +1928,39 @@ class Mapper extends AbstractFolderMapper implements ILocator
             }
         }
 
+        /* If you're moving a unit (a folder with a unit spec):
+         *
+         * Check if the $parentFolder had a deleted course spec associated with it. If it did, resurrect it; otherwise
+         * we end up trying to re-insert a course spec. I'm not sure we are *supposed* to reset subject_code and uuid
+         * in this workflow: I'm not actually sure what it means when a user drags a unit from one place to another
+         * place that had a previously-deleted course spec: I don't know why it was deleted in the first place.
+         *
+         * A soft-deleted course spec won't turn up in the joins, so you kind of have to check manually
+         */
+        if ($movedFolder->hasUnitSpecification() && !$parentFolder->hasCourseSpecification()) {
+            $courseSpecMapper = CourseSpecification\Mapper::getInstance();
+
+            /* Find a previously deleted course spec; there was a time when we had broken course hierarchies (nested
+             * courses by accident) but the UNIQUE index on folder_id should have addressed that. A folder_id can only
+             * be associated with zero or exactly one course spec.
+             */
+            try {
+                $courseSpec = $courseSpecMapper->findOneByColumn('folder_id', $parentFolder->getId(), [
+                    'deleted' => true,
+                    'order' => [
+                        'deleted_at' => 'DESC'
+                    ]
+                ]);
+
+                if ($courseSpec->isDeleted()) {
+                    $courseSpecMapper->restoreSoftDeleted($courseSpec);
+                }
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                /* No previously-assigned course spec was here: nothing to do, except continue normally
+                 */
+            }
+        }
+
         $folderMapper->save($movedFolder->setParent($parentFolder)->setUpdatedBy($this->getSessionUser()->getId()));
     }
 
