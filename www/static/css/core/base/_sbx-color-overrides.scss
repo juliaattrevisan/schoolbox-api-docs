@@ -5,112 +5,115 @@
 
 body.sbx-body {
     background: var(--sbx-color-body-background);
-}
-/**
- * Foreground primary
- */
-.sbx-body .island section,
-.sbx-body table,
-.sbx-body table thead,
-.sbx-body .side-nav,
-.sbx-body .dzone,
-.sbx-body [data-component-palette],
-.sbx-body .c-island,
-.sbx-body .c-card,
-.sbx-body .clr-picker,
-.sbx-body textarea,
-.sbx-body .ck.ck-editor__main > .ck-editor__editable,
-.sbx-body .ck.ck-toolbar,
-.sbx-body .VueTables__search,
-.sbx-body .VueTables__wrapper,
-.sbx-body .VueTables__table-footer,
-.sbx-body .highcharts-background,
-.sbx-body .timetable th,
-.sbx-body .reveal-modal,
-.sbx-body .diagonal-headings-table thead tr.rotate-headers th > div:not(:empty),
-.sbx-body .accordion .accordion-navigation > .content.active,
-.sbx-body table tfoot {
-    background: var(--sbx-color-foreground-primary);
-}
 
-.sbx-body .white {
-    background: var(--sbx-color-foreground-primary);
-}
+    /**
+     * Foreground primary
+     */
+    .island section,
+    table,
+    table thead,
+    .side-nav,
+    .dzone,
+    [data-component-palette],
+    .c-island,
+    .c-card,
+    .clr-picker,
+    textarea,
+    .ck.ck-editor__main > .ck-editor__editable,
+    .ck.ck-toolbar,
+    .VueTables__search,
+    .VueTables__wrapper,
+    .VueTables__table-footer,
+    .highcharts-background,
+    .timetable th,
+    .reveal-modal,
+    .diagonal-headings-table thead tr.rotate-headers th > div:not(:empty),
+    .accordion .accordion-navigation > .content.active,
+    table tfoot {
+        background: var(--sbx-color-foreground-primary);
+    }
 
-.sbx-body .highcharts-background {
-    fill: var(--sbx-color-foreground-primary);
-}
+    // separate to remind to address this colour classes
+    .white {
+        background: var(--sbx-color-foreground-primary);
+    }
 
-/**
-* Foreground secondary
-*/
-.sbx-body .empty-state,
-.sbx-body .empty-state-flex-centered,
-.sbx-body blockquote,
-.sbx-body .fc .fc-cell-shaded,
-.sbx-body .side-nav li ul.flyout {
-    background: var(--sbx-color-foreground-secondary);
-}
+    .highcharts-background {
+        fill: var(--sbx-color-foreground-primary);
+    }
 
-/**
-* Text primary
-*/
-.sbx-body .subheader,
-.sbx-body h1,
-.sbx-body h2,
-.sbx-body h3,
-.sbx-body h4,
-.sbx-body h5,
-.sbx-body h6,
-.sbx-body p,
-.sbx-body li,
-.sbx-body small,
-.sbx-body abbr,
-.sbx-body acronym,
-.sbx-body address,
-.sbx-body ins,
-.sbx-body em,
-.sbx-body cite,
-.sbx-body span,
-.sbx-body pre,
-.sbx-body b,
-.sbx-body i,
-.sbx-body strong,
-.sbx-body strike,
-.sbx-body s,
-.sbx-body u,
-.sbx-body th,
-.sbx-body td,
-.sbx-body mark,
-.sbx-body meta.title {
-    color: var(--sbx-color-text-primary);
-}
+    /**
+     * Foreground secondary
+     */
+    .empty-state,
+    .empty-state-flex-centered,
+    blockquote,
+    .fc .fc-cell-shaded,
+    .side-nav li ul.flyout {
+        background: var(--sbx-color-foreground-secondary);
+    }
 
-/**
-* Text secondary
-*/
-.sbx-body .empty-state p,
-.sbx-body .meta,
-.sbx-body [class^="icon-"],
-.sbx-body blockquote,
-.sbx-body blockquote:before {
-    color: var(--sbx-color-text-secondary);
-}
+    /**
+     * Text primary
+     */
+    .subheader,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    li,
+    small,
+    abbr,
+    acronym,
+    address,
+    ins,
+    em,
+    cite,
+    span,
+    pre,
+    b,
+    i,
+    strong,
+    strike,
+    s,
+    u,
+    th,
+    td,
+    mark,
+    meta.title {
+        color: var(--sbx-color-text-primary);
+    }
 
-.sbx-body blockquote {
-    border-left: 6px solid var(--sbx-color-text-secondary);
-}
+    /**
+     * Text secondary
+     */
+    .empty-state p,
+    .meta,
+    [class^="icon-"],
+    blockquote,
+    blockquote:before {
+        color: var(--sbx-color-text-secondary);
+    }
 
-/**
-* Accent
-*/
-.sbx-body a {
-    color: var(--sbx-color-accent);
-}
+    // for the border left to match the text colour
+    blockquote {
+        border-left: 6px solid var(--sbx-color-text-secondary);
+    }
 
-/**
-* Active
-*/
-.sbx-body th.timetable-period-active {
-    background: var(--sbx-color-active);
+    /**
+     * Accent
+     */
+    a {
+        color: var(--sbx-color-accent);
+    }
+
+    /**
+     * Active
+     */
+    th.timetable-period-active {
+        background: var(--sbx-color-active);
+    }
 }
