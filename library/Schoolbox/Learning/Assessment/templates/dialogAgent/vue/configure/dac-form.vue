@@ -33,7 +33,7 @@ const returnUrl = getPageReturnUrl();
 const submitError = window.Vue.ref<string | null>(null);
 
 const formEl = window.Vue.useTemplateRef<HTMLFormElement>("formRef");
-const validator = window.Vue.ref<ReturnType<ReturnType<typeof window.jQuery>["alaressValidate"]> | null>(null);
+const validator = window.Vue.ref<ReturnType<ReturnType<typeof $>["alaressValidate"]> | null>(null);
 
 /**
  * Submit the new configuration
@@ -61,7 +61,7 @@ async function onSubmit(): Promise<void> {
         },
     });
 
-    window.jQuery(formEl.value).alaressValidate();
+    $(formEl.value).alaressValidate();
 
     if (!validator.value.form()) {
         return; // validation failed

@@ -151,7 +151,7 @@
 
         {% if record.id != '' %}
 
-        $('[data-delete]').click(function (e) {
+        $('[data-delete]').on('click', function (e) {
             e.preventDefault();
 
             $(this).confirmDialog({
@@ -229,7 +229,7 @@
             submitHandler: function (form) {
                 var button = $("[data-submit]");
                 button.val('Saving, Please Wait');
-                button.attr('disabled', 'true');
+                button.prop('disabled', true);
 
                 {# Need to submit the form on timeout, otherwise the DOM doesn't update with new button label #}
 

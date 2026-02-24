@@ -154,7 +154,7 @@
             }
         });
 
-        $('a[data-delete]').click(function (event) {
+        $('a[data-delete]').on('click', function (event) {
             event.preventDefault();
 
             var $toast = $('[data-button-toast]');

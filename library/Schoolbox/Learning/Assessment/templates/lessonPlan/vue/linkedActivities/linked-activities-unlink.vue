@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { kebabCase } from "lodash";
+import { kebabCase } from "es-toolkit";
 import locale from "@js/terminology/rosettaStone";
 import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
 

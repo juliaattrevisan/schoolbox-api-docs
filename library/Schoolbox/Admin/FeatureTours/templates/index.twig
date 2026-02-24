@@ -66,7 +66,7 @@
 
 <script>
     // On change of global enable/disable - toggle show/hide of options
-    $('#tours_enabled-field').change(function() {
+    $('#tours_enabled-field').on('change', function() {
         if ($(this).is(':checked')) {
             $('#available-tours').removeClass('hide');
         } else {

@@ -238,10 +238,9 @@
                     // reset all, switch on/off based on masks
                     options = $role.find('input[data-perm]')
                         .prop('checked', false)
-                        .prop('disabled', true)
-                        .attr('disabled', 'disabled');
+                        .prop('disabled', true);
 
-                    options.filter(inMask).prop('disabled', false).removeAttr('disabled');
+                    options.filter(inMask).prop('disabled', false);
                     options.filter(inDefault).prop('checked', true);
 
                     options.eq(0).trigger('change.force');

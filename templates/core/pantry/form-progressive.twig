@@ -251,7 +251,7 @@
 
         // this listener is only for aesthetic purposes
         part3.on('click', function () {
-            part3.attr('readonly', 'readonly').val('Waiting on you, buddy...')
+            part3.prop('readonly', true).val('Waiting on you, buddy...')
         });
 
         // register a click staller on part 3
@@ -265,7 +265,7 @@
             var $link = $(this);
 
             var d = $.Deferred().done(function () {
-                $link.removeAttr('href').addClass('strike').attr('disabled', true);
+                $link.removeAttr('href').addClass('strike').prop('disabled', true);
             });
 
             $link.one('click', function () {

@@ -19,7 +19,7 @@
             $submitButton = $importForm.find('input[type=submit]');
 
         // Enable submit button if any checkbox is checked.
-        $checkboxes.change(function () {
+        $checkboxes.on('change', function () {
             if ($checkboxes.filter(':checked:not(:disabled)').length) {
                 $submitButton.prop('disabled', false);
             } else {

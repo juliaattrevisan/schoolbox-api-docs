@@ -17,6 +17,7 @@
             "@schoolboxVue/*": ["vue/*"],
             "@schoolboxTest/*": ["test/*"],
             "@js/*": ["www/static/js/*"],
+            "@vueuse/integrations/*": ["node_modules/@vueuse/integrations/dist/*"], // @vueuse now uses ESM, so we need to explicitly tell TypeScript where to find the types for @vueuse/integrations
         },
         "skipLibCheck": true, // Skip type checking of declaration file:  https://www.typescriptlang.org/tsconfig#skipLibCheck
         "strict": true, // The strict flag enables a wide range of type checking behaviour that results in stronger guarantees of program correctness.

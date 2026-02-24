@@ -320,9 +320,9 @@
                              #}
                             $.each(lists, function(index, element) {
                                 if (0 === element.numChecked && !defaultState) {
-                                    element.selectAll.removeClass(cssIndeterminate).attr('checked', false);
+                                    element.selectAll.removeClass(cssIndeterminate).prop('checked', false);
                                 } else if (element.numChecked === element.numElems) {
-                                    element.selectAll.removeClass(cssIndeterminate).attr('checked', true);
+                                    element.selectAll.removeClass(cssIndeterminate).prop('checked', true);
                                 } else {
                                     element.selectAll.addClass(cssIndeterminate);
                                 }
@@ -408,7 +408,7 @@
                                         draftFeedbackId = $publishButton.attr('data-draft-id');
 
                                     $publishButton.html('Publishing...');
-                                    $publishButton.attr('disabled', 'disabled');
+                                    $publishButton.prop('disabled', true);
                                     draftFeedbackIds.push(draftFeedbackId);
                                     $actionBars[draftFeedbackId] = $actionBar;
                                 });
@@ -687,8 +687,8 @@
                                 {# Handle clicks on confirm popup buttons. #}
                                 {# We bind click handlers here so we can pass $buttonClicked to postSobo() directly. #}
                                 {# Because we bind here, we first unbind to avoid binding the same function again each time the 'No' or 'Yes' button is clicked. #}
-                                $('#confirm-dialog [data-yes]').unbind('click').click(function () {postSobo($buttonClicked, true );});
-                                $('#confirm-dialog [data-no]' ).unbind('click').click(function () {postSobo($buttonClicked, false);});
+                                $('#confirm-dialog [data-yes]').off('click').on('click', function () {postSobo($buttonClicked, true );});
+                                $('#confirm-dialog [data-no]' ).off('click').on('click', function () {postSobo($buttonClicked, false);});
                             } else {
                                 postSobo($buttonClicked, false); {# Submission was not confirmed to be on-time. #}
                             }
@@ -712,7 +712,7 @@
 
                             $toast.toastActivate({text: 'Marking submission as received...'});
                             $button.html('Working...');
-                            $button.attr('disabled', '');
+                            $button.prop('disabled', true);
 
                             $.post($button.attr('href'), {'submissionWasOnTime': submissionWasOnTime})
                             .done(function(response) {

@@ -14,7 +14,7 @@ import { initEditColumns } from "./editColumns/editColumns";
 import { initNewComponents } from "./newComponents/newComponents";
 import { updateAllComponentCounts } from "./newComponents/updateNewComponentButtons";
 import { initUpdatePlaceHolders } from "./updatePlaceHolders";
-import { merge } from "lodash";
+import { merge } from "es-toolkit";
 
 document.addEventListener("MASONRY__CREATE", (e) => {
     setMasonryConfig(e.detail);

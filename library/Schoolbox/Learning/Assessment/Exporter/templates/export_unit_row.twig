@@ -14,19 +14,19 @@
         const courseId = $checkbox.attr('data-course-id');
 
         // Toggle date fields
-        $checkbox.change(function () {
+        $checkbox.on('change', function () {
             const datesContainer = $('#course-' + courseId + '-dates');
 
             if ($checkbox.prop('checked') && !$checkbox.prop('disabled')) {
                 datesContainer.removeAttr('hidden');
-                datesContainer.find('input').attr('required', true);
+                datesContainer.find('input').prop('required', true);
             } else {
                 datesContainer.attr('hidden', true);
                 datesContainer.find('input').removeAttr('required');
             }
         });
 
-        $checkbox.change(); // Run function on page load.
+        $checkbox.trigger('change'); // Run function on page load.
     });
 </script>
 

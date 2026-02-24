@@ -670,7 +670,7 @@
                 return groupMax;
             }
 
-            $("[data-group-max-value]").change(function() {
+            $("[data-group-max-value]").on('change', function() {
                 var groupIdentifier = $(this).closest("[data-group]").attr("data-group");
                 var $closestAssignButton = $(this).next("[data-use-criterion-values]");
                 if (! ($(this).val() == calculateGroupTotal(groupIdentifier)) ) {
@@ -695,7 +695,7 @@
                 }
             });
 
-            $("[data-use-criterion-values]").click(function($e) {
+            $("[data-use-criterion-values]").on('click', function($e) {
                 $e.preventDefault();
                 var $closestMaxMarkInput = $(this).prev("[data-group-max-value]");
                 var groupIdentifier = $(this).closest("[data-group]").attr("data-group");

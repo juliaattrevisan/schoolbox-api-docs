@@ -2,7 +2,7 @@
     $(function() {
         /* Re Generation of data usage
          */
-        $('[data-perform-update]').click(function (e) {
+        $('[data-perform-update]').on('click', function (e) {
             e.preventDefault();
 
             var toaster = $('#toast');

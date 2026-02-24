@@ -49,7 +49,7 @@
          * Set up event handler
          */
         function setup() {
-            $(config.element).change(function (event) {
+            $(config.element).on("change", function (event) {
                 retrieveData($(this).val());
             });
         }

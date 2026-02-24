@@ -58,7 +58,7 @@
             {% if routeRecordDelete %}
                 <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
                 <script>
-                    $('[data-delete]').click(function (event) {
+                    $('[data-delete]').on('click', function (event) {
                         event.preventDefault();
 
                         $(this).confirmDialog({

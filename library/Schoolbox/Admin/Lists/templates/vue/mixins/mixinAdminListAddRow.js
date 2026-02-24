@@ -32,7 +32,7 @@ export default {
                 }
             });
             newRow.sequence = this.getNextSequence();
-            (newRow.id = this.getNextId()), (newRow.isNew = true);
+            ((newRow.id = this.getNextId()), (newRow.isNew = true));
             this.addRow(newRow);
         },
 

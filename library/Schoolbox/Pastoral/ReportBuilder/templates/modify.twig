@@ -574,7 +574,7 @@
 
         // When a parent type checkbox is changed, show or hide its subtypes
         // and check them by default when shown
-        $(parentCheckboxSelector).change(function (e) {
+        $(parentCheckboxSelector).on('change', function (e) {
             var parentCheckbox = e.target;
             var $subCheckboxes = $(parentCheckbox).siblings(childGroupSelector).find(childCheckboxSelector);
 
@@ -610,7 +610,7 @@
         $(parentCheckboxSelector).each(function (index, parentCheckbox) {
             var $subtypes = $(parentCheckbox).siblings(childGroupSelector).find(childCheckboxSelector);
 
-            $subtypes.change(function () {
+            $subtypes.on('change', function () {
                 if ($subtypes.filter(":checked").length < 1) {
                     $(parentCheckbox).prop("checked", false);
                     $subtypes.parent(childGroupSelector).hide();
@@ -624,7 +624,7 @@
         })
 
         // Hide/show the relevant date range picker based on the user's radio button selection
-        $("input[type='radio'][name='date-option']").change(function (e) {
+        $("input[type='radio'][name='date-option']").on('change', function (e) {
             if ($("#relative-dates-option").is(":checked")) {
                 $("#relative-dates").removeClass("hide");
                 $("#absolute-dates").addClass("hide");

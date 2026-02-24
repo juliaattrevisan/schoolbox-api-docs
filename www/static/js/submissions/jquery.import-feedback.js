@@ -158,7 +158,7 @@
                 editor.setData(valueWithReplacedNewlines);
             } else {
                 // No editor? It may be hidden or not initialised yet, set the value directly instead
-                textarea.val(value).change();
+                textarea.val(value).trigger("change");
             }
         }
 
@@ -180,7 +180,7 @@
 
             if (dataFormat === "mark-only") {
                 assign = function (input, form) {
-                    $(form).find('input[name="mark"], select[name="mark"]').val(input[1]).change();
+                    $(form).find('input[name="mark"], select[name="mark"]').val(input[1]).trigger("change");
                 };
             } else if (dataFormat === "comment-only") {
                 assign = function (input, form) {
@@ -188,7 +188,7 @@
                 };
             } else {
                 assign = function (input, form) {
-                    $(form).find('input[name="mark"], select[name="mark"]').val(input[1]).change();
+                    $(form).find('input[name="mark"], select[name="mark"]').val(input[1]).trigger("change");
                     updateCommentField(form, input[2]);
                 };
             }

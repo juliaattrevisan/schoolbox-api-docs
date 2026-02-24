@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { kebabCase } from "lodash";
+import { kebabCase } from "es-toolkit";
 import { getGradient } from "@js/util/cssUtils";
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import ProgressTick from "@schoolboxLibrary/Learning/Assessment/templates/fragments/vue/progress-tick.vue";

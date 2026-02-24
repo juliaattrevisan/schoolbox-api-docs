@@ -3,7 +3,7 @@
  * To search the currently selected curriculum node
  */
 
-import debounce from "lodash/debounce";
+import { debounce } from "es-toolkit";
 import { useViewNodesStore } from "../viewNodes/store/mcViewNodesStore";
 import { useSearchStore, DEBOUNCE_AMOUNT } from "../store/mcSearchStore";
 
@@ -49,10 +49,10 @@ const debounceSearch = debounce(async () => {
  */
 window.Vue.watch(
     () => searchStore.query,
-    async () => {
+    () => {
         if (searchStore.isActive) {
             searchStore.enableSearch();
-            await debounceSearch();
+            void debounceSearch();
         }
     },
 );

@@ -39,7 +39,7 @@
         showSelectorButton.insertAfter(this.textInputElement);
         var thisSelector = this.selector;
         var thisCombobox = this;
-        showSelectorButton.click(function (e) {
+        showSelectorButton.on("click", function (e) {
             jQuery("html").trigger("click");
             thisSelector.buildSelectOptionList();
             thisSelector.show();
@@ -184,7 +184,7 @@
                 ulElement.append("<li>" + selectOptions[i] + "</li>");
             }
             var thisSelector = this;
-            this.selectorElement.find("li").click(function (e) {
+            this.selectorElement.find("li").on("click", function (e) {
                 thisSelector.hide();
                 thisSelector.combobox.setValue(this.innerHTML);
                 thisSelector.combobox.focus();
@@ -203,14 +203,14 @@
             }
             jQuery("html").keydown(this.keypressHandler);
             this.selectorElement.slideDown("fast");
-            jQuery("html").click(this.htmlClickHandler);
+            jQuery("html").on("click", this.htmlClickHandler);
             return true;
         },
 
         hide: function () {
-            jQuery("html").unbind("keydown", this.keypressHandler);
-            jQuery("html").unbind("click", this.htmlClickHandler);
-            this.selectorElement.unbind("click");
+            jQuery("html").off("keydown", this.keypressHandler);
+            jQuery("html").off("click", this.htmlClickHandler);
+            this.selectorElement.off("click");
             this.unselect();
             this.selectorElement.hide();
         },

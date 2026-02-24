@@ -42,11 +42,11 @@
 
             <script>
                 $(function() {
-                    $('#similarity-preview-{{ latestResponse.id }}').click(function() {
+                    $('#similarity-preview-{{ latestResponse.id }}').on('click', function() {
                         /* Close all other joyrides before starting the next one
                          * because foundation is buggy
                          */
-                         $('.joyride-close-tip').click();
+                         $('.joyride-close-tip').trigger("click");
 
                         $('#similarity-preview-set-{{ latestResponse.id }}').foundation('joyride', 'start');
                     });

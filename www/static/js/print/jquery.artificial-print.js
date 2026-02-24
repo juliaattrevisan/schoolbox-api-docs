@@ -37,7 +37,7 @@
          * Apply javascript to trigger Print artificially
          */
         function apply() {
-            $(config.element).click(function (event) {
+            $(config.element).on("click", function (event) {
                 event.preventDefault();
                 window.print();
                 return false;

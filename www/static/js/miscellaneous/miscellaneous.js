@@ -127,7 +127,7 @@ $(function () {
         $debugBar.find(".phpdebugbar-indicator").first().before($html);
 
         // Toggle twig template names showing on click of the button
-        $("#showTwigNames").click(function () {
+        $("#showTwigNames").on("click", function () {
             if ($(".twigName").attr("hidden")) {
                 $(".twigName").removeAttr("hidden");
             } else {
@@ -217,7 +217,7 @@ $(function () {
     // Listen for changes to window size and run the top nav update
     // Apply a timeout so that the function doesn't run a million times while resizing
     var resizeTimeout;
-    $(window).resize(function () {
+    $(window).on("resize", function () {
         this.clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(updateTopNavItems, 100);
     });

@@ -91,7 +91,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         renderTimetableAllDay();
 
         // Listen for changes to campus
-        timetable.campus.change(function () {
+        timetable.campus.on("change", function () {
             resetCycles(
                 $("#byTimetable-" + twigVars.id)
                     .find("[data-adtp-tt-submit]")
@@ -103,15 +103,15 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         });
 
         // Listen for changes to term
-        timetable.term.change(function () {
+        timetable.term.on("change", function () {
             buildCycles();
         });
 
         // Attach week cycle functionality to prev & next buttons
-        $byTimetable.find("[data-tt-next]").click(function () {
+        $byTimetable.find("[data-tt-next]").on("click", function () {
             changeCycle($(this), false);
         });
-        $byTimetable.find("[data-tt-prev]").click(function () {
+        $byTimetable.find("[data-tt-prev]").on("click", function () {
             changeCycle($(this), true);
         });
 
@@ -126,14 +126,14 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         $byTimetable.find("[data-tt-day].active").trigger("click");
 
         // Catch period select change
-        $byTimetable.find("[data-adtp-tt-period]").change(function () {
+        $byTimetable.find("[data-adtp-tt-period]").on("change", function () {
             updateTimeControls($(this));
         });
     }
 
     // If input value gets changed from outside, reset the timetable picker
 
-    $picker.change(function () {
+    $picker.on("change", function () {
         if (isInputValueValid()) {
             resetCalendar();
             if (twigVars.timetable) {
@@ -730,7 +730,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
             $pickerResponseDueWork.append(html);
 
-            $pickerResponse.find("[data-show-full-due]").click(function () {
+            $pickerResponse.find("[data-show-full-due]").on("click", function () {
                 var listDiv = $(this).data("show-full-due");
                 $(this).parents("[data-adtp-top-due]").addClass("hide");
                 $("#" + listDiv).removeClass("hide");
@@ -738,7 +738,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 $("[data-due-work-title]").text(dictTop5Loaded);
             });
 
-            $pickerResponse.find("[data-hide-full-due]").click(function () {
+            $pickerResponse.find("[data-hide-full-due]").on("click", function () {
                 var listDiv = $(this).data("hide-full-due");
                 $pickerResponseDueWork.find("[data-adtp-top-due]").removeClass("hide");
                 $("#" + listDiv).addClass("hide");
@@ -789,7 +789,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             calendar.render();
         }
 
-        $modal.find("[data-collapser]").unbind().collapsable();
+        $modal.find("[data-collapser]").off().collapsable();
     }
 
     /**

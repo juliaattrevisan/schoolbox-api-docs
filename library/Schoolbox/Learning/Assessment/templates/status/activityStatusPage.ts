@@ -3,7 +3,7 @@
  * To avoid this, the view status page now loads up to 30 instances at a time and paginates the rest of the students.
  */
 
-import debounce from "lodash/debounce";
+import { debounce } from "es-toolkit";
 import { slideDown, slideUp } from "@js/util/animateUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import type { EditorCreateEventInfo } from "@js/editor/event/editorEvent";

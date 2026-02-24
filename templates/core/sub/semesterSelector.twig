@@ -13,11 +13,11 @@ Usage: include 'sub/semesterSelector.twig
         var $semesterSelector = $('#context-selector-semester');
         var $options = $semesterSelector.find('option');
         {# Wire up context selector #}
-        $semesterSelector.change(function () {
+        $semesterSelector.on('change', function () {
             window.location.href = $semesterSelector.find(':selected').data('href');
         });
         {# Wire up next/previous term buttons #}
-        $("[data-semester-switch]").click(function (e) {
+        $("[data-semester-switch]").on('click', function (e) {
             e.preventDefault();
             var index = $semesterSelector.prop('selectedIndex');
             var newIndex = 'next' === $(this).data('semester-switch') ? index - 1 : index + 1;

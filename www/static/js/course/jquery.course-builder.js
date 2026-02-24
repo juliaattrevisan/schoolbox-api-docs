@@ -26,7 +26,7 @@
                 handle: ".grip",
                 axis: "y",
             });
-            assessmentList.bind("sortstop", function (event, ui) {
+            assessmentList.on("sortstop", function (event, ui) {
                 var sequence = [];
                 assessmentList.find("[data-assessment]").each(function (idx, elem) {
                     sequence.push($(elem).attr("data-assessment"));

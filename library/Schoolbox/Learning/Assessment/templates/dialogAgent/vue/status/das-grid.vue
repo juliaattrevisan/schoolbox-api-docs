@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { cloneDeep } from "lodash";
+import { cloneDeep } from "es-toolkit";
 import locale from "@js/terminology/rosettaStone";
 import type { DialogAgentResponseStatus } from "@schoolboxAssessment/Types/dialogAgent";
 import { getResponseStatus } from "./dialogAgentStatusTypes";

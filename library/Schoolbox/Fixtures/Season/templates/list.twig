@@ -59,17 +59,17 @@
         $radioMove.add($radioDelete).on('change', function () {
             if ($radioMove.prop('checked')) {
                 $alertDelete.addClass('hide');
-                $buttonDelete.attr('disabled', $selectMove[0].selectedIndex < 1);
+                $buttonDelete.prop('disabled', $selectMove[0].selectedIndex < 1);
             } else {
                 $alertDelete.removeClass('hide');
-                $buttonDelete.attr('disabled', false);
+                $buttonDelete.prop('disabled', false);
             }
             $selectMove.prop('disabled', !$radioMove.prop('checked'));
         });
 
         // Did user select a season from the dropdown to move divisions/matches to ?
         $selectMove.on('change', function () {
-            $buttonDelete.attr('disabled', $selectMove[0].selectedIndex < 1);
+            $buttonDelete.prop('disabled', $selectMove[0].selectedIndex < 1);
         });
 
         // Did user click an action button on the delete modal ?
@@ -280,5 +280,3 @@
         </div>
     </div>
 </div>
-
-

@@ -178,18 +178,18 @@
             setupDropdownIcons();
             autoSelectAllCheckboxes();
 
-            config.selector.change(function () {
+            config.selector.on("change", function () {
                 selectAllCheckboxes();
 
                 config.change();
             });
 
-            config.checkboxes.change(function () {
+            config.checkboxes.on("change", function () {
                 autoSelectAllCheckboxes();
             });
 
             if (config.childCheckboxes) {
-                config.childCheckboxes.change(function () {
+                config.childCheckboxes.on("change", function () {
                     autoSelectAllCheckboxes();
                 });
             }

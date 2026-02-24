@@ -32,7 +32,7 @@
          * Save response upon change
          */
         function initChange() {
-            config.questionForm.find("input[type=checkbox]").change(function () {
+            config.questionForm.find("input[type=checkbox]").on("change", function () {
                 /* Clear Other value if unchecked
                  */
                 var element = $(this);
@@ -54,7 +54,7 @@
             /* Detect change in Other field
              * If the Other has content, check the Other Checkbox, and highlight
              */
-            config.questionForm.find('[data-role="other-answer"]').change(function () {
+            config.questionForm.find('[data-role="other-answer"]').on("change", function () {
                 config.questionForm.find('[data-role="other-checkbox"]').prop("checked", $(this).val().length);
                 $.fn.evaluationMultipleChoiceOther.saveOne(config.questionForm);
             });

@@ -71,7 +71,7 @@
             ];
 
             // Disable form for aesthetic reasons
-            form.attr("disabled", "disabled");
+            form.prop("disabled", true);
 
             // And transition
             $.ajax({

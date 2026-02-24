@@ -282,16 +282,16 @@ $(function() {
 
     // On submission attempt: clear list of errors
     form.find('#resource-booking-save')
-        .click(function() {
+        .on('click', function() {
             errors = {};
             form.valid()
         })
-        .click(function() {
+        .on('click', function() {
             // Record that I clicked Save
             form.data('action', 'save')
         });
     form.find('#resource-booking-cancel')
-        .click(function() {
+        .on('click', function() {
             // Record that I clicked Cancel
             form.data('action', 'cancel')
         });
@@ -305,7 +305,7 @@ $(function() {
 
     // Show/hide the repeat until input, depending on if a repeat is chosen.
     form.find('#repeatUntilSelect')
-        .change(function() {
+        .on('change', function() {
             if ($(this).val() !== '') {
                 $('#repeatUntil').show();
                 $("#repeat_until").rules("add", "required");
@@ -315,7 +315,7 @@ $(function() {
                 $("#repeat_until").rules("remove", "required");
             }
         })
-        .change();
+        .trigger('change');
 
     // Related Resources:
     // show/hide name and notes

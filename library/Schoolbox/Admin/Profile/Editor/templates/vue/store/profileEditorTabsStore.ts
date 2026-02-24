@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { cloneDeep } from "lodash";
+import { cloneDeep } from "es-toolkit";
 import { until } from "@vueuse/core";
 import { keysOf } from "@js/util/arrayUtils";
 import { useProfileEditorStore } from "./profileEditorStore";

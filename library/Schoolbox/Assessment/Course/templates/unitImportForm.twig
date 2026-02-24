@@ -18,7 +18,7 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.basic.js?v={{ config.site_version }}"></script>
 <script>
     $(function() {
-        $('[data-warn-removal]').click(function(e) {
+        $('[data-warn-removal]').on('click', function(e) {
             if (!$(e.target).prop('checked')) {
                 event.preventDefault();
                 $(this).confirmDialog({
@@ -141,5 +141,3 @@
 
     </ul>
 {% endif %}
-
-

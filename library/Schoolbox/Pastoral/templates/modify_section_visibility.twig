@@ -90,10 +90,10 @@
                 let permList = $('#permission-'+element);
                 if (locked) {
                     $(permList).find('input[type=radio]').each(function () {
-                        $(this).attr('readonly', 'readonly');
+                        $(this).prop('readonly', true);
                     })
                     $(permList).find('input[type=checkbox]').each(function () {
-                        $(this).attr('readonly', 'readonly');
+                        $(this).prop('readonly', true);
                     })
                     $(permList).find('label.radio-label').each(function () {
                         $(this).attr('for', $(this).attr('for') + '-locked');
@@ -190,8 +190,8 @@
         {
             let targetCheckboxLabel = $("label[for='" + targetCheckbox.attr('id') +"']");
             if (alwaysReadOnly) {
-                targetCheckbox.attr('checked', 'checked');
-                targetCheckbox.attr('readonly', 'readonly');
+                targetCheckbox.prop('checked', true);
+                targetCheckbox.prop('readonly', true);
                 targetCheckbox.attr('data-always-read-only', 1);
                 if (permission === '0') {
                     targetCheckbox.hide();
@@ -199,7 +199,7 @@
                 }
             } else {
                 if (isChecked) {
-                    targetCheckbox.attr('checked', 'checked');
+                    targetCheckbox.prop('checked', true);
                 }
                 targetCheckbox.attr('data-always-read-only', 0);
                 if (permission === '0') {
@@ -215,14 +215,14 @@
        {# of the radio buttons to whichever value was 'checked' on page load. So, we need to update the #}
        {# check attribute in the DOM for all radio buttons in the clicked group #}
         function setRadioButtonListener (row) {
-            $(row).find('.radio-label').click(function () {
+            $(row).find('.radio-label').on('click', function () {
                 let clickedElement = $("#" + $(this).attr('for'));
                 let elementName = clickedElement.attr('name');
                 let radioGroupSelector = 'input[name*="' + elementName + '"]';
                 {# Uncheck all radio buttons in the group #}
                 $(radioGroupSelector).removeAttr('checked');
                 {# Check the one that was clicked #}
-                clickedElement.attr('checked', 'true');
+                clickedElement.prop('checked', true);
                 // hide checkboxes for denied permission
                 clickedElement.closest('tr').find('.checkbox-label').each(
                         function () {

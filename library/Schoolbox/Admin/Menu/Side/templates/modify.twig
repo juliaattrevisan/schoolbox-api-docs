@@ -2,7 +2,7 @@
     $(function () {
         var form = $('form#itemForm');
 
-        $('[data-submit]').click(function () {
+        $('[data-submit]').on('click', function () {
             form.alaressValidate({
                 ignore: ':disabled',
                 rules: {
@@ -16,7 +16,7 @@
             });
         });
 
-        $('[data-delete]').click(function (event) {
+        $('[data-delete]').on('click', function (event) {
             event.preventDefault();
             var id = $(this).data('delete');
             $(this).confirmDialog({
@@ -188,22 +188,22 @@
             $('#campus-all').prop('checked', true);
         }
 
-        $('[data-campus]').change(function() {
+        $('[data-campus]').on('change', function() {
             $('#campus-all').prop('checked', false);
         });
 
-        $('#campus-all').change(function() {
+        $('#campus-all').on('change', function() {
             var status = $(this).prop('checked');
             $('[data-campus]').each(function() {
                 $(this).prop('checked', status);
             });
         });
 
-        $('[data-role]').change(function() {
+        $('[data-role]').on('change', function() {
             $('#role-all').prop('checked', false);
         });
 
-        $('#role-all').change(function() {
+        $('#role-all').on('change', function() {
             var status = $(this).prop('checked');
             $('[data-role]').each(function() {
                 $(this).prop('checked', status);

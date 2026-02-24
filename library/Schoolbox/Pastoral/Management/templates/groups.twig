@@ -97,7 +97,7 @@
 
 <script>
     $(function () {
-        $('[data-delete]').click(function (e) {
+        $('[data-delete]').on('click', function (e) {
             e.preventDefault();
             var groupId = $(this).attr('data-delete');
             $(this).confirmDialog({

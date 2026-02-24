@@ -38,11 +38,11 @@
             settings.endDate = element;
         }
 
-        settings.startDate.bind("change.syncDates", function () {
+        settings.startDate.on("change.syncDates", function () {
             settings.startDate.syncDatesNow(settings);
         });
 
-        settings.endDate.bind("change.syncDates", function () {
+        settings.endDate.on("change.syncDates", function () {
             settings.endDate.syncDatesNow(settings);
         });
 
@@ -73,7 +73,7 @@
             var endDate = dayjs($(this).val(), settings.dateFormat, true);
 
             if (startDate.isValid() && endDate.isValid() && startDate.isAfter(endDate)) {
-                settings.startDate.val($(this).val()).change();
+                settings.startDate.val($(this).val()).trigger("change");
             }
         }
 
@@ -84,7 +84,7 @@
             endDate = dayjs(settings.endDate.val(), settings.dateFormat, true);
 
             if (startDate.isValid() && endDate.isValid() && startDate.isAfter(endDate)) {
-                settings.endDate.val($(this).val()).change();
+                settings.endDate.val($(this).val()).trigger("change");
             }
         }
     };

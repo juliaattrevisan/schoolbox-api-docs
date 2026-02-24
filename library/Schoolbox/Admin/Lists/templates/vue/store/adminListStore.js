@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
-import cloneDeep from "lodash/cloneDeep";
-import orderBy from "lodash/orderBy";
+import { cloneDeep, orderBy } from "es-toolkit";
 
 export const useAdminListStore = defineStore("main", {
     state: () => ({
@@ -53,14 +52,14 @@ export const useAdminListStore = defineStore("main", {
          */
         updateLoadedData(loadedData) {
             this.loadedData = Object.freeze(loadedData); //freeze the loaded data to ensure it's not changed
-            const loadedRows = cloneDeep(this.loadedData.rows); //cloneDeep is from underscore.js
-            const sortedRows = orderBy(loadedRows, "sequence", "asc"); //orderBy is from underscore.js, to display according to sequence
+            const loadedRows = cloneDeep(this.loadedData.rows);
+            const sortedRows = orderBy(loadedRows, "sequence", "asc"); // to display according to sequence
             sortedRows.forEach((row) => (row.isNew = false)); //Add a boolean to know whether the row is one being newly added
             this.rows = sortedRows;
         },
 
         /**
-         * Can be choosen by opening the pop out
+         * Can be chosen by opening the pop out
          */
         updateSelectedRow(row) {
             this.selectedRow = row;
@@ -140,7 +139,7 @@ export const useAdminListStore = defineStore("main", {
          * and display the error on the relevant row fields.
          * To do this we loop through the fields
          * and the associated rows for each. Because of the structure
-         * of the data, (with the fields and rows being seperate objects)
+         * of the data, (with the fields and rows being separate objects)
          * the check is a little more complicated than what we might expect.
          **/
         isValidated() {

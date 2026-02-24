@@ -202,7 +202,7 @@ $(function () {
         if (!uploadEnabled) {
             abUploadSubmitBtn
                 .html('Upload')
-                .attr('disabled', 'disabled')
+                .prop('disabled', true)
                 .off('click');
             abUploadCancelBtn.removeAttr('disabled');
         } else {
@@ -217,8 +217,8 @@ $(function () {
                     abUploadSubmitBtn
                         .data('uploading', dz.getQueuedFiles())
                         .html('Uploading')
-                        .attr('disabled', 'disabled');
-                    abUploadCancelBtn.attr('disabled', 'disabled');
+                        .prop('disabled', true);
+                    abUploadCancelBtn.prop('disabled', true);
 
                     // Is the queue complete anyway?
                     // Trigger the message that queueComplete would send

@@ -2,7 +2,7 @@
     $(function() {
         var $toast = $('[data-toast]');
 
-        $('[data-install-package]').click(function(event) {
+        $('[data-install-package]').on('click', function(event) {
             event.preventDefault();
             $(this).confirmDialog({
                 text: 'Are you sure you want to install this package?',
@@ -84,4 +84,3 @@
     </div>
 </div>
 <div id='toaster' class="toast" data-toast></div>
-

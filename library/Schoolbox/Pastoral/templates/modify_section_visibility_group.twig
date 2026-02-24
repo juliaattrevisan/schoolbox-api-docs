@@ -96,7 +96,7 @@
             {# Setup click events #}
 
             function updateGroupPermissionsClick() {
-                $('[data-delete-visibility="group"]').click(function (e) {
+                $('[data-delete-visibility="group"]').on('click', function (e) {
                     e.preventDefault();
 
                     let row = $(this).closest('tr');
@@ -144,7 +144,7 @@
                 {# Subtracting one for the dummy clone row #}
 
                 if ($("[data-group-add]:not(.hide)").length === 0) {
-                    groupModalButtons.attr('disabled', 'true');
+                    groupModalButtons.prop('disabled', true);
                 } else {
                     groupModalButtons.removeAttr('disabled');
                 }
@@ -175,7 +175,7 @@
                     applyLock(['groups'], locked);
                     //Check the correct box
                     let selector = 'input[name = "group['+groupId+']"][value ="'+permission+'"]';
-                    $(permissionListGroups).find(selector).attr("checked", "checked");
+                    $(permissionListGroups).find(selector).prop("checked", true);
                 }
 
                 $(this).addClass('hide');
@@ -185,7 +185,7 @@
                 updateVisibility();
             }
 
-            $('[data-group-add]').click(function(e) {
+            $('[data-group-add]').on('click', function(e) {
                 e.preventDefault();
 
                 let groupId = $(this).attr('data-group-add');

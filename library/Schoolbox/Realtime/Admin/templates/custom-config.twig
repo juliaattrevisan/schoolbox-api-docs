@@ -40,7 +40,7 @@ set labelDisplayNames = {
             } else {
                 // disable correspondible input in Step 2
                 tgt.prop('checked', false)         // ensure not still checked
-                   .attr('disabled', 'disabled');  // disable
+                   .prop('disabled', true);  // disable
 
                 if (tgt.data('perm') == 1) {
                     // deselect the other perms
@@ -92,7 +92,7 @@ set labelDisplayNames = {
 
         posTable.closest('form').on('submit', function (e) {
             e.preventDefault();
-            $(this).find('input[type=submit]').attr('disabled', 'disabled').val('Saving');
+            $(this).find('input[type=submit]').prop('disabled', true).val('Saving');
 
             $.post('/adminv2/notifications/configure', $(this).serialize(), function (data) {
                 customiserCallback(data);

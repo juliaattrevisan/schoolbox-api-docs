@@ -50,7 +50,7 @@
                     .data('label', jstree.node.text);
 
             $('[data-select],[data-selection]')
-                    .attr('disabled', jstree.node.parent == '#');
+                    .prop('disabled', jstree.node.parent == '#');
         });
 
         var $resources = $('#resources');
@@ -66,7 +66,7 @@
                 $resources.scrollTo(initialNode);
                 tree.off('.jstree.initial');
             } else if (tree.focused !== undefined) {
-                $('[data-select],[data-selection]').attr('disabled', tree.focused().parent == '#');
+                $('[data-select],[data-selection]').prop('disabled', tree.focused().parent == '#');
             }
         });
 

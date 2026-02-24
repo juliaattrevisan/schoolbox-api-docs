@@ -39,10 +39,10 @@
             var enablePrevious = index > 0 && length > 1;
             var enableNext     = index < (length-1) && length > 1;
 
-            enablePrevious ? $previous.removeAttr('disabled') : $previous.attr('disabled','disabled');
+            enablePrevious ? $previous.removeAttr('disabled') : $previous.prop('disabled', true);
             $previous.prop('disabled', enablePrevious);
 
-            enableNext ? $next.removeAttr('disabled') : $next.attr('disabled','disabled');
+            enableNext ? $next.removeAttr('disabled') : $next.prop('disabled', true);
             $next.prop('disabled', enableNext);
         }
         // Refresh UI if user got here by clicking browser 'back'

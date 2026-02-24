@@ -8,7 +8,7 @@
             }
         });
 
-        $('[data-interaction="delete"]').click(function(event) {
+        $('[data-interaction="delete"]').on('click', function(event) {
             event.preventDefault();
 
             $(this).confirmDialog({

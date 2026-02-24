@@ -129,7 +129,7 @@
                 }
             },
             submitHandler: function(form) {
-                $saveButton.attr('disabled', true);
+                $saveButton.prop('disabled', true);
 
                 var data = $(form).find('input').serialize();
                 var href = $saveButton.data('href');
@@ -147,7 +147,7 @@
                         $toast.toastTimeout({text: 'Unable to save.', css: 'alert', duration: duration});
                     })
                     .always(function() {
-                        $saveButton.attr('disabled', false);
+                        $saveButton.prop('disabled', false);
                         setTimeout(function(){
                             $toast.removeClass('success alert');
                         }, duration);

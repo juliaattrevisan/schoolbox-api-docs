@@ -189,7 +189,7 @@
 <script type="text/javascript">
     $(function() {
         // Delete attempts script
-        $('#attempts').find('[data-delete]').click(function (event) {
+        $('#attempts').find('[data-delete]').on('click', function (event) {
             event.preventDefault();
 
             var element = $(this);

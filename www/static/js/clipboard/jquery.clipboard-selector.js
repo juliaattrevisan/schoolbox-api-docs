@@ -101,7 +101,7 @@ $.fn.clipboardSelector = function (options) {
      * URL to click.
      */
     function setupExport() {
-        $(config.exportActivator).click(function (event) {
+        $(config.exportActivator).on("click", function (event) {
             event.preventDefault();
 
             // ZeroClipboard was not ready immediately.

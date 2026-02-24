@@ -270,7 +270,7 @@
             });
 
             {# download attempts delayed #}
-            $('[data-download]').click(function (e) {
+            $('[data-download]').on('click', function (e) {
                 e.preventDefault();
                 $(this).confirmDialog({
                     header: 'Download all attempts?',

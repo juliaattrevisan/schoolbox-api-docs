@@ -95,7 +95,7 @@
                         removeLoadingState(config.courseSelector.filter);
 
                         if (config.courseSelector.addFilterQueryToUrlHistory) {
-                            $("[data-course-link]").click(function (e) {
+                            $("[data-course-link]").on("click", function (e) {
                                 // Add filter query to URL history before redirecting to link destination page.  This
                                 // ensures that when the user clicks the 'back' button from the link destination page,
                                 // the filter query will be remembered on the results list page.

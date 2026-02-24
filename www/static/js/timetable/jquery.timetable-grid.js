@@ -76,7 +76,7 @@
          * Occurs when selecting a menu item from the person selector
          */
         function showSelectedTimetable() {
-            $(config.selectors.data).click(function (event) {
+            $(config.selectors.data).on("click", function (event) {
                 event.preventDefault();
 
                 updateMenu($(this));
@@ -105,7 +105,7 @@
 
             /* Wait till resizing actually stops before resizing everything
              */
-            $(window).bind("resizeEnd", function () {
+            $(window).on("resizeEnd", function () {
                 timetable.timetableResize();
             });
         }

@@ -59,7 +59,7 @@
             canvas.attr({ width: width });
             redrawSignature(signature);
         };
-        $(window).resize(resizeSignature);
+        $(window).on("resize", resizeSignature);
         resizeSignature();
 
         return this;

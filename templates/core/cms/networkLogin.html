@@ -58,7 +58,7 @@
             var form = $(this),
                 data = form.serialize();
 
-            form.find('input').attr('disabled', true);
+            form.find('input').prop('disabled', true);
 
             $.post(this.action, data, function () {
                 var explorer = form.closest('.explorer');

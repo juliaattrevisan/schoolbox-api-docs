@@ -84,7 +84,7 @@ Usage:
         // Template input: show a warning if changing the selected option
         const templateInput = $('[data-template]');
 
-        templateInput.change(function() {
+        templateInput.on('change', function() {
             $("[data-template-warning]").toggleClass("hide", Number({{ courseSpec.template.id ?? null }}) === Number(templateInput.val()));
         });
         {% endif %}

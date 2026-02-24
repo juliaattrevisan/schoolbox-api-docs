@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { kebabCase } from "lodash";
+import { kebabCase } from "es-toolkit";
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
 

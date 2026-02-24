@@ -1,4 +1,4 @@
-import { debounce } from "lodash";
+import { debounce } from "es-toolkit";
 import type { Reactive, Ref } from "vue";
 import type { Plan } from "@schoolboxLibrary/Learning/Assessment/templates/participation/js/types/customParticipationTypes";
 

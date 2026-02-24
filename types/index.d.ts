@@ -3,6 +3,9 @@
  * https://ilikekillnerds.com/2022/09/how-to-extend-the-window-object-in-typescript/
  */
 
+// Include type definitions from the @types/jquery package
+/// <reference types="jquery" />
+
 import type Vue from "vue";
 import type dayjs from "dayjs";
 import type { lightGallery } from "lightgallery";
@@ -26,6 +29,9 @@ type Dropzone = {
 };
 
 declare global {
+    const $: JQueryStatic;
+    const jQuery: JQueryStatic;
+
     interface Window {
         cdnPrefix: string;
         dayjs: typeof dayjs;

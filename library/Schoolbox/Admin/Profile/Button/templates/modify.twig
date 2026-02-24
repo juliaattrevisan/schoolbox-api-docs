@@ -264,7 +264,7 @@
         updateIconPreview($('#icon-select').val());
 
         // Update icon preview on change of the dropdown
-        $('#icon-select').change(function() {
+        $('#icon-select').on('change', function() {
             updateIconPreview($('#icon-select').val());
         });
 

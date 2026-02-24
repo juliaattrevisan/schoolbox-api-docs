@@ -50,7 +50,7 @@
 
         var writePermission = {{ write }};
 
-        $('[data-checkbox-inherit]').change(function(event) {
+        $('[data-checkbox-inherit]').on('change', function(event) {
             if ($(event.target).prop('checked')) {
                 $('#permissions').addClass('hide');
                 $('#synergetic-codes').addClass('hide');
@@ -97,7 +97,7 @@
 
         {% if folder.id %}
 
-            $('[data-interaction="delete"]').click(function(event) {
+            $('[data-interaction="delete"]').on('click', function(event) {
                 event.preventDefault();
                 $(this).confirmDialog({
                     text: 'Are you sure you wish to delete this folder?',
@@ -124,7 +124,7 @@
                 });
             });
 
-            $('[data-reset-homepage-content]').click(function(event) {
+            $('[data-reset-homepage-content]').on('click', function(event) {
                 event.preventDefault();
 
                 let element = $(this);
@@ -181,7 +181,7 @@
             var templateInput = $('[data-template]'),
                 templateValue = Number(templateInput.val());
             if (templateValue !== -1) {
-                templateInput.change(function() {
+                templateInput.on('change', function() {
                     $("[data-template-warning]").toggleClass("hide", Number(this.value) === templateValue);
                 });
             }
@@ -211,7 +211,7 @@
         {% if folder.id %}
             {# Warn user that changing inherit permissions will destroy this group #}
             {% if not folder.getInherit  %}
-                $("#inherit").change(function() {
+                $("#inherit").on('change', function() {
                     $("[data-alert-permissions]").toggleClass("hide", !this.checked);
                     $("[data-alert-recursive-permissions] span").toggleClass("hide", !this.checked);
                 });
@@ -221,12 +221,12 @@
                 Warn user that permission recursion will delete role/group/class permissions if inherit is ON
                 Only superusers can recurse permission changes, and its only relevant on modification
             #}
-            $("#recursive-permissions").change(function() {
+            $("#recursive-permissions").on('change', function() {
                 $("[data-alert-recursive-permissions]").toggleClass("hide", !this.checked);
                 $("[data-alert-recursive-permissions] span").toggleClass("hide", !$("#inherit")[0].checked);
             });
             {# confirm if inherit, as this will remove group / class codes also from children folders #}
-            $("#inherit").change(function() {
+            $("#inherit").on('change', function() {
                 $("[data-alert-recursive-permissions] span").toggleClass("hide", !this.checked);
             });
         {% endif %}

@@ -10,7 +10,7 @@
             $('#' + o).slideToggle();
         });
 
-        $('input[name=provider]').click(function() {
+        $('input[name=provider]').on('click', function() {
             $('[data-mage-next="part-2"]').trigger('click');
         });
 

@@ -277,7 +277,7 @@ export default window.Vue.defineComponent({
         onEnter(element: Element, done: () => void) {
             const elementIndex = element.getAttribute("index") ?? "0";
             const delay = parseInt(elementIndex, 10) * 0.025;
-            gsap.to(element, 0.3, { opacity: 1, y: 0, height: "auto", delay, onComplete: done });
+            gsap.to(element, { duration: 0.3, opacity: 1, y: 0, height: "auto", delay, onComplete: done });
         },
 
         /**
@@ -286,7 +286,7 @@ export default window.Vue.defineComponent({
          * @param done - to be called once animation is complete
          */
         onLeave(element: Element, done: () => void) {
-            gsap.to(element, 0.3, { opacity: 0, y: 10, height: 0, onComplete: done });
+            gsap.to(element, { duration: 0.3, opacity: 0, y: 10, height: 0, onComplete: done });
         },
 
         /**

@@ -19,7 +19,8 @@ import type { FilterEventHandlerMap } from "@schoolboxLibrary/Filter/templates/t
  * You can either extend an existing event map interface, or just add the custom events directly
  */
 export interface SbxGlobalDocumentEventHandlerMap
-    extends EditorDocumentEventHandlerMap,
+    extends
+        EditorDocumentEventHandlerMap,
         ColourPickerDocumentEventHandlerMap,
         ImageLightboxDocumentEventHandlerMap,
         SwiperDocumentEventHandlerMap,

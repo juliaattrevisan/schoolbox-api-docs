@@ -3,7 +3,7 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/dataTables.js?v={{ config.site_version }}"></script>
 <script>
     $(function () {
-        $('[data-restart-processing]').click(async function (e) {
+        $('[data-restart-processing]').on('click', async function (e) {
             e.preventDefault();
             const deleteId = $(this).data('restartProcessing');
             const row = $(this).closest('tr');
@@ -39,7 +39,7 @@
                 });
             }
         });
-        $('[data-delete]').click(function (e) {
+        $('[data-delete]').on('click', function (e) {
             e.preventDefault();
             var deleteId = $(this).data('delete');
             var row = $(this).closest('tr');

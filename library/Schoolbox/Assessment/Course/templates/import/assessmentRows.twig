@@ -23,7 +23,7 @@
     $(function () {
 
         // Reveal 'use unit date' if input value differs form the unit date value
-        $('#import_assessments').find('[data-datepicker]').change(function() {
+        $('#import_assessments').find('[data-datepicker]').on('change', function() {
             var $useUnitDate = $(this).parent().next('[data-course-unit-date]');
             if ($(this).val() !== $useUnitDate.attr('data-course-unit-date')) {
                 $useUnitDate.removeClass('hide');
@@ -34,7 +34,7 @@
         });
 
         // Copy unit date into the field
-        $('[data-course-unit-date]').click(function() {
+        $('[data-course-unit-date]').on('click', function() {
             var date = $(this).attr('data-course-unit-date');
             var $input = $(this).prevAll('.input-group').find('input');
 
@@ -55,7 +55,7 @@
 
 <script>
     $(function() {
-        $('[data-warn-removal]').click(function(e) {
+        $('[data-warn-removal]').on('click', function(e) {
             if (!$(e.target).prop('checked')) {
                 e.preventDefault();
                 $(this).confirmDialog({

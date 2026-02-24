@@ -155,13 +155,13 @@ import { getLoadedHTML } from "@js/util/domUtils";
         var $e = $(this.element);
         var $t = this.findSubmittable($e);
 
-        $t.attr("disabled", "disabled");
+        $t.prop("disabled", true);
         $t.find("[data-mage-error]").slideUp(slideFast);
 
         if ($e.data("mage-reset") === undefined) {
             $e.data("mage-reset", $e.val());
         }
-        $e.val($e.data("mage-working")).attr("disabled", "disabled");
+        $e.val($e.data("mage-working")).prop("disabled", true);
     };
 
     /**
@@ -208,7 +208,7 @@ import { getLoadedHTML } from "@js/util/domUtils";
             .find("[data-mage-helptext]")
             .slideUp(slideSlow, function () {
                 // disable all inputs in the closed section
-                $t.find(":input").attr("disabled", "disabled");
+                $t.find(":input").prop("disabled", true);
             });
     };
 

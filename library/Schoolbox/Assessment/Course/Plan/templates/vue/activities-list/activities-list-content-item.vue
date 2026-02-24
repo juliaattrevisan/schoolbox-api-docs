@@ -8,7 +8,7 @@
  */
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
-import { kebabCase, startCase } from "lodash";
+import { kebabCase, startCase } from "es-toolkit";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { ACTIVITY_TYPE_DIALOG_AGENT, ACTIVITY_TYPE_QUIZ } from "@schoolboxAssessment/Types/assessmentTypes";
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";

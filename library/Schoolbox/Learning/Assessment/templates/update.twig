@@ -113,7 +113,7 @@
             }
         }
 
-        $('[data-delete]').click(function(event) {
+        $('[data-delete]').on('click', function(event) {
             event.preventDefault();
 
             $(this).confirmDialog({

@@ -130,13 +130,12 @@ window.Vue.onMounted(() => {
     </button>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .sbx-button {
     align-items: center;
-    align-self: start; // https://moderncss.dev/css-button-styling-guide/#gotcha-child-of-flex-columns
+    align-self: start; /* https://moderncss.dev/css-button-styling-guide/#gotcha-child-of-flex-columns */
     background: none;
     border: none;
-    // border-radius: var(--roundness-form-elements); // ^foundation-fixes^ - will round in a future release
     border-radius: 0;
     color: var(--content-ui-foreground);
     cursor: pointer;
@@ -150,88 +149,91 @@ window.Vue.onMounted(() => {
     min-width: 2.5rem;
     padding: var(--spacing-s) var(--spacing-m);
     text-align: center;
-    &:hover,
-    &:active {
-        &:not([disabled]) {
-            background-color: var(--content-ui-hover);
-        }
-    }
-    &:focus {
-        &:not([disabled]) {
-            background-color: var(
-                --content-ui-background
-            ); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
-        }
-    }
-    &:disabled {
-        opacity: 0.7;
-        &:hover {
-            cursor: default;
-        }
-    }
-    &--icon-only {
-        padding: var(--spacing-s);
-    }
-    &--block {
-        width: 100%;
-    }
-    &__icon {
-        fill: currentColor;
-    }
-    &__icon--dropdown {
-        transform: rotate(180deg);
-    }
-
-    &--component-action {
-        background-color: transparent;
-        font-weight: 600;
-        font-size: rem-calc((var(--base-font-size) - 2));
-        height: auto;
-        line-height: 1.5rem;
-        margin: 0;
-        padding: var(--spacing-s);
-        text-transform: uppercase;
-        width: auto;
-
-        &:hover {
-            background-color: var(--content-ui-hover);
-        }
-        &:disabled,
-        &.disabled {
-            &:hover {
-                // don't show a hover if it's disabled
-                background-color: transparent;
-            }
-        }
-    }
-    /**
-    * Override styles for Sonar UI
-    */
-    &--component-action.sbx-body {
-        background: var(--sbx-color-foreground-primary);
-        border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
-        border-radius: var(--sbx-config-field-roundness);
-        color: var(--sbx-color-accent);
-        font-size: var(--sbx-font-size-s);
-        font-weight: var(--sbx-font-weight-normal);
-        text-transform: capitalize;
-        &:hover {
-            background-color: var(
-                --sbx-color-foreground-primary
-            ); // ^foundation-fixes^ - remove the use of --content-ui-hover
-            color: var(--sbx-color-accent); // ^foundation-fixes^ - remove the change of text colour on hover
-            filter: brightness(1.1);
-        }
-    }
 }
 
-// To match the typical background colour of the dropdown content
-// and better visually connect the button to the content
-.sbx-button[aria-expanded="true"] {
-    // rotate when open
-    .sbx-button__icon--dropdown {
-        transform: rotate(0deg);
-    }
+.sbx-button:hover:not([disabled]),
+.sbx-button:active:not([disabled]) {
+    background-color: var(--content-ui-hover);
+}
+
+.sbx-button:focus:not([disabled]) {
+    background-color: var(
+        --content-ui-background
+    ); /* ^foundation-fixes^ - don't lighten on focus, just reduces contrast */
+}
+
+.sbx-button:disabled {
+    opacity: 0.7;
+}
+
+.sbx-button:disabled:hover {
+    cursor: default;
+}
+
+.sbx-button--icon-only {
+    padding: var(--spacing-s);
+}
+
+.sbx-button--block {
+    width: 100%;
+}
+
+.sbx-button__icon {
+    fill: currentColor;
+}
+
+.sbx-button__icon--dropdown {
+    transform: rotate(180deg);
+}
+
+.sbx-button--component-action {
+    background-color: transparent;
+    font-weight: 600;
+    font-size: calc((1rem) - 2px);
+    height: auto;
+    line-height: 1.5rem;
+    margin: 0;
+    padding: var(--spacing-s);
+    text-transform: uppercase;
+    width: auto;
+}
+
+.sbx-button--component-action:hover {
+    background-color: var(--content-ui-hover);
+}
+
+.sbx-button--component-action:disabled:hover,
+.sbx-button--component-action.disabled:hover {
+    /* don't show a hover if it's disabled */
+    background-color: transparent;
+}
+
+/**
+* Override styles for Sonar UI
+*/
+.sbx-button--component-action.sbx-body {
+    background: var(--sbx-color-foreground-primary);
+    border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+    border-radius: var(--sbx-config-field-roundness);
+    color: var(--sbx-color-accent);
+    font-size: var(--sbx-font-size-s);
+    font-weight: var(--sbx-font-weight-normal);
+    text-transform: capitalize;
+}
+
+.sbx-button--component-action.sbx-body:hover {
+    background-color: var(
+        --sbx-color-foreground-primary
+    ); /* ^foundation-fixes^ - remove the use of --content-ui-hover */
+    color: var(--sbx-color-accent); /* ^foundation-fixes^ - remove the change of text colour on hover */
+    filter: brightness(1.1);
+}
+
+/* To match the typical background colour of the dropdown content
+   and better visually connect the button to the content */
+.sbx-button[aria-expanded="true"] .sbx-button__icon--dropdown {
+    /* rotate when open */
+    transform: rotate(0deg);
 }
 
 /* Styles for printing */

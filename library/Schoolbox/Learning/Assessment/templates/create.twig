@@ -165,7 +165,7 @@
              * Once they have clicked an activity type - trigger a click on the part-2 hidden input
              * to send the user straight to the next section
              */
-            $('input[name=type]').click(function() {
+            $('input[name=type]').on('click', function() {
                 $('#part2loader').show();
 
                 $('[data-mage-next=part-2]').trigger('click');

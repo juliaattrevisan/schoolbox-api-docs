@@ -164,7 +164,7 @@
             {# Setup click events #}
 
             function updateRolePermissionsClick() {
-                $('[data-delete-visibility="role"]').click(function (e) {
+                $('[data-delete-visibility="role"]').on('click', function (e) {
                     e.preventDefault();
 
                     let row = $(this).closest('tr');
@@ -212,7 +212,7 @@
                 let roleModalButtons = $("[data-reveal-id='modal-role']");
 
                 if ($("[data-role-add]:not(.hide)").length === 0) {
-                    roleModalButtons.attr('disabled', 'true');
+                    roleModalButtons.prop('disabled', true);
                 } else {
                     roleModalButtons.removeAttr('disabled');
                 }
@@ -253,7 +253,7 @@
 
                     //Check the correct box
                     let selector = 'input[name = "role['+roleId+']"][value ="'+permission+'"]';
-                    permissionListRoles.find(selector).attr("checked", "checked");
+                    permissionListRoles.find(selector).prop("checked", true);
                     setRadioButtonListener('[data-role-id="' + roleId + '"]', commentCheckbox);
                     applyLock(['roles'], locked);
                 }
@@ -265,7 +265,7 @@
                 updateVisibility();
             }
 
-            $('[data-role-add]').click(function (e) {
+            $('[data-role-add]').on('click', function (e) {
                 e.preventDefault();
 
                 let roleId = $(this).attr('data-role-add');
