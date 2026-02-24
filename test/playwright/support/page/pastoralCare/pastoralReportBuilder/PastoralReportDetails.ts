@@ -164,9 +164,6 @@ export default class PastoralReportDetails {
      * @param tableLocator.tdIndex - The column number in the table
      */
     async clickCell(tableLocator: { trIndex: number; tdIndex: number }): Promise<void> {
-        // const row = this.page.locator(`table tbody tr:nth-child(${rowNumber})`);
-        // await row.getByTestId(`pr-table-data-cell-${tableCell}`).click();
-
         const tableCellLocator = this.page.locator(
             `table tbody tr:nth-child(${tableLocator.trIndex}) td:nth-child(${tableLocator.tdIndex})`,
         );
@@ -185,15 +182,6 @@ export default class PastoralReportDetails {
         await expect(modalTableLocator.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_RECORDS_ROWS)).toHaveCount(
             expectedCount,
         );
-    }
-
-    /**
-     * locates the modal and check the record details in the modal are correct
-     * @param expectedTitle - The expected text presented to the record in the modal
-     */
-    async checkModalRecordDetails1(expectedTitle: string[]): Promise<void> {
-        const modalTableLocator = this.page.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_TABLE_RECORD);
-        await expect(modalTableLocator).toContainText(expectedTitle);
     }
 
     /**
@@ -323,10 +311,10 @@ export default class PastoralReportDetails {
 
     /**
      * check if the header is not presented in the table in a report tab
-     * @param typesPresent - The types to check are presented in each tab: eg: 1 for Award/Achievement, 7 for Behavioural Issues, etc
+     * @param typesNotPresent - The types to check are presented in each tab: eg: 1 for Award/Achievement, 7 for Behavioural Issues, etc
      */
-    async checkHeaderNotPresented(typesPresent: string[]): Promise<void> {
-        for (const type of typesPresent) {
+    async checkHeaderNotPresented(typesNotPresent: string[]): Promise<void> {
+        for (const type of typesNotPresent) {
             const typeLocator = this.page.getByTestId(
                 PastoralReportDetails.DATA_TEST_SORT_BUTTON.replace("{headerName}", `count_subtype_${type}`),
             );

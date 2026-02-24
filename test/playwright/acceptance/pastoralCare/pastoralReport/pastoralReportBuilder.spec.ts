@@ -176,7 +176,7 @@ test.describe("Pastoral Report Builder", () => {
                 [5, 8, 8, 5, 5],
             );
 
-            tester.isGoingTo("check the list tab shows the records details properly: title, severiy, points");
+            tester.isGoingTo("check the list tab shows the records details properly: title, severity, points");
             await pastoralReportDetails.clickTab("List");
             await pastoralReportDetails.checkRecordDetails(
                 recordId,
