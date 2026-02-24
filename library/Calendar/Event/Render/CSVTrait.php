@@ -9,6 +9,7 @@
 namespace Calendar\Event\Render;
 
 use Calendar\Event\Type\Day\Event;
+use Calendar\Event\Type\ResourceBooking\Event as ResourceBookingEvent;
 
 /**
  * Default CSV rendering for all types of Calendar events.
@@ -41,7 +42,11 @@ trait CSVTrait
             $event->getEndTime()->getLocalShort(),
             $event->getAllday() ? '' : $event->getEndTime()->getUsingFormat('H:i'),
             $event->getAllday() ? 1 : 0,
-            $event->getTitleForExport(),
+            (
+                $event instanceof ResourceBookingEvent
+                ? $event->getTitleForResourceBookingExport()
+                : $event->getTitleForExport()
+            ),
             $event->getDetail() ? \Scrub::htmlAbsoluteUri($event->getDetail(), $this->baseUrl) : '',
             $event->getLocation(),
             $event->getType(),

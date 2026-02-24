@@ -9,6 +9,7 @@
 namespace Calendar\Event\Render;
 
 use Calendar\Event\Type\EventInterface;
+use Calendar\Event\Type\ResourceBooking\Event as ResourceBookingEvent;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Component\VEvent;
 use DateTime;
@@ -91,7 +92,14 @@ trait VObjectTrait
             $vEvent->add('DTEND', $end_time->format('Ymd'), ['VALUE' => 'DATE']);
         }
 
-        $vEvent->add('SUMMARY', $event->getTitleForExport());
+        $vEvent->add(
+            'SUMMARY',
+            (
+                $event instanceof ResourceBookingEvent
+                ? $event->getTitleForResourceBookingExport()
+                : $event->getTitleForExport()
+            )
+        );
 
         return $vEvent->serialize();
     }
