@@ -237,7 +237,7 @@ $alert-default-background: css-darken($body-bg, 10%);
 .toast {
     background-color: $tuatara;
     bottom: 1rem;
-    color: $white !important;
+    color: $white;
     display: block;
     font-size: $base-font-size - 2;
     opacity: 0;
@@ -256,6 +256,9 @@ $alert-default-background: css-darken($body-bg, 10%);
         &::before {
             animation: pulse 1.5s infinite;
         }
+    }
+    &.success {
+        color: $white;
     }
 
     &::before {

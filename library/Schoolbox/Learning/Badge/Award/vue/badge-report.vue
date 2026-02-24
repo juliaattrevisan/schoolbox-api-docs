@@ -265,9 +265,12 @@ export default {
                 <em>{{ selectedStudentsCount }} selected</em>
             </h3>
             <button @click.prevent="onClearStudentSelection" class="button-clear">Clear selection</button>
-            <div class="modal-actions">
-                <a :href="getUrl('goal')" title="Set goal" class="button submit icon-goal">Set goal</a>
-                <a :href="getUrl('achievement')" title="Award achievement" class="button submit icon-achievement"
+            <div class="l-flex-row l-gap-s">
+                <a :href="getUrl('goal')" title="Set goal" class="button icon-goal l-flex__item--1">Set goal</a>
+                <a
+                    :href="getUrl('achievement')"
+                    title="Award achievement"
+                    class="button icon-achievement l-flex__item--1"
                     >Award achievement</a
                 >
             </div>
@@ -304,12 +307,5 @@ export default {
     background: none;
     vertical-align: baseline;
     font-size: 0.8rem;
-}
-
-.modal-actions {
-    display: flex;
-    a {
-        margin: 0 1px;
-    }
 }
 </style>

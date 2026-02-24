@@ -29,7 +29,8 @@ body.sbx-body {
     .reveal-modal,
     .diagonal-headings-table thead tr.rotate-headers th > div:not(:empty),
     .accordion .accordion-navigation > .content.active,
-    table tfoot {
+    table tfoot,
+    .toast {
         background: var(--sbx-color-foreground-primary);
     }
 
@@ -49,7 +50,9 @@ body.sbx-body {
     .empty-state-flex-centered,
     blockquote,
     .fc .fc-cell-shaded,
-    .side-nav li ul.flyout {
+    .side-nav li ul.flyout,
+    code,
+    .rounded-progress-bar .bar {
         background: var(--sbx-color-foreground-secondary);
     }
 
@@ -86,7 +89,11 @@ body.sbx-body {
     div,
     label,
     legend,
-    p.meta.title {
+    p.meta.title,
+    .toast,
+    .toast.success,
+    .toast.fail,
+    .breadcrumb li.active span:not([href]) {
         color: var(--sbx-color-text-primary);
     }
 
@@ -95,9 +102,10 @@ body.sbx-body {
      */
     .empty-state p,
     .meta,
-    [class^="icon-"],
     blockquote,
-    blockquote:before {
+    blockquote:before,
+    code,
+    .rounded-progress-bar .legend-item {
         color: var(--sbx-color-text-secondary);
     }
 
@@ -106,11 +114,19 @@ body.sbx-body {
         border-left: 6px solid var(--sbx-color-text-secondary);
     }
 
+    code {
+        border: 1px solid var(--sbx-color-text-secondary);
+    }
+
     /**
      * Accent
      */
     a,
-    a h3 {
+    a h3,
+    .breadcrumb li a[href],
+    div.dzone,
+    div.dzone span,
+    #footer a {
         color: var(--sbx-color-accent);
     }
 

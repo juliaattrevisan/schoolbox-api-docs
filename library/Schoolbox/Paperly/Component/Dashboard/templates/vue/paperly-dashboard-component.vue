@@ -112,7 +112,7 @@ const upcoming = window.Vue.computed<UpcomingItem[]>(() => {
         </div>
         <div v-if="paperlyPayload && paperlyPayload.upcoming.length > 3 && !viewMore" class="component-action">
             <section>
-                <button @click.prevent="viewMore = true">View more</button>
+                <button class="button" @click.prevent="viewMore = true">View more</button>
             </section>
         </div>
     </template>

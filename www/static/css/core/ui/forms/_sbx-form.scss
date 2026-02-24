@@ -18,11 +18,16 @@
 /* Shared form input disabled styles */
 @mixin form-input-disabled {
     background-color: var(--sbx-color-foreground-secondary);
+    border: 1px solid var(--sbx-color-text-secondary) !important;
     color: var(--sbx-color-text-secondary) !important;
     cursor: not-allowed;
     pointer-events: auto;
     & + label {
         opacity: 1 !important;
+    }
+    &:hover,
+    &:active {
+        color: var(--sbx-color-text-secondary) !important;
     }
 }
 

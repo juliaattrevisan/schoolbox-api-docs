@@ -44,13 +44,8 @@ body.sbx-body {
         &.disabled {
             @include sbx-form.form-input-disabled;
             border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
-            background-color: var(--sbx-color-foreground-secondary) !important;
-            color: var(--sbx-color-accent) !important;
-            pointer-events: none;
             &:hover,
             &:active {
-                background-color: var(--sbx-color-foreground-secondary) !important;
-                color: var(--sbx-color-accent) !important;
                 filter: none !important;
             }
         }
@@ -92,13 +87,9 @@ body.sbx-body {
         &.disabled {
             @include sbx-form.form-input-disabled;
             border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
-            background-color: var(--sbx-color-foreground-secondary) !important;
-            color: var(--sbx-color-accent) !important;
             pointer-events: none;
             &:hover,
             &:active {
-                background-color: var(--sbx-color-foreground-secondary) !important;
-                color: var(--sbx-color-accent) !important;
                 filter: none !important;
             }
         }
