@@ -3,51 +3,53 @@
  * Scope: UI Uplift
  */
 
-.tabs {
-    background-color: var(--sbx-color-foreground-primary);
-    border-bottom: var(--sbx-color-accent);
-    overflow-x: auto;
-    overflow-y: clip;
+body.sbx-body {
+    .tabs {
+        background-color: var(--sbx-color-foreground-primary);
+        border-bottom: var(--sbx-color-accent);
+        overflow-x: auto;
+        overflow-y: clip;
 
-    &::-webkit-scrollbar {
-        display: none;
-    }
+        &::-webkit-scrollbar {
+            display: none;
+        }
 
-    & .active a {
-        border-color: var(--sbx-color-accent);
-        font-weight: 600;
-    }
+        & .active a {
+            border-color: var(--sbx-color-accent);
+            font-weight: 600;
+        }
 
-    & a {
-        white-space: nowrap;
+        & a {
+            white-space: nowrap;
 
-        &:focus-visible {
-            outline: 1px solid var(--sbx-color-accent);
-            outline-offset: -1px;
+            &:focus-visible {
+                outline: 1px solid var(--sbx-color-accent);
+                outline-offset: -1px;
+            }
         }
     }
-}
 
-/* Tabs component styles */
-.component-tabs {
-    & .tabs {
-        border: var(--border);
-        border-bottom: 0;
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-        border-radius: var(--sbx-border-radius-normal);
-    }
+    /* Tabs component styles */
+    .component-tabs {
+        & .tabs {
+            border: var(--border);
+            border-bottom: 0;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            border-radius: var(--sbx-border-radius-normal);
+        }
 
-    & .tabs-content {
-        border: var(--border);
-        border-radius: var(--sbx-border-radius-normal);
-        border-top: 0;
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
+        & .tabs-content {
+            border: var(--border);
+            border-radius: var(--sbx-border-radius-normal);
+            border-top: 0;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
 
-        & > .content li {
-            box-shadow: none !important;
-            padding: 0 !important;
+            & > .content li {
+                box-shadow: none !important;
+                padding: 0 !important;
+            }
         }
     }
 }

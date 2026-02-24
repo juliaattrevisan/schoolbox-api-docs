@@ -32,23 +32,26 @@
     }
 }
 
-.sbx-body label,
-.sbx-body label.checkbox-label,
-.sbx-body.body.login input[type="checkbox"]:not(.plain) + label {
-    vertical-align: text-bottom !important;
-}
+body.sbx-body {
+    label,
+    label.checkbox-label,
+    &.body.login input[type="checkbox"]:not(.plain) + label {
+        vertical-align: text-bottom !important;
+    }
 
-.sbx-body .option-list .columns:has(input + label),
-.sbx-body .option-list li:has(input + label) {
-    white-space: normal;
-}
-// Ensure meta text wraps normally
-.sbx-body .columns:has(input + label) p.meta,
-.sbx-body li:has(input + label) p.meta {
-    white-space: normal;
-}
+    .option-list .columns:has(input + label),
+    .option-list li:has(input + label) {
+        white-space: normal;
+    }
 
-// Align inputs to the top when there is meta text
-.sbx-body input:has(+ label p.meta) {
-    vertical-align: top;
+    // Ensure meta text wraps normally
+    .columns:has(input + label) p.meta,
+    li:has(input + label) p.meta {
+        white-space: normal;
+    }
+
+    // Align inputs to the top when there is meta text
+    input:has(+ label p.meta) {
+        vertical-align: top;
+    }
 }

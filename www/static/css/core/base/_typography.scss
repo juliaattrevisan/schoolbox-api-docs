@@ -272,7 +272,7 @@ abbr {
     font-style: italic;
     margin: 0 0 rem-calc(($base-font-size - 10)) 0;
     &.title {
-        color: $black !important;
+        color: $black;
         font-style: normal;
         font-weight: bold;
     }

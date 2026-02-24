@@ -14,57 +14,57 @@
     --sbx-font-primary: "Figtree", sans-serif;
 }
 
-body {
+body.sbx-body {
     font-family: var(--sbx-font-primary) !important;
     // to prevent barcode/vjs/view file modal icons override
     & *:not(.barcode-39, button.vjs-control, [class*=" lg-"]) {
         font-family: var(--sbx-font-primary) !important;
     }
-}
 
-// Provide greater contrast and readability to subheaders
-.sbx-body .subheader {
-    font-weight: var(--sbx-font-weight-heading);
-    text-transform: none;
-}
+    // Provide greater contrast and readability to subheaders
+    .subheader {
+        font-weight: var(--sbx-font-weight-heading);
+        text-transform: none;
+    }
 
-// Enlarge a bit specifically those subheaders that sit outside islands
-.sbx-body h2.subheader {
-    font-size: var(--sbx-font-size-l);
-}
+    // Enlarge a bit specifically those subheaders that sit outside islands
+    h2.subheader {
+        font-size: var(--sbx-font-size-l);
+    }
 
-// Enlarge a bit and remove italic for readability
-.sbx-body .meta {
-    font-size: var(--sbx-font-size-xs);
-    font-style: normal;
-}
+    // Enlarge a bit and remove italic for readability
+    .meta {
+        font-size: var(--sbx-font-size-xs);
+        font-style: normal;
+    }
 
-// Enlarge font-size for greater readability
-.sbx-body p,
-.sbx-body ul,
-.sbx-body ol,
-.sbx-body dl,
-.sbx-body blockquote,
-.sbx-body label,
-.sbx-body div,
-.sbx-body table tr th {
-    font-size: var(--sbx-font-size-s);
-}
+    // Enlarge font-size for greater readability
+    p,
+    ul,
+    ol,
+    dl,
+    blockquote,
+    label,
+    div,
+    table tr th {
+        font-size: var(--sbx-font-size-s);
+    }
 
-.sbx-body label {
-    font-weight: var(--sbx-font-weight-active);
-}
+    label {
+        font-weight: var(--sbx-font-weight-active);
+    }
 
-// Enlarge for greater readability
-.sbx-body small,
-.sbx-body table tr td,
-.f-dropdown .separator {
-    font-size: var(--sbx-font-size-xs);
-}
+    // Enlarge for greater readability
+    small,
+    table tr td,
+    .f-dropdown .separator {
+        font-size: var(--sbx-font-size-xs);
+    }
 
-// Provide greater contrast and readability to labels
-.sbx-body .label {
-    font-size: var(--sbx-font-size-xs);
-    font-weight: var(--sbx-font-weight-normal);
-    text-transform: none;
+    // Provide greater contrast and readability to labels
+    .label {
+        font-size: var(--sbx-font-size-xs);
+        font-weight: var(--sbx-font-weight-normal);
+        text-transform: none;
+    }
 }

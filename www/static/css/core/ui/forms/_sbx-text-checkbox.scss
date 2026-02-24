@@ -5,104 +5,105 @@
 
 @use "sbx-form";
 
-/* Base */
-.sbx-body input[type="checkbox"],
-.sbx-body .VueTables input[type="checkbox"] {
-    -webkit-appearance: none;
-    appearance: none; // remove native styles
-    background-color: var(--sbx-color-foreground-primary);
-    border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
-    border-radius: var(--sbx-config-field-roundness);
-    color: var(--sbx-color-accent);
-    cursor: pointer;
-    display: inline-grid;
-    height: 1.5rem;
-    line-height: 1;
-    margin: 0;
-    min-height: auto;
-    opacity: 1;
-    place-content: center;
-    position: static;
-    transform: translateY(-0.075em);
-    width: 1.5rem;
-
-    &:hover:not(:disabled):not(:read-only) {
-        // no reduced contrast on hover
+body.sbx-body {
+    /* Base */
+    input[type="checkbox"],
+    .VueTables input[type="checkbox"] {
+        -webkit-appearance: none;
+        appearance: none; // remove native styles
         background-color: var(--sbx-color-foreground-primary);
-        border-color: var(--sbx-color-accent);
-        color: var(--sbx-color-text-primary);
+        border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+        border-radius: var(--sbx-config-field-roundness);
+        color: var(--sbx-color-accent);
+        cursor: pointer;
+        display: inline-grid;
+        height: 1.5rem;
+        line-height: 1;
+        margin: 0;
+        min-height: auto;
+        opacity: 1;
+        place-content: center;
+        position: static;
+        transform: translateY(-0.075em);
+        width: 1.5rem;
+
+        &:hover:not(:disabled):not(:read-only) {
+            // no reduced contrast on hover
+            background-color: var(--sbx-color-foreground-primary);
+            border-color: var(--sbx-color-accent);
+            color: var(--sbx-color-text-primary);
+        }
+
+        /* tick mark */
+        &::before {
+            background-color: CanvasText; // high contrast mode
+            box-shadow: inset 1rem 1rem var(--sbx-color-accent); // visible when printed
+            content: "";
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+            height: 1rem;
+            width: 1rem;
+            transform: scale(0);
+            transform-origin: bottom left;
+            transition: var(--sbx-animation-form-input-change) transform;
+        }
+
+        &:checked::before {
+            transform: scale(1);
+        }
+
+        /* focus / disabled use shared mixins like text input */
+        &:focus {
+            @include sbx-form.form-input-focus;
+        }
+
+        &:disabled,
+        &[readonly] {
+            @include sbx-form.form-input-disabled;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        & + label {
+            cursor: pointer;
+            font-weight: var(--sbx-font-weight-normal);
+        }
+
+        /**
+        * We don't always use a label with a checkbox
+        * so ensure empty labels don't impact the display flow
+        */
+        & + label:empty {
+            display: none;
+        }
     }
 
-    /* tick mark */
-    &::before {
-        background-color: CanvasText; // high contrast mode
-        box-shadow: inset 1rem 1rem var(--sbx-color-accent); // visible when printed
-        content: "";
-        clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-        height: 1rem;
-        width: 1rem;
-        transform: scale(0);
-        transform-origin: bottom left;
-        transition: var(--sbx-animation-form-input-change) transform;
-    }
-
-    &:checked::before {
+    /* indeterminate state */
+    .indeterminate[type="checkbox"]::before {
+        clip-path: polygon(100% 35%, 100% 60%, 0% 60%, 0% 35%);
         transform: scale(1);
     }
 
-    /* focus / disabled use shared mixins like text input */
-    &:focus {
-        @include sbx-form.form-input-focus;
-    }
-
-    &:disabled,
-    &[readonly] {
-        @include sbx-form.form-input-disabled;
-        cursor: not-allowed;
-        pointer-events: none;
-    }
-
-    & + label {
-        cursor: pointer;
-        font-weight: var(--sbx-font-weight-normal);
-    }
-
-    /**
-    * We don't always use a label with a checkbox
-    * so ensure empty labels don't impact the display flow
-    */
-    & + label:empty {
+    input[type="checkbox"]:not(.plain) + label.checkbox-label:before,
+    .login input[type="checkbox"]:not(.plain) + label:before,
+    input[type="checkbox"]:not(.plain) + label.checkbox-label:after,
+    body.login input[type="checkbox"]:not(.plain) + label:after {
         display: none;
     }
-}
-/* indeterminate state */
-.sbx-body .indeterminate[type="checkbox"]::before {
-    clip-path: polygon(100% 35%, 100% 60%, 0% 60%, 0% 35%);
-    transform: scale(1);
-}
 
-.sbx-body input[type="checkbox"]:not(.plain) + label.checkbox-label:before,
-.sbx-body .login input[type="checkbox"]:not(.plain) + label:before,
-.sbx-body input[type="checkbox"]:not(.plain) + label.checkbox-label:after,
-.sbx-body body.login input[type="checkbox"]:not(.plain) + label:after {
-    display: none;
-}
-.sbx-body input[type="checkbox"]:not(.plain) + label.checkbox-label:after,
-body.login input[type="checkbox"]:not(.plain) + label:after {
-    display: none;
-}
-.sbx-body input[type="checkbox"]:not(.plain) + label.checkbox-label:before,
-body.login input[type="checkbox"]:not(.plain) + label:before {
-    display: none;
-}
+    input[type="checkbox"]:not(.plain) + label.checkbox-label:after {
+        display: none;
+    }
 
-// Reset cursor for checkboxes used as selectors for fixing cursor issues in packages page
-.sbx-body .information-list.card-selectable > li .selector {
-    cursor: auto;
-}
+    input[type="checkbox"]:not(.plain) + label.checkbox-label:before {
+        display: none;
+    }
 
-// Fix reveal modal checklist checkbox alignment issue (Browse curriculum modal)
-.sbx-body {
+    // Reset cursor for checkboxes used as selectors for fixing cursor issues in packages page
+    .information-list.card-selectable > li .selector {
+        cursor: auto;
+    }
+
+    // Fix reveal modal checklist checkbox alignment issue (Browse curriculum modal)
     .reveal-modal {
         span.name {
             white-space: normal;
@@ -112,60 +113,69 @@ body.login input[type="checkbox"]:not(.plain) + label:before {
             overflow-y: visible;
         }
     }
+
+    // filter styles in view status page
+    ul.filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--spacing-s);
+        list-style: none;
+        justify-content: end;
+    }
+
+    // Hide labels for checkboxes used as selectors
+    .card-selectable .selector input[type="checkbox"] + label {
+        display: none;
+    }
+
+    // Hide labels for checkboxes in buttons container
+    .buttons-container .checklist input[type="checkbox"] + label {
+        display: none;
+    }
+
+    // Add vertical spacing between checkboxes
+    .option-list:not([class*="l-flex"]) {
+        display: flex;
+        flex-direction: column;
+        gap: var(--sbx-size-s);
+        margin: 0 0 var(--sbx-size-s) 0; // add bottom margin to separate from next element
+    }
+
+    // Layout fixes for checkboxes inside option lists
+    .option-list li {
+        align-items: flex-start;
+        display: flex;
+        gap: var(--sbx-size-s);
+    }
+
+    .option-list input[type="checkbox"] {
+        align-self: center;
+        flex: 0 0 auto;
+    }
+
+    // Remove extra margin/padding added to checkbox labels in forms.scss
+    input[type="checkbox"]:not(.plain) + label,
+    input[type="checkbox"]:not(.plain) + label.checkbox-label {
+        margin: 0;
+        padding: 0;
+    }
+
+    // add some spacing between the checkbox and label in the participant group settings
+    [data-participant-group] .checkbox-label {
+        margin-top: var(--sbx-size-s);
+    }
+
+    // Keep checkbox buttons hidden within rubrics, as the label is what's used to trigger the checkbox selection, and the checkbox itself is not needed visually
+    .rb input[type="checkbox"] {
+        display: none;
+    }
 }
 
-// filter styles in view status page
-.sbx-body ul.filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-s);
-    list-style: none;
-    justify-content: end;
-}
-
-// Hide labels for checkboxes used as selectors
-.sbx-body .card-selectable .selector input[type="checkbox"] + label {
-    display: none;
-}
-
-// Hide labels for checkboxes in buttons container
-.sbx-body .buttons-container .checklist input[type="checkbox"] + label {
-    display: none;
-}
-
-// Add vertical spacing between checkboxes
-.sbx-body .option-list:not([class*="l-flex"]) {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sbx-size-s);
-    margin: 0 0 var(--sbx-size-s) 0; // add bottom margin to separate from next element
-}
-
-// Layout fixes for checkboxes inside option lists
-.sbx-body .option-list li {
-    align-items: flex-start;
-    display: flex;
-    gap: var(--sbx-size-s);
-}
-.sbx-body .option-list input[type="checkbox"] {
-    align-self: center;
-    flex: 0 0 auto;
-}
-
-// Remove extra margin/padding added to checkbox labels in forms.scss
-.sbx-body input[type="checkbox"]:not(.plain) + label,
-.sbx-body input[type="checkbox"]:not(.plain) + label.checkbox-label,
+// Selectors for body.login (outside sbx-body scope)
+body.login input[type="checkbox"]:not(.plain) + label:after,
+body.login input[type="checkbox"]:not(.plain) + label:before,
 body.login input[type="checkbox"]:not(.plain) + label {
+    display: none;
     margin: 0;
     padding: 0;
-}
-
-// add some spacing between the checkbox and label in the participant group settings
-.sbx-body [data-participant-group] .checkbox-label {
-    margin-top: var(--sbx-size-s);
-}
-
-// Keep checkbox buttons hidden within rubrics, as the label is what's used to trigger the checkbox selection, and the checkbox itself is not needed visually
-.sbx-body .rb input[type="checkbox"] {
-    display: none;
 }

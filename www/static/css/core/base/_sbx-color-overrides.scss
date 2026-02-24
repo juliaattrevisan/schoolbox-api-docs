@@ -83,7 +83,10 @@ body.sbx-body {
     th,
     td,
     mark,
-    meta.title {
+    div,
+    label,
+    legend,
+    p.meta.title {
         color: var(--sbx-color-text-primary);
     }
 
@@ -106,7 +109,8 @@ body.sbx-body {
     /**
      * Accent
      */
-    a {
+    a,
+    a h3 {
         color: var(--sbx-color-accent);
     }
 

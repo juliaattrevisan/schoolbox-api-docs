@@ -5,89 +5,92 @@
 
 @use "sbx-form";
 
-// Base
-.sbx-body input:not([type]),
-.sbx-body input[type="text"],
-.sbx-body input[type="number"],
-.sbx-body input[type="select-multiple"],
-.sbx-body input[type="password"],
-.sbx-body input[type="date"],
-.sbx-body input[type="datetime"],
-.sbx-body input[type="datetime-local"],
-.sbx-body input[type="month"],
-.sbx-body input[type="week"],
-.sbx-body input[type="email"],
-.sbx-body input[type="search"],
-.sbx-body input[type="tel"],
-.sbx-body input[type="time"],
-.sbx-body input[type="url"],
-.sbx-body input[type="color"],
-.sbx-body select,
-.sbx-body .selectize-input,
-.sbx-body .c-filter-search-term input[type="text"].c-filter-search-term__field {
-    background-color: var(--sbx-color-foreground-primary);
-    border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
-    border-radius: var(--sbx-config-field-roundness);
-    color: var(--sbx-color-text-primary);
-    font-family: inherit;
-    height: 2.25rem;
-    line-height: 1;
-    width: 100%;
-    -webkit-font-smoothing: antialiased;
+body.sbx-body {
+    // Base
+    input:not([type]),
+    input[type="text"],
+    input[type="number"],
+    input[type="select-multiple"],
+    input[type="password"],
+    input[type="date"],
+    input[type="datetime"],
+    input[type="datetime-local"],
+    input[type="month"],
+    input[type="week"],
+    input[type="email"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="time"],
+    input[type="url"],
+    input[type="color"],
+    select,
+    .selectize-input,
+    .c-filter-search-term input[type="text"].c-filter-search-term__field {
+        background-color: var(--sbx-color-foreground-primary);
+        border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+        border-radius: var(--sbx-config-field-roundness);
+        color: var(--sbx-color-text-primary);
+        font-family: inherit;
+        height: 2.25rem;
+        line-height: 1;
+        width: 100%;
+        -webkit-font-smoothing: antialiased;
 
-    &:focus {
-        @include sbx-form.form-input-focus;
-    }
-    &:focus:not(:focus-visible) {
-        @include sbx-form.form-input-focus-not-visible;
-    }
-    &:disabled {
-        @include sbx-form.form-input-disabled;
-    }
-
-    &[readonly] {
-        background-color: var(--sbx-color-foreground-secondary) !important;
-
-        &:hover {
-            background-color: var(--sbx-color-foreground-secondary);
-            color: var(--sbx-color-text-secondary) !important;
-            pointer-events: auto;
-        }
         &:focus {
+            @include sbx-form.form-input-focus;
+        }
+        &:focus:not(:focus-visible) {
             @include sbx-form.form-input-focus-not-visible;
         }
+        &:disabled {
+            @include sbx-form.form-input-disabled;
+        }
+
+        &[readonly] {
+            background-color: var(--sbx-color-foreground-secondary) !important;
+
+            &:hover {
+                background-color: var(--sbx-color-foreground-secondary);
+                color: var(--sbx-color-text-secondary) !important;
+                pointer-events: auto;
+            }
+            &:focus {
+                @include sbx-form.form-input-focus-not-visible;
+            }
+        }
     }
-}
 
-.sbx-body .input-group:has(> input[type="text"] + a) input[type="text"],
-.sbx-body .input-group:has(> input[type="text"] + button) input[type="text"] {
-    border-radius: var(--sbx-config-field-roundness) 0 0 var(--sbx-config-field-roundness);
-}
+    // When a text input is immediately followed by a button or link, remove the border radius on the right side of the input to visually connect them
+    .input-group:has(> input[type="text"] + a) input[type="text"],
+    .input-group:has(> input[type="text"] + button) input[type="text"] {
+        border-radius: var(--sbx-config-field-roundness) 0 0 var(--sbx-config-field-roundness);
+    }
 
-// States
-.sbx-body .c-filter-search-term input[type="text"].c-filter-search-term__field {
-    border-radius: var(--sbx-config-field-roundness) 0 0 var(--sbx-config-field-roundness);
-}
+    // States
+    .c-filter-search-term input[type="text"].c-filter-search-term__field {
+        border-radius: var(--sbx-config-field-roundness) 0 0 var(--sbx-config-field-roundness);
+    }
 
-// Selectize overrides to match input styles
-.sbx-body .selectize-input {
-    height: auto;
-    line-height: 1.875rem;
-    padding: 3px 0;
-}
-.sbx-body .selectize-control.multi .selectize-input.has-items {
-    padding: 0 0 3px 3px;
-}
+    // Selectize overrides to match input styles
+    .selectize-input {
+        height: auto;
+        line-height: 1.875rem;
+        padding: 3px 0;
+    }
+    .selectize-control.multi .selectize-input.has-items {
+        padding: 0 0 3px 3px;
+    }
 
-// color picker input width fix
-.sbx-body input[type="text"].clr-color {
-    width: calc(100% - 80px);
-}
-// Additional styles for button in input group
-.sbx-body .input-group button.button.icon-search {
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    margin: 0;
-    padding: 0;
+    // color picker input width fix
+    input[type="text"].clr-color {
+        width: calc(100% - 80px);
+    }
+    // Additional styles for button in input group
+    .input-group button.button.icon-search {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        margin: 0;
+        padding: 0;
+    }
 }
