@@ -1370,7 +1370,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @return array|Collection
      * @throws MapperException
      */
-    protected function getUnitAssessments(IAssessable $assessment): array|Collection
+    protected function getUnitAssessments(IAssessable $assessment, bool $hydrateParticipants = true): array|Collection
     {
         $assessments = [];
         if ($assessment->isSpecification()) {
@@ -1408,7 +1408,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
             });
 
             // hydrate participants
-            $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+            if ($hydrateParticipants) {
+                $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+            }
         }
         return $assessments;
     }
@@ -1464,5 +1466,37 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $studentId
         );
         return $this->aiCache?->get($cacheKey);
+    }
+
+    /**
+     * project only endpoint
+     *
+     * fetch and display the participants for a specific class assessment, that is part of the course assessment
+     * this is not chromed, so we can async it into the dom and it _should_ just work...
+     *
+     * @api GET /learning/assessments/{assessmentId}/status/{assessmentImplId}
+     * @param IAssessable $assessmentSpec
+     * @param IAssessable $assessmentImpl
+     * @return void
+     */
+    public function getClassStatus(IAssessable $assessmentSpec, IAssessable $assessmentImpl): void
+    {
+        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+    }
+
+    /**
+     * project only endpoint
+     *
+     * fetch and display the participants for a specific class assessment, that is part of the course assessment
+     * this is not chromed, so we can async it into the dom and it _should_ just work...
+     *
+     * @api GET /learning/assessments/{assessmentId}/status/{assessmentImplId}/chunk
+     * @param IAssessable $assessmentSpec
+     * @param IAssessable $assessmentImpl
+     * @return void
+     */
+    public function getClassStatusChunk(IAssessable $assessmentSpec, IAssessable $assessmentImpl): void
+    {
+        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
     }
 }

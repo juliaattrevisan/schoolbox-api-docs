@@ -51,6 +51,11 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 class Controller extends Assessment\Controller
 {
     /**
+     * when asyncing project participant chunks, how many participants should we show in one chunk?
+     */
+    private const PARTICIPANT_CHUNK_SIZE = 100;
+
+    /**
      * Controller constructor.
      *
      * @param EditorTemplateHelper|null $editorTemplateHelper
@@ -213,13 +218,15 @@ class Controller extends Assessment\Controller
         ];
 
         // impl assessments we can just grab the details, spec we need to get the unit assessments first
-        if (!$assessment->isSpecification()) {
+        if ($assessment->isImplementation()) {
             $twigData['aImpls'][$assessment->getId()] = [
+                'participantCount' => $participants->count(),
+                'participantCursor' => $participants->count(),
                 'assessment' => $assessment,
                 'participantStats' => $participantStats,
             ];
         } else {
-            $assessments = $this->getUnitAssessments($assessment);
+            $assessments = $this->getUnitAssessments($assessment, false);
             /** @var Project $assessment */
             foreach ($assessments as $assessment) {
                 // Calculate summary totals for display purposes
@@ -232,8 +239,11 @@ class Controller extends Assessment\Controller
 
                 $twigData['participantStats'][$assessment->getId()] = $participantStats;
                 $twigData['aImpls'][$assessment->getId()] = [
+                    'participantCount' => $participants->count(),
+                    'participantCursor' => null,
                     'assessment' => $assessment,
                     'participantStats' => $participantStats,
+                    'participants' => $participants,
                 ];
             }
         }
@@ -373,5 +383,107 @@ class Controller extends Assessment\Controller
         }
 
         return parent::determineRedirect($assessment, $postReturnUrl, $defaultReturnUrl, $relocated, $isCreate);
+    }
+
+
+    /**
+     * fetch and display the participants for a specific class assessment, that is part of the course assessment
+     * this is not chromed, so we can async it into the dom and it _should_ just work...
+     *
+     * @api GET /learning/assessments/{assessmentId}/status/{assessmentImplId}
+     * @param IAssessable $assessmentSpec
+     * @param IAssessable $assessmentImpl
+     * @return void
+     * @throws Exception\NotFound
+     * @throws \Twig\Error\Error
+     */
+    public function getClassStatus(IAssessable $assessmentSpec, IAssessable $assessmentImpl): void
+    {
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@learningAssessment/project/status/class.twig',
+            $this->getClassStudentInfo($assessmentSpec, $assessmentImpl)
+        );
+    }
+
+    /**
+     * fetch and display the participants for a specific class assessment, that is part of the course assessment
+     * this is not chromed, so we can async it into the dom and it _should_ just work... (chunked version)
+     *
+     * @api GET /learning/assessments/{assessmentId}/status/{assessmentImplId}/chunk
+     * @param IAssessable $assessmentSpec
+     * @param IAssessable $assessmentImpl
+     * @return void
+     * @throws Exception\NotFound
+     * @throws \Twig\Error\Error
+     */
+    public function getClassStatusChunk(IAssessable $assessmentSpec, IAssessable $assessmentImpl): void
+    {
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@learningAssessment/project/status/classChunk.twig',
+            $this->getClassStudentInfo($assessmentSpec, $assessmentImpl)
+        );
+    }
+
+    /**
+     * fetch participants for a specific class assessment, that is part of the course assessment
+     * this collates and may chunk the data as needed
+     *
+     * @param IAssessable $assessmentSpec
+     * @param IAssessable $assessmentImpl
+     * @return array
+     * @throws Exception\NotFound
+     */
+    private function getClassStudentInfo(IAssessable $assessmentSpec, IAssessable $assessmentImpl): array
+    {
+        $assessments = new GenericCollection(IAssessable::class, [$assessmentImpl]);
+        // We are first loading and hydrating the participants into the assessments, so we know how many exist, for when we chunk them
+        // we chunk them later as the stats logic causes increased load and demand on the system.
+        // Looking through `loadParticipantsIntoAssessmentCollection` it was going to be too hard to try and fetch / hydrate only a specific chunk of participants.
+        // so we are loading and then throwing away data (yes, can be fixed later) but this is better than trying to load and use everything and run out of memory)
+        $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+
+        $twigData = [
+            'baseContext'      => $assessmentSpec->getBaseContext(),
+            'assessment'       => $assessmentSpec,
+            'aImpls'           => [],
+            'isSpecification'  => true,
+            'returnUrl'        =>
+                $this->requestQuery->get(Redirect::RETURN_URL)
+                    ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
+                    : $this->getSession()->getHistory(),
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
+        ];
+        /** @var Project $assessment */
+        foreach ($assessments as $assessment) {
+            // Calculate summary totals for display purposes
+            $participants = $assessment->getAllParticipants();
+
+            // slice/cut the participants to a chunked count
+            $participantCount = $participants->count();
+            $participantCursor = (int)$this->requestQuery->get('participantCursor', 0);
+            if ($participantCursor < 0) {
+                $participantCursor = 0;
+            }
+
+            // slice the participant list to a reduced set, `new Assessment\ParticipantStatistics` is expensive and when you are doing that for hundreds of humans
+            // it can cause memory and load issues, so we are chunking the participants and only doing the stats for the chunk we are showing
+            $participants = $participants->slice($participantCursor, self::PARTICIPANT_CHUNK_SIZE);
+
+            $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
+            foreach ($participants as $participant) {
+                $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
+            }
+
+            $twigData['participantStats'][$assessment->getId()] = $participantStats;
+            $twigData['aImpl'] = [
+                'participantCount' => $participantCount,
+                'participantCursor' => $participantCursor + self::PARTICIPANT_CHUNK_SIZE,
+                'assessment' => $assessment,
+                'participantStats' => $participantStats,
+                'participants' => $participants,
+            ];
+        }
+
+        return $twigData;
     }
 }

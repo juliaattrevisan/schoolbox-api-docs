@@ -1,0 +1,65 @@
+{##
+ # Participant chunk for class level project assessment status.
+ # This chunk is responsible for rendering the participants of a class level assessment, along with their progress and marks.
+ # if there are more participants to load, it also renders a load more button with the appropriate data attributes for fetching the next chunk.
+ #
+ # @param ?Project/Model $assessment    Project Model of course level assessment, or null if this is a class level assessment
+ # @param array $aImpl                  array for the class assessment with associated participants chunk, assessment object, and participant stats
+ #    [
+ #       'assessment'       IAssessable
+ #       'participantStats' ParticipantStatistics[] Indexed by user.id
+ #       'participantCount' int Total number of participants in the class (not just in this chunk)
+ #       'participantCursor' int Cursor for pagination, indicating the offset for the next chunk of participants to load
+ #   ]
+ # @param bool $isSpecification         Whether to show classes as groups (course level), or just a flat list (class level)
+#}
+
+{% import '@learning/macro/urgency.twig' as urgency %}
+{% set participants = aImpl.participants ?? aImpl.assessment.allParticipants %}
+{% for participant in participants %}
+    {% set stats = aImpl.participantStats[participant.user.id] ?? null %}
+    {% if stats %}
+    <li>
+        <div class="flex-grade">
+            <div class="small-12 compact card columns">
+                {# cache to prevent repeated traversals #}
+                <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: aImpl.assessment.id, studentId: participant.user.id}) }}">
+                    {% include 'include/portrait.twig' with {user: participant.user} only %}
+                    <p>
+                        {{ participant.user.formatName }}
+                        <span class="pipe meta">
+                            {{ stats.countAssessments - stats.countResponseRequired }}/{{ stats.countAssessments }} activities completed
+                        </span>
+                    </p>
+                </a>
+            </div>
+
+            {# initially created SA-13616
+             # projects are a unique space where we can hit a project cache or manually calculate the results.
+             # projects do NOT have Submission States, and null is a valid option (no score, not attempted)
+             #}
+            {% set publishedHumanReadableMark = participant.humanReadableMark(true) ?? null %}
+
+            {# if the mark is NOT NULL, there is a valid score, so we should show the colours, and mark #}
+            {% if publishedHumanReadableMark is not null %}
+                <div class="grade {{ urgency.marks( participant.normalisedMark(true)) }}-bg">
+                    <span>{{ publishedHumanReadableMark }}</span>
+                </div>
+            {% endif %}
+        </div>
+    </li>
+    {% endif %}
+{% endfor %}
+{% if isSpecification and (aImpl.participantCursor < aImpl.participantCount) %}
+    {# there are more participants to show, we should show a load more (that triggers a new chunk, managed by `@learningAssessment/project/status/staff.twig::loadMoreParticipants` #}
+    <li data-class-chunk-href="{{ routeLookup('learningAssessment.getClassStatusChunk', {
+        assessmentId: assessment.id,
+        assessment: assessment,
+        assessmentSpec: assessment,
+        assessmentImpl: aImpl.assessment,
+        assessmentImplId: aImpl.assessment.id
+    })}}?participantCursor={{ aImpl.participantCursor }}">
+        <a data-click-load-more class="button load-more expand" title="Load more">Load more</a>
+        <div data-loader class="loader hide"></div>
+    </li>
+{% endif %}

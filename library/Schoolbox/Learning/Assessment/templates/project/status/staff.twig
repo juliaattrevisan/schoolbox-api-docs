@@ -244,10 +244,10 @@ Data:
     {% if aImpls | length %}
     <div class="small-12 large-6 island">
         <h2 class="subheader">Students</h2>
-        {% set showGroups = assessment.baseContext is unitSpecification %}
+        {% set isSpecification = assessment.baseContext is unitSpecification %}
 
         {% for aImpl in aImpls %}
-            {% if showGroups %}
+            {% if isSpecification %}
             <div class="component-container">
                 <div class="row">
                     <div class="small-12 columns">
@@ -262,9 +262,20 @@ Data:
                                 </div>
                                 <nav>
                                     <a
+                                        {% if isSpecification %}
+                                            data-data-loaded="false"
+                                            data-click-load="{{ aImpl.assessment.id }}"
+                                            data-class-status-href="{{ routeLookup('learningAssessment.getClassStatus', {
+                                                assessmentId: assessment.id,
+                                                assessment: assessment,
+                                                assessmentSpec: assessment,
+                                                assessmentImpl: aImpl.assessment,
+                                                assessmentImplId: aImpl.assessment.id
+                                            })}}"
+                                        {% endif %}
                                         data-collapser="collap-{{ aImpl.assessment.id }}"
                                         href="#"
-                                        class="icon-up-arrow collapse"
+                                        class="icon-down-arrow collapse"
                                         title="Expand/collapse content"
                                     ></a>
                                 </nav>
@@ -272,62 +283,118 @@ Data:
                         </div>
                     </div>
                 </div>
-            {% endif %}
-
-            {% if aImpl.assessment.allParticipants | length %}
-                <section
-                    {% if showGroups %}
-                    data-collapse-state="uncollapsed"
-                    data-collapsable="collap-{{ aImpl.assessment.id }}"
-                    {% endif %}
-                >
-                    <ul class="information-list">
-                        {% for participant in aImpl.assessment.allParticipants %}
-                            <li>
-                                <div class="flex-grade">
-                                    <div class="small-12 compact card columns">
-                                        {# cache to prevent repeated traversals #}
-                                        <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: aImpl.assessment.id, studentId: participant.user.id}) }}">
-                                            {% include 'include/portrait.twig' with {user: participant.user} only %}
-                                            <p>
-                                                {{ participant.user.formatName }}
-                                                <span class="pipe meta">
-                                                    {% set stats = aImpl.participantStats[participant.user.id] %}
-                                                    {{ stats.countAssessments - stats.countResponseRequired }}/{{ stats.countAssessments }} activities completed
-                                                </span>
-                                            </p>
-                                        </a>
-                                    </div>
-
-                                    {% set publishedHumanReadableMark = participant.humanReadableMark(true) ?? null %}
-
-                                    {% if publishedHumanReadableMark is not null %}
-                                        <div class="grade {{ urgency.marks( participant.normalisedMark(true)) }}-bg">
-                                            <span>{{ publishedHumanReadableMark }}</span>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </section>
+                <div id="class-{{ aImpl.assessment.id  }}">
+                </div>
+            </div>
             {% else %}
-                {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: aImpl.assessment.id, context: aImpl.assessment }) %}
-                <div class="empty-state">
-                    <i class="icon-group"></i>
-                    <p>There are no students currently undertaking this {{ locale.project }}.</p>
-                    <p>As you <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">add {{ locale.activity.plural }}</a>, the participating students will appear here. </p>
-                </div>
-            {% endif %}
-            {% if showGroups %}
-                </div>
+                {% include '@learningAssessment/project/status/class.twig' with {assessment: assessment, aImpl: aImpl, isSpecification: isSpecification} only %}
             {% endif %}
         {% endfor %}
 
-        {% if showGroups %}
+        {% if isSpecification %}
             <script type="text/javascript">
-                $(function () {
-                    $('[data-collapser]').collapsable();
+                // async fetch the next chunk of participants for a requested class,
+                // insert them after the current participant list, and if needed, re-enable the new load more button
+                function loadMoreParticipants(event) {
+                    // hide the load more button
+                    event.preventDefault();
+                    $(event.target).hide();
+                    // show the loader
+                    $(event.target.parentNode).find('[data-loader]').removeClass('hide');
+
+                    let toast = $('#assessment-toast');
+                    toast.toastActivate({text: 'Fetching participants...'});
+
+                    // fetch the class status data
+                    fetch(event.target.parentNode.dataset.classChunkHref, { credentials: 'same-origin' })
+                        .then(function(response) {
+                            if (!response.ok) {
+                                // toaster
+                                toast.toastTimeout({text: 'Unable to load more participants.', css: 'alert'});
+
+                                // show the hidden things
+                                $(event.target).show();
+                                // show the loader
+                                $(event.target.parentNode).find('[data-loader]').addClass('hide');
+                                // exit
+                                return;
+                            }
+                            return response.text();
+                        })
+                        .then(function(data) {
+                            let el = event.target.parentNode,
+                                    participateList = el.parentNode;
+                            if (el && participateList && data) {
+                                // toaster
+                                toast.toastTimeout({text: 'Loaded.', css: 'success'});
+                                el.outerHTML = data;
+                                // re-enable the load more button (if one exists. it may not...)
+                                $(participateList).find('[data-click-load-more]').on('click', loadMoreParticipants);
+                            } else {
+                                // toaster
+                                toast.toastTimeout({text: 'Unable to load more participants.', css: 'alert'});
+                            }
+                        })
+                        .catch(function() {
+                            // toaster
+                            toast.toastTimeout({text: 'Unable to load more participants.', css: 'alert'});
+
+                            // show the hidden things
+                            $(event.target).show();
+                            // show the loader
+                            $(event.target.parentNode).find('[data-loader]').addClass('hide');
+                        });
+                }
+
+                // when a user clicks the text in data-click-load
+                // we should async fetch the participants and add it to the div
+                $('[data-click-load]').on('click', function (event) {
+                    // stop the scroll
+                    event.preventDefault();
+                    // if data has been loaded, exit
+                    if (event.target.dataset.dataLoaded === 'true') {
+                        return;
+                    }
+
+                    let toast = $('#assessment-toast');
+                    toast.toastActivate({text: 'Fetching participants...'});
+
+                    // swap out the class `icon-down-arrow` to `icon-up-arrow` before it loads
+                    $(event.target).removeClass('icon-down-arrow').addClass('icon-up-arrow');
+
+                    // fetch the class status data
+                    fetch(event.target.dataset.classStatusHref, { credentials: 'same-origin' })
+                        .then(function(response) {
+                            if (!response.ok) {
+                                // toaster
+                                toast.toastTimeout({text: 'Unable to load more participants.', css: 'alert'});
+                                // exit
+                                return;
+                            }
+                            return response.text();
+                        })
+                        .then(function(data) {
+                            let el = document.getElementById('class-' + event.target.dataset.clickLoad);
+                            if (el && data) {
+                                el.innerHTML = data;
+
+                                // toaster
+                                toast.toastTimeout({text: 'Loaded.', css: 'success'});
+
+                                // initialise the load more button if it exists
+                                $('#class-' + event.target.dataset.clickLoad + ' [data-click-load-more]').on('click', loadMoreParticipants);
+
+                                // update data attribute once content has successfully loaded
+                                event.target.dataset.dataLoaded = 'true';
+
+                                // enable full collapsable on this class now that content is present
+                                $(event.target).collapsable();
+                            }
+                        })
+                        .catch(function() {
+                            // toaster
+                            toast.toastTimeout({text: 'Unable to load more participants.', css: 'alert'});
+                    });
                 });
             </script>
         {% endif %}
@@ -337,7 +404,7 @@ Data:
 <div class="row">
     <div class="small-12 column">
         {% if returnUrl %}
-            <a href={{ returnUrl }} class="button submit">Return</a>
+            <a href="{{ returnUrl }}" class="button submit">Return</a>
         {% elseif baseContext is unitSpecification %}
             <a href="{{ routeLookup('course.modifyCourse', {id: baseContext.course.id })}}#{{ baseContext.id }}" class="button submit">Return to course</a>
         {% else %}

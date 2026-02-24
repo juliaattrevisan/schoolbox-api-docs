@@ -1,0 +1,33 @@
+{##
+ # Class chunk for project status page. This chunk is responsible for rendering the class information and participants.
+ #
+ #
+ # @param ?Project/Model $assessment    Project Model of course level assessment, or null if this is a class level assessment
+ # @param array $aImpl                  array for the class assessment with associated participants chunk, assessment object, and participant stats
+ #   [
+ #       'assessment'       IAssessable
+ #       'participantStats' ParticipantStatistics[] Indexed by user.id
+ #       'participantCount' int Total number of participants in the class (not just in this chunk)
+ #       'participantCursor' int Cursor for pagination, indicating the offset for the next chunk of participants to load
+ #   ]
+ # @param bool $isSpecification         Whether to show classes as groups (course level), or just a flat list (class level)
+#}
+{% if aImpl.participantCount %}
+    <section
+            {% if isSpecification %}
+                data-collapse-state="uncollapsed"
+                data-collapsable="collap-{{ aImpl.assessment.id }}"
+            {% endif %}
+    >
+        <ul class="information-list">
+            {% include '@learningAssessment/project/status/classChunk.twig' with {assessment: assessment, aImpl: aImpl, isSpecification: isSpecification} only %}
+        </ul>
+    </section>
+{% else %}
+    {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: aImpl.assessment.id, context: aImpl.assessment }) %}
+    <div class="empty-state">
+        <i class="icon-group"></i>
+        <p>There are no students currently undertaking this {{ locale.project }}.</p>
+        <p>As you <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">add {{ locale.activity.plural }}</a>, the participating students will appear here. </p>
+    </div>
+{% endif %}
