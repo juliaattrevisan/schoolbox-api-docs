@@ -32,72 +32,58 @@ use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 class Markbook
 {
     /**
-     * The assessments that are a part of this markbook.
-     *
-     * @var Collection|IAssessable[]
-     */
-    protected $assessments;
-
-    /**
      * Students that are a part of this markbook.
      *
      * @var Collection
      */
-    private $students;
+    private Collection $students;
+
 
     /**
      * Assessments part of this markbook on the top level (not including assessments inside projects)
      *
-     * @var Collection|IAssessable[]
+     * @var Collection<IAssessable>
      */
-    protected $topLevelAssessments;
+    protected Collection $topLevelAssessments;
 
-    /**
-     * The mark scheme to use when summarising a student's overall grade for these assessments.
-     *
-     * @var IMarkScheme
-     */
-    protected $defaultMarkScheme;
-
-    /**
-     * The user viewing the markbook, usually whoever is logged in
-     *
-     * @var User
-     */
-    protected $viewingUser;
 
     /**
      * @var int
      */
-    private $totalWeight = 0;
+    private int $totalWeight = 0;
+
 
     /**
      * Normalised (0.0 - 100.0) average mark for all assessments in this markbook
      *
      * @var float
      */
-    private $normalisedMean;
+    private float $normalisedMean;
+
 
     /**
      * Normalised (0.0 - 100.0) average mark for all draft assessments in this markbook
      *
      * @var float
      */
-    private $draftNormalisedMean;
+    private float $draftNormalisedMean;
+
 
     /**
      * Human readable weighted average mark for all assessments in this markbook
      *
      * @var string
      */
-    private $weightedMean;
+    private string $weightedMean;
+
 
     /**
      * Human readable weighted average mark for all draft assessments in this markbook
      *
      * @var string
      */
-    private $draftWeightedMean;
+    private string $draftWeightedMean;
+
 
     /**
      * Statistics for each assessment.
@@ -107,7 +93,8 @@ class Markbook
      *
      * @var array
      */
-    protected $assessmentStatistics = [];
+    protected array $assessmentStatistics = [];
+
 
     /**
      * Statistics for each student.
@@ -117,7 +104,8 @@ class Markbook
      *
      * @var array
      */
-    protected $studentStatistics = [];
+    protected array $studentStatistics = [];
+
 
     /**
      * Whether draft exists for student & assessment combination
@@ -125,22 +113,23 @@ class Markbook
      * key: assessment ID, student ID
      * @var array
      */
-    private $hasDraft = [];
+    private array $hasDraft = [];
+
 
     /**
      * Build a markbook out of a list of assessments.
      *
      * This assumes that all participants, responses and feedbacks have been filled out.
      *
-     * @param GenericCollection|IAssessable[] $assessments
-     * @param IMarkScheme              $defaultMarkScheme
-     * @param User                     $viewingUser
+     * @param GenericCollection<IAssessable> $assessments The assessments that are a part of this markbook.
+     * @param IMarkScheme              $defaultMarkScheme The mark scheme to use when summarising a student's overall grade for these assessments.
+     * @param User                     $viewingUser The user viewing the markbook, usually whoever is logged in
      */
-    public function __construct(GenericCollection $assessments, IMarkScheme $defaultMarkScheme, User $viewingUser)
-    {
-        $this->assessments       = $assessments;
-        $this->defaultMarkScheme = $defaultMarkScheme;
-        $this->viewingUser       = $viewingUser;
+    public function __construct(
+        private GenericCollection $assessments,
+        private IMarkScheme $defaultMarkScheme,
+        private User $viewingUser
+    ) {
         $this->topLevelAssessments = $assessments->filter(function (IAssessable $assessment) {
             return !$assessment->getContext() instanceof Project;
         });
@@ -148,25 +137,6 @@ class Markbook
         $this->collateStatistics();
     }
 
-    /**
-     * Get all assessments in this collection.
-     *
-     * @return Collection|IAssessable[]
-     */
-    public function getAssessments()
-    {
-        return $this->assessments;
-    }
-
-    /**
-     * Get all top level assessments in this collection.
-     *
-     * @return Collection|IAssessable[]
-     */
-    public function getTopLevelAssessments()
-    {
-        return $this->topLevelAssessments;
-    }
 
     /**
      * Retrieves all students who have participated in any of the assessments in the markbook.
@@ -191,30 +161,11 @@ class Markbook
         return $this->students;
     }
 
-    /**
-     * Gets all stats for the assessments in this markbook.
-     *
-     * @return array
-     */
-    public function getAssessmentStatistics(): array
-    {
-        return $this->assessmentStatistics;
-    }
-
-    /**
-     * Gets all stats for the students in this markbook.
-     *
-     * @return array
-     */
-    public function getStudentStatistics()
-    {
-        return $this->studentStatistics;
-    }
 
     /**
      * Collates statistics for each assessment, student and the overall markbook.
      */
-    protected function collateStatistics()
+    protected function collateStatistics(): void
     {
         // Collate all assessment statistics
         foreach ($this->assessments as $assessment) {
@@ -298,6 +249,7 @@ class Markbook
         $this->draftWeightedMean = $this->defaultMarkScheme->getHumanReadableMark($this->draftNormalisedMean);
     }
 
+
     /**
      * Is the most recent feedback on `$assessment` a draft?
      * * Due work:   is the most recent feedback for `$student` a draft?
@@ -333,52 +285,13 @@ class Markbook
         return false;
     }
 
-    /**
-     * @return array
-     */
-    public function getHasDraft(): array
-    {
-        return $this->hasDraft;
-    }
-
-    /**
-     * @return float
-     */
-    public function getNormalisedMean()
-    {
-        return $this->normalisedMean;
-    }
-
-    /**
-     * @return float
-     */
-    public function getDraftNormalisedMean()
-    {
-        return $this->draftNormalisedMean;
-    }
-
-    /**
-     * @return string
-     */
-    public function getWeightedMean()
-    {
-        return $this->weightedMean;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDraftWeightedMean()
-    {
-        return $this->draftWeightedMean;
-    }
 
     /**
      * Collates statistics for a single assessment.
      *
      * @param IAssessable $assessment
      */
-    protected function collateAssessmentStatistics(IAssessable $assessment)
+    protected function collateAssessmentStatistics(IAssessable $assessment): void
     {
         $meanSummator  = new Average();
         $stdevSummator = new StandardDeviation();
@@ -405,23 +318,23 @@ class Markbook
         $fivePoints = (new Summary($normMarks))->getSummary();
 
         $statistics = [
-            'mean'              => null,
-            'sd'                => null,
-            'min'               => $markScheme->getHumanReadableMark($minSummator->summateList($normMarks)),
-            'minNormalized'     => $fivePoints['min'],
-            'max'               => $markScheme->getHumanReadableMark($maxSummator->summateList($normMarks)),
-            'maxNormalized'     => $fivePoints['max'],
-            'count'             => $countSummator->summateList($normMarks),
-            'quartile1'         => $fivePoints['quartile1'],
-            'quartile2'         => $fivePoints['quartile2'],
-            'quartile3'         => $fivePoints['quartile3']
+            'mean'          => null,
+            'sd'            => null,
+            'min'           => $markScheme->getHumanReadableMark($minSummator->summateList($normMarks)),
+            'minNormalized' => $fivePoints['min'],
+            'max'           => $markScheme->getHumanReadableMark($maxSummator->summateList($normMarks)),
+            'maxNormalized' => $fivePoints['max'],
+            'count'         => $countSummator->summateList($normMarks),
+            'quartile1'     => $fivePoints['quartile1'],
+            'quartile2'     => $fivePoints['quartile2'],
+            'quartile3'     => $fivePoints['quartile3']
         ];
 
         /* $assessment might or might not be in a Project
          * (Projects are assessments too)
          *
-         * If it's in a Project, we need to inspect its siblings' weights
-         * to do an additional analysis
+         * If it's in a Project, we need to inspect its siblings' weights to do an additional analysis
+         *
          */
         if ($assessment->getContext() instanceof Project) {
             $statistics['weightInProject'] = $assessment->getWeight();
@@ -430,14 +343,11 @@ class Markbook
              */
             $statistics['projectTotalWeight'] = 0;
 
-            /* If $assessment is inside a Project, it needs to know
-             * about the weights of its siblings so that $assessment
-             * can be represented as a proportion of the siblings'
-             * combined weights
+            /* If $assessment is inside a Project, it needs to know about the weights of its siblings so that $assessment
+             * can be represented as a proportion of the siblings' combined weights
              *
-             * Note that this might be repeated a bit, for every assessment
-             * in the project itself but there's probably nothing convenient
-             * we can do to address that right now
+             * Note that this might be repeated a bit, for every assessment in the project itself but there's probably
+             * nothing convenient we can do to address that right now
              */
             foreach ($assessment->getContext()->getAssessables() as $projectAssessment) {
                 $statistics['projectTotalWeight'] += $projectAssessment->getWeight();
@@ -454,22 +364,23 @@ class Markbook
 
         // mean and SD are only meaningful for quantitative marks
         if ($assessment->getMarkScheme()->isQuantitative()) {
-            $statistics['mean']             = $markScheme->getHumanReadableMark($meanSummator->summateList($normMarks));
-            $statistics['draftMean']        = $markScheme->getHumanReadableMark($meanSummator->summateList($draftNormMarks));
-            $statistics['sd']               = $markScheme->getHumanReadableMark($stdevSummator->summateList($normMarks));
-            $statistics['sdNormalized']     = $stdevSummator->summateList($normMarks);
+            $statistics['mean']         = $markScheme->getHumanReadableMark($meanSummator->summateList($normMarks));
+            $statistics['draftMean']    = $markScheme->getHumanReadableMark($meanSummator->summateList($draftNormMarks));
+            $statistics['sd']           = $markScheme->getHumanReadableMark($stdevSummator->summateList($normMarks));
+            $statistics['sdNormalized'] = $stdevSummator->summateList($normMarks);
         }
 
         $this->assessmentStatistics[$assessment->getId()] = $statistics;
     }
 
+
     /**
      * Retrieves a generator which iterates all assessments, and drills down into project
      * sub-assessments.
      *
-     * @return \Generator|IAssessable[]
+     * @return \Generator<IAssessable>
      */
-    public function getAssessmentsWithProjectContents()
+    public function getAssessmentsWithProjectContents(): \Generator
     {
         foreach ($this->getTopLevelAssessments() as $assessment) {
             yield $assessment;
@@ -498,6 +409,7 @@ class Markbook
         $this->assessments->sortByCallback($comparator->getCallable());
         return $this;
     }
+
 
     /**
      * Build student ranking
@@ -542,5 +454,98 @@ class Markbook
         }
 
         return $rank;
+    }
+
+
+    /* Getters/Setters
+     */
+
+
+    /**
+     * Get all assessments in this collection.
+     *
+     * @return Collection<IAssessable>
+     */
+    public function getAssessments(): Collection
+    {
+        return $this->assessments;
+    }
+
+
+    /**
+     * Get all top level assessments in this collection.
+     *
+     * @return Collection<IAssessable>
+     */
+    public function getTopLevelAssessments(): Collection
+    {
+        return $this->topLevelAssessments;
+    }
+
+
+    /**
+     * Gets all stats for the assessments in this markbook.
+     *
+     * @return array
+     */
+    public function getAssessmentStatistics(): array
+    {
+        return $this->assessmentStatistics;
+    }
+
+
+    /**
+     * Gets all stats for the students in this markbook.
+     *
+     * @return array
+     */
+    public function getStudentStatistics(): array
+    {
+        return $this->studentStatistics;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getHasDraft(): array
+    {
+        return $this->hasDraft;
+    }
+
+
+    /**
+     * @return float
+     */
+    public function getNormalisedMean(): float
+    {
+        return $this->normalisedMean;
+    }
+
+
+    /**
+     * @return float
+     */
+    public function getDraftNormalisedMean(): float
+    {
+        return $this->draftNormalisedMean;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getWeightedMean(): string
+    {
+        return $this->weightedMean;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getDraftWeightedMean(): string
+    {
+        return $this->draftWeightedMean;
     }
 }
