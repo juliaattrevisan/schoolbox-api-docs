@@ -180,7 +180,7 @@ class MomentsRetention implements IStrategy
                             $statementComment->rowCount()
                         )
                     );
-                } catch (\PDOException|Exception $e) {
+                } catch (\PDOException | Exception $e) {
                     $this->database->rollBack();
                     $this->log->error(sprintf("Error processing chunk: %s", $e->getMessage()));
                 }
