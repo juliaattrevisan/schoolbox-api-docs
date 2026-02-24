@@ -100,4 +100,31 @@ body.sbx-body {
     .rubric input[type="radio"] {
         display: none;
     }
+
+    // the radio buttons that look like buttons, but are single selections
+    input[type="radio"] + .block {
+        background-color: var(--sbx-color-foreground-primary);
+        border: 1px solid var(--sbx-color-accent);
+        color: var(--sbx-color-accent);
+        padding: var(--sbx-size-m);
+    }
+
+    input[type="radio"] + .block i {
+        color: var(--sbx-color-accent);
+    }
+
+    input[type="radio"]:checked + .block {
+        background-color: var(--sbx-color-accent);
+        color: var(--sbx-color-accent-text);
+    }
+
+    input[type="radio"]:checked + .block i {
+        color: var(--sbx-color-accent-text);
+    }
+
+    // the icon only radio - used in notification settings
+    input[type="radio"]:not(.plain):checked + label.input-toggle {
+        background-color: var(--sbx-color-accent);
+        color: var(--sbx-color-accent-text);
+    }
 }

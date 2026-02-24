@@ -169,6 +169,12 @@ body.sbx-body {
     .rb input[type="checkbox"] {
         display: none;
     }
+
+    // the icon only checkbox - used in notification settings
+    input[type="checkbox"]:not(.plain):checked + label.input-toggle {
+        background-color: var(--sbx-color-accent);
+        color: var(--sbx-color-accent-text);
+    }
 }
 
 // Selectors for body.login (outside sbx-body scope)

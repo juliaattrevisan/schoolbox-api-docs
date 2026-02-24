@@ -137,7 +137,7 @@ window.Vue.onMounted(() => {
     background: none;
     border: none;
     border-radius: 0;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-color-accent, var(--content-ui-foreground));
     cursor: pointer;
     display: inline-flex;
     gap: var(--spacing-s);

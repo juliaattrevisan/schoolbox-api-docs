@@ -307,7 +307,7 @@ $container-bg: white;
 // Tooltips that reveal further information on selection
 // Typically they sit next to a label
 .hint {
-    color: $content-ui-foreground !important;
+    color: $content-ui-foreground;
     top: -1px;
     margin-left: 4px;
     width: 1rem;

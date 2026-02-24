@@ -30,7 +30,8 @@ body.sbx-body {
     .diagonal-headings-table thead tr.rotate-headers th > div:not(:empty),
     .accordion .accordion-navigation > .content.active,
     table tfoot,
-    .toast {
+    .toast,
+    span.tooltip {
         background: var(--sbx-color-foreground-primary);
     }
 
@@ -75,7 +76,6 @@ body.sbx-body {
     ins,
     em,
     cite,
-    span,
     pre,
     b,
     i,
@@ -102,6 +102,7 @@ body.sbx-body {
      */
     .empty-state p,
     .meta,
+    span.meta,
     blockquote,
     blockquote:before,
     code,
@@ -123,11 +124,48 @@ body.sbx-body {
      */
     a,
     a h3,
+    a p,
     .breadcrumb li a[href],
     div.dzone,
     div.dzone span,
-    #footer a {
+    #footer a,
+    .f-dropdown li button,
+    .actions-small-3 > nav a[class^="icon-"],
+    .actions-small-2 > nav a[class^="icon-"],
+    .actions-small-1 > nav a[class^="icon-"],
+    #news-component .card.reversed .card-actions [class^="icon-"],
+    .v-card .card-actions [class^="icon-"],
+    fieldset.collapsible legend,
+    label.input-toggle span,
+    .dz-default.dz-message {
         color: var(--sbx-color-accent);
+    }
+
+    .checklist.checklist-container {
+        border: 2px solid var(--sbx-color-accent);
+    }
+
+    .checklist.checklist-container input[type="checkbox"]:not(.plain):not(:disabled) + label {
+        border-bottom: 1px solid var(--sbx-color-accent);
+    }
+
+    .dzone {
+        border: 0.0625rem dashed var(--sbx-color-accent);
+    }
+
+    .hint {
+        background: var(--sbx-color-accent);
+    }
+
+    .tabs.vertical li.tab-title.active a {
+        border-left: 2px solid var(--sbx-color-accent);
+    }
+
+    /**
+     * Accent Text
+     */
+    .hint {
+        color: var(--sbx-color-accent-text);
     }
 
     /**

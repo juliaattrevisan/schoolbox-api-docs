@@ -19,12 +19,32 @@ body.sbx-body {
             font-weight: 600;
         }
 
+        dd.active > a {
+            color: var(--sbx-color-accent);
+        }
+
+        .tab-title.active > a {
+            color: var(--sbx-color-accent);
+        }
+
         & a {
             white-space: nowrap;
 
             &:focus-visible {
                 outline: 1px solid var(--sbx-color-accent);
                 outline-offset: -1px;
+            }
+            &:hover {
+                color: var(--sbx-color-accent);
+                border-bottom: 2px solid var(--sbx-color-accent);
+            }
+        }
+    }
+
+    .tabs.vertical {
+        & a {
+            &:hover {
+                border-bottom: none;
             }
         }
     }
