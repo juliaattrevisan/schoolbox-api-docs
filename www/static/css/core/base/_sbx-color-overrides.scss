@@ -6,7 +6,9 @@
 body.sbx-body {
     background: var(--sbx-color-body-background);
 }
-
+/**
+ * Foreground primary
+ */
 .sbx-body .island section,
 .sbx-body table,
 .sbx-body table thead,
@@ -25,7 +27,9 @@ body.sbx-body {
 .sbx-body .highcharts-background,
 .sbx-body .timetable th,
 .sbx-body .reveal-modal,
-.sbx-body .diagonal-headings-table thead tr.rotate-headers th > div:not(:empty) {
+.sbx-body .diagonal-headings-table thead tr.rotate-headers th > div:not(:empty),
+.sbx-body .accordion .accordion-navigation > .content.active,
+.sbx-body table tfoot {
     background: var(--sbx-color-foreground-primary);
 }
 
@@ -37,29 +41,42 @@ body.sbx-body {
     fill: var(--sbx-color-foreground-primary);
 }
 
-.sbx-body th.timetable-period-active {
-    background: var(--sbx-color-active);
+/**
+* Foreground secondary
+*/
+.sbx-body .empty-state,
+.sbx-body .empty-state-flex-centered,
+.sbx-body blockquote,
+.sbx-body .fc .fc-cell-shaded,
+.sbx-body .side-nav li ul.flyout {
+    background: var(--sbx-color-foreground-secondary);
 }
 
+/**
+* Text primary
+*/
 .sbx-body .subheader {
     color: var(--sbx-color-text-primary);
 }
 
-.sbx-body .empty-state,
-.sbx-body .empty-state-flex-centered,
-.sbx-body blockquote,
-.sbx-body .fc .fc-cell-shaded {
-    background: var(--sbx-color-foreground-secondary);
-}
-
-.sbx-body blockquote {
-    border-left: 6px solid var(--sbx-color-text-secondary);
-}
-
+/**
+* Text secondary
+*/
 .sbx-body .empty-state p,
 .sbx-body .meta,
 .sbx-body [class^="icon-"],
 .sbx-body blockquote,
 .sbx-body blockquote:before {
     color: var(--sbx-color-text-secondary);
+}
+
+.sbx-body blockquote {
+    border-left: 6px solid var(--sbx-color-text-secondary);
+}
+
+/**
+* Active
+*/
+.sbx-body th.timetable-period-active {
+    background: var(--sbx-color-active);
 }

@@ -495,7 +495,10 @@ table.attempts-table {
 
 /* make an element sticky on the left */
 .u-sticky-left {
-    background: #ffffff; /* Also needs a background to prevent the sticky from being transparent */
+    background: var(
+        --sbx-color-foreground-primary,
+        #fff
+    ); /* Also needs a background to prevent the sticky from being transparent */
     left: 0;
     position: sticky;
     z-index: var(--sbx-depth-ui-sticky);
@@ -505,7 +508,7 @@ table.attempts-table {
 .u-sticky-left--row {
     z-index: calc(var(--sbx-depth-ui-sticky) - 1);
     &:hover {
-        background-color: #f4f3f3; /* to help legibility */
+        background-color: var(--sbx-color-foreground-secondary, #f4f2f2); /* to help legibility */
     }
 }
 
@@ -520,7 +523,10 @@ table.attempts-table {
 
 /* make a table <th> sticky on the right */
 .u-sticky-right {
-    background: #ffffff; /* Also needs a background to prevent the sticky from being transparent */
+    background: var(
+        --sbx-color-foreground-primary,
+        #fff
+    ); /* Also needs a background to prevent the sticky from being transparent */
     right: 0;
     position: sticky;
     z-index: var(--sbx-depth-ui-sticky);
@@ -547,6 +553,6 @@ td:has(.u-td-button):not(.u-sticky-left) {
     text-align: left;
     width: 100%;
     &:hover {
-        background: var(--accent-background);
+        background: var(--sbx-color-active, var(--accent-background));
     }
 }
