@@ -99,7 +99,7 @@ window.Vue.watch(
 
 <style lang="scss" scoped>
 .selected-nodes-container {
-    background: #fff;
+    background: var(--sbx-color-foreground-primary, #fff);
     border: 1px solid var(--form-border-color);
     display: flex;
     flex-wrap: wrap;

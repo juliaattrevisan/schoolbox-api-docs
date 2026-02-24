@@ -22,8 +22,23 @@ body.sbx-body {
 .sbx-body .VueTables__search,
 .sbx-body .VueTables__wrapper,
 .sbx-body .VueTables__table-footer,
-.sbx-body .highcharts-background {
+.sbx-body .highcharts-background,
+.sbx-body .timetable th,
+.sbx-body .reveal-modal,
+.sbx-body .diagonal-headings-table thead tr.rotate-headers th > div:not(:empty) {
     background: var(--sbx-color-foreground-primary);
+}
+
+.sbx-body .white {
+    background: var(--sbx-color-foreground-primary);
+}
+
+.sbx-body .highcharts-background {
+    fill: var(--sbx-color-foreground-primary);
+}
+
+.sbx-body th.timetable-period-active {
+    background: var(--sbx-color-active);
 }
 
 .sbx-body .subheader {
@@ -31,6 +46,7 @@ body.sbx-body {
 }
 
 .sbx-body .empty-state,
+.sbx-body .empty-state-flex-centered,
 .sbx-body blockquote {
     background: var(--sbx-color-foreground-secondary);
 }
