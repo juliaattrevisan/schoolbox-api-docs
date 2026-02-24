@@ -121,20 +121,64 @@ class Markbook
      *
      * This assumes that all participants, responses and feedbacks have been filled out.
      *
+     *
+     * There are three optional reductive filters: $studentIds, $curriculumCodes, $folderIds
+     *
+     * Any of those could be provided (or not provided) and they work in conjunction with one another.
+     * For this Markbook class, these three filtration options operate on $assessments which is typically fulfilled
+     * and prehydrated from somewhere else and $assessments could be reused by some other part of the app beyond
+     * markbook calculations.
+     *
+     * The three filters here basically pick-and-choose what parts of $assessments needs to be operated upon without
+     * affecting anything else that might want to operate on the full set of $assessments.
+     *
      * @param GenericCollection<IAssessable> $assessments The assessments that are a part of this markbook.
      * @param IMarkScheme              $defaultMarkScheme The mark scheme to use when summarising a student's overall grade for these assessments.
      * @param User                     $viewingUser The user viewing the markbook, usually whoever is logged in
+     * @param array|null $studentIds A reductive filter that operates on $assessments: a set of user ids
+     * @param array|null $curriculumCodes A reductive filter that operates on $assessments: a set of curriculum codes
+     * @param array|null $folderIds A reductive filter that operates on $assessments: a set of folder ids
      */
     public function __construct(
         private GenericCollection $assessments,
         private IMarkScheme $defaultMarkScheme,
-        private User $viewingUser
+        private User $viewingUser,
+        private ?array $studentIds = null,
+        private ?array $curriculumCodes = null,
+        private ?array $folderIds = null
     ) {
         $this->topLevelAssessments = $assessments->filter(function (IAssessable $assessment) {
             return !$assessment->getContext() instanceof Project;
         });
 
         $this->collateStatistics();
+    }
+
+
+    /**
+     * Check if we had a specific set of $studentIds to care about: if we did, and this user isn't one of those
+     * people, skip them
+     *
+     * @param int $studentId
+     * @return bool
+     */
+    private function isFilteredStudent(int $studentId): bool
+    {
+        /* No specific people to care about? Everyone's included
+         */
+        if (null === $this->studentIds || !count($this->studentIds)) {
+            return true;
+        }
+
+        /* We only care about specific people: check that $studentId is one of them
+         */
+        if (\in_array($studentId, $this->studentIds)) {
+            return true;
+        }
+
+        /* This person should be skipped
+         */
+        return false;
     }
 
 
@@ -150,6 +194,14 @@ class Markbook
             foreach ($this->getAssessments() as $assessment) {
                 foreach ($assessment->getAllParticipants() as $participant) {
                     $student = $participant->getUser();
+
+                    /* Check if we had a specific set of $studentIds to care about:
+                     * if we did, and this user isn't one of those people, skip them
+                     */
+                    if (!$this->isFilteredStudent($student->getId())) {
+                        continue;
+                    }
+
                     if (!$participants->offsetExists($student->getId())) {
                         $participants->setOffset($student->getId(), $student);
                     }
@@ -188,7 +240,7 @@ class Markbook
 
         // Summate student's statistics as an average, weighted by each assessment's weight.
         // Render as whatever the default grade group is
-        $weightedSummator  = new WeightedAverage();
+        $weightedSummator = new WeightedAverage();
 
         // Not all assessables are used in stats:
         // only ones for which feedback is visible, and are not project sub-assessments, are usable.
@@ -198,6 +250,13 @@ class Markbook
 
         $visibleAssessmentIds = $visibleAssessments->getPropertyValues('id');
         foreach ($this->getStudents() as $student) {
+            /* Check if we had a specific set of $studentIds to care about:
+             * if we did, and this user isn't one of those people, skip them
+             */
+            if (!$this->isFilteredStudent($student->getId())) {
+                continue;
+            }
+
             // Check whether latest feedback is draft
             $statsHasDraft = false;
             foreach ($this->assessments as $assessment) {
@@ -310,6 +369,20 @@ class Markbook
         // Only collate stats for assessments whose feedback may be viewed by this user
         if ($assessment->isFeedbackVisibleToUser($this->viewingUser)) {
             foreach ($assessment->getAllParticipants() as $participant) {
+                /* Check if we had a specific set of $studentIds to care about:
+                 * if we did, and this user isn't one of those people, skip them
+                 *
+                 * FIXME Maybe controversial: applying filters here basically reduces the universe. You'll be making
+                 *  boxplots for a subset of people and might not be indicative of the entire *actual* class/cohort,
+                 *  which might be somewhat misleading unless you think about this mindfully. If your class/cohort had
+                 *  20 people in it, but 3 people are in your student filter, is the class average based on:
+                 *    - those 20 people, or
+                 *    - just those 3 people?
+                 */
+                if (!$this->isFilteredStudent($participant->getUser()->getId())) {
+                    continue;
+                }
+
                 $normMarks[]      = $participant->getNormalisedMark(true);
                 $draftNormMarks[] = $participant->getNormalisedMark(false);
             }
@@ -334,7 +407,6 @@ class Markbook
          * (Projects are assessments too)
          *
          * If it's in a Project, we need to inspect its siblings' weights to do an additional analysis
-         *
          */
         if ($assessment->getContext() instanceof Project) {
             $statistics['weightInProject'] = $assessment->getWeight();
