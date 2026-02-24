@@ -36,6 +36,8 @@ class CommandLineTool extends CliTool\App
     private const string OPT_SHORT_HELP = 'h';
     private const string OPT_LONG_HELP  = 'help';
 
+    private const string OPT_SHORT_LOOP_COUNT = 'n:';
+
 
     /**
      * @inheritdoc
@@ -44,6 +46,7 @@ class CommandLineTool extends CliTool\App
     {
         return [
             self::OPT_SHORT_HELP,
+            self::OPT_SHORT_LOOP_COUNT,
         ];
     }
 
@@ -107,6 +110,9 @@ HELP;
         }
         register_shutdown_function(fn () => $this->releaseLock($lock));
 
+        // get the number of loops to run for each strategy, default 3
+        $loopCount = $this->getOptAsInt(self::OPT_SHORT_LOOP_COUNT, 3);
+
 
         // build the bus for all the data retention tasks
         /** @var GenericCollection<IStrategy> $bus */
@@ -116,7 +122,7 @@ HELP;
 //        $cmsLogRetentionPeriod = $this->getConfig()->get('dataRetention_cmsLogRetentionPeriod');
 //        $cmsLogRetentionPeriod = '365';  // example data retention period get from the config table
 //        $bus->add(new CmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig()));
-        $bus->add(new MomentsRetention($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig()));
+        $bus->add(new MomentsRetention($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig(), $loopCount));
 
         // if we have functions, run them
         if (count($bus) > 0) {
