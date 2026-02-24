@@ -18,6 +18,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\DataRetention\IStrategy;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper\Exception;
 use Symfony\Component\Lock\LockInterface;
 
 class MomentsRetention implements IStrategy
@@ -124,54 +125,65 @@ class MomentsRetention implements IStrategy
 
             // chunk things into self::CHUNK_SIZE
             foreach (array_chunk($deleteIds, self::CHUNK_SIZE) as $chunkId => $chunk) {
-                // log the chunk we are working on
-                $this->log->notice(sprintf("[%s/%s] Processing chunk", $chunkId + 1, $chunkCount));
+                // begin transaction for the chunk
+                $this->database->beginTransaction();
 
-                // extract the ids and the discussion threads from the chunk
-                $chunkIds = array_column($chunk, 'id');
-                $discussionThreadIds = array_column($chunk, 'discussion_thread_id');
+                try {
+                    // log the chunk we are working on
+                    $this->log->notice(sprintf("[%s/%s] Processing chunk", $chunkId + 1, $chunkCount));
 
-                $delPlaceholders = Builder::getArrayPlaceholders($chunkIds, 'moment_id');
-                $delParams       = Builder::getArrayParameters($chunkIds, 'moment_id');
+                    // extract the ids and the discussion threads from the chunk
+                    $chunkIds            = array_column($chunk, 'id');
+                    $discussionThreadIds = array_column($chunk, 'discussion_thread_id');
 
-                $discussionPlaceholders = Builder::getArrayPlaceholders($discussionThreadIds, 'moment_id');
-                $discussionParams       = Builder::getArrayParameters($discussionThreadIds, 'moment_id');
+                    $delPlaceholders = Builder::getArrayPlaceholders($chunkIds, 'moment_id');
+                    $delParams       = Builder::getArrayParameters($chunkIds, 'moment_id');
 
-                // unlink evidence // the Garbage Collector will take care of the actual files, we just need to remove the database records
-                $statementEvidence = $this->database->prepare("DELETE FROM moment_evidence WHERE moment_id IN {$delPlaceholders}");
-                $statementEvidence->execute($delParams);
+                    $discussionPlaceholders = Builder::getArrayPlaceholders($discussionThreadIds, 'moment_id');
+                    $discussionParams       = Builder::getArrayParameters($discussionThreadIds, 'moment_id');
 
-                // unlink folders
-                $statementFolder = $this->database->prepare("DELETE FROM moment_folder WHERE moment_id IN {$delPlaceholders}");
-                $statementFolder->execute($delParams);
+                    // unlink evidence // the Garbage Collector will take care of the actual files, we just need to remove the database records
+                    $statementEvidence = $this->database->prepare("DELETE FROM moment_evidence WHERE moment_id IN {$delPlaceholders}");
+                    $statementEvidence->execute($delParams);
 
-                // unlink tags
-                $statementTag = $this->database->prepare("DELETE FROM moment_tag WHERE moment_id IN {$delPlaceholders}");
-                $statementTag->execute($delParams);
+                    // unlink folders
+                    $statementFolder = $this->database->prepare("DELETE FROM moment_folder WHERE moment_id IN {$delPlaceholders}");
+                    $statementFolder->execute($delParams);
 
-                // delete the moments
-                $statementMoment = $this->database->prepare("DELETE FROM moment WHERE id IN {$delPlaceholders}");
-                $statementMoment->execute($delParams);
+                    // unlink tags
+                    $statementTag = $this->database->prepare("DELETE FROM moment_tag WHERE moment_id IN {$delPlaceholders}");
+                    $statementTag->execute($delParams);
 
-                // delete the discussion thread comments // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads comments that were not... but they do match to the moment...
-                $statementComment = $this->database->prepare("DELETE FROM discussion_thread_comment WHERE discussion_thread_id IN {$discussionPlaceholders}");
-                $statementComment->execute($discussionParams);
+                    // delete the moments
+                    $statementMoment = $this->database->prepare("DELETE FROM moment WHERE id IN {$delPlaceholders}");
+                    $statementMoment->execute($delParams);
 
-                // delete the discussion threads // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads that were not... but they do match to the moment...
-                $statementThread = $this->database->prepare("DELETE FROM discussion_thread WHERE id IN {$discussionPlaceholders}");
-                $statementThread->execute($discussionParams);
+                    // delete the discussion thread comments // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads comments that were not... but they do match to the moment...
+                    $statementComment = $this->database->prepare("DELETE FROM discussion_thread_comment WHERE discussion_thread_id IN {$discussionPlaceholders}");
+                    $statementComment->execute($discussionParams);
 
-                $this->log->notice(
-                    sprintf(
-                        "Deleted '%s' moments, '%s' moment_evidence, '%s' moment_folders, '%s' moment_tags '%s' discussion_threads, '%s' discussion_thread_comments",
-                        $statementMoment->rowCount(),
-                        $statementEvidence->rowCount(),
-                        $statementFolder->rowCount(),
-                        $statementTag->rowCount(),
-                        $statementThread->rowCount(),
-                        $statementComment->rowCount()
-                    )
-                );
+                    // delete the discussion threads // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads that were not... but they do match to the moment...
+                    $statementThread = $this->database->prepare("DELETE FROM discussion_thread WHERE id IN {$discussionPlaceholders}");
+                    $statementThread->execute($discussionParams);
+
+                    // perform the transaction for the chunk
+                    $this->database->commit();
+
+                    $this->log->notice(
+                        sprintf(
+                            "Deleted '%s' moments, '%s' moment_evidence, '%s' moment_folders, '%s' moment_tags '%s' discussion_threads, '%s' discussion_thread_comments",
+                            $statementMoment->rowCount(),
+                            $statementEvidence->rowCount(),
+                            $statementFolder->rowCount(),
+                            $statementTag->rowCount(),
+                            $statementThread->rowCount(),
+                            $statementComment->rowCount()
+                        )
+                    );
+                } catch (\PDOException|Exception $e) {
+                    $this->database->rollBack();
+                    $this->log->error(sprintf("Error processing chunk: %s", $e->getMessage()));
+                }
 
                 // if we have more chunks, refresh the lock
                 if ($chunkId < $chunkCount - 1) {
