@@ -83,18 +83,9 @@ body.sbx-body {
         transform: scale(1);
     }
 
+    // hide when label is not used
     input[type="checkbox"]:not(.plain) + label.checkbox-label:before,
-    .login input[type="checkbox"]:not(.plain) + label:before,
-    input[type="checkbox"]:not(.plain) + label.checkbox-label:after,
-    body.login input[type="checkbox"]:not(.plain) + label:after {
-        display: none;
-    }
-
     input[type="checkbox"]:not(.plain) + label.checkbox-label:after {
-        display: none;
-    }
-
-    input[type="checkbox"]:not(.plain) + label.checkbox-label:before {
         display: none;
     }
 
@@ -119,8 +110,8 @@ body.sbx-body {
         display: flex;
         flex-wrap: wrap;
         gap: var(--spacing-s);
-        list-style: none;
         justify-content: end;
+        list-style: none;
     }
 
     // Hide labels for checkboxes used as selectors
@@ -179,8 +170,7 @@ body.sbx-body {
 
 // Selectors for body.login (outside sbx-body scope)
 body.login input[type="checkbox"]:not(.plain) + label:after,
-body.login input[type="checkbox"]:not(.plain) + label:before,
-body.login input[type="checkbox"]:not(.plain) + label {
+body.login input[type="checkbox"]:not(.plain) + label:before {
     display: none;
     margin: 0;
     padding: 0;

@@ -350,7 +350,7 @@ $z-index-base: var(--sbx-depth-modal);
         position: relative;
         line-height: 1.375rem;
         font-weight: $font-weight-semibold;
-        color: $body-font-color;
+        color: var(--sbx-color-foreground-primary, $body-font-color);
     }
 }
 

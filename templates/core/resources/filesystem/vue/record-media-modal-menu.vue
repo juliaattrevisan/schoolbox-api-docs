@@ -232,11 +232,11 @@ $font-family-icon: "schoolbox";
 .menu-item {
     flex-grow: 1;
     flex-basis: 0;
-    border: 1px solid #ededed;
+    border: 1px solid var(--sbx-color-text-secondary, #ededed);
     margin-right: 1rem;
     margin-top: 1rem;
     padding: 20px;
-    background: #fafafa;
+    background: var(--sbx-color-foreground-primary, #fff);
     &:last-child {
         margin-right: 0;
     }
@@ -253,7 +253,7 @@ $font-family-icon: "schoolbox";
 .icon {
     font-family: $font-family-icon;
     &:before {
-        color: $content-ui-foreground;
+        color: var(--sbx-color-accent, $content-ui-foreground);
         font-size: 3rem;
         padding: 0;
     }

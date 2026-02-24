@@ -65,7 +65,8 @@ body.sbx-body {
     .sub-nav li a,
     .sub-nav dd a,
     .sub-nav li.active a,
-    .sub-nav dd.active a {
+    .sub-nav dd.active a,
+    button.load-more {
         background: var(--sbx-color-foreground-primary);
         border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
         border-radius: var(--sbx-config-field-roundness);

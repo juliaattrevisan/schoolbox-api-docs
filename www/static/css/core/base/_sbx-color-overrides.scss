@@ -3,7 +3,7 @@
  * Scope: UI Uplift
  */
 
-body.sbx-body {
+body.sbx-body:not(.login) {
     background: var(--sbx-color-body-background);
 
     /**
@@ -122,7 +122,7 @@ body.sbx-body {
     /**
      * Accent
      */
-    a,
+    a:not(.close-reveal-modal),
     a h3,
     a p,
     .breadcrumb li a[href],
@@ -137,7 +137,10 @@ body.sbx-body {
     .v-card .card-actions [class^="icon-"],
     fieldset.collapsible legend,
     label.input-toggle span,
-    .dz-default.dz-message {
+    .dz-default.dz-message,
+    .information-list.expandable-card > li .expander:before,
+    .resource-browser .meta-panel .meta-preview .icon-folder:before,
+    div.jstree-default .icon-folder:before {
         color: var(--sbx-color-accent);
     }
 
