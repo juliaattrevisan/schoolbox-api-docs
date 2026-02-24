@@ -50,8 +50,6 @@ class MomentsRetention implements IStrategy
 
         $this->lock->refresh();
 
-        $deleteCount = 0;
-
         $deleteOlderThan = (\Alaress_Date_Format::newNaturalDate(sprintf("-%s days", $retentionPeriod)))->getDatabase();
 
         // find out how many moments are soft deleted for the retention period
