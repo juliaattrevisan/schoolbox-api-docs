@@ -20,14 +20,14 @@ use Symfony\Component\Lock\LockInterface;
 class CmsLogExample implements IStrategy
 {
     /**
-     * @param null|LoggerInterface  $log
-     * @param bool                  $perform
-     * @param IConnector            $database
-     * @param LockInterface         $lock
-     * @param IConfigLoader         $config
-     * @return void
+     * @param null|LoggerInterface $log
+     * @param bool                 $perform
+     * @param IConnector           $database
+     * @param LockInterface        $lock
+     * @param IConfigLoader        $config
+     * @param int                  $chunkLoops
      */
-    public function __construct(private ?LoggerInterface $log, private bool $perform, private IConnector $database, private LockInterface $lock, private IConfigLoader $config)
+    public function __construct(private ?LoggerInterface $log, private bool $perform, private IConnector $database, private LockInterface $lock, private IConfigLoader $config, private int $chunkLoops = 3)
     {
     }
 

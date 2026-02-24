@@ -76,6 +76,7 @@ DESCRIPTION
 
 OPTIONS
     -h, --help:              Print this help text and exit
+    -n                       Count of loops to run for each strategy, default 3, set to 1 to only loop once
     -p:                      perform: *without* this flag, this tool will only do a dry run, outputting what would be
                              deleted
     -v[v[v]]:                verbosity: how much activity will be logged

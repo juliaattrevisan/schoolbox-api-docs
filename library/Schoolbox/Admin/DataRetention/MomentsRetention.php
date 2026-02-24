@@ -26,14 +26,14 @@ class MomentsRetention implements IStrategy
     private const CHUNK_SIZE = 1000; // how many things to delete at once
 
     /**
-     * @param null|LoggerInterface  $log
-     * @param bool                  $perform
-     * @param IConnector            $database
-     * @param LockInterface         $lock
-     * @param IConfigLoader         $config
-     * @return void
+     * @param null|LoggerInterface $log
+     * @param bool                 $perform
+     * @param IConnector           $database
+     * @param LockInterface        $lock
+     * @param IConfigLoader        $config
+     * @param int                  $chunkLoops
      */
-    public function __construct(private ?LoggerInterface $log, private bool $perform, private IConnector $database, private LockInterface $lock, private IConfigLoader $config)
+    public function __construct(private ?LoggerInterface $log, private bool $perform, private IConnector $database, private LockInterface $lock, private IConfigLoader $config, private int $chunkLoops = 3)
     {
     }
 
@@ -49,6 +49,8 @@ class MomentsRetention implements IStrategy
         }
 
         $this->lock->refresh();
+        // init the chunk loop
+        $chunkLoop = 1; // first loop
 
         $deleteOlderThan = (\Alaress_Date_Format::newNaturalDate(sprintf("-%s days", $retentionPeriod)))->getDatabase();
 
@@ -107,7 +109,6 @@ class MomentsRetention implements IStrategy
 
         // collate ids to delete
         $deleteIds = [];
-        $discussionThreadIds = [];
         while ($row = $statement->fetch()) {
             $deleteIds[] = [
                 'id' => $row['id'],
@@ -212,8 +213,19 @@ class MomentsRetention implements IStrategy
                 $this->log->error(sprintf("Error processing chunk: %s", $e->getMessage()));
             }
 
-            // if we have more chunks, refresh the lock
+            /** if we have more chunks
+             * check if we have looped through more than the count limit
+             * check if have passed the time limit we can continue tomorrow
+             * refresh the lock
+             */
+            //
             if ($chunkId < $chunkCount - 1) {
+                // if we have looped through more than the count limit, stop for now and continue tomorrow
+                if ($this->chunkLoops > 0 && $chunkLoop >= $this->chunkLoops) {
+                    $this->log->notice(sprintf("Chunk loop limit of '%s' reached, stopping for now", $this->chunkLoops));
+                    break;
+                }
+                $chunkLoop++;
                 $this->lock->refresh();
             }
         }
