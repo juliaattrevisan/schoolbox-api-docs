@@ -100,8 +100,10 @@ Usage:
 
 <style>
 /* Ensure the page can scroll when the 3-dot overflow menu is not clipped on small screens */
-.course-list-page {
-    min-height: 100vh;
-    padding-bottom: 350px;
+@media (max-height: 750px) {
+    .course-list-page {
+        min-height: 100vh;
+        padding-bottom: 350px;
+    }
 }
 </style>
