@@ -30,7 +30,10 @@ test.describe("Course location picker tests", () => {
         tester.isGoingTo("check that Use This Folder button is initially disabled");
         await expect(page.locator(CourseModify.SELECTOR_USE_FOLDER)).toHaveAttribute("disabled");
 
-        tester.isGoingTo("click current location Competing ideologies unit");
+        tester.isGoingTo("click Year 9 Humanities");
+        await page.click('[id="217"]');
+
+        tester.isGoingTo("click Competing ideologies unit");
         await page.click('[id="266"]');
 
         tester.isGoingTo("check that Use This Folder button is now enabled");
