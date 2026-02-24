@@ -55,7 +55,34 @@ body.sbx-body {
 /**
 * Text primary
 */
-.sbx-body .subheader {
+.sbx-body .subheader,
+.sbx-body h1,
+.sbx-body h2,
+.sbx-body h3,
+.sbx-body h4,
+.sbx-body h5,
+.sbx-body h6,
+.sbx-body p,
+.sbx-body li,
+.sbx-body small,
+.sbx-body abbr,
+.sbx-body acronym,
+.sbx-body address,
+.sbx-body ins,
+.sbx-body em,
+.sbx-body cite,
+.sbx-body span,
+.sbx-body pre,
+.sbx-body b,
+.sbx-body i,
+.sbx-body strong,
+.sbx-body strike,
+.sbx-body s,
+.sbx-body u,
+.sbx-body th,
+.sbx-body td,
+.sbx-body mark,
+.sbx-body meta.title {
     color: var(--sbx-color-text-primary);
 }
 
@@ -72,6 +99,13 @@ body.sbx-body {
 
 .sbx-body blockquote {
     border-left: 6px solid var(--sbx-color-text-secondary);
+}
+
+/**
+* Accent
+*/
+.sbx-body a {
+    color: var(--sbx-color-accent);
 }
 
 /**
