@@ -12,20 +12,26 @@
 </nav>
 <ul id="resourceManagement-status-{{ event.booking.id }}" class="f-dropdown" aria-hidden="true" data-dropdown-content>
     {% if booking.clash and booking.clash | length == 1 %}
-        <li>
-            <a
-                href="{{ routeLookup('resourceBooking.edit', {id: booking.clash[0].booking.id}) }}?returnUrl={{ returnUrl }}"
-                class="icon-modify"
-            >Modify Approved Booking</a>
-        </li>
+    {% set modifyRoute = routeLookupIfAuthorized('resourceBooking.edit', {id: booking.clash[0].booking.id, item: booking.clash[0].booking}) %}
+        {% if modifyRoute %}
+            <li>
+                <a
+                    href="{{ modifyRoute }}?returnUrl={{ returnUrl }}"
+                    class="icon-modify"
+                >Modify Approved Booking</a>
+            </li>
+        {% endif %}
     {% endif %}
 
-    <li>
-        <a
-            href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}?returnUrl={{ returnUrl }}"
-            class="icon-modify"
-        >Modify{% if booking.clash %} Clash{% endif %} Booking</a>
-    </li>
+    {% set modifyRoute = routeLookupIfAuthorized('resourceBooking.edit', {id: event.booking.id, item: event.booking}) %}
+    {% if modifyRoute %}
+        <li>
+            <a
+                href="{{ modifyRoute }}?returnUrl={{ returnUrl }}"
+                class="icon-modify"
+            >Modify{% if booking.clash %} Clash{% endif %} Booking</a>
+        </li>
+    {% endif %}
 
     {% if booking.clash and booking.clash | length > 1 %}
         <li>
