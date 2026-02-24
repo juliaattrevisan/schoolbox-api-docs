@@ -229,11 +229,6 @@ class Controller extends Base\Base
                         'deleted' => true,
                     ]
                 );
-            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-                /** @var CourseSpecification $deletedCourse */
-                $deletedCourse = $e->getDeletedObject();
-
-                $course = $deletedCourse->setDeletedAt(null);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $course = $this->courseSpecificationMapper->createModel();
                 // give the course the default template of initial `1: Default` or if that doesn't exist, the first non deleted entry...
@@ -245,6 +240,13 @@ class Controller extends Base\Base
                 $course->setTemplate($template);
             }
             $course->setFolder($courseFolder);
+        }
+
+        /* The $course we obtained might have been deleted: [deleted => true] is in the options payload.
+         * If it's soft-deleted, resurrect it
+         */
+        if ($course->isDeleted()) {
+            $this->courseSpecificationMapper->restoreSoftDeleted($course);
         }
 
         /* Unit folder might have been deleted at some point in the past
@@ -272,7 +274,6 @@ class Controller extends Base\Base
         $response = [];
 
         if (!$courseExists) {
-            $this->courseSpecificationMapper->save($course);
             $response['course'] = $course->getId();
         }
 
