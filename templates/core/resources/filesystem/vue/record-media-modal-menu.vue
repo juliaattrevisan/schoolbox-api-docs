@@ -225,7 +225,7 @@ $font-family-icon: "schoolbox";
     width: 100%;
     height: 100%;
     display: flex;
-    background: white;
+    background: var(--sbx-color-foreground-primary, #fff);
     overflow: hidden;
 }
 

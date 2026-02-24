@@ -219,7 +219,7 @@ export default {
     .vjs-volume-level,
     .vjs-slider-horizontal.vjs-play-progress,
     .vjs-slider-bar {
-        background: white;
+        background: var(--sbx-color-foreground-primary, #fff);
     }
     @media screen and (max-width: 640px) {
         //shrink down everything to fit better

@@ -6,8 +6,12 @@ $cdn-prefix: "/static";
 
 .VueTables__search {
     padding: 1rem;
-    background: white;
+    background: var(--sbx-color-foreground-primary, #fff);
     width: 100%;
+}
+
+.VueTables__table th {
+    background: var(--sbx-color-foreground-primary, #fff) !important;
 }
 
 .VueTables table {
@@ -28,7 +32,7 @@ $cdn-prefix: "/static";
 }
 
 .VueTables__wrapper {
-    background: white;
+    background: var(--sbx-color-foreground-primary, #fff);
     overflow-x: auto; //to horizontally scroll when required
     padding: 0rem 1rem;
 }
@@ -94,7 +98,7 @@ $font-family-icon: "schoolbox";
     align-items: center;
     margin-bottom: 2rem;
     padding: 2rem 1rem;
-    background: white;
+    background: var(--sbx-color-foreground-primary, #fff);
 }
 
 .VueTables__limit {

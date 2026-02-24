@@ -311,7 +311,7 @@ window.Vue.onUnmounted(() => {
 }
 
 .unit-planner-sortable-placeholder {
-    background: white;
+    background: var(--sbx-color-foreground-primary, #fff);
     grid-template-columns: 200px repeat(var(--UnitPlannerVisibleColumns), minmax(400px, 1fr));
     position: absolute;
     width: 100%;

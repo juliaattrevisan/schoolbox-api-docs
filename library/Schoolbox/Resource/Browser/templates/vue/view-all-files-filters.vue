@@ -129,7 +129,7 @@ export default {
 
 <style lang="scss" scoped>
 .filters {
-    background: white;
+    background: var(--sbx-color-foreground-primary, #fff);
     display: flex;
     padding: 0 1rem;
 }

@@ -125,12 +125,12 @@ export default {
 
 <style lang="scss">
 .dropped-files-container {
-    background: white;
+    background: var(--sbx-color-foreground-primary, #fff);
     ul li {
         list-style-type: none;
     }
     .card {
-        background: white;
+        background: var(--sbx-color-foreground-primary, #fff);
     }
 }
 

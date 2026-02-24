@@ -576,8 +576,4 @@ export default {
         background: none;
     }
 }
-
-.button-delete:hover {
-    background-color: rgba(240, 65, 36, 0.8) !important;
-}
 </style>

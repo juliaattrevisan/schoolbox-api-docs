@@ -47,7 +47,8 @@ body.sbx-body {
 
 .sbx-body .empty-state,
 .sbx-body .empty-state-flex-centered,
-.sbx-body blockquote {
+.sbx-body blockquote,
+.sbx-body .fc .fc-cell-shaded {
     background: var(--sbx-color-foreground-secondary);
 }
 

@@ -138,7 +138,7 @@ const addButtonText = window.Vue.computed(() => (addMembersStore.isProcessing ? 
 
 <style lang="scss" scoped>
 .filters {
-    background: white;
+    background: var(--sbx-color-foreground-primary, #fff);
     display: flex;
     padding: 0.5rem 0 0 0;
 }

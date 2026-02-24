@@ -127,7 +127,7 @@ export default {
 .search-result {
     display: block;
     padding: 0.75rem;
-    background: white;
+    background: var(--sbx-color-foreground-primary, #fff);
     transition: background 0.2s;
     &:hover,
     &:focus {

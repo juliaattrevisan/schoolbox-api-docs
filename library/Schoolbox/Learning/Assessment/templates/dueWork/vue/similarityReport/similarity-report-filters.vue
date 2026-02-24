@@ -142,7 +142,7 @@ export default {
 @import "./similarity-report";
 
 .filters {
-    background: white;
+    background: var(--sbx-color-foreground-primary, #fff);
     display: flex;
     padding: 1rem 0;
     @media (max-width: $tableToSingleColumn) {
