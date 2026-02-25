@@ -7,8 +7,8 @@
 
 // usually used for when a component has been added to a home page and nothing has been added to it yet
 .empty-state {
-    background-color: $gainsboro;
-    color: $aluminum;
+    background-color: var(--sbx-color-foreground-secondary, $gainsboro);
+    color: var(--sbx-color-text-secondary, $aluminum);
     padding: 1rem;
     font-style: italic;
     text-align: center;
@@ -17,7 +17,7 @@
     [class^="icon-"],
     [class*=" icon-"] {
         @extend .size-48;
-        color: $aluminum;
+        color: var(--sbx-color-text-secondary, $aluminum);
         margin-bottom: 0.5rem;
         display: block;
 
@@ -30,7 +30,7 @@
     }
     h1 {
         // default override
-        color: $aluminum;
+        color: var(--sbx-color-text-secondary, $aluminum);
     }
     p,
     a,
@@ -70,11 +70,11 @@
 // a general error display notifying something couldn't be processed
 .error-state section {
     background-color: transparent;
-    color: $jet;
+    color: var(--sbx-color-text-primary, $jet);
     padding: 2rem;
     h1,
     h2 {
-        color: $jet;
+        color: var(--sbx-color-text-primary, $jet);
     }
     .row {
         display: flex;
@@ -129,7 +129,7 @@
         }
 
         .meta {
-            color: $aluminum;
+            color: var(--sbx-color-text-secondary, $aluminum);
         }
     }
 }
@@ -273,7 +273,7 @@ $container-bg: white;
 
 // For individual student learning plan notes
 .individualisation {
-    background-color: #9a9a9a;
+    background-color: var(--sbx-color-foreground-secondary, #9a9a9a);
     display: inline-block;
     width: rem-calc($base-font-size - 2);
     height: rem-calc($base-font-size - 2);
@@ -307,7 +307,7 @@ $container-bg: white;
 // Tooltips that reveal further information on selection
 // Typically they sit next to a label
 .hint {
-    color: $content-ui-foreground;
+    color: var(--sbx-color-text-primary, $content-ui-foreground);
     top: -1px;
     margin-left: 4px;
     width: 1rem;
@@ -320,10 +320,10 @@ $container-bg: white;
     position: relative;
     margin-bottom: auto;
     font-size: $small-font-size;
-    background-color: $content-ui-background;
+    background-color: var(--sbx-color-foreground-primary, $content-ui-background);
     border-radius: 0.5rem;
     &.icon-help:before {
-        color: $monsoon;
+        color: var(--sbx-color-text-primary, $monsoon);
     }
     &.has-tip:hover {
         border-bottom: none;

@@ -28,7 +28,7 @@
         width: 100%;
 
         &-item {
-            color: var(--body-foreground);
+            color: var(--sbx-color-text-secondary, var(--body-foreground));
 
             &:last-child {
                 margin-left: auto;
@@ -59,7 +59,7 @@
             }
 
             &:before {
-                background-color: var(--body-foreground);
+                background-color: var(--sbx-color-text-secondary, var(--body-foreground));
                 border-radius: 1rem;
                 content: "";
                 display: inline-block;

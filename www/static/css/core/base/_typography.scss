@@ -177,11 +177,11 @@ small {
 }
 
 code {
-    background-color: $accent-background;
-    border-color: $accent-foreground;
+    background-color: var(--sbx-color-foreground-secondary, $accent-background);
+    border-color: var(--sbx-color-text-secondary, $accent-foreground);
     border-style: solid;
     border-width: 1px;
-    color: $accent-foreground;
+    color: var(--sbx-color-text-secondary, $accent-foreground);
     font-family: $font-family-monospace;
     font-weight: $font-weight-normal;
     padding: rem-calc(2) rem-calc(5) rem-calc(1);

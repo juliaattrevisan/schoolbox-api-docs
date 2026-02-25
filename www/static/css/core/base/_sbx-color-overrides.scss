@@ -7,37 +7,6 @@ body.sbx-body:not(.login) {
     /**
      * Foreground primary
      */
-    // .island section,
-    // table,
-    // table thead,
-    // .side-nav,
-    // .dzone,
-    // [data-component-palette],
-    // .c-island,
-    // .c-card,
-    // .clr-picker,
-    // textarea,
-    // .ck.ck-editor__main > .ck-editor__editable,
-    // .ck.ck-toolbar,
-    // .VueTables__search,
-    // .VueTables__wrapper,
-    // .VueTables__table-footer,
-    // .highcharts-background,
-    // .timetable th,
-    // .reveal-modal,
-    // .diagonal-headings-table thead tr.rotate-headers th > div:not(:empty),
-    // .accordion .accordion-navigation > .content.active,
-    // table tfoot,
-    // .toast,
-    // span.tooltip {
-    //     background: var(--sbx-color-foreground-primary);
-    // }
-
-    // separate to remind to address this colour classes
-    // .white {
-    //     background: var(--sbx-color-foreground-primary);
-    // }
-
     .highcharts-background {
         fill: var(--sbx-color-foreground-primary);
     }
@@ -45,15 +14,6 @@ body.sbx-body:not(.login) {
     /**
      * Foreground secondary
      */
-    // .empty-state,
-    // .empty-state-flex-centered,
-    // blockquote,
-    // .fc .fc-cell-shaded,
-    // .side-nav li ul.flyout,
-    // code,
-    // .rounded-progress-bar .bar {
-    //     background: var(--sbx-color-foreground-secondary);
-    // }
 
     /**
      * Text primary

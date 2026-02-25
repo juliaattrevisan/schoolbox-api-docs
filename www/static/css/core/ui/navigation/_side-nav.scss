@@ -137,7 +137,7 @@ $border-bottom-width: 2px;
             @media #{$medium-up} {
                 //ensure isn't applied on desktop
                 &:hover {
-                    border-left: $border-bottom-width solid $content-ui-hover;
+                    border-left: $border-bottom-width solid var(--sbx-color-accent, $content-ui-hover);
                     color: $side-nav-link-color-hover;
                 }
             }
@@ -163,7 +163,7 @@ $border-bottom-width: 2px;
             }
             &.flyout {
                 display: none;
-                background-color: $side-nav-link-bg-hover;
+                background-color: var(--sbx-color-foreground-secondary, $side-nav-link-bg-hover);
                 width: 100%;
                 z-index: var(--sbx-depth-pop-over);
 

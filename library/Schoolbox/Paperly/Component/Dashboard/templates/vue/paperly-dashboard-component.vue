@@ -83,7 +83,7 @@ const upcoming = window.Vue.computed<UpcomingItem[]>(() => {
         <data-load-error data-title="Paperly" />
     </section>
     <template v-else>
-        <ul class="flex-list flex-wrap buttons">
+        <ul class="flex-list flex-wrap buttons l-pad-s">
             <li v-for="feature in paperlyPayload.features" :key="feature.url">
                 <a
                     :class="feature.icon ?? ''"
@@ -118,9 +118,4 @@ const upcoming = window.Vue.computed<UpcomingItem[]>(() => {
     </template>
 </template>
 
-<style scoped>
-h3 {
-    background-color: #f5f5f5; /* to help distinguish the title */
-    border-bottom: 1px solid #efefef;
-}
-</style>
+<style scoped></style>
