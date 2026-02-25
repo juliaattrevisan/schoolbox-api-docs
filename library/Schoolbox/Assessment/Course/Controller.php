@@ -221,6 +221,7 @@ class Controller extends Base\Base
              * See if there's a deleted row we can recycle since foreign keys
              * will stop us from inserting a tuple that already exists
              */
+            $createCourse = false;
             try {
                 $course = $this->courseSpecificationMapper->findOneByColumn(
                     'folder_id',
@@ -230,7 +231,8 @@ class Controller extends Base\Base
                     ]
                 );
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $course = $this->courseSpecificationMapper->createModel();
+                $createCourse = true;
+                $course       = $this->courseSpecificationMapper->createModel();
                 // give the course the default template of initial `1: Default` or if that doesn't exist, the first non deleted entry...
                 try {
                     $template = $this->courseTemplateMapper->findById(CourseTemplateMapper::INITIAL_DEFAULT);
@@ -240,6 +242,9 @@ class Controller extends Base\Base
                 $course->setTemplate($template);
             }
             $course->setFolder($courseFolder);
+            if ($createCourse) {
+                $this->courseSpecificationMapper->save($course);
+            }
         }
 
         /* The $course we obtained might have been deleted: [deleted => true] is in the options payload.
@@ -274,7 +279,6 @@ class Controller extends Base\Base
         $response = [];
 
         if (!$courseExists) {
-            $this->courseSpecificationMapper->save($course);
             $response['course'] = $course->getId();
         }
 
