@@ -141,8 +141,8 @@ class Markbook
      * affecting anything else that might want to operate on the full set of $assessments.
      *
      * @param GenericCollection<IAssessable> $assessments The assessments that are a part of this markbook.
-     * @param IMarkScheme              $defaultMarkScheme The mark scheme to use when summarising a student's overall grade for these assessments.
-     * @param User                     $viewingUser The user viewing the markbook, usually whoever is logged in
+     * @param IMarkScheme $defaultMarkScheme The mark scheme to use when summarising a student's overall grade for these assessments.
+     * @param User $viewingUser The user viewing the markbook, usually whoever is logged in
      * @param array|null $studentIds A reductive filter that operates on $assessments: a set of user ids
      * @param array|null $curriculumCodes A reductive filter that operates on $assessments: a set of curriculum codes
      * @param array|null $folderIds A reductive filter that operates on $assessments: a set of folder ids
