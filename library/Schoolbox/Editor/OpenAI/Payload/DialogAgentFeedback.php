@@ -171,7 +171,7 @@ class DialogAgentFeedback
             'content' => $this->generateUserFeedPrompt($assessment, $response),
         ];
 
-        return $payload;
+        return new ModelParser()->filterPayload($payload, $this->openAiModel);
     }
 
 
