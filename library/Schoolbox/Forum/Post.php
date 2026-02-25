@@ -37,12 +37,6 @@ class Post implements ISoftDeletable
     /** @var string */
     protected $body;
 
-    /**
-     * @var string
-     * @deprecated use `$deletedAt`
-     */
-    protected $deleted = 'false';
-
     /** @var Alaress_Date_Format */
     protected $modified;
 
@@ -189,30 +183,6 @@ class Post implements ISoftDeletable
         }
 
         return $this->body;
-    }
-
-
-    /**
-     * @deprecated use `setDeletedAt`
-     *
-     * @param string $deleted
-     * @return self
-     */
-    public function setDeleted($deleted)
-    {
-        $this->deleted = $deleted;
-        return $this;
-    }
-
-
-    /**
-     * @deprecated use `getDeletedAt`
-     *
-     * @return string
-     */
-    public function getDeleted()
-    {
-        return $this->deleted;
     }
 
 

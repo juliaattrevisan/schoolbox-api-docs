@@ -56,7 +56,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             FROM " . $this->_revisionTable . " r
             LEFT JOIN " . $this->_table . " w ON w.wikiID = r.wikiID
             LEFT JOIN user u ON u.id = r.userID
-            WHERE w.deleted = 'false' AND r.wikiID = ?
+            WHERE w.deleted_at IS NULL AND r.wikiID = ?
         ";
         $params = [$wikiID];
 
@@ -116,7 +116,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
                   FROM wiki w
                   LEFT JOIN " . $this->_revisionTable . " r ON r.revisionID = (SELECT r.revisionID FROM " . $this->_revisionTable . " r WHERE r.wikiID = w.wikiID ORDER BY r.created DESC LIMIT 1)
                   LEFT JOIN user u ON u.id = r.userID
-                  WHERE w.deleted = 'false' AND categoryID = ?
+                  WHERE w.deleted_at IS NULL AND categoryID = ?
                   {$orderBySQL} {$sortDir}";
 
         if (is_numeric($limit) && ($limit > 0)) {
@@ -132,8 +132,8 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      */
     public function homepageClean($cid)
     {
-        $query = "UPDATE wiki SET deleted = true WHERE categoryID=?";
-        $this->db->query($query, [$cid]);
+        $query = "UPDATE wiki SET deleted_AT = ? WHERE categoryID=?";
+        $this->db->query($query, [Alaress_Date_Format::now()->getDatabase(), $cid]);
     }
 
 
@@ -220,7 +220,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     public function delete($wikiID)
     {
         $data = array('wikiID' => $wikiID,
-                      'deleted' => 'true');
+                      'deleted_at' => Alaress_Date_Format::now()->getDatabase());
         return parent::update($data);
     }
 
@@ -275,7 +275,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
                   FROM {$this->_revisionTable} r
                   LEFT JOIN {$this->_table} w ON w.wikiID = r.wikiID
                   LEFT JOIN user u ON u.id = r.userID
-                  WHERE w.deleted = 'false'
+                  WHERE w.deleted_at IS NULL
                   AND w.categoryID = ?
                   AND w.slug = ?";
         $params = [$categoryID, $slug];

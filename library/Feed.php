@@ -464,7 +464,7 @@ class Feed
             JOIN wiki w ON w.wikiID = r.wikiID
             JOIN user u ON u.id = r.userID
             LEFT JOIN folder c ON c.id = w.categoryID
-            WHERE w.deleted = 'false' AND w.categoryID IN {$where}
+            WHERE w.deleted_at IS NULL AND w.categoryID IN {$where}
             ORDER BY r.created DESC LIMIT 0, :limit
         ");
 

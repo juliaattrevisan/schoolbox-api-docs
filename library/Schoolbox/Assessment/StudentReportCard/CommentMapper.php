@@ -26,7 +26,7 @@ class CommentMapper extends Mapper
         $this->uses('parent_visibility', self::TYPE_BOOLEAN);
         $this->uses('created', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
         $this->uses('modified', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP, 'updatedAt');
-        $this->uses('deleted', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
 
         $this->joins('category_id', \Schoolbox\Resource\Folder\Mapper::class, 'id', null, null, 'category', 'category');
@@ -82,7 +82,7 @@ class CommentMapper extends Mapper
         ";
 
         if (!$includeDeletions) {
-            $query .= 'AND com.deleted IS NULL';
+            $query .= 'AND com.deleted_at IS NULL';
         }
 
         $query .= ' ORDER BY created DESC';

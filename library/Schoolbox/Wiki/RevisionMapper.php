@@ -15,6 +15,7 @@ use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 /**
  * Class RevisionMapper
@@ -33,67 +34,12 @@ class RevisionMapper extends Mapper implements FeedableMapperInterface
     {
         $this->hasTable('wikiRevision');
         $this->hasModel(Revision::class);
-        $this->hasMap(
-            array(
-                'column'     => 'revisionID',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'wikiID',
-                'property' => 'wiki',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'wiki'
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'heading',
-                'property' => 'heading',
-                'type'     => self::TYPE_STRING
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'body',
-                'property' => 'body',
-                'type'     => self::TYPE_STRING
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'userID',
-                'property' => 'user',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'user'
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'created',
-                'property' => 'created',
-                'type'     => self::TYPE_DATETIME
-            )
-        );
-        $this->hasJoin(
-            'user',
-            array(
-                'mapper'    => '\\Schoolbox\\UserMapper',
-                'this_key'  => 'userID',
-                'other_key' => 'id'
-            )
-        );
-        $this->hasJoin(
-            'wiki',
-            array(
-                'mapper'    => '\\Schoolbox\\Wiki\\WikiMapper',
-                'this_key'  => 'wikiID',
-                'other_key' => 'wikiID'
-            )
-        );
+        $this->uses('revisionID', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->joins('wikiID', WikiMapper::class, 'wikiID', null, null, 'wiki', 'wiki');
+        $this->uses('heading', self::TYPE_STRING);
+        $this->uses('body', self::TYPE_STRING);
+        $this->joins('userID', UserMapper::class, 'id', null, null, 'user', 'user');
+        $this->uses('created', self::TYPE_DATETIME);
     }
 
     /**

@@ -36,12 +36,6 @@ class Thread implements ISoftDeletable
     /** @var Alaress_Date_Format */
     protected $date;
 
-    /**
-     * @deprecated use `$deletedAt`
-     * @var string
-     */
-    protected $deleted = 'false';
-
     /** @var bool */
     protected $locked = false;
 
@@ -161,30 +155,6 @@ class Thread implements ISoftDeletable
     public function getDate()
     {
         return $this->date;
-    }
-
-
-    /**
-     * @deprecated use `setDeletedAt`
-     *
-     * @param string $deleted
-     * @return self
-     */
-    public function setDeleted($deleted)
-    {
-        $this->deleted = $deleted;
-        return $this;
-    }
-
-
-    /**
-     * @deprecated use `getDeletedAt`
-     *
-     * @return string
-     */
-    public function getDeleted()
-    {
-        return $this->deleted;
     }
 
 

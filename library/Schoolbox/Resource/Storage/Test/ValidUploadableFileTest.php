@@ -51,7 +51,7 @@ class ValidUploadableFileTest extends TestCase
             ->setMime('text/plain')
             ->setMaxFileSize(1_000_000)
             ->setEnable(true)
-            ->setDeleted(false);
+            ->setDeletedAt(null);
         $standardFile = (new Model())
             ->setExpiryAt(null)
             ->setMimetype($standardMimetype)
@@ -103,7 +103,7 @@ class ValidUploadableFileTest extends TestCase
             ->setMime('text/plain')
             ->setMaxFileSize(1_000_000)
             ->setEnable(true)
-            ->setDeleted(false);
+            ->setDeletedAt(null);
         $standardFile = (new Model())
             ->setExpiryAt(null)
             ->setSize(1_000);
@@ -119,7 +119,7 @@ class ValidUploadableFileTest extends TestCase
         ];
         yield 'file mimetype is deleted' => [
             (clone $standardFile)
-                ->setMimetype((clone $standardMimetype)->setDeleted(true)),
+                ->setMimetype((clone $standardMimetype)->setDeletedAt(Alaress_Date_Format::now())),
             '/^this file is not a permitted file type/i',
         ];
         yield 'file over size limit, no expiry' => [

@@ -50,7 +50,7 @@ class MyFile extends DeprecatedModel
             LEFT JOIN storage s ON f.hash = s.hash
             LEFT JOIN allowedFileExtension afe ON s.ext = afe.extension
             LEFT JOIN allowedFileTypes af ON afe.FileTypeID = af.FileTypeID
-            WHERE owner = " . $this->owner . " AND parent = " . (int)$folderID . " AND deleted = 0";
+            WHERE owner = " . $this->owner . " AND parent = " . (int)$folderID . " AND deleted_at IS NULL";
 
         if ($config['published'] == true) {
             $query .= " AND published IS NOT NULL";

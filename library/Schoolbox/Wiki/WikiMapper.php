@@ -13,6 +13,7 @@ use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
  * Class WikiMapper
@@ -29,60 +30,13 @@ class WikiMapper extends Mapper implements FeedableMapperInterface
     {
         $this->hasTable('wiki');
         $this->hasModel(Wiki::class);
-
-        $this->hasMap(array(
-            'column'     => 'wikiID',
-            'property'   => 'id',
-            'type'       => self::TYPE_INTEGER,
-            'identifier' => true
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'categoryID',
-            'property'   => 'category',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'category'
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'latestRevision',
-            'property'   => 'latestRevision',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'revision'
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'slug',
-            'property'   => 'slug',
-            'type'       => self::TYPE_STRING
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'created',
-            'property'   => 'created',
-            'type'       => self::TYPE_DATETIME
-        ));
-
-        $this->uses('deleted', self::TYPE_BOOL_ENUM);
-        $this->hasSoftDeleteField('deleted', 'true', 'false');
-
-        $this->hasMap(array(
-            'column'     => 'locked',
-            'property'   => 'locked',
-            'type'       => self::TYPE_BOOL_ENUM
-        ));
-
-        $this->hasJoin('category', array(
-            'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
-            'this_key'  => 'categoryID',
-            'other_key' => 'id'
-        ));
-
-        $this->hasJoin('revision', array(
-            'mapper'    => '\\Schoolbox\\Wiki\\RevisionMapper',
-            'this_key'  => 'latestRevision',
-            'other_key' => 'revisionID'
-        ));
+        $this->uses('wikiID', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->joins('categoryID', FolderMapper::class, 'id', null, null, 'category', 'category');
+        $this->joins('latestRevision', RevisionMapper::class, 'revisionID', null, null, 'latestRevision', 'revision');
+        $this->uses('slug', self::TYPE_STRING);
+        $this->uses('created', self::TYPE_DATETIME);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+        $this->uses('locked', self::TYPE_BOOL_ENUM);
     }
 
 
@@ -100,23 +54,23 @@ class WikiMapper extends Mapper implements FeedableMapperInterface
         $offset = (int)$offset;
 
         $stmt = $this->database->prepare("
-			SELECT
-				{$this->getColumnString('w')},
-				{$this->getJoinColumnString('category', 'c')},
-				{$this->getJoinColumnString('revision', 'r')},
-				{$this->getJoinMapper('revision')->getJoinColumnString('user', 'u')}
-			FROM
-				`{$this->getTable()}` `w`
-				LEFT JOIN {$this->getJoinSql('category', 'w', 'c')}
-				LEFT JOIN {$this->getJoinSql('revision', 'w', 'r', true)}
-				LEFT JOIN {$this->getJoinMapper('revision')->getJoinSql('user', 'r', 'u', true)}
-			WHERE
-				`c`.`id` = :cat_id
-				AND `w`.`created` < :time
-				AND `w`.`deleted` = 'false'
-			ORDER BY `w`.`created` DESC
-			LIMIT $offset, $limit
-		");
+            SELECT
+                {$this->getColumnString('w')},
+                {$this->getJoinColumnString('category', 'c')},
+                {$this->getJoinColumnString('revision', 'r')},
+                {$this->getJoinMapper('revision')->getJoinColumnString('user', 'u')}
+            FROM
+                `{$this->getTable()}` `w`
+                LEFT JOIN {$this->getJoinSql('category', 'w', 'c')}
+                LEFT JOIN {$this->getJoinSql('revision', 'w', 'r', true)}
+                LEFT JOIN {$this->getJoinMapper('revision')->getJoinSql('user', 'r', 'u', true)}
+            WHERE
+                `c`.`id` = :cat_id
+                AND `w`.`created` < :time
+                AND `w`.`deleted_at` IS NULL
+            ORDER BY `w`.`created` DESC
+            LIMIT $offset, $limit
+        ");
 
         $stmt->execute(array(
             'cat_id' => $categoryId,

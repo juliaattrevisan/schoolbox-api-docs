@@ -34,7 +34,6 @@ if (is_ascii($heading)) {
 $pb = $wikiMapper->getPredicateBuilder();
 $pb->equals('categoryID', (int)($_POST['categoryID'] ?? 0))
     ->notEquals('wikiID', (int)($_POST['wikiID'] ?? 0))
-    ->equals('deleted', 'false')
     ->equals('slug', $potentialSlug);
 $count = $wikiMapper->countByPredicates($pb);
 
@@ -93,7 +92,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
             ->setLatestRevision(null)
             ->setCreated($now)
             ->setLocked(false)
-            ->setDeleted(false);
+            ->setDeletedAt(null);
 
         /* If the heading contains unicode it can't be used as a slug, so we
         use the wiki ID instead */
