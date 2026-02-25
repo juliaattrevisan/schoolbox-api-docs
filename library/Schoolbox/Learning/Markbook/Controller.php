@@ -708,11 +708,6 @@ class Controller extends Base
                 null,
                 ['ids' => $assessmentIds]
             );
-
-            // Add 9SPANISHA here
-            $assessments = $assessments->merge($this->assessmentMapperProxy->findAllByFolderIdForReview(
-                78,
-            ));
         }
 
         // Build a markbook
@@ -725,7 +720,7 @@ class Controller extends Base
             viewingUser: $this->getUser(),
             studentIds: null,
             curriculumCodes: null,
-            folderIds: [78]
+            folderIds: null,
         );
 
         $markbook->sortAssessables();
