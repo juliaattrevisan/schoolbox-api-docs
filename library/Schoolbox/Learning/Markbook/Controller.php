@@ -713,6 +713,7 @@ class Controller extends Base
                     189, // 9MATA
                     85, // 9PDHC
                     190, // 9MYPA
+                    97, // 3TR
                 ],
                 null,
                 //['ids' => $assessmentIds]
@@ -723,8 +724,8 @@ class Controller extends Base
                  * date range filters, term-based filters, etc. deep in the swamp where you'd never look.
                  */
                 [
-//                    'ids' => $assessmentIds,
                     'due_after' => new \Alaress_Date_Format('2025-01-01 00:00:00', 'Y-m-d H:i:s'),
+                    'due_before' => new \Alaress_Date_Format('2026-03-01 00:00:00', 'Y-m-d H:i:s'),
                     'type' => [
                         AssessmentType::TYPE_DUE_WORK,
                         AssessmentType::TYPE_QUIZ
@@ -745,7 +746,7 @@ class Controller extends Base
             assessments: $assessments,
             defaultMarkScheme: $overallMarkScheme,
             viewingUser: $this->getUser(),
-            studentIds: [13,20],
+            studentIds: null,
             curriculumCodes: null,
             folderIds: null,
         );
