@@ -62,6 +62,45 @@ class Config
         'auto',
     ];
 
+    public const REASONING_EFFORT_MODEL_DEFAULTS = [
+        "gpt-4o"       => 'none',
+        "gpt-4o-mini"  => 'none',
+        "gpt-4.1"      => 'none',
+        "gpt-4.1-mini" => 'none',
+        "gpt-5"        => 'minimal',
+        "gpt-5-mini"   => 'minimal',
+        "gpt-5-nano"   => 'minimal',
+        "gpt-5.1"      => 'none',
+        "gpt-5.2"      => 'none',
+        "gpt-5.2-pro"  => 'high',
+    ];
+    public const array REASONING_EFFORT_MODEL_OPTIONS = [
+        "gpt-4o"       => ['none'],
+        "gpt-4o-mini"  => ['none'],
+        "gpt-4.1"      => ['none'],
+        "gpt-4.1-mini" => ['none'],
+        "gpt-5"        => ['minimal', 'low', 'medium', 'high'],
+        "gpt-5-mini"   => ['minimal', 'low', 'medium', 'high'],
+        "gpt-5-nano"   => ['minimal', 'low', 'medium', 'high'],
+        "gpt-5.1"      => ['none', 'low', 'medium', 'high'],
+        "gpt-5.2"      => ['none', 'low', 'medium', 'high'],
+        "gpt-5.2-pro"  => ['high'],
+    ];
+    public const array REASONING_EFFORT_OPTIONS = [
+        'none',
+        'minimal',
+        'low',
+        'medium',
+        'high',
+    ];
+
+    public const string TEXT_VERBOSITY_DEFAULT = 'low';
+    public const array TEXT_VERBOSITY_OPTIONS = [
+        'low',
+        'medium',
+        'high',
+    ];
+
     // field keys
     public const string FIELD_PROVIDER = 'provider';
     public const string FIELD_AIKEY = 'ai_key';
