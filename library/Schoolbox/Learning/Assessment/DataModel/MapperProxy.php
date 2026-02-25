@@ -1981,10 +1981,11 @@ class MapperProxy
             $placeholders = Builder::getArrayPlaceholders($curriculumnNodeIds, 'cnodeIds');
             $params = Builder::getArrayParameters($curriculumnNodeIds, 'cnodeIds');
 
+            /* There isn't a mapper for this join table. We have to reference it directly
+             */
             $statement = $this->baseMapper->getDatabase()->prepare("
                 SELECT assessment_id
-                FROM {$aTable} a
-                INNER JOIN curriculum_node_for_assessment cnfa ON a.id = cnfa.assessment_id 
+                FROM curriculum_node_for_assessment cnfa 
                 WHERE cnfa.curriculum_node_id IN {$placeholders}
             ");
 
@@ -1992,10 +1993,21 @@ class MapperProxy
 
             /* We tried to filter this (even if it results in an empty set)
              */
-            $assessmentIds = [];
+            $curriculumAssessmentIds = [];
 
             while ($row = $statement->fetch()) {
-                $assessmentIds[] = $row['assessment_id'];
+                $curriculumAssessmentIds[] = $row['assessment_id'];
+            }
+
+            /* If we never tried to set this before, pretend we did by using the curriculum assessment ids
+             *
+             * Otherwise, find the intersection between the concepts (ie. out of a set of assessment ids, find the ones
+             * that are using a particular set of curriculum nodes)
+             */
+            if (null === $assessmentIds) {
+                $assessmentIds = $curriculumAssessmentIds;
+            } else {
+                $assessmentIds = array_intersect($assessmentIds, $curriculumAssessmentIds);
             }
         }
 

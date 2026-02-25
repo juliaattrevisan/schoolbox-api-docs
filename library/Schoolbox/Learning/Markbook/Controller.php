@@ -742,6 +742,9 @@ class Controller extends Base
                         7, // Reporting
                         3, // Learning Activity
                     ],
+                    /* Assessment ids and curriculum nodes execute an intersect, so they work together (if provided)
+                     */
+                    'ids' => [391],
                     'curriculum_codes' => [
                         'AC9SAS09'
                     ]
@@ -770,6 +773,9 @@ class Controller extends Base
          *
          * When filtered to use due dates, types and work types, the markbook takes:
          * float(0.5908069610595703) to build (4 times faster?)
+         *
+         * When filtered to also use a curric code, the markbook takes:
+         * float(0.085470199584961) to build
          */
         $_SESSION['mbdur'] =  $end - $start;
 
