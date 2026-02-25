@@ -109,7 +109,12 @@ class ModelParser
         // GPT 5.1 and 5.2 default to `none` for reasoning effort
         if (in_array($version, ['5.1', '5.2'])) {
             $reasoningEffort = $payload['reasoning']['effort'] ?? 'none';
+            // Also don't support `minimal` reasoning
+            if ($reasoningEffort === 'minimal') {
+                $reasoningEffort = 'low';
+            }
         }
+
 
         // Set reasoning effort, and clear temperature and top_p if any effort
         // other than null was set
