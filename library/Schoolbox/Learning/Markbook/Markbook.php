@@ -162,6 +162,13 @@ class Markbook
             return $this->isFilteredCurriculumCode($assessment->getCurriculumNodes()->getPropertyValues('code'));
         });
 
+        /* Check if we had a specific set of $folderIds to care about:
+         * if we did, and this activity isn't in one of them, skip it
+         */
+        $this->assessments = $assessments->filter(function (IAssessable $assessment) {
+            return $this->isFilteredFolder($assessment->getBaseContext()->getFolder()->getId());
+        });
+
         /* Find all the Project instances within the set of $assessments that we might already have filtered out
          */
         $this->topLevelAssessments = $this->assessments->filter(function (IAssessable $assessment) {
@@ -218,6 +225,33 @@ class Markbook
          * check for overlaps. If at least one activity curric code matches our curric code filter, we're in
          */
         if (count(array_intersect($curriculumCodes, $this->curriculumCodes))) {
+            return true;
+        }
+
+        /* This activity should be skipped
+         */
+        return false;
+    }
+
+
+    /**
+     * Check if we had a specific set of $folderIds to care about: if we did, and this activity isn't in one of them,
+     * skip this activity
+     *
+     * @param int $folderId
+     * @return bool
+     */
+    private function isFilteredFolder(int $folderId): bool
+    {
+        /* No specific folder ids to care about? Everything's included
+         */
+        if (null === $this->folderIds || !count($this->folderIds)) {
+            return true;
+        }
+
+        /* We only care about specific activities that are in the folders we're interested in
+         */
+        if (\in_array($folderId, $this->folderIds)) {
             return true;
         }
 
