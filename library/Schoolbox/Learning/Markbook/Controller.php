@@ -721,7 +721,7 @@ class Controller extends Base
                     96, // 3IBVA
                     250, // ELCB
                 ],
-                \Schoolbox\UserMapper::getInstance()->findById(13),
+                null, // \Schoolbox\UserMapper::getInstance()->findById(13),
                 //['ids' => $assessmentIds]
 
                 /* There's this somewhat obscure "options to pass to findByColumList" but there's actually a few
@@ -744,10 +744,10 @@ class Controller extends Base
                     ],
                     /* Assessment ids and curriculum nodes execute an intersect, so they work together (if provided)
                      */
-                    'ids' => [391],
-                    'curriculum_codes' => [
-                        'AC9SAS09'
-                    ]
+//                    'ids' => [391],
+//                    'curriculum_codes' => [
+//                        'AC9SAS09'
+//                    ]
                 ]
             );
         }
@@ -766,7 +766,7 @@ class Controller extends Base
              * Plus, this isn't the usual use case afaik: you're operating on your entire class of students at a time,
              * mostly: not an individual. Nevertheless, you can operate on a reduced set by using this reductive.
              */
-            studentIds: [13],
+            studentIds: null,
             curriculumCodes: null,
             folderIds: null,
         );
