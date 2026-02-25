@@ -10,6 +10,7 @@
 
     // Foreground
     --sbx-color-foreground-primary: #fff;
+    // --sbx-color-foreground-primary: red;
     --sbx-color-foreground-secondary: #f4f2f2;
 
     // Text
@@ -23,8 +24,8 @@
     --sbx-color-highlight: #ffd100;
 
     // Accent
-    // --sbx-color-accent: var(--form-border-color); // Skin Config > Form Input Border Colour
-    --sbx-color-accent: green; // Skin Config > Form Input Border Colour
+    --sbx-color-accent: var(--form-border-color); // Skin Config > Form Input Border Colour
+    // --sbx-color-accent: green; // Skin Config > Form Input Border Colour
     --sbx-color-accent-text: var(--content-ui-submit-foreground); // Skin Config > Form Submit Button Text Colour
 
     // Active

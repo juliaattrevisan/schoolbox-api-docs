@@ -170,7 +170,7 @@ $icon-color-basic-list: $icon-color-clickView;
 $icon-color-my-files: $icon-color-files;
 
 .white {
-    background-color: $white;
+    background-color: var(--sbx-color-foreground-primary, $white);
 }
 .ghost {
     background-color: $ghost;

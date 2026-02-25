@@ -233,7 +233,7 @@
 }
 
 [data-component-palette] {
-    background-color: $white;
+    background-color: var(--sbx-color-foreground-primary, $white);
     position: relative;
     overflow: hidden;
     &:hover {

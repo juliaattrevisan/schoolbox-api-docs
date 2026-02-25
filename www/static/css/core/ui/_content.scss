@@ -136,7 +136,7 @@
 
 $container-bg: white;
 %container {
-    background-color: $container-bg;
+    background-color: var(--sbx-color-foreground-primary, $container-bg);
     margin-bottom: $base-font-size;
 }
 

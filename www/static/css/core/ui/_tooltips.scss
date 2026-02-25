@@ -51,8 +51,9 @@ $tooltip-max-width: 300px !default;
         }
 
         span.tooltip {
-            background: $tooltip-bg;
-            color: $tooltip-font-color;
+            background: var(--sbx-color-foreground-primary, $tooltip-bg);
+            box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
+            color: var(--sbx-color-text-primary, $tooltip-font-color);
             display: none;
             font-size: $tooltip-font-size;
             font-weight: $tooltip-font-weight;
@@ -66,7 +67,7 @@ $tooltip-max-width: 300px !default;
 
             > .nub {
                 border: solid $tooltip-pip-size;
-                border-color: transparent transparent $tooltip-bg transparent;
+                border-color: transparent transparent var(--sbx-color-foreground-primary, $tooltip-bg) transparent;
                 display: block;
                 height: 0;
                 pointer-events: none;

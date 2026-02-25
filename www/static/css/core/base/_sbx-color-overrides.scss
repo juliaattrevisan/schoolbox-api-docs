@@ -4,41 +4,39 @@
  */
 
 body.sbx-body:not(.login) {
-    background: var(--sbx-color-body-background);
-
     /**
      * Foreground primary
      */
-    .island section,
-    table,
-    table thead,
-    .side-nav,
-    .dzone,
-    [data-component-palette],
-    .c-island,
-    .c-card,
-    .clr-picker,
-    textarea,
-    .ck.ck-editor__main > .ck-editor__editable,
-    .ck.ck-toolbar,
-    .VueTables__search,
-    .VueTables__wrapper,
-    .VueTables__table-footer,
-    .highcharts-background,
-    .timetable th,
-    .reveal-modal,
-    .diagonal-headings-table thead tr.rotate-headers th > div:not(:empty),
-    .accordion .accordion-navigation > .content.active,
-    table tfoot,
-    .toast,
-    span.tooltip {
-        background: var(--sbx-color-foreground-primary);
-    }
+    // .island section,
+    // table,
+    // table thead,
+    // .side-nav,
+    // .dzone,
+    // [data-component-palette],
+    // .c-island,
+    // .c-card,
+    // .clr-picker,
+    // textarea,
+    // .ck.ck-editor__main > .ck-editor__editable,
+    // .ck.ck-toolbar,
+    // .VueTables__search,
+    // .VueTables__wrapper,
+    // .VueTables__table-footer,
+    // .highcharts-background,
+    // .timetable th,
+    // .reveal-modal,
+    // .diagonal-headings-table thead tr.rotate-headers th > div:not(:empty),
+    // .accordion .accordion-navigation > .content.active,
+    // table tfoot,
+    // .toast,
+    // span.tooltip {
+    //     background: var(--sbx-color-foreground-primary);
+    // }
 
     // separate to remind to address this colour classes
-    .white {
-        background: var(--sbx-color-foreground-primary);
-    }
+    // .white {
+    //     background: var(--sbx-color-foreground-primary);
+    // }
 
     .highcharts-background {
         fill: var(--sbx-color-foreground-primary);
@@ -47,134 +45,134 @@ body.sbx-body:not(.login) {
     /**
      * Foreground secondary
      */
-    .empty-state,
-    .empty-state-flex-centered,
-    blockquote,
-    .fc .fc-cell-shaded,
-    .side-nav li ul.flyout,
-    code,
-    .rounded-progress-bar .bar {
-        background: var(--sbx-color-foreground-secondary);
-    }
+    // .empty-state,
+    // .empty-state-flex-centered,
+    // blockquote,
+    // .fc .fc-cell-shaded,
+    // .side-nav li ul.flyout,
+    // code,
+    // .rounded-progress-bar .bar {
+    //     background: var(--sbx-color-foreground-secondary);
+    // }
 
     /**
      * Text primary
      */
-    .subheader,
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    p,
-    li,
-    small,
-    abbr,
-    acronym,
-    address,
-    ins,
-    em,
-    cite,
-    pre,
-    b,
-    i,
-    strong,
-    strike,
-    s,
-    u,
-    th,
-    td,
-    mark,
-    div,
-    label,
-    legend,
-    p.meta.title,
-    .toast,
-    .toast.success,
-    .toast.fail,
-    .breadcrumb li.active span:not([href]) {
-        color: var(--sbx-color-text-primary);
-    }
+    // .subheader,
+    // h1,
+    // h2,
+    // h3,
+    // h4,
+    // h5,
+    // h6,
+    // p,
+    // li,
+    // small,
+    // abbr,
+    // acronym,
+    // address,
+    // ins,
+    // em,
+    // cite,
+    // pre,
+    // b,
+    // i,
+    // strong,
+    // strike,
+    // s,
+    // u,
+    // th,
+    // td,
+    // mark,
+    // div,
+    // label,
+    // legend,
+    // p.meta.title,
+    // .toast,
+    // .toast.success,
+    // .toast.fail,
+    // .breadcrumb li.active span:not([href]) {
+    //     color: var(--sbx-color-text-primary);
+    // }
 
     /**
      * Text secondary
      */
-    .empty-state p,
-    .meta,
-    span.meta,
-    blockquote,
-    blockquote:before,
-    code,
-    .rounded-progress-bar .legend-item {
-        color: var(--sbx-color-text-secondary);
-    }
+    // .empty-state p,
+    // .meta,
+    // span.meta,
+    // blockquote,
+    // blockquote:before,
+    // code,
+    // .rounded-progress-bar .legend-item {
+    //     color: var(--sbx-color-text-secondary);
+    // }
 
     // for the border left to match the text colour
-    blockquote {
-        border-left: 6px solid var(--sbx-color-text-secondary);
-    }
+    // blockquote {
+    //     border-left: 6px solid var(--sbx-color-text-secondary);
+    // }
 
-    code {
-        border: 1px solid var(--sbx-color-text-secondary);
-    }
+    // code {
+    //     border: 1px solid var(--sbx-color-text-secondary);
+    // }
 
     /**
      * Accent
      */
-    a:not(.close-reveal-modal),
-    a h3,
-    a p,
-    .breadcrumb li a[href],
-    div.dzone,
-    div.dzone span,
-    #footer a,
-    .f-dropdown li button,
-    .actions-small-3 > nav a[class^="icon-"],
-    .actions-small-2 > nav a[class^="icon-"],
-    .actions-small-1 > nav a[class^="icon-"],
-    #news-component .card.reversed .card-actions [class^="icon-"],
-    .v-card .card-actions [class^="icon-"],
-    fieldset.collapsible legend,
-    label.input-toggle span,
-    .dz-default.dz-message,
-    .information-list.expandable-card > li .expander:before,
-    .resource-browser .meta-panel .meta-preview .icon-folder:before,
-    div.jstree-default .icon-folder:before {
-        color: var(--sbx-color-accent);
-    }
+    // a:not(.close-reveal-modal),
+    // a h3,
+    // a p,
+    // .breadcrumb li a[href],
+    // div.dzone,
+    // div.dzone span,
+    // #footer a,
+    // .f-dropdown li button,
+    // .actions-small-3 > nav a[class^="icon-"],
+    // .actions-small-2 > nav a[class^="icon-"],
+    // .actions-small-1 > nav a[class^="icon-"],
+    // #news-component .card.reversed .card-actions [class^="icon-"],
+    // .v-card .card-actions [class^="icon-"],
+    // fieldset.collapsible legend,
+    // label.input-toggle span,
+    // .dz-default.dz-message,
+    // .information-list.expandable-card > li .expander:before,
+    // .resource-browser .meta-panel .meta-preview .icon-folder:before,
+    // div.jstree-default .icon-folder:before {
+    //     color: var(--sbx-color-accent);
+    // }
 
-    .checklist.checklist-container {
-        border: 2px solid var(--sbx-color-accent);
-    }
+    // .checklist.checklist-container {
+    //     border: 2px solid var(--sbx-color-accent);
+    // }
 
-    .checklist.checklist-container input[type="checkbox"]:not(.plain):not(:disabled) + label {
-        border-bottom: 1px solid var(--sbx-color-accent);
-    }
+    // .checklist.checklist-container input[type="checkbox"]:not(.plain):not(:disabled) + label {
+    //     border-bottom: 1px solid var(--sbx-color-accent);
+    // }
 
-    .dzone {
-        border: 0.0625rem dashed var(--sbx-color-accent);
-    }
+    // .dzone {
+    //     border: 0.0625rem dashed var(--sbx-color-accent);
+    // }
 
-    .hint {
-        background: var(--sbx-color-accent);
-    }
+    // .hint {
+    //     background: var(--sbx-color-accent);
+    // }
 
-    .tabs.vertical li.tab-title.active a {
-        border-left: 2px solid var(--sbx-color-accent);
-    }
+    // .tabs.vertical li.tab-title.active a {
+    //     border-left: 2px solid var(--sbx-color-accent);
+    // }
 
     /**
      * Accent Text
      */
-    .hint {
-        color: var(--sbx-color-accent-text);
-    }
+    // .hint {
+    //     color: var(--sbx-color-accent-text);
+    // }
 
     /**
      * Active
      */
-    th.timetable-period-active {
-        background: var(--sbx-color-active);
-    }
+    // th.timetable-period-active {
+    //     background: var(--sbx-color-active);
+    // }
 }

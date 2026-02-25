@@ -3,19 +3,7 @@
  * This `c-island` will replace the `c-island` in `www/static/css/core/layout/_container.scss`
  */
 
-:root {
-    --size-island-border: 0px;
-    --color-island-border: #4c94c8;
-    --shadow-island-length: 0px;
-    --color-island-blur: #b3b3b3;
-}
-
 .c-island {
-    background-color: var(--color-foreground-primary);
-    border: var(--size-island-border) solid var(--color-island-border);
-    border-radius: var(--roundness-islands);
+    background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
     padding: var(--spacing-l);
-    filter: drop-shadow(
-        var(--color-island-blur) var(--shadow-island-length) var(--shadow-island-length) var(--shadow-island-length)
-    );
 }

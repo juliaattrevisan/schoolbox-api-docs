@@ -3,12 +3,12 @@
 */
 
 :root {
-    --alt-foreground-colour: #f9f9f9;
-    --border-colour: #aaaaaa;
+    --alt-foreground-colour: var(--sbx-color-foreground-secondary, #f9f9f9);
+    --border-colour: var(--sbx-color-text-secondary, #aaaaaa);
 }
 
 .c-card {
-    background-color: var(--color-foreground-primary);
+    background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
     border-radius: 0;
     line-height: var(--base-line-height);
     position: relative;

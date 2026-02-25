@@ -162,7 +162,7 @@ $accordion-content-active-bg-color: $white !default;
                     display: none;
                     padding: $accordion-content-padding;
                     &.active {
-                        background: $accordion-content-active-bg-color;
+                        background: var(--sbx-color-foreground-primary, $accordion-content-active-bg-color);
                         display: block;
                     }
                 }

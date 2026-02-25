@@ -218,7 +218,7 @@ $alert-default-background: css-darken($body-bg, 10%);
     [class^="icon-"],
     [class*=" icon-"] {
         &:before {
-            color: $white;
+            color: var(--sbx-color-text-primary, $white);
             padding-right: 0;
         }
     }
@@ -235,9 +235,9 @@ $alert-default-background: css-darken($body-bg, 10%);
 // Toast pop-up alert...
 // A less obnoxious pop-up alert
 .toast {
-    background-color: $tuatara;
+    background-color: var(--sbx-color-foreground-primary, $tuatara);
     bottom: 1rem;
-    color: $white;
+    color: var(--sbx-color-text-primary, $white);
     display: block;
     font-size: $base-font-size - 2;
     opacity: 0;
@@ -262,7 +262,7 @@ $alert-default-background: css-darken($body-bg, 10%);
     }
 
     &::before {
-        background-color: $white;
+        background-color: var(--sbx-color-foreground-primary, $white);
         border-radius: 0.75rem;
         content: "";
         display: inline-block;

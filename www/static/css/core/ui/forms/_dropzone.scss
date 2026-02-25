@@ -489,7 +489,7 @@ ul.az-error-list {
     font-size: $paragraph-font-size;
     overflow: hidden;
     position: relative;
-    background-color: $attachzone-resting-background;
+    background-color: var(--sbx-color-foreground-primary, $attachzone-resting-background);
     border: $input-border-width dashed $attachzone-resting-color;
     background-repeat: no-repeat;
     display: table;

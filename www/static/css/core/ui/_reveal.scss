@@ -140,7 +140,7 @@ $z-index-base: var(--sbx-depth-modal);
     $top-offset: false
 ) {
     @if $bg {
-        background-color: $bg;
+        background-color: var(--sbx-color-foreground-primary, $bg);
     }
     @if $padding != false {
         padding: $padding;
