@@ -703,10 +703,27 @@ class Controller extends Base
         if (empty($assessmentIds)) {
             $assessments = $this->assessmentMapperProxy->createCollection();
         } else {
+            /* Note that the first arg to findAllByFolderIdForReview() can actually be a set of folder ids
+             */
             $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
-                $folder->getId(),
+                [
+                    $folder->getId(),  // typically 80, 9ENGA
+                    78, // 9SPANISHA
+                    189,  // 9MATA
+                    85, // 9PDHC
+                ],
                 null,
-                ['ids' => $assessmentIds]
+                //['ids' => $assessmentIds]
+
+                /* There's this somewhat obscure "options to pass to findByColumList" but there's actually a few
+                 * rarely-used, rarely-encountered ideas here: ref. convertOptionsToPredicateBuilder() in the
+                 * Assessment MapperProxy:1790. You get there via findAllByFolderIdForReview() and it has a plethora of
+                 * date range filters, term-based filters, etc. deep in the swamp where you'd never look.
+                 */
+                [
+//                    'ids' => $assessmentIds,
+                    'due_after' => new \Alaress_Date_Format('2026-04-03 00:00:00', 'Y-m-d H:i:s')
+                ]
             );
         }
 
