@@ -761,6 +761,13 @@ class Controller extends Base
 
         $markbook->sortAssessables();
         $end = microtime(true);
+
+        /* Temporary timing experiment: unfiltered, for 10 homepages, markbook takes:
+         * float(2.780165910720825) to build
+         *
+         * When filtered to use due dates, types and work types, the markbook takes:
+         * float(0.5908069610595703) to build (4 times faster?)
+         */
         $_SESSION['mbdur'] =  $end - $start;
 
         return $markbook;
