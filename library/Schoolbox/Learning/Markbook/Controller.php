@@ -714,6 +714,11 @@ class Controller extends Base
                     85, // 9PDHC
                     190, // 9MYPA
                     97, // 3TR
+                    93, // 3AC
+                    92, // 3IB
+                    95, // 3IBSPA
+                    96, // 3IBVA
+                    250, // ELCB
                 ],
                 null,
                 //['ids' => $assessmentIds]
@@ -725,7 +730,7 @@ class Controller extends Base
                  */
                 [
                     'due_after' => new \Alaress_Date_Format('2025-01-01 00:00:00', 'Y-m-d H:i:s'),
-                    'due_before' => new \Alaress_Date_Format('2026-03-01 00:00:00', 'Y-m-d H:i:s'),
+                    'due_before' => new \Alaress_Date_Format('2026-12-30 00:00:00', 'Y-m-d H:i:s'),
                     'type' => [
                         AssessmentType::TYPE_DUE_WORK,
                         AssessmentType::TYPE_QUIZ
