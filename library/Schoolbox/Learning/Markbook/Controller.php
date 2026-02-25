@@ -746,12 +746,13 @@ class Controller extends Base
                         7, // Reporting
                         3, // Learning Activity
                     ],
-                    /* Assessment ids and curriculum nodes execute an intersect, so they work together (if provided)
+                    /* If both are provided, assessment ids and curriculum nodes execute an intersect
                      */
 //                    'ids' => [391],
-//                    'curriculum_codes' => [
-//                        'AC9SAS09'
-//                    ]
+                    'curriculum_codes' => [
+                        'AC9SAS09',
+                        'GC-FA-a'
+                    ]
                 ]
             );
         }
