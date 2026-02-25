@@ -1,6 +1,8 @@
 /**
  * Color overrides for Storybook UI Uplift
  * Scope: UI Uplift
+ * The majority of colour overrides are applied directly on the element to avoid specificity issues,
+ * adding thew new color while falling back to the old color if the new one isn't set.
  */
 
 body.sbx-body:not(.login) {
@@ -10,129 +12,4 @@ body.sbx-body:not(.login) {
     .highcharts-background {
         fill: var(--sbx-color-foreground-primary);
     }
-
-    /**
-     * Foreground secondary
-     */
-
-    /**
-     * Text primary
-     */
-    // .subheader,
-    // h1,
-    // h2,
-    // h3,
-    // h4,
-    // h5,
-    // h6,
-    // p,
-    // li,
-    // small,
-    // abbr,
-    // acronym,
-    // address,
-    // ins,
-    // em,
-    // cite,
-    // pre,
-    // b,
-    // i,
-    // strong,
-    // strike,
-    // s,
-    // u,
-    // th,
-    // td,
-    // mark,
-    // div,
-    // label,
-    // legend,
-    // p.meta.title,
-    // .toast,
-    // .toast.success,
-    // .toast.fail,
-    // .breadcrumb li.active span:not([href]) {
-    //     color: var(--sbx-color-text-primary);
-    // }
-
-    /**
-     * Text secondary
-     */
-    // .empty-state p,
-    // .meta,
-    // span.meta,
-    // blockquote,
-    // blockquote:before,
-    // code,
-    // .rounded-progress-bar .legend-item {
-    //     color: var(--sbx-color-text-secondary);
-    // }
-
-    // for the border left to match the text colour
-    // blockquote {
-    //     border-left: 6px solid var(--sbx-color-text-secondary);
-    // }
-
-    // code {
-    //     border: 1px solid var(--sbx-color-text-secondary);
-    // }
-
-    /**
-     * Accent
-     */
-    // a:not(.close-reveal-modal),
-    // a h3,
-    // a p,
-    // .breadcrumb li a[href],
-    // div.dzone,
-    // div.dzone span,
-    // #footer a,
-    // .f-dropdown li button,
-    // .actions-small-3 > nav a[class^="icon-"],
-    // .actions-small-2 > nav a[class^="icon-"],
-    // .actions-small-1 > nav a[class^="icon-"],
-    // #news-component .card.reversed .card-actions [class^="icon-"],
-    // .v-card .card-actions [class^="icon-"],
-    // fieldset.collapsible legend,
-    // label.input-toggle span,
-    // .dz-default.dz-message,
-    // .information-list.expandable-card > li .expander:before,
-    // .resource-browser .meta-panel .meta-preview .icon-folder:before,
-    // div.jstree-default .icon-folder:before {
-    //     color: var(--sbx-color-accent);
-    // }
-
-    // .checklist.checklist-container {
-    //     border: 2px solid var(--sbx-color-accent);
-    // }
-
-    // .checklist.checklist-container input[type="checkbox"]:not(.plain):not(:disabled) + label {
-    //     border-bottom: 1px solid var(--sbx-color-accent);
-    // }
-
-    // .dzone {
-    //     border: 0.0625rem dashed var(--sbx-color-accent);
-    // }
-
-    // .hint {
-    //     background: var(--sbx-color-accent);
-    // }
-
-    // .tabs.vertical li.tab-title.active a {
-    //     border-left: 2px solid var(--sbx-color-accent);
-    // }
-
-    /**
-     * Accent Text
-     */
-    // .hint {
-    //     color: var(--sbx-color-accent-text);
-    // }
-
-    /**
-     * Active
-     */
-    // th.timetable-period-active {
-    //     background: var(--sbx-color-active);
-    // }
 }
