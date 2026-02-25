@@ -721,7 +721,7 @@ class Controller extends Base
                     96, // 3IBVA
                     250, // ELCB
                 ],
-                null,
+                \Schoolbox\UserMapper::getInstance()->findById(13),
                 //['ids' => $assessmentIds]
 
                 /* There's this somewhat obscure "options to pass to findByColumList" but there's actually a few
@@ -729,26 +729,26 @@ class Controller extends Base
                  * Assessment MapperProxy:1790. You get there via findAllByFolderIdForReview() and it has a plethora of
                  * date range filters, term-based filters, etc. deep in the swamp where you'd never look.
                  */
-                [
-                    'due_after' => new \Alaress_Date_Format('2026-01-01 00:00:00', 'Y-m-d H:i:s'),
-                    'due_before' => new \Alaress_Date_Format('2026-02-06 00:00:00', 'Y-m-d H:i:s'),
-                    'type' => [
-                        AssessmentType::TYPE_DUE_WORK,
-                        AssessmentType::TYPE_QUIZ,
-                        AssessmentType::TYPE_PROJECT,
-                        AssessmentType::TYPE_LTI_ASSESSMENT
-                    ],
-                    'work_type' => [
-                        7, // Reporting
-                        3, // Learning Activity
-                    ],
-                    /* Assessment ids and curriculum nodes execute an intersect, so they work together (if provided)
-                     */
-                    'ids' => [391],
-                    'curriculum_codes' => [
-                        'AC9SAS09'
-                    ]
-                ]
+//                [
+//                    'due_after' => new \Alaress_Date_Format('2026-01-01 00:00:00', 'Y-m-d H:i:s'),
+//                    'due_before' => new \Alaress_Date_Format('2026-02-06 00:00:00', 'Y-m-d H:i:s'),
+//                    'type' => [
+//                        AssessmentType::TYPE_DUE_WORK,
+//                        AssessmentType::TYPE_QUIZ,
+//                        AssessmentType::TYPE_PROJECT,
+//                        AssessmentType::TYPE_LTI_ASSESSMENT
+//                    ],
+//                    'work_type' => [
+//                        7, // Reporting
+//                        3, // Learning Activity
+//                    ],
+//                    /* Assessment ids and curriculum nodes execute an intersect, so they work together (if provided)
+//                     */
+//                    'ids' => [391],
+//                    'curriculum_codes' => [
+//                        'AC9SAS09'
+//                    ]
+//                ]
             );
         }
 
@@ -760,6 +760,12 @@ class Controller extends Base
             assessments: $assessments,
             defaultMarkScheme: $overallMarkScheme,
             viewingUser: $this->getUser(),
+            /* Use this to reduce $assessments to only returning a row for these guy(s)
+             * findAllByFolderIdForReview() doesn't really support individual participants across multiple folders.
+             * It goes into a different orthogonal method
+             * Plus, this isn't the usual use case afaik: you're operating on your entire class of students at a time,
+             * mostly: not an individual. Nevertheless, you can operate on a reduced set by using this reductive.
+             */
             studentIds: null,
             curriculumCodes: null,
             folderIds: null,

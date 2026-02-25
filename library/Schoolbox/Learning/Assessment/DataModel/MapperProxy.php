@@ -919,7 +919,7 @@ class MapperProxy
     {
         if ($student instanceof User) {
             $assessments = $this->baseMapper->findForFolderAndParticipant(
-                [$folderId],
+                is_array($folderId) ? $folderId : [$folderId],
                 $student,
                 $this->convertOptionsToPredicateBuilder($options, true),
                 [],
