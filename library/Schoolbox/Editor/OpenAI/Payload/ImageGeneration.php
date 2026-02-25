@@ -155,7 +155,7 @@ class ImageGeneration
                 'verbosity' => 'low',
             ],
             'reasoning' => [
-                'effort' => 'none',
+                'effort' => 'low',
             ],
         ];
 
