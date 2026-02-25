@@ -4,13 +4,6 @@ interface SbxAIAssistantConfig {
     ai: {
         openAI: {
             apiUrl: string;
-            // requestParameters: {
-                // max_completion_tokens: number;
-                // temperature: number;
-                // top_p: number;
-                // stream: boolean;
-                // model: string | undefined;
-            // };
         };
         aiAssistant: AIAssistantConfig;
         useTheme: boolean;
@@ -26,13 +19,6 @@ export function getAISettings(): SbxAIAssistantConfig {
         ai: {
             openAI: {
                 apiUrl: "/openai",
-                // requestParameters: {
-                    // max_completion_tokens: 10000,
-                    // temperature: 1,
-                    // top_p: 1,
-                    // stream: true,
-                    // model,
-                // },
             },
             aiAssistant: {
                 // Define the commands list from scratch.

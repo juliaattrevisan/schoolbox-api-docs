@@ -159,7 +159,6 @@
 
                 window.sbProps.aiFeatures["{{ feature }}"] = {
                     enabled: {{ isEnabled ? 'true' : 'false' }},
-                    {% if featureModel %}model: "{{ featureModel }}",{% endif %}
                 };
             {% endfor %}
         {% endif %}
