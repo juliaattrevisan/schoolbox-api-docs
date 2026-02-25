@@ -274,6 +274,7 @@ class Controller extends Base\Base
         $response = [];
 
         if (!$courseExists) {
+            $this->courseSpecificationMapper->save($course);
             $response['course'] = $course->getId();
         }
 
