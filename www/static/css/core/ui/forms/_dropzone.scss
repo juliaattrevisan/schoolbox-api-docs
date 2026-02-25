@@ -1,4 +1,4 @@
-$attachzone-resting-color: $accent-foreground;
+$attachzone-resting-color: var(--sbx-color-accent, $accent-foreground);
 $attachzone-resting-background: $accent-background;
 
 $attachzone-dragging-color: $accent-foreground;
@@ -31,7 +31,7 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
     }
 
     .dz-preview {
-        border: 1px solid $attachzone-resting-color;
+        border: 1px solid var(--sbx-color-accent, $attachzone-resting-color);
         display: flex;
         height: 5rem;
 
@@ -54,18 +54,18 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
         }
 
         &.dz-success {
-            border: 1px solid $success-color;
+            border: 1px solid var(--sbx-color-success, $success-color);
 
             .dz-remove {
-                color: $success-color;
+                color: var(--sbx-color-success, $success-color);
             }
         }
 
         &.dz-error {
-            border: 1px solid $alert-color;
+            border: 1px solid var(--sbx-color-alert, $alert-color);
 
             .dz-remove {
-                color: $alert-color;
+                color: var(--sbx-color-alert, $alert-color);
             }
         }
 
@@ -94,10 +94,6 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
 
         .dz-close {
             flex: 0 0 2.5rem;
-
-            a:hover {
-                background-color: rgba(0, 0, 0, 0.1);
-            }
         }
     }
 }
@@ -239,7 +235,7 @@ ul.az-error-list {
 }
 
 ul.az-error-list {
-    background: $attachzone-error-background;
+    background: var(--sbx-color-foreground-primary, $attachzone-error-background);
 
     .filename {
         line-height: 1.5rem;
@@ -248,10 +244,6 @@ ul.az-error-list {
     }
     nav a {
         opacity: 1;
-
-        &:hover {
-            background-color: tint($attachzone-error-color, 74%);
-        }
     }
 
     > li {
@@ -368,7 +360,7 @@ ul.az-error-list {
             border-color: transparent;
             background: none;
             padding-left: 0;
-            color: rgba($white, 0);
+            color: var(--sbx-color-foreground-primary, rgba($white, 0));
             &:before {
                 content: "";
             }
@@ -400,7 +392,7 @@ ul.az-error-list {
     }
     ul.az-list > li {
         position: relative;
-        background: rgba($white, 0.8);
+        background: var(--sbx-color-foreground-primary, rgba($white, 0.8));
     }
     .dzone {
         width: 100%;
@@ -421,13 +413,13 @@ ul.az-error-list {
         }
     }
     .dz-error {
-        background-color: $attachzone-error-background;
-        color: $attachzone-error-color;
+        background-color: var(--sbx-color-foreground-primary, $attachzone-error-background);
+        color: var(--sbx-color-alert, $attachzone-error-color);
         img[data-dz-thumbnail] {
             display: none;
         }
         .dz-upload {
-            background-color: $attachzone-error-background;
+            background-color: var(--sbx-color-foreground-primary, $attachzone-error-background);
         }
         .card {
             padding: 0.5rem 2rem 0.5rem 1rem;
@@ -438,7 +430,7 @@ ul.az-error-list {
         // but other attachzones use data-dz-name in one line of info
         [data-dz-name],
         [data-dz-status] {
-            color: $alert-color;
+            color: var(--sbx-color-alert, $alert-color);
         }
         .close-button {
             line-height: 0;
@@ -490,29 +482,21 @@ ul.az-error-list {
     overflow: hidden;
     position: relative;
     background-color: var(--sbx-color-foreground-primary, $attachzone-resting-background);
-    border: $input-border-width dashed $attachzone-resting-color;
+    border: $input-border-width dashed var(--sbx-color-accent, $attachzone-resting-color);
     background-repeat: no-repeat;
     display: table;
-    color: $attachzone-resting-color;
-    transition:
-        background-color 360ms $attachzone-overlay-timing,
-        border-color 360ms $attachzone-overlay-timing,
-        color 360ms $attachzone-overlay-timing,
-        height 360ms $attachzone-overlay-timing 360ms;
+    color: var(--sbx-color-accent, $attachzone-resting-color);
     &:hover {
-        border-color: $attachzone-hover-color;
-        background-color: $attachzone-hover-background;
-        color: $attachzone-hover-color;
         cursor: pointer;
+        filter: brightness(1.1);
     }
 }
 
 // hover can be applied either to child or self
 .dz-drag-hover .dzone,
 .dz-drag-hover.dzone {
-    border-color: $attachzone-can-accept-color;
-    background-color: $attachzone-can-accept-background;
-    color: $attachzone-can-accept-color;
+    border-color: var(--sbx-color-success, $attachzone-can-accept-color);
+    color: var(--sbx-color-success, $attachzone-can-accept-color);
     span {
         color: inherit;
     }
@@ -548,17 +532,17 @@ ul.az-error-list {
         }
     }
     .dz-error-mark {
-        color: $alert-color;
+        color: var(--sbx-color-alert, $alert-color);
     }
     .dz-success-mark {
-        color: $success-color;
+        color: var(--sbx-color-success, $success-color);
     }
     .dz-preview {
         &.dz-error {
-            color: $alert-color;
+            color: var(--sbx-color-alert, $alert-color);
         }
         &.dz-success {
-            color: $success-color;
+            color: var(--sbx-color-success, $success-color);
         }
     }
     .dz-error .dz-error-message {
@@ -583,10 +567,10 @@ ul.az-error-list {
         display: none;
     }
     .dz-preview {
-        background-color: $white;
+        background-color: var(--sbx-color-foreground-primary, $white);
         position: relative;
         width: 120px;
-        border: solid 1px $monsoon;
+        border: solid 1px var(--sbx-color-text-secondary, $monsoon);
         box-sizing: border-box;
     }
     img[data-dz-thumbnail] {
@@ -615,13 +599,13 @@ ul.az-error-list {
         min-height: rem-calc(80);
         width: 100%;
         span {
-            color: $attachzone-resting-color;
+            color: var(--sbx-color-accent, $attachzone-resting-color);
         }
     }
     .dz-progress [data-dz-uploadprogress] {
         height: 100%;
         display: block;
-        background: $jumbo;
+        background: var(--sbx-color-text-secondary, $jumbo);
         position: absolute;
         top: 0;
         left: 0;
@@ -635,16 +619,15 @@ ul.az-error-list {
 
 // Default Dropzone
 .dropzone {
-    background-color: $attachzone-resting-background;
-    border: 2px dashed $attachzone-resting-color;
+    background-color: var(--sbx-color-foreground-primary, $attachzone-resting-background);
+    border: 2px dashed var(--sbx-color-accent, $attachzone-resting-color);
     padding: rem-calc(($base-font-size - 6));
     position: relative;
     height: 4rem;
     margin-bottom: rem-calc(($base-font-size - 2));
 
     &.dz-drag-hover {
-        border-color: $attachzone-can-accept-color;
-        background: $attachzone-can-accept-background;
+        border-color: var(--sbx-color-success, $attachzone-can-accept-color);
     }
 
     .dz-default.dz-message {
@@ -660,12 +643,12 @@ ul.az-error-list {
 
     .dz-preview,
     .dropzone-previews .dz-preview {
-        background: $white;
+        background: var(--sbx-color-foreground-primary, $white);
         position: relative;
         display: inline-block;
         margin: rem-calc(($base-font-size)) rem-calc(($base-font-size - 2));
         vertical-align: top;
-        border: 2px solid tint($tertiary, 66%);
+        border: 2px solid var(--sbx-color-text-secondary, tint($tertiary, 66%));
         padding: 0.4rem;
     }
 
@@ -729,7 +712,7 @@ ul.az-error-list {
         display: block;
         padding: 4px 5px;
         text-align: center;
-        color: #0ff;
+        color: var(--sbx-color-alert, #0ff);
     }
 }
 
@@ -778,7 +761,7 @@ ul.az-error-list {
     left: 6px;
     right: 6px;
     height: 6px;
-    background: $body-bg;
+    background: var(--sbx-color-foreground-primary, $body-bg);
     display: none;
 }
 .dz-preview .dz-progress .dz-upload,
@@ -789,7 +772,7 @@ ul.az-error-list {
     bottom: 0;
     left: 0;
     width: 0%;
-    background-color: $success-color;
+    background-color: var(--sbx-color-success, $success-color);
 }
 .dz-preview.dz-processing .dz-progress,
 .dropzone-previews .dz-preview.dz-processing .dz-progress {
@@ -801,9 +784,9 @@ ul.az-error-list {
     position: absolute;
     top: -5px;
     left: -20px;
-    background: rgba($white, 0.8);
+    background: var(--sbx-color-foreground-primary, rgba($white, 0.8));
     padding: 8px 10px;
-    color: $alert-color;
+    color: var(--sbx-color-alert, $alert-color);
     font-style: italic;
     min-width: 140px;
     max-width: 500px;
@@ -811,7 +794,7 @@ ul.az-error-list {
 }
 
 .dz-default.dz-message {
-    color: $attachzone-resting-color;
+    color: var(--sbx-color-accent, $attachzone-resting-color);
     font-weight: $body-font-weight;
     width: 100%;
     position: relative;
@@ -853,7 +836,7 @@ ul.az-error-list {
 }
 .dz-preview.dz-error .dz-progress .dz-upload,
 .dropzone-previews .dz-preview.dz-error .dz-progress .dz-upload {
-    background: $alert-color;
+    background: var(--sbx-color-alert, $alert-color);
 }
 
 .dz-preview.dz-success .dz-progress,
