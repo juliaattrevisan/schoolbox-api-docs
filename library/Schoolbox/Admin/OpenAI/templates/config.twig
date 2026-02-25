@@ -50,6 +50,14 @@
         'title': 'OpenAI Image Model',
         'description': 'Select which model you wish to use for image generation. This is distinct from the OpenAI Model, which is used only to generate text.'
     },
+    'text_verbosity': {
+        'title': 'Text Verbosity',
+        'description': 'Select the level of verbosity for the text you wish for this model to generate.'
+    },
+    'reasoning_effort': {
+        'title': 'Reasoning Effort',
+        'description': 'Select the level of effort you wish the model to take when reasoning about its response. More reasoning should lead to more accurate but slower responses. When using Azure, you must ensure this level is compatible with the model your deployment uses.'
+    },
 } %}
 
 {# Each panel consists of various sections; each supported AI service (openAI, azure, et al) has its own section

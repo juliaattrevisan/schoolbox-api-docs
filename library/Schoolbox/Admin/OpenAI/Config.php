@@ -111,6 +111,8 @@ class Config
     public const string FIELD_SYSTEM_PROMPT  = 'system_prompt';
     public const string FIELD_OUTPUT_QUALITY = 'output_quality';
     public const string FIELD_IMAGE_MODEL = 'image_model';
+    public const string FIELD_REASONING_EFFORT = 'reasoning_effort';
+    public const string FIELD_TEXT_VERBOSITY = 'text_verbosity';
 
     // field types
     public const string FIELD_TYPE_SELECT   = 'select';
@@ -130,6 +132,12 @@ class Config
             'value' => '',
         ],
         self::FIELD_SYSTEM_PROMPT => [
+            'value' => '',
+        ],
+        self::FIELD_REASONING_EFFORT => [
+            'value' => '',
+        ],
+        self::FIELD_TEXT_VERBOSITY => [
             'value' => '',
         ],
     ];
@@ -202,6 +210,16 @@ class Config
         ],
         self::FIELD_SYSTEM_PROMPT => [
             'type'    => self::FIELD_TYPE_TEXTAREA,
+            'section' => self::SECTION_GENERAL,
+        ],
+        self::FIELD_REASONING_EFFORT => [
+            'type'    => self::FIELD_TYPE_SELECT,
+            'options' => self::REASONING_EFFORT_OPTIONS,
+            'section' => self::SECTION_GENERAL,
+        ],
+        self::FIELD_TEXT_VERBOSITY => [
+            'type'    => self::FIELD_TYPE_SELECT,
+            'options' => self::TEXT_VERBOSITY_OPTIONS,
             'section' => self::SECTION_GENERAL,
         ],
     ];
