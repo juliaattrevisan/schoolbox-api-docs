@@ -6,9 +6,9 @@
     }
     .reply,
     .child {
-        background-color: $snow;
-        border-top: 1px solid $body-bg;
-        border-left: 6px solid $base;
+        background-color: var(--sbx-color-foreground-secondary, $snow);
+        border-top: 1px solid var(--sbx-color-text-secondary, $body-bg);
+        border-left: 6px solid var(--sbx-color-text-secondary, $base);
         padding-left: 1rem;
 
         @media #{$small-only} {
@@ -37,14 +37,14 @@
             }
 
             li {
-                border-top: 1px solid $body-bg;
+                border-top: 1px solid var(--sbx-color-text-secondary, $body-bg);
             }
         }
     }
 
     .reply ~ .reply,
     .child ~ .child {
-        border-top: 1px solid $body-bg;
+        border-top: 1px solid var(--sbx-color-text-secondary, $body-bg);
     }
     .socialstream-attachment .meta {
         padding-left: 2.5rem;
@@ -60,7 +60,7 @@
 }
 
 .socialstream-preview {
-    background-color: $snow;
+    background-color: var(--sbx-color-foreground-secondary, $snow);
     font-size: $paragraph-font-size;
     padding: 1rem;
 }
@@ -71,7 +71,7 @@
         padding-top: 0.5rem;
 
         &:nth-of-type(n + 2) {
-            border-top: 1px solid $body-bg;
+            border-top: 1px solid var(--sbx-color-text-secondary, $body-bg);
             padding-top: 0.5rem;
         }
         &:last-child {
