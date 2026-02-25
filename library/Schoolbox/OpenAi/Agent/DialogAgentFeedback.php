@@ -99,10 +99,8 @@ class DialogAgentFeedback
         // and ditching all its training markdown (lol) that it loves to use
         //
         // https://community.openai.com/t/json-returning-with-json/584818/6
-        $data = json_decode($feedbackResponseData, true);
-
-        /* The actual output we requested is in this chain of objects, for now assume it'll only ever be one */
-        $relevantData = $data['output'][0]['content'][0]['text'] ?? null;
+        $data         = json_decode($feedbackResponseData, true);
+        $relevantData = new ResponseParser()->extractContentText($data);
         if (!isset($relevantData)) {
             throw new SchoolboxException('Invalid response');
         }
