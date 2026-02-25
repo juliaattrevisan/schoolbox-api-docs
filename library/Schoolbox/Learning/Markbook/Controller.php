@@ -724,10 +724,14 @@ class Controller extends Base
                  */
                 [
 //                    'ids' => $assessmentIds,
-                    'due_after' => new \Alaress_Date_Format('2026-01-01 00:00:00', 'Y-m-d H:i:s'),
+                    'due_after' => new \Alaress_Date_Format('2025-01-01 00:00:00', 'Y-m-d H:i:s'),
                     'type' => [
                         AssessmentType::TYPE_DUE_WORK,
                         AssessmentType::TYPE_QUIZ
+                    ],
+                    'work_type' => [
+                        7, // Reporting
+                        3, // Learning Activity
                     ]
                 ]
             );

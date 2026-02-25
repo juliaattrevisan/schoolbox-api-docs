@@ -1922,6 +1922,8 @@ class MapperProxy
      * * converts "window_open" and "window_close" to a window inside which
      *   to find due assessments
      * * converts "ids" to a set of assessment IDs to restrict the result to
+     * * converts "work_type" to a filter for assessments' work types; allowed to be an array for multiple work types,
+     *   or just an int for a singular work type
      *
      * @param array $options
      * @param bool  $usePlanDates Filter by plan dates instead of assessment dates
@@ -2046,7 +2048,15 @@ class MapperProxy
 
         // Work type filter
         if (isset($options['work_type'])) {
-            $builder->equals('work_type_id', $options['work_type']);
+            $workTypes = $options['work_type'];
+
+            /* Co-erce singular values into a set
+             */
+            if (!is_array($options['work_type'])) {
+                $workTypes = [$options['work_type']];
+            }
+
+            $builder->in('work_type_id', $workTypes);
         }
 
         // Assessment title filter?
