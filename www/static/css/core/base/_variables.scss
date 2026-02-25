@@ -32,7 +32,7 @@ $accent-hover: var(--accent-hover) !default;
 
 $logo-background: var(--logo-background) !default;
 
-$body-bg: var(--body-background) !default;
+$body-bg: var(--sbx-color-body-background, var(--body-background)) !default;
 
 $login-form-background: var(--login-form-background) !default;
 
