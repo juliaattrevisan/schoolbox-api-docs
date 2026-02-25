@@ -85,10 +85,10 @@ class ModelParser
             }
         }
 
-        // GPT-5 doesn't support temperature and top_p, however GPT-5.2 does,
-        // or at least does not error when you pass them?
-        // Or does it? I tested with image generation and it failed.
-        if (in_array($version, ['5', '5.2'])) {
+        // GPT-5 family doesn't support temperature and top_p:
+        // however I remember trying 5.1 with these parameters with success?
+        // I tested with image generation and got a failure though.
+        if (in_array($version, ['5', '5.1', '5.2'])) {
             unset($payload['temperature'], $payload['top_p']);
         }
 
