@@ -56,7 +56,10 @@
     },
     'reasoning_effort': {
         'title': 'Reasoning Effort',
-        'description': 'Select the level of effort you wish the model to take when reasoning about its response. More reasoning should lead to more accurate but slower responses. When using Azure, you must ensure this level is compatible with the model your deployment uses.'
+        'description': 'Select the level of effort you wish the model to take when reasoning about its response. More reasoning should lead to more accurate but slower responses.',
+        'warnings': {
+            'Azure': 'You must ensure this effort level is compatible with the model your deployment uses.',
+        },
     },
 } %}
 
@@ -157,6 +160,15 @@
                    data-test="ai-feature-option-input-{{ name }}"
             />
         {% endif %}
+
+        {% for sectionName, section in sections  %}
+            {% if (manifest[name].warnings[sectionName] ?? null) is not empty %}
+                <div data-alert {{ section.dataAttrs }} style="display: none" class="alert-box warning">
+                    {{ manifest[name].warnings[sectionName] }}
+                </div>
+            {% endif %}
+        {% endfor %}
+
     {% endfor %}
 
     <script type="application/javascript">
