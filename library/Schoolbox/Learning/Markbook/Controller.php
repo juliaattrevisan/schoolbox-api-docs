@@ -719,7 +719,15 @@ class Controller extends Base
         $markSchemeFactory = new Factory($this->getConfigLoader());
         $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
 
-        $markbook = new Markbook($assessments, $overallMarkScheme, $this->getUser(), null, null, [80]);
+        $markbook = new Markbook(
+            assessments: $assessments,
+            defaultMarkScheme: $overallMarkScheme,
+            viewingUser: $this->getUser(),
+            studentIds: null,
+            curriculumCodes: null,
+            folderIds: [78]
+        );
+
         $markbook->sortAssessables();
         return $markbook;
     }
