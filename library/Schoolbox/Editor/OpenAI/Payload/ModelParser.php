@@ -102,7 +102,7 @@ class ModelParser
         if ($version === '5') {
             $reasoningEffort = $payload['reasoning']['effort'] ?? 'medium';
             if ($reasoningEffort === 'none') {
-                $reasoningEffort = 'low';
+                $reasoningEffort = 'minimal';
             }
         }
 
