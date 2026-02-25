@@ -155,20 +155,23 @@ class Markbook
         private ?array $curriculumCodes = null,
         private ?array $folderIds = null
     ) {
+        /* We'll reduce this set further by applying the reductive filters for student ids, curric codes and folder ids
+         */
+        $this->assessments = $assessments;
+
         /* Check if we had a specific set of $curriculumCodes to care about:
          * if we did, and this activity doesn't use one of them, skip it
          */
-        $this->assessments = $assessments->filter(function (IAssessable $assessment) {
+        $this->assessments = $this->assessments->filter(function (IAssessable $assessment) {
             return $this->isFilteredCurriculumCode($assessment->getCurriculumNodes()->getPropertyValues('code'));
         });
 
         /* Check if we had a specific set of $folderIds to care about:
          * if we did, and this activity isn't in one of them, skip it
          */
-        $this->assessments = $assessments->filter(function (IAssessable $assessment) {
+        $this->assessments = $this->assessments->filter(function (IAssessable $assessment) {
             return $this->isFilteredFolder($assessment->getBaseContext()->getFolder()->getId());
         });
-
 
         /* Find all the Project instances within the set of $assessments that we might already have filtered out
          */
