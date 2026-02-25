@@ -169,6 +169,7 @@ class Markbook
             return $this->isFilteredFolder($assessment->getBaseContext()->getFolder()->getId());
         });
 
+
         /* Find all the Project instances within the set of $assessments that we might already have filtered out
          */
         $this->topLevelAssessments = $this->assessments->filter(function (IAssessable $assessment) {
