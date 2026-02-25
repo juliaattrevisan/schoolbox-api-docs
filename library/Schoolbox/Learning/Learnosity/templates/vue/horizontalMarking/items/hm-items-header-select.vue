@@ -93,7 +93,7 @@ function onItemSelected(reference: string): void {
     align-items: center;
     align-self: start; // https://moderncss.dev/css-button-styling-guide/#gotcha-child-of-flex-columns
     background: var(--color-foreground-primary);
-    border: 1px solid var(--form-border-color);
+    border: 1px solid var(--sbx-color-accent, var(--form-border-color));
     color: var(--color-buttons-text);
     display: inline-flex;
     justify-content: space-between;
@@ -119,9 +119,9 @@ function onItemSelected(reference: string): void {
 
 .item-list {
     background: var(--color-foreground-primary);
-    border-left: 1px solid var(--form-border-color);
-    border-right: 1px solid var(--form-border-color);
-    border-bottom: 1px solid var(--form-border-color);
+    border-left: 1px solid var(--sbx-color-accent, var(--form-border-color));
+    border-right: 1px solid var(--sbx-color-accent, var(--form-border-color));
+    border-bottom: 1px solid var(--sbx-color-accent, var(--form-border-color));
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
     display: none;
     max-height: 250px;

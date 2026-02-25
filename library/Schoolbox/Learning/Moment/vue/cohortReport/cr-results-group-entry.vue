@@ -225,7 +225,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
 }
 
 .cr-result-entry {
-    border: 1px solid var(--form-border-color);
+    border: 1px solid var(--sbx-color-accent, var(--form-border-color));
 
     &--loading {
         opacity: 0.5;

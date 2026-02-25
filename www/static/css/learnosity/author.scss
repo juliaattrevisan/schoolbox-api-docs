@@ -363,8 +363,8 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 
 /* form styles */
 .lrn-qe .lrn-qe-ui .lrn-qe-form-control {
-    border: 1px solid var(--form-border-color);
-    border-color: var(--form-border-color);
+    border: 1px solid var(--sbx-color-accent, var(--form-border-color));
+    border-color: var(--sbx-color-accent, var(--form-border-color));
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-form-control:hover {
     background-color: var(--form-bg-hover-color);
@@ -378,7 +378,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     outline: none;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-form-el-reorderable .lrn-qe-form-el-reorder-handle {
-    border: 1px solid var(--form-border-color);
+    border: 1px solid var(--sbx-color-accent, var(--form-border-color));
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-btn-primary {
     background-color: var(--content-ui-background) !important;
@@ -447,8 +447,8 @@ span.lrn-qe-i-trash {
 
 /* select drop down styles */
 .lrn-qe .lrn-qe-ui .lrn-qe-custom-select select {
-    border: 1px solid var(--form-border-color);
-    border-color: var(--form-border-color);
+    border: 1px solid var(--sbx-color-accent, var(--form-border-color));
+    border-color: var(--sbx-color-accent, var(--form-border-color));
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-custom-select select:hover,
 .lrn-qe .lrn-qe-ui .lrn-qe-custom-select select:focus {
@@ -494,7 +494,7 @@ span.lrn-qe-i-trash {
 }
 .lrn.lrn-author .lrn-author-item-for-activity-list .lrn-author-check-box-wrapper .lrn-author-check-box-span {
     background: none;
-    border: 1px solid var(--form-border-color);
+    border: 1px solid var(--sbx-color-accent, var(--form-border-color));
     border-radius: 0px;
     color: transparent;
 }
@@ -509,7 +509,7 @@ span.lrn-qe-i-trash {
     .lrn-check-box-wrapper
     .lrn-check-box-input:checked
     + .lrn-check-box-span:hover {
-    background-color: var(--form-border-color);
+    background-color: var(--sbx-color-accent, var(--form-border-color));
 }
 
 .lrn
@@ -548,7 +548,7 @@ button.lrn-author-activity-button.lrn-author-btn-i-xs.lrn-author-btn-primary.lrn
     z-index: var(--sbx-depth-default);
 }
 span.lrn-author-name-wrapper {
-    border: 1px solid var(--form-border-color);
+    border: 1px solid var(--sbx-color-accent, var(--form-border-color));
 }
 
 /* questions and features button styles */
@@ -613,16 +613,16 @@ li.lrn-author-list-view-item.lrn-author-flyout-wrapper {
 }
 .lrn .lrn-author-ui .lrn-form-control-padded,
 .lrn .lrn-author-ui .lrn-form-control {
-    border: 1px solid var(--form-border-color);
+    border: 1px solid var(--sbx-color-accent, var(--form-border-color));
 }
 .lrn .lrn-author-ui .lrn-author-input-group-lg .lrn-author-input-group-btn {
-    border: 1px solid var(--form-border-color);
+    border: 1px solid var(--sbx-color-accent, var(--form-border-color));
     padding: 0.5rem 1rem;
 }
 .lrn .lrn-author-ui .lrn-author-input-group-lg .lrn-author-form-control {
     background-color: #fff;
-    border: 1px solid var(--form-border-color);
-    border-color: var(--form-border-color);
+    border: 1px solid var(--sbx-color-accent, var(--form-border-color));
+    border-color: var(--sbx-color-accent, var(--form-border-color));
     padding: 0.5rem;
 }
 .lrn .lrn-author-ui .lrn-author-btn-save.lrn-author-btn-saving {
@@ -654,17 +654,17 @@ li.lrn-author-list-view-item.lrn-author-flyout-wrapper {
 
 /* update search form dropdown styles */
 .lrn .lrn-author-ui .lrn-custom-select select {
-    border: 1px solid var(--form-border-color);
-    border-color: var(--form-border-color);
+    border: 1px solid var(--sbx-color-accent, var(--form-border-color));
+    border-color: var(--sbx-color-accent, var(--form-border-color));
 }
 .lrn .lrn-author-ui .lrn-custom-select select:hover {
     background-color: var(--form-bg-hover-color);
-    border-color: var(--form-border-color);
+    border-color: var(--sbx-color-accent, var(--form-border-color));
     color: #000000;
 }
 .lrn .lrn-author-ui .lrn-sort-author-button {
-    border: 1px solid var(--form-border-color);
-    border-color: var(--form-border-color);
+    border: 1px solid var(--sbx-color-accent, var(--form-border-color));
+    border-color: var(--sbx-color-accent, var(--form-border-color));
 }
 
 /* update search button text transformation from uppercase to unset  */

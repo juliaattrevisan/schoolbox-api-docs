@@ -378,7 +378,7 @@ export default {
 }
 
 input[type="radio"]:not(.plain) + label.input-toggle {
-    border: 1px solid var(--form-border-color);
+    border: 1px solid var(--sbx-color-accent, var(--form-border-color));
     margin-left: 0.5rem;
 }
 
@@ -389,7 +389,7 @@ input[type="radio"]:not(.plain) + label.input-toggle {
 }
 
 .content-container {
-    border: 1px solid var(--form-border-color);
+    border: 1px solid var(--sbx-color-accent, var(--form-border-color));
     border-radius: var(--sbx-config-field-roundness, 0);
     margin: auto;
     margin-top: 1rem;

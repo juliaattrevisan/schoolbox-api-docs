@@ -21,7 +21,7 @@ const searchStore = useSearchStore();
 
 <style lang="scss" scoped>
 .selected-results-container {
-    border: 1px solid var(--form-border-color);
+    border: 1px solid var(--sbx-color-accent, var(--form-border-color));
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
