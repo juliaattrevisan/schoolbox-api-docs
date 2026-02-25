@@ -58,7 +58,7 @@
 // to display a icon only button without the typical .actions-small-1 context
 .f-no-icon-button {
     background: none;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-color-accent, var(--content-ui-foreground));
     margin: 0;
     &:hover {
         // background: var(--content-ui-background);

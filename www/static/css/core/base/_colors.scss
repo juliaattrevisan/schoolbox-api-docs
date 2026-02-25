@@ -11,13 +11,13 @@
     --color-alert: #ea0a06;
     --color-success: #298129;
     --color-warning: #ff7d00;
-    --color-buttons: var(--content-ui-foreground);
+    --color-buttons: var(--sbx-color-accent, var(--content-ui-foreground));
     --color-buttons-hover: var(--content-ui-hover);
 
     --color-icon-badge: darkorange;
     --color-icon-course: #008600;
     --color-icon-class: #72c600;
-    --color-icon-folder: var(--content-ui-foreground);
+    --color-icon-folder: var(--sbx-color-accent, var(--content-ui-foreground));
     --color-icon-home: darkorange;
     --color-icon-learning-activity: #c1009e;
     --color-icon-unit: grey;

@@ -56,7 +56,7 @@ $f-dropdown-line-height: rem-calc(18) !default;
         }
         a,
         button {
-            color: var(--content-ui-foreground);
+            color: var(--sbx-color-accent, var(--content-ui-foreground));
             display: block;
             margin: 0;
             padding: $f-dropdown-list-padding;
@@ -67,7 +67,7 @@ $f-dropdown-line-height: rem-calc(18) !default;
                 text-decoration: none;
             }
             &::before {
-                color: var(--content-ui-foreground);
+                color: var(--sbx-color-accent, var(--content-ui-foreground));
             }
         }
     }

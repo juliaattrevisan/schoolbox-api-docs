@@ -15,7 +15,7 @@ $off-canvas-foreground: var(--off-canvas-foreground) !default;
 $off-canvas-background: var(--off-canvas-background) !default;
 $off-canvas-hover: var(--off-canvas-hover) !default;
 
-$content-ui-foreground: var(--content-ui-foreground) !default;
+$content-ui-foreground: var(--sbx-color-accent, var(--content-ui-foreground)) !default;
 $content-ui-background: var(--content-ui-background) !default;
 $content-ui-hover: var(--content-ui-hover) !default;
 $content-ui-selected: var(--content-ui-selected) !default;

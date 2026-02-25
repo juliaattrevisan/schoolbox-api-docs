@@ -19,8 +19,7 @@ $font-family-icon: var(--sbx-icon-font-family);
 
 [class^="icon-"],
 [class*=" icon-"] {
-    // DONE figure out what to do about this mixin
-    color: $body-foreground;
+    color: var(--sbx-color-text-secondary, $body-foreground);
     &:before {
         speak: none;
         font-family: var(--sbx-icon-font-family);

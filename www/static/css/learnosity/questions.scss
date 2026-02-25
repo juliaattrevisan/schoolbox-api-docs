@@ -29,12 +29,12 @@
     .lrn_response
     .lrn_mcqgroup-block
     .lrn-mcq-option.lrn_selected:not(.lrn_valid):not(.lrn_correct):not(.lrn_incorrect) {
-    border-left-color: var(--content-ui-foreground);
+    border-left-color: var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* update the drag item border color to  content-ui-foreground in Cloze with drag & drop */
 .lrn_widget .lrn_btn_drag {
-    box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
+    box-shadow: inset 0 0 0 1px var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* update focus color for drag and drop btn  */
@@ -43,9 +43,9 @@
 .lrn_widget .lrn_btn_sort:focus,
 .lrn_widget .lrn_btn_sort.lrn_focus {
     box-shadow:
-        inset 0 0 0 1px var(--content-ui-foreground),
+        inset 0 0 0 1px var(--sbx-color-accent, var(--content-ui-foreground)),
         inset 0 0 0 1px #fff,
-        inset 0 0 0 1px var(--content-ui-foreground);
+        inset 0 0 0 1px var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* update the hover color for drag and drop */
@@ -62,7 +62,7 @@
 .lrn_widget .lrn_btn_sort:active,
 .lrn_widget .lrn_btn_sort.lrn_active {
     background-color: var(--content-ui-selected);
-    color: var(--content-ui-foreground);
+    color: var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* update the drag and drop empty state styles  */
@@ -106,8 +106,8 @@
 /* updated the drop down styles*/
 .lrn_widget .lrn_response.lrn_cloze .lrn_combobox select.lrn-cloze-select {
     background-color: #fff;
-    border: 1px solid var(--content-ui-foreground);
-    color: var(--content-ui-foreground);
+    border: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
+    color: var(--sbx-color-accent, var(--content-ui-foreground));
     margin: 10px 0;
     padding: 0 20px 0 10px;
 }
@@ -128,7 +128,7 @@
 .lrn_widget input:not([type="radio"]):not([type="checkbox"]),
 .lrn_widget textarea,
 .lrn_widget .lrn_texteditor_editable {
-    border: 1px solid var(--content-ui-foreground);
+    border: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_cloze .lrn_response_input .lrn_textinput input,
 .lrn_cloze .lrn_response_input .lrn_textinput textarea {
@@ -141,43 +141,43 @@
     .lrn_dropzones_container
     .lrn_imagecloze_response
     .lrn_dropzone_mask {
-    border: 1px dashed var(--content-ui-foreground);
+    border: 1px dashed var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* update the border color for label image with text*/
 .lrn_widget .lrn_imagecloze_response .lrn_textinput.lrn_response_pointer_right:before {
-    border-left: 1.14285714em solid var(--content-ui-foreground);
+    border-left: 1.14285714em solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* update the border color for classification */
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table .lrn_response_container {
-    border-top: 1px dashed var(--content-ui-foreground);
-    border-left: 1px dashed var(--content-ui-foreground);
+    border-top: 1px dashed var(--sbx-color-accent, var(--content-ui-foreground));
+    border-left: 1px dashed var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_last {
-    border-right: 1px dashed var(--content-ui-foreground);
+    border-right: 1px dashed var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
-    border-bottom: 1px dashed var(--content-ui-foreground);
+    border-bottom: 1px dashed var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_association .lrn_response_container.lrn_dropzone {
-    border-color: var(--content-ui-foreground);
+    border-color: var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* update styles for order list*/
 .lrn_widget.lrn_orderlist .lrn_btn_sort.lrn_sort_block {
-    box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
+    box-shadow: inset 0 0 0 1px var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_orderlist .lrn_btn_sort.lrn_button:hover,
 .lrn_widget.lrn_orderlist .lrn_btn_sort.lrn_button.lrn_hover,
 .lrn_widget.lrn_orderlist .lrn_btn_sort.lrn_list:hover,
 .lrn_widget.lrn_orderlist .lrn_btn_sort.lrn_list.lrn_hover {
-    box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
+    box-shadow: inset 0 0 0 1px var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* update sortlist border, color and arrow icons styles */
 .lrn_widget.lrn_sortlist .lrn_response .lrn_cell {
-    border: 1px solid var(--content-ui-foreground);
+    border: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget .lrn_btn_drag:focus:hover,
 .lrn_widget .lrn_btn_drag.lrn_focus.lrn_hover,
@@ -188,48 +188,48 @@
 .lrn_widget .lrn_btn_sort.lrn_focus:hover,
 .lrn_widget .lrn_btn_sort:focus.lrn_hover {
     box-shadow:
-        inset 0 0 0 1px var(--content-ui-foreground),
-        inset 0 0 0 1px var(--content-ui-foreground);
+        inset 0 0 0 1px var(--sbx-color-accent, var(--content-ui-foreground)),
+        inset 0 0 0 1px var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn .lrn_btn_sort {
     color: #000;
 }
 .lrn_widget.lrn_sortlist .lrn_arrow_top span {
-    border-bottom: 1em solid var(--content-ui-foreground);
+    border-bottom: 1em solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_sortlist .lrn_arrow_down span {
-    border-top: 1em solid var(--content-ui-foreground);
+    border-top: 1em solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_sortlist .lrn_arrow_left span {
-    border-right: 1em solid var(--content-ui-foreground);
+    border-right: 1em solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_sortlist .lrn_arrow_right span {
-    border-left: 1em solid var(--content-ui-foreground);
+    border-left: 1em solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* update reachtext styles */
 .lrn_widget.lrn_chemistryessayV2 .lrn_response_input_wrapper,
 .lrn_widget.lrn_formulaessayV2 .lrn_response_input_wrapper,
 .lrn_widget.lrn_longtextV2 .lrn_response_input_wrapper {
-    border-color: var(--content-ui-foreground);
+    border-color: var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_chemistryessayV2 .lrn-toolbar,
 .lrn_widget.lrn_formulaessayV2 .lrn-toolbar,
 .lrn_widget.lrn_longtextV2 .lrn-toolbar {
     background: #ffff;
-    border-bottom: 1px solid var(--content-ui-foreground);
+    border-bottom: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_chemistryessayV2 .lrn-divider:after,
 .lrn_widget.lrn_formulaessayV2 .lrn-divider:after,
 .lrn_widget.lrn_longtextV2 .lrn-divider:after {
-    border-right: 1px solid var(--content-ui-foreground);
+    border-right: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
     transform: translate(0, -50%);
 }
 .lrn_widget.lrn_chemistryessayV2 .lrn-toolbar-footer,
 .lrn_widget.lrn_formulaessayV2 .lrn-toolbar-footer,
 .lrn_widget.lrn_longtextV2 .lrn-toolbar-footer {
     background: #ffff;
-    border-top: 1px solid var(--content-ui-foreground);
+    border-top: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_chemistryessayV2 .lrn_texteditor_editable:focus,
 .lrn_widget.lrn_chemistryessayV2 .lrn_texteditor_editable.lrn_active,
@@ -241,40 +241,40 @@
     outline: none;
 }
 .lrn_widget .lrn_texteditor_editable:focus {
-    border: 1px solid var(--content-ui-foreground);
+    border: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
     box-shadow: 1px 1px 2px #0000001a inset;
 }
 
 /* update shading styles */
 .lrn_widget.lrn_simpleshading .lrn-shading-cell {
     background-color: #e6f2fc;
-    border: 1px solid var(--content-ui-foreground);
+    border: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell.lrn-shading-selected:hover,
 .lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell.lrn-shading-selected:focus {
-    background-color: var(--content-ui-foreground);
+    background-color: var(--sbx-color-accent, var(--content-ui-foreground));
     border: 1px solid var(--content-ui-background);
 }
 .lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell:hover {
     background-color: rgba(255, 255, 255, 0.8);
-    border: 1px solid var(--content-ui-foreground);
+    border: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_simpleshading .lrn-shading-cell.lrn-shading-selected {
-    background-color: var(--content-ui-foreground);
+    background-color: var(--sbx-color-accent, var(--content-ui-foreground));
     border: 1px solid var(--content-ui-background);
 }
 .lrn_widget.lrn_simpleshading .lrn-shading-wrapper.lrn_no_touch .lrn-shading-cell:focus {
-    border: 1px solid var(--content-ui-foreground);
+    border: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* update token highlight styles */
 .lrn_widget.lrn_tokenhighlight .lrn_response .lrn_response_input_wrapper {
-    box-shadow: 0 0 0 1px var(--content-ui-foreground);
+    box-shadow: 0 0 0 1px var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* update Math and calculator styles */
 .lrn.lrn_widget .lrn_bordered_mathinput {
-    border: 1px solid var(--content-ui-foreground);
+    border: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget .lrn-formula-keyboard .lrn-formula-keyboard-close {
     top: -0.5em;
@@ -287,7 +287,7 @@
 /*update the radio and checkbox background color to content-ui-foregroud*/
 input[type="radio"],
 input[type="checkbox"] {
-    accent-color: var(--content-ui-foreground);
+    accent-color: var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /*the hover color of choice matrix-standard radio buttons set to content-ui-selected*/
@@ -297,7 +297,7 @@ input[type="checkbox"] {
 
 /*update the border color of dropzone in Cloze with drag & drop*/
 .lrn_dropzone {
-    border: 1px dashed var(--content-ui-foreground);
+    border: 1px dashed var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* update the drag items color to content-ui-foreground in Cloze with drago & drop */
@@ -307,19 +307,19 @@ input[type="checkbox"] {
 .lrn .lrn_btn_drag:active,
 .lrn .lrn_btn_drag.lrn_active,
 .lrn .lrn_btn_drag:focus {
-    color: var(--content-ui-foreground);
+    color: var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* update border styles for match list */
 .lrn_qr.lrn_association .lrn_response .lrn_assoc_question {
-    border: 1px solid var(--content-ui-foreground);
+    border: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_qr.lrn_association .lrn_response .lrn_arrows .lrn_arrow {
-    border-bottom: 0.36em solid var(--content-ui-foreground);
+    border-bottom: 0.36em solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_qr.lrn_association .lrn_response .lrn_arrows .lrn_arrow:after,
 .lrn_qr.lrn_association .lrn_response .lrn_arrows .lrn_arrow:before {
-    border: 0.4em solid var(--content-ui-foreground);
+    border: 0.4em solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* plaintext styles*/
@@ -336,51 +336,51 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
     background-color: #fff;
 }
 .lrn_texteditor > .lrn_toolbar {
-    border-left: 1px solid var(--content-ui-foreground);
-    border-right: 1px solid var(--content-ui-foreground);
-    border-top: 1px solid var(--content-ui-foreground);
+    border-left: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
+    border-right: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
+    border-top: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* update number line with drag and drop styles */
 .lrn .lrn_btn_arrow:after {
-    border-color: var(--content-ui-foreground) transparent transparent;
+    border-color: var(--sbx-color-accent, var(--content-ui-foreground)) transparent transparent;
 }
 .lrn_widget.lrn_numberline .lrn_btn_arrow {
-    border: 1px solid var(--content-ui-foreground);
+    border: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_numberline .lrn_btn_arrow:not(.lrn_disabled, .lrn_suggested):hover,
 .lrn_widget.lrn_numberline .lrn_btn_arrow:not(.lrn_disabled, .lrn_suggested):focus {
     background: var(--content-ui-selected);
-    border-color: var(--content-ui-foreground);
+    border-color: var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn .lrn_btn_arrow:active:after,
 .lrn .lrn_btn_arrow.lrn_active:after {
-    border-color: var(--content-ui-foreground) transparent transparent;
+    border-color: var(--sbx-color-accent, var(--content-ui-foreground)) transparent transparent;
 }
 
 /* update number line with plot styles  */
 .lrn_widget.lrn_numberlineplot .lrn_jxg_toolbox li button.lrn_active {
-    background: var(--content-ui-foreground);
+    background: var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* update file upload styles */
 .lrn_widget.lrn_fileupload .lrn_response_input_wrapper {
-    border-color: var(--content-ui-foreground);
+    border-color: var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_wid .lrn_widget.lrn_fileupload .lrn-toolbar,
 .lrn_widget.lrn_fileupload .lrn-toolbar,
 .lrn_widget .lrn-imageupload-config-outlet .lrn-imageupload-config-upload-btn-container,
 .lrn_widget .lrn-imageupload-img-wrapper-is-empty {
     background: #fff;
-    border-bottom: 1px solid var(--content-ui-foreground);
+    border-bottom: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget .lrn-imageupload-config-outlet .lrn-imageupload-config-upload-btn-container,
 .lrn_widget .lrn-imageupload-img-wrapper-is-empty {
-    border-left: 1px solid var(--content-ui-foreground);
-    border-right: 1px solid var(--content-ui-foreground);
+    border-left: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
+    border-right: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_imageupload .lrn_toolbar {
-    border: 1px solid var(--content-ui-foreground);
+    border: 1px solid var(--sbx-color-accent, var(--content-ui-foreground));
     touch-action: none;
     -ms-touch-action: none;
 }
@@ -388,10 +388,10 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 /* update rating styles */
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton,
 .lrn_widget.lrn_rating .lrn_response .lrn_ratingInfo_icon_wrap {
-    box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
+    box-shadow: inset 0 0 0 1px var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton:hover {
-    box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
+    box-shadow: inset 0 0 0 1px var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton:focus {
     box-shadow:
@@ -401,11 +401,11 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton.lrn_active {
     background-color: var(--content-ui-selected);
-    color: var(--content-ui-foreground);
+    color: var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton.lrn_active:focus {
     box-shadow:
-        inset 0 0 0 1px var(--content-ui-foreground),
+        inset 0 0 0 1px var(--sbx-color-accent, var(--content-ui-foreground)),
         inset 0 0 0 3px #fff;
 }
 
@@ -432,14 +432,14 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 /* update the classification drop zone borders */
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr .lrn_response_container.lrn_last,
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
-    border-right: 1px dashed var(--content-ui-foreground);
+    border-right: 1px dashed var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table tr.lrn_last .lrn_response_container {
-    border-bottom: 1px dashed var(--content-ui-foreground);
+    border-bottom: 1px dashed var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_classification .lrn_response .lrn_response_input_wrapper table .lrn_response_container {
-    border-left: 1px dashed var(--content-ui-foreground);
-    border-top: 1px dashed var(--content-ui-foreground);
+    border-left: 1px dashed var(--sbx-color-accent, var(--content-ui-foreground));
+    border-top: 1px dashed var(--sbx-color-accent, var(--content-ui-foreground));
 }
 .lrn_widget.lrn_classification
     .lrn_response
@@ -485,7 +485,7 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 /* update shortlist icon color */
 .lrn_widget.lrn_sortlist .lrn_response .lrn_btn_sort:active:before,
 .lrn_widget.lrn_sortlist .lrn_response .lrn_btn_sort.lrn_active:before {
-    color: var(--content-ui-foreground);
+    color: var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* update graphing border */
@@ -501,12 +501,12 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
 
 /* upload image button color */
 span.btn.lrn_btn_blue.lrn-imageupload-config-btn-upload {
-    background-color: var(--content-ui-foreground);
+    background-color: var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* upload file button color */
 .lrn_widget.lrn_fileupload .lrn-fileupload-btn-upload {
-    background-color: var(--content-ui-foreground);
+    background-color: var(--sbx-color-accent, var(--content-ui-foreground));
 }
 
 /* add "Add" before icon for adding question to an item */
@@ -514,12 +514,12 @@ button.lrn-author-widget-button.lrn-author-widget-button-more > span.lrn-author-
     content: " Add";
 }
 .lrn .lrn-author-ui .lrn-author-widget-button:hover .lrn-author-widget-icon:before {
-    color: var(--content-ui-foreground);
+    color: var(--sbx-color-accent, var(--content-ui-foreground));
     text-shadow: none;
 }
 button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
     background-color: var(--content-ui-hover) !important;
-    color: var(--content-ui-foreground) !important;
+    color: var(--sbx-color-accent, var(--content-ui-foreground)) !important;
     text-decoration: none !important;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-btn:focus,
@@ -594,7 +594,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
     background-color: var(--content-ui-background);
     border: none;
     border-radius: 0;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-color-accent, var(--content-ui-foreground));
     min-height: auto;
 }
 .lds-btn-secondary,
@@ -602,7 +602,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 .lds-btn-secondary,
 .lrn .lrn_btn:is(.lds-btn-secondary):focus {
     background-color: var(--content-ui-hover);
-    color: var(--content-ui-foreground);
+    color: var(--sbx-color-accent, var(--content-ui-foreground));
     font-family:
         -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial,
         sans-serif !important;
@@ -727,15 +727,15 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 }
 span.lrn-author {
     border-top-color: rgba(0, 0, 0, 0) !important;
-    color: var(--content-ui-foreground) !important;
+    color: var(--sbx-color-accent, var(--content-ui-foreground)) !important;
 }
 .lrn-author .lrn-author-ui .lrn-author-widget-sidebar li button [class^="lrn-author-i-"] {
     border-top: none !important;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-color-accent, var(--content-ui-foreground));
 }
 button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-default.lrn-author-btn-default-legacy.lrn-author-btn-icon-left {
     background-color: var(--content-ui-background) !important;
-    color: var(--content-ui-foreground) !important;
+    color: var(--sbx-color-accent, var(--content-ui-foreground)) !important;
     line-height: inherit !important;
     margin: auto;
     min-height: 2.5rem !important;

@@ -6,15 +6,14 @@
 
 :root {
     // Background
-    --sbx-color-body-background: var(--body-background); // Skin Config > Body Background Colour
+    --sbx-color-body-background: #e5eff7;
 
     // Foreground
     --sbx-color-foreground-primary: #fff;
     --sbx-color-foreground-secondary: #f4f2f2;
 
     // Text
-    // --sbx-color-text-primary: #000;
-    --sbx-color-text-primary: red;
+    --sbx-color-text-primary: #000;
     --sbx-color-text-secondary: #525252;
 
     // Status / semantic
@@ -24,13 +23,11 @@
     --sbx-color-highlight: #ffd100;
 
     // Accent
-    --sbx-color-accent: var(--form-border-color); // Skin Config > Form Input Border Colour
-    // --sbx-color-accent: green; // Skin Config > Form Input Border Colour
-    --sbx-color-accent-text: var(--content-ui-submit-foreground); // Skin Config > Form Submit Button Text Colour
+    // --sbx-color-accent: #001691;
+    --sbx-color-accent: green;
+    --sbx-color-accent-text: #fff;
 
     // Active
-    --sbx-color-active: var(--content-ui-selected); // Skin Config > Primary Interactive Content Selected-State Colour
-    --sbx-color-active-text: var(
-        --content-ui-foreground
-    ); // Skin Config > Primary Interactive Content Foreground Colour
+    --sbx-color-active: var(--content-ui-selected);
+    --sbx-color-active-text: var(--sbx-color-accent, var(--content-ui-foreground));
 }

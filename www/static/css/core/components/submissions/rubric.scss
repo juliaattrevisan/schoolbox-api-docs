@@ -342,8 +342,8 @@ table.rb {
     //Background stripes for blank rubric
     background-image: repeating-linear-gradient(
         135deg,
-        var(--content-ui-foreground) 0px,
-        var(--content-ui-foreground) 5px,
+        var(--sbx-color-accent, var(--content-ui-foreground)) 0px,
+        var(--sbx-color-accent, var(--content-ui-foreground)) 5px,
         #fff 5px,
         #fff 20px
     );
