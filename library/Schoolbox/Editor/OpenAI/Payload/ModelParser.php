@@ -74,9 +74,20 @@ class ModelParser
      */
     public function filterPayload(array $payload, string $model): array
     {
+        // GPT-4o and 4.1 family models:
+        // * don't support reasoning
+        // * only support medium verbosity
+        $version = $this->extractModelVersion($model);
+        if (in_array($version, ['4o', '4.1'])) {
+            unset($payload['reasoning']);
+            if (isset($payload['text']['verbosity'])) {
+                $payload['text']['verbosity'] = 'medium';
+            }
+        }
+
         // GPT-5 doesn't support temperature and top_p, however GPT-5.2 does,
         // or at least does not error when you pass them
-        if ($this->extractModelVersion($model) === '5') {
+        if ($version === '5') {
             unset($payload['temperature'], $payload['top_p']);
         }
         return $payload;
