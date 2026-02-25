@@ -191,7 +191,11 @@ class LearningActivityCustomisation
             ],
             'stream' => false,
             'text' => [
-                'format' => $responseFormat
+                'format' => $responseFormat,
+                'verbosity' => 'low',
+            ],
+            'reasoning' => [
+                'effort' => 'minimal',
             ],
         ];
         return new ModelParser()->filterPayload($payload, $model);

@@ -199,6 +199,10 @@ class DialogAgentConfigureFields
             'stream' => false,
             'text' => [
                 'format' => $this->generateResponseFormat($scenario),
+                'verbosity' => 'low',
+            ],
+            'reasoning' => [
+                'effort' => 'minimal',
             ],
         ];
 

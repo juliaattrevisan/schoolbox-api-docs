@@ -148,6 +148,10 @@ class DialogAgentFeedback
             'stream' => false,
             'text' => [
                 'format' => $this->generateResponseFormat($scenario),
+                'verbosity' => 'low',
+            ],
+            'reasoning' => [
+                'effort' => 'minimal',
             ],
         ];
 

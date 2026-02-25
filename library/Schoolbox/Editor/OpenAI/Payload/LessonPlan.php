@@ -310,8 +310,12 @@ class LessonPlan
              */
             "stream" => false,
             'text' => [
-                'format' => $responseFormat
-            ]
+                'format' => $responseFormat,
+                'verbosity' => 'low',
+            ],
+            'reasoning' => [
+                'effort' => 'minimal',
+            ],
         ];
 
         /* Add in the overarching text system prompt if available

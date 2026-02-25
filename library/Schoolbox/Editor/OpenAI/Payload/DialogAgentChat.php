@@ -161,6 +161,10 @@ class DialogAgentChat
                 'format' => [
                     'type' => 'text',
                 ],
+                'verbosity' => 'low',
+            ],
+            'reasoning' => [
+                'effort' => 'minimal',
             ],
         ];
 
