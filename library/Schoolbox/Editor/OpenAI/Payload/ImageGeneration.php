@@ -152,6 +152,10 @@ class ImageGeneration
                 'format' => [
                     'type' => 'text',
                 ],
+                'verbosity' => 'low',
+            ],
+            'reasoning' => [
+                'effort' => 'none',
             ],
         ];
 
