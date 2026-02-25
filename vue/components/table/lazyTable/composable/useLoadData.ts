@@ -6,7 +6,7 @@ import type { Ref } from "vue";
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { isNewUrl } from "@js/util/queryUtils";
 import { apiRequest } from "@js/util/sbx/apiUtils";
-import type { Header, Payload } from "@schoolboxVue/components/table/lazyTable/types/lazyTableTypes";
+import type { Header, Payload } from "@schoolboxVue/components/cell/cellTypes/BasicType";
 
 /**
  * load the table data from the given url.

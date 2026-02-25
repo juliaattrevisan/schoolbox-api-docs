@@ -6,7 +6,7 @@ import { defineStore } from "pinia";
 import type { Nested } from "@js/util/queryUtils";
 import { SearchParam } from "@js/util/sbx/apiUtils";
 import { getKeyValuePairs } from "@js/util/queryUtils";
-import type { Header } from "@schoolboxVue/components/grid/lazyGrid/types/lazyGridTypes";
+import type { Header } from "../../../cell/cellTypes/BasicType";
 import { ON_FILTER_CHANGE } from "../event/LazyGridEvent";
 import { useLoadData } from "../composable/useLoadData";
 

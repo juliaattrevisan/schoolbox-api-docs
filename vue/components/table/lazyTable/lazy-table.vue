@@ -3,7 +3,7 @@
  * To display a grid-like display
  */
 
-import type { Header } from "./types/lazyTableTypes";
+import type { Header } from "../../cell/cellTypes/BasicType";
 
 const props = defineProps<{
     header: Header[];

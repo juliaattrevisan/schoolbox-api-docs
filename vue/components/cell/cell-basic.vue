@@ -3,7 +3,7 @@
  * Display a basic cell value, with optional link support.
  */
 
-import type { BasicType } from "../types/lazyGridTypes";
+import type { BasicType } from "@schoolboxVue/components/cell/cellTypes/BasicType";
 
 const props = defineProps<{
     value: BasicType;
