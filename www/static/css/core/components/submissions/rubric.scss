@@ -353,9 +353,7 @@ table.rb {
     opacity: 0.25;
 }
 .rb-final-summary {
-    background-color: var(--sbx-color-accent, $input-border-color) !important;
-    // DONE use contrasting color
-    color: $input-border-color-contrast;
+    font-weight: var(--sbx-font-weight-active);
 }
 
 .rb-description,
