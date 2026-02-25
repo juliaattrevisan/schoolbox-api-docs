@@ -20,6 +20,7 @@ use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment\AssessmentType\Definition as AssessmentTypeDefinition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -709,8 +710,9 @@ class Controller extends Base
                 [
                     $folder->getId(),  // typically 80, 9ENGA
                     78, // 9SPANISHA
-                    189,  // 9MATA
+                    189, // 9MATA
                     85, // 9PDHC
+                    190, // 9MYPA
                 ],
                 null,
                 //['ids' => $assessmentIds]
@@ -722,7 +724,11 @@ class Controller extends Base
                  */
                 [
 //                    'ids' => $assessmentIds,
-                    'due_after' => new \Alaress_Date_Format('2026-04-03 00:00:00', 'Y-m-d H:i:s')
+                    'due_after' => new \Alaress_Date_Format('2026-01-01 00:00:00', 'Y-m-d H:i:s'),
+                    'type' => [
+                        AssessmentType::TYPE_DUE_WORK,
+                        AssessmentType::TYPE_QUIZ
+                    ]
                 ]
             );
         }
@@ -735,7 +741,7 @@ class Controller extends Base
             assessments: $assessments,
             defaultMarkScheme: $overallMarkScheme,
             viewingUser: $this->getUser(),
-            studentIds: null,
+            studentIds: [13,20],
             curriculumCodes: null,
             folderIds: null,
         );
