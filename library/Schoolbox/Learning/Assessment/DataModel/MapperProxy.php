@@ -1954,12 +1954,74 @@ class MapperProxy
             $closeDateColumn   = "$aTable.close_date";
         }
 
+        /* Restrict to a particular set of assessment identifiers, if provided. This *must* be a set of assessment ids,
+         * if provided: singular scalar values aren't allowed.
+         */
+        $assessmentIds = null;
 
-        // IDs
         if (is_iterable($options['ids'] ?? null)) {
-            $builder->in("$aTable.id", $options['ids']);
+            $assessmentIds = $options['ids'];
         }
 
+        /* Restrict to a particular set of assessment identifiers that intersect with curriculum code usage, if provided
+         * This is done separately and only on demand, rather than altering the base selection to always include curric
+         * codes. That's because there's a mega left join that will only be bigger if you join onto curric nodes too;
+         * even if you never intended to use them.
+         *
+         * Therefore, only incur the cost *if needed*, rather than always.
+         */
+        if (is_iterable($options['curriculum_codes'] ?? null)) {
+            $curriculumNodeMapper = \Schoolbox\Curriculum\Node\Mapper::getInstance();
+
+            $ccpb = $curriculumNodeMapper->getPredicateBuilder()
+                ->in('code', $options['curriculum_codes']);
+
+            $curriculumnNodeIds = $curriculumNodeMapper->findByPredicates($ccpb)->getPropertyValues('id');
+
+            $placeholders = Builder::getArrayPlaceholders($curriculumnNodeIds, 'cnodeIds');
+            $params = Builder::getArrayParameters($curriculumnNodeIds, 'cnodeIds');
+
+            $statement = $this->baseMapper->getDatabase()->prepare("
+                SELECT assessment_id
+                FROM {$aTable} a
+                INNER JOIN curriculum_node_for_assessment cnfa ON a.id = cnfa.assessment_id 
+                WHERE cnfa.curriculum_node_id IN {$placeholders}
+            ");
+
+            $statement->execute($params);
+
+            /* We tried to filter this (even if it results in an empty set)
+             */
+            $assessmentIds = [];
+
+            while ($row = $statement->fetch()) {
+                $assessmentIds[] = $row['assessment_id'];
+            }
+        }
+
+        /* If any assessment ids remain, filter to those; otherwise don't filter on assessment identifiers at all.
+         * Note this introduces the possibility that your assessment ids and curric node usage is so exclusive that it
+         * returns everything, instead of returning nothing: that might be a bit misleading.
+         *
+         * As per filters: nothing selected == everything selected...hmm
+         */
+
+        /* $assessmentIds != null means that we tried to filter assessment ids somehow, even if that filtration
+         * returned an empty set.
+         */
+        if (null !== $assessmentIds) {
+            if (count($assessmentIds)) {
+                /* If there are some assessmentIds in particular to examine, use those
+                 */
+                $builder->in("$aTable.id", $assessmentIds);
+            } else {
+                /* We filtered on specific assessment ids, but the end result of all the filtrations is that there are
+                 * no assessments that match the criteria; instead of returning everything, return nothing by fetching
+                 * an impossible record (-1 identifier)
+                 */
+                $builder->in("$aTable.id", [-1]);
+            }
+        }
 
         // Due before / after filter (an ADF)
         if (isset($options['due_after']) && $options['due_after'] instanceof \Alaress_Date_Format) {

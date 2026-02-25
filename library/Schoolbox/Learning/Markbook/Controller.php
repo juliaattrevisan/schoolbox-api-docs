@@ -730,7 +730,7 @@ class Controller extends Base
                  * date range filters, term-based filters, etc. deep in the swamp where you'd never look.
                  */
                 [
-                    'due_after' => new \Alaress_Date_Format('2026-02-01 00:00:00', 'Y-m-d H:i:s'),
+                    'due_after' => new \Alaress_Date_Format('2026-01-01 00:00:00', 'Y-m-d H:i:s'),
                     'due_before' => new \Alaress_Date_Format('2026-02-06 00:00:00', 'Y-m-d H:i:s'),
                     'type' => [
                         AssessmentType::TYPE_DUE_WORK,
@@ -741,6 +741,9 @@ class Controller extends Base
                     'work_type' => [
                         7, // Reporting
                         3, // Learning Activity
+                    ],
+                    'curriculum_codes' => [
+                        'AC9SAS09'
                     ]
                 ]
             );
@@ -755,7 +758,7 @@ class Controller extends Base
             defaultMarkScheme: $overallMarkScheme,
             viewingUser: $this->getUser(),
             studentIds: null,
-            curriculumCodes: ['AC9SAS09'],
+            curriculumCodes: null,
             folderIds: null,
         );
 
