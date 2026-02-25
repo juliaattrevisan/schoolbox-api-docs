@@ -44,7 +44,7 @@
                 text-align: center;
                 width: $global-button-height;
                 line-height: strip-unit($global-button-height);
-                color: $content-ui-foreground;
+                color: var(--sbx-color-accent, $content-ui-foreground);
 
                 &:before {
                     padding-right: 0;
@@ -56,7 +56,7 @@
                 }
                 &.selected {
                     color: $content-ui-selected;
-                    background-color: $content-ui-foreground;
+                    background-color: var(--sbx-color-accent, $content-ui-foreground);
                 }
                 &:hover {
                     background-color: rgba(0, 0, 0, 0.1);
@@ -75,7 +75,7 @@
 
             input:checked + label {
                 a {
-                    background-color: $content-ui-foreground;
+                    background-color: var(--sbx-color-accent, $content-ui-foreground);
                     // DONE As far as I can know, there's never a checkbox inside a header action
                     color: $content-ui-selected;
                 }

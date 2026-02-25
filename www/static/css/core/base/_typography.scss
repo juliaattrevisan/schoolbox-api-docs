@@ -12,8 +12,8 @@
 
 $anchor-text-decoration: none;
 $anchor-text-decoration-hover: none;
-$anchor-font-color: $content-ui-foreground;
-$anchor-font-color-hover: $content-ui-foreground;
+$anchor-font-color: var(--sbx-color-accent, $content-ui-foreground);
+$anchor-font-color-hover: var(--sbx-color-accent, $content-ui-foreground);
 a {
     color: var(--sbx-color-accent, $anchor-font-color);
     line-height: inherit;

@@ -340,7 +340,7 @@ $container-bg: white;
 
 // reveal more info on selection, see Expandable on: https://vagrant.dev.schoolbox.cloud/pantry
 .expander {
-    color: $content-ui-foreground;
+    color: var(--sbx-color-accent, $content-ui-foreground);
     line-height: 1;
     font-size: 1rem;
     text-decoration: none;
@@ -673,7 +673,7 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
 $train-line-segment-maxlength: 15rem;
 $train-line-stop-size: 2rem;
 $train-line-segment-width: 0.25rem;
-$train-line-visited-color: $content-ui-foreground;
+$train-line-visited-color: var(--sbx-color-accent, $content-ui-foreground);
 $train-line-visited-glow-blur: 0.5rem;
 $train-line-unvisited-color: $content-ui-background;
 .train-line {
@@ -700,7 +700,7 @@ $train-line-unvisited-color: $content-ui-background;
             width: 50%;
             position: absolute;
             top: 0;
-            background: $content-ui-foreground;
+            background: var(--sbx-color-accent, $content-ui-foreground);
         }
         &:before {
             left: 0;
@@ -726,7 +726,7 @@ $train-line-unvisited-color: $content-ui-background;
                 }
             }
             a span {
-                box-shadow: 0 0 $train-line-visited-glow-blur $content-ui-foreground;
+                box-shadow: 0 0 $train-line-visited-glow-blur var(--sbx-color-accent, $content-ui-foreground);
             }
         }
         a {
@@ -736,7 +736,7 @@ $train-line-unvisited-color: $content-ui-background;
             // The 0.4 multiplier and offset is empirical - I don't know what the math is
             // to derive it from the stop size or segment width
             span {
-                background: $content-ui-foreground;
+                background: var(--sbx-color-accent, $content-ui-foreground);
                 border-radius: calc($train-line-stop-size / 2);
                 // DONE use contrasting color
                 color: $content-ui-foreground-contrast;

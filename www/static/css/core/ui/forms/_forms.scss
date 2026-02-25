@@ -628,7 +628,7 @@ td {
     $checkbox-margin: 0.5rem,
     $icon-size: 1rem,
     $hover-color: $input-border-color,
-    $active-color: $content-ui-foreground
+    $active-color: var(--sbx-color-accent, $content-ui-foreground)
 ) {
     $checkbox-inner-size: $checkbox-size - (2 * $input-border-width);
     $label-selector: "label";
@@ -682,7 +682,7 @@ td {
         + #{$label-selector} {
             &:before,
             &:after {
-                color: $content-ui-foreground !important;
+                color: var(--sbx-color-accent, $content-ui-foreground) !important;
                 background-color: $content-ui-background;
             }
         }
@@ -692,7 +692,7 @@ td {
         + #{$label-selector} {
             &:before,
             &:after {
-                color: $content-ui-foreground !important;
+                color: var(--sbx-color-accent, $content-ui-foreground) !important;
                 background-color: $content-ui-background;
             }
             &:after {
@@ -747,7 +747,7 @@ td {
     display: block;
     background-color: $white;
     border: $input-border-width solid $content-ui-background;
-    color: $content-ui-foreground;
+    color: var(--sbx-color-accent, $content-ui-foreground);
     margin: 0 0 1rem 0;
     padding: ($base-font-size - 4);
     width: 100%;
@@ -758,14 +758,14 @@ td {
     transition: all 0.1s ease-in;
     i {
         @extend .size-32;
-        color: $content-ui-foreground;
+        color: var(--sbx-color-accent, $content-ui-foreground);
         padding-right: 0.35rem;
         float: left;
         line-height: 1;
     }
     &:hover {
         background-color: $content-ui-background;
-        color: $content-ui-foreground;
+        color: var(--sbx-color-accent, $content-ui-foreground);
         cursor: pointer;
     }
 }
@@ -774,8 +774,8 @@ input[type="radio"] {
         @extend .button-block;
     }
     &:checked + .block {
-        background-color: $content-ui-foreground;
-        border: $input-border-width solid $content-ui-foreground;
+        background-color: var(--sbx-color-accent, $content-ui-foreground);
+        border: $input-border-width solid var(--sbx-color-accent, $content-ui-foreground);
         color: $content-ui-selected;
         i {
             color: $content-ui-selected;
@@ -789,7 +789,7 @@ input[type="radio"] {
     $toggle-height: $input-height,
     $toggle-width: $input-height,
     $hover-background-color: $button-bg-hover,
-    $active-color: $content-ui-foreground,
+    $active-color: var(--sbx-color-accent, $content-ui-foreground),
     $active-text-color: $content-ui-foreground-contrast
 ) {
     $label-selector: "label";

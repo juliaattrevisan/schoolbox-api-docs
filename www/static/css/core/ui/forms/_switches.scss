@@ -27,7 +27,7 @@ $switch-bottom-margin: 1rem;
 $switch-paddle-bg: $white !default;
 $switch-paddle-transition-speed: 0.15s !default;
 $switch-paddle-transition-ease: ease-out !default;
-$switch-active-color: $content-ui-foreground;
+$switch-active-color: var(--sbx-color-accent, $content-ui-foreground);
 
 //
 // @mixins

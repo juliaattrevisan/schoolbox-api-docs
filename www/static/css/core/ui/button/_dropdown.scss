@@ -80,7 +80,7 @@ $f-dropdown-line-height: rem-calc(18) !default;
     .separator,
     .meta {
         // DONE making this color transparent works okay
-        color: css-scale-color($content-ui-foreground, $alpha: -65%);
+        color: css-scale-color(var(--sbx-color-accent, $content-ui-foreground), $alpha: -65%);
     }
 
     .separator {

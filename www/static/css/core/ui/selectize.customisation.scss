@@ -80,7 +80,7 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
             a {
                 padding: 0.5rem !important;
                 width: 1.5rem !important;
-                color: $content-ui-foreground;
+                color: var(--sbx-color-accent, $content-ui-foreground);
             }
         }
         .selectize-input.input-active {
@@ -165,7 +165,7 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
         font-size: $selectize-font-size;
 
         .remove {
-            color: $content-ui-foreground;
+            color: var(--sbx-color-accent, $content-ui-foreground);
         }
 
         /* !important because of chrome.css

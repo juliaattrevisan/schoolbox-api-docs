@@ -49,7 +49,7 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
         padding: 0;
     }
 }
-@mixin list-interaction($selector, $cursor, $icon: "", $color: $content-ui-foreground) {
+@mixin list-interaction($selector, $cursor, $icon: "", $color: var(--sbx-color-accent, $content-ui-foreground)) {
     > li {
         > div:first-of-type {
             @extend %interaction-li;
@@ -374,10 +374,10 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
     @extend .action-list;
     .card {
         a {
-            color: $content-ui-foreground;
+            color: var(--sbx-color-accent, $content-ui-foreground);
         }
         .size-32 {
-            color: $content-ui-foreground;
+            color: var(--sbx-color-accent, $content-ui-foreground);
             padding-top: 1rem;
         }
     }

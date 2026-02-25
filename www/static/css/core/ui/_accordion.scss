@@ -13,7 +13,7 @@ $accordion-navigation-bg-color: $content-ui-background;
 $accordion-navigation-hover-bg-color: $content-ui-hover;
 $accordion-navigation-active-bg-color: $content-ui-background;
 $accordion-navigation-active-font-color: $jet !default;
-$accordion-navigation-font-color: $content-ui-foreground;
+$accordion-navigation-font-color: var(--sbx-color-accent, $content-ui-foreground);
 $accordion-navigation-font-size: rem-calc(($base-font-size));
 $accordion-navigation-font-family: $body-font-family !default;
 

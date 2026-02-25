@@ -152,11 +152,11 @@
     }
     input,
     [type="submit"] {
-        color: $content-ui-foreground;
+        color: var(--sbx-color-accent, $content-ui-foreground);
         display: inline-block;
 
         &:hover {
-            color: $content-ui-foreground;
+            color: var(--sbx-color-accent, $content-ui-foreground);
         }
     }
     p {
