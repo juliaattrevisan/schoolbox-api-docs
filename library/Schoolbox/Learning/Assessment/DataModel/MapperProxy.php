@@ -2050,13 +2050,17 @@ class MapperProxy
         if (isset($options['work_type'])) {
             $workTypes = $options['work_type'];
 
-            /* Co-erce singular values into a set
+            /* Co-erce singular values into a set...
              */
             if (!is_array($options['work_type'])) {
                 $workTypes = [$options['work_type']];
             }
 
-            $builder->in('work_type_id', $workTypes);
+            /* ...but it only matters if we had anything to filter upon
+             */
+            if (count($workTypes)) {
+                $builder->in('work_type_id', $workTypes);
+            }
         }
 
         // Assessment title filter?
