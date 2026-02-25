@@ -4,7 +4,7 @@ $selectize-font-size: rem-calc(($base-font-size - 3));
 $selectize-line-height: 18px !default;
 
 $selectize-color-text: $body-font-color;
-$selectize-color-border: $input-border-color;
+$selectize-color-border: var(--sbx-color-accent, $input-border-color);
 $selectize-color-highlight: $highlight-color;
 $selectize-color-input: $white !default;
 $selectize-color-input-full: $selectize-color-input !default;

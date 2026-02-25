@@ -21,7 +21,7 @@ $input-font-color: $black;
 $input-font-size: $paragraph-font-size;
 $input-bg-color: $white;
 $input-focus-bg-color: $form-bg-hover-color;
-$input-border-color: $form-border-color !default;
+$input-border-color: var(--sbx-color-accent, $form-border-color) !default;
 $input-focus-border-color: css-darken($form-border-color, 15%);
 $input-border-style: solid;
 $input-border-width: 0.0625rem;
@@ -78,7 +78,7 @@ $input-number-spinners: true !default;
     border: {
         style: $input-border-style;
         width: $input-border-width;
-        color: $input-border-color;
+        color: var(--sbx-color-accent, $input-border-color);
     }
     box-shadow: none;
     color: $input-font-color;
@@ -186,7 +186,7 @@ $input-number-spinners: true !default;
     border: {
         style: $input-border-style;
         width: $input-border-width;
-        color: $input-border-color;
+        color: var(--sbx-color-accent, $input-border-color);
     }
     color: $input-font-color;
     font-family: $input-font-family;
@@ -450,7 +450,7 @@ select {
     &:hover {
         background-color: $input-hover-bg-color;
         color: $input-hover-color;
-        border-color: $input-border-color;
+        border-color: var(--sbx-color-accent, $input-border-color);
     }
     &:focus {
         color: $input-focus-color;
@@ -627,7 +627,7 @@ td {
     $checkbox-size: 1.5rem,
     $checkbox-margin: 0.5rem,
     $icon-size: 1rem,
-    $hover-color: $input-border-color,
+    $hover-color: var(--sbx-color-accent, $input-border-color),
     $active-color: var(--sbx-color-accent, $content-ui-foreground)
 ) {
     $checkbox-inner-size: $checkbox-size - (2 * $input-border-width);
@@ -849,7 +849,7 @@ input[type="checkbox"].plain {
 .checklist.checklist-container {
     padding: 0;
     max-height: 13rem;
-    border: $fieldset-border-width $fieldset-border-style $input-border-color;
+    border: $fieldset-border-width $fieldset-border-style var(--sbx-color-accent, $input-border-color);
 
     input[type="checkbox"]:not(.plain):not(:disabled) {
         border: none;
@@ -863,7 +863,7 @@ input[type="checkbox"].plain {
         }
 
         + label {
-            border-bottom: 1px solid $input-border-color;
+            border-bottom: 1px solid var(--sbx-color-accent, $input-border-color);
             margin: 0;
             padding: 0.5rem 0 0.5rem 2rem;
             width: 100%;

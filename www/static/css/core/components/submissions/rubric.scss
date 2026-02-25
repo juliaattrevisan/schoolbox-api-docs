@@ -82,7 +82,7 @@ table.rb {
         }
 
         input[type="tel"] {
-            border-color: $input-border-color;
+            border-color: var(--sbx-color-accent, $input-border-color);
             background-color: $container-bg;
         }
     }
@@ -145,7 +145,7 @@ table.rb {
             input[type="text"],
             input[type="tel"],
             textarea {
-                border-color: $input-border-color;
+                border-color: var(--sbx-color-accent, $input-border-color);
                 background-color: $container-bg;
             }
         }
@@ -209,7 +209,7 @@ table.rb {
         }
 
         input[type="tel"] {
-            border-color: $input-border-color;
+            border-color: var(--sbx-color-accent, $input-border-color);
             color: calc-text-color($container-bg);
             background-color: $container-bg;
             width: 5rem;
@@ -353,7 +353,7 @@ table.rb {
     opacity: 0.25;
 }
 .rb-final-summary {
-    background-color: $input-border-color !important;
+    background-color: var(--sbx-color-accent, $input-border-color) !important;
     // DONE use contrasting color
     color: $input-border-color-contrast;
 }
