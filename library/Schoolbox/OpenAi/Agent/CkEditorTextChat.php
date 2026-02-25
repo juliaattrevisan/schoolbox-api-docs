@@ -88,6 +88,16 @@ class CkEditorTextChat
      */
     private function buildPayload(array $payload): array
     {
+        // Model depends on azure vs. OpenAI
+        $provider = $this->config[Config::FIELD_PROVIDER]['value'];
+        $payload['model'] = $provider === Helper::ENDPOINT_TYPE_AZURE
+            ? ($this->config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? '')
+            : ($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? '')
+        ;
+        $payload['stream'] = true;
+        $payload['max_completion_tokens'] = 10000;
+        $payload['temperature'] = 1;
+        $payload['top_p'] = 1;
         $payload['messages'] ??= [];
         $payload['stream_options'] = ['include_usage' => true];
         $systemPrompt = $this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? '';
