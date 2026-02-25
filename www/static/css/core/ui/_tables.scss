@@ -64,8 +64,8 @@ $table-margin-bottom: rem-calc(($base-font-size - 2));
     table-layout: $table-layout;
 
     caption {
-        background: $table-caption-bg;
-        color: $table-caption-font-color;
+        background: var(--sbx-color-foreground-primary, $table-caption-bg);
+        color: var(--sbx-color-text-primary, $table-caption-font-color);
         font: {
             size: $table-caption-font-size;
             weight: $table-caption-font-weight;
@@ -78,7 +78,7 @@ $table-margin-bottom: rem-calc(($base-font-size - 2));
         tr {
             th,
             td {
-                color: $table-head-font-color;
+                color: var(--sbx-color-text-primary, $table-head-font-color);
                 font-size: $table-head-font-size;
                 font-weight: $table-head-font-weight;
                 padding: $table-head-padding;
@@ -92,7 +92,7 @@ $table-margin-bottom: rem-calc(($base-font-size - 2));
         tr {
             th,
             td {
-                color: $table-foot-font-color;
+                color: var(--sbx-color-text-primary, $table-foot-font-color);
                 font-size: $table-foot-font-size;
                 font-weight: $table-foot-font-weight;
                 padding: $table-foot-padding;
@@ -103,7 +103,7 @@ $table-margin-bottom: rem-calc(($base-font-size - 2));
     tr {
         th,
         td {
-            color: $table-row-font-color;
+            color: var(--sbx-color-text-primary, $table-row-font-color);
             font-size: $table-row-font-size;
             padding: $table-row-padding;
             text-align: $default-float;
@@ -165,7 +165,7 @@ table th {
 td,
 th {
     vertical-align: top;
-    border-bottom: 1px solid $body-bg;
+    border-bottom: 1px solid var(--sbx-color-text-secondary, $body-bg);
     input[type="radio"] + label.radio-label,
     input[type="checkbox"] + label.checkbox-label {
         margin: 0 rem-calc(($base-font-size)) 0 0;
@@ -175,7 +175,7 @@ th {
 tr.sub-row {
     th,
     td {
-        background-color: $gainsboro;
+        background-color: var(--sbx-color-foreground-secondary, $gainsboro);
     }
 }
 
@@ -189,7 +189,7 @@ tbody.skeleton {
 
 .row-header,
 .island table.dataTable thead th {
-    border-bottom: 2px solid $body-bg;
+    border-bottom: 2px solid var(--sbx-color-text-secondary, $body-bg);
     font-weight: $font-weight-semibold;
 }
 
@@ -206,7 +206,7 @@ tbody.skeleton {
 .information-list {
     li.row-header {
         padding-top: 0.5rem;
-        border-bottom: 2px solid $body-bg;
+        border-bottom: 2px solid var(--sbx-color-text-secondary, $body-bg);
     }
 }
 
@@ -232,14 +232,14 @@ tr:hover {
 /* Don't use row hovers on Timetable Grid screens anymore
  * They don't do much now due to fully-expanding coloured blocks
  */
-table:not(.no-hover) tbody tr:hover {
-    nav a {
-        opacity: 1;
-        &:hover {
-            background-color: $row-action-hover-background;
-        }
-    }
-}
+// table:not(.no-hover) tbody tr:hover {
+//     nav a {
+//         opacity: 1;
+//         &:hover {
+//             background-color: $row-action-hover-background;
+//         }
+//     }
+// }
 
 $diagonal-cell-width: 4rem;
 $rotate-width: 4.5rem;
@@ -262,13 +262,13 @@ $rotate-span-width: 11rem;
         position: sticky;
         z-index: calc(var(--sbx-depth-default) + 2);
         top: 0;
-        background-color: $body-bg;
+        background-color: var(--sbx-color-foreground-primary, $body-bg);
 
         tr.rotate-headers {
             th {
                 border: 0;
                 font-size: $paragraph-font-size;
-                border-color: $vapor;
+                border-color: var(--sbx-color-text-secondary, $vapor);
                 height: $rotate-width * 2 + 1;
                 min-width: $rotate-th-width;
                 vertical-align: bottom;
@@ -280,10 +280,10 @@ $rotate-span-width: 11rem;
 
                 // Prevent data showing under fixed cells when scrolling horizontally.
                 &:has(div:empty) {
-                    background-color: $body-bg;
+                    background-color: var(--sbx-color-foreground-primary, $body-bg);
 
                     div {
-                        background-color: $body-bg;
+                        background-color: var(--sbx-color-foreground-primary, $body-bg);
                     }
                 }
 
@@ -300,8 +300,8 @@ $rotate-span-width: 11rem;
                     pointer-events: auto;
 
                     &:not(:empty) {
-                        background-color: $white;
-                        border: 0 solid $body-bg;
+                        background-color: var(--sbx-color-foreground-primary, $white);
+                        border: 0 solid var(--sbx-color-text-secondary, $body-bg);
                         border-right-width: 3px;
                         border-bottom-width: 2px;
                     }

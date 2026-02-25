@@ -25,7 +25,7 @@ $ups-log-window-height: 30rem !default;
     }
 
     [class^="level-"]:hover {
-        color: $ups-hover-color;
+        color: var(--sbx-color-text-primary, $ups-hover-color);
     }
 
     li.squash {

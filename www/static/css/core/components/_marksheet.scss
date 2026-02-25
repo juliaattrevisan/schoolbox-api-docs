@@ -161,11 +161,11 @@
         // Various rows and headers
         .course-row {
             background: $content-ui-background;
-            color: $body-font-color;
+            color: var(--sbx-color-text-primary, $body-font-color);
         }
         .class-row {
             background: $content-ui-selected;
-            color: $body-font-color;
+            color: var(--sbx-color-text-primary, $body-font-color);
         }
         .class-row-heading {
             font-weight: 700;
