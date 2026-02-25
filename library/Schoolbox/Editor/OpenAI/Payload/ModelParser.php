@@ -91,6 +91,18 @@ class ModelParser
         if (in_array($version, ['5', '5.2'])) {
             unset($payload['temperature'], $payload['top_p']);
         }
+
+        // GPT-5.2-pro supports no reasoning levels other than:
+        // `medium`, `high`, `x-high`
+        if (
+            $version === '5.2'
+            && isset($payload['reasoning']['effort'])
+            && $this->extractModelVariant($model) === 'pro'
+        ) {
+            if (!in_array($payload['reasoning']['effort'], ['medium', 'high', 'xhigh'])) {
+                $payload['reasoning']['effort'] = 'medium';
+            }
+        }
         return $payload;
     }
 }
