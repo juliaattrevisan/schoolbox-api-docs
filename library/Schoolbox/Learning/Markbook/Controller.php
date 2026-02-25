@@ -708,10 +708,13 @@ class Controller extends Base
             $from = new \Alaress_Date_Format('2026-01-01 00:00:00', 'Y-m-d H:i:s');
             $to = new \Alaress_Date_Format('2026-02-26 00:00:00', 'Y-m-d H:i:s');
 
+            // TODO get a class list from somewhere
+            $studentIds = [13, 20];
+
             /* Note that the first arg to findAllByFolderIdForReview() can actually be a set of folder ids
              */
             $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
-                (new FeedbackFolders($this->getDi()->get('databaseInternal')))->findForStudents([13, 20], $from, $to),
+                (new FeedbackFolders($this->getDi()->get('databaseInternal')))->findForStudents($studentIds, $from, $to),
 //                [
 //                    $folder->getId(),  // typically 80, 9ENGA
 //                    78, // 9SPANISHA
@@ -749,10 +752,10 @@ class Controller extends Base
                     /* If both are provided, assessment ids and curriculum nodes execute an intersect
                      */
 //                    'ids' => [391],
-                    'curriculum_codes' => [
-                        'AC9SAS09',
-                        'GC-FA-a'
-                    ]
+//                    'curriculum_codes' => [
+//                        'AC9SAS09',
+//                        'GC-FA-a'
+//                    ]
                 ]
             );
         }
