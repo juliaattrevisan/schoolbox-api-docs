@@ -729,26 +729,26 @@ class Controller extends Base
                  * Assessment MapperProxy:1790. You get there via findAllByFolderIdForReview() and it has a plethora of
                  * date range filters, term-based filters, etc. deep in the swamp where you'd never look.
                  */
-//                [
-//                    'due_after' => new \Alaress_Date_Format('2026-01-01 00:00:00', 'Y-m-d H:i:s'),
-//                    'due_before' => new \Alaress_Date_Format('2026-02-06 00:00:00', 'Y-m-d H:i:s'),
-//                    'type' => [
-//                        AssessmentType::TYPE_DUE_WORK,
-//                        AssessmentType::TYPE_QUIZ,
-//                        AssessmentType::TYPE_PROJECT,
-//                        AssessmentType::TYPE_LTI_ASSESSMENT
-//                    ],
-//                    'work_type' => [
-//                        7, // Reporting
-//                        3, // Learning Activity
-//                    ],
-//                    /* Assessment ids and curriculum nodes execute an intersect, so they work together (if provided)
-//                     */
-//                    'ids' => [391],
-//                    'curriculum_codes' => [
-//                        'AC9SAS09'
-//                    ]
-//                ]
+                [
+                    'due_after' => new \Alaress_Date_Format('2026-01-01 00:00:00', 'Y-m-d H:i:s'),
+                    'due_before' => new \Alaress_Date_Format('2026-02-06 00:00:00', 'Y-m-d H:i:s'),
+                    'type' => [
+                        AssessmentType::TYPE_DUE_WORK,
+                        AssessmentType::TYPE_QUIZ,
+                        AssessmentType::TYPE_PROJECT,
+                        AssessmentType::TYPE_LTI_ASSESSMENT
+                    ],
+                    'work_type' => [
+                        7, // Reporting
+                        3, // Learning Activity
+                    ],
+                    /* Assessment ids and curriculum nodes execute an intersect, so they work together (if provided)
+                     */
+                    'ids' => [391],
+                    'curriculum_codes' => [
+                        'AC9SAS09'
+                    ]
+                ]
             );
         }
 
@@ -766,7 +766,7 @@ class Controller extends Base
              * Plus, this isn't the usual use case afaik: you're operating on your entire class of students at a time,
              * mostly: not an individual. Nevertheless, you can operate on a reduced set by using this reductive.
              */
-            studentIds: null,
+            studentIds: [13],
             curriculumCodes: null,
             folderIds: null,
         );
