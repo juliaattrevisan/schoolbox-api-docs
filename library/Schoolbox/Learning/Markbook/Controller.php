@@ -705,22 +705,26 @@ class Controller extends Base
         if (empty($assessmentIds)) {
             $assessments = $this->assessmentMapperProxy->createCollection();
         } else {
+            $from = new \Alaress_Date_Format('2026-01-01 00:00:00', 'Y-m-d H:i:s');
+            $to = new \Alaress_Date_Format('2026-02-26 00:00:00', 'Y-m-d H:i:s');
+
             /* Note that the first arg to findAllByFolderIdForReview() can actually be a set of folder ids
              */
             $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
-                [
-                    $folder->getId(),  // typically 80, 9ENGA
-                    78, // 9SPANISHA
-                    189, // 9MATA
-                    85, // 9PDHC
-                    190, // 9MYPA
-                    97, // 3TR
-                    93, // 3AC
-                    92, // 3IB
-                    95, // 3IBSPA
-                    96, // 3IBVA
-                    250, // ELCB
-                ],
+                (new FeedbackFolders($this->getDi()->get('databaseInternal')))->findForStudents([13, 20], $from, $to),
+//                [
+//                    $folder->getId(),  // typically 80, 9ENGA
+//                    78, // 9SPANISHA
+//                    189, // 9MATA
+//                    85, // 9PDHC
+//                    190, // 9MYPA
+//                    97, // 3TR
+//                    93, // 3AC
+//                    92, // 3IB
+//                    95, // 3IBSPA
+//                    96, // 3IBVA
+//                    250, // ELCB
+//                ],
                 null, // \Schoolbox\UserMapper::getInstance()->findById(13),
                 //['ids' => $assessmentIds]
 
@@ -730,8 +734,8 @@ class Controller extends Base
                  * date range filters, term-based filters, etc. deep in the swamp where you'd never look.
                  */
                 [
-                    'due_after' => new \Alaress_Date_Format('2026-01-01 00:00:00', 'Y-m-d H:i:s'),
-                    'due_before' => new \Alaress_Date_Format('2026-02-06 00:00:00', 'Y-m-d H:i:s'),
+                    'due_after' => $from,
+                    'due_before' => $to,
                     'type' => [
                         AssessmentType::TYPE_DUE_WORK,
                         AssessmentType::TYPE_QUIZ,
