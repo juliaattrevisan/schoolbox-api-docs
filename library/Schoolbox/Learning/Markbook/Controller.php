@@ -700,6 +700,7 @@ class Controller extends Base
      */
     private function buildMarkbook(array $assessmentIds, FolderModel $folder): Markbook
     {
+        $start = microtime(true);
         // Fetch assessments & participants
         if (empty($assessmentIds)) {
             $assessments = $this->assessmentMapperProxy->createCollection();
@@ -729,16 +730,18 @@ class Controller extends Base
                  * date range filters, term-based filters, etc. deep in the swamp where you'd never look.
                  */
                 [
-//                    'due_after' => new \Alaress_Date_Format('2025-01-01 00:00:00', 'Y-m-d H:i:s'),
-//                    'due_before' => new \Alaress_Date_Format('2026-12-30 00:00:00', 'Y-m-d H:i:s'),
-//                    'type' => [
-//                        AssessmentType::TYPE_DUE_WORK,
-//                        AssessmentType::TYPE_QUIZ
-//                    ],
-//                    'work_type' => [
-//                        7, // Reporting
-//                        3, // Learning Activity
-//                    ]
+                    'due_after' => new \Alaress_Date_Format('2025-10-10 00:00:00', 'Y-m-d H:i:s'),
+                    'due_before' => new \Alaress_Date_Format('2026-03-03 00:00:00', 'Y-m-d H:i:s'),
+                    'type' => [
+                        AssessmentType::TYPE_DUE_WORK,
+                        AssessmentType::TYPE_QUIZ,
+                        AssessmentType::TYPE_PROJECT,
+                        AssessmentType::TYPE_LTI_ASSESSMENT
+                    ],
+                    'work_type' => [
+                        7, // Reporting
+                        3, // Learning Activity
+                    ]
                 ]
             );
         }
@@ -752,11 +755,14 @@ class Controller extends Base
             defaultMarkScheme: $overallMarkScheme,
             viewingUser: $this->getUser(),
             studentIds: null,
-            curriculumCodes: null,
+            curriculumCodes: [''],
             folderIds: null,
         );
 
         $markbook->sortAssessables();
+        $end = microtime(true);
+        $_SESSION['mbdur'] =  $end - $start;
+
         return $markbook;
     }
 
