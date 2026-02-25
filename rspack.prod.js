@@ -22,6 +22,7 @@ module.exports = merge(common, {
                     "./node_modules/vue/dist/vue.global.prod.js",
                     // jQuery
                     "./node_modules/jquery/dist/jquery.min.js",
+                    "./node_modules/jquery-migrate/dist/jquery-migrate.js",
                     "./node_modules/jquery-validation/dist/jquery.validate.min.js",
                     // jQuery UI
                     "./node_modules/jquery-ui/dist/jquery-ui.min.js",
