@@ -14,7 +14,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\NotFound;
-use \Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\UserMapper;
 
 /**
