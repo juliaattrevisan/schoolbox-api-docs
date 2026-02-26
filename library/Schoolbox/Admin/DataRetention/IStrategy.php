@@ -34,7 +34,7 @@ interface IStrategy
      * @param int                  $chunkLoops // how many times to loop through the data in chunks, default 3, set to 1 to only loop once, set to 0 for infinite looping until no more data is found
      * @param int                  $chunkSize  // how many records to process at once, default 1000
      */
-    public function __construct(?LoggerInterface $log, bool $perform, IConnector $database, LockInterface $lock, IConfigLoader $config, int $endTime, int $chunkLoops = StrategyBase::DEFAULT_CHUNK_LOOPS, int $chunkSize = StrategyBase::CHUNK_SIZE);
+    public function __construct(?LoggerInterface $log, bool $perform, IConnector $database, LockInterface $lock, IConfigLoader $config, int $endTime, int $chunkLoops = StrategyBase::DEFAULT_CHUNK_LOOPS, int $chunkSize = StrategyBase::DEFAULT_CHUNK_SIZE);
 
     /**
      * find and remove all soft deleted data
