@@ -26,8 +26,10 @@ class Controller extends ConfigController
         $config                      = new Config();
         $features                    = $config->fetchFeatures($this->getConfigMapper());
         $reasoningEffortModelOptions = [];
+        $textVerbosityModelOptions   = [];
         foreach (array_keys($features) as $feature) {
             $reasoningEffortModelOptions[$feature] = $config->buildReasoningEffortModelOptions($feature);
+            $textVerbosityModelOptions[$feature]   = $config->buildTextVerbosityModelOptions($feature);
         }
 
         $this->response = $this->responseFromTemplate('@adminOpenAi/index.twig', [
@@ -38,6 +40,7 @@ class Controller extends ConfigController
             'providers' => Config::PROVIDERS,
             'models' => Config::AI_MODELS,
             'reasoningEffortModelOptions' => $reasoningEffortModelOptions,
+            'textVerbosityModelOptions' => $textVerbosityModelOptions,
         ], 'AI Services');
     }
 

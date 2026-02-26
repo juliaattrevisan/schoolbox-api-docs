@@ -179,6 +179,7 @@
         const providerSelect        = featureEl.querySelector(`#${FEATURE}-provider-value`);
         const modelSelect           = featureEl.querySelector(`#${FEATURE}-model-value`);
         const reasoningEffortSelect = featureEl.querySelector(`#${FEATURE}-reasoning_effort-value`);
+        const textVerbositySelect   = featureEl.querySelector(`#${FEATURE}-text_verbosity-value`);
 
         /**
          * reusable function to show/hide fields based on provider
@@ -196,6 +197,33 @@
                 featureEl.querySelectorAll('[data-feature-azure]').forEach(el => el.style.display = 'block');
                 return;
             }
+        }
+
+        /**
+         * Reusable function for enabling/disabling reasoning options, based on
+         * the selected model.
+         *
+         * @param baseOptions
+         * @param model
+         * @param provider
+         * @param selectEl
+         */
+        function toggleOptions(baseOptions, model, provider, selectEl) {
+            if (!selectEl) {
+                return;
+            }
+            const modelOptions = baseOptions[model] ?? null;
+            Array.from(selectEl.options).forEach(el => {
+                if (el.value !== null) {
+                    if (provider === 'OpenAI') {
+                        if (modelOptions !== null) {
+                            el.disabled = !modelOptions.includes(el.value);
+                        }
+                    } else {
+                        el.disabled = false;
+                    }
+                }
+            });
         }
 
         /**
@@ -222,6 +250,24 @@
                 }
             });
         }
+        //
+        // function toggleTextVerbosityOptions(model, provider) {
+        //     if (!textVerbositySelect) {
+        //         return;
+        //     }
+        //     const modelOptions = window.TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE][model] ?? null;
+        //     Array.from(textVerbositySelect.options).forEach(el => {
+        //         if (el.value !== null) {
+        //             if (provider === 'OpenAI') {
+        //                 if (modelOptions !== null) {
+        //                     el.disabled = !modelOptions.includes(el.value);
+        //                 }
+        //             } else {
+        //                 el.disabled = false;
+        //             }
+        //         }
+        //     });
+        // }
 
         /**
          * If the currently selected reasoning option is now disabled:
@@ -242,21 +288,24 @@
 
         // Disable reasoning levels which are incompatible with the model
         modelSelect.addEventListener('change', (event) => {
-            toggleReasoningEffortOptions(event.target.value, providerSelect.value);
+            toggleOptions(window.REASONING_EFFORT_MODEL_OPTIONS[FEATURE], event.target.value, providerSelect.value, reasoningEffortSelect);
+            // toggleReasoningEffortOptions(event.target.value, providerSelect.value);
             selectFirstReasoningOptionIfSelectedDisabled();
         });
 
         // when changing the provider select, show/hide the relevant fields
         providerSelect.addEventListener('change', (event) => {
             toggleInputVisibility(event.target.value);
-            toggleReasoningEffortOptions(modelSelect.value, event.target.value);
+            toggleOptions(window.REASONING_EFFORT_MODEL_OPTIONS[FEATURE], modelSelect.value, event.target.value, reasoningEffortSelect);
+            // toggleReasoningEffortOptions(modelSelect.value, event.target.value);
             selectFirstReasoningOptionIfSelectedDisabled();
         });
 
         // on page load, show the current selected provider fields
         document.addEventListener('DOMContentLoaded', () => {
             toggleInputVisibility(providerSelect.value);
-            toggleReasoningEffortOptions(modelSelect.value, providerSelect.value);
+            toggleOptions(window.REASONING_EFFORT_MODEL_OPTIONS[FEATURE], modelSelect.value, providerSelect.value, reasoningEffortSelect);
+            // toggleReasoningEffortOptions(modelSelect.value, providerSelect.value);
         });
     })();
     </script>

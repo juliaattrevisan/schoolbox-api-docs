@@ -47,6 +47,12 @@ class Config
         "gpt-5.2",
         "gpt-5.2-pro",
     ];
+    public const array AI_MODELS_GPT4 = [
+        "gpt-4o",
+        "gpt-4o-mini",
+        "gpt-4.1",
+        "gpt-4.1-mini",
+    ];
 
     public const string IMAGE_MODEL_DEFAULT = 'gpt-image-1';
     public const array AI_IMAGE_MODELS = [
@@ -146,6 +152,23 @@ class Config
         self::TEXT_VERBOSITY_OPTION_LOW,
         self::TEXT_VERBOSITY_OPTION_MEDIUM,
         self::TEXT_VERBOSITY_OPTION_HIGH,
+    ];
+    public const array TEXT_VERBOSITY_OPTIONS_GPT4 = [
+        self::TEXT_VERBOSITY_OPTION_DEFAULT,
+        self::TEXT_VERBOSITY_OPTION_MEDIUM,
+    ];
+
+    public const array TEXT_VERBOSITY_MODEL_OPTIONS = [
+        "gpt-4o"       => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-4o-mini"  => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-4.1"      => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-4.1-mini" => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5"        => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5-mini"   => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5-nano"   => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5.1"      => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5.2"      => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5.2-pro"  => self::TEXT_VERBOSITY_OPTIONS,
     ];
 
     // field keys
@@ -572,6 +595,27 @@ class Config
         $options = self::REASONING_EFFORT_MODEL_OPTIONS;
         if ($feature === Helper::FEATURE_IMAGE) {
             $options = array_map(fn ($effortLevels) => array_values(array_diff($effortLevels, ['minimal'])), $options);
+        }
+        return $options;
+    }
+
+    /**
+     * Build available reasoning effort levels for this feature.
+     *
+     * This ensures the `minimal` level is stripped from the image feature..
+     *
+     * @param string $feature
+     * @return array|array[]
+     */
+    public function buildTextVerbosityModelOptions(string $feature): array
+    {
+        $options = self::TEXT_VERBOSITY_OPTIONS;
+        if ($feature === Helper::FEATURE_CHAT) {
+            foreach ($options as $key => $value) {
+                if (in_array($key, self::AI_MODELS_GPT4)) {
+                    $options[$key] = self::TEXT_VERBOSITY_OPTIONS_GPT4;
+                }
+            }
         }
         return $options;
     }
