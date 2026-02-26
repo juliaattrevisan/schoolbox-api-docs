@@ -136,13 +136,16 @@ class Config
         self::REASONING_EFFORT_OPTION_HIGH,
     ];
 
+    public const string TEXT_VERBOSITY_DEFAULT = self::TEXT_VERBOSITY_OPTION_DEFAULT;
     public const string TEXT_VERBOSITY_OPTION_DEFAULT = 'default';
-    public const string TEXT_VERBOSITY_DEFAULT = 'low';
+    public const string TEXT_VERBOSITY_OPTION_LOW = 'low';
+    public const string TEXT_VERBOSITY_OPTION_MEDIUM = 'medium';
+    public const string TEXT_VERBOSITY_OPTION_HIGH = 'high';
     public const array TEXT_VERBOSITY_OPTIONS = [
         self::TEXT_VERBOSITY_OPTION_DEFAULT,
-        'low',
-        'medium',
-        'high',
+        self::TEXT_VERBOSITY_OPTION_LOW,
+        self::TEXT_VERBOSITY_OPTION_MEDIUM,
+        self::TEXT_VERBOSITY_OPTION_HIGH,
     ];
 
     // field keys

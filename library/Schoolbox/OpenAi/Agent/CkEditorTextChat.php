@@ -100,7 +100,7 @@ class CkEditorTextChat
         if ($reasoningEffort !== Config::REASONING_EFFORT_OPTION_DEFAULT) {
             $payload['reasoning_effort'] = $reasoningEffort;
         }
-        $textVerbosity = trim($this->config[Config::SECTION_GENERAL][Config::FIELD_TEXT_VERBOSITY]['value'] ?? '');
+        $textVerbosity = trim($this->config[Config::SECTION_GENERAL][Config::FIELD_TEXT_VERBOSITY]['value'] ?? '') ?: Config::TEXT_VERBOSITY_DEFAULT;
         if ($textVerbosity !== Config::TEXT_VERBOSITY_OPTION_DEFAULT) {
             $payload['verbosity'] = $textVerbosity;
         }
