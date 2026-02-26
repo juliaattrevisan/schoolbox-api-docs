@@ -111,7 +111,7 @@ HELP;
         register_shutdown_function(fn () => $this->releaseLock($lock));
 
         // get the number of loops to run for each strategy, default 3
-        $loopCount = $this->getOptAsInt(self::OPT_SHORT_LOOP_COUNT, 3);
+        $loopCount = $this->getOptAsInt(self::OPT_SHORT_LOOP_COUNT, StrategyBase::CHUNK_LOOPS);
 
 
         // build the bus for all the data retention tasks

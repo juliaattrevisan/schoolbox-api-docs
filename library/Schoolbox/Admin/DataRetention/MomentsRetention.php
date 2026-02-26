@@ -21,22 +21,8 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception;
 use Symfony\Component\Lock\LockInterface;
 
-class MomentsRetention implements IStrategy
+class MomentsRetention extends StrategyBase
 {
-    private const CHUNK_SIZE = 1000; // how many things to delete at once
-
-    /**
-     * @param null|LoggerInterface $log
-     * @param bool                 $perform
-     * @param IConnector           $database
-     * @param LockInterface        $lock
-     * @param IConfigLoader        $config
-     * @param int                  $chunkLoops
-     */
-    public function __construct(private ?LoggerInterface $log, private bool $perform, private IConnector $database, private LockInterface $lock, private IConfigLoader $config, private int $chunkLoops = 3)
-    {
-    }
-
     /**
      * @inheritDoc
      */

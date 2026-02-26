@@ -17,20 +17,8 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
 use Symfony\Component\Lock\LockInterface;
 
-class CmsLogExample implements IStrategy
+class CmsLogExample extends StrategyBase
 {
-    /**
-     * @param null|LoggerInterface $log
-     * @param bool                 $perform
-     * @param IConnector           $database
-     * @param LockInterface        $lock
-     * @param IConfigLoader        $config
-     * @param int                  $chunkLoops
-     */
-    public function __construct(private ?LoggerInterface $log, private bool $perform, private IConnector $database, private LockInterface $lock, private IConfigLoader $config, private int $chunkLoops = 3)
-    {
-    }
-
     /**
      * @inheritDoc
      */
