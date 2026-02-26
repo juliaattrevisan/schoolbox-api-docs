@@ -128,6 +128,8 @@ class LessonPlan
      * @param string $openAiModel
      * @param string $openAiDeploymentId
      * @param string $textSystemPrompt
+     * @param string $reasoningEffort The reasoning effort level from admin config
+     * @param string $textVerbosity The text verbosity level from admin config
      * @param string $language
      * @param Mapper $curriculumNodeMapper
      */
@@ -136,6 +138,8 @@ class LessonPlan
         private string $openAiModel,
         private string $openAiDeploymentId,
         private string $textSystemPrompt,
+        private string $reasoningEffort,
+        private string $textVerbosity,
         private string $language,
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper
     ) {
@@ -311,10 +315,10 @@ class LessonPlan
             "stream" => false,
             'text' => [
                 'format' => $responseFormat,
-                'verbosity' => 'low',
+                'verbosity' => $this->textVerbosity,
             ],
             'reasoning' => [
-                'effort' => 'minimal',
+                'effort' => $this->reasoningEffort,
             ],
         ];
 

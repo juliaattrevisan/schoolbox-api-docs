@@ -91,12 +91,23 @@ class DifferentiationProfile
 
     /**
      * Constructor.
+     *
+     * @param string $openAiEndpoint
+     * @param string $openAiModel
+     * @param string $openAiDeploymentId
+     * @param string $systemPrompt The system prompt from admin config
+     * @param string $reasoningEffort The reasoning effort level from admin config
+     * @param string $textVerbosity The text verbosity level from admin config
+     * @param string $documentContent
+     * @param Collection $enabledFields
      */
     public function __construct(
         private string $openAiEndpoint,
         private string $openAiModel,
         private string $openAiDeploymentId,
         private string $systemPrompt,
+        private string $reasoningEffort,
+        private string $textVerbosity,
         private string $documentContent,
         private Collection $enabledFields,
     ) {
@@ -143,10 +154,10 @@ class DifferentiationProfile
             'stream'            => false,
             'text'              => [
                 'format' => $responseFormat,
-                'verbosity' => 'low',
+                'verbosity' => $this->textVerbosity,
             ],
             'reasoning' => [
-                'effort' => 'minimal',
+                'effort' => $this->reasoningEffort,
             ],
         ];
         return new ModelParser()->filterPayload($payload, $model);

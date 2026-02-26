@@ -85,6 +85,8 @@ class DialogAgentFeedback
      * @param string $openAiModel
      * @param string $openAiDeploymentId
      * @param string $featureSystemPrompt The system prompt from admin config
+     * @param string $reasoningEffort The reasoning effort level from admin config
+     * @param string $textVerbosity The text verbosity level from admin config
      * @param Log\Mapper $aiLogMapper
      */
     public function __construct(
@@ -92,6 +94,8 @@ class DialogAgentFeedback
         private string $openAiModel,
         private string $openAiDeploymentId,
         private string $featureSystemPrompt,
+        private string $reasoningEffort,
+        private string $textVerbosity,
         private Log\Mapper $aiLogMapper,
     ) {
     }
@@ -148,10 +152,10 @@ class DialogAgentFeedback
             'stream' => false,
             'text' => [
                 'format' => $this->generateResponseFormat($scenario),
-                'verbosity' => 'low',
+                'verbosity' => $this->textVerbosity,
             ],
             'reasoning' => [
-                'effort' => 'minimal',
+                'effort' => $this->reasoningEffort,
             ],
         ];
 

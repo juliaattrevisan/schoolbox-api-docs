@@ -84,12 +84,16 @@ class ImageGeneration
      * @param string $imageModel
      * @param string $systemPrompt
      * @param string $imageOutputQuality
+     * @param string $reasoningEffort The reasoning effort level from admin config
+     * @param string $textVerbosity The text verbosity level from admin config
      */
     public function __construct(
         private string $textModel,
         private string $imageModel,
         private string $systemPrompt,
         private string $imageOutputQuality,
+        private string $reasoningEffort,
+        private string $textVerbosity,
     ) {
     }
 
@@ -152,10 +156,10 @@ class ImageGeneration
                 'format' => [
                     'type' => 'text',
                 ],
-                'verbosity' => 'low',
+                'verbosity' => $this->textVerbosity,
             ],
             'reasoning' => [
-                'effort' => 'minimal',
+                'effort' => $this->reasoningEffort,
             ],
         ];
 

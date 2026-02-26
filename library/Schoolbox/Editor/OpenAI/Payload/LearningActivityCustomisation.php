@@ -118,6 +118,8 @@ class LearningActivityCustomisation
      * @param string      $openAiModel
      * @param string      $openAiDeploymentId
      * @param string      $systemPrompt
+     * @param string      $reasoningEffort The reasoning effort level from admin config
+     * @param string      $textVerbosity The text verbosity level from admin config
      * @param IAssessable $assessable
      * @param User        $student
      * @param Folder      $course
@@ -129,6 +131,8 @@ class LearningActivityCustomisation
         private string $openAiModel,
         private string $openAiDeploymentId,
         private string $systemPrompt,
+        private string $reasoningEffort,
+        private string $textVerbosity,
         private IAssessable $assessable,
         private User $student,
         private Folder $course,
@@ -192,10 +196,10 @@ class LearningActivityCustomisation
             'stream' => false,
             'text' => [
                 'format' => $responseFormat,
-                'verbosity' => 'low',
+                'verbosity' => $this->textVerbosity,
             ],
             'reasoning' => [
-                'effort' => 'minimal',
+                'effort' => $this->reasoningEffort,
             ],
         ];
         return new ModelParser()->filterPayload($payload, $model);

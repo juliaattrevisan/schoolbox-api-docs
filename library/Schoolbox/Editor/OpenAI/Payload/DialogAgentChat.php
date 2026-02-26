@@ -104,12 +104,16 @@ class DialogAgentChat
      * @param string $openAiModel
      * @param string $openAiDeploymentId
      * @param string $featureSystemPrompt The system prompt from admin config
+     * @param string $reasoningEffort The reasoning effort level from admin config
+     * @param string $textVerbosity The text verbosity level from admin config
      */
     public function __construct(
         private string $openAiEndpoint,
         private string $openAiModel,
         private string $openAiDeploymentId,
         private string $featureSystemPrompt,
+        private string $reasoningEffort,
+        private string $textVerbosity,
     ) {
     }
 
@@ -161,10 +165,10 @@ class DialogAgentChat
                 'format' => [
                     'type' => 'text',
                 ],
-                'verbosity' => 'low',
+                'verbosity' => $this->textVerbosity,
             ],
             'reasoning' => [
-                'effort' => 'minimal',
+                'effort' => $this->reasoningEffort,
             ],
         ];
 
