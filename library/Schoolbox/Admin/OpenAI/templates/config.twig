@@ -200,8 +200,8 @@
         }
 
         /**
-         * Reusable function for enabling/disabling reasoning options, based on
-         * the selected model.
+         * Reusable function for enabling/disabling options, based on the
+         * selected model and provider.
          *
          * @param baseOptions
          * @param model
@@ -227,85 +227,66 @@
         }
 
         /**
-         * Reusable function for enabling/disabling reasoning options, based on
-         * the selected model.
-         *
-         * @param model
-         * @param provider
-         */
-        function toggleReasoningEffortOptions(model, provider) {
-            if (!reasoningEffortSelect) {
-                return;
-            }
-            const modelOptions = window.REASONING_EFFORT_MODEL_OPTIONS[FEATURE][model] ?? null;
-            Array.from(reasoningEffortSelect.options).forEach(el => {
-                if (el.value !== null) {
-                    if (provider === 'OpenAI') {
-                        if (modelOptions !== null) {
-                            el.disabled = !modelOptions.includes(el.value);
-                        }
-                    } else {
-                        el.disabled = false;
-                    }
-                }
-            });
-        }
-        //
-        // function toggleTextVerbosityOptions(model, provider) {
-        //     if (!textVerbositySelect) {
-        //         return;
-        //     }
-        //     const modelOptions = window.TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE][model] ?? null;
-        //     Array.from(textVerbositySelect.options).forEach(el => {
-        //         if (el.value !== null) {
-        //             if (provider === 'OpenAI') {
-        //                 if (modelOptions !== null) {
-        //                     el.disabled = !modelOptions.includes(el.value);
-        //                 }
-        //             } else {
-        //                 el.disabled = false;
-        //             }
-        //         }
-        //     });
-        // }
-
-        /**
-         * If the currently selected reasoning option is now disabled:
+         * If the currently selected option in `selectEl` is now disabled:
          * select the first option which is not disabled.
+         *
+         * @param selectEl
          */
-        function selectFirstReasoningOptionIfSelectedDisabled() {
-            if (!reasoningEffortSelect) {
+        function selectFirstNonDisabledOption(selectEl) {
+            if (!selectEl) {
                 return;
             }
-            const selectedAndDisabled = Array.from(reasoningEffortSelect.options).find(el => el.selected && el.disabled);
+            const selectedAndDisabled = Array.from(selectEl.options).find(el => el.selected && el.disabled);
             if (selectedAndDisabled) {
-                const firstEnabled = Array.from(reasoningEffortSelect.options).find(el => !el.disabled);
+                const firstEnabled = Array.from(selectEl.options).find(el => !el.disabled);
                 if (firstEnabled) {
                     firstEnabled.selected = true;
                 }
             }
         }
 
+        // /**
+        //  * If the currently selected reasoning option is now disabled:
+        //  * select the first option which is not disabled.
+        //  */
+        // function selectFirstReasoningOptionIfSelectedDisabled() {
+        //     if (!reasoningEffortSelect) {
+        //         return;
+        //     }
+        //     const selectedAndDisabled = Array.from(reasoningEffortSelect.options).find(el => el.selected && el.disabled);
+        //     if (selectedAndDisabled) {
+        //         const firstEnabled = Array.from(reasoningEffortSelect.options).find(el => !el.disabled);
+        //         if (firstEnabled) {
+        //             firstEnabled.selected = true;
+        //         }
+        //     }
+        // }
+
         // Disable reasoning levels which are incompatible with the model
         modelSelect.addEventListener('change', (event) => {
             toggleOptions(window.REASONING_EFFORT_MODEL_OPTIONS[FEATURE], event.target.value, providerSelect.value, reasoningEffortSelect);
-            // toggleReasoningEffortOptions(event.target.value, providerSelect.value);
-            selectFirstReasoningOptionIfSelectedDisabled();
+            selectFirstNonDisabledOption(reasoningEffortSelect);
+
+            toggleOptions(window.TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], event.target.value, providerSelect.value, textVerbositySelect);
+            selectFirstNonDisabledOption(textVerbositySelect);
         });
 
         // when changing the provider select, show/hide the relevant fields
         providerSelect.addEventListener('change', (event) => {
             toggleInputVisibility(event.target.value);
+
             toggleOptions(window.REASONING_EFFORT_MODEL_OPTIONS[FEATURE], modelSelect.value, event.target.value, reasoningEffortSelect);
-            // toggleReasoningEffortOptions(modelSelect.value, event.target.value);
-            selectFirstReasoningOptionIfSelectedDisabled();
+            selectFirstNonDisabledOption(reasoningEffortSelect);
+
+            toggleOptions(window.TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], event.target.value, providerSelect.value, textVerbositySelect);
+            selectFirstNonDisabledOption(textVerbositySelect);
         });
 
         // on page load, show the current selected provider fields
         document.addEventListener('DOMContentLoaded', () => {
             toggleInputVisibility(providerSelect.value);
             toggleOptions(window.REASONING_EFFORT_MODEL_OPTIONS[FEATURE], modelSelect.value, providerSelect.value, reasoningEffortSelect);
-            // toggleReasoningEffortOptions(modelSelect.value, providerSelect.value);
+            toggleOptions(window.TEXT_VERBOSITY_MODEL_OPTIONS[FEATURE], modelSelect.value, providerSelect.value, textVerbositySelect);
         });
     })();
     </script>
