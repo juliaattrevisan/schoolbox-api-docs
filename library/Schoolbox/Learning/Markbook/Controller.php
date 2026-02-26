@@ -725,6 +725,10 @@ class Controller extends Base
              */
             $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
                 (new FeedbackFolders($this->getDi()->get('databaseInternal')))->findForStudents($studentIds, $from, $to),
+
+                /* Instead of the FeedbackFolders, you can slam together your own list of folders arbitrarily
+                 * I found these manually
+                 */
 //                [
 //                    $folder->getId(),  // typically 80, 9ENGA
 //                    78, // 9SPANISHA
@@ -738,8 +742,14 @@ class Controller extends Base
 //                    96, // 3IBVA
 //                    250, // ELCB
 //                ],
-                null, // \Schoolbox\UserMapper::getInstance()->findById(13),
-                //['ids' => $assessmentIds]
+
+                /* This was thought to limit it to one student, but it doesn't help much; it just finds assessments
+                 * this student did, which still ends up hydrating what every other student in that assessment too,
+                 * by virtue of the swamp.
+                 *
+                 * \Schoolbox\UserMapper::getInstance()->findById(13),
+                 */
+                null,
 
                 /* There's this somewhat obscure "options to pass to findByColumList" but there's actually a few
                  * rarely-used, rarely-encountered ideas here: ref. convertOptionsToPredicateBuilder() in the
