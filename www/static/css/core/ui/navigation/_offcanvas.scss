@@ -28,10 +28,16 @@ $off-canvas-height: rem-calc(300) !default;
 $off-canvas-bg: $oil !default;
 
 // DONE multiply lightness instead of scale-color
-$off-canvas-bg-hover: css-scale-color($navigation-foreground, $lightness: -30%) !default;
+$off-canvas-bg-hover: css-scale-color(
+    var(--sbx-color-menu-foreground, $navigation-foreground),
+    $lightness: -30%
+) !default;
 
 // DONE multiply lightness instead of scale-color
-$off-canvas-bg-active: css-scale-color($navigation-foreground, $lightness: -30%) !default;
+$off-canvas-bg-active: css-scale-color(
+    var(--sbx-color-menu-foreground, $navigation-foreground),
+    $lightness: -30%
+) !default;
 
 // Off Canvas Menu List Variables
 $off-canvas-label-padding: 0.3rem rem-calc(15) !default;

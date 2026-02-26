@@ -15,7 +15,7 @@ $allow-notification-stash: $xlarge-up;
     /* The Notification Bell
      */
     &[data-unread] {
-        color: $navigation-foreground;
+        color: var(--sbx-color-menu-foreground, $navigation-foreground);
 
         /* The colour of the bell in its idle state
          */
@@ -72,7 +72,7 @@ $allow-notification-stash: $xlarge-up;
         ul.off-canvas-list {
             #notification-toggle-full {
                 background: $notification-header-background;
-                color: $navigation-foreground;
+                color: var(--sbx-color-menu-foreground, $navigation-foreground);
             }
 
             /* Hide gap from ".island section" definition
@@ -113,7 +113,7 @@ $allow-notification-stash: $xlarge-up;
         }
         &[data-unread="0"] {
             .right-menu-dock {
-                color: $navigation-foreground;
+                color: var(--sbx-color-menu-foreground, $navigation-foreground);
             }
         }
     }
