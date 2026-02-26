@@ -33,6 +33,7 @@ export default class AdminDifferentiationProfiles {
      */
     async toggleOn(): Promise<void> {
         this.tester.isGoingTo("Toggle the differentiation profiles on");
+        await expect(this.page.getByTestId("differentiation-profiles-toggle")).toBeEnabled();
         await this.page.getByTestId("differentiation-profiles-toggle").click();
         this.tester.isGoingTo("Validate that the text 'Terminology' is now visible on the page");
         await expect(this.page.getByTestId("differentiation-profiles-header-Terminology")).toBeVisible();
@@ -50,6 +51,7 @@ export default class AdminDifferentiationProfiles {
      */
     async toggleOff(): Promise<void> {
         this.tester.isGoingTo("Toggle the differentiation profiles off");
+        await expect(this.page.getByTestId("differentiation-profiles-toggle")).toBeEnabled();
         await this.page.getByTestId("differentiation-profiles-toggle").click();
         this.tester.isGoingTo("Validate that the text 'Terminology' is no longer visible on the page");
         await expect(this.page.getByTestId("differentiation-profiles-header-Terminology")).not.toBeVisible();
