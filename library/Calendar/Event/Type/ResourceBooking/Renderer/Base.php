@@ -87,8 +87,6 @@ abstract class Base extends RendererBase
     }
 
     /**
-     * Get all events
-     *
      * @return ?string
      */
     public function getExportType(): ?string
