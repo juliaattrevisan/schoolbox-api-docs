@@ -753,6 +753,13 @@ class Controller extends Base
                  */
                 student: null,
 
+                /* Somewhat experimental:
+                 * Don't need any response instances. You get some mixed results here, since the markbook infers states:
+                 * a response existing, but no feedback given yet, is shown as a hyphen - ...but if a response doesn't
+                 * exist, the markbook shows "Pending" under the assumption you never submitted anything.
+                 */
+                includeResponses: true,
+
                 /* There's this somewhat obscure "options to pass to findByColumList" but there's actually a few
                  * rarely-used, rarely-encountered ideas here: ref. convertOptionsToPredicateBuilder() in the
                  * Assessment MapperProxy:1790. You get there via findAllByFolderIdForReview() and it has a plethora of
@@ -786,7 +793,7 @@ class Controller extends Base
 //                        'AC9SAS09',
 //                        'GC-FA-a'
 //                    ]
-                ]
+                ],
             );
         }
 
