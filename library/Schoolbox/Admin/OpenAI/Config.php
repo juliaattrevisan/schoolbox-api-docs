@@ -609,7 +609,7 @@ class Config
      */
     public function buildTextVerbosityModelOptions(string $feature): array
     {
-        $options = self::TEXT_VERBOSITY_OPTIONS;
+        $options = self::TEXT_VERBOSITY_MODEL_OPTIONS;
         if ($feature === Helper::FEATURE_CHAT) {
             foreach ($options as $key => $value) {
                 if (in_array($key, self::AI_MODELS_GPT4)) {
