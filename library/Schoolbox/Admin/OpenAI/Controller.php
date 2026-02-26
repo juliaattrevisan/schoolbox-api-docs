@@ -32,6 +32,7 @@ class Controller extends ConfigController
             'fields' => Config::FIELDS,
             'providers' => Config::PROVIDERS,
             'models' => Config::AI_MODELS,
+            'reasoningEffortModelOptions' => Config::REASONING_EFFORT_MODEL_OPTIONS,
         ], 'AI Services');
     }
 

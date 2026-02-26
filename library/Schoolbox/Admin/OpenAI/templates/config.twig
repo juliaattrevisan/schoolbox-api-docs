@@ -174,8 +174,11 @@
     <script type="application/javascript">
     (() => {
         // use a const feature as the container selector
-        const FEATURE = '{{ feature.feature }}';
-        const featureEl = document.querySelector(`[data-feature="${FEATURE}"]`);
+        const FEATURE               = '{{ feature.feature }}';
+        const featureEl             = document.querySelector(`[data-feature="${FEATURE}"]`);
+        const providerSelect        = featureEl.querySelector(`#${FEATURE}-provider-value`);
+        const modelSelect           = featureEl.querySelector(`#${FEATURE}-model-value`);
+        const reasoningEffortSelect = featureEl.querySelector(`#${FEATURE}-reasoning_effort-value`);
 
         /**
          * reusable function to show/hide fields based on provider
@@ -195,18 +198,39 @@
             }
         }
 
+        // Also disable reasoning levels which are incompatible with the model
+        // On selecting Azure though: enable them all.
+        modelSelect.addEventListener('change', (event) => {
+            const modelOptions = window.REASONING_EFFORT_MODEL_OPTIONS[event.target.value] ?? null;
+            let deselected     = false;
+            Array.from(reasoningEffortSelect.options).forEach(el => {
+                if (el.value) {
+                    if (providerSelect.value === 'OpenAI') {
+                        if (modelOptions !== null) {
+                            el.disabled = !modelOptions.includes(el.value);
+                            if (el.disabled) {
+                                el.selected = false;
+                                deselected  = true;
+                            }
+                        }
+                    } else {
+                        el.disabled = false;
+                    }
+                }
+            });
+            if (deselected) {
+                reasoningEffortSelect.options.find(el => !el.disabled).selected = true;
+            }
+        });
+
         // on page load, show the current selected provider fields
         document.addEventListener('DOMContentLoaded', () => {
-            const currentValue = featureEl.querySelector(`#${FEATURE}-provider-value`).value;
-            showHide(currentValue);
+            showHide(providerSelect.value);
         });
 
         // when changing the provider select, show/hide the relevant fields
-        featureEl.querySelector(`#${FEATURE}-provider-value`).addEventListener('change', (event) => {
-            const value = event.target.value;
-
-            // show relevant fields
-            showHide(value);
+        providerSelect.addEventListener('change', (event) => {
+            showHide(event.target.value);
         });
     })();
     </script>
