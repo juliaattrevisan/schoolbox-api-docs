@@ -153,7 +153,7 @@ table {
         }
     }
     tr.alert {
-        background-color: var(--sbx-color-highlight, $alert-color);
+        background-color: tint($alert-color, 74%);
     }
 }
 
@@ -165,7 +165,7 @@ table th {
 td,
 th {
     vertical-align: top;
-    border-bottom: 1px solid var(--sbx-color-foreground-secondary, $body-bg);
+    border-bottom: 1px solid var(--sbx-color-border, $body-bg);
     input[type="radio"] + label.radio-label,
     input[type="checkbox"] + label.checkbox-label {
         margin: 0 rem-calc(($base-font-size)) 0 0;
@@ -479,11 +479,11 @@ table.attempts-table {
 }
 
 .u-border-left {
-    border-left: 1px solid var(--body-background);
+    border-left: 1px solid var(--sbx-color-border, var(--body-background));
 }
 
 .u-border-right {
-    border-right: 1px solid var(--body-background);
+    border-right: 1px solid var(--sbx-color-border, var(--body-background));
 }
 
 /* make an element sticky on the top */

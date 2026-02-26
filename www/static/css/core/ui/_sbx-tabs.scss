@@ -6,7 +6,7 @@
 body.sbx-body {
     .tabs {
         background-color: var(--sbx-color-foreground-primary);
-        border-bottom: var(--sbx-color-accent);
+        border-bottom: 1px solid var(--sbx-color-text-secondary);
         overflow-x: auto;
         overflow-y: clip;
 
@@ -52,16 +52,11 @@ body.sbx-body {
     /* Tabs component styles */
     .component-tabs {
         & .tabs {
-            border: var(--border);
-            border-bottom: 0;
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
-            border-radius: var(--sbx-border-radius-normal);
         }
 
         & .tabs-content {
-            border: var(--border);
-            border-radius: var(--sbx-border-radius-normal);
             border-top: 0;
             border-top-left-radius: 0;
             border-top-right-radius: 0;

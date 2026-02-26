@@ -67,4 +67,10 @@ body.sbx-body {
         font-weight: var(--sbx-font-weight-normal);
         text-transform: none;
     }
+
+    table.rubric th[colspan] {
+        font-weight: var(--sbx-font-weight-heading);
+        padding: 10px;
+        text-transform: none;
+    }
 }

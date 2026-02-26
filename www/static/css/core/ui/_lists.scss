@@ -82,7 +82,7 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
         $behavior: nest
     ); // there is no scenario in which .information-list > li will operate as anything other than a row
     @include responsive-sides(-1, margin);
-    border-bottom: 1px solid $body-bg;
+    border-bottom: 1px solid var(--sbx-color-foreground-secondary, $body-bg);
     position: relative;
     overflow: visible;
     list-style: none;
@@ -97,7 +97,7 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
 
 %ui-sortable-helper {
     border-bottom: none;
-    background-color: $row-action-hover-background;
+    background-color: var(--sbx-color-active, $row-action-hover-background);
 }
 
 @mixin information-list() {
@@ -161,7 +161,7 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
         }
     }
     &.group {
-        border-bottom: 0.5rem solid $body-bg;
+        border-bottom: 0.5rem solid var(--sbx-color-foreground-secondary, $body-bg);
         &:last-of-type {
             border-bottom: 0;
         }
@@ -187,7 +187,7 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
         margin: 0;
     }
     nav a:not(.progress-tick):hover {
-        background-color: $row-action-hover-background;
+        background-color: var(--sbx-color-foreground-primary, $row-action-hover-background);
     }
     .card {
         flex: 1 100%;
@@ -239,7 +239,7 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
     }
     // Grades expandable layout
     .unit {
-        border-top: 2px solid $body-bg;
+        border-top: 2px solid var(--sbx-color-foreground-secondary, $body-bg);
 
         .card {
             padding: 0.5rem 0 0.5rem 0;

@@ -9,19 +9,19 @@ $ups-log-window-height: 30rem !default;
 
 .ups {
     .level-100 {
-        color: $ups-debug-color;
+        color: var(--sbx-color-text-primary, $ups-debug-color);
     }
     .level-200 {
-        color: $ups-info-color;
+        color: var(--sbx-color-active, $ups-info-color);
     }
     .level-250 {
-        color: $ups-notice-color;
+        color: var(--sbx-color-success, $ups-notice-color);
     }
     .level-300 {
-        color: $ups-warning-color;
+        color: var(--sbx-color-warning, $ups-warning-color);
     }
     .level-400 {
-        color: $ups-error-color;
+        color: var(--sbx-color-alert, $ups-error-color);
     }
 
     [class^="level-"]:hover {

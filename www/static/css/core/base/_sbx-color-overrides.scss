@@ -68,10 +68,21 @@ body.sbx-body {
         color: var(--sbx-color-text-secondary);
     }
 
-    tr:nth-child(even) {
+    /**
+     * Add colour alternating rows for better readability
+     */
+    table:not([class]) tr:nth-child(even),
+    table.rubric tr:nth-child(even),
+    table.diagonal-headings-table tr:nth-child(even),
+    #course-selector-results ul.information-list li:nth-child(even),
+    ul.information-list.sortable-card li:nth-child(even),
+    ul.information-list.unsortable li:nth-child(even) {
         background-color: var(--sbx-color-foreground-secondary);
     }
 
+    /**
+    * Use highlight instead of pinky red of alert with Sass tint()
+    */
     tr.alert {
         background-color: var(--sbx-color-highlight);
     }
