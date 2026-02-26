@@ -41,7 +41,7 @@ const results = window.Vue.ref<SearchSelectItem[]>([]);
 function onSearchResponse(json: unknown): void {
     if (typeof json === "object" && json !== null && "data" in json) {
         const newResults = json.data as CourseAPIResponse;
-        results.value = [...newResults.courses.map((course:Course) => ({ ...course, name: course.title }))];
+        results.value = [...newResults.courses.map((course: Course) => ({ ...course, name: course.title }))];
     }
 }
 
