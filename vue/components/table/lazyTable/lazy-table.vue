@@ -82,21 +82,12 @@ function onSortSelected(key: string): void {
 </template>
 
 <style scoped lang="scss">
-.lazy-table {
-    border-collapse: separate;
-    border-spacing: 0;
-    position: relative;
-}
-
 .lazy-table__row > th,
 .lazy-table__row > td {
-    background-color: #fff;
-    border-color: var(--body-background);
+    border-color: var(--sbx-color-border, var(--body-background));
     border-style: solid;
     border-width: 1px 0 1px 0; // Unless overridden below
-    font-size: 0.8125rem;
     overflow-wrap: anywhere;
-    text-wrap: wrap;
     &:not(:last-child) {
         border-right-width: 1px;
     }
@@ -105,11 +96,11 @@ function onSortSelected(key: string): void {
     }
 }
 .lazy-table__row--header > th {
-    border-top-width: 0px;
-    color: #000;
-    font-weight: 600;
-    padding: 0.625rem;
+    padding: var(--sbx-size-s, var(--spacing-s));
     white-space: nowrap;
+}
+.lazy-table__row > td {
+    padding: 0; // padding is handled by the cell components
 }
 
 .u-sticky-top.u-sticky-left {
@@ -120,7 +111,7 @@ function onSortSelected(key: string): void {
     align-items: center;
     background: none;
     display: flex;
-    gap: var(--spacing-m);
+    gap: var(--sbx-size-m, var(--spacing-m));
     justify-content: space-between;
     height: auto;
     margin: 0;
