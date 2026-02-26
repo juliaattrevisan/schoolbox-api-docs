@@ -76,7 +76,7 @@ declare global {
             };
             editors: Partial<Record<string, SbxEditor>>;
             gradeGradientEnabled: boolean;
-            aiFeatures: Record<AiFeature, {enabled: boolean}>;
+            aiFeatures: Record<AiFeature, { enabled: boolean }>;
             lightGallery: typeof lightGallery;
             lightGalleryInit: InitLightGallery;
             lightGalleries: Record<string, LightGallery | undefined>;
