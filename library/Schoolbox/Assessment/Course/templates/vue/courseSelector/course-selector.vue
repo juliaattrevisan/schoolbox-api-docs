@@ -11,7 +11,7 @@ import type { Course } from "@schoolboxLibrary/types/Course";
 import { useCourseSelectorStore } from "./store/courseSelectorStore";
 
 type CourseAPIResponse = {
-    courses: SearchSelectItem[];
+    courses: Course[];
 };
 
 interface Props {
@@ -41,7 +41,7 @@ const results = window.Vue.ref<SearchSelectItem[]>([]);
 function onSearchResponse(json: unknown): void {
     if (typeof json === "object" && json !== null && "data" in json) {
         const newResults = json.data as CourseAPIResponse;
-        results.value = newResults.courses;
+        results.value = [...newResults.courses.map((course:Course) => ({ ...course, name: course.title }))];
     }
 }
 
@@ -79,11 +79,12 @@ function updateResults(json: unknown, $results: Ref<SearchSelectItem[]>, isMoreR
         return;
     }
     const newResults = json.data as CourseAPIResponse;
+    const formattedResults = newResults.courses.map((course: Course) => ({ ...course, name: course.title }));
     if (isMoreResults) {
-        $results.value = [...$results.value, ...newResults.courses];
+        $results.value = [...$results.value, ...formattedResults];
         return;
     }
-    $results.value = [...newResults.courses];
+    $results.value = [...formattedResults];
 }
 
 /**
