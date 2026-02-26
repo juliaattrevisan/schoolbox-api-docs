@@ -738,9 +738,9 @@ class Factory
         // Not interested in work types other than assessment tasks
         foreach (
             $this->assessmentDataSource->findAllByFolderIdForReview(
-                $folder->getId(),
-                $student,
-                ['order' => ['due_date' => 'asc'],]
+                folderId: $folder->getId(),
+                student: $student,
+                options: ['order' => ['due_date' => 'asc'],]
             ) as $assessment
         ) {
             if (isset($calendarYear)) {
@@ -887,9 +887,9 @@ class Factory
                 $cohortFolderIds[] = $cohortFolder->getId();
             }
             $assessments = $this->assessmentDataSource->findAllByFolderIdForReview(
-                $cohortFolderIds,
-                null,
-                [
+                folderId: $cohortFolderIds,
+                student: null,
+                options: [
                     'spec_assessment_id' => $specAssessment->getId(),
                     'order'              => ['due_date' => 'asc'],
                     'type'               => AssessmentType::TYPE_DUE_WORK,

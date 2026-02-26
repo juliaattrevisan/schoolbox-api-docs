@@ -721,7 +721,7 @@ class Controller extends Base
             $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
                 /* For the students in $folder, find all the folders where they had a published feedback
                  */
-                $feedbackFolders->findForFolder($folder, $from, $to),
+                folderId: $feedbackFolders->findForFolder($folder, $from, $to),
 
                 /* For the $studentIds provided, find all the folders where they had a published feedback
                  */
@@ -751,14 +751,14 @@ class Controller extends Base
                  *
                  * \Schoolbox\UserMapper::getInstance()->findById(13),
                  */
-                null,
+                student: null,
 
                 /* There's this somewhat obscure "options to pass to findByColumList" but there's actually a few
                  * rarely-used, rarely-encountered ideas here: ref. convertOptionsToPredicateBuilder() in the
                  * Assessment MapperProxy:1790. You get there via findAllByFolderIdForReview() and it has a plethora of
                  * date range filters, term-based filters, etc. deep in the swamp where you'd never look.
                  */
-                [
+                options: [
                     'due_after' => $from,
                     'due_before' => $to,
                     'type' => [

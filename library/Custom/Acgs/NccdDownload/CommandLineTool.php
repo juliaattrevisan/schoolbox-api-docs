@@ -237,7 +237,7 @@ class CommandLineTool extends App
             // are within one of the NCCD information courses.
             /** @var MapperProxy $assessmentDataSource */
             $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-            $assessments          = $assessmentDataSource->findAllByFolderIdForReview($row['id']);
+            $assessments          = $assessmentDataSource->findAllByFolderIdForReview(folderId: $row['id']);
             foreach ($assessments as $assessment) {
                 $context = $assessment->getContext();
                 if (
