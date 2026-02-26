@@ -146,6 +146,16 @@ trait VObjectTrait
 
 
     /**
+     * This function is overridden in Calendar/Event/Type/ResourceBooking/Renderer/Base.php.
+     * @return ?string
+     */
+    public function getExportType(): ?string
+    {
+        return null;
+    }
+
+
+    /**
      * @param string $baseUrl
      */
     public function setBaseUrl(string $baseUrl): void
