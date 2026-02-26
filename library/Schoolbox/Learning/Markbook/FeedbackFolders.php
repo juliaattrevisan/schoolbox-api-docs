@@ -55,6 +55,26 @@ class FeedbackFolders
         \Alaress_Date_Format $from,
         \Alaress_Date_Format $to
     ): array {
+        $studentIds = $this->findStudentIds($folder);
+
+        return $this->findForStudents($studentIds, $from, $to);
+    }
+
+
+    /**
+     * For a given hydrated $folder, use its folder code to find a list of students from the sis.
+     *
+     * You might end up reusing this to reduce the Markbook's output via its studentIds reductive filter because
+     * the swamp fetches and hydrates assessments; that sometimes includes more guys than are actually in your class
+     * list. You don't need to show that.
+     *
+     * @param FolderModel $folder
+     * @return array
+     * @throws Exception
+     * @throws NotFound
+     */
+    public function findStudentIds(FolderModel $folder): array
+    {
         /* Find a list of students currently involved in $folder, according to the sis
          */
         $students = $this->externalClass->getStudents($folder->getCodeString());
@@ -65,11 +85,9 @@ class FeedbackFolders
          * TODO you could also put a Role::STUDENT as the second arg, but that would preclude any staff
          *  members being in their professional development workflow. Not sure how much that matters atm
          */
-        $studentIds = $this->userMapper
+        return $this->userMapper
             ->findByExternalIds($externalIds)
             ->getPropertyValues('id');
-
-        return $this->findForStudents($studentIds, $from, $to);
     }
 
 

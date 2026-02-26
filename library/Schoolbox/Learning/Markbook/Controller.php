@@ -710,16 +710,18 @@ class Controller extends Base
             $from = new \Alaress_Date_Format('2025-01-01 00:00:00', 'Y-m-d H:i:s');
             $to = new \Alaress_Date_Format('2026-11-07 00:00:00', 'Y-m-d H:i:s');
 
+            $feedbackFolders = new FeedbackFolders(
+                $this->getDi()->get('databaseInternal'),
+                $this->getDi()->get('externalClass'),
+                \Schoolbox\UserMapper::getInstance(), // TODO inject this from wherever you implement later
+            );
+
             /* Note that the first arg to findAllByFolderIdForReview() can actually be a set of folder ids
              */
             $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
                 /* For the students in $folder, find all the folders where they had a published feedback
                  */
-                (new FeedbackFolders(
-                    $this->getDi()->get('databaseInternal'),
-                    $this->getDi()->get('externalClass'),
-                    \Schoolbox\UserMapper::getInstance(), // TODO inject this from wherever you implement later
-                ))->findForFolder($folder, $from, $to),
+                $feedbackFolders->findForFolder($folder, $from, $to),
 
                 /* For the $studentIds provided, find all the folders where they had a published feedback
                  */
@@ -806,7 +808,7 @@ class Controller extends Base
              * Plus, this isn't the usual use case afaik: you're operating on your entire class of students at a time,
              * mostly: not an individual. Nevertheless, you can operate on a reduced set by using this reductive.
              */
-            studentIds: null,
+            studentIds: $feedbackFolders->findStudentIds($folder),
             curriculumCodes: null,
             folderIds: null,
         );
