@@ -791,6 +791,9 @@ class Controller extends Base
                 //                        'GC-FA-a'
                 //                    ]
                 ],
+                /* Only hydrate these particular participants and their feedbacks, if specified: otherwise swamp hydrates
+                 * everyone who participated in each $assessment which might be more than you need.
+                 */
                 participantUsers: $feedbackFolders->findStudentIds($folder),
             );
         }
