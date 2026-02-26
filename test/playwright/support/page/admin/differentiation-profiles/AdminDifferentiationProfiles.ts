@@ -41,6 +41,7 @@ export default class AdminDifferentiationProfiles {
         await this.clickSave();
         this.tester.isGoingTo("Refresh the page");
         await this.page.reload();
+        await this.page.waitForLoadState("load"); // Waits for full page reload
         this.tester.isGoingTo("Validate that the text 'Terminology' is still visible on the page after refresh");
         await expect(this.page.getByTestId("differentiation-profiles-header-Terminology")).toBeVisible();
         this.tester.isGoingTo("Verify that the checkbox is still checked");
@@ -60,6 +61,7 @@ export default class AdminDifferentiationProfiles {
         await this.clickSave();
         this.tester.isGoingTo("Refresh the page");
         await this.page.reload();
+        await this.page.waitForLoadState("load"); // Waits for full page reload
         this.tester.isGoingTo("Validate that the text 'Terminology' is no longer visible on the page after refresh");
         await expect(this.page.getByTestId("differentiation-profiles-header-Terminology")).not.toBeVisible();
         this.tester.isGoingTo("Verify that the checkbox is still unchecked");
