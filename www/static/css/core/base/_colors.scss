@@ -231,7 +231,7 @@ $icon-color-my-files: $icon-color-files;
     color: var(--sbx-color-alert, $alert-color);
 }
 .success {
-    color: $success-color;
+    color: var(--sbx-color-success, $success-color);
 }
 .warning {
     color: $warning-color;

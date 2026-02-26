@@ -270,10 +270,10 @@ button.submit {
     }
     .achievement {
         &:before {
-            color: $success-color;
+            color: var(--sbx-color-success, $success-color);
         }
         &:hover {
-            background-color: $success-color;
+            background-color: var(--sbx-color-success, $success-color);
             color: $white;
 
             &:before {

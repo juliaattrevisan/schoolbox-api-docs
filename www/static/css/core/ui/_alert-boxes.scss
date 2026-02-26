@@ -181,12 +181,12 @@ $alert-default-background: css-darken($body-bg, 10%);
         color: $accent-foreground;
     }
     &.success {
-        background-color: $success-color;
+        background-color: var(--sbx-color-success, $success-color);
         color: $white;
     }
     &.success-tint {
         background-color: tint($success-color, $alert-tint-amount);
-        color: $success-color;
+        color: var(--sbx-color-success, $success-color);
     }
     &.warning {
         background-color: $warning-color;
@@ -272,7 +272,7 @@ $alert-default-background: css-darken($body-bg, 10%);
     }
 
     &.success::before {
-        background-color: $success-color;
+        background-color: var(--sbx-color-success, $success-color);
         animation: none;
     }
     &.warning::before {

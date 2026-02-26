@@ -79,7 +79,7 @@
         border-left: 0.75rem solid transparent;
     }
     .legend-indicator.indicator-published {
-        border-top: 0.75rem solid $success-color;
+        border-top: 0.75rem solid var(--sbx-color-success, $success-color);
         border-left: 0.75rem solid transparent;
     }
     .legend-indicator.indicator-resubmit {

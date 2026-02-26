@@ -102,7 +102,7 @@
     .accepted {
         .status-icon:after {
             background-color: tint($success-color, 74%);
-            color: $success-color;
+            color: var(--sbx-color-success, $success-color);
             content: "\e604"; //.icon-approve
         }
     }
@@ -142,8 +142,8 @@
     &.flex-list.buttons a {
         &.accepted {
             background-color: tint($success-color, 74%);
-            border: 1px solid $success-color;
-            color: $success-color;
+            border: 1px solid var(--sbx-color-success, $success-color);
+            color: var(--sbx-color-success, $success-color);
             font-weight: 600;
         }
 
@@ -160,8 +160,8 @@
     a.accepted,
     a.accepted:hover {
         background-color: tint($success-color, 74%);
-        border: 1px solid $success-color;
-        color: $success-color;
+        border: 1px solid var(--sbx-color-success, $success-color);
+        color: var(--sbx-color-success, $success-color);
     }
 
     a.declined,

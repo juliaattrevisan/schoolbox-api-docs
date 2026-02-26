@@ -748,7 +748,7 @@ ul.az-error-list {
 }
 .dz-preview .dz-success-mark,
 .dropzone-previews .dz-preview .dz-success-mark {
-    color: $success-color;
+    color: var(--sbx-color-success, $success-color);
 }
 .dz-preview .dz-error-mark,
 .dropzone-previews .dz-preview .dz-error-mark {

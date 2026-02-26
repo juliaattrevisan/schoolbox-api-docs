@@ -38,7 +38,7 @@ $progress-meter-alert-color: $alert-color !default;
 //
 // We use this to set up the progress bar container
 @mixin progress-container {
-    background-color: $progress-bar-color;
+    background-color: var(--sbx-color-foreground-secondary, $progress-bar-color);
     border: $progress-bar-border-size $progress-bar-border-style $progress-bar-border-color;
     height: $progress-bar-height;
     margin-bottom: $progress-bar-margin-bottom;

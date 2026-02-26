@@ -12,7 +12,7 @@
     overflow: visible;
     position: absolute !important;
     right: 1.25rem;
-    color: $success-color;
+    color: var(--sbx-color-success, $success-color);
 }
 
 /* Respondent chose an incorrect answer
@@ -102,7 +102,7 @@
             $bg: tint($success-color, 74%),
             $padding: rem-calc(calc($base-font-size / 2))
         );
-        color: $success-color;
+        color: var(--sbx-color-success, $success-color);
     }
     &.incorrect {
         @include label(

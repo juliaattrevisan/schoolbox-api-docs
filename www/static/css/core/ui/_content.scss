@@ -214,7 +214,7 @@ $container-bg: white;
     // Label colors
     &.reviewed {
         @include label($bg: tint($success-color, 74%));
-        color: $success-color;
+        color: var(--sbx-color-success, $success-color);
     }
     &.submitted {
         @include label($bg: tint($warning-color, 74%));
@@ -241,7 +241,7 @@ $container-bg: white;
     // (Colors for this section were copied from 'Label colors' above - 'approved' to match 'reviewed' etc.)
     &.approved {
         @include label($bg: tint($success-color, 74%));
-        color: $success-color;
+        color: var(--sbx-color-success, $success-color);
     }
     &.pending {
         @include label($bg: tint($warning-color, 74%));
@@ -593,7 +593,7 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
     &.reviewed,
     &.submitted {
         @extend .icon-approve;
-        background-color: $success-color;
+        background-color: var(--sbx-color-success, $success-color);
         border-radius: $progress-tick-size-regular;
         transform: rotate(360deg);
         &:before {
