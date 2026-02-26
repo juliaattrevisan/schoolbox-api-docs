@@ -134,7 +134,6 @@ export default {
 }
 
 .title,
-.option-list,
 .option-list li {
     display: inline-block; //line up along the bottom of the search field input
 }
