@@ -10,9 +10,14 @@
 import { test } from "@schoolboxTest/playwright/support/integrations";
 import AdminDifferentiationProfiles from "@schoolboxTest/playwright/support/page/admin/differentiation-profiles/AdminDifferentiationProfiles";
 
-test.describe.configure({ mode: "parallel" });
+test.describe.configure({ mode: "serial" });
 
 test.describe("Admin Differentiation Profiles", () => {
+    test.beforeAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("Turn the differentiation flag off to ensure a consistent starting point for tests");
+        await db.updateInDatabase("config", { value: 0 }, { name: "differentiation_profiles_enabled" });
+    });
+
     test.beforeEach(async ({ tester, page }) => {
         const adminDifferentiationProfiles = new AdminDifferentiationProfiles(tester, page);
         tester.isGoingTo("Login as admin");
