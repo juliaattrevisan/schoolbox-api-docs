@@ -710,21 +710,18 @@ class Controller extends Base
             $from = new \Alaress_Date_Format('2026-01-01 00:00:00', 'Y-m-d H:i:s');
             $to = new \Alaress_Date_Format('2026-02-26 00:00:00', 'Y-m-d H:i:s');
 
-            /* Find a list of students currently involved in $folder, according to the sis
-             */
-            $students = (new \External_Class())->getStudents($folder->getCodeString());
-            $externalIds = array_column($students, 'synergy_id');
-
-            /* Need their user ids, not the external ids
-             */
-            $studentIds = \Schoolbox\UserMapper::getInstance()
-                ->findByExternalIds($externalIds)
-                ->getPropertyValues('id');
-
             /* Note that the first arg to findAllByFolderIdForReview() can actually be a set of folder ids
              */
             $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
-                (new FeedbackFolders($this->getDi()->get('databaseInternal')))->findForStudents($studentIds, $from, $to),
+                /* For the students in $folder, find all the folders where they had a published feedback
+                 */
+                (new FeedbackFolders($this->getDi()->get('databaseInternal'), $this->getDi()->get('externalClass')))
+                    ->findForFolder($folder, $from, $to),
+
+                /* For the $studentIds provided, find all the folders where they had a published feedback
+                 */
+//                (new FeedbackFolders($this->getDi()->get('databaseInternal'), $this->getDi()->get('externalClass')))
+//                    ->findForStudents($studentIds, $from, $to),
 
                 /* Instead of the FeedbackFolders, you can slam together your own list of folders arbitrarily
                  * I found these manually
