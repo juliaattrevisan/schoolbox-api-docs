@@ -165,7 +165,7 @@ $input-number-spinners: true !default;
     @if $bg-lightness < 70% or $bg == yellow {
         color: $white;
     } @else {
-        color: $alert-color;
+        color: var(--sbx-color-alert, $alert-color);
     }
 }
 
@@ -430,7 +430,7 @@ legend {
     &.required:after,
     span.required-with-tip:after {
         content: " *";
-        color: $alert-color;
+        color: var(--sbx-color-alert, $alert-color);
     }
     &.error {
         display: block;
@@ -1192,7 +1192,7 @@ fieldset {
 input.invalid-data,
 input.invalid-data:focus {
     background-color: $hot-color;
-    border-color: $alert-color;
+    border-color: var(--sbx-color-alert, $alert-color);
 }
 
 @import "dropzone";
@@ -1202,7 +1202,7 @@ input.invalid-data:focus {
  * the correct way to indicate a failure.
  */
 .component-action .button.saving-error {
-    background-color: $alert-color;
+    background-color: var(--sbx-color-alert, $alert-color);
     color: #fff;
     opacity: 1;
 }

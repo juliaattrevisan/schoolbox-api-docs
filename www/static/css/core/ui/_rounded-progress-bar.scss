@@ -51,7 +51,7 @@
             }
 
             &.alert:before {
-                background-color: $alert-color;
+                background-color: var(--sbx-color-alert, $alert-color);
             }
 
             &.warning:before {
@@ -108,7 +108,7 @@
         }
 
         &.alert {
-            background-color: $alert-color;
+            background-color: var(--sbx-color-alert, $alert-color);
         }
 
         &.warning {

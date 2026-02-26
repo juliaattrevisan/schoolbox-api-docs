@@ -153,7 +153,8 @@ table {
         }
     }
     tr.alert {
-        background-color: tint($alert-color, 74%);
+        background-color: var(--sbx-color-alert, $alert-color);
+        color: var(--sbx-color-alert-text, #fff);
     }
 }
 

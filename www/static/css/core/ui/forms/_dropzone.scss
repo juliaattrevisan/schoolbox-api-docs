@@ -752,7 +752,7 @@ ul.az-error-list {
 }
 .dz-preview .dz-error-mark,
 .dropzone-previews .dz-preview .dz-error-mark {
-    color: $alert-color;
+    color: var(--sbx-color-alert, $alert-color);
 }
 .dz-preview .dz-progress,
 .dropzone-previews .dz-preview .dz-progress {

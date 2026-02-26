@@ -83,7 +83,7 @@
         border-left: 0.75rem solid transparent;
     }
     .legend-indicator.indicator-resubmit {
-        border-top: 0.75rem solid $alert-color;
+        border-top: 0.75rem solid var(--sbx-color-alert, $alert-color);
         border-left: 0.75rem solid transparent;
     }
 

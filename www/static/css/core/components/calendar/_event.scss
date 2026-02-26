@@ -110,7 +110,7 @@
     .declined {
         .status-icon:after {
             background-color: tint($alert-color, 74%);
-            color: $alert-color;
+            color: var(--sbx-color-alert, $alert-color);
             content: "\e60d"; //.icon-close
         }
     }
@@ -149,8 +149,8 @@
 
         &.declined {
             background-color: tint($alert-color, 74%);
-            border: 1px solid $alert-color;
-            color: $alert-color;
+            border: 1px solid var(--sbx-color-alert, $alert-color);
+            color: var(--sbx-color-alert, $alert-color);
             font-weight: 600;
         }
     }
@@ -167,7 +167,7 @@
     a.declined,
     a.declined:hover {
         background-color: tint($alert-color, 74%);
-        border: 1px solid $alert-color;
-        color: $alert-color;
+        border: 1px solid var(--sbx-color-alert, $alert-color);
+        color: var(--sbx-color-alert, $alert-color);
     }
 }

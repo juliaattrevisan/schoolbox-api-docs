@@ -360,7 +360,7 @@ table.rb {
 .rb-value {
     display: block;
     &.error {
-        border-color: $alert-color !important;
+        border-color: var(--sbx-color-alert, $alert-color) !important;
     }
 }
 .rb-value {

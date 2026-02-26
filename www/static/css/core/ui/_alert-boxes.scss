@@ -197,12 +197,12 @@ $alert-default-background: css-darken($body-bg, 10%);
         color: $warning-color;
     }
     &.alert {
-        background-color: $alert-color;
+        background-color: var(--sbx-color-alert, $alert-color);
         color: $white;
     }
     &.alert-tint {
         background-color: tint($alert-color, $alert-tint-amount);
-        color: $alert-color;
+        color: var(--sbx-color-alert, $alert-color);
     }
 }
 
@@ -280,7 +280,7 @@ $alert-default-background: css-darken($body-bg, 10%);
         animation: none;
     }
     &.alert::before {
-        background-color: $alert-color;
+        background-color: var(--sbx-color-alert, $alert-color);
         animation: none;
     }
 }

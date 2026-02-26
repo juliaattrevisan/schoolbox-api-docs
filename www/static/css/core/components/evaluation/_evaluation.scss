@@ -27,7 +27,7 @@
     overflow: visible;
     position: absolute !important;
     right: 1.25rem;
-    color: $alert-color;
+    color: var(--sbx-color-alert, $alert-color);
 }
 
 /* Respondent did not choose a correct answer
@@ -110,7 +110,7 @@
             $bg: tint($alert-color, 74%),
             $padding: rem-calc(calc($base-font-size / 2))
         );
-        color: $alert-color;
+        color: var(--sbx-color-alert, $alert-color);
     }
 }
 

@@ -207,7 +207,7 @@ $container-bg: white;
             right: 10px;
             top: -2px;
             &:hover {
-                color: $alert-color;
+                color: var(--sbx-color-alert, $alert-color);
             }
         }
     }
@@ -222,7 +222,7 @@ $container-bg: white;
     }
     &.submitted-late {
         @include label($bg: tint($alert-color, 74%));
-        color: $alert-color;
+        color: var(--sbx-color-alert, $alert-color);
     }
     &.unsubmitted {
         @include label($bg: $gainsboro);
@@ -249,7 +249,7 @@ $container-bg: white;
     }
     &.rejected {
         @include label($bg: tint($alert-color, 74%));
-        color: $alert-color;
+        color: var(--sbx-color-alert, $alert-color);
     }
 
     /* Learning Moment Moderation
@@ -267,7 +267,7 @@ $container-bg: white;
 
     &--moment-rejected {
         @include label($bg: tint($alert-color, 74%));
-        color: $alert-color;
+        color: var(--sbx-color-alert, $alert-color);
     }
 }
 
@@ -601,7 +601,7 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
         }
     }
     &.failed {
-        background-color: $alert-color;
+        background-color: var(--sbx-color-alert, $alert-color);
         &:before {
             visibility: visible;
             content: "\0021";
