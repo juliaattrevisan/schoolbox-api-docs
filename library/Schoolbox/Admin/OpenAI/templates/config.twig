@@ -209,7 +209,7 @@
             if (!reasoningEffortSelect) {
                 return;
             }
-            const modelOptions = window.REASONING_EFFORT_MODEL_OPTIONS[model] ?? null;
+            const modelOptions = window.REASONING_EFFORT_MODEL_OPTIONS[FEATURE][model] ?? null;
             Array.from(reasoningEffortSelect.options).forEach(el => {
                 if (el.value !== null) {
                     if (provider === 'OpenAI') {

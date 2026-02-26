@@ -63,18 +63,6 @@ class Config
         'auto',
     ];
 
-    public const REASONING_EFFORT_MODEL_DEFAULTS = [
-        "gpt-4o"       => 'none',
-        "gpt-4o-mini"  => 'none',
-        "gpt-4.1"      => 'none',
-        "gpt-4.1-mini" => 'none',
-        "gpt-5"        => 'minimal',
-        "gpt-5-mini"   => 'minimal',
-        "gpt-5-nano"   => 'minimal',
-        "gpt-5.1"      => 'none',
-        "gpt-5.2"      => 'none',
-        "gpt-5.2-pro"  => 'high',
-    ];
     public const array REASONING_EFFORT_MODEL_OPTIONS = [
         "gpt-4o"       => ['none'],
         "gpt-4o-mini"  => ['none'],
@@ -517,5 +505,22 @@ class Config
         }
 
         return $formInputs;
+    }
+
+    /**
+     * Build available reasoning effort levels for this feature.
+     *
+     * This ensures the `minimal` level is stripped from the image feature..
+     *
+     * @param string $feature
+     * @return array|array[]
+     */
+    public function buildReasoningEffortModelOptions(string $feature): array
+    {
+        $options = self::REASONING_EFFORT_MODEL_OPTIONS;
+        if ($feature === Helper::FEATURE_IMAGE) {
+            $options = array_map(fn ($effortLevels) => array_values(array_diff($effortLevels, ['minimal'])), $options);
+        }
+        return $options;
     }
 }
