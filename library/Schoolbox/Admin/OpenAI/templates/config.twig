@@ -215,9 +215,6 @@
                     if (provider === 'OpenAI') {
                         if (modelOptions !== null) {
                             el.disabled = !modelOptions.includes(el.value);
-                            if (el.disabled) {
-                                el.selected = false;
-                            }
                         }
                     } else {
                         el.disabled = false;
@@ -228,7 +225,7 @@
 
         /**
          * If the currently selected reasoning option is now disabled:
-         * select the first option without a value.
+         * select the first option which is not disabled.
          */
         function selectFirstReasoningOptionIfSelectedDisabled() {
             if (!reasoningEffortSelect) {
@@ -236,10 +233,9 @@
             }
             const selectedAndDisabled = Array.from(reasoningEffortSelect.options).find(el => el.selected && el.disabled);
             if (selectedAndDisabled) {
-                const firstWithoutValue = Array.from(reasoningEffortSelect.options).find(el => el.value === null);
-                if (firstWithoutValue) {
-                    selectedAndDisabled.selected = false;
-                    firstWithoutValue.selected = true;
+                const firstEnabled = Array.from(reasoningEffortSelect.options).find(el => !el.disabled);
+                if (firstEnabled) {
+                    firstEnabled.selected = true;
                 }
             }
         }
