@@ -3547,12 +3547,6 @@ parameters:
 			path: library/Schoolbox/Learning/MarkScheme/TotalMarkAbstract.php
 
 		-
-			message: '#^Property Schoolbox\\Learning\\Markbook\\Markbook\:\:\$students \(Schoolbox\\Collection\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: library/Schoolbox/Learning/Markbook/Markbook.php
-
-		-
 			message: '#^Property Schoolbox\\Learning\\Markbook\\Markbook\:\:\$totalWeight \(int\) does not accept float\.$#'
 			identifier: assign.propertyType
 			count: 1
