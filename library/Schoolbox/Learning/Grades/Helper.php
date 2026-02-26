@@ -87,7 +87,7 @@ class Helper
             ->filter(function (IAssessable $a) use ($viewee) {
                 return $a->isPublished($viewee) && $a->isParticipant($viewee);
             });
-        $assessmentsPerFolder = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessmentsPerFolder, null, false, false)
+        $assessmentsPerFolder = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection(collection: $assessmentsPerFolder, user: null, removeExcluded: false, assumeParticipation: false)
             ->groupByCallback(function (IAssessable $assessment) {
                 return $assessment->getBaseContext()->getFolder()->getId();
             });

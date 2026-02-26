@@ -492,10 +492,10 @@ class Controller extends Base
 
                     // User's participation cannot be assumed: they cannot be assumed to be in the folder
                     $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection(
-                        $contexts,
-                        $viewee,
-                        false,
-                        false
+                        collection: $contexts,
+                        user: $viewee,
+                        removeExcluded: false,
+                        assumeParticipation: false
                     );
                     $tree[$baseContextId]['assessments'][$contextId]['assessment'] = $context;
                 }
@@ -661,7 +661,7 @@ class Controller extends Base
 
         // User's participation cannot be assumed: they cannot be assumed to be in the folder
         $assessments = $this->assessmentMapperProxy
-            ->loadParticipantsIntoAssessmentCollection($assessments, $user, false, false)
+            ->loadParticipantsIntoAssessmentCollection(collection: $assessments, user: $user, removeExcluded: false, assumeParticipation: false)
             ->filter(static function (IAssessable $a) use ($viewee) {
                 // Note that we the assessment list is already filtered to published assessments due to filters
                 return $a->isParticipant($viewee);

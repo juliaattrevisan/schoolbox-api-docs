@@ -96,7 +96,7 @@ class Exporter
 
             // Load participation
             $singleCollection  = new GenericCollection(get_class($assessment), [$assessment]);
-            $assessment = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($singleCollection)->first();
+            $assessment = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection(collection: $singleCollection)->first();
 
             foreach ($assessment->getAllParticipants() as $participant) {
                 /** @var Participant $participant */

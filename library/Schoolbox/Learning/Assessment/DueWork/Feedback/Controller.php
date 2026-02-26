@@ -228,7 +228,7 @@ class Controller extends Base
                 ->indexBy('id');
 
             // hydrate participants
-            $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($aImpls, null, true);
+            $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection(collection: $aImpls, user: null, removeExcluded: true);
         } else {
             $aImpls->add($assessment)->indexBy('id');
         }

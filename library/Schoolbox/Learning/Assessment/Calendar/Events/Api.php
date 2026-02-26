@@ -124,10 +124,10 @@ class Api implements Calendar_Api_EventType_Interface
         if ($this->visibility) {
             // User's participation can be assumed if they exist
             $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection(
-                $assessments,
-                $this->user,
-                true,
-                true
+                collection: $assessments,
+                user: $this->user,
+                removeExcluded: true,
+                assumeParticipation: true
             );
         }
 

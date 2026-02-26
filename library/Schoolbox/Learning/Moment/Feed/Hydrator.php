@@ -146,7 +146,7 @@ class Hydrator
         }));
 
         $assessments = $this->assessmentDataSource->findAllByIds($assessmentIds->getAll())->indexBy('id');
-        $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments);
+        $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection(collection: $assessments);
 
         // Insert matching results into the collection
         $return = new Collection();

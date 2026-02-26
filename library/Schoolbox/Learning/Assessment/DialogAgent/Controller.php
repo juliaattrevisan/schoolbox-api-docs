@@ -254,7 +254,7 @@ class Controller extends Assessment\Controller
                             });
 
                         // hydrate participation
-                        $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments);
+                        $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $assessments);
 
                         $unitImpl->setAssessables($assessments);
 

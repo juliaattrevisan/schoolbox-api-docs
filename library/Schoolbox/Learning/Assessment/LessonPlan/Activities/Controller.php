@@ -89,10 +89,10 @@ class Controller extends Base
         $assessmentIds = $this->lessonPlanMapper->findForFolder([$folder->getId()], null, null, $publishDate, $isStaff);
         // hydrate those assessments
         $lessonPlans =  $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection(
-            $this->assessmentMapperProxy->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'DESC']]),
-            $this->getUser(),
-            false,
-            true
+            collection: $this->assessmentMapperProxy->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'DESC']]),
+            user: $this->getUser(),
+            removeExcluded: false,
+            assumeParticipation: true
         )
         ->groupByCallback(function ($assessment) {
             return $assessment->getBaseContext()->getId();

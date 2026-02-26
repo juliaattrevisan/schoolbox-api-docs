@@ -1662,7 +1662,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
             // hydrate participants
             if ($hydrateParticipants) {
-                $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+                $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $assessments, user: null, removeExcluded: true);
             }
         }
         return $assessments;

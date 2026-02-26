@@ -92,7 +92,7 @@ class Hydrator extends BaseHydrator
 
         // Find the matching assessments.
         $assessments = $this->assessmentMapperProxy->findAllByIds($ids);
-        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments);
+        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection(collection: $assessments);
 
         // Permissions (from AC of SA-16014):
         //    Students

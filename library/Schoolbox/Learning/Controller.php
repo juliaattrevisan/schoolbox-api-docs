@@ -221,7 +221,7 @@ class Controller extends Base
         // Fetch assessments & participants
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
         $assessments   = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
-        $assessments   = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments);
+        $assessments   = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection(collection: $assessments);
 
         $toChaseLimit            = Alaress_Date_Format::now()->addDays(1);
         $totalAssessmentsToMark  = 0;

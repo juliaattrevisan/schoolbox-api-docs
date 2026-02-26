@@ -246,7 +246,7 @@ abstract class Eportfolio_Page_Abstract
         /** @var MapperProxy $assessmentDataSource */
         $assessmentDataSource = $this->getPage()->getDi()->get('assessmentDataSource');
         $assessments = $assessmentDataSource->findAllByIds($assessmentIds);
-        $assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments);
+        $assessmentDataSource->loadParticipantsIntoAssessmentCollection(collection: $assessments);
         $assessments->indexBy('id');
         return $assessments;
     }

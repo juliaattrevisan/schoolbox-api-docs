@@ -230,7 +230,7 @@ class Controller extends Assessment\Controller
                             });
 
                         // hydrate participation
-                        $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments);
+                        $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $assessments);
 
                         $unitImpl->setAssessables($assessments);
                         $courseAssessments['units'][] = [
@@ -291,10 +291,10 @@ class Controller extends Assessment\Controller
 
             // if staff hydrate participation
             if ($this->getUser()->getRole()->isStaff()) {
-                $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($linkedAssessments);
+                $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $linkedAssessments);
             } else {
                 // only hydrate for the user who's lesson plan this is
-                $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($linkedAssessments, $student);
+                $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $linkedAssessments, user: $student);
 
                 // only show the linked assessments that the student is a participant of
                 $linkedAssessments = $linkedAssessments->filter(function (IAssessable $assessable) use ($student) {
