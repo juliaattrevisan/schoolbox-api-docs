@@ -104,7 +104,7 @@
 
         &.info {
             background-color: var(--sbx-color-active, var(--accent-background));
-            color: var(--sbx-color-active-text, var(--accent-foreground));
+            color: var(--sbx-color-text-primary, var(--accent-foreground));
         }
 
         &.alert {

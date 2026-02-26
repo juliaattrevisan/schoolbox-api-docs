@@ -207,7 +207,7 @@ $container-bg: white;
             right: 10px;
             top: -2px;
             &:hover {
-                color: var(--sbx-color-alert, $alert-color);
+                color: var(--sbx-color-accent, $alert-color);
             }
         }
     }
@@ -283,10 +283,10 @@ $container-bg: white;
     text-align: center;
     &.has-tip {
         border-bottom: 0;
-        color: $white;
+        color: var(--sbx-color-text-primary, $white);
         font-weight: 400;
         &:hover {
-            color: $white;
+            color: var(--sbx-color-text-primary, $white);
         }
     }
 }
