@@ -141,7 +141,8 @@ export default class AdminDifferentiationProfiles {
     async clickSave(): Promise<void> {
         this.tester.isGoingTo("Select the save button");
         await this.page.getByRole("button", { name: "Save" }).click();
-        this.tester.isGoingTo("Wait for the success message to appear");
+        this.tester.isGoingTo("Wait for the success message to appear and disappear to ensure it is saved");
         await expect(this.page.locator("text=Differentiation profiles successfully updated")).toBeVisible();
+        await expect(this.page.locator("text=Differentiation profiles successfully updated")).not.toBeVisible();
     }
 }
