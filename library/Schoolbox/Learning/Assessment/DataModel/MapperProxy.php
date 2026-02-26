@@ -919,8 +919,9 @@ class MapperProxy
     public function findAllByFolderIdForReview(
         $folderId,
         ?User $student = null,
-        ?bool $includeResponses = true,
+        bool $includeResponses = true,
         array $options = [],
+        array $participantUsers = [],
     ) {
         if ($student instanceof User) {
             $assessments = $this->baseMapper->findForFolderAndParticipant(
@@ -945,7 +946,8 @@ class MapperProxy
             user: $student,
             removeExcluded: true,
             assumeParticipation: false,
-            includeResponses: $includeResponses
+            includeResponses: $includeResponses,
+            participantUsers: $participantUsers
         );
     }
 
@@ -2182,13 +2184,15 @@ class MapperProxy
         bool $removeExcluded = false,
         bool $assumeParticipation = false,
         bool $includeResponses = true,
+        array $participantUsers = [],
     ) {
         return $this->participantDataSource->loadParticipationIntoAssessmentCollection(
             assessments: $collection,
             user: $user,
             removeExcluded: $removeExcluded,
             assumeParticipation: $assumeParticipation,
-            includeResponses: $includeResponses
+            includeResponses: $includeResponses,
+            participantUsers: $participantUsers,
         );
     }
 

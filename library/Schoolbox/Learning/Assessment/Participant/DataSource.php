@@ -170,6 +170,7 @@ class DataSource
         bool $assumeParticipation = false,
         bool $includeResponses = true,
         array $options = [],
+        array $participantUsers = []
     ): GenericCollection {
         /** @var GenericCollection|IAssessable[] $assessableWithDescendants */
         $assessableWithDescendants = new GenericCollection(IAssessable::class);
@@ -182,7 +183,8 @@ class DataSource
             removeExcluded: $removeExcluded,
             assumeParticipation: $assumeParticipation,
             includeResponses: $includeResponses,
-            options: $options
+            options: $options,
+            participantUsers: $participantUsers
         );
 
         // Insert project participant objects into any project
@@ -223,12 +225,13 @@ class DataSource
         bool $removeExcluded = false,
         bool $assumeParticipation = false,
         bool $includeResponses = true,
-        array $options = []
+        array $options = [],
+        array $participantUsers = []
     ): void {
         // Clear all participation from $assessments
         $this->clearParticipants($assessments);
 
-        $this->loadPlansAndParticipants($assessments);
+        $this->loadPlansAndParticipants($assessments, $participantUsers);
 
         $dynamicPlans = new GenericCollection(PlanObject::class);
         foreach ($assessments as $assessment) {
@@ -244,7 +247,7 @@ class DataSource
 
         // We do need excluded participants to be present to determine whether to whether to
         // insert students as dynamic participants.
-        $this->loadDynamicPlanParticipants($dynamicPlans, $user, $assumeParticipation);
+        $this->loadDynamicPlanParticipants($dynamicPlans, $user, $assumeParticipation, $participantUsers);
 
         /* Add responses conditionally to save some computation if you never needed them
          */
@@ -283,8 +286,13 @@ class DataSource
     private function loadDynamicPlanParticipants(
         GenericCollection $dynamicPlans,
         ?User $user = null,
-        bool $assumeParticipation = false
+        bool $assumeParticipation = false,
+        array $participantUsers = []
     ): void {
+        /* Decide if we need to filter participants to particular people to hydrate the minimum data
+         */
+        $hasParticipants = (bool)count($participantUsers);
+
         // Load dynamic participants into dynamic plans
         foreach ($dynamicPlans as $dynamicPlan) {
             $assessment = $dynamicPlan->getAssessable();
@@ -300,6 +308,12 @@ class DataSource
             } else {
                 // It's acceptable to findAllStudents in a loop for now, because the list is cached
                 foreach ($this->findAllStudentsForAssessment($assessment) as $student) {
+                    /* Not a person whose contents we care to hydrate
+                     */
+                    if ($hasParticipants && !in_array($student->getId(), $participantUsers)) {
+                        continue;
+                    }
+
                     // Is this user already an explicit participant? (Either an inclusion or exclusion)
                     if ($explicitParticipants->keyExists($student->getId())) {
                         continue;
@@ -542,11 +556,15 @@ class DataSource
      * @param IAssessable[]|GenericCollection $assessables Indexed by assessment.id
      * @throws DefinitionException If unable to locate a specified mapper join
      */
-    private function loadPlansAndParticipants(GenericCollection $assessables): void
+    private function loadPlansAndParticipants(GenericCollection $assessables, array $participantUsers = []): void
     {
         // Find all participant and plan models for the assessments
         $planMapper = $this->planMapper;
         $planModels = $planMapper->findPlansAndParticipantsForAssessments($assessables->keys());
+
+        /* Decide if we need to filter participants to particular people to hydrate the minimum data
+         */
+        $hasParticipantUsers = (bool)count($participantUsers);
 
         foreach ($planModels as $planModel) {
             $assessable = $assessables[$planModel->getAssessment()->getId()];
@@ -574,7 +592,14 @@ class DataSource
                 // Is this student already participating?
                 // Don't load them if they are already, otherwise remove
                 // from existing participation.
-                $user                = $participantModel->getUser();
+                $user = $participantModel->getUser();
+
+                /* Not a person whose contents we care to hydrate
+                 */
+                if ($hasParticipantUsers && !in_array($user->getId(), $participantUsers)) {
+                    continue;
+                }
+
                 $existingParticipant = $assessable->getParticipantIfExtant($user);
                 if ($existingParticipant) {
                     if ($existingParticipant->getUpdatedAt()->gt($participantModel->getUpdatedAt())) {
