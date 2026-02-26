@@ -2170,7 +2170,7 @@ class MapperProxy
      *                                        to the SIS to determine if $user is actually a participant in the
      *                                        assessment's folder.
      *                                        Only has an effect if $user is set.
-     * @param bool|null $includeResponses If true, hydrate Response instances
+     * @param bool  $includeResponses If true, hydrate Response instances
      * @return GenericCollection|IAssessable[]
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record

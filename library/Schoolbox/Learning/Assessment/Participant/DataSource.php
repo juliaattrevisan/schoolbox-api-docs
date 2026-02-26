@@ -156,7 +156,7 @@ class DataSource
      * @param bool                     $removeExcluded      Set to true to exclude excluded non-member participants
      * @param bool                     $assumeParticipation if true, assume $user is a participant in the assessment
      *                                                      without checking the assessment's folder.
-     * @param bool|null $includeResponses If true, hydrate Response instances
+     * @param bool  $includeResponses If true, hydrate Response instances
      * @param array                    $options Options for findByColumnList
      * @return GenericCollection|IAssessable[] $assessments, with participation loaded.
      * @throws DefinitionException If unable to locate a specified mapper join
@@ -211,7 +211,7 @@ class DataSource
      * @param bool                            $removeExcluded      if true, exclude excluded non-member participants
      * @param bool                            $assumeParticipation if true, assume $user is a participant in the
      *                                                             assessment without checking the assessment's folder.
-     * @param bool|null $includeResponses If true, hydrate Response instances
+     * @param bool $includeResponses If true, hydrate Response instances
      * @throws UnexpectedValueException If unable to merge student collections
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join

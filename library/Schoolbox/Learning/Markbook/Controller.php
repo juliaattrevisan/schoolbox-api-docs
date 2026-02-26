@@ -701,6 +701,13 @@ class Controller extends Base
     private function buildMarkbook(array $assessmentIds, FolderModel $folder): Markbook
     {
         $start = microtime(true);
+
+        $feedbackFolders = new FeedbackFolders(
+            $this->getDi()->get('databaseInternal'),
+            $this->getDi()->get('externalClass'),
+            \Schoolbox\UserMapper::getInstance(), // TODO inject this from wherever you implement later
+        );
+
         // Fetch assessments & participants
         if (empty($assessmentIds)) {
             $assessments = $this->assessmentMapperProxy->createCollection();
@@ -709,12 +716,6 @@ class Controller extends Base
              */
             $from = new \Alaress_Date_Format('2025-01-01 00:00:00', 'Y-m-d H:i:s');
             $to = new \Alaress_Date_Format('2026-11-07 00:00:00', 'Y-m-d H:i:s');
-
-            $feedbackFolders = new FeedbackFolders(
-                $this->getDi()->get('databaseInternal'),
-                $this->getDi()->get('externalClass'),
-                \Schoolbox\UserMapper::getInstance(), // TODO inject this from wherever you implement later
-            );
 
             /* Note that the first arg to findAllByFolderIdForReview() can actually be a set of folder ids
              */
