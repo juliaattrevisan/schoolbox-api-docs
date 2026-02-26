@@ -42,7 +42,7 @@
     overflow: visible;
     position: absolute !important;
     right: 1.25rem;
-    color: $warning-color;
+    color: var(--sbx-color-warning, $warning-color);
 }
 
 /* This is used to show which Respondents submitted a chosen response.

@@ -189,12 +189,12 @@ $alert-default-background: css-darken($body-bg, 10%);
         color: var(--sbx-color-success, $success-color);
     }
     &.warning {
-        background-color: $warning-color;
+        background-color: var(--sbx-color-warning, $warning-color);
         color: $white;
     }
     &.warning-tint {
         background-color: tint($warning-color, $alert-tint-amount);
-        color: $warning-color;
+        color: var(--sbx-color-warning, $warning-color);
     }
     &.alert {
         background-color: var(--sbx-color-alert, $alert-color);
@@ -276,7 +276,7 @@ $alert-default-background: css-darken($body-bg, 10%);
         animation: none;
     }
     &.warning::before {
-        background-color: $warning-color;
+        background-color: var(--sbx-color-warning, $warning-color);
         animation: none;
     }
     &.alert::before {

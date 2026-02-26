@@ -34,4 +34,15 @@ body.sbx-body:not(.login) {
         background-color: var(--sbx-color-success);
         color: var(--sbx-color-success-text);
     }
+
+    /**
+     * Warning
+     */
+    .warning.label,
+    .submitted.label,
+    .pending.label,
+    .alert-box.warning-tint {
+        background-color: var(--sbx-color-warning);
+        color: var(--sbx-color-warning-text);
+    }
 }

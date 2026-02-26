@@ -48,7 +48,7 @@ a.disabled {
     }
 
     &.warning {
-        background-color: $warning-color;
+        background-color: var(--sbx-color-warning, $warning-color);
         &:hover {
             background-color: tint($warning-color, 20%);
         }

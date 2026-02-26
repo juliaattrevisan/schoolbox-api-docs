@@ -218,7 +218,7 @@ $container-bg: white;
     }
     &.submitted {
         @include label($bg: tint($warning-color, 74%));
-        color: $warning-color;
+        color: var(--sbx-color-warning, $warning-color);
     }
     &.submitted-late {
         @include label($bg: tint($alert-color, 74%));
@@ -230,7 +230,7 @@ $container-bg: white;
     }
     &.warning {
         @include label($bg: tint($warning-color, 74%));
-        color: $warning-color;
+        color: var(--sbx-color-warning, $warning-color);
     }
     &.neutral {
         @include label($bg: $neutral-color);
@@ -245,7 +245,7 @@ $container-bg: white;
     }
     &.pending {
         @include label($bg: tint($warning-color, 74%));
-        color: $warning-color;
+        color: var(--sbx-color-warning, $warning-color);
     }
     &.rejected {
         @include label($bg: tint($alert-color, 74%));
@@ -262,7 +262,7 @@ $container-bg: white;
 
     &--moment-submitted {
         @include label($bg: tint($warning-color, 74%));
-        color: $warning-color;
+        color: var(--sbx-color-warning, $warning-color);
     }
 
     &--moment-rejected {
@@ -421,7 +421,7 @@ nav {
             line-height: inherit;
         }
         &.review {
-            background-color: $warning-color;
+            background-color: var(--sbx-color-warning, $warning-color);
         }
         &.in-progress {
             background-color: $base;
@@ -582,7 +582,7 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
      */
     &.pending {
         @extend .icon-approve;
-        background-color: $warning-color;
+        background-color: var(--sbx-color-warning, $warning-color);
         transform: rotate(135deg);
         &:before {
             visibility: visible;
@@ -626,7 +626,7 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
     }
     &.requires-assistance {
         @extend .icon-alert;
-        background-color: $warning-color;
+        background-color: var(--sbx-color-warning, $warning-color);
         transform: rotate(135deg);
         &:before {
             visibility: visible;

@@ -237,7 +237,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
     }
 
     &--submitted {
-        border-color: $warning-color;
+        border-color: var(--sbx-color-warning, $warning-color);
     }
 
     &--rejected {

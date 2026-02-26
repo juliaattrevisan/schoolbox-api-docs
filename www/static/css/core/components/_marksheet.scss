@@ -75,7 +75,7 @@
         border-left: 0.75rem solid transparent;
     }
     .legend-indicator.indicator-pending {
-        border-top: 0.75rem solid $warning-color;
+        border-top: 0.75rem solid var(--sbx-color-warning, $warning-color);
         border-left: 0.75rem solid transparent;
     }
     .legend-indicator.indicator-published {
