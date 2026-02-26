@@ -63,24 +63,76 @@ class Config
         'auto',
     ];
 
+    public const string REASONING_EFFORT_OPTION_DEFAULT = 'default';
+    public const string REASONING_EFFORT_OPTION_NONE = 'none';
+    public const string REASONING_EFFORT_OPTION_MINIMAL = 'minimal';
+    public const string REASONING_EFFORT_OPTION_LOW = 'low';
+    public const string REASONING_EFFORT_OPTION_MEDIUM = 'medium';
+    public const string REASONING_EFFORT_OPTION_HIGH = 'high';
     public const array REASONING_EFFORT_MODEL_OPTIONS = [
-        "gpt-4o"       => ['none'],
-        "gpt-4o-mini"  => ['none'],
-        "gpt-4.1"      => ['none'],
-        "gpt-4.1-mini" => ['none'],
-        "gpt-5"        => ['minimal', 'low', 'medium', 'high'],
-        "gpt-5-mini"   => ['minimal', 'low', 'medium', 'high'],
-        "gpt-5-nano"   => ['minimal', 'low', 'medium', 'high'],
-        "gpt-5.1"      => ['none', 'low', 'medium', 'high'],
-        "gpt-5.2"      => ['none', 'low', 'medium', 'high'],
-        "gpt-5.2-pro"  => ['high'],
+        "gpt-4o"       => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+        ],
+        "gpt-4o-mini"  => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+        ],
+        "gpt-4.1"      => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+        ],
+        "gpt-4.1-mini" => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+        ],
+        "gpt-5"        => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_MINIMAL,
+            self::REASONING_EFFORT_OPTION_LOW,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+        "gpt-5-mini"   => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_MINIMAL,
+            self::REASONING_EFFORT_OPTION_LOW,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+        "gpt-5-nano"   => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_MINIMAL,
+            self::REASONING_EFFORT_OPTION_LOW,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+        "gpt-5.1"      => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+            self::REASONING_EFFORT_OPTION_LOW,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+        "gpt-5.2"      => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+            self::REASONING_EFFORT_OPTION_LOW,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+        "gpt-5.2-pro"  => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
     ];
     public const array REASONING_EFFORT_OPTIONS = [
-        'none',
-        'minimal',
-        'low',
-        'medium',
-        'high',
+        self::REASONING_EFFORT_OPTION_DEFAULT,
+        self::REASONING_EFFORT_OPTION_NONE,
+        self::REASONING_EFFORT_OPTION_MINIMAL,
+        self::REASONING_EFFORT_OPTION_LOW,
+        self::REASONING_EFFORT_OPTION_MEDIUM,
+        self::REASONING_EFFORT_OPTION_HIGH,
     ];
 
     public const string TEXT_VERBOSITY_DEFAULT = 'low';

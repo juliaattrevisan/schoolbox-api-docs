@@ -96,8 +96,11 @@ class CkEditorTextChat
         ;
         $payload['stream'] = true;
         $payload['max_completion_tokens'] = 10000;
-        $payload['reasoning_effort'] = trim($this->config[Config::SECTION_GENERAL][Config::FIELD_REASONING_EFFORT]['value'] ?? '');
-        $payload['verbosity']        = trim($this->config[Config::SECTION_GENERAL][Config::FIELD_TEXT_VERBOSITY]['value'] ?? '') ?: Config::TEXT_VERBOSITY_DEFAULT;
+        $reasoningEffort = trim($this->config[Config::SECTION_GENERAL][Config::FIELD_REASONING_EFFORT]['value'] ?? '');
+        if ($reasoningEffort !== Config::REASONING_EFFORT_OPTION_DEFAULT) {
+            $payload['reasoning_effort'] = $reasoningEffort;
+        }
+        $payload['verbosity'] = trim($this->config[Config::SECTION_GENERAL][Config::FIELD_TEXT_VERBOSITY]['value'] ?? '') ?: Config::TEXT_VERBOSITY_DEFAULT;
         $payload['temperature'] = 1;
         $payload['top_p'] = 1;
         $payload['messages'] ??= [];

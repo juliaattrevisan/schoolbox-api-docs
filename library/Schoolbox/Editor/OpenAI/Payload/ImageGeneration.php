@@ -2,6 +2,8 @@
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
+use Schoolbox\Admin\OpenAI\Config;
+
 class ImageGeneration
 {
     /**
@@ -158,10 +160,11 @@ class ImageGeneration
                 ],
                 'verbosity' => $this->textVerbosity,
             ],
-            'reasoning' => [
-                'effort' => $this->reasoningEffort,
-            ],
         ];
+
+        if ($this->reasoningEffort !== Config::REASONING_EFFORT_OPTION_DEFAULT) {
+            $payload['reasoning'] = ['effort' => $this->reasoningEffort];
+        }
 
         /** add prompt inputs if they are meaningful */
         $systemPrompt = strtr(self::PROMPT_SYSTEM_PERSONA, [

@@ -99,7 +99,7 @@ class ModelParser
         // The relevant quote being:
         // > Reasoning models do not accept sampling parameters such as temperature or top_p.
         $reasoningEffort = null;
-        if ($version === '5') {
+        if ($version === '5' && isset($payload['reasoning'])) {
             $reasoningEffort = $payload['reasoning']['effort'] ?? 'medium';
             if ($reasoningEffort === 'none') {
                 $reasoningEffort = 'minimal';
@@ -107,7 +107,7 @@ class ModelParser
         }
 
         // GPT 5.1 and 5.2 default to `none` for reasoning effort
-        if (in_array($version, ['5.1', '5.2'])) {
+        if (in_array($version, ['5.1', '5.2']) && isset($payload['reasoning'])) {
             $reasoningEffort = $payload['reasoning']['effort'] ?? 'none';
             // Also don't support `minimal` reasoning
             if ($reasoningEffort === 'minimal') {

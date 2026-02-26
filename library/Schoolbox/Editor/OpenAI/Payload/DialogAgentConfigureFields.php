@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
+use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Admin\DialogAgent\Scenario\Model as Scenario;
@@ -205,10 +206,11 @@ class DialogAgentConfigureFields
                 'format' => $this->generateResponseFormat($scenario),
                 'verbosity' => $this->textVerbosity,
             ],
-            'reasoning' => [
-                'effort' => $this->reasoningEffort,
-            ],
         ];
+
+        if ($this->reasoningEffort !== Config::REASONING_EFFORT_OPTION_DEFAULT) {
+            $payload['reasoning'] = ['effort' => $this->reasoningEffort];
+        }
 
         /* Add in the overarching feature system prompt (from config) if available */
         if ('' !== trim($this->featureSystemPrompt)) {

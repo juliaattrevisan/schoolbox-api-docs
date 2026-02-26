@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
+use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
@@ -167,10 +168,11 @@ class DialogAgentChat
                 ],
                 'verbosity' => $this->textVerbosity,
             ],
-            'reasoning' => [
-                'effort' => $this->reasoningEffort,
-            ],
         ];
+
+        if ($this->reasoningEffort !== Config::REASONING_EFFORT_OPTION_DEFAULT) {
+            $payload['reasoning'] = ['effort' => $this->reasoningEffort];
+        }
 
         /* System guardrails always come first */
         $payload['input'][] = [
