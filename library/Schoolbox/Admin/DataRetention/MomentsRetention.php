@@ -404,7 +404,7 @@ class MomentsRetention extends StrategyBase
      * @param array $chunkIds
      * @return array
      */
-    private function preparePartChunkMomentQueries(array $chunkIds)
+    private function preparePartChunkMomentQueries(array $chunkIds): array
     {
         $delPlaceholders = Builder::getArrayPlaceholders($chunkIds, 'moment_id');
         $statementEvidence = $this->database->prepare("DELETE FROM moment_evidence WHERE moment_id IN {$delPlaceholders}");
@@ -446,7 +446,7 @@ class MomentsRetention extends StrategyBase
      * @param array $discussionThreadIds
      * @return array
      */
-    private function preparePartChunkDiscussionQueries(array $discussionThreadIds)
+    private function preparePartChunkDiscussionQueries(array $discussionThreadIds): array
     {
         $discussionPlaceholders = Builder::getArrayPlaceholders($discussionThreadIds, 'moment_id');
         // delete the discussion thread comments // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads comments that were not... but they do match to the moment...

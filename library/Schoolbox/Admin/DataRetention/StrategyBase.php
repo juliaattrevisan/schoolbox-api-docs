@@ -24,7 +24,7 @@ class StrategyBase implements IStrategy
 {
     public const CHUNK_LOOPS = 3;
 
-    protected const CHUNK_SIZE = 2; // how many things to delete at once
+    protected const CHUNK_SIZE = 1000; // how many things to delete at once
 
     /* the config key to look up the retention period for this strategy, e.g. 'ConfigMapper::NAME_DATA_RETENTION_*'
      * planned options 1;1 Day:30;30 Days:365;365 Days and <null> (null is do NOT hard delete this)
