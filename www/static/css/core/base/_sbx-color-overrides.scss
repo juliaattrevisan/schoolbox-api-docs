@@ -76,7 +76,8 @@ body.sbx-body {
     table.diagonal-headings-table tr:nth-child(even),
     #course-selector-results ul.information-list li:nth-child(even),
     ul.information-list.sortable-card li:nth-child(even),
-    ul.information-list.unsortable li:nth-child(even) {
+    ul.information-list.unsortable li:nth-child(even),
+    table.VueTables__table tr:nth-child(even) {
         background-color: var(--sbx-color-foreground-secondary);
     }
 
