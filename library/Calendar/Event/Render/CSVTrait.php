@@ -9,7 +9,6 @@
 namespace Calendar\Event\Render;
 
 use Calendar\Event\Type\Day\Event;
-use Calendar\Event\Type\ResourceBooking\Event as ResourceBookingEvent;
 
 /**
  * Default CSV rendering for all types of Calendar events.
