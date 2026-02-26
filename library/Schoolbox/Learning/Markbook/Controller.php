@@ -791,7 +791,7 @@ class Controller extends Base
                 //                        'GC-FA-a'
                 //                    ]
                 ],
-                participantUsers: [13],
+                participantUsers: $feedbackFolders->findStudentIds($folder),
             );
         }
 
@@ -813,7 +813,7 @@ class Controller extends Base
              * Plus, this isn't the usual use case afaik: you're operating on your entire class of students at a time,
              * mostly: not an individual. Nevertheless, you can operate on a reduced set by using this reductive.
              */
-            studentIds: $feedbackFolders->findStudentIds($folder),
+            studentIds: null,
             curriculumCodes: null,
             folderIds: null,
         );
