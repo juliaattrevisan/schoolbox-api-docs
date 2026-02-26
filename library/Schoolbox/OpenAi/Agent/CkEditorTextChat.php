@@ -96,7 +96,7 @@ class CkEditorTextChat
         ;
         $payload['stream'] = true;
         $payload['max_completion_tokens'] = 10000;
-        $reasoningEffort = trim($this->config[Config::SECTION_GENERAL][Config::FIELD_REASONING_EFFORT]['value'] ?? '');
+        $reasoningEffort = trim($this->config[Config::SECTION_GENERAL][Config::FIELD_REASONING_EFFORT]['value'] ?? '') ?: Config::REASONING_EFFORT_DEFAULT;
         if ($reasoningEffort !== Config::REASONING_EFFORT_OPTION_DEFAULT) {
             $payload['reasoning_effort'] = $reasoningEffort;
         }

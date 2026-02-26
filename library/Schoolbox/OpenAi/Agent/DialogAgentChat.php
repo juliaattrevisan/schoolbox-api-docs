@@ -152,7 +152,7 @@ Your teacher has been notified.";
             trim($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
             trim($this->config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
             trim($this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
-            trim($this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_REASONING_EFFORT]['value'] ?? ''),
+            trim($this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_REASONING_EFFORT]['value'] ?? '') ?: Config::REASONING_EFFORT_DEFAULT,
             trim($this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_TEXT_VERBOSITY]['value'] ?? '') ?: Config::TEXT_VERBOSITY_DEFAULT,
         )->generate(
             $assessment,

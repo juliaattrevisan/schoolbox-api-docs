@@ -63,6 +63,7 @@ class Config
         'auto',
     ];
 
+    public const string REASONING_EFFORT_DEFAULT = self::REASONING_EFFORT_OPTION_DEFAULT;
     public const string REASONING_EFFORT_OPTION_DEFAULT = 'default';
     public const string REASONING_EFFORT_OPTION_NONE = 'none';
     public const string REASONING_EFFORT_OPTION_MINIMAL = 'minimal';
