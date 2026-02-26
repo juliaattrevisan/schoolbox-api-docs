@@ -707,8 +707,8 @@ class Controller extends Base
         } else {
             /* Find data between these date ranges
              */
-            $from = new \Alaress_Date_Format('2026-01-01 00:00:00', 'Y-m-d H:i:s');
-            $to = new \Alaress_Date_Format('2026-02-26 00:00:00', 'Y-m-d H:i:s');
+            $from = new \Alaress_Date_Format('2025-01-01 00:00:00', 'Y-m-d H:i:s');
+            $to = new \Alaress_Date_Format('2026-11-07 00:00:00', 'Y-m-d H:i:s');
 
             /* Note that the first arg to findAllByFolderIdForReview() can actually be a set of folder ids
              */
