@@ -72,6 +72,8 @@ class StrategyBase implements IStrategy
 
         // chunk things into self::CHUNK_SIZE
         foreach (array_chunk($deleteIds, self::CHUNK_SIZE) as $chunkId => $chunk) {
+            // capture time, so we know how long a chunk took
+            $start = microtime(true);
             // begin transaction for the chunk
             $this->database->beginTransaction();
 
@@ -84,6 +86,10 @@ class StrategyBase implements IStrategy
                 $this->database->rollBack();
                 $this->log->error(sprintf("Error processing chunk: %s", $e->getMessage()));
             }
+
+            // log how long the chunk took to process
+            $duration = microtime(true) - $start;
+            $this->log->notice(sprintf("[%s/%s] Finished chunk in %ds", $chunkId + 1, $chunkCount, $duration));
 
             /** if we have more chunks
              * check if we have looped through more than the count limit
