@@ -12,4 +12,16 @@ body.sbx-body:not(.login) {
     .highcharts-background {
         fill: var(--sbx-color-foreground-primary);
     }
+
+    /**
+     * Alert
+     */
+    .alert,
+    .alert.label,
+    .rejected.label,
+    .submitted-late.label,
+    .alert-box.alert-tint {
+        background-color: var(--sbx-color-alert);
+        color: var(--sbx-color-alert-text);
+    }
 }

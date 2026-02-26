@@ -218,7 +218,7 @@ $alert-default-background: css-darken($body-bg, 10%);
     [class^="icon-"],
     [class*=" icon-"] {
         &:before {
-            color: var(--sbx-color-text-primary, $white);
+            color: var(--sbx-color-foreground-primary, $white);
             padding-right: 0;
         }
     }
