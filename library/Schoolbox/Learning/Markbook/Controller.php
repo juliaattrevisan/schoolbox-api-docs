@@ -127,15 +127,12 @@ class Controller extends Base
             $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
             $markbook      = $this->buildMarkbook($assessmentIds, $folder);
 
-            /**
-             * need to get an list of the students by id, with their ranking
-             */
-            $rank = $markbook->getRanking();
-
             $terms = $this->termMapper->findAll(['order' => ['start' => 'ASC']]);
 
             $data = [
-                'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $rank : null,
+                /* Only show class ranking if the config allows it. It seemingly ranks based on Student Weighted Average.
+                 */
+                'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $markbook->getRanking() : null,
                 'assessments' => $markbook->getAssessments()->reindex()->map(function (IAssessable $assessment, $sequence) {
                     $unitAssessmentsTranslator = new UnitAssessments(
                         $this->routeGenerator,
