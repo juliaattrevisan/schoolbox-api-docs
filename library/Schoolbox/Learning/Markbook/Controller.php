@@ -715,8 +715,11 @@ class Controller extends Base
             $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
                 /* For the students in $folder, find all the folders where they had a published feedback
                  */
-                (new FeedbackFolders($this->getDi()->get('databaseInternal'), $this->getDi()->get('externalClass')))
-                    ->findForFolder($folder, $from, $to),
+                (new FeedbackFolders(
+                    $this->getDi()->get('databaseInternal'),
+                    $this->getDi()->get('externalClass'),
+                    \Schoolbox\UserMapper::getInstance(), // TODO inject this from wherever you implement later
+                ))->findForFolder($folder, $from, $to),
 
                 /* For the $studentIds provided, find all the folders where they had a published feedback
                  */

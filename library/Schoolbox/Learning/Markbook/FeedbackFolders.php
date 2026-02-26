@@ -15,6 +15,7 @@ use Alaress\Database\Predicate\Builder;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\NotFound;
 use \Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\UserMapper;
 
 /**
  * Finds a set of folder ids where the $students have a published feedback within a date range.
@@ -24,9 +25,13 @@ class FeedbackFolders
     /**
      * @param IConnector $db
      * @param \External_Class $externalClass
+     * @param UserMapper $userMapper
      */
-    public function __construct(private IConnector $db, private \External_Class $externalClass)
-    {
+    public function __construct(
+        private IConnector $db,
+        private \External_Class $externalClass,
+        private \Schoolbox\UserMapper $userMapper,
+    ) {
     }
 
 
@@ -56,8 +61,11 @@ class FeedbackFolders
         $externalIds = array_column($students, 'synergy_id');
 
         /* Need their user ids, not the external ids
+         *
+         * TODO you could also put a Role::STUDENT as the second arg, but that would preclude any staff
+         *  members being in their professional development workflow. Not sure how much that matters atm
          */
-        $studentIds = \Schoolbox\UserMapper::getInstance()
+        $studentIds = $this->userMapper
             ->findByExternalIds($externalIds)
             ->getPropertyValues('id');
 
