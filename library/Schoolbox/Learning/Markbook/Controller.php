@@ -705,6 +705,8 @@ class Controller extends Base
         if (empty($assessmentIds)) {
             $assessments = $this->assessmentMapperProxy->createCollection();
         } else {
+            /* Find data between these date ranges
+             */
             $from = new \Alaress_Date_Format('2026-01-01 00:00:00', 'Y-m-d H:i:s');
             $to = new \Alaress_Date_Format('2026-02-26 00:00:00', 'Y-m-d H:i:s');
 
