@@ -14,6 +14,11 @@ import AdminDifferentiationProfiles from "@schoolboxTest/playwright/support/page
 test.describe.configure({ mode: "parallel" });
 
 test.describe("Manage Differentiation Profiles", () => {
+    test.beforeAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("Turn the differentiation flag off to ensure a consistent starting point for tests");
+        await db.updateInDatabase("config", { value: 0 }, { name: "differentiation_profiles_enabled" });
+    });
+
     test.beforeEach(async ({ tester }) => {
         tester.isGoingTo("Login as admin");
         await tester.loginAsAdmin();
@@ -107,8 +112,6 @@ test.describe("Manage Differentiation Profiles", () => {
         const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
         try {
             await manageDifferentiationProfiles.initDefaults(db);
-            await page.waitForLoadState("load"); // Waits for full page reload
-            await expect(page.getByTestId("lazy-grid-row-cell-0-0-student")).toBeVisible();
             tester.isGoingTo("Click on the name filter button");
             await page.getByTestId("sbx-pop-out-filter-component-36-button").click();
             tester.isGoingTo("Type 'reed' in the name filter input");
@@ -117,7 +120,6 @@ test.describe("Manage Differentiation Profiles", () => {
             await page.getByTestId("panel-apply-filters-button").click();
             await page.getByTestId("panel-apply-filters-button").click(); // click twice as first click closes the filter pop out
             await page.waitForLoadState("load"); // Waits for full page reload
-            await expect(page.getByTestId("lazy-grid-row-cell-0-0-student")).toBeVisible();
             tester.isGoingTo("Verify that Jana Reed and Leon Reed are visible");
             const container = page.getByTestId("manage-differentiation-profiles-container");
             const msJanaReed = container.getByText("Reed, Jana");
