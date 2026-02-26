@@ -249,6 +249,10 @@ class DataSource
         // insert students as dynamic participants.
         $this->loadDynamicPlanParticipants($dynamicPlans, $user, $assumeParticipation, $participantUsers);
 
+        /* TODO: take $participantUsers and shove it deeper into responseDataSource and feedbackDataSource
+         *  implementations of findForAssessmentCollection()
+         */
+
         /* Add responses conditionally to save some computation if you never needed them
          */
         if ($includeResponses) {
