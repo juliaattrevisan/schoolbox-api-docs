@@ -31,11 +31,29 @@ class CommandLineTool extends CliTool\App
     private const int LOCK_TIME = 30;
 
     /**
+     * --max-time={max-time}: run for this many seconds before exiting.
+     */
+    private const OPT_LONG_MAX_TIME = 'max-time:';
+
+    /**
+     * Default max time: 1 hour.
+     */
+    private const DEFAULT_MAX_TIME = 60 * 60 * 1;
+
+    /**
+     * --chunk={chunk-size}: process this many records per chunk.
+     */
+    private const OPT_LONG_CHUNK_SIZE = 'chunk:';
+
+    /**
      * Print help
      */
     private const string OPT_SHORT_HELP = 'h';
     private const string OPT_LONG_HELP  = 'help';
 
+    /**
+     * -n: Count of loops to run for each strategy, default StrategyBase::DEFAULT_CHUNK_LOOPS
+     */
     private const string OPT_SHORT_LOOP_COUNT = 'n:';
 
 
@@ -57,6 +75,8 @@ class CommandLineTool extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_CHUNK_SIZE,
+            self::OPT_LONG_MAX_TIME,
         ];
     }
 
@@ -80,6 +100,9 @@ DESCRIPTION
 OPTIONS
     -h, --help:              Print this help text and exit
     -n                       Count of loops to run for each strategy, default 3, set to 1 to only loop once
+    --max-time={max-time}:   process entries in chunks until the script has been running for this many seconds.
+                             Defaults to 3600 (1 hours).
+    --chunk={chunk-size}:    process this many entries per chunk: defaults to 1000.
     -p:                      perform: *without* this flag, this tool will only do a dry run, outputting what would be
                              deleted
     -v[v[v]]:                verbosity: how much activity will be logged
@@ -90,10 +113,18 @@ HELP;
 
         $logger = $this->getLogger();
 
+        // Hold process lock for max-time,
+        // plus a little longer to finish actually deleting files
+        $maxTime = $this->getOptAsInt(self::OPT_LONG_MAX_TIME, self::DEFAULT_MAX_TIME);
+        if ($maxTime <= 0) {
+            $maxTime = self::DEFAULT_MAX_TIME;
+        }
+        $endTime = time() + $maxTime;
+
         $logger->info(
             sprintf(
-                "Attempting to acquire process lock (%ds): will release at end",
-                self::LOCK_TIME,
+                "Attempting to acquire process lock. will release at end, or after '%s', whichever comes first.",
+                date('Y-m-d H:i:s', $endTime)
             ),
         );
         try {
@@ -111,7 +142,16 @@ HELP;
         register_shutdown_function(fn () => $this->releaseLock($lock));
 
         // get the number of loops to run for each strategy, default 3
-        $loopCount = $this->getOptAsInt(self::OPT_SHORT_LOOP_COUNT, StrategyBase::CHUNK_LOOPS);
+        $loopCount = $this->getOptAsInt(self::OPT_SHORT_LOOP_COUNT, StrategyBase::DEFAULT_CHUNK_LOOPS);
+        if ($loopCount <= 0) {
+            $loopCount = StrategyBase::DEFAULT_CHUNK_LOOPS;
+        }
+
+        // get the chunk size, default 1000
+        $chunkSize = $this->getOptAsInt(self::OPT_LONG_CHUNK_SIZE, StrategyBase::DEFAULT_CHUNK_SIZE);
+        if ($chunkSize <= 0) {
+            $chunkSize = StrategyBase::DEFAULT_CHUNK_SIZE;
+        }
 
 
         // build the bus for all the data retention tasks
@@ -122,7 +162,16 @@ HELP;
 //        $cmsLogRetentionPeriod = $this->getConfig()->get('dataRetention_cmsLogRetentionPeriod');
 //        $cmsLogRetentionPeriod = '365';  // example data retention period get from the config table
 //        $bus->add(new CmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig()));
-        $bus->add(new MomentsRetention($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig(), $loopCount));
+        $bus->add(new MomentsRetention(
+            $logger,
+            $this->perform(),
+            $this->getDatabaseInternal(),
+            $lock,
+            $this->getConfig(),
+            $endTime,
+            $loopCount,
+            $chunkSize,
+        ));
 
         // if we have functions, run them
         if (count($bus) > 0) {
@@ -141,6 +190,12 @@ HELP;
                 // log how long the strategy took to run
                 $duration = microtime(true) - $start;
                 $logger->notice(sprintf("[%s/%s] Finished %s in %ds", $busNumber + 1, count($bus), $strategy->getRetentionLabel(), $duration));
+
+                // if we have passed the end time, stop for now and continue tomorrow
+                if (time() > $endTime) {
+                    $logger->notice(sprintf("End time of '%s' reached, stopping for now", date('Y-m-d H:i:s', $endTime)));
+                    exit(CliKernelAbstract::EXIT_STATUS_OK);
+                }
 
                 // refresh lock, depending on the data retention queries this may have taken a while...
                 $lock->refresh();

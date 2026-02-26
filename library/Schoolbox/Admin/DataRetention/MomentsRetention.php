@@ -137,7 +137,7 @@ class MomentsRetention extends StrategyBase
         }
 
         // if chunk is full, we can use the pre-prepared statements to save some time preparing statements
-        if (count($chunkIds) === self::CHUNK_SIZE) {
+        if (count($chunkIds) === $this->chunkSize) {
             [
                'evidence' => $prepareEvidence,
                 'folder' => $prepareFolder,
@@ -172,7 +172,7 @@ class MomentsRetention extends StrategyBase
 
         if (!empty($discussionThreadIds)) { // if there are discussion threads to delete, delete the threads and comments
             // if chunk is full, we can use the pre-prepared statements to save some time preparing statements
-            if (count($discussionThreadIds) === self::CHUNK_SIZE) {
+            if (count($discussionThreadIds) === $this->chunkSize) {
                 [
                     'comment' => $prepareComment,
                     'thread' => $prepareThread,
@@ -235,7 +235,7 @@ class MomentsRetention extends StrategyBase
     private function prepareFullChunkMomentQueries(): array
     {
         // build an array length of the chunk size
-        $chunkSize = array_fill(0, self::CHUNK_SIZE, 0);
+        $chunkSize = array_fill(0, $this->chunkSize, 0);
         $delPlaceholders = Builder::getArrayPlaceholders($chunkSize, 'moment_id');
         $statementEvidence = $this->database->prepare("DELETE FROM moment_evidence WHERE moment_id IN {$delPlaceholders}");
         $statementFolder = $this->database->prepare("DELETE FROM moment_folder WHERE moment_id IN {$delPlaceholders}");
@@ -279,7 +279,7 @@ class MomentsRetention extends StrategyBase
     private function prepareFullChunkDiscussionQueries(): array
     {
         // build an array length of the chunk size
-        $chunkSize = array_fill(0, self::CHUNK_SIZE, 0);
+        $chunkSize = array_fill(0, $this->chunkSize, 0);
         $discussionPlaceholders = Builder::getArrayPlaceholders($chunkSize, 'moment_id');
         // delete the discussion thread comments // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads comments that were not... but they do match to the moment...
         $statementComment = $this->database->prepare("DELETE FROM discussion_thread_comment WHERE discussion_thread_id IN {$discussionPlaceholders}");

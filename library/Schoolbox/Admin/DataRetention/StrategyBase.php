@@ -22,9 +22,9 @@ use Symfony\Component\Lock\LockInterface;
 
 class StrategyBase implements IStrategy
 {
-    public const CHUNK_LOOPS = 3;
+    public const DEFAULT_CHUNK_LOOPS = 3; // how many times do we loop through the data in chunks
 
-    protected const CHUNK_SIZE = 1000; // how many things to delete at once
+    public const DEFAULT_CHUNK_SIZE = 1000; // how many things to delete at once
 
     /* the config key to look up the retention period for this strategy, e.g. 'ConfigMapper::NAME_DATA_RETENTION_*'
      * planned options 1;1 Day:30;30 Days:365;365 Days and <null> (null is do NOT hard delete this)
@@ -39,7 +39,9 @@ class StrategyBase implements IStrategy
         protected IConnector $database,
         protected LockInterface $lock,
         protected IConfigLoader $config,
-        protected int $chunkLoops = self::CHUNK_LOOPS
+        protected int $endTime,
+        protected int $chunkLoops = self::DEFAULT_CHUNK_LOOPS,
+        protected int $chunkSize = self::DEFAULT_CHUNK_SIZE,
     ) {
     }
 
@@ -67,11 +69,11 @@ class StrategyBase implements IStrategy
 
 
         // log how many chunks we will delete
-        $chunkCount = ceil(count($deleteIds) / self::CHUNK_SIZE);
+        $chunkCount = ceil(count($deleteIds) / $this->chunkSize);
         $this->log->notice(sprintf("Deleting '%s' entries broken into '%s' chunks", count($deleteIds), $chunkCount));
 
-        // chunk things into self::CHUNK_SIZE
-        foreach (array_chunk($deleteIds, self::CHUNK_SIZE) as $chunkId => $chunk) {
+        // chunk things into $this->chunkSize
+        foreach (array_chunk($deleteIds, $this->chunkSize) as $chunkId => $chunk) {
             // capture time, so we know how long a chunk took
             $start = microtime(true);
             // begin transaction for the chunk
@@ -92,16 +94,21 @@ class StrategyBase implements IStrategy
             $this->log->notice(sprintf("[%s/%s] Finished chunk in %ds", $chunkId + 1, $chunkCount, $duration));
 
             /** if we have more chunks
+             * check if we have passed the time limit we can continue tomorrow
              * check if we have looped through more than the count limit
-             * check if have passed the time limit we can continue tomorrow
              * refresh the lock
              */
             //
             if ($chunkId < $chunkCount - 1) {
+                // if we have passed the end time, stop for now and continue tomorrow
+                if (time() > $this->endTime) {
+                    $this->log->notice(sprintf("End time of '%s' reached, stopping for now", date('Y-m-d H:i:s', $this->endTime)));
+                    return;
+                }
                 // if we have looped through more than the count limit, stop for now and continue tomorrow
                 if ($this->chunkLoops > 0 && $chunkLoop >= $this->chunkLoops) {
                     $this->log->notice(sprintf("Chunk loop limit of '%s' reached, stopping for now", $this->chunkLoops));
-                    break;
+                    return;
                 }
                 $chunkLoop++;
                 $this->lock->refresh();
