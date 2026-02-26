@@ -456,7 +456,11 @@ class Markbook
                 'quartile1'     => null,
                 'quartile2'     => null,
                 'quartile3'     => null,
+                /* These are just randomly appended during calculations
+                 */
                 'weight'        => null,
+                'draftMean'     => null,
+                'sdNormalized'  => null,
                 /* Project stuff
                  */
                 'weightInProject' => null,
