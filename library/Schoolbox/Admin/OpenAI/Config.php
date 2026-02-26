@@ -51,6 +51,7 @@ class Config
     public const string IMAGE_MODEL_DEFAULT = 'gpt-image-1';
     public const array AI_IMAGE_MODELS = [
         "gpt-image-1",
+        "gpt-image-1-mini",
         "gpt-image-1.5",
     ];
 
