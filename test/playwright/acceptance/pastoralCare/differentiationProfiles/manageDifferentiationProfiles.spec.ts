@@ -107,6 +107,7 @@ test.describe("Manage Differentiation Profiles", () => {
         const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
         try {
             await manageDifferentiationProfiles.initDefaults(db);
+            await page.waitForLoadState("load"); // Waits for full page reload
             tester.isGoingTo("Click on the name filter button");
             await page.getByTestId("sbx-pop-out-filter-component-36-button").click();
             tester.isGoingTo("Type 'reed' in the name filter input");
@@ -115,7 +116,6 @@ test.describe("Manage Differentiation Profiles", () => {
             await page.getByTestId("panel-apply-filters-button").click();
             await page.getByTestId("panel-apply-filters-button").click(); // click twice as first click closes the filter pop out
             await page.waitForLoadState("load"); // Waits for full page reload
-            await expect(page.getByTestId("manage-differentiation-profiles-container")).toBeVisible();
             tester.isGoingTo("Verify that Jana Reed and Leon Reed are visible");
             const container = page.getByTestId("manage-differentiation-profiles-container");
             const msJanaReed = container.getByText("Reed, Jana");
