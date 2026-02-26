@@ -136,8 +136,10 @@ class Config
         self::REASONING_EFFORT_OPTION_HIGH,
     ];
 
+    public const string TEXT_VERBOSITY_OPTION_DEFAULT = 'default';
     public const string TEXT_VERBOSITY_DEFAULT = 'low';
     public const array TEXT_VERBOSITY_OPTIONS = [
+        self::TEXT_VERBOSITY_OPTION_DEFAULT,
         'low',
         'medium',
         'high',

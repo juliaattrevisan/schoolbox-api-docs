@@ -108,7 +108,7 @@ class ImageGeneration
         $systemPrompt = $this->config[Config::SECTION_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? '';
         $imageModel   = $this->config[Config::SECTION_OPENAI][Config::FIELD_IMAGE_MODEL]['value'] ?? Config::IMAGE_MODEL_DEFAULT;
         $reasoningEffort = trim($this->config[Config::SECTION_GENERAL][Config::FIELD_REASONING_EFFORT]['value'] ?? '') ?: Config::REASONING_EFFORT_DEFAULT;
-        $textVerbosity   = trim($this->config[Config::SECTION_GENERAL][Config::FIELD_TEXT_VERBOSITY]['value'] ?? '') ?: Config::TEXT_VERBOSITY_DEFAULT;
+        $textVerbosity   = trim($this->config[Config::SECTION_GENERAL][Config::FIELD_TEXT_VERBOSITY]['value'] ?? '');
         $payloadGenerator = new PayloadGenerator(
             $model,
             $imageModel,

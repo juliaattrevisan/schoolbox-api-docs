@@ -153,9 +153,12 @@ class DialogAgentFeedback
             'stream' => false,
             'text' => [
                 'format' => $this->generateResponseFormat($scenario),
-                'verbosity' => $this->textVerbosity,
             ],
         ];
+
+        if ($this->textVerbosity !== Config::TEXT_VERBOSITY_OPTION_DEFAULT) {
+            $payload['text']['verbosity'] = $this->textVerbosity;
+        }
 
         if ($this->reasoningEffort !== Config::REASONING_EFFORT_OPTION_DEFAULT) {
             $payload['reasoning'] = ['effort' => $this->reasoningEffort];
