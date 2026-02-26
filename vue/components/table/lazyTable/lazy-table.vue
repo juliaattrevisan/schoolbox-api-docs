@@ -86,7 +86,6 @@ function onSortSelected(key: string): void {
     border-collapse: separate;
     border-spacing: 0;
     position: relative;
-    width: max-content; /* so sticky left elements stick for the entire width */
 }
 
 .lazy-table__row > th,
