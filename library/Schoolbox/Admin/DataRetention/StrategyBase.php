@@ -73,7 +73,7 @@ class StrategyBase implements IStrategy
         $this->log->notice(sprintf("Deleting '%s' entries broken into '%s' chunks", count($deleteIds), $chunkCount));
 
         // chunk things into $this->chunkSize
-        foreach (array_chunk($deleteIds, $this->chunkSize) as $chunkId => $chunk) {
+        foreach (array_chunk($deleteIds, $this->chunkSize) as $chunkNum => $chunk) {
             // capture time, so we know how long a chunk took
             $start = microtime(true);
             // begin transaction for the chunk
@@ -81,7 +81,7 @@ class StrategyBase implements IStrategy
 
             try {
                 // log the chunk we are working on
-                $this->log->notice(sprintf("[%s/%s] Processing chunk", $chunkId + 1, $chunkCount));
+                $this->log->notice(sprintf("[%s/%s] Processing chunk", $chunkNum + 1, $chunkCount));
 
                 $this->deleteChunk($chunk);
             } catch (\PDOException | \Schoolbox\Mapper\Exception $e) {
@@ -91,7 +91,7 @@ class StrategyBase implements IStrategy
 
             // log how long the chunk took to process
             $duration = microtime(true) - $start;
-            $this->log->notice(sprintf("[%s/%s] Finished chunk in %ds", $chunkId + 1, $chunkCount, $duration));
+            $this->log->notice(sprintf("[%s/%s] Finished chunk in %ds", $chunkNum + 1, $chunkCount, $duration));
 
             /** if we have more chunks
              * check if we have passed the time limit we can continue tomorrow
@@ -99,7 +99,7 @@ class StrategyBase implements IStrategy
              * refresh the lock
              */
             //
-            if ($chunkId < $chunkCount - 1) {
+            if ($chunkNum < $chunkCount - 1) {
                 // if we have passed the end time, stop for now and continue tomorrow
                 if (time() > $this->endTime) {
                     $this->log->notice(sprintf("End time of '%s' reached, stopping for now", date('Y-m-d H:i:s', $this->endTime)));
