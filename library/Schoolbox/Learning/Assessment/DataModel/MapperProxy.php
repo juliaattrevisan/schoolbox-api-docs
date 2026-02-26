@@ -907,7 +907,7 @@ class MapperProxy
      * @param int|int[] $folderId A folder or list of folders
      * @param User|null $student  If provided, load only this student's participation
      * @param array     $options
-     * @param bool|null $includeResponses If true, hydrate Response instances
+     * @param bool $includeResponses If true, hydrate Response instances
      * @return Collection|IAssessable[]
      * @throws TypeError If a PredicateBuilder method is called with wrong data type
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
