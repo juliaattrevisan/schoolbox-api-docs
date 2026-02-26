@@ -14,9 +14,7 @@ namespace Schoolbox\Admin\DataRetention;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception;
-use Alaress\Database\Predicate\Builder;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Admin\DataRetention\IStrategy;
 use Schoolbox\IConfigLoader;
 use Symfony\Component\Lock\LockInterface;
 

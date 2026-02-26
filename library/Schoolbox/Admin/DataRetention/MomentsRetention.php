@@ -12,14 +12,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\DataRetention;
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
-use Psr\Log\LoggerInterface;
-use Schoolbox\Admin\DataRetention\IStrategy;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\IConfigLoader;
-use Schoolbox\Mapper\Exception;
-use Symfony\Component\Lock\LockInterface;
 
 class MomentsRetention extends StrategyBase
 {
@@ -155,7 +149,6 @@ class MomentsRetention extends StrategyBase
         // each loop needs this
         $delParams       = Builder::getArrayParameters($chunkIds, 'moment_id');
 
-        $discussionPlaceholders = Builder::getArrayPlaceholders($discussionThreadIds, 'moment_id');
         $discussionParams       = Builder::getArrayParameters($discussionThreadIds, 'moment_id');
 
         // unlink evidence // the Garbage Collector will take care of the actual files, we just need to remove the database records
