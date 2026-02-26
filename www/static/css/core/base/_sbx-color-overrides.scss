@@ -7,14 +7,14 @@
 
 body.sbx-body {
     /**
-     * Foreground primary
+     * Highchart fill - directly override the white background
      */
     .highcharts-background {
         fill: var(--sbx-color-foreground-primary);
     }
 
     /**
-     * Highlight
+     * Highlight - overridden as they currently implement Sass methods which are not compatible with CSS variables
      */
     .highlight.label,
     .alert-box,
@@ -24,7 +24,7 @@ body.sbx-body {
     }
 
     /**
-     * Alert
+     * Alert labels/boxes - overridden as they currently implement Sass methods which are not compatible with CSS variables
      */
     .alert.label,
     .rejected.label,
@@ -36,7 +36,7 @@ body.sbx-body {
     }
 
     /**
-     * Success
+     * Success labels/boxes - overridden as they currently implement Sass methods which are not compatible with CSS variables
      */
     .success.label,
     .approved.label,
@@ -48,7 +48,7 @@ body.sbx-body {
     }
 
     /**
-     * Warning
+     * Warning labels/boxes - overridden as they currently implement Sass methods which are not compatible with CSS variables
      */
     .warning.label,
     .submitted.label,
@@ -59,9 +59,20 @@ body.sbx-body {
         color: var(--sbx-color-warning-text);
     }
 
+    /**
+     * Neutral labels - overridden as they currently implement Sass methods which are not compatible with CSS variables
+     */
     .unsubmitted.label,
     .neutral.label {
         background-color: var(--sbx-color-foreground-secondary);
         color: var(--sbx-color-text-secondary);
+    }
+
+    tr:nth-child(even) {
+        background-color: var(--sbx-color-foreground-secondary);
+    }
+
+    tr.alert {
+        background-color: var(--sbx-color-highlight);
     }
 }

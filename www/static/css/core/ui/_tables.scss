@@ -153,8 +153,7 @@ table {
         }
     }
     tr.alert {
-        background-color: var(--sbx-color-alert, $alert-color);
-        color: var(--sbx-color-alert-text, #fff);
+        background-color: var(--sbx-color-highlight, $alert-color);
     }
 }
 
@@ -166,7 +165,7 @@ table th {
 td,
 th {
     vertical-align: top;
-    border-bottom: 1px solid var(--sbx-color-text-secondary, $body-bg);
+    border-bottom: 1px solid var(--sbx-color-foreground-secondary, $body-bg);
     input[type="radio"] + label.radio-label,
     input[type="checkbox"] + label.checkbox-label {
         margin: 0 rem-calc(($base-font-size)) 0 0;
