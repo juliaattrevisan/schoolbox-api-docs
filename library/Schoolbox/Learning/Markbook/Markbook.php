@@ -66,7 +66,7 @@ class Markbook
      *
      * @var null|float
      */
-    private ?float $normalisedMean;
+    private ?float $normalisedMean = null;
 
 
     /**
@@ -74,7 +74,7 @@ class Markbook
      *
      * @var null|float
      */
-    private ?float $draftNormalisedMean;
+    private ?float $draftNormalisedMean = null;
 
 
     /**
@@ -82,7 +82,7 @@ class Markbook
      *
      * @var null|string
      */
-    private ?string $weightedMean;
+    private ?string $weightedMean = null;
 
 
     /**
@@ -90,7 +90,7 @@ class Markbook
      *
      * @var null|string
      */
-    private ?string $draftWeightedMean;
+    private ?string $draftWeightedMean = null;
 
 
     /**
@@ -143,6 +143,7 @@ class Markbook
      * @param GenericCollection<IAssessable> $assessments The assessments that are a part of this markbook.
      * @param IMarkScheme $defaultMarkScheme The mark scheme to use when summarising a student's overall grade for these assessments.
      * @param User $viewingUser The user viewing the markbook, usually whoever is logged in
+     * @param bool|null $overallStatistics Optionally accumulate statistic values (mean, stdev, etc) for assessments
      * @param array|null $studentIds A reductive filter that operates on $assessments: a set of user ids
      * @param array|null $curriculumCodes A reductive filter that operates on $assessments: a set of curriculum codes
      * @param array|null $folderIds A reductive filter that operates on $assessments: a set of folder ids
@@ -151,6 +152,7 @@ class Markbook
         GenericCollection $assessments,
         private IMarkScheme $defaultMarkScheme,
         private User $viewingUser,
+        private ?bool $overallStatistics = true,
         private ?array $studentIds = null,
         private ?array $curriculumCodes = null,
         private ?array $folderIds = null
@@ -313,11 +315,13 @@ class Markbook
         }
 
         // Collate weight percent for each top-level assessment
-        if ($this->totalWeight > 0) {
-            foreach ($this->getTopLevelAssessments() as $assessment) {
-                $assessmentId = $assessment->getId();
-                $this->assessmentStatistics[$assessmentId]['weightPercent'] =
-                    $this->assessmentStatistics[$assessmentId]['weight'] / $this->totalWeight * 100;
+        if ($this->overallStatistics) {
+            if ($this->totalWeight > 0) {
+                foreach ($this->getTopLevelAssessments() as $assessment) {
+                    $assessmentId = $assessment->getId();
+                    $this->assessmentStatistics[$assessmentId]['weightPercent'] =
+                        $this->assessmentStatistics[$assessmentId]['weight'] / $this->totalWeight * 100;
+                }
             }
         }
 
@@ -356,7 +360,7 @@ class Markbook
                     $weightedSummator->summateAllAssessablesForUser($visibleAssessments, $student, true)
                 );
             $this->studentStatistics[$student->getId()]['meanNormalised'] =
-                    $weightedSummator->summate($visibleAssessments, $student, true);
+                $weightedSummator->summate($visibleAssessments, $student, true);
 
             $this->studentStatistics[$student->getId()]['draftWeightedMean'] = null;
             $this->studentStatistics[$student->getId()]['meanDraftNormalised'] = null;
@@ -375,20 +379,22 @@ class Markbook
         // Then, summate the result as an average, weighted by each assessment's weight.
         // Render as whatever the default grade group is
 
-        $this->normalisedMean = $weightedSummator->summateAllAssessables(
-            $visibleAssessments,
-            true,
-            new Average()
-        );
+        if ($this->overallStatistics) {
+            $this->normalisedMean = $weightedSummator->summateAllAssessables(
+                $visibleAssessments,
+                true,
+                new Average()
+            );
 
-        $this->draftNormalisedMean = $weightedSummator->summateAllAssessables(
-            $visibleAssessments,
-            false,
-            new Average()
-        );
+            $this->draftNormalisedMean = $weightedSummator->summateAllAssessables(
+                $visibleAssessments,
+                false,
+                new Average()
+            );
 
-        $this->weightedMean = $this->defaultMarkScheme->getHumanReadableMark($this->normalisedMean);
-        $this->draftWeightedMean = $this->defaultMarkScheme->getHumanReadableMark($this->draftNormalisedMean);
+            $this->weightedMean = $this->defaultMarkScheme->getHumanReadableMark($this->normalisedMean);
+            $this->draftWeightedMean = $this->defaultMarkScheme->getHumanReadableMark($this->draftNormalisedMean);
+        }
     }
 
 
@@ -435,6 +441,31 @@ class Markbook
      */
     protected function collateAssessmentStatistics(IAssessable $assessment): void
     {
+        /* Just exit early if you -didn't- turn on overallStatistics
+         * Maybe think about standardising this data struct somewhere, one day: it's arbitrarily defined
+         */
+        if (!$this->overallStatistics) {
+            $this->assessmentStatistics[$assessment->getId()] = [
+                'mean'          => null,
+                'sd'            => null,
+                'min'           => null,
+                'minNormalized' => null,
+                'max'           => null,
+                'maxNormalized' => null,
+                'count'         => null,
+                'quartile1'     => null,
+                'quartile2'     => null,
+                'quartile3'     => null,
+                'weight'        => null,
+                /* Project stuff
+                 */
+                'weightInProject' => null,
+                'projectTotalWeight' => null,
+            ];
+
+            return;
+        }
+
         $meanSummator  = new Average();
         $stdevSummator = new StandardDeviation();
         $minSummator   = new Minimum();

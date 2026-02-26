@@ -765,13 +765,13 @@ class Controller extends Base
                     'work_type' => [
                         1, // Formative Assessment Task
                         2, // Summative Assessment Task
-//                        3, // Learning Activity
-//                        4, // Homework Task
-//                        5, // Observation
-//                        6, // Lesson Planning
-//                        7, // Reporting
-//                        8, // Unknown (maybe deleted)
-//                        9, // Approach To Learning
+                        3, // Learning Activity
+                        4, // Homework Task
+                        5, // Observation
+                        6, // Lesson Planning
+                        7, // Reporting
+                        8, // Unknown (maybe deleted)
+                        9, // Approach To Learning
                     ],
                     /* If both are provided, assessment ids and curriculum nodes execute an intersect: this results in
                      * all the assessment ids provided that -also- are associated with any of the curric codes specified
@@ -793,6 +793,10 @@ class Controller extends Base
             assessments: $assessments,
             defaultMarkScheme: $overallMarkScheme,
             viewingUser: $this->getUser(),
+            /* Ignore processing weight, mean, stdev, min, max, etc. statistics. This appears in an accordion thing on
+             * the markbook page. Setting this to false zeroes out the data, ignoring its normal calculation algorithms
+             */
+            overallStatistics: false,
             /* Use this to reduce $assessments to only returning a row for these guy(s)
              * findAllByFolderIdForReview() doesn't really support individual participants across multiple folders.
              * It goes into a different orthogonal method
