@@ -210,15 +210,13 @@
                 return;
             }
             const modelOptions = window.REASONING_EFFORT_MODEL_OPTIONS[model] ?? null;
-            let deselected     = false;
             Array.from(reasoningEffortSelect.options).forEach(el => {
-                if (el.value) {
+                if (el.value !== null) {
                     if (provider === 'OpenAI') {
                         if (modelOptions !== null) {
                             el.disabled = !modelOptions.includes(el.value);
                             if (el.disabled) {
                                 el.selected = false;
-                                deselected  = true;
                             }
                         }
                     } else {
@@ -226,26 +224,43 @@
                     }
                 }
             });
-            if (deselected) {
-                Array.from(reasoningEffortSelect.options).find(el => !el.disabled).selected = true;
+        }
+
+        /**
+         * If the currently selected reasoning option is now disabled:
+         * select the first option without a value.
+         */
+        function selectFirstReasoningOptionIfSelectedDisabled() {
+            if (!reasoningEffortSelect) {
+                return;
+            }
+            const selectedAndDisabled = Array.from(reasoningEffortSelect.options).find(el => el.selected && el.disabled);
+            if (selectedAndDisabled) {
+                const firstWithoutValue = Array.from(reasoningEffortSelect.options).find(el => el.value === null);
+                if (firstWithoutValue) {
+                    selectedAndDisabled.selected = false;
+                    firstWithoutValue.selected = true;
+                }
             }
         }
 
         // Disable reasoning levels which are incompatible with the model
         modelSelect.addEventListener('change', (event) => {
             toggleReasoningEffortOptions(event.target.value, providerSelect.value);
-        });
-
-        // on page load, show the current selected provider fields
-        document.addEventListener('DOMContentLoaded', () => {
-            toggleInputVisibility(providerSelect.value);
-            toggleReasoningEffortOptions(modelSelect.value, providerSelect.value);
+            selectFirstReasoningOptionIfSelectedDisabled();
         });
 
         // when changing the provider select, show/hide the relevant fields
         providerSelect.addEventListener('change', (event) => {
             toggleInputVisibility(event.target.value);
             toggleReasoningEffortOptions(modelSelect.value, event.target.value);
+            selectFirstReasoningOptionIfSelectedDisabled();
+        });
+
+        // on page load, show the current selected provider fields
+        document.addEventListener('DOMContentLoaded', () => {
+            toggleInputVisibility(providerSelect.value);
+            toggleReasoningEffortOptions(modelSelect.value, providerSelect.value);
         });
     })();
     </script>
