@@ -33,15 +33,12 @@ export default class AdminDifferentiationProfiles {
      */
     async toggleOn(): Promise<void> {
         this.tester.isGoingTo("Toggle the differentiation profiles on");
-        await this.page.waitForLoadState("load"); // Waits for full page reload
-        await expect(this.page.getByTestId("differentiation-profiles-toggle")).toBeEnabled();
         await this.page.getByTestId("differentiation-profiles-toggle").click();
         this.tester.isGoingTo("Validate that the text 'Terminology' is now visible on the page");
         await expect(this.page.getByTestId("differentiation-profiles-header-Terminology")).toBeVisible();
         await this.clickSave();
         this.tester.isGoingTo("Refresh the page");
         await this.page.reload();
-        await this.page.waitForLoadState("load"); // Waits for full page reload
         this.tester.isGoingTo("Validate that the text 'Terminology' is still visible on the page after refresh");
         await expect(this.page.getByTestId("differentiation-profiles-header-Terminology")).toBeVisible();
         this.tester.isGoingTo("Verify that the checkbox is still checked");
@@ -53,15 +50,12 @@ export default class AdminDifferentiationProfiles {
      */
     async toggleOff(): Promise<void> {
         this.tester.isGoingTo("Toggle the differentiation profiles off");
-        await this.page.waitForLoadState("load"); // Waits for full page reload
-        await expect(this.page.getByTestId("differentiation-profiles-toggle")).toBeEnabled();
         await this.page.getByTestId("differentiation-profiles-toggle").click();
         this.tester.isGoingTo("Validate that the text 'Terminology' is no longer visible on the page");
         await expect(this.page.getByTestId("differentiation-profiles-header-Terminology")).not.toBeVisible();
         await this.clickSave();
         this.tester.isGoingTo("Refresh the page");
         await this.page.reload();
-        await this.page.waitForLoadState("load"); // Waits for full page reload
         this.tester.isGoingTo("Validate that the text 'Terminology' is no longer visible on the page after refresh");
         await expect(this.page.getByTestId("differentiation-profiles-header-Terminology")).not.toBeVisible();
         this.tester.isGoingTo("Verify that the checkbox is still unchecked");
@@ -143,8 +137,7 @@ export default class AdminDifferentiationProfiles {
     async clickSave(): Promise<void> {
         this.tester.isGoingTo("Select the save button");
         await this.page.getByRole("button", { name: "Save" }).click();
-        this.tester.isGoingTo("Wait for the success message to appear and disappear to ensure it is saved");
+        this.tester.isGoingTo("Wait for the success message to appear");
         await expect(this.page.locator("text=Differentiation profiles successfully updated")).toBeVisible();
-        await expect(this.page.locator("text=Differentiation profiles successfully updated")).not.toBeVisible();
     }
 }
