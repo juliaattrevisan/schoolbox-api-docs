@@ -11,7 +11,7 @@ import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import ManageDifferentiationProfiles from "@schoolboxTest/playwright/support/page/pastoralCare/ManageDifferentiationProfiles";
 import AdminDifferentiationProfiles from "@schoolboxTest/playwright/support/page/admin/differentiation-profiles/AdminDifferentiationProfiles";
 
-test.describe.configure({ mode: "parallel" });
+test.describe.configure({ mode: "serial" });
 
 test.describe("Manage Differentiation Profiles", () => {
     test.beforeAll(async ({ baseTester, db }) => {
