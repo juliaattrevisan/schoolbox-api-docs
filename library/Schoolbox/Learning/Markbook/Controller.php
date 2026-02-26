@@ -708,8 +708,16 @@ class Controller extends Base
             $from = new \Alaress_Date_Format('2026-01-01 00:00:00', 'Y-m-d H:i:s');
             $to = new \Alaress_Date_Format('2026-02-26 00:00:00', 'Y-m-d H:i:s');
 
-            // TODO get a class list from somewhere
-            $studentIds = [13, 20];
+            /* Find a list of students currently involved in $folder, according to the sis
+             */
+            $students = (new \External_Class())->getStudents($folder->getCodeString());
+            $externalIds = array_column($students, 'synergy_id');
+
+            /* Need their user ids, not the external ids
+             */
+            $studentIds = \Schoolbox\UserMapper::getInstance()
+                ->findByExternalIds($externalIds)
+                ->getPropertyValues('id');
 
             /* Note that the first arg to findAllByFolderIdForReview() can actually be a set of folder ids
              */
@@ -745,10 +753,10 @@ class Controller extends Base
                         AssessmentType::TYPE_PROJECT,
                         AssessmentType::TYPE_LTI_ASSESSMENT
                     ],
-                    'work_type' => [
-                        7, // Reporting
-                        3, // Learning Activity
-                    ],
+//                    'work_type' => [
+//                        7, // Reporting
+//                        3, // Learning Activity
+//                    ],
                     /* If both are provided, assessment ids and curriculum nodes execute an intersect
                      */
 //                    'ids' => [391],
