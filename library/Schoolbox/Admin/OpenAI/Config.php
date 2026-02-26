@@ -475,12 +475,6 @@ class Config
             ];
         }
 
-        // Chat feature: uses chat completions,
-        // thus doesn't yet use reasoning or verbosity
-        if ($feature === Helper::FEATURE_CHAT) {
-            unset($formInputs[self::FIELD_REASONING_EFFORT], $formInputs[self::FIELD_TEXT_VERBOSITY]);
-        }
-
         if ($feature === Helper::FEATURE_IMAGE) {
             // Image feature:
             // * add output quality and image model
