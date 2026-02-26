@@ -5,7 +5,7 @@
  * adding thew new color while falling back to the old color if the new one isn't set.
  */
 
-body.sbx-body:not(.login) {
+body.sbx-body {
     /**
      * Foreground primary
      */
@@ -14,11 +14,22 @@ body.sbx-body:not(.login) {
     }
 
     /**
+     * Highlight
+     */
+    .highlight.label,
+    .alert-box,
+    .alert-box.highlight {
+        background-color: var(--sbx-color-highlight);
+        color: var(--sbx-color-highlight-text);
+    }
+
+    /**
      * Alert
      */
     .alert.label,
     .rejected.label,
     .submitted-late.label,
+    .alert-box.alert,
     .alert-box.alert-tint {
         background-color: var(--sbx-color-alert);
         color: var(--sbx-color-alert-text);
@@ -30,6 +41,7 @@ body.sbx-body:not(.login) {
     .success.label,
     .approved.label,
     .reviewed.label,
+    .alert-box.success,
     .alert-box.success-tint {
         background-color: var(--sbx-color-success);
         color: var(--sbx-color-success-text);
@@ -41,8 +53,15 @@ body.sbx-body:not(.login) {
     .warning.label,
     .submitted.label,
     .pending.label,
+    .alert-box.warning,
     .alert-box.warning-tint {
         background-color: var(--sbx-color-warning);
         color: var(--sbx-color-warning-text);
+    }
+
+    .unsubmitted.label,
+    .neutral.label {
+        background-color: var(--sbx-color-foreground-secondary);
+        color: var(--sbx-color-text-secondary);
     }
 }
