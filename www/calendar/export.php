@@ -739,4 +739,4 @@ $renderer = new Renderer(
     $viewer
 );
 
-$exporter->export($renderer, $filename);
+$exporter->export($renderer, $filename, $export_type);

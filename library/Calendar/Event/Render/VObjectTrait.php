@@ -95,7 +95,9 @@ trait VObjectTrait
         $vEvent->add(
             'SUMMARY',
             (
-                $event instanceof ResourceBookingEvent
+                // Function getTitleForResourceBookingExport() should only be used for exports of
+                // resource booking calendar items, in exports from the resource booking calendar.
+                $event instanceof ResourceBookingEvent && $this->getExportType() === 'resource'
                 ? $event->getTitleForResourceBookingExport()
                 : $event->getTitleForExport()
             )

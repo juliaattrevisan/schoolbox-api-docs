@@ -21,6 +21,7 @@ abstract class Base extends RendererBase
     /** @var ResourceBooking\Event */
     protected $event;
 
+    protected ?string $exportType = null;
 
     /**
      * Constructor
@@ -83,5 +84,25 @@ abstract class Base extends RendererBase
     protected function getEvent(): ResourceBooking\Event
     {
         return $this->event;
+    }
+
+    /**
+     * Get all events
+     *
+     * @return ?string
+     */
+    public function getExportType(): ?string
+    {
+        return $this->exportType;
+    }
+
+    /**
+     * @param string $exportType
+     * @return $this
+     */
+    public function setExportType(string $exportType): self
+    {
+        $this->exportType = $exportType;
+        return $this;
     }
 }

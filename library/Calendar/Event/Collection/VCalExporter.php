@@ -17,12 +17,12 @@ class VCalExporter implements IExporter
     /**
      * This will stream the vcal output as it parses over the event collection
      *
-     * @param Renderer $renderer
-     * @param string   $filename
-     * @throws \InvalidArgumentException
+     * @param Renderer    $renderer
+     * @param string      $filename
+     * @param string|null $exportType
      * @throws \Exception
      */
-    public function export(Renderer $renderer, string $filename): void
+    public function export(Renderer $renderer, string $filename, ?string $exportType = null): void
     {
         header('Cache-Control: private');
         header('Content-Type: text/calendar; charset=utf-8');
@@ -39,7 +39,13 @@ class VCalExporter implements IExporter
 
         $baseUrl = 'https://' . Config::get('site_hostname') . '.' . Config::get('site_domain');
         foreach ($renderer->getAllEvents() as $currentEvent) {
-            echo $renderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_VCAL, null, $baseUrl);
+            echo $renderer->renderEvent(
+                $currentEvent,
+                EventBase::RENDER_FORMAT_VCAL,
+                null,
+                $baseUrl,
+                $exportType,
+            );
         }
 
         echo "END:VCALENDAR";
