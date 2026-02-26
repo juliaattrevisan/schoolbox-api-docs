@@ -6,8 +6,7 @@
 
 :root {
     // Background
-    // --sbx-color-body-background: #e5eff7;
-    --sbx-color-body-background: red;
+    --sbx-color-body-background: #e5eff7;
 
     // Foreground
     --sbx-color-foreground-primary: #fff;
@@ -24,11 +23,15 @@
     --sbx-color-highlight: #ffd100;
 
     // Accent
-    // --sbx-color-accent: #001691;
-    --sbx-color-accent: green;
+    --sbx-color-accent: #001691;
     --sbx-color-accent-text: #fff;
 
     // Active
-    --sbx-color-active: var(--content-ui-selected);
-    --sbx-color-active-text: var(--sbx-color-accent, var(--content-ui-foreground));
+    --sbx-color-active: #d2edf2;
+    --sbx-color-active-text: #055584;
+
+    // Menu
+    --sbx-color-menu-background: #001691;
+    --sbx-color-menu-foreground: #fff;
+    --sbx-color-menu-hover: #009eb2;
 }

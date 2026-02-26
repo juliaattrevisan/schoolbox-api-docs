@@ -7,28 +7,28 @@
  Refined Colour Application
  (these are Skin Builder vars)
  ****************************/
-$navigation-foreground: var(--navigation-foreground) !default;
-$navigation-background: var(--navigation-background) !default;
-$navigation-hover: var(--navigation-hover) !default;
+$navigation-foreground: var(--sbx-color-menu-foreground, var(--navigation-foreground)) !default;
+$navigation-background: var(--sbx-color-menu-background, var(--navigation-background)) !default;
+$navigation-hover: var(--sbx-color-menu-hover, var(--navigation-hover)) !default;
 
-$off-canvas-foreground: var(--off-canvas-foreground) !default;
-$off-canvas-background: var(--off-canvas-background) !default;
-$off-canvas-hover: var(--off-canvas-hover) !default;
+$off-canvas-foreground: var(--sbx-color-menu-background, var(--off-canvas-foreground)) !default;
+$off-canvas-background: var(--sbx-color-menu-foreground, var(--off-canvas-background)) !default;
+$off-canvas-hover: var(--sbx-color-menu-hover, var(--off-canvas-hover)) !default;
 
 $content-ui-foreground: var(--sbx-color-accent, var(--content-ui-foreground)) !default;
-$content-ui-background: var(--content-ui-background) !default;
-$content-ui-hover: var(--content-ui-hover) !default;
-$content-ui-selected: var(--content-ui-selected) !default;
+$content-ui-background: var(--sbx-color-active, var(--content-ui-background)) !default;
+$content-ui-hover: var(--sbx-color-foreground-primary, var(--content-ui-hover)) !default;
+$content-ui-selected: var(--sbx-color-active, var(--content-ui-selected)) !default;
 
-$content-ui-submit-foreground: var(--content-ui-submit-foreground) !default;
-$content-ui-submit-background: var(--content-ui-submit-background) !default;
+$content-ui-submit-foreground: var(--sbx-color-accent-text, var(--content-ui-submit-foreground)) !default;
+$content-ui-submit-background: var(--sbx-color-accent, var(--content-ui-submit-background)) !default;
 
-$form-border-color: var(--form-border-color) !default;
-$form-bg-hover-color: var(--form-bg-hover-color) !default;
+$form-border-color: var(--sbx-color-accent, var(--form-border-color)) !default;
+$form-bg-hover-color: var(--sbx-color-accent, var(--form-bg-hover-color)) !default;
 
-$accent-foreground: var(--accent-foreground) !default;
-$accent-background: var(--accent-background) !default;
-$accent-hover: var(--accent-hover) !default;
+$accent-foreground: var(--sbx-color-active-text, var(--accent-foreground)) !default;
+$accent-background: var(--sbx-color-active, var(--accent-background)) !default;
+$accent-hover: var(--sbx-color-active, var(--accent-hover)) !default;
 
 $logo-background: var(--logo-background) !default;
 
@@ -36,9 +36,9 @@ $body-bg: var(--sbx-color-body-background, var(--body-background)) !default;
 
 $login-form-background: var(--login-form-background) !default;
 
-$accounts-menu-foreground: var(--accounts-menu-foreground) !default;
-$accounts-menu-background: var(--accounts-menu-background) !default;
-$accounts-menu-hover: var(--accounts-menu-hover) !default;
+$accounts-menu-foreground: var(--sbx-color-menu-background, var(--accounts-menu-foreground)) !default;
+$accounts-menu-background: var(--sbx-color-menu-foreground, var(--accounts-menu-background)) !default;
+$accounts-menu-hover: var(--sbx-color-menu-hover, var(--accounts-menu-hover)) !default;
 
 /*****************************
  Contrasts to skin color vars above
