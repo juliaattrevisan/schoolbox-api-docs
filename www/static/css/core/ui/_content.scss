@@ -719,19 +719,20 @@ $train-line-unvisited-color: $content-ui-background;
         }
         &.current-stop {
             &:after {
-                background: $content-ui-background;
+                background: var(--sbx-color-active, $content-ui-background);
             }
             ~ li {
                 &:before,
                 &:after {
-                    background: $content-ui-background;
+                    background: var(--sbx-color-active, $content-ui-background);
                 }
                 a span {
-                    background: $content-ui-background;
+                    background: var(--sbx-color-active, $content-ui-background);
                 }
             }
             a span {
                 box-shadow: 0 0 $train-line-visited-glow-blur var(--sbx-color-accent, $content-ui-foreground);
+                color: var(--sbx-color-accent-text, $content-ui-foreground-contrast);
             }
         }
         a {
@@ -744,7 +745,7 @@ $train-line-unvisited-color: $content-ui-background;
                 background: var(--sbx-color-accent, $content-ui-foreground);
                 border-radius: calc($train-line-stop-size / 2);
                 // DONE use contrasting color
-                color: $content-ui-foreground-contrast;
+                color: var(--sbx-color-text-primary, $content-ui-foreground-contrast);
                 height: 0.5 * $train-line-stop-size;
                 left: calc(50% - (#{calc($train-line-stop-size / 2)}) + 0.4rem);
                 padding: calc(($train-line-stop-size - (rem-calc($base-font-size) * 1.5)) / 2)
