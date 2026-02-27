@@ -1,0 +1,108 @@
+import { test } from "@schoolboxTest/playwright/support/integrations";
+import LearningMomentModify from "@schoolboxTest/playwright/support/page/learningMoments/LearningMomentModify";
+import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
+import Common from "@schoolboxTest/playwright/support/page/Common";
+import ActivityFeed from "@schoolboxTest/playwright/support/page/profilePage/ActivityFeed";
+import { EvidenceStatus } from "@schoolboxLearningMomentEvidence/evidenceTypes";
+
+const CONFIG_LEARNING_MOMENTS_MODERATION_ENABLED = "learning_moments_moderation_enabled";
+const YEAR_LEVEL_NAME_ON = "9"; // The name of the year level to enable moderation for
+const MOMENT_BODY_PREFIX = "This is a learning moment test "; // Distinct prefix used to find learning moments to soft-delete at the end of the test
+
+test.describe("Learning Moment Moderation", () => {
+    /**
+     * Preparations
+     * - Enable the Learning Moments Moderation module
+     * - Enable Learning Moments Moderation for Year 9 only
+     */
+    test.beforeAll(async ({ db }) => {
+        await db.updateInDatabase("config", { value: 1 }, { name: CONFIG_LEARNING_MOMENTS_MODERATION_ENABLED });
+        await db.updateInDatabase("lu_year_level", { learning_moments_moderation: 1 }, { name: YEAR_LEVEL_NAME_ON });
+    });
+
+    test.beforeEach(async ({ tester }) => {
+        await tester.loginAsAdmin();
+    });
+
+    test("As a student, draft a learning moment for a moderated year level", async ({ tester, page }) => {
+        const profilePage = new ProfilePage(tester, page);
+        const activityFeed = new ActivityFeed(tester, page);
+        const learningMomentModify = new LearningMomentModify(tester, page);
+
+        const studentId = Common.USER_ID_LOUISASMITH;
+        const studentName = Common.USER_LOUISASMITH;
+
+        tester.isGoingTo("As Luisa Smith, save a draft learning moment");
+        await tester.impersonateViaUserProfilePage(studentName);
+        await profilePage.goto(studentId);
+        await activityFeed.clickShareLearningMoment();
+        await activityFeed.shareLearningModal.clickShareText();
+
+        const momentBody = `${MOMENT_BODY_PREFIX} draft`;
+        await learningMomentModify.typeBody(momentBody);
+        await learningMomentModify.clickSaveDraft();
+
+        tester.isGoingTo("check the learning moment is saved as a draft");
+        const moment = activityFeed.locateMomentWithBody(momentBody);
+        await ActivityFeed.verifyMomentHasStatus(moment, EvidenceStatus.DRAFT);
+
+        // From the activity feed, you should be able to submit the draft for approval directly
+        tester.isGoingTo("submit the learning moment for approval via the activity feed");
+        await ActivityFeed.clickMomentSubmitForApprovalAction(moment);
+
+        tester.isGoingTo("check the learning moment requires approval");
+        await ActivityFeed.verifyMomentHasStatus(moment, EvidenceStatus.SUBMITTED);
+    });
+
+    test("As a student, submit a learning moment for approval for a moderated year level", async ({ tester, page }) => {
+        const profilePage = new ProfilePage(tester, page);
+        const activityFeed = new ActivityFeed(tester, page);
+        const learningMomentModify = new LearningMomentModify(tester, page);
+
+        const studentId = Common.USER_ID_LOUISASMITH;
+        const studentName = Common.USER_LOUISASMITH;
+
+        tester.isGoingTo("As Luisa Smith, submit a learning moment for approval");
+        await tester.impersonateViaUserProfilePage(studentName);
+        await profilePage.goto(studentId);
+        await activityFeed.clickShareLearningMoment();
+        await activityFeed.shareLearningModal.clickShareText();
+
+        const momentBody = `${MOMENT_BODY_PREFIX} that needs approval`;
+        await learningMomentModify.typeBody(momentBody);
+        await learningMomentModify.clickSubmitForApproval();
+
+        tester.isGoingTo("check the learning moment requires approval");
+        const moment = activityFeed.locateMomentWithBody(momentBody);
+        await ActivityFeed.verifyMomentHasStatus(moment, EvidenceStatus.SUBMITTED);
+
+        // From the activity feed, you should be able to modify the learning moment that currently requires approval
+        tester.isGoingTo("modify the learning moment, which should put it back to draft");
+        await ActivityFeed.clickMomentModifyAction(moment);
+        const modifiedMomentBody = `${momentBody} - modified`;
+        await learningMomentModify.typeBody(modifiedMomentBody);
+        await learningMomentModify.clickSubmitForApproval();
+
+        tester.isGoingTo("check the modified learning moment still requires approval");
+        const modifiedMoment = activityFeed.locateMomentWithBody(modifiedMomentBody);
+        await ActivityFeed.verifyMomentHasStatus(modifiedMoment, EvidenceStatus.SUBMITTED);
+    });
+
+    /**
+     * (per test) soft-delete all learning moments that were created as to not interfere with other tests
+     */
+    test.afterEach(async ({ db, api }) => {
+        const momentIds = (await db.grabColumnFromDatabase("moment", "id", {
+            "body LIKE": `%${MOMENT_BODY_PREFIX}%`,
+        })) as number[];
+        await Promise.all(momentIds.map((momentId) => api.deleteLearningMoment(momentId)));
+    });
+
+    /**
+     * Restore original settings as to not interfere with other tests
+     */
+    test.afterAll(async ({ db }) => {
+        await db.updateInDatabase("config", { value: 0 }, { name: CONFIG_LEARNING_MOMENTS_MODERATION_ENABLED });
+        await db.updateInDatabase("lu_year_level", { learning_moments_moderation: 0 }, { name: YEAR_LEVEL_NAME_ON });
+    });
+});

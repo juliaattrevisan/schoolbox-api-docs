@@ -666,7 +666,12 @@ window.Vue.onMounted(async () => {
                             </time>
                         </h2>
                         <ul class="information-list">
-                            <li v-for="(item, itemIndex) in itemGroup.items" :key="itemIndex" class="feed-item">
+                            <li
+                                v-for="(item, itemIndex) in itemGroup.items"
+                                :key="itemIndex"
+                                class="feed-item"
+                                :data-test="`activity-feed-item-${item.discriminator}-${item.object.id}`"
+                            >
                                 <template v-if="item.discriminator === FeedDiscriminator.LEARNING_MOMENT">
                                     <!-- This moment isn't necessarily editable -->
                                     <div
@@ -722,6 +727,7 @@ window.Vue.onMounted(async () => {
                                                     v-if="item.object.currentState !== EvidenceStatus.PUBLISHED"
                                                     class="label l-mar--0"
                                                     :class="`label--moment-${item.object.currentState}`"
+                                                    :data-test="`learning-moment-status-${item.object.currentState}`"
                                                 >
                                                     {{ evidenceStatusLabels[item.object.currentState] }}
                                                 </span>
@@ -847,6 +853,7 @@ window.Vue.onMounted(async () => {
                                                         <li v-if="item.object._links.modifyForm">
                                                             <a
                                                                 class="button"
+                                                                data-test="learning-moment-action-modify"
                                                                 :href="getReturnUrl(item.object._links.modifyForm)"
                                                             >
                                                                 Modify
@@ -860,6 +867,7 @@ window.Vue.onMounted(async () => {
                                                             <li>
                                                                 <button
                                                                     class="submit"
+                                                                    data-test="learning-moment-action-submit"
                                                                     @click="submitMoment(item.object)"
                                                                 >
                                                                     Submit for approval
@@ -870,6 +878,7 @@ window.Vue.onMounted(async () => {
                                                             <li>
                                                                 <button
                                                                     class="submit"
+                                                                    data-test="learning-moment-action-publish"
                                                                     @click="publishMoment(item.object)"
                                                                 >
                                                                     Publish
@@ -897,6 +906,7 @@ window.Vue.onMounted(async () => {
                                                     <li v-if="item.object._links.modifyForm">
                                                         <a
                                                             class="button"
+                                                            data-test="learning-moment-action-modify"
                                                             :href="getReturnUrl(item.object._links.modifyForm)"
                                                         >
                                                             Modify
@@ -907,7 +917,11 @@ window.Vue.onMounted(async () => {
                                                 <template v-if="'draft' === item.object.currentState">
                                                     <!-- Publish button available when a learning moment is: draft/submitted/rejected -->
                                                     <li>
-                                                        <button class="submit" @click="publishMoment(item.object)">
+                                                        <button
+                                                            class="submit"
+                                                            data-test="learning-moment-action-publish"
+                                                            @click="publishMoment(item.object)"
+                                                        >
                                                             Publish
                                                         </button>
                                                     </li>
@@ -928,6 +942,7 @@ window.Vue.onMounted(async () => {
                                                         <a
                                                             class="button"
                                                             :href="getReturnUrl(item.object._links.modifyForm)"
+                                                            data-test="learning-moment-action-modify"
                                                         >
                                                             Modify
                                                         </a>
@@ -943,7 +958,11 @@ window.Vue.onMounted(async () => {
                                                 >
                                                     <!-- Publish button available when a learning moment is: draft/submitted/rejected -->
                                                     <li v-if="item.object._links.publish">
-                                                        <button class="submit" @click="publishMoment(item.object)">
+                                                        <button
+                                                            class="submit"
+                                                            @click="publishMoment(item.object)"
+                                                            data-test="learning-moment-action-publish"
+                                                        >
                                                             {{ item.object._labels.publish }}
                                                         </button>
                                                     </li>

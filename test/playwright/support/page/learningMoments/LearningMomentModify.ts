@@ -13,12 +13,10 @@ export default class LearningMomentModify {
     public readonly share: LearningMomentShare;
 
     // Constants for data-test selectors
-    static readonly DATA_TEST_EVIDENCE_DELETE = `mf-evidence-delete`;
-
+    static readonly DATA_TEST_EVIDENCE_DELETE = "mf-evidence-delete";
+    static readonly DATA_TEST_SAVE_DRAFT_BUTTON = "learning-moment-save-draft";
     static readonly DATA_TEST_SUBMIT_FOR_APPROVAL_BUTTON = "learning-moment-submit-for-approval";
-
     static readonly DATA_TEST_PUBLISH_BUTTON = "learning-moment-publish";
-
     static readonly ID_LEARNING_MOMENT_BODY_TEXTAREA = "mf-evidence-textarea";
 
     constructor(tester: AcceptanceTester, page: Page) {
@@ -53,6 +51,13 @@ export default class LearningMomentModify {
             LearningMomentModify.ID_LEARNING_MOMENT_BODY_TEXTAREA,
             templateTitle,
         );
+    }
+
+    /**
+     * Click the "Save for later" (Save draft) button
+     */
+    async clickSaveDraft(): Promise<void> {
+        await this.page.getByTestId(LearningMomentModify.DATA_TEST_SAVE_DRAFT_BUTTON).click();
     }
 
     /**

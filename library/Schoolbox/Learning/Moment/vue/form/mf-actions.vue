@@ -32,7 +32,11 @@ const relevantRoutes = window.Vue.computed(() => {
 <template>
     <ul class="flex-list buttons">
         <li v-if="relevantRoutes.draft">
-            <button :disabled="mfStore.isSaving" @click="() => mfStore.submitForm(false, 'draft')">
+            <button
+                data-test="learning-moment-save-draft"
+                :disabled="mfStore.isSaving"
+                @click="() => mfStore.submitForm(false, 'draft')"
+            >
                 Save for later
             </button>
         </li>

@@ -1,5 +1,6 @@
 import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
+import type { EvidenceStatus } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import LearningMomentShare from "@schoolboxTest/playwright/support/page/learningMoments/LearningMomentShare";
 import ProfilePage from "./ProfilePage";
@@ -12,11 +13,17 @@ export default class ActivityFeed {
     public readonly shareLearningModal: LearningMomentShare;
 
     // Constants for data-test selectors
-    static readonly SELECTOR_FEED_ITEM = ".activity-feed li.feed-item";
+    static readonly DATA_TEST_FEED_ITEM = "activity-feed-item"; // Append "-[discriminator]-[objectId]"
 
     // Learning Moment related selectors
+    static readonly DATA_TEST_LEARNING_MOMENT_STATUS = "learning-moment-status";
     static readonly DATA_TEST_LEARNING_MOMENT_BODY = "learning-moment-body";
     static readonly DATA_TEST_LEARNING_MOMENT_EVIDENCE_MEDIA = "learning-moment-evidence-media";
+
+    // Learning Moment action buttons
+    static readonly DATA_TEST_LEARNING_MOMENT_ACTION_MODIFY = "learning-moment-action-modify";
+    static readonly DATA_TEST_LEARNING_MOMENT_ACTION_SUBMIT = "learning-moment-action-submit";
+    static readonly DATA_TEST_LEARNING_MOMENT_ACTION_PUBLISH = "learning-moment-action-publish";
 
     // Learning Moment Popout Menu
     static readonly DATA_TEST_LEARNING_MOMENT_POPOUT = "sbx-pop-out-learning-moment-{momentId}-popout-button"; // Replace {momentId}
@@ -43,7 +50,8 @@ export default class ActivityFeed {
      * @returns - The locator for the activity feed item
      */
     locateActivityFeedItem(text: string): Locator {
-        return this.page.locator(ActivityFeed.SELECTOR_FEED_ITEM).filter({ hasText: text });
+        const anyActivityFeedItem = new RegExp(`^${ActivityFeed.DATA_TEST_FEED_ITEM}`);
+        return this.page.getByTestId(anyActivityFeedItem).filter({ hasText: text });
     }
 
     /**
@@ -108,18 +116,50 @@ export default class ActivityFeed {
     /** LEARNING MOMENTS */
 
     /**
-     * Verify the evidence for a learning moment
+     * Find a particular learning moment in the activity feed based on the body
+     * @param body - The expected body of the learning moment
+     * @returns Locator
+     */
+    public locateMomentWithBody(body: string): Locator {
+        const anyActivityFeedLearningMoment = new RegExp(`^${ActivityFeed.DATA_TEST_FEED_ITEM}-moment`);
+        const matchingBodyLocator = this.page
+            .getByTestId(ActivityFeed.DATA_TEST_LEARNING_MOMENT_BODY)
+            .filter({ hasText: body });
+        return this.page.getByTestId(anyActivityFeedLearningMoment).filter({ has: matchingBodyLocator });
+    }
+
+    /**
+     * Retrieve the ID of a particular learning moment
+     * @param moment - Locator for the learning moment
+     * @returns The learning moment ID
+     */
+    public static async getMomentLocatorId(moment: Locator): Promise<number> {
+        const testId = await moment.getAttribute("data-test-id");
+        if (!testId) {
+            throw new Error("Moment does not have a data-test-id attribute");
+        }
+
+        const match = testId.match(/moment-(\d+)/);
+        if (!match) {
+            throw new Error(`Could not extract moment ID from data-test-id: ${testId}`);
+        }
+
+        return parseInt(match[1], 10);
+    }
+
+    /**
+     * Verify the text evidence (body) for a learning moment
      * TODO: This only verifies the most recent learning moment, we should avoid using .first() at some point
-     * @param body - The expected body of the evidence
+     * @param body - The expected body of the learning moment
      */
     async verifyMomentEvidence(body: string): Promise<void> {
         await expect(this.page.getByTestId(ActivityFeed.DATA_TEST_LEARNING_MOMENT_BODY).first()).toHaveText(body);
     }
 
     /**
-     * Verifies that the evidence for a learning moment is not present
+     * Verifies that the text evidence (body) for a learning moment is not present
      * TODO: This only verifies the most recent learning moment, we should avoid using .first() at some point
-     * @param body - The expected body of the evidence that was deleted
+     * @param body - The expected body of the learning moment that was deleted
      */
     async verifyMomentEvidenceNotPresent(body: string): Promise<void> {
         await expect(this.page.getByTestId(ActivityFeed.DATA_TEST_LEARNING_MOMENT_BODY).first()).not.toHaveText(body);
@@ -133,6 +173,40 @@ export default class ActivityFeed {
         const mediaLocator = this.page.getByTestId(ActivityFeed.DATA_TEST_LEARNING_MOMENT_EVIDENCE_MEDIA);
         await expect(mediaLocator).toBeVisible();
         await expect(mediaLocator).toHaveAttribute("alt", "photo.jpeg");
+    }
+
+    /**
+     * Verify a learning moment is a particular status
+     * @param moment - Locator to narrow down to a particular learning moment
+     * @param status - The status to check
+     */
+    static async verifyMomentHasStatus(moment: Locator, status: EvidenceStatus): Promise<void> {
+        await expect(moment.getByTestId(`${ActivityFeed.DATA_TEST_LEARNING_MOMENT_STATUS}-${status}`)).toBeVisible();
+    }
+
+    /**
+     * Click the "Modify" action button for a learning moment
+     * This is available if the moment is not published yet
+     * @param moment - Locator to narrow down to a particular learning moment
+     */
+    static async clickMomentModifyAction(moment: Locator): Promise<void> {
+        await moment.getByTestId(ActivityFeed.DATA_TEST_LEARNING_MOMENT_ACTION_MODIFY).click();
+    }
+
+    /**
+     * Click the "Submit for approval" action button for a learning moment
+     * @param moment - Locator to narrow down to a particular learning moment
+     */
+    static async clickMomentSubmitForApprovalAction(moment: Locator): Promise<void> {
+        await moment.getByTestId(ActivityFeed.DATA_TEST_LEARNING_MOMENT_ACTION_SUBMIT).click();
+    }
+
+    /**
+     * Click the "Publish" action button for a learning moment
+     * @param moment - Locator to narrow down to a particular learning moment
+     */
+    static async clickMomentPublishAction(moment: Locator): Promise<void> {
+        await moment.getByTestId(ActivityFeed.DATA_TEST_LEARNING_MOMENT_ACTION_PUBLISH).click();
     }
 
     /**
@@ -176,8 +250,8 @@ export default class ActivityFeed {
      * @param expectedCount - The expected number of learning moments
      */
     async verifyMomentCount(expectedCount: number): Promise<void> {
-        const anyLearningMomentBody = new RegExp(`${ActivityFeed.DATA_TEST_LEARNING_MOMENT_BODY}-\\d+`);
-        await expect(this.page.getByTestId(anyLearningMomentBody)).toHaveCount(expectedCount);
+        const anyActivityFeedLearningMoment = new RegExp(`^${ActivityFeed.DATA_TEST_FEED_ITEM}-moment`);
+        await expect(this.page.getByTestId(anyActivityFeedLearningMoment)).toHaveCount(expectedCount);
     }
 
     /**
