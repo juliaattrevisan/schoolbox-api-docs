@@ -86,8 +86,6 @@ body.sbx-body {
             width: 17.25rem;
 
             & .back {
-                border-bottom: var(--border);
-
                 & a {
                     height: auto !important;
                     line-height: 4;
@@ -141,7 +139,6 @@ body.sbx-body {
     }
 
     .side-nav {
-        border: var(--border);
         border-radius: var(--sbx-border-radius-normal);
         overflow: hidden;
 
@@ -154,7 +151,7 @@ body.sbx-body {
                 > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
                     button.submit
                 ):not(.show-ckeditor-button) {
-                color: var(--sbx-color-text-primary);
+                color: var(--sbx-color-accent);
                 font-weight: 600;
             }
 
@@ -162,14 +159,10 @@ body.sbx-body {
                 > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
                     button.submit
                 ):not(.show-ckeditor-button) {
-                color: var(--sbx-color-text-primary);
+                color: var(--sbx-color-accent);
                 font-family: var(--ff-primary);
                 padding-block: 1rem;
             }
-        }
-
-        & li:not(:last-child) {
-            border-bottom: var(--border);
         }
     }
 
@@ -179,7 +172,6 @@ body.sbx-body {
 
         & .separator {
             background-color: #eee !important;
-            border-bottom: var(--border);
             color: var(--sbx-color-accent);
             font-weight: 600;
         }
@@ -191,13 +183,11 @@ body.sbx-body {
             line-height: 1.2;
 
             li:has(&) {
-                border-bottom: var(--border) !important;
                 padding-block: 0.4rem;
             }
         }
 
         & li.user {
-            border-bottom: var(--border);
             padding-block: 0.8rem;
             padding-inline: 0.8rem;
 

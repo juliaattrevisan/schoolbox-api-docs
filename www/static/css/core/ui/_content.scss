@@ -417,7 +417,7 @@ nav {
         justify-content: center;
         margin-left: 0.75rem;
         span {
-            color: var(--sbx-color-text-primary, $white);
+            color: var(--sbx-color-foreground-primary, $white);
             line-height: inherit;
         }
         &.review {

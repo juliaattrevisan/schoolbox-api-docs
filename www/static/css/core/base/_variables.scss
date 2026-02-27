@@ -26,7 +26,7 @@ $content-ui-submit-background: var(--sbx-color-accent, var(--content-ui-submit-b
 $form-border-color: var(--sbx-color-accent, var(--form-border-color)) !default;
 $form-bg-hover-color: var(--sbx-color-accent, var(--form-bg-hover-color)) !default;
 
-$accent-foreground: var(--sbx-color-text-primary, var(--accent-foreground)) !default;
+$accent-foreground: var(--sbx-color-accent, var(--accent-foreground)) !default;
 $accent-background: var(--sbx-color-active, var(--accent-background)) !default;
 $accent-hover: var(--sbx-color-active, var(--accent-hover)) !default;
 
