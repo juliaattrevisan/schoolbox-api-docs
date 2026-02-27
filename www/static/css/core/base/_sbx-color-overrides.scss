@@ -89,7 +89,13 @@ body.sbx-body {
         background-color: var(--sbx-color-highlight);
     }
 
+    // bring back the pipe
     .pipe-meter {
         background-color: var(--sbx-color-text-secondary);
+    }
+
+    // switch from the highlight color
+    .label.filter {
+        background: var(--sbx-color-active);
     }
 }
