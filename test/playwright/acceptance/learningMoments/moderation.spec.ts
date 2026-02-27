@@ -182,6 +182,7 @@ test.describe("Learning Moment Moderation", () => {
     test.afterEach(async ({ db, api }) => {
         const momentIds = (await db.grabColumnFromDatabase("moment", "id", {
             "body LIKE": `%${MOMENT_BODY_PREFIX}%`,
+            deleted_at: null,
         })) as number[];
         await Promise.all(momentIds.map((momentId) => api.deleteLearningMoment(momentId)));
     });
