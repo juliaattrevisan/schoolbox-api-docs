@@ -83,7 +83,7 @@ table.rb {
 
         input[type="tel"] {
             border-color: var(--sbx-color-accent, $input-border-color);
-            background-color: $container-bg;
+            background-color: var(--sbx-color-foreground-primary, $container-bg);
         }
     }
 
@@ -141,14 +141,6 @@ table.rb {
         border-left: 1px solid $body-bg;
         transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
         min-width: 100px;
-        &:hover {
-            input[type="text"],
-            input[type="tel"],
-            textarea {
-                border-color: var(--sbx-color-accent, $input-border-color);
-                background-color: $container-bg;
-            }
-        }
         .fieldAssign {
             font-weight: normal;
             padding-left: 1rem;
@@ -179,21 +171,12 @@ table.rb {
         overflow-y: auto;
         height: 100px; /* yes, I used pixels. wanna fight about it? */
         min-width: 5rem;
-        &:focus {
-            color: calc-text-color($container-bg);
-            background-color: $container-bg;
-        }
     }
     textarea,
     input[type="text"],
     input[type="tel"] {
         border-color: transparent;
         background-color: transparent;
-        &:focus {
-            border-color: $input-focus-border-color !important;
-            color: calc-text-color($container-bg);
-            background-color: $container-bg;
-        }
     }
 
     .rb-group-summary {
@@ -210,8 +193,7 @@ table.rb {
 
         input[type="tel"] {
             border-color: var(--sbx-color-accent, $input-border-color);
-            color: calc-text-color($container-bg);
-            background-color: $container-bg;
+            background-color: var(--sbx-color-foreground-primary, $container-bg);
             width: 5rem;
             display: inline-block;
         }
