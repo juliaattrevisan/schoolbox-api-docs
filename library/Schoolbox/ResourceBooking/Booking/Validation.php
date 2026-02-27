@@ -984,7 +984,6 @@ class Validation
 
     /**
      * For each event in $eventById, check whether adding a booking of each resource in $resourceById would result in
-<<<<<<< HEAD
      * a clash with an already approved booking.
      *
      * Notes:
@@ -994,10 +993,6 @@ class Validation
      *     to make that check.  A suggestion is to use $this->getNewStatusIdForBooking() to get the status of the
      *     moved bookings, which makes that check.
      *  2. If a booking does clash, the new booking can still be made if clash bookings are allowed on the resource.
-=======
-     * a clash with an already approved booking.  (If so, the new booking can still be made if clash bookings are
-     * allowed on the resource.)
->>>>>>> a51a229baf2 (Move function into Validation class [SA-21759])
      *
      * @param GenericCollection<int, BookingItemModel> $resourceById - Resources indexed by resourceId.
      * @param GenericCollection<int, Event> $eventById - Events indexed by eventId.
