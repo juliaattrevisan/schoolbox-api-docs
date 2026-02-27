@@ -159,4 +159,17 @@ export default class ResourcesMyFilesPicker {
         const submitButton = this.page.locator("button.submit");
         await submitButton.click();
     }
+
+    /**
+     * takes a picture by using the camera option and save the file with the given name
+     * @param fileName - The name of the file to be saved
+     */
+    async takePictureAndSave(fileName: string): Promise<void> {
+        await this.clickRecording();
+        await this.clickPhoto();
+        await this.clickCameraPhotoButton();
+        await this.clickUploadButton();
+        await this.typeName(fileName);
+        await this.clickSubmitButton();
+    }
 }

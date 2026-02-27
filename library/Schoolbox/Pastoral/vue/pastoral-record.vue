@@ -103,7 +103,7 @@ window.Vue.onMounted((): void => {
                         class="actions-small-1"
                     >
                         <div class="list-item">
-                            <div class="card attachment small-12">
+                            <div class="card attachment small-12" data-test="pastoral-record-attachment">
                                 <a data-plugin="preview" :href="attachment.route" :title="attachment.storage.filename">
                                     <img
                                         v-if="attachment.storage._links.image"
