@@ -97,6 +97,7 @@ trait VObjectTrait
             (
                 // Function getTitleForResourceBookingExport() should only be used for exports of
                 // resource booking calendar items, in exports from the resource booking calendar.
+                // Note the value obtained from $this->getExportType() value originates in www/calendar/export.php.
                 $event instanceof ResourceBookingEvent && $this->getExportType() === 'resource'
                 ? $event->getTitleForResourceBookingExport()
                 : $event->getTitleForExport()
