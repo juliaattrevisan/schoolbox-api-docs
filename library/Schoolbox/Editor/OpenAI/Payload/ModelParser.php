@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
+use Schoolbox\Editor\OpenAI\Helper;
+
 /**
  * Helper for parsing a model string into its constituent parts:
  * * model name
@@ -71,12 +73,17 @@ class ModelParser
      * These filters are not any guess as to what the payload _should_ be: they
      * only keep the payload within the bounds of what will actually work.
      *
-     * @param array  $payload
-     * @param string $model
+     * @param array  $payload  The data which would be sent to the AI provider.
+     * @param string $model    The name of the model to use.
+     * @param string $endpoint The endpoint type (e.g. `Helper::ENDPOINT_TYPE_AZURE`). Filtering is skipped for Azure.
      * @return array
      */
-    public function filterPayload(array $payload, string $model): array
+    public function filterPayload(array $payload, string $model, string $endpoint = ''): array
     {
+        if ($endpoint === Helper::ENDPOINT_TYPE_AZURE) {
+            return $payload;
+        }
+
         // GPT-4o and 4.1 family models:
         // * don't support reasoning
         // * only support medium verbosity

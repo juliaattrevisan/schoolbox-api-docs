@@ -336,7 +336,7 @@ class LessonPlan
             ]);
         }
 
-        return new ModelParser()->filterPayload($payload, $this->openAiModel);
+        return new ModelParser()->filterPayload($payload, $this->openAiModel, $this->openAiEndpoint);
     }
 
 

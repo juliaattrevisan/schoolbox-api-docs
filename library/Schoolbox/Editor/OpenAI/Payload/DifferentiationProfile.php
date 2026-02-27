@@ -166,7 +166,7 @@ class DifferentiationProfile
             $payload['reasoning'] = ['effort' => $this->reasoningEffort];
         }
 
-        return new ModelParser()->filterPayload($payload, $model);
+        return new ModelParser()->filterPayload($payload, $model, $this->openAiEndpoint);
     }
 
     /**

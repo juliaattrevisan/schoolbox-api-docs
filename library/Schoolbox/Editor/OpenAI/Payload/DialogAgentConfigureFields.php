@@ -235,7 +235,7 @@ class DialogAgentConfigureFields
             'content' => $this->formatActivityContextPrompt($scenario, $assessment),
         ];
 
-        return new ModelParser()->filterPayload($payload, $this->openAiModel);
+        return new ModelParser()->filterPayload($payload, $this->openAiModel, $this->openAiEndpoint);
     }
 
 
