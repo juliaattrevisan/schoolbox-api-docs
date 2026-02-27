@@ -740,4 +740,9 @@ $renderer = new Renderer(
     $viewer
 );
 
-$exporter->export($renderer, $filename, $export_type);
+// Only VCalExporter supports the optional $expor_type argument.
+if ($exporter instanceof VCalExporter) {
+    $exporter->export($renderer, $filename, $export_type);
+} else {
+    $exporter->export($renderer, $filename);
+}
