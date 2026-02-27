@@ -661,7 +661,7 @@ class Controller extends Base
 
         // User's participation cannot be assumed: they cannot be assumed to be in the folder
         $assessments = $this->assessmentMapperProxy
-            ->loadParticipantsIntoAssessmentCollection(collection: $assessments, users: (new \Schoolbox\Collection())->add($user), removeExcluded: false, assumeParticipation: false)
+            ->loadParticipantsIntoAssessmentCollection(collection: $assessments, users: $user ? (new \Schoolbox\Collection())->add($user) : null, removeExcluded: false, assumeParticipation: false)
             ->filter(static function (IAssessable $a) use ($viewee) {
                 // Note that we the assessment list is already filtered to published assessments due to filters
                 return $a->isParticipant($viewee);
