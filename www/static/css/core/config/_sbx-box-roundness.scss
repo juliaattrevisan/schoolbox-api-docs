@@ -48,6 +48,11 @@ body.sbx-body {
         border-radius: var(--sbx-config-box-roundness) var(--sbx-config-box-roundness) 0 0;
     }
 
+    // bottom only rounded elements
+    .reveal-modal .component-action section {
+        border-radius: 0 0 var(--sbx-config-box-roundness) var(--sbx-config-box-roundness);
+    }
+
     // Component layout fixes
     #component-layout .component-container .row > .island section:last-child {
         border-top-left-radius: 0;
