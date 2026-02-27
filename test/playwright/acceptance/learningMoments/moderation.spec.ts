@@ -1,4 +1,4 @@
-import { test } from "@schoolboxTest/playwright/support/integrations";
+import { expect, test } from "@schoolboxTest/playwright/support/integrations";
 import LearningMomentModify from "@schoolboxTest/playwright/support/page/learningMoments/LearningMomentModify";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
 import Common from "@schoolboxTest/playwright/support/page/Common";
@@ -140,10 +140,7 @@ test.describe("Learning Moment Moderation", () => {
         await ActivityFeed.verifyMomentHasStatus(moment1, EvidenceStatus.PUBLISHED);
     });
 
-    test("As a teacher, reject a learning moment that is awaiting approval (request update)", async ({
-        tester,
-        page,
-    }) => {
+    test("As a teacher, reject a learning moment that is awaiting approval", async ({ tester, page }) => {
         const profilePage = new ProfilePage(tester, page);
         const activityFeed = new ActivityFeed(tester, page);
         const learningMomentModify = new LearningMomentModify(tester, page);
@@ -164,6 +161,44 @@ test.describe("Learning Moment Moderation", () => {
 
         tester.isGoingTo("check the learning moment is rejected and has the right comment attached");
         await ActivityFeed.verifyMomentHasStatus(moment2, EvidenceStatus.REJECTED);
+        await activityFeed.verifyMomentComment(requestUpdateReason);
+    });
+
+    test("As a parent, only see approved learning moments", async ({ tester, page }) => {
+        const profilePage = new ProfilePage(tester, page);
+        const activityFeed = new ActivityFeed(tester, page);
+
+        await tester.impersonateViaUserProfilePage(Common.USER_JENNIREED);
+        await profilePage.goto(STUDENT_ID);
+
+        // Should only be able to see moment1, not moment2 or moment3
+        tester.isGoingTo("check only the approved learning moment is visible");
+        const moment1 = activityFeed.locateMomentWithBody(moment1Body);
+        const moment2 = activityFeed.locateMomentWithBody(moment2Body);
+        const moment3 = activityFeed.locateMomentWithBody(moment3Body);
+
+        await expect(moment1).toBeVisible();
+        await expect(moment2).not.toBeVisible();
+        await expect(moment3).not.toBeVisible();
+    });
+
+    test("As a student, view teacher's feedback for a rejected learning moment", async ({ tester, page }) => {
+        const profilePage = new ProfilePage(tester, page);
+        const activityFeed = new ActivityFeed(tester, page);
+
+        await tester.impersonateViaUserProfilePage(STUDENT_NAME);
+        await profilePage.goto(STUDENT_ID);
+
+        tester.isGoingTo("check the status of each learning moment");
+        const moment1 = activityFeed.locateMomentWithBody(moment1Body);
+        const moment2 = activityFeed.locateMomentWithBody(moment2Body);
+        const moment3 = activityFeed.locateMomentWithBody(moment3Body);
+
+        await ActivityFeed.verifyMomentHasStatus(moment1, EvidenceStatus.PUBLISHED);
+        await ActivityFeed.verifyMomentHasStatus(moment2, EvidenceStatus.REJECTED);
+        await ActivityFeed.verifyMomentHasStatus(moment3, EvidenceStatus.SUBMITTED);
+
+        tester.isGoingTo("check the teacher's feedback is visible for the rejected learning moment");
         await activityFeed.verifyMomentComment(requestUpdateReason);
     });
 
