@@ -122,7 +122,7 @@ export default class PastoralReportDetails {
     }
 
     /**
-     * check the record is presenting the proper title, severity and number of points
+     * check the record is presenting the proper title, severity,number of points student picture and meta information for a record
      * @param recordId - The id of the record
      * @param studentId - The id of the student
      * @param expectedTitle - The expected title of the record
@@ -185,7 +185,7 @@ export default class PastoralReportDetails {
     }
 
     /**
-     * check the modal is presenting the proper title, severity and number of points
+     * check the modal is presenting the proper title, severity, number of points, student picture and meta information for a record
      * @param recordId - The id of the record
      * @param studentId - The id of the student
      * @param expectedTitle - The expected title of the record
