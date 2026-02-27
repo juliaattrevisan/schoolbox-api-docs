@@ -30,7 +30,7 @@ test.describe("Learning Moment Moderation", () => {
         const learningMomentModify = new LearningMomentModify(tester, page);
 
         const studentId = Common.USER_ID_JANAREED;
-        const studentName = Common.USER_JANAREED;
+        const studentName = Common.USER_JANAREED_FULL;
 
         tester.isGoingTo("As a student, save a draft learning moment");
         await tester.impersonateViaUserProfilePage(studentName);
@@ -60,7 +60,7 @@ test.describe("Learning Moment Moderation", () => {
         const learningMomentModify = new LearningMomentModify(tester, page);
 
         const studentId = Common.USER_ID_JANAREED;
-        const studentName = Common.USER_JANAREED;
+        const studentName = Common.USER_JANAREED_FULL;
 
         tester.isGoingTo("As a student, submit a learning moment for approval");
         await tester.impersonateViaUserProfilePage(studentName);
@@ -94,7 +94,7 @@ test.describe("Learning Moment Moderation", () => {
         const learningMomentModify = new LearningMomentModify(tester, page);
 
         const studentId = Common.USER_ID_JANAREED;
-        const studentName = Common.USER_JANAREED;
+        const studentName = Common.USER_JANAREED_FULL;
 
         tester.isGoingTo("As a student, submit a learning moment for approval");
         await tester.impersonateViaUserProfilePage(studentName);
@@ -133,7 +133,7 @@ test.describe("Learning Moment Moderation", () => {
         const learningMomentModify = new LearningMomentModify(tester, page);
 
         const studentId = Common.USER_ID_JANAREED;
-        const studentName = Common.USER_JANAREED;
+        const studentName = Common.USER_JANAREED_FULL;
 
         tester.isGoingTo("As a student, submit a learning moment for approval");
         await tester.impersonateViaUserProfilePage(studentName);
