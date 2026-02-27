@@ -474,7 +474,7 @@ class Controller extends Assessment\Controller
         // we chunk them later as the stats logic causes increased load and demand on the system.
         // Looking through `loadParticipantsIntoAssessmentCollection` it was going to be too hard to try and fetch / hydrate only a specific chunk of participants.
         // so we are loading and then throwing away data (yes, can be fixed later) but this is better than trying to load and use everything and run out of memory)
-        $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $assessments, user: null, removeExcluded: true);
+        $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $assessments, users: null, removeExcluded: true);
 
         $twigData = [
             'baseContext'      => $assessmentSpec->getBaseContext(),

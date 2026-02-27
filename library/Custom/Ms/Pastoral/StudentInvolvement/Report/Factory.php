@@ -739,7 +739,7 @@ class Factory
         foreach (
             $this->assessmentDataSource->findAllByFolderIdForReview(
                 folderId: $folder->getId(),
-                student: $student,
+                users: (new \Schoolbox\Collection())->add($student),
                 options: ['order' => ['due_date' => 'asc'],]
             ) as $assessment
         ) {
@@ -888,7 +888,7 @@ class Factory
             }
             $assessments = $this->assessmentDataSource->findAllByFolderIdForReview(
                 folderId: $cohortFolderIds,
-                student: null,
+                users: null,
                 options: [
                     'spec_assessment_id' => $specAssessment->getId(),
                     'order'              => ['due_date' => 'asc'],

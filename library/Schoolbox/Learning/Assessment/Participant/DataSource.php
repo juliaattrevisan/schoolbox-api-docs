@@ -126,7 +126,7 @@ class DataSource
      *       as it is more efficient when loading responses and feedbacks.
      *
      * @param IAssessable $assessment
-     * @param Collection<\Schoolbox\User>|null $user If specified, only load this user's interactions
+     * @param Collection<\Schoolbox\User>|null $users If specified, only load this user's interactions
      * @param array $options Options for findByColumnList
      * @return IAssessable $assessment, with participation loaded.
      * @throws UnexpectedValueException If unable to derive project participant collection

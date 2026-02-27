@@ -294,7 +294,7 @@ class Controller extends Assessment\Controller
                 $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $linkedAssessments);
             } else {
                 // only hydrate for the user who's lesson plan this is
-                $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $linkedAssessments, user: $student);
+                $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $linkedAssessments, users: (new \Schoolbox\Collection())->add($student));
 
                 // only show the linked assessments that the student is a participant of
                 $linkedAssessments = $linkedAssessments->filter(function (IAssessable $assessable) use ($student) {

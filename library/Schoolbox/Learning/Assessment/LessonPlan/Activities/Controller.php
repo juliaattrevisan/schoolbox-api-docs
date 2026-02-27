@@ -90,7 +90,7 @@ class Controller extends Base
         // hydrate those assessments
         $lessonPlans =  $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection(
             collection: $this->assessmentMapperProxy->findAllByIds($assessmentIds, ['order'  => ['due_date' => 'DESC']]),
-            user: $this->getUser(),
+            users: (new \Schoolbox\Collection())->add($this->getUser()),
             removeExcluded: false,
             assumeParticipation: true
         )

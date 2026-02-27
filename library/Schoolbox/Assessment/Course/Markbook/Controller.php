@@ -704,7 +704,7 @@ class Controller extends WebController\Base
     {
         // Fetch assessments & participants
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds)->indexBy('id');
-        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection(collection: $assessments, user: null, removeExcluded: true);
+        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection(collection: $assessments, users: null, removeExcluded: true);
 
         // Build a course markbook
         return new CourseMarkbook(

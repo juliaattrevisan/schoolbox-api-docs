@@ -42,7 +42,7 @@ interface IFeedbackDataSource
      * @param Collection<\Schoolbox\User>|null $users If set, only return this student's responses
      * @return Collection|IFeedback[][]
      */
-    public function findForAssessmentCollection(Collection $assessments, Collection $users = null, array $options = []);
+    public function findForAssessmentCollection(Collection $assessments, ?Collection $users = null, array $options = []);
 
     /**
      * Returns feedback for work that this student has submitted.

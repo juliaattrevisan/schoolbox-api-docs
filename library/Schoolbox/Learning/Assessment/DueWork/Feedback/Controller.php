@@ -228,7 +228,7 @@ class Controller extends Base
                 ->indexBy('id');
 
             // hydrate participants
-            $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection(collection: $aImpls, user: null, removeExcluded: true);
+            $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection(collection: $aImpls, users: null, removeExcluded: true);
         } else {
             $aImpls->add($assessment)->indexBy('id');
         }
@@ -534,7 +534,7 @@ class Controller extends Base
          */
         $this->participantDataSource->loadParticipationIntoAssessment(
             $feedback->getAssessable(),
-            $participant->getUser()
+            (new \Schoolbox\Collection())->add($participant->getUser())
         );
 
         $plan = $feedback->getAssessable()->getParticipantIfExtant($participant->getUser())->getPlan();

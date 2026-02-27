@@ -493,7 +493,7 @@ class Controller extends Base
                     // User's participation cannot be assumed: they cannot be assumed to be in the folder
                     $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection(
                         collection: $contexts,
-                        user: $viewee,
+                        users: (new \Schoolbox\Collection())->add($viewee),
                         removeExcluded: false,
                         assumeParticipation: false
                     );
@@ -644,7 +644,7 @@ class Controller extends Base
      * @param array $filters
      * @param User  $viewee
      * @param bool  $loadOtherParticipantInteractions
-     * @return GenericCollection|IAssessable[]
+     * @return GenericCollection<IAssessable>
      * @throws DomainException If MarkType is invalid for the assessment, or user has interaction but not participant record
      * @throws InvalidArgumentException If assessment class not registered
      * @throws LogicException If cyclic graph detected
@@ -661,7 +661,7 @@ class Controller extends Base
 
         // User's participation cannot be assumed: they cannot be assumed to be in the folder
         $assessments = $this->assessmentMapperProxy
-            ->loadParticipantsIntoAssessmentCollection(collection: $assessments, user: $user, removeExcluded: false, assumeParticipation: false)
+            ->loadParticipantsIntoAssessmentCollection(collection: $assessments, users: (new \Schoolbox\Collection())->add($user), removeExcluded: false, assumeParticipation: false)
             ->filter(static function (IAssessable $a) use ($viewee) {
                 // Note that we the assessment list is already filtered to published assessments due to filters
                 return $a->isParticipant($viewee);

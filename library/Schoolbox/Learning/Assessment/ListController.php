@@ -1467,7 +1467,7 @@ class ListController extends Web\Controller\Base
     {
         // hydrate participant
         $assessments = $this->getAssessmentMapper()->createCollection([$assessment]);
-        $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $assessments, user: $student, removeExcluded: true);
+        $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection(collection: $assessments, users: (new \Schoolbox\Collection())->add($student), removeExcluded: true);
 
         $participant = $assessment->getParticipantIfExtant($student);
 

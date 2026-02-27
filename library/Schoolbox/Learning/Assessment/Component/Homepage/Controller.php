@@ -105,7 +105,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
         $this->assessments = $this->getAssessmentMapper()
             ->findAllByFolderIdForReview(
                 folderId: $this->getSource()->getId(),
-                student: $user->getRole()->isParent() ? null : $user,
+                users: $user->getRole()->isParent() ? null : (new \Schoolbox\Collection())->add($user),
                 options: $options
             )
             ->map([$mutator, 'map'])

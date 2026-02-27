@@ -72,7 +72,7 @@ class DataSource implements IFeedbackDataSource
      * @param array $options Options for findByColumnList
      * @return Collection|IFeedback[][]
      */
-    public function findForAssessmentCollection(Collection $assessments, Collection $users = null, array $options = [])
+    public function findForAssessmentCollection(Collection $assessments, ?Collection $users = null, array $options = [])
     {
         $feedback = new Collection();
         foreach ($this->subSources as $subSource) {

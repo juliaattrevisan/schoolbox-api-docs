@@ -125,7 +125,7 @@ class Api implements Calendar_Api_EventType_Interface
             // User's participation can be assumed if they exist
             $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection(
                 collection: $assessments,
-                user: $this->user,
+                users: (new \Schoolbox\Collection())->add($this->user),
                 removeExcluded: true,
                 assumeParticipation: true
             );

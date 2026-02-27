@@ -499,7 +499,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             $contextUser = null;
         }
 
-        $assessments = $this->assessmentDataSource->findAllByFolderIdForReview(folderId: $context, student: $contextUser)
+        $assessments = $this->assessmentDataSource->findAllByFolderIdForReview(folderId: $context, users: (new \Schoolbox\Collection())->add($contextUser))
             ->map([$mutator, 'map'])
             ->filter([$mutator, 'filter']);
 
