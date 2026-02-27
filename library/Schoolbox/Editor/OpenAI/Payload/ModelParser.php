@@ -78,7 +78,7 @@ class ModelParser
      * @param string $endpoint The endpoint type (e.g. `Helper::ENDPOINT_TYPE_AZURE`). Filtering is skipped for Azure.
      * @return array
      */
-    public function filterPayload(array $payload, string $model, string $endpoint = ''): array
+    public function filterPayload(array $payload, string $model, string $endpoint): array
     {
         if ($endpoint === Helper::ENDPOINT_TYPE_AZURE) {
             return $payload;

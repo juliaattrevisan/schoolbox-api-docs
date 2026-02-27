@@ -3,6 +3,7 @@
 namespace Schoolbox\Editor\OpenAI\Payload;
 
 use Schoolbox\Admin\OpenAI\Config;
+use Schoolbox\Editor\OpenAI\Helper;
 
 class ImageGeneration
 {
@@ -207,7 +208,9 @@ class ImageGeneration
             $payload['previous_response_id'] = $previousResponseId;
         }
 
-        return new ModelParser()->filterPayload($payload, $this->textModel);
+        // For now: image generation is supported only by OpenAI.
+        // This may change in the future.
+        return new ModelParser()->filterPayload($payload, $this->textModel, Helper::ENDPOINT_TYPE_OPENAI);
     }
 
     /**
