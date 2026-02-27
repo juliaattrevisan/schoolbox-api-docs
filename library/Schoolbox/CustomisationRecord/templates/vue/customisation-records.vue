@@ -8,12 +8,12 @@ import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import CursorPagination from "@schoolboxVue/components/pagination/cursor-pagination.vue";
-import LazyGrid from "@schoolboxVue/components/grid/lazyGrid/lazy-grid.vue";
-import type { Header, Routes, BasicType } from "@schoolboxVue/components/grid/lazyGrid/types/lazyGridTypes";
-import LgUserCell from "@schoolboxVue/components/grid/lazyGrid/cellTypes/lg-user-cell.vue";
-import LgDateCell from "@schoolboxVue/components/grid/lazyGrid/cellTypes/lg-date-cell.vue";
-import LgBasicCell from "@schoolboxVue/components/grid/lazyGrid/cellTypes/lg-basic-cell.vue";
-import { useRowsStore } from "@schoolboxVue/components/grid/lazyGrid/store/lgRowsStore";
+import LazyTable from "@schoolboxVue/components/table/lazyTable/lazy-table.vue";
+import type { Header, Routes, BasicType } from "@schoolboxVue/components/cell/cellTypes/BasicType";
+import CellUser from "@schoolboxVue/components/cell/cell-user.vue";
+import CellDate from "@schoolboxVue/components/cell/cell-date.vue";
+import CellBasic from "@schoolboxVue/components/cell/cell-basic.vue";
+import { useRowsStore } from "@schoolboxVue/components/table/lazyTable/store/ltRowsStore";
 import { useMaxScrollableHeight } from "@schoolboxVue/composables/content/useMaxScrollableHeight";
 import { useHeaderStore } from "./store/crHeaderStore";
 
@@ -49,7 +49,7 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
     </empty-state>
     <template v-else-if="rowsStore.hasRows && rowsStore.payload">
         <div ref="scrollableRef" class="scrollable" :style="{ maxHeight: maxScrollableHeight }">
-            <lazy-grid
+            <lazy-table
                 :header="headerStore.header"
                 :rows="rowsStore.payload.data"
                 :is-loading="rowsStore.isMoreLoading"
@@ -58,15 +58,15 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
                 @sort="rowsStore.onSort"
             >
                 <template #User="{ row, header: columnHeader }">
-                    <lg-user-cell :user="row[columnHeader.key] as User" />
+                    <cell-user :user="row[columnHeader.key] as User" />
                 </template>
                 <template #DateTime="{ row, header: columnHeader }">
-                    <lg-date-cell :value="row[columnHeader.key] as string" />
+                    <cell-date :value="row[columnHeader.key] as string" />
                 </template>
                 <template #Basic="{ row, header: columnHeader }">
-                    <lg-basic-cell :value="row[columnHeader.key] as BasicType" />
+                    <cell-basic :value="row[columnHeader.key] as BasicType" />
                 </template>
-            </lazy-grid>
+            </lazy-table>
             <loading-table v-if="rowsStore.isMoreLoading" :rows="5" row-height="3rem" />
             <cursor-pagination
                 :url="rowsStore.url"

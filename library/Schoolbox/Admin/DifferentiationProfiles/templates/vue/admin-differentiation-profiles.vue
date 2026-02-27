@@ -199,7 +199,7 @@ async function onSaveSelected(): Promise<void> {
                                         <div class="list-item">
                                             <template
                                                 v-for="header in (convertObjectToArray(data.headers) as Header[]) || []"
-                                                :key="header.headerKey"
+                                                :key="header.key"
                                             >
                                                 <div :class="`small-12 medium-${header.colSpan} column`">
                                                     <template v-if="header.type === 'checkbox'">
