@@ -10,7 +10,7 @@ blockquote {
     print-color-adjust: exact;
 
     background-color: var(--sbx-color-foreground-secondary, $vapor);
-    border-#{$default-float}: 6px solid $base;
+    border-#{$default-float}: 6px solid var(--sbx-color-border, $base);
     font-size: rem-calc(($base-font-size - 3));
     margin: 0 0 $paragraph-margin-bottom;
     /*  Necessary to encase floating elements within a blockquote (tables).
@@ -56,7 +56,7 @@ blockquote p {
  *  tags but still wrap properly around the " mark
 **/
 blockquote {
-    border-left: 6px solid var(--sbx-color-text-secondary, $base);
+    border-left: 6px solid var(--sbx-color-border, $base);
     position: relative;
     padding-left: 2.5rem !important;
 
