@@ -8,6 +8,7 @@
 
 namespace Calendar\Event\Render;
 
+use Calendar\Event\Collection\ExportType;
 use Calendar\Event\Type\EventInterface;
 use Calendar\Event\Type\ResourceBooking\Event as ResourceBookingEvent;
 use Sabre\VObject\Component\VCalendar;
@@ -97,8 +98,8 @@ trait VObjectTrait
             (
                 // Function getTitleForResourceBookingExport() should only be used for exports of
                 // resource booking calendar items, in exports from the resource booking calendar.
-                // Note the value obtained from $this->getExportType() value originates in www/calendar/export.php.
-                $event instanceof ResourceBookingEvent && $this->getExportType() === 'resource'
+                $event instanceof ResourceBookingEvent &&
+                in_array($this->getExportType(), [ExportType::RESOURCE, ExportType::RESOURCES, ExportType::RESOURCE_CATEGORY], true)
                 ? $event->getTitleForResourceBookingExport()
                 : $event->getTitleForExport()
             )

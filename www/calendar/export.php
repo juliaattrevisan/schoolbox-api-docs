@@ -13,6 +13,7 @@
 
 use Alaress\Database\Connector\IConnector;
 use Calendar\Event\Collection\CSVExporter;
+use Calendar\Event\Collection\ExportType;
 use Calendar\Event\Collection\JsonExporter;
 use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Collection\VCalExporter;
@@ -138,10 +139,10 @@ try {
     $resourceCategoryId = (int)($_GET['resource_category_id'] ?? 0);
     $eventTypeId        = (int)($_GET['event_type'] ?? 0);
     if ($resourceId > 0) {
-        $export_type = 'resource';
+        $export_type = ExportType::RESOURCE;
     }
     if ($resourceCategoryId > 0) {
-        $export_type = 'resource_category';
+        $export_type = ExportType::RESOURCE_CATEGORY;
     }
     if (empty($token)) {
         throw new SchoolboxException('No token provided', 401);
@@ -209,7 +210,7 @@ try {
     $sentry = $kernel->getDependencyInjector()->get('sentry');
 
     switch ($export_type) {
-        case 'personal':
+        case ExportType::PERSONAL:
             $api = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Personal::class,
                 [ $user, $viewer ],
@@ -220,7 +221,7 @@ try {
             $filename = 'personal';
             break;
 
-        case 'group':
+        case ExportType::GROUP:
             $export_id = (int)$_GET['group'];
 
             /* Check if $_GET['group'] is a meaningful value before event
@@ -284,7 +285,7 @@ try {
             $filename = sprintf('group%d', $export_id);
             break;
 
-        case 'campus':
+        case ExportType::CAMPUS:
             $export_id = (int)$_GET['campus'];
             if ($export_id <= 0) {
                 throw new SchoolboxException('Please select a campus', 400);
@@ -300,7 +301,7 @@ try {
             $filename = sprintf('campus%d', $export_id);
             break;
 
-        case 'duework':
+        case ExportType::DUE_WORK:
             /** @var MapperProxy $assessmentDataSource */
             $assessmentDataSource = $kernel->get('assessmentDataSource');
             $visibility           = new Visibility(Access::getInstance());
@@ -315,7 +316,7 @@ try {
             $filename = 'duework';
             break;
 
-        case 'timetable':
+        case ExportType::TIMETABLE:
             $api = new Calendar_Api_Composite();
 
             $api->add(buildApiClass(
@@ -356,7 +357,7 @@ try {
             $endTimestamp   = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             break;
 
-        case 'timetabledays':
+        case ExportType::TIMETABLE_DAYS:
             $api = buildApiClass(
                 Calendar_Api_EventType_TimetableDays_External_Default::class,
                 [ $user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance() ],
@@ -369,7 +370,7 @@ try {
             $endTimestamp   = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             break;
 
-        case 'resources':
+        case ExportType::RESOURCES:
             /* Only include this api if Resource Booking is enabled by Feature Flag
              */
             $api = buildApiClass(
@@ -382,7 +383,7 @@ try {
             $filename = 'resources';
             break;
 
-        case 'resource':
+        case ExportType::RESOURCE:
             $api = new Calendar_Api_Composite();
 
             /* Only include this api if Resource Booking is enabled by Feature Flag
@@ -420,7 +421,7 @@ try {
             $filename = sprintf('resource%d', $resourceId);
             break;
 
-        case 'resource_category':
+        case ExportType::RESOURCE_CATEGORY:
             /* Only include this api if Resource Booking is enabled by Feature Flag
              */
             if ($config->get('resource_booking_enabled')) {
@@ -441,7 +442,7 @@ try {
             $filename = sprintf('resourceCategory%d', $resourceCategoryId);
             break;
 
-        case 'event_type':
+        case ExportType::EVENT_TYPE:
             /* Check if $_GET['group'] is a meaningful value before event
              * trying to find a folder
              */
@@ -459,7 +460,7 @@ try {
             $filename = sprintf('eventType%d', $eventTypeId);
             break;
 
-        case 'external':
+        case ExportType::EXTERNAL:
             /** @var IConnector $databaseExternal */
             $databaseExternal = $kernel->getDependencyInjector()->get('databaseExternal');
             $factory          = new ExternalConnectorFactory();
@@ -538,7 +539,7 @@ try {
 
         /* All EOTC Events
          */
-        case 'eotc_all':
+        case ExportType::EOTC_ALL:
             $api = buildApiClass(
                 Calendar_Api_EventType_Custom_EOTC_Default::class,
                 [ $user, $viewer ],
@@ -547,8 +548,8 @@ try {
             );
 
             break;
-        case 'all':
-        case 'all_external':
+        case ExportType::ALL:
+        case ExportType::ALL_EXTERNAL:
             // All day events, but exclude other sources
             $api    = new Calendar_Api_Composite();
             $subApi = buildApiClass(
