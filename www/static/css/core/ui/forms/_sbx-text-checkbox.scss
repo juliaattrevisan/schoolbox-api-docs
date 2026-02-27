@@ -166,6 +166,50 @@ body.sbx-body {
         background-color: var(--sbx-color-accent);
         color: var(--sbx-color-accent-text);
     }
+
+    // make the switches more in line with the new styling
+    .switch {
+        label {
+            // the whole switch
+            background: var(--sbx-color-foreground-primary);
+            border: 1px solid var(--sbx-color-accent);
+        }
+        label:after {
+            // the switch toggle
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            background: var(--sbx-color-accent);
+        }
+        input:checked + label {
+            // the whole switch when active
+            background: var(--sbx-color-accent);
+        }
+        input:checked + label:after {
+            // the switch toggle when active
+            background: var(--sbx-color-foreground-primary);
+            top: 4px;
+        }
+        input:checked + span {
+            // the label text when active
+            top: -2px;
+        }
+        span {
+            // the label text
+            font-size: var(--sbx-font-size-s);
+            text-transform: none;
+        }
+        input:disabled + label {
+            background: var(--sbx-color-foreground-secondary);
+            cursor: not-allowed;
+        }
+        input:disabled + label:after {
+            background: var(--sbx-color-text-secondary);
+        }
+        input:disabled + label span {
+            color: var(--sbx-color-text-secondary);
+        }
+    }
 }
 
 // Selectors for body.login (outside sbx-body scope)

@@ -1230,10 +1230,6 @@ body.sbx-body {
         input[type="checkbox"]:not(.plain) {
             display: none;
         }
-
-        label::after {
-            background: #fff;
-        }
     }
 
     input[type="checkbox"]:not(.plain) {
