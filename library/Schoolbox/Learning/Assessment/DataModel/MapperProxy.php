@@ -542,10 +542,10 @@ class MapperProxy
         );
 
         // $marks[assessment_id][user_id] = mark
-        $marks            = [];
+        $marks = [];
         $assessmentWeight = [];
         foreach ($markQuery as $row) {
-            $marks[$row['assessment_id']]            ??= [];
+            $marks[$row['assessment_id']] ??= [];
             $assessmentWeight[$row['assessment_id']] ??= $row['weight'];
             if (key_exists($row['user_id'], $marks[$row['assessment_id']]) || $row['published_at'] === null) {
                 // latest mark is already stored for this user
@@ -598,7 +598,7 @@ class MapperProxy
                 if (empty($userId)) {
                     continue;
                 }
-                $projects[$row['assessment_id']][$userId]              ??= [
+                $projects[$row['assessment_id']][$userId] ??= [
                     'values'  => [],
                     'weights' => [],
                 ];
@@ -610,7 +610,7 @@ class MapperProxy
         // Calculate project marks and append to $marks
         foreach ($projects as $assessmentId => $projectMarks) {
             $marks[$assessmentId] ??= [];
-            $summator             = Translator\Project::getSummatorFromString(
+            $summator = Translator\Project::getSummatorFromString(
                 $summators[$assessmentId]['summator'],
                 (bool)$summators[$assessmentId]['require_all_activities'],
             );
@@ -870,9 +870,9 @@ class MapperProxy
      *
      * This method loads participants, responses and feedback.
      *
-     * @param int[]     $unitImplIds
-     * @param User|null $student If provided, load only this student's participation
-     * @param array     $options
+     * @param int[] $unitImplIds
+     * @param Collection<\Schoolbox\User>|null $users If provided, load only this student's participation
+     * @param array $options
      * @return GenericCollection|IAssessable[]
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
      * @throws TypeError If a PredicateBuilder method is called with wrong data type
@@ -881,7 +881,7 @@ class MapperProxy
      * @throws UnexpectedValueException If unable to merge student collections
      * @throws LogicException If cyclic graph detected during translation
      */
-    public function findAllByUnitImplementationIdsForCourseOutline(array $unitImplIds, ?User $student = null, array $options = [])
+    public function findAllByUnitImplementationIdsForCourseOutline(array $unitImplIds, ?Collection $users = null, array $options = [])
     {
         // User's participation cannot be assumed: they cannot be assumed to be in the folder
         return $this->loadParticipantsIntoAssessmentCollection(
@@ -892,7 +892,7 @@ class MapperProxy
                     isset($options['type']) ? (array)$options['type'] : null,
                 ),
             ),
-            user: $student,
+            users: $users,
             removeExcluded: false,
             assumeParticipation: false
         );
@@ -905,8 +905,8 @@ class MapperProxy
      * This method loads participants, responses, feedback and rubric grids.
      *
      * @param int|int[] $folderId A folder or list of folders
-     * @param User|null $student  If provided, load only this student's participation
-     * @param array     $options
+     * @param Collection<\Schoolbox\User>|null $users If provided, load only this student's participation
+     * @param array $options
      * @param bool $includeResponses If true, hydrate Response instances
      * @return Collection|IAssessable[]
      * @throws TypeError If a PredicateBuilder method is called with wrong data type
@@ -918,15 +918,17 @@ class MapperProxy
      */
     public function findAllByFolderIdForReview(
         $folderId,
-        ?User $student = null,
+        ?Collection $users = null,
         bool $includeResponses = true,
         array $options = [],
         array $participantUsers = [],
     ) {
-        if ($student instanceof User) {
+        /* Specifically one person
+         */
+        if ($users instanceof \Traversable && 1 === $users->count()) {
             $assessments = $this->baseMapper->findForFolderAndParticipant(
                 is_array($folderId) ? $folderId : [$folderId],
-                $student,
+                $users->first(),
                 $this->convertOptionsToPredicateBuilder($options, true),
                 [],
                 $options
@@ -943,11 +945,10 @@ class MapperProxy
         // User's participation cannot be assumed: they cannot be assumed to be in the folder
         return $this->loadParticipantsIntoAssessmentCollection(
             collection: $this->translateToDomainModelCollection($assessments),
-            user: $student,
+            users: $users,
             removeExcluded: true,
             assumeParticipation: false,
             includeResponses: $includeResponses,
-            participantUsers: $participantUsers
         );
     }
 
@@ -999,34 +1000,35 @@ class MapperProxy
         }
     }
 
-
-    /**
-     * Finds all assessables that are part of the given project, along with
-     * all participation and rubric grids.
-     *
-     * @param int       $projectId The assessment ID of the project (as opposed to the project's internal ID)
-     * @param User|null $student   If provided, load only this student's participation
-     * @param array     $options
-     * @return Collection|IAssessable[]
-     * @throws TypeError If a PredicateBuilder method is called with wrong data type
-     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
-     * @throws DefinitionException If unable to locate a specified mapper join
-     * @throws DomainException If user has interaction but not participant record
-     * @throws UnexpectedValueException If unable to merge student collections
-     * @throws LogicException If cyclic graph detected during translation
-     */
-    public function findAllByProjectIdForReview($projectId, ?User $student = null, array $options = [])
-    {
-        $assessments = $this->findAllByProjectId($projectId, $options);
-
-        // User's participation cannot be assumed: they cannot be assumed to be in the project
-        return $this->loadParticipantsIntoAssessmentCollection(
-            collection: $assessments,
-            user: $student,
-            removeExcluded: false,
-            assumeParticipation: false
-        );
-    }
+// Seems unused: only ever mentioned in a docblock
+//
+//    /**
+//     * Finds all assessables that are part of the given project, along with
+//     * all participation and rubric grids.
+//     *
+//     * @param int       $projectId The assessment ID of the project (as opposed to the project's internal ID)
+//     * @param User|null $student   If provided, load only this student's participation
+//     * @param array     $options
+//     * @return Collection<IAssessable>
+//     * @throws TypeError If a PredicateBuilder method is called with wrong data type
+//     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
+//     * @throws DefinitionException If unable to locate a specified mapper join
+//     * @throws DomainException If user has interaction but not participant record
+//     * @throws UnexpectedValueException If unable to merge student collections
+//     * @throws LogicException If cyclic graph detected during translation
+//     */
+//    public function findAllByProjectIdForReview($projectId, ?User $student = null, array $options = [])
+//    {
+//        $assessments = $this->findAllByProjectId($projectId, $options);
+//
+//        // User's participation cannot be assumed: they cannot be assumed to be in the project
+//        return $this->loadParticipantsIntoAssessmentCollection(
+//            collection: $assessments,
+//            users: $student ? (new \Schoolbox\Collection())->add($student) : null,
+//            removeExcluded: false,
+//            assumeParticipation: false
+//        );
+//    }
 
 
     /**
@@ -1161,7 +1163,7 @@ class MapperProxy
         // User's participation can be assumed: we've fetched based on the student's folders
         return $this->loadParticipantsIntoAssessmentCollection(
             collection: $this->translateToDomainModelCollection($assessments),
-            user: $student,
+            users: (new \Schoolbox\Collection())->add($student),
             removeExcluded: false,
             assumeParticipation: true
         );
@@ -1234,7 +1236,7 @@ class MapperProxy
         // User's participation can be assumed: we've fetched based on the student's folders
         return $this->loadParticipantsIntoAssessmentCollection(
             collection: $this->translateToDomainModelCollection($assessments),
-            user: $student,
+            users: (new \Schoolbox\Collection())->add($student),
             removeExcluded: false,
             assumeParticipation: true
         );
@@ -1269,7 +1271,7 @@ class MapperProxy
      * @param Alaress_Date_Format|null $from    If provided, fetch only assessables due on or after this date
      * @param Alaress_Date_Format|null $to      If provided, fetch only assessables due on or before this date
      * @param array                    $options Any other query options
-     * @return GenericCollection|IAssessable[]
+     * @return GenericCollection<IAssessable>
      */
     public function findAllByStaffBetweenDates(
         User $staff,
@@ -1840,7 +1842,7 @@ class MapperProxy
                 $assessmentId  = $originalModel->getId();
                 $assessment    = $this->translateToDomainModel($originalModel);
                 if ($loadParticipants) {
-                    $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student, $options);
+                    $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, (new \Schoolbox\Collection())->add($student), $options);
                 }
 
                 /* Each rubric instance represents a grid; find its latest incarnation and supply it here.
@@ -1859,7 +1861,7 @@ class MapperProxy
                     $assessmentId = $originalModel->getId();
                     $assessment   = $this->translateToDomainModel($originalModel);
                     if ($loadParticipants) {
-                        $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student, $options);
+                        $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, (new \Schoolbox\Collection())->add($student), $options);
                     }
 
                     /* Each rubric instance represents a grid; find its latest incarnation and supply it here.
@@ -2162,37 +2164,34 @@ class MapperProxy
     /**
      * Loads participants into a collection of assessables.
      *
-     * @param Collection $collection
-     * @param User|null  $user                If specified, only load this user's interactions
-     * @param bool       $removeExcluded      Set to true to exclude excluded non-member participants
-     * @param bool       $assumeParticipation if true, assume $user is a participant in the assessment without checking
-     *                                        the assessment's folder.
-     *                                        Some places which may have called this may have already loaded a student's
-     *                                        folders, so they already know $user is a participant: this avoids a call
-     *                                        to the SIS to determine if $user is actually a participant in the
-     *                                        assessment's folder.
-     *                                        Only has an effect if $user is set.
-     * @param bool  $includeResponses If true, hydrate Response instances
-     * @return GenericCollection|IAssessable[]
+     * @param GenericCollection<IAssessable> $collection
+     * @param Collection<\Schoolbox\User>|null $users If specified, only load this user's interactions
+     * @param bool $removeExcluded Set to true to exclude excluded non-member participants
+     * @param bool $assumeParticipation if true, assume $user is a participant in the assessment without checking the assessment's folder.
+     *                                  Some places which may have called this may have already loaded a student's
+     *                                  folders, so they already know $user is a participant: this avoids a call
+     *                                  to the SIS to determine if $users is actually a participant in the
+     *                                  assessment's folder.
+     *                                  Only has an effect if $users is set.
+     * @param bool $includeResponses If true, hydrate Response instances
+     * @return GenericCollection<IAssessable>
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
      * @throws UnexpectedValueException If unable to merge student collections
      */
     public function loadParticipantsIntoAssessmentCollection(
-        Collection $collection,
-        ?User $user = null,
+        GenericCollection $collection,
+        ?Collection $users = null,
         bool $removeExcluded = false,
         bool $assumeParticipation = false,
         bool $includeResponses = true,
-        array $participantUsers = [],
     ) {
         return $this->participantDataSource->loadParticipationIntoAssessmentCollection(
             assessments: $collection,
-            user: $user,
+            users: $users,
             removeExcluded: $removeExcluded,
             assumeParticipation: $assumeParticipation,
             includeResponses: $includeResponses,
-            participantUsers: $participantUsers,
         );
     }
 

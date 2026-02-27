@@ -205,7 +205,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 $assessments = $this->assessmentMapperProxy
                     ->findAllByUnitImplementationIdsForCourseOutline(
                         $uiIds,
-                        $user->getRole()->isParent() ? null : $user,
+                        $user->getRole()->isParent() ? null : (new \Schoolbox\Collection())->add($user),
                         $this->filterList ? ['type' => $assessmentTypes] : []
                     )
                     ->map([$mutator, 'map'])

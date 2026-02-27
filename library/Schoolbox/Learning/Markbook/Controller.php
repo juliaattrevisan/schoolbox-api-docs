@@ -745,9 +745,12 @@ class Controller extends Base
                  * this student did, which still ends up hydrating what every other student in that assessment too,
                  * by virtue of the swamp.
                  *
-                 * \Schoolbox\UserMapper::getInstance()->findById(13),
+                 * student: \Schoolbox\UserMapper::getInstance()->findById(13),
                  */
-                student: null,
+                /* Only hydrate these particular participants and their feedbacks, if specified: otherwise swamp hydrates
+                 * everyone who participated in each $assessment which might be more than you need.
+                 */
+                users: $feedbackFolders->findStudents($folder),
                 /* Somewhat experimental:
                  * Don't need any response instances. You get some mixed results here, since the markbook infers states:
                  * a response existing, but no feedback given yet, is shown as a hyphen - ...but if a response doesn't
@@ -788,12 +791,32 @@ class Controller extends Base
                 //                        'GC-FA-a'
                 //                    ]
                 ],
-                /* Only hydrate these particular participants and their feedbacks, if specified: otherwise swamp hydrates
-                 * everyone who participated in each $assessment which might be more than you need.
-                 */
-                participantUsers: $feedbackFolders->findStudentIds($folder),
             );
         }
+
+
+//        foreach ($assessments as $assessment) {
+//            // Final Assessment: Essay somethingorother
+//            if ($assessment->getId() == 49) {
+//                foreach ($assessment->getAllParticipants() as $participant) {
+//                    $msg = sprintf(
+//                        "%s: %s responses, %s feedbacks\n",
+//                        $participant->getUser()->getFullname(),
+//                        $participant->getAllResponses()->count(),
+//                        $participant->getAllFeedbacks()->count(),
+//                    );
+//                    echo $msg;
+//                }
+//            }
+//        }
+
+
+
+
+
+
+
+
 
         // Build a markbook
         $markSchemeFactory = new Factory($this->getConfigLoader());

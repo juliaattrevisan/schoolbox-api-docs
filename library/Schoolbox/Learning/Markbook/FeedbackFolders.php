@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Markbook;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -55,7 +56,7 @@ class FeedbackFolders
         \Alaress_Date_Format $from,
         \Alaress_Date_Format $to
     ): array {
-        $studentIds = $this->findStudentIds($folder);
+        $studentIds = $this->findStudents($folder)->getPropertyValues('id');
 
         return $this->findForStudents($studentIds, $from, $to);
     }
@@ -69,11 +70,11 @@ class FeedbackFolders
      * list. You don't need to show that.
      *
      * @param FolderModel $folder
-     * @return array
+     * @return Collection<\Schoolbox\User>
      * @throws Exception
      * @throws NotFound
      */
-    public function findStudentIds(FolderModel $folder): array
+    public function findStudents(FolderModel $folder): Collection
     {
         /* Find a list of students currently involved in $folder, according to the sis
          */
@@ -85,9 +86,7 @@ class FeedbackFolders
          * TODO you could also put a Role::STUDENT as the second arg, but that would preclude any staff
          *  members being in their professional development workflow. Not sure how much that matters atm
          */
-        return $this->userMapper
-            ->findByExternalIds($externalIds)
-            ->getPropertyValues('id');
+        return $this->userMapper->findByExternalIds($externalIds);
     }
 
 
