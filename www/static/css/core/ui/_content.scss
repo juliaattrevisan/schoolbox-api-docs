@@ -119,7 +119,7 @@
 
 // To highlight the list item is in a disabled / archived state
 .faded {
-    background-color: $vapor;
+    background-color: var(--sbx-color-foreground-secondary, $vapor);
 
     .card.small-12 {
         opacity: 0.75;
@@ -194,8 +194,8 @@ $container-bg: white;
     margin: 0 rem-calc(($base-font-size - 8)) rem-calc(($base-font-size - 8)) 0;
     // A generic label used to indicate something is taking place, used mainly in label-timeout indicators
     &.highlight {
-        color: $accent-foreground;
-        background-color: $accent-background;
+        color: var(--sbx-color-highlight-text, $accent-foreground);
+        background-color: var(--sbx-color-highlight, $accent-background);
     }
     &.filter {
         @extend .highlight;
@@ -371,7 +371,7 @@ nav {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
     &.gradient-none-bg {
-        background-color: $aluminum;
+        background-color: var(--sbx-color-foreground-secondary, $aluminum);
     }
     span {
         display: block;
@@ -408,7 +408,7 @@ nav {
         padding: 0.5rem 0.75rem;
     }
     .gradient-none-bg {
-        background-color: $aluminum;
+        background-color: var(--sbx-color-foreground-secondary, $aluminum);
     }
     .grade {
         align-items: center;
@@ -417,14 +417,14 @@ nav {
         justify-content: center;
         margin-left: 0.75rem;
         span {
-            color: $white;
+            color: var(--sbx-color-text-primary, $white);
             line-height: inherit;
         }
         &.review {
             background-color: var(--sbx-color-warning, $warning-color);
         }
         &.in-progress {
-            background-color: $base;
+            background-color: var(--sbx-color-foreground-secondary, $base);
         }
     }
     @media not print {
@@ -616,7 +616,7 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
     }
     &.in-progress {
         @extend .icon-time-value;
-        background-color: #0c78cf;
+        background-color: var(--sbx-color-foreground-secondary, #0c78cf);
         transform: rotate(-135deg);
         &:before {
             visibility: visible;
@@ -814,5 +814,6 @@ li.feed-item article ol {
 
 //this highlights the selected section
 .highlight-selection {
-    background-color: #ffa;
+    background-color: var(--sbx-color-highlight, #ffa);
+    color: var(--sbx-color-highlight-text, #000);
 }
