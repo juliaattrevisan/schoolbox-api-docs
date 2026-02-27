@@ -461,7 +461,7 @@ nav {
 
 // Schoolbox Loader: https://vagrant.dev.schoolbox.cloud/pantry
 .loader {
-    background-color: $accent-foreground;
+    background-color: var(--sbx-color-accent, $accent-foreground);
     border-radius: 0.5rem;
     margin: 2rem auto;
     width: 3rem;

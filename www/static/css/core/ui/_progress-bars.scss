@@ -16,7 +16,7 @@ $include-html-media-classes: $include-html-classes !default;
 
 // We use this to set the progress bar height
 $progress-bar-height: rem-calc(($base-font-size - 2));
-$progress-bar-color: $accent-background;
+$progress-bar-color: var(--sbx-color-text-secondary, $accent-background);
 
 // We use these to control the border styles
 $progress-bar-border-color: scale-color($white, $lightness: 20%) !default;
@@ -29,10 +29,10 @@ $progress-bar-pad: rem-calc(0);
 $progress-bar-margin-bottom: rem-calc(10) !default;
 
 // We use these to set the meter colors
-$progress-meter-color: $accent-foreground;
+$progress-meter-color: var(--sbx-color-text-secondary, $accent-foreground);
 $progress-meter-secondary-color: $secondary-color !default;
-$progress-meter-success-color: $success-color !default;
-$progress-meter-alert-color: $alert-color !default;
+$progress-meter-success-color: var(--sbx-color-success, $success-color) !default;
+$progress-meter-alert-color: var(--sbx-color-alert, $alert-color) !default;
 
 // @mixins
 //
