@@ -183,7 +183,6 @@ class DataSource
             includeResponses: $includeResponses,
             options: $options,
         );
-
         // Insert project participant objects into any project
         foreach ($assessableWithDescendants as $assessable) {
             if ($assessable instanceof Project) {

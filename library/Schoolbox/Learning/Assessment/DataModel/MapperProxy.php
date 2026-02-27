@@ -1842,7 +1842,7 @@ class MapperProxy
                 $assessmentId  = $originalModel->getId();
                 $assessment    = $this->translateToDomainModel($originalModel);
                 if ($loadParticipants) {
-                    $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, (new \Schoolbox\Collection())->add($student), $options);
+                    $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student ? (new \Schoolbox\Collection())->add($student) : null, $options);
                 }
 
                 /* Each rubric instance represents a grid; find its latest incarnation and supply it here.
@@ -1861,7 +1861,7 @@ class MapperProxy
                     $assessmentId = $originalModel->getId();
                     $assessment   = $this->translateToDomainModel($originalModel);
                     if ($loadParticipants) {
-                        $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, (new \Schoolbox\Collection())->add($student), $options);
+                        $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student ? (new \Schoolbox\Collection())->add($student) : null, $options);
                     }
 
                     /* Each rubric instance represents a grid; find its latest incarnation and supply it here.
