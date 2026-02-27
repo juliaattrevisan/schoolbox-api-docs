@@ -258,11 +258,11 @@ $alert-default-background: css-darken($body-bg, 10%);
         }
     }
     &.success {
-        color: $white;
+        color: var(--sbx-color-text-primary, $white);
     }
 
     &::before {
-        background-color: var(--sbx-color-foreground-primary, $white);
+        background-color: var(--sbx-color-warning, $white);
         border-radius: 0.75rem;
         content: "";
         display: inline-block;
