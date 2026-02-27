@@ -719,7 +719,7 @@ class Controller extends Base
             $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
                 /* For the students in $folder, find all the folders where they had a published feedback
                  */
-                folderId: $feedbackFolders->findForFolder($folder, $from, $to),
+//                folderId: $feedbackFolders->findForFolder($folder, $from, $to),
                 /* For the $studentIds provided, find all the folders where they had a published feedback
                  */
                 //                (new FeedbackFolders($this->getDi()->get('databaseInternal'), $this->getDi()->get('externalClass')))
@@ -728,19 +728,19 @@ class Controller extends Base
                 /* Instead of the FeedbackFolders, you can slam together your own list of folders arbitrarily
                  * I found these manually
                  */
-                //                [
-                //                    $folder->getId(),  // typically 80, 9ENGA
-                //                    78, // 9SPANISHA
-                //                    189, // 9MATA
-                //                    85, // 9PDHC
-                //                    190, // 9MYPA
-                //                    97, // 3TR
-                //                    93, // 3AC
-                //                    92, // 3IB
-                //                    95, // 3IBSPA
-                //                    96, // 3IBVA
-                //                    250, // ELCB
-                //                ],
+                folderId: [
+                    $folder->getId(),  // typically 80, 9ENGA
+                    78, // 9SPANISHA
+                    189, // 9MATA
+                    85, // 9PDHC
+                    190, // 9MYPA
+                    97, // 3TR
+                    93, // 3AC
+                    92, // 3IB
+                    95, // 3IBSPA
+                    96, // 3IBVA
+                    250, // ELCB
+                ],
                 /* This was thought to limit it to one student, but it doesn't help much; it just finds assessments
                  * this student did, which still ends up hydrating what every other student in that assessment too,
                  * by virtue of the swamp.
