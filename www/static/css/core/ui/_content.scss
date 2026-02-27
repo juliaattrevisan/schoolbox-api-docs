@@ -307,7 +307,7 @@ $container-bg: white;
 // Tooltips that reveal further information on selection
 // Typically they sit next to a label
 .hint {
-    color: var(--sbx-color-text-primary, $content-ui-foreground);
+    color: var(--sbx-color-accent-text, $content-ui-foreground);
     top: -1px;
     margin-left: 4px;
     width: 1rem;
@@ -320,7 +320,7 @@ $container-bg: white;
     position: relative;
     margin-bottom: auto;
     font-size: $small-font-size;
-    background-color: var(--sbx-color-foreground-primary, $content-ui-background);
+    background-color: var(--sbx-color-accent, $content-ui-background);
     border-radius: 0.5rem;
     &.icon-help:before {
         color: var(--sbx-color-text-primary, $monsoon);

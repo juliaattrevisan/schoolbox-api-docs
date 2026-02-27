@@ -18,7 +18,8 @@ body.sbx-body {
      */
     .highlight.label,
     .alert-box,
-    .alert-box.highlight {
+    .alert-box.highlight,
+    mark {
         background-color: var(--sbx-color-highlight);
         color: var(--sbx-color-highlight-text);
     }
