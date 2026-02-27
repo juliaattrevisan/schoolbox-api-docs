@@ -38,15 +38,22 @@ class ModelParser
     /**
      * Extract the version number from the model string.
      *
-     * Assumes that the model string is either:
+     * If using Azure, `$model` is an arbitrary deployment ID which maps to an
+     * unknowable model: thus no assumption can be made about model version.
+     *
+     * If using OpenAI, assumes that the model string is either:
      * * `gpt-${version}`
      * * `gpt-${version}-${variant}`
      *
      * @param string $model
+     * @param string $endpoint
      * @return string|null
      */
-    public function extractModelVersion(string $model): ?string
+    public function extractModelVersion(string $model, string $endpoint): ?string
     {
+        if ($endpoint === Helper::ENDPOINT_TYPE_AZURE) {
+            return null;
+        }
         $parts = explode('-', $model);
         return $parts[1] ?? null;
     }
@@ -54,15 +61,22 @@ class ModelParser
     /**
      * Extract the variant from the model string.
      *
-     * Assumes that the model string is either:
+     * If using Azure, `$model` is an arbitrary deployment ID which maps to an
+     * unknowable model: thus no assumption can be made about model variant.
+     *
+     * If using OpenAI, assumes that the model string is either:
      * * `gpt-${version}`
      * * `gpt-${version}-${variant}`
      *
      * @param string $model
+     * @param string $endpoint
      * @return string|null
      */
-    public function extractModelVariant(string $model): ?string
+    public function extractModelVariant(string $model, string $endpoint): ?string
     {
+        if ($endpoint === Helper::ENDPOINT_TYPE_AZURE) {
+            return null;
+        }
         $parts = explode('-', $model);
         return $parts[2] ?? null;
     }
@@ -80,14 +94,10 @@ class ModelParser
      */
     public function filterPayload(array $payload, string $model, string $endpoint): array
     {
-        if ($endpoint === Helper::ENDPOINT_TYPE_AZURE) {
-            return $payload;
-        }
-
         // GPT-4o and 4.1 family models:
         // * don't support reasoning
         // * only support medium verbosity
-        $version = $this->extractModelVersion($model);
+        $version = $this->extractModelVersion($model, $endpoint);
         if (in_array($version, ['4o', '4.1'])) {
             unset($payload['reasoning']);
             if (isset($payload['text']['verbosity'])) {
@@ -137,7 +147,7 @@ class ModelParser
         if (
             $version === '5.2'
             && isset($payload['reasoning']['effort'])
-            && $this->extractModelVariant($model) === 'pro'
+            && $this->extractModelVariant($model, $endpoint) === 'pro'
         ) {
             if (!in_array($payload['reasoning']['effort'], ['medium', 'high', 'xhigh'])) {
                 $payload['reasoning']['effort'] = 'medium';
