@@ -468,7 +468,7 @@ class Model implements ISoftDeletable, JsonSerializable
      * @param User $user
      * @return bool
      */
-    public function canUserModerateThisItem(User $user)
+    public function canUserModerateThisItem(User $user): bool
     {
         return $user->isSuperuser() || $this->isUserModerator($user);
     }

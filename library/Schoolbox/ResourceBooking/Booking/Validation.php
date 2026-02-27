@@ -16,20 +16,20 @@ use External_Timetable;
 use InvalidArgumentException;
 use Schoolbox\Calendar\Event;
 use Schoolbox\External\Event\Mapper;
-use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Collection;
+use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 use Schoolbox\ResourceBooking\Booking\Model as BookingModel;
+use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatusModel;
+use Schoolbox\ResourceBooking\Item;
+use Schoolbox\ResourceBooking\Item\Mapper as ResourceMapper;
 use Schoolbox\ResourceBooking\Item\Model as BookingItemModel;
 use Schoolbox\ResourceBooking\Item\ModerationType\Model as BookingModerationTypeModel;
 use Schoolbox\User;
-use Schoolbox\Collection;
-use Schoolbox\ResourceBooking\Item;
-use Schoolbox\ResourceBooking\Item\Mapper as ResourceMapper;
-use Schoolbox\ResourceBooking\Booking\Model as Booking;
-use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
-use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Campus;
@@ -111,9 +111,9 @@ class Validation
     /**
      * cache array if we are calling the validation multiple times, to avoid multiple calls to the database for the same data
      * we can always break the cache if needed
-     * @var Collection|Model[]
+     * @var array<string, Collection<BookingModel>>
      */
-    private array|Collection $conflictingBookings = [];
+    private array $conflictingBookings = [];
 
     /**
      * @param User                             $user
@@ -160,7 +160,7 @@ class Validation
      *            'related_item' => array of ['resource_id' => int, 'notes' => string]
      *            'repeat' => (E.g. 'daily', 'weekly', etc.  See the create.twig form)
      *        ]
-     * @param Booking|null $existingBooking If provided, this is the booking that is being updated.
+     * @param BookingModel|null $existingBooking If provided, this is the booking that is being updated.
      *                                      Leave it out of conflict checks.
      * @return array<string, array<string, array<string>>> Example:
      *         [
@@ -188,7 +188,7 @@ class Validation
     public function validateBookingFromPostData(
         Item\Model $resource,
         Values|array $postData,
-        ?Booking $existingBooking = null
+        ?BookingModel $existingBooking = null
     ): array {
         // Check:
         // Beginning and end of booking are valid datetime
@@ -199,8 +199,9 @@ class Validation
         $endDate       = null;
 
         // Only users allowed to moderate this item may override validation
-        $override = !empty($postData['override_validation'])
-            && $resource->canUserModerateThisItem($this->user);
+        $override = (
+            !empty($postData['override_validation']) && $resource->canUserModerateThisItem($this->user)
+        );
 
         try {
             $startDate = Alaress_Date_Format::newLocal($postData['startDate'])->getDateTimeObject();
@@ -215,6 +216,7 @@ class Validation
         }
 
         // Return early if either date couldn't be parsed.
+        // These validation errors cannot be overridden, because if the dates can't be parsed, we don't have a booking.
         if ($startDate === null || $endDate === null) {
             return $errors;
         }
@@ -223,11 +225,12 @@ class Validation
 
         $series = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
 
-        if (!($existingBooking instanceof Booking)) {
+        if (!($existingBooking instanceof BookingModel)) {
             // new booking: Validate related and recurrent bookings
             $campus = null;
-            if ($postData['campus'] > 0) {
-                $campus = $this->getCampusMapper()->findById($postData['campus']);
+            $campusId = (int)($postData['campus'] ?? 0);
+            if ($campusId > 0) {
+                $campus = $this->getCampusMapper()->findById($campusId);
             }
             /** @var Campus $campus */
             $dateParts = $series->getNewBookingSeries(
@@ -239,25 +242,25 @@ class Validation
                 $postData['repeat'] ?? null,
                 $campus
             );
+            $validationResults = [];
             foreach ($dateParts as $check) {
                 /** @var Item\Model $thisResource */
                 [$thisResource, $thisStart, $thisEnd] = $check;
 
                 // Validate for matching the current term
-                if ($thisResource->getCurrentTermRestriction()) {
-                    $errors = array_merge_recursive(
-                        $errors,
-                        $this->validateCurrentTermRestriction($thisEnd, $this->getCurrentTerm())
-                    );
+                if (!$override && $thisResource->getCurrentTermRestriction()) {
+                    $validationResults[] = $this->validateCurrentTermRestriction($thisEnd, $this->getCurrentTerm());
                 }
 
-                $errors = array_merge_recursive(
-                    $errors,
-                    $this->validateForClashes($thisResource, $thisStart, $thisEnd)
-                );
+                // Validate for clashes even if $override is true.
+                // The clash validation results will allow us to find and reject the clashing bookings.
+                // See $this->validateBookingIgnoringClashesIfClashesAllowed().
+                $validationResults[] = $this->validateForClashes($thisResource, $thisStart, $thisEnd);
             }
+            $errors = array_merge_recursive($errors, ...$validationResults);
         } else {
             // existing booking: Validate related and recurrent bookings
+            $validationResults = [];
             foreach (
                 $series->getExistingSeries(
                     $existingBooking,
@@ -271,18 +274,16 @@ class Validation
                 [$thisResource, $thisStart, $thisEnd, $thisBooking] = $check;
 
                 // Validate for matching the current term
-                if ($thisResource->getCurrentTermRestriction()) {
-                    $errors = array_merge_recursive(
-                        $errors,
-                        $this->validateCurrentTermRestriction($thisEnd, $this->getCurrentTerm())
-                    );
+                if (!$override && $thisResource->getCurrentTermRestriction()) {
+                    $validationResults[] = $this->validateCurrentTermRestriction($thisEnd, $this->getCurrentTerm());
                 }
 
-                $errors = array_merge_recursive(
-                    $errors,
-                    $this->validateForClashes($thisResource, $thisStart, $thisEnd, $thisBooking)
-                );
+                // Validate for clashes even if $override is true.
+                // The clash validation results will allow us to find and reject the clashing bookings.
+                // See $this->validateBookingIgnoringClashesIfClashesAllowed().
+                $validationResults[] = $this->validateForClashes($thisResource, $thisStart, $thisEnd, $thisBooking);
             }
+            $errors = array_merge_recursive($errors, ...$validationResults);
         }
 
         return $errors;
@@ -317,7 +318,6 @@ class Validation
     {
         $errors = [];
         $now    = new DateTime();
-        $startDate->format('Y-m-d H:i');
 
         if ($startDate->format('Y-m-d H:i') < $now->format('Y-m-d H:i')) {
             $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
@@ -398,14 +398,16 @@ class Validation
     /**
      * This function groups the simplest validation rule checks into one function to
      * avoid repetition when all those functions need to be called from multiple places.
+     * Another reason these tests are grouped together is that if any of these tests fail for
+     * the first booking in a series, they will also fail for all later bookings in the series.
      *
      * @param Item\Model $resource
-     * @param            $startDate
-     * @param            $endDate
-     * @param            $override
+     * @param DateTime   $startDate
+     * @param DateTime   $endDate
+     * @param bool       $override
      * @return array
      */
-    public function validateSimpleRules(Item\Model $resource, $startDate, $endDate, $override): array
+    public function validateSimpleRules(Item\Model $resource, DateTime $startDate, DateTime $endDate, bool $override): array
     {
         $errors = [];
 
@@ -433,19 +435,30 @@ class Validation
      *
      * @return array If not empty, this contains the errors for this change.
      */
-    public function validateChangeStatus(Model $booking, $status)
+    public function validateChangeStatus(Model $booking, int $status): array
     {
-        switch ($status) {
-            case Status\Model::STATUS_APPROVED:
-                return $this->validateForClashes(
-                    $booking->getResource(),
-                    $booking->getEvent()->getStartDateTime()->getDateTimeObject(),
-                    $booking->getEvent()->getEndDateTime()->getDateTimeObject(),
-                    $booking
-                );
-            default:
-                return [];
+        $bookingStartAt = $booking->getBookingStartAt() ?? $booking->getEvent()->getStartDateTime();
+        $bookingEndAt = $booking->getBookingEndAt() ?? $booking->getEvent()->getEndDateTime();
+
+        if ($bookingStartAt === null) {
+            // This should never happen since we fall back to event start/end dates, but handle this theoretical case.
+            return [self::START_PERIOD_ERRORS => [self::ERROR_INVALID => [self::ERROR_INVALID]]];
         }
+
+        if ($bookingEndAt === null) {
+            // This should never happen since we fall back to event start/end dates, but handle this theoretical case.
+            return [self::END_PERIOD_ERRORS => [self::ERROR_INVALID => [self::ERROR_INVALID]]];
+        }
+
+        return match ($status) {
+            Status\Model::STATUS_APPROVED => $this->validateForClashes(
+                $booking->getResource(),
+                $bookingStartAt->getDateTimeObject(),
+                $bookingEndAt->getDateTimeObject(),
+                $booking
+            ),
+            default => [],
+        };
     }
 
     /**
@@ -469,7 +482,7 @@ class Validation
         $errors = [];
 
         /** @var Collection|Model[] $conflictingBookings */
-        $conflictingBookings = $this->getConflictingBookings($resource, $startDate, $endDate, $existingBooking, true);
+        $conflictingBookings = $this->getConflictingBookings($resource, $startDate, $endDate, $existingBooking);
 
         // Anything still in list of conflicts? We have a conflict
         if (count($conflictingBookings)) {
@@ -521,7 +534,8 @@ class Validation
     }
 
     /**
-     * Get all bookings for a resource in a window
+     * Get all bookings for a resource in a window.
+     * Results of this function are cached, so repeated calls with the same parameters are cheap.
      *
      * @param Item\Model $resource
      * @param DateTime   $startDate
@@ -530,7 +544,7 @@ class Validation
      * @param bool       $breakCache // should we hit the db to find all booking, or use the cached ones?
      * @return Collection|Model[]
      */
-    private function getConflictingBookings(Item\Model $resource, DateTime $startDate, DateTime $endDate, ?Model $existingBooking = null, bool $breakCache = false): Collection|array
+    public function getConflictingBookings(Item\Model $resource, DateTime $startDate, DateTime $endDate, ?Model $existingBooking = null, bool $breakCache = false): Collection|array
     {
         // booking cache is a sum of the data of the function params
         $cacheKey = sprintf(self::CONFLICTING_BOOKINGS_CACHE_KEY, $resource->getId(), $startDate->getTimestamp(), $endDate->getTimestamp(), $existingBooking ? $existingBooking->getId() : '');
@@ -565,10 +579,10 @@ class Validation
             if ($existingId) {
                 $existingSeriesId    = $existingBooking->getEvent()->getSeriesId();
                 $conflictingBookings = $conflictingBookings->filter(
-                /**
-                 * @param Model $item
-                 * @return bool
-                 */
+                    /**
+                     * @param Model $item
+                     * @return bool
+                     */
                     function ($item) use ($existingId, $existingSeriesId) {
                         /** @var Model $item */
                         if ($item->getId() == $existingId) {
@@ -585,6 +599,38 @@ class Validation
         }
 
         return $conflictingBookings;
+    }
+
+    /**
+     * Find and return all bookings that conflict with the given set of bookings.
+     *
+     * @param GenericCollection<BookingModel> $bookings
+     * @return Collection
+     */
+    public function getConflictingBookingsForSetOfBookings(GenericCollection $bookings): Collection
+    {
+        $allConflictingBookings = new GenericCollection(BookingModel::class);
+
+        foreach ($bookings as $booking) {
+            $startDatetime = $booking->getBookingStartAt() ?? $booking->getEvent()->getStartDateTime();
+            $endDatetime = $booking->getBookingEndAt() ?? $booking->getEvent()->getEndDateTime();
+
+            if ($startDatetime === null || $endDatetime === null) {
+                // Handle this theoretical error case to prevent warnings below.
+                continue;
+            }
+
+            $conflictingBookings = $this->getConflictingBookings(
+                $booking->getResource(),
+                $startDatetime->getDateTimeObject(),
+                $endDatetime->getDateTimeObject(),
+                $booking,
+            );
+
+            $allConflictingBookings = $allConflictingBookings->merge($conflictingBookings);
+        }
+
+        return $allConflictingBookings->getUnique('id'); // Return a de-duplicated collection of bookings.
     }
 
     /**
@@ -760,17 +806,17 @@ class Validation
     /**
      * Return true if the given array is non-empty, and all values are either ERROR_CONFLICT or ERROR_TIMETABLED_CLASS.
      * @see validateForClashes()
-     * @param array<string, array<string, array<string>>> $errorsByKey Assumed to come from this class.
+     * @param array<string, array<string, array<string>>> $errorsStruct Assumed to come from this class.
      * @return bool
      */
-    public function validationErrorsAreAllClashes(array $errorsByKey): bool
+    public function validationErrorsAreAllClashes(array $errorsStruct): bool
     {
-        if (count($errorsByKey) === 0) {
+        if (count($errorsStruct) === 0) {
             throw new InvalidArgumentException('No errors, so this function should not have been called.');
         }
 
         return array_all(
-            $this->getAllErrorStringsAsFlatArray($errorsByKey),
+            $this->getAllErrorStringsAsFlatArray($errorsStruct),
             static fn ($error) => in_array($error, [self::ERROR_CONFLICT, self::ERROR_TIMETABLED_CLASS], true)
         );
     }
@@ -796,6 +842,83 @@ class Validation
         }
 
         return $errorsFlattened;
+    }
+
+    /**
+     * Validate the booking of a single resource $item, possibly as a recurrence.
+     * If clash bookings are allowed for the resource, do not record clash validation errors.  Remember the dates on
+     * which clashes are found however, and return those in a separate array.  This allows the caller to identify the
+     * bookings that clash for special treatment (e.g. the caller may wish to set the status of those bookings to 'pending').
+     *
+     * @param Item\Model $item
+     * @param array $bookingDetailsForItem - See docblock on for Validation->validateBookingFromPostData() for details.
+     * @param null|Model $existingBooking
+     * @return array
+     * @throws MapperException
+     * @throws Deleted
+     */
+    public function validateBookingIgnoringClashesIfClashesAllowed(
+        Item\Model $item,
+        array $bookingDetailsForItem,
+        ?Model $existingBooking = null
+    ): array {
+        // Validate this item.
+        $errorsStruct = $this->validateBookingFromPostData($item, $bookingDetailsForItem, $existingBooking);
+
+        // Refactoring idea
+        // ----------------
+        // For anyone considering making changes to this function, note this function may not be necessary after some
+        // refactoring.  The results of $this->getConflictingBookings() are now cached so that repeated calls with the
+        // same parameters are cheap.  Since $this->validateBookingFromPostData() above relies on that function to
+        // detect clashes, we may now be better off making repeated calls to $this->getConflictingBookings() instead
+        // of using $clashBookingStartDatesAsKeys to find clashing bookings.
+        // So, we could remove $clashBookingStartDatesAsKeys, and modify affected code to instead use $this->getConflictingBookings().
+
+        $clashBookingStartDatesAsKeys = [];
+        if (count($errorsStruct) > 0) {
+            // Remember the start dates of clash bookings.
+            // Note clash errors always use the Validation::START_PERIOD_ERRORS key (see Validation->validateForClashes()).
+            foreach ($errorsStruct[self::START_PERIOD_ERRORS] ?? [] as $startDate => $errors) {
+                foreach ($errors as $error) {
+                    if (in_array($error, [self::ERROR_CONFLICT, self::ERROR_TIMETABLED_CLASS], true)) {
+                        $clashBookingStartDatesAsKeys[$startDate] = null;
+                        break; // Once a clash error is found for this start date, no need to check remaining errors.
+                    }
+                }
+            }
+
+            // If clash bookings are allowed, or
+            // a moderator user has ordered that all validation rules should be bypassed...
+            if (
+                $item->getAllowClashBookings() ||
+                (!empty($bookingDetailsForItem['override_validation']) && $item->canUserModerateThisItem($this->user))
+            ) {
+                // Clear all the clash-related errors from the $errorsStruct array,
+                // leaving only errors that cannot be overridden.
+                // The clash-related errors will have been left in by $this->validateBookingFromPostData()
+                // to allow us to find the start dates of clash bookings (as has been done above).
+                $errorsStructFiltered = [];
+                foreach ($errorsStruct as $key => $errorsByDate) {
+                    foreach ($errorsByDate as $date => $errors) {
+                        foreach ($errors as $error) {
+                            if (!in_array($error, [self::ERROR_CONFLICT, self::ERROR_TIMETABLED_CLASS], true)) {
+                                if (!array_key_exists($key, $errorsStructFiltered)) {
+                                    $errorsStructFiltered[$key] = [];
+                                }
+                                if (!array_key_exists($date, $errorsStructFiltered[$key])) {
+                                    $errorsStructFiltered[$key][$date] = [];
+                                }
+                                $errorsStructFiltered[$key][$date][] = $error;
+                            }
+                        }
+                    }
+                }
+                $errorsStruct = $errorsStructFiltered;
+                // Only non-overridable errors will remain after removing the clash errors above.
+            }
+        }
+
+        return [$errorsStruct, $clashBookingStartDatesAsKeys];
     }
 
     /**
@@ -895,14 +1018,14 @@ class Validation
             foreach ($resourceById as $resourceId => $resource) {
                 $periodsOfApprovedBookings = $periodsOfApprovedBookingsByResourceId[$resourceId] ?? [];
                 foreach ($periodsOfApprovedBookings as $period) {
-                    if ($period['startDatetime']->gt($event->getEndDatetime())) {
+                    if ($period['startDatetime']->gt($event->getEndDateTime())) {
                         // The $periods are sorted by start datetime ascending, so we can be sure that no other periods will clash with event.
                         break;
                     }
 
                     if (
-                        $period['startDatetime']->lt($event->getEndDatetime()) &&
-                        $period['endDatetime']->gt($event->getStartDatetime())
+                        $period['startDatetime']->lt($event->getEndDateTime()) &&
+                        $period['endDatetime']->gt($event->getStartDateTime())
                     ) {
                         if (!array_key_exists($eventId, $isClashByResourceIdByEventId)) {
                             $isClashByResourceIdByEventId[$eventId] = [];
@@ -921,19 +1044,24 @@ class Validation
     /**
      * Return a suitable status for an updated resource booking, based on:
      *  - Any validation errors found
-     *  - Whether the booking clashes with any other approved bookings (as supplied vai $isClash)
+     *  - Whether the booking clashes with any other approved bookings (as supplied via $isClash)
      *
      * @param BookingModel $booking
-     * @param bool  $isClash
+     * @param bool $isClash
      * @param User $user
+     * @param bool $overrideValidation
      * @return int
      */
-    public function getNewStatusIdForBooking(BookingModel $booking, bool $isClash, User $user): int
-    {
+    public function getNewStatusIdForBooking(
+        BookingModel $booking,
+        bool $isClash,
+        User $user,
+        bool $overrideValidation = false
+    ): int {
         $resource = $booking->getResource();
 
-        $bookingStartAt = $booking->getBookingStartAt() ?? $booking->getEvent()->getStartDatetime();
-        $bookingEndAt = $booking->getBookingEndAt() ?? $booking->getEvent()->getEndDatetime();
+        $bookingStartAt = $booking->getBookingStartAt() ?? $booking->getEvent()->getStartDateTime();
+        $bookingEndAt = $booking->getBookingEndAt() ?? $booking->getEvent()->getEndDateTime();
 
         if ($bookingStartAt === null || $bookingEndAt === null) {
             // This should never happen since we fall back to event start/end dates, but handle this theoretical case.
@@ -944,11 +1072,19 @@ class Validation
             $resource,
             $bookingStartAt->getDateTimeObject(),
             $bookingEndAt->getDateTimeObject(),
-            false,
+            $overrideValidation,
         );
 
+        if ($overrideValidation && count($errors) === 0) {
+            // All the non-overridable validation rules have been checked, so we can approve.
+            // Note if there were clashing bookings, they are assumed to have been dealt with by the calling function.
+            // The clashing bookings should be dealt with by rejecting them and sending notifications.
+            // The end result should be that no approved bookings for any resource overlap.
+            return BookingStatusModel::STATUS_APPROVED;
+        }
+
         // This check is done separately since it is not included in $this->validateSimpleRules().
-        if ($resource->getCurrentTermRestriction()) {
+        if (!$overrideValidation && $resource->getCurrentTermRestriction()) {
             $errors = array_merge_recursive(
                 $errors,
                 $this->validateCurrentTermRestriction($bookingEndAt->getDateTimeObject(), $this->getCurrentTerm())
@@ -974,20 +1110,18 @@ class Validation
      * Return the status to be set for a new booking that does not clash with any existing booking.
      * Note bookings that clash with existing bookings should be given status 'pending'.
      *
-     * TODO: Modify this function so that no database operations are required.
-     *       This should be done because this function is called from within a loop.
-     *
      * @param BookingModel $booking
      * @param User $user
      * @return int
      */
-    private function getStatusIdForNonClashBooking(BookingModel $booking, User $user): int
-    {
+    private function getStatusIdForNonClashBooking(
+        BookingModel $booking,
+        User $user,
+    ): int {
         $resource = $booking->getResource();
         $event = $booking->getEvent();
 
-        // What about the resource? If it's an open resource, confirm the
-        // booking immediately.
+        // What about the resource? If it's an open resource, confirm the booking immediately.
         if ($resource->getModerationType()->getId() === BookingModerationTypeModel::TYPE_OPEN) {
             return BookingStatusModel::STATUS_APPROVED;
         }
