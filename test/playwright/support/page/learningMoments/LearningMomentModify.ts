@@ -16,6 +16,9 @@ export default class LearningMomentModify {
     static readonly DATA_TEST_EVIDENCE_DELETE = "mf-evidence-delete";
     static readonly DATA_TEST_SAVE_DRAFT_BUTTON = "learning-moment-save-draft";
     static readonly DATA_TEST_SUBMIT_FOR_APPROVAL_BUTTON = "learning-moment-submit-for-approval";
+    static readonly DATA_TEST_REQUEST_UPDATE_BUTTON = "learning-moment-request-update";
+    static readonly DATA_TEST_REQUEST_UPDATE_REASON = "learning-moment-request-update-reason";
+    static readonly DATA_TEST_REQUEST_UPDATE_CONFIRM = "learning-moment-request-update-confirm";
     static readonly DATA_TEST_PUBLISH_BUTTON = "learning-moment-publish";
     static readonly ID_LEARNING_MOMENT_BODY_TEXTAREA = "mf-evidence-textarea";
 
@@ -65,6 +68,22 @@ export default class LearningMomentModify {
      */
     async clickSubmitForApproval(): Promise<void> {
         await this.page.getByTestId(LearningMomentModify.DATA_TEST_SUBMIT_FOR_APPROVAL_BUTTON).click();
+    }
+
+    /**
+     * Click the "Request update" button (if the learning moment is rejected)
+     */
+    async clickRequestUpdate(): Promise<void> {
+        await this.page.getByTestId(LearningMomentModify.DATA_TEST_REQUEST_UPDATE_BUTTON).click();
+    }
+
+    /**
+     * Confirm the "Request update" action in the confirmation modal with a given reason
+     * @param reason - The reason for requesting an update
+     */
+    async confirmRequestUpdate(reason: string): Promise<void> {
+        await this.page.getByTestId(LearningMomentModify.DATA_TEST_REQUEST_UPDATE_REASON).fill(reason);
+        await this.page.getByTestId(LearningMomentModify.DATA_TEST_REQUEST_UPDATE_CONFIRM).click();
     }
 
     /**

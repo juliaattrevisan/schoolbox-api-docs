@@ -32,8 +32,19 @@ const mfStore = useMomentFormStore();
             <p>You have requested the student updates their learning moment before it is published.</p>
             <p>Provide feedback to the student. This will appear as a comment that can be deleted later.</p>
 
-            <textarea v-model="mfStore.rejectionReason" name="rejectionReason"></textarea>
-            <button type="submit" class="icon-surveys" @click="() => mfStore.reject(true)">Request update</button>
+            <textarea
+                v-model="mfStore.rejectionReason"
+                name="rejectionReason"
+                data-test="learning-moment-request-update-reason"
+            ></textarea>
+            <button
+                type="submit"
+                class="icon-surveys"
+                data-test="learning-moment-request-update-confirm"
+                @click="() => mfStore.reject(true)"
+            >
+                Request update
+            </button>
         </template>
 
         <template v-else-if="mfStore.modalType === MomentFormModalType.CONFIRM_DELETE">

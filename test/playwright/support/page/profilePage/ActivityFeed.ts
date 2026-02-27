@@ -1,6 +1,6 @@
 import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
-import type { EvidenceStatus } from "@schoolboxLearningMomentEvidence/evidenceTypes";
+import { EvidenceStatus } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import LearningMomentShare from "@schoolboxTest/playwright/support/page/learningMoments/LearningMomentShare";
 import ProfilePage from "./ProfilePage";
@@ -181,6 +181,13 @@ export default class ActivityFeed {
      * @param status - The status to check
      */
     static async verifyMomentHasStatus(moment: Locator, status: EvidenceStatus): Promise<void> {
+        // For published, no status is shown
+        if (status === EvidenceStatus.PUBLISHED) {
+            const anyStatusLocator = new RegExp(`^${ActivityFeed.DATA_TEST_LEARNING_MOMENT_STATUS}`);
+            await expect(moment.getByTestId(anyStatusLocator)).not.toBeVisible();
+            return;
+        }
+
         await expect(moment.getByTestId(`${ActivityFeed.DATA_TEST_LEARNING_MOMENT_STATUS}-${status}`)).toBeVisible();
     }
 

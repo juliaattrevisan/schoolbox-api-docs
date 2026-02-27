@@ -41,7 +41,13 @@ const relevantRoutes = window.Vue.computed(() => {
             </button>
         </li>
         <li v-if="relevantRoutes.reject">
-            <button :disabled="mfStore.isSaving" @click="() => mfStore.reject()">Request update</button>
+            <button
+                :disabled="mfStore.isSaving"
+                data-test="learning-moment-request-update"
+                @click="() => mfStore.reject()"
+            >
+                Request update
+            </button>
         </li>
         <li v-if="relevantRoutes.submit">
             <button
