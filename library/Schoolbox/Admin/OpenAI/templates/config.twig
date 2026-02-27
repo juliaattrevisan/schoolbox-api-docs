@@ -58,7 +58,14 @@
         'title': 'Reasoning Effort',
         'description': 'Select the level of effort you wish the model to take when reasoning about its response. More reasoning should lead to more accurate but slower responses.',
         'warnings': {
-            'Azure': 'You must ensure this effort level is compatible with the model your deployment uses.',
+            'Azure': '
+                <p>You must ensure this effort level is compatible with the model your deployment uses.</p>
+                <ul>
+                <li><b>GPT-4o and GPT-4.1</b>: any</li>
+                <li><b>GPT-5</b>: minimal, low, medium, high (not default)</li>
+                <li><b>GPT-5.1 and GPT-5.2</b>: default, none, low, medium, high</li>
+                </ul>
+            ',
         },
     },
 } %}
@@ -164,7 +171,7 @@
         {% for sectionName, section in sections  %}
             {% if (manifest[name].warnings[sectionName] ?? null) is not empty %}
                 <div data-alert {{ section.dataAttrs }} style="display: none" class="alert-box warning">
-                    {{ manifest[name].warnings[sectionName] }}
+                    {{ manifest[name].warnings[sectionName] | raw }}
                 </div>
             {% endif %}
         {% endfor %}
