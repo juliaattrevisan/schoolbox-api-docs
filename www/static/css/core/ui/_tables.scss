@@ -508,7 +508,7 @@ table.attempts-table {
 .u-sticky-left--row {
     z-index: calc(var(--sbx-depth-ui-sticky) - 1);
     &:hover {
-        background-color: var(--sbx-color-foreground-secondary, #f4f2f2); /* to help legibility */
+        background-color: var(--sbx-color-foreground-secondary, #f4f3f3); /* to help legibility */
     }
 }
 
