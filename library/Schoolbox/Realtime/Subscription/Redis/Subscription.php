@@ -76,7 +76,7 @@ class Subscription implements ISubscription
     public function unsubscribe(): void
     {
         if ($this->asyncClient instanceof Async\Client) {
-            $this->asyncClient->unsubscribe($this->getRouteKey());
+            $this->asyncClient->punsubscribe($this->getRouteKey());
             unset($this->asyncClient);
         }
     }
