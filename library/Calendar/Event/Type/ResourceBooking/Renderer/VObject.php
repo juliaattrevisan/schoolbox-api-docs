@@ -20,6 +20,17 @@ class VObject extends Base
      */
     use VObjectTrait;
 
+    /**
+     * Delegate to parent (Base) rather than the trait's default null implementation.
+     * PHP trait methods take precedence over inherited parent methods, so without this
+     * override the trait's getExportType() would always return null.
+     *
+     * @return ?string
+     */
+    public function getExportType(): ?string
+    {
+        return parent::getExportType();
+    }
 
     protected function getCategories(): string
     {
