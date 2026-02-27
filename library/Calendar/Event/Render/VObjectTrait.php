@@ -146,7 +146,7 @@ trait VObjectTrait
 
 
     /**
-     * This function is overridden in Calendar/Event/Type/ResourceBooking/Renderer/Base.php.
+     * This is overridden in Calendar\Event\Type\ResourceBooking\Renderer\VObject.
      * @return ?string
      */
     public function getExportType(): ?string
