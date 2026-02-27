@@ -232,7 +232,7 @@ test.describe("Learning Moment Moderation", () => {
         })) as number[];
         await Promise.all(momentIds.map((momentId) => api.deleteLearningMoment(momentId)));
 
-        // await db.updateInDatabase("config", { value: 0 }, { name: CONFIG_LEARNING_MOMENTS_MODERATION_ENABLED });
-        // await db.updateInDatabase("lu_year_level", { learning_moments_moderation: 0 }, { name: YEAR_LEVEL_NAME_ON });
+        await db.updateInDatabase("config", { value: 0 }, { name: CONFIG_LEARNING_MOMENTS_MODERATION_ENABLED });
+        await db.updateInDatabase("lu_year_level", { learning_moments_moderation: 0 }, { name: YEAR_LEVEL_NAME_ON });
     });
 });
