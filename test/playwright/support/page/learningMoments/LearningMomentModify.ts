@@ -1,3 +1,4 @@
+import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import LearningMomentShare from "./LearningMomentShare";
@@ -68,6 +69,13 @@ export default class LearningMomentModify {
      */
     async clickSubmitForApproval(): Promise<void> {
         await this.page.getByTestId(LearningMomentModify.DATA_TEST_SUBMIT_FOR_APPROVAL_BUTTON).click();
+    }
+
+    /**
+     * Verify that it's possible to "Request update" for the current learning moment
+     */
+    async verifyCanRequestUpdate(): Promise<void> {
+        await expect(this.page.getByTestId(LearningMomentModify.DATA_TEST_REQUEST_UPDATE_BUTTON)).toBeVisible();
     }
 
     /**

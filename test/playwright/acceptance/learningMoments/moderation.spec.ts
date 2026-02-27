@@ -9,7 +9,14 @@ const CONFIG_LEARNING_MOMENTS_MODERATION_ENABLED = "learning_moments_moderation_
 const YEAR_LEVEL_NAME_ON = "9"; // The name of the year level to enable moderation for
 const MOMENT_BODY_PREFIX = "This is a learning moment test "; // Distinct prefix used to find learning moments to soft-delete at the end of the test
 
+// The student which is part of the moderated year level to use between tests
+const STUDENT_ID = Common.USER_ID_JANAREED;
+const STUDENT_NAME = Common.USER_JANAREED_FULL;
+
 test.describe("Learning Moment Moderation", () => {
+    // Run tests serially, as tests rely on prior tests to have been run
+    test.describe.configure({ mode: "serial" });
+
     /**
      * Preparations
      * - Enable the Learning Moments Moderation module
@@ -24,174 +31,173 @@ test.describe("Learning Moment Moderation", () => {
         await tester.loginAsAdmin();
     });
 
-    test("As a student, draft a learning moment for a moderated year level", async ({ tester, page }) => {
+    let moment1Body = `${MOMENT_BODY_PREFIX} 1 - draft created by student`;
+    const moment2Body = `${MOMENT_BODY_PREFIX} 2 - draft created by student, submitted for approval`;
+    const moment3Body = `${MOMENT_BODY_PREFIX} 3 - submitted for approval by student`;
+
+    const requestUpdateReason = "reason for requesting an update";
+
+    test("As a student, create 2 draft learning moments", async ({ tester, page }) => {
         const profilePage = new ProfilePage(tester, page);
         const activityFeed = new ActivityFeed(tester, page);
         const learningMomentModify = new LearningMomentModify(tester, page);
 
-        const studentId = Common.USER_ID_JANAREED;
-        const studentName = Common.USER_JANAREED_FULL;
+        await tester.impersonateViaUserProfilePage(STUDENT_NAME);
+        await profilePage.goto(STUDENT_ID);
 
-        tester.isGoingTo("As a student, save a draft learning moment");
-        await tester.impersonateViaUserProfilePage(studentName);
-        await profilePage.goto(studentId);
+        tester.isGoingTo("As a student, create the 1st draft learning moment");
         await activityFeed.clickShareLearningMoment();
         await activityFeed.shareLearningModal.clickShareText();
-
-        const momentBody = `${MOMENT_BODY_PREFIX} draft`;
-        await learningMomentModify.typeBody(momentBody);
+        await learningMomentModify.typeBody(moment1Body);
         await learningMomentModify.clickSaveDraft();
 
-        tester.isGoingTo("check the learning moment is saved as a draft");
-        const moment = activityFeed.locateMomentWithBody(momentBody);
-        await ActivityFeed.verifyMomentHasStatus(moment, EvidenceStatus.DRAFT);
+        tester.isGoingTo("As a student, create the 2nd draft learning moment");
+        await activityFeed.clickShareLearningMoment();
+        await activityFeed.shareLearningModal.clickShareText();
+        await learningMomentModify.typeBody(moment2Body);
+        await learningMomentModify.clickSaveDraft();
 
-        // From the activity feed, you should be able to submit the draft for approval directly
-        tester.isGoingTo("submit the learning moment for approval via the activity feed");
-        await ActivityFeed.clickMomentSubmitForApprovalAction(moment);
-
-        tester.isGoingTo("check the learning moment requires approval");
-        await ActivityFeed.verifyMomentHasStatus(moment, EvidenceStatus.SUBMITTED);
+        tester.isGoingTo("check both learning moments are visible and saved as drafts");
+        const moment1 = activityFeed.locateMomentWithBody(moment1Body);
+        const moment2 = activityFeed.locateMomentWithBody(moment2Body);
+        await ActivityFeed.verifyMomentHasStatus(moment1, EvidenceStatus.DRAFT);
+        await ActivityFeed.verifyMomentHasStatus(moment2, EvidenceStatus.DRAFT);
     });
 
-    test("As a student, submit a learning moment for approval for a moderated year level", async ({ tester, page }) => {
+    test("As a student, modify a draft learning moment", async ({ tester, page }) => {
         const profilePage = new ProfilePage(tester, page);
         const activityFeed = new ActivityFeed(tester, page);
         const learningMomentModify = new LearningMomentModify(tester, page);
 
-        const studentId = Common.USER_ID_JANAREED;
-        const studentName = Common.USER_JANAREED_FULL;
+        await tester.impersonateViaUserProfilePage(STUDENT_NAME);
+        await profilePage.goto(STUDENT_ID);
 
-        tester.isGoingTo("As a student, submit a learning moment for approval");
-        await tester.impersonateViaUserProfilePage(studentName);
-        await profilePage.goto(studentId);
-        await activityFeed.clickShareLearningMoment();
-        await activityFeed.shareLearningModal.clickShareText();
+        tester.isGoingTo("modify the 1st draft learning moment and keep it as a draft");
+        const moment1 = activityFeed.locateMomentWithBody(moment1Body);
+        await ActivityFeed.clickMomentModifyAction(moment1);
 
-        const momentBody = `${MOMENT_BODY_PREFIX} that needs approval`;
-        await learningMomentModify.typeBody(momentBody);
-        await learningMomentModify.clickSubmitForApproval();
+        moment1Body += " - modified";
+        await learningMomentModify.typeBody(moment1Body);
+        await learningMomentModify.clickSaveDraft();
 
-        tester.isGoingTo("check the learning moment requires approval");
-        const moment = activityFeed.locateMomentWithBody(momentBody);
-        await ActivityFeed.verifyMomentHasStatus(moment, EvidenceStatus.SUBMITTED);
-
-        // From the activity feed, you should be able to modify the learning moment that currently requires approval
-        tester.isGoingTo("modify the learning moment, which should put it back to draft");
-        await ActivityFeed.clickMomentModifyAction(moment);
-        const modifiedMomentBody = `${momentBody} - modified`;
-        await learningMomentModify.typeBody(modifiedMomentBody);
-        await learningMomentModify.clickSubmitForApproval();
-
-        tester.isGoingTo("check the modified learning moment still requires approval");
-        const modifiedMoment = activityFeed.locateMomentWithBody(modifiedMomentBody);
-        await ActivityFeed.verifyMomentHasStatus(modifiedMoment, EvidenceStatus.SUBMITTED);
+        tester.isGoingTo("check the modified learning moment is saved as a draft");
+        const modifiedMoment1 = activityFeed.locateMomentWithBody(moment1Body);
+        await ActivityFeed.verifyMomentHasStatus(modifiedMoment1, EvidenceStatus.DRAFT);
     });
 
-    test("As a teacher, approve a learning moment", async ({ tester, page }) => {
+    test("As a student, submit a draft learning moment for approval from activity feed", async ({ tester, page }) => {
+        const profilePage = new ProfilePage(tester, page);
+        const activityFeed = new ActivityFeed(tester, page);
+
+        await tester.impersonateViaUserProfilePage(STUDENT_NAME);
+        await profilePage.goto(STUDENT_ID);
+
+        tester.isGoingTo("submit the 2nd draft learning moment for approval from the activity feed");
+        const moment2 = activityFeed.locateMomentWithBody(moment2Body);
+        await ActivityFeed.clickMomentSubmitForApprovalAction(moment2);
+        await ActivityFeed.verifyMomentHasStatus(moment2, EvidenceStatus.SUBMITTED);
+    });
+
+    test("As a student, create a learning moment and submit for approval immediately", async ({ tester, page }) => {
         const profilePage = new ProfilePage(tester, page);
         const activityFeed = new ActivityFeed(tester, page);
         const learningMomentModify = new LearningMomentModify(tester, page);
 
-        const studentId = Common.USER_ID_JANAREED;
-        const studentName = Common.USER_JANAREED_FULL;
+        await tester.impersonateViaUserProfilePage(STUDENT_NAME);
+        await profilePage.goto(STUDENT_ID);
 
         tester.isGoingTo("As a student, submit a learning moment for approval");
-        await tester.impersonateViaUserProfilePage(studentName);
-        await profilePage.goto(studentId);
         await activityFeed.clickShareLearningMoment();
         await activityFeed.shareLearningModal.clickShareText();
 
-        const momentBody = `${MOMENT_BODY_PREFIX} that needs approval`;
-        await learningMomentModify.typeBody(momentBody);
+        await learningMomentModify.typeBody(moment3Body);
         await learningMomentModify.clickSubmitForApproval();
 
         tester.isGoingTo("check the learning moment requires approval");
-        const moment = activityFeed.locateMomentWithBody(momentBody);
+        const moment = activityFeed.locateMomentWithBody(moment3Body);
         await ActivityFeed.verifyMomentHasStatus(moment, EvidenceStatus.SUBMITTED);
+    });
 
-        // Switch to a teacher (Jack Coles) who has access to Year 9 English
-        tester.isGoingTo("Impersonate a teacher and navigate to the student's profile page");
+    test("As a teacher, approve a draft learning moment", async ({ tester, page }) => {
+        const profilePage = new ProfilePage(tester, page);
+        const activityFeed = new ActivityFeed(tester, page);
+        const learningMomentModify = new LearningMomentModify(tester, page);
+
         await tester.impersonateTeacher();
-        await profilePage.goto(studentId);
+        await profilePage.goto(STUDENT_ID);
 
-        tester.isGoingTo("check the learning moment requires approval");
-        await ActivityFeed.verifyMomentHasStatus(moment, EvidenceStatus.SUBMITTED);
+        const moment1 = activityFeed.locateMomentWithBody(moment1Body);
 
-        // From the activity feed, you should be able to approve (publish) the learning moment directly
-        tester.isGoingTo("approve the learning moment via the activity feed");
-        await ActivityFeed.clickMomentPublishAction(moment);
+        tester.isGoingTo("check the learning moment is a draft");
+        await ActivityFeed.verifyMomentHasStatus(moment1, EvidenceStatus.DRAFT);
+
+        tester.isGoingTo("approve the learning moment via the modify page");
+        await ActivityFeed.clickMomentModifyAction(moment1);
+        await learningMomentModify.verifyCanRequestUpdate();
+        await learningMomentModify.clickPublish();
 
         tester.isGoingTo("check the learning moment is published");
-        const publishedMoment = activityFeed.locateMomentWithBody(momentBody);
-        await ActivityFeed.verifyMomentHasStatus(publishedMoment, EvidenceStatus.PUBLISHED);
+        await ActivityFeed.verifyMomentHasStatus(moment1, EvidenceStatus.PUBLISHED);
     });
 
-    test("As a teacher, reject a learning moment", async ({ tester, page }) => {
+    test("As a teacher, reject a learning moment that is awaiting approval (request update)", async ({
+        tester,
+        page,
+    }) => {
         const profilePage = new ProfilePage(tester, page);
         const activityFeed = new ActivityFeed(tester, page);
         const learningMomentModify = new LearningMomentModify(tester, page);
 
-        const studentId = Common.USER_ID_JANAREED;
-        const studentName = Common.USER_JANAREED_FULL;
-
-        tester.isGoingTo("As a student, submit a learning moment for approval");
-        await tester.impersonateViaUserProfilePage(studentName);
-        await profilePage.goto(studentId);
-        await activityFeed.clickShareLearningMoment();
-        await activityFeed.shareLearningModal.clickShareText();
-
-        const momentBody = `${MOMENT_BODY_PREFIX} that needs approval`;
-        await learningMomentModify.typeBody(momentBody);
-        await learningMomentModify.clickSubmitForApproval();
-
-        tester.isGoingTo("check the learning moment requires approval");
-        const moment = activityFeed.locateMomentWithBody(momentBody);
-        await ActivityFeed.verifyMomentHasStatus(moment, EvidenceStatus.SUBMITTED);
-
-        // Switch to a teacher (Jack Coles) who has access to Year 9 English
-        tester.isGoingTo("Impersonate a teacher and navigate to the student's profile page");
         await tester.impersonateTeacher();
-        await profilePage.goto(studentId);
+        await profilePage.goto(STUDENT_ID);
+
+        const moment2 = activityFeed.locateMomentWithBody(moment2Body);
 
         tester.isGoingTo("check the learning moment requires approval");
-        await ActivityFeed.verifyMomentHasStatus(moment, EvidenceStatus.SUBMITTED);
+        await ActivityFeed.verifyMomentHasStatus(moment2, EvidenceStatus.SUBMITTED);
 
         // From the activity feed, you should be able to approve (publish) the learning moment directly
         tester.isGoingTo("reject the learning moment via the activity feed");
-        const requestUpdateReason = "reason for requesting an update";
-        await ActivityFeed.clickMomentModifyAction(moment);
+        await ActivityFeed.clickMomentModifyAction(moment2);
         await learningMomentModify.clickRequestUpdate();
         await learningMomentModify.confirmRequestUpdate(requestUpdateReason);
 
         tester.isGoingTo("check the learning moment is rejected and has the right comment attached");
-        await ActivityFeed.verifyMomentHasStatus(moment, EvidenceStatus.REJECTED);
+        await ActivityFeed.verifyMomentHasStatus(moment2, EvidenceStatus.REJECTED);
         await activityFeed.verifyMomentComment(requestUpdateReason);
+    });
 
-        tester.isGoingTo("approve the rejected learning moment via the activity feed");
-        await ActivityFeed.clickMomentPublishAction(moment);
+    test("As a teacher, approve learning moment that is awaiting approval", async ({ tester, page }) => {
+        const profilePage = new ProfilePage(tester, page);
+        const activityFeed = new ActivityFeed(tester, page);
+
+        await tester.impersonateTeacher();
+        await profilePage.goto(STUDENT_ID);
+
+        const moment3 = activityFeed.locateMomentWithBody(moment3Body);
+
+        tester.isGoingTo("check the learning moment requires approval");
+        await ActivityFeed.verifyMomentHasStatus(moment3, EvidenceStatus.SUBMITTED);
+
+        tester.isGoingTo("approve a learning moment that is awaiting approval from the activity feed");
+        await ActivityFeed.clickMomentPublishAction(moment3);
 
         tester.isGoingTo("check the learning moment is published");
-        const publishedMoment = activityFeed.locateMomentWithBody(momentBody);
+        const publishedMoment = activityFeed.locateMomentWithBody(moment3Body);
         await ActivityFeed.verifyMomentHasStatus(publishedMoment, EvidenceStatus.PUBLISHED);
     });
 
     /**
-     * (per test) soft-delete all learning moments that were created as to not interfere with other tests
+     * Restore original settings/soft-delete new data as to not interfere with other tests
      */
-    test.afterEach(async ({ db, api }) => {
+    test.afterAll(async ({ db, api }) => {
         const momentIds = (await db.grabColumnFromDatabase("moment", "id", {
             "body LIKE": `%${MOMENT_BODY_PREFIX}%`,
             deleted_at: null,
         })) as number[];
         await Promise.all(momentIds.map((momentId) => api.deleteLearningMoment(momentId)));
-    });
 
-    /**
-     * Restore original settings as to not interfere with other tests
-     */
-    test.afterAll(async ({ db }) => {
-        await db.updateInDatabase("config", { value: 0 }, { name: CONFIG_LEARNING_MOMENTS_MODERATION_ENABLED });
-        await db.updateInDatabase("lu_year_level", { learning_moments_moderation: 0 }, { name: YEAR_LEVEL_NAME_ON });
+        // await db.updateInDatabase("config", { value: 0 }, { name: CONFIG_LEARNING_MOMENTS_MODERATION_ENABLED });
+        // await db.updateInDatabase("lu_year_level", { learning_moments_moderation: 0 }, { name: YEAR_LEVEL_NAME_ON });
     });
 });
