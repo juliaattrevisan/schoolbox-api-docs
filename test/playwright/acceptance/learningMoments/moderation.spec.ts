@@ -29,10 +29,10 @@ test.describe("Learning Moment Moderation", () => {
         const activityFeed = new ActivityFeed(tester, page);
         const learningMomentModify = new LearningMomentModify(tester, page);
 
-        const studentId = Common.USER_ID_LOUISASMITH;
-        const studentName = Common.USER_LOUISASMITH;
+        const studentId = Common.USER_ID_JANAREED;
+        const studentName = Common.USER_JANAREED;
 
-        tester.isGoingTo("As Luisa Smith, save a draft learning moment");
+        tester.isGoingTo("As a student, save a draft learning moment");
         await tester.impersonateViaUserProfilePage(studentName);
         await profilePage.goto(studentId);
         await activityFeed.clickShareLearningMoment();
@@ -59,10 +59,10 @@ test.describe("Learning Moment Moderation", () => {
         const activityFeed = new ActivityFeed(tester, page);
         const learningMomentModify = new LearningMomentModify(tester, page);
 
-        const studentId = Common.USER_ID_LOUISASMITH;
-        const studentName = Common.USER_LOUISASMITH;
+        const studentId = Common.USER_ID_JANAREED;
+        const studentName = Common.USER_JANAREED;
 
-        tester.isGoingTo("As Luisa Smith, submit a learning moment for approval");
+        tester.isGoingTo("As a student, submit a learning moment for approval");
         await tester.impersonateViaUserProfilePage(studentName);
         await profilePage.goto(studentId);
         await activityFeed.clickShareLearningMoment();
