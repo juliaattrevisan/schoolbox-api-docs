@@ -106,6 +106,11 @@ async function onSubmit(): Promise<void> {
     assessmentConfig.value._routes.postSandboxMessage = response.data._routes.postSandboxMessage;
     emit("saved", response.data);
 }
+
+window.Vue.onMounted(() => {
+    // As vue loads the template after foundation has been initialised, we need to reinitialise the tooltips
+    window.jQuery(document).foundation("tooltip", "reflow");
+});
 </script>
 
 <template>
