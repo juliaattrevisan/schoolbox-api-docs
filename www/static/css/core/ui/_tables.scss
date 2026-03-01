@@ -553,6 +553,6 @@ td:has(.u-td-button):not(.u-sticky-left) {
     text-align: left;
     width: 100%;
     &:hover {
-        background: var(--sbx-color-active, var(--accent-background));
+        background: var(--sbx-config-color-active, var(--accent-background));
     }
 }

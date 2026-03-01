@@ -137,7 +137,7 @@ $crumb-slash-position: 1px !default;
     }
 }
 
-$breadcrumb-color: var(--sbx-color-accent, $content-ui-foreground);
+$breadcrumb-color: var(--sbx-config-color-accent, $content-ui-foreground);
 $breadcrumb-noclick-color: $oil;
 $breadcrumb-bg-color: $content-ui-background;
 $breadcrumb-hover-bg-color: $content-ui-hover;

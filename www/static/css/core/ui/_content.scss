@@ -207,7 +207,7 @@ $container-bg: white;
             right: 10px;
             top: -2px;
             &:hover {
-                color: var(--sbx-color-accent, $alert-color);
+                color: var(--sbx-config-color-accent, $alert-color);
             }
         }
     }
@@ -307,7 +307,7 @@ $container-bg: white;
 // Tooltips that reveal further information on selection
 // Typically they sit next to a label
 .hint {
-    color: var(--sbx-color-accent-text, $content-ui-foreground);
+    color: var(--sbx-config-color-accent-text, $content-ui-foreground);
     top: -1px;
     margin-left: 4px;
     width: 1rem;
@@ -320,7 +320,7 @@ $container-bg: white;
     position: relative;
     margin-bottom: auto;
     font-size: $small-font-size;
-    background-color: var(--sbx-color-accent, $content-ui-background);
+    background-color: var(--sbx-config-color-accent, $content-ui-background);
     border-radius: 0.5rem;
     &.icon-help:before {
         color: var(--sbx-color-text-primary, $monsoon);
@@ -340,7 +340,7 @@ $container-bg: white;
 
 // reveal more info on selection, see Expandable on: https://vagrant.dev.schoolbox.cloud/pantry
 .expander {
-    color: var(--sbx-color-accent, $content-ui-foreground);
+    color: var(--sbx-config-color-accent, $content-ui-foreground);
     line-height: 1;
     font-size: 1rem;
     text-decoration: none;
@@ -461,7 +461,7 @@ nav {
 
 // Schoolbox Loader: https://vagrant.dev.schoolbox.cloud/pantry
 .loader {
-    background-color: var(--sbx-color-accent, $accent-foreground);
+    background-color: var(--sbx-config-color-accent, $accent-foreground);
     border-radius: 0.5rem;
     margin: 2rem auto;
     width: 3rem;
@@ -678,7 +678,7 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
 $train-line-segment-maxlength: 15rem;
 $train-line-stop-size: 2rem;
 $train-line-segment-width: 0.25rem;
-$train-line-visited-color: var(--sbx-color-accent, $content-ui-foreground);
+$train-line-visited-color: var(--sbx-config-color-accent, $content-ui-foreground);
 $train-line-visited-glow-blur: 0.5rem;
 $train-line-unvisited-color: $content-ui-background;
 .train-line {
@@ -705,7 +705,7 @@ $train-line-unvisited-color: $content-ui-background;
             width: 50%;
             position: absolute;
             top: 0;
-            background: var(--sbx-color-accent, $content-ui-foreground);
+            background: var(--sbx-config-color-accent, $content-ui-foreground);
         }
         &:before {
             left: 0;
@@ -719,20 +719,20 @@ $train-line-unvisited-color: $content-ui-background;
         }
         &.current-stop {
             &:after {
-                background: var(--sbx-color-active, $content-ui-background);
+                background: var(--sbx-config-color-active, $content-ui-background);
             }
             ~ li {
                 &:before,
                 &:after {
-                    background: var(--sbx-color-active, $content-ui-background);
+                    background: var(--sbx-config-color-active, $content-ui-background);
                 }
                 a span {
-                    background: var(--sbx-color-active, $content-ui-background);
+                    background: var(--sbx-config-color-active, $content-ui-background);
                 }
             }
             a span {
-                box-shadow: 0 0 $train-line-visited-glow-blur var(--sbx-color-accent, $content-ui-foreground);
-                color: var(--sbx-color-accent-text, $content-ui-foreground-contrast);
+                box-shadow: 0 0 $train-line-visited-glow-blur var(--sbx-config-color-accent, $content-ui-foreground);
+                color: var(--sbx-config-color-accent-text, $content-ui-foreground-contrast);
             }
         }
         a {
@@ -742,7 +742,7 @@ $train-line-unvisited-color: $content-ui-background;
             // The 0.4 multiplier and offset is empirical - I don't know what the math is
             // to derive it from the stop size or segment width
             span {
-                background: var(--sbx-color-accent, $content-ui-foreground);
+                background: var(--sbx-config-color-accent, $content-ui-foreground);
                 border-radius: calc($train-line-stop-size / 2);
                 // DONE use contrasting color
                 color: var(--sbx-color-text-primary, $content-ui-foreground-contrast);

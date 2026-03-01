@@ -104,14 +104,14 @@ table.dataTable thead {
         content: "\25b2";
         position: absolute;
         right: 0.2rem;
-        color: var(--sbx-color-accent, $content-ui-foreground);
+        color: var(--sbx-config-color-accent, $content-ui-foreground);
     }
 
     .sorting_desc:after {
         content: "\25bc";
         position: absolute;
         right: 0.2rem;
-        color: var(--sbx-color-accent, $content-ui-foreground);
+        color: var(--sbx-config-color-accent, $content-ui-foreground);
     }
 
     .sorting_asc_disabled:after {
@@ -119,7 +119,7 @@ table.dataTable thead {
         opacity: 0.25;
         position: absolute;
         right: 0.2rem;
-        color: var(--sbx-color-accent, $content-ui-foreground);
+        color: var(--sbx-config-color-accent, $content-ui-foreground);
     }
 
     .sorting_desc_disabled:after {
@@ -127,6 +127,6 @@ table.dataTable thead {
         opacity: 0.25;
         position: absolute;
         right: 0.2rem;
-        color: var(--sbx-color-accent, $content-ui-foreground);
+        color: var(--sbx-config-color-accent, $content-ui-foreground);
     }
 }

@@ -4,7 +4,7 @@ $selectize-font-size: rem-calc(($base-font-size - 3));
 $selectize-line-height: 18px !default;
 
 $selectize-color-text: $body-font-color;
-$selectize-color-border: var(--sbx-color-accent, $input-border-color);
+$selectize-color-border: var(--sbx-config-color-accent, $input-border-color);
 $selectize-color-highlight: $highlight-color;
 $selectize-color-input: $white !default;
 $selectize-color-input-full: $selectize-color-input !default;
@@ -80,7 +80,7 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
             a {
                 padding: 0.5rem !important;
                 width: 1.5rem !important;
-                color: var(--sbx-color-accent, $content-ui-foreground);
+                color: var(--sbx-config-color-accent, $content-ui-foreground);
             }
         }
         .selectize-input.input-active {
@@ -165,7 +165,7 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
         font-size: $selectize-font-size;
 
         .remove {
-            color: var(--sbx-color-accent, $content-ui-foreground);
+            color: var(--sbx-config-color-accent, $content-ui-foreground);
         }
 
         /* !important because of chrome.css

@@ -225,7 +225,7 @@ acPromptEventBus.on(({ retryRequest }) => {
     /* mimic the style if this were an input */
     border-style: solid;
     border-width: 0.0625rem;
-    border-color: var(--sbx-color-accent, var(--form-border-color));
+    border-color: var(--sbx-config-color-accent, var(--form-border-color));
     border-top: 0;
 
     .list-item {

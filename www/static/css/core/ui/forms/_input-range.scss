@@ -36,14 +36,14 @@
         -webkit-appearance: none; /* Override default look */
         appearance: none;
         margin-top: -0.5rem; /* Centers thumb on the track */
-        background-color: var(--sbx-color-accent, var(--content-ui-foreground));
+        background-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
         border-radius: 1rem;
         height: 2rem;
         width: 2rem;
     }
 
     &__input:focus-visible::-webkit-slider-thumb {
-        outline: 3px solid var(--sbx-color-accent, var(--content-ui-foreground));
+        outline: 3px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
         outline-offset: 0.125rem;
     }
 
@@ -57,7 +57,7 @@
 
     /* slider thumb */
     &__input::-moz-range-thumb {
-        background-color: var(--sbx-color-accent, var(--content-ui-foreground));
+        background-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
         border: none; /*Removes extra border that FF applies*/
         border-radius: 1rem;
         height: 2rem;
@@ -65,7 +65,7 @@
     }
 
     &__input:focus-visible::-moz-range-thumb {
-        outline: 3px solid var(--sbx-color-accent, var(--content-ui-foreground));
+        outline: 3px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
         outline-offset: 0.125rem;
     }
 }

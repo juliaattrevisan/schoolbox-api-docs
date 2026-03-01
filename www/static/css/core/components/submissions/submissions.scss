@@ -72,7 +72,7 @@ table.rubric {
         }
 
         input:checked + label {
-            background-color: var(--sbx-color-active, $table-cell-highlight-background);
+            background-color: var(--sbx-config-color-active, $table-cell-highlight-background);
             color-adjust: exact;
             -webkit-print-color-adjust: exact;
         }
@@ -114,7 +114,8 @@ table.rubric {
                 width: 1.5rem;
                 > textarea {
                     height: 10rem;
-                    border-bottom: $input-border-style $input-border-width var(--sbx-color-accent, $input-border-color);
+                    border-bottom: $input-border-style $input-border-width
+                        var(--sbx-config-color-accent, $input-border-color);
                 }
             }
         }
@@ -170,7 +171,8 @@ table.rubric {
                 }
             }
             &:not(:last-child) {
-                border-right: $input-border-style $input-border-width var(--sbx-color-accent, $input-border-color);
+                border-right: $input-border-style $input-border-width
+                    var(--sbx-config-color-accent, $input-border-color);
             }
             > textarea {
                 width: 100%;

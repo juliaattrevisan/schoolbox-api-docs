@@ -43,7 +43,7 @@
             }
 
             &.info:before {
-                background-color: var(--sbx-color-active, var(--accent-background));
+                background-color: var(--sbx-config-color-active, var(--accent-background));
             }
 
             &.neutral:before {
@@ -103,7 +103,7 @@
         }
 
         &.info {
-            background-color: var(--sbx-color-active, var(--accent-background));
+            background-color: var(--sbx-config-color-active, var(--accent-background));
             color: var(--sbx-color-text-primary, var(--accent-foreground));
         }
 

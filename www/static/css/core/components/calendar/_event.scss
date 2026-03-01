@@ -27,7 +27,7 @@
     }
 
     time.icon strong {
-        background-color: var(--sbx-color-accent, $content-ui-foreground);
+        background-color: var(--sbx-config-color-accent, $content-ui-foreground);
         position: absolute;
         top: 0;
         color: $white;
@@ -35,8 +35,8 @@
     }
 
     time.icon span {
-        border: 1px solid var(--sbx-color-accent, $content-ui-foreground);
-        color: var(--sbx-color-accent, $content-ui-foreground);
+        border: 1px solid var(--sbx-config-color-accent, $content-ui-foreground);
+        color: var(--sbx-config-color-accent, $content-ui-foreground);
         font-size: 1.5rem;
         padding-top: 1rem;
     }

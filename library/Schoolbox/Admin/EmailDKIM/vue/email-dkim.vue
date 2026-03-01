@@ -430,7 +430,7 @@ export default {
 }
 
 .edit a {
-    color: var(--sbx-color-accent, var(--content-ui-foreground));
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     line-height: 2.5;
     opacity: 0.7;
     padding-left: 8px; //move the pencil into the centre

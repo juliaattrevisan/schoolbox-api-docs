@@ -12,9 +12,9 @@ body.sbx-body {
         -webkit-appearance: none;
         appearance: none; // remove native styles
         background-color: var(--sbx-color-foreground-primary);
-        border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+        border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
         border-radius: var(--sbx-config-field-roundness);
-        color: var(--sbx-color-accent);
+        color: var(--sbx-config-color-accent);
         cursor: pointer;
         display: inline-grid;
         height: 1.5rem;
@@ -30,14 +30,14 @@ body.sbx-body {
         &:hover:not(:disabled):not(:read-only) {
             // no reduced contrast on hover
             background-color: var(--sbx-color-foreground-primary);
-            border-color: var(--sbx-color-accent);
+            border-color: var(--sbx-config-color-accent);
             color: var(--sbx-color-text-primary);
         }
 
         /* tick mark */
         &::before {
             background-color: CanvasText; // high contrast mode
-            box-shadow: inset 1rem 1rem var(--sbx-color-accent); // visible when printed
+            box-shadow: inset 1rem 1rem var(--sbx-config-color-accent); // visible when printed
             content: "";
             clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
             height: 1rem;
@@ -163,8 +163,8 @@ body.sbx-body {
 
     // the icon only checkbox - used in notification settings
     input[type="checkbox"]:not(.plain):checked + label.input-toggle {
-        background-color: var(--sbx-color-accent);
-        color: var(--sbx-color-accent-text);
+        background-color: var(--sbx-config-color-accent);
+        color: var(--sbx-config-color-accent-text);
     }
 
     // make the switches more in line with the new styling
@@ -172,18 +172,18 @@ body.sbx-body {
         label {
             // the whole switch
             background: var(--sbx-color-foreground-primary);
-            border: 1px solid var(--sbx-color-accent);
+            border: 1px solid var(--sbx-config-color-accent);
         }
         label:after {
             // the switch toggle
             border-radius: 50%;
             width: 20px;
             height: 20px;
-            background: var(--sbx-color-accent);
+            background: var(--sbx-config-color-accent);
         }
         input:checked + label {
             // the whole switch when active
-            background: var(--sbx-color-accent);
+            background: var(--sbx-config-color-accent);
         }
         input:checked + label:after {
             // the switch toggle when active

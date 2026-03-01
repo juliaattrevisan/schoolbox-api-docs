@@ -548,7 +548,7 @@ function onClearAllSelected() {
 }
 
 .selected-classes-container {
-    border: 1px solid var(--sbx-color-accent, var(--form-border-color));
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
     display: flex;
     flex-wrap: wrap;
     margin-top: -1px; //to sit against .search-input

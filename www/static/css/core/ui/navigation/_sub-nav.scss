@@ -134,22 +134,22 @@ $sub-nav-item-divider-margin: rem-calc(12) !default;
         margin: 0 1px 1px 0;
         a {
             @include button-dimensions();
-            color: var(--sbx-color-accent, $content-ui-foreground);
+            color: var(--sbx-config-color-accent, $content-ui-foreground);
             background-color: $content-ui-background;
             display: inline-block;
 
             &:hover {
-                color: var(--sbx-color-accent, $content-ui-foreground);
+                color: var(--sbx-config-color-accent, $content-ui-foreground);
                 background-color: $content-ui-hover;
                 text-decoration: none;
             }
         }
         &.active a {
-            color: var(--sbx-color-accent, $content-ui-foreground);
+            color: var(--sbx-config-color-accent, $content-ui-foreground);
             background-color: $content-ui-selected;
 
             &:hover {
-                color: var(--sbx-color-accent, $content-ui-foreground);
+                color: var(--sbx-config-color-accent, $content-ui-foreground);
                 background-color: $content-ui-selected;
             }
         }

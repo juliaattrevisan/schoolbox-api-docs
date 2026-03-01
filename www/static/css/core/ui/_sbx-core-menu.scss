@@ -27,7 +27,7 @@ body.sbx-body {
             width: 2rem;
 
             &::before {
-                color: var(--sbx-color-accent-text);
+                color: var(--sbx-config-color-accent-text);
                 height: 100%;
                 line-height: 1.9;
                 width: 100%;
@@ -61,11 +61,11 @@ body.sbx-body {
     #side-menu-mylinks {
         & h3 {
             border-bottom: 1px solid var(--sbx-color-foreground-secondary);
-            color: var(--sbx-color-accent) !important;
+            color: var(--sbx-config-color-accent) !important;
             padding-inline: 0.5rem;
 
             & a {
-                color: var(--sbx-color-accent) !important;
+                color: var(--sbx-config-color-accent) !important;
                 border-radius: 0px !important;
                 background-color: transparent !important;
                 padding-inline: 0.5rem;
@@ -108,12 +108,12 @@ body.sbx-body {
 
             #right-menu-dock,
             .settings-button {
-                color: var(--sbx-color-accent);
+                color: var(--sbx-config-color-accent);
             }
 
             & #notification-toggle-full {
                 background-color: var(--bg-primary) !important;
-                color: var(--sbx-color-accent);
+                color: var(--sbx-config-color-accent);
             }
         }
     }
@@ -122,7 +122,7 @@ body.sbx-body {
     #message-list {
         & #notification-toggle-full {
             background-color: transparent;
-            color: var(--sbx-color-accent);
+            color: var(--sbx-config-color-accent);
         }
 
         & li:has(:is(#msg-bar, section, .button)) {
@@ -134,7 +134,7 @@ body.sbx-body {
         }
 
         & :where(#right-menu-dock, #notification-toggle-full, .icon-settings) {
-            color: var(--sbx-color-accent);
+            color: var(--sbx-config-color-accent);
         }
     }
 
@@ -151,7 +151,7 @@ body.sbx-body {
                 > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
                     button.submit
                 ):not(.show-ckeditor-button) {
-                color: var(--sbx-color-accent);
+                color: var(--sbx-config-color-accent);
                 font-weight: 600;
             }
 
@@ -159,7 +159,7 @@ body.sbx-body {
                 > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
                     button.submit
                 ):not(.show-ckeditor-button) {
-                color: var(--sbx-color-accent);
+                color: var(--sbx-config-color-accent);
                 font-family: var(--ff-primary);
                 padding-block: 1rem;
             }
@@ -172,7 +172,7 @@ body.sbx-body {
 
         & .separator {
             background-color: #eee !important;
-            color: var(--sbx-color-accent);
+            color: var(--sbx-config-color-accent);
             font-weight: 600;
         }
 

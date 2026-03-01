@@ -2,15 +2,15 @@ $tree-node-height: 3rem;
 
 /* Default idle state of a node anchor
  */
-$tree-node-color: var(--sbx-color-accent, $content-ui-foreground);
+$tree-node-color: var(--sbx-config-color-accent, $content-ui-foreground);
 
 $tree-node-hover-background: $content-ui-hover;
-$tree-node-hover-color: var(--sbx-color-accent, $content-ui-foreground);
+$tree-node-hover-color: var(--sbx-config-color-accent, $content-ui-foreground);
 
 $tree-node-selected-background: $content-ui-background;
-$tree-node-selected-color: var(--sbx-color-accent, $content-ui-foreground);
+$tree-node-selected-color: var(--sbx-config-color-accent, $content-ui-foreground);
 
-$tree-folder-icon-color: var(--sbx-color-accent, $content-ui-foreground);
+$tree-folder-icon-color: var(--sbx-config-color-accent, $content-ui-foreground);
 $tree-homepage-icon-color: darkorange;
 $tree-course-icon-color: #008600;
 $tree-favorite-icon-color: darkorange;

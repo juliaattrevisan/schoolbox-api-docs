@@ -80,7 +80,7 @@ function onSelected(e: Event): void {
         }
 
         &--marker {
-            background-color: var(--sbx-color-accent, var(--content-ui-foreground));
+            background-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
             border-radius: 50%;
             height: 0.25rem;
             width: 0.25rem;
@@ -91,7 +91,7 @@ function onSelected(e: Event): void {
 /* We don't want these styles applying to the div v-if="props.justText", just the <a> and <button> elements */
 a.c-menu-item,
 button.c-menu-item {
-    color: var(--sbx-color-accent, var(--content-ui-foreground));
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     &:hover:not(.is-disabled) {
         background-color: var(--content-ui-background);
     }

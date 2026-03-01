@@ -353,7 +353,7 @@ function updateSelectedMembers() {
 
 @keyframes justUpdatedAnimation {
     0% {
-        background-color: var(--sbx-color-active, var(--accent-background));
+        background-color: var(--sbx-config-color-active, var(--accent-background));
     }
     100% {
         background-color: var(--sbx-color-foreground-primary, #fff);

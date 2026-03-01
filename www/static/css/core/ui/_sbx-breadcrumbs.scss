@@ -9,7 +9,7 @@ body.sbx-body {
 
         & li {
             &:not(.active) a::after {
-                background-color: var(--sbx-color-accent);
+                background-color: var(--sbx-config-color-accent);
                 border: 0;
                 clip-path: polygon(40% 0, 60% 50%, 40% 100%, 0% 100%, 25% 50%, 0% 0%);
                 content: "";
@@ -42,7 +42,7 @@ body.sbx-body {
         }
 
         & li a:focus-visible {
-            outline: 1px solid var(--sbx-color-accent);
+            outline: 1px solid var(--sbx-config-color-accent);
             outline-offset: 1px;
             border-radius: var(--sbx-config-field-roundness);
         }

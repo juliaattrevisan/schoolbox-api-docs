@@ -12,10 +12,10 @@
 
 $anchor-text-decoration: none;
 $anchor-text-decoration-hover: none;
-$anchor-font-color: var(--sbx-color-accent, $content-ui-foreground);
-$anchor-font-color-hover: var(--sbx-color-accent, $content-ui-foreground);
+$anchor-font-color: var(--sbx-config-color-accent, $content-ui-foreground);
+$anchor-font-color-hover: var(--sbx-config-color-accent, $content-ui-foreground);
 a {
-    color: var(--sbx-color-accent, $anchor-font-color);
+    color: var(--sbx-config-color-accent, $anchor-font-color);
     line-height: inherit;
     text-decoration: $anchor-text-decoration;
     transition: all 0.15s linear;
@@ -24,7 +24,7 @@ a {
     }
     &:hover,
     &:focus {
-        color: var(--sbx-color-accent, $anchor-font-color-hover);
+        color: var(--sbx-config-color-accent, $anchor-font-color-hover);
         @if $anchor-text-decoration-hover != $anchor-text-decoration {
             text-decoration: $anchor-text-decoration-hover;
         }

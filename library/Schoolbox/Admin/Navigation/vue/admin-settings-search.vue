@@ -394,14 +394,14 @@ ul {
 
     li {
         border-bottom: 1px solid var(--sbx-color-foreground-secondary, $body-bg);
-        border-left: 1px solid var(--sbx-color-accent, $navigation-hover);
-        border-right: 1px solid var(--sbx-color-accent, $navigation-hover);
+        border-left: 1px solid var(--sbx-config-color-accent, $navigation-hover);
+        border-right: 1px solid var(--sbx-config-color-accent, $navigation-hover);
         transform: none !important;
         &:first-child {
-            border-top: 1px solid var(--sbx-color-accent, $navigation-hover);
+            border-top: 1px solid var(--sbx-config-color-accent, $navigation-hover);
         }
         &:last-child {
-            border-bottom: 1px solid var(--sbx-color-accent, $navigation-hover);
+            border-bottom: 1px solid var(--sbx-config-color-accent, $navigation-hover);
         }
     }
 }

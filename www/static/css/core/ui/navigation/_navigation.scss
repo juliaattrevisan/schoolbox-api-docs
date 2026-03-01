@@ -35,7 +35,7 @@ $tabbar-header-weight: $header-font-weight;
 $tabbar-header-line-height: $header-line-height;
 $tabbar-header-margin: $header-bottom-margin;
 
-$tabbar-menu-icon-color: var(--sbx-color-menu-foreground, $navigation-foreground);
+$tabbar-menu-icon-color: var(--sbx-config-color-menu-foreground, $navigation-foreground);
 $tabbar-menu-icon-hover: $navigation-hover;
 $tabbar-menu-icon-text-indent: rem-calc(35);
 $tabbar-menu-icon-width: rem-calc(80);
@@ -168,7 +168,7 @@ $allow-sidebar-stash: $large-up;
         z-index: calc(var(--sbx-depth-menu) - 2);
 
         svg {
-            fill: var(--sbx-color-menu-foreground, $navigation-foreground);
+            fill: var(--sbx-config-color-menu-foreground, $navigation-foreground);
         }
     }
 
@@ -220,13 +220,13 @@ $allow-sidebar-stash: $large-up;
                     transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
                     text-align: center;
                     float: none;
-                    color: var(--sbx-color-menu-foreground, $navigation-foreground);
+                    color: var(--sbx-config-color-menu-foreground, $navigation-foreground);
                 }
             }
 
             span {
                 transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
-                color: var(--sbx-color-menu-foreground, $navigation-foreground);
+                color: var(--sbx-config-color-menu-foreground, $navigation-foreground);
                 font-weight: $font-weight-normal;
                 line-height: rem-calc($base-font-size * 1.5);
                 display: block;
@@ -308,9 +308,9 @@ $allow-sidebar-stash: $large-up;
 
 .left-off-canvas-toggle,
 .right-off-canvas-toggle {
-    color: var(--sbx-color-menu-foreground, $navigation-foreground);
+    color: var(--sbx-config-color-menu-foreground, $navigation-foreground);
     &:hover {
-        color: var(--sbx-color-menu-foreground, $navigation-foreground);
+        color: var(--sbx-config-color-menu-foreground, $navigation-foreground);
     }
 }
 

@@ -205,7 +205,7 @@ async function onSave(): Promise<void> {
     transition: height v-bind(animationDuration) ease;
     &--content-focused {
         .content-container-fixed .content-overlay {
-            border: 1px solid var(--sbx-color-accent, var(--form-border-color)) !important;
+            border: 1px solid var(--sbx-config-color-accent, var(--form-border-color)) !important;
         }
     }
 }

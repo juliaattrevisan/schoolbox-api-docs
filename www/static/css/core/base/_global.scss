@@ -40,7 +40,7 @@ body {
 
 // Default body styles
 body {
-    background: var(--sbx-color-body-background, $body-bg);
+    background: var(--sbx-config-color-body-background, $body-bg);
     color: var(--sbx-color-text-primary, $body-font-color);
     cursor: $cursor-auto-value;
     font-family: $body-font-family;
@@ -55,8 +55,8 @@ body {
 
 ::selection {
     //to customise the portion of a document that has been highlighted
-    background-color: var(--sbx-color-accent, $accent-foreground);
-    color: var(--sbx-color-accent-text, $accent-background);
+    background-color: var(--sbx-config-color-accent, $accent-foreground);
+    color: var(--sbx-config-color-accent-text, $accent-background);
 }
 
 // Disabled elements

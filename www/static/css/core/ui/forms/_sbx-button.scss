@@ -25,25 +25,27 @@ body.sbx-body {
     .introjs-prevbutton,
     .introjs-button,
     .fc .fc-button {
-        background: var(--sbx-color-accent);
-        border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+        background: var(--sbx-config-color-accent);
+        border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
         border-radius: var(--sbx-config-field-roundness);
-        color: var(--sbx-color-accent-text);
+        color: var(--sbx-config-color-accent-text);
         &:hover,
         &:active {
-            background: var(--sbx-color-accent); // ^foundation-fixes^ - remove the use of --content-ui-hover
-            color: var(--sbx-color-accent-text); // ^foundation-fixes^ - remove the change of text colour on hover
+            background: var(--sbx-config-color-accent); // ^foundation-fixes^ - remove the use of --content-ui-hover
+            color: var(
+                --sbx-config-color-accent-text
+            ); // ^foundation-fixes^ - remove the change of text colour on hover
             filter: brightness(1.1);
         }
         &:focus {
             @include sbx-form.form-input-focus;
-            background: var(--sbx-color-accent);
-            color: var(--sbx-color-accent-text);
+            background: var(--sbx-config-color-accent);
+            color: var(--sbx-config-color-accent-text);
         }
         &:disabled,
         &.disabled {
             @include sbx-form.form-input-disabled;
-            border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+            border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
             &:hover,
             &:active {
                 filter: none !important;
@@ -68,9 +70,9 @@ body.sbx-body {
     .sub-nav dd.active a,
     button.load-more {
         background: var(--sbx-color-foreground-primary);
-        border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+        border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
         border-radius: var(--sbx-config-field-roundness);
-        color: var(--sbx-color-accent);
+        color: var(--sbx-config-color-accent);
         font-size: var(--sbx-font-size-s);
         text-transform: none;
         &:hover,
@@ -78,7 +80,7 @@ body.sbx-body {
             background-color: var(
                 --sbx-color-foreground-primary
             ); // ^foundation-fixes^ - remove the use of --content-ui-hover
-            color: var(--sbx-color-accent); // ^foundation-fixes^ - remove the change of text colour on hover
+            color: var(--sbx-config-color-accent); // ^foundation-fixes^ - remove the change of text colour on hover
             filter: brightness(1.1);
         }
         &:focus {
@@ -87,7 +89,7 @@ body.sbx-body {
         &:disabled,
         &.disabled {
             @include sbx-form.form-input-disabled;
-            border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+            border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
             pointer-events: none;
             &:hover,
             &:active {
@@ -163,14 +165,14 @@ body.sbx-body {
     }
 
     button.button[class*="icon-"]:not(:empty) {
-        border: var(--sbx-border-width-normal) solid var(--sbx-color-accent); // add border back in for icon and text buttons
+        border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent); // add border back in for icon and text buttons
     }
 
     /**
      * Specific style for the search button to match design
      */
     .c-filter-search-term__button {
-        background-color: var(--sbx-color-accent);
+        background-color: var(--sbx-config-color-accent);
         border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
         height: auto;
     }
@@ -215,7 +217,7 @@ body.sbx-body {
     // Ensure the colour is the accent colour
     &.f-dropdown li :is(a, button),
     .f-dropdown li :is(a, button)::before {
-        color: var(--sbx-color-accent);
+        color: var(--sbx-config-color-accent);
     }
 
     /**

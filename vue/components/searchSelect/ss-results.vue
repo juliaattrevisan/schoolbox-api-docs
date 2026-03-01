@@ -192,7 +192,7 @@ window.Vue.watch(
 
 <style lang="scss" scoped>
 .results {
-    border: 1px solid var(--sbx-color-accent, var(--form-border-color));
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
     max-height: 400px;
     overflow: auto;
     width: 100%;

@@ -253,7 +253,7 @@ $font-family-icon: "schoolbox";
 .icon {
     font-family: $font-family-icon;
     &:before {
-        color: var(--sbx-color-accent, $content-ui-foreground);
+        color: var(--sbx-config-color-accent, $content-ui-foreground);
         font-size: 3rem;
         padding: 0;
     }

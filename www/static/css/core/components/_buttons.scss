@@ -30,8 +30,8 @@ $button-med: $global-button-padding;
 $button-margin-bottom: rem-calc(($base-font-size - 12));
 
 // We use these to control button text styles.
-$button-font-color: var(--sbx-color-accent, $content-ui-foreground);
-$button-font-color-alt: var(--sbx-color-accent, $content-ui-foreground);
+$button-font-color: var(--sbx-config-color-accent, $content-ui-foreground);
+$button-font-color-alt: var(--sbx-config-color-accent, $content-ui-foreground);
 $button-font-med: $base-font-size;
 
 $button-font-weight: $font-weight-normal;

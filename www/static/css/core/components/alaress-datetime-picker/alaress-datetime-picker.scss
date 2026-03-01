@@ -200,7 +200,7 @@ input.datepicker-input {
             left: rem-calc(-4);
             width: rem-calc(45);
             border-top: solid 1px css-change-color($accent-foreground, $alpha: 0.5);
-            background: css-change-color(var(--sbx-color-accent, $input-border-color), $alpha: 0.3);
+            background: css-change-color(var(--sbx-config-color-accent, $input-border-color), $alpha: 0.3);
         }
 
         &[data-heat="5"]:before {

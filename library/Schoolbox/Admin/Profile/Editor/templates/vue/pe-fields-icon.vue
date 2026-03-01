@@ -70,6 +70,6 @@ const isClickToReveal = window.Vue.computed(() => {
 }
 
 .pe-fields-icon-primary {
-    color: var(--sbx-color-accent, var(--content-ui-foreground));
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 </style>

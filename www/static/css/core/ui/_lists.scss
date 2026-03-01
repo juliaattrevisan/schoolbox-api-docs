@@ -49,7 +49,7 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
         padding: 0;
     }
 }
-@mixin list-interaction($selector, $cursor, $icon: "", $color: var(--sbx-color-accent, $content-ui-foreground)) {
+@mixin list-interaction($selector, $cursor, $icon: "", $color: var(--sbx-config-color-accent, $content-ui-foreground)) {
     > li {
         > div:first-of-type {
             @extend %interaction-li;
@@ -97,7 +97,7 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
 
 %ui-sortable-helper {
     border-bottom: none;
-    background-color: var(--sbx-color-active, $row-action-hover-background);
+    background-color: var(--sbx-config-color-active, $row-action-hover-background);
 }
 
 @mixin information-list() {
@@ -374,10 +374,10 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
     @extend .action-list;
     .card {
         a {
-            color: var(--sbx-color-accent, $content-ui-foreground);
+            color: var(--sbx-config-color-accent, $content-ui-foreground);
         }
         .size-32 {
-            color: var(--sbx-color-accent, $content-ui-foreground);
+            color: var(--sbx-config-color-accent, $content-ui-foreground);
             padding-top: 1rem;
         }
     }
@@ -442,7 +442,7 @@ ul.meta {
 .pastoral-actions-list {
     margin: 0;
     &__item {
-        border-bottom: 1px solid var(--sbx-color-border, var(--sbx-color-body-background));
+        border-bottom: 1px solid var(--sbx-color-border, var(--sbx-config-color-body-background));
         display: flex;
         gap: 0.5rem;
         justify-content: space-between; // checkbox/label on the left, date and user on the far right

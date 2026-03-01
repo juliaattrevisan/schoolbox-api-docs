@@ -56,7 +56,7 @@ $f-dropdown-line-height: rem-calc(18) !default;
         }
         a,
         button {
-            color: var(--sbx-color-accent, var(--content-ui-foreground));
+            color: var(--sbx-config-color-accent, var(--content-ui-foreground));
             display: block;
             margin: 0;
             padding: $f-dropdown-list-padding;
@@ -67,7 +67,7 @@ $f-dropdown-line-height: rem-calc(18) !default;
                 text-decoration: none;
             }
             &::before {
-                color: var(--sbx-color-accent, var(--content-ui-foreground));
+                color: var(--sbx-config-color-accent, var(--content-ui-foreground));
             }
         }
     }
@@ -80,7 +80,7 @@ $f-dropdown-line-height: rem-calc(18) !default;
     .separator,
     .meta {
         // DONE making this color transparent works okay
-        color: css-scale-color(var(--sbx-color-accent, $content-ui-foreground), $alpha: -65%);
+        color: css-scale-color(var(--sbx-config-color-accent, $content-ui-foreground), $alpha: -65%);
     }
 
     .separator {

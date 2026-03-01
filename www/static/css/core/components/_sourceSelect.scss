@@ -2,7 +2,7 @@
  */
 .source-select {
     @include form-element;
-    color: var(--sbx-color-accent, $content-ui-foreground);
+    color: var(--sbx-config-color-accent, $content-ui-foreground);
     font-weight: normal;
     min-height: $global-button-input-height;
     overflow: hidden;

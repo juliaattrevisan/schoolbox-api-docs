@@ -15,28 +15,28 @@ body.sbx-body {
         }
 
         & .active a {
-            border-color: var(--sbx-color-accent);
+            border-color: var(--sbx-config-color-accent);
             font-weight: 600;
         }
 
         dd.active > a {
-            color: var(--sbx-color-accent);
+            color: var(--sbx-config-color-accent);
         }
 
         .tab-title.active > a {
-            color: var(--sbx-color-accent);
+            color: var(--sbx-config-color-accent);
         }
 
         & a {
             white-space: nowrap;
 
             &:focus-visible {
-                outline: 1px solid var(--sbx-color-accent);
+                outline: 1px solid var(--sbx-config-color-accent);
                 outline-offset: -1px;
             }
             &:hover {
-                color: var(--sbx-color-accent);
-                border-bottom: 2px solid var(--sbx-color-accent);
+                color: var(--sbx-config-color-accent);
+                border-bottom: 2px solid var(--sbx-config-color-accent);
             }
         }
     }

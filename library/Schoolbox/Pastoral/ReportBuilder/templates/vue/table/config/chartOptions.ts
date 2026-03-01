@@ -88,13 +88,13 @@ export function getChartOptions(rowData: Record<string, RowOptions>, recordsOrPo
                 color:
                     recordsOrPoints === "points"
                         ? "var(--sbx-color-success, #4fa74f)"
-                        : "var(--sbx-color-accent, var(--accent-foreground))",
+                        : "var(--sbx-config-color-accent, var(--accent-foreground))",
                 data: trend.line,
                 name: recordsOrPoints,
                 negativeColor:
                     recordsOrPoints === "points"
                         ? "var(--sbx-color-alert, #fa4a47)"
-                        : "var(--sbx-color-accent, var(--accent-foreground))",
+                        : "var(--sbx-config-color-accent, var(--accent-foreground))",
                 point: {
                     events: {
                         click(this: Point): void {

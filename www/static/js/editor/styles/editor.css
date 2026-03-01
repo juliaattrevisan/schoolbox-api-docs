@@ -10,8 +10,8 @@
     --ck-border-radius: 0px;
 
     /* -- Border colours */
-    --ck-color-toolbar-border: var(--sbx-color-accent, var(--form-border-color));
-    --ck-color-base-border: var(--sbx-color-accent, var(--form-border-color));
+    --ck-color-toolbar-border: var(--sbx-config-color-accent, var(--form-border-color));
+    --ck-color-base-border: var(--sbx-config-color-accent, var(--form-border-color));
 
     /* Button hover colour */
     --ck-color-button-default-hover-background: var(--form-bg-hover-color);

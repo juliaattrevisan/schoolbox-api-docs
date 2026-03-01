@@ -126,7 +126,7 @@
 
         td.gradient-none-bg a,
         td.gradient-off-bg a {
-            color: var(--sbx-color-accent, $content-ui-foreground);
+            color: var(--sbx-config-color-accent, $content-ui-foreground);
         }
 
         th.gradient-none-bg,

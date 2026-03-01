@@ -82,7 +82,7 @@ table.rb {
         }
 
         input[type="tel"] {
-            border-color: var(--sbx-color-accent, $input-border-color);
+            border-color: var(--sbx-config-color-accent, $input-border-color);
             background-color: var(--sbx-color-foreground-primary, $container-bg);
         }
     }
@@ -192,7 +192,7 @@ table.rb {
         }
 
         input[type="tel"] {
-            border-color: var(--sbx-color-accent, $input-border-color);
+            border-color: var(--sbx-config-color-accent, $input-border-color);
             background-color: var(--sbx-color-foreground-primary, $container-bg);
             width: 5rem;
             display: inline-block;
@@ -324,8 +324,8 @@ table.rb {
     //Background stripes for blank rubric
     background-image: repeating-linear-gradient(
         135deg,
-        var(--sbx-color-accent, var(--content-ui-foreground)) 0px,
-        var(--sbx-color-accent, var(--content-ui-foreground)) 5px,
+        var(--sbx-config-color-accent, var(--content-ui-foreground)) 0px,
+        var(--sbx-config-color-accent, var(--content-ui-foreground)) 5px,
         #fff 5px,
         #fff 20px
     );

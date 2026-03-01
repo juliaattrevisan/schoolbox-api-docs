@@ -44,7 +44,7 @@ const disabled = window.Vue.computed(() => peFieldsStore.getActiveFieldType(prop
 
     &:not(.disabled) {
         cursor: grab;
-        color: var(--sbx-color-accent, var(--content-ui-foreground));
+        color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 
         /* Hover effect on the items in the palette */
         &:hover {

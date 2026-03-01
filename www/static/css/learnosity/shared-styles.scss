@@ -20,7 +20,7 @@ h3.lrn-report-item-title {
 .lrn .lrn_btn:focus {
     background-color: var(--content-ui-selected);
     box-shadow: unset;
-    color: var(--sbx-color-accent, var(--content-ui-foreground));
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 
 /* update the botton hover and focus styles */
@@ -31,7 +31,7 @@ h3.lrn-report-item-title {
 .lrn .lrn_btn:focus {
     background-color: var(--content-ui-selected);
     box-shadow: unset;
-    color: var(--sbx-color-accent, var(--content-ui-foreground));
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 
 /* bring it back as we negative margin our own */
@@ -46,7 +46,7 @@ h3.lrn-report-item-title {
 .lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_widget.lrn_feature > button .btn-label,
 .lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn.lrn_btn_blue:before,
 .lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn.lrn_btn_blue .btn-label {
-    color: var(--sbx-color-accent, var(--content-ui-foreground));
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 
 /* button with icon only on hover */
@@ -56,7 +56,7 @@ h3.lrn-report-item-title {
 .lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_widget.lrn_feature > button:hover .btn-label,
 .lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn.lrn_btn_blue:hover:before,
 .lrn.lrn-assess .lrn-right-region .right-wrapper .lrn_btn.lrn_btn_blue:hover .btn-label {
-    color: var(--sbx-color-accent, var(--content-ui-foreground));
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 
 /* Set z-index to fix dropdown and side panels open behind the quiz modal */
@@ -67,17 +67,17 @@ h3.lrn-report-item-title {
 
 /* add new question button styles */
 .lrn .lrn-author-ui .lrn-author-widget-button-more .lrn-author-widget-icon:before {
-    color: var(--sbx-color-accent, var(--content-ui-foreground));
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: initial;
 }
 .lrn .lrn-author-ui .lrn-author-widget-icon:before {
-    color: var(--sbx-color-accent, var(--content-ui-foreground));
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: initial;
 }
 [data-authorapi-selector="add-button"] {
     background-color: var(--content-ui-background) !important;
     border: 0 !important;
-    color: var(--sbx-color-accent, var(--content-ui-foreground)) !important;
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
     line-height: inherit !important;
     min-height: 2.5rem !important;
     overflow: hidden !important;
@@ -88,7 +88,7 @@ h3.lrn-report-item-title {
 }
 .lrn .lrn-author-ui .lrn-author-widget-text {
     bottom: 0px;
-    color: var(--sbx-color-accent, var(--content-ui-foreground));
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: initial;
     top: 0px;
 }
@@ -100,7 +100,7 @@ h3.lrn-report-item-title {
 }
 .lrn-btn.lrn-author-btn-default.lrn-author-btn-icon-left {
     background-color: var(--content-ui-background) !important;
-    color: var(--sbx-color-accent, var(--content-ui-foreground)) !important;
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
     line-height: inherit !important;
     margin: auto;
     min-height: 2.5rem !important;
