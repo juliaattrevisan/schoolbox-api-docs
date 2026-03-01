@@ -53,7 +53,7 @@ async function onSubmit(): Promise<void> {
 
     /** Create validator and destroy any existing one */
     validator.value?.destroy();
-    validator.value = $(formEl.value).alaressValidate({
+    validator.value = window.jQuery(formEl.value).alaressValidate({
         submitHandler: (_: unknown, event: SubmitEvent) => {
             // Don't do anything in the submit handler:
             // allow Vue to handle saving.
