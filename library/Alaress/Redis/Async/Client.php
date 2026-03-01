@@ -25,15 +25,17 @@ class Client
 {
     /**
      * Stored message listeners created by `subscribe`, keyed by channel.
+     * Multiple listeners per channel are supported.
      *
-     * @var array<string, callable>
+     * @var array<string, array<callable>>
      */
     private array $messageListeners = [];
 
     /**
      * Stored message listeners created by `psubscribe`, keyed by pattern.
+     * Multiple listeners per pattern are supported.
      *
-     * @var array<string, callable>
+     * @var array<string, array<callable>>
      */
     private array $pmessageListeners = [];
 
@@ -67,7 +69,7 @@ class Client
                 }
             };
             $this->client->on('message', $handler);
-            $this->messageListeners[$ch] = $handler;
+            $this->messageListeners[$ch][] = $handler;
             /** @phpstan-ignore-next-line method.notFound */
             $promises[] = $this->client->subscribe($ch);
         }
@@ -93,7 +95,7 @@ class Client
                 }
             };
             $this->client->on('pmessage', $handler);
-            $this->pmessageListeners[$p] = $handler;
+            $this->pmessageListeners[$p][] = $handler;
             /** @phpstan-ignore-next-line method.notFound */
             $promises[] = $this->client->psubscribe($p);
         }
@@ -111,10 +113,10 @@ class Client
     {
         $channels = is_array($channel) ? $channel : [$channel];
         foreach ($channels as $ch) {
-            if (isset($this->messageListeners[$ch])) {
-                $this->client->removeListener('message', $this->messageListeners[$ch]);
-                unset($this->messageListeners[$ch]);
+            foreach ($this->messageListeners[$ch] ?? [] as $handler) {
+                $this->client->removeListener('message', $handler);
             }
+            unset($this->messageListeners[$ch]);
         }
         /** @phpstan-ignore-next-line method.notFound */
         return Promise\all(array_map($this->client->unsubscribe(...), $channels));
@@ -131,10 +133,10 @@ class Client
     {
         $patterns = is_array($pattern) ? $pattern : [$pattern];
         foreach ($patterns as $p) {
-            if (isset($this->pmessageListeners[$p])) {
-                $this->client->removeListener('pmessage', $this->pmessageListeners[$p]);
-                unset($this->pmessageListeners[$p]);
+            foreach ($this->pmessageListeners[$p] ?? [] as $handler) {
+                $this->client->removeListener('pmessage', $handler);
             }
+            unset($this->pmessageListeners[$p]);
         }
         /** @phpstan-ignore-next-line method.notFound */
         return Promise\all(array_map($this->client->punsubscribe(...), $patterns));
