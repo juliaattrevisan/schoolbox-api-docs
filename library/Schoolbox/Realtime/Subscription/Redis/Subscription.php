@@ -9,8 +9,7 @@
 
 namespace Schoolbox\Realtime\Subscription\Redis;
 
-use Alaress\Async\Notification\Instance\Instance;
-use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Realtime\Subscription\ISubscription;
 use Alaress\Redis\Async;
 use Predis;
@@ -38,6 +37,7 @@ class Subscription implements ISubscription
      * @param Async\Client           $asyncClient     Asynchronous Redis client: used for subscribing to a queue.
      * @param Async\EventListener    $listener        The event listener for queue subscriptions.
      * @param UnreadRetriever        $unreadRetriever Fetches unread messages for this subscription.
+     * @param LoggerInterface        $log             Logger
      * @throws Predis\ClientException
      */
     public function __construct(
@@ -46,8 +46,10 @@ class Subscription implements ISubscription
         private Predis\ClientInterface $syncClient,
         private Async\Client $asyncClient,
         Async\EventListener $listener,
-        private UnreadRetriever $unreadRetriever
+        private UnreadRetriever $unreadRetriever,
+        private LoggerInterface $log,
     ) {
+        $this->log->debug("Subscribing to queue for instance:user {$this->instanceId}:{$this->userId}");
         $this->asyncClient->psubscribe($this->getRouteKey(), $listener);
     }
 
@@ -59,13 +61,14 @@ class Subscription implements ISubscription
     public function __destruct()
     {
         try {
+            $this->log->debug("Destructing subscription for instance:user {$this->instanceId}:{$this->userId}");
             $this->unsubscribe();
         } catch (\Exception $e) {
             // destructors must NOT throw exceptions
         }
 
         // unload object refs
-        unset($this->asyncClient, $this->syncClient);
+        unset($this->asyncClient, $this->syncClient, $this->log);
     }
 
     /**
@@ -75,6 +78,7 @@ class Subscription implements ISubscription
      */
     public function unsubscribe(): void
     {
+        $this->log->debug("Unsubscribing from queue for instance:user {$this->instanceId}:{$this->userId}");
         if ($this->asyncClient instanceof Async\Client) {
             $this->asyncClient->punsubscribe($this->getRouteKey());
             unset($this->asyncClient);

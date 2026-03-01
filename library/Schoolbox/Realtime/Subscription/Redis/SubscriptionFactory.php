@@ -10,6 +10,7 @@
 namespace Schoolbox\Realtime\Subscription\Redis;
 
 use Predis\ClientException;
+use Psr\Log\LoggerInterface;
 use Schoolbox\MultiInstance\RedisAsyncClientRepository;
 use Schoolbox\MultiInstance\RedisClientRepository;
 use Schoolbox\Realtime\Subscription\ISubscription;
@@ -34,10 +35,12 @@ class SubscriptionFactory implements ISubscriptionFactory
      *
      * @param RedisClientRepository      $redisClientRepository
      * @param RedisAsyncClientRepository $redisAsyncClientRepository
+     * @param LoggerInterface            $log
      */
     public function __construct(
         private RedisClientRepository $redisClientRepository,
         private RedisAsyncClientRepository $redisAsyncClientRepository,
+        private LoggerInterface $log,
     ) {
     }
 
@@ -72,6 +75,7 @@ class SubscriptionFactory implements ISubscriptionFactory
             $this->redisAsyncClientRepository->fetchForInstance($instanceId),
             $this->listener,
             new UnreadRetriever($redisClient),
+            $this->log,
         );
     }
 }

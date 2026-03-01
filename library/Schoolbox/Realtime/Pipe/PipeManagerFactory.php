@@ -79,6 +79,7 @@ class PipeManagerFactory
         $subFactory = new Subscription\Redis\SubscriptionFactory(
             $this->redisClientRepository,
             $this->redisAsyncClientRepository,
+            $this->log,
         );
 
         // Shouldn't need multi-instance?
