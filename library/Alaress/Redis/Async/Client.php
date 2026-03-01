@@ -23,10 +23,18 @@ use React\Promise\PromiseInterface;
  */
 class Client
 {
-    /** @var array<string, callable> Stored 'message' listeners keyed by channel */
+    /**
+     * Stored message listeners created by `subscribe`, keyed by channel.
+     *
+     * @var array<string, callable>
+     */
     private array $messageListeners = [];
 
-    /** @var array<string, callable> Stored 'pmessage' listeners keyed by pattern */
+    /**
+     * Stored message listeners created by `psubscribe`, keyed by pattern.
+     *
+     * @var array<string, callable>
+     */
     private array $pmessageListeners = [];
 
     /**
