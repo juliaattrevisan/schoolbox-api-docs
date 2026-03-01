@@ -134,14 +134,14 @@ export default class ActivityFeed {
      * @returns The learning moment ID
      */
     public static async getMomentLocatorId(moment: Locator): Promise<number> {
-        const testId = await moment.getAttribute("data-test-id");
+        const testId = await moment.getAttribute("data-test");
         if (!testId) {
-            throw new Error("Moment does not have a data-test-id attribute");
+            throw new Error("Moment does not have a data-test attribute");
         }
 
         const match = testId.match(/moment-(\d+)/);
         if (!match) {
-            throw new Error(`Could not extract moment ID from data-test-id: ${testId}`);
+            throw new Error(`Could not extract moment ID from data-test: ${testId}`);
         }
 
         return parseInt(match[1], 10);
