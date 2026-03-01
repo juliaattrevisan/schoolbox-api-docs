@@ -61,7 +61,6 @@ class Subscription implements ISubscription
     public function __destruct()
     {
         try {
-            $this->log->debug("Destructing subscription for instance:user {$this->instanceId}:{$this->userId}");
             $this->unsubscribe();
         } catch (\Exception $e) {
             // destructors must NOT throw exceptions
@@ -79,10 +78,7 @@ class Subscription implements ISubscription
     public function unsubscribe(): void
     {
         $this->log->debug("Unsubscribing from queue for instance:user {$this->instanceId}:{$this->userId}");
-        if ($this->asyncClient instanceof Async\Client) {
-            $this->asyncClient->punsubscribe($this->getRouteKey());
-            unset($this->asyncClient);
-        }
+        $this->asyncClient->punsubscribe($this->getRouteKey());
     }
 
     /**
