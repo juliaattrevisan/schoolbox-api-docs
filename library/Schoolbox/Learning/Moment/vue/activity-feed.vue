@@ -960,8 +960,8 @@ window.Vue.onMounted(async () => {
                                                     <li v-if="item.object._links.publish">
                                                         <button
                                                             class="submit"
-                                                            @click="publishMoment(item.object)"
                                                             data-test="learning-moment-action-publish"
+                                                            @click="publishMoment(item.object)"
                                                         >
                                                             {{ item.object._labels.publish }}
                                                         </button>
