@@ -9,9 +9,11 @@ const CONFIG_LEARNING_MOMENTS_MODERATION_ENABLED = "learning_moments_moderation_
 const YEAR_LEVEL_NAME_ON = "9"; // The name of the year level to enable moderation for
 const MOMENT_BODY_PREFIX = "This is a learning moment test "; // Distinct prefix used to find learning moments to soft-delete at the end of the test
 
-// The student which is part of the moderated year level to use between tests
+// The users to use between each test
 const STUDENT_ID = Common.USER_ID_JANAREED;
-const STUDENT_NAME = Common.USER_JANAREED_FULL;
+const STUDENT_NAME = Common.USER_JANAREED;
+const TEACHER_NAME = Common.USER_JACKCOLES;
+const PARENT_NAME = Common.USER_JENNIREED;
 
 test.describe("Learning Moment Moderation", () => {
     // Run tests serially, as tests rely on prior tests to have been run
@@ -27,10 +29,6 @@ test.describe("Learning Moment Moderation", () => {
         await db.updateInDatabase("lu_year_level", { learning_moments_moderation: 1 }, { name: YEAR_LEVEL_NAME_ON });
     });
 
-    test.beforeEach(async ({ tester }) => {
-        await tester.loginAsAdmin();
-    });
-
     let moment1Body = `${MOMENT_BODY_PREFIX} 1 - draft created by student`;
     const moment2Body = `${MOMENT_BODY_PREFIX} 2 - draft created by student, submitted for approval`;
     const moment3Body = `${MOMENT_BODY_PREFIX} 3 - submitted for approval by student`;
@@ -42,7 +40,7 @@ test.describe("Learning Moment Moderation", () => {
         const activityFeed = new ActivityFeed(tester, page);
         const learningMomentModify = new LearningMomentModify(tester, page);
 
-        await tester.impersonateViaUserProfilePage(STUDENT_NAME);
+        await tester.impersonate(STUDENT_NAME);
         await profilePage.goto(STUDENT_ID);
 
         tester.isGoingTo("As a student, create the 1st draft learning moment");
@@ -69,7 +67,7 @@ test.describe("Learning Moment Moderation", () => {
         const activityFeed = new ActivityFeed(tester, page);
         const learningMomentModify = new LearningMomentModify(tester, page);
 
-        await tester.impersonateViaUserProfilePage(STUDENT_NAME);
+        await tester.impersonate(STUDENT_NAME);
         await profilePage.goto(STUDENT_ID);
 
         tester.isGoingTo("modify the 1st draft learning moment and keep it as a draft");
@@ -89,7 +87,7 @@ test.describe("Learning Moment Moderation", () => {
         const profilePage = new ProfilePage(tester, page);
         const activityFeed = new ActivityFeed(tester, page);
 
-        await tester.impersonateViaUserProfilePage(STUDENT_NAME);
+        await tester.impersonate(STUDENT_NAME);
         await profilePage.goto(STUDENT_ID);
 
         tester.isGoingTo("submit the 2nd draft learning moment for approval from the activity feed");
@@ -103,7 +101,7 @@ test.describe("Learning Moment Moderation", () => {
         const activityFeed = new ActivityFeed(tester, page);
         const learningMomentModify = new LearningMomentModify(tester, page);
 
-        await tester.impersonateViaUserProfilePage(STUDENT_NAME);
+        await tester.impersonate(STUDENT_NAME);
         await profilePage.goto(STUDENT_ID);
 
         tester.isGoingTo("As a student, submit a learning moment for approval");
@@ -123,7 +121,7 @@ test.describe("Learning Moment Moderation", () => {
         const activityFeed = new ActivityFeed(tester, page);
         const learningMomentModify = new LearningMomentModify(tester, page);
 
-        await tester.impersonateTeacher();
+        await tester.impersonate(TEACHER_NAME);
         await profilePage.goto(STUDENT_ID);
 
         const moment1 = activityFeed.locateMomentWithBody(moment1Body);
@@ -145,7 +143,7 @@ test.describe("Learning Moment Moderation", () => {
         const activityFeed = new ActivityFeed(tester, page);
         const learningMomentModify = new LearningMomentModify(tester, page);
 
-        await tester.impersonateTeacher();
+        await tester.impersonate(TEACHER_NAME);
         await profilePage.goto(STUDENT_ID);
 
         const moment2 = activityFeed.locateMomentWithBody(moment2Body);
@@ -168,7 +166,7 @@ test.describe("Learning Moment Moderation", () => {
         const profilePage = new ProfilePage(tester, page);
         const activityFeed = new ActivityFeed(tester, page);
 
-        await tester.impersonateViaUserProfilePage(Common.USER_JENNIREED);
+        await tester.impersonate(PARENT_NAME);
         await profilePage.goto(STUDENT_ID);
 
         // Should only be able to see moment1, not moment2 or moment3
@@ -186,7 +184,7 @@ test.describe("Learning Moment Moderation", () => {
         const profilePage = new ProfilePage(tester, page);
         const activityFeed = new ActivityFeed(tester, page);
 
-        await tester.impersonateViaUserProfilePage(STUDENT_NAME);
+        await tester.impersonate(STUDENT_NAME);
         await profilePage.goto(STUDENT_ID);
 
         tester.isGoingTo("check the status of each learning moment");
@@ -206,7 +204,7 @@ test.describe("Learning Moment Moderation", () => {
         const profilePage = new ProfilePage(tester, page);
         const activityFeed = new ActivityFeed(tester, page);
 
-        await tester.impersonateTeacher();
+        await tester.impersonate(TEACHER_NAME);
         await profilePage.goto(STUDENT_ID);
 
         const moment3 = activityFeed.locateMomentWithBody(moment3Body);
