@@ -5473,12 +5473,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Schedule/Trigger/TriggerFactory.php
 
 		-
-			message: '#^Instanceof between Alaress\\Redis\\Async\\Client and Alaress\\Redis\\Async\\Client will always evaluate to true\.$#'
-			identifier: instanceof.alwaysTrue
-			count: 1
-			path: library/Schoolbox/Realtime/Subscription/Redis/Subscription.php
-
-		-
 			message: '#^Method Schoolbox\\Realtime\\Timetable\\TimetableNotifier\:\:process\(\) should return string but returns int\.$#'
 			identifier: return.type
 			count: 2
