@@ -170,6 +170,10 @@ declare global {
          */
         foundation(scope: "tooltip", method: "reflow"): void;
         /**
+         * Open/close a Foundation reveal modal directly
+         */
+        foundation(scope: "reveal", method: "close" | "open" | { close_on_background_click?: boolean }): void;
+        /**
          * From jquery.selectize-selector.js
          */
         selectizeSelector(options: SelectizeSelectorOptions): JQuery;

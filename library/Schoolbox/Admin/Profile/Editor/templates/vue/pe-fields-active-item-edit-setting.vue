@@ -87,9 +87,8 @@ function onFieldSettingOptionChange(fieldSettingOption: ProfileEditorFieldSettin
 }
 
 window.Vue.onMounted(() => {
-    // @ts-expect-error -- When a setting is added after the page is loaded, we need to tell foundation to fix the tooltips
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- foundation isn't typed, see above
-    $(document).foundation("tooltip", "reflow");
+    // When a setting is added after the page is loaded, we need to tell foundation to fix the tooltips
+    window.jQuery(document).foundation("tooltip", "reflow");
 });
 </script>
 

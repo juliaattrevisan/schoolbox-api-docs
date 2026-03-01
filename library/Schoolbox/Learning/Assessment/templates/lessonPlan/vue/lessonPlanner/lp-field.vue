@@ -56,9 +56,8 @@ window.Vue.onMounted(async () => {
 
     // a setTimeout is needed here otherwise foundation throws a fit...
     setTimeout(() => {
-        // @ts-expect-error -- To trigger the tooltip next to the field title to show up correctly
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- foundation isn't typed, see above
-        $(document).foundation("tooltip", "reflow");
+        // When a setting is added after the page is loaded, we need to tell foundation to fix the tooltips
+        window.jQuery(document).foundation("tooltip", "reflow");
     }, 0);
 });
 </script>
