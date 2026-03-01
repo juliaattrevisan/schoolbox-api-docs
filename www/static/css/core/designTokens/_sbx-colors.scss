@@ -5,18 +5,23 @@
  */
 
 :root {
-    // Background
+    // Configurable
     --sbx-color-body-background: #e5eff7;
+    --sbx-color-accent: #001691;
+    --sbx-color-accent-text: #fff;
+    --sbx-color-active: #d2edf2;
+    --sbx-color-menu-background: #001691;
+    --sbx-color-menu-foreground: #fff;
+    --sbx-color-menu-hover: #009eb2;
 
-    // Foreground
+    // Core
     --sbx-color-foreground-primary: #fff;
     --sbx-color-foreground-secondary: #f4f2f2;
-
-    // Text
     --sbx-color-text-primary: #000;
     --sbx-color-text-secondary: #525252;
+    --sbx-color-border: #c5c5c5;
 
-    // Status / semantic
+    // Status
     --sbx-color-alert: #ea0a06;
     --sbx-color-alert-text: #fff;
     --sbx-color-success: #3e843e;
@@ -25,18 +30,4 @@
     --sbx-color-warning-text: #fff;
     --sbx-color-highlight: #fae587;
     --sbx-color-highlight-text: #000;
-
-    // Accent
-    --sbx-color-accent: #001691;
-    --sbx-color-accent-text: #fff;
-
-    // Active
-    --sbx-color-active: #d2edf2;
-
-    // Menu
-    --sbx-color-menu-background: #001691;
-    --sbx-color-menu-foreground: #fff;
-    --sbx-color-menu-hover: #009eb2;
-
-    --sbx-color-border: #c5c5c5;
 }
