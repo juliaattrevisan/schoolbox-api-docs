@@ -49,10 +49,13 @@ function onPrintSelected(): void {
     <div v-if="props.course.subjectCode || props.curriculumNodes.length > 0" class="row">
         <div class="small-12 columns">
             <ul class="l-mar--0-left">
-                <li v-if="props.course.subjectCode" class="meta l-flex-row l-flex--align-center l-gap-s">
+                <li v-if="props.course.subjectCode" class="meta l-flex-row l-flex--align-start l-gap-s">
                     <sbx-icon name="subject-code"></sbx-icon>Subject Code: {{ props.course.subjectCode }}
                 </li>
-                <li v-if="props.curriculumNodes.length > 0" class="meta l-flex-row l-flex--align-center l-gap-s">
+                <li
+                    v-if="props.curriculumNodes.length > 0"
+                    class="meta l-flex-row l-flex--align-start l-flex--no-wrap l-gap-s"
+                >
                     <sbx-icon name="curriculum"></sbx-icon>
                     <div>
                         <curriculum-codes :nodes="props.curriculumNodes" />
