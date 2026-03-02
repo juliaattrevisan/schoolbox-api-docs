@@ -67,7 +67,7 @@
     }
 } %}
 
-<div data-feature="{{ feature.feature }}">
+<div data-feature="{{ feature.feature }}" data-test="ai-feature-{{ feature.feature }}">
     {% for name, formInput in feature.formInputs %}
         {% set section = formInput.section ?? null %}
 
@@ -106,12 +106,14 @@
                       rows="5"
                       {{ dataAttrs }}
                       {{ style }}
+                      data-test="ai-feature-option-textarea-{{ name }}"
             >{{ inputValue }}</textarea>
         {% elseif type == 'select' %}
             <select id="{{ feature.feature }}-{{ name }}-value"
                     name="{{ inputName }}"
                     {{ dataAttrs }}
                     {{ style }}
+                    data-test="ai-feature-option-select-{{ name }}"
             >
                 <option value="" disabled>-- select an option --</option>
                 {% for option in formInput.options %}
@@ -126,6 +128,7 @@
                     name="{{ inputName }}"
                     value="1"
                     {% if inputValue %}checked{% endif %}
+                    data-test="ai-feature-option-checkbox-{{ name }}"
                 >
                 <label for="{{ feature.feature }}-{{ name }}-value">
                     <span>On</span>
@@ -139,6 +142,7 @@
                    value="{{ inputValue }}"
                    {{ dataAttrs }}
                    style="display:none"
+                   data-test="ai-feature-option-input-{{ name }}"
             />
         {% endif %}
     {% endfor %}
