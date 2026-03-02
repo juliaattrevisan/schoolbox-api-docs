@@ -155,7 +155,7 @@ abstract class BaseApp extends App
     public function outputHelpIfOptionProvided(): void
     {
         if ($this->getOpt(self::OPT_SHORT_HELP)) {
-            $printer = new HelpPrinter();
+            $printer = new HelpPrinter($this->getName(), $this->getDescription());
             echo $printer->render($this->optionCollection);
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }

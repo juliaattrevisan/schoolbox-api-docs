@@ -35,16 +35,17 @@ class HelpPrinter implements OptionPrinter
     NAME:
     {NAME}
 
-    USAGE:
-    {USAGE}
-
     DESCRIPTION:
     {DESCRIPTION}
 
+    OPTIONS:
+    {OPTIONS}
 
     TEMPLATE;
 
     public function __construct(
+        private string $name,
+        private string $description,
         private int $indent = self::DEFAULT_INDENT_WIDTH,
         private ?int $screenWidth = null,
     ) {
@@ -85,15 +86,24 @@ class HelpPrinter implements OptionPrinter
             $screenWidth = self::FALLBACK_SCREEN_WIDTH;
         }
 
+        // Indent all output by this many lines
+        $baseIndent = str_repeat(' ', $this->indent);
+
         $lines = [];
         foreach ($options as $option) {
             $c1 = $this->renderOption($option);
-            $baseIndent = str_repeat(' ', $this->indent);
             $lines[] = $baseIndent . $c1;
             $lines[] = wordwrap($baseIndent . $baseIndent . $option->desc, $screenWidth, "\n" . $baseIndent . $baseIndent);
             $lines[] = '';
         }
 
-        return implode("\n", $lines);
+        return strtr(
+            self::USAGE_TEMPLATE,
+            [
+                '{NAME}'        => $baseIndent . $this->name,
+                '{DESCRIPTION}' => wordwrap($baseIndent . $this->description, $screenWidth, "\n" . $baseIndent),
+                '{OPTIONS}'     => implode("\n", $lines),
+            ]
+        );
     }
 }
