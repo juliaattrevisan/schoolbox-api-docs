@@ -93,7 +93,11 @@ class HelpPrinter implements OptionPrinter
         foreach ($options as $option) {
             $c1 = $this->renderOption($option);
             $lines[] = $baseIndent . $c1;
-            $lines[] = wordwrap($baseIndent . $baseIndent . $option->desc, $screenWidth, "\n" . $baseIndent . $baseIndent);
+            $lines[] = wordwrap(
+                $baseIndent . $baseIndent . $option->desc,
+                $screenWidth,
+                "\n" . $baseIndent . $baseIndent,
+            );
             $lines[] = '';
         }
 
@@ -101,9 +105,32 @@ class HelpPrinter implements OptionPrinter
             self::USAGE_TEMPLATE,
             [
                 '{NAME}'        => $baseIndent . $this->name,
-                '{DESCRIPTION}' => wordwrap($baseIndent . $this->description, $screenWidth, "\n" . $baseIndent),
+                '{DESCRIPTION}' => $this->wordwrapDescription($baseIndent, $screenWidth),
                 '{OPTIONS}'     => implode("\n", $lines),
             ]
         );
+    }
+
+    /**
+     * Helper function for outputting a word-wrapped description.
+     *
+     * @param string $baseIndent
+     * @param int    $screenWidth
+     * @return string
+     */
+    private function wordwrapDescription(string $baseIndent, int $screenWidth): string
+    {
+        // Find each line break in the description, and line-break that as a
+        // separate paragraph.
+        $splits = preg_split('/\n/', $this->description);
+        $parts  = [];
+        foreach ($splits as $split) {
+            if ($split !== '') {
+                $parts[] = wordwrap($baseIndent . $split, $screenWidth, "\n" . $baseIndent);
+            } else {
+                $parts[] = $baseIndent . $split;
+            }
+        }
+        return implode("\n", $parts);
     }
 }
