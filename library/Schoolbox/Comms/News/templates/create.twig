@@ -56,7 +56,7 @@
 
                                 window.location.href = response.redirect;
                             }).fail(function (response) {
-                                var temp = $.parseJSON(response.responseText);
+                                var temp = JSON.parse(response.responseText);
 
                                 $toast.toastTimeout({
                                     text: 'Error: ' + temp.message,
@@ -278,7 +278,7 @@
 
                             window.location.href = response.redirect;
                         }).fail(function (response) {
-                            var temp = $.parseJSON(response.responseText);
+                            var temp = JSON.parse(response.responseText);
 
                             $toast.toastTimeout({
                                 text: 'Error: ' + temp.message,
