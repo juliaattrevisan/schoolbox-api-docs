@@ -492,7 +492,7 @@ class Controller extends Base
 
         $units = [];
         $newUnitSpecs = [];
-        
+
         /* Finding the textbox definition ID from the Unit Template
          */
         $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
@@ -503,7 +503,7 @@ class Controller extends Base
             $class
         );
         $textboxDefId = $unitTextboxComp->first()?->getDefinitionId();
-        
+
         // Create units within a transaction
         try {
             $this->unitSpecificationMapper->getDatabase()->beginTransaction();
