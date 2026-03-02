@@ -15,7 +15,10 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new CliTool\Kernel(new class extends CliTool\BaseApp {
     public function run(): void
     {
-        var_dump($this->optionParser->getOptions());
+        var_dump($this->optionResult->toArray());
+        var_dump($this->getOpt('v'));
+        var_dump($this->getOpt('p'));
+        var_dump($this->getOpt('perform'));
     }
 
     /**
@@ -83,7 +86,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\BaseApp {
      */
     protected function hasPerformMode(): bool
     {
-        return false;
+        return true;
     }
 });
 $kernel->runApp();

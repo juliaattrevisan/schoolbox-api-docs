@@ -12,6 +12,7 @@ namespace Schoolbox\Application\CliTool;
 use GetOpt;
 use GetOptionKit\OptionCollection;
 use GetOptionKit\OptionParser;
+use GetOptionKit\OptionPrinter\ConsoleOptionPrinter;
 use GetOptionKit\OptionResult;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -99,6 +100,8 @@ abstract class BaseApp extends App
             ->setDescription($this->getDescription());
         $this->optionParser->setHelp($help);
 
+        $this->optionCollection = new OptionCollection();
+
         // Set up command-line options common to all scripts
         $this->optionParser = $this->optionParser->addOption(
             new GetOpt\Option(self::OPT_SHORT_HELP, self::OPT_LONG_HELP, GetOpt\GetOpt::NO_ARGUMENT)
@@ -150,6 +153,11 @@ abstract class BaseApp extends App
      */
     public function outputHelpIfOptionProvided(): void
     {
+        if ($this->optionResult->get(self::OPT_SHORT_HELP)) {
+            $printer = new ConsoleOptionPrinter();
+            echo $printer->render($this->optionCollection);
+            exit(CliKernelAbstract::EXIT_STATUS_OK);
+        }
         if ($this->optionParser->getOption(self::OPT_SHORT_HELP)) {
             echo $this->optionParser->getHelpText();
             exit(CliKernelAbstract::EXIT_STATUS_OK);
