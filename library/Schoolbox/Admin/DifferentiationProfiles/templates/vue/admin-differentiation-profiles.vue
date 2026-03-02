@@ -8,7 +8,7 @@ import SortableWrapper from "@schoolboxVue/components/sortable-wrapper.vue";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import { convertObjectToArray } from "@js/util/jsUtils";
-import type { Data, Header } from "../js/types/adminDifferentiationProfilesTypes";
+import type { Data, Header, Field } from "../js/types/adminDifferentiationProfilesTypes";
 
 const props = defineProps<{
     postRoute: string;
@@ -17,6 +17,16 @@ const props = defineProps<{
 }>();
 
 const data = window.Vue.ref<Data>(props.data);
+
+// We need to maintain a separate reactive list of fields for each module to work with the sortable component, as it requires an array. We will keep this in sync with the original data.modules object.
+const moduleFieldLists = window.Vue.reactive<Record<string, Field[]>>({});
+window.Vue.watchEffect(() => {
+    Object.keys(data.value.modules).forEach((moduleKey) => {
+        if (!moduleFieldLists[moduleKey]) {
+            moduleFieldLists[moduleKey] = convertObjectToArray(data.value.modules[moduleKey].fields) as Field[];
+        }
+    });
+});
 
 // #region resequence
 
@@ -31,16 +41,20 @@ const sortableOptions = window.Vue.computed(() => ({
  * When the user resequences the fields, update the sequence of
  * each field in the relevant module
  * @param event The event that triggered the resequence
+ * @param moduleKey The key of the module whose fields are being resequenced
  */
-function onResequenceField(event: Sortable.SortableEvent): void {
-    const moduleKey = event.item.getAttribute("data-module-key");
-    if (moduleKey === null) {
-        return;
-    }
-    const fields = document.querySelectorAll(`[data-module-key="${moduleKey}"]`);
-    const fieldKeys = Array.from(fields).map((fieldElement) => fieldElement.getAttribute("data-field-key"));
-    fieldKeys.forEach((fieldKey, index) => {
-        data.value.modules[moduleKey].fields[fieldKey!].sequence = index;
+function onResequenceField(event: Sortable.SortableEvent, moduleKey: string): void {
+    if (event.oldIndex === event.newIndex) return;
+    if (event.oldIndex === undefined || event.newIndex === undefined) return;
+
+    const list = moduleFieldLists[moduleKey];
+    if (!list) return;
+
+    const [moved] = list.splice(event.oldIndex, 1);
+    list.splice(event.newIndex, 0, moved);
+
+    list.forEach((field, index) => {
+        data.value.modules[moduleKey].fields[field.name].sequence = index;
     });
 }
 
@@ -175,12 +189,12 @@ async function onSaveSelected(): Promise<void> {
                         <sortable-wrapper
                             tag="ul"
                             class="information-list sortable ui-sortable"
-                            :list="convertObjectToArray(module.fields)"
+                            :list="moduleFieldLists[key]"
                             :item-key="(item) => item.id"
                             :options="sortableOptions"
                             :transition-enter="slideDownOnEnter"
                             :transition-leave="slideUpOnLeave"
-                            @end="onResequenceField"
+                            @end="(e) => onResequenceField(e, key as string)"
                         >
                             <template #item="item">
                                 <li
