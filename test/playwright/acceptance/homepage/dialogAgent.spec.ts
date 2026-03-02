@@ -16,7 +16,7 @@ const ACTIVITY_NAME = "Anteresia Stimsoni";
 test.describe("Dialog Agent Homepage Component", () => {
     // Keep a copy of the initial AI settings so they can be reset after the tests are done
     const initialSettings: Record<string, string | null> = {
-        ai_text_chat: null,
+        ai_dialogagent: null,
     };
 
     test.beforeAll(async ({ db }) => {
@@ -61,9 +61,11 @@ test.describe("Dialog Agent Homepage Component", () => {
         await AIServices.selectProviderForFeature(dialogAgentFeature, AiProvider.OPENAI);
         await AIServices.fillOpenAIKeyForFeature(dialogAgentFeature);
         await aiServices.save();
+        await aiServices.waitForFeatureToBeEnabled(AiFeature.DIALOG_AGENT);
 
         tester.isGoingTo("create a new discussion via the empty state of the Dialog Agent component");
         const homepage = new Homepage(tester, page);
+        await homepage.goto(Common.CLASS_ID_9AENG);
         const component = homepage.locateComponentByName(COMPONENT_NAME);
         await component.getByTestId(DATA_TEST_COMPONENT_DIALOGAGENT_EMPTY_CREATE_BUTTON).click();
 

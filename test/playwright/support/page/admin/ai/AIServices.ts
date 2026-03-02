@@ -94,6 +94,20 @@ export default class AIServices {
     }
 
     /**
+     * Wait for a particular feature to be enabled
+     * This is useful for waiting for the settings to properly save
+     * @param feature - the feature to wait for
+     */
+    public async waitForFeatureToBeEnabled(feature: AiFeature): Promise<void> {
+        await this.page.waitForFunction((_feature) => window.sbProps.aiFeatures[_feature]?.enabled === true, feature);
+        const featureEnabled = await this.page.evaluate(
+            (_feature) => window.sbProps.aiFeatures[_feature]?.enabled,
+            feature,
+        );
+        expect(featureEnabled).toBe(true);
+    }
+
+    /**
      * Fill in the AI key input for a feature
      * @param feature - Locator for the particular feature
      */

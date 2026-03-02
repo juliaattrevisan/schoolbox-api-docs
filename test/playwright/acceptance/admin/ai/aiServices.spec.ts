@@ -70,14 +70,8 @@ test.describe("Admin AI Services Settings", () => {
         await AIServices.fillOpenAIKeyForFeature(chatFeature);
         await aiServices.save();
 
-        // Verify that the chat feature is enabled (can check via window.sbProps.aiFeatures.chat.enabled)
-        await page.waitForFunction((feature) => window.sbProps.aiFeatures[feature]?.enabled === true, AiFeature.CHAT);
-        const chatEnabled = await page.evaluate(
-            (feature) => window.sbProps.aiFeatures[feature]?.enabled,
-            AiFeature.CHAT,
-        );
-        expect(chatEnabled).toBe(true);
-
+        tester.isGoingTo("wait for the feature to be enabled");
+        await aiServices.waitForFeatureToBeEnabled(AiFeature.CHAT);
         await AIServices.verifyFeatureUsesProvider(chatFeature, AiProvider.OPENAI);
     });
 
