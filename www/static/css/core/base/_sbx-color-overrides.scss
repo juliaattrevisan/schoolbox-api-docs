@@ -23,7 +23,8 @@ body.sbx-body {
     .rejected.label,
     .submitted-late.label,
     .alert-box.alert,
-    .alert-box.alert-tint {
+    .alert-box.alert-tint,
+    .label--moment-rejected {
         background-color: var(--sbx-color-alert);
         color: var(--sbx-color-alert-text);
     }
@@ -43,14 +44,16 @@ body.sbx-body {
     .submitted.label,
     .pending.label,
     .alert-box.warning,
-    .alert-box.warning-tint {
+    .alert-box.warning-tint,
+    .label--moment-submitted {
         background-color: var(--sbx-color-warning);
         color: var(--sbx-color-warning-text);
     }
 
     // Neutral labels - overridden as they currently implement Sass methods which are not compatible with CSS variables
     .unsubmitted.label,
-    .neutral.label {
+    .neutral.label,
+    .label--moment-draft {
         background-color: var(--sbx-color-foreground-secondary);
         color: var(--sbx-color-text-secondary);
     }
@@ -59,11 +62,9 @@ body.sbx-body {
     table:not([class]) tr:nth-child(even),
     table.rubric tr:nth-child(even),
     table.diagonal-headings-table tr:nth-child(even),
-    #course-selector-results ul.information-list li:nth-child(even),
-    ul.information-list.sortable-card li:nth-child(even),
-    ul.information-list.unsortable li:nth-child(even),
     table.VueTables__table tr:nth-child(even),
-    .action-list li:nth-child(even) {
+    .action-list li:nth-child(even),
+    .information-list li:nth-child(even):not(:has(.information-list)) {
         background-color: var(--sbx-color-foreground-secondary);
     }
 
@@ -173,5 +174,10 @@ body.sbx-body {
         background-color: var(--sbx-color-gradient-0);
         color: var(--sbx-color-foreground-primary);
         fill: var(--sbx-color-gradient-0);
+    }
+
+    // remove the borders off fieldsets that sit on the background colour
+    fieldset.no-pad {
+        border: none;
     }
 }

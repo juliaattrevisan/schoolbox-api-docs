@@ -33,7 +33,8 @@ body.sbx-body {
     .swiper-horizontal,
     .scrollable.show-for-medium-up,
     .Schoolbox_Tile_Component_DashboardTileController .tileList .tile,
-    .row:has(> #filter_panel) {
+    .row:has(> #filter_panel),
+    table {
         border-radius: var(--sbx-config-box-roundness);
     }
 

@@ -176,10 +176,11 @@ body.sbx-body {
         }
         label:after {
             // the switch toggle
+            background: var(--sbx-color-foreground-primary);
             border-radius: 50%;
-            width: 20px;
+            border: 1px solid var(--sbx-config-color-accent);
             height: 20px;
-            background: var(--sbx-config-color-accent);
+            width: 20px;
         }
         input:checked + label {
             // the whole switch when active
@@ -188,11 +189,7 @@ body.sbx-body {
         input:checked + label:after {
             // the switch toggle when active
             background: var(--sbx-color-foreground-primary);
-            top: 4px;
-        }
-        input:checked + span {
-            // the label text when active
-            top: -2px;
+            border: 0;
         }
         span {
             // the label text

@@ -151,7 +151,7 @@ h6 {
 $hr-margin: rem-calc(16);
 $hr-border-width: 1px;
 hr {
-    border: solid var(--sbx-color-text-secondary, $gainsboro);
+    border: solid var(--sbx-color-border, $gainsboro);
     border-width: $hr-border-width 0 0;
     clear: both;
     height: 0;

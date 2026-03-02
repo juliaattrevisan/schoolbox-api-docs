@@ -104,7 +104,7 @@
     // }
 
     &--border-end {
-        border-block-end: 1px solid var(--border-colour);
+        border-block-end: 1px solid var(--sbx-color-border, var(--border-colour));
     }
 
     &--alt-bkg {

@@ -73,4 +73,8 @@ body.sbx-body {
         padding: 10px;
         text-transform: none;
     }
+
+    legend {
+        font-size: var(--sbx-font-size-m);
+    }
 }

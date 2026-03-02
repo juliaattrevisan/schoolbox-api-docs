@@ -189,7 +189,7 @@ tbody.skeleton {
 
 .row-header,
 .island table.dataTable thead th {
-    border-bottom: 2px solid var(--sbx-color-text-secondary, $body-bg);
+    border-bottom: 2px solid var(--sbx-color-border, $body-bg);
     font-weight: $font-weight-semibold;
 }
 
@@ -206,7 +206,7 @@ tbody.skeleton {
 .information-list {
     li.row-header {
         padding-top: 0.5rem;
-        border-bottom: 2px solid var(--sbx-color-text-secondary, $body-bg);
+        border-bottom: 2px solid var(--sbx-color-border, $body-bg);
     }
 }
 
@@ -268,7 +268,7 @@ $rotate-span-width: 11rem;
             th {
                 border: 0;
                 font-size: $paragraph-font-size;
-                border-color: var(--sbx-color-text-secondary, $vapor);
+                border-color: var(--sbx-color-border, $vapor);
                 height: $rotate-width * 2 + 1;
                 min-width: $rotate-th-width;
                 vertical-align: bottom;
@@ -301,7 +301,7 @@ $rotate-span-width: 11rem;
 
                     &:not(:empty) {
                         background-color: var(--sbx-color-foreground-primary, $white);
-                        border: 0 solid var(--sbx-color-text-secondary, $body-bg);
+                        border: 0 solid var(--sbx-color-border, $body-bg);
                         border-right-width: 3px;
                         border-bottom-width: 2px;
                     }

@@ -125,15 +125,15 @@
     }
 
     &--border-end {
-        border-block-end: 1px solid var(--border-colour);
+        border-block-end: 1px solid var(--sbx-color-border, var(--border-colour));
     }
 
     &--border-end-alt {
-        border-block-end: 1px solid var(--body-background);
+        border-block-end: 1px solid var(--sbx-color-border, var(--body-background));
     }
 
     &--alt-bkg {
-        background-color: var(--alt-foreground-colour);
+        background-color: var(--sbx-color-foreground-secondary, var(--alt-foreground-colour));
     }
 }
 

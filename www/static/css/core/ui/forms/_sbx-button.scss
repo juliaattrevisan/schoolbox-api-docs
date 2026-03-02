@@ -114,17 +114,6 @@ body.sbx-body {
     }
 
     /**
-     * When a button sits next to an input (e.g. search bars)
-     * We need to tweak the rounding of the corners so they align properly
-     */
-    .input-group .button,
-    .input-group a {
-        border-left: none;
-        border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
-        line-height: 1;
-    }
-
-    /**
      * A horizontal list of buttons, adding some gap between them
      */
     .sub-nav {
@@ -158,14 +147,26 @@ body.sbx-body {
      * These need to be treated differently to standard buttons
      * as they have no text content and so need a border to define their shape
      */
-    button.button[class*="icon-"],
+    .button[class*="icon-"],
     .dz-remove,
     .ab-upload .dz-remove {
         border: none;
     }
 
-    button.button[class*="icon-"]:not(:empty) {
+    .button[class*="icon-"]:not(:empty) {
         border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent); // add border back in for icon and text buttons
+    }
+
+    /**
+     * When a button sits next to an input (e.g. search bars)
+     * We need to tweak the rounding of the corners so they align properly
+     */
+    .input-group .button,
+    .input-group a,
+    .input-group .button[class*="icon-"]:not(:empty) {
+        border-left: none;
+        border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
+        line-height: 1;
     }
 
     /**
@@ -260,5 +261,10 @@ body.sbx-body {
      */
     .search-result {
         gap: var(--sbx-size-s);
+    }
+
+    // add spacing to pagination buttons on pastoral class report
+    .count-filter {
+        gap: var(--sbx-size-xs);
     }
 }

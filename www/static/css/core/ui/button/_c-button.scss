@@ -99,7 +99,10 @@ a.c-button {
             background-color: var(--sbx-color-success, var(--color-success));
         }
         &:focus {
-            background-color: var(--sbx-color-success, var(--color-success)); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
+            background-color: var(
+                --sbx-color-success,
+                var(--color-success)
+            ); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
         }
     }
     // To highlight that this action has a destructive effect
@@ -110,7 +113,10 @@ a.c-button {
             background-color: var(--sbx-color-alert, var(--color-alert));
         }
         &:focus {
-            background-color: var(--sbx-color-alert, var(--color-alert)); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
+            background-color: var(
+                --sbx-color-alert,
+                var(--color-alert)
+            ); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
         }
     }
     &--with-input {
