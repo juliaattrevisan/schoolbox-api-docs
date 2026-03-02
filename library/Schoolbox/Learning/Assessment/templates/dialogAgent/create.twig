@@ -122,9 +122,14 @@
         <div class="radiolist">
             <ul class="option-list l-flex l-flex-col l-gap-m">
                 {% for scenario in dialogAgent.scenarios %}
-                    <li>
+                    <li data-test="dialog-agent-scenario-select-{{ scenario.id }}">
                         <input type="radio" id="scenario-{{ scenario.id }}" name="scenarioId" value="{{ scenario.id }}" required />
-                        <label for="scenario-{{ scenario.id }}"><strong>{{ scenario.title }}</strong></label>
+                        <label
+                            for="scenario-{{ scenario.id }}"
+                            data-test="dialog-agent-scenario-select-label-{{ scenario.id }}"
+                        >
+                            <strong>{{ scenario.title }}</strong>
+                        </label>
 
                         {% set scenarioModalId = 'scenario-info-' ~ scenario.id %}
                         {% include '@learningAssessment/dialogAgent/scenarioInfo.twig' with {
