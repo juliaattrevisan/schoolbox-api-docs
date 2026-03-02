@@ -106,7 +106,7 @@
                 if ($.data(this, "plugin_" + pluginName)) {
                     var inst = $.data(this, "plugin_" + pluginName);
 
-                    if ($.isFunction(inst[options])) {
+                    if (typeof inst[options] === "function") {
                         inst[options].apply(inst, args.splice(1));
                     }
                 }

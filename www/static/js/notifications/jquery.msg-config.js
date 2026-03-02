@@ -162,7 +162,7 @@
 
         if (typeof this.options[sel] == "undefined") {
             result = "";
-        } else if ($.isFunction(this.options[sel])) {
+        } else if (typeof this.options[sel] === "function") {
             result = options[sel].call(this.element);
         } else {
             result = this.options[sel];

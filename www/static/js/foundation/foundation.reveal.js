@@ -223,7 +223,7 @@
                     var old_success = typeof ajax_settings.success !== "undefined" ? ajax_settings.success : null;
                     $.extend(ajax_settings, {
                         success: function (data, textStatus, jqXHR) {
-                            if ($.isFunction(old_success)) {
+                            if (typeof old_success === "function") {
                                 var result = old_success(data, textStatus, jqXHR);
                                 if (typeof result == "string") {
                                     data = result;

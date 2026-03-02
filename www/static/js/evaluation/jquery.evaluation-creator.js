@@ -378,8 +378,8 @@
                             $.each($(config.answerCollectionList).find("[data-input]"), function (index, element) {
                                 var elem = $(element);
 
-                            var description = (elem.find("[data-answer-description]").val()).trim();
-                            var code = (elem.find("[data-answer-code-value]").val()).trim();
+                                var description = elem.find("[data-answer-description]").val().trim();
+                                var code = elem.find("[data-answer-code-value]").val().trim();
 
                                 /* Ignore empty answers that weren't removed
                                  */
