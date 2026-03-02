@@ -129,7 +129,7 @@ abstract class BaseApp extends App
         $this->optionCollection->add(
             self::OPT_SHORT_VERBOSITY,
             'Verbosity (up to 3 times)',
-        )->isa('Number')->incremental();
+        )->incremental();
         $this->assignDeprecatedOptions();
 
 //        // ... including an esoteric option I forgot existed
