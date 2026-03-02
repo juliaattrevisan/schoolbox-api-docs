@@ -71,23 +71,24 @@ class Mapper extends \Schoolbox\Mapper
     public function updateSelections(User $user, $page, Collection $selectionsPerFilter)
     {
         // Build user's current selections
-        $selectionsToSave = $this->createCollection();
-
+        $newSelections = $this->createCollection();
         /** @var Model[] $filterSelections */
-        foreach ($selectionsPerFilter as $filterId => $filterSelections) {
-            foreach ($filterSelections as $key => $selection) {
-                $selectionsToSave->add($selection);
+        foreach ($selectionsPerFilter as $filterSelections) {
+            foreach ($filterSelections as $selection) {
+                $newSelections->add($selection);
             }
         }
 
-        // Delete and save user's selections atomically
-        $this->database->transact(function () use ($user, $page, $selectionsToSave): void {
-            $this->deleteByColumnList([
-                'user_id' => $user->getId(),
-                'page'    => $page,
-            ]);
-            $this->save($selectionsToSave);
-        });
+        // Load old selections
+        $oldSelections = $this->findByColumnList([
+            'user_id' => $user->getId(),
+            'page'    => $page,
+        ]);
+
+        // Save new selections, and delete old ones:
+        // selections are identified by filter and key
+        $this->save($newSelections);
+        $this->delete($oldSelections->diff($newSelections, fn (Model $a, Model $b) => $a->isIdentical($b)));
         return true;
     }
 

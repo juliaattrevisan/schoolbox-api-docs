@@ -132,4 +132,20 @@ class Model
         $this->selected = $selected;
         return $this;
     }
+
+    /**
+     * Is this identical to another filter selections model?
+     *
+     * It is if it for the same user, page, filter and key.
+     *
+     * @param Model $other
+     * @return bool
+     */
+    public function isIdentical(Model $other): bool
+    {
+        return $this->user->getId() === $other->user->getId()
+            && $this->page === $other->page
+            && $this->filter->getId() === $other->filter->getId()
+            && $this->key === $other->key;
+    }
 }
