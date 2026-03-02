@@ -59,14 +59,6 @@ abstract class Base extends CliTool\App
 
 
     // Query for finding capabilities to repair within a folder.
-    protected const FIND_CAPABILITIES_QUERY_V1 = "
-        SELECT id, name
-        FROM   rubric_group
-        WHERE  parent_type = 'category'
-        AND    parent_id   = :folderId
-        AND    deleted_at  IS NULL
-        ORDER BY name, id
-    ";
     protected const FIND_CAPABILITIES_QUERY_V2 = "
         SELECT id, name
         FROM   rubric_capability
@@ -293,11 +285,7 @@ abstract class Base extends CliTool\App
         $this->findFoldersQuery
             = $this->db->prepareQuery(self::FIND_FOLDERS_QUERY);
         $this->findCapabilitiesQuery
-            = $this->db->prepareQuery(
-                $this->useV2Queries
-                    ? self::FIND_CAPABILITIES_QUERY_V2
-                    : self::FIND_CAPABILITIES_QUERY_V1
-            );
+            = $this->db->prepareQuery(self::FIND_CAPABILITIES_QUERY_V2);
     }
 
 

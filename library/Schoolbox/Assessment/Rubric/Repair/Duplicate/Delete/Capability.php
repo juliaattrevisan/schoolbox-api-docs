@@ -34,11 +34,6 @@ class Capability extends Base
 {
     /**************************** Capability queries ***************************/
 
-    private const DELETE_CAPABILITY_QUERY_V1 = '
-        UPDATE rubric_group
-        SET    deleted_at = :now
-        WHERE  id         = :capabilityId
-    ';
     private const DELETE_CAPABILITY_QUERY_V2 = '
         UPDATE rubric_capability
         SET    deleted_at = :now
@@ -48,13 +43,6 @@ class Capability extends Base
 
     /**************************** Indicator queries ***************************/
 
-    private const COUNT_CAPABILITY_INDICATORS_QUERY_V1 = '
-        SELECT COUNT(*)
-        FROM   rubric_criterion
-        WHERE  rubric_group_id = :capabilityId
-        AND    deleted_at IS NULL
-        ORDER BY name, id
-    ';
     private const COUNT_CAPABILITY_INDICATORS_QUERY_V2 = '
         SELECT COUNT(*)
         FROM   rubric_indicator
@@ -66,14 +54,6 @@ class Capability extends Base
 
     /**************************** Usage queries ***************************/
 
-    private const COUNT_CAPABILITY_USAGES_QUERY_V1 = '
-        SELECT COUNT(*)
-        FROM rubric_group_usage rgu
-        INNER JOIN submission_box sb ON rgu.submission_box_id = sb.id
-        INNER JOIN assessment     a  ON sb.assessment_id = a.id
-        WHERE rgu.rubric_group_id = :capabilityId
-        AND   a.deleted_at IS NULL
-    ';
     private const COUNT_CAPABILITY_USAGES_QUERY_V2 = '
         SELECT COUNT(*)
         FROM rubric_capability_usage rgu
@@ -120,24 +100,12 @@ class Capability extends Base
     protected function setupQueries(): void
     {
         $this->deleteCapabilityQuery
-            = $this->db->prepareQuery(
-                $this->useV2Queries
-                    ? self::DELETE_CAPABILITY_QUERY_V2
-                    : self::DELETE_CAPABILITY_QUERY_V1
-            );
+            = $this->db->prepareQuery(self::DELETE_CAPABILITY_QUERY_V2);
 
         $this->countCapabilityIndicatorsQuery
-            = $this->db->prepareQuery(
-                $this->useV2Queries
-                    ? self::COUNT_CAPABILITY_INDICATORS_QUERY_V2
-                    : self::COUNT_CAPABILITY_INDICATORS_QUERY_V1
-            );
+            = $this->db->prepareQuery(self::COUNT_CAPABILITY_INDICATORS_QUERY_V2);
         $this->countCapabilityUsagesQuery
-            = $this->db->prepareQuery(
-                $this->useV2Queries
-                    ? self::COUNT_CAPABILITY_USAGES_QUERY_V2
-                    : self::COUNT_CAPABILITY_USAGES_QUERY_V1
-            );
+            = $this->db->prepareQuery(self::COUNT_CAPABILITY_USAGES_QUERY_V2);
     }
 
 
