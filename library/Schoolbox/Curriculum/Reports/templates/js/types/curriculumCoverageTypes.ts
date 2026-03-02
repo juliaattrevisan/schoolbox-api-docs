@@ -23,7 +23,7 @@ export type CurriculumCoveragePayload = {
  * A unit with node usage counts for the different
  * items a curriculum node can be assigned to
  */
-export type UnitWithCurriculumNodeUsage = Pick<Unit, "id" | "name"> & {
+export type UnitWithCurriculumNodeUsage = Pick<Unit, "id" | "title"> & {
     usage: {
         unit: {
             count: number;
@@ -47,7 +47,7 @@ export type UnitWithCurriculumNodeUsage = Pick<Unit, "id" | "name"> & {
 /**
  * A course that includes units with node usage counts
  */
-export type CourseWithCurriculumNodeUsage = Pick<Course, "id" | "name"> & {
+export type CourseWithCurriculumNodeUsage = Pick<Course, "id" | "title"> & {
     units: UnitWithCurriculumNodeUsage[];
     usage: {
         course: {

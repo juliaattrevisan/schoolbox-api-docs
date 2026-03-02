@@ -1,26 +1,32 @@
 <div id="unit-planner-container" data-test="unit-planner-container">
+    {% set routeFolderSequence = routeLookupIfAuthorized('folder.postFolderSequence', {id: course.folder.id, folder: course.folder}) %}
+    {% set routeImportIntoClasses = routeLookupIfAuthorized('courseImport.getImport', { courseSpecId: course.id ?? 0, folderId: 0, componentId: 0 }) %}
+    {% set routeCurriculumReport = routeLookupIfAuthorized('curriculumreports.getCoverage') %}
+    {% set routeModifyCourse = routeLookupIfAuthorized('course.modifyCourse', { courseSpec: course, id: course.id}) %}
+    {% set routeCourseMarkbook = routeLookupIfAuthorized('courseMarkbook.getMarkbook', { courseSpec: course, courseSpecId: course.id}) %}
+    {% set routeLearningAnalytics = routeLookupIfAuthorized('learningAnalytics.course', { courseSpec: course, courseSpecId: course.id}) %}
     <unit-planner
-        :course-id="{{ course.id }}"
+        :course="{{ {
+            id: course.id,
+            title: course.title,
+            subjectCode: course.subjectCode
+        }|json_encode }}"
+        :curriculum-nodes="{{ curriculumNodes |json_encode }}"
         :folder-id="{{ course.folder.id }}"
-        course-title="{{ course.title }}"
-        {% set routeFolderSequence = routeLookupIfAuthorized('folder.postFolderSequence', {id: course.folder.id, folder: course.folder}) %}
-        :route-folder-sequence="{{ routeFolderSequence ? (routeFolderSequence |json_encode) : 'null' }}"
-        {% set routeImportIntoClasses = routeLookupIfAuthorized('courseImport.getImport', { courseSpecId: course.id ?? 0, folderId: 0, componentId: 0 }) %}
-        :route-import-into-classes="{{ routeImportIntoClasses ? (routeImportIntoClasses |json_encode) : 'null' }}"
         :units="{{ units |json_encode }}"
         :template="{{ template |json_encode }}"
-        {% set routeCurriculumReport = routeLookupIfAuthorized('curriculumreports.getCoverage') %}
-        :route-curriculum-coverage="{{ routeCurriculumReport ? (routeCurriculumReport|json_encode) : 'null' }}"
         {% if editorTemplates is defined %}
         :editor-templates="{{ editorTemplates |json_encode }}"
         {% endif %}
-        :route-new-units="{{ routeNewUnits ? (routeNewUnits|json_encode) : 'null' }}"
-        {% set routeModifyCourse = routeLookupIfAuthorized('course.modifyCourse', { courseSpec: course, id: course.id}) %}
-        :route-modify-course="{{ routeModifyCourse ? (routeModifyCourse|json_encode) : 'null' }}"
-        {% set routeCourseMarkbook = routeLookupIfAuthorized('courseMarkbook.getMarkbook', { courseSpec: course, courseSpecId: course.id}) %}
-        :route-course-markbook="{{ routeCourseMarkbook ? (routeCourseMarkbook|json_encode) : 'null' }}"
-        {% set routeLearningAnalytics = routeLookupIfAuthorized('learningAnalytics.course', { courseSpec: course, courseSpecId: course.id}) %}
-        :route-learning-analytics="{{ routeLearningAnalytics ? (routeLearningAnalytics|json_encode) : 'null' }}"
+        :routes="{{ {
+            folderSequence: routeFolderSequence,
+            importIntoClasses: routeImportIntoClasses,
+            curriculumCoverage: routeCurriculumReport,
+            newUnits: routeNewUnits,
+            modifyCourse: routeModifyCourse,
+            courseMarkbook: routeCourseMarkbook,
+            learningAnalytics: routeLearningAnalytics
+        }|json_encode }}"
     ></unit-planner>
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/unitPlanner.js?v={{ config.site_version }}"></script>

@@ -117,3 +117,16 @@ export type UnitTemplate = {
     textboxes: UnitTemplateTextboxComponent[]; // Textbox components
     activities: UnitTemplateComponent[]; // course builder components
 };
+
+/**
+ * Routes used by the Unit Planner
+ */
+export type Routes = {
+    folderSequence: string | null;
+    importIntoClasses: string | null;
+    curriculumCoverage: string | null;
+    newUnits: string | null;
+    modifyCourse: string | null;
+    courseMarkbook: string | null;
+    learningAnalytics: string | null;
+};

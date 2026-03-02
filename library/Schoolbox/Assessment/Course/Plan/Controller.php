@@ -246,6 +246,7 @@ class Controller extends Base
 
         $this->response = $this->responseFromTemplate('@coursePlan/index.twig', [
             'course' => $course,
+            'curriculumNodes' => $course->getFolder()->getViewableCurriculumNodes()->reindex(),
             'units' => $units,
             'template'  => [
                 'textboxDefId' => $textboxDefId,

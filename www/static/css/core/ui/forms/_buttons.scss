@@ -382,6 +382,7 @@ $button-disabled-cursor: $cursor-default-value !default;
 //a button that is contained with .meta styling that we want to appear more like an <a> tag
 .meta-button {
     background: none;
+    font-size: var(--sbx-font-size-xs, inherit);
     margin: 0;
     min-height: auto;
     padding: 0;

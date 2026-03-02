@@ -3,7 +3,7 @@
  */
 export type Unit = {
     id: number;
-    name: string;
+    title: string;
     folder?: {
         _links: {
             view: string; // URL to view the folder

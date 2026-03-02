@@ -1,8 +1,7 @@
 <script setup lang="ts">
 /**
- * A container to display curriculum codes linked to an assessment
- * It's specific to an assesment as the other areas that display curriculum codes are
- * currently handled in other Vue files
+ * Display a list of curriculum codes linked to an activity/unit/course,
+ * and allow users to click on them to view more details in a modal.
  */
 
 import CodesList from "@schoolboxCurriculum/vue/codes-list.vue";

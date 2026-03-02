@@ -29,8 +29,7 @@ function onCodeSelected(node: TCurriculumNode): void {
 <template>
     <template v-for="(node, index) in props.nodes" :key="node.id">
         <button class="meta-button" title="View details" @click.prevent="onCodeSelected(node)">
-            {{ node.code }}
-        </button>
-        <template v-if="index + 1 < props.nodes.length">, </template>
+            {{ node.code }}</button
+        ><template v-if="index + 1 < props.nodes.length">, </template>
     </template>
 </template>

@@ -6,6 +6,7 @@
 import type { Ref } from "vue";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import SearchSelectModal from "@schoolboxVue/components/searchSelect/modal/search-select-modal.vue";
+import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import { useCourseSelectorStore } from "./store/courseSelectorStore";
 
@@ -15,7 +16,7 @@ type CourseAPIResponse = {
 
 interface Props {
     endpoint: string; // The course api endpoint
-    preselected: Course[]; // The courses that have already been selected previously
+    preselected: SearchSelectItem[]; // The courses that have already been selected previously
     label?: string; // The label text
     labelId?: string; // The label id
     isRequired?: boolean; // Whether the input requires a value
@@ -31,7 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const store = useCourseSelectorStore();
 store.init(props.preselected);
-const results = window.Vue.ref<Course[]>([]);
+const results = window.Vue.ref<SearchSelectItem[]>([]);
 
 /**
  * To manipulate the results to target the courses object
@@ -40,7 +41,7 @@ const results = window.Vue.ref<Course[]>([]);
 function onSearchResponse(json: unknown): void {
     if (typeof json === "object" && json !== null && "data" in json) {
         const newResults = json.data as CourseAPIResponse;
-        results.value = newResults.courses;
+        results.value = [...newResults.courses.map((course: Course) => ({ ...course, name: course.title }))];
     }
 }
 
@@ -48,8 +49,8 @@ function onSearchResponse(json: unknown): void {
  * To select a link to the course
  * @param course - the selected course
  */
-function onCourseNameSelect(course: Course): void {
-    if (course.folder) {
+function onCourseNameSelect(course: SearchSelectItem & Partial<Course>): void {
+    if (course.folder?._links?.view) {
         window.location.href = course.folder._links.view;
     }
 }
@@ -57,8 +58,8 @@ function onCourseNameSelect(course: Course): void {
 // #region modal
 
 const isModalOpen = window.Vue.ref(false);
-const modalDefaultResults = window.Vue.ref<Course[]>([]); // to display results when the search input is empty
-const modalSearchResults = window.Vue.ref<Course[]>([]); // to display results based on the search input
+const modalDefaultResults = window.Vue.ref<SearchSelectItem[]>([]); // to display results when the search input is empty
+const modalSearchResults = window.Vue.ref<SearchSelectItem[]>([]); // to display results based on the search input
 
 /**
  *  To open up the modal
@@ -73,16 +74,17 @@ function onButtonSelect(): void {
  * @param $results - the results to update
  * @param isMoreResults - whether the results are more results
  */
-function updateResults(json: unknown, $results: Ref<Course[]>, isMoreResults: boolean): void {
+function updateResults(json: unknown, $results: Ref<SearchSelectItem[]>, isMoreResults: boolean): void {
     if (typeof json !== "object" || json === null || "data" in json === false) {
         return;
     }
     const newResults = json.data as CourseAPIResponse;
+    const formattedResults = newResults.courses.map((course: Course) => ({ ...course, name: course.title }));
     if (isMoreResults) {
-        $results.value = [...$results.value, ...newResults.courses];
+        $results.value = [...$results.value, ...formattedResults];
         return;
     }
-    $results.value = [...newResults.courses];
+    $results.value = [...formattedResults];
 }
 
 /**

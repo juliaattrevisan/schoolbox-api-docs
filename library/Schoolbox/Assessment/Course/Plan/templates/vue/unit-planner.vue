@@ -5,9 +5,11 @@
 import type { Ref } from "vue";
 import type { Template as EditorTemplate } from "@js/editor/types/editorTypes";
 import DummyInlineEditor from "@schoolboxVue/components/ckeditor/dummy-inline-editor.vue";
+import type { Course } from "@schoolboxLibrary/types/Course";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
-import type { Unit, UnitTemplate } from "./unitPlannerTypes";
+import type { Unit, UnitTemplate, Routes } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
 import UpHeader from "./up-header.vue";
 import UpAddUnitsModal from "./up-add-units-modal.vue";
@@ -18,19 +20,13 @@ import UpCurriculum from "./up-curriculum.vue";
 import ActivitiesListDeleteModal from "./activities-list/activities-list-delete-modal.vue";
 
 interface Props {
-    courseId: number;
+    course: Course;
+    curriculumNodes: Node[];
     folderId: number;
-    courseTitle: string;
     units: Unit[];
-    routeFolderSequence: string | null;
-    routeImportIntoClasses: string | null;
     template: UnitTemplate; // the course framework template that units are linked to
-    routeCurriculumCoverage: string | null;
     editorTemplates: EditorTemplate[]; // the editor templates available for insertion into textboxes
-    routeNewUnits: string | null;
-    routeModifyCourse: string | null;
-    routeCourseMarkbook: string | null;
-    routeLearningAnalytics: string | null;
+    routes: Routes;
 }
 
 const props = defineProps<Props>();
@@ -125,9 +121,9 @@ window.Vue.watch(
 );
 
 window.Vue.onBeforeMount(() => {
-    store.init(props.courseId, props.units, props.template, props.editorTemplates);
+    store.init(props.course.id, props.units, props.template, props.editorTemplates);
     dragStore.init(
-        props.routeFolderSequence,
+        props.routes.folderSequence,
         unitPlannerContainerEl as Ref<HTMLElement>, // Override type as it will be defined here.
         headerRowHeight,
         unitPlannerContainerScrollTop,
@@ -158,15 +154,10 @@ window.Vue.onUnmounted(() => {
 <template>
     <dummy-inline-editor v-if="store.units.some((u) => u.textboxes._routes.createTextbox !== null)" />
     <up-header
-        :course-title="props.courseTitle"
-        :course-id="store.courseId"
+        :course="props.course"
+        :curriculum-nodes="props.curriculumNodes"
         :folder-id="props.folderId"
-        :route-curriculum-coverage="props.routeCurriculumCoverage"
-        :route-import-into-classes="props.routeImportIntoClasses"
-        :route-new-units="props.routeNewUnits"
-        :route-modify-course="props.routeModifyCourse"
-        :route-course-markbook="props.routeCourseMarkbook"
-        :route-learning-analytics="props.routeLearningAnalytics"
+        :routes="props.routes"
     />
     <up-empty-state v-if="store.units.length === 0" />
     <div v-else class="row">
@@ -189,7 +180,7 @@ window.Vue.onUnmounted(() => {
                     <!-- Dropdowns that need to escape a content container's overflow:hidden target this with [data-dropdown-move-to]
                 The specific placement of this element ensures that the dropdowns are still contained within the table -->
                 </div>
-                <div class="unit-planner" v-bind="{ 'data-sortable': props.routeFolderSequence ? '' : undefined }">
+                <div class="unit-planner" v-bind="{ 'data-sortable': props.routes.folderSequence ? '' : undefined }">
                     <div id="unit-planner-sortable-container"></div>
                     <div ref="headerRowEl" class="grid-row header-row">
                         <div
