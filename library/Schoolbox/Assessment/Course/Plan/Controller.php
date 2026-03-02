@@ -491,6 +491,7 @@ class Controller extends Base
         }
 
         $units = [];
+        $newUnitSpecs = [];
         try {
             /* Finding the textbox definition ID from the Unit Template
              */
@@ -504,10 +505,14 @@ class Controller extends Base
             $textboxDefId = $unitTextboxComp->first()?->getDefinitionId();
             $this->unitSpecificationMapper->getDatabase()->beginTransaction();
             foreach ($names as $name) {
-                $newUnit = ($this->createUnit(trim($name ?? ''), $course));
-                $units[] = $this->getTranslatedUnitData($newUnit, $course, $textboxDefId);
+                $newUnitSpecs[] = $this->createUnit(trim($name ?? ''), $course);
             }
             $this->unitSpecificationMapper->getDatabase()->commit();
+
+            // Now that the transaction is committed, fetch the unit data with component IDs
+            foreach ($newUnitSpecs as $newUnit) {
+                $units[] = $this->getTranslatedUnitData($newUnit, $course, $textboxDefId);
+            }
         } catch (\Exception $e) {
             $this->unitSpecificationMapper->getDatabase()->rollBack();
             $problem = (new ApiProblem($e->getMessage()))
