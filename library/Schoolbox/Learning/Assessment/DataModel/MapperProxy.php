@@ -194,7 +194,7 @@ class MapperProxy
      *
      * @param int[] $ids
      * @param array $options
-     * @return GenericCollection|IAssessable[]
+     * @return GenericCollection<IAssessable>
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      * @throws LogicException If cyclic graph detected
@@ -742,7 +742,7 @@ class MapperProxy
      *
      * @param AssessmentContext $context
      * @param array             $options
-     * @return Collection|IAssessable[]
+     * @return Collection<IAssessable>
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
      * @throws TypeError If a PredicateBuilder method is called with wrong data type
      * @throws LogicException If cyclic graph detected during translation
@@ -873,7 +873,7 @@ class MapperProxy
      * @param int[] $unitImplIds
      * @param Collection<\Schoolbox\User>|null $users If provided, load only this student's participation
      * @param array $options
-     * @return GenericCollection|IAssessable[]
+     * @return GenericCollection<IAssessable>
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
      * @throws TypeError If a PredicateBuilder method is called with wrong data type
      * @throws DefinitionException If unable to locate a specified mapper join
