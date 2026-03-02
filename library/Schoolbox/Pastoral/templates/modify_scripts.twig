@@ -450,8 +450,8 @@
                  * Template's current value is empty string
                  * same above with the Confidential Templates
                  */
-                replaceTemplate($.trim(subtypesIndex[subtypeVal]), $.trim(subtypesIndexPrivate[subtypeVal]));
-                updatePoints($.trim(subtypesIndexDefaultPoints[subtypeVal]));
+                replaceTemplate((subtypesIndex[subtypeVal]).trim(), (subtypesIndexPrivate[subtypeVal]).trim());
+                updatePoints((subtypesIndexDefaultPoints[subtypeVal]).trim());
             } else {
 
                 /* If subtypeId == null, look at the parent typeId. load its template
@@ -459,8 +459,8 @@
                  * Type template or if the General Template's current value is empty string
                  * same above with the Confidential Templates
                  */
-                replaceTemplate($.trim(typesIndex[typeVal]), $.trim(typesIndexPrivate[typeVal]));
-                updatePoints($.trim(typesIndexDefaultPoints[typeVal]));
+                replaceTemplate((typesIndex[typeVal]).trim(), (typesIndexPrivate[typeVal]).trim());
+                updatePoints((typesIndexDefaultPoints[typeVal]).trim());
             }
         }
 
@@ -480,7 +480,7 @@
              * @returns {String}
              */
             let normalizeSpace = function (value) {
-                return $.trim(value.replace(/\s+/g, ' '));
+                return (value.replace(/\s+/g, ' ').trim());
             };
 
             /* If the current data is the same as the template contents,

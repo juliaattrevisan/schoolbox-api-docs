@@ -199,7 +199,7 @@
             var shortEnough = true;
 
             explodeCodes.forEach(function(code){
-                if($.trim(code).length > 64) {
+                if((code).trim().length > 64) {
                     shortEnough = false;
                 }
             });

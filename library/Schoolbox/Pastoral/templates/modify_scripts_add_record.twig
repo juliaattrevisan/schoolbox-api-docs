@@ -94,11 +94,11 @@
         /* Get the current entry tip when modifying the record
          */
         if (subtypeDropdown.val() === null) {
-            updateEntryTip($.trim(typesIndexEntryTip[typeDropdown.val()]));
-            updateExpiresAt($.trim(typesIndexDefaultExpiry[typeDropdown.val()]));
+            updateEntryTip((typesIndexEntryTip[typeDropdown.val().trim()]));
+            updateExpiresAt((typesIndexDefaultExpiry[typeDropdown.val().trim()]));
         } else {
-            updateEntryTip($.trim(subtypesIndexEntryTip[subtypeDropdown.val()]));
-            updateExpiresAt($.trim(subtypesIndexDefaultExpiry[subtypeDropdown.val()]));
+            updateEntryTip((subtypesIndexEntryTip[subtypeDropdown.val().trim()]));
+            updateExpiresAt((subtypesIndexDefaultExpiry[subtypeDropdown.val().trim()]));
         }
         {% endif %}
 
@@ -107,11 +107,11 @@
          */
         function init(typeVal, subtypeVal) {
             if (null !== subtypeVal) {
-                updateEntryTip($.trim(subtypesIndexEntryTip[subtypeVal]));
-                updateExpiresAt($.trim(subtypesIndexDefaultExpiry[subtypeVal]));
+                updateEntryTip((subtypesIndexEntryTip[subtypeVal]).trim());
+                updateExpiresAt((subtypesIndexDefaultExpiry[subtypeVal]).trim());
             } else {
-                updateEntryTip($.trim(typesIndexEntryTip[typeVal]));
-                updateExpiresAt($.trim(typesIndexDefaultExpiry[typeVal]));
+                updateEntryTip((typesIndexEntryTip[typeVal]).trim());
+                updateExpiresAt((typesIndexDefaultExpiry[typeVal]).trim());
             }
         }
 

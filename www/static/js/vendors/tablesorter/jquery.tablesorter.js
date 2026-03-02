@@ -168,7 +168,7 @@
 						text = c.supportsTextContent ? node.textContent : $(node).text();
 					}
 				}
-				return $.trim(text);
+				return (text).trim();
 			}
 
 			function detectParserForColumn(table, rows, rowIndex, cellIndex) {
@@ -1349,7 +1349,7 @@
 					// include sorter class name "sorter-text", etc; now works with "sorter-my-custom-parser"
 					val = cl.match( new RegExp('\\s' + key + '-([\\w-]+)') )[1] || '';
 				}
-				return $.trim(val);
+				return (val).trim();
 			};
 
 			ts.formatFloat = function(s, table) {
@@ -1372,7 +1372,7 @@
 				}
 				i = parseFloat(s);
 				// return the text instead of zero
-				return isNaN(i) ? $.trim(s) : i;
+				return isNaN(i) ? (s).trim() : i;
 			};
 
 			ts.isDigit = function(s) {
@@ -1400,7 +1400,7 @@
 		format: function(s, table) {
 			var c = table.config;
 			if (s) {
-				s = $.trim( c.ignoreCase ? s.toLocaleLowerCase() : s );
+				s = ( c.ignoreCase ? s.toLocaleLowerCase().trim() : s );
 				s = c.sortLocaleCompare ? ts.replaceAccents(s) : s;
 			}
 			return s;
@@ -1415,7 +1415,7 @@
 		},
 		format: function(s, table) {
 			var n = ts.formatFloat((s || '').replace(/[^\w,. \-()]/g, ""), table);
-			return s && typeof n === 'number' ? n : s ? $.trim( s && table.config.ignoreCase ? s.toLocaleLowerCase() : s ) : s;
+			return s && typeof n === 'number' ? n : s ? ( s && table.config.ignoreCase ? s.toLocaleLowerCase().trim() : s ) : s;
 		},
 		type: "numeric"
 	});
@@ -1427,7 +1427,7 @@
 		},
 		format: function(s, table) {
 			var n = ts.formatFloat((s || '').replace(/[^\w,. \-()]/g, ""), table);
-			return s && typeof n === 'number' ? n : s ? $.trim( s && table.config.ignoreCase ? s.toLocaleLowerCase() : s ) : s;
+			return s && typeof n === 'number' ? n : s ? ( s && table.config.ignoreCase ? s.toLocaleLowerCase().trim() : s ) : s;
 		},
 		type: "numeric"
 	});
@@ -1455,7 +1455,7 @@
 			return (/^(https?|ftp|file):\/\//).test(s);
 		},
 		format: function(s) {
-			return s ? $.trim(s.replace(/(https?|ftp|file):\/\//, '')) : s;
+			return s ? (s.replace(/(https?|ftp|file).trim():\/\//, '')) : s;
 		},
 		type: "text"
 	});

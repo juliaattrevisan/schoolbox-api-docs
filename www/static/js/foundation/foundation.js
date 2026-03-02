@@ -549,7 +549,7 @@
 
                 function trim(str) {
                     if (typeof str === "string") {
-                        return $.trim(str);
+                        return (str).trim();
                     }
                     return str;
                 }
