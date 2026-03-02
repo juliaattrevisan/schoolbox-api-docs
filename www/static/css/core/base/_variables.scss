@@ -34,7 +34,7 @@ $logo-background: var(--logo-background) !default;
 
 $body-bg: var(--sbx-config-color-body-background, var(--body-background)) !default;
 
-$login-form-background: var(--login-form-background) !default;
+$login-form-background: var(--sbx-config-login-form-background, var(--login-form-background)) !default;
 
 $accounts-menu-foreground: var(--sbx-config-color-menu-background, var(--accounts-menu-foreground)) !default;
 $accounts-menu-background: var(--sbx-config-color-menu-foreground, var(--accounts-menu-background)) !default;

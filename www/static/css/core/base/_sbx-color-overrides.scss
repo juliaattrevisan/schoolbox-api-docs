@@ -1,7 +1,9 @@
-// Color overrides for Storybook UI Uplift
-// Scope: UI Uplift
-// The majority of colour overrides are applied directly on the element to avoid specificity issues,
-// adding thew new color while falling back to the old color if the new one isn't set.
+/**
+ * Color overrides for Storybook UI Uplift
+ * Scope: UI Uplift
+ * The majority of colour overrides are applied directly on the element to avoid specificity issues,
+ * adding the new color while falling back to the old color if the new one isn't set.
+ */
 
 body.sbx-body {
     // Highchart fill - directly override the white background
