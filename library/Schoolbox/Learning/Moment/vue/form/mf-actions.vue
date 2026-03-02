@@ -32,20 +32,40 @@ const relevantRoutes = window.Vue.computed(() => {
 <template>
     <ul class="flex-list buttons">
         <li v-if="relevantRoutes.draft">
-            <button :disabled="mfStore.isSaving" @click="() => mfStore.submitForm(false, 'draft')">
+            <button
+                data-test="learning-moment-save-draft"
+                :disabled="mfStore.isSaving"
+                @click="() => mfStore.submitForm(false, 'draft')"
+            >
                 Save for later
             </button>
         </li>
         <li v-if="relevantRoutes.reject">
-            <button :disabled="mfStore.isSaving" @click="() => mfStore.reject()">Request update</button>
+            <button
+                :disabled="mfStore.isSaving"
+                data-test="learning-moment-request-update"
+                @click="() => mfStore.reject()"
+            >
+                Request update
+            </button>
         </li>
         <li v-if="relevantRoutes.submit">
-            <button :disabled="mfStore.isSaving" class="submit" @click="() => mfStore.submitForm(false, 'submit')">
+            <button
+                :disabled="mfStore.isSaving"
+                class="submit"
+                data-test="learning-moment-submit-for-approval"
+                @click="() => mfStore.submitForm(false, 'submit')"
+            >
                 Submit for approval
             </button>
         </li>
         <li v-if="relevantRoutes.publish">
-            <button :disabled="mfStore.isSaving" class="submit" @click="() => mfStore.publish()">
+            <button
+                :disabled="mfStore.isSaving"
+                class="submit"
+                data-test="learning-moment-publish"
+                @click="() => mfStore.publish()"
+            >
                 {{ props.publishLabel }}
             </button>
         </li>

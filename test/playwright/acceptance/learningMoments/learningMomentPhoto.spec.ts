@@ -2,8 +2,11 @@
  * This test creates, modifies and delete a learning moment, add a comment and delete it
  */
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
-import LearningMomentsPage from "@schoolboxTest/playwright/support/page/learningMoments/LearningMomentsPage";
+import LearningMomentModify from "@schoolboxTest/playwright/support/page/learningMoments/LearningMomentModify";
 import EditorTemplate from "@schoolboxTest/playwright/support/page/admin/design/EditorTemplates";
+import ActivityFeed from "@schoolboxTest/playwright/support/page/profilePage/ActivityFeed";
+import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
+import EvidenceMediaRecording from "@schoolboxTest/playwright/support/page/learningMoments/EvidenceMediaRecording";
 
 test.describe("Learning Moment Photo Tests", () => {
     /**
@@ -23,163 +26,199 @@ test.describe("Learning Moment Photo Tests", () => {
     });
 
     test("Learning Moment Photo", async ({ tester, page }) => {
-        const learningMomentsPage = new LearningMomentsPage(tester, page);
+        const profilePage = new ProfilePage(tester, page);
+        const activityFeed = new ActivityFeed(tester, page);
+        const learningMomentModify = new LearningMomentModify(tester, page);
+        const evidenceMediaRecording = new EvidenceMediaRecording(tester, page);
         const editorTemplate = new EditorTemplate(page, tester);
+
+        const studentId = 25;
+
         tester.isGoingTo("Create a editor template to use as learning moment description");
+        const templateTitle = "Learning Moments Automation Template";
         await editorTemplate.gotoCreateTemplatePage(7);
         await editorTemplate.createTemplate(
-            "Learning Moments Automation Template",
+            templateTitle,
             "This is an automation template",
             "This is a learning moments test - take a photo",
         );
 
-        await page.goto(LearningMomentsPage.getStudentProfilePage(25));
-
         tester.isGoingTo("share a photo learning moment");
-        await learningMomentsPage.clickShareLearningMomentLink();
-        await learningMomentsPage.clickTakeAPhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
+        await profilePage.goto(studentId);
+        await activityFeed.clickShareLearningMoment();
+        await activityFeed.shareLearningModal.clickSharePhoto();
+        await evidenceMediaRecording.takePhoto();
 
         tester.isGoingTo("ensure I am able to delete the photo and then take the photo again");
-        await learningMomentsPage.deletePhotoEvidence();
-        await learningMomentsPage.clickCameraIconButton();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
+        await learningMomentModify.deleteEvidence();
+        await learningMomentModify.share.clickSharePhoto();
+        await evidenceMediaRecording.takePhoto();
 
         tester.isGoingTo("write a description");
-        await learningMomentsPage.clickWriteSomethingButton();
-        await tester.clickEditorTemplateCKEditor("mf-evidence-textarea", "Learning Moments Automation Template");
-        await learningMomentsPage.clickSubmit();
+        await learningMomentModify.share.clickShareText();
+        await learningMomentModify.setBodyEditorTemplate(templateTitle);
+        await learningMomentModify.clickPublish();
 
         tester.isGoingTo("check if the picture and text are presented in the student activity feed");
-        await learningMomentsPage.verifyEvidence("This is a learning moments test - take a photo");
-        await learningMomentsPage.verifyEvidenceHasPhoto();
-        await learningMomentsPage.verifyShareLearningMomentLinkExists();
+        await activityFeed.verifyShareLearningMomentButtonExists(); // should have been returned to the activity feed
+        await activityFeed.verifyMomentEvidence("This is a learning moments test - take a photo");
+        await activityFeed.verifyMomentEvidenceHasPhoto();
 
         tester.isGoingTo("As Jana Reed check that student cannot see the template icon in the CKEditor");
         await tester.impersonate("Jana Reed");
-        await page.goto(LearningMomentsPage.getStudentProfilePage(25));
-        await learningMomentsPage.clickShareLearningMomentLink();
-        await learningMomentsPage.clickWriteSomethingButton();
+        await profilePage.goto(studentId);
+        await activityFeed.clickShareLearningMoment();
+        await learningMomentModify.share.clickShareText();
         await tester.checkTemplateIconVisibility(false);
     });
 
     test("Learning Moment Comments", async ({ tester, page }) => {
-        const learningMomentsPage = new LearningMomentsPage(tester, page);
-        await page.goto(LearningMomentsPage.getStudentProfilePage(6));
+        const profilePage = new ProfilePage(tester, page);
+        const activityFeed = new ActivityFeed(tester, page);
+        const learningMomentModify = new LearningMomentModify(tester, page);
+        const evidenceMediaRecording = new EvidenceMediaRecording(tester, page);
+        await profilePage.goto(6);
 
         tester.isGoingTo("share a learning moment");
-        await learningMomentsPage.clickShareLearningMomentLink();
-        await learningMomentsPage.clickTakeAPhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
-        await learningMomentsPage.clickWriteSomethingButton();
-        await learningMomentsPage.typeMediaEvidenceDescription("This is a learning moments test to be commented");
-        await learningMomentsPage.clickSubmit();
+        await activityFeed.clickShareLearningMoment();
+        await activityFeed.shareLearningModal.clickSharePhoto();
+        await evidenceMediaRecording.takePhoto();
+
+        const momentBody = "This is a learning moments test to be commented";
+        await learningMomentModify.share.clickShareText();
+        await learningMomentModify.typeBody(momentBody);
+        await learningMomentModify.clickPublish();
 
         tester.isGoingTo("check the learning moment is presented in the student activity feed and comment it");
-        await learningMomentsPage.verifyEvidence("This is a learning moments test to be commented");
+        await activityFeed.verifyShareLearningMomentButtonExists(); // should have been returned to the activity feed
+        await activityFeed.verifyMomentEvidence(momentBody);
+
+        const commentText = "Well done. This is my first comment in this learning moment!";
         await tester.common.clickAddComment();
-        await learningMomentsPage.typeComment();
-        await learningMomentsPage.clickPostComment();
+        await activityFeed.typeMomentComment(commentText);
+        await activityFeed.clickMomentPostComment();
 
         tester.isGoingTo("check the comment is presented");
-        await learningMomentsPage.verifyComment("Well done. This is my first comment in this learning moment!");
+        await activityFeed.verifyMomentComment(commentText);
     });
 
     test("Learning Moment Modify", async ({ tester, page, db }) => {
-        const learningMomentsPage = new LearningMomentsPage(tester, page);
-        await page.goto(LearningMomentsPage.getStudentProfilePage(45));
+        const profilePage = new ProfilePage(tester, page);
+        const activityFeed = new ActivityFeed(tester, page);
+        const learningMomentModify = new LearningMomentModify(tester, page);
+        const evidenceMediaRecording = new EvidenceMediaRecording(tester, page);
+
+        const studentId = 45;
+        await profilePage.goto(studentId);
 
         tester.isGoingTo("share a learning moment");
-        await learningMomentsPage.clickShareLearningMomentLink();
-        await learningMomentsPage.clickTakeAPhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
-        await learningMomentsPage.clickWriteSomethingButton();
-        await learningMomentsPage.typeMediaEvidenceDescription("This is a learning moments test to be modified");
-        await learningMomentsPage.clickSubmit();
+        await activityFeed.clickShareLearningMoment();
+        await activityFeed.shareLearningModal.clickSharePhoto();
+        await evidenceMediaRecording.takePhoto();
+
+        const momentBody = "This is a learning moments test to be modified";
+        await learningMomentModify.share.clickShareText();
+        await learningMomentModify.typeBody(momentBody);
+        await learningMomentModify.clickPublish();
 
         tester.isGoingTo("check the learning moment is presented in the student activity feed and getting it updated");
-
-        await learningMomentsPage.verifyEvidence("This is a learning moments test to be modified");
+        await activityFeed.verifyShareLearningMomentButtonExists(); // should have been returned to the activity feed
+        await activityFeed.verifyMomentEvidence(momentBody);
         const evidenceId = (await db.grabFromDatabase("moment", "id", {
             deleted_at: null,
-            "body LIKE": "%This is a learning moments test to be modified%",
-            user_id: 45,
+            "body LIKE": `%${momentBody}%`,
+            user_id: studentId,
         })) as number;
         expect(evidenceId).not.toBe(null);
 
-        await learningMomentsPage.clickDropdownMenu(evidenceId);
-        await learningMomentsPage.clickModifySubmenu(evidenceId);
-        await learningMomentsPage.typeMediaEvidenceDescription(
-            "This is a learning moments test to be modified updated",
-        );
-        await learningMomentsPage.deletePhotoEvidence();
-        await learningMomentsPage.clickCameraIconButton();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
-        await learningMomentsPage.clickSubmit();
+        await activityFeed.clickMomentDropdownMenu(evidenceId);
+        await activityFeed.clickMomentModifySubmenu(evidenceId);
+
+        const updatedMomentBody = "This is a learning moments test to be modified updated";
+        await learningMomentModify.typeBody(updatedMomentBody);
+        await learningMomentModify.deleteEvidence();
+        await learningMomentModify.share.clickSharePhoto();
+        await evidenceMediaRecording.takePhoto();
+        await learningMomentModify.clickPublish();
 
         tester.isGoingTo("check the learning moment is presented in the student activity feed updated");
-        await learningMomentsPage.verifyEvidence("This is a learning moments test to be modified updated");
+        await activityFeed.verifyShareLearningMomentButtonExists(); // should have been returned to the activity feed
+        await activityFeed.verifyMomentEvidence(updatedMomentBody);
     });
 
     test("Learning Moment Delete Comment", async ({ tester, page }) => {
-        const learningMomentsPage = new LearningMomentsPage(tester, page);
-        await page.goto(LearningMomentsPage.getStudentProfilePage(60));
+        const profilePage = new ProfilePage(tester, page);
+        const activityFeed = new ActivityFeed(tester, page);
+        const learningMomentModify = new LearningMomentModify(tester, page);
+        const evidenceMediaRecording = new EvidenceMediaRecording(tester, page);
+        await profilePage.goto(60);
 
         tester.isGoingTo("share a learning moment");
-        await learningMomentsPage.clickShareLearningMomentLink();
-        await learningMomentsPage.clickTakeAPhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
-        await learningMomentsPage.clickWriteSomethingButton();
-        await learningMomentsPage.typeMediaEvidenceDescription(
-            "This is a learning moments test to get comments deleted",
-        );
-        await learningMomentsPage.clickSubmit();
+        await activityFeed.clickShareLearningMoment();
+        await activityFeed.shareLearningModal.clickSharePhoto();
+        await evidenceMediaRecording.takePhoto();
+
+        const momentBody = "This is a learning moments test to get comments deleted";
+        await learningMomentModify.share.clickShareText();
+        await learningMomentModify.typeBody(momentBody);
+        await learningMomentModify.clickPublish();
 
         tester.isGoingTo("check the learning moment is presented in the student activity feed and adding a comment");
-        await learningMomentsPage.verifyEvidence("This is a learning moments test to get comments deleted");
+        await activityFeed.verifyShareLearningMomentButtonExists(); // should have been returned to the activity feed
+        await activityFeed.verifyMomentEvidence(momentBody);
+
+        const commentText = "Well done. This is my first comment in this learning moment!";
         await tester.common.clickAddComment();
-        await learningMomentsPage.typeComment();
-        await learningMomentsPage.clickPostComment();
+        await activityFeed.typeMomentComment(commentText);
+        await activityFeed.clickMomentPostComment();
 
         tester.isGoingTo("check the comment is presented");
-        await learningMomentsPage.verifyComment("Well done. This is my first comment in this learning moment!");
-        await learningMomentsPage.clickCommentDeleteButton();
-        await learningMomentsPage.clickConfirmDeleteButton();
+        await activityFeed.verifyMomentComment(commentText);
+        await activityFeed.clickMomentCommentDeleteButton();
+        await activityFeed.clickMomentConfirmCommentDeleteButton();
 
         tester.isGoingTo("check the comment is no longer presented and the count is zero");
-        await learningMomentsPage.verifyCommentCount(0);
+        await activityFeed.verifyMomentCommentCount(0);
     });
 
     test("Learning Moment Delete", async ({ tester, page, db }) => {
-        const learningMomentsPage = new LearningMomentsPage(tester, page);
-        await page.goto(LearningMomentsPage.getStudentProfilePage(29));
+        const profilePage = new ProfilePage(tester, page);
+        const activityFeed = new ActivityFeed(tester, page);
+        const learningMomentModify = new LearningMomentModify(tester, page);
+        const evidenceMediaRecording = new EvidenceMediaRecording(tester, page);
+
+        const studentId = 29;
+        await profilePage.goto(studentId);
 
         tester.isGoingTo("share a learning moment");
-        await learningMomentsPage.clickShareLearningMomentLink();
-        await learningMomentsPage.clickTakeAPhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
-        await learningMomentsPage.clickWriteSomethingButton();
-        await learningMomentsPage.typeMediaEvidenceDescription("This is a learning moments test to get deleted");
-        await learningMomentsPage.clickSubmit();
+        await activityFeed.clickShareLearningMoment();
+        await activityFeed.shareLearningModal.clickSharePhoto();
+        await evidenceMediaRecording.takePhoto();
+
+        const momentBody = "This is a learning moments test to get deleted";
+        await learningMomentModify.share.clickShareText();
+        await learningMomentModify.typeBody(momentBody);
+        await learningMomentModify.clickPublish();
 
         tester.isGoingTo("check the learning moment is presented in the student activity feed");
-        await learningMomentsPage.verifyEvidence("This is a learning moments test to get deleted");
+        await activityFeed.verifyShareLearningMomentButtonExists(); // should have been returned to the activity feed
+        await activityFeed.verifyMomentEvidence(momentBody);
 
         tester.isGoingTo("delete the learning moment");
         const evidenceId = (await db.grabFromDatabase("moment", "id", {
             deleted_at: null,
-            "body LIKE": "%This is a learning moments test to get deleted%",
-            user_id: 29,
+            "body LIKE": `%${momentBody}%`,
+            user_id: studentId,
         })) as number;
         expect(evidenceId).not.toBe(null);
 
-        await learningMomentsPage.clickDropdownMenu(evidenceId);
-        await learningMomentsPage.clickLearningMomentDeleteButton(evidenceId);
-        await learningMomentsPage.clickLearningMomentConfirmDeleteButton();
+        await activityFeed.clickMomentDropdownMenu(evidenceId);
+        await activityFeed.clickMomentDeleteButton(evidenceId);
+        await activityFeed.clickMomentConfirmDeleteButton();
 
         tester.isGoingTo("check the text is no longer presented ");
-        await learningMomentsPage.verifyEvidenceNotPresent("This is a learning moment test to get deleted");
-        await learningMomentsPage.verifyShareLearningMomentLinkExists();
+        await activityFeed.verifyShareLearningMomentButtonExists(); // should have been returned to the activity feed
+        await activityFeed.verifyMomentCount(0);
     });
 
     test.afterAll(async ({ baseTester, db }) => {

@@ -149,4 +149,16 @@ export default class ApiHelper {
             throw new Error(`Failed to delete homepage component: ${resp.status()} ${resp.statusText()}`);
         }
     }
+
+    /**
+     * Delete a learning moment
+     * @param momentId - ID of the learning moment to delete
+     */
+    async deleteLearningMoment(momentId: string | number): Promise<void> {
+        this.baseTester.isGoingTo(`soft delete the learning moment with ID ${momentId}`);
+        const resp = await this.request.delete(`/learning/evidence/${momentId}`, await this.getAuthHeader());
+        if (!resp.ok()) {
+            throw new Error(`Failed to delete learning moment: ${resp.status()} ${resp.statusText()}`);
+        }
+    }
 }

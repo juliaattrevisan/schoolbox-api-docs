@@ -120,6 +120,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
                     v-if="props.entry.currentState !== EvidenceStatus.PUBLISHED"
                     class="label"
                     :class="`label--moment-${props.entry.currentState}`"
+                    :data-test="`learning-moment-status-${props.entry.currentState}`"
                 >
                     {{ evidenceStatusLabels[props.entry.currentState] }}
                 </span>
