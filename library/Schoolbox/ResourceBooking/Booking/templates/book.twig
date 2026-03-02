@@ -29,7 +29,9 @@ $(function() {
     // Have some sort of helper for creating remote validations.
     let getValidatorRemoteMethod = function(code, key) {
         return function(value, element) {
-            let errorsByDate = (errors[key || element.name] || {}); // This will be an object containing dates as keys, arrays as values.
+            // Variable 'errors' will contain the server's response to the form submission (set in the ajaxFail() method).
+            // Variable 'errors' will be an object containing dates as keys, arrays as values.
+            let errorsByDate = (errors[key || element.name] || {});
             let errorsArrays = Object.values(errorsByDate);
 
             // Search for code in all the errorStrings arrays.
@@ -185,7 +187,8 @@ $(function() {
             const toast = window.sbProps.toastActivate();
             let errorMsg = null;
             if (jqXHR?.responseJSON?.errors) {
-                errorMsg = convertErrorsDataStructureToString(jqXHR?.responseJSON?.errors);
+                errors = jqXHR?.responseJSON?.errors;
+                errorMsg = convertErrorsDataStructureToString(errors);
             } else if (jqXHR?.responseJSON?.message) {
                 errorMsg = jqXHR?.responseJSON?.message;
             }
