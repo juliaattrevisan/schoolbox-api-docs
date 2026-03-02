@@ -713,8 +713,8 @@ class Controller extends Base
             \Schoolbox\UserMapper::getInstance(), // TODO inject this from wherever you implement later
         );
 
-        // turn on the stats
-        $overallStatistics = true;
+        // toggle the stats
+        $overallStatistics = false;
 
         // Fetch assessments & participants
         if (empty($assessmentIds)) {
@@ -729,93 +729,91 @@ class Controller extends Base
              */
 
             // load the folder's info
-            $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
-                folderId: $folder->getId(),
-                users: null,
-                options: [ 'ids' => $assessmentIds ]
-            );
-
-//            /* Reporting Activity
-//             * Note that the first arg to findAllByFolderIdForReview() can actually be a set of folder ids
-//             */
-//            // Turn off the stats
-//            $overallStatistics = false;
-//
 //            $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
-//                /* For the students in $folder, find all the folders where they had a published feedback
-//                 */
-//                folderId: $feedbackFolders->findForFolder($folder, $from, $to),
-//                /* For the $studentIds provided, find all the folders where they had a published feedback
-//                 */
-//                //                (new FeedbackFolders($this->getDi()->get('databaseInternal'), $this->getDi()->get('externalClass')))
-//                //                    ->findForStudents($studentIds, $from, $to),
-//                /* Instead of the FeedbackFolders, you can slam together your own list of folders arbitrarily
-//                 * I found these manually
-//                 */
-//                // folderId: [
-//                //                     $folder->getId(),  // typically 80, 9ENGA
-//                //                     78, // 9SPANISHA
-//                //                     189, // 9MATA
-//                //                     85, // 9PDHC
-//                //                     190, // 9MYPA
-//                //                     97, // 3TR
-//                //                     93, // 3AC
-//                //                     92, // 3IB
-//                //                     95, // 3IBSPA
-//                //                     96, // 3IBVA
-//                //                     250, // ELCB
-//                //                 ],
-//                /* This was thought to limit it to one student, but it doesn't help much; it just finds assessments
-//                 * this student did, which still ends up hydrating what every other student in that assessment too,
-//                 * by virtue of the swamp.
-//                 *
-//                 * student: \Schoolbox\UserMapper::getInstance()->findById(13),
-//                 */
-//                /* Only hydrate these particular participants and their feedbacks, if specified: otherwise swamp hydrates
-//                 * everyone who participated in each $assessment which might be more than you need.
-//                 */
-//                users: $feedbackFolders->findStudents($folder),
-//                /* Somewhat experimental:
-//                 * Don't need any response instances. You get some mixed results here, since the markbook infers states:
-//                 * a response existing, but no feedback given yet, is shown as a hyphen - ...but if a response doesn't
-//                 * exist, the markbook shows "Pending" under the assumption you never submitted anything.
-//                 */
-//                includeResponses: true,
-//                /* There's this somewhat obscure "options to pass to findByColumList" but there's actually a few
-//                 * rarely-used, rarely-encountered ideas here: ref. convertOptionsToPredicateBuilder() in the
-//                 * Assessment MapperProxy:1790. You get there via findAllByFolderIdForReview() and it has a plethora of
-//                 * date range filters, term-based filters, etc. deep in the swamp where you'd never look.
-//                 */
-//                options: [
-//                    'due_after' => $from,
-//                    'due_before' => $to,
-//                    'type' => [
-//                        AssessmentType::TYPE_DUE_WORK,
-//                        AssessmentType::TYPE_QUIZ,
-//                        AssessmentType::TYPE_PROJECT,
-//                        AssessmentType::TYPE_LTI_ASSESSMENT
-//                    ],
-//                    'work_type' => [
-//                        1, // Formative Assessment Task
-//                        2, // Summative Assessment Task
-//                        3, // Learning Activity
-//                        4, // Homework Task
-//                        5, // Observation
-//                        6, // Lesson Planning
-//                        7, // Reporting
-//                        8, // Unknown (maybe deleted)
-//                        9, // Approach To Learning
-//                    ],
-//                    /* If both are provided, assessment ids and curriculum nodes execute an intersect: this results in
-//                     * all the assessment ids provided that -also- are associated with any of the curric codes specified
-//                     */
-//                //                    'ids' => [391],
-//                //                    'curriculum_codes' => [
-//                //                        'AC9SAS09',
-//                //                        'GC-FA-a'
-//                //                    ]
-//                ],
+//                folderId: $folder->getId(),
+//                users: null,
+//                options: [ 'ids' => $assessmentIds ]
 //            );
+
+            /* Reporting Activity
+             * Note that the first arg to findAllByFolderIdForReview() can actually be a set of folder ids
+             */
+
+            $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview(
+                /* For the students in $folder, find all the folders where they had a published feedback
+                 */
+                folderId: $feedbackFolders->findForFolder($folder, $from, $to),
+                /* For the $studentIds provided, find all the folders where they had a published feedback
+                 */
+                //                (new FeedbackFolders($this->getDi()->get('databaseInternal'), $this->getDi()->get('externalClass')))
+                //                    ->findForStudents($studentIds, $from, $to),
+                /* Instead of the FeedbackFolders, you can slam together your own list of folders arbitrarily
+                 * I found these manually
+                 */
+                // folderId: [
+                //                     $folder->getId(),  // typically 80, 9ENGA
+                //                     78, // 9SPANISHA
+                //                     189, // 9MATA
+                //                     85, // 9PDHC
+                //                     190, // 9MYPA
+                //                     97, // 3TR
+                //                     93, // 3AC
+                //                     92, // 3IB
+                //                     95, // 3IBSPA
+                //                     96, // 3IBVA
+                //                     250, // ELCB
+                //                 ],
+                /* This was thought to limit it to one student, but it doesn't help much; it just finds assessments
+                 * this student did, which still ends up hydrating what every other student in that assessment too,
+                 * by virtue of the swamp.
+                 *
+                 * student: \Schoolbox\UserMapper::getInstance()->findById(13),
+                 */
+                /* Only hydrate these particular participants and their feedbacks, if specified: otherwise swamp hydrates
+                 * everyone who participated in each $assessment which might be more than you need.
+                 */
+                users: $feedbackFolders->findStudents($folder),
+                /* Somewhat experimental:
+                 * Don't need any response instances. You get some mixed results here, since the markbook infers states:
+                 * a response existing, but no feedback given yet, is shown as a hyphen - ...but if a response doesn't
+                 * exist, the markbook shows "Pending" under the assumption you never submitted anything.
+                 */
+                includeResponses: true,
+                /* There's this somewhat obscure "options to pass to findByColumList" but there's actually a few
+                 * rarely-used, rarely-encountered ideas here: ref. convertOptionsToPredicateBuilder() in the
+                 * Assessment MapperProxy:1790. You get there via findAllByFolderIdForReview() and it has a plethora of
+                 * date range filters, term-based filters, etc. deep in the swamp where you'd never look.
+                 */
+                options: [
+                    'due_after' => $from,
+                    'due_before' => $to,
+                    'type' => [
+                        AssessmentType::TYPE_DUE_WORK,
+                        AssessmentType::TYPE_QUIZ,
+                        AssessmentType::TYPE_PROJECT,
+                        AssessmentType::TYPE_LTI_ASSESSMENT
+                    ],
+                    'work_type' => [
+                        1, // Formative Assessment Task
+                        2, // Summative Assessment Task
+                        3, // Learning Activity
+                        4, // Homework Task
+                        5, // Observation
+                        6, // Lesson Planning
+                        7, // Reporting
+                        8, // Unknown (maybe deleted)
+                        9, // Approach To Learning
+                    ],
+                    /* If both are provided, assessment ids and curriculum nodes execute an intersect: this results in
+                     * all the assessment ids provided that -also- are associated with any of the curric codes specified
+                     */
+                //                    'ids' => [391],
+                //                    'curriculum_codes' => [
+                //                        'AC9SAS09',
+                //                        'GC-FA-a'
+                //                    ]
+                ],
+            );
         }
 
         // Build a markbook
