@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Application\CliTool;
 
 use GetOpt;
+use GetOptionKit\Option;
 use GetOptionKit\OptionCollection;
 use GetOptionKit\OptionParser;
 use GetOptionKit\OptionPrinter\ConsoleOptionPrinter;
@@ -275,7 +276,21 @@ abstract class BaseApp extends App
     protected function getOpt(string $name)
     {
         // Old options might have the : suffix: if so, remove it
-        return $this->optionResult->get(rtrim($name, ':'));
+        $trimmedName = rtrim($name, ':');
+        $result      = $this->optionResult->get($trimmedName);
+        if (isset($result)) {
+            return $result;
+        }
+
+        // This might be a short value, which has a long value alias?
+        $option = $this->optionCollection->get($trimmedName);
+        if ($option instanceof Option) {
+            return $this->optionResult->get($option->long);
+        }
+
+        // Otherwise return nothing
+        return null;
+
 //        return $this->optionParser->getOption(rtrim($name, ':'));
     }
 }
