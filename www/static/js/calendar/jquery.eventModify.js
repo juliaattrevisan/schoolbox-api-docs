@@ -197,6 +197,8 @@
                 return false;
             };
 
+            const startDateField = config.element.find('input[name="startDate"]');
+
             $(config.element).alaressValidate({
                 rules: {
                     "campuses[]": {
@@ -233,6 +235,23 @@
                     endDate: {
                         required: true,
                         datepickerDate: true,
+                        datepickerDateNotBefore: startDateField,
+                        /**
+                         * When the event isn't an all-day event, the end date and time must be after (not before)
+                         * the start date and time.
+                         * The datetime picker lets you switch between all-day and timed, so only apply this rule
+                         * when it's set to all day.
+                         */
+                        datepickerDateTimeNotBeforeOrEqual: {
+                            param: startDateField,
+                            depends: (element) => {
+                                const isDateOnly =
+                                    typeof $(element).attr("data-datepicker-time") == "undefined" ||
+                                    $("#" + $(element).attr("data-datepicker-alldayinput")).val() == 1;
+
+                                return !isDateOnly;
+                            },
+                        },
                     },
                     repeat_until: {
                         datepickerDate: {
