@@ -98,4 +98,106 @@ body.sbx-body {
     .label.filter {
         background: var(--sbx-config-color-active);
     }
+
+    .gradient-10,
+    .plagscan-ok {
+        color: var(--sbx-color-gradient-10);
+    }
+    .gradient-10-bg {
+        background-color: var(--sbx-color-gradient-10);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-10);
+    }
+
+    .gradient-9 {
+        color: var(--sbx-color-gradient-9);
+    }
+    .gradient-9-bg {
+        background-color: var(--sbx-color-gradient-9);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-9);
+    }
+
+    .gradient-8 {
+        color: var(--sbx-color-gradient-8);
+    }
+    .gradient-8-bg {
+        background-color: var(--sbx-color-gradient-8);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-8);
+    }
+
+    .gradient-7 {
+        color: var(--sbx-color-gradient-7);
+    }
+    .gradient-7-bg {
+        background-color: var(--sbx-color-gradient-7);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-7);
+    }
+
+    .gradient-6 {
+        color: var(--sbx-color-gradient-6);
+    }
+    .gradient-6-bg {
+        background-color: var(--sbx-color-gradient-6);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-6);
+    }
+
+    .gradient-5 {
+        color: var(--sbx-color-gradient-5);
+    }
+    .gradient-5-bg {
+        background-color: var(--sbx-color-gradient-5);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-5);
+    }
+
+    .gradient-4 {
+        color: var(--sbx-color-gradient-4);
+    }
+    .gradient-4-bg,
+    .plagscan-warning {
+        background-color: var(--sbx-color-gradient-4);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-4);
+    }
+
+    .gradient-3 {
+        color: var(--sbx-color-gradient-3);
+    }
+    .gradient-3-bg {
+        background-color: var(--sbx-color-gradient-3);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-3);
+    }
+
+    .gradient-2 {
+        color: var(--sbx-color-gradient-2);
+    }
+    .gradient-2-bg {
+        background-color: var(--sbx-color-gradient-2);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-2);
+    }
+
+    .gradient-1 {
+        color: var(--sbx-color-gradient-1);
+    }
+    .gradient-1-bg {
+        background-color: var(--sbx-color-gradient-1);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-1);
+    }
+
+    .gradient-0,
+    .plagscan-critical {
+        color: var(--sbx-color-gradient-0);
+    }
+    .gradient-0-bg {
+        background-color: var(--sbx-color-gradient-0);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-0);
+    }
 }
