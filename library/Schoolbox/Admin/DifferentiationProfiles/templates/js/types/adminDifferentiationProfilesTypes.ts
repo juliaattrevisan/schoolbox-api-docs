@@ -37,7 +37,7 @@ export type Header = {
     maxLength?: number;
     type: "text" | "checkbox";
     colSpan: number;
-    key: string;
+    key: keyof Field;
 };
 
 /**
