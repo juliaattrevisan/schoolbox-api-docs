@@ -908,7 +908,7 @@ class MapperProxy
      * @param Collection<\Schoolbox\User>|null $users If provided, load only this student's participation
      * @param array $options
      * @param bool $includeResponses If true, hydrate Response instances
-     * @return Collection|IAssessable[]
+     * @return Collection<IAssessable>
      * @throws TypeError If a PredicateBuilder method is called with wrong data type
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
      * @throws DefinitionException If unable to locate a specified mapper join
@@ -921,7 +921,6 @@ class MapperProxy
         ?Collection $users = null,
         bool $includeResponses = true,
         array $options = [],
-        array $participantUsers = [],
     ) {
         /* Specifically one person
          */
