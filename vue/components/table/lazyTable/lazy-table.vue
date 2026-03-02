@@ -85,6 +85,7 @@ function onSortSelected(key: string): void {
 .lazy-table__row > th,
 .lazy-table__row > td {
     border-color: var(--sbx-color-border, var(--body-background));
+    background-color: var(--sbx-color-foreground-primary, white);
     border-style: solid;
     border-width: 1px 0 1px 0; // Unless overridden below
     overflow-wrap: anywhere;
