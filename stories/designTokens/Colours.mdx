@@ -8,35 +8,53 @@ import { Meta, ColorItem } from "@storybook/addon-docs/blocks";
 
 ## Configurable
 
-| CSS Custom Property                  | Description |
-| ------------------------------------ | ----------- |
-| `--sbx-config-color-body-background` |             |
-| `--sbx-config-color-accent`          |             |
-| `--sbx-config-color-accent-text`     |             |
-| `--sbx-config-color-active`          |             |
-| `--sbx-config-color-menu-background` |             |
-| `--sbx-config-color-menu-foreground` |             |
-| `--sbx-config-color-menu-hover`      |             |
+| CSS Custom Property                  | Value     | Preview                                                                                                    | Contrast                             |
+| ------------------------------------ | --------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| `--sbx-config-color-body-background` | `#e5eff7` | <div style={{backgroundColor: '#e5eff7', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-text-primary`           |
+| `--sbx-config-color-accent`          | `#001691` | <div style={{backgroundColor: '#001691', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-config-color-accent-text`     |
+| `--sbx-config-color-accent-text`     | `#fff`    | <div style={{backgroundColor: '#fff', width: '100px', height: '30px', border: '1px solid #ccc'}}></div>    | `--sbx-config-color-accent`          |
+| `--sbx-config-color-active`          | `#d2edf2` | <div style={{backgroundColor: '#d2edf2', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-config-color-accent`          |
+| `--sbx-config-color-menu-background` | `#001691` | <div style={{backgroundColor: '#001691', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-config-color-menu-foreground` |
+| `--sbx-config-color-menu-foreground` | `#fff`    | <div style={{backgroundColor: '#fff', width: '100px', height: '30px', border: '1px solid #ccc'}}></div>    | `--sbx-config-color-menu-background` |
+| `--sbx-config-color-menu-hover`      | `#009eb2` | <div style={{backgroundColor: '#009eb2', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-config-color-menu-foreground` |
 
 ## Core
 
-| CSS Custom Property                | Description |
-| ---------------------------------- | ----------- |
-| `--sbx-color-foreground-primary`   |             |
-| `--sbx-color-foreground-secondary` |             |
-| `--sbx-color-text-primary`         |             |
-| `--sbx-color-text-secondary`       |             |
-| `--sbx-color-border`               |             |
+| CSS Custom Property                | Value     | Preview                                                                                                    | Contrast                           |
+| ---------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| `--sbx-color-foreground-primary`   | `#fff`    | <div style={{backgroundColor: '#fff', width: '100px', height: '30px', border: '1px solid #ccc'}}></div>    | `--sbx-color-text-primary`         |
+| `--sbx-color-foreground-secondary` | `#f4f2f2` | <div style={{backgroundColor: '#f4f2f2', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-text-secondary`       |
+| `--sbx-color-text-primary`         | `#000`    | <div style={{backgroundColor: '#000', width: '100px', height: '30px', border: '1px solid #ccc'}}></div>    | `--sbx-color-foreground-primary`   |
+| `--sbx-color-text-secondary`       | `#525252` | <div style={{backgroundColor: '#525252', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-foreground-secondary` |
+| `--sbx-color-border`               | `#c5c5c5` | <div style={{backgroundColor: '#c5c5c5', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-foreground-primary`   |
 
 ## Status
 
-| CSS Custom Property           | Description |
-| ----------------------------- | ----------- |
-| `--sbx-color-alert`           |             |
-| `--sbx-color-alert--text`     |             |
-| `--sbx-color-success`         |             |
-| `--sbx-color-success--text`   |             |
-| `--sbx-color-warning`         |             |
-| `--sbx-color-warning--text`   |             |
-| `--sbx-color-highlight`       |             |
-| `--sbx-color-highlight--text` |             |
+| CSS Custom Property          | Value     | Preview                                                                                                    | Contrast                     |
+| ---------------------------- | --------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `--sbx-color-alert`          | `#ea0a06` | <div style={{backgroundColor: '#ea0a06', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-alert-text`     |
+| `--sbx-color-alert-text`     | `#fff`    | <div style={{backgroundColor: '#fff', width: '100px', height: '30px', border: '1px solid #ccc'}}></div>    | `--sbx-color-alert`          |
+| `--sbx-color-success`        | `#3e843e` | <div style={{backgroundColor: '#3e843e', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-success-text`   |
+| `--sbx-color-success-text`   | `#fff`    | <div style={{backgroundColor: '#fff', width: '100px', height: '30px', border: '1px solid #ccc'}}></div>    | `--sbx-color-success`        |
+| `--sbx-color-warning`        | `#ff7d00` | <div style={{backgroundColor: '#ff7d00', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-warning-text`   |
+| `--sbx-color-warning-text`   | `#fff`    | <div style={{backgroundColor: '#fff', width: '100px', height: '30px', border: '1px solid #ccc'}}></div>    | `--sbx-color-warning`        |
+| `--sbx-color-highlight`      | `#fae587` | <div style={{backgroundColor: '#fae587', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> | `--sbx-color-highlight-text` |
+| `--sbx-color-highlight-text` | `#000`    | <div style={{backgroundColor: '#000', width: '100px', height: '30px', border: '1px solid #ccc'}}></div>    | `--sbx-color-highlight`      |
+
+## Gradients
+
+Gradients provide a smooth color transition from red (alert) to green (success), useful for visualizing progress, scores, and performance metrics.
+
+| CSS Custom Property       | Value     | Preview                                                                                                    |
+| ------------------------- | --------- | ---------------------------------------------------------------------------------------------------------- |
+| `--sbx-color-gradient-0`  | `#ea0a06` | <div style={{backgroundColor: '#ea0a06', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
+| `--sbx-color-gradient-1`  | `#df3a0d` | <div style={{backgroundColor: '#df3a0d', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
+| `--sbx-color-gradient-2`  | `#d36313` | <div style={{backgroundColor: '#d36313', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
+| `--sbx-color-gradient-3`  | `#c9851a` | <div style={{backgroundColor: '#c9851a', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
+| `--sbx-color-gradient-4`  | `#bea020` | <div style={{backgroundColor: '#bea020', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
+| `--sbx-color-gradient-5`  | `#b2b425` | <div style={{backgroundColor: '#b2b425', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
+| `--sbx-color-gradient-6`  | `#8faa2b` | <div style={{backgroundColor: '#8faa2b', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
+| `--sbx-color-gradient-7`  | `#72a030` | <div style={{backgroundColor: '#72a030', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
+| `--sbx-color-gradient-8`  | `#5c9635` | <div style={{backgroundColor: '#5c9635', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
+| `--sbx-color-gradient-9`  | `#4a8d3a` | <div style={{backgroundColor: '#4a8d3a', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
+| `--sbx-color-gradient-10` | `#3e843e` | <div style={{backgroundColor: '#3e843e', width: '100px', height: '30px', border: '1px solid #ccc'}}></div> |
