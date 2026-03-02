@@ -14,7 +14,7 @@
 $include-html-table-classes: $include-html-classes !default;
 
 // These control the background color for the table and even rows
-$table-bg: $white;
+$table-bg: var(--sbx-color-foreground-primary, white);
 $table-even-row-bg: transparent;
 
 // These control the table cell border style
