@@ -53,7 +53,7 @@ async function onSubmit(): Promise<void> {
 
     /** Create validator and destroy any existing one */
     validator.value?.destroy();
-    validator.value = $(formEl.value).alaressValidate({
+    validator.value = window.jQuery(formEl.value).alaressValidate({
         submitHandler: (_: unknown, event: SubmitEvent) => {
             // Don't do anything in the submit handler:
             // allow Vue to handle saving.
@@ -106,6 +106,11 @@ async function onSubmit(): Promise<void> {
     assessmentConfig.value._routes.postSandboxMessage = response.data._routes.postSandboxMessage;
     emit("saved", response.data);
 }
+
+window.Vue.onMounted(() => {
+    // As vue loads the template after foundation has been initialised, we need to reinitialise the tooltips
+    window.jQuery(document).foundation("tooltip", "reflow");
+});
 </script>
 
 <template>

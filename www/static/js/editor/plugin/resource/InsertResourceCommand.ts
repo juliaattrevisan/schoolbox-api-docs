@@ -88,9 +88,7 @@ export default class InsertResourceCommand extends Command {
             console.warn(error);
         }
         // to close the resource modal
-        // @ts-expect-error -- jquery plugin
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- see above
-        $("#file-picker").foundation("reveal", "close");
+        window.jQuery("#file-picker").foundation("reveal", "close");
     }
 
     /**

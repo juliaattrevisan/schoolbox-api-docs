@@ -80,9 +80,7 @@ export default class InsertResourceLinkCommand extends Command {
      * to close the resource modal and allow the LinkUI to be also closed again
      */
     closeModal(): void {
-        // @ts-expect-error -- jquery plugin
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- see above
-        $("#file-picker").foundation("reveal", "close");
+        window.jQuery("#file-picker").foundation("reveal", "close");
         this.set("isOn", false);
     }
 

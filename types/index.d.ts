@@ -165,6 +165,15 @@ declare global {
             dropzone: Dropzone;
         };
         /**
+         * Reflow will make Foundation check the DOM for any elements and re-apply any listeners to them.
+         * This is particularly useful to make tooltips work again if loading content in Vue after the initial page load
+         */
+        foundation(scope: "tooltip", method: "reflow"): void;
+        /**
+         * Open/close a Foundation reveal modal directly
+         */
+        foundation(scope: "reveal", method: "close" | "open" | { close_on_background_click?: boolean }): void;
+        /**
          * From jquery.selectize-selector.js
          */
         selectizeSelector(options: SelectizeSelectorOptions): JQuery;
