@@ -83,28 +83,17 @@
                         'student': {
                             '_default': true,
                             'email': showEmail,
-                            'currentLocation': user.isShowTimetable,
-                            'formTeacher': user.isShowTimetable,
-                            'StudentForm': user.isShowTimetable,
-                            'StudentTutorDescription': user.isShowTimetable,
-                            'tutorTeacher': user.isShowTimetable,
                         },
                         'parent': {
                             '_default': true,
-                            'currentLocation': user.isShowTimetable,
-                            'formTeacher': user.isShowTimetable,
-                            'StudentForm': user.isShowTimetable,
-                            'StudentTutorDescription': user.isShowTimetable,
-                            'tutorTeacher': user.isShowTimetable,
                         },
                         'staff': {
                             '_default': USER.role.viewStudentProfile,
                             'email': showEmail,
-                            'currentLocation': user.isShowTimetable,
-                            'formTeacher': USER.role.viewStudentProfile and user.isShowTimetable,
-                            'StudentForm': USER.role.viewStudentProfile and user.isShowTimetable,
-                            'StudentTutorDescription': USER.role.viewStudentProfile and user.isShowTimetable,
-                            'tutorTeacher': USER.role.viewStudentProfile and user.isShowTimetable,
+                            'formTeacher': USER.role.viewStudentProfile,
+                            'StudentForm': USER.role.viewStudentProfile,
+                            'StudentTutorDescription': USER.role.viewStudentProfile,
+                            'tutorTeacher': USER.role.viewStudentProfile,
                             'pastoralCounts': USER.role.viewStudentProfile and pastoralUrl,
                         }
                     } %}
