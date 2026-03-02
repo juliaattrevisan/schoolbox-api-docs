@@ -11,7 +11,7 @@ export default class EvidenceMediaRecording {
     private page: Page;
 
     // Constants for data-test selectors
-    static readonly DATA_TEST_CATPURE_MEDIA_CONTAINER = "capture-media-container";
+    static readonly DATA_TEST_CAPTURE_MEDIA_CONTAINER = "capture-media-container";
 
     static readonly SELECTOR_TAKE_PHOTO = "button.vjs-camera-button.vjs-control.vjs-button.vjs-icon-photo-camera";
     static readonly SELECTOR_RECORDING_START = "button.vjs-record-button.vjs-control.vjs-button.vjs-icon-record-start";
@@ -28,7 +28,7 @@ export default class EvidenceMediaRecording {
      * @returns Locator for the <evidence-media-recording> component
      */
     public locateCaptureMediaContainer(): Locator {
-        return this.page.getByTestId(EvidenceMediaRecording.DATA_TEST_CATPURE_MEDIA_CONTAINER);
+        return this.page.getByTestId(EvidenceMediaRecording.DATA_TEST_CAPTURE_MEDIA_CONTAINER);
     }
 
     /**

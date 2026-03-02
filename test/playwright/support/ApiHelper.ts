@@ -158,7 +158,7 @@ export default class ApiHelper {
         this.baseTester.isGoingTo(`soft delete the learning moment with ID ${momentId}`);
         const resp = await this.request.delete(`/learning/evidence/${momentId}`, await this.getAuthHeader());
         if (!resp.ok()) {
-            throw new Error(`Failed to delete folder: ${resp.status()} ${resp.statusText()}`);
+            throw new Error(`Failed to delete learning moment: ${resp.status()} ${resp.statusText()}`);
         }
     }
 }
