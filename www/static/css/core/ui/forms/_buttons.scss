@@ -390,4 +390,8 @@ $button-disabled-cursor: $cursor-default-value !default;
     &:focus {
         background: none;
     }
+    @media print {
+        // these buttons should be displayed as they are primarily meta
+        display: inline-block !important;
+    }
 }
