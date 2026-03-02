@@ -140,13 +140,7 @@ class External_Synergetic_Srcl_User extends External_Synergetic_User
             $courtOrderType = trim((string)($row['CourtOrderType'] ?? null));
 
             if ('' !== $courtOrderType) {
-                /* A specially-crafted AlertLegal message about legal matters.
-                 */
-                $student['AlertLegal'][] = sprintf(
-                    '%s - %s',
-                    \External_UserInterface::COURT_ORDER_PREFIX,
-                    $courtOrderType
-                );
+                $student['AlertLegal'][] = $courtOrderType;
             }
 
             /* Some kind of generic alert message
