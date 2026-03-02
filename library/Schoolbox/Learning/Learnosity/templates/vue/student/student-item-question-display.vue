@@ -296,7 +296,7 @@ window.Vue.onBeforeUnmount(async () => {
 
 /* as it's readonly, but we still want to make it fully readable  */
 input[readonly] {
-    background-color: var(--color-foreground-primary);
+    background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
     color: #000;
 }
 </style>

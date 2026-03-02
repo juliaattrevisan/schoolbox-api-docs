@@ -45,7 +45,7 @@
         & + label {
             align-items: center;
             border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
-            border-radius: var(--roundness-form-elements);
+            border-radius: var(--sbx-config-field-roundness, var(--roundness-form-elements));
             background-color: var(--content-ui-background);
             color: var(--sbx-config-color-accent, var(--content-ui-foreground));
             cursor: pointer;

@@ -93,26 +93,24 @@ a.c-button {
     }
     // Used to further highlight the primary action of a page
     &--success {
-        background-color: var(--color-success);
+        background-color: var(--sbx-color-success, var(--color-success));
         &:hover,
         &:active {
-            background-color: var(--color-success);
+            background-color: var(--sbx-color-success, var(--color-success));
         }
         &:focus {
-            background-color: var(
-                --color-success
-            ); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
+            background-color: var(--sbx-color-success, var(--color-success)); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
         }
     }
     // To highlight that this action has a destructive effect
     &--alert {
-        background-color: var(--color-alert);
+        background-color: var(--sbx-color-alert, var(--color-alert));
         &:hover,
         &:active {
-            background-color: var(--color-alert);
+            background-color: var(--sbx-color-alert, var(--color-alert));
         }
         &:focus {
-            background-color: var(--color-alert); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
+            background-color: var(--sbx-color-alert, var(--color-alert)); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
         }
     }
     &--with-input {

@@ -153,8 +153,8 @@ function onMouseOut(event: MouseEvent): void {
 
     input[type="text"].c-filter-search-term__field {
         border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
-        background-color: var(--color-foreground-primary);
-        color: var(--color-text-primary);
+        background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
+        color: var(--sbx-color-text-primary, var(--color-text-primary));
         font-size: var(--base-font-size);
         height: var(--tabbar-height);
         padding: var(--spacing-s);

@@ -65,7 +65,7 @@ const isClickToReveal = window.Vue.computed(() => {
     // For now, if "alert" is a specific class that may be applied,
     // in that scenario, we want to change the color to the alert color
     &.alert {
-        color: var(--color-alert);
+        color: var(--sbx-color-alert, var(--color-alert));
     }
 }
 

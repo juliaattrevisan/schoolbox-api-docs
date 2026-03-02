@@ -26,8 +26,8 @@
     /******** Chrome, Safari, Opera and Edge Chromium styles ********/
     /* slider track */
     &__input::-webkit-slider-runnable-track {
-        background-color: var(--content-ui-background);
-        border-radius: var(--roundness-form-elements);
+        background-color: var(--sbx-config-color-active, var(--content-ui-background));
+        border-radius: var(--sbx-config-field-roundness, var(--roundness-form-elements));
         height: 1rem;
     }
 
@@ -50,7 +50,7 @@
     /*********** Firefox styles ***********/
     /* slider track */
     &__input::-moz-range-track {
-        background-color: var(--content-ui-background);
+        background-color: var(--sbx-config-color-active, var(--content-ui-background));
         border-radius: 0rem;
         height: 1rem;
     }

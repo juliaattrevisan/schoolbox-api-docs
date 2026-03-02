@@ -6,7 +6,7 @@
     border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
     border-radius: var(--sbx-config-field-roundess);
     color: var(--sbx-color-text-primary);
-    color: var(--color-text-primary);
+    color: var(--sbx-color-text-primary, var(--color-text-primary));
     font-size: max(16px, 1rem);
     font-family: inherit;
     height: 2.25rem;
@@ -40,7 +40,7 @@
 }
 
 .sbx-input-text--error[type="text"] {
-    border: 1px solid var(--color-alert);
+    border: 1px solid var(--sbx-color-alert, var(--color-alert));
 }
 
 .sbx-input-text--with-button[type="text"] {

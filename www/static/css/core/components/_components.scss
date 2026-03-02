@@ -118,7 +118,7 @@
         display: flex;
         justify-content: flex-end;
         background-color: $ghost;
-        border-top: 1px solid $body-bg;
+        border-top: 1px solid var(--sbx-color-border, $body-bg);
         border-bottom: 3px solid $body-bg;
         margin: 0;
         min-height: 2.5rem;

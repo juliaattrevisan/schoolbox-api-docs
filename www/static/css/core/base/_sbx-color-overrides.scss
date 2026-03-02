@@ -1,21 +1,15 @@
-/**
- * Color overrides for Storybook UI Uplift
- * Scope: UI Uplift
- * The majority of colour overrides are applied directly on the element to avoid specificity issues,
- * adding thew new color while falling back to the old color if the new one isn't set.
- */
+// Color overrides for Storybook UI Uplift
+// Scope: UI Uplift
+// The majority of colour overrides are applied directly on the element to avoid specificity issues,
+// adding thew new color while falling back to the old color if the new one isn't set.
 
 body.sbx-body {
-    /**
-     * Highchart fill - directly override the white background
-     */
+    // Highchart fill - directly override the white background
     .highcharts-background {
         fill: var(--sbx-color-foreground-primary);
     }
 
-    /**
-     * Highlight - overridden as they currently implement Sass methods which are not compatible with CSS variables
-     */
+    // Highlight - overridden as they currently implement Sass methods which are not compatible with CSS variables
     .highlight.label,
     .alert-box,
     .alert-box.highlight,
@@ -24,9 +18,7 @@ body.sbx-body {
         color: var(--sbx-color-highlight-text);
     }
 
-    /**
-     * Alert labels/boxes - overridden as they currently implement Sass methods which are not compatible with CSS variables
-     */
+    // Alert labels/boxes - overridden as they currently implement Sass methods which are not compatible with CSS variables
     .alert.label,
     .rejected.label,
     .submitted-late.label,
@@ -36,9 +28,7 @@ body.sbx-body {
         color: var(--sbx-color-alert-text);
     }
 
-    /**
-     * Success labels/boxes - overridden as they currently implement Sass methods which are not compatible with CSS variables
-     */
+    // Success labels/boxes - overridden as they currently implement Sass methods which are not compatible with CSS variables
     .success.label,
     .approved.label,
     .reviewed.label,
@@ -48,9 +38,7 @@ body.sbx-body {
         color: var(--sbx-color-success-text);
     }
 
-    /**
-     * Warning labels/boxes - overridden as they currently implement Sass methods which are not compatible with CSS variables
-     */
+    // Warning labels/boxes - overridden as they currently implement Sass methods which are not compatible with CSS variables
     .warning.label,
     .submitted.label,
     .pending.label,
@@ -60,31 +48,26 @@ body.sbx-body {
         color: var(--sbx-color-warning-text);
     }
 
-    /**
-     * Neutral labels - overridden as they currently implement Sass methods which are not compatible with CSS variables
-     */
+    // Neutral labels - overridden as they currently implement Sass methods which are not compatible with CSS variables
     .unsubmitted.label,
     .neutral.label {
         background-color: var(--sbx-color-foreground-secondary);
         color: var(--sbx-color-text-secondary);
     }
 
-    /**
-     * Add colour alternating rows for better readability
-     */
+    // Add colour alternating rows for better readability
     table:not([class]) tr:nth-child(even),
     table.rubric tr:nth-child(even),
     table.diagonal-headings-table tr:nth-child(even),
     #course-selector-results ul.information-list li:nth-child(even),
     ul.information-list.sortable-card li:nth-child(even),
     ul.information-list.unsortable li:nth-child(even),
-    table.VueTables__table tr:nth-child(even) {
+    table.VueTables__table tr:nth-child(even),
+    .action-list li:nth-child(even) {
         background-color: var(--sbx-color-foreground-secondary);
     }
 
-    /**
-    * Use highlight instead of pinky red of alert with Sass tint()
-    */
+    // Use highlight instead of pinky red of alert with Sass tint()
     tr.alert {
         background-color: var(--sbx-color-highlight);
     }
@@ -99,6 +82,7 @@ body.sbx-body {
         background: var(--sbx-config-color-active);
     }
 
+    // gradient colours - overridden as they currently implement Sass methods which are not compatible with CSS variables
     .gradient-10,
     .plagscan-ok {
         color: var(--sbx-color-gradient-10);
@@ -108,7 +92,6 @@ body.sbx-body {
         color: var(--sbx-color-foreground-primary);
         fill: var(--sbx-color-gradient-10);
     }
-
     .gradient-9 {
         color: var(--sbx-color-gradient-9);
     }
@@ -117,7 +100,6 @@ body.sbx-body {
         color: var(--sbx-color-foreground-primary);
         fill: var(--sbx-color-gradient-9);
     }
-
     .gradient-8 {
         color: var(--sbx-color-gradient-8);
     }
@@ -126,7 +108,6 @@ body.sbx-body {
         color: var(--sbx-color-foreground-primary);
         fill: var(--sbx-color-gradient-8);
     }
-
     .gradient-7 {
         color: var(--sbx-color-gradient-7);
     }
@@ -135,7 +116,6 @@ body.sbx-body {
         color: var(--sbx-color-foreground-primary);
         fill: var(--sbx-color-gradient-7);
     }
-
     .gradient-6 {
         color: var(--sbx-color-gradient-6);
     }
@@ -144,7 +124,6 @@ body.sbx-body {
         color: var(--sbx-color-foreground-primary);
         fill: var(--sbx-color-gradient-6);
     }
-
     .gradient-5 {
         color: var(--sbx-color-gradient-5);
     }
@@ -153,7 +132,6 @@ body.sbx-body {
         color: var(--sbx-color-foreground-primary);
         fill: var(--sbx-color-gradient-5);
     }
-
     .gradient-4 {
         color: var(--sbx-color-gradient-4);
     }
@@ -163,7 +141,6 @@ body.sbx-body {
         color: var(--sbx-color-foreground-primary);
         fill: var(--sbx-color-gradient-4);
     }
-
     .gradient-3 {
         color: var(--sbx-color-gradient-3);
     }
@@ -172,7 +149,6 @@ body.sbx-body {
         color: var(--sbx-color-foreground-primary);
         fill: var(--sbx-color-gradient-3);
     }
-
     .gradient-2 {
         color: var(--sbx-color-gradient-2);
     }
@@ -181,7 +157,6 @@ body.sbx-body {
         color: var(--sbx-color-foreground-primary);
         fill: var(--sbx-color-gradient-2);
     }
-
     .gradient-1 {
         color: var(--sbx-color-gradient-1);
     }
@@ -190,7 +165,6 @@ body.sbx-body {
         color: var(--sbx-color-foreground-primary);
         fill: var(--sbx-color-gradient-1);
     }
-
     .gradient-0,
     .plagscan-critical {
         color: var(--sbx-color-gradient-0);

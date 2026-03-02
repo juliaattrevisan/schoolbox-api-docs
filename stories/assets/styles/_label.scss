@@ -2,7 +2,7 @@
  *   The <label> element is used to label form inputs, and is used in conjunction with the <input> element.
  */
 .c-label {
-    color: var(--color-text-primary);
+    color: var(--sbx-color-text-primary, var(--color-text-primary));
     display: block;
     font-size: 1rem;
     font-weight: 500;
@@ -10,7 +10,7 @@
     &--required {
         &::after {
             content: " *";
-            color: var(--color-alert);
+            color: var(--sbx-color-alert, var(--color-alert));
         }
     }
     &--large {

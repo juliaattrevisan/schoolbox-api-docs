@@ -1127,7 +1127,7 @@ section > fieldset {
 
     // second sibling onwards
     ~ fieldset {
-        border-top: solid $fieldset-border-width $body-bg;
+        border-top: solid $fieldset-border-width var(--sbx-color-border, $body-bg);
     }
 
     > legend {

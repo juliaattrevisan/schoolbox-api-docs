@@ -35,7 +35,7 @@
         --offset: 0.25rem;
         --diameter: 1.5rem;
         align-items: center;
-        background-color: var(--color-foreground-primary);
+        background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
         border: 1px solid var(--sbx-config-color-accent);
         border-radius: var(--sbx-border-radius-normal);
         box-sizing: content-box;
@@ -47,7 +47,7 @@
         width: calc(var(--diameter) * 2 + var(--offset) * 2);
         &::before {
             // the toggle
-            background-color: var(--color-foreground-primary);
+            background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
             border: 1px solid var(--sbx-config-color-accent);
             border-radius: 50%;
             box-sizing: border-box;

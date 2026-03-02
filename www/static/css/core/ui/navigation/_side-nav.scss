@@ -20,7 +20,7 @@ $side-nav-list-margin: 0;
 $side-nav-link-color: $anchor-font-color;
 $side-nav-link-color-active: $side-nav-link-color;
 $side-nav-link-color-hover: $body-font-color;
-$side-nav-link-bg-hover: hsla(0, 0%, 0%, 0.025) !default;
+$side-nav-link-bg-hover: var(--sbx-color-foreground-primary, hsla(0, 0%, 0%, 0.025)) !default;
 $side-nav-link-margin: 0 !default;
 $side-nav-link-padding: rem-calc(7 14) !default;
 $side-nav-font-size: rem-calc(13);

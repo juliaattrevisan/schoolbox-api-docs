@@ -9,8 +9,8 @@
 }
 
 .c-new-card {
-    background-color: var(--color-foreground-primary);
-    border-radius: var(--roundness-cards);
+    background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
+    border-radius: var(--sbx-config-field-roundness, var(--roundness-cards));
     line-height: var(--base-line-height);
     position: relative;
     text-align: start;
@@ -26,7 +26,7 @@
 
     // Add inline (default left) border and grey background to card.
     &--child {
-        background-color: var(--color-foreground-secondary);
+        background-color: var(--sbx-color-foreground-secondary, var(--color-foreground-secondary));
         border-inline-start: var(--spacing-s) solid var(--border-colour);
     }
 
@@ -108,7 +108,7 @@
     }
 
     &--alt-bkg {
-        background-color: var(--color-foreground-secondary);
+        background-color: var(--sbx-color-foreground-secondary, var(--color-foreground-secondary));
     }
 }
 

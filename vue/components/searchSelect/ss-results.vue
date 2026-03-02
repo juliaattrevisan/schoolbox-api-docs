@@ -197,7 +197,7 @@ window.Vue.watch(
     overflow: auto;
     width: 100%;
     &__status {
-        background: var(--color-foreground-primary);
+        background: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
         font-size: 0.825rem;
         font-style: italic;
         padding: var(--spacing-s);

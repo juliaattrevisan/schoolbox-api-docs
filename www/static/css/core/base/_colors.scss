@@ -1,6 +1,6 @@
 // proposed new colours, some of which could be in the theme UI in the future
 :root {
-    --color-background: var(--body-background);
+    --color-background: var(--sbx-config-color-body-background, var(--body-background));
     --color-foreground-primary: white;
     --color-foreground-secondary: #f4f2f2;
     --color-text-primary: rgb(0, 0, 0);
