@@ -72,6 +72,8 @@ test.describe("Learning Moment Drafts", () => {
         tester.isGoingTo("publish the learning moment from the modify screen");
         await ActivityFeed.clickMomentModifyAction(modifiedMoment);
         await learningMomentModify.clickPublish();
+
+        await ActivityFeed.verifyMomentHasStatus(modifiedMoment, EvidenceStatus.PUBLISHED);
     });
 
     /**
