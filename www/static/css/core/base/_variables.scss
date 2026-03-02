@@ -24,7 +24,7 @@ $content-ui-submit-foreground: var(--sbx-config-color-accent-text, var(--content
 $content-ui-submit-background: var(--sbx-config-color-accent, var(--content-ui-submit-background)) !default;
 
 $form-border-color: var(--sbx-config-color-accent, var(--form-border-color)) !default;
-$form-bg-hover-color: var(--sbx-config-color-accent, var(--form-bg-hover-color)) !default;
+$form-bg-hover-color: var(--sbx-color-foreground-primary, var(--form-bg-hover-color)) !default;
 
 $accent-foreground: var(--sbx-config-color-accent, var(--accent-foreground)) !default;
 $accent-background: var(--sbx-config-color-active, var(--accent-background)) !default;
@@ -53,7 +53,7 @@ $content-ui-selected-contrast: var(--content-ui-selected-contrast) !default;
 
 $content-ui-submit-foreground-contrast: var(--content-ui-submit-foreground-contrast) !default;
 
-$form-bg-hover-color-contrast: var(--form-bg-hover-color-contrast) !default;
+$form-bg-hover-color-contrast: var(--sbx-color-text-primary, var(--form-bg-hover-color-contrast)) !default;
 
 $body-bg-contrast: var(--body-background-contrast) !default;
 

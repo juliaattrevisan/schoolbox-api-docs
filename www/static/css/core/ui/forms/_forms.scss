@@ -20,12 +20,12 @@ $input-font-family: inherit !default;
 $input-font-color: $black;
 $input-font-size: $paragraph-font-size;
 $input-bg-color: $white;
-$input-focus-bg-color: $form-bg-hover-color;
+$input-focus-bg-color: var(--sbx-color-foreground-primary, $form-bg-hover-color);
 $input-border-color: var(--sbx-config-color-accent, $form-border-color) !default;
 $input-focus-border-color: css-darken($form-border-color, 15%);
 $input-border-style: solid;
 $input-border-width: 0.0625rem;
-$input-disabled-bg: $vapor;
+$input-disabled-bg: var(--sbx-color-foreground-secondary, $vapor);
 $input-disabled-cursor: $cursor-default-value;
 
 // We use these to style the fieldset border and spacing.
@@ -99,7 +99,7 @@ $input-number-spinners: true !default;
     }
     // Disabled Styles
     &:disabled {
-        background-color: $input-disabled-bg;
+        background-color: var(--sbx-color-foreground-secondary, $input-disabled-bg);
         cursor: $input-disabled-cursor;
     }
 }
@@ -199,11 +199,11 @@ $input-number-spinners: true !default;
     }
     &:focus {
         background-color: tint($warning-color, 50%);
-        border-color: $input-focus-border-color;
+        border-color: var(--sbx-config-color-accent, $input-focus-border-color);
     }
     // Disabled Styles
     &:disabled {
-        background-color: $input-disabled-bg;
+        background-color: var(--sbx-color-foreground-secondary, $input-disabled-bg);
         cursor: $input-disabled-cursor;
     }
 }
@@ -411,14 +411,14 @@ label.error {
 -------------------------------------------------------------------------------------*/
 
 $input-height: $global-button-input-height;
-$input-focus-color: $form-bg-hover-color-contrast;
-$input-hover-bg-color: $form-bg-hover-color;
-$input-hover-color: $black;
+$input-focus-color: var(--sbx-color-text-primary, $form-bg-hover-color-contrast);
+$input-hover-bg-color: var(--sbx-color-foreground-primary, $form-bg-hover-color);
+$input-hover-color: var(--sbx-color-text-primary, $black);
 $legend-bg: transparent;
 
 form {
     ::placeholder {
-        color: $aluminum;
+        color: var(--sbx-color-text-secondary, $aluminum);
         font-weight: normal;
     }
     margin: 0 0 calc($form-spacing / 2) 0;
@@ -449,11 +449,11 @@ select {
     font-weight: $font-weight-normal;
     &:hover {
         background-color: $input-hover-bg-color;
-        color: $input-hover-color;
+        color: var(--sbx-color-text-primary, $input-hover-color);
         border-color: var(--sbx-config-color-accent, $input-border-color);
     }
     &:focus {
-        color: $input-focus-color;
+        color: var(--sbx-color-text-primary, $input-focus-color);
         background-color: $input-focus-bg-color;
         border-color: $input-focus-border-color;
         outline: none;
@@ -461,8 +461,8 @@ select {
     &:disabled,
     &[disabled],
     &[readonly] {
-        background-color: $input-disabled-bg;
-        color: $aluminum;
+        background-color: var(--sbx-color-foreground-secondary, $input-disabled-bg);
+        color: var(--sbx-color-text-secondary, $aluminum);
         opacity: 1;
         label:hover & {
             &:focus::placeholder {
@@ -473,16 +473,16 @@ select {
             }
         }
         &:hover {
-            background-color: $input-disabled-bg;
-            border-color: $form-border-color;
-            color: $aluminum;
+            background-color: var(--sbx-color-foreground-secondary, $input-disabled-bg);
+            border-color: var(--sbx-color-text-secondary, $form-border-color);
+            color: var(--sbx-color-text-secondary, $aluminum);
         }
     }
     // $aluminum as a color is not great for contrast in a readonly context
     &[readonly] {
-        color: $input-font-color;
+        color: var(--sbx-color-text-primary, $input-font-color);
         &:hover {
-            color: $input-font-color;
+            color: var(--sbx-color-text-primary, $input-font-color);
         }
     }
 }

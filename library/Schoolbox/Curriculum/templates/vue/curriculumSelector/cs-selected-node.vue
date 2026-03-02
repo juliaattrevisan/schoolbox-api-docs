@@ -80,8 +80,8 @@ function onRemoveSelected() {
 
 <style lang="scss" scoped>
 .selected-node {
-    background: var(--body-background);
-    color: #000;
+    background: var(--sbx-config-color-active, var(--body-background));
+    color: var(--sbx-config-color-accent, #000);
     display: flex;
     font-size: 0.8125rem;
     gap: 0.5rem;
@@ -94,7 +94,7 @@ function onRemoveSelected() {
 }
 
 .title-button {
-    background: var(--body-background);
+    background: var(--sbx-config-color-active, var(--body-background));
     margin: 0;
     min-height: 0;
     padding: 0;
@@ -102,7 +102,7 @@ function onRemoveSelected() {
 }
 
 .remove-button {
-    background: var(--body-background);
+    background: var(--sbx-config-color-active, var(--body-background));
     border-radius: 1rem;
     flex: 0 0 1rem;
     height: 1rem;

@@ -183,7 +183,7 @@ table.rb {
         // DONE use CSS lighten
         //background-color: $form-bg-hover-color !important;
         // DONE use contrasting color
-        color: $form-bg-hover-color-contrast;
+        color: var(--sbx-color-text-primary, $form-bg-hover-color-contrast);
 
         label {
             //color: $form-bg-hover-color-contrast;

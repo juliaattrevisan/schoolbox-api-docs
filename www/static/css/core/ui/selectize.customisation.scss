@@ -85,9 +85,9 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
         }
         .selectize-input.input-active {
             background-color: $form-bg-hover-color;
-            color: $form-bg-hover-color-contrast;
+            color: var(--sbx-color-text-primary, $form-bg-hover-color-contrast);
             input {
-                color: $form-bg-hover-color-contrast;
+                color: var(--sbx-color-text-primary, $form-bg-hover-color-contrast);
             }
         }
     }
@@ -181,10 +181,10 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
     &:hover,
     &:focus,
     &.input-active {
-        background-color: $form-bg-hover-color;
-        color: $form-bg-hover-color-contrast;
+        background-color: var(--sbx-color-foreground-primary, $form-bg-hover-color);
+        color: var(--sbx-color-text-primary, $form-bg-hover-color-contrast);
         input {
-            color: $form-bg-hover-color-contrast;
+            color: var(--sbx-color-text-primary, $form-bg-hover-color-contrast);
         }
     }
 }
