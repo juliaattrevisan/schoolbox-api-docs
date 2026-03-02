@@ -414,7 +414,6 @@ class Config
                 'type'    => self::FIELD_TYPE_CHECKBOX,
                 'section' => self::SECTION_GENERAL,
             ];
-            unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
         }
 
         if ($feature === Helper::FEATURE_IMAGE) {
