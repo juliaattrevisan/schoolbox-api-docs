@@ -10,6 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Application\CliTool;
 
 use GetOpt;
+use GetOptionKit\OptionCollection;
+use GetOptionKit\OptionParser;
+use GetOptionKit\OptionResult;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliKernelAbstract;
@@ -70,6 +73,16 @@ abstract class BaseApp extends App
     protected GetOpt\GetOpt $optionParser;
 
     /**
+     * Collection of command-line options
+     */
+    protected OptionCollection $optionCollection;
+
+    /**
+     * The actual parsed result
+     */
+    protected OptionResult $optionResult;
+
+    /**
      * Overridden to allow the option parser to be set up.
      *
      * @inheritdoc
@@ -91,16 +104,28 @@ abstract class BaseApp extends App
             new GetOpt\Option(self::OPT_SHORT_HELP, self::OPT_LONG_HELP, GetOpt\GetOpt::NO_ARGUMENT)
                 ->setDescription('Display help text and exit')
         );
+        $this->optionCollection->add(
+            self::OPT_SHORT_HELP . '|' . self::OPT_LONG_HELP,
+            'Display help text and exit',
+        );
         if ($this->hasPerformMode()) {
             $this->optionParser = $this->optionParser->addOption(
                 new GetOpt\Option(self::OPT_SHORT_PERFORM, self::OPT_LONG_PERFORM, GetOpt\GetOpt::NO_ARGUMENT)
                     ->setDescription('Perform mode: if not provided, no changes will be written')
+            );
+            $this->optionCollection->add(
+                self::OPT_SHORT_PERFORM . '|' . self::OPT_LONG_PERFORM,
+                'Perform mode: if not provided, no changes will be written',
             );
         }
         $this->optionParser = $this->optionParser->addOption(
             new GetOpt\Option(self::OPT_SHORT_VERBOSITY, null, GetOpt\GetOpt::NO_ARGUMENT)
                 ->setDescription('Verbosity (up to 3 times)')
         );
+        $this->optionCollection->add(
+            self::OPT_SHORT_VERBOSITY,
+            'Verbosity (up to 3 times)',
+        )->isa('Number')->incremental();
         $this->assignDeprecatedOptions();
 
 //        // ... including an esoteric option I forgot existed
@@ -111,6 +136,9 @@ abstract class BaseApp extends App
 
         $this->setOptions();
         $this->optionParser->process();
+
+        $this->optionResult = new OptionParser($this->optionCollection)->parse($_SERVER['argv']);
+
         return $this;
     }
 
@@ -154,6 +182,7 @@ abstract class BaseApp extends App
                     $hasOptions ? GetOpt\GetOpt::REQUIRED_ARGUMENT : GetOpt\GetOpt::NO_ARGUMENT,
                 )
             );
+            $this->optionCollection->add($shortOption);
         }
 
         $longOptions = $this->getLongOpts();
@@ -173,6 +202,7 @@ abstract class BaseApp extends App
                     $hasOptions ? GetOpt\GetOpt::REQUIRED_ARGUMENT : GetOpt\GetOpt::NO_ARGUMENT,
                 )
             );
+            $this->optionCollection->add($longOption);
         }
     }
 
@@ -224,7 +254,8 @@ abstract class BaseApp extends App
         if (!$this->hasPerformMode()) {
             throw new \LogicException('This application does not have a perform mode.');
         }
-        return $this->optionParser->get('p');
+        return $this->optionResult->get('p');
+//        return $this->optionParser->get('p');
     }
 
     /**
@@ -236,6 +267,7 @@ abstract class BaseApp extends App
     protected function getOpt(string $name)
     {
         // Old options might have the : suffix: if so, remove it
-        return $this->optionParser->getOption(rtrim($name, ':'));
+        return $this->optionResult->get(rtrim($name, ':'));
+//        return $this->optionParser->getOption(rtrim($name, ':'));
     }
 }
