@@ -9,13 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Iframely;
 
-use DiDom\Document;
-use DiDom\Element;
-use DiDom\Exceptions\InvalidSelectorException;
+use Dom\Element;
+use Dom\Node;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Schoolbox\Url\Uri;
-use ValueError;
 
 /**
  * Replaces Iframely embeds within a HTML fragment with a version which avoids
@@ -89,7 +87,6 @@ class EmbedReplacer
      *
      * @param string $html
      * @return string
-     * @noinspection PhpDocMissingThrowsInspection - selector is hardcoded
      */
     public function replace(string $html): string
     {
@@ -99,17 +96,11 @@ class EmbedReplacer
         }
 
         // Try to load the purified content into a DOM document
-        try {
-            $doc = new Document($html, false, 'UTF-8');
-            /** @phpstan-ignore-next-line - this can raise a ValueError */
-        } catch (ValueError) {
-            return $html;
-        }
+        $doc = \Dom\HTMLDocument::createFromString($html, LIBXML_NOERROR, 'utf-8');
 
         // Search for Iframely embeds (within data-oembed-url attributes).
         // If there are none, return early
-        /** @noinspection PhpUnhandledExceptionInspection - selector is hardcoded */
-        $embeds = $doc->find(self::IFRAMELY_EMBED_CONTAINER_ELEMENT_SELECTOR);
+        $embeds = $doc->querySelectorAll(self::IFRAMELY_EMBED_CONTAINER_ELEMENT_SELECTOR);
         if (count($embeds) === 0) {
             return $html;
         }
@@ -122,12 +113,10 @@ class EmbedReplacer
                 // Replace the Iframely element's HTML with the new embed
                 if (isset($replacementHtml)) {
                     $replacementsApplied = true;
-                    try {
-                        $embed->setInnerHtml($replacementHtml);
-                    } catch (InvalidSelectorException) {
-                        // Can't set the content: noop
-                        continue;
-                    }
+                    $replacementDoc      = \Dom\HTMLDocument::createFromString($replacementHtml, LIBXML_NOERROR, 'utf-8');
+                    $replacementNode     = $replacementDoc->querySelector('body')->firstChild;
+                    $doc->adoptNode($replacementNode);
+                    $embed->parentNode->replaceChild($replacementNode, $embed);
                     break;
                 }
             }
@@ -138,68 +127,57 @@ class EmbedReplacer
             return $html;
         }
 
-        /** @noinspection PhpUnhandledExceptionInspection - selector is hardcoded */
-        $body = $doc->first('body');
-        return $body instanceof Element ? $body->html() : $html;
+        // Figure out how to extract body
+        $body = $doc->querySelector('body');
+        return $body instanceof Element ? $body->innerHTML : $html;
     }
 
     /**
      * Determine what the replacement HTML should be for elements within an
      * Iframely embed.
      *
-     * @param Element $embed     The HTML element for the Iframely embed.
+     * @param Node    $srcNode   The HTML element for the Iframely embed.
      * @param string  $attribute The attribute to search for within the embed.
      * @return string|null
-     * @noinspection PhpDocMissingThrowsInspection - selector is hardcoded
      */
-    private function findReplacementHtml(Element $embed, string $attribute): ?string
+    private function findReplacementHtml(Node $srcNode, string $attribute): ?string
     {
-        // Search for the attribute within the embed node:
-        // if there are none, skip this embed
-        /** @noinspection PhpUnhandledExceptionInspection - selector is hardcoded */
-        $nodes = $embed->find('[' . $attribute . ']');
-        if (count($nodes) === 0) {
-            return null;
-        }
-
         // If there are attributes, check if any of those URLs point to the
         // Iframely CDN.
         // If any do: hit the iframely API to get the HTML embed without the
         // iframe helper, or without scripts.
-        foreach ($nodes as $srcNode) {
-            $src = $srcNode->getAttribute($attribute);
-            if (!isset($src)) {
+        $src = $srcNode->getAttribute($attribute);
+        if (!isset($src)) {
+            return null;
+        }
+        $srcUrl = new Uri($srcNode->getAttribute($attribute));
+
+        foreach (self::IFRAMELY_API_PARAMS_SETS as $paramsSet) {
+            $apiUrl = new Uri(self::IFRAMELY_API_ENDPOINT);
+            if (strtolower($srcNode->tagName) === 'oembed') {
+                // We are in an oembed ckeditor5 object so we need to add different query strings
+                $apiUrl = $apiUrl->appendQueryParameters($paramsSet + ['api_key' => $this->iframelyLicenseKey, 'url' => $srcNode->getAttribute($attribute)]);
+            } else if ($srcUrl->getHost() === self::IFRAMELY_CDN_HOST) {
+                //ckeditor4 the iframe tag contains the required iframe url with the key already there
+                $apiUrl = $apiUrl->appendQueryParameters($paramsSet + $srcUrl->getQueryAsArray());
+            } else {
+                // not supposed to be here... don't iframely non iframely iframes...
+                // lets just continue without editing the current node.
                 continue;
             }
-            $srcUrl = new Uri($srcNode->getAttribute($attribute));
-
-            foreach (self::IFRAMELY_API_PARAMS_SETS as $paramsSet) {
-                $apiUrl = (new Uri(self::IFRAMELY_API_ENDPOINT));
-                if ('oembed' === $srcNode->tagName()) {
-                    // We are in an oembed ckeditor5 object so we need to add different query strings
-                    $apiUrl = $apiUrl->appendQueryParameters($paramsSet + ['api_key' => $this->iframelyLicenseKey, 'url' => $srcNode->getAttribute($attribute)]);
-                } else if ($srcUrl->getHost() === self::IFRAMELY_CDN_HOST) {
-                    //ckeditor4 the iframe tag contains the required iframe url with the key already there
-                    $apiUrl = $apiUrl->appendQueryParameters($paramsSet + $srcUrl->getQueryAsArray());
-                } else {
-                    // not supposed to be here... don't iframely non iframely iframes...
-                    // lets just continue without editing the current node.
-                    continue;
-                }
-                try {
-                    $response = $this->httpClient->get($apiUrl);
-                } catch (GuzzleException $e) {
-                    // Something went wrong whilst making the new request,
-                    // e.g. this request return a 417 Expectation Failed:
-                    // this means Iframely doesn't know how to output this
-                    // content without the iframe helper.
-                    // Try the next param set.
-                    continue;
-                }
-                $responseBody = json_decode($response->getBody()->getContents(), true);
-                if (isset($responseBody['html'])) {
-                    return $responseBody['html'];
-                }
+            try {
+                $response = $this->httpClient->get($apiUrl);
+            } catch (GuzzleException $e) {
+                // Something went wrong whilst making the new request,
+                // e.g. this request return a 417 Expectation Failed:
+                // this means Iframely doesn't know how to output this
+                // content without the iframe helper.
+                // Try the next param set.
+                continue;
+            }
+            $responseBody = json_decode($response->getBody()->getContents(), true);
+            if (isset($responseBody['html'])) {
+                return $responseBody['html'];
             }
         }
         return null;

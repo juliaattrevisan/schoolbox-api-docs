@@ -1,7 +1,7 @@
 <?php
 
 use GuzzleHttp\Client;
-use Schoolbox\Iframely\DomDocumentEmbedReplacer;
+use Schoolbox\Iframely\EmbedReplacer;
 use League\CommonMark;
 use Proxy\Server as ProxyServer;
 
@@ -51,7 +51,7 @@ class Scrub
      * Singleton Iframely embed replacer used by this class in `html` and
      * `htmlAbsoluteUri`.
      */
-    private static ?DomDocumentEmbedReplacer $embedReplacer = null;
+    private static ?EmbedReplacer $embedReplacer = null;
 
 
     /**
@@ -593,16 +593,16 @@ class Scrub
     /**
      * Build the Iframely embed replacer.
      *
-     * @return DomDocumentEmbedReplacer
+     * @return EmbedReplacer
      */
-    private static function buildEmbedReplacer(): DomDocumentEmbedReplacer
+    private static function buildEmbedReplacer(): EmbedReplacer
     {
         if (!self::$embedReplacer) {
             // This should be injected, but since Scrub uses static methods
             // I'd have to rewrite the whole thing to not be a static class.
             // For now: just create a concrete HTTP client.
             $httpClient = new Client(['curl' => ProxyServer::getInstance()->buildCurlOptions()]);
-            self::$embedReplacer = new DomDocumentEmbedReplacer($httpClient, trim((string)Config::get('iframely_license_key_private')));
+            self::$embedReplacer = new EmbedReplacer($httpClient, trim((string)Config::get('iframely_license_key_private')));
         }
         return self::$embedReplacer;
     }
