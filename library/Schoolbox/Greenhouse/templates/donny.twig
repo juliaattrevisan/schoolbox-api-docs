@@ -2,9 +2,20 @@
     <div class="c-island l-flex-col l-pad-m l-gap-m">
         <sbx-search-select
             label="Search"
-            label-id="`Search"
+            label-id="Search"
+            form-value-name="students"
             endpoint="/ajax/user.php?roleTypeID=student&"
-            placeholder="">
+            placeholder="Search for students">
         </sbx-search-select>
+        <button type="button" class="button" id="submitButton">Submit</button>
     </div>
-<div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('submitButton').addEventListener('click', function() {
+        const studentsInputs = document.querySelectorAll('input[name="students"]');
+        console.warn('Students input values:', Array.from(studentsInputs).map(input => input.value));
+    });
+});
+</script>

@@ -27,7 +27,7 @@ export function register(): void {
         window.customElements.define("sbx-label", SbxLabelCE);
         const SbxLabelPastoralPointsCE = window.Vue.defineCustomElement(SbxLabelPastoralPoints);
         window.customElements.define("sbx-label-pastoral-points", SbxLabelPastoralPointsCE);
-        const SbxSearchSelectCE = window.Vue.defineCustomElement(SbxSearchSelect);
+        const SbxSearchSelectCE = window.Vue.defineCustomElement(SbxSearchSelect, { shadowRoot: false });
         window.customElements.define("sbx-search-select", SbxSearchSelectCE);
     }
 }
