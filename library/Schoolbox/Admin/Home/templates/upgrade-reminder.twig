@@ -14,7 +14,7 @@
 {% if dismissRouteUrl %}
     <script type="text/javascript">
         {% autoescape 'js' %}
-            $(window).on('load', function () {
+            $(function () {
                 const url = '{{ dismissRouteUrl }}';
 
                 {# if the user closes the upgrade reminder alert, lets make sure we

@@ -344,7 +344,7 @@
 
                     el.on("closed.fndtn.reveal.wrapped", function () {
                         el.detach().appendTo(placeholder);
-                        el.unwrap().unbind("closed.fndtn.reveal.wrapped");
+                        el.unwrap().off("closed.fndtn.reveal.wrapped");
                     });
 
                     el.detach().appendTo(root_element);

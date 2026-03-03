@@ -30,7 +30,7 @@
             }, config.threshold);
         });
 
-        $(window).bind("resizeEnd", function () {
+        $(window).on("resizeEnd", function () {
             config.onResize();
         });
 

@@ -29,7 +29,7 @@
                 if (e.ctrlKey && k == "v") e.preventDefault();
             });
 
-            $(this).bind("contextmenu", function () {
+            $(this).on("contextmenu", function () {
                 return false;
             });
         });
