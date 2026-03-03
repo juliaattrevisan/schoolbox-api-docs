@@ -458,6 +458,7 @@ class Controller extends ConfigController
                 return match ($type) {
                     // This is for the settings in 'Admin -> Resources -> Resource Settings'.
                     'Resources' => $user->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL),
+                    // This is for the settings in 'Admin -> Design -> Assets'.
                     'Assets',
                     // This is for the settings in 'Admin -> Design -> Skin Config'.
                     'Skin Config' => $user->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL),
