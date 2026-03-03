@@ -456,10 +456,10 @@
             // Prevent scroll bouncing...wait to remove from layout
             this.settings.$current_tip.css("visibility", "hidden");
             setTimeout(
-                $.proxy(function () {
+                function () {
                     this.hide();
                     this.css("visibility", "visible");
-                }, this.settings.$current_tip),
+                }.bind(this.settings.$current_tip),
                 0,
             );
             this.settings.post_step_callback(this.settings.$li.index(), this.settings.$current_tip);
