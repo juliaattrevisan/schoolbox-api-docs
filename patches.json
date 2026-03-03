@@ -11,9 +11,6 @@
         },
         "ssnepenthe/color-utils": {
             "PHP 8.4 deprecation fix": "./patches/ssnepenthe/color-utils/php84-deprecation-fix.patch"
-        },
-        "mpratt/embera": {
-            "PHP 8.4 deprecation fix": "./patches/mpratt/embera/php84-deprecation-fix.patch"
         }
     }
 }
