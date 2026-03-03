@@ -132,15 +132,88 @@ class MyFilesRetention extends StrategyBase
             $this->log->debug(sprintf("Deleting myFolder ids: %s", implode(', ', $folderIds)));
         }
 
-        // each loop needs this
-        $fileParams     = Builder::getArrayParameters($fileIds, 'id');
+        $filesDeleted = $this->deleteFiles($fileIds);
+        $foldersDeleted = $this->deleteFolders($folderIds);
 
-        $folderParams   = Builder::getArrayParameters($folderIds, 'id');
+        // if perform is true, delete learning moments older than the retention period
+        if ($this->perform) {
+            // perform the transaction for the chunk
+            $this->database->commit();
 
-        // prepare for full chunk, or part chunk (for each table)
+            $this->log->notice(
+                sprintf(
+                    "Deleted '%s' MyFolders, '%s' MyFiles",
+                    $foldersDeleted,
+                    $filesDeleted,
+                )
+            );
+        } else {
+            // if not performing, roll back the transaction to avoid making changes
+            $this->database->rollBack();
 
-        // delete
+            $this->log->notice(
+                sprintf(
+                    "Would have deleted '%s' MyFolders, '%s' MyFiles",
+                    $foldersDeleted,
+                    $filesDeleted,
+                )
+            );
+        }
+    }
 
-        // log outputs
+    /**
+     * delete files by id, returns the number of rows deleted
+     *
+     * @param array $fileIds
+     * @return int
+     */
+    private function deleteFiles(array $fileIds): int
+    {
+        if (empty($fileIds)) {
+            return 0;
+        }
+
+        // prepare based on the number of ids we have
+        if (count($fileIds) === $this->chunkSize) {
+            // build an array length of the chunk size
+            $chunkSize = array_fill(0, $this->chunkSize, 0);
+            $delPlaceholders = Builder::getArrayPlaceholders($chunkSize, 'id');
+        } else {
+            $delPlaceholders = Builder::getArrayPlaceholders($fileIds, 'id');
+        }
+
+        $statement = $this->database->prepare("DELETE FROM myFile WHERE id IN {$delPlaceholders}");
+
+        $statement->execute(Builder::getArrayParameters($fileIds, 'id'));
+
+        return $statement->rowCount();
+    }
+
+    /**
+     * delete Folders by id, returns the number of rows deleted
+     *
+     * @param array $fileIds
+     * @return int
+     */
+    private function deleteFolders(array $fileIds): int
+    {
+        if (empty($fileIds)) {
+            return 0;
+        }
+
+        // prepare based on the number of ids we have
+        if (count($fileIds) === $this->chunkSize) {
+            // build an array length of the chunk size
+            $chunkSize = array_fill(0, $this->chunkSize, 0);
+            $delPlaceholders = Builder::getArrayPlaceholders($chunkSize, 'id');
+        } else {
+            $delPlaceholders = Builder::getArrayPlaceholders($fileIds, 'id');
+        }
+
+        $statement = $this->database->prepare("DELETE FROM myFolder WHERE id IN {$delPlaceholders}");
+
+        $statement->execute(Builder::getArrayParameters($fileIds, 'id'));
+
+        return $statement->rowCount();
     }
 }
