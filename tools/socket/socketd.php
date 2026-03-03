@@ -33,7 +33,7 @@ $kernel = new Daemon\Kernel('Socket', [Daemon\Kernel::OPTION_APP_SHORT_OPTS => '
 $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) use ($kernel): void {
 
     $port = $opts['p'] ?? 9081;
-    $conf = $opts['c'] ?? 'socketd.conf';
+    $conf = $opts['c'] ?? (SITE_root . '/tools/socket/socketd.conf');
 
     // Session serialize handler: depends on configuration
     $sessionSerializeHandlerConfig = strtolower(ini_get('session.serialize_handler'));
