@@ -139,7 +139,9 @@
          * @return string
          */
         function getRubricSum() {
-        return ($rb.find(finalSummarySelector).text()).trim();
+            return ($rb.find(finalSummarySelector).text()).trim();
+        }
+
         // Update the input val when manually assigning grade from rubric
         $assignFromRubricButton.on('click', function(e) {
             var $markInput = $status.find(markInputSelector);
