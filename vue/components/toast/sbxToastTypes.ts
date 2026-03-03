@@ -36,7 +36,7 @@ export type Toast = {
 export type ToastTimeoutDetail = {
     text: string;
     isSuccess?: boolean;
-    duration?: number;
-    fadeDuration?: number;
+    duration?: number; // Units: milliseconds.
+    fadeDuration?: number; // Units: milliseconds.
     timeoutCallback?: () => void;
 };

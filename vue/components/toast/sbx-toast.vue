@@ -9,9 +9,9 @@
 import { ToastState } from "./sbxToastTypes";
 import type { Toast, ToastLink, ToastTimeoutDetail } from "./sbxToastTypes";
 
-const DEFAULT_FADE_DURATION = 3000;
-const DEFAULT_DISPLAY_DURATION_SUCCESSFUL = 3000;
-const DEFAULT_DISPLAY_DURATION_UNSUCCESSFUL = 5000;
+const DEFAULT_FADE_DURATION = 3000; // Units: milliseconds.
+const DEFAULT_DISPLAY_DURATION_SUCCESSFUL = 3000; // Units: milliseconds.
+const DEFAULT_DISPLAY_DURATION_UNSUCCESSFUL = 5000; // Units: milliseconds.
 
 /**
  * All toasts on the page
