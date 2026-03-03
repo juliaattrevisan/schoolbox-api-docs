@@ -9,13 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Iframely;
 
-//use DiDom\Element;
-use DiDom\Exceptions\InvalidSelectorException;
-use Dom\Document;
 use Dom\Element;
 use Dom\Node;
-use Dom\NodeList;
-use Dom\XPath;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Schoolbox\Url\Uri;
@@ -105,7 +100,6 @@ class DomDocumentEmbedReplacer
 
         // Search for Iframely embeds (within data-oembed-url attributes).
         // If there are none, return early
-//        $xpath  = new \Dom\XPath($doc);
         $embeds = $doc->querySelectorAll(self::IFRAMELY_EMBED_CONTAINER_ELEMENT_SELECTOR);
         if (count($embeds) === 0) {
             return $html;
@@ -123,12 +117,6 @@ class DomDocumentEmbedReplacer
                     $replacementNode     = $replacementDoc->querySelector('body')->firstChild;
                     $doc->adoptNode($replacementNode);
                     $embed->parentNode->replaceChild($replacementNode, $embed);
-//                    try {
-//                        // Figure out how to set innerHTML
-//                    } catch (InvalidSelectorException) {
-//                        // Can't set the content: noop
-//                        continue;
-//                    }
                     break;
                 }
             }
@@ -154,13 +142,6 @@ class DomDocumentEmbedReplacer
      */
     private function findReplacementHtml(Node $srcNode, string $attribute): ?string
     {
-//        // Search for the attribute within the embed node:
-//        // if there are none, skip this embed
-//        $nodes = $xpath->query('[' . $attribute . ']', $embed);
-//        if (count($nodes) === 0) {
-//            return null;
-//        }
-
         // If there are attributes, check if any of those URLs point to the
         // Iframely CDN.
         // If any do: hit the iframely API to get the HTML embed without the
