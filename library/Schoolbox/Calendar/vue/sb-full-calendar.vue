@@ -82,6 +82,7 @@ export default {
                 end: null,
             },
             calendarOptions: {},
+            suppressNextReloadEventsToast: false,
         };
     },
 
@@ -240,7 +241,10 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
-            const toast = window.sbProps.toastActivate("Retrieving calendar events...");
+            const toast = this.suppressNextReloadEventsToast
+                ? null
+                : window.sbProps.toastActivate("Retrieving calendar events...");
+            this.suppressNextReloadEventsToast = false;
             const params = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                 end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
@@ -258,10 +262,10 @@ export default {
                             return "start" in v;
                         }),
                     );
-                    toast.timeout({ text: "Events retrieved successfully" });
+                    toast?.timeout({ text: "Events retrieved successfully" });
                 })
                 .catch((error) => {
-                    toast.timeout({ text: "Events could not be retrieved", isSuccess: false });
+                    toast?.timeout({ text: "Events could not be retrieved", isSuccess: false });
                     console.error(error);
                 });
         },
@@ -598,6 +602,15 @@ export default {
         },
 
         /**
+         * Same as reloadEvents(), except that no toast is shown.
+         * This should be used if relaoding events in response to another event that already has a toast.
+         */
+        reloadEventsWithoutToast() {
+            this.suppressNextReloadEventsToast = true;
+            this.calendarApi.refetchEvents();
+        },
+
+        /**
          * Callback for when the filters have been updated: rerender events
          * (thus hiding events which don't match the new filters) and
          * persist the filters selected.
@@ -830,8 +843,9 @@ export default {
         />
 
         <!--
-            On @eventCreated reloadEvents() is called instead of addEvent().  This is because the
-            event might have associated bookings that would not be added if only addEvent() was called.
+            On @eventCreated reloadEventsWithoutToast() is called instead of addEvent().  This ensures that:
+             * all events are reloaded (as the event might have associated bookings that would not be added if only addEvent() was called)
+             * no toast is created (as a toast will have already been created by the emitter of the @eventCreated event)
         -->
         <create-event-modal
             ref="createEvent"
@@ -846,7 +860,7 @@ export default {
             :format-form-datetime="formats.formDatetime"
             :format-display-date="formats.displayDate"
             :format-display-datetime="formats.displayDatetime"
-            @eventCreated="reloadEvents"
+            @eventCreated="reloadEventsWithoutToast"
         />
 
         <view-event-modal
