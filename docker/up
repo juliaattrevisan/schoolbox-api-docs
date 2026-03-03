@@ -12,6 +12,7 @@ declare RABBITMQ_MAJOR_VERSION
 declare ETHERPAD_MAJOR_VERSION
 declare HTTP_PUBLISHED_PORT
 declare HTTPS_PUBLISHED_PORT
+declare FRANKENPHP_REPLICAS
 declare REDIS_STORAGE_PUBLISHED_PORT
 declare REDIS_CACHE_PUBLISHED_PORT
 declare RABBITMQ_MANAGEMENT_PUBLISHED_PORT
@@ -228,6 +229,19 @@ function build_schoolbox_cron_config_ini() {
     " | sed -e 's/^[ \t]*//' > ./docker/schoolbox/config/cron_config.ini
 }
 
+function build_caddyfile() {
+    # Generate the upstream list
+    UPSTREAMS=""
+    for i in $(seq 1 $FRANKENPHP_REPLICAS); do
+        UPSTREAMS="${UPSTREAMS}        to https://docker-schoolbox-frankenphp-{i}:443\n"
+    done
+
+    # Export for envsubst
+    export FRANKENPHP_UPSTREAMS=$(printf "%b" "$UPSTREAMS")
+
+    envsubst < ./docker/caddy/config/Caddyfile.template > ./docker/caddy/config/Caddyfile
+}
+
 function build_image_names() {
     # Determine base image tag from current branch:
     # assume master if nothing better known.
@@ -359,6 +373,7 @@ function main() {
     build_schoolbox_config_ini
     build_instance_registry_json
     build_schoolbox_cron_config_ini
+    build_caddyfile
     start_containers "$@"
 }
 

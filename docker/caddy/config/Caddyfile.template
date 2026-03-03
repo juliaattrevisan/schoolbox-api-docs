@@ -1,0 +1,64 @@
+{
+    default_sni docker.dev.schoolbox.cloud
+}
+http:// {
+    handle_path /.well-known/acme-challenge/ping {
+        respond "port 80 accessible from your location\n" 200
+    }
+    redir https://{host}{uri} 308
+}
+
+# Forward all traffic to schoolbox-frankenphp (terminating SSL)
+# Maybe static assets will be served by another container, but that can be
+# figured out later.
+https:// {
+    tls /etc/nginx/certs/schoolbox-docker-fullchain.crt /etc/nginx/certs/schoolbox-docker-private.key
+    log {
+        output stdout
+    }
+
+    # What's this?
+    #import headers
+
+    # Handle allowed and disallowed methods
+    @allowed-methods method GET HEAD POST PUT DELETE PATCH OPTIONS
+    @disallowed-methods not {
+        method GET HEAD POST PUT DELETE PATCH OPTIONS
+    }
+    error @disallowed-methods "Method {method} Not Allowed" 405
+
+    # Handle requests for fail images before frankenphp
+    handle_path /static/images/core/fail-whale.png {
+        rewrite * /images/core/fail-whale.png
+        reverse_proxy https://schoolbox-static.cloud {
+            header_up host {http.reverse_proxy.upstream.hostport}
+        }
+    }
+    handle_path /static/images/core/icons/fail-whale-16x16.png {
+        rewrite * /images/core/icons/fail-whale-16x16.png
+        reverse_proxy https://schoolbox-static.cloud {
+            header_up host {http.reverse_proxy.upstream.hostport}
+        }
+    }
+
+    # Handle requests for websockets and Etherpad
+    handle_path /websocket {
+        reverse_proxy schoolbox-socketd:9081
+    }
+    handle_path /pad* {
+        reverse_proxy schoolbox-etherpad:9001
+    }
+
+    # TODO determine how to handle DAV requests:
+    # I'm guessing they're handled in the frankenphp container,
+    # if DAV is handled at all?
+
+    # All other requests just get forwarded to frankenphp
+    reverse_proxy {
+        ${FRANKENPHP_UPSTREAMS}
+        lb_policy round_robin
+        transport http {
+            tls_insecure_skip_verify
+        }
+    }
+}
