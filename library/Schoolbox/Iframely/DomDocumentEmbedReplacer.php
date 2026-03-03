@@ -101,11 +101,11 @@ class DomDocumentEmbedReplacer
         }
 
         // Try to load the purified content into a DOM document
-        $doc = \Dom\HTMLDocument::createFromString($html, 0, 'utf-8');
+        $doc = \Dom\HTMLDocument::createFromString($html, LIBXML_NOERROR, 'utf-8');
 
         // Search for Iframely embeds (within data-oembed-url attributes).
         // If there are none, return early
-        $xpath  = new \Dom\XPath($doc);
+//        $xpath  = new \Dom\XPath($doc);
         $embeds = $doc->querySelectorAll(self::IFRAMELY_EMBED_CONTAINER_ELEMENT_SELECTOR);
         if (count($embeds) === 0) {
             return $html;
@@ -119,13 +119,16 @@ class DomDocumentEmbedReplacer
                 // Replace the Iframely element's HTML with the new embed
                 if (isset($replacementHtml)) {
                     $replacementsApplied = true;
-                    try {
-                        // Figure out how to set innerHTML
-                        $embed->innerHtml = $replacementHtml;
-                    } catch (InvalidSelectorException) {
-                        // Can't set the content: noop
-                        continue;
-                    }
+                    $replacementDoc      = \Dom\HtmlDocument::createFromString($replacementHtml, LIBXML_NOERROR, 'utf-8');
+                    $replacementNode     = $replacementDoc->querySelector('body')->firstChild;
+                    $doc->adoptNode($replacementNode);
+                    $embed->parentNode->replaceChild($replacementNode, $embed);
+//                    try {
+//                        // Figure out how to set innerHTML
+//                    } catch (InvalidSelectorException) {
+//                        // Can't set the content: noop
+//                        continue;
+//                    }
                     break;
                 }
             }
@@ -137,8 +140,8 @@ class DomDocumentEmbedReplacer
         }
 
         // Figure out how to extract body
-        $body = $doc->first('body');
-        return $body instanceof Element ? $body->html() : $html;
+        $body = $doc->querySelector('body');
+        return $body instanceof Element ? $body->innerHTML : $html;
     }
 
     /**
@@ -170,7 +173,7 @@ class DomDocumentEmbedReplacer
 
         foreach (self::IFRAMELY_API_PARAMS_SETS as $paramsSet) {
             $apiUrl = new Uri(self::IFRAMELY_API_ENDPOINT);
-            if ('oembed' === $srcNode->tagName) {
+            if (strtolower($srcNode->tagName) === 'oembed') {
                 // We are in an oembed ckeditor5 object so we need to add different query strings
                 $apiUrl = $apiUrl->appendQueryParameters($paramsSet + ['api_key' => $this->iframelyLicenseKey, 'url' => $srcNode->getAttribute($attribute)]);
             } else if ($srcUrl->getHost() === self::IFRAMELY_CDN_HOST) {
