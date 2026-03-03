@@ -230,15 +230,20 @@ class Factory
         $this->setSummator($post['summator'] ?? '');
         $this->setRequireAllActivities((bool)($post['requireAllActivities'] ?? false));
 
+        /* Due Work and Reporting have display vs. instructor marking
+         */
+        $markType = (int)trim($post['markType'] ?? '');
+        $this->setMarkType($markType);
+
+        $instructorMarkType = (int)trim($post['instructor-markType'] ?? '');
+        $this->setInstructorMarkType($instructorMarkType);
+
+        $this->setGradingScheme(empty($post['gradingScheme']) ? null : (int)trim($post['gradingScheme']));
+        $this->setInstructorGradingScheme(empty($post['instructor-gradingScheme']) ? null : (int)trim($post['instructor-gradingScheme']));
+
         /* Due Work needs this to instantiate correctly
          */
         $this->setAcceptOnline((int)trim($post['acceptOnline'] ?? ''));
-        $markType = (int)trim($post['markType'] ?? '');
-        $this->setMarkType($markType);
-        $instructorMarkType = (int)trim($post['instructor-markType'] ?? '');
-        $this->setInstructorMarkType($instructorMarkType);
-        $this->setGradingScheme(empty($post['gradingScheme']) ? null : (int)trim($post['gradingScheme']));
-        $this->setInstructorGradingScheme(empty($post['instructor-gradingScheme']) ? null : (int)trim($post['instructor-gradingScheme']));
         $this->setUseRubric((bool)($post['useRubric'] ?? ''));
         $this->setSimilarityCheckEnabled(trim($post['similarityCheckEnabled'] ?? '') === 'on');
 
@@ -282,7 +287,7 @@ class Factory
         $this->setUseMarkRange(trim($post['useMarkRange'] ?? '') === 'on');
 
         // Only due works have a max mark.
-        if ($assessmentType === AssessmentType::TYPE_DUE_WORK) {
+        if (in_array($assessmentType, [AssessmentType::TYPE_DUE_WORK, AssessmentType::TYPE_REPORTING])) {
             // MaxMark is the maximum available marks for the entire assessment.
             // It is permitted to be null for all mark types except Total Mark.
             // Unfortunately, the due work create form uses these deprecated values, not the new "slug" ones.

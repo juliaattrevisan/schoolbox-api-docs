@@ -808,6 +808,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $assessment->setCloseAt($assessment->getDueAt());
         }
 
+        /* Enforce Open Date = Publish Date for Reporting
+         */
+        if ($assessment instanceof Reporting\Model) {
+            $assessment->setOpenAt($assessment->getPublishAt());
+        }
+
         /* Regular update while you're creating the assessment, otherwise
          */
         try {

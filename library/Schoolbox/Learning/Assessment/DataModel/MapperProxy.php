@@ -1392,6 +1392,8 @@ class MapperProxy
             }
         } elseif ($subObject instanceof DialogAgent\Model) {
             DialogAgent\Mapper::getInstance()->save($subObject);
+        } elseif ($subObject instanceof Reporting\Model) {
+            Reporting\Mapper::getInstance()->save($subObject);
         } elseif ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);
         }
@@ -1486,6 +1488,8 @@ class MapperProxy
                 $mapper = LessonPlan\Mapper::getInstance();
             } elseif ($subObject instanceof DialogAgent\Model) {
                 $mapper = DialogAgent\Mapper::getInstance();
+            } elseif ($subObject instanceof Reporting\Model) {
+                $mapper = Reporting\Mapper::getInstance();
             } else {
                 return null;
             }
@@ -1544,6 +1548,14 @@ class MapperProxy
             /* Deletes the \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model instance
              */
             DialogAgent\Mapper::getInstance()->delete($subModel);
+        } elseif ($subModel instanceof Reporting\Model) {
+            /* Deletes the \Schoolbox\Learning\Assessment\DataModel\Model instance
+             */
+            $this->baseMapper->delete($dataModel);
+
+            /* Deletes the \Schoolbox\Learning\Assessment\DataModel\Reporting\Model instance
+             */
+            Reporting\Mapper::getInstance()->delete($subModel);
         } else {
             $this->baseMapper->delete($dataModel);
         }
@@ -1594,6 +1606,10 @@ class MapperProxy
 
             if ($subModel instanceof DialogAgent\Model) {
                 DialogAgent\Mapper::getInstance()->restoreSoftDeleted($subModel);
+            }
+
+            if ($subModel instanceof Reporting\Model) {
+                Reporting\Mapper::getInstance()->restoreSoftDeleted($subModel);
             }
 
             $this->baseMapper->restoreSoftDeleted($dataModel);
@@ -1886,6 +1902,10 @@ class MapperProxy
 
                     case AssessmentType::TYPE_DIALOG_AGENT:
                         $filterBuilder->notNull('dialogAgent.id');
+                        break;
+
+                    case AssessmentType::TYPE_REPORTING:
+                        $filterBuilder->notNull('reporting.id');
                         break;
 
                     default:

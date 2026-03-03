@@ -1553,6 +1553,7 @@ abstract class Kernel
                     ->addSubTranslator(new AssessmentDataModelTranslator\Lti())
                     ->addSubTranslator(new AssessmentDataModelTranslator\LessonPlan())
                     ->addSubTranslator(new AssessmentDataModelTranslator\DialogAgent())
+                    ->addSubTranslator(new AssessmentDataModelTranslator\Reporting())
                     ->addSubTranslator(new AssessmentDataModelTranslator\Project($translator));
                 return $translator;
             })

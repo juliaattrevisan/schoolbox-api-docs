@@ -18,7 +18,7 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model as LessonPlan;
-use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\DataModel\Reporting\Model as Reporting;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -143,7 +143,7 @@ class Model implements ISoftDeletable
     /**
      * The task which may or may not be associated with this assessment.
      *
-     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent or project may be
+     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent, Reporting or project may be
      * associated with a single assessment.
      *
      * @var null|Task
@@ -153,7 +153,7 @@ class Model implements ISoftDeletable
     /**
      * The due work which may or may not be associated with this assessment.
      *
-     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent or project may be
+     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent, Reporting or project may be
      * associated with a single assessment.
      *
      * @var null|DueWork
@@ -163,7 +163,7 @@ class Model implements ISoftDeletable
     /**
      * The quiz which may or may not be associated with this assessment.
      *
-     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent or project may be
+     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent, Reporting or project may be
      * associated with a single assessment.
      *
      * @var null|Quiz
@@ -174,7 +174,7 @@ class Model implements ISoftDeletable
      * The LTI assessment which may or may not be associated with this
      * assessment.
      *
-     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent or project may be
+     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent, Reporting or project may be
      * associated with a single assessment.
      */
     private ?LtiAssessment $ltiAssessment = null;
@@ -183,7 +183,7 @@ class Model implements ISoftDeletable
     /**
      * The Lesson Plan which might exist for this assessment
      *
-     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent or project may be
+     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent, Reporting or project may be
      * associated with a single assessment.
      *
      * @var LessonPlan|null
@@ -194,7 +194,7 @@ class Model implements ISoftDeletable
     /**
      * The Dialog Agent which might exist for this assessment
      *
-     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent or project may be
+     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent, Reporting or project may be
      * associated with a single assessment.
      *
      * @var DialogAgent|null
@@ -203,9 +203,20 @@ class Model implements ISoftDeletable
 
 
     /**
+     * The Reporting which might exist for this assessment
+     *
+     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent, Reporting or project may be
+     * associated with a single assessment.
+     *
+     * @var Reporting|null
+     */
+    private ?Reporting $reporting = null;
+
+
+    /**
      * The project which may or may not be associated with this assessment.
      *
-     * Only one of task, due work, quiz, LTI assessment or project may be
+     * Only one of task, due work, quiz, LTI assessment, Dialog Agent, Reporting or project may be
      * associated with a single assessment.
      *
      * @var null|Project
@@ -307,6 +318,10 @@ class Model implements ISoftDeletable
 
         if ($this->hasDialogAgent()) {
             $this->dialogAgent = clone $this->dialogAgent;
+        }
+
+        if ($this->hasReporting()) {
+            $this->reporting = clone $this->reporting;
         }
     }
 
@@ -460,6 +475,17 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Does this have a Reporting
+     *
+     * @return bool
+     */
+    public function hasReporting(): bool
+    {
+        return ($this->getReporting() instanceof Reporting);
+    }
+
+
+    /**
      * Does this have any sub-objects?
      *
      * @return bool
@@ -473,7 +499,8 @@ class Model implements ISoftDeletable
             $this->hasQuiz() ||
             $this->hasProject() ||
             $this->hasLessonPlan() ||
-            $this->hasDialogAgent();
+            $this->hasDialogAgent() ||
+            $this->hasReporting();
     }
 
     /**
@@ -515,6 +542,10 @@ class Model implements ISoftDeletable
             return $this->getDialogAgent();
         }
 
+        if ($this->hasReporting()) {
+            return $this->getReporting();
+        }
+
         return null;
     }
 
@@ -554,6 +585,9 @@ class Model implements ISoftDeletable
             return $this->setDialogAgent($subObject);
         }
 
+        if ($subObject instanceof Reporting) {
+            return $this->setReporting($subObject);
+        }
         return $this;
     }
 
@@ -851,6 +885,26 @@ class Model implements ISoftDeletable
     public function setDialogAgent(?DialogAgent $dialogAgent): self
     {
         $this->dialogAgent = $dialogAgent;
+        return $this;
+    }
+
+
+    /**
+     * @return Reporting|null
+     */
+    public function getReporting(): ?Reporting
+    {
+        return $this->reporting;
+    }
+
+
+    /**
+     * @param Reporting|null $reporting
+     * @return $this
+     */
+    public function setReporting(?Reporting $reporting): self
+    {
+        $this->reporting = $reporting;
         return $this;
     }
 

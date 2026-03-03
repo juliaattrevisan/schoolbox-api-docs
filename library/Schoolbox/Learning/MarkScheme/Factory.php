@@ -21,6 +21,7 @@ use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -86,6 +87,19 @@ class Factory
      */
     private static array $markTypesLtiAssessment = [
         MarkType::TYPE_TOTAL => TotalMarkFractional::TITLE,
+    ];
+
+
+    /**
+     * MarkTypes available for Reporting
+     *
+     * @var array
+     */
+    private static array $markTypesReporting = [
+        MarkType::TYPE_NONE    => None::TITLE,
+        MarkType::TYPE_PERCENT => Percentage::TITLE,
+        MarkType::TYPE_TOTAL   => TotalMarkFractional::TITLE,
+        MarkType::TYPE_LETTER  => LetterGrade::TITLE
     ];
 
 
@@ -163,6 +177,10 @@ class Factory
 
         if ($assessable instanceof DialogAgent) {
             return $this->spawnForDialogAgent($assessable);
+        }
+
+        if ($assessable instanceof Reporting) {
+            return $this->spawnForReporting($assessable, false);
         }
 
         throw new InvalidArgumentException('Unknown IAssessable class: ' . \get_class($assessable));
@@ -385,6 +403,53 @@ class Factory
 
 
     /**
+     * @param Reporting $reporting
+     * @param bool $isInstructor - Whether to spawn the mark scheme for viewing as an instructor or learner
+     * @return IMarkScheme
+     * @throws RangeException
+     * @throws DomainException
+     */
+    protected function spawnForReporting(Reporting $reporting, bool $isInstructor): IMarkScheme
+    {
+        /* There are two types of mark types (input and display), this determines which function
+         * to use from the Reporting object to get the mark type based on if we need the instructor or learner mark
+         */
+        $methods = [
+            'markType' => [
+                'learner' => 'getMarkType',
+                'instructor' => 'getInstructorMarkType',
+            ],
+            'maxMark' => [
+                'learner' => 'getMaxMark',
+                'instructor' => 'getInstructorMaxMark',
+            ],
+            'gradeGroup' => [
+                'learner' => 'getGradeGroup',
+                'instructor' => 'getInstructorGradeGroup',
+            ],
+        ];
+
+        // The key to the methods array for the user type to use
+        $userType = $isInstructor ? 'instructor' : 'learner';
+
+        $markType = $reporting->{$methods['markType'][$userType]}();
+        switch ($markType->getId()) {
+            case MarkType::TYPE_PERCENT:
+                return new Percentage();
+            case MarkType::TYPE_NONE:
+                return new None();
+            case MarkType::TYPE_TOTAL:
+                $maxMark = $reporting->{$methods['maxMark'][$userType]}();
+                return new TotalMarkFractional($maxMark);
+            case MarkType::TYPE_LETTER:
+                return new LetterGrade($reporting->{$methods['gradeGroup'][$userType]}());
+            default:
+                throw new DomainException('Invalid MarkType for DueWork: ' . $markType->getName());
+        }
+    }
+
+
+    /**
      * @param IAssessable $assessable
      * @return string[] Indexed by MarkType.id
      * @throws UnexpectedValueException If $assessment class is not registered
@@ -417,6 +482,10 @@ class Factory
 
         if ($assessable instanceof DialogAgent) {
             return self::$markTypesDialogAgent;
+        }
+
+        if ($assessable instanceof Reporting) {
+            return self::$markTypesReporting;
         }
 
         throw new UnexpectedValueException('Unknown IAssessable: ' . get_class($assessable));

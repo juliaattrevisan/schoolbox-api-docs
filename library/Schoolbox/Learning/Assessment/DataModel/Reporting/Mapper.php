@@ -2,23 +2,23 @@
 
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2025, Schoolbox Pty Ltd
+ * @copyright   Copyright 2026, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent;
+namespace Schoolbox\Learning\Assessment\DataModel\Reporting;
 
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Learning\Assessment\DialogAgent\Lookup\Helpfulness;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 
 /**
  * @method Model createModel($idValue = null)
- * @method GenericCollection|Model[] findAll($options = [])
+ * @method GenericCollection<Model> findAll($options = [])
  * @method Model findById($identifierValue)
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  * @method Model findOneByColumnList($columnList, array $options = [])
@@ -30,17 +30,25 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function mapping(): void
     {
-        $this->hasTable('dialog_agent');
+        $this->hasTable('reporting');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('scenario_id', self::TYPE_INTEGER, null, 'scenarioId');
-        $this->uses('language', self::TYPE_STRING, null, 'language');
-        $this->uses('helpfulness', self::TYPE_STRING, self::COLUMN_ENUM, 'helpfulness', [...array_column(Helpfulness::cases(), 'value'), null]);
-        $this->uses('use_diff_profile', self::TYPE_BOOLEAN, null, 'useDifferentiationProfile');
-        $this->uses('opening_message', self::TYPE_STRING, null, 'openingMessage');
-        $this->uses('rules', self::TYPE_STRING, null, 'rules');
-        $this->uses('prompt', self::TYPE_STRING, null, 'prompt');
-        $this->uses('duration', self::TYPE_INTEGER, null, 'duration');
+
+        /* Grading, Mark Types, Grade Groups
+         */
+        $this->joins('instructor_mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
+        $this->joins('mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
+        $this->joins('instructor_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'instructorGradeGroup', 'instructor_grade_group');
+        $this->joins('grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'gradeGroup', 'grade_group');
+        $this->uses('instructor_max_mark', self::TYPE_DECIMAL);
+        $this->uses('max_mark', self::TYPE_DECIMAL);
+
+        /* Mark Visibility
+         */
+        $this->uses('mark_visibility', self::TYPE_INTEGER);
+
+        /* Auditor fields
+         */
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('created_by', self::TYPE_INTEGER, null, 'createdBy');
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
@@ -58,12 +66,8 @@ class Mapper extends \Schoolbox\Mapper
             'assessmentModel',
         );
 
-        $this->hasJoin('responses', array(
-            'multiple'  => true,
-            'mapper'    => \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Mapper::class,
-            'this_key'  => 'id',
-            'other_key' => 'dialog_agent_id',
-        ));
+        /* Add join for Feedbacks
+         */
 
         /* Created/Updated/Deleted By fields need special treatment due to swampy reasons
          */
@@ -75,11 +79,6 @@ class Mapper extends \Schoolbox\Mapper
          */
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteResponses']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteFeedbacks']);
-
-        /* Recursive Undeleter callbacks: deleting a dialog agent also deletes the scenario field contexts that users
-         * have lovingly crafted; these are used to make prompts so people can make responses.
-         */
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCriteriaContext']);
     }
 
 
@@ -117,14 +116,14 @@ class Mapper extends \Schoolbox\Mapper
         $stack = $this->createCollection();
 
         foreach ($statement as $row) {
-            $dialogAgent = $this->hydrate($row);
+            $subobject = $this->hydrate($row);
 
             /* Bolt on the IAssessable instance
              */
             $assessment = $this->hydrateJoin($row, 'assessmentModel', 'assessmentModel');
-            $dialogAgent->setAssessmentModel($assessment);
+            $subobject->setAssessmentModel($assessment);
 
-            $stack->add($dialogAgent);
+            $stack->add($subobject);
         }
 
         return $stack;
@@ -134,19 +133,19 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Prefill auditor fields (the Swamp shouldn't need to know about this)
      */
-    protected function auditorFields(Model $dialogAgent): void
+    protected function auditorFields(Model $subobject): void
     {
         /* TODO Technical Uplift Candidate
          *  The traits are wrong and should have accepted a user instance rather than just an id
          *  All usages of the trait require you to ->getId() anyway, which means you have the user instance already.
          *  WHy not just supply that instead?
          */
-        if (null === $dialogAgent->getCreatedBy()) {
-            $dialogAgent->setCreatedBy($this->getSessionUser()->getId());
+        if (null === $subobject->getCreatedBy()) {
+            $subobject->setCreatedBy($this->getSessionUser()->getId());
         }
 
-        if (null === $dialogAgent->getUpdatedBy()) {
-            $dialogAgent->setUpdatedBy($this->getSessionUser()->getId());
+        if (null === $subobject->getUpdatedBy()) {
+            $subobject->setUpdatedBy($this->getSessionUser()->getId());
         }
     }
 
@@ -154,83 +153,67 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Prefill deleter fields (the Swamp shouldn't need to know about this)
      *
-     * @param Model $dialogAgent
+     * @param Model $subobject
      * @return void
      * @throws Exception
      */
-    protected function deleterFields(Model $dialogAgent): void
+    protected function deleterFields(Model $subobject): void
     {
         /* Remember who deleted this thing, in a dirty doubletap
          */
-        $dialogAgent->setDeletedBy($this->getSessionUser()->getId());
-        $this->save($dialogAgent);
-
-        /* TODO remove scenario context stuff specifically related to this instance
-         */
+        $subobject->setDeletedBy($this->getSessionUser()->getId());
+        $this->save($subobject);
     }
 
 
     /**
      * Forget who deleted this. Used when undeleting
      *
-     * @param Model $dialogAgent
+     * @param Model $subobject
      * @return void
      * @throws Exception
      */
-    public function restoreDeleterFields(Model $dialogAgent): void
+    public function restoreDeleterFields(Model $subobject): void
     {
         /* Forget who deleted this thing, in a dirty doubletap
          */
-        $dialogAgent->setDeletedBy(null);
-        $this->save($dialogAgent);
+        $subobject->setDeletedBy(null);
+        $this->save($subobject);
     }
 
 
+//    /**
+//     * Soft deletes all responses
+//     *
+//     * @param Model $subobject
+//     * @return void
+//     * @throws Exception
+//     */
+//    public function softDeleteResponses(Model $subobject): void
+//    {
+//        $mapper = $this->getJoinMapper('responses');
+//
+//        $mapper->suppressNotification();
+//        $mapper->deleteByColumn('reporting_id', $subobject->getId());
+//        $mapper->restoreNotification();
+//    }
+
+
     /**
-     * Soft deletes all responses for this dialog agent
+     * Soft deletes all feedbacks
      *
-     * @param Model $dialogAgent
+     * @param Model $subobject
      * @return void
      * @throws Exception
      */
-    public function softDeleteResponses(Model $dialogAgent): void
+    public function softDeleteFeedbacks(Model $subobject): void
     {
-        $mapper = $this->getJoinMapper('responses');
+        /* TODO this can probably be obtained via getJoinMapper somehow
+         */
+        $mapper = \Schoolbox\Learning\Assessment\DataModel\Reporting\Feedback\Mapper::getInstance();
 
         $mapper->suppressNotification();
-        $mapper->deleteByColumn('dialog_agent_id', $dialogAgent->getId());
-        $mapper->restoreNotification();
-    }
-
-
-    /**
-     * Soft deletes all feedbacks for this dialog agent
-     *
-     * @param Model $dialogAgent
-     * @return void
-     * @throws Exception
-     */
-    public function softDeleteFeedbacks(Model $dialogAgent): void
-    {
-        $mapper = \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Mapper::getInstance();
-
-        $mapper->suppressNotification();
-        $mapper->deleteByColumn('dialog_agent_id', $dialogAgent->getId());
-        $mapper->restoreNotification();
-    }
-
-
-    /**
-     * @param Model $dialogAgent
-     * @return void
-     * @throws Exception
-     */
-    public function softDeleteCriteriaContext(Model $dialogAgent): void
-    {
-        $mapper = \Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper::getInstance();
-
-        $mapper->suppressNotification();
-        $mapper->deleteByColumn('dialog_agent_id', $dialogAgent->getId());
+        $mapper->deleteByColumn('reporting_id', $subobject->getId());
         $mapper->restoreNotification();
     }
 }

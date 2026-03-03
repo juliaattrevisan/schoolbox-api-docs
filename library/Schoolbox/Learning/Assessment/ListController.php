@@ -41,6 +41,7 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\AssessmentContext;
@@ -582,6 +583,17 @@ class ListController extends Web\Controller\Base
                 'icon'  => 'quiz',
                 'title' => 'Ask a series of questions with automatic marking',
             ],
+        ];
+
+        /* TODO Hide behind a feature flag
+         * TODO Jezwords
+         */
+        $data['types'][] = [
+            'id'    => 'reporting',
+            'value' => AssessmentType::TYPE_REPORTING,
+            'label' => Reporting::getDefaultTypeName(),
+            'icon'  => 'reporting',
+            'title' => 'Provide teacher discretionary marking',
         ];
 
         // TODO: avoid this AI config copypasta to check if dialog agent is enabled

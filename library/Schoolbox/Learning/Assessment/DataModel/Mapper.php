@@ -95,6 +95,7 @@ class Mapper extends BaseMapper
         // * LTI assessment
         // * Lesson Plan
         // * Dialog Agent
+        // * Reporting
         $this->joinsReverseSingle('assessment_id', TaskMapper::class, 'task', 'task');
         $this->joinsReverseSingle('assessment_id', SubmissionBoxMapper::class, 'duework', 'duework');
         $this->joinsReverseSingle('assessment_id', Quiz\Mapper::class, 'quiz', 'quiz');
@@ -102,6 +103,7 @@ class Mapper extends BaseMapper
         $this->joinsReverseSingle('assessment_id', LtiAssessment\Mapper::class, 'ltiAssessment', 'ltiAssessment');
         $this->joinsReverseSingle('assessment_id', LessonPlan\Mapper::class, 'lessonPlan', 'lessonPlan');
         $this->joinsReverseSingle('assessment_id', DialogAgent\Mapper::class, 'dialogAgent', 'dialogAgent');
+        $this->joinsReverseSingle('assessment_id', DialogAgent\Mapper::class, 'reporting', 'reporting');
 
         // Participation plan join
         $this->joinsReverseMulti('assessment_id', Plan\Mapper::class, 'plans', 'plans');
@@ -201,6 +203,7 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteLtiAssessment(...));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteLessonPlan(...));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteDialogAgent(...));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteReporting(...));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteCustomisation(...));
 
         $this->registerPersistSearchIndexCallbacks();
@@ -427,6 +430,24 @@ class Mapper extends BaseMapper
 
 
     /**
+     * Delete all of a Reporting's subobjects
+     *
+     * @param Model $assessment
+     * @return bool
+     */
+    public function softDeleteReporting(Model $assessment): bool
+    {
+        if ($assessment->getReporting() instanceof Reporting\Model) {
+            $reportingMapper = $this->getJoinMapper('reporting');
+            $reporting = $reportingMapper->findByColumn('assessment_id', $assessment->getId());
+            $reportingMapper->softDelete($reporting);
+        }
+
+        return true;
+    }
+
+
+    /**
      * Cascades soft-delete to any customisation of this assessment.
      *
      * @param Model $assessment
@@ -548,6 +569,8 @@ class Mapper extends BaseMapper
                 JOIN  {$this->getJoinSql('dialogAgent.responses', 'da', 'dr')} AND dr.learner_id = :userId
                 WHERE {$where}
 
+                -- Reporting activity doesn't have any responses
+                
                 ORDER BY id ASC
             ";
 
@@ -589,6 +612,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('ltiAssessment', 'l')},
                 {$this->getJoinColumnString('lessonPlan', 'lessonPlan')},
                 {$this->getJoinColumnString('dialogAgent', 'dialogAgent')},
+                {$this->getJoinColumnString('reporting', 'reporting')},
                 {$this->getJoinColumnString('project', 'p')},
                 {$this->getJoinColumnString('assessment_folder', 'f')},
                 {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
@@ -613,6 +637,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}
             LEFT JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
             LEFT JOIN {$this->getJoinSql('dialogAgent', '', 'dialogAgent', true)}
+            LEFT JOIN {$this->getJoinSql('reporting', '', 'reporting', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
@@ -704,6 +729,10 @@ class Mapper extends BaseMapper
                         $typeJoins[] = " LEFT JOIN {$this->getJoinSql('dialogAgent', '', 'dialogAgent', true)}";
                         $typesPb     = $typesPb->notNull('dialogAgent.id');
                         break;
+                    case AssessmentType::TYPE_REPORTING:
+                        $typeJoins[] = " LEFT JOIN {$this->getJoinSql('reporting', '', 'reporting', true)}";
+                        $typesPb     = $typesPb->notNull('reporting.id');
+                        break;
                     default:
                         break;
                 }
@@ -763,6 +792,7 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithLtiAssessments($modelList);
         $modelList = $this->augmentListWithLessonPlans($modelList);
         $modelList = $this->augmentListWithDialogAgents($modelList);
+        $modelList = $this->augmentListWithReporting($modelList);
         $modelList = $this->augmentListWithProjects($modelList);
 
         // Augmentations for one-to-many fields, copied from standard hydrate.
@@ -1102,6 +1132,16 @@ class Mapper extends BaseMapper
                 $model->setDialogAgent(null);
             }
 
+            /* Reporting
+             */
+            if ($row['reporting.id']) {
+                $reporting = $this->hydrateJoin($row, 'reporting', 'reporting');
+
+                $model->setReporting($reporting);
+            } else {
+                $model->setReporting(null);
+            }
+
             // Project?
             if ($row['p.id']) {
                 $projectIds[$row['p.id']] = true;
@@ -1395,6 +1435,30 @@ class Mapper extends BaseMapper
     {
         /** @var DialogAgent\Mapper $mapper */
         $mapper = $this->getJoinMapper('dialogAgent');
+
+        return $this->augmentListWithSubObjects(
+            $modelList,
+            $mapper,
+            "
+                SELECT {$mapper->getColumnString()}
+                FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
+            ",
+            fn ($row) => $mapper->hydrate($row),
+        );
+    }
+
+
+    /**
+     * For any assessments in `$modelList`: fetch and add their corresponding
+     * Reporting, if there are any.
+     *
+     * @param GenericCollection<Model> $modelList
+     * @return GenericCollection<Model>
+     */
+    private function augmentListWithReporting(GenericCollection $modelList): GenericCollection
+    {
+        /** @var Reporting\Mapper $mapper */
+        $mapper = $this->getJoinMapper('reporting');
 
         return $this->augmentListWithSubObjects(
             $modelList,

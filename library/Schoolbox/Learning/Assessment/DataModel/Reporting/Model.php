@@ -2,15 +2,17 @@
 
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2025, Schoolbox Pty Ltd
+ * @copyright   Copyright 2026, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent;
+namespace Schoolbox\Learning\Assessment\DataModel\Reporting;
 
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -32,197 +34,181 @@ class Model implements IAssessableDataModel, ISoftDeletable
     use DeletedAtDate;
     use DeletedBy;
 
-
     /**
-     * @var int|null
+     * This is the instructor mark type which is only visible to staff
+     *
+     * @var null|MarkType
      */
-    private ?int $scenarioId = null;
-
-
-    /**
-     * @var string|null
-     */
-    private ?string $language = null;
+    private ?MarkType $instructorMarkType = null;
 
 
     /**
-     * @var string|null
+     * This is the display mark type which is seen by students
+     *
+     * @var null|MarkType
      */
-    private ?string $helpfulness = null;
+    private ?MarkType $markType = null;
 
 
     /**
-     * @var bool|null
+     * This is the grade level associated with the Letter Grade mark type that is seen by staff
+     * (optional: only applies if Letter Grade was chosen)
+     *
+     * @var null|GradeLevel\Group\Model
      */
-    private ?bool $useDifferentiationProfile = null;
+    private ?GradeLevel\Group\Model $instructorGradeGroup = null;
 
 
     /**
-     * @var string|null
+     * This is the grade level associated with the Letter Grade mark type that is seen by students
+     * (optional: only applies if Letter Grade was chosen)
+     *
+     * @var null|GradeLevel\Group\Model
      */
-    private ?string $openingMessage = null;
+    private ?GradeLevel\Group\Model $gradeGroup = null;
 
 
     /**
-     * @var string|null
+     * This is the max mark available for the Total Mark scheme, seen by staff
+     *
+     * @var null|float
      */
-    private ?string $rules = null;
+    private ?float $instructorMaxMark = null;
 
 
     /**
-     * @var string|null
+     * This is the max mark available for the Total Mark scheme, seen by students
+     *
+     * @var null|float
      */
-    private ?string $prompt = null;
+    private ?float $maxMark = null;
 
 
     /**
-     * @var int|null
+     * Decides which demographic can see the marks associated with this activity.
+     * These correspond to consts in IAssessable
+     *
+     * @var null|int
      */
-    private ?int $duration = null;
+    private ?int $markVisibility = null;
 
 
     /**
-     * @var \Schoolbox\GenericCollection|null
+     * @return MarkType|null
      */
-    private ?\Schoolbox\GenericCollection $fields = null;
-
-
-    /**
-     * @return int|null
-     */
-    public function getScenarioId(): ?int
+    public function getInstructorMarkType(): ?MarkType
     {
-        return $this->scenarioId;
+        return $this->instructorMarkType;
     }
 
 
     /**
-     * @param int|null $scenarioId
+     * @param MarkType|null $instructorMarkType
      * @return $this
      */
-    public function setScenarioId(?int $scenarioId): self
+    public function setInstructorMarkType(?MarkType $instructorMarkType): self
     {
-        $this->scenarioId = $scenarioId;
+        $this->instructorMarkType = $instructorMarkType;
         return $this;
     }
 
 
     /**
-     * @return string|null
+     * @return MarkType|null
      */
-    public function getLanguage(): ?string
+    public function getMarkType(): ?MarkType
     {
-        return $this->language;
+        return $this->markType;
     }
 
 
     /**
-     * @param string|null $language
+     * @param MarkType|null $markType
      * @return $this
      */
-    public function setLanguage(?string $language): self
+    public function setMarkType(?MarkType $markType): self
     {
-        $this->language = $language;
+        $this->markType = $markType;
         return $this;
     }
 
 
     /**
-     * @return string|null
+     * @return GradeLevel\Group\Model|null
      */
-    public function getHelpfulness(): ?string
+    public function getInstructorGradeGroup(): ?GradeLevel\Group\Model
     {
-        return $this->helpfulness;
+        return $this->instructorGradeGroup;
     }
 
 
     /**
-     * @param string|null $helpfulness
+     * @param GradeLevel\Group\Model|null $instructorGradeGroup
      * @return $this
      */
-    public function setHelpfulness(?string $helpfulness): self
+    public function setInstructorGradeGroup(?GradeLevel\Group\Model $instructorGradeGroup): self
     {
-        $this->helpfulness = $helpfulness;
+        $this->instructorGradeGroup = $instructorGradeGroup;
         return $this;
     }
 
 
     /**
-     * @return bool|null
+     * @return GradeLevel\Group\Model|null
      */
-    public function getUseDifferentiationProfile(): ?bool
+    public function getGradeGroup(): ?GradeLevel\Group\Model
     {
-        return $this->useDifferentiationProfile;
+        return $this->gradeGroup;
     }
 
 
     /**
-     * @param bool|null $useDifferentiationProfile
+     * @param GradeLevel\Group\Model|null $gradeGroup
      * @return $this
      */
-    public function setUseDifferentiationProfile(?bool $useDifferentiationProfile): self
+    public function setGradeGroup(?GradeLevel\Group\Model $gradeGroup): self
     {
-        $this->useDifferentiationProfile = $useDifferentiationProfile;
+        $this->gradeGroup = $gradeGroup;
         return $this;
     }
 
 
     /**
-     * @return string|null
+     * @return float|null
      */
-    public function getOpeningMessage(): ?string
+    public function getInstructorMaxMark(): ?float
     {
-        return $this->openingMessage;
+        return $this->instructorMaxMark;
     }
 
 
     /**
-     * @param string|null $openingMessage
+     * @param float|null $instructorMaxMark
      * @return $this
      */
-    public function setOpeningMessage(?string $openingMessage): self
+    public function setInstructorMaxMark(?float $instructorMaxMark): self
     {
-        $this->openingMessage = $openingMessage;
+        $this->instructorMaxMark = $instructorMaxMark;
         return $this;
     }
 
 
     /**
-     * @return string|null
+     * @return float|null
      */
-    public function getRules(): ?string
+    public function getMaxMark(): ?float
     {
-        return $this->rules;
+        return $this->maxMark;
     }
 
 
     /**
-     * @param string|null $rules
+     * @param float|null $maxMark
      * @return $this
      */
-    public function setRules(?string $rules): self
+    public function setMaxMark(?float $maxMark): self
     {
-        $this->rules = $rules;
-        return $this;
-    }
-
-
-    /**
-     * @return string|null
-     */
-    public function getPrompt(): ?string
-    {
-        return $this->prompt;
-    }
-
-
-    /**
-     * @param string|null $prompt
-     * @return $this
-     */
-    public function setPrompt(?string $prompt): self
-    {
-        $this->prompt = $prompt;
+        $this->maxMark = $maxMark;
         return $this;
     }
 
@@ -230,39 +216,19 @@ class Model implements IAssessableDataModel, ISoftDeletable
     /**
      * @return int|null
      */
-    public function getDuration(): ?int
+    public function getMarkVisibility(): ?int
     {
-        return $this->duration;
+        return $this->markVisibility;
     }
 
 
     /**
-     * @param int|null $duration
+     * @param int|null $markVisibility
      * @return $this
      */
-    public function setDuration(?int $duration): self
+    public function setMarkVisibility(?int $markVisibility): self
     {
-        $this->duration = $duration;
-        return $this;
-    }
-
-
-    /**
-     * @return \Schoolbox\GenericCollection|null
-     */
-    public function getFields(): ?\Schoolbox\GenericCollection
-    {
-        return $this->fields;
-    }
-
-
-    /**
-     * @param \Schoolbox\GenericCollection|null $fields
-     * @return $this
-     */
-    public function setFields(?\Schoolbox\GenericCollection $fields): self
-    {
-        $this->fields = $fields;
+        $this->markVisibility = $markVisibility;
         return $this;
     }
 }
