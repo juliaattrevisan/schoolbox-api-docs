@@ -172,14 +172,13 @@ export default {
                 const responseData = await response.json();
                 if (response.ok) {
                     this.$refs.modal.close();
-                    // check if errors exist?
-                    if (responseData.errors && responseData.errors.length > 0) {
+                    if (Object.hasOwn(responseData, "message")) {
+                        toast.timeout({ text: responseData.message, isSuccess: true });
+                    } else {
                         toast.timeout({
-                            text: `Event / Task created with some issues: ${responseData.errors.join(", ")}`,
+                            text: "Unexpected response from server",
                             isSuccess: false,
                         });
-                    } else {
-                        toast.timeout({ text: "Created", isSuccess: true });
                     }
 
                     this.$emit("eventCreated", responseData.event);

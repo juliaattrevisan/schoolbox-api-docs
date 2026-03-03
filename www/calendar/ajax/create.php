@@ -108,7 +108,7 @@ if ($eventAccess->checkDestination($user, Event::ACCESS_PERSONAL, $user, $owner)
 }
 
 // now create the related resource bookings
-$errors = [];
+$nBookingsCreatedByStatusId = [];
 $bookingList = new Collection();
 if (!empty($resourceIds)) {
     // spawn a Resource Booking object here and link it to the event
@@ -144,34 +144,23 @@ if (!empty($resourceIds)) {
         $item = Item\Mapper::getInstance()->findById((int)$resourceId);
 
         // Validate this item.
-        $errors[$resourceId] = $validation->validateBookingFromPostData($item, $postVars, null);
-
-        // If clashes are allowed on the booking, and all validation errors are clash errors...
-        if (
-            count($errors[$resourceId]) > 0 && $item->getAllowClashBookings() &&
-            $validation->validationErrorsAreAllClashes($errors[$resourceId])
-        ) {
-            // Ignore errors since all were clashes and clashes are allowed.
-            $errors[$resourceId] = [];
+        try {
+            [$errorsStruct, $clashBookingStartDatesAsKeys] = $validation->validateBookingIgnoringClashesIfClashesAllowed($item, $postVars);
+            $booking = getBookingFromEvent($item, $event);
+            $isClash = count($clashBookingStartDatesAsKeys) > 0;
+            $bookingStatusId = $validation->getNewStatusIdForBooking($booking, $isClash, $user);
+            $booking->setStatus(getStatusMapper()->createModel($bookingStatusId));
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // Some kind of database problem occurred, so skip this booking.
+            // The user can infer that a booking was skipped from the counts of created bookings.
+            continue;
         }
-
-        // Build the booking
-        $booking = getBookingFromEvent($item, $event, $user);
-        if (!empty($errors[$resourceId])) {
-            // if errors exist, set booking to rejected
-            $booking->setStatus($statusMapper->createModel(Status\Model::STATUS_REJECTED));
-        } else {
-            // if errors are empty, remove from the list
-            unset($errors[$resourceId]);
-        }
-
-        // add the booking in its current state
         $bookingList->add($booking);
 
-        // flatten errors
-        if (!empty($errors[$resourceId]) && is_array($errors[$resourceId])) {
-            $errors[$resourceId] = $validation->getAllErrorStringsAsFlatArray($errors[$resourceId]);
+        if (!array_key_exists($bookingStatusId, $nBookingsCreatedByStatusId)) {
+            $nBookingsCreatedByStatusId[$bookingStatusId] = 0;
         }
+        $nBookingsCreatedByStatusId[$bookingStatusId]++;
     }
 }
 
@@ -193,7 +182,7 @@ $personalRelationMapper->save($personalRelation);
 
 // manually craft a json response, to contain logs and the generated event below..
 $output = [
-    'errors' => array_values($errors),
+    'message' => getResponseMessage($nBookingsCreatedByStatusId),
     'event'  => null,
 ];
 
@@ -213,7 +202,7 @@ if (count($affectedIds) == 1) {
             $user,
             $user
         );
-        $output['event']   = json_decode($renderer->render(), true);
+        $output['event'] = json_decode($renderer->render(), true);
         break;
     }
 }
@@ -229,20 +218,18 @@ function getStatusMapper()
 
 /**
  * Helper for getting a booking from an event.
+ * Note the bookings status will be left as null.  This should be set using Validation->getNewStatusIdForBooking().
  *
- * @param Item\Model      $resource
- * @param Event           $event
- * @param \Schoolbox\User $user
+ * @param Item\Model $resource
+ * @param Event      $event
  * @return Model
- * @throws \Schoolbox\Mapper\Exception
  */
-function getBookingFromEvent(Item\Model $resource, Calendar\Event $event, Schoolbox\User $user): Model
+function getBookingFromEvent(Item\Model $resource, Calendar\Event $event): Model
 {
     $booking = new Model();
     $booking
         ->setEvent($event)
         ->setResource($resource)
-        ->setStatus(getStatusMapper()->createModel(Status\Model::STATUS_PENDING))
         ->setName($resource->getName())
         ->setNotes($_POST['detail'] ?? '')
         ->setRelatedBookingList(new GenericCollection(Model::class));
@@ -260,19 +247,40 @@ function getBookingFromEvent(Item\Model $resource, Calendar\Event $event, School
         $booking->setBookingEndAt(null);
     }
 
-    // What about the resource? If it's an open resource, confirm the
-    // booking immediately.
-    if ($resource->getModerationType()->getId() === Item\ModerationType\Model::TYPE_OPEN) {
-        $booking->setStatus(getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
-    } elseif (
-        $resource->isUserModerator($user)
-        && (int)$event->getAuthor()->getId() === (int)$user->getId()
-    ) {
-        /* If you're a Moderator and can moderate this request,
-         * and you created the booking in the first place,
-         * set it to Approved - otherwise you'll end up approving your own request anyway
-         */
-        $booking->setStatus(getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
-    }
     return $booking;
+}
+
+/**
+ * @param array<int, int> $nBookingsCreatedByStatusId - The number of bookings created, indexed by bookingStatusId.
+ * @return string
+ */
+function getResponseMessage(array $nBookingsCreatedByStatusId): string
+{
+    $nApprovedBookings = $nBookingsCreatedByStatusId[Status\Model::STATUS_APPROVED] ?? 0;
+    $nPendingBookings = $nBookingsCreatedByStatusId[Status\Model::STATUS_PENDING] ?? 0;
+    $nRejectedBookings = $nBookingsCreatedByStatusId[Status\Model::STATUS_REJECTED] ?? 0;
+    $nTotalBookings = $nPendingBookings + $nApprovedBookings + $nRejectedBookings;
+
+    if ($nTotalBookings === 0) {
+        return 'Created event with no bookings';
+    }
+
+    if ($nTotalBookings === 1) {
+        $bookingStatus = match ($nTotalBookings) {
+            $nApprovedBookings => 'approved',
+            $nPendingBookings => 'pending',
+            $nRejectedBookings => 'rejected',
+        };
+        return "Created event with one $bookingStatus booking";
+    }
+
+    $messageEndingParts = [
+        $nApprovedBookings === 0 ? '' : "$nApprovedBookings approved",
+        $nPendingBookings  === 0 ? '' : "$nPendingBookings pending"  ,
+        $nRejectedBookings === 0 ? '' : "$nRejectedBookings rejected",
+    ];
+
+    $messageEndingParts = array_filter($messageEndingParts, static fn ($messageEndingPart) => $messageEndingPart !== '');
+
+    return "Created event with $nTotalBookings bookings - " . implode(', ', $messageEndingParts);
 }
