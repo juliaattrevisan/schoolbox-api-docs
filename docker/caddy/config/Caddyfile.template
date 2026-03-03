@@ -49,10 +49,6 @@ https:// {
         reverse_proxy schoolbox-etherpad:9001
     }
 
-    # TODO determine how to handle DAV requests:
-    # I'm guessing they're handled in the frankenphp container,
-    # if DAV is handled at all?
-
     # All other requests just get forwarded to frankenphp
     reverse_proxy {
 ${FRANKENPHP_UPSTREAMS}
