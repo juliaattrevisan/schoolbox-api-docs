@@ -19,10 +19,10 @@ services:
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
         PHP_MAJOR_VERSION: ${PHP_MAJOR_VERSION}
         BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
-    scale: 2
+    scale: ${FRANKENPHP_REPLICAS}
     deploy:
       mode: replicated
-      replicas: 2
+      replicas: ${FRANKENPHP_REPLICAS}
     healthcheck:
         test: [ "CMD", "curl", "http://localhost/health" ]
         interval: 30s
