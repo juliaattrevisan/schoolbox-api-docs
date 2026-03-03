@@ -1,0 +1,121 @@
+-- Reporting Activity in the swamp
+CREATE TABLE `reporting` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `assessment_id` INT UNSIGNED NOT NULL,
+    `instructor_mark_type` INT,
+    `mark_type` INT NOT NULL,
+    `instructor_grade_group_id` INT,
+    `grade_group_id` INT,
+    `instructor_max_mark` DECIMAL(14, 11),
+    `max_mark` DECIMAL(14, 11),
+    `mark_visibility` TINYINT,
+    `start_date` DATETIME COMMENT 'data is retrieved after start of day, on this date',
+    `end_date` DATETIME COMMENT 'data is retrieved until end of day, on this date',
+    `folder_restriction` ENUM('current_only', 'active_folders', 'any_folder') COMMENT 'corresponds to "the students in my folder specifically", "any folder with a code which had any of my students in it where they have a published feedback", or "any folder where my students had a published feedback"',
+    `allow_comments` TINYINT COMMENT 'a toggle: if enabled, staff can write comments in their reporting feedbacks',
+    `show_markbook` TINYINT COMMENT 'a toggle: if enabled, the minimal mega markbook is generated',
+    `created_at` DATETIME NOT NULL,
+    `created_by` INT UNSIGNED NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    `updated_by` INT UNSIGNED NOT NULL,
+    `deleted_at` DATETIME,
+    `deleted_by` INT UNSIGNED DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `fk_r_assessment_idx` (`assessment_id` ASC),
+    CONSTRAINT `fk_r_assessment`
+        FOREIGN KEY (`assessment_id`)
+        REFERENCES `assessment` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    INDEX `fk_r_createdby_idx` (`created_by` ASC),
+    CONSTRAINT `fk_r_createdby`
+        FOREIGN KEY (`created_by`)
+        REFERENCES `user` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    INDEX `fk_r_updatedby_idx` (`updated_by` ASC),
+    CONSTRAINT `fk_r_updatedby`
+        FOREIGN KEY (`updated_by`)
+        REFERENCES `user` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    INDEX `fk_r_deletedby_idx` (`deleted_by` ASC),
+    CONSTRAINT `fk_r_deletedby`
+        FOREIGN KEY (`deleted_by`)
+        REFERENCES `user` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION
+);
+
+-- This is different to curriculum_node_for_assessment despite being the same schema.
+-- rcn means "filter the mega markbook to only show assessments that used descendents of this curriculum node(s)"
+-- It does not mean "this reporting activity is associated with these curriculum nodes" which is what rcn means.
+--
+-- So, it's the same schema structure but has a different contextual usage.
+CREATE TABLE `reporting_curriculum_node` (
+    `assessment_id` INT UNSIGNED NOT NULL,
+    `curriculum_node_id` INT NOT NULL,
+    UNIQUE INDEX `fk_ca_unique` (assessment_id, curriculum_node_id),
+    INDEX `fk_rcn_a_assessment_idx` (`assessment_id` ASC),
+    CONSTRAINT `fk_rcn_a_assessment`
+        FOREIGN KEY (`assessment_id`)
+            REFERENCES `assessment` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    INDEX `fk_rcn_cni_curriculum_node_idx` (`curriculum_node_id` ASC),
+    CONSTRAINT `fk_rcn_cni_curriculum_node`
+        FOREIGN KEY (`curriculum_node_id`)
+            REFERENCES `curriculum_node` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION
+);
+
+-- Similarly, this means "filter the mega markbook to only show assessments that had one or more of these work types"
+-- It does not mean "this reporting activity has this work type" (that's on the assessment table)
+CREATE TABLE `reporting_work_type` (
+    `assessment_id` INT UNSIGNED NOT NULL,
+    `work_type_id` INT NOT NULL,
+    UNIQUE INDEX `fk_aw_unique` (assessment_id, work_type_id),
+    INDEX `fk_rwt_a_assessment_idx` (`assessment_id` ASC),
+    CONSTRAINT `fk_rwt_a_assessment`
+        FOREIGN KEY (`assessment_id`)
+            REFERENCES `assessment` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    INDEX `fk_rwt_wti_work_type_idx` (`work_type_id` ASC),
+    CONSTRAINT `fk_rwt_wti_work_type`
+        FOREIGN KEY (`work_type_id`)
+            REFERENCES `lu_work_type` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION
+);
+
+-- A somewhat teacher-discretionary feedback that is meant to represent the student's achievements holistically
+--
+-- Note that the swamp REQUIRES you know the direct relationship between a row in this table and the subobject
+-- to which it belongs (ie. each row knows its reporting.id without having to dig through the relationships)
+-- Just Another Swamp Secret
+CREATE TABLE `reporting_feedback` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `reporting_id` INT NOT NULL,
+    `norm_mark` DECIMAL(14, 11),
+    `mark` VARCHAR(255),
+    `comment` MEDIUMTEXT,
+    `learner_id` INT UNSIGNED NOT NULL,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    `deleted_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `fk_rf_reporting_idx` (`reporting_id` ASC),
+    CONSTRAINT `fk_rf_reporting`
+        FOREIGN KEY (`reporting_id`)
+            REFERENCES `reporting` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    INDEX `fk_rf_learner_idx` (`learner_id` ASC),
+    CONSTRAINT `fk_rf_learner`
+        FOREIGN KEY (`learner_id`)
+            REFERENCES `user` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION
+);
