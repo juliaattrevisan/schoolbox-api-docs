@@ -25,7 +25,7 @@
 
             /* Handles maximum two parents now. */
             $(parentSelector).each(function() {
-                $(this).bind("change", function() {
+                $(this).on("change", function() {
                     updateChildren();
                 });
 
@@ -61,7 +61,7 @@
                 /* TODO: This should be dynamic and check for each parent */
                 /*       without subclassing. */
                 var first;
-                if ($.isArray(parentSelector)) {
+                if (Array.isArray(parentSelector)) {
                     first = $(parentSelector[0]).first();
                 } else {
                     first = $(parentSelector).first();
