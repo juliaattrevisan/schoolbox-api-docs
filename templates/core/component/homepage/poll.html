@@ -4,7 +4,7 @@
 
             /* Delete a poll
              */
-            $('#component{COMPONENT_INSTANCE_ID}').find('[data-poll-delete]').click(function(event) {
+            $('#component{COMPONENT_INSTANCE_ID}').find('[data-poll-delete]').on("click", function(event) {
                 event.preventDefault();
 
                 let self = $(this);

@@ -203,7 +203,7 @@
 
         /* Toggle answer visibility
          */
-        $('[data-show-answer-content]').click(function(event) {
+        $('[data-show-answer-content]').on("click", function(event) {
             event.preventDefault();
 
             var id = $(this).attr('data-show-answer-content');
@@ -213,7 +213,7 @@
 
         /* Delete confirmation
          */
-        $('[data-delete-question]').click(function(event) {
+        $('[data-delete-question]').on("click", function(event) {
             event.preventDefault();
             $(this).confirmDialog({
                 text: 'Do you want to remove this question from the Question Bank?',

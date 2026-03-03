@@ -57,7 +57,7 @@
 
         bindKeypress: function () {
             var thisCombobox = this;
-            this.textInputElement.keyup(function (event) {
+            this.textInputElement.on("keyup", function (event) {
                 if (event.keyCode == Combobox.keys.TAB || event.keyCode == Combobox.keys.SHIFT) {
                     return;
                 }
@@ -189,7 +189,7 @@
                 thisSelector.combobox.setValue(this.innerHTML);
                 thisSelector.combobox.focus();
             });
-            this.selectorElement.mouseover(function (e) {
+            this.selectorElement.on("mouseover", function (e) {
                 thisSelector.unselect();
             });
             this.htmlClickHandler = function () {

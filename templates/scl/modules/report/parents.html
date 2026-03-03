@@ -169,7 +169,7 @@
          * clicking the button or by default, if any search
          * parameters were used
          */
-        $('[data-action="search"]').click(function() {
+        $('[data-action="search"]').on("click", function() {
             $('[data-searchfilteroptions]').show();
         });
 
@@ -186,7 +186,7 @@
 <!-- BEGIN email_all_parents -->
 <script type="text/javascript">
     $(function() {
-        $('[data-action="email-all-parents"]').click(function(event) {
+        $('[data-action="email-all-parents"]').on("click", function(event) {
             event.preventDefault();
 
             $('[data-emailallparents]').submit();

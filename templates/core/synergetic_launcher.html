@@ -1,6 +1,6 @@
 <script>
     $(function() {
-        $('[data-portal]').click(function() {
+        $('[data-portal]').on("click", function() {
             window.loginWindow = window.open('/synRedir.php', 'synRedir', 'height=50,width=50');
             setTimeout(function() {
                 window.loginWindow.close();

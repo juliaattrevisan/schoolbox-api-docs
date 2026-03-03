@@ -79,7 +79,7 @@ String.prototype.format = function () {
                 }
             });
 
-            this.options.body_el.keypress(function (event) {
+            this.options.body_el.on("keypress", function (event) {
                 /* Execute send on enter key pressed */
                 if (event.keyCode == 13) {
                     var $body_el = $self.options.body_el;

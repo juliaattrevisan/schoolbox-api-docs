@@ -60,7 +60,7 @@
          * Save commentary on blur
          */
         function initSaveComment() {
-            config.questionForm.find("textarea").blur(function () {
+            config.questionForm.find("textarea").on("blur", function () {
                 if ($(this).val() !== "") {
                     $.fn.evaluationResponseReview.saveReview(config.questionForm);
                 }
@@ -75,7 +75,7 @@
          * Save marks on blur
          */
         function initSaveMarks() {
-            config.questionForm.find("input[name=reviewedMarks]").blur(function () {
+            config.questionForm.find("input[name=reviewedMarks]").on("blur", function () {
                 $.fn.evaluationResponseReview.saveReview(config.questionForm);
                 config.questionForm.find("input[name=reviewedMarks]").addClass("ajax-updated");
                 setTimeout(function () {

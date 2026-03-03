@@ -80,7 +80,7 @@
         /* Enforce two decimal places
          * and limit mark upper limit to 9999999999999.99
          */
-        $('input[name=marks]').change(function() {
+        $('input[name=marks]').on("change", function() {
             var val;
 
             /* Empty string is classified as a number

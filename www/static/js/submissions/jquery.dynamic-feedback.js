@@ -549,7 +549,7 @@
         function disableFormSubmit() {
             $(config.assessmentList)
                 .find("form[data-feedback-form]")
-                .submit(function (e) {
+                .on("submit", function (e) {
                     e.preventDefault();
 
                     $(this).find("[data-mark-input]").blur();

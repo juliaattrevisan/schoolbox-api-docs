@@ -4,7 +4,7 @@
 
             $('#component{COMPONENT_INSTANCE_ID}-dropBox').alaressValidate();
 
-            $('#component{COMPONENT_INSTANCE_ID}').find('[data-delete]').click(function(event) {
+            $('#component{COMPONENT_INSTANCE_ID}').find('[data-delete]').on("click", function(event) {
                 event.preventDefault();
 
                 var element = $(this);

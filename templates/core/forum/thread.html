@@ -1,14 +1,14 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
     $(function () {
-        $('a[data-action="delete"][data-relation="post"]').click(function(event) {
+        $('a[data-action="delete"][data-relation="post"]').on("click", function(event) {
             event.preventDefault();
             $(this).confirmDialog({
                 text:'Are you sure you want to delete this post?',
                 confirmLabel: 'Delete'
             });
         });
-        $('a[data-action="delete"][data-relation="thread"]').click(function(event) {
+        $('a[data-action="delete"][data-relation="thread"]').on("click", function(event) {
             event.preventDefault();
             $(this).confirmDialog({
                 text:'Are you sure you want to delete this thread?',
@@ -92,4 +92,3 @@
     <li><a href="/forum/thread/{THREAD_ID}/{NEXT_PAGE}">&rsaquo;</a></li>
     <!-- END next_button -->
 </ul>
-

@@ -1,7 +1,7 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
     $(function() {
-        $('[data-preview]').click(function(event) {
+        $('[data-preview]').on("click", function(event) {
             event.preventDefault();
 
             window.open($(this).attr('href'),'1396330261396','width=720,height=500,toolbar=0,menubar=0,location=0,status=1,scrollbars=1,resizable=0,left=0,top=0');

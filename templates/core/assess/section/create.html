@@ -61,7 +61,7 @@
             }
         }));
 
-        $('[data-shuffle]').change(function() {
+        $('[data-shuffle]').on("change", function() {
             var prompt = $('[data-max-questions-prompt]');
             var input = prompt.find('[data-max-questions]');
 

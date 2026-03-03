@@ -496,7 +496,7 @@
 
 <script type="text/javascript">
     // all forms should submit without prevention
-    $(".homepage form").submit(function() {
+    $(".homepage form").on("submit", function() {
         window.check = false;
     });
 </script>

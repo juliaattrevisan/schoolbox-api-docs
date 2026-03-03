@@ -4,7 +4,7 @@
             var component    = $('#component{COMPONENT_INSTANCE_ID}');
             var videoElement = component.find('[data-videocomponent]').mediaelementplayer();
             var video        = videoElement.data('mediaelementplayer');
-            component.find('[data-media-id]').click(function(event) {
+            component.find('[data-media-id]').on("click", function(event) {
                 event.preventDefault();
                 var videoId = $(this).data('media-id');
                 var $target = "/cms/sendVideo.php?type=myfile&id="+videoId;

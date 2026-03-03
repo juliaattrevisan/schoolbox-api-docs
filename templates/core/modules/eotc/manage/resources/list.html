@@ -102,7 +102,7 @@
             }
         });
 
-        $submitButton.click(function(event) {
+        $submitButton.on("click", function(event) {
             event.preventDefault();
 
             var id = $('[data-resourcebookingsuggest]').val().pop();
@@ -113,7 +113,7 @@
             return false;
         });
 
-        $('a[data-action="delete"]').click(function(event) {
+        $('a[data-action="delete"]').on("click", function(event) {
             event.preventDefault();
             $(this).confirmDialog({
                 text: 'Are you sure you wish to delete this booking?'

@@ -65,7 +65,7 @@ declare global {
         function preview(): void {
             $(config.element)
                 .off()
-                .click(async function fnClick(this: HTMLElement, event: JQuery.ClickEvent): Promise<void> {
+                .on("click", async function fnClick(this: HTMLElement, event: JQuery.ClickEvent) {
                     if (event.which > 1) {
                         return;
                     }

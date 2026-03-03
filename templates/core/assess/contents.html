@@ -1,14 +1,14 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
     $(function () {
-        $('[data-delete-section]').click(function (event) {
+        $('[data-delete-section]').on("click", function (event) {
             event.preventDefault();
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this section?',
                 confirmLabel: 'Delete',
             });
         });
-        $('[data-delete-question]').click(function (event) {
+        $('[data-delete-question]').on("click", function (event) {
             event.preventDefault();
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this question?',

@@ -35,7 +35,7 @@ $(document).ready(function() {
         });
     });
 
-    forms.find('textarea, input').blur(function(e) {
+    forms.find('textarea, input').on("blur", function(e) {
         e.preventDefault();
         if ($(this).val() !== '') {
             //if field is input not textarea
@@ -65,7 +65,7 @@ $(document).ready(function() {
         }
     }
 
-    $('[data-action="finish-review"]').click(function(event) {
+    $('[data-action="finish-review"]').on("click", function(event) {
         event.preventDefault();
         $(this).confirmDialog();
     });

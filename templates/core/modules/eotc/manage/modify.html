@@ -31,7 +31,7 @@
 
         /* Confirmation when removing RAMS requirement
          */
-        $('[data-ramscheckbox]').click(function(event) {
+        $('[data-ramscheckbox]').on("click", function(event) {
             var self = $(this);
 
             /* Untick the checkbox
@@ -41,12 +41,12 @@
 
                 modal.foundation('reveal', 'open');
 
-                modal.find('[data-rams-ok]').click(function(event) {
+                modal.find('[data-rams-ok]').on("click", function(event) {
                     self.prop('checked', false);
                     $('#ramsModal').foundation('reveal', 'close');
                 });
 
-                modal.find('[data-rams-cancel]').click(function(event) {
+                modal.find('[data-rams-cancel]').on("click", function(event) {
                     self.prop('checked', true);
                     $('#ramsModal').foundation('reveal', 'close');
                 });

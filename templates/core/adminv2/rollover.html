@@ -54,7 +54,7 @@
                                     confirmation.append($('<button type="submit" data-rollover>Rollover</button>'));
                                     confirmationWindow.html(confirmation);
 
-                                    $('button[data-rollover]').click(function (event) {
+                                    $('button[data-rollover]').on("click", function (event) {
                                         event.preventDefault();
                                         $(this).confirmDialog({
                                             text: 'Are you sure you wish to rollover?',

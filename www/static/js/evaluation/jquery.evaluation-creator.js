@@ -107,7 +107,7 @@
          */
         function applyValidator() {
             $(config.element)
-                .submit(function () {
+                .on("submit", function () {
                     // update underlying textareas before submit validation
                     $.each(window.sbProps.editors, function (prop, val) {
                         window.sbProps.editors[prop].updateSourceElement();
@@ -358,7 +358,7 @@
          */
         function applyValidator() {
             $(config.element)
-                .submit(function () {
+                .on("submit", function () {
                     // update underlying textarea before submit validation
                     window.sbProps.editors["question"].updateSourceElement();
                 })
