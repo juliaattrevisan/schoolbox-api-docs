@@ -1,11 +1,12 @@
 <div class='f-container'>
     <div class="c-island l-flex-col l-pad-m l-gap-m">
         <sbx-search-select
+            id="studentSearch"
             label="Search"
             label-id="Search"
             form-value-name="students"
             endpoint="/ajax/user.php?roleTypeID=student&"
-            placeholder="Search for students">
+            placeholder="Search for students...">
         </sbx-search-select>
         <button type="button" class="button" id="submitButton">Submit</button>
     </div>
@@ -13,7 +14,25 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const searchSelect = document.getElementById('studentSearch');
+
+    // Set initial selected value
+    searchSelect.selected = [{
+        id: 13,
+        name: "Jana Reed - Year 9, Senior Student (201)"
+    }];
+
+    // Listen to changes in the selected items via the update:selected event
+    searchSelect.addEventListener('update:selected', function(event) {
+        console.warn('Selected items updated:', event.detail);
+    });
+
+    // Listen to the submit button click to log the current selected items
     document.getElementById('submitButton').addEventListener('click', function() {
+        // Access the selected property directly from the web component
+        console.warn('Current selected items:', searchSelect.selected);
+
+        // Also query the hidden inputs
         const studentsInputs = document.querySelectorAll('input[name="students"]');
         console.warn('Students input values:', Array.from(studentsInputs).map(input => input.value));
     });
