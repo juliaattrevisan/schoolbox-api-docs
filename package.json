@@ -4,7 +4,6 @@
   "author": "Schoolbox Pty Ltd",
   "description": "Refer to 'External dependency list' in Confluence for more info on the dependencies below",
   "dependencies": {
-    "@andxor/jquery-ui-touch-punch-fix": "~1.0.2",
     "@caspingus/lt": "~2.26.1",
     "@firebase/app": "~0.14.8",
     "@firebase/messaging": "~0.12.23",

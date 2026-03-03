@@ -28,8 +28,6 @@ module.exports = merge(common, {
                     "./node_modules/jquery-validation/dist/jquery.validate.js",
                     // jQuery UI
                     "./node_modules/jquery-ui/dist/jquery-ui.js",
-                    // jQueryUI Touch Punch
-                    "./node_modules/@andxor/jquery-ui-touch-punch-fix/jquery.ui.touch-punch.js",
                     // Sound / video player
                     "./node_modules/mediaelement/build/mediaelement-and-player.js",
                     // For drag/drop of resources
