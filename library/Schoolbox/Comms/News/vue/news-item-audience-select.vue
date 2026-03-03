@@ -337,7 +337,7 @@ export default {
 
                                 // Trigger a blur on the selectize so that validation updates
                                 // This has to happen on a slight delay as well for some reason
-                                selectize.$input.blur();
+                                selectize.$input.trigger("blur");
                             }, 1);
                         }
                     },
