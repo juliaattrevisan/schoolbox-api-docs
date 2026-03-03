@@ -38,6 +38,9 @@ class ConfiguredDispatchStrategyBuilder
     /** @var int */
     protected $workerTimeoutHard = DefaultDispatchStrategy::WORKER_HARD_TIMEOUT;
 
+    /** @var int */
+    protected $maxRequestsPerWorker = DefaultDispatchStrategy::MAX_REQUESTS_PER_WORKER;
+
 
     /**
      * @param array $conf
@@ -68,7 +71,8 @@ class ConfiguredDispatchStrategyBuilder
             $this->idleTimeout,
             $this->workerTimeoutSoft,
             $this->workerTimeoutHard,
-            $flags
+            $flags,
+            $this->maxRequestsPerWorker
         );
     }
 
