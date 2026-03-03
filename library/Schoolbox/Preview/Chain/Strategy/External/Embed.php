@@ -11,7 +11,6 @@
 namespace Schoolbox\Preview\Chain\Strategy\External;
 
 use Embed\Embed as EmbedLibrary;
-use Embera\Embera;
 
 class Embed extends Base
 {
@@ -23,8 +22,6 @@ class Embed extends Base
      */
     public function test(): ?array
     {
-//        $embera = new Embera();
-//        $embedCode = $embera->autoEmbed($this->getUrl());
         $embed     = new EmbedLibrary();
         $info      = $embed->get($this->url);
         $embedCode = $info->code->html;
