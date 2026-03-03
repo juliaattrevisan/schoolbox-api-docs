@@ -9,6 +9,7 @@ import SbxPopOut from "@schoolboxVue/components/popOut/sbx-pop-out.ce.vue";
 import SbxIcon from "@schoolboxVue/components/icon/sbx-icon.ce.vue";
 import SbxLabel from "@schoolboxVue/components/label/sbx-label.ce.vue";
 import SbxLabelPastoralPoints from "@schoolboxVue/components/label/sbx-label-pastoral-points.ce.vue";
+import SbxSearchSelect from "@schoolboxVue/components/searchSelect/sbx-search-select.ce.vue";
 
 /**
  * Register all web components here
@@ -26,6 +27,8 @@ export function register(): void {
         window.customElements.define("sbx-label", SbxLabelCE);
         const SbxLabelPastoralPointsCE = window.Vue.defineCustomElement(SbxLabelPastoralPoints);
         window.customElements.define("sbx-label-pastoral-points", SbxLabelPastoralPointsCE);
+        const SbxSearchSelectCE = window.Vue.defineCustomElement(SbxSearchSelect);
+        window.customElements.define("sbx-search-select", SbxSearchSelectCE);
     }
 }
 
