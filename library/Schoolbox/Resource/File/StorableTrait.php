@@ -106,14 +106,6 @@ trait StorableTrait
     }
 
     /**
-     * @return \Alaress_Date_Format
-     */
-    public function getLastAccessed()
-    {
-        return $this->getStorage()->getLastAccessed();
-    }
-
-    /**
      * @return string
      */
     public function getExtension()
