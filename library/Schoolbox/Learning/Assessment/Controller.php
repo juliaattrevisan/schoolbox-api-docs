@@ -387,6 +387,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $data['dialogAgent']['scenarios'] = $this->dialogAgentScenarioMapper->findAll();
         }
 
+        /* Reporting activities need to know about all the available Work Types that could be selected
+         */
+        if (AssessmentType::TYPE_REPORTING === $type) {
+            $data['reporting']['workTypes'] = $this->workTypeMapper->findAll();
+        }
+
         /* TODO lol why is this outside the AssessmentType check?
          *
          * A list of lesson plans

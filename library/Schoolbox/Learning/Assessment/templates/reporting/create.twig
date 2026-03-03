@@ -1,0 +1,209 @@
+{##
+ # Create/update a Dialog Agent instance
+ #
+ # TODO fill in the rest of this mega set of params which are shared across all activities
+ #
+ # @param \Schoolbox\Resource\Folder\Model $context
+ # @param string $contextType                                            A string denoting the next closest context oft his assessment
+ # @param string $baseContextType                                        A string denoting the deepest context of this assessment
+ # @param Collection $breadcrumbs                                        A list of (name, url) tuples
+ # @param \Schoolbox\Learning\Assessment\Reporting\Model $assessment
+ # @param Collection $workTypes  A set of work types that could be selected for Supporting Data
+ # @param $assessmentType
+ # @param $markVisibility
+ # @param $availabeVisibilities
+ # @param $allWorkTypes
+ # @param $capabilitymarkTypes
+ # @param $capabilityGradingSchemes
+ # @param $parentFolderId
+ # @param $participants
+ # @param $curriculumNodes
+ # @param $returnUrl
+ # @param $cuestom_assessment_participation
+ # @param $selfAssessmentEnabled
+ # @param $defaultGradeGroup
+ # @param $canRelocate
+ # @param $courseManaged
+ #}
+
+{% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
+
+<input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
+
+{# Basic Details #}
+<fieldset>
+    <label class="required" for="title">Title</label>
+
+    <input type="text" name="title" id="title" data-test="assessment-form-input-title" value="{{ assessment.title }}" required maxlength="255"  />
+
+    <div class="row">
+        <div class="small-12 columns">
+            {# Work Type #}
+            {% include '@learningAssessment/fragments/workTypeSelectorWithLabel.twig'
+                with {
+                allWorkTypes: allWorkTypes,
+                assessment: assessment,
+                courseManaged: courseManaged
+            } only
+            %}
+        </div>
+    </div>
+
+    {# Curriculum Nodes for this Reporting Activity#}
+    {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+        entityType: locale.dialogAgent.proper,
+        courseManagedReadonly: courseManaged.isReadonly,
+        excludeLegend: true,
+        hasTabs: true,
+        parentFolderId: parentFolderId ?? null,
+    } %}
+
+    <label for="assessment-description">Description</label>
+    <textarea name="description" id="assessment-description" data-test="assessment-form-input-description">{{ assessment.description }}</textarea>
+
+    {# Assessment Location #}
+    {% if canRelocate %}
+        {% include '@learningAssessment/fragments/assessmentLocation.twig' %}
+    {% endif %}
+
+    {# Default Activity Duration #}
+    {% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
+</fieldset>
+
+<fieldset>
+    <legend>Supporting Data</legend>
+
+    <div class="row">
+        <div class="small-12 columns">
+            <label>Date Range</label>
+            {# TODO Jezwords #}
+            <p class="meta">
+                Choose two dates here
+            </p>
+            <div class="row">
+                <div class="small-12 medium-6 columns">
+                    <input id="supporting[dates][start]" type="text" value="" />
+                </div>
+                <div class="small-12 medium-6 columns">
+                    <input id="supporting[dates][end]" type="text" value="" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 columns">
+            {# Curriculum Nodes for Supporting Data
+             # TODO somehow separate this usage from the other curriculum node usage
+             # TODO set this entity type somewhere
+             #}
+
+            {# TODO Snake Lord, inject this meta text into the curric nodes fragment somehow #}
+            <p class="meta">
+                Select branches of the curriculum to have supporting data appear to staff when entering feedback for this
+                {{ locale.activity }}. This data can come from {{ locale.activity.plural}} and rubrics that have been tagged
+                with curriculum codes matching the selection below. It is possible to select both a branch of a curriculum or
+                specific curriculum codes. If you select a branch, all nodes contained within will be applied.
+            </p>
+            {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+                entityType: 'reporting',
+                courseManagedReadonly: courseManaged.isReadonly,
+                excludeLegend: true,
+                hasTabs: true,
+                parentFolderId: parentFolderId ?? null,
+            } %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 columns">
+            <label for="supporting-folders">{{ locale.class.properPlural }}</label>
+            {# TODO Jezwords #}
+            <p class="meta">
+                The supporting data can come from a range of locations.<br />
+                Current class folder will show content from only the page that this activity is imported to.<br />
+                All current class folders will look at content across all pages that have a current class code and that a student has data for.<br />
+                Current & archived class folders will look at content across all current and historic pages that a student has data for.
+            </p>
+            <select id="supporting-folders" name="supporting[folders]">
+                <option value="current_only">Current class folder</option>
+                <option value="active_folders">Active folders where students have published feedback</option>
+                <option value="any_folders">Any folders where students have published feedback</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 columns">
+            <label>Work Types</label>
+            <p class="meta">Select which work types will be presented as supporting data.</p>
+
+            {# TODO Snake Lord, the checkbox container in the pantry is broken;
+             # need to implement the one on the Advanced Search control panel instead
+             #}
+            <div class="checklist">
+                <ul class="option-list">
+                    {% for workType in reporting.workTypes %}
+                        <li>
+                            <input id="checkbox-worktype-{{ workType.id }}" name="supporting[workTypes][]" type="checkbox" />
+                            <label for="checkbox-worktype-{{ workType.id }}">{{ workType.name }}</label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 columns">
+            <label>{{ locale.activity.proper }} {{ locale.grades.plural }}</label>
+            <p class="meta">
+                {{ locale.activity.proper }} {{ locale.grades.plural }} shown are based upon the teacher input of data
+                within quizzes, {{ locale.dueWork.plural }}, {{ locale.project.plural }} and third party assessments.
+                These can be seen in the {{ locale.class }} and course markbooks.
+            </p>
+            <div class="switch">
+                <input id="supporting-megamarkbook" name="supporting[megamarkbook]" type="checkbox" checked="">
+                <label for="supporting-megamarkbook">
+                    <span class="icon-approve"></span>
+                    <span class="icon-cancel"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+</fieldset>
+
+{# The Four Dates of the Apocalypse
+ # This is a unique implementation which doesn't have a due date plus it's horizontally
+ # arranged, unlike the other activities
+ #}
+{% if context.baseContext is not unitSpecification %}
+    {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
+    <fieldset>
+        <legend>Submission Dates</legend>
+        {% include '@learningAssessment/fragments/dates.twig' %}
+    </fieldset>
+{% endif %}
+
+{# Submit #}
+{{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
+
+
+{# General Scripts #}
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
+<script>
+    $(function () {
+
+        // 'Description' TextArea only
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
+                targetElements: ['#assessment-description'],
+                fileBrowserCategoryId: {{ context.baseContext.folder.id ?? 0 }},
+                {% if editorTemplates is defined %}
+                templates: {{ editorTemplates|json_encode|raw }},
+                {% endif %}
+            }
+        }));
+    });
+</script>

@@ -1,0 +1,50 @@
+{##
+ # @param IAssessable             assessment          an IAssesssable instance
+ # @param User                    student             the student currently being viewed
+ # @param string                  icon                a css class representing the assessable
+ # @param null|Participant\Model  participant         an instance if the student is excluded from the assessment or deleted
+ #}
+{% import '@learning/macro/dueDate.twig' as dueDate %}
+{% import '@learningAssessment/fragments/macro/duration.twig' as duration %}
+
+{% apply spaceless %}
+<ul class="meta">
+    {% include '@learning/fragments/meta/dueDate.twig' %}
+    {% include '@learning/fragments/meta/workType.twig' %}
+
+    {# joining student name with lastView data #}
+    {% if student.id != USER.id %}
+        <li class="icon-staff-students" title="{% if lastViews.student.date is defined and lastViews.student.date is not null %}{{ lastViews.student.date }}{% endif %}">
+            <a href="/search/user/{{ student.id }}">{{ student.fullname }}</a>
+            {% if lastViews is not empty %}
+                {{ lastViews.student.status }}
+                {% if 'assessment' is same as(lastViews.student.object) %} this {{ locale.activity }}{% else %} the feedback {% endif %}
+            {% endif %}
+        </li>
+    {% endif %}
+
+    {% if assessment.allParticipants[student.id].isExcluded ?? false %}
+        {#
+         # now using the same code as the assessment update page:
+         # library/Schoolbox/Learning/Assessment/templates/fragments/participation.twig:105
+         #
+         # needed isNull is same as(false) to test if getExcludedAt() has valid data.
+         # I was not able to just test as getExcluedAt() is null, or find a better way
+         #}
+        <li class="icon-close">Excluded from {{ locale.activity }}</li>
+    {% endif %}
+
+    {% if lastViews is not empty %}
+        {% for parent in lastViews.parents %}
+            {% if parent.date is not null %}
+            <li class="icon-staff" title="{{ parent.date }}">
+                <a href="/search/user/{{ parent.id }}">{{ parent.name }}</a>
+                {{ parent.status }} {% if 'assessment' is same as(parent.object) %} this {{ locale.activity }}{% else %} the feedback {% endif %}
+            </li>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% include '@learning/fragments/meta/curriculumCodes.twig' %}
+</ul>
+{% endapply %}
