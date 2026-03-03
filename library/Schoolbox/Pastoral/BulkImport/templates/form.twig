@@ -226,9 +226,11 @@
         /* Get the current entry tip when modifying the record
          */
         if (subtypeDropdown.val() === null) {
-        updateExpiresAt((typesIndexEntryTip[typeDropdown.val()]).trim());
-    } else {
-        updateExpiresAt((subtypesIndexEntryTip[subtypeDropdown.val()]).trim());
+            updateExpiresAt((typesIndexEntryTip[typeDropdown.val()]).trim());
+        } else {
+            updateExpiresAt((subtypesIndexEntryTip[subtypeDropdown.val()]).trim());
+        }
+        {% endif %}
         /**
          * Update the entry tip and expires at date based on the type / subtype selection
          */
