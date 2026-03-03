@@ -21,7 +21,7 @@
             event.preventDefault();
             window.location.href = '/adminv2/user/'+modifyForm.find(':input[name="userId"]').val() + '/modify';
         };
-        modifyForm.submit(openModifyScreen);
+        modifyForm.on('submit', openModifyScreen);
 
         // The clone form
         var cloneForm = $('form[data-action="clone"]');

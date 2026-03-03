@@ -158,7 +158,7 @@
                     if (event.keyCode === 13) {
                         event.preventDefault();
 
-                        $(element).blur();
+                        $(element).trigger('blur');
                     }
                 });
             });

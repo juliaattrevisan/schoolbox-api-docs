@@ -13,7 +13,7 @@
         $('#{{ reportContentId }}').on('filterContentLoaded', function() {
             // Hide/show a drop shadow when scrolling the markbook horizontally
             // The shadow only appears when you have scrolled past a certain threshold
-            $(".scrollable-table-wrap").scroll(function(e) {
+            $(".scrollable-table-wrap").on('scroll', function(e) {
                 const scrollAmount = e.target.scrollLeft;
                 const scrollPixelThreshold = 10;
                 const $leftColumns = $(".left-columns-wrap");

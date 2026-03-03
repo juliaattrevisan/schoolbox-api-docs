@@ -31,13 +31,13 @@
 <script type="text/javascript">
     $(function () {
         $('#email-all-staff').on('click', function () {
-            $('#email-all-form').submit();
+            $('#email-all-form').trigger('submit');
         })
     });
 
     $(function () {
         $('#email-all-parents').on('click', function () {
-            $('#email-contacts-form').submit();
+            $('#email-contacts-form').trigger('submit');
         })
     });
 
@@ -533,7 +533,7 @@
                                         {% autoescape 'js' %}
                                         <script type="text/javascript">
                                             $('#email-all-{{ groupIdentifier }}').on('click',function(){
-                                                $('#email-all-form-{{ groupIdentifier }}').submit();
+                                                $('#email-all-form-{{ groupIdentifier }}').trigger('submit');
                                             });
                                         </script>
                                         {% endautoescape %}

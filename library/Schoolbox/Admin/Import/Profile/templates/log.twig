@@ -63,7 +63,7 @@
                         $(this).confirmDialog({
                             text: 'Are you sure you want to proceed with importing this data?',
                             confirmEvent: function () {
-                                $('#form').submit();
+                                $('#form').trigger('submit');
                             }
                         });
                     });

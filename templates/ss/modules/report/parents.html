@@ -206,7 +206,7 @@
         $('[data-action="email-all-parents"]').on("click", function(event) {
             event.preventDefault();
 
-            $('[data-emailallparents]').submit();
+            $('[data-emailallparents]').trigger('submit');
         });
     });
 </script>

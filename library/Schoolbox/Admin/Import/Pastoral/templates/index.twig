@@ -10,9 +10,9 @@
             if (defaultOwnerId != '') {
                 $("[data-import]").prop('value', 'Please Wait...');
                 $("[data-import]").prop('disabled', true);
-                $("[data-form-import]").submit();
+                $("[data-form-import]").trigger('submit');
             } else {
-                $('#defaultOwner').focus();
+                $('#defaultOwner').trigger('focus');
                 $('#defaultOwnerError').removeClass('hide');
                 e.preventDefault();
             }

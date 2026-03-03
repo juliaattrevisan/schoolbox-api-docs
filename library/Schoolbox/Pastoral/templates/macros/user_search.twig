@@ -290,7 +290,7 @@
 
                 {# Wire up the event to add members to the group list #}
 
-                $('[data-user-add="{{ guid }}"]').click(window.addClickEvent['{{ guid }}']);
+                $('[data-user-add="{{ guid }}"]').on('click', window.addClickEvent['{{ guid }}']);
             }
 
             {# --------------------------------------------------------------------------------------------------------------------------------------------#}
@@ -416,7 +416,7 @@
 
                     {# Add click event to this new search result #}
 
-                    $('[data-user-add="{{ guid }}"]').click(window.addClickEvent['{{ guid }}']);
+                    $('[data-user-add="{{ guid }}"]').on('click', window.addClickEvent['{{ guid }}']);
                 }
 
                 {# If there are no results left display the empty state #}

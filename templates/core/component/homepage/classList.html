@@ -64,7 +64,7 @@
                             <script>
                                 $(function() {
                                     $('[data-students-email]').on("click", function() {
-                                        $('#form-students').submit();
+                                        $('#form-students').trigger('submit');
                                     });
                                 })
                             </script>
@@ -80,7 +80,7 @@
                         <script>
                             $(function() {
                                 $('[data-parents-email]').on("click", function() {
-                                    $('#form-parents').submit();
+                                    $('#form-parents').trigger('submit');
                                 });
                             })
                         </script>

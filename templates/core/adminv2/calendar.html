@@ -354,7 +354,7 @@
             });
             //if there are no issues submit the form
             if (allGood) {
-                $("#subscribeForm").submit();
+                $("#subscribeForm").trigger('submit');
             }
         });
     });
