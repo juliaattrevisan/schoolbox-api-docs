@@ -55,7 +55,7 @@ https:// {
 
     # All other requests just get forwarded to frankenphp
     reverse_proxy {
-        ${FRANKENPHP_UPSTREAMS}
+${FRANKENPHP_UPSTREAMS}
         lb_policy round_robin
         transport http {
             tls_insecure_skip_verify

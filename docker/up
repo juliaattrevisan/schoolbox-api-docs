@@ -233,7 +233,7 @@ function build_caddyfile() {
     # Generate the upstream list
     UPSTREAMS=""
     for i in $(seq 1 $FRANKENPHP_REPLICAS); do
-        UPSTREAMS="${UPSTREAMS}        to https://docker-schoolbox-frankenphp-{i}:443\n"
+        UPSTREAMS="${UPSTREAMS}        to https://docker-schoolbox-frankenphp-${i}:443\n"
     done
 
     # Export for envsubst
@@ -320,6 +320,10 @@ function start_containers() {
     # this has Schoolbox's code folder mounted as a local mount, thus changes
     # made locally are available immediately within the container.
     "$(dirname "$0")/compose" up -d $docker_compose_args
+
+    # Since the Caddy reverse proxy configuration is dynamically generated,
+    # restart that container now
+    "$(dirname "$0")/compose" restart caddy
 
     # if using a remote schoolbox-cli image is built:
     # tag the remote image with the "docker-schoolbox-cli" tag, so that there is
