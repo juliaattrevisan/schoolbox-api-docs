@@ -218,7 +218,7 @@ class AbstractRedirect
          JOIN course_sections cs ON cs.course_id = c.id
          JOIN enrollment_terms term ON term.id = c.enrollment_term_id
          WHERE
-             cs.{$searchColumn} = :courseCode
+             c.sis_source_id = :courseCode
          AND c.workflow_state in ('available', 'completed');
         ";
 
