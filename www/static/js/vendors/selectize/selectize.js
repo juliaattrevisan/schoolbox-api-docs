@@ -740,11 +740,11 @@ var autoGrow = function ($input) {
     if (e.type && e.type.toLowerCase() === 'keydown') {
       keyCode = e.keyCode;
       printable = (
-        (keyCode >= 48 && keyCode <= 57) || 
-        (keyCode >= 65 && keyCode <= 90) || 
-        (keyCode >= 96 && keyCode <= 111) || 
-        (keyCode >= 186 && keyCode <= 222) || 
-        keyCode === 32 
+        (keyCode >= 48 && keyCode <= 57) ||
+        (keyCode >= 65 && keyCode <= 90) ||
+        (keyCode >= 96 && keyCode <= 111) ||
+        (keyCode >= 186 && keyCode <= 222) ||
+        keyCode === 32
       );
 
       if (keyCode === KEY_DELETE || keyCode === KEY_BACKSPACE) {
@@ -1531,7 +1531,7 @@ $.extend(Selectize.prototype, {
 	},
 
 	setMaxItems: function(value){
-		if(value === 0) value = null; 
+		if(value === 0) value = null;
 		this.settings.maxItems = value;
 		this.settings.mode = this.settings.mode || (this.settings.maxItems === 1 ? 'single' : 'multi');
 		this.refreshState();
@@ -2368,7 +2368,7 @@ $.extend(Selectize.prototype, {
 			self.hideInput();
 
 			if (self.isBlurring) {
-				self.$control_input[0].blur(); 
+				self.$control_input[0].blur();
 			}
 		}
 
@@ -2747,7 +2747,7 @@ Selectize.defaults = {
 
   plugins: [],
   delimiter: ',',
-  splitOn: null, 
+  splitOn: null,
   persist: true,
   diacritics: true,
   create: false,
@@ -2767,10 +2767,10 @@ Selectize.defaults = {
   emptyOptionLabel: '--',
   setFirstOptionActive: false,
   closeAfterSelect: false,
-  closeDropdownThreshold: 250, 
+  closeDropdownThreshold: 250,
 
   scrollDuration: 60,
-  deselectBehavior: 'previous', 
+  deselectBehavior: 'previous',
   loadThrottle: 300,
   loadingClass: 'loading',
 
@@ -2786,7 +2786,7 @@ Selectize.defaults = {
   sortField: '$order',
   searchField: ['text'],
   searchConjunction: 'and',
-  respect_word_boundaries: false, 
+  respect_word_boundaries: false,
   normalize: true,
 
   mode: null,
@@ -2926,7 +2926,7 @@ $.fn.selectize = function (settings_user) {
       }
     };
 
-    settings_element.maxItems = $input.attr('multiple') ? null : 1;
+    settings_element.maxItems = $input.prop('multiple') ? null : 1;
 
     $children = $input.children();
     for (i = 0, n = $children.length; i < n; i++) {
@@ -2992,7 +2992,7 @@ Selectize.define("auto_position", function () {
       const offset = this.settings.dropdownParent === 'body' ? $control.offset() : $control.position();
       offset.top += $control.outerHeight(true);
 
-      const dropdownHeight = this.$dropdown.prop('scrollHeight') + 5; 
+      const dropdownHeight = this.$dropdown.prop('scrollHeight') + 5;
       const controlPosTop = this.$control.get(0).getBoundingClientRect().top;
       const wrapperHeight = this.$wrapper.height();
       const controlPosBottom = self.$control.get(0).getBoundingClientRect().bottom
