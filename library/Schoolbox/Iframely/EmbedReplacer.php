@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Iframely;
 
 use Dom\Element;
+use Dom\HTMLDocument;
 use Dom\Node;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -96,7 +97,7 @@ class EmbedReplacer
         }
 
         // Try to load the purified content into a DOM document
-        $doc = \Dom\HTMLDocument::createFromString($html, LIBXML_NOERROR, 'utf-8');
+        $doc = HTMLDocument::createFromString($html, LIBXML_NOERROR, 'utf-8');
 
         // Search for Iframely embeds (within data-oembed-url attributes).
         // If there are none, return early
@@ -113,7 +114,7 @@ class EmbedReplacer
                 // Replace the Iframely element's HTML with the new embed
                 if (isset($replacementHtml)) {
                     $replacementsApplied = true;
-                    $replacementDoc      = \Dom\HTMLDocument::createFromString($replacementHtml, LIBXML_NOERROR, 'utf-8');
+                    $replacementDoc      = HTMLDocument::createFromString($replacementHtml, LIBXML_NOERROR, 'utf-8');
                     $replacementNode     = $replacementDoc->querySelector('body')->firstChild;
                     $doc->adoptNode($replacementNode);
                     $embed->parentNode->replaceChild($replacementNode, $embed);
