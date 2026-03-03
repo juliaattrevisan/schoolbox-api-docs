@@ -798,7 +798,11 @@
         var accessLevelDropdown = $("#accessLevelSelect");
 
         {# Put that array struct into something js can comprehend #}
-    var serviceMapping = JSON.parse('{{ serviceMapping|json_encode|purify }}');
+
+        var serviceSelector = $('#serviceSelect');
+
+        serviceSelector.on('change', function() {
+            var serviceMapping = JSON.parse('{{ serviceMapping|json_encode|purify }}');
 
             {# Enable submit button #}
             $('form[data-validatable-as="addService"]').find(':submit').prop('disabled', false);
