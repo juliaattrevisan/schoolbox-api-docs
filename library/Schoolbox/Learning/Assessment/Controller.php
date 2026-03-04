@@ -283,10 +283,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         // Unfortunately each different type of assessment needs to be handled
         // uniquely in this method, because type is passed in the query string.
-        if (
-            AssessmentType::TYPE_LTI_ASSESSMENT === $type
-            && $assessment instanceof \Schoolbox\Learning\Assessment\Lti\Model
-        ) {
+        if (AssessmentType::TYPE_LTI_ASSESSMENT === $type && $assessment instanceof \Schoolbox\Learning\Assessment\Lti\Model) {
             // Use Learnosity's GUID generator for better or worse,
             // because it's used above.
             // Consider replacing with Ramsey UUID?

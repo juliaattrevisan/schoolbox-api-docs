@@ -33,7 +33,7 @@
 {# Basic Details #}
 <fieldset>
     <label class="required" for="title">Title</label>
-
+    <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
     <input type="text" name="title" id="title" data-test="assessment-form-input-title" value="{{ assessment.title }}" required maxlength="255"  />
 
     <div class="row">
@@ -185,6 +185,38 @@
         {% include '@learningAssessment/fragments/dates.twig' %}
     </fieldset>
 {% endif %}
+
+{# Grading options #}
+<fieldset>
+    <legend>{{ locale.grading.proper }}</legend>
+
+    {% include '@learningAssessment/fragments/weight.twig' with {
+        assessment: assessment,
+        courseManagedReadonly: courseManaged.isReadonly
+    } %}
+
+    {% import 'sub/visibility.twig' as visibility %}
+    {{ visibility.dropdown(markVisibility, availableVisibilities) }}
+
+    {# Letter Grade enables Grading Scheme
+     # Total Mark enables Maximum Available Marks
+     #}
+    {% set markTypeLetterGrade = 2 %}
+    {% set markTypeTotalMark = 3 %}
+    {% set markTypeNone = 6 %}
+
+    {% include '@learningAssessment/fragments/dualMarkTypes.twig' with {
+        assessment: assessment,
+        allMarkTypes: allMarkTypes,
+        allGradeSchemes: allGradeSchemes,
+        selectedMaxMark: assessment.instructorMaxMark ?? null,
+        selectedMarkType: assessment.instructorMarkType.id ?? null,
+        selectedGradeGroup: assessment.instructorGradeGroup.id ?? null,
+        defaultGradeGroup: defaultGradeGroup,
+        courseManagedReadonly: courseManaged.isReadonly
+    } %}
+</fieldset>
+
 
 {# Submit #}
 {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}

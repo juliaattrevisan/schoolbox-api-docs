@@ -308,23 +308,6 @@ class Controller extends Assessment\Controller
 
         $participant = $assessment->getParticipantIfExtant($student);
 
-        /* Find out if there's an unsubmitted dialog agent linked to a session (Resume) and create a
-         * button which goes to that particular response so students can continue it.
-         *
-         * Otherwise create a new response.
-         */
-        $existingResponse = null;
-
-        if ($participant) {
-            $pb = $this->dialogAgentResponseMapper->getPredicateBuilder()
-                ->equals('dialog_agent_id', $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId())
-                ->equals('learner_id', $participant->getUser()->getId())
-                ->isNull('submitted_by')
-                ->isNull('submitted_at');
-
-            $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
-        }
-
         $twigData = [
             'lastViews'         => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
             'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
@@ -395,25 +378,6 @@ class Controller extends Assessment\Controller
      */
     public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false, bool $isCreate = false, bool $toParticipation = false): string
     {
-        /**
-         * Always go to the summary screen when a dialog agent has been created,
-         * but send the return url with it
-         *
-         * If the dialog agent was only updated, use the parent logic to determine the redirect instead
-         */
-        if ($isCreate) {
-            $redirect = $this->routeGenerator->generate('learningDialogAgent.getUpdateForm', [
-                'assessmentId' => $assessment->getId(),
-                'studentId' => $this->getUser()->getId()
-            ]);
-
-            if ($postReturnUrl) {
-                $redirect .= '?' . Redirect::RETURN_URL . "=$postReturnUrl";
-            }
-
-            return $redirect;
-        }
-
         return parent::determineRedirect($assessment, $postReturnUrl, $defaultReturnUrl, $relocated, $isCreate);
     }
 
@@ -428,6 +392,8 @@ class Controller extends Assessment\Controller
     {
         return [
             'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
+            'allMarkTypes' => $this->getAllMarkTypes($assessment),
+            'allGradeSchemes' => $this->getAllGradeSchemes(),
         ];
     }
 
