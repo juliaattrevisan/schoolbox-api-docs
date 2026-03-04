@@ -62,6 +62,7 @@
         function retrieveData(id) {
             $.post(config.url, { id: id, campus: config.campus }, function (responseText) {
                 var data = JSON.parse(responseText);
+                var allOptions = "";
                 for (var i = 0; i < data.length; i++) {
                     var option = '<option value="' + data[i].ClassCodeValue + '">' + data[i].ClassCode + "</option>";
                     allOptions += option;
