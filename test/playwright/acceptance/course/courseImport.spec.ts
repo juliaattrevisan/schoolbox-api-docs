@@ -393,7 +393,6 @@ test.describe("Course import tests", () => {
         await courseOutline.checkActivityMetaText([
             { activityName: "Romeo and Juliet Key Quote Activity", expectMetaText: "1/4 students completed" },
             { activityName: "Key events sequencing task", expectMetaText: "1/4 students completed" },
-
         ]);
     });
 

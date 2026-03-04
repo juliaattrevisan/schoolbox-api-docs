@@ -82,7 +82,9 @@ export default class CourseOutline {
         const courseOutlineUnit = courseOutline.locator("li[data-unit]").filter({ hasText: unitName });
 
         this.tester.isGoingTo("click to expand/collapse the unit");
-        await courseOutlineUnit.locator(`a[class="expand-link icon-down-arrow"][data-interaction-state="collapsed"]`).click();
+        await courseOutlineUnit
+            .locator(`a[class="expand-link icon-down-arrow"][data-interaction-state="collapsed"]`)
+            .click();
     }
 
     /**
@@ -109,7 +111,11 @@ export default class CourseOutline {
      * @param activityName - The name of the activity to find in the unit
      * @param customActivityTitle - The title of the custom activity to check is shown under the activity
      */
-    async checkCustomActivityPresented(unitName: string, activityName: string, customActivityTitle: string): Promise<void> {
+    async checkCustomActivityPresented(
+        unitName: string,
+        activityName: string,
+        customActivityTitle: string,
+    ): Promise<void> {
         // Find the course outline and the unit we created inside it
         this.tester.isGoingTo("find the unit in the course outline");
         const courseOutline = this.homepage.locateComponentByName("Course Outline");
@@ -120,7 +126,6 @@ export default class CourseOutline {
         this.tester.isGoingTo("check the custom activity is shown in the course outline");
         await expect(activity.locator(`li[class="child"]:has-text("${customActivityTitle}")`)).toBeVisible();
     }
-
 
     /**
      * finds the activity id by passing its name
@@ -284,9 +289,9 @@ export default class CourseOutline {
      */
     async checkActivityMetaText(activities: { activityName: string; expectMetaText: string }[]): Promise<void> {
         for (const activity of activities) {
-            await expect(this.page.getByTestId(`course-outline-number-students-${activity.activityName}`)).toContainText(
-                activity.expectMetaText,
-            );
+            await expect(
+                this.page.getByTestId(`course-outline-number-students-${activity.activityName}`),
+            ).toContainText(activity.expectMetaText);
         }
     }
 }

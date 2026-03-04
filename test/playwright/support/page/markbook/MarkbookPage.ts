@@ -458,5 +458,4 @@ export default class MarkbookPage {
             await expect(progressTick).not.toBeVisible();
         }
     }
-
 }
