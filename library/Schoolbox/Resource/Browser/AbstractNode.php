@@ -145,11 +145,7 @@ abstract class AbstractNode implements NodeInterface
             );
 
             for ($i = 0; (($folder->getParent()?->getId() ?? 0) > 0) && ($i < self::MAX_DEPTH); $i++) {
-                $parentId = $folder->getParent()?->getId();
-                if (!isset($parentId)) {
-                    break;
-                }
-
+                $parentId      = $folder->getParent()?->getId();
                 $currentFolder = $this->getFolderLocator()->findById($parentId);
 
                 $crumb = array(
