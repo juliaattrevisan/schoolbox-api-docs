@@ -139,6 +139,10 @@ class Module extends BaseModule
             $bookingEditRule,
             new Rule\Callback(function ($params) {
                 // Bookings linked to events of variant Event::VARIANT_EVENT should be managed via the 'Modify Event' page.
+                if (!array_key_exists('item', $params)) {
+                    // This will occur if the URL for the Update Booking page refers to a soft-deleted resource booking.
+                    throw new NotFound();
+                }
                 if ($params['item']->getEvent()->getVariant() === Event::VARIANT_EVENT) {
                     throw new Unauthorized("Bookings linked to events cannot be updated by this method.");
                 }
