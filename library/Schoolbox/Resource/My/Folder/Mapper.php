@@ -36,7 +36,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
             return $this->createModel()
                         ->setId(null)
                         ->setName('Top Level')
-                        ->setParent(null);
+                        ->setParent($this->createModel()->setId(IFolder::ROOT_PARENT_ID));
         }
 
         return parent::findById($id);
