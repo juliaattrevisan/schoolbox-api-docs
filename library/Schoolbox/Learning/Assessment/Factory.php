@@ -694,7 +694,18 @@ class Factory
             );
         } elseif ($assessment instanceof Reporting\Model) {
             $decorator = new Reporting\Decorator\Decorator(
-
+                $this->getMarkType(),
+                $this->getInstructorMarkType(),
+                $this->getGradingScheme(),
+                $this->getInstructorGradingScheme(),
+                $this->getMaxMark(),
+                $this->getInstructorMaxMark(),
+                $this->getSupportingDataEnable(),
+                $this->getSupportingDataRange(),
+                $this->getSupportingDataFolders(),
+                $this->getSupportingDataWorkTypes(),
+                $this->getSupportingDataMegamarkboook(),
+                $this->getFeedbackCommentsEnable()
             );
         } else {
             throw new DomainException('Please select an assessment type');
