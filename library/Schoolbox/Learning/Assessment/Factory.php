@@ -164,9 +164,11 @@ class Factory
 
 
     /**
-     * Used in Lesson Plans' AI generation to decide how much data
-     * the LLM should generate. Unfortunately shares a similar name,
-     * but not concept, with other duration fields here
+     * Idiosyncratic usage in Lesson Plans
+     * Used in Lesson Plans' AI generation to decide how much data the LLM should generate. Unfortunately shares a
+     * similar name, but not concept, with other duration fields here
+     *
+     * (Used by Lesson Plans, Quiz and Dialog Agents)
      *
      * @var string|null
      */
