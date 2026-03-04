@@ -85,8 +85,7 @@ class Placement extends HasDimensions
     private function getImageBoxPoint(
         BoxInterface $canvasBox,
         BoxInterface $imageBox,
-        string $alignment = 'center',
-        bool $portraitBias = false
+        string $alignment = 'center'
     ) {
         $xLeft   = 0;
         $xRight  = $canvasBox->getWidth() - $imageBox->getWidth();
@@ -94,13 +93,6 @@ class Placement extends HasDimensions
         $yTop    = 0;
         $yBottom = $canvasBox->getHeight() - $imageBox->getHeight();
         $yCenter = (int)($yBottom / 2);
-
-        /* Subtract an arbitrary 20% from the bottom, so crop is taken closer to eyeballs
-         */
-        if ($portraitBias) {
-            $yCenter -= (0.20 * $yBottom);
-        }
-
         switch (strtolower($alignment)) {
             case 'top':
                 $xPoint = $xCenter;
