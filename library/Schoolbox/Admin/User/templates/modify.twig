@@ -799,7 +799,6 @@
 
         {# Put that array struct into something js can comprehend #}
         var serviceMapping = JSON.parse('{{ serviceMapping|json_encode|purify }}');
-
         var serviceSelector = $('#serviceSelect');
 
         serviceSelector.on('change', function() {
