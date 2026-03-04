@@ -9,6 +9,7 @@ use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 use Schoolbox\Resource\My\File\Model as MyFile;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Resource\My\Folder\Mapper as MyFolderMapper;
 
 $ajax = isset($_GET['ajax']) && $_GET['ajax'];
 
@@ -105,7 +106,21 @@ if (isset($_POST['description'])) {
     $file->setCreatedAt(Alaress_Date_Format::now());
     $file->setOwner($user);
     $file->setTitle($_POST['description']);
-    $file->setFolder(\Schoolbox\Resource\My\Folder\Mapper::getInstance()->createModel()->setId($_POST['parent']));
+
+    // Set and verify parent folder
+    $folderMapper = MyFolderMapper::getInstance();
+    $parentFolder = null;
+    if (!empty($_POST['parent'])) {
+        try {
+            $parent = MyFolderMapper::getInstance()->findByColumnList([
+                'id'    => $_POST['parent'],
+                'owner' => $user->getId(),
+            ]);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            error(ErrorMapper::ERROR_FILE_NOT_FOUND);
+        }
+    }
+    $file->setFolder($parentFolder);
 
     try {
         /* Spawn a new file if creating; reuse the existing one if modifying
