@@ -1,0 +1,1 @@
+ALTER TABLE myFile ADD _parent INT DEFAULT 0 NOT NULL AFTER parent;
