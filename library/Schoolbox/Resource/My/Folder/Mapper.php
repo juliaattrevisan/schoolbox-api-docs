@@ -34,9 +34,9 @@ class Mapper extends AbstractFolderMapper implements ILocator
         // special case: 0 == root, but not in db
         if ($id == 0) {
             return $this->createModel()
-                        ->setId(0)
+                        ->setId(null)
                         ->setName('Top Level')
-                        ->setParent($this->createModel()->setId(IFolder::ROOT_PARENT_ID));
+                        ->setParent(null);
         }
 
         return parent::findById($id);
