@@ -394,9 +394,19 @@ abstract class Controller extends ListController implements IAssessmentControlle
              */
             $data['reporting']['workTypes'] = $this->workTypeMapper->findAll();
 
-            /* There are numerous date range options of which numerous could be enabled
+            /* Reporting activities can constrain the mega markbook to certain kinds of folders
+             * TODO make consts/enums for these once finalised
              */
-            $data['reporting']['availableRanges'] = [
+            $data['reporting']['availableFolderOptions'] = [
+                'current_only' => 'Current class folder',
+                'active_folders' => 'Active folders where students have published feedback',
+                'any_folders' => 'Any folders where students have published feedback'
+            ];
+
+            /* There are numerous date range options of which numerous could be enabled
+             * TODO make consts/enums for these once finalised
+             */
+            $data['reporting']['availableRangeOptions'] = [
                 'current' => 'Current academic period',
                 'previous' => 'Previous academic period',
                 '1_year' => '1 year into the past',

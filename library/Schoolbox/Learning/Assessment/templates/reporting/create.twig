@@ -83,7 +83,7 @@
 
             <div class="checklist">
                 <ul class="option-list">
-                    {% for key, label in reporting.availableRanges %}
+                    {% for key, label in reporting.availableRangeOptions %}
                         <li>
                             <input id="checkbox-range-{{ key }}" name="supporting[range][]" type="checkbox" />
                             <label for="checkbox-range-{{ key }}">{{ label }}</label>
@@ -126,9 +126,9 @@
                 Current & archived class folders will look at content across all current and historic pages that a student has data for.
             </p>
             <select id="supporting-folders" name="supporting[folders]">
-                <option value="current_only">Current class folder</option>
-                <option value="active_folders">Active folders where students have published feedback</option>
-                <option value="any_folders">Any folders where students have published feedback</option>
+                {% for key, label in reporting.availableFolderOptions %}
+                    <option value="{{ key }}">{{ label }}</option>
+                {% endfor %}
             </select>
         </div>
     </div>
