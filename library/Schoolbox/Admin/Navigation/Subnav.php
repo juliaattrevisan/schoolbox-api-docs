@@ -263,6 +263,11 @@ class Subnav
                 'visible'    => $userIsSuperuser || $userHasServicePermissionDesign,
                 'searchable' => false,
                 'children'   => [
+                    '/adminv2/setting/design/Assets' => [
+                        'name'        => 'Assets',
+                        'visible'     => true,
+                        'description' => 'Manage the assets such as the logos and background assets that are used within the system.',
+                    ],
                     '/adminv2/dashboard' => [
                         'name'        => 'Dashboard Templates',
                         'visible'     => true,

@@ -411,6 +411,7 @@ class Controller extends ConfigController
                 $typeEncoded = str_replace(' ', '%20', $type);
                 return match ($type) {
                     'Resources'           => "/adminv2/setting/cms/$typeEncoded",      // E.g. /adminv2/setting/cms/Resources
+                    'Assets',
                     'Skin Config'         => "/adminv2/setting/design/$typeEncoded",   // E.g. /adminv2/setting/design/Skin%20Config
                     'LMS Policy',
                     'Document Management' => "/adminv2/setting/lms/$typeEncoded",      // E.g. /adminv2/setting/lms/LMS%20Policy
@@ -457,7 +458,8 @@ class Controller extends ConfigController
                 return match ($type) {
                     // This is for the settings in 'Admin -> Resources -> Resource Settings'.
                     'Resources' => $user->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL),
-
+                    // This is for the settings in 'Admin -> Design -> Assets'.
+                    'Assets',
                     // This is for the settings in 'Admin -> Design -> Skin Config'.
                     'Skin Config' => $user->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL),
 
@@ -534,6 +536,7 @@ class Controller extends ConfigController
             'Document Management',
             'LMS Policy' => 'Lms',
             'Resources' => 'Cms',
+            'Assets',
             'Skin Config' => 'Design',
             default => '',
         };
