@@ -9,7 +9,7 @@ CREATE TABLE `reporting` (
     `instructor_max_mark` DECIMAL(14, 11),
     `max_mark` DECIMAL(14, 11),
     `mark_visibility` TINYINT,
-    `enable_supporting_data` TINYINT COMMENT 'Supporting Data section is shown',
+    `supporting_data_enable` TINYINT COMMENT 'Supporting Data section is shown',
     `period_current` TINYINT COMMENT 'Current academic period',
     `period_previous` TINYINT COMMENT 'Previous academic period',
     `period_1_year` TINYINT COMMENT '1 year in the past',

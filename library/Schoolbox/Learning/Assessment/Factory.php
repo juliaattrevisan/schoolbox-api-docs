@@ -186,13 +186,95 @@ class Factory
 
 
     /**
+     * Supporting Data Enable
+     * A bool that basically represents the mega markbook and other academic details. This is optional; some reporting
+     * activities will not require it (such as a reporting activity that records someone attendances)
+     *
+     * (Reporting activity specific)
+     */
+    private ?bool $supportingDataEnable = null;
+
+
+    /**
+     * Supporting Data Date Range
+     * The multiple options here help inform how we derive From and To dates for the swamp to retrieve data.
+     * This date range helps constrain how much data is fetched, hydrated and collated in the mega markbook for
+     * performance reasons...since we're looking at a LOT of objects here, anything we do to minimise waste is nice
+     *
+     * (Reporting activity specific)
+     */
+    private ?array $supportingDataRange = null;
+
+
+    /**
+     * Supporting Data Curriculum Nodes
+     * The work types option here helps constrain the mega markbook to look in particular folders for assessments that
+     * were associated with any of the selected curriculum to minimise wasted hydration
+     *
+     * Note that this might be a parent node containing multiple descendents and not have its own curriculum code: such
+     * a node would be a subject area or subtree of a curriculum hierarchy.. If chosen, we'll look for assessments that
+     * were associated with *any* of this node's descendents.
+     *
+     * (Reporting activity specific)
+     *
+     * @var array|null
+     */
+    private ?array $supportingDataCurriculumNodes = null;
+
+
+    /**
+     * Supporting Data Folders
+     * The folder option here helps constrain the mega markbook to look in particular folders for assessments that were
+     * due within the Supporting Data Date Range and for feedbacks that were published within the Supporting Data Date
+     * Range, to minimise wasted hydration
+     *
+     * (Reporting activity specific)
+     */
+    private ?string $supportingDataFolders = null;
+
+
+    /**
+     * Supporting Data Work Types
+     * The work types option here helps constrain the mega markbook to look in particular folders for assessments that
+     * were associated with any of the selected worktypes to minimise wasted hydration
+     *
+     * (Reporting activity specific)
+     */
+    private ?array $supportingDataWorkTypes = null;
+
+
+    /**
+     * Supporting Data Activity Grades
+     * This decides whether to render the mega aggregation of students' grades across all their markbooks as derived by
+     * the folder/date/worktype selected
+     *
+     * This is optional for Reporting activities that aren't specifically academically oriented, such as attendances
+     *
+     * (Reporting activity specific)
+     * @var bool|null
+     */
+    private ?bool $supportingDataMegamarkboook = null;
+
+
+    /**
+     * Feedback Comments Enable
+     * This decides whether to provide a ckeditor to staff for writing arbitrary Comments in the feedback area. This is
+     * optional for all those reporting activities that just tell you a value, rather than provide any meaningful
+     * feedback, such as attendance data.
+     *
+     * @var bool|null
+     */
+    private ?bool $feedbackCommentsEnable = null;
+
+
+    /**
      * Factory constructor.
-     * @param User             $creator
-     * @param array            $post (an array of post vars from the create/update forms)
-     * @param string|null      $assessmentType
+     * @param User $creator
+     * @param array $post (an array of post vars from the create/update forms)
+     * @param string|null $assessmentType
      * @param IAssessable|null $original
-     * @throws MapperException
-     * @throws Deleted
+     * @param $errorMapper
+     * @throws \Exception
      */
     public function __construct(User $creator, $post, $assessmentType, ?IAssessable $original, $errorMapper)
     {
@@ -399,6 +481,20 @@ class Factory
          */
         $this->setScenarioId((int)($post['scenarioId'] ?? null));
 
+        /* Reporting Activities
+         * These are mostly settings for Supporting Data; some parts are shared with Due Work and other activities such
+         * as mark types, grade groups, etc. Reporting-specific stuff is namespaced in the ui, unsurprisingly, in a node
+         * called "reporting".
+         */
+        $this->setSupportingDataEnable('on' === ($post['reporting']['supporting']['enable'] ?? null));
+        $this->setSupportingDataRange($post['reporting']['supporting']['range'] ?? null);
+        $this->setSupportingDataFolders($post['reporting']['supporting']['folders'] ?? null);
+        $this->setSupportingDataWorkTypes($post['reporting']['supporting']['workTypes'] ?? null);
+        $this->setSupportingDataMegamarkboook('on' === ($post['reporting']['supporting']['megamarkbook'] ?? null));
+        $this->setFeedbackCommentsEnable('on' === ($post['reporting']['comments']['enable'] ?? null));
+
+        /* TODO Explain what this thing means: custom fields, line items, what it's supposed to be doing here
+         */
         // Ensure custom fields is an array if it's set
         $customFields = $post['customFields'] ?? null;
         if (isset($customFields)) {
@@ -473,7 +569,6 @@ class Factory
      * @throws UnexpectedValueException
      * @throws \RangeException
      * @throws MapperException
-     * @throws ResourceException
      */
     private function produceFromExistingAssessment(IAssessable $assessment): IAssessable
     {
@@ -593,6 +688,10 @@ class Factory
                 $this->getDurationHours(),
                 $this->getDurationMinutes(),
             );
+        } elseif ($assessment instanceof Reporting\Model) {
+            $decorator = new Reporting\Decorator\Decorator(
+
+            );
         } else {
             throw new DomainException('Please select an assessment type');
         }
@@ -658,6 +757,15 @@ class Factory
         /* Dialog Agents have a special treatment of dates where Close Date = Due Date
          */
         if ($assessment instanceof DialogAgent\Model) {
+            $assessment->setCloseAt($assessment->getDueAt());
+        }
+
+        /* Reporting activities have a special treatment of dates where Open Date = Publish Date...also, probably
+         * Close Date = Due Date. There isn't really a "late date" for staff to give feedbacks; students never respond
+         * to Reporting activities.
+         */
+        if ($assessment instanceof Reporting\Model) {
+            $assessment->setOpenAt($assessment->getPublishAt());
             $assessment->setCloseAt($assessment->getDueAt());
         }
 
@@ -870,6 +978,9 @@ class Factory
         return $this->originalAssessmentId;
     }
 
+    /**
+     * @return IAssessable|null
+     */
     public function getOriginalAssessment(): ?IAssessable
     {
         return $this->originalAssessment;
@@ -1009,6 +1120,8 @@ class Factory
         return $this;
     }
 
+    /* Lesson Plan specific
+     */
 
     /**
      * @return string|null
@@ -1029,6 +1142,8 @@ class Factory
         return $this;
     }
 
+    /* Dialog Agent specific
+     */
 
     /**
      * @return int|null
@@ -1046,6 +1161,149 @@ class Factory
     public function setScenarioId(?int $scenarioId): self
     {
         $this->scenarioId = $scenarioId;
+        return $this;
+    }
+
+
+    /* Reporting activity specific
+     */
+
+    /**
+     * @return bool|null
+     */
+    public function getSupportingDataEnable(): ?bool
+    {
+        return $this->supportingDataEnable;
+    }
+
+
+    /**
+     * @param bool|null $supportingDataEnable
+     * @return $this
+     */
+    public function setSupportingDataEnable(?bool $supportingDataEnable): self
+    {
+        $this->supportingDataEnable = $supportingDataEnable;
+        return $this;
+    }
+
+
+    /**
+     * @return array|null
+     */
+    public function getSupportingDataRange(): ?array
+    {
+        return $this->supportingDataRange;
+    }
+
+
+    /**
+     * @param array|null $supportingDataRange
+     * @return $this
+     */
+    public function setSupportingDataRange(?array $supportingDataRange): self
+    {
+        $this->supportingDataRange = $supportingDataRange;
+        return $this;
+    }
+
+
+    /**
+     * @return array|null
+     */
+    public function getSupportingDataCurriculumNodes(): ?array
+    {
+        return $this->supportingDataCurriculumNodes;
+    }
+
+
+    /**
+     * @param array|null $supportingDataCurriculumNodes
+     * @return $this
+     */
+    public function setSupportingDataCurriculumNodes(?array $supportingDataCurriculumNodes): self
+    {
+        $this->supportingDataCurriculumNodes = $supportingDataCurriculumNodes;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getSupportingDataFolders(): ?string
+    {
+        return $this->supportingDataFolders;
+    }
+
+
+    /**
+     * @param string|null $supportingDataFolders
+     * @return $this
+     */
+    public function setSupportingDataFolders(?string $supportingDataFolders): self
+    {
+        $this->supportingDataFolders = $supportingDataFolders;
+        return $this;
+    }
+
+
+    /**
+     * @return array|null
+     */
+    public function getSupportingDataWorkTypes(): ?array
+    {
+        return $this->supportingDataWorkTypes;
+    }
+
+
+    /**
+     * @param array|null $supportingDataWorkTypes
+     * @return $this
+     */
+    public function setSupportingDataWorkTypes(?array $supportingDataWorkTypes): self
+    {
+        $this->supportingDataWorkTypes = $supportingDataWorkTypes;
+        return $this;
+    }
+
+
+    /**
+     * @return bool|null
+     */
+    public function getSupportingDataMegamarkboook(): ?bool
+    {
+        return $this->supportingDataMegamarkboook;
+    }
+
+
+    /**
+     * @param bool|null $supportingDataMegamarkboook
+     * @return $this
+     */
+    public function setSupportingDataMegamarkboook(?bool $supportingDataMegamarkboook): self
+    {
+        $this->supportingDataMegamarkboook = $supportingDataMegamarkboook;
+        return $this;
+    }
+
+
+    /**
+     * @return bool|null
+     */
+    public function getFeedbackCommentsEnable(): ?bool
+    {
+        return $this->feedbackCommentsEnable;
+    }
+
+
+    /**
+     * @param bool|null $feedbackCommentsEnable
+     * @return $this
+     */
+    public function setFeedbackCommentsEnable(?bool $feedbackCommentsEnable): self
+    {
+        $this->feedbackCommentsEnable = $feedbackCommentsEnable;
         return $this;
     }
 }

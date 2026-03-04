@@ -12,6 +12,7 @@
  # @param $assessmentType
  # @param $markVisibility
  # @param $availabeVisibilities
+ # @param allMarkTypes
  # @param $allWorkTypes
  # @param $capabilitymarkTypes
  # @param $capabilityGradingSchemes
@@ -94,9 +95,9 @@
             <label>Enable Supporting Data</label>
             <p class="meta">If on, shows academic grades from various sources to help staff provide feedback.</p>
             <div class="switch">
-                <input type="hidden" name="supporting[active]" value="0" />
-                <input id="supporting-active" name="supporting[active]" type="checkbox" checked="">
-                <label for="supporting-active">
+                <input type="hidden" name="reporting[supporting][enable]" value="0" />
+                <input id="supporting-enable" name="reporting[supporting][enable]" type="checkbox" checked="">
+                <label for="supporting-enable">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>
                 </label>
@@ -116,7 +117,7 @@
                 <ul class="option-list">
                     {% for key, label in reporting.availableRangeOptions %}
                         <li>
-                            <input id="checkbox-range-{{ key }}" name="supporting[range][]" type="checkbox" />
+                            <input id="checkbox-range-{{ key }}" name="reporting[supporting][range][]" type="checkbox" value="{{ key }}" />
                             <label for="checkbox-range-{{ key }}">{{ label }}</label>
                         </li>
                     {% endfor %}
@@ -156,7 +157,7 @@
                 All current class folders will look at content across all pages that have a current class code and that a student has data for.<br />
                 Current & archived class folders will look at content across all current and historic pages that a student has data for.
             </p>
-            <select id="supporting-folders" name="supporting[folders]">
+            <select id="supporting-folders" name="reporting[supporting][folders]">
                 {% for key, label in reporting.availableFolderOptions %}
                     <option value="{{ key }}">{{ label }}</option>
                 {% endfor %}
@@ -176,7 +177,7 @@
                 <ul class="option-list">
                     {% for workType in reporting.workTypes %}
                         <li>
-                            <input id="checkbox-worktype-{{ workType.id }}" name="supporting[workTypes][]" type="checkbox" />
+                            <input id="checkbox-worktype-{{ workType.id }}" name="reporting[supporting][workTypes][]" type="checkbox" value="{{ workType.id }}"/>
                             <label for="checkbox-worktype-{{ workType.id }}">{{ workType.name }}</label>
                         </li>
                     {% endfor %}
@@ -194,8 +195,8 @@
                 These can be seen in the {{ locale.class }} and course markbooks.
             </p>
             <div class="switch">
-                <input type="hidden" name="supporting[markbook]" value="0" />
-                <input id="supporting-megamarkbook" name="supporting[megamarkbook]" type="checkbox" checked="">
+                <input type="hidden" name="reporting[supporting][megamarkbook][enable]" value="0" />
+                <input id="supporting-megamarkbook" name="reporting[supporting][megamarkbook][enable]" type="checkbox" checked="">
                 <label for="supporting-megamarkbook">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>
@@ -215,8 +216,8 @@
             <label>Enable Feedback Comments</label>
             <p class="meta">If on, a place for written feedback will be available to staff.</p>
             <div class="switch">
-                <input type="hidden" name="supporting[comments]" value="0" />
-                <input id="supporting-comments" name="supporting[comments]" type="checkbox" checked="">
+                <input type="hidden" name="reporting[comments][enable]" value="0" />
+                <input id="supporting-comments" name="reporting[comments][enable]" type="checkbox" checked="">
                 <label for="supporting-comments">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>
