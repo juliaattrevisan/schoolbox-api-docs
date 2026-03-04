@@ -153,13 +153,7 @@ class External_Schoolbox_User implements External_UserInterface
         $courtOrderType = trim((string)($student['CourtOrderType'] ?? null));
 
         if ('' !== $courtOrderType) {
-            /* A specially-crafted AlertLegal message about legal matters.
-             */
-            $student['AlertLegal'][] = sprintf(
-                '%s - %s',
-                \External_UserInterface::COURT_ORDER_PREFIX,
-                $courtOrderType
-            );
+            $student['AlertLegal'][] = $courtOrderType;
         }
 
         return $student;

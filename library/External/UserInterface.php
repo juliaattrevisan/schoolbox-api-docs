@@ -15,12 +15,6 @@ use Schoolbox\User;
  */
 interface External_UserInterface extends External\IConnector
 {
-    /**
-     * A hardcoded prefix used before all AlertLegal messages.
-     */
-    public const COURT_ORDER_PREFIX = 'Court Order';
-
-
     /* Student-specific
      */
 

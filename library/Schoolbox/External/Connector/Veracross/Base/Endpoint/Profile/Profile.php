@@ -385,8 +385,8 @@ class Profile implements IStrategy
 
                     /* Alerts
                      */
-                    $comments = $alertLookup[$externalId]['academic_alert'] ?? null;
-                    $legal = $alertLookup[$externalId]['family_alert'] ?? null;
+                    $comments = $alertLookup[$externalId]['family_alert'] ?? null;
+                    $legal = null;
                     $medical = $alertLookup[$externalId]['medical_alert'] ?? null;
                     $messages = $alertLookup[$externalId]['general_alert'] ?? null;
 
