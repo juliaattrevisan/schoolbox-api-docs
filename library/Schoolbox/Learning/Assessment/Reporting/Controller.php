@@ -191,8 +191,8 @@ class Controller extends Assessment\Controller
             $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
         }
 
-        /**
-         * record view
+        /* Remember when someone last looked at this summary screen (normally parents and students)
+         * This is used as proof that someone looked at the information here so they can't plead ignorance
          */
         $lastView = new Assessment\Views\LatestView(
             $this->getAccess(),
@@ -207,105 +207,6 @@ class Controller extends Assessment\Controller
 
         $lastView->addNewView($assessment, $student, $this->getUser());
 
-        /**
-         * get list of all activities within this course
-         * only for staff
-         */
-        $unitAssessmentsTranslator = new Assessment\Translator\UnitAssessments(
-            $this->routeGenerator,
-            $this->getAuthorizer(),
-            $student,
-            $this->getUser(),
-            true
-        );
-
-        $courseAssessments = [];
-
-        if ($this->getUser()->getRole()->isStaff()) {
-            // if we are inside a project get the projects context
-            $course = null;
-
-            if ($assessment->getContext()->isImplementationContext()) {
-                //get all courses for the Class Page (Implementation)...
-                $folder = $assessment->getContext()->getFolder();
-                $courses = $this->courseImplementationMapper->findByFolderId($folder->getId());
-
-                foreach ($courses as $course) {
-                    // if the course has been deleted, ignore
-                    if ($course->isDeleted()) {
-                        continue;
-                    }
-
-                    $course->setUnits($this->unitImplementationMapper->findAllByCourseId($course->getId()));
-
-                    foreach ($course->getUnits() as $unitImpl) {
-                        /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $unitImpl */
-                        $unitImplId  = $unitImpl->getId();
-                        $options     = ['order' => ['sequence' => 'ASC']];
-
-                        $assessments = $this->getAssessmentMapper()->findAllByUnitImplementationIds([$unitImplId], $options)
-                            // Remove Lesson plans, no linking to other lessons
-                            ->filter(function ($assessment) {
-                                /** @var IAssessable $assessment */
-                                return !($assessment instanceof Model);
-                            });
-
-                        // hydrate participation
-                        $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments);
-
-                        $unitImpl->setAssessables($assessments);
-
-                        $courseAssessments['units'][] = [
-                            'id'                         => $unitImplId,
-                            'title'                      => $unitImpl->getTitle(),
-                            'closeDate'                  => $unitImpl->getDueDate()?->getUsingFormat(DATE_ATOM),
-                            'closeDateFormatted'         => $unitImpl->getDueDate()?->getRelativeTime(),
-                            'openDate'                   => $unitImpl->getOpenDate()?->getUsingFormat(DATE_ATOM),
-                            'openDateFormatted'          => $unitImpl->getOpenDate()?->getRelativeTime(),
-                            'relativeCloseDateFormatted' => $unitImpl->getRelativeDueDate()->getRelativeTime(),
-                            'relativeOpenDateFormatted'  => $unitImpl->getRelativeOpenDate()->getRelativeTime(),
-                            'assessments'                => $assessments->reindex()->map($unitAssessmentsTranslator)
-                        ];
-                    }
-                }
-            } else {
-                $unit = $assessment->getContext()->getBaseContext();
-
-                if ($unit instanceof AbstractUnit) {
-                    $course = $unit->getCourse();
-                }
-
-                $course->setUnits($this->unitSpecificationMapper->findAllByCourseId($course->getId()));
-
-                foreach ($course->getUnits() as $unitSpec) {
-                    /** @var \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model $unitSpec */
-                    $unitSpecId = $unitSpec->getId();
-                    $options = ['order' => ['sequence' => 'ASC']];
-
-                    $assessments = $this->getAssessmentMapper()->findAllByUnitSpecificationId($unitSpecId, $options)
-                        // Remove Lesson plans, no linking to other lessons
-                        ->filter(function ($assessment) {
-                            /** @var IAssessable $assessment */
-                            return !($assessment instanceof Model);
-                        });
-
-                    $unitSpec->setAssessables($assessments);
-
-                    $courseAssessments['units'][] = [
-                        'id' => $unitSpecId,
-                        'title' => $unitSpec->getTitle(),
-                        'closeDate' => null, // No Close Date for specifications
-                        'closeDateFormatted' => null, // No Close Date for specifications
-                        'openDate' => null, // No Open Date for specifications
-                        'openDateFormatted' => null, // No Open Date for specifications
-                        'relativeCloseDateFormatted' => null, // No Close Date for specifications
-                        'relativeOpenDateFormatted' => null, // No Open Date for specifications
-                        'assessments' => $assessments->reindex()->map($unitAssessmentsTranslator)
-                    ];
-                }
-            }
-        }
-
         $participant = $assessment->getParticipantIfExtant($student);
 
         $twigData = [
@@ -315,7 +216,6 @@ class Controller extends Assessment\Controller
             'student'           => $student,
             'returnUrl'         => $returnUrl,
             'returnUrlEncoded'  => Redirect::encode($returnUrl),
-            'courseAssessments' => $courseAssessments,
             'participant'       => $participant,
             /* The full history of interactions for this dialog agent
              * Note that we won't have feedbacks in this
