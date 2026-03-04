@@ -89,7 +89,12 @@ abstract class AbstractTreeBuilder
                 break;
             }
             try {
-                $parentList[] = $parentId = $this->folderLocator->findById($parentId)->getParent()->getId();
+                $parentId = $this->folderLocator->findById($parentId)->getParent()?->getId();
+                if (isset($parentId)) {
+                    $parentList[] = $parentId;
+                } else {
+                    break;
+                }
             } catch (Mapper\Exception $e) {
                 break;
             }
