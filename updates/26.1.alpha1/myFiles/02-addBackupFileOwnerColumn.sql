@@ -1,0 +1,2 @@
+ALTER TABLE myFile ADD _owner INT DEFAULT 0 NOT NULL AFTER owner;
+
