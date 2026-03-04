@@ -592,7 +592,7 @@ try {
             }
 
             //if including timetable classes, do that now
-            if ('all_external' === $export_type) {
+            if (ExportType::ALL_EXTERNAL === $export_type) {
                 //build timetable
                 $subApi = buildApiClass(
                     Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class,
