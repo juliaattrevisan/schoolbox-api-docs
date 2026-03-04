@@ -4,6 +4,7 @@ namespace Calendar\Event\Collection;
 
 /**
  * This class defines export types for the Calendar\Event\Collection namespace.
+ * They were originally hard-coded in www/calendar/export.php.
  */
 class ExportType
 {
