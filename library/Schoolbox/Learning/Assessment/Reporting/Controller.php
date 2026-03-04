@@ -217,8 +217,8 @@ class Controller extends Assessment\Controller
             'returnUrl'         => $returnUrl,
             'returnUrlEncoded'  => Redirect::encode($returnUrl),
             'participant'       => $participant,
-            /* The full history of interactions for this dialog agent
-             * Note that we won't have feedbacks in this
+            /* The full history of interactions for this reporting activity
+             * Note that this should only contain feedbacks, by nature of this activity
              */
             'timeline' => $participant ? (new FullTimeline($participant))->getForUser($this->getUser()) : null,
 
