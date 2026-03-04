@@ -49,9 +49,9 @@
         </div>
     </div>
 
-    {# Curriculum Nodes for this Reporting Activity#}
+    {# Curriculum Nodes for this Reporting Activity #}
     {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
-        entityType: locale.dialogAgent.proper,
+        entityType: 'reporting',
         courseManagedReadonly: courseManaged.isReadonly,
         excludeLegend: true,
         hasTabs: true,
@@ -97,23 +97,20 @@
     <div class="row">
         <div class="small-12 columns">
             {# Curriculum Nodes for Supporting Data
-             # TODO somehow separate this usage from the other curriculum node usage
              # TODO set this entity type somewhere
              #}
-
-            {# TODO Snake Lord, inject this meta text into the curric nodes fragment somehow #}
-            <p class="meta">
-                Select branches of the curriculum to have supporting data appear to staff when entering feedback for this
-                {{ locale.activity }}. This data can come from {{ locale.activity.plural}} and rubrics that have been tagged
-                with curriculum codes matching the selection below. It is possible to select both a branch of a curriculum or
-                specific curriculum codes. If you select a branch, all nodes contained within will be applied.
-            </p>
             {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
                 entityType: 'reporting',
                 courseManagedReadonly: courseManaged.isReadonly,
                 excludeLegend: true,
                 hasTabs: true,
                 parentFolderId: parentFolderId ?? null,
+                tooltip:
+                    'Select branches of the curriculum to have supporting data appear to staff when entering feedback for this ' ~
+                    locale.activity ~ '. This data can come from ' ~ locale.activity.plural ~ ' and rubrics that have been tagged
+                    with curriculum codes matching the selection below. It is possible to select both a branch of a curriculum or
+                    specific curriculum codes. If you select a branch, all nodes contained within will be applied.',
+                useMetaTooltip: true,
             } %}
         </div>
     </div>
