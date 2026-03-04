@@ -58,8 +58,8 @@
         parentFolderId: parentFolderId ?? null,
     } %}
 
-    <label for="assessment-description">Description</label>
-    <textarea name="description" id="assessment-description" data-test="assessment-form-input-description">{{ assessment.description }}</textarea>
+    {# Reporting activities don't have a description #}
+    <input type="hidden" name="description" value="" />
 
     {# Assessment Location #}
     {% if canRelocate %}
@@ -220,23 +220,3 @@
 
 {# Submit #}
 {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
-
-
-{# General Scripts #}
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
-<script>
-    $(function () {
-
-        // 'Description' TextArea only
-        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-            detail: {
-                maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
-                targetElements: ['#assessment-description'],
-                fileBrowserCategoryId: {{ context.baseContext.folder.id ?? 0 }},
-                {% if editorTemplates is defined %}
-                templates: {{ editorTemplates|json_encode|raw }},
-                {% endif %}
-            }
-        }));
-    });
-</script>
