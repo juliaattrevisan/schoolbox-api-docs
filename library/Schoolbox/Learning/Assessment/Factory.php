@@ -16,6 +16,7 @@ use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Error;
+use Schoolbox\Error\Mapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Decorator\CourseManagedDecorator as DueWorkCourseManagedDecorator;
 use Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator as DueWorkDecorator;
@@ -38,7 +39,6 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\User;
 use UnexpectedValueException;
@@ -164,18 +164,6 @@ class Factory
 
 
     /**
-     * Dialog Agents have a scenario
-     *
-     * @var int|null
-     */
-    private ?int $scenarioId = null;
-
-
-    /** @var Error\Mapper */
-    private Error\Mapper $errorMapper;
-
-
-    /**
      * Used in Lesson Plans' AI generation to decide how much data
      * the LLM should generate. Unfortunately shares a similar name,
      * but not concept, with other duration fields here
@@ -183,6 +171,16 @@ class Factory
      * @var string|null
      */
     private ?string $duration = null;
+
+
+    /**
+     * Dialog Agents have a scenario
+     *
+     * (Dialog Agent specific)
+     *
+     * @var int|null
+     */
+    private ?int $scenarioId = null;
 
 
     /**
@@ -273,11 +271,16 @@ class Factory
      * @param array $post (an array of post vars from the create/update forms)
      * @param string|null $assessmentType
      * @param IAssessable|null $original
-     * @param $errorMapper
+     * @param Mapper $errorMapper
      * @throws \Exception
      */
-    public function __construct(User $creator, $post, $assessmentType, ?IAssessable $original, $errorMapper)
-    {
+    public function __construct(
+        User $creator,
+        array $post,
+        ?string $assessmentType,
+        ?IAssessable $original,
+        private \Schoolbox\Error\Mapper $errorMapper
+    ) {
         $this->setAssessmentType(trim($post['assessmentType'] ?? ''));
         $this->setContext($post['context'] ?? '');
         $this->setTitle(trim($post['title'] ?? ''));
@@ -293,7 +296,6 @@ class Factory
         $this->setOpenAt(trim($post['openDate'] ?? ''));
         $this->setDueAt(trim($post['dueDate'] ?? ''));
         $this->setCloseAt(trim($post['closeDate'] ?? ''));
-        $this->errorMapper = $errorMapper;
 
         if ($assessmentType === AssessmentType::TYPE_LESSON_PLAN) {
             // Work type should always be null for lesson plans.
