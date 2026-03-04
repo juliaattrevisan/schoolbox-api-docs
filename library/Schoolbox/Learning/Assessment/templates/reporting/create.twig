@@ -78,15 +78,18 @@
             <label>Date Range</label>
             {# TODO Jezwords #}
             <p class="meta">
-                Choose two dates here
+                Select how much data to obtain based on this relative time period.
             </p>
-            <div class="row">
-                <div class="small-12 medium-6 columns">
-                    <input id="supporting[dates][start]" type="text" value="" />
-                </div>
-                <div class="small-12 medium-6 columns">
-                    <input id="supporting[dates][end]" type="text" value="" />
-                </div>
+
+            <div class="checklist">
+                <ul class="option-list">
+                    {% for key, label in reporting.availableRanges %}
+                        <li>
+                            <input id="checkbox-range-{{ key }}" name="supporting[range][]" type="checkbox" />
+                            <label for="checkbox-range-{{ key }}">{{ label }}</label>
+                        </li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
     </div>

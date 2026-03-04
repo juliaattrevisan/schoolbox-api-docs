@@ -387,10 +387,21 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $data['dialogAgent']['scenarios'] = $this->dialogAgentScenarioMapper->findAll();
         }
 
-        /* Reporting activities need to know about all the available Work Types that could be selected
+        /* Reporting Activity specific settings/data are here
          */
         if (AssessmentType::TYPE_REPORTING === $type) {
+            /* Reporting activities need to know about all the available Work Types that could be selected
+             */
             $data['reporting']['workTypes'] = $this->workTypeMapper->findAll();
+
+            /* There are numerous date range options of which numerous could be enabled
+             */
+            $data['reporting']['availableRanges'] = [
+                'current' => 'Current academic period',
+                'previous' => 'Previous academic period',
+                '1_year' => '1 year into the past',
+                '2_year' => '2 years into the past',
+            ];
         }
 
         /* TODO lol why is this outside the AssessmentType check?
