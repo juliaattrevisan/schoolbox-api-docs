@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\User;
 
 class Model extends AbstractAssessment
@@ -35,6 +36,12 @@ class Model extends AbstractAssessment
      * The IAssessable associated with this activity
      */
     private ?AssessmentModel $assessmentModel = null;
+
+
+    /**
+     * @var float|null
+     */
+    private ?float $maxMark = null;
 
 
     /**
@@ -65,6 +72,17 @@ class Model extends AbstractAssessment
      * @var GradeGroup|null
      */
     private ?GradeGroup $gradeGroup = null;
+
+
+    /**
+     * This is used to convert normalised marks to human readable, and vice versa, according to the Mark Type chosen
+     * Used for the Instructor Marks that staff see.
+     *
+     * (AbstractAssessment already sets a markScheme instance which is used for students' display marks.)
+     *
+     * @var IMarkScheme|null
+     */
+    private ?IMarkScheme $instructorMarkScheme = null;
 
 
     /**
@@ -330,6 +348,26 @@ class Model extends AbstractAssessment
 
 
     /**
+     * @return float|null
+     */
+    public function getMaxMark(): ?float
+    {
+        return $this->maxMark;
+    }
+
+
+    /**
+     * @param float|null $maxMark
+     * @return static
+     */
+    public function setMaxMark(?float $maxMark): self
+    {
+        $this->maxMark = $maxMark;
+        return $this;
+    }
+
+
+    /**
      * @return MarkType|null
      */
     public function getInstructorMarkType(): ?MarkType
@@ -405,6 +443,26 @@ class Model extends AbstractAssessment
     public function setGradeGroup(?GradeGroup $gradeGroup): self
     {
         $this->gradeGroup = $gradeGroup;
+        return $this;
+    }
+
+
+    /**
+     * @return IMarkScheme|null
+     */
+    public function getInstructorMarkScheme(): ?IMarkScheme
+    {
+        return $this->instructorMarkScheme;
+    }
+
+
+    /**
+     * @param IMarkScheme|null $instructorMarkScheme
+     * @return $this
+     */
+    public function setInstructorMarkScheme(?IMarkScheme $instructorMarkScheme): self
+    {
+        $this->instructorMarkScheme = $instructorMarkScheme;
         return $this;
     }
 
