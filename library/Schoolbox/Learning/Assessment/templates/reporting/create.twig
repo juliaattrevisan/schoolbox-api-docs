@@ -201,10 +201,6 @@
     {# Letter Grade enables Grading Scheme
      # Total Mark enables Maximum Available Marks
      #}
-    {% set markTypeLetterGrade = 2 %}
-    {% set markTypeTotalMark = 3 %}
-    {% set markTypeNone = 6 %}
-
     {% include '@learningAssessment/fragments/dualMarkTypes.twig' with {
         assessment: assessment,
         allMarkTypes: allMarkTypes,
