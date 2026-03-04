@@ -1,1 +1,0 @@
-ALTER TABLE myFolder ADD _owner INT DEFAULT 0 NOT NULL AFTER owner;
