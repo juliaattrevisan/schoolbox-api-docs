@@ -42,6 +42,7 @@ test.describe("Course import tests", () => {
         const manageGroup = new ManageGroup(page);
         const editorTemplate = new EditorTemplate(page, tester);
         const unitPlanner = new UnitPlanner(tester, page);
+        const courseOutline = new CourseOutline(tester, page);
 
         const folderName = `Automation Course Import Folder1`;
         const homepageTemplateOption = "Course";
@@ -199,40 +200,24 @@ test.describe("Course import tests", () => {
         await expect(page.getByTestId(`course-outline-assessment-title-${dueWorkName}`)).not.toBeVisible();
 
         tester.isGoingTo("check the number of students for each activity type imported");
-        await expect(page.getByTestId(`course-outline-number-students-Pre-unit Quiz`)).toContainText(
-            "0/4 students completed",
-        );
-        await expect(page.getByTestId(`course-outline-number-students-Post to Forum: Prologue`)).toContainText(
-            "0/4 students completed",
-        );
-        await expect(page.getByTestId(`course-outline-number-students-Essay - Final Assessment`)).toContainText(
-            "0/4 students completed",
-        );
-        await expect(page.getByTestId(`course-outline-number-students-${lessonPlanName}`)).not.toContainText(
-            "0/4 students completed",
-        );
-        await expect(page.getByTestId(`course-outline-number-students-${projectName}`)).toContainText(
-            "0/4 students completed",
-        );
+        await courseOutline.checkActivityMetaText([
+            { activityName: "Pre-unit Quiz", expectMetaText: "0/4 students completed" },
+            { activityName: "Post to Forum: Prologue", expectMetaText: "0/4 students completed" },
+            { activityName: "Essay - Final Assessment", expectMetaText: "0/4 students completed" },
+            { activityName: lessonPlanName, expectMetaText: "0/4 students completed" },
+            { activityName: projectName, expectMetaText: "0/4 students completed" },
+        ]);
 
         tester.isGoingTo("check the due dates for each activity type imported");
         const dueDateToBeFormated = dayjs().add(+30, "days");
         const dateFormatted = dueDateToBeFormated.format("MMM D, YYYY");
-        await expect(page.getByTestId(`course-outline-number-students-Pre-unit Quiz`)).toContainText(
-            `Due ${dateFormatted}`,
-        );
-        await expect(page.getByTestId(`course-outline-number-students-Post to Forum: Prologue`)).toContainText(
-            `Due ${dateFormatted}`,
-        );
-        await expect(page.getByTestId(`course-outline-number-students-Essay - Final Assessment`)).toContainText(
-            `Due ${dateFormatted}`,
-        );
-        await expect(page.getByTestId(`course-outline-number-students-${lessonPlanName}`)).toContainText(
-            `Scheduled ${dateFormatted}`,
-        );
-        await expect(page.getByTestId(`course-outline-number-students-${projectName}`)).toContainText(
-            `Due ${dateFormatted}`,
-        );
+        await courseOutline.checkActivityMetaText([
+            { activityName: "Pre-unit Quiz", expectMetaText: `Due ${dateFormatted}` },
+            { activityName: "Post to Forum: Prologue", expectMetaText: `Due ${dateFormatted}` },
+            { activityName: "Essay - Final Assessment", expectMetaText: `Due ${dateFormatted}` },
+            { activityName: lessonPlanName, expectMetaText: `Scheduled ${dateFormatted}` },
+            { activityName: projectName, expectMetaText: `Due ${dateFormatted}` },
+        ]);
     });
 
     /**
@@ -248,6 +233,7 @@ test.describe("Course import tests", () => {
         const lessonPlanName = "Export Activity Lesson Plan for Romeo and Juliet";
         const projectName = "Export Activity Project for Romeo and Juliet";
         const unitPlanner = new UnitPlanner(tester, page);
+        const courseOutline = new CourseOutline(tester, page);
 
         const folderId = (await db.grabFromDatabase("folder", "id", {
             name: "Automation Course Import Folder1",
@@ -356,21 +342,18 @@ test.describe("Course import tests", () => {
         tester.isGoingTo("as Jack Coles check the course outline: dates, number of students");
         await tester.impersonate("Jack Coles");
         await page.goto(`/homepage/${folderId.toString()}`);
-        await expect(page.getByTestId(`course-outline-number-students-${lessonPlanName}`)).not.toContainText(
-            "0/4 students completed",
-        );
-        await expect(page.getByTestId(`course-outline-number-students-${projectName}`)).toContainText(
-            "0/4 students completed",
-        );
+        await courseOutline.checkActivityMetaText([
+            { activityName: lessonPlanName, expectMetaText: "0/4 students completed" },
+            { activityName: projectName, expectMetaText: "0/4 students completed" },
+        ]);
+
         tester.isGoingTo("check the due dates for each activity type imported");
         const dueDateToBeFormated = dayjs().add(+10, "days");
         const dateFormatted = dueDateToBeFormated.format("MMM D, YYYY");
-        await expect(page.getByTestId(`course-outline-number-students-${lessonPlanName}`)).toContainText(
-            `Scheduled ${dateFormatted}`,
-        );
-        await expect(page.getByTestId(`course-outline-number-students-${projectName}`)).toContainText(
-            `Due ${dateFormatted}`,
-        );
+        await courseOutline.checkActivityMetaText([
+            { activityName: lessonPlanName, expectMetaText: `Due ${dateFormatted}` },
+            { activityName: projectName, expectMetaText: `Due ${dateFormatted}` },
+        ]);
 
         tester.isGoingTo(
             "as Jana Reed check they are able to view activities under the lesson plan and mark the tasks",
@@ -407,12 +390,11 @@ test.describe("Course import tests", () => {
         tester.isGoingTo("as jack coles check the course outline shows 1/4 students completed the activity");
         await tester.impersonate("Jack Coles");
         await page.goto(`/homepage/${folderId.toString()}`);
-        await expect(
-            page.getByTestId("course-outline-number-students-Romeo and Juliet Key Quote Activity"),
-        ).toContainText("1/4 students completed");
-        await expect(page.getByTestId("course-outline-number-students-Key events sequencing task")).toContainText(
-            "1/4 students completed",
-        );
+        await courseOutline.checkActivityMetaText([
+            { activityName: "Romeo and Juliet Key Quote Activity", expectMetaText: "1/4 students completed" },
+            { activityName: "Key events sequencing task", expectMetaText: "1/4 students completed" },
+
+        ]);
     });
 
     test("Create activities via course outline, save into the course, delete activities, check students cannot view activities with open date in the future", async ({
