@@ -106,6 +106,7 @@ class Event extends Day\Event
 
     /**
      * @inheritDoc
+     * @see getTitleForResourceBooking for notes on the intricacies of the resource booking title.
      */
     public function getTitleForExport()
     {
