@@ -378,7 +378,7 @@ abstract class AbstractTreeBuilder
     ): array {
         return $this->generateNodeArray(
             $folder->getId(),
-            $folder->getParent()->getId(),
+            $folder->getParent()?->getId(),
             $type,
             $name ?: $folder->getName(),
             $colour,

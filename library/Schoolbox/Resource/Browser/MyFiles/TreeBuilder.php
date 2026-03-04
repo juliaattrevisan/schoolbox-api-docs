@@ -69,6 +69,9 @@ class TreeBuilder extends AbstractTreeBuilder
     {
         /** @var Mapper $locator */
         $locator = $this->folderLocator;
+        if (intval($nodeId) === 0) {
+            $nodeId = null;
+        }
 
         // TODO cache this
         return $locator->findByColumnList([
@@ -87,6 +90,9 @@ class TreeBuilder extends AbstractTreeBuilder
     {
         /** @var Mapper $locator */
         $locator = $this->fileLocator;
+        if (intval($nodeId) === 0) {
+            $nodeId = null;
+        }
 
         return $this->filterMime($locator->findByColumnList([
             'owner' => $this->user->getId(),
