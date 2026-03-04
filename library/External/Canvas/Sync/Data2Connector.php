@@ -31,7 +31,7 @@ class Data2Connector
     // number of times to try checking job status
     private const MAX_JOB_CHECK_COUNTS = 20;
     // seconds to wait for the job to finish
-    private const RETRY_TIME_PERIOD = 60;
+    private const RETRY_TIME_PERIOD = 1;
 
     /**
      * Guzzle requests consts

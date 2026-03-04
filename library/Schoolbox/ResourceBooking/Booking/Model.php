@@ -332,6 +332,31 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
+     * This function was added so that methods in Calendar\Event\Controller that deal with bookings could check
+     * booking permissions without having to infer a general permission (e.g. 'can a user edit a booking') from
+     * permission to access a specific route (e.g. 'resourceBooking.edit').  Route permissions should only be used to
+     * check access to that route.  A similar function canUserModerateThisItem() exists in ResourceBooking\Item\Model.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function canUserEditBooking(User $user): bool
+    {
+        if ($this->getResource()->canUserModerateThisItem($user)) {
+            return true;
+        }
+
+        try {
+            $bookingOwner = $this->getEvent()->getOwner();
+        } catch (\TypeError) {
+            throw new \UnexpectedValueException('Booking object does not have event owner set');
+        }
+
+        // If the user is the owner of the event, he/she can edit the booking.
+        return ($bookingOwner->getId() === $user->getId());
+    }
+
+    /**
     * Specify data which should be serialized to JSON
     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
     * @return array data which can be serialized by <b>json_encode</b>,
