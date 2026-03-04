@@ -7,6 +7,7 @@
  #                         Otherwise, this will render it as an independent vue app
  # @param bool $hasTabs - Whether the curriculum code selector should have tabs
  # @param int|null $parentFolderId - The folder ID to use for the current curriculum selector tab
+ # @param string|null $formValueName  If provided, becomes the element's name= attribute
  #}
 {% if courseManagedReadonly is not defined %}
     {% set courseManagedReadonly = false %}
@@ -27,6 +28,7 @@
         data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
         :include-children="true"
         :has-tabs="{{ hasTabs ? 'true' : 'false' }}"
+        {% if formValueName is defined and formValueName is not null %}form-value-name="{{ formValueName }}"{% endif %}
         {% if parentFolderId is defined and parentFolderId is not null %}:parent-folder-id="{{ parentFolderId }}"{% endif %}
     />
 {% if not vueSlot %}

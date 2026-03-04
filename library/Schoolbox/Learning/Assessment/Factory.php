@@ -492,6 +492,7 @@ class Factory
          */
         $this->setSupportingDataEnable('on' === ($post['reporting']['supporting']['enable'] ?? null));
         $this->setSupportingDataRange($post['reporting']['supporting']['range'] ?? null);
+        $this->setSupportingDataCurriculumNodes(explode(',', $post['reporting']['supporting']['curriculumNodes'][0] ?? []));
         $this->setSupportingDataFolders($post['reporting']['supporting']['folders'] ?? null);
         $this->setSupportingDataWorkTypes($post['reporting']['supporting']['workTypes'] ?? null);
         $this->setSupportingDataMegamarkboook('on' === ($post['reporting']['supporting']['megamarkbook'] ?? null));
@@ -702,6 +703,7 @@ class Factory
                 $this->getInstructorMaxMark(),
                 $this->getSupportingDataEnable(),
                 $this->getSupportingDataRange(),
+                $this->getSupportingDataCurriculumNodes(),
                 $this->getSupportingDataFolders(),
                 $this->getSupportingDataWorkTypes(),
                 $this->getSupportingDataMegamarkboook(),
