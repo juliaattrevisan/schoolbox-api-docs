@@ -112,6 +112,10 @@ class StrategyBase implements IStrategy
                 $this->lock->refresh();
             }
         }
+
+        // log that we have finished and release the lock
+        $this->log->notice("Finished processing all chunks");
+        $this->lock->release();
     }
 
     /**
