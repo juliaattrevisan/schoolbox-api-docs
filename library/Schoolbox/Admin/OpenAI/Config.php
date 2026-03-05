@@ -142,11 +142,11 @@ class Config
             self::REASONING_EFFORT_OPTION_MEDIUM,
             self::REASONING_EFFORT_OPTION_HIGH,
         ],
-        "gpt-5.2-pro"  => [
-            self::REASONING_EFFORT_OPTION_DEFAULT,
-            self::REASONING_EFFORT_OPTION_MEDIUM,
-            self::REASONING_EFFORT_OPTION_HIGH,
-        ],
+//        "gpt-5.2-pro"  => [
+//            self::REASONING_EFFORT_OPTION_DEFAULT,
+//            self::REASONING_EFFORT_OPTION_MEDIUM,
+//            self::REASONING_EFFORT_OPTION_HIGH,
+//        ],
         "gpt-5.2-chat-latest" => [
             self::REASONING_EFFORT_OPTION_DEFAULT,
             self::REASONING_EFFORT_OPTION_MEDIUM,
@@ -162,11 +162,11 @@ class Config
             self::REASONING_EFFORT_OPTION_MEDIUM,
             self::REASONING_EFFORT_OPTION_HIGH,
         ],
-        "gpt-5.4-pro"  => [
-            self::REASONING_EFFORT_OPTION_DEFAULT,
-            self::REASONING_EFFORT_OPTION_MEDIUM,
-            self::REASONING_EFFORT_OPTION_HIGH,
-        ],
+//        "gpt-5.4-pro"  => [
+//            self::REASONING_EFFORT_OPTION_DEFAULT,
+//            self::REASONING_EFFORT_OPTION_MEDIUM,
+//            self::REASONING_EFFORT_OPTION_HIGH,
+//        ],
     ];
     public const array REASONING_EFFORT_OPTIONS = [
         self::REASONING_EFFORT_OPTION_DEFAULT,
@@ -192,18 +192,28 @@ class Config
         self::TEXT_VERBOSITY_OPTION_DEFAULT,
         self::TEXT_VERBOSITY_OPTION_MEDIUM,
     ];
+    public const array TEXT_VERBOSITY_OPTIONS_GPT5_CHAT = [
+        self::TEXT_VERBOSITY_OPTION_DEFAULT,
+        self::TEXT_VERBOSITY_OPTION_MEDIUM,
+    ];
 
     public const array TEXT_VERBOSITY_MODEL_OPTIONS = [
-        "gpt-4o"       => self::TEXT_VERBOSITY_OPTIONS,
-        "gpt-4o-mini"  => self::TEXT_VERBOSITY_OPTIONS,
-        "gpt-4.1"      => self::TEXT_VERBOSITY_OPTIONS,
-        "gpt-4.1-mini" => self::TEXT_VERBOSITY_OPTIONS,
-        "gpt-5"        => self::TEXT_VERBOSITY_OPTIONS,
-        "gpt-5-mini"   => self::TEXT_VERBOSITY_OPTIONS,
-        "gpt-5-nano"   => self::TEXT_VERBOSITY_OPTIONS,
-        "gpt-5.1"      => self::TEXT_VERBOSITY_OPTIONS,
-        "gpt-5.2"      => self::TEXT_VERBOSITY_OPTIONS,
-        "gpt-5.2-pro"  => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-4o"              => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-4o-mini"         => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-4.1"             => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-4.1-mini"        => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5"               => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5-mini"          => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5-nano"          => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5-chat-latest"   => self::TEXT_VERBOSITY_OPTIONS_GPT5_CHAT,
+        "gpt-5.1"             => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5.1-chat-latest" => self::TEXT_VERBOSITY_OPTIONS_GPT5_CHAT,
+        "gpt-5.2"             => self::TEXT_VERBOSITY_OPTIONS,
+//        "gpt-5.2-pro"         => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5.2-chat-latest" => self::TEXT_VERBOSITY_OPTIONS_GPT5_CHAT,
+        "gpt-5.3-chat-latest" => self::TEXT_VERBOSITY_OPTIONS_GPT5_CHAT,
+        "gpt-5.4"             => self::TEXT_VERBOSITY_OPTIONS,
+//        "gpt-5.4-pro"         => self::TEXT_VERBOSITY_OPTIONS,
     ];
 
     // field keys
@@ -635,9 +645,10 @@ class Config
     }
 
     /**
-     * Build available reasoning effort levels for this feature.
+     * Build available verbosity effort levels for this feature.
      *
-     * This ensures the `minimal` level is stripped from the image feature..
+     * This ensures that only the `medium` level is available for chat for
+     * GPT-4 models.
      *
      * @param string $feature
      * @return array|array[]
