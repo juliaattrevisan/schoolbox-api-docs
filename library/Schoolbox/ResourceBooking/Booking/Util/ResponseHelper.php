@@ -12,9 +12,10 @@ class ResponseHelper
 {
     /**
      * @param array<int, int> $nBookingsCreatedByStatusId - The number of bookings created, indexed by bookingStatusId.
+     * @param bool            $createdEvent - Whether an event was created also.
      * @return string
      */
-    public function getResponseMessage(array $nBookingsCreatedByStatusId): string
+    public function getResponseMessage(array $nBookingsCreatedByStatusId, bool $createdEvent): string
     {
         $nApprovedBookings = $nBookingsCreatedByStatusId[Status\Model::STATUS_APPROVED] ?? 0;
         $nPendingBookings = $nBookingsCreatedByStatusId[Status\Model::STATUS_PENDING] ?? 0;
@@ -22,8 +23,10 @@ class ResponseHelper
         $nTotalBookings = $nPendingBookings + $nApprovedBookings + $nRejectedBookings;
 
         if ($nTotalBookings === 0) {
-            return 'Created event with no bookings';
+            return $createdEvent ? 'Created event with no bookings' : 'Could not create any bookings';
         }
+
+        $messageStart = $createdEvent ? 'Created event with' : 'Created';
 
         if ($nTotalBookings === 1) {
             $bookingStatus = match ($nTotalBookings) {
@@ -31,7 +34,7 @@ class ResponseHelper
                 $nPendingBookings => 'pending',
                 $nRejectedBookings => 'rejected',
             };
-            return "Created event with one $bookingStatus booking";
+            return "$messageStart one $bookingStatus booking";
         }
 
         $messageEndingParts = [
@@ -42,6 +45,6 @@ class ResponseHelper
 
         $messageEndingParts = array_filter($messageEndingParts, static fn ($messageEndingPart) => $messageEndingPart !== '');
 
-        return "Created event with $nTotalBookings bookings - " . implode(', ', $messageEndingParts);
+        return "$messageStart $nTotalBookings bookings - " . implode(', ', $messageEndingParts);
     }
 }
