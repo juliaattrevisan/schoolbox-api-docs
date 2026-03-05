@@ -443,7 +443,7 @@ export default class MarkbookPage {
      * check whether or not the progress-tick-form is visible or not
      * @param studentId - The ID of the student
      * @param assessmentId - The ID of the assessment
-     * @param shouldBeVisible - Whether the tick field should be visible or not: pass true to check it is visible and false fo check it is not visible
+     * @param shouldBeVisible - Whether the tick field should be visible or not: pass true to check it is visible and false to check it is not visible
      */
     async checkProgressTickVisibility(
         studentId: string | number,

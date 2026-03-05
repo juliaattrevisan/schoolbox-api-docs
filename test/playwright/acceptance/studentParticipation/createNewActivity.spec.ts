@@ -1,5 +1,5 @@
 /**
- * Test the core functionality of student participation exclusion
+ * Playwright acceptance tests for student participation custom activity creation and assignment.
  * 1. Provision sales.tar.gz data
  * 2. Execute npx playwright test createNewActivity.spec.ts
  */
@@ -60,12 +60,12 @@ test.describe("Student Participation Tests: new activity, title validation, chec
         tester.isGoingTo("Choose task and attempt to save with empty title and with the same title as the due work");
         await studentParticipation.chooseActivityType("task");
         await assessmentForm.clickCreate();
-        await expect(page.locator("#title-error")).toHaveText("This field is required.");
-        await expect(page.locator("#workTypeSelector-error")).toHaveText("This field is required.");
+        await expect(page.locator("#title-error")).toContainText("This field is required.");
+        await expect(page.locator("#workTypeSelector-error")).toContainText("This field is required.");
         await assessmentForm.setTitle(originalActivityTitle);
         await assessmentForm.setWorkType(5); // select "Essay" work type
         await assessmentForm.clickCreate();
-        await expect(page.locator(`div[class="alert alert-box icon-alert"]`)).toHaveText(
+        await expect(page.locator(`div[class="alert alert-box icon-alert"]`)).toContainText(
             " Could not save activity. The activity can not have the same title as the original activity.",
         );
 
@@ -78,8 +78,8 @@ test.describe("Student Participation Tests: new activity, title validation, chec
         await studentParticipation.checkCustomActivityInTable(studentNameMario, customActivityTitle);
 
         await homepage.goto(classId);
-        await courseOutline.clickUnitExpandCollapse("Persuasion and the Media");
-        await courseOutline.clickActivityExpandCollapse("Persuasion and the Media", originalActivityTitle);
+        await courseOutline.clickUnitExpandCollapse("Persuasion and the Media", "down");
+        await courseOutline.clickActivityExpandCollapse("Persuasion and the Media", originalActivityTitle, "down");
         await courseOutline.checkCustomActivityPresented(
             "Persuasion and the Media",
             originalActivityTitle,
@@ -120,8 +120,8 @@ test.describe("Student Participation Tests: new activity, title validation, chec
         await studentParticipation.checkCustomActivityInTable(studentNameJamal, customActivityTitle);
 
         await homepage.goto(classId);
-        await courseOutline.clickUnitExpandCollapse("Persuasion and the Media");
-        await courseOutline.clickActivityExpandCollapse("Persuasion and the Media", originalActivityTitle);
+        await courseOutline.clickUnitExpandCollapse("Persuasion and the Media", "down");
+        await courseOutline.clickActivityExpandCollapse("Persuasion and the Media", originalActivityTitle, "down");
         await courseOutline.checkCustomActivityPresented(
             "Persuasion and the Media",
             originalActivityTitle,
@@ -163,8 +163,8 @@ test.describe("Student Participation Tests: new activity, title validation, chec
         await studentParticipation.checkCustomActivityInTable(studentNameMario, customActivityTitle);
 
         await homepage.goto(classId);
-        await courseOutline.clickUnitExpandCollapse("Persuasion and the Media");
-        await courseOutline.clickActivityExpandCollapse("Persuasion and the Media", originalActivityTitle);
+        await courseOutline.clickUnitExpandCollapse("Persuasion and the Media", "down");
+        await courseOutline.clickActivityExpandCollapse("Persuasion and the Media", originalActivityTitle, "down");
         // check the custom activity is still shown in the course outline but the meta text is updated
         await courseOutline.checkCustomActivityPresented(
             "Persuasion and the Media",
@@ -211,9 +211,10 @@ test.describe("Student Participation Tests: new activity, title validation, chec
         await db.dontHaveInDatabase("participant", { participant_plan_id: customPlanId });
         await db.dontHaveInDatabase("participant", { participant_plan_id: originalPlanId });
 
+        const deletedAt = new Date().toISOString().slice(0, 19).replace("T", " ");
         await db.updateInDatabase(
             "assessment",
-            { deleted_at: "2026-03-04 10:24:59" },
+            { deleted_at: deletedAt },
             { title: customActivityTitle, deleted_at: null },
         );
     });

@@ -204,7 +204,7 @@ test.describe("Course import tests", () => {
             { activityName: "Pre-unit Quiz", expectMetaText: "0/4 students completed" },
             { activityName: "Post to Forum: Prologue", expectMetaText: "0/4 students completed" },
             { activityName: "Essay - Final Assessment", expectMetaText: "0/4 students completed" },
-            { activityName: lessonPlanName, expectMetaText: "0/4 students completed" },
+            { activityName: lessonPlanName, expectMetaText: "0/4 students completed", isMetaTextPresented: false },
             { activityName: projectName, expectMetaText: "0/4 students completed" },
         ]);
 
@@ -343,7 +343,7 @@ test.describe("Course import tests", () => {
         await tester.impersonate("Jack Coles");
         await page.goto(`/homepage/${folderId.toString()}`);
         await courseOutline.checkActivityMetaText([
-            { activityName: lessonPlanName, expectMetaText: "0/4 students completed" },
+            { activityName: lessonPlanName, expectMetaText: "0/4 students completed", isMetaTextPresented: false },
             { activityName: projectName, expectMetaText: "0/4 students completed" },
         ]);
 
@@ -351,7 +351,7 @@ test.describe("Course import tests", () => {
         const dueDateToBeFormated = dayjs().add(+10, "days");
         const dateFormatted = dueDateToBeFormated.format("MMM D, YYYY");
         await courseOutline.checkActivityMetaText([
-            { activityName: lessonPlanName, expectMetaText: `Due ${dateFormatted}` },
+            { activityName: lessonPlanName, expectMetaText: `Scheduled ${dateFormatted}` },
             { activityName: projectName, expectMetaText: `Due ${dateFormatted}` },
         ]);
 
