@@ -11,7 +11,6 @@ namespace Alaress\Color;
 
 use OzdemirBurak\Iris\BaseColor;
 use OzdemirBurak\Iris\Color\Hexa;
-//use SSNepenthe\ColorUtils;
 
 /**
  * Functions for transforming colors.
@@ -39,7 +38,6 @@ class Transformer
         // TODO use relative luminance function:
         //      https://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef
         $luminance = $this->convertToIrisColor($color)->toHsl()->lightness();
-//        $luminance = ColorUtils\relative_luminance($this->convertToColorUtilsColor($color));
         return $luminance < $threshold
             ? ($light ?? Color::white())
             : ($dark ?? Color::black());
@@ -81,7 +79,6 @@ class Transformer
 
         // flatten opacity onto the background
         // This uses another SASS function flatten-alpha
-//        $flat = $this->convertToColorUtilsColor($this->flattenAlpha($translucent, $background));
         $flat = $this->convertToIrisColor($this->flattenAlpha($translucent, $background));
 
         // boost saturation
@@ -106,14 +103,6 @@ class Transformer
         return $this->convertFromIrisColor(
             $opaque->mix($this->convertToIrisColor($background), $percent),
         );
-//        $opaque  = ColorUtils\color(['alpha' => 1] + $this->convertToColorUtilsColor($color)->getHsl()->toArray());
-//        return $this->convertToAlaressColor(
-//            ColorUtils\mix(
-//                $opaque,
-//                $this->convertToColorUtilsColor($background),
-//                (int)$percent
-//            )
-//        );
     }
 
 
@@ -142,61 +131,11 @@ class Transformer
         return $this->convertFromIrisColor(
             (clone $foregroundColor)->lightness($basebackgroundColor->lightness()),
         );
-
-//        $foregroundColor     = $this->convertToColorUtilsColor($foreground);
-//        $foregroundHsl       = $foregroundColor->getHsl();
-//        $basebackgroundColor = $this->convertToColorUtilsColor(
-//            $this->calculateTextColor($foreground ?? Color::black(), $light, $dark)
-//        );
-//        $basebackgroundHsl   = $basebackgroundColor->getHsl();
-//
-//        return $this->convertToAlaressColor(
-//            ColorUtils\hsla(
-//                $foregroundHsl->getHue(),
-//                $foregroundHsl->getSaturation(),
-//                $basebackgroundHsl->getLightness(),
-//                $foregroundHsl->getAlpha()
-//            )
-//        );
     }
 
 
-//    /**
-//     * Convert an Alaress color object to a ColorUtils color object.
-//     *
-//     * @param Color $color
-//     * @return ColorUtils\Colors\Color
-//     */
-//    private function convertToColorUtilsColor(Color $color): ColorUtils\Colors\Color
-//    {
-//        return ColorUtils\rgba(
-//            $color->getRed(),
-//            $color->getGreen(),
-//            $color->getBlue(),
-//            $color->getAlpha()
-//        );
-//    }
-//
-//
-//    /**
-//     * Convert a ColorUtils color object to an Alaress color object.
-//     *
-//     * @param ColorUtils\Colors\Color $color
-//     * @return Color
-//     */
-//    private function convertToAlaressColor(ColorUtils\Colors\Color $color): Color
-//    {
-//        return new Color(
-//            ColorUtils\red($color),
-//            ColorUtils\green($color),
-//            ColorUtils\blue($color),
-//            ColorUtils\alpha($color)
-//        );
-//    }
-
-
     /**
-     * Convert an Alaress color object to a ColorUtils color object.
+     * Convert an Alaress color object to an Iris color object.
      *
      * @param Color $color
      * @return BaseColor
@@ -208,7 +147,7 @@ class Transformer
 
 
     /**
-     * Convert an Alaress color object to a ColorUtils color object.
+     * Convert an Iris color object to an Alaress color object.
      *
      * @param BaseColor $color
      * @return Color
