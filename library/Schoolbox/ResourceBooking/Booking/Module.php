@@ -11,6 +11,7 @@
 namespace Schoolbox\ResourceBooking\Booking;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
