@@ -1544,6 +1544,7 @@ class Controller extends Base
         }
 
         $resourceIds = []; // Remember the set of resourceIds to be booked.  It will be used below.
+        /** @var BookingModel $booking */
         foreach ($bookings as $booking) {
             $resourceId = $booking->getResource()->getId();
             $resourceIds[] = $resourceId;
