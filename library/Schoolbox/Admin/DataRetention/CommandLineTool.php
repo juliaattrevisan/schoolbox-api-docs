@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\DataRetention;
 
-use JetBrains\PhpStorm\NoReturn;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\GenericCollection;
@@ -299,7 +298,6 @@ class CommandLineTool extends CliTool\App
      * @param array $validStrats a list of valid strats to run, used for help text. If empty, will just show the option as is.
      * @return void
      */
-    #[NoReturn]
     private function getHelp(array $validStrats = []): void
     {
         $csvStrats = implode(', ', $validStrats);
