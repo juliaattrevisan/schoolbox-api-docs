@@ -67,7 +67,7 @@ test.describe("Dialog Agent Homepage Component", () => {
         tester.isGoingTo("create a new discussion via the empty state of the Dialog Agent component");
         const homepage = new Homepage(tester, page);
         await homepage.goto(Common.CLASS_ID_9AENG);
-        const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_ADD_COMPONENT_SECTION);
+        const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME);
         const dialogAgentComponent = new DialogAgentHomepage(page, tester, component);
         await dialogAgentComponent.clickEmptyStateCreateButton();
 
@@ -84,7 +84,8 @@ test.describe("Dialog Agent Homepage Component", () => {
 
     test("view activity in component", async ({ tester, page }) => {
         const homepage = new Homepage(tester, page);
-        const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_ADD_COMPONENT_SECTION);
+        await homepage.goto(Common.CLASS_ID_9AENG);
+        const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME);
 
         const allAssessmentsSelector = new RegExp(`^${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TITLE}`);
         const activityTitle = component.getByTestId(allAssessmentsSelector).filter({ hasText: ACTIVITY_NAME });
