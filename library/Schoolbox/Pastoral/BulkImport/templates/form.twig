@@ -226,9 +226,11 @@
         /* Get the current entry tip when modifying the record
          */
         if (subtypeDropdown.val() === null) {
-            updateExpiresAt((typesIndexEntryTip[typeDropdown.val()]).trim());
+            let typeEntryTip = typesIndexEntryTip[typeDropdown.val()];
+            updateExpiresAt(typeEntryTip != null ? typeEntryTip.trim() : null);
         } else {
-            updateExpiresAt((subtypesIndexEntryTip[subtypeDropdown.val()]).trim());
+            let subtypeEntryTip = subtypesIndexEntryTip[subtypeDropdown.val()];
+            updateExpiresAt(subtypeEntryTip != null ? subtypeEntryTip.trim() : null);
         }
         {% endif %}
         /**
@@ -236,9 +238,11 @@
          */
         function init(typeVal, subtypeVal) {
             if (null !== subtypeVal) {
-                updateExpiresAt((subtypesIndexDefaultExpiry[subtypeVal]).trim());
+                let subtypeExpiry = subtypesIndexDefaultExpiry[subtypeVal];
+                updateExpiresAt(subtypeExpiry != null ? subtypeExpiry.trim() : null);
             } else {
-                updateExpiresAt((typesIndexDefaultExpiry[typeVal]).trim());
+                let typeExpiry = typesIndexDefaultExpiry[typeVal];
+                updateExpiresAt(typeExpiry != null ? typeExpiry.trim() : null);
             }
         }
     })

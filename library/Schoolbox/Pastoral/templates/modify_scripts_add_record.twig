@@ -107,11 +107,15 @@
          */
         function init(typeVal, subtypeVal) {
             if (null !== subtypeVal) {
-                updateEntryTip((subtypesIndexEntryTip[subtypeVal]).trim());
-                updateExpiresAt((subtypesIndexDefaultExpiry[subtypeVal]).trim());
+                let subtypeEntryTip = subtypesIndexEntryTip[subtypeVal];
+                let subtypeExpiry = subtypesIndexDefaultExpiry[subtypeVal];
+                updateEntryTip(subtypeEntryTip != null ? subtypeEntryTip.trim() : null);
+                updateExpiresAt(subtypeExpiry != null ? subtypeExpiry.trim() : null);
             } else {
-                updateEntryTip((typesIndexEntryTip[typeVal]).trim());
-                updateExpiresAt((typesIndexDefaultExpiry[typeVal]).trim());
+                let typeEntryTip = typesIndexEntryTip[typeVal];
+                let typeExpiry = typesIndexDefaultExpiry[typeVal];
+                updateEntryTip(typeEntryTip != null ? typeEntryTip.trim() : null);
+                updateExpiresAt(typeExpiry != null ? typeExpiry.trim() : null);
             }
         }
 
