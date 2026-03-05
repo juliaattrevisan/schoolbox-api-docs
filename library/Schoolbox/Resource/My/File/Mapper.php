@@ -68,7 +68,7 @@ class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
     {
         return $this->findByColumnList(
             array(
-                'parent' => $nodeId,
+                'parent' => $nodeId ?: null,
                 'owner'  => $this->getSessionUserId()
             ),
             ['order' => ['description' => 'asc',],]

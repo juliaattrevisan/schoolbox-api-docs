@@ -68,7 +68,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
     public function findByParentId($nodeId)
     {
         return $this->findByColumnList([
-            'parent' => $nodeId,
+            'parent' => $nodeId ?: null,
             'owner'  => $_SESSION['id'] // TODO: FIX. DO NOT MERGE THIS
         ]);
     }
