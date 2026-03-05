@@ -95,6 +95,7 @@ const { isConfirmModifyOpen, participantsWithInteractions, onActionSelected, onC
 
 const studentWithDP = window.Vue.ref<User | null>(null);
 const studentWithDPRoute = window.Vue.ref<string>("");
+const studentWithCustomisationsRoute = window.Vue.ref<string>("");
 
 /**
  * Display the differentiation profile for a participant
@@ -102,6 +103,7 @@ const studentWithDPRoute = window.Vue.ref<string>("");
  */
 function onViewDP(participant: Participant): void {
     studentWithDPRoute.value = participant._links.differentiationProfile ?? "";
+    studentWithCustomisationsRoute.value = participant._links.customisationRecord ?? "";
     studentWithDP.value = participant.user;
 }
 
@@ -182,7 +184,11 @@ function onViewSuggestedCustomisation(participant: Participant): void {
             @open-include-in-existing-modal="openIncludeInExistingModal"
         />
     </div>
-    <view-dp-modal v-model:student="studentWithDP" :route="studentWithDPRoute" />
+    <view-dp-modal
+        v-model:student="studentWithDP"
+        :dp-route="studentWithDPRoute"
+        :customisations-route="studentWithCustomisationsRoute"
+    />
     <cp-include-in-existing-modal
         v-model:is-open="isIncludeInExistingOpen"
         v-model:selected-activity-id="includeInExistingActivityId"

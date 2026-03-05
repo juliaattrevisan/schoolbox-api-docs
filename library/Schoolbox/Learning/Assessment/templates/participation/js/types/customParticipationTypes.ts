@@ -86,5 +86,6 @@ export type Participant = {
         exclude: string;
         include: string;
         differentiationProfile: string | null;
+        customisationRecord: string | null;
     };
 };

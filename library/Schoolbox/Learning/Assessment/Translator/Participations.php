@@ -115,6 +115,12 @@ class Participations
                         'studentId' => $participant->getId()
                     ],
                 ),
+                'customisationRecord' => $this->getRouteIfAuthorized(
+                    'customisationRecord.viewRecordByStudent',
+                    [
+                        'studentId' => $participant->getId()
+                    ],
+                ),
             ]
         ];
     }

@@ -297,6 +297,7 @@ export default {
             locale: locale,
             studentWithDP: null,
             studentWithDPRoute: "",
+            studentWithCustomisationsRoute: "",
         };
     },
     mounted: function () {
@@ -496,6 +497,7 @@ export default {
          */
         onDPSelected(student) {
             this.studentWithDPRoute = student._links.differentiationProfile ?? "";
+            this.studentWithCustomisationsRoute = student._links.customisationRecord ?? "";
             this.studentWithDP = student;
         },
     },
@@ -837,5 +839,9 @@ export default {
             </div>
         </div>
     </div>
-    <view-dp-modal v-model:student="studentWithDP" :route="studentWithDPRoute" />
+    <view-dp-modal
+        v-model:student="studentWithDP"
+        :dp-route="studentWithDPRoute"
+        :customisations-route="studentWithCustomisationsRoute"
+    />
 </template>

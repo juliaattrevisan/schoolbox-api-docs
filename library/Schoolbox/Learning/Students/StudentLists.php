@@ -274,6 +274,11 @@ class StudentLists
                 $this->routeGenerator->generate('differentiationProfiles.viewDifferentiationProfileData', $dpRouteParam) :
                 null;
 
+        $studentSisRecord['_links']['customisationRecord'] =
+            $this->authorizer->isPathAuthorizedForUser('customisationRecord.viewRecordByStudent', ['studentId' => $user->getId()], $this->viewer) ?
+                $this->routeGenerator->generate('customisationRecord.viewRecordByStudent', ['studentId' => $user->getId()]) :
+                null;
+
         return $studentSisRecord;
     }
 }

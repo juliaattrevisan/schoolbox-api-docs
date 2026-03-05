@@ -82,7 +82,6 @@ class Module extends BaseModule
                 $this->injector->get('user')
             ),
             $this->getMapperFactory()->get(\Schoolbox\DifferentiationProfile\Mapper::class),
-            $this->getMapperFactory()->get(\Schoolbox\CustomisationRecord\Mapper::class),
         );
     }
 
