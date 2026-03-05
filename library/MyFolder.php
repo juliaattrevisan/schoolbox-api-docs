@@ -55,51 +55,6 @@ class MyFolder extends DeprecatedModel
         return $this->db->query($query, $params)->fetchAll();
     }
 
-
-    /**
-     * @param int $id
-     * @return mixed
-     */
-    public function getParent($id)
-    {
-        $query = "SELECT parent FROM " . $this->_table . " WHERE id = " . (int)$id;
-        return $this->db->query($query)->fetchColumn();
-    }
-
-
-    /**
-     * @param int $folderID
-     * @return array|bool
-     */
-    public function getFolderNode($folderID = 0)
-    {
-
-        // get folder contents
-        $folderList = $this->getFolderList($folderID);
-
-        if ($folderID > 0) {
-            // get parent folder contents
-            $siblingList = $this->getFolderNode($this->getParent($folderID));
-
-            if (is_array($folderList)) {
-                // find index of parent node in siblingList
-                $total = count($siblingList);
-                for ($i = 0; $i < $total; $i++) {
-                    if ($siblingList[$i]['id'] == $folderID) {
-                        break;
-                    }
-                }
-
-                // insert folder contents next to parent node
-                array_splice($siblingList, $i + 1, 0, $folderList);
-            }
-            return $siblingList;
-        } else {
-            return $folderList;
-        }
-    }
-
-
     /**
      * @param int  $folderID
      * @param int  $depth
