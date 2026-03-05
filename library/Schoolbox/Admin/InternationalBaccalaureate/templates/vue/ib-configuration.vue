@@ -30,8 +30,8 @@ const saveError = window.Vue.ref<string | null>(null);
 
 // Form change tracking for save button
 const hasFormChanges = window.Vue.ref<boolean>(false);
-const originalValues = window.Vue.ref<{[key: string]: string}>({});
-const currentValues = window.Vue.ref<{[key: string]: string}>({});
+const originalValues = window.Vue.ref<{ [key: string]: string }>({});
+const currentValues = window.Vue.ref<{ [key: string]: string }>({});
 const saveContainer = window.Vue.ref(null);
 const isAtBottomOfPage = window.Vue.ref<boolean>(false);
 
@@ -39,48 +39,49 @@ const isAtBottomOfPage = window.Vue.ref<boolean>(false);
 const showSaveButton = window.Vue.computed(() => hasFormChanges.value || isAtBottomOfPage.value);
 
 // Computed property to check if current tab is general config
-const isGeneralConfigTab = window.Vue.computed(() => 
-    currentCategory.value.name.toLowerCase().includes('general') || 
-    currentCategory.value.name.toLowerCase().includes('config')
+const isGeneralConfigTab = window.Vue.computed(
+    () =>
+        currentCategory.value.name.toLowerCase().includes("general") ||
+        currentCategory.value.name.toLowerCase().includes("config"),
 );
 
 // Define IB subjects mapped by category name (tab name)
-const ibSubjectsByCategory: Record<string, Array<{subject: string, level: string}>> = {
+const ibSubjectsByCategory: Record<string, Array<{ subject: string; level: string }>> = {
     // Multiple possible variations of Studies in Language and Literature
     "studies-in-language-and-literature": [
         { subject: "Language A: literature", level: "SL" },
         { subject: "Language A: literature", level: "HL" },
         { subject: "Language A: language and literature", level: "SL" },
         { subject: "Language A: language and literature", level: "HL" },
-        { subject: "Literature and performance", level: "SL" }
+        { subject: "Literature and performance", level: "SL" },
     ],
     "studies in language and literature": [
         { subject: "Language A: literature", level: "SL" },
         { subject: "Language A: literature", level: "HL" },
         { subject: "Language A: language and literature", level: "SL" },
         { subject: "Language A: language and literature", level: "HL" },
-        { subject: "Literature and performance", level: "SL" }
+        { subject: "Literature and performance", level: "SL" },
     ],
     "language and literature": [
         { subject: "Language A: literature", level: "SL" },
         { subject: "Language A: literature", level: "HL" },
         { subject: "Language A: language and literature", level: "SL" },
         { subject: "Language A: language and literature", level: "HL" },
-        { subject: "Literature and performance", level: "SL" }
+        { subject: "Literature and performance", level: "SL" },
     ],
     "language-acquisition": [
         { subject: "Classical languages", level: "SL" },
         { subject: "Classical languages", level: "HL" },
         { subject: "Language Ab initio", level: "SL" },
         { subject: "Language B", level: "SL" },
-        { subject: "Language B", level: "HL" }
+        { subject: "Language B", level: "HL" },
     ],
     "language acquisition": [
         { subject: "Classical languages", level: "SL" },
         { subject: "Classical languages", level: "HL" },
         { subject: "Language Ab initio", level: "SL" },
         { subject: "Language B", level: "SL" },
-        { subject: "Language B", level: "HL" }
+        { subject: "Language B", level: "HL" },
     ],
     "individuals-and-societies": [
         { subject: "Business management", level: "SL" },
@@ -104,7 +105,7 @@ const ibSubjectsByCategory: Record<string, Array<{subject: string, level: string
         { subject: "Psychology", level: "HL" },
         { subject: "Social and cultural anthropology", level: "SL" },
         { subject: "Social and cultural anthropology", level: "HL" },
-        { subject: "World religions", level: "SL" }
+        { subject: "World religions", level: "SL" },
     ],
     "individuals and societies": [
         { subject: "Business management", level: "SL" },
@@ -128,9 +129,9 @@ const ibSubjectsByCategory: Record<string, Array<{subject: string, level: string
         { subject: "Psychology", level: "HL" },
         { subject: "Social and cultural anthropology", level: "SL" },
         { subject: "Social and cultural anthropology", level: "HL" },
-        { subject: "World religions", level: "SL" }
+        { subject: "World religions", level: "SL" },
     ],
-    "sciences": [
+    sciences: [
         { subject: "Biology", level: "SL" },
         { subject: "Biology", level: "HL" },
         { subject: "Chemistry", level: "SL" },
@@ -144,13 +145,13 @@ const ibSubjectsByCategory: Record<string, Array<{subject: string, level: string
         { subject: "Physics", level: "SL" },
         { subject: "Physics", level: "HL" },
         { subject: "Sports, exercise and health science", level: "SL" },
-        { subject: "Sports, exercise and health science", level: "HL" }
+        { subject: "Sports, exercise and health science", level: "HL" },
     ],
-    "mathematics": [
+    mathematics: [
         { subject: "Analysis and approaches", level: "SL" },
         { subject: "Analysis and approaches", level: "HL" },
         { subject: "Applications and interpretation", level: "SL" },
-        { subject: "Applications and interpretation", level: "HL" }
+        { subject: "Applications and interpretation", level: "HL" },
     ],
     "the-arts": [
         { subject: "Dance", level: "SL" },
@@ -162,7 +163,7 @@ const ibSubjectsByCategory: Record<string, Array<{subject: string, level: string
         { subject: "Theatre", level: "SL" },
         { subject: "Theatre", level: "HL" },
         { subject: "Visual arts", level: "SL" },
-        { subject: "Visual arts", level: "HL" }
+        { subject: "Visual arts", level: "HL" },
     ],
     "the arts": [
         { subject: "Dance", level: "SL" },
@@ -174,9 +175,9 @@ const ibSubjectsByCategory: Record<string, Array<{subject: string, level: string
         { subject: "Theatre", level: "SL" },
         { subject: "Theatre", level: "HL" },
         { subject: "Visual arts", level: "SL" },
-        { subject: "Visual arts", level: "HL" }
+        { subject: "Visual arts", level: "HL" },
     ],
-    "arts": [
+    arts: [
         { subject: "Dance", level: "SL" },
         { subject: "Dance", level: "HL" },
         { subject: "Music", level: "SL" },
@@ -186,8 +187,8 @@ const ibSubjectsByCategory: Record<string, Array<{subject: string, level: string
         { subject: "Theatre", level: "SL" },
         { subject: "Theatre", level: "HL" },
         { subject: "Visual arts", level: "SL" },
-        { subject: "Visual arts", level: "HL" }
-    ]
+        { subject: "Visual arts", level: "HL" },
+    ],
 };
 
 // Computed property to get table rows for subject tabs
@@ -195,34 +196,32 @@ const tableRows = window.Vue.computed(() => {
     if (isGeneralConfigTab.value) {
         return [];
     }
-    
+
     // If we have configurations, use those as the base
     if (currentConfigurations.value.length > 0) {
         return currentConfigurations.value;
     }
-    
+
     // Get subjects for the current category by name
     const categoryName = currentCategory.value.name.toLowerCase();
-    
+
     // Debug: Check what category names we're actually getting
-    if (process.env.NODE_ENV === 'development') {
-        console.info('Current category name:', categoryName);
-        console.info('Category title:', currentCategory.value.title);
-        console.info('Available mapping keys:', Object.keys(ibSubjectsByCategory));
-    }
-    
+    console.info("Current category name:", categoryName);
+    console.info("Category title:", currentCategory.value.title);
+    console.info("Available mapping keys:", Object.keys(ibSubjectsByCategory));
+
     const subjects = ibSubjectsByCategory[categoryName] || [];
-    
+
     // Create table rows from IB subjects
     return subjects.map((subjectData, index) => ({
         id: index + 1, // Use numeric ID for compatibility
         key: `${categoryName}_subject_${index}`,
         categoryId: currentCategory.value.id,
-        value: '',
+        value: "",
         label: `${subjectData.subject} (${subjectData.level})`,
-        type: 'text',
+        type: "text",
         defaultSubject: subjectData.subject,
-        defaultLevel: subjectData.level
+        defaultLevel: subjectData.level,
     }));
 });
 
@@ -233,7 +232,9 @@ function initIntersectionObserver(): void {
     const intersectionObserver = new IntersectionObserver((elements) => {
         isAtBottomOfPage.value = elements[0].intersectionRatio !== 0;
     });
-    intersectionObserver.observe(saveContainer.value);
+    if (saveContainer.value) {
+        intersectionObserver.observe(saveContainer.value);
+    }
 }
 
 /**
@@ -244,26 +245,26 @@ function initFormTracking(): void {
     hasFormChanges.value = false;
     originalValues.value = {};
     currentValues.value = {};
-    
+
     // Store initial values
     currentConfigurations.value.forEach((config) => {
         const key = config.key;
         originalValues.value[key] = config.value || "";
         currentValues.value[key] = config.value || "";
-        
+
         // For subject tabs, initialize table field values
         if (!isGeneralConfigTab.value) {
-            originalValues.value[key + '_subject'] = "";
-            originalValues.value[key + '_level'] = "SL";
-            originalValues.value[key + '_languages'] = "";
-            originalValues.value[key + '_class_code'] = "";
-            originalValues.value[key + '_student_count'] = "0";
-            
-            currentValues.value[key + '_subject'] = "";
-            currentValues.value[key + '_level'] = "SL";
-            currentValues.value[key + '_languages'] = "";
-            currentValues.value[key + '_class_code'] = "";
-            currentValues.value[key + '_student_count'] = "0";
+            originalValues.value[key + "_subject"] = "";
+            originalValues.value[key + "_level"] = "SL";
+            originalValues.value[key + "_languages"] = "";
+            originalValues.value[key + "_class_code"] = "";
+            originalValues.value[key + "_student_count"] = "0";
+
+            currentValues.value[key + "_subject"] = "";
+            currentValues.value[key + "_level"] = "SL";
+            currentValues.value[key + "_languages"] = "";
+            currentValues.value[key + "_class_code"] = "";
+            currentValues.value[key + "_student_count"] = "0";
         }
     });
 }
@@ -275,10 +276,10 @@ function initFormTracking(): void {
  */
 function onInputChange(config: IBConfiguration, newValue: string): void {
     currentValues.value[config.key] = newValue;
-    
+
     // Check if any values have changed from original
     hasFormChanges.value = Object.keys(originalValues.value).some(
-        key => originalValues.value[key] !== currentValues.value[key]
+        (key) => originalValues.value[key] !== currentValues.value[key],
     );
 }
 
@@ -289,26 +290,27 @@ async function saveCurrentTabChanges(): Promise<void> {
     if (!hasFormChanges.value || !props.saveEndpoint) {
         return;
     }
-    
+
     try {
         isSaving.value = true;
         saveError.value = null;
-        
+
         // Find changed configurations for the current category only
-        const changedConfigs = currentConfigurations.value.filter(config => 
-            config.categoryId === currentCategory.value.id &&
-            originalValues.value[config.key] !== currentValues.value[config.key]
+        const changedConfigs = currentConfigurations.value.filter(
+            (config) =>
+                config.categoryId === currentCategory.value.id &&
+                originalValues.value[config.key] !== currentValues.value[config.key],
         );
-        
+
         if (changedConfigs.length === 0) {
             hasFormChanges.value = false;
             return;
         }
-        
+
         // Save each changed configuration for current tab
         for (const config of changedConfigs) {
             const newValue = currentValues.value[config.key];
-            
+
             const response = await fetch(props.saveEndpoint, {
                 method: "POST",
                 headers: {
@@ -319,39 +321,38 @@ async function saveCurrentTabChanges(): Promise<void> {
                     id: config.id,
                     key: config.key,
                     value: newValue,
-                    categoryId: config.categoryId
+                    categoryId: config.categoryId,
                 }),
             });
-            
+
             if (!response.ok) {
                 const errorMessage = await extractErrorMessage(response);
                 throw new Error(errorMessage);
             }
-            
+
             // Update the local state
             config.value = newValue;
             originalValues.value[config.key] = newValue;
         }
-        
+
         // Check if there are still changes in other tabs
-        const hasOtherTabChanges = Object.keys(originalValues.value).some(
-            key => {
-                const config = currentConfigurations.value.find(c => c.key === key);
-                return config && 
-                       config.categoryId !== currentCategory.value.id &&
-                       originalValues.value[key] !== currentValues.value[key];
-            }
-        );
-        
+        const hasOtherTabChanges = Object.keys(originalValues.value).some((key) => {
+            const config = currentConfigurations.value.find((c) => c.key === key);
+            return (
+                config &&
+                config.categoryId !== currentCategory.value.id &&
+                originalValues.value[key] !== currentValues.value[key]
+            );
+        });
+
         // Reset form change tracking if no other tabs have changes
         if (!hasOtherTabChanges) {
             hasFormChanges.value = false;
         }
-        
+
         // Show success message
         const toast = window.sbProps.toastActivate(`${currentCategory.value.title} configuration saved successfully`);
         toast.timeout({ text: "Saved" });
-        
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
             saveError.value = error.message;
@@ -371,31 +372,30 @@ async function loadCategoryConfigurations(): Promise<void> {
     if (!props.configurationEndpoint) {
         return;
     }
-    
+
     try {
         isLoading.value = true;
         loadError.value = null;
-        
+
         const url = props.configurationEndpoint.replace("{categoryId}", currentCategory.value.id.toString());
         const response = await fetch(url, {
             headers: {
                 Accept: "application/json",
             },
         });
-        
+
         if (!response.ok) {
             const errorMessage = await extractErrorMessage(response);
             throw new Error(errorMessage);
         }
-        
+
         const responseJson = (await response.json()) as IBConfiguration[];
         if (responseJson === null || !Array.isArray(responseJson)) {
             throw new Error("Unexpected response format");
         }
-        
+
         currentConfigurations.value = responseJson;
         initFormTracking();
-        
     } catch (error) {
         if (isAbortError(error)) {
             return;
@@ -408,7 +408,6 @@ async function loadCategoryConfigurations(): Promise<void> {
         isLoading.value = false;
     }
 }
-
 
 /**
  * Handle category selection, update URL and load configurations.
@@ -438,9 +437,9 @@ window.Vue.onMounted((): void => {
         }
     }
     void loadCategoryConfigurations();
-    
+
     // Initialize intersection observer for bottom drawer
-    window.Vue.nextTick(() => {
+    void window.Vue.nextTick(() => {
         initIntersectionObserver();
     });
 });
@@ -454,10 +453,7 @@ window.Vue.onMounted((): void => {
                 :key="category.id"
                 :class="{ active: currentCategory.name === category.name }"
             >
-                <a
-                    :data-test="`ib-configuration-tab-${category.name}`"
-                    @click="onCategorySelected(category)"
-                >
+                <a :data-test="`ib-configuration-tab-${category.name}`" @click="onCategorySelected(category)">
                     {{ category.title }}
                 </a>
             </dd>
@@ -480,7 +476,7 @@ window.Vue.onMounted((): void => {
                         No configurations available for {{ currentCategory.title }}.
                     </div>
 
-                    <form @submit.prevent="void 0" class="c-island">
+                    <form class="c-island" @submit.prevent="void 0">
                         <div v-for="config in currentConfigurations" :key="config.id" class="form-row">
                             <label :for="`config-${config.key}`" class="form-label">
                                 {{ config.label }}
@@ -489,21 +485,21 @@ window.Vue.onMounted((): void => {
                                 </span>
                             </label>
                             <div class="form-field">
-                                <input 
+                                <input
                                     :id="`config-${config.key}`"
                                     :type="config.type"
                                     :value="currentValues[config.key] || config.value"
                                     :data-test="`ib-configuration-input-${config.key}`"
                                     class="form-control"
-                                    @input="(event) => onInputChange(config, (event.target as HTMLInputElement).value)"
                                     :disabled="isSaving"
+                                    @input="(event) => onInputChange(config, (event.target as HTMLInputElement).value)"
                                 />
                                 <small v-if="config.description" class="form-help">
                                     {{ config.description }}
                                 </small>
                             </div>
                         </div>
-                        
+
                         <div v-if="saveError" class="alert alert-box alert">
                             <i class="fa fa-exclamation-triangle"></i>
                             {{ saveError }}
@@ -532,55 +528,93 @@ window.Vue.onMounted((): void => {
                             <tbody>
                                 <tr v-for="config in tableRows" :key="config.id">
                                     <td>
-                                        <input 
-                                            :value="currentValues[config.key + '_subject'] || (config as any).defaultSubject || ''"
-                                            @input="(event) => onInputChange({...config, key: config.key + '_subject'}, (event.target as HTMLInputElement).value)"
+                                        <input
+                                            :value="
+                                                currentValues[config.key + '_subject'] ||
+                                                (config as any).defaultSubject ||
+                                                ''
+                                            "
                                             class="table-input"
                                             placeholder="Subject name"
                                             :disabled="isSaving"
+                                            @input="
+                                                (event) =>
+                                                    onInputChange(
+                                                        { ...config, key: config.key + '_subject' },
+                                                        (event.target as HTMLInputElement).value,
+                                                    )
+                                            "
                                         />
                                     </td>
                                     <td>
-                                        <input 
-                                            :value="currentValues[config.key + '_level'] || (config as any).defaultLevel || ''"
-                                            @input="(event) => onInputChange({...config, key: config.key + '_level'}, (event.target as HTMLInputElement).value)"
+                                        <input
+                                            :value="
+                                                currentValues[config.key + '_level'] ||
+                                                (config as any).defaultLevel ||
+                                                ''
+                                            "
                                             class="table-input"
                                             placeholder="SL/HL"
                                             :disabled="isSaving"
+                                            @input="
+                                                (event) =>
+                                                    onInputChange(
+                                                        { ...config, key: config.key + '_level' },
+                                                        (event.target as HTMLInputElement).value,
+                                                    )
+                                            "
                                         />
                                     </td>
                                     <td>
-                                        <input 
+                                        <input
                                             :value="currentValues[config.key + '_languages'] || ''"
-                                            @input="(event) => onInputChange({...config, key: config.key + '_languages'}, (event.target as HTMLInputElement).value)"
                                             class="table-input"
                                             placeholder="e.g., English, Spanish"
                                             :disabled="isSaving"
+                                            @input="
+                                                (event) =>
+                                                    onInputChange(
+                                                        { ...config, key: config.key + '_languages' },
+                                                        (event.target as HTMLInputElement).value,
+                                                    )
+                                            "
                                         />
                                     </td>
                                     <td>
-                                        <input 
+                                        <input
                                             :value="currentValues[config.key + '_class_code'] || ''"
-                                            @input="(event) => onInputChange({...config, key: config.key + '_class_code'}, (event.target as HTMLInputElement).value)"
                                             class="table-input"
                                             placeholder="Class code"
                                             :disabled="isSaving"
+                                            @input="
+                                                (event) =>
+                                                    onInputChange(
+                                                        { ...config, key: config.key + '_class_code' },
+                                                        (event.target as HTMLInputElement).value,
+                                                    )
+                                            "
                                         />
                                     </td>
                                     <td>
-                                        <input 
+                                        <input
                                             :value="currentValues[config.key + '_student_count'] || '0'"
-                                            @input="(event) => onInputChange({...config, key: config.key + '_student_count'}, (event.target as HTMLInputElement).value)"
                                             class="table-input"
                                             type="number"
                                             min="0"
                                             :disabled="isSaving"
+                                            @input="
+                                                (event) =>
+                                                    onInputChange(
+                                                        { ...config, key: config.key + '_student_count' },
+                                                        (event.target as HTMLInputElement).value,
+                                                    )
+                                            "
                                         />
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
-                        
+
                         <div v-if="saveError" class="alert alert-box alert">
                             <i class="fa fa-exclamation-triangle"></i>
                             {{ saveError }}
@@ -589,14 +623,14 @@ window.Vue.onMounted((): void => {
                 </div>
             </div>
         </section>
-        
-        <div class="save-container" ref="saveContainer">
-            <bottom-drawer :showDrawer="showSaveButton">
-                <input 
-                    type="submit" 
-                    value="Save" 
-                    @click="saveCurrentTabChanges"
+
+        <div ref="saveContainer" class="save-container">
+            <bottom-drawer :show-drawer="showSaveButton">
+                <input
+                    type="submit"
+                    value="Save"
                     :disabled="isSaving || !hasFormChanges"
+                    @click="saveCurrentTabChanges"
                 />
             </bottom-drawer>
         </div>
