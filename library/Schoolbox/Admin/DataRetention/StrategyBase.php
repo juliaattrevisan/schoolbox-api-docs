@@ -165,4 +165,10 @@ abstract class StrategyBase implements IStrategy
      * @throws \Schoolbox\Mapper\Exception
      */
     abstract protected function deleteChunk(array $chunk): void;
+
+    /**
+     * Get the strategy name, this is used to identify the strategy in the command line tool, e.g. 'cmslog'
+     * @return string
+     */
+    abstract public function getStrategyName(): string;
 }

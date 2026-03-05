@@ -34,4 +34,10 @@ interface IStrategy
      * @return string
      */
     public function getRetentionLabel(): string;
+
+    /**
+     * Get the strategy name, this is used to identify the strategy in the command line tool, e.g. 'cmslog'
+     * @return string
+     */
+    public function getStrategyName(): string;
 }

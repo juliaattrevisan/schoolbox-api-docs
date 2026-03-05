@@ -30,6 +30,11 @@ class MomentsRetention extends StrategyBase
         return 'Learning Moment Retention';
     }
 
+        public function getStrategyName(): string
+        {
+            return 'moments';
+        }
+
     /**
      * Find out if we have any data to delete, if not, we can exit early and save resources
      * @return bool

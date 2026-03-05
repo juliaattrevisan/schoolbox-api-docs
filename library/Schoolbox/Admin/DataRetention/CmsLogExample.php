@@ -33,6 +33,11 @@ class CmsLogExample extends StrategyBase
         return 'CMSLog Retention - This is an example strategy';
     }
 
+    public function getStrategyName(): string
+    {
+        return 'cmslog';
+    }
+
     protected function hasDataToDelete(): bool
     {
         // find how cmsLog Entries are stored in the database
