@@ -8,18 +8,21 @@
 {% endblock filterComponent %}
 
 {% block userOptions %}
-    {# Empty input is required so that filter works if not user-configurable, or
-       nothing is selected #}
     <li>
-        <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
-
         {% if isUserConfigurable %}
-            <input type="text"
-                placeholder="Enter a full or partial student name"
-                name="filter_selection[{{ definition.filter.id }}][]"
-                value="{{ searchQuery }}"
-                data-value-default="" />
+            <sbx-search-select
+                    id="studentSearch"
+                    label="Search"
+                    label-id="Search"
+                    form-value-name="filter_selection[{{ definition.filter.id }}][]"
+                    endpoint="/ajax/user.php?roleTypeID=student&"
+                    :selected-default="[]"
+                    placeholder="Search for students...">
+            </sbx-search-select>
         {% else %}
+            {# Empty input is required so that filter works if not user-configurable, or
+            nothing is selected #}
+            <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
             {{ parent() }}
         {% endif %}
     </li>

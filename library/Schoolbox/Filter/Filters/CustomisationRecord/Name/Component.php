@@ -32,7 +32,8 @@ class Component extends BaseComponent
         foreach (($this->getUrlOverrides() ?? []) as $override) {
             $searchQueryParts[] = $override->getKey();
         }
-        $context['searchQuery'] = implode(' ', $searchQueryParts);
+//        $context['searchQuery'] = implode(' ', $searchQueryParts);
+        $context['searchQuery'] = $searchQueryParts;
 
         return $context;
     }

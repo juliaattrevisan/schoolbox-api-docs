@@ -485,6 +485,7 @@ Usage:
                         queryArgs.push(filterId + '='); // empty filter selection syntax
                     } else {
                         for (optionKey in selections) {
+                            console.log(selections)
                             if (selections.hasOwnProperty(optionKey)) {
                                 queryArgs.push(filterId + '[' + optionKey + ']=' + selections[optionKey]); // filter option selected syntax
                             }
