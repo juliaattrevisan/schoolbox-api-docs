@@ -41,7 +41,6 @@ class MyFolder extends DeprecatedModel
      */
     public function getFolderList($parent = 0)
     {
-        $quoter = $this->db->getQuoter();
         $params = [
             $_SESSION['id'],
             $parent
@@ -49,7 +48,7 @@ class MyFolder extends DeprecatedModel
         $query = "SELECT * FROM `myFolder`
          WHERE
             `owner` = ?
-            AND `parent` = ?
+            AND COALESCE(`parent`, 0) = ?
             AND `deleted_at` is null
         ";
         return $this->db->query($query, $params)->fetchAll();
@@ -102,7 +101,7 @@ class MyFolder extends DeprecatedModel
     {
         $query = "SELECT f.id as children
                   FROM myFolder f
-                  WHERE parent = ?
+                  WHERE COALESCE(`parent`, 0) = ?
                   LIMIT 1";
 
         return $this->db->query($query, [$folderID])->fetchColumn();
