@@ -203,7 +203,7 @@ class Factory
      *
      * (Reporting activity specific)
      */
-    private ?array $supportingDataRange = null;
+    private ?string $supportingDataRange = null;
 
 
     /**
@@ -253,7 +253,7 @@ class Factory
      * (Reporting activity specific)
      * @var bool|null
      */
-    private ?bool $supportingDataMegamarkboook = null;
+    private ?bool $supportingDataMegamarkbook = null;
 
 
     /**
@@ -490,13 +490,13 @@ class Factory
          * as mark types, grade groups, etc. Reporting-specific stuff is namespaced in the ui, unsurprisingly, in a node
          * called "reporting".
          */
+        $this->setFeedbackCommentsEnable('on' === ($post['reporting']['comments']['enable'] ?? null));
         $this->setSupportingDataEnable('on' === ($post['reporting']['supporting']['enable'] ?? null));
         $this->setSupportingDataRange($post['reporting']['supporting']['range'] ?? null);
         $this->setSupportingDataCurriculumNodes(explode(',', $post['reporting']['supporting']['curriculumNodes'][0] ?? []));
         $this->setSupportingDataFolders($post['reporting']['supporting']['folders'] ?? null);
         $this->setSupportingDataWorkTypes($post['reporting']['supporting']['workTypes'] ?? null);
-        $this->setSupportingDataMegamarkboook('on' === ($post['reporting']['supporting']['megamarkbook'] ?? null));
-        $this->setFeedbackCommentsEnable('on' === ($post['reporting']['comments']['enable'] ?? null));
+        $this->setSupportingDataMegamarkbook('on' === ($post['reporting']['supporting']['megamarkbook'] ?? null));
 
         /* TODO Explain what this thing means: custom fields, line items, what it's supposed to be doing here
          */
@@ -707,7 +707,7 @@ class Factory
                 $this->getSupportingDataCurriculumNodes(),
                 $this->getSupportingDataFolders(),
                 $this->getSupportingDataWorkTypes(),
-                $this->getSupportingDataMegamarkboook(),
+                $this->getSupportingDataMegamarkbook(),
             );
         } else {
             throw new DomainException('Please select an assessment type');
@@ -1206,19 +1206,19 @@ class Factory
 
 
     /**
-     * @return array|null
+     * @return string|null
      */
-    public function getSupportingDataRange(): ?array
+    public function getSupportingDataRange(): ?string
     {
         return $this->supportingDataRange;
     }
 
 
     /**
-     * @param array|null $supportingDataRange
+     * @param string|null $supportingDataRange
      * @return $this
      */
-    public function setSupportingDataRange(?array $supportingDataRange): self
+    public function setSupportingDataRange(?string $supportingDataRange): self
     {
         $this->supportingDataRange = $supportingDataRange;
         return $this;
@@ -1288,19 +1288,19 @@ class Factory
     /**
      * @return bool|null
      */
-    public function getSupportingDataMegamarkboook(): ?bool
+    public function getSupportingDataMegamarkbook(): ?bool
     {
-        return $this->supportingDataMegamarkboook;
+        return $this->supportingDataMegamarkbook;
     }
 
 
     /**
-     * @param bool|null $supportingDataMegamarkboook
+     * @param bool|null $supportingDataMegamarkbook
      * @return $this
      */
-    public function setSupportingDataMegamarkboook(?bool $supportingDataMegamarkboook): self
+    public function setSupportingDataMegamarkbook(?bool $supportingDataMegamarkbook): self
     {
-        $this->supportingDataMegamarkboook = $supportingDataMegamarkboook;
+        $this->supportingDataMegamarkbook = $supportingDataMegamarkbook;
         return $this;
     }
 

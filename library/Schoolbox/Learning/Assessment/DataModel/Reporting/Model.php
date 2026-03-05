@@ -111,6 +111,14 @@ class Model implements IAssessableDataModel, ISoftDeletable
 
 
     /**
+     * An int corresponding to one of the date range options in the ui
+     *
+     * @var string|null
+     */
+    private ?string $supportingDataRange = null;
+
+
+    /**
      * @return MarkType|null
      */
     public function getInstructorMarkType(): ?MarkType
@@ -286,6 +294,26 @@ class Model implements IAssessableDataModel, ISoftDeletable
     public function setSupportingDataEnable(?bool $supportingDataEnable): self
     {
         $this->supportingDataEnable = $supportingDataEnable;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getSupportingDataRange(): ?string
+    {
+        return $this->supportingDataRange;
+    }
+
+
+    /**
+     * @param string|null $supportingDataRange
+     * @return $this
+     */
+    public function setSupportingDataRange(?string $supportingDataRange): self
+    {
+        $this->supportingDataRange = $supportingDataRange;
         return $this;
     }
 }

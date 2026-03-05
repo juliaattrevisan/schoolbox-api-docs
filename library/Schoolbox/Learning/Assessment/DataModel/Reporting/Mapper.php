@@ -42,10 +42,10 @@ class Mapper extends \Schoolbox\Mapper
         $this->joins('grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'gradeGroup', 'grade_group');
         $this->uses('instructor_max_mark', self::TYPE_DECIMAL);
         $this->uses('max_mark', self::TYPE_DECIMAL);
-
-        /* Mark Visibility
-         */
         $this->uses('mark_visibility', self::TYPE_INTEGER);
+        $this->uses('feedback_comments_enable', self::TYPE_BOOLEAN);
+        $this->uses('supporting_data_enable', self::TYPE_BOOLEAN);
+        $this->uses('supporting_data_range', self::TYPE_STRING);
 
         /* Auditor fields
          */

@@ -9,13 +9,18 @@ CREATE TABLE `reporting` (
     `instructor_max_mark` DECIMAL(14, 11),
     `max_mark` DECIMAL(14, 11),
     `mark_visibility` TINYINT,
+    `feedback_comments_enable` TINYINT COMMENT 'a toggle: if enabled, staff can write comments in their reporting feedbacks',
     `supporting_data_enable` TINYINT COMMENT 'Supporting Data section is shown',
-    `period_current` TINYINT COMMENT 'Current academic period',
-    `period_previous` TINYINT COMMENT 'Previous academic period',
-    `period_1_year` TINYINT COMMENT '1 year in the past',
+    -- I cannot think of a succinct way to summarise these date ranges; sry for long enum values
+    `supporting_data_range` ENUM(
+        'current_academic_period',
+        'previous_academic_period',
+        'current_and_previous_academic_period',
+        'current_academic_year',
+        'current_and_previous_academic_year'
+    '') COMMENT 'These translate into from/to date range for supporting data',
     `folder_restriction` ENUM('current_only', 'any_folder') COMMENT 'corresponds to "the students in my folder specifically", or "any folder where my students had a published feedback"',
     `show_markbook` TINYINT COMMENT 'a toggle: if enabled, the minimal mega markbook is generated',
-    `feedback_comments_enable` TINYINT COMMENT 'a toggle: if enabled, staff can write comments in their reporting feedbacks',
     `created_at` DATETIME NOT NULL,
     `created_by` INT UNSIGNED NOT NULL,
     `updated_at` DATETIME NOT NULL,

@@ -38,7 +38,7 @@ class Decorator implements DecoratorInterface
         private ?float $instructorMaxMark,
         private ?bool $feedbackCommentsEnable,
         private ?bool $supportingDataEnable,
-        private ?array $supportingDataDateRange,
+        private ?string $supportingDataRange,
         private ?array $supportingDataCurriculumNodes,
         private ?array $supportingDataFolders,
         private ?array $supportingDataWorkTypes,
@@ -110,6 +110,7 @@ class Decorator implements DecoratorInterface
          */
         $assessment->setFeedbackCommentsEnable($this->feedbackCommentsEnable);
         $assessment->setSupportingDataEnable($this->supportingDataEnable);
+        $assessment->setSupportingDataRange($this->supportingDataRange);
 
         // supporting data enable
         // supporting data range

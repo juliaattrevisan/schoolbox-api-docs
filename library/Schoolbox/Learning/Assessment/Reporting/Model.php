@@ -103,6 +103,14 @@ class Model extends AbstractAssessment
 
 
     /**
+     * A string corresponding to one of the date range options in the ui
+     *
+     * @var string|null
+     */
+    private ?string $supportingDataRange = null;
+
+
+    /**
      * The user who created this activity
      *
      * @var User|null
@@ -520,6 +528,26 @@ class Model extends AbstractAssessment
     public function setSupportingDataEnable(?bool $supportingDataEnable): self
     {
         $this->supportingDataEnable = $supportingDataEnable;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getSupportingDataRange(): ?string
+    {
+        return $this->supportingDataRange;
+    }
+
+
+    /**
+     * @param string|null $supportingDataRange
+     * @return $this
+     */
+    public function setSupportingDataRange(?string $supportingDataRange): self
+    {
+        $this->supportingDataRange = $supportingDataRange;
         return $this;
     }
 
