@@ -390,7 +390,7 @@
                     /* Asynchronous update
                      * Rerun plugin
                      */
-                    skipUnsubmitted.change(function (event) {
+                    skipUnsubmitted.on('change', function (event) {
 
                         var ize  = tgt[0].selectize,
                                 skip = $(this).is(':checked') ? 1 : 0,

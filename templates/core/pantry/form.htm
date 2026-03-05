@@ -324,7 +324,7 @@
                                 $(parentCheckboxSelector).each(function(index, parentCheckbox) {
                                     var $subtypes = $(parentCheckbox).siblings(childGroupSelector).find(childCheckboxSelector);
 
-                                    $subtypes.change(function() {
+                                    $subtypes.on('change', function() {
                                         if ($subtypes.filter(":checked").length < 1) {
                                             $(parentCheckbox).prop("checked", false);
                                             $subtypes.parent(childGroupSelector).hide();

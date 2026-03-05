@@ -317,7 +317,7 @@ Data:
             var articleSubmitButton = $('#article-submit');
             var buttonOriginalValue = articleSubmitButton.val();
 
-            form.submit(function( event ) {
+            form.on('submit', function( event ) {
                 event.preventDefault();
                 var $toast     = $('#toast');
 
