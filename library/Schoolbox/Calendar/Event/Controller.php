@@ -1535,10 +1535,15 @@ class Controller extends Base
             throw new NotFound('Booking' . (count($bookingIds) > 1 ? 's' : '') . ' not found.');
         }
 
-        // The $bookings obtained above will not have their event hydrated.  Fix that.
-        // If this step is skipped, the event owner will not be hydrated in $booking->canUserDeleteBooking() (checked below).
+        // The $bookings obtained above will not have their event and resource hydrated.
+        // Fix that, because hydrated objects are required in $booking->canUserDeleteBooking() (checked below).
+        // (The hydrated resource is needed for its moderator list.)
+        $resourceIds = $bookings->map(fn ($booking) => $booking->getResource()->getId());
+        /** @var GenericCollection<BookingItemModel> $resourceById */
+        $resourceById = $this->bookingItemMapper->findByColumn('id', $resourceIds)->indexBy('id');
         foreach ($bookings as $booking) {
             $booking->setEvent($event);
+            $booking->setResource($resourceById[$booking->getResource()->getId()]);
         }
 
         $resourceIds = []; // Remember the set of resourceIds to be booked.  It will be used below.
