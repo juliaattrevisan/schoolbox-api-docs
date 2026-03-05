@@ -57,8 +57,9 @@ case "${SECOND_INSTANCE_ENABLE}" in
         ;;
 esac
 
-# restart the caddy container to pick up any changes
-"$(dirname "$0")/compose" restart caddy
+# restart the web server and reverse proxy containers,
+# so that any changes in configuration are respected
+"$(dirname "$0")/compose" restart caddy schoolbox-frankenphp
 
 # If using devkit:
 # install its SQL, reading:
