@@ -93,6 +93,8 @@ $app = new class extends CliTool\App
                 $this->getLogger()->notice("Found TRIGS school code, applying specific canvas settings.");
                 $newSettings = array_merge($defaultOptions, [
                     'canvas_redirect_homepages' => 1, // enable homepage redirection
+                    'canvas_sissourceid_template' => '{folderCode}_{parentCode}',
+                    'canvas_code_redirect_homepages' => 'subject_code',
                 ]);
                 break;
             case 'yvgs':
