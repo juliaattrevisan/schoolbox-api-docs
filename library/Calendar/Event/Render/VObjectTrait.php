@@ -98,8 +98,9 @@ trait VObjectTrait
             (
                 // Function getTitleForResourceBookingExport() should only be used for exports of
                 // resource booking calendar items, in exports from the resource booking section.
+                // Note ExportType::RESOURCES is from the main calendar, so is not included below.
                 $event instanceof ResourceBookingEvent &&
-                in_array($this->getExportType(), [ExportType::RESOURCE, ExportType::RESOURCES, ExportType::RESOURCE_CATEGORY], true)
+                in_array($this->getExportType(), [ExportType::RESOURCE, ExportType::RESOURCE_CATEGORY], true)
                 ? $event->getTitleForResourceBookingExport()
                 : $event->getTitleForExport()
             )
