@@ -186,19 +186,6 @@
         $blackoutStartTimeInput.on('change', blackoutTimeChange);
         $blackoutEndTimeInput.on('change', blackoutTimeChange);
 
-        // Simple debounce implementation
-        const debounce = function (func, delay) {
-            let timeout;
-            return function () {
-                const context = this;
-                const args = arguments;
-                clearTimeout(timeout);
-                timeout = setTimeout(function () {
-                    func.apply(context, args);
-                }, delay);
-            };
-        };
-
         // Save blackout form
         let $toast       = $('#toast'),
             blackoutForm = document.getElementById('blackoutForm'),
@@ -223,7 +210,7 @@
                     });
                 }
             };
-        $(blackoutForm).on('change', ':input', debounce(formSubmit, 1000));
+        $(blackoutForm).on('change', ':input', _.debounce(formSubmit, 1000));
     });
 
     function customiserCallback(data) {
