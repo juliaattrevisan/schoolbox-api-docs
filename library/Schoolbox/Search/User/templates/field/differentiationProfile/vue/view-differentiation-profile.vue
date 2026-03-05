@@ -10,8 +10,8 @@ import ViewDpModal from "@schoolboxLibrary/DifferentiationProfile/templates/vue/
 
 const props = defineProps<{
     student: User;
-    customisationCount: number;
-    route: string;
+    dpRoute: string;
+    customisationsRoute: string;
 }>();
 
 const studentWithDP = window.Vue.ref<User | null>(null);
@@ -39,8 +39,8 @@ function onViewDP(): void {
     </dt>
     <view-dp-modal
         v-model:student="studentWithDP"
-        :customisation-count="props.customisationCount"
-        :route="props.route"
+        :dp-route="props.dpRoute"
+        :customisations-route="props.customisationsRoute"
     />
 </template>
 

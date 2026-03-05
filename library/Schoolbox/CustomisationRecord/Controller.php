@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\CustomisationRecord;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Filter\IFactoryFactory;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
@@ -147,6 +148,37 @@ class Controller extends Base
                 'filterPanel' => $filterPanel,
             ],
             $pageTitle,
+        );
+    }
+
+    /**
+     * Redirect to the customisation record list page with a filter applied for the specified student
+     *
+     * @param int $studentId
+     * @return void
+     * @throws RouteNotFound
+     */
+    public function viewRecordByStudent(int $studentId): void
+    {
+        $customisationRecordsRoute = $this->getRouteIfAuthorized(
+            'customisationRecord.viewRecords',
+        );
+
+        if (!$customisationRecordsRoute) {
+            $this->sendJsonError('Unauthorized', 403);
+            return;
+        }
+
+        $nameFilter = $this->filterMapper->findByClass(\Schoolbox\Filter\Filters\CustomisationRecord\Name\Definition::class)->first();
+
+        $this->response = $this->redirectPermanent(
+            $customisationRecordsRoute . '?' . http_build_query(
+                [
+                    $nameFilter->getId() => [
+                        $studentId => 1
+                    ]
+                ]
+            )
         );
     }
 

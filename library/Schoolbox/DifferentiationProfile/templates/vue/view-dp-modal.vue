@@ -36,8 +36,8 @@ type TextItem = {
 };
 
 const props = defineProps<{
-    customisationCount: number;
-    route: string;
+    dpRoute: string;
+    customisationsRoute: string;
 }>();
 
 const student = defineModel<User | null>("student", { default: null });
@@ -52,7 +52,7 @@ const textData = window.Vue.ref<TextItem[]>([]);
  * Load the DP
  */
 async function load(): Promise<void> {
-    if (props.route === "") {
+    if (props.dpRoute === "") {
         loadError.value = "No route specified";
         return;
     }
@@ -60,7 +60,7 @@ async function load(): Promise<void> {
         isProcessing.value = true;
         loadError.value = null;
         const response = await apiRequest<Item[]>({
-            url: props.route,
+            url: props.dpRoute,
             method: "GET",
         });
         if (!response.success) {
@@ -122,7 +122,11 @@ function onClose(): void {
                         {{ locale.differentiationProfile.translate(false, true) }} for {{ getFirstName(student) }}
                         {{ student.lastname }}
                     </h2>
-                    <a v-if="props.customisationCount" href="#" class="button l-flex l-gap-s">
+                    <a
+                        v-if="props.customisationsRoute"
+                        :href="`${props.customisationsRoute}`"
+                        class="button l-flex l-gap-s"
+                    >
                         <sbx-icon name="group"></sbx-icon>
                         View Customisations
                     </a>
