@@ -33,9 +33,13 @@ class Color
      * @throws \InvalidArgumentException @see $this->assertAlphaChannelValue()
      *                                   and $this->assertColorChannelValue()
      */
-    public function __construct($red, $green, $blue, $alpha = 1.0)
-    {
-        $this->colorObject = ColorUtils\rgba($red, $green, $blue, $alpha);
+    public function __construct(
+        private int $red,
+        private int $green,
+        private int $blue,
+        private float $alpha = 1.0,
+    ) {
+//        $this->colorObject = ColorUtils\rgba($red, $green, $blue, $alpha);
     }
 
 
@@ -69,8 +73,8 @@ class Color
     public function setAlpha($alpha)
     {
         $this->assertAlphaChannelValue($alpha);
-//        $this->alpha = $alpha;
-        $this->colorObject = ColorUtils\rgba($this->getRed(), $this->getGreen(), $this->getBlue(), $alpha);
+        $this->alpha = $alpha;
+//        $this->colorObject = ColorUtils\rgba($this->getRed(), $this->getGreen(), $this->getBlue(), $alpha);
         return $this;
     }
 
@@ -80,8 +84,8 @@ class Color
      */
     public function getAlpha()
     {
-        return $this->colorObject->getRgb()->getAlpha();
-//        return $this->alpha;
+//        return $this->colorObject->getRgb()->getAlpha();
+        return $this->alpha;
     }
 
 
@@ -93,8 +97,8 @@ class Color
     public function setBlue($blue)
     {
         $this->assertColorChannelValue($blue);
-//        $this->blue = intval($blue);
-        $this->colorObject = ColorUtils\rgba($this->getRed(), $this->getGreen(), $blue, $this->getAlpha());
+        $this->blue = intval($blue);
+//        $this->colorObject = ColorUtils\rgba($this->getRed(), $this->getGreen(), $blue, $this->getAlpha());
         return $this;
     }
 
@@ -104,8 +108,8 @@ class Color
      */
     public function getBlue()
     {
-        return $this->colorObject->getRgb()->getBlue();
-//        return $this->blue;
+//        return $this->colorObject->getRgb()->getBlue();
+        return $this->blue;
     }
 
 
@@ -117,8 +121,8 @@ class Color
     public function setGreen($green)
     {
         $this->assertColorChannelValue($green);
-//        $this->green = intval($green);
-        $this->colorObject = ColorUtils\rgba($this->getRed(), $green, $this->getBlue(), $this->getAlpha());
+        $this->green = intval($green);
+//        $this->colorObject = ColorUtils\rgba($this->getRed(), $green, $this->getBlue(), $this->getAlpha());
         return $this;
     }
 
@@ -128,8 +132,8 @@ class Color
      */
     public function getGreen()
     {
-        return $this->colorObject->getRgb()->getGreen();
-//        return $this->green;
+//        return $this->colorObject->getRgb()->getGreen();
+        return $this->green;
     }
 
 
@@ -141,8 +145,8 @@ class Color
     public function setRed($red)
     {
         $this->assertColorChannelValue($red);
-//        $this->red = intval($red);
-        $this->colorObject = ColorUtils\rgba($red, $this->getGreen(), $this->getBlue(), $this->getAlpha());
+        $this->red = intval($red);
+//        $this->colorObject = ColorUtils\rgba($red, $this->getGreen(), $this->getBlue(), $this->getAlpha());
         return $this;
     }
 
@@ -152,8 +156,8 @@ class Color
      */
     public function getRed()
     {
-        return $this->colorObject->getRgb()->getRed();
-//        return $this->red;
+//        return $this->colorObject->getRgb()->getRed();
+        return $this->red;
     }
 
 
