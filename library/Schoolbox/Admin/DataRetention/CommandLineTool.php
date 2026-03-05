@@ -63,6 +63,11 @@ class CommandLineTool extends CliTool\App
     private const OPT_LONG_STRATS = 'strats::';
 
     /**
+     * Manually override the retention period for a strategy, for testing purposes (number of days (same format as the admin config value)
+     */
+    private const OPT_RETENTION_PERIOD = 'retention-period:';
+
+    /**
      * @inheritdoc
      */
     public function getShortOpts(): array
@@ -83,6 +88,7 @@ class CommandLineTool extends CliTool\App
             self::OPT_LONG_CHUNK_SIZE,
             self::OPT_LONG_MAX_TIME,
             self::OPT_LONG_STRATS,
+            self::OPT_RETENTION_PERIOD,
         ];
     }
 
@@ -193,11 +199,17 @@ class CommandLineTool extends CliTool\App
             $selectedStrats = array_values($temp);
         }
 
+        // if set override the retention period for all strats, for testing purposes
+        $retentionPeriod = $this->getOptAsInt(self::OPT_RETENTION_PERIOD);
+
         // log the settings we are running with
         $logger->notice(sprintf("Running %s:", $this->perform() ? "with perform" : "in dry-run mode"));
         $logger->notice(sprintf("Script will end at or before '%s'", date('Y-m-d H:i:s', $endTime)));
         $logger->notice(sprintf("Chunk size: %s", $chunkSize));
         $logger->notice(sprintf("Loop count: %s", $loopCount));
+        if (null !== $retentionPeriod) {
+            $logger->notice(sprintf("Overriding retention period to '%s' days", $retentionPeriod));
+        }
 
 
         // filter buses to those we have requested
@@ -221,6 +233,11 @@ class CommandLineTool extends CliTool\App
                 $start = microtime(true);
                 // log a helpful counter to know where we are up to
                 $logger->notice(sprintf("[%s/%s] Running %s", $busNumber + 1, count($bus), $strategy->getRetentionLabel()));
+
+                // if retention period override is set, override the strategy's retention period for this run, for testing purposes
+                if (null !== $retentionPeriod) {
+                    $strategy->setRetentionPeriod($retentionPeriod);
+                }
 
                 $strategy->process();
 
@@ -288,6 +305,7 @@ OPTIONS
     --chunk={chunk-size}:    process this many entries per chunk: defaults to 1000.
     --strats=                A csv of strats to hard delete: {$csvStrats}. If not provided, will run all strats.
                              e.g. hard delete only learning moment stuff: ./tools/dataRetention/process.php --strats=moments
+    --retention-period=      Manually override the retention period for a strategy, for testing purposes (number of days, same format as the admin config value)
     -p:                      perform: *without* this flag, this tool will only do a dry run, outputting what would be
                              deleted
     -v[v[v]]:                verbosity: how much activity will be logged

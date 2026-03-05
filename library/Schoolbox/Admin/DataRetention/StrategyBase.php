@@ -30,6 +30,16 @@ abstract class StrategyBase implements IStrategy
     public string $retentionConfigKey = '';
 
     /**
+     * cache and store the retention period for this strategy,
+     * so we don't have to keep looking it up from the config for every chunk,
+     * and so we can override it with setRetentionPeriod if needed
+     *
+     * This should be in database format, e.g. '2024-01-01 00:00:00'
+     * @var null|string
+     */
+    private ?string $retentionPeriod = null;
+
+    /**
      * @param null|LoggerInterface $log        // log to STDERR
      * @param bool                 $perform    // should we actually perform the deletion?
      * @param IConnector           $database   // database connector, do we can craft manual queries rather than use mappers
@@ -135,13 +145,20 @@ abstract class StrategyBase implements IStrategy
      */
     protected function getRetentionPeriod()
     {
-        $retentionPeriod = (string)$this->config->get($this->retentionConfigKey); // configured by admin with planned options 1 Day, 30 Days, 365 Days, <null> (null is do NOT hard delete this)
-        if ('' === $retentionPeriod) {
-            $this->log->notice('No retention period set, skipping');
-            return null;
+        if (null === $this->retentionPeriod) {
+            $retentionPeriod = (string)$this->config->get($this->retentionConfigKey); // configured by admin with planned options 1 Day, 30 Days, 365 Days, <null> (null is do NOT hard delete this)
+            if ('' === $retentionPeriod) {
+                $this->log->notice('No retention period set, skipping');
+                return null;
+            }
+            $this->retentionPeriod = (\Alaress_Date_Format::newNaturalDate(sprintf("-%s days", $retentionPeriod)))->getDatabase();
         }
+        return $this->retentionPeriod;
+    }
 
-        return (\Alaress_Date_Format::newNaturalDate(sprintf("-%s days", $retentionPeriod)))->getDatabase();
+    public function setRetentionPeriod(?int $retentionPeriod): void
+    {
+        $this->retentionPeriod = (\Alaress_Date_Format::newNaturalDate(sprintf("-%s days", $retentionPeriod)))->getDatabase();
     }
 
     /**

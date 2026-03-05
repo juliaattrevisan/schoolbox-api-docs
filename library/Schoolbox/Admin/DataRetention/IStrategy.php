@@ -40,4 +40,11 @@ interface IStrategy
      * @return string
      */
     public function getStrategyName(): string;
+
+    /**
+     * Override the retention period for this strategy, do NOT use the date range from the config
+     * @param null|int $retentionPeriod
+     * @return void
+     */
+    public function setRetentionPeriod(?int $retentionPeriod): void;
 }
