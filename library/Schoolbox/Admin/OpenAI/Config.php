@@ -45,9 +45,9 @@ class Config
         "gpt-5-nano",
         "gpt-5.1",
         "gpt-5.2",
-        "gpt-5.2-pro",
+//        "gpt-5.2-pro",
         "gpt-5.4",
-        "gpt-5.4-pro",
+//        "gpt-5.4-pro",
     ];
     public const array AI_MODELS_GPT4 = [
         "gpt-4o",
