@@ -65,7 +65,7 @@ declare global {
         function preview(): void {
             $(config.element)
                 .off()
-                .on("click", async function fnClick(this: HTMLElement, event: JQuery.ClickEvent) {
+                .on("click", function fnClick(this: HTMLElement, event: JQuery.ClickEvent) {
                     if (event.which > 1) {
                         return;
                     }
@@ -78,7 +78,7 @@ declare global {
                         return;
                     }
 
-                    await openFilePreview(href, config.baseUrl);
+                    void openFilePreview(href, config.baseUrl);
                 });
         }
 

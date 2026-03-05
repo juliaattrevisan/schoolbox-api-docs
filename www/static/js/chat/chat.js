@@ -343,7 +343,7 @@ String.prototype.format = function () {
 
                     var componentID = "component" + $self.options.component_id;
                     if (document.activeElement.id == componentID) {
-                        $("#" + componentID + "-chatmessage").trigger('focus');
+                        $("#" + componentID + "-chatmessage").trigger("focus");
                     }
                 },
                 dataType: "json",

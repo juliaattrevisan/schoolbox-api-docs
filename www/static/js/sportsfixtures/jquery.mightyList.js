@@ -188,7 +188,7 @@
 
                 /* Force trim
                  */
-                element.val((element.val().trim()));
+                element.val(element.val().trim());
 
                 element.attr("data-item-original-value", element.val());
             });
@@ -222,7 +222,7 @@
 
             /* Force trim
              */
-            $element.val(($element.val().trim()));
+            $element.val($element.val().trim());
 
             /* Only execute if there is data to send
              */

@@ -158,7 +158,7 @@
                     if (event.keyCode === 13) {
                         event.preventDefault();
 
-                        $(element).trigger('blur');
+                        $(element).trigger("blur");
                     }
                 });
             });
@@ -552,7 +552,7 @@
                 .on("submit", function (e) {
                     e.preventDefault();
 
-                    $(this).find("[data-mark-input]").blur();
+                    $(this).find("[data-mark-input]").trigger("blur");
                 });
         }
 
