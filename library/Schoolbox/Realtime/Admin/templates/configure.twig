@@ -210,7 +210,7 @@
                     });
                 }
             };
-        $(blackoutForm).on('change', ':input', _.debounce(formSubmit, 1000));
+        $(blackoutForm).on('change', ':input', window.Foundation.utils.debounce(formSubmit, 1000));
     });
 
     function customiserCallback(data) {
