@@ -94,8 +94,9 @@ test.describe("Dialog Agent Homepage Component", () => {
     test.afterAll(async ({ api, db }) => {
         await api.deleteHomepageComponent(Common.CLASS_ID_9AENG, componentId);
 
-        // Purge any dialog agent, sales data has none
-        const dialogAgentIds = (await db.grabColumnFromDatabase("dialog_agent", "assessment_id", {
+        // Delete any activities created in this test
+        const dialogAgentIds = (await db.grabColumnFromDatabase("assessment", "id", {
+            "title LIKE": `${ACTIVITY_NAME}%`,
             deleted_at: null,
         })) as number[];
         await Promise.all(dialogAgentIds.map((id) => api.deleteAssessment(id)));
