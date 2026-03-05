@@ -332,15 +332,37 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * This function was added so that methods in Calendar\Event\Controller that deal with bookings could check
-     * booking permissions without having to infer a general permission (e.g. 'can a user edit a booking') from
-     * permission to access a specific route (e.g. 'resourceBooking.edit').  Route permissions should only be used to
-     * check access to that route.  A similar function canUserModerateThisItem() exists in ResourceBooking\Item\Model.
-     *
+     * See comments in docblock for canUserModifyBooking().
      * @param User $user
      * @return bool
      */
     public function canUserEditBooking(User $user): bool
+    {
+        return $this->canUserModifyBooking($user);
+    }
+
+    /**
+     * See comments in docblock for canUserModifyBooking().
+     * @param User $user
+     * @return bool
+     */
+    public function canUserDeleteBooking(User $user): bool
+    {
+        return $this->canUserModifyBooking($user);
+    }
+
+    /**
+     * This function was added so that methods in Calendar\Event\Controller that deal with bookings could check
+     * booking permissions without having to infer a general permission (e.g. 'can a user edit a booking') from
+     * permission to access a specific route (e.g. 'resourceBooking.edit').  Route permissions should only be used to
+     * check access to that route.
+     * The name 'modify' is intended to include 'update' and 'delete' operations.
+     * A similar function canUserModerateThisItem() exists in ResourceBooking\Item\Model.
+     *
+     * @param User $user
+     * @return bool - true means the user has permission to edit or delete this booking.
+     */
+    private function canUserModifyBooking(User $user): bool
     {
         if ($this->getResource()->canUserModerateThisItem($user)) {
             return true;

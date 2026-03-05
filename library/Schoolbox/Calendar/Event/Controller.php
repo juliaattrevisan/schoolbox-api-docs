@@ -1538,7 +1538,7 @@ class Controller extends Base
         }
 
         // The $bookings obtained above will not have their event hydrated.  Fix that.
-        // If this step is skipped, the event owner will not be hydrated in $booking->canUserEditBooking() (checked below).
+        // If this step is skipped, the event owner will not be hydrated in $booking->canUserDeleteBooking() (checked below).
         foreach ($bookings as $booking) {
             $booking->setEvent($event);
         }
@@ -1551,11 +1551,10 @@ class Controller extends Base
             // Check whether the user has permission to delete the booking.
             // Note the 'calendarEvent.deleteBooking' permission will have been checked in Calendar/Event/Module.php.
             // That checks whether a user has permission to delete bookings linked to events generally.  A user's
-            // permission to delete a booking of a specific resource might depend on the resource.  A user can delete
-            // a booking in the resource booking section if they can access the 'resourceBooking.edit' route - so
-            // checking canUserEdit() also checks permission to delete.  If the permission check fails for any resource,
-            // stop the operation.  The user can remove the offending resource from the list if he/she wants to continue.
-            if (!$booking->canUserEditBooking($this->getUser())) {
+            // permission to delete a booking of a specific resource might depend on the resource.
+            // If the permission check fails for any resource, stop the operation.  The user can remove the offending
+            // resource from the list if he/she wants to continue.
+            if (!$booking->canUserDeleteBooking($this->getUser())) {
                 // This will occur if permissions have changed since the form page was generated.
                 throw new Forbidden(
                     "You do not have permission to delete bookings for resource '{$booking->getResource()->getName()}'."
