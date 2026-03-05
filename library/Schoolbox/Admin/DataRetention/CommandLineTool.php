@@ -198,6 +198,11 @@ HELP;
                 // refresh lock, depending on the data retention queries this may have taken a while...
                 $lock->refresh();
             }
+
+
+            // log that we have finished and release the lock
+            $logger->notice("Finished processing all chunks");
+            $this->releaseLock($lock);
         } else {
             $logger->notice('No data retention strategies to run');
         }
