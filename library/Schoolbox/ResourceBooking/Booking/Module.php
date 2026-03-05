@@ -22,6 +22,7 @@ use Schoolbox\Calendar\Event;
 use Schoolbox\CampusMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
+use Schoolbox\ResourceBooking\Item\Model as ItemModel;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\Application\Exception\NotFound;
@@ -138,11 +139,11 @@ class Module extends BaseModule
         $bookingEditNotCal = new Rule\All(
             $bookingEditRule,
             new Rule\Callback(function ($params) {
-                // Bookings linked to events of variant Event::VARIANT_EVENT should be managed via the 'Modify Event' page.
-                if (!array_key_exists('item', $params)) {
-                    // This will occur if the URL for the Update Booking page refers to a soft-deleted resource booking.
-                    throw new NotFound();
+                $item = $params['item'] ?? null;
+                if (!($item instanceof ItemModel)) {
+                    throw new InvalidPath('No booking item found in route params.');
                 }
+                // Bookings linked to events of variant Event::VARIANT_EVENT should be managed via the 'Modify Event' page.
                 if ($params['item']->getEvent()->getVariant() === Event::VARIANT_EVENT) {
                     throw new Unauthorized("Bookings linked to events cannot be updated by this method.");
                 }
