@@ -10,7 +10,7 @@ import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 
 const ACTIVITY_NAME = "Anteresia Stimsoni";
 
-test.describe("Dialog Agent Homepage Component", () => {
+test.describe("Dialog Agent", () => {
     // Run tests serially, as tests rely on prior tests to have been run
     test.describe.configure({ mode: "serial" });
 
