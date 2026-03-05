@@ -103,6 +103,14 @@ class Model implements IAssessableDataModel, ISoftDeletable
 
 
     /**
+     * This is used to decide whether to show any supporting data at all.
+     *
+     * @var bool|null
+     */
+    private ?bool $supportingDataEnable = null;
+
+
+    /**
      * @return MarkType|null
      */
     public function getInstructorMarkType(): ?MarkType
@@ -261,4 +269,23 @@ class Model implements IAssessableDataModel, ISoftDeletable
         return $this;
     }
 
+
+    /**
+     * @return bool|null
+     */
+    public function getSupportingDataEnable(): ?bool
+    {
+        return $this->supportingDataEnable;
+    }
+
+
+    /**
+     * @param bool|null $supportingDataEnable
+     * @return $this
+     */
+    public function setSupportingDataEnable(?bool $supportingDataEnable): self
+    {
+        $this->supportingDataEnable = $supportingDataEnable;
+        return $this;
+    }
 }

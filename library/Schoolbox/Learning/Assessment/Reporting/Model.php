@@ -95,6 +95,14 @@ class Model extends AbstractAssessment
 
 
     /**
+     * This is used to decide whether to show any supporting data at all.
+     *
+     * @var bool|null
+     */
+    private ?bool $supportingDataEnable = null;
+
+
+    /**
      * The user who created this activity
      *
      * @var User|null
@@ -492,6 +500,26 @@ class Model extends AbstractAssessment
     public function setFeedbackCommentsEnable(?bool $feedbackCommentsEnable): self
     {
         $this->feedbackCommentsEnable = $feedbackCommentsEnable;
+        return $this;
+    }
+
+
+    /**
+     * @return bool|null
+     */
+    public function getSupportingDataEnable(): ?bool
+    {
+        return $this->supportingDataEnable;
+    }
+
+
+    /**
+     * @param bool|null $supportingDataEnable
+     * @return $this
+     */
+    public function setSupportingDataEnable(?bool $supportingDataEnable): self
+    {
+        $this->supportingDataEnable = $supportingDataEnable;
         return $this;
     }
 

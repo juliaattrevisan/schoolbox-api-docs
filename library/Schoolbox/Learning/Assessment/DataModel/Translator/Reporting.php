@@ -110,6 +110,10 @@ class Reporting implements IAssessmentTypeTranslator
         /* Feedback Comments Enabled
          */
         $dataModel->setFeedbackCommentsEnable($domainObject->getFeedbackCommentsEnable());
+
+        /* Supporting Data Enabled
+         */
+        $dataModel->setSupportingDataEnable($domainObject->getSupportingDataEnable());
     }
 
 
@@ -142,5 +146,9 @@ class Reporting implements IAssessmentTypeTranslator
         /* Feedback Comments Enabled
          */
         $domainObject->setFeedbackCommentsEnable($dataModel->getFeedbackCommentsEnable());
+
+        /* Supporting Data Enabled
+         */
+        $domainObject->setSupportingDataEnable($dataModel->getSupportingDataEnable());
     }
 }
