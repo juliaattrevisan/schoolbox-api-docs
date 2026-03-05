@@ -269,7 +269,7 @@ Data:
                 // Disable draft autosaving
                 suspendAutosave();
                 // Submit the form
-                $form.submit();
+                $form.trigger('submit');
             };
 
         // Confirm dialog accept/reject

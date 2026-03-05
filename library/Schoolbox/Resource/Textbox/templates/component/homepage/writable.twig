@@ -166,7 +166,7 @@
                 configForm
                     .find('select[name="textbox"]')
                     .val(0);
-                configForm.submit();
+                configForm.trigger('submit');
             })
             .on('inlineTextboxEditor.change inlineTextboxEditor.save', function (event, inlineTextboxEditor) {
                 dirtyIndicator.toggleClass('hide', !inlineTextboxEditor.isDirty());

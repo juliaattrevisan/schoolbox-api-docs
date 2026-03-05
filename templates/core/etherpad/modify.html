@@ -12,7 +12,7 @@
                 confirmLabel: 'Delete',
                 confirmEvent: function() {
                     form.find('input[name="type"]').val('delete');
-                    form.submit();
+                    form.trigger('submit');
                 }
             });
         });

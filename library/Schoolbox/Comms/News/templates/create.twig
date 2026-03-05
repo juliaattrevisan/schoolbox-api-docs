@@ -315,7 +315,7 @@
             $createForm.prop('action', $createForm.data('action-' + event.data.action));
 
             // Submit the form
-            $createForm.submit();
+            $createForm.trigger('submit');
         }
 
     });

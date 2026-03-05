@@ -281,7 +281,7 @@
 
                         text: 'Are you sure you want to save this group with no members?',
                         confirmEvent: function () {
-                            form.submit();
+                            form.trigger('submit');
                         }
                     });
 
@@ -289,7 +289,7 @@
 
                     $('#members').val(selectedIds.join());
 
-                    form.submit();
+                    form.trigger('submit');
                 }
             }
 

@@ -120,7 +120,7 @@
 
             var form = $(this).closest('[data-interaction-container]').find('form');
             form.find('input[name=enable]').val(enable);
-            form.submit();
+            form.trigger('submit');
         });
 
         // form buttons
