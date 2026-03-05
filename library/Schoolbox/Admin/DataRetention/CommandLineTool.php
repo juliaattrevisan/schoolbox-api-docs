@@ -172,31 +172,7 @@ class CommandLineTool extends CliTool\App
         $selectedStrats = [];
         $csvStrats = (string)$this->getOpt(self::OPT_LONG_STRATS);
         if ('' !== $csvStrats) {
-            // Split csv args into individual pieces
-            $temp = explode(',', $csvStrats);
-
-            /* Cast all the elements in $values to strings
-             * because loosely typed data is poopy
-             */
-            $temp = array_map('strval', $temp);
-
-            /* Lowercase everything
-             */
-            $temp = array_map('strtolower', $temp);
-
-            /* Trim all the strings in the set
-             * because doing manual trimming is boring
-             */
-            $temp = array_map('trim', $temp);
-
-            /* Remove anything that doesn't also appear in $validStrats
-             * and ignore those
-             */
-            $temp = array_intersect($validStrats, $temp);
-
-            /* Store only the valid strats chosen
-             */
-            $selectedStrats = array_values($temp);
+            $selectedStrats = $this->validateStrats($csvStrats, $validStrats);
         }
 
         // if set override the retention period for all strats, for testing purposes
@@ -276,6 +252,42 @@ class CommandLineTool extends CliTool\App
     {
         $lock->release();
         $this->getLogger()->notice('Data Retention cleanup complete: released process lock');
+    }
+
+    /**
+     * Validate the strats provided in the csv against the valid strats, and return an array of the valid strats to run.
+     * This will ignore any invalid strats provided in the csv, and will return an empty array if no valid strats are found.
+     * @param string $csvStrats
+     * @param array  $validStrats
+     * @return array
+     */
+    private function validateStrats(string $csvStrats, array $validStrats): array
+    {
+        // Split csv args into individual pieces
+        $temp = explode(',', $csvStrats);
+
+        /* Cast all the elements in $values to strings
+         * because loosely typed data is poopy
+         */
+        $temp = array_map('strval', $temp);
+
+        /* Lowercase everything
+         */
+        $temp = array_map('strtolower', $temp);
+
+        /* Trim all the strings in the set
+         * because doing manual trimming is boring
+         */
+        $temp = array_map('trim', $temp);
+
+        /* Remove anything that doesn't also appear in $validStrats
+         * and ignore those
+         */
+        $temp = array_intersect($validStrats, $temp);
+
+        /* Store only the valid strats chosen
+         */
+        return array_values($temp);
     }
 
     /**
