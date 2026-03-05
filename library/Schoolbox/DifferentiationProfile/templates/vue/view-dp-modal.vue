@@ -36,6 +36,7 @@ type TextItem = {
 };
 
 const props = defineProps<{
+    customisationCount: number;
     route: string;
 }>();
 
@@ -116,10 +117,16 @@ function onClose(): void {
         />
         <div v-else-if="student && data.length > 0" class="l-flex-col l-gap-m f-no-margins">
             <div class="l-flex-col l-gap-s f-no-margins">
-                <h2>
-                    {{ locale.differentiationProfile.translate(false, true) }} for {{ getFirstName(student) }}
-                    {{ student.lastname }}
-                </h2>
+                <div class="l-flex-row l-flex--justify-space">
+                    <h2>
+                        {{ locale.differentiationProfile.translate(false, true) }} for {{ getFirstName(student) }}
+                        {{ student.lastname }}
+                    </h2>
+                    <a v-if="props.customisationCount" href="#" class="button l-flex l-gap-s">
+                        <sbx-icon name="group"></sbx-icon>
+                        View Customisations
+                    </a>
+                </div>
             </div>
             <div class="c-vert-scroll-container l-flex-col l-gap-s" data-test="view-dp-modal-fields-container">
                 <div class="l-flex-col l-gap-s f-no-margins">
