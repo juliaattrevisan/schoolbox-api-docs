@@ -37,13 +37,6 @@ class Capability extends Base
 {
     /**************************** Indicator merging queries ***************************/
 
-    private const FIND_CAPABILITY_INDICATORS_QUERY_V1 = '
-        SELECT id, name
-        FROM   rubric_criterion
-        WHERE  rubric_group_id = :capabilityId
-        AND    deleted_at IS NULL
-        ORDER BY name, id
-    ';
     private const FIND_CAPABILITY_INDICATORS_QUERY_V2 = '
         SELECT id, name
         FROM   rubric_indicator
@@ -52,12 +45,6 @@ class Capability extends Base
         ORDER BY name, id
     ';
 
-    private const MERGE_CAPABILITY_INDICATOR_QUERY_V1 = '
-        UPDATE rubric_criterion
-        SET rubric_group_id = :originalCapabilityId
-        WHERE rubric_group_id = :duplicateCapabilityId
-        AND id = :indicatorId
-    ';
     private const MERGE_CAPABILITY_INDICATOR_QUERY_V2 = '
         UPDATE rubric_indicator
         SET rubric_capability_id = :originalCapabilityId
@@ -68,17 +55,6 @@ class Capability extends Base
 
     /**************************** Usage merging queries ***************************/
 
-    private const FIND_CAPABILITY_USAGES_QUERY_V1 = '
-        SELECT
-            rgu.submission_box_id AS box_id,
-            a.id,
-            a.title
-        FROM rubric_group_usage rgu
-        INNER JOIN submission_box sb ON rgu.submission_box_id = sb.id
-        INNER JOIN assessment     a  ON sb.assessment_id = a.id
-        WHERE rgu.rubric_group_id = :capabilityId
-        AND   a.deleted_at IS NULL
-    ';
     private const FIND_CAPABILITY_USAGES_QUERY_V2 = '
         SELECT
             rgu.submission_box_id AS box_id,
@@ -91,12 +67,6 @@ class Capability extends Base
         AND   a.deleted_at IS NULL
     ';
 
-    private const MERGE_CAPABILITY_USAGE_QUERY_V1 = '
-        UPDATE rubric_group_usage
-        SET rubric_group_id = :originalCapabilityId
-        WHERE rubric_group_id = :duplicateCapabilityId
-        AND submission_box_id = :boxId
-    ';
     private const MERGE_CAPABILITY_USAGE_QUERY_V2 = '
         UPDATE rubric_capability_usage
         SET rubric_capability_id = :originalCapabilityId
@@ -104,13 +74,6 @@ class Capability extends Base
         AND submission_box_id = :boxId
     ';
 
-    private const MERGE_CAPABILITY_MARK_QUERY_V1 = '
-        UPDATE rubric_group_mark rm
-        INNER JOIN rubric_group_usage rgu ON rm.rubric_group_id = rgu.rubric_group_id
-        SET rm.rubric_group_id = :originalCapabilityId
-        WHERE rm.rubric_group_id = :duplicateCapabilityId
-        AND rgu.submission_box_id = :boxId
-    ';
     private const MERGE_CAPABILITY_MARK_QUERY_V2 = '
         UPDATE rubric_capability_mark rm
         INNER JOIN rubric_capability_usage rgu ON rm.rubric_capability_id = rgu.rubric_capability_id
@@ -179,36 +142,16 @@ class Capability extends Base
     protected function setupQueries(): void
     {
         $this->findCapabilityIndicatorsQuery
-            = $this->db->prepareQuery(
-                $this->useV2Queries
-                    ? self::FIND_CAPABILITY_INDICATORS_QUERY_V2
-                    : self::FIND_CAPABILITY_INDICATORS_QUERY_V1
-            );
+            = $this->db->prepareQuery(self::FIND_CAPABILITY_INDICATORS_QUERY_V2);
         $this->mergeCapabilityIndicatorQuery
-            = $this->db->prepareQuery(
-                $this->useV2Queries
-                    ? self::MERGE_CAPABILITY_INDICATOR_QUERY_V2
-                    : self::MERGE_CAPABILITY_INDICATOR_QUERY_V1
-            );
+            = $this->db->prepareQuery(self::MERGE_CAPABILITY_INDICATOR_QUERY_V2);
 
         $this->findCapabilityUsagesQuery
-            = $this->db->prepareQuery(
-                $this->useV2Queries
-                    ? self::FIND_CAPABILITY_USAGES_QUERY_V2
-                    : self::FIND_CAPABILITY_USAGES_QUERY_V1
-            );
+            = $this->db->prepareQuery(self::FIND_CAPABILITY_USAGES_QUERY_V2);
         $this->mergeCapabilityUsageQuery
-            = $this->db->prepareQuery(
-                $this->useV2Queries
-                    ? self::MERGE_CAPABILITY_USAGE_QUERY_V2
-                    : self::MERGE_CAPABILITY_USAGE_QUERY_V1
-            );
+            = $this->db->prepareQuery(self::MERGE_CAPABILITY_USAGE_QUERY_V2);
         $this->mergeCapabilityMarkQuery
-            = $this->db->prepareQuery(
-                $this->useV2Queries
-                    ? self::MERGE_CAPABILITY_MARK_QUERY_V2
-                    : self::MERGE_CAPABILITY_MARK_QUERY_V1
-            );
+            = $this->db->prepareQuery(self::MERGE_CAPABILITY_MARK_QUERY_V2);
     }
 
 

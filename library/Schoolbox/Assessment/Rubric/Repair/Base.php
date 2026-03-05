@@ -37,10 +37,6 @@ abstract class Base extends CliTool\App
     private const INDENT = '  ';
 
 
-    // Query for validating whether this should even run.
-    private const VERIFY_RUNNABLE_QUERY = "SHOW TABLES LIKE 'rubric_capability'";
-
-
     // Query for finding folders to repair.
     // Don't repair course spec or unit spec folders: there's already a script
     // for those (tools/rubric/repairSpecAssessments.php)
@@ -59,14 +55,6 @@ abstract class Base extends CliTool\App
 
 
     // Query for finding capabilities to repair within a folder.
-    protected const FIND_CAPABILITIES_QUERY_V1 = "
-        SELECT id, name
-        FROM   rubric_group
-        WHERE  parent_type = 'category'
-        AND    parent_id   = :folderId
-        AND    deleted_at  IS NULL
-        ORDER BY name, id
-    ";
     protected const FIND_CAPABILITIES_QUERY_V2 = "
         SELECT id, name
         FROM   rubric_capability
@@ -80,14 +68,6 @@ abstract class Base extends CliTool\App
     // If a capability or indicator is more than this many characters:
     // truncate it to this width.
     protected const MAX_LOG_ITEM_WIDTH = 50;
-
-
-    /**
-     * Should the v1 or v2 queries be used?
-     *
-     * @var bool
-     */
-    protected $useV2Queries;
 
 
     /**
@@ -244,25 +224,6 @@ abstract class Base extends CliTool\App
 
 
     /**
-     * Determines whether v2 queries are used.
-     *
-     * @return bool
-     */
-    private function determineV2QueryUsage(): bool
-    {
-        $this->log->notice('Checking `rubric_capability` table exists...');
-        $query = $this->db->prepareQuery(self::VERIFY_RUNNABLE_QUERY);
-        $query->execute();
-        if ($query->rowCount() > 0) {
-            $this->log->notice('`rubric_capability` table exists: running with v2 queries');
-            return true;
-        }
-        $this->log->notice('`rubric_capability` table does not exist: running with v1 queries');
-        return false;
-    }
-
-
-    /**
      * Set up basic dependencies for all repair scripts.
      *
      * @throws ContainerExceptionInterface
@@ -293,11 +254,7 @@ abstract class Base extends CliTool\App
         $this->findFoldersQuery
             = $this->db->prepareQuery(self::FIND_FOLDERS_QUERY);
         $this->findCapabilitiesQuery
-            = $this->db->prepareQuery(
-                $this->useV2Queries
-                    ? self::FIND_CAPABILITIES_QUERY_V2
-                    : self::FIND_CAPABILITIES_QUERY_V1
-            );
+            = $this->db->prepareQuery(self::FIND_CAPABILITIES_QUERY_V2);
     }
 
 
@@ -313,7 +270,6 @@ abstract class Base extends CliTool\App
     public function run(): void
     {
         $this->setupDependencies();
-        $this->useV2Queries = $this->determineV2QueryUsage();
         $this->setupCommonQueries();
         $this->setupQueries();
 
