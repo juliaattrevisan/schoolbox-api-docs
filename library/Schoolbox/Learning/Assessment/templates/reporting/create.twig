@@ -229,10 +229,15 @@
         </div>
     </div>
 
-    {% include '@learningAssessment/fragments/weight.twig' with {
-        assessment: assessment,
-        courseManagedReadonly: courseManaged.isReadonly
-    } %}
+    {# Reporting activities were chosen to have zero weighting, always
+     # This avoids the scenario of statistically weighting and re-weighting outcomes, which might or might not be truthful
+     # in a mathematical sense. We also considered Reporting activities in a Reporting Project where you'd have the
+     # usual project summators at your disposal to make things even harder to understand, so we just turned this off
+     #}
+    {#    {% include '@learningAssessment/fragments/weight.twig' with {#}
+    {#        assessment: assessment,#}
+    {#        courseManagedReadonly: courseManaged.isReadonly#}
+    {#    } %}#}
 
     {% import 'sub/visibility.twig' as visibility %}
     {{ visibility.dropdown(markVisibility, availableVisibilities) }}

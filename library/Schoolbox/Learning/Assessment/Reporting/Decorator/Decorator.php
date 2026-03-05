@@ -94,6 +94,10 @@ class Decorator implements DecoratorInterface
         $assessment->setMaxMark($this->maxMark);
         $assessment->setInstructorMaxMark($this->instructorMaxMark);
 
+        /* Reporting activities never have a meaningful weighting
+         */
+        $assessment->setWeight(0.0);
+
         /* Reporting-specific stuffs
          * TODO assign these and make translation layer functional
          */
