@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Assessment\Reporting\Decorator;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Learning\Assessment\DecoratorInterface;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Reporting\Model;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Mapper\Exception;
@@ -97,6 +98,12 @@ class Decorator implements DecoratorInterface
         /* Reporting activities never have a meaningful weighting
          */
         $assessment->setWeight(0.0);
+
+        /* Reporting activities' feedbacks only spawn on Summative Reports for now, never the ui; this means only staff
+         * would have the ability to see it. Some future feature will enable mass-release of marks, but for now, this is
+         * gonna be hardcoded to staff only.
+         */
+        $assessment->setMarkVisibility(IAssessable::MARK_VISIBILITY_PRIVATE);
 
         /* Reporting-specific stuffs
          * TODO assign these and make translation layer functional

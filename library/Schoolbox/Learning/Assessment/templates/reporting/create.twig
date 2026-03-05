@@ -239,8 +239,13 @@
     {#        courseManagedReadonly: courseManaged.isReadonly#}
     {#    } %}#}
 
-    {% import 'sub/visibility.twig' as visibility %}
-    {{ visibility.dropdown(markVisibility, availableVisibilities) }}
+    {# Reporting activities always have mark visibility set to Staff (0)
+     # There'll be some future feature where one person can change this setting en masse to have a synchronous release
+     # of final marks. For now, feedbacks for reporting activities only appear in summative reports rather than the
+     # usual schoolbox app ui
+     #}
+    {#    {% import 'sub/visibility.twig' as visibility %}#}
+    {#    {{ visibility.dropdown(markVisibility, availableVisibilities) }}#}
 
     {# Letter Grade enables Grading Scheme
      # Total Mark enables Maximum Available Marks
