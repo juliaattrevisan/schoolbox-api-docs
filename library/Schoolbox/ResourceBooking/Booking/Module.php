@@ -13,20 +13,20 @@ namespace Schoolbox\ResourceBooking\Booking;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Failure\Unauthorized;
-use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
+use Alaress\Module\Module as BaseModule;
+use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Calendar;
 use Schoolbox\Calendar\Event;
 use Schoolbox\CampusMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
 use Schoolbox\ResourceBooking\Item\Model as ItemModel;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
-use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
-use Schoolbox\Application\Exception\NotFound;
 
 class Module extends BaseModule
 {
