@@ -120,12 +120,20 @@ class Config
             self::REASONING_EFFORT_OPTION_MEDIUM,
             self::REASONING_EFFORT_OPTION_HIGH,
         ],
+        "gpt-5-chat-latest" => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+        ],
         "gpt-5.1"      => [
             self::REASONING_EFFORT_OPTION_DEFAULT,
             self::REASONING_EFFORT_OPTION_NONE,
             self::REASONING_EFFORT_OPTION_LOW,
             self::REASONING_EFFORT_OPTION_MEDIUM,
             self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+        "gpt-5.1-chat-latest" => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
         ],
         "gpt-5.2"      => [
             self::REASONING_EFFORT_OPTION_DEFAULT,
@@ -138,6 +146,14 @@ class Config
             self::REASONING_EFFORT_OPTION_DEFAULT,
             self::REASONING_EFFORT_OPTION_MEDIUM,
             self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+        "gpt-5.2-chat-latest" => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+        ],
+        "gpt-5.3-chat-latest" => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
         ],
         "gpt-5.4"      => [
             self::REASONING_EFFORT_OPTION_DEFAULT,
@@ -604,7 +620,7 @@ class Config
     /**
      * Build available reasoning effort levels for this feature.
      *
-     * This ensures the `minimal` level is stripped from the image feature..
+     * This ensures the `minimal` level is stripped from the image feature.
      *
      * @param string $feature
      * @return array|array[]
