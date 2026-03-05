@@ -31,7 +31,7 @@ class ModelParser
      */
     public function extractModelName(string $model): ?string
     {
-        $parts = explode('-', $model);
+        $parts = explode('-', $model, 3);
         return $parts[0] ?? null;
     }
 
@@ -54,7 +54,7 @@ class ModelParser
         if ($endpoint === Helper::ENDPOINT_TYPE_AZURE) {
             return null;
         }
-        $parts = explode('-', $model);
+        $parts = explode('-', $model, 3);
         return $parts[1] ?? null;
     }
 
@@ -77,7 +77,7 @@ class ModelParser
         if ($endpoint === Helper::ENDPOINT_TYPE_AZURE) {
             return null;
         }
-        $parts = explode('-', $model);
+        $parts = explode('-', $model, 3);
         return $parts[2] ?? null;
     }
 
