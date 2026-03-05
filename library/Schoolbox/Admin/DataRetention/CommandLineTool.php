@@ -184,6 +184,11 @@ class CommandLineTool extends CliTool\App
         $logger->notice(sprintf("Chunk size: %s", $chunkSize));
         $logger->notice(sprintf("Loop count: %s", $loopCount));
         if (null !== $retentionPeriod) {
+            // if in the future for some reason, log and return null to avoid deleting everything
+            if ($retentionPeriod < 0) {
+                $logger->notice('Negative retention period, exiting');
+                return;
+            }
             $logger->notice(sprintf("Overriding retention period to '%s' days", $retentionPeriod));
         }
 

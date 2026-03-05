@@ -151,7 +151,14 @@ abstract class StrategyBase implements IStrategy
                 $this->log->notice('No retention period set, skipping');
                 return null;
             }
-            $this->retentionPeriod = (\Alaress_Date_Format::newNaturalDate(sprintf("-%s days", $retentionPeriod)))->getDatabase();
+            $retentionDate = \Alaress_Date_Format::newNaturalDate(sprintf("-%s days", $retentionPeriod));
+
+            // if in the future for some reason, log and return null to avoid deleting everything
+            if ($retentionDate->isFuture()) {
+                $this->log->notice('Negative retention period, skipping');
+                return null;
+            }
+            $this->retentionPeriod = $retentionDate->getDatabase();
         }
         return $this->retentionPeriod;
     }
