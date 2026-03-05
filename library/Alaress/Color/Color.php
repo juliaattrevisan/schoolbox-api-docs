@@ -299,10 +299,10 @@ class Color
     public function __serialize(): array
     {
         return [
-            'r' => $this->getRed(),
-            'g' => $this->getGreen(),
-            'b' => $this->getBlue(),
-            'a' => $this->getAlpha(),
+            'r' => $this->red,
+            'g' => $this->green,
+            'b' => $this->blue,
+            'a' => $this->alpha,
         ];
     }
 
@@ -316,11 +316,17 @@ class Color
      */
     public function __unserialize(array $serialized): void
     {
-        $this->colorObject = ColorUtils\rgba(
-            $serialized['r'],
-            $serialized['g'],
-            $serialized['b'],
-            $serialized['a'],
-        );
+        if (isset($serialized['r'])) {
+            $this->red = $serialized['r'];
+        }
+        if (isset($serialized['g'])) {
+            $this->green = $serialized['g'];
+        }
+        if (isset($serialized['b'])) {
+            $this->blue = $serialized['b'];
+        }
+        if (isset($serialized['a'])) {
+            $this->alpha = $serialized['a'];
+        }
     }
 }
