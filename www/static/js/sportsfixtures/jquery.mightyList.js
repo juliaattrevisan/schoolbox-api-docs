@@ -162,7 +162,7 @@
                 if (canSpawnRow()) {
                     spawnNewRow();
                 } else {
-                    $(config.element).find(config.focusSelector).last().focus();
+                    $(config.element).find(config.focusSelector).last().trigger("focus");
                 }
             });
         }
@@ -330,7 +330,7 @@
 
             /* Focus it, to save you needing to do it manually
              */
-            $element.find(config.focusSelector).last().focus();
+            $element.find(config.focusSelector).last().trigger("focus");
 
             refreshEmptyStates();
 

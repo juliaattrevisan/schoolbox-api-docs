@@ -11,7 +11,7 @@
                     }
                 })
                 .on('selectize.item_add', function() {
-                    modifyForm.find(':submit').prop('disabled', false).focus();
+                    modifyForm.find(':submit').prop('disabled', false).trigger('focus');
                 })
                 .on('selectize.item_remove', function() {
                     modifyForm.find(':submit').prop('disabled', true);

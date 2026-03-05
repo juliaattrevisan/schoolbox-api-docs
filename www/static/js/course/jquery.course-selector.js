@@ -197,7 +197,7 @@
          */
         function setupModal() {
             $(document).on("opened.fndtn.reveal", config.courseSelector.modalIdentifier, function () {
-                config.courseSelector.modal.find(config.courseSelector.filter).focus();
+                config.courseSelector.modal.find(config.courseSelector.filter).trigger("focus");
             });
 
             /* Spawn modal

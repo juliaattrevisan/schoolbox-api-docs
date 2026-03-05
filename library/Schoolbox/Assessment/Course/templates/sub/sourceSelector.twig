@@ -35,7 +35,7 @@
 
                 //Hacky way to remove error message - could not find alternative
                 $input.trigger("click");
-                $input.blur();
+                $input.trigger("blur");
 
                 modal.foundation('reveal', 'close');
             });

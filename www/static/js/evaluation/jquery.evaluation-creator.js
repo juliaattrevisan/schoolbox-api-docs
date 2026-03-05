@@ -324,7 +324,7 @@
 
                     /* Bring focus to the new clone
                      */
-                    $(config.answerCollectionList).find("[data-answer-description]").last().focus();
+                    $(config.answerCollectionList).find("[data-answer-description]").last().trigger("focus");
                 }
 
                 return false;

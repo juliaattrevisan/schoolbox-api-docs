@@ -254,7 +254,7 @@
             /* Force blur in case you directly go from fiddling with the mark
              * straight to the publish
              */
-            $participant.find("[data-mark-input]").blur();
+            $participant.find("[data-mark-input]").trigger("blur");
 
             // We can safely clear this timeout now that we're publishing
             window.clearTimeout(commentBoxTimeouts[commentBoxId]);

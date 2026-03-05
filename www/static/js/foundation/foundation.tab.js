@@ -181,16 +181,7 @@
                                 tabindex: "0",
                                 "aria-selected": true,
                             })
-                            .focus();
-                    }
-
-                    // Hide panels
-
-                    $('[role="tabpanel"]').attr("aria-hidden", "true");
-
-                    // Show panel which corresponds to target
-
-                    $("#" + $(document.activeElement).attr("href").substring(1)).attr("aria-hidden", null);
+                        .trigger("focus");
                 },
                 go_to_hash = function (hash) {
                     // This function allows correct behaviour of the browser's back button when deep linking is enabled. Without it

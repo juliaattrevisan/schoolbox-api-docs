@@ -25,7 +25,7 @@
                 else {
                     allPanels.addClass('hide');
                     panel.removeClass('hide');
-                    panel.find('[data-first-focus]').focus();
+                    panel.find('[data-first-focus]').trigger('focus');
 
                     allContent.removeClass('hide');
                     content.addClass('hide');

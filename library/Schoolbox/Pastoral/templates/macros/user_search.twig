@@ -168,7 +168,7 @@
             {# After the search modal is revealed automatically highlight the search box #}
 
             $(document).on('opened.fndtn.reveal', '#userSearchModal{{ guid }}', function () {
-                userSearch.focus();
+                userSearch.trigger('focus');
             });
 
             {# --------------------------------------------------------------------------------------------------------------------------------------------#}
@@ -428,7 +428,9 @@
 
                 {# Put focus back on the search box so they can keep typing #}
 
-                userSearch.focus();
+                userSearch.trigger('focus');
+
+                {# Execute the callback function to let the page know a user has been added #}
 
                 {# Execute requested callback #}
 

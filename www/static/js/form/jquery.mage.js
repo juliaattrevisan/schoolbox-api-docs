@@ -362,7 +362,7 @@ import { getLoadedHTML } from "@js/util/domUtils";
          */
         if (form.valid() == false) {
             // focus user to first invalid field
-            $(form).find(":input.error").first().focus();
+            $(form).find(":input.error").first().trigger("focus");
 
             // prevent submit
             return;
