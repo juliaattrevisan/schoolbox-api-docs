@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
 use Symfony\Component\Lock\LockInterface;
 
-class StrategyBase implements IStrategy
+abstract class StrategyBase implements IStrategy
 {
     public const DEFAULT_CHUNK_LOOPS = 3; // how many times do we loop through the data in chunks
 
@@ -28,8 +28,16 @@ class StrategyBase implements IStrategy
      * planned options 1;1 Day:30;30 Days:365;365 Days and <null> (null is do NOT hard delete this)
      */
     public string $retentionConfigKey = '';
+
     /**
-     * @inheritDoc
+     * @param null|LoggerInterface $log        // log to STDERR
+     * @param bool                 $perform    // should we actually perform the deletion?
+     * @param IConnector           $database   // database connector, do we can craft manual queries rather than use mappers
+     * @param LockInterface        $lock       // lock to prevent multiple instances of this running at once, should be refreshed by long running processes
+     * @param IConfigLoader        $config     // config loader gives the strategy ability to access its own config
+     * @param int                  $endTime    // at what time should we just stop processing, to prevent the tool from running for too long, should be a unix timestamp, e.g. time() + 60*60 for 1 hour from now
+     * @param int                  $chunkLoops // how many times to loop through the data in chunks, default 3, set to 1 to only loop once, set to 0 for infinite looping until no more data is found
+     * @param int                  $chunkSize  // how many records to process at once, default 1000
      */
     public function __construct(
         protected ?LoggerInterface $log,
@@ -117,10 +125,7 @@ class StrategyBase implements IStrategy
     /**
      * @inheritDoc
      */
-    public function getRetentionLabel(): string
-    {
-        throw new Exception('Not implemented.');
-    }
+    abstract public function getRetentionLabel(): string;
 
     /**
      * Get the retention period for this strategy, in database format
@@ -143,19 +148,13 @@ class StrategyBase implements IStrategy
      * Find out if we have any data to delete, if not, we can exit early and save resources
      * @return bool
      */
-    protected function hasDataToDelete(): bool
-    {
-        return false;
-    }
+    abstract protected function hasDataToDelete(): bool;
 
     /**
      * Get the ids of the entities to delete, so we can delete them in chunks
      * @return array
      */
-    protected function getIdsToDelete(): array
-    {
-        return [];
-    }
+    abstract protected function getIdsToDelete(): array;
 
     /**
      * Delete a chunk of entities and their related data,
@@ -165,7 +164,5 @@ class StrategyBase implements IStrategy
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      */
-    protected function deleteChunk(array $chunk): void
-    {
-    }
+    abstract protected function deleteChunk(array $chunk): void;
 }
