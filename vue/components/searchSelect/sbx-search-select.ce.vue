@@ -34,6 +34,7 @@ interface Props {
     buttonTitle?: string; // the title of the button
     showSelected?: boolean; // whether to show the selected items
     showInput?: boolean; // whether to show the input, sometimes we don't need search at all if defaultResults is all the results available
+    forFilterPanel?: boolean; // whether this search select is being used within a filter panel, which requires some specific behaviour around dispatching change events on selection change
 }
 const props = withDefaults(defineProps<Props>(), {
     label: "",
@@ -48,6 +49,7 @@ const props = withDefaults(defineProps<Props>(), {
     queryKey: "query",
     showSelected: true,
     showInput: true,
+    forFilterPanel: false,
 });
 
 const emit = defineEmits<{
@@ -205,6 +207,7 @@ function onButtonSelected(): void {
             :is-single-select="props.isSingleSelect"
             :can-select-item="props.canSelectItem"
             :is-read-only="props.isReadOnly"
+            :for-filter-panel="props.forFilterPanel"
             @select="onSelect"
             @remove="onRemove"
         />

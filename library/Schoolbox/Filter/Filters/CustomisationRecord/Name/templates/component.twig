@@ -14,9 +14,10 @@
                     id="studentSearch"
                     label="Search"
                     label-id="Search"
-                    form-value-name="filter_selection[{{ definition.filter.id }}][]"
+                    form-value-name="filter_selection[{{ definition.filter.id }}]"
                     endpoint="/ajax/user.php?roleTypeID=student&"
                     :selected-default="[]"
+                    for-filter-panel
                     placeholder="Search for students...">
             </sbx-search-select>
         {% else %}

@@ -703,6 +703,7 @@ Usage:
                             $moreCount.find('[data-count]').attr('title', moreCountText).html(moreCountText);
                         }
                         $appliedFilters.append($newTab);
+                        console.warn('Filter ' + componentsInUse[filterId]['name'] + ' is in use with options: ' + componentsInUse[filterId]['labels'].join(', '));
                     }
                 }
             } else {

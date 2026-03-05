@@ -13,6 +13,7 @@ interface Props {
     isSingleSelect: boolean; // whether only one result can be selected
     canSelectItem: boolean; // whether the user can select an item (to trigger the select emit)
     isReadOnly?: boolean; // whether can remove items
+    forFilterPanel?: boolean; // whether this search select is being used within a filter panel, which requires some specific behaviour around dispatching change events on selection change
 }
 const props = defineProps<Props>();
 
