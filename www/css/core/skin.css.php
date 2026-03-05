@@ -12,9 +12,9 @@ declare(strict_types=1);
 use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Color\Transformer;
+use OzdemirBurak\Iris\Color\Hexa;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
-use Spatie\Color\Argb;
 use Twig\Environment;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
@@ -74,7 +74,7 @@ $colorFactory   = new ColorFactory();
 $transformer    = new Transformer();
 $twigVars       = [];
 $createTwigVars = static function (Color $color, $cssVar) {
-    $hsl = new Argb($color->getAlpha(), $color->getRed(), $color->getGreen(), $color->getBlue())->toHsl();
+    $hsl = new Hexa($color->getAsHexAlpha())->toHsla();
     return [
         'cssVar'      => $cssVar,
         'colorObject' => $color,
