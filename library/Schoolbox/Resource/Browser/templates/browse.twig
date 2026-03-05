@@ -34,7 +34,7 @@
 
     function initResourceTree () {
 
-        var openNode = {{ folder.id }};
+        var openNode = {{ folder.id ?? 0 }};
 
         {# TODO put this in a new module #}
         var tree = $('#tree'),
@@ -158,7 +158,7 @@
             var nodeId = jstree.node.id;
 
             // If this node is the parent of the selected: scroll to the selected now
-            var initialNode = jstree.instance.get_children_dom(nodeId).filter('#'+{{ folder.id }});
+            var initialNode = jstree.instance.get_children_dom(nodeId).filter('#'+{{ folder.id ?? 0 }});
             if (initialNode.length) {
                 $resources.scrollTo(initialNode);
                 tree.off('.jstree.initial');
