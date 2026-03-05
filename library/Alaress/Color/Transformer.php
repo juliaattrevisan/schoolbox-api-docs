@@ -35,14 +35,42 @@ class Transformer
         ?Color $dark = null,
         float $threshold = 0.45
     ): Color {
-        // TODO use relative luminance function:
-        //      https://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef
-        $luminance = $this->convertToIrisColor($color)->toHsl()->lightness();
+        $luminance = $this->calculateRelativeLuminance($this->convertToIrisColor($color));
         return $luminance < $threshold
             ? ($light ?? Color::white())
             : ($dark ?? Color::black());
     }
 
+    /**
+     * Calculate relative luminance of a color, based on the definition in
+     * https://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef.
+     *
+     * @param BaseColor $color
+     * @return float
+     */
+    private function calculateRelativeLuminance(BaseColor $color): float
+    {
+        return
+            0.2126 * $this->calculateChannelLuminance($color->toRgb()->red())
+            + 0.7152 * $this->calculateChannelLuminance($color->toRgb()->green())
+            + 0.0722 * $this->calculateChannelLuminance($color->toRgb()->blue())
+        ;
+    }
+
+    /**
+     * Calculate the luminance of a color channel value.
+     *
+     * @param int $value
+     * @return float
+     */
+    private function calculateChannelLuminance(int $value): float
+    {
+        $ratio = $value / 255;
+        if ($ratio <= 0.03928) {
+            return $ratio / 12.92;
+        }
+        return (($ratio + 0.055) / 1.055) ** 2.4;
+    }
 
     /**
      * Port of Schoolbox-written SASS function `contrast-bg`.
