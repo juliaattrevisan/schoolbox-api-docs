@@ -5,6 +5,8 @@ use Schoolbox\Notif\Notifactory;
 
 /**
  * Class MyFolder
+ *
+ * @deprecated use \Schoolbox\Resource\My\Folder\Mapper instead
  */
 class MyFolder extends DeprecatedModel
 {
