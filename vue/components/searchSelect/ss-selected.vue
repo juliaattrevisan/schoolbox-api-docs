@@ -20,6 +20,22 @@ const emit = defineEmits<{
     remove: [items: SearchSelectItem[]];
 }>();
 
+const inputEl = window.Vue.useTemplateRef<HTMLInputElement>("inputEl");
+const selectEl = window.Vue.useTemplateRef<HTMLSelectElement>("selectEl");
+
+/**
+ * to listen for any clears of the selected codes from outside the Vue app
+ */
+window.Vue.onMounted(() => {
+    document.addEventListener("SEARCH_SELECT__UPDATE_SELECTION", (event) => {
+        if (selectEl.value?.getAttribute("id") === event.detail.elementId) {
+            // just in case there are multiple on the page
+            // const newSelection = JSON.parse(event.detail.selection);
+            // selectedNodesStore.update(newSelection);
+        }
+    });
+});
+
 /**
  * Add a comma separated string of the ids of the selected ids
  * for use in forms
@@ -44,6 +60,19 @@ function onSelectItem(item: SearchSelectItem): void {
 function onRemoveItem(item: SearchSelectItem): void {
     emit("remove", [item]);
 }
+
+/**
+ * To manually dispatch a <select> change event when there's been a change in the selection
+ * As this is being handled by Vue rather than user input, the change event won't fire otherwise
+ * except when the <select> is first displayed in the DOM.
+ * We listen for this in library/Schoolbox/Filter/templates/panel.twig
+ */
+window.Vue.watch(ids, async () => {
+    await window.Vue.nextTick(); // nextTick to ensure the dom has updated so we can access with the latest changes
+    const event = new Event("change");
+    selectEl.value?.dispatchEvent(event);
+    inputEl.value?.dispatchEvent(event);
+});
 </script>
 
 <template>
@@ -59,7 +88,35 @@ function onRemoveItem(item: SearchSelectItem): void {
             @remove="onRemoveItem"
         />
     </div>
-    <input :id="props.formValueName" :name="props.formValueName" type="hidden" tabindex="-1" :value="ids" />
+    <input
+        :id="props.formValueName"
+        ref="inputEl"
+        :name="props.formValueName"
+        type="hidden"
+        tabindex="-1"
+        :value="ids"
+    />
+    <select
+        :id="`${props.formValueName}[]`"
+        ref="selectEl"
+        :name="`${props.formValueName}[]`"
+        :data-selected-original="JSON.stringify(props.selected)"
+        :data-selected-default="JSON.stringify(props.selected)"
+        tabindex="-1"
+        multiple
+        data-search-select
+        hidden
+    >
+        <option
+            v-for="item in props.selected"
+            :key="item.id"
+            :value="item.id"
+            :data-selected-object="item.name"
+            selected
+        >
+            {{ item.name }}
+        </option>
+    </select>
 </template>
 
 <style lang="scss" scoped>
