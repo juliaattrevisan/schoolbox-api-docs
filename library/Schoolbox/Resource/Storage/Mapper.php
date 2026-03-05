@@ -57,7 +57,6 @@ class Mapper extends BaseMapper implements IReceiver
         $this->uses('filename', self::TYPE_STRING);
         $this->uses('filesize', self::TYPE_INTEGER, null, 'size');
         $this->uses('uploaded_on', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
-        $this->uses('last_accessed', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('public', self::TYPE_BOOLEAN);
         $this->uses('ext', self::TYPE_STRING, null, 'extension');
         $this->uses('expired_at', self::TYPE_DATETIME, null, 'expiryAt');

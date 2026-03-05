@@ -43,9 +43,6 @@ class Model implements IStorage, \Alaress\Json\Serializable, Linkable
     /** @var int $size */
     protected $size;
 
-    /** @var Alaress_Date_Format $lastAccessed */
-    protected $lastAccessed;
-
     /** @var bool $public */
     protected $public;
 
@@ -168,26 +165,6 @@ class Model implements IStorage, \Alaress\Json\Serializable, Linkable
     public function setSize($size)
     {
         $this->size = $size;
-
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getLastAccessed()
-    {
-        return $this->lastAccessed;
-    }
-
-    /**
-     * @param Alaress_Date_Format $lastAccessed
-     *
-     * @return self
-     */
-    public function setLastAccessed($lastAccessed)
-    {
-        $this->lastAccessed = $lastAccessed;
 
         return $this;
     }
