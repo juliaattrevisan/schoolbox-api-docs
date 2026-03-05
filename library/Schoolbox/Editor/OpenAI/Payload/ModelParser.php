@@ -100,11 +100,18 @@ class ModelParser
         // chat variants:
         // * all support only medium verbosity
         // * 5 does not support reasoning at all
-        // * 5.1, 5.2 and 5.3 support only medium reasoning
+        // * 5.1, 5.2 and 5.3 support only medium reasoning, and thus no
+        //   sampling settings
         // Therefore, don't set reasoning at all
         if ($variant === 'chat-latest') {
-            unset($payload['reasoning']);
             $payload['text']['verbosity'] = 'medium';
+            if ($version === '5') {
+                unset($payload['reasoning']);
+            }
+            if (in_array($version, ['5.1', '5.2', '5.3'])) {
+                $payload['reasoning']['effort'] = 'medium';
+                unset($payload['temperature'], $payload['top_p']);
+            }
             return $payload;
         }
 
