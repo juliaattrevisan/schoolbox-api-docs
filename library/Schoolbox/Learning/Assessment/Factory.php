@@ -701,13 +701,13 @@ class Factory
                 $this->getInstructorGradingScheme(),
                 $this->getMaxMark(),
                 $this->getInstructorMaxMark(),
+                $this->getFeedbackCommentsEnable(),
                 $this->getSupportingDataEnable(),
                 $this->getSupportingDataRange(),
                 $this->getSupportingDataCurriculumNodes(),
                 $this->getSupportingDataFolders(),
                 $this->getSupportingDataWorkTypes(),
                 $this->getSupportingDataMegamarkboook(),
-                $this->getFeedbackCommentsEnable()
             );
         } else {
             throw new DomainException('Please select an assessment type');

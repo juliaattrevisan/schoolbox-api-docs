@@ -36,13 +36,13 @@ class Decorator implements DecoratorInterface
         private ?int $instructorGradeGroup,
         private ?float $maxMark,
         private ?float $instructorMaxMark,
+        private ?bool $feedbackCommentsEnable,
         private ?bool $supportingDataEnable,
         private ?array $supportingDataDateRange,
         private ?array $supportingDataCurriculumNodes,
         private ?array $supportingDataFolders,
         private ?array $supportingDataWorkTypes,
         private ?bool $supportingDataMegamarkbook,
-        private ?bool $feedbackCommentsEnable
     ) {
     }
 
@@ -108,12 +108,12 @@ class Decorator implements DecoratorInterface
         /* Reporting-specific stuffs
          * TODO assign these and make translation layer functional
          */
+        // feedback comments
         // supporting data enable
         // supporting data range
         // supporting data curric nodes $assessment->setCurriculumNodes(CurriculumNodeMapper::getInstance()->findByColumn('id', $selectedNodes));
         // supporting data folders
         // supporting data work types
         // supporting data megamarkbook
-        // feedback comments
     }
 }
