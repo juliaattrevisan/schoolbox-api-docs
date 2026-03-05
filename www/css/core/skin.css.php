@@ -14,6 +14,7 @@ use Alaress\Color\ColorFactory;
 use Alaress\Color\Transformer;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Spatie\Color\Argb;
 use Twig\Environment;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
@@ -73,16 +74,16 @@ $colorFactory   = new ColorFactory();
 $transformer    = new Transformer();
 $twigVars       = [];
 $createTwigVars = static function (Color $color, $cssVar) {
-    $hsl = $color->getAsHslArray();
+    $hsl = new Argb($color->getAlpha(), $color->getRed(), $color->getGreen(), $color->getBlue())->toHsl();
     return [
         'cssVar'      => $cssVar,
         'colorObject' => $color,
         'r'           => $color->getRed(),
         'g'           => $color->getGreen(),
         'b'           => $color->getBlue(),
-        'h'           => $hsl['hue'],
-        's'           => $hsl['saturation'],
-        'l'           => $hsl['lightness'],
+        'h'           => $hsl->hue(),
+        's'           => $hsl->saturation(),
+        'l'           => $hsl->lightness(),
         'a'           => $color->getAlpha(),
     ];
 };
