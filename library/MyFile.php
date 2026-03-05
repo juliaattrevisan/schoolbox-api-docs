@@ -50,7 +50,14 @@ class MyFile extends DeprecatedModel
             LEFT JOIN storage s ON f.hash = s.hash
             LEFT JOIN allowedFileExtension afe ON s.ext = afe.extension
             LEFT JOIN allowedFileTypes af ON afe.FileTypeID = af.FileTypeID
-            WHERE owner = " . $this->owner . " AND parent = " . (int)$folderID . " AND deleted_at IS NULL";
+            WHERE owner = :owner
+            AND   COALESCE(parent, 0) = :folderId
+            AND   deleted_at IS NULL
+        ";
+        $params = [
+            'folderId' => $folderID,
+            'owner'    => $this->owner,
+        ];
 
         if ($config['published'] == true) {
             $query .= " AND published IS NOT NULL";
@@ -69,18 +76,19 @@ class MyFile extends DeprecatedModel
                 'other'    => " OR ( afe.mime LIKE 'application%' AND afe.mime NOT LIKE '%pdf' AND afe.mime NOT LIKE '%msword' AND afe.mime NOT LIKE '%rtf' AND afe.mime NOT LIKE 'text%' AND afe.mime NOT LIKE '%document%' AND afe.mime NOT LIKE '%powerpoint%') ",
             ];
 
-            foreach ($config['filter'] as $filter) {
+            foreach ($config['filter'] as $i => $filter) {
                 if (array_key_exists($filter, $filter_sql)) {
                     $query .= $filter_sql[$filter];
                 } else {
-                    $query .= " OR ( afe.mime = '$filter ' ) ";
+                    $query .= " OR ( afe.mime = :filter_$i ) ";
+                    $params["filter_$i"] = $filter;
                 }
             }
 
             $query .= ") ";
         }
 
-        return $this->db->query($query)->fetchAll();
+        return $this->db->query($query, $params)->fetchAll();
     }
 
 
