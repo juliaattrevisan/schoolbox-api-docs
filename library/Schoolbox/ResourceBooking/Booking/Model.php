@@ -374,7 +374,7 @@ class Model implements ISoftDeletable, JsonSerializable
             throw new \UnexpectedValueException('Booking object does not have event owner set');
         }
 
-        // If the user is the owner of the event, he/she can edit the booking.
+        // If the user is the owner of the event, he/she can modify (edit or delete) the booking.
         return ($bookingOwner->getId() === $user->getId());
     }
 
