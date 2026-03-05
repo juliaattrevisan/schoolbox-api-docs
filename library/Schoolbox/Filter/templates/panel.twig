@@ -485,7 +485,6 @@ Usage:
                         queryArgs.push(filterId + '='); // empty filter selection syntax
                     } else {
                         for (optionKey in selections) {
-                            console.log(selections)
                             if (selections.hasOwnProperty(optionKey)) {
                                 queryArgs.push(filterId + '[' + optionKey + ']=' + selections[optionKey]); // filter option selected syntax
                             }
@@ -703,7 +702,6 @@ Usage:
                             $moreCount.find('[data-count]').attr('title', moreCountText).html(moreCountText);
                         }
                         $appliedFilters.append($newTab);
-                        console.warn('Filter ' + componentsInUse[filterId]['name'] + ' is in use with options: ' + componentsInUse[filterId]['labels'].join(', '));
                     }
                 }
             } else {
