@@ -218,7 +218,7 @@ try {
                 $sentry
             );
 
-            $filename = 'personal';
+            $filename = ExportType::PERSONAL;
             break;
 
         case ExportType::GROUP:
@@ -282,7 +282,7 @@ try {
                 $sentry
             ));
 
-            $filename = sprintf('group%d', $export_id);
+            $filename = sprintf(ExportType::GROUP . '%d', $export_id);
             break;
 
         case ExportType::CAMPUS:
@@ -298,7 +298,7 @@ try {
                 $sentry
             );
 
-            $filename = sprintf('campus%d', $export_id);
+            $filename = sprintf(ExportType::CAMPUS . '%d', $export_id);
             break;
 
         case ExportType::DUE_WORK:
@@ -313,7 +313,7 @@ try {
                 $sentry
             );
 
-            $filename = 'duework';
+            $filename = ExportType::DUE_WORK;
             break;
 
         case ExportType::TIMETABLE:
@@ -352,7 +352,7 @@ try {
                 $sentry
             ));
 
-            $filename       = 'timetable';
+            $filename       = ExportType::TIMETABLE;
             $startTimestamp = $_SERVER['REQUEST_TIME'];
             $endTimestamp   = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             break;
@@ -365,7 +365,7 @@ try {
                 $sentry
             );
 
-            $filename       = 'timetabledays';
+            $filename       = ExportType::TIMETABLE_DAYS;
             $startTimestamp = $_SERVER['REQUEST_TIME'];
             $endTimestamp   = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             break;
@@ -380,7 +380,7 @@ try {
                 $sentry
             );
 
-            $filename = 'resources';
+            $filename = ExportType::RESOURCES;
             break;
 
         case ExportType::RESOURCE:
@@ -418,7 +418,7 @@ try {
 
             $endTimestamp = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
 
-            $filename = sprintf('resource%d', $resourceId);
+            $filename = sprintf(ExportType::RESOURCE . '%d', $resourceId);
             break;
 
         case ExportType::RESOURCE_CATEGORY:
@@ -534,7 +534,7 @@ try {
                 $sentry
             ));
 
-            $filename = 'external';
+            $filename = ExportType::EXTERNAL;
             break;
 
         /* All EOTC Events
