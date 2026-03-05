@@ -3,17 +3,19 @@ import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import AIServices, { AiProvider } from "@schoolboxTest/playwright/support/page/admin/ai/AIServices";
 import Common from "@schoolboxTest/playwright/support/page/Common";
 import DialogAgentConfigure from "@schoolboxTest/playwright/support/page/dialogAgent/DialogAgentConfigure";
+import DialogAgentHomepage from "@schoolboxTest/playwright/support/page/dialogAgent/DialogAgentHomepage";
 import DialogAgentModify from "@schoolboxTest/playwright/support/page/dialogAgent/DialogAgentModify";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 
-const DATA_TEST_COMPONENT_DIALOGAGENT_EMPTY_CREATE_BUTTON = "component-dialogAgent-empty-create-button";
-
-const EMPTY_STATE_MESSAGE_AI_DISABLED = "The Discussion feature is currently disabled";
-const COMPONENT_NAME = "Discussions"; // Terminology for Dialog Agent is "Discussions"
 const ACTIVITY_NAME = "Anteresia Stimsoni";
 
 test.describe("Dialog Agent Homepage Component", () => {
+    // Run tests serially, as tests rely on prior tests to have been run
+    test.describe.configure({ mode: "serial" });
+
+    let componentId: number;
+
     // Keep a copy of the initial AI settings so they can be reset after the tests are done
     const initialSettings: Record<string, string | null> = {
         ai_dialogagent: null,
@@ -24,11 +26,6 @@ test.describe("Dialog Agent Homepage Component", () => {
             initialSettings[setting] = (await db.grabFromDatabase("config", "value", { name: setting })) as string;
         }
     });
-
-    // Run tests serially, as tests rely on prior tests to have been run
-    test.describe.configure({ mode: "serial" });
-
-    let componentId: number;
 
     test.beforeEach(async ({ tester }) => {
         await tester.loginAsAdmin();
@@ -41,15 +38,19 @@ test.describe("Dialog Agent Homepage Component", () => {
         await homepage.goto(Common.CLASS_ID_9AENG);
 
         tester.isGoingTo("Add Discussions (Dialog Agent) component");
-        await homepage.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_LEARNING, COMPONENT_NAME);
-        const component = homepage.locateComponentByName(COMPONENT_NAME);
+        await homepage.addComponent(
+            DialogAgentHomepage.HOMEPAGE_ADD_COMPONENT_SECTION,
+            DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME,
+        );
+        const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME);
         componentId = await Homepage.getComponentId(component);
 
         tester.isGoingTo(
             "expect to see an empty state message indicating that the feature is disabled, and no create button",
         );
-        await expect(component).toContainText(EMPTY_STATE_MESSAGE_AI_DISABLED);
-        await expect(component.getByTestId(DATA_TEST_COMPONENT_DIALOGAGENT_EMPTY_CREATE_BUTTON)).not.toBeVisible();
+        const dialogAgentComponent = new DialogAgentHomepage(page, tester, component);
+        await dialogAgentComponent.verifyEmptyStateDisabled();
+        await dialogAgentComponent.verifyEmptyStateCreateButtonNotVisible();
     });
 
     test("enable AI feature, create a new discussion via the empty state", async ({ tester, page }) => {
@@ -66,8 +67,9 @@ test.describe("Dialog Agent Homepage Component", () => {
         tester.isGoingTo("create a new discussion via the empty state of the Dialog Agent component");
         const homepage = new Homepage(tester, page);
         await homepage.goto(Common.CLASS_ID_9AENG);
-        const component = homepage.locateComponentByName(COMPONENT_NAME);
-        await component.getByTestId(DATA_TEST_COMPONENT_DIALOGAGENT_EMPTY_CREATE_BUTTON).click();
+        const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_ADD_COMPONENT_SECTION);
+        const dialogAgentComponent = new DialogAgentHomepage(page, tester, component);
+        await dialogAgentComponent.clickEmptyStateCreateButton();
 
         tester.isGoingTo("create a new activity");
         const assessmentForm = new AssessmentForm(tester, page);
@@ -82,7 +84,7 @@ test.describe("Dialog Agent Homepage Component", () => {
 
     test("view activity in component", async ({ tester, page }) => {
         const homepage = new Homepage(tester, page);
-        const component = homepage.locateComponentByName(COMPONENT_NAME);
+        const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_ADD_COMPONENT_SECTION);
 
         const allAssessmentsSelector = new RegExp(`^${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TITLE}`);
         const activityTitle = component.getByTestId(allAssessmentsSelector).filter({ hasText: ACTIVITY_NAME });
