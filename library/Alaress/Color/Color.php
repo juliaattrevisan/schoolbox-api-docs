@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 /**
  * Representation of a color.
  *
@@ -61,11 +63,10 @@ class Color
      * @return $this
      * @throws \InvalidArgumentException @see $this->assertAlphaChannelValue()
      */
-    public function setAlpha($alpha)
+    public function setAlpha(float $alpha): self
     {
         $this->assertAlphaChannelValue($alpha);
         $this->alpha = $alpha;
-//        $this->colorObject = ColorUtils\rgba($this->getRed(), $this->getGreen(), $this->getBlue(), $alpha);
         return $this;
     }
 
@@ -73,9 +74,8 @@ class Color
     /**
      * @return float
      */
-    public function getAlpha()
+    public function getAlpha(): float
     {
-//        return $this->colorObject->getRgb()->getAlpha();
         return $this->alpha;
     }
 
@@ -85,11 +85,10 @@ class Color
      * @return $this
      * @throws \InvalidArgumentException @see $this->assertColorChannelValue()
      */
-    public function setBlue($blue)
+    public function setBlue(int $blue): self
     {
         $this->assertColorChannelValue($blue);
-        $this->blue = intval($blue);
-//        $this->colorObject = ColorUtils\rgba($this->getRed(), $this->getGreen(), $blue, $this->getAlpha());
+        $this->blue = $blue;
         return $this;
     }
 
@@ -97,9 +96,8 @@ class Color
     /**
      * @return int
      */
-    public function getBlue()
+    public function getBlue(): int
     {
-//        return $this->colorObject->getRgb()->getBlue();
         return $this->blue;
     }
 
@@ -109,11 +107,10 @@ class Color
      * @return $this
      * @throws \InvalidArgumentException @see $this->assertColorChannelValue()
      */
-    public function setGreen($green)
+    public function setGreen(int $green): self
     {
         $this->assertColorChannelValue($green);
-        $this->green = intval($green);
-//        $this->colorObject = ColorUtils\rgba($this->getRed(), $green, $this->getBlue(), $this->getAlpha());
+        $this->green = $green;
         return $this;
     }
 
@@ -121,9 +118,8 @@ class Color
     /**
      * @return int
      */
-    public function getGreen()
+    public function getGreen(): int
     {
-//        return $this->colorObject->getRgb()->getGreen();
         return $this->green;
     }
 
@@ -133,11 +129,10 @@ class Color
      * @return $this
      * @throws \InvalidArgumentException @see $this->assertColorChannelValue()
      */
-    public function setRed($red)
+    public function setRed(int $red): self
     {
         $this->assertColorChannelValue($red);
-        $this->red = intval($red);
-//        $this->colorObject = ColorUtils\rgba($red, $this->getGreen(), $this->getBlue(), $this->getAlpha());
+        $this->red = $red;
         return $this;
     }
 
@@ -145,48 +140,41 @@ class Color
     /**
      * @return int
      */
-    public function getRed()
+    public function getRed(): int
     {
-//        return $this->colorObject->getRgb()->getRed();
         return $this->red;
     }
 
 
     /**
-     * Asserts that the value is an integer, and between 0x00 and 0xFF.
+     * Asserts that the value is between 0x00 and 0xFF.
      *
      * @param int $value
      * @throws \InvalidArgumentException if color value doesn't match above
      */
-    protected function assertColorChannelValue($value)
+    protected function assertColorChannelValue(int $value): void
     {
-        if (!preg_match('/^\\d+$/', $value)) {
-            throw new \InvalidArgumentException("Color value \"$value\" is not an integer");
-        }
-        if (intval($value) < 0x00) {
+        if ($value < 0x00) {
             throw new \InvalidArgumentException("Color value \"$value\" < 0");
         }
-        if (intval($value) > 0xFF) {
+        if ($value > 0xFF) {
             throw new \InvalidArgumentException("Color value \"$value\" > 255");
         }
     }
 
 
     /**
-     * Asserts that the value is an float between 0 and 1.
+     * Asserts that the value is between 0 and 1.
      *
      * @param float $value
      * @throws \InvalidArgumentException if alpha value doesn't match above
      */
-    protected function assertAlphaChannelValue($value)
+    protected function assertAlphaChannelValue(float $value): void
     {
-        if (!is_numeric($value)) {
-            throw new \InvalidArgumentException("Alpha value \"$value\" is not a number");
-        }
-        if (floatval($value) < 0) {
+        if ($value < 0) {
             throw new \InvalidArgumentException("Alpha value \"$value\" < 0");
         }
-        if (floatval($value) > 1) {
+        if ($value > 1) {
             throw new \InvalidArgumentException("Alpha value \"$value\" > 1");
         }
     }
@@ -197,7 +185,7 @@ class Color
      *
      * @return string
      */
-    public function getAsHex()
+    public function getAsHex(): string
     {
         return sprintf(
             '%02X%02X%02X',
@@ -213,7 +201,7 @@ class Color
      *
      * @return string
      */
-    public function getAsHexAlpha()
+    public function getAsHexAlpha(): string
     {
         return sprintf(
             '%02X%02X%02X%02X',
@@ -230,7 +218,7 @@ class Color
      *
      * @return string
      */
-    public function getAsRgb()
+    public function getAsRgb(): string
     {
         return sprintf(
             'rgb(%d, %d, %d)',
@@ -248,7 +236,7 @@ class Color
      *
      * @return string
      */
-    public function getAsRgba()
+    public function getAsRgba(): string
     {
         return sprintf(
             'rgba(%d, %d, %d, %0.3f)',
@@ -265,7 +253,7 @@ class Color
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getAsRgba();
     }
