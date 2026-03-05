@@ -20,6 +20,7 @@ use Schoolbox\Config\Loader;
 use Schoolbox\GenericCollection;
 use Schoolbox\ResourceBooking\Booking\Model;
 use Schoolbox\ResourceBooking\Booking\Validation;
+use Schoolbox\ResourceBooking\Booking\Util\ResponseHelper as BookingResponseHelper;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Booking\Status;
 use Schoolbox\UserMapper;
@@ -182,7 +183,7 @@ $personalRelationMapper->save($personalRelation);
 
 // manually craft a json response, to contain logs and the generated event below..
 $output = [
-    'message' => getResponseMessage($nBookingsCreatedByStatusId),
+    'message' => new BookingResponseHelper()->getResponseMessage($nBookingsCreatedByStatusId),
     'event'  => null,
 ];
 
@@ -248,39 +249,4 @@ function getBookingFromEvent(Item\Model $resource, Calendar\Event $event): Model
     }
 
     return $booking;
-}
-
-/**
- * @param array<int, int> $nBookingsCreatedByStatusId - The number of bookings created, indexed by bookingStatusId.
- * @return string
- */
-function getResponseMessage(array $nBookingsCreatedByStatusId): string
-{
-    $nApprovedBookings = $nBookingsCreatedByStatusId[Status\Model::STATUS_APPROVED] ?? 0;
-    $nPendingBookings = $nBookingsCreatedByStatusId[Status\Model::STATUS_PENDING] ?? 0;
-    $nRejectedBookings = $nBookingsCreatedByStatusId[Status\Model::STATUS_REJECTED] ?? 0;
-    $nTotalBookings = $nPendingBookings + $nApprovedBookings + $nRejectedBookings;
-
-    if ($nTotalBookings === 0) {
-        return 'Created event with no bookings';
-    }
-
-    if ($nTotalBookings === 1) {
-        $bookingStatus = match ($nTotalBookings) {
-            $nApprovedBookings => 'approved',
-            $nPendingBookings => 'pending',
-            $nRejectedBookings => 'rejected',
-        };
-        return "Created event with one $bookingStatus booking";
-    }
-
-    $messageEndingParts = [
-        $nApprovedBookings === 0 ? '' : "$nApprovedBookings approved",
-        $nPendingBookings  === 0 ? '' : "$nPendingBookings pending"  ,
-        $nRejectedBookings === 0 ? '' : "$nRejectedBookings rejected",
-    ];
-
-    $messageEndingParts = array_filter($messageEndingParts, static fn ($messageEndingPart) => $messageEndingPart !== '');
-
-    return "Created event with $nTotalBookings bookings - " . implode(', ', $messageEndingParts);
 }
