@@ -497,12 +497,21 @@ class Controller extends Base
          */
         $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
         $class = Textbox\Component\Homepage\Controller::class;
-        $unitTextboxComp = $this->componentInstanceMapper->findByContextAndClass(
-            $module,
-            $course->getTemplate()->getUnitTemplate()->getId(),
-            $class
-        );
-        $textboxDefId = $unitTextboxComp->first()?->getDefinitionId();
+        try {
+            $unitTextboxComp = $this->componentInstanceMapper->findByContextAndClass(
+                $module,
+                $course->getTemplate()->getUnitTemplate()->getId(),
+                $class
+            );
+            $textboxDefId = $unitTextboxComp->first()?->getDefinitionId();
+        } catch (\Exception $e) {
+            $problem = (new ApiProblem('Could not find component instance.'))
+                ->setStatus(500)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus(500);
+            return;
+        }
 
         // Create units within a transaction
         try {
