@@ -108,7 +108,6 @@ class Decorator implements DecoratorInterface
         /* Reporting-specific stuffs
          * TODO assign these and make translation layer functional
          */
-        // feedback comments
         // supporting data enable
         // supporting data range
         // supporting data curric nodes $assessment->setCurriculumNodes(CurriculumNodeMapper::getInstance()->findByColumn('id', $selectedNodes));

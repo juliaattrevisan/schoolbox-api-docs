@@ -41,13 +41,13 @@ class Model extends AbstractAssessment
     /**
      * @var float|null
      */
-    private ?float $maxMark = null;
+    private ?float $instructorMaxMark = null;
 
 
     /**
      * @var float|null
      */
-    private ?float $instructorMaxMark = null;
+    private ?float $maxMark = null;
 
 
     /**
@@ -83,6 +83,15 @@ class Model extends AbstractAssessment
      * @var IMarkScheme|null
      */
     private ?IMarkScheme $instructorMarkScheme = null;
+
+
+    /**
+     * This is used to decide if the feedbacks should have a ckeditor for people to write comments. This is optional for
+     * reporting activities that have no value offering comments, such as attendance or other clerical data.
+     *
+     * @var bool|null
+     */
+    private ?bool $feedbackCommentsEnable = null;
 
 
     /**
@@ -463,6 +472,26 @@ class Model extends AbstractAssessment
     public function setInstructorMarkScheme(?IMarkScheme $instructorMarkScheme): self
     {
         $this->instructorMarkScheme = $instructorMarkScheme;
+        return $this;
+    }
+
+
+    /**
+     * @return bool|null
+     */
+    public function getFeedbackCommentsEnable(): ?bool
+    {
+        return $this->feedbackCommentsEnable;
+    }
+
+
+    /**
+     * @param bool|null $feedbackCommentsEnable
+     * @return $this
+     */
+    public function setFeedbackCommentsEnable(?bool $feedbackCommentsEnable): self
+    {
+        $this->feedbackCommentsEnable = $feedbackCommentsEnable;
         return $this;
     }
 

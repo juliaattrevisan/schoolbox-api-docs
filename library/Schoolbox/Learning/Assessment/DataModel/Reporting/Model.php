@@ -94,6 +94,15 @@ class Model implements IAssessableDataModel, ISoftDeletable
 
 
     /**
+     * This is used to decide if the feedbacks should have a ckeditor for people to write comments. This is optional for
+     * reporting activities that have no value offering comments, such as attendance or other clerical data.
+     *
+     * @var bool|null
+     */
+    private ?bool $feedbackCommentsEnable = null;
+
+
+    /**
      * @return MarkType|null
      */
     public function getInstructorMarkType(): ?MarkType
@@ -231,4 +240,25 @@ class Model implements IAssessableDataModel, ISoftDeletable
         $this->markVisibility = $markVisibility;
         return $this;
     }
+
+
+    /**
+     * @return bool|null
+     */
+    public function getFeedbackCommentsEnable(): ?bool
+    {
+        return $this->feedbackCommentsEnable;
+    }
+
+
+    /**
+     * @param bool|null $feedbackCommentsEnable
+     * @return $this
+     */
+    public function setFeedbackCommentsEnable(?bool $feedbackCommentsEnable): self
+    {
+        $this->feedbackCommentsEnable = $feedbackCommentsEnable;
+        return $this;
+    }
+
 }

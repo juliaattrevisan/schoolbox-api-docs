@@ -15,7 +15,7 @@ CREATE TABLE `reporting` (
     `period_1_year` TINYINT COMMENT '1 year in the past',
     `folder_restriction` ENUM('current_only', 'any_folder') COMMENT 'corresponds to "the students in my folder specifically", or "any folder where my students had a published feedback"',
     `show_markbook` TINYINT COMMENT 'a toggle: if enabled, the minimal mega markbook is generated',
-    `allow_comments` TINYINT COMMENT 'a toggle: if enabled, staff can write comments in their reporting feedbacks',
+    `feedback_comments_enable` TINYINT COMMENT 'a toggle: if enabled, staff can write comments in their reporting feedbacks',
     `created_at` DATETIME NOT NULL,
     `created_by` INT UNSIGNED NOT NULL,
     `updated_at` DATETIME NOT NULL,

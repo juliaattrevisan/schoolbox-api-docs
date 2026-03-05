@@ -106,6 +106,10 @@ class Reporting implements IAssessmentTypeTranslator
         } elseif ($instructorMarkScheme instanceof None) {
             $dataModel->setInstructorMarkType((new MarkType())->setId(MarkType::TYPE_NONE));
         }
+
+        /* Feedback Comments Enabled
+         */
+        $dataModel->setFeedbackCommentsEnable($domainObject->getFeedbackCommentsEnable());
     }
 
 
@@ -134,5 +138,9 @@ class Reporting implements IAssessmentTypeTranslator
             $domainObject->setInstructorMarkType($dataModel->getInstructorMarkType());
             $domainObject->setInstructorGradeGroup($dataModel->getInstructorGradeGroup());
         }
+
+        /* Feedback Comments Enabled
+         */
+        $domainObject->setFeedbackCommentsEnable($dataModel->getFeedbackCommentsEnable());
     }
 }
