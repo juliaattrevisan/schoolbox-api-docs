@@ -46,6 +46,8 @@ class Config
         "gpt-5.1",
         "gpt-5.2",
         "gpt-5.2-pro",
+        "gpt-5.4",
+        "gpt-5.4-pro",
     ];
     public const array AI_MODELS_GPT4 = [
         "gpt-4o",
@@ -130,6 +132,19 @@ class Config
         ],
         "gpt-5.2-pro"  => [
             self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+        "gpt-5.4"      => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+            self::REASONING_EFFORT_OPTION_LOW,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+        "gpt-5.4-pro"  => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
             self::REASONING_EFFORT_OPTION_HIGH,
         ],
     ];

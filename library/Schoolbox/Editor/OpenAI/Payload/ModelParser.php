@@ -123,8 +123,8 @@ class ModelParser
             }
         }
 
-        // GPT 5.1 and 5.2 default to `none` for reasoning effort
-        if (in_array($version, ['5.1', '5.2']) && isset($payload['reasoning'])) {
+        // GPT 5.1, 5.2 and 5.4 default to `none` for reasoning effort
+        if (in_array($version, ['5.1', '5.2', '5.4']) && isset($payload['reasoning'])) {
             $reasoningEffort = $payload['reasoning']['effort'] ?? 'none';
             // Also don't support `minimal` reasoning
             if ($reasoningEffort === 'minimal') {
@@ -142,10 +142,10 @@ class ModelParser
             unset($payload['temperature'], $payload['top_p']);
         }
 
-        // GPT-5.2-pro supports no reasoning levels other than:
+        // GPT 5.2 and 5.4 pro variants supports no reasoning levels other than:
         // `medium`, `high`, `x-high`
         if (
-            $version === '5.2'
+            in_array($version, ['5.2', '5.4'])
             && isset($payload['reasoning']['effort'])
             && $this->extractModelVariant($model, $endpoint) === 'pro'
         ) {
