@@ -3,26 +3,14 @@
 /**
  * Representation of a color.
  *
- * This now is just a wrapper around a `\SSNepenthe\ColorUtils\Colors\Color`
- * object.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
- * @link      https://schoolbox.com.au/
+ * @link      https://schoolbox.education
  */
 
 namespace Alaress\Color;
 
-use SSNepenthe\ColorUtils;
-
 class Color
 {
-    /**
-     * @var ColorUtils\Colors\Color
-     */
-    private $colorObject;
-
-
     /**
      * Constructor
      *
@@ -39,7 +27,10 @@ class Color
         private int $blue,
         private float $alpha = 1.0,
     ) {
-//        $this->colorObject = ColorUtils\rgba($red, $green, $blue, $alpha);
+        $this->assertColorChannelValue($red);
+        $this->assertColorChannelValue($green);
+        $this->assertColorChannelValue($blue);
+        $this->assertAlphaChannelValue($alpha);
     }
 
 
@@ -198,17 +189,6 @@ class Color
         if (floatval($value) > 1) {
             throw new \InvalidArgumentException("Alpha value \"$value\" > 1");
         }
-    }
-
-
-    /**
-     * Retrieves the color's HSL values.
-     *
-     * @return array {hue: float, saturation: float, lightness: float}
-     */
-    public function getAsHslArray(): array
-    {
-        return $this->colorObject->getHsl()->toArray();
     }
 
 
