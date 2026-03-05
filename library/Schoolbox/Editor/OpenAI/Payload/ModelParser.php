@@ -94,10 +94,23 @@ class ModelParser
      */
     public function filterPayload(array $payload, string $model, string $endpoint): array
     {
+        $version = $this->extractModelVersion($model, $endpoint);
+        $variant = $this->extractModelVariant($model, $endpoint);
+
+        // chat variants:
+        // * all support only medium verbosity
+        // * 5 does not support reasoning at all
+        // * 5.1, 5.2 and 5.3 support only medium reasoning
+        // Therefore, don't set reasoning at all
+        if ($variant === 'chat-latest') {
+            unset($payload['reasoning']);
+            $payload['text']['verbosity'] = 'medium';
+            return $payload;
+        }
+
         // GPT-4o and 4.1 family models:
         // * don't support reasoning
         // * only support medium verbosity
-        $version = $this->extractModelVersion($model, $endpoint);
         if (in_array($version, ['4o', '4.1'])) {
             unset($payload['reasoning']);
             if (isset($payload['text']['verbosity'])) {
@@ -132,7 +145,6 @@ class ModelParser
             }
         }
 
-
         // Set reasoning effort, and clear temperature and top_p if any effort
         // other than null was set
         if (isset($reasoningEffort)) {
@@ -147,7 +159,7 @@ class ModelParser
         if (
             in_array($version, ['5.2', '5.4'])
             && isset($payload['reasoning']['effort'])
-            && $this->extractModelVariant($model, $endpoint) === 'pro'
+            && $variant === 'pro'
         ) {
             if (!in_array($payload['reasoning']['effort'], ['medium', 'high', 'xhigh'])) {
                 $payload['reasoning']['effort'] = 'medium';
