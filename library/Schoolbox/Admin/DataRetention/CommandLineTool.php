@@ -153,6 +153,11 @@ HELP;
             $chunkSize = StrategyBase::DEFAULT_CHUNK_SIZE;
         }
 
+        // log the settings we are running with
+        $logger->notice(sprintf("Running %s:", $this->perform() ? "with perform" : "in dry-run mode"));
+        $logger->notice(sprintf("Script will end at or before '%s'", date('Y-m-d H:i:s', $endTime)));
+        $logger->notice(sprintf("Chunk size: %s", $chunkSize));
+        $logger->notice(sprintf("Loop count: %s", $loopCount));
 
         // build the bus for all the data retention tasks
         /** @var GenericCollection<IStrategy> $bus */
