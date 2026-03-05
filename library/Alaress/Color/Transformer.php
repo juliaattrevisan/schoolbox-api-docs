@@ -129,7 +129,7 @@ class Transformer
         $percent = $color->getAlpha() * 100;
         $opaque  = $this->convertToIrisColor($color)->toHsla()->alpha($percent);
         return $this->convertFromIrisColor(
-            $opaque->mix($this->convertToIrisColor($background), $percent),
+            $this->convertToIrisColor($background)->mix($opaque, $percent),
         );
     }
 
