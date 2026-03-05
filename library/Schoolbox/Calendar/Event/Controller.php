@@ -1544,7 +1544,11 @@ class Controller extends Base
         $resourceById = $this->bookingItemMapper->findByColumn('id', $resourceIdsToHydrateDeduped)->indexBy('id');
         foreach ($bookings as $booking) {
             $booking->setEvent($event);
-            $booking->setResource($resourceById[$booking->getResource()->getId()]);
+            if ($resourceById->offsetExists($booking->getResource()->getId())) {
+                $booking->setResource($resourceById[$booking->getResource()->getId()]);
+            } else {
+                throw new UnexpectedValueException('Resource not found for booking to be deleted, so cannot check permission.');
+            }
         }
 
         $resourceIds = []; // Remember the set of resourceIds to be booked.  It will be used below.
