@@ -73,7 +73,8 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
             'class' => 'active',
         ]
     ]);
-} else if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+} else if ($this->arg[0] == 'new') {
+    $parentId = $this->arg[1] ?? null;
     $this->setFile(TEMPLATE_content, 'cms/myFolder.html');
     $this->setBlock(TEMPLATE_content, 'parent_list', 'parent_list_block');
 
@@ -82,10 +83,10 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     $this->setTab('resources');
 
 
-    if ($this->arg[1]) {
+    if ($parentId) {
         try {
             /** @var Schoolbox\Resource\My\Folder\Model $folder */
-            $folder = $folderMapper->findById($this->arg[1]);
+            $folder = $folderMapper->findById($parentId);
             // if folder exists and owner is different
             if ((int)$folder->getOwner()->getId() !== (int)$_SESSION['id']) {
                 $this->error(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
@@ -108,7 +109,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         'ACTION' => 'Add',
         'FOLDER_ID' => '',
         'NAME' => '',
-        'PARENT_ID' => $this->arg[1],
+        'PARENT_ID' => $parentId,
     );
     $this->setVar($output);
 
@@ -125,7 +126,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
                 'PARENT_ID' => $parent['id'],
                 'PARENT_NAME' => Scrub::text($parent['name']),
                 'PARENT_INDENT' => str_repeat('&nbsp;', ($parent['depth'] + 1) * 4),
-                'PARENT_SELECTED' => $parent['id'] == $this->arg[1] ? 'selected="selected"' : '',
+                'PARENT_SELECTED' => $parent['id'] == $parentId ? 'selected="selected"' : '',
             );
             $this->setVar($output);
             $this->parse('parent_list_block', 'parent_list', true);
