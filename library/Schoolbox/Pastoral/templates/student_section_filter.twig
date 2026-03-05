@@ -44,11 +44,11 @@
         </section>
     </div>
 
-    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/chained/jquery.chained.js?v={{ config.site_version }}"></script>
+    <script src="{{ CDN_PREFIX }}/js/bundle/chained.js?v={{ config.site_version }}"></script>
     {% if user.role.isStaff %}
     <script>
         $(function () {
-            $('#subtypeId').chained('#typeId');
+            window.sbx.chained('#subtypeId', '#typeId');
             $('[data-type-filter]').on('change', function () {
                 window.location.href = "?type=" + $(this).val() + "&subtype=" + $('#subtypeId').val() + "&showArchived=" + ($('#showArchivedRecords').is(':checked') ? 1 : 0);
             });
