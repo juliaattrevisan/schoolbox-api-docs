@@ -26,27 +26,6 @@ const inputEl = window.Vue.useTemplateRef<HTMLInputElement>("inputEl");
 const selectEl = window.Vue.useTemplateRef<HTMLSelectElement>("selectEl");
 
 /**
- * to listen for any clears of the selected codes from outside the Vue app
- */
-window.Vue.onMounted(() => {
-    // document.addEventListener(ON_FILTER_CHANGE, (event) => {
-    //     if (selectEl.value?.getAttribute("id") === event.detail.elementId) {
-    //         console.warn(event.detail.selection);
-    //         // just in case there are multiple on the page
-    //         const currentSelection = props.selected;
-    //         const newSelection = event.detail.selection;
-    //         // compare the newSelection with the currentSelection, removing any from the current selection that aren't in the new selection
-    //         const itemsToRemove = currentSelection.filter(
-    //             (item) => !newSelection.some((newItem: SearchSelectItem) => newItem.id === item.id),
-    //         );
-    //         if (itemsToRemove.length > 0) {
-    //             emit("remove", itemsToRemove);
-    //         }
-    //     }
-    // });
-});
-
-/**
  * Add a comma separated string of the ids of the selected ids
  * for use in forms
  * @returns - a comma separated string of the ids
@@ -72,17 +51,43 @@ function onRemoveItem(item: SearchSelectItem): void {
 }
 
 /**
- * To manually dispatch a <select> change event when there's been a change in the selection
- * As this is being handled by Vue rather than user input, the change event won't fire otherwise
- * except when the <select> is first displayed in the DOM.
- * We listen for this in library/Schoolbox/Filter/templates/panel.twig
+ * to keep the filter panel / search select in sync when changes are made to either
  */
-window.Vue.watch(ids, async () => {
-    await window.Vue.nextTick(); // nextTick to ensure the dom has updated so we can access with the latest changes
-    const event = new Event("change");
-    selectEl.value?.dispatchEvent(event);
-    inputEl.value?.dispatchEvent(event);
-});
+if (props.forFilterPanel) {
+    /**
+     * To manually dispatch a <select> change event when there's been a change in the selection
+     * As this is being handled by Vue rather than user input, the change event won't fire otherwise
+     * except when the <select> is first displayed in the DOM.
+     * We listen for this in library/Schoolbox/Filter/templates/panel.twig
+     */
+    window.Vue.watch(ids, async () => {
+        await window.Vue.nextTick(); // nextTick to ensure the dom has updated so we can access with the latest changes
+        const event = new Event("change");
+        selectEl.value?.dispatchEvent(event);
+        inputEl.value?.dispatchEvent(event);
+    });
+
+    /**
+     * to listen for any clears of the selected codes from outside the Vue app
+     */
+    window.Vue.onMounted(() => {
+        document.addEventListener(ON_FILTER_CHANGE, (event) => {
+            if (selectEl.value?.getAttribute("id") === event.detail.elementId) {
+                console.warn(event.detail.selection);
+                // just in case there are multiple on the page
+                const currentSelection = props.selected;
+                const newSelection = JSON.parse(event.detail.selection) as SearchSelectItem[];
+                // compare the newSelection with the currentSelection, removing any from the current selection that aren't in the new selection
+                const itemsToRemove = currentSelection.filter(
+                    (item) => !newSelection.some((newItem: SearchSelectItem) => newItem.id === item.id),
+                );
+                if (itemsToRemove.length > 0) {
+                    emit("remove", itemsToRemove);
+                }
+            }
+        });
+    });
+}
 </script>
 
 <template>
@@ -107,6 +112,7 @@ window.Vue.watch(ids, async () => {
         :value="ids"
     />
     <select
+        v-if="$props.forFilterPanel"
         :id="`${props.formValueName}[]`"
         ref="selectEl"
         :name="`${props.formValueName}[]`"
