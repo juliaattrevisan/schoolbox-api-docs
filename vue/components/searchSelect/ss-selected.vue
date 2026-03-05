@@ -5,6 +5,7 @@
 
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import SsSelectedItem from "./ss-selected-item.vue";
+import { ON_FILTER_CHANGE } from "./event/SbxSearchSelectEvent";
 
 interface Props {
     selected: SearchSelectItem[]; // the selected items
@@ -27,13 +28,21 @@ const selectEl = window.Vue.useTemplateRef<HTMLSelectElement>("selectEl");
  * to listen for any clears of the selected codes from outside the Vue app
  */
 window.Vue.onMounted(() => {
-    document.addEventListener("SEARCH_SELECT__UPDATE_SELECTION", (event) => {
-        if (selectEl.value?.getAttribute("id") === event.detail.elementId) {
-            // just in case there are multiple on the page
-            // const newSelection = JSON.parse(event.detail.selection);
-            // selectedNodesStore.update(newSelection);
-        }
-    });
+    // document.addEventListener(ON_FILTER_CHANGE, (event) => {
+    //     if (selectEl.value?.getAttribute("id") === event.detail.elementId) {
+    //         console.warn(event.detail.selection);
+    //         // just in case there are multiple on the page
+    //         const currentSelection = props.selected;
+    //         const newSelection = event.detail.selection;
+    //         // compare the newSelection with the currentSelection, removing any from the current selection that aren't in the new selection
+    //         const itemsToRemove = currentSelection.filter(
+    //             (item) => !newSelection.some((newItem: SearchSelectItem) => newItem.id === item.id),
+    //         );
+    //         if (itemsToRemove.length > 0) {
+    //             emit("remove", itemsToRemove);
+    //         }
+    //     }
+    // });
 });
 
 /**
