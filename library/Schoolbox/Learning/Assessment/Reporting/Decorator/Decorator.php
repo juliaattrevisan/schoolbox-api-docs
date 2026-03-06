@@ -116,14 +116,7 @@ class Decorator implements DecoratorInterface
 
         /* Assemble curriculum nodes
          */
-        $selectedNodesCsv = $this->supportingDataCurriculumNodes;
-
-        if (isset($selectedNodesCsv[0])) {
-            $selectedNodes = explode(',', $selectedNodesCsv[0]);
-
-            $assessment->setCurriculumNodes(CurriculumNodeMapper::getInstance()->findByColumn('id', $selectedNodes));
-        }
-
+        $assessment->setSupportingDataCurriculumNodes(CurriculumNodeMapper::getInstance()->findByColumn('id', $this->supportingDataCurriculumNodes));
         $assessment->setSupportingDataFolders($this->supportingDataFolders);
 
         /* Assemble work types' instances
