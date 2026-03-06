@@ -103,7 +103,7 @@ class Mapper extends BaseMapper
         $this->joinsReverseSingle('assessment_id', LtiAssessment\Mapper::class, 'ltiAssessment', 'ltiAssessment');
         $this->joinsReverseSingle('assessment_id', LessonPlan\Mapper::class, 'lessonPlan', 'lessonPlan');
         $this->joinsReverseSingle('assessment_id', DialogAgent\Mapper::class, 'dialogAgent', 'dialogAgent');
-        $this->joinsReverseSingle('assessment_id', DialogAgent\Mapper::class, 'reporting', 'reporting');
+        $this->joinsReverseSingle('assessment_id', Reporting\Mapper::class, 'reporting', 'reporting');
 
         // Participation plan join
         $this->joinsReverseMulti('assessment_id', Plan\Mapper::class, 'plans', 'plans');
