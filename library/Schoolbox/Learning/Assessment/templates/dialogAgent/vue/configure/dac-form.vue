@@ -214,7 +214,7 @@ window.Vue.onMounted(() => {
                 :disabled="isSubmitting || undefined"
             >
                 <div
-                    v-for="fieldContext in assessmentConfig.fieldContexts"
+                    v-for="(fieldContext, index) in assessmentConfig.fieldContexts"
                     :key="fieldContext.id"
                     class="small-12 columns"
                 >
@@ -232,6 +232,11 @@ window.Vue.onMounted(() => {
                             markdown: true,
                             toolbar: EditorToolbar.SIMPLE,
                         }"
+                        @update:body.once="
+                            // When an editor loads for the first time, it will mutate the saved value for that field from markdown to HTML.
+                            // This shouldn't count as a cache invalidation, so treat the first update of each field as the new value in the cache
+                            (content) => (assessmentConfigCache.fieldContexts[index].body = content || '')
+                        "
                     />
                 </div>
             </fieldset>
@@ -248,6 +253,11 @@ window.Vue.onMounted(() => {
                             markdown: true,
                             toolbar: EditorToolbar.SIMPLE,
                         }"
+                        @update:body.once="
+                            // When an editor loads for the first time, it will mutate the saved value for that field from markdown to HTML.
+                            // This shouldn't count as a cache invalidation, so treat the first update of each field as the new value in the cache
+                            (content) => (assessmentConfigCache.openingMessage = content || '')
+                        "
                     />
                 </div>
 
@@ -265,6 +275,11 @@ window.Vue.onMounted(() => {
                             markdown: true,
                             toolbar: EditorToolbar.SIMPLE,
                         }"
+                        @update:body.once="
+                            // When an editor loads for the first time, it will mutate the saved value for that field from markdown to HTML.
+                            // This shouldn't count as a cache invalidation, so treat the first update of each field as the new value in the cache
+                            (content) => (assessmentConfigCache.rules = content || '')
+                        "
                     />
                 </div>
             </fieldset>
