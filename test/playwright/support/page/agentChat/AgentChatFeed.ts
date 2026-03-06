@@ -10,9 +10,11 @@ import { expect } from "@schoolboxTest/playwright/support/integrations";
  */
 export default class AgentChatFeed {
     static readonly DATA_TEST_FEED_CONTAINER = "ac-feed";
-    static readonly DATA_TEST_FEED_REQUEST = "ac-feed-request"; // append -{entryKey}
-    static readonly DATA_TEST_FEED_RESPONSE = "ac-feed-response"; // append -{entryKey}
-    static readonly DATA_TEST_FEED_ALERT = "ac-feed-alert"; // append -{entryKey}
+    static readonly DATA_TEST_FEED_REQUEST = "ac-feed-request-list-item"; // append -{entryKey}
+    static readonly DATA_TEST_FEED_RESPONSE = "ac-feed-response-list-item"; // append -{entryKey}
+    static readonly DATA_TEST_FEED_RESPONSE_LOADING = "ac-feed-response-loading";
+    static readonly DATA_TEST_FEED_RESPONSE_RETRY = "ac-feed-response-retry-button";
+    static readonly DATA_TEST_FEED_ALERT = "ac-feed-alert-list-item"; // append -{entryKey}
     static readonly DATA_TEST_FEED_MESSAGE_CONTENT = "ac-feed-message-content";
 
     constructor(
@@ -88,5 +90,32 @@ export default class AgentChatFeed {
         const firstMessage = this.locateAllMessages().first();
         await AgentChatFeed.expectMessageIsType(firstMessage, AgentChatMessageType.RESPONSE);
         await AgentChatFeed.expectMessageToHaveText(firstMessage, expectedText);
+    }
+
+    /**
+     * Expect that a message in the feed is currently loading
+     * @param messageLocator - Locator for the message to check
+     */
+    public static async expectMessageIsLoading(messageLocator: Locator): Promise<void> {
+        const loadingIndicator = messageLocator.getByTestId(AgentChatFeed.DATA_TEST_FEED_RESPONSE_LOADING);
+        await expect(loadingIndicator).toBeVisible();
+    }
+
+    /**
+     * Wait for a message to no longer be loading
+     * @param messageLocator - Locator for the message to check
+     */
+    public static async waitForMessageLoaded(messageLocator: Locator): Promise<void> {
+        const loadingIndicator = messageLocator.getByTestId(AgentChatFeed.DATA_TEST_FEED_RESPONSE_LOADING);
+        await expect(loadingIndicator).not.toBeVisible();
+    }
+
+    /**
+     * Click the retry button on a given message (should always be the most recent)
+     * @param messageLocator - Locator for the response message that has a retry button
+     */
+    public static async clickRetry(messageLocator: Locator): Promise<void> {
+        const retryButton = messageLocator.getByTestId(AgentChatFeed.DATA_TEST_FEED_RESPONSE_RETRY);
+        await retryButton.click();
     }
 }

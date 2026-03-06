@@ -1,12 +1,17 @@
 import { AiFeature } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
+import { AgentChatMessageType } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
+import { DialogAgentHelpfulness } from "@schoolboxLibrary/Learning/Assessment/templates/dialogAgent/vue/configure/dacTypes";
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import AIServices, { AiProvider } from "@schoolboxTest/playwright/support/page/admin/ai/AIServices";
 import AgentChatFeed from "@schoolboxTest/playwright/support/page/agentChat/AgentChatFeed";
+import AgentChatPrompt from "@schoolboxTest/playwright/support/page/agentChat/AgentChatPrompt";
 import Common from "@schoolboxTest/playwright/support/page/Common";
 import DialogAgentConfigure from "@schoolboxTest/playwright/support/page/dialogAgent/DialogAgentConfigure";
 import DialogAgentHomepage from "@schoolboxTest/playwright/support/page/dialogAgent/DialogAgentHomepage";
 import DialogAgentModify from "@schoolboxTest/playwright/support/page/dialogAgent/DialogAgentModify";
+import DialogAgentResponse from "@schoolboxTest/playwright/support/page/dialogAgent/DialogAgentResponse";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
+import AssessmentPage from "@schoolboxTest/playwright/support/page/dueWork/AssessmentPage";
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 
 const ACTIVITY_NAME_BASE = "Anteresia Stimsoni";
@@ -98,8 +103,9 @@ test.describe("Dialog Agent", () => {
         const dialogAgentModify = new DialogAgentModify(page, tester);
         const dialogAgentConfigure = new DialogAgentConfigure(page, tester);
         await assessmentForm.setTitle(ACTIVITY_NAME_2);
+        await assessmentForm.setDescription("A science lesson about the Stimson's python");
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_HOMEWORK);
-        await dialogAgentModify.selectScenario("Self-Reflection");
+        await dialogAgentModify.selectScenario("Socratic Tutor");
         await assessmentForm.clickCreate();
 
         tester.isGoingTo("check sandbox is inactive prior to saving the initial configuration");
@@ -137,7 +143,7 @@ test.describe("Dialog Agent", () => {
         const dialogAgentConfigure = new DialogAgentConfigure(page, tester);
 
         tester.isGoingTo("open the configure page for the 2nd activity");
-        const activity2 = homepage.locateAssessmentRow(component, "test");
+        const activity2 = homepage.locateAssessmentRow(component, ACTIVITY_NAME_2);
         const activity2Id = await Homepage.getAssessmentId(activity2);
 
         await homepage.clickAssessmentComponentTOTMenu(activity2Id);
@@ -221,11 +227,104 @@ test.describe("Dialog Agent", () => {
         });
     });
 
-    test("view both activities in the component", async ({ tester, page }) => {
+    test("as a student, complete an attempt", async ({ tester, page, context }) => {
+        await tester.impersonate(Common.USER_JANAREED);
+
         const homepage = new Homepage(tester, page);
         await homepage.goto(Common.CLASS_ID_9AENG);
+
         const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME);
 
+        tester.isGoingTo("start an attempt for activity 2");
+        const activity2 = homepage.locateAssessmentRow(component, ACTIVITY_NAME_2);
+        const activity2Id = await Homepage.getAssessmentId(activity2);
+        await homepage.clickAssessmentComponentTitle(activity2Id);
+
+        const discussionHistory = new AssessmentPage(tester, page);
+        await discussionHistory.clickCreateSubmission();
+
+        const dialogAgentResponse = new DialogAgentResponse(page, tester);
+        await dialogAgentResponse.assertIsOnResponsePage(ACTIVITY_NAME_2);
+
+        tester.isGoingTo("expect to only see the opening message in the feed");
+        const agentChatFeed = new AgentChatFeed(page, tester);
+        const agentChatPrompt = new AgentChatPrompt(page, tester);
+
+        const allRequestMessages = agentChatFeed.locateMessagesWithType(AgentChatMessageType.REQUEST);
+        const allResponseMessages = agentChatFeed.locateMessagesWithType(AgentChatMessageType.RESPONSE);
+
+        await expect(allRequestMessages).toHaveCount(0);
+        await expect(allResponseMessages).toHaveCount(1);
+
+        await test.step("send a message in the chat", async () => {
+            const prompt1 = "What is the python's habitat?";
+            await agentChatPrompt.typePrompt(prompt1);
+            await agentChatPrompt.send();
+
+            tester.isGoingTo("expect to see the student's prompt in the feed, and a receive response from the AI");
+            await AgentChatFeed.expectMessageToHaveText(allRequestMessages.last(), prompt1);
+            await AgentChatFeed.expectMessageIsLoading(allResponseMessages.last());
+            await AgentChatFeed.waitForMessageLoaded(allResponseMessages.last());
+
+            await expect(allRequestMessages).toHaveCount(1);
+            await expect(allResponseMessages).toHaveCount(2);
+        });
+
+        tester.isGoingTo("emulate network being offline");
+        await context.setOffline(true);
+
+        const prompt2 = "What do they eat?";
+        await test.step("simulate a failed response, expect to see an error", async () => {
+            await agentChatPrompt.typePrompt(prompt2);
+            await agentChatPrompt.send();
+
+            await expect(allRequestMessages).toHaveCount(2);
+            await expect(allResponseMessages).toHaveCount(3);
+
+            await AgentChatFeed.expectMessageToHaveText(
+                allResponseMessages.last(),
+                "There was a problem retrieving the response. Failed to fetch",
+            );
+        });
+
+        await test.step("retry the failed message, (with network off), expect a 2nd error message", async () => {
+            await AgentChatFeed.clickRetry(allResponseMessages.last());
+
+            await expect(allRequestMessages).toHaveCount(3);
+            await expect(allResponseMessages).toHaveCount(4);
+
+            await AgentChatFeed.expectMessageToHaveText(
+                allResponseMessages.last(),
+                "There was a problem retrieving the response. Failed to fetch",
+            );
+        });
+
+        tester.isGoingTo("restore network connection");
+        await context.setOffline(false);
+
+        await test.step("retry the failed message again, expect a successful response", async () => {
+            await AgentChatFeed.clickRetry(allResponseMessages.last());
+
+            await AgentChatFeed.expectMessageToHaveText(allRequestMessages.last(), prompt2);
+            await AgentChatFeed.expectMessageIsLoading(allResponseMessages.last());
+            await AgentChatFeed.waitForMessageLoaded(allResponseMessages.last());
+
+            await expect(allRequestMessages).toHaveCount(4);
+            await expect(allResponseMessages).toHaveCount(5);
+        });
+
+        await dialogAgentResponse.clickSubmit();
+        await dialogAgentResponse.clickConfirmSubmission();
+
+        tester.isGoingTo("expect to see the attempt in submission history");
+        await expect(discussionHistory.locateAllInteractions()).toHaveCount(1);
+    });
+
+    test("as a staff member, see both activities in the component", async ({ tester, page }) => {
+        const homepage = new Homepage(tester, page);
+        await homepage.goto(Common.CLASS_ID_9AENG);
+
+        const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME);
         const activity1 = homepage.locateAssessmentRow(component, ACTIVITY_NAME_1);
         const activity2 = homepage.locateAssessmentRow(component, ACTIVITY_NAME_2);
 

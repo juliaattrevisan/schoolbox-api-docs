@@ -74,11 +74,11 @@ function retryResponse(): void {
             'ac-feed-response-success': isResponseComplete,
             radiolist: props.allowSelection && imageSrc && isResponseComplete,
         }"
-        :data-test="`ac-feed-response-${props.message.entryKey}`"
+        :data-test="`ac-feed-response-list-item-${props.message.entryKey}`"
     >
         <div class="ac-feed-side l-flex-row l-mar-s--right">
             <!-- When loading -->
-            <div v-if="!isResponseComplete" class="loader"></div>
+            <div v-if="!isResponseComplete" class="loader" data-test="ac-feed-response-loading"></div>
 
             <!-- When not loading, show a radio button to select this response -->
             <div v-if="isResponseComplete && props.allowSelection && imageSrc" class="ac-feed-select">
@@ -105,12 +105,19 @@ function retryResponse(): void {
 
         <!-- response errored -->
         <template v-if="props.message.data.status === 'error'">
-            <p class="alert-box alert l-mar--0 l-pad-s">
+            <p class="alert-box alert l-mar--0 l-pad-s" data-test="ac-feed-message-content">
                 <b v-if="props.errorPrefix">{{ props.errorPrefix }}</b>
                 {{ props.message.data.message }}
             </p>
             <div v-if="props.allowRetry && isLatestMessage" class="l-mar-xs--left">
-                <button class="button f-no-icon-button" type="button" title="Retry" data-tooltip @click="retryResponse">
+                <button
+                    class="button f-no-icon-button"
+                    type="button"
+                    title="Retry"
+                    data-tooltip
+                    data-test="ac-feed-response-retry-button"
+                    @click="retryResponse"
+                >
                     <sbx-icon name="refresh" size="m" color="currentColor"></sbx-icon>
                 </button>
             </div>

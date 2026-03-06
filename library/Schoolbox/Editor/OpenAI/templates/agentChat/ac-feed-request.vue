@@ -15,7 +15,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <div class="ac-feed-request" :data-test="`ac-feed-request-${props.message.entryKey}`">
+    <div class="ac-feed-request" :data-test="`ac-feed-request-list-item-${props.message.entryKey}`">
         <div class="ac-feed-message-container l-pad-s">
             <file-drop
                 v-if="props.message.meta.file"

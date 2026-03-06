@@ -41,7 +41,7 @@
 
 {# TODO: implement deleting a particular response #}
 {% set deleteRoute = routeLookupIfAuthorized('learningDialogAgentResponse.deleteParticularResponse', responseRouteData) %}
-<ul class="information-list threaded">
+<ul class="information-list threaded" data-test="assessment-submission-history-interaction-{{ currentInteraction.id }}">
     <li class="actions-small-1">
         <ul class="action-list">
             <li class="actions-small-1">

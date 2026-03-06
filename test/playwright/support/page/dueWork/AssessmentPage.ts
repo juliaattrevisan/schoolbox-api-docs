@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import AssessmentForm from "./AssessmentForm";
 
@@ -21,6 +21,8 @@ export default class AssessmentPage {
     static readonly DATA_TEST_ASSESSMENT_SUMMARY_SELF_ACKNOWLEDGE_BUTTON = "assessment-summary-self-acknowledge-button";
 
     static readonly DATA_TEST_ASSESSMENT_SUBMISSION_HISTORY = "assessment-submission-history";
+
+    static readonly DATA_TEST_ASSESSMENT_SUBMISSION_HISTORY_INTERACTION = "assessment-submission-history-interaction-"; // append "{interactionId}"
 
     static readonly SELECTOR_RETURN_BUTTON = 'a:has-text("Return")';
 
@@ -101,5 +103,13 @@ export default class AssessmentPage {
      */
     async clickReturn(): Promise<void> {
         await this.page.locator(AssessmentPage.SELECTOR_RETURN_BUTTON).click();
+    }
+
+    /**
+     * @returns A Locator for all interactions in the submission history section
+     */
+    public locateAllInteractions(): Locator {
+        const anyInteraction = new RegExp(`^${AssessmentPage.DATA_TEST_ASSESSMENT_SUBMISSION_HISTORY_INTERACTION}`);
+        return this.page.getByTestId(anyInteraction);
     }
 }
