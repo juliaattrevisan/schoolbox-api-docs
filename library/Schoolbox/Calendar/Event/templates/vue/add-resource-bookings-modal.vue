@@ -95,10 +95,10 @@ async function createNewBooking(): Promise<void> {
             toast.timeout({
                 text: responseData.message,
                 isSuccess: responseData.isSuccess,
-                //                timeoutCallback: () => {
-                //                    // Reload the page after the timeout expires.
-                //                    window.location.reload();
-                //                },
+                timeoutCallback: () => {
+                    // Reload the page after the timeout expires.
+                    window.location.reload();
+                },
             });
             isModalOpen.value = false; // Close the modal only on success.
         } else {
