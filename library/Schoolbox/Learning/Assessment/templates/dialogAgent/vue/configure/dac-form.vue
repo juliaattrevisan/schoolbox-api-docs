@@ -161,6 +161,7 @@ window.Vue.onMounted(() => {
                         name="helpfulness"
                         required
                         :disabled="!props.postUpdate"
+                        data-test="dac-form-helpfulness"
                     >
                         <option v-for="option in props.helpfulnessOptions" :key="option.value" :value="option.value">
                             {{ option.label }}
@@ -176,6 +177,7 @@ window.Vue.onMounted(() => {
                         name="language"
                         required
                         :disabled="!props.postUpdate"
+                        data-test="dac-form-language"
                     >
                         <option v-for="language in props.languageOptions" :key="language" :value="language">
                             {{ language }}

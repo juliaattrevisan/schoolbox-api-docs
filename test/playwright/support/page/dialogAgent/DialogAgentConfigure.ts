@@ -1,4 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
+import type { DialogAgentHelpfulness } from "@schoolboxLibrary/Learning/Assessment/templates/dialogAgent/vue/configure/dacTypes";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import { expect } from "@schoolboxTest/playwright/support/integrations";
 
@@ -8,6 +9,8 @@ export default class DialogAgentConfigure {
     static readonly DATA_TEST_SANDBOX_DISABLED = "dac-sandbox-disabled";
     static readonly DATA_TEST_SANDBOX_ALERT_DIRTY = "dac-sandbox-alert-dirty";
 
+    static readonly DATA_TEST_FORM_HELPFULNESS_SELECT = "dac-form-helpfulness";
+    static readonly DATA_TEST_FORM_LANGUAGE_SELECT = "dac-form-language";
     static readonly DATA_TEST_FORM_FIELD_TEXTAREA = "dac-form-field-"; // append field context id
     static readonly DATA_TEST_FORM_OPENING_MESSAGE_TEXTAREA = "dac-form-opening-message";
     static readonly DATA_TEST_FORM_RULES_TEXTAREA = "dac-form-rules";
@@ -93,5 +96,23 @@ export default class DialogAgentConfigure {
     public async assertSandboxUnsavedAlertNotVisible(): Promise<void> {
         const alert = this.locateContainer().getByTestId(DialogAgentConfigure.DATA_TEST_SANDBOX_ALERT_DIRTY);
         await expect(alert).not.toBeVisible();
+    }
+
+    /**
+     * Change the helpfulness setting
+     * @param option - The new helpfulness option to select
+     */
+    public async setHelpfulness(option: DialogAgentHelpfulness): Promise<void> {
+        const select = this.locateContainer().getByTestId(DialogAgentConfigure.DATA_TEST_FORM_HELPFULNESS_SELECT);
+        await select.selectOption({ value: option });
+    }
+
+    /**
+     * Change the language setting
+     * @param option - The new language option to select
+     */
+    public async setLanguage(option: string): Promise<void> {
+        const select = this.locateContainer().getByTestId(DialogAgentConfigure.DATA_TEST_FORM_LANGUAGE_SELECT);
+        await select.selectOption({ value: option });
     }
 }

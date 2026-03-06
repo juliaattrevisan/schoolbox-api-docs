@@ -130,7 +130,7 @@ test.describe("Dialog Agent", () => {
         await agentChatFeed.expectOpeningMessageToHaveText(openingMessage);
     });
 
-    test("configuration sandbox unsaved changes alert", async ({ tester, page }) => {
+    test("unsaved configuration changes alert", async ({ tester, page }) => {
         const homepage = new Homepage(tester, page);
         await homepage.goto(Common.CLASS_ID_9AENG);
         const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME);
@@ -146,15 +146,13 @@ test.describe("Dialog Agent", () => {
         tester.isGoingTo("expect no unsaved changes alert on page load");
         await dialogAgentConfigure.assertSandboxUnsavedAlertNotVisible();
 
-        const agentChatFeed = new AgentChatFeed(page, tester);
-
         await test.step("opening message", async () => {
             tester.isGoingTo("confirm the opening message is shown in the sandbox");
             const openingMessageTextarea = dialogAgentConfigure.locateFormOpeningMessageTextarea();
             const openingMessage = await tester.readCKEditorByLocator(openingMessageTextarea);
-            await agentChatFeed.expectOpeningMessageToHaveText(openingMessage);
 
-            tester.isGoingTo("confirm the opening message is shown in the sandbox");
+            const agentChatFeed = new AgentChatFeed(page, tester);
+            await agentChatFeed.expectOpeningMessageToHaveText(openingMessage);
 
             tester.isGoingTo("add 1 character, expect alert to be visible");
             await tester.focusCKEditorByLocator(openingMessageTextarea);
@@ -184,6 +182,42 @@ test.describe("Dialog Agent", () => {
             tester.isGoingTo("confirm the new opening message is shown in the sandbox");
             const updatedOpeningMessage = `${newChar}${openingMessage.slice(1)}`;
             await agentChatFeed.expectOpeningMessageToHaveText(updatedOpeningMessage);
+        });
+
+        await test.step("helpfulness setting", async () => {
+            tester.isGoingTo("change the helpfulness setting, expect alert to be visible");
+            await dialogAgentConfigure.setHelpfulness(DialogAgentHelpfulness.DIRECTED);
+            await dialogAgentConfigure.assertSandboxUnsavedAlertVisible();
+
+            tester.isGoingTo("change the helpfulness setting back to the original value, expect alert to be hidden");
+            await dialogAgentConfigure.setHelpfulness(DialogAgentHelpfulness.GUIDED);
+            await dialogAgentConfigure.assertSandboxUnsavedAlertNotVisible();
+
+            tester.isGoingTo("change the helpfulness setting again, expect alert to be visible");
+            await dialogAgentConfigure.setHelpfulness(DialogAgentHelpfulness.EXPLORATORY);
+            await dialogAgentConfigure.assertSandboxUnsavedAlertVisible();
+
+            tester.isGoingTo("save changes, expect alert to be hidden");
+            await dialogAgentConfigure.clickSaveConfiguration();
+            await dialogAgentConfigure.assertSandboxUnsavedAlertNotVisible();
+        });
+
+        await test.step("language setting", async () => {
+            tester.isGoingTo("change the language setting, expect alert to be visible");
+            await dialogAgentConfigure.setLanguage("French");
+            await dialogAgentConfigure.assertSandboxUnsavedAlertVisible();
+
+            tester.isGoingTo("change the language setting back to the original value, expect alert to be hidden");
+            await dialogAgentConfigure.setLanguage("English (AU)");
+            await dialogAgentConfigure.assertSandboxUnsavedAlertNotVisible();
+
+            tester.isGoingTo("change the language setting again, expect alert to be visible");
+            await dialogAgentConfigure.setLanguage("English (US)");
+            await dialogAgentConfigure.assertSandboxUnsavedAlertVisible();
+
+            tester.isGoingTo("save changes, expect alert to be hidden");
+            await dialogAgentConfigure.clickSaveConfiguration();
+            await dialogAgentConfigure.assertSandboxUnsavedAlertNotVisible();
         });
     });
 
