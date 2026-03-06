@@ -24,6 +24,22 @@ use React\Promise\PromiseInterface;
 class Client
 {
     /**
+     * Stored message listeners created by `subscribe`, keyed by channel.
+     * Multiple listeners per channel are supported.
+     *
+     * @var array<string, array<callable>>
+     */
+    private array $messageListeners = [];
+
+    /**
+     * Stored message listeners created by `psubscribe`, keyed by pattern.
+     * Multiple listeners per pattern are supported.
+     *
+     * @var array<string, array<callable>>
+     */
+    private array $pmessageListeners = [];
+
+    /**
      * Constructor
      *
      * @param ReactRedisClient $client The internal asynchronous Redis client.
@@ -45,15 +61,19 @@ class Client
     public function subscribe(array|string $channel, EventListener $listener): PromiseInterface
     {
         $channels = is_array($channel) ? $channel : [$channel];
-
-        /** @phpstan-ignore-next-line method.notFound - subscribe does exist */
-        $promise = Promise\all(array_map($this->client->subscribe(...), $channels));
-        $this->client->on('message', function (string $messageChannel, string $payload) use ($channels, $listener) {
-            if (in_array($messageChannel, $channels)) {
-                $listener->handle(new Message($payload, $messageChannel));
-            }
-        });
-        return $promise;
+        $promises = [];
+        foreach ($channels as $ch) {
+            $handler = function (string $messageChannel, string $payload) use ($ch, $listener) {
+                if ($messageChannel === $ch) {
+                    $listener->handle(new Message($payload, $messageChannel));
+                }
+            };
+            $this->client->on('message', $handler);
+            $this->messageListeners[$ch][] = $handler;
+            /** @phpstan-ignore-next-line method.notFound */
+            $promises[] = $this->client->subscribe($ch);
+        }
+        return Promise\all($promises);
     }
 
 
@@ -67,16 +87,19 @@ class Client
     public function psubscribe(string|array $pattern, EventListener $listener): PromiseInterface
     {
         $patterns = is_array($pattern) ? $pattern : [$pattern];
-
-        /** @phpstan-ignore-next-line method.notFound - psubscribe does exist */
-        $promise = Promise\all(array_map($this->client->psubscribe(...), $patterns));
-        $this->client->on('pmessage', function (string $messagePattern, string $messageChannel, string $payload) use ($patterns, $listener) {
-            if (in_array($messagePattern, $patterns)) {
-                $event = new PMessage($payload, $messageChannel, $messagePattern);
-                $listener->handle($event);
-            }
-        });
-        return $promise;
+        $promises = [];
+        foreach ($patterns as $p) {
+            $handler = function (string $messagePattern, string $messageChannel, string $payload) use ($p, $listener) {
+                if ($messagePattern === $p) {
+                    $listener->handle(new PMessage($payload, $messageChannel, $messagePattern));
+                }
+            };
+            $this->client->on('pmessage', $handler);
+            $this->pmessageListeners[$p][] = $handler;
+            /** @phpstan-ignore-next-line method.notFound */
+            $promises[] = $this->client->psubscribe($p);
+        }
+        return Promise\all($promises);
     }
 
 
@@ -89,7 +112,13 @@ class Client
     public function unsubscribe(array|string $channel): PromiseInterface
     {
         $channels = is_array($channel) ? $channel : [$channel];
-        /** @phpstan-ignore-next-line method.notFound - unsubscribe does exist */
+        foreach ($channels as $ch) {
+            foreach ($this->messageListeners[$ch] ?? [] as $handler) {
+                $this->client->removeListener('message', $handler);
+            }
+            unset($this->messageListeners[$ch]);
+        }
+        /** @phpstan-ignore-next-line method.notFound */
         return Promise\all(array_map($this->client->unsubscribe(...), $channels));
     }
 
@@ -103,7 +132,13 @@ class Client
     public function punsubscribe(array|string $pattern): PromiseInterface
     {
         $patterns = is_array($pattern) ? $pattern : [$pattern];
-        /** @phpstan-ignore-next-line method.notFound - punsubscribe does exist */
+        foreach ($patterns as $p) {
+            foreach ($this->pmessageListeners[$p] ?? [] as $handler) {
+                $this->client->removeListener('pmessage', $handler);
+            }
+            unset($this->pmessageListeners[$p]);
+        }
+        /** @phpstan-ignore-next-line method.notFound */
         return Promise\all(array_map($this->client->punsubscribe(...), $patterns));
     }
 }

@@ -41,15 +41,18 @@ class SubscriptionManager implements ISubscriptionManager
      */
     public function subscribeUser(string $instanceId, int $userId): bool
     {
+        $this->log->debug("Subscribing instance:user $instanceId:$userId");
         if ($this->userHasSubscription($instanceId, $userId)) {
             // TODO consider parameterised logging
-            $this->log->info("User $userId is already subscribed for instance $instanceId");
+            $this->log->info("Instance:user $instanceId:$userId is already subscribed");
             return true;
         }
 
         try {
             $this->putSubscription($instanceId, $userId, $this->factory->build($instanceId, $userId));
+            $this->log->debug("Subscribed instance:user $instanceId:$userId");
         } catch (\RuntimeException $e) {
+            $this->log->warning("Failed to subscribe instance:user $instanceId:$userId: {$e->getMessage()}");
             return false;
         }
 
@@ -69,6 +72,7 @@ class SubscriptionManager implements ISubscriptionManager
      */
     public function getUserSubscription(string $instanceId, int $userId): ISubscription
     {
+        $this->log->debug("Retrieving subscription for instance:user $instanceId:$userId");
         if (!$this->userHasSubscription($instanceId, $userId)) {
             // doesn't exist: create it
             $this->subscribeUser($instanceId, $userId);
@@ -82,11 +86,14 @@ class SubscriptionManager implements ISubscriptionManager
      */
     public function removeSubscription(string $instanceId, int $userId): bool
     {
+        $this->log->debug("Unsubscribing instance:user $instanceId:$userId");
         if (!$this->userHasSubscription($instanceId, $userId)) {
+            $this->log->info("Instance:user $instanceId:$userId is not subscribed");
             return false;
         }
         // unsetting this will call Subscription::__destruct, which will call unsubscribe()
         unset($this->subscriptions[$instanceId][$userId]);
+        $this->log->debug("Unsubscribed instance:user $instanceId:$userId");
 
         // Clean up empty instance array to prevent memory accumulation
         if (empty($this->subscriptions[$instanceId])) {
