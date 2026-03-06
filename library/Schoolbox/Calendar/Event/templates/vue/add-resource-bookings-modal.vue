@@ -91,10 +91,16 @@ async function createNewBooking(): Promise<void> {
         });
         const responseData = (await response.json()) as AddBookingsToEventResponse;
         if (response.ok) {
-            isModalOpen.value = false; // Close the modal only on success.
-            // Note no toast is shown here because on success the page refreshes, and
-            // the added resources will appear with their statuses on the refreshed page.
-            window.location.reload();
+            if (responseData.isSuccess) {
+                isModalOpen.value = false; // Close the modal only on success.
+                // Note no toast is shown here because on success the page refreshes, and
+                // the added resources will appear with their statuses on the refreshed page.
+                window.location.reload();
+            } else {
+                // This will happen if no errors occurred but no bookings were created.
+                // This is possible because any resources already booked are skipped.
+                toast.timeout({ text: responseData.message, isSuccess: responseData.isSuccess });
+            }
         } else {
             toast.timeout({ text: "Unable to create booking(s)", isSuccess: false });
         }
