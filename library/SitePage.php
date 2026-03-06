@@ -477,6 +477,7 @@ class SitePage
      *                        null: outputs whatever's in $message as error
      * @param string $message Replaces '%MESSAGE%' in $ec
      * @param int    $code    HTTP response code, defaults to 400 (Bad Request)
+     * @return never-return
      * @throws SchoolboxException
      */
     public function error($ec, $message = '', $code = 400)

@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 $folderHandler = new MyFolder();
 $userMapper = new Schoolbox\UserMapper();
@@ -13,7 +14,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         $folder = $folderMapper->findById($this->arg[0]);
         // if folder exists and owner is different
         if ((int)$folder->getOwner()->getId() !== (int)$_SESSION['id']) {
-            $this->error(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
+            $this->error(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
         try {
             $folder->setOwner($userMapper->findById($folder->getOwner()->getId()));
@@ -21,8 +22,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
             // Has no owner, and that's okay
         }
     } catch (\Schoolbox\Mapper\Exception $e) {
-        error(2);
-        exit;
+        $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 
     $this->setFile(TEMPLATE_content, "cms/myFolder.html");
@@ -74,7 +74,10 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         ]
     ]);
 } else if ($this->arg[0] == 'new') {
-    $parentId = $this->arg[1] ?? null;
+    $parentId = $this->arg[1] ?? 0;
+    if (!is_numeric($parentId)) {
+        $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
+    }
     $this->setFile(TEMPLATE_content, 'cms/myFolder.html');
     $this->setBlock(TEMPLATE_content, 'parent_list', 'parent_list_block');
 
@@ -89,7 +92,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
             $folder = $folderMapper->findById($parentId);
             // if folder exists and owner is different
             if ((int)$folder->getOwner()->getId() !== (int)$_SESSION['id']) {
-                $this->error(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
+                $this->error(ErrorMapper::ERROR_PAGE_NOT_FOUND);
             }
             try {
                 $folder->setOwner($userMapper->findById($folder->getOwner()->getId()));
@@ -98,8 +101,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
             }
             $owner = $folder->getOwner();
         } catch (\Schoolbox\Mapper\Exception $e) {
-            error(2);
-            exit;
+            $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
     } else {
         $owner = $_SESSION['user'];
@@ -148,5 +150,5 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         ]
     ]);
 } else {
-    $this->error(2);
+    $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
