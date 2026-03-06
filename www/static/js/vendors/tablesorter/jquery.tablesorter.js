@@ -86,7 +86,7 @@
 				cssHeaderRow     : '',
 				cssProcessing    : '', // processing icon applied to header during sort/filter
 
-				cssChildRow      : 'tablesorter-childRow', // class name indiciating that a row is to be attached to the its parent 
+				cssChildRow      : 'tablesorter-childRow', // class name indiciating that a row is to be attached to the its parent
 				cssIcon          : 'tablesorter-icon',     //  if this class exists, a <i> will be added to the header automatically
 				cssInfoBlock     : 'tablesorter-infoOnly', // don't sort tbody with this class name (only one class name allowed here!)
 
@@ -168,10 +168,7 @@
 						text = c.supportsTextContent ? node.textContent : $(node).text();
 					}
 				}
-				return (text).trim();
-			}
-
-			function detectParserForColumn(table, rows, rowIndex, cellIndex) {
+			return String(text || '').trim();
 				var cur,
 				i = ts.parsers.length,
 				node = false,
@@ -1400,7 +1397,8 @@
 		format: function(s, table) {
 			var c = table.config;
 			if (s) {
-				s = ( c.ignoreCase ? s.toLocaleLowerCase().trim() : s );
+				s = ( c.ignoreCase ? s.toLocaleLowerCase() : s );
+				s = s.trim();
 				s = c.sortLocaleCompare ? ts.replaceAccents(s) : s;
 			}
 			return s;
@@ -1415,7 +1413,7 @@
 		},
 		format: function(s, table) {
 			var n = ts.formatFloat((s || '').replace(/[^\w,. \-()]/g, ""), table);
-			return s && typeof n === 'number' ? n : s ? ( s && table.config.ignoreCase ? s.toLocaleLowerCase().trim() : s ) : s;
+			return s && typeof n === 'number' ? n : s ? ( s && table.config.ignoreCase ? s.toLocaleLowerCase().trim() : s.trim() ) : s;
 		},
 		type: "numeric"
 	});
@@ -1427,7 +1425,7 @@
 		},
 		format: function(s, table) {
 			var n = ts.formatFloat((s || '').replace(/[^\w,. \-()]/g, ""), table);
-			return s && typeof n === 'number' ? n : s ? ( s && table.config.ignoreCase ? s.toLocaleLowerCase().trim() : s ) : s;
+			return s && typeof n === 'number' ? n : s ? ( s && table.config.ignoreCase ? s.toLocaleLowerCase().trim() : s.trim() ) : s;
 		},
 		type: "numeric"
 	});
@@ -1455,7 +1453,7 @@
 			return (/^(https?|ftp|file):\/\//).test(s);
 		},
 		format: function(s) {
-			return s ? (s.replace(/(https?|ftp|file).trim():\/\//, '')) : s;
+			return s ? (s.replace(/(https?|ftp|file):\/\//, '').trim()) : s;
 		},
 		type: "text"
 	});

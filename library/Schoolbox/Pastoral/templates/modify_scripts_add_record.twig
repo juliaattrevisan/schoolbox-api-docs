@@ -94,11 +94,17 @@
         /* Get the current entry tip when modifying the record
          */
         if (subtypeDropdown.val() === null) {
-            updateEntryTip((typesIndexEntryTip[typeDropdown.val().trim()]));
-            updateExpiresAt((typesIndexDefaultExpiry[typeDropdown.val().trim()]));
+            const typeVal = String(typeDropdown.val() ?? "").trim();
+            const typeEntryTip = typesIndexEntryTip[typeVal];
+            const typeExpiry = typesIndexDefaultExpiry[typeVal];
+            updateEntryTip(typeEntryTip != null ? String(typeEntryTip).trim() : "");
+            updateExpiresAt(typeExpiry != null ? String(typeExpiry).trim() : "");
         } else {
-            updateEntryTip((subtypesIndexEntryTip[subtypeDropdown.val().trim()]));
-            updateExpiresAt((subtypesIndexDefaultExpiry[subtypeDropdown.val().trim()]));
+            const subtypeVal = String(subtypeDropdown.val() ?? "").trim();
+            const subtypeEntryTip = subtypesIndexEntryTip[subtypeVal];
+            const subtypeExpiry = subtypesIndexDefaultExpiry[subtypeVal];
+            updateEntryTip(subtypeEntryTip != null ? String(subtypeEntryTip).trim() : "");
+            updateExpiresAt(subtypeExpiry != null ? String(subtypeExpiry).trim() : "");
         }
         {% endif %}
 
@@ -109,13 +115,13 @@
             if (null !== subtypeVal) {
                 let subtypeEntryTip = subtypesIndexEntryTip[subtypeVal];
                 let subtypeExpiry = subtypesIndexDefaultExpiry[subtypeVal];
-                updateEntryTip(subtypeEntryTip != null ? subtypeEntryTip.trim() : null);
-                updateExpiresAt(subtypeExpiry != null ? subtypeExpiry.trim() : null);
+                updateEntryTip(subtypeEntryTip != null ? String(subtypeEntryTip).trim() : "");
+                updateExpiresAt(subtypeExpiry != null ? String(subtypeExpiry).trim() : "");
             } else {
                 let typeEntryTip = typesIndexEntryTip[typeVal];
                 let typeExpiry = typesIndexDefaultExpiry[typeVal];
-                updateEntryTip(typeEntryTip != null ? typeEntryTip.trim() : null);
-                updateExpiresAt(typeExpiry != null ? typeExpiry.trim() : null);
+                updateEntryTip(typeEntryTip != null ? String(typeEntryTip).trim() : "");
+                updateExpiresAt(typeExpiry != null ? String(typeExpiry).trim() : "");
             }
         }
 

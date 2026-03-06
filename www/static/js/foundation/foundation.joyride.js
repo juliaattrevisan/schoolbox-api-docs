@@ -277,7 +277,7 @@
 
         button_text: function (txt) {
             if (this.settings.tip_settings.next_button) {
-                txt = txt.trim() || "Next";
+                txt = (txt || "").trim() || "Next";
                 txt = $(this.settings.template.button).append(txt)[0].outerHTML;
             } else {
                 txt = "";
@@ -287,7 +287,7 @@
 
         prev_button_text: function (txt, idx) {
             if (this.settings.tip_settings.prev_button) {
-                txt = txt.trim() || "Previous";
+                txt = (txt || "").trim() || "Previous";
 
                 // Add the disabled class to the button if it's the first element
                 if (idx == 0) {

@@ -255,7 +255,7 @@ describe("chained()", () => {
             parentSelect.dispatchEvent(new Event("change"));
 
             // The child won't be updated, so we just verify destroy doesn't break anything
-            expect(api.destroy).not.toThrow();
+            expect(() => api.destroy()).not.toThrow();
         });
     });
 

@@ -1,5 +1,5 @@
 /*
- * The following is a Vanilla JS Typescsript simplified conversion of jQuery Chained: https://github.com/tuupola/jquery_chained for our current needs
+ * The following is a Vanilla JS TypeScript simplified conversion of jQuery Chained: https://github.com/tuupola/jquery_chained for our current needs
  * It's currently only used in the Pastoral module, to update the subtype options based on the selected type,
  * but it is designed to be reusable and easily extendable to other use cases.
  * Usage: window.sbx.chained(childSelector, parentSelector)

@@ -332,7 +332,7 @@
         "ckeRequired",
         function (value, element) {
             var textboxId = $(element).attr("id");
-            return $(window.sbProps.editors[textboxId].getData().trim()).length > 0;
+            return window.sbProps.editors[textboxId].getData().trim().length > 0;
         },
         "This field is required",
     );
