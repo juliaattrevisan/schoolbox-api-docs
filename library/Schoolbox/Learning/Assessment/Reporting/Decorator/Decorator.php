@@ -115,8 +115,13 @@ class Decorator implements DecoratorInterface
         $assessment->setSupportingDataRange($this->supportingDataRange);
 
         /* Assemble curriculum nodes
+         * Selection of curriculum nodes is entirely optional for users: leaving this empty means we won't filter on
+         * curriculum nodes at all, letting everything through
          */
-        $assessment->setSupportingDataCurriculumNodes(CurriculumNodeMapper::getInstance()->findByColumn('id', $this->supportingDataCurriculumNodes));
+        if ($this->supportingDataCurriculumNodes && \count($this->supportingDataCurriculumNodes)) {
+            $assessment->setSupportingDataCurriculumNodes(CurriculumNodeMapper::getInstance()->findByColumn('id', $this->supportingDataCurriculumNodes));
+        }
+
         $assessment->setSupportingDataFolders($this->supportingDataFolders);
 
         /* Assemble work types' instances

@@ -80,13 +80,13 @@ CREATE TABLE `reporting_curriculum_node` (
 -- Similarly, this means "filter the mega markbook to only show assessments that had one or more of these work types"
 -- It does not mean "this reporting activity has this work type" (that's on the assessment table)
 CREATE TABLE `reporting_work_type` (
-    `assessment_id` INT UNSIGNED NOT NULL,
+    `reporting_id` INT NOT NULL,
     `work_type_id` INT NOT NULL,
-    UNIQUE INDEX `fk_aw_unique` (assessment_id, work_type_id),
-    INDEX `fk_rwt_a_assessment_idx` (`assessment_id` ASC),
-    CONSTRAINT `fk_rwt_a_assessment`
-        FOREIGN KEY (`assessment_id`)
-            REFERENCES `assessment` (`id`)
+    UNIQUE INDEX `fk_aw_unique` (reporting_id, work_type_id),
+    INDEX `fk_rwt_reporting_id_idx` (`reporting_id` ASC),
+    CONSTRAINT `fk_rwt_reporting_id`
+        FOREIGN KEY (`reporting_id`)
+            REFERENCES `reporting` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION,
     INDEX `fk_rwt_wti_work_type_idx` (`work_type_id` ASC),

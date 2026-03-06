@@ -81,6 +81,18 @@ class Mapper extends \Schoolbox\Mapper
         );
 
 
+        $this->joinsVia(
+            'reporting_work_type',
+            \Schoolbox\Learning\Assessment\WorkType\Mapper::class,
+            'id',
+            'work_type_id',
+            'reporting_id',
+            null,
+            null,
+            null,
+            'supportingDataWorkTypes'
+        );
+
         /* TODO Add join for Feedbacks
          */
 
@@ -144,20 +156,20 @@ class Mapper extends \Schoolbox\Mapper
                 /* Initialise collections
                  */
                 $subobject->setSupportingDataCurriculumNodes($this->getJoinmapper('reporting_curriculum_node')->createcollection());
+                $subobject->setSupportingDataWorkTypes($this->getJoinmapper('reporting_work_type')->createcollection());
 
                 $stack[$subobject->getId()] = $subobject;
             }
 
         }
 
+        /* Supporting Data nodes (sry, there isn't a shorter name...)
+         */
         if ($this->getConfigLoader()->get('curriculum_tagging_enabled')) {
-            /* Supporting Data nodes (sry, there isn't a shorter name...)
-             */
             $stack = $this->hydrateSupportingDataCurriculumNodesIntoCollection($stack);
         }
 
-
-        return $stack;
+        return $this->hydrateSupportingDataWorkTypesIntoCollection($stack);
     }
 
 
@@ -189,6 +201,40 @@ class Mapper extends \Schoolbox\Mapper
             /** @var \Schoolbox\Curriculum\Node\Model $curriculumNode */
             $curriculumNode = $this->hydrateJoin($row, 'reporting_curriculum_node', 'cn');
             $collection[$row['id']]->getSupportingDataCurriculumNodes()->setOffset($curriculumNode->getId(), $curriculumNode);
+        }
+
+        return $collection;
+    }
+
+
+    /**
+     * Helper method for hydrating work types into the collection of
+     * Reporting activity's supporting data, retrieved by `hydrateSelect`.
+     *
+     * @param GenericCollection $collection
+     * @return GenericCollection
+     */
+    private function hydrateSupportingDataWorkTypesIntoCollection(GenericCollection $collection): GenericCollection
+    {
+        $reportingIds = $collection->keys();
+
+        $pb = $this->getPredicateBuilder()->in('id', $reportingIds);
+        $query = "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('reporting_work_type', 'lwt')}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
+            INNER JOIN reporting_work_type rwt ON reporting.id = rwt.reporting_id
+            INNER JOIN lu_work_type lwt ON rwt.work_type_id = lwt.id AND lwt.deleted_at IS NULL
+            WHERE {$pb->getWhereIntersect()}
+        ";
+
+        $workTypeStatement = $this->database->query($query, $pb->getParams());
+
+        foreach ($workTypeStatement as $row) {
+            /** @var \Schoolbox\Learning\Assessment\WorkType\Model */
+            $workType = $this->hydrateJoin($row, 'reporting_work_type', 'lwt');
+            $collection[$row['id']]->getSupportingDataWorkTypes()->setOffset($workType->getId(), $workType);
         }
 
         return $collection;
