@@ -10,6 +10,7 @@ test.describe("Curriculum Overview Component Tests", () => {
     let homepage: Homepage;
     let curriculumOverview: CurriculumOverview;
     let curriculumOverviewComponent: Locator;
+    let curriculumOverviewComponentId: number;
 
     const curriculumOverviewTitle = "Test Curriculum Overview Automation";
 
@@ -27,8 +28,8 @@ test.describe("Curriculum Overview Component Tests", () => {
 
         await homepage.addComponent(Homepage.ELEMENT_COMPONENT_SECTION_LEARNING, "Curriculum Description",);
         curriculumOverviewComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1,);
-        const componentEnglishId = await Homepage.getComponentId(curriculumOverviewComponent);
-        tester.isGoingTo(`Use component: ${componentEnglishId}`);
+        curriculumOverviewComponentId = await Homepage.getComponentId(curriculumOverviewComponent);
+        tester.isGoingTo(`Use component: ${curriculumOverviewComponentId}`);
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
         await Homepage.clickComponentSettings(curriculumOverviewComponent);
         tester.isGoingTo("Add Title");
@@ -72,6 +73,30 @@ test.describe("Curriculum Overview Component Tests", () => {
         await curriculumOverview.clickCurriculumCodeLink(curriculumOverviewComponent, "ELBE1177");
         await expect(page).toHaveURL(/\/curriculum#154/);
 
-        await db.updateInDatabase("curriculum_node", { enabled: 0 }, { id: 155, code: "ELBE1178" },);
+        //await db.updateInDatabase("curriculum_node", { enabled: 0 }, { id: 155, code: "ELBE1178" },);
+
+        tester.isGoingTo("Login as student and check the header and buttons are not visible");
+        await tester.impersonate("Jana Reed");
+        await homepage.goto(83);
+
+
+
+
     });
+
+
+
+
+
+
+
+
+    test.afterAll(async ({ baseTester, db, api }) => {
+        baseTester.isGoingTo("clean up: remove Curriculum Overview component and restore curriculum node");
+
+        // await db.updateInDatabase("curriculum_node", { enabled: 1 }, { id: 155, code: "ELBE1178" });
+        // await api.deleteHomepageComponent(87, curriculumOverviewComponentId);
+    });
+
+
 });
