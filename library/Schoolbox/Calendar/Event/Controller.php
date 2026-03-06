@@ -1177,7 +1177,7 @@ class Controller extends Base
         $this->response = $this->responseAsJson(
             // This data structure must match type 'AddBookingsToEventResponse' defined in add-resource-bookings-modal.vue.
             [
-                'message' => $this->bookingResponseHelper->getResponseMessage(
+                'message' => $this->bookingResponseHelper->getCreateResponseMessage(
                     $results['nBookingsCreatedByStatusId'],
                     false
                 ),
