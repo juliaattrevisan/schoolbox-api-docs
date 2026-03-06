@@ -83,6 +83,7 @@ export default {
             },
             calendarOptions: {},
             suppressNextReloadEventsToast: false,
+            pendingReloadToastMessage: null,
         };
     },
 
@@ -115,6 +116,16 @@ export default {
     },
 
     beforeMount() {
+        // Support cross-page redirects that want to show a custom toast after events load.
+        // The redirecting page adds ?calendarToast=<message> to the calendar URL.
+        const url = new URL(window.location.href);
+        const pendingToast = url.searchParams.get("calendarToast");
+        if (pendingToast) {
+            this.pendingReloadToastMessage = pendingToast;
+            url.searchParams.delete("calendarToast");
+            window.history.replaceState({}, "", url.toString());
+        }
+
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
             plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, adaptivePlugin],
@@ -241,7 +252,10 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
-            const toast = this.suppressNextReloadEventsToast
+            const customSuccessMessage = this.pendingReloadToastMessage;
+            this.pendingReloadToastMessage = null;
+
+            const toast = (this.suppressNextReloadEventsToast && customSuccessMessage === null)
                 ? null
                 : window.sbProps.toastActivate("Retrieving calendar events...");
             this.suppressNextReloadEventsToast = false;
@@ -262,7 +276,7 @@ export default {
                             return "start" in v;
                         }),
                     );
-                    toast?.timeout({ text: "Events retrieved successfully" });
+                    toast?.timeout({ text: customSuccessMessage ?? "Events retrieved successfully" });
                 })
                 .catch((error) => {
                     toast?.timeout({ text: "Events could not be retrieved", isSuccess: false });
@@ -607,6 +621,19 @@ export default {
          */
         reloadEventsWithoutToast() {
             this.suppressNextReloadEventsToast = true;
+            this.calendarApi.refetchEvents();
+        },
+
+        /**
+         * Same as reloadEvents(), but replaces the default success toast message with a custom one.
+         * Useful when a Vue module emits an event describing what was created (e.g. booking counts).
+         * For cross-page redirects, prefer the ?calendarToast=<message> URL parameter instead,
+         * which is read automatically on mount.
+         *
+         * @param {string} message
+         */
+        reloadEventsWithCustomToast(message) {
+            this.pendingReloadToastMessage = message;
             this.calendarApi.refetchEvents();
         },
 
