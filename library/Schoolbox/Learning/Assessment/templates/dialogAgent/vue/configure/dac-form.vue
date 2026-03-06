@@ -235,10 +235,12 @@ window.Vue.onMounted(() => {
                             markdown: true,
                             toolbar: EditorToolbar.SIMPLE,
                         }"
-                        @update:body.once="
+                        @editor-loaded="
                             // When an editor loads for the first time, it will mutate the saved value for that field from markdown to HTML.
                             // This shouldn't count as a cache invalidation, so treat the first update of each field as the new value in the cache
-                            (content) => (assessmentConfigCache.fieldContexts[index].body = content || '')
+                            () =>
+                                (assessmentConfigCache.fieldContexts[index].body =
+                                    assessmentConfig.fieldContexts[index].body)
                         "
                     />
                 </div>
@@ -256,10 +258,10 @@ window.Vue.onMounted(() => {
                             markdown: true,
                             toolbar: EditorToolbar.SIMPLE,
                         }"
-                        @update:body.once="
+                        @editor-loaded="
                             // When an editor loads for the first time, it will mutate the saved value for that field from markdown to HTML.
                             // This shouldn't count as a cache invalidation, so treat the first update of each field as the new value in the cache
-                            (content) => (assessmentConfigCache.openingMessage = content || '')
+                            () => (assessmentConfigCache.openingMessage = assessmentConfig.openingMessage)
                         "
                     />
                 </div>
@@ -278,10 +280,10 @@ window.Vue.onMounted(() => {
                             markdown: true,
                             toolbar: EditorToolbar.SIMPLE,
                         }"
-                        @update:body.once="
+                        @editor-loaded="
                             // When an editor loads for the first time, it will mutate the saved value for that field from markdown to HTML.
                             // This shouldn't count as a cache invalidation, so treat the first update of each field as the new value in the cache
-                            (content) => (assessmentConfigCache.rules = content || '')
+                            () => (assessmentConfigCache.rules = assessmentConfig.rules)
                         "
                     />
                 </div>

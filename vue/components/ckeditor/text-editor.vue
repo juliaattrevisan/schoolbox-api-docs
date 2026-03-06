@@ -14,6 +14,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const body = defineModel<string | null>("body", { required: true });
+const emit = defineEmits(["editorLoaded"]);
 
 /** Proxy for the body model to handle null values gracefully */
 const bodyProxy = window.Vue.computed({
@@ -40,6 +41,8 @@ window.Vue.onMounted(async () => {
             true,
         );
     });
+
+    emit("editorLoaded");
 });
 
 window.Vue.onBeforeUnmount(async () => {
