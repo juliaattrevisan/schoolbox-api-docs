@@ -6,6 +6,7 @@ export default class DialogAgentConfigure {
     static readonly DATA_TEST_CONTAINER = "dialog-agent-configure-container";
 
     static readonly DATA_TEST_SANDBOX_DISABLED = "dac-sandbox-disabled";
+    static readonly DATA_TEST_SANDBOX_ALERT_DIRTY = "dac-sandbox-alert-dirty";
 
     static readonly DATA_TEST_FORM_FIELD_TEXTAREA = "dac-form-field-"; // append field context id
     static readonly DATA_TEST_FORM_OPENING_MESSAGE_TEXTAREA = "dac-form-opening-message";
@@ -76,5 +77,21 @@ export default class DialogAgentConfigure {
     public async clickSaveConfiguration(): Promise<void> {
         const saveButton = this.locateContainer().getByTestId(DialogAgentConfigure.DATA_TEST_FORM_SAVE_BUTTON);
         await saveButton.click();
+    }
+
+    /**
+     * Verify that the sandbox shows the unsaved changes alert
+     */
+    public async assertSandboxUnsavedAlertVisible(): Promise<void> {
+        const alert = this.locateContainer().getByTestId(DialogAgentConfigure.DATA_TEST_SANDBOX_ALERT_DIRTY);
+        await expect(alert).toBeVisible();
+    }
+
+    /**
+     * Verify that the sandbox does NOT show the unsaved changes alert
+     */
+    public async assertSandboxUnsavedAlertNotVisible(): Promise<void> {
+        const alert = this.locateContainer().getByTestId(DialogAgentConfigure.DATA_TEST_SANDBOX_ALERT_DIRTY);
+        await expect(alert).not.toBeVisible();
     }
 }

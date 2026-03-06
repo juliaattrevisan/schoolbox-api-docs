@@ -116,6 +116,10 @@ test.describe("Dialog Agent", () => {
 
         tester.isGoingTo("save the initial configuration");
         await dialogAgentConfigure.clickSaveConfiguration();
+
+        // TODO: SA-22047
+        // tester.isGoingTo("confirm the sandbox doesn't show the unsaved changes alert");
+        // await dialogAgentConfigure.assertSandboxUnsavedAlertNotVisible();
     });
 
     test("view both activities in the component", async ({ tester, page }) => {

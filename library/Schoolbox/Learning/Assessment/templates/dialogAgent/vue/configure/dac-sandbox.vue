@@ -52,7 +52,7 @@ defineExpose({ resetFeed });
 
 <template>
     <div class="content">
-        <div v-if="props.isDirty" class="alert-box highlight">
+        <div v-if="props.isDirty" class="alert-box highlight" data-test="dac-sandbox-alert-dirty">
             You have unsaved changes, this sandbox will not reflect the current configuration until you save.
         </div>
 
