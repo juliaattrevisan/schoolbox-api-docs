@@ -82,9 +82,12 @@ class ConfiguredDispatchStrategyBuilder
      */
     public function summarise()
     {
+        $maxRequestsPerWorkerOutput = $this->maxRequestsPerWorker > 0
+            ? sprintf('max %d', $this->maxRequestsPerWorker)
+            : 'no max';
         return [
             'queue'  => sprintf("Q : n < %d <= %d, every %dms", $this->queueWarnSize, $this->queueMaxSize, $this->queueDelay),
-            'worker' => sprintf("W : %d <= n <= %d", $this->minWorkers, $this->maxWorkers),
+            'worker' => sprintf("W : %d <= n <= %d, %s requests/worker", $this->minWorkers, $this->maxWorkers, $maxRequestsPerWorkerOutput),
             'task'   => sprintf("T : t < %dms <= %dms", $this->workerTimeoutSoft, $this->workerTimeoutHard),
         ];
     }
