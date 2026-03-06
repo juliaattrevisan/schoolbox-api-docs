@@ -126,6 +126,19 @@ class Model implements IAssessableDataModel, ISoftDeletable
 
 
     /**
+     * These are used to constrain the folders in which we'll look for assessments for the mega markbook. To minimise
+     * hydration users should select the most appropriate time period for which we fetch assessments.
+     *
+     * We look in this time period for assessments due within that time period;
+     * also, we find any published feedback within that time period to minimise hydration to determine a person's
+     * Feedback footprint.
+     *
+     * @var string|null
+     */
+    private ?string $supportingDataFolders = null;
+
+
+    /**
      * @return MarkType|null
      */
     public function getInstructorMarkType(): ?MarkType
@@ -341,6 +354,26 @@ class Model implements IAssessableDataModel, ISoftDeletable
     public function setSupportingDataCurriculumNodes(?GenericCollection $supportingDataCurriculumNodes): self
     {
         $this->supportingDataCurriculumNodes = $supportingDataCurriculumNodes;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getSupportingDataFolders(): ?string
+    {
+        return $this->supportingDataFolders;
+    }
+
+
+    /**
+     * @param string|null $supportingDataFolders
+     * @return $this
+     */
+    public function setSupportingDataFolders(?string $supportingDataFolders): self
+    {
+        $this->supportingDataFolders = $supportingDataFolders;
         return $this;
     }
 }

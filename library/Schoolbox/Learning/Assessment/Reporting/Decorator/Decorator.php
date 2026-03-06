@@ -123,6 +123,7 @@ class Decorator implements DecoratorInterface
             $assessment->setCurriculumNodes(CurriculumNodeMapper::getInstance()->findByColumn('id', $selectedNodes));
         }
 
+        $assessment->setSupportingDataFolders($this->supportingDataFolders);
 
 
         // supporting data enable
