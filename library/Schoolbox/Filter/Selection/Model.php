@@ -136,7 +136,7 @@ class Model
     /**
      * Is this identical to another filter selections model?
      *
-     * It is if it for the same user, page, filter and key.
+     * It is if both are for the same user, page, filter and key.
      *
      * @param Model $other
      * @return bool
