@@ -333,6 +333,20 @@ test.describe("Dialog Agent", () => {
         await expect(activity2).toBeVisible();
     });
 
+    test("as a student, see only configured activities in the component", async ({ tester, page }) => {
+        await tester.impersonate(Common.USER_JANAREED);
+
+        const homepage = new Homepage(tester, page);
+        await homepage.goto(Common.CLASS_ID_9AENG);
+
+        const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME);
+        const activity1 = homepage.locateAssessmentRow(component, ACTIVITY_NAME_1);
+        const activity2 = homepage.locateAssessmentRow(component, ACTIVITY_NAME_2);
+
+        await expect(activity1).not.toBeVisible();
+        await expect(activity2).toBeVisible();
+    });
+
     test.afterAll(async ({ api, db }) => {
         await api.deleteHomepageComponent(Common.CLASS_ID_9AENG, componentId);
 
