@@ -35,7 +35,7 @@ class Controller extends BaseController
             ],
             [
                 'id' => 2,
-                'name' => 'studies-language-literature',
+                'name' => 'studies-in-language-and-literature',
                 'title' => 'Studies in Language and Literature'
             ],
             [
@@ -45,7 +45,7 @@ class Controller extends BaseController
             ],
             [
                 'id' => 4,
-                'name' => 'individuals-societies',
+                'name' => 'individuals-and-societies',
                 'title' => 'Individuals and Societies'
             ],
             [
@@ -60,7 +60,7 @@ class Controller extends BaseController
             ],
             [
                 'id' => 7,
-                'name' => 'arts',
+                'name' => 'the-arts',
                 'title' => 'The Arts'
             ],
             [
