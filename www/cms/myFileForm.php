@@ -27,8 +27,7 @@ if (isset($_POST['user'])) {
     try {
         $user = \Schoolbox\UserMapper::getInstance()->findById($_POST['user']);
     } catch (\Schoolbox\Mapper\Exception $e) {
-        error(41);
-        exit; // shut UP, storm.
+        $page->error(ErrorMapper::ERROR_FILE_NOT_FOUND);
     }
 } else {
     $user = $_SESSION['user'];
@@ -41,7 +40,7 @@ if (!($groupHandler->isStaff() || $_SESSION['user']->getId() == $user->getId()))
         http_response_code(400);
         die(json_encode('You do not have write permission to this ePortfolio.'));
     } else {
-        error(47);
+        $page->error(ErrorMapper::ERROR_PERM_FILE_MODIFY);
     }
 }
 
@@ -90,11 +89,9 @@ if (isset($_POST['description'])) {
                 throw new InvalidArgumentException('No file attachment supplied');
             }
         } catch (\Schoolbox\Mapper\Exception $e) {
-            error(ErrorMapper::ERROR_FILE_NOT_FOUND);
-            exit; // shut UP, storm.
+            $page->error(ErrorMapper::ERROR_FILE_NOT_FOUND);
         } catch (\InvalidArgumentException $e) {
-            error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
-            exit;
+            $page->error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
         }
     }
 
@@ -117,7 +114,7 @@ if (isset($_POST['description'])) {
                 'owner' => $user->getId(),
             ]);
         } catch (\Schoolbox\Mapper\Exception $e) {
-            error(ErrorMapper::ERROR_FILE_NOT_FOUND);
+            $page->error(ErrorMapper::ERROR_FILE_NOT_FOUND);
         }
     }
     $file->setFolder($parentFolder);
@@ -224,8 +221,7 @@ if (isset($_POST['description'])) {
     try {
         $parent = deleteMyFile($_GET['delete']);
     } catch (Schoolbox\Resource\Exception $e) {
-        error($e->getCode());
-        exit;
+        $page->error($e->getCode());
     }
     if (isset($_REQUEST['ajax'])) {
         die(json_encode(['result' => 'success']));
@@ -247,11 +243,11 @@ if (isset($_POST['description'])) {
             }
         }
         if (count($errorList)) {
-            error($errorList[0]);
+            $page->error($errorList[0]);
         }
         SitePage::localRedir("/my-files/$parent");
     } else {
-        error(2);
+        $page->error(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 } elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
     /* Move file from one category to another, after checking permission on both from and to categories
@@ -316,14 +312,14 @@ function outputException(Exception $e, IFile $file, $ajax = false)
 {
     // Output errors
     if ($e->getCode() === \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
-        $code = 11;
+        $code = ErrorMapper::ERROR_FILE_TYPE;
         $msg  = "Your file, '{$file->getFilename()}' is not a valid filetype";
     } elseif ($e->getCode() === \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE) {
-        $code = 10;
+        $code = ErrorMapper::ERROR_FILE_SIZE;
         $msg  = 'The size of the uploaded file exceeds the file size restrictions of '
             . Alaress_Byte_Format::bytesToString($file->getMimetype()->getActualMaxFileSize()) . '.';
     } else {
-        $code = 9;
+        $code = ErrorMapper::ERROR_PROCESSING;
         $msg  = $e->getMessage();
     }
 
@@ -331,6 +327,6 @@ function outputException(Exception $e, IFile $file, $ajax = false)
         http_response_code(400);
         die(json_encode(['code' => $code, 'error' => $msg]));
     } else {
-        error($code, $msg);
+        throw ErrorMapper::getInstance()->generateException($code, null, $msg);
     }
 }
