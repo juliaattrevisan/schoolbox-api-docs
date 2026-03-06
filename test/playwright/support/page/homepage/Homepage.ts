@@ -27,7 +27,7 @@ export default class Homepage {
 
     static readonly ELEMENT_COMPONENT_SECTION_COLLABORATION = 'a[href="#tabs-sub-2"]';
 
-    static readonly ELEMENT_COMPONENT_SECTION_LEARNING = 'a[href="#tabs-sub-3"]';
+    static readonly ELEMENT_COMPONENT_SECTION_LEARNING = '#tabs-sub-3';
 
     static readonly ELEMENT_COMPONENT_SECTION_MULTIMEDIA = 'a[href="#tabs-sub-4"]';
 

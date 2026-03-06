@@ -19,11 +19,12 @@ test.describe("Curriculum Overview Component Tests", () => {
         await tester.loginAsAdmin();
     });
 
-    test("Verify Curriculum Overview Component", async ({ tester, page }) => {
+    test("Verify Curriculum Overview Component", async ({ tester, page, db }) => {
         tester.isGoingTo("Homepage, open tab panel, click components tab");
         await homepage.goto(87);
 
         tester.isGoingTo("Add Curriculum Overview component");
+
         await homepage.addComponent(Homepage.ELEMENT_COMPONENT_SECTION_LEARNING, "Curriculum Description",);
         curriculumOverviewComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1,);
         const componentEnglishId = await Homepage.getComponentId(curriculumOverviewComponent);
@@ -52,8 +53,6 @@ test.describe("Curriculum Overview Component Tests", () => {
         await CurriculumOverview.verifyCurriculumLinkCode(curriculumOverviewComponent, "ELBE1177");
         await CurriculumOverview.verifyCurriculumCodeWithDescription(curriculumOverviewComponent, "experimenting with the use of colons and semicolons",);
 
-
-
         tester.isGoingTo("Click curriculum code link and verify it redirects to curriculum page");
         tester.isGoingTo("Click ACELA1556 and verify URL");
         await curriculumOverview.clickCurriculumCodeLink(curriculumOverviewComponent, "ACELA1556");
@@ -73,12 +72,6 @@ test.describe("Curriculum Overview Component Tests", () => {
         await curriculumOverview.clickCurriculumCodeLink(curriculumOverviewComponent, "ELBE1177");
         await expect(page).toHaveURL(/\/curriculum#154/);
 
-
-
-
-
-
-
-
+        await db.updateInDatabase("curriculum_node", { enabled: 0 }, { id: 155, code: "ELBE1178" },);
     });
 });
