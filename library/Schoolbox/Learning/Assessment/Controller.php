@@ -404,10 +404,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
              * TODO make consts/enums for these once finalised
              */
             $data['reporting']['availableRangeOptions'] = [
-                'current' => 'Current academic period',
-                'previous' => 'Previous academic period',
-                '1_year' => '1 year into the past',
-                '2_year' => '2 years into the past',
+                'current_academic_period' => 'Current academic period',
+                'previous_academic_period' => 'Previous academic period',
+                'current_and_previous_academic_period' => 'Current and previous academic period',
+                'current_academic_year' => 'Current academic year',
+                'current_and_previous_academic_year' => 'Current and previous academic year',
             ];
         }
 

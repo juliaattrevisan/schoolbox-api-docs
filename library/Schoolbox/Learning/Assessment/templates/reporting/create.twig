@@ -107,22 +107,17 @@
 
     <div class="row">
         <div class="small-12 columns">
-            <label>Date Range</label>
+            <label for="reporting-range">Date Range</label>
             {# TODO Jezwords #}
             <p class="meta">
                 Select how much data to obtain based on this relative time period.
             </p>
 
-            <div class="checklist">
-                <ul class="option-list">
-                    {% for key, label in reporting.availableRangeOptions %}
-                        <li>
-                            <input id="checkbox-range-{{ key }}" name="reporting[supporting][range][]" type="checkbox" value="{{ key }}" />
-                            <label for="checkbox-range-{{ key }}">{{ label }}</label>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
+            <select name="reporting[supporting][range]" id="reporting-range">
+                {% for key, label in reporting.availableRangeOptions %}
+                    <option value="{{ key }}">{{ label }}</option>
+                {% endfor %}
+            </select>
         </div>
     </div>
 
