@@ -311,7 +311,14 @@ window.Vue.watch(
             {{ isHelpRequestChanging ? "Requesting Assistance..." : "Request Teacher Help" }}
         </button>
         <nav>
-            <button class="button submit icon-approve" type="submit" @click="openSubmitModal">Submit</button>
+            <button
+                class="button submit icon-approve"
+                type="submit"
+                data-test="dialog-agent-response-submit"
+                @click="openSubmitModal"
+            >
+                Submit
+            </button>
         </nav>
     </div>
 
@@ -393,6 +400,7 @@ window.Vue.watch(
                     <button
                         class="button submit"
                         :disabled="isSubmitting || undefined"
+                        data-test="dialog-agent-response-submit-confirm"
                         @click="() => submitResponse(false)"
                     >
                         {{ isSubmitting ? "Submitting... please wait" : "Submit" }}

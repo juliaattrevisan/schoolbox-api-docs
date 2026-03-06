@@ -10,6 +10,7 @@ import DialogAgentConfigure from "@schoolboxTest/playwright/support/page/dialogA
 import DialogAgentHomepage from "@schoolboxTest/playwright/support/page/dialogAgent/DialogAgentHomepage";
 import DialogAgentModify from "@schoolboxTest/playwright/support/page/dialogAgent/DialogAgentModify";
 import DialogAgentResponse from "@schoolboxTest/playwright/support/page/dialogAgent/DialogAgentResponse";
+import DialogAgentViewResponse from "@schoolboxTest/playwright/support/page/dialogAgent/DialogAgentViewResponse";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 import AssessmentPage from "@schoolboxTest/playwright/support/page/dueWork/AssessmentPage";
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
@@ -319,6 +320,33 @@ test.describe("Dialog Agent", () => {
         tester.isGoingTo("expect to see the attempt in submission history");
         await homepage.clickAssessmentComponentTitle(activity2Id);
         await expect(discussionHistory.locateAllInteractions()).toHaveCount(1);
+    });
+
+    test("as a student, view a submitted attempt", async ({ tester, page }) => {
+        await tester.impersonate(Common.USER_JANAREED);
+
+        const homepage = new Homepage(tester, page);
+        await homepage.goto(Common.CLASS_ID_9AENG);
+
+        const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME);
+        tester.isGoingTo("view the submitted attempt for activity 2");
+        const activity2 = homepage.locateAssessmentRow(component, ACTIVITY_NAME_2);
+        const activity2Id = await Homepage.getAssessmentId(activity2);
+        await homepage.clickAssessmentComponentTitle(activity2Id);
+
+        const discussionHistory = new AssessmentPage(tester, page);
+        await discussionHistory.clickCreateSubmission();
+
+        const dialogAgentViewResponse = new DialogAgentViewResponse(page, tester);
+        await dialogAgentViewResponse.assertIsOnViewResponsePage(ACTIVITY_NAME_2);
+
+        tester.isGoingTo("expect to see all messages in the feed");
+        const agentChatFeed = new AgentChatFeed(page, tester);
+        const allRequestMessages = agentChatFeed.locateMessagesWithType(AgentChatMessageType.REQUEST);
+        const allResponseMessages = agentChatFeed.locateMessagesWithType(AgentChatMessageType.RESPONSE);
+
+        await expect(allRequestMessages).toHaveCount(2);
+        await expect(allResponseMessages).toHaveCount(3);
     });
 
     test("as a staff member, see both activities in the component", async ({ tester, page }) => {
