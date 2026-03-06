@@ -87,8 +87,10 @@ class Mapper extends \Schoolbox\Mapper
 
         // Save new selections, and delete old ones:
         // selections are identified by filter and key
-        $this->save($newSelections);
-        $this->delete($oldSelections->diff($newSelections, fn (Model $a, Model $b) => $a->isIdentical($b)));
+        $this->getDatabase()->transact(function () use ($newSelections, $oldSelections) {
+            $this->save($newSelections);
+            $this->delete($oldSelections->diff($newSelections, fn (Model $a, Model $b) => $a->isIdentical($b)));
+        });
         return true;
     }
 
