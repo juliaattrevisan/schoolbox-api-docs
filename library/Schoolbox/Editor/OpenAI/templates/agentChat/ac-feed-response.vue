@@ -74,6 +74,7 @@ function retryResponse(): void {
             'ac-feed-response-success': isResponseComplete,
             radiolist: props.allowSelection && imageSrc && isResponseComplete,
         }"
+        :data-test="`ac-feed-response-${props.message.entryKey}`"
     >
         <div class="ac-feed-side l-flex-row l-mar-s--right">
             <!-- When loading -->
@@ -121,7 +122,7 @@ function retryResponse(): void {
 
             <div class="ac-feed-message-container l-pad-s" :class="{ 'l-mar-s--top': imageSrc }">
                 <!-- we don't render the in progress message as HTML as it may be malformed -->
-                <p class="ac-feed-message-content">
+                <p class="ac-feed-message-content" data-test="ac-feed-message-content">
                     {{
                         props.message.data.message.length === 0
                             ? "Generating... Please wait"
@@ -147,8 +148,13 @@ function retryResponse(): void {
                 class="ac-feed-message-container l-pad-s"
                 :class="{ 'l-mar-s--top': imageSrc !== null }"
             >
-                <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
-                <p class="ac-feed-message-content" v-html="props.message.data.message"></p>
+                <!-- eslint-disable vue/no-v-html -- scrubbed in the backend -->
+                <p
+                    class="ac-feed-message-content"
+                    data-test="ac-feed-message-content"
+                    v-html="props.message.data.message"
+                ></p>
+                <!-- eslint-enable vue/no-v-html -->
                 <p v-if="props.showTimestamps" class="meta l-mar--0">
                     <time :datetime="props.message.createdAt" :title="getDayjsDatetimeLong(props.message.createdAt)">
                         {{ formatTimestamp(props.message) }}

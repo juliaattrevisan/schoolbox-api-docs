@@ -1,6 +1,8 @@
 import { AiFeature } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
+import { AgentChatMessageType } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import AIServices, { AiProvider } from "@schoolboxTest/playwright/support/page/admin/ai/AIServices";
+import AgentChatFeed from "@schoolboxTest/playwright/support/page/agentChat/AgentChatFeed";
 import Common from "@schoolboxTest/playwright/support/page/Common";
 import DialogAgentConfigure from "@schoolboxTest/playwright/support/page/dialogAgent/DialogAgentConfigure";
 import DialogAgentHomepage from "@schoolboxTest/playwright/support/page/dialogAgent/DialogAgentHomepage";
@@ -102,17 +104,17 @@ test.describe("Dialog Agent", () => {
         await assessmentForm.clickCreate();
 
         tester.isGoingTo("check sandbox is inactive prior to saving the initial configuration");
-        await dialogAgentConfigure.assertIsOnConfigurePage(ACTIVITY_NAME_1);
+        await dialogAgentConfigure.assertIsOnConfigurePage(ACTIVITY_NAME_2);
         await dialogAgentConfigure.assertSandboxDisabled();
 
-        tester.isGoingTo("confirm the AI prefilled each field");
-        const fieldTextareas = await dialogAgentConfigure.locateFormFieldTextareas();
         const openingMessageTextarea = dialogAgentConfigure.locateFormOpeningMessageTextarea();
+        await test.step("confirm the AI prefilled every field with some content", async () => {
+            const fieldTextareas = await dialogAgentConfigure.locateFormFieldTextareas();
+            const prefilledTextareas = [...fieldTextareas, openingMessageTextarea];
 
-        for (const textarea of [...fieldTextareas, openingMessageTextarea]) {
-            const editorContent = await tester.readCKEditorByLocator(textarea);
-            expect(editorContent.trim()).not.toBe("");
-        }
+            const contentPromises = prefilledTextareas.map((textarea) => tester.readCKEditorByLocator(textarea));
+            await Promise.all(contentPromises.map((content) => expect(content).resolves.not.toBe("")));
+        });
 
         tester.isGoingTo("save the initial configuration");
         await dialogAgentConfigure.clickSaveConfiguration();
@@ -120,6 +122,17 @@ test.describe("Dialog Agent", () => {
         // TODO: SA-22047
         // tester.isGoingTo("confirm the sandbox doesn't show the unsaved changes alert");
         // await dialogAgentConfigure.assertSandboxUnsavedAlertNotVisible();
+
+        tester.isGoingTo("confirm the opening message is shown in the sandbox");
+        const openingMessage = await tester.readCKEditorByLocator(openingMessageTextarea);
+
+        const agentChatFeed = new AgentChatFeed(page, tester);
+        const feedMessages = agentChatFeed.locateAllMessages();
+        await expect(feedMessages).toHaveCount(1);
+
+        const firstFeedMessage = feedMessages.first();
+        await AgentChatFeed.expectMessageIsType(firstFeedMessage, AgentChatMessageType.RESPONSE);
+        await AgentChatFeed.expectMessageToHaveText(firstFeedMessage, openingMessage);
     });
 
     test("view both activities in the component", async ({ tester, page }) => {

@@ -15,7 +15,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <div class="ac-feed-request">
+    <div class="ac-feed-request" :data-test="`ac-feed-request-${props.message.entryKey}`">
         <div class="ac-feed-message-container l-pad-s">
             <file-drop
                 v-if="props.message.meta.file"
@@ -23,7 +23,7 @@ const props = defineProps<Props>();
                 :current-file="props.message.meta.file"
                 disabled
             />
-            <p class="ac-feed-message-content l-mar--0">{{ props.message.data }}</p>
+            <p class="ac-feed-message-content l-mar--0" data-test="ac-feed-message-content">{{ props.message.data }}</p>
             <p v-if="props.showTimestamps" class="meta l-mar--0">
                 <time :datetime="props.message.createdAt" :title="getDayjsDatetimeLong(props.message.createdAt)">
                     {{ formatTimestamp(props.message) }}
