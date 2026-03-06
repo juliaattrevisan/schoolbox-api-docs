@@ -159,14 +159,18 @@ $(function() {
                 }
             } else {
                 // Get the time of the first booking, direct to that date
-                var dateQuery = '';
+                let dateQuery = '';
                 try {
                     var date = dayjs(data.item[0].event.start);
                     dateQuery += '?date='+date.format('DD-MM-YYYY');
                 } catch (e) {
                     // noop
                 }
-                window.location.href = $('#resource-booking-back').attr('href') + dateQuery + '&calendarToast=TODO: Custom success message goes here.';
+                window.location.href = (
+                    $('#resource-booking-back').attr('href') +
+                    dateQuery +
+                    (dateQuery === '' ? '?' : '&') + 'calendarToast=' + encodeURIComponent(data.message)
+                );
             }
         };
         var ajaxFail = function (jqXHR) {

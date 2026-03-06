@@ -101,6 +101,7 @@ class Controller extends Base
      * @param TermMapper                  $termMapper
      * @param ExternalEventMapper         $externalEventMapper
      * @param External_Timetable          $externalTimetable
+     * @param BookingResponseHelper       $bookingResponseHelper
      */
     public function __construct(
         private Error\Mapper $errorMapper,

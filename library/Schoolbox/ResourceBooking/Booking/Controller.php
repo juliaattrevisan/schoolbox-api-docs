@@ -33,6 +33,7 @@ use Calendar\Event\Type\Timetable\Renderer\Javascript;
 use Calendar\Event\Collection\Renderer;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
+use Schoolbox\ResourceBooking\Booking\Util\ResponseHelper as BookingResponseHelper;
 use Schoolbox\Calendar\EventRecurrenceMapper;
 use Calendar_Api_EventType_ResourceBooking_Booking_ForItem;
 
@@ -89,6 +90,13 @@ class Controller extends Base
      * @var Validation
      */
     protected Validation $validation;
+
+    /**
+     * @param BookingResponseHelper $bookingResponseHelper
+     */
+    public function __construct(protected BookingResponseHelper $bookingResponseHelper)
+    {
+    }
 
     /**
      * Generates the 'Book Item' page.
@@ -229,6 +237,8 @@ class Controller extends Base
             $item->canUserModerateThisItem($this->user)
         );
 
+        $nBookingsCreatedByStatusId = [];
+
         if (empty($errors)) {
             // Get the event that all bookings are based off of.
             $event = $this->getBaseEvent();
@@ -297,6 +307,13 @@ class Controller extends Base
             }
 
             $this->bookingMapper->save($bookingList);
+
+            foreach ($bookingList as $booking) {
+                if (!array_key_exists($booking->getStatus()->getId(), $nBookingsCreatedByStatusId)) {
+                    $nBookingsCreatedByStatusId[$booking->getStatus()->getId()] = 0;
+                }
+                ++$nBookingsCreatedByStatusId[$booking->getStatus()->getId()];
+            }
         } else {
             $code = self::HTTP_STATUS_CODE_BAD_REQUEST;
         }
@@ -319,11 +336,7 @@ class Controller extends Base
                 [
                     'item' => $bookingList,
                     'errors' => $errors,
-                    'bookedPendingBecauseClashes' => (
-                        // If overrideValidation was used, bookings will have been made despite the clashes.
-                        // The clashing bookings will have been found and rejected.
-                        !$overrideValidation && count($clashBookingStartDatesAsKeys) > 0
-                    ),
+                    'message' => $this->bookingResponseHelper->getResponseMessage($nBookingsCreatedByStatusId, false),
                     'returnUrl' => (string)$returnUrl,
                 ],
             )->withStatus($code);
