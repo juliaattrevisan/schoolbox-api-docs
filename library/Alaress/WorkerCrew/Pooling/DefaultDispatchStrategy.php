@@ -32,6 +32,8 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
 
     const IDLE_TIMEOUT = 60000; // 1 minute
 
+    const MAX_REQUESTS_PER_WORKER = 0; // 0 = unlimited
+
     const WORKER_SOFT_TIMEOUT = 300000; // 5 minutes
     const WORKER_HARD_TIMEOUT = 1200000; // 20 minutes
 
@@ -360,5 +362,16 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
     public function getWorkerExecutionTimeout($hard = true)
     {
         return $hard ? self::WORKER_HARD_TIMEOUT : self::WORKER_SOFT_TIMEOUT;
+    }
+
+
+    /**
+     * Returns the maximum number of requests a worker should process before being retired (0 = unlimited)
+     *
+     * @return int
+     */
+    public function getMaxRequestsPerWorker(): int
+    {
+        return static::MAX_REQUESTS_PER_WORKER;
     }
 }

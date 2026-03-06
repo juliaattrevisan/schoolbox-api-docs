@@ -208,4 +208,12 @@ interface DispatchStrategyInterface
      * @return int
      */
     public function getWorkerExecutionTimeout($hard = true);
+
+
+    /**
+     * Returns the maximum number of requests a worker should process before being retired (0 = unlimited)
+     *
+     * @return int
+     */
+    public function getMaxRequestsPerWorker(): int;
 }

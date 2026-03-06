@@ -27,6 +27,7 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
     protected $queueMaxSize;
     protected $workerTimeoutSoft;
     protected $workerTimeoutHard;
+    protected $maxRequestsPerWorker;
 
 
     /**
@@ -40,8 +41,9 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
      * @param int    $workerTimeoutSoft
      * @param int    $workerTimeoutHard
      * @param string $flags
+     * @param int    $maxRequestsPerWorker
      */
-    public function __construct($minWorkers, $maxWorkers, $maxFlywheel, $queueDelay, $queueWarnSize, $queueMaxSize, $idleTimeout, $workerTimeoutSoft, $workerTimeoutHard, $flags = '')
+    public function __construct($minWorkers, $maxWorkers, $maxFlywheel, $queueDelay, $queueWarnSize, $queueMaxSize, $idleTimeout, $workerTimeoutSoft, $workerTimeoutHard, $flags = '', $maxRequestsPerWorker = DefaultDispatchStrategy::MAX_REQUESTS_PER_WORKER)
     {
         parent::__construct($flags);
         $this->flywheelSpins = $maxFlywheel;
@@ -52,9 +54,10 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
         $this->queueMaxSize  = $queueMaxSize;
         $this->maxFlywheel   = $maxFlywheel;
         $this->idleTimeout   = $idleTimeout;
-        $this->workerTimeoutSoft = $workerTimeoutSoft;
-        $this->workerTimeoutHard = $workerTimeoutHard;
-        $this->protocol      = new AlaressIPCProtocol();
+        $this->workerTimeoutSoft    = $workerTimeoutSoft;
+        $this->workerTimeoutHard    = $workerTimeoutHard;
+        $this->maxRequestsPerWorker = $maxRequestsPerWorker;
+        $this->protocol             = new AlaressIPCProtocol();
     }
 
 
@@ -162,5 +165,14 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
     public function getWorkerExecutionTimeout($hard = true)
     {
         return $hard ? $this->workerTimeoutHard : $this->workerTimeoutSoft;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getMaxRequestsPerWorker(): int
+    {
+        return $this->maxRequestsPerWorker;
     }
 }

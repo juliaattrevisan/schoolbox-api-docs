@@ -38,6 +38,9 @@ class ConfiguredDispatchStrategyBuilder
     /** @var int */
     protected $workerTimeoutHard = DefaultDispatchStrategy::WORKER_HARD_TIMEOUT;
 
+    /** @var int */
+    protected $maxRequestsPerWorker = DefaultDispatchStrategy::MAX_REQUESTS_PER_WORKER;
+
 
     /**
      * @param array $conf
@@ -68,7 +71,8 @@ class ConfiguredDispatchStrategyBuilder
             $this->idleTimeout,
             $this->workerTimeoutSoft,
             $this->workerTimeoutHard,
-            $flags
+            $flags,
+            $this->maxRequestsPerWorker
         );
     }
 
@@ -78,9 +82,12 @@ class ConfiguredDispatchStrategyBuilder
      */
     public function summarise()
     {
+        $maxRequestsPerWorkerOutput = $this->maxRequestsPerWorker > 0
+            ? sprintf('max %d', $this->maxRequestsPerWorker)
+            : 'no max';
         return [
             'queue'  => sprintf("Q : n < %d <= %d, every %dms", $this->queueWarnSize, $this->queueMaxSize, $this->queueDelay),
-            'worker' => sprintf("W : %d <= n <= %d", $this->minWorkers, $this->maxWorkers),
+            'worker' => sprintf("W : %d <= n <= %d, %s requests/worker", $this->minWorkers, $this->maxWorkers, $maxRequestsPerWorkerOutput),
             'task'   => sprintf("T : t < %dms <= %dms", $this->workerTimeoutSoft, $this->workerTimeoutHard),
         ];
     }

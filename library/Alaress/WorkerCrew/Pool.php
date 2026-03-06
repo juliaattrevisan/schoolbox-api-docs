@@ -503,6 +503,19 @@ class Pool extends EventEmitter implements PoolInterface
             $this->log->debug("$success transitioned {{$pid}} from $oldStatus to $status");
         }
 
+        // if transitioned to READY, track request count and potentially retire the worker
+        if ($newStatus === Worker::READY) {
+            $worker->incrementRequestCount();
+            $max   = $this->strat->getMaxRequestsPerWorker();
+            $count = $worker->getRequestCount();
+            if ($max > 0 && $count >= $max) {
+                $this->log->info("Worker {{$pid}} has processed {$count} requests, retiring", ['char' => '-']);
+                $worker->setStatus(Worker::ENDED);
+                $this->releaseWorker($pid, self::RELEASE_SOFT);
+                return Worker::ENDED;
+            }
+        }
+
         // return the result, knowing it may not have changed
         return $newStatus;
     }

@@ -35,6 +35,8 @@ class Worker extends PipeWriter
     protected $start;
     /** @var Task */
     protected $task;
+    /** @var int */
+    protected int $requestCount = 0;
 
     /**
      * @var DispatchStrategyInterface
@@ -249,5 +251,23 @@ class Worker extends PipeWriter
     {
         $this->task = null;
         return $this;
+    }
+
+
+    /**
+     * @return void
+     */
+    public function incrementRequestCount(): void
+    {
+        $this->requestCount++;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getRequestCount(): int
+    {
+        return $this->requestCount;
     }
 }
