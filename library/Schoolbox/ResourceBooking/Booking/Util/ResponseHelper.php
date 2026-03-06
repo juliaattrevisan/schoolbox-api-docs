@@ -33,7 +33,7 @@ class ResponseHelper
     }
 
     /**
-     * @param array  $nBookingsModifiedByStatusId
+     * @param array  $nBookingsModifiedByStatusId - The number of bookings updated, indexed by bookingStatusId.
      * @param string $responseType
      * @param bool   $createdEvent
      * @return string

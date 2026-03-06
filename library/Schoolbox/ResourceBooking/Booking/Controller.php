@@ -503,7 +503,7 @@ class Controller extends Base
                 [
                     'item' => $item,
                     'errors' => $errors,
-                    'message' => $this->bookingResponseHelper->getUpdateResponseMessage($nBookingsCreatedByStatusId, false, true),
+                    'message' => $this->bookingResponseHelper->getUpdateResponseMessage($nBookingsCreatedByStatusId),
                     'returnUrl' => $returnUrl,
                 ],
             )->withStatus($code);
