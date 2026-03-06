@@ -68,6 +68,19 @@ class Mapper extends \Schoolbox\Mapper
             'assessmentModel',
         );
 
+        $this->joinsVia(
+            'reporting_curriculum_node',
+            \Schoolbox\Curriculum\Node\Mapper::class,
+            'id',
+            'curriculum_node_id',
+            'reporting_id',
+            null,
+            null,
+            null,
+            'supportingDataCurriculumNodes'
+        );
+
+
         /* TODO Add join for Feedbacks
          */
 
@@ -118,17 +131,67 @@ class Mapper extends \Schoolbox\Mapper
         $stack = $this->createCollection();
 
         foreach ($statement as $row) {
+            /** @var Model $subobject */
             $subobject = $this->hydrate($row);
 
             /* Bolt on the IAssessable instance
              */
+            /** @var \Schoolbox\Learning\Assessment\DataModel\Model $assessment */
             $assessment = $this->hydrateJoin($row, 'assessmentModel', 'assessmentModel');
             $subobject->setAssessmentModel($assessment);
 
-            $stack->add($subobject);
+            if (null === $stack->getBy('id', $subobject->getId())) {
+                /* Initialise collections
+                 */
+                $subobject->setSupportingDataCurriculumNodes($this->getJoinmapper('reporting_curriculum_node')->createcollection());
+
+                $stack[$subobject->getId()] = $subobject;
+            }
+
         }
 
+        if ($this->getConfigLoader()->get('curriculum_tagging_enabled')) {
+            /* Supporting Data nodes (sry, there isn't a shorter name...)
+             */
+            $stack = $this->hydrateSupportingDataCurriculumNodesIntoCollection($stack);
+        }
+
+
         return $stack;
+    }
+
+
+    /**
+     * Helper method for hydrating curriculum nodes into the collection of
+     * Reporting activity's supporting data, retrieved by `hydrateSelect`.
+     *
+     * @param GenericCollection $collection
+     * @return GenericCollection
+     */
+    private function hydrateSupportingDataCurriculumNodesIntoCollection(GenericCollection $collection): GenericCollection
+    {
+        $reportingIds = $collection->keys();
+
+        $pb = $this->getPredicateBuilder()->in('id', $reportingIds);
+        $query = "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('reporting_curriculum_node', 'cn')}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
+            INNER JOIN reporting_curriculum_node rcn ON reporting.id = rcn.reporting_id
+            INNER JOIN curriculum_node cn ON rcn.curriculum_node_id = cn.id AND cn.deleted_at IS NULL
+            WHERE {$pb->getWhereIntersect()}
+        ";
+
+        $curriculumNodeStatement = $this->database->query($query, $pb->getParams());
+
+        foreach ($curriculumNodeStatement as $row) {
+            /** @var \Schoolbox\Curriculum\Node\Model $curriculumNode */
+            $curriculumNode = $this->hydrateJoin($row, 'reporting_curriculum_node', 'cn');
+            $collection[$row['id']]->getSupportingDataCurriculumNodes()->setOffset($curriculumNode->getId(), $curriculumNode);
+        }
+
+        return $collection;
     }
 
 

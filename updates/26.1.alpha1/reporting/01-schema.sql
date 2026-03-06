@@ -60,13 +60,13 @@ CREATE TABLE `reporting` (
 --
 -- So, it's the same schema structure but has a different contextual usage.
 CREATE TABLE `reporting_curriculum_node` (
-    `assessment_id` INT UNSIGNED NOT NULL,
+    `reporting_id` INT NOT NULL,
     `curriculum_node_id` INT NOT NULL,
-    UNIQUE INDEX `fk_ca_unique` (assessment_id, curriculum_node_id),
-    INDEX `fk_rcn_a_assessment_idx` (`assessment_id` ASC),
-    CONSTRAINT `fk_rcn_a_assessment`
-        FOREIGN KEY (`assessment_id`)
-            REFERENCES `assessment` (`id`)
+    UNIQUE INDEX `fk_rc_unique` (reporting_id, curriculum_node_id),
+    INDEX `fk_rcn_reporting_id_idx` (`reporting_id` ASC),
+    CONSTRAINT `fk_rcn_reporting_id`
+        FOREIGN KEY (`reporting_id`)
+            REFERENCES `reporting` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION,
     INDEX `fk_rcn_cni_curriculum_node_idx` (`curriculum_node_id` ASC),
