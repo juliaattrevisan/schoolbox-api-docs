@@ -2,7 +2,6 @@
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
-import type { Toast } from "@schoolboxVue/components/toast/sbxToastTypes";
 import type { Booking, Resource } from "./resourceBookingTypes";
 import { EFFICACY_SELF, EFFICACY_SERIES } from "./eventTypes";
 
