@@ -117,6 +117,7 @@ class Reporting implements IAssessmentTypeTranslator
         $dataModel->setSupportingDataRange($domainObject->getSupportingDataRange());
         $dataModel->setSupportingDataCurriculumNodes($domainObject->getSupportingDataCurriculumNodes());
         $dataModel->setSupportingDataFolders($domainObject->getSupportingDataFolders());
+        $dataModel->setSupportingDataWorkTypes($domainObject->getSupportingDataWorkTypes());
     }
 
 
@@ -156,5 +157,6 @@ class Reporting implements IAssessmentTypeTranslator
         $domainObject->setSupportingDataRange($dataModel->getSupportingDataRange());
         $domainObject->setSupportingDataCurriculumNodes($dataModel->getSupportingDataCurriculumNodes());
         $domainObject->setSupportingDataFolders($dataModel->getSupportingDataFolders());
+        $domainObject->setSupportingDataWorkTypes($dataModel->getSupportingDataWorkTypes());
     }
 }

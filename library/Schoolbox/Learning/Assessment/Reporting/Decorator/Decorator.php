@@ -14,8 +14,10 @@ use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Learning\Assessment\DecoratorInterface;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Reporting\Model;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Mapper\Exception;
+
 
 /**
  * Class Decorator
@@ -125,12 +127,14 @@ class Decorator implements DecoratorInterface
 
         $assessment->setSupportingDataFolders($this->supportingDataFolders);
 
+        /* Assemble work types' instances
+         * Selection of work types is entirely optional for users: leaving this empty means we won't filter on work
+         * types at all, letting everything through
+         */
+        if (\count($this->supportingDataWorkTypes)) {
+            $assessment->setSupportingDataWorkTypes(WorkTypeMapper::getInstance()->findByColumn('id', $this->supportingDataWorkTypes));
+        }
 
-        // supporting data enable
-        // supporting data range
-        // supporting data curric nodes $assessment->setCurriculumNodes(CurriculumNodeMapper::getInstance()->findByColumn('id', $selectedNodes));
-        // supporting data folders
-        // supporting data work types
         // supporting data megamarkbook
     }
 }

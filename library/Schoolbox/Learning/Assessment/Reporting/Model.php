@@ -136,6 +136,17 @@ class Model extends AbstractAssessment
 
 
     /**
+     * These are used to constrain the assessments being fetched for the mega markbook. To minimise hydration people
+     * should specify all the work types that would be needed to perform the reporting activity's feedback.
+     *
+     * As per tradition, zero work types selected == all work types selected
+     *
+     * @var GenericCollection|null
+     */
+    private ?GenericCollection $supportingDataWorkTypes = null;
+
+
+    /**
      * The user who created this activity
      *
      * @var User|null
@@ -613,6 +624,26 @@ class Model extends AbstractAssessment
     public function setSupportingDataFolders(?string $supportingDataFolders): self
     {
         $this->supportingDataFolders = $supportingDataFolders;
+        return $this;
+    }
+
+
+    /**
+     * @return GenericCollection|null
+     */
+    public function getSupportingDataWorkTypes(): ?GenericCollection
+    {
+        return $this->supportingDataWorkTypes;
+    }
+
+
+    /**
+     * @param GenericCollection|null $supportingDataWorkTypes
+     * @return $this
+     */
+    public function setSupportingDataWorkTypes(?GenericCollection $supportingDataWorkTypes): self
+    {
+        $this->supportingDataWorkTypes = $supportingDataWorkTypes;
         return $this;
     }
 
