@@ -147,7 +147,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(TermMapper::class),
             $this->getMapperFactory()->get(ExternalEventMapper::class),
             $this->injector->get('externalTimetable'),
-            new BookingResponseHelper,
+            new BookingResponseHelper(),
         );
     }
 
