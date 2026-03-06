@@ -473,6 +473,28 @@ test.describe("Dialog Agent", () => {
         // leave the attempt in progress
     });
 
+    test("as a student, resume an in progress attempt", async ({ tester, page }) => {
+        await tester.impersonate(Common.USER_LOUISASMITH);
+
+        const homepage = new Homepage(tester, page);
+        await homepage.goto(Common.CLASS_ID_9AENG);
+
+        const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME);
+        tester.isGoingTo("view the submitted attempt for activity 2");
+        const activity2 = homepage.locateAssessmentRow(component, ACTIVITY_NAME_2);
+        const activity2Id = await Homepage.getAssessmentId(activity2);
+        await homepage.clickAssessmentComponentTitle(activity2Id);
+
+        const discussionHistory = new AssessmentPage(tester, page);
+        const interactions = discussionHistory.locateAllInteractions();
+        await expect(interactions).toHaveCount(1);
+        await expect(interactions.first()).toContainText("Current Draft Response by Louisa Smith");
+        await discussionHistory.clickCreateSubmission();
+
+        const dialogAgentResponse = new DialogAgentResponse(page, tester);
+        await dialogAgentResponse.assertIsOnResponsePage(ACTIVITY_NAME_2);
+    });
+
     test("as a staff member, see both activities in the component", async ({ tester, page }) => {
         const homepage = new Homepage(tester, page);
         await homepage.goto(Common.CLASS_ID_9AENG);
