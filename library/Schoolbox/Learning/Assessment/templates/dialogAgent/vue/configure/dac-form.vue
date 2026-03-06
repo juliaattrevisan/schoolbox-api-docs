@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { cloneDeep } from "es-toolkit";
 import locale from "@js/terminology/rosettaStone";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import { getPageReturnUrl } from "@js/util/sbx/urlUtils";
@@ -34,6 +35,16 @@ const submitError = window.Vue.ref<string | null>(null);
 
 const formEl = window.Vue.useTemplateRef<HTMLFormElement>("formRef");
 const validator = window.Vue.ref<ReturnType<ReturnType<typeof $>["alaressValidate"]> | null>(null);
+
+/**
+ * The sandbox should warn if there are unsaved changes (and hence it's not actually reflecting the current config)
+ */
+const assessmentConfigCache = window.Vue.ref(cloneDeep(assessmentConfig.value));
+const isAssessmentConfigDirty = window.Vue.computed(() => {
+    return JSON.stringify(assessmentConfigCache.value) !== JSON.stringify(assessmentConfig.value);
+});
+
+defineExpose({ isAssessmentConfigDirty });
 
 /**
  * Submit the new configuration
@@ -104,6 +115,9 @@ async function onSubmit(): Promise<void> {
      */
     assessmentConfig.value.prompt = response.data.prompt;
     assessmentConfig.value._routes.postSandboxMessage = response.data._routes.postSandboxMessage;
+
+    assessmentConfigCache.value = cloneDeep(assessmentConfig.value);
+
     emit("saved", response.data);
 }
 
