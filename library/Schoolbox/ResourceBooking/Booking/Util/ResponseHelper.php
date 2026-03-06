@@ -29,10 +29,10 @@ class ResponseHelper
         $messageStart = $createdEvent ? 'Created event with' : 'Created';
 
         if ($nTotalBookings === 1) {
-            $bookingStatus = match ($nTotalBookings) {
-                $nApprovedBookings => 'approved',
-                $nPendingBookings => 'pending',
-                $nRejectedBookings => 'rejected',
+            $bookingStatus = match (true) {
+                $nApprovedBookings === 1 => 'approved',
+                $nPendingBookings === 1 => 'pending',
+                $nRejectedBookings === 1 => 'rejected',
             };
             return "$messageStart one $bookingStatus booking";
         }
