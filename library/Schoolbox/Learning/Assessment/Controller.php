@@ -19,6 +19,7 @@ use Schoolbox\Filter\Codec;
 use Schoolbox\Filter;
 use Schoolbox\Filter\CompositeFactoryFactory;
 use Schoolbox\Filter\Filters\Assessment\IdFinder;
+use Schoolbox\Learning\Assessment\Reporting\Folder;
 use Schoolbox\Learning\Assessment\Reporting\Range;
 use Schoolbox\Learning\Assessment\Translator\ParticipationPlans;
 use Schoolbox\Learning\Assessment\Translator\Participations;
@@ -393,13 +394,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $data['reporting']['workTypes'] = $this->workTypeMapper->findAll();
 
             /* Reporting activities can constrain the mega markbook to certain kinds of folders
-             * TODO make consts/enums for these once finalised
              */
-            $data['reporting']['availableFolderOptions'] = [
-                'current_only' => 'Current class folder',
-                'active_folders' => 'Active folders where students have published feedback',
-                'any_folders' => 'Any folders where students have published feedback'
-            ];
+            $data['reporting']['availableFolderOptions'] = Folder::lookup();
 
             /* There are numerous date range options of which numerous could be enabled
              */
@@ -750,13 +746,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $data['reporting']['workTypes'] = $this->workTypeMapper->findAll();
 
             /* Reporting activities can constrain the mega markbook to certain kinds of folders
-             * TODO make consts/enums for these once finalised
              */
-            $data['reporting']['availableFolderOptions'] = [
-                'current_only' => 'Current class folder',
-                'active_folders' => 'Active folders where students have published feedback',
-                'any_folders' => 'Any folders where students have published feedback'
-            ];
+            $data['reporting']['availableFolderOptions'] = Folder::lookup();
 
             /* There are numerous date range options of which numerous could be enabled
              */
