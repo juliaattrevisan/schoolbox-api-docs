@@ -1,6 +1,6 @@
-import { expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 import type { AiFeature } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
+import { expect } from "@schoolboxTest/playwright/support/integrations";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 
 export enum AiProvider {

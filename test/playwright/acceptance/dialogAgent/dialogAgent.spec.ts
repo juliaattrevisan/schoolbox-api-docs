@@ -8,7 +8,9 @@ import DialogAgentModify from "@schoolboxTest/playwright/support/page/dialogAgen
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 
-const ACTIVITY_NAME = "Anteresia Stimsoni";
+const ACTIVITY_NAME_BASE = "Anteresia Stimsoni";
+const ACTIVITY_NAME_1 = `${ACTIVITY_NAME_BASE} 1 (unconfigured)`;
+const ACTIVITY_NAME_2 = `${ACTIVITY_NAME_BASE} 2 (configured)`;
 
 test.describe("Dialog Agent", () => {
     // Run tests serially, as tests rely on prior tests to have been run
@@ -53,7 +55,7 @@ test.describe("Dialog Agent", () => {
         await dialogAgentComponent.verifyEmptyStateCreateButtonNotVisible();
     });
 
-    test("enable AI feature, create a new discussion via the empty state", async ({ tester, page }) => {
+    test("enable AI feature", async ({ tester, page }) => {
         tester.isGoingTo("Enable the Dialog Agent feature in AI Services");
         const aiServices = new AIServices(page, tester);
         await aiServices.goto();
@@ -63,33 +65,70 @@ test.describe("Dialog Agent", () => {
         await AIServices.fillOpenAIKeyForFeature(dialogAgentFeature);
         await aiServices.save();
         await aiServices.waitForFeatureToBeEnabled(AiFeature.DIALOG_AGENT);
+    });
 
-        tester.isGoingTo("create a new discussion via the empty state of the Dialog Agent component");
+    test("create an unconfigured discussion activity via the component empty state", async ({ tester, page }) => {
         const homepage = new Homepage(tester, page);
         await homepage.goto(Common.CLASS_ID_9AENG);
         const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME);
         const dialogAgentComponent = new DialogAgentHomepage(page, tester, component);
         await dialogAgentComponent.clickEmptyStateCreateButton();
 
-        tester.isGoingTo("create a new activity");
+        tester.isGoingTo("fill out the create form and leave the discussion unconfigured afterwards");
         const assessmentForm = new AssessmentForm(tester, page);
         const dialogAgentModify = new DialogAgentModify(page, tester);
         const dialogAgentConfigure = new DialogAgentConfigure(page, tester);
-        await assessmentForm.setTitle(ACTIVITY_NAME);
+        await assessmentForm.setTitle(ACTIVITY_NAME_1);
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_HOMEWORK);
         await dialogAgentModify.selectScenario("Self-Reflection");
         await assessmentForm.clickCreate();
-        await dialogAgentConfigure.assertIsOnConfigurePage(ACTIVITY_NAME);
+        await dialogAgentConfigure.assertIsOnConfigurePage(ACTIVITY_NAME_1);
     });
 
-    test("view activity in component", async ({ tester, page }) => {
+    test("create a discussion activity via the component, fully configure it", async ({ tester, page }) => {
+        const homepage = new Homepage(tester, page);
+        await homepage.goto(Common.CLASS_ID_9AENG);
+        const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME);
+        const dialogAgentComponent = new DialogAgentHomepage(page, tester, component);
+        await dialogAgentComponent.clickCreateAction();
+
+        tester.isGoingTo("fill out the create form");
+        const assessmentForm = new AssessmentForm(tester, page);
+        const dialogAgentModify = new DialogAgentModify(page, tester);
+        const dialogAgentConfigure = new DialogAgentConfigure(page, tester);
+        await assessmentForm.setTitle(ACTIVITY_NAME_2);
+        await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_HOMEWORK);
+        await dialogAgentModify.selectScenario("Self-Reflection");
+        await assessmentForm.clickCreate();
+
+        tester.isGoingTo("check sandbox is inactive prior to saving the initial configuration");
+        await dialogAgentConfigure.assertIsOnConfigurePage(ACTIVITY_NAME_1);
+        await dialogAgentConfigure.assertSandboxDisabled();
+
+        tester.isGoingTo("confirm the AI prefilled each field");
+        const fieldTextareas = await dialogAgentConfigure.locateFormFieldTextareas();
+        const openingMessageTextarea = dialogAgentConfigure.locateFormOpeningMessageTextarea();
+
+        for (const textarea of [...fieldTextareas, openingMessageTextarea]) {
+            const editorContent = await tester.readCKEditorByLocator(textarea);
+            expect(editorContent.trim()).not.toBe("");
+        }
+
+        tester.isGoingTo("save the initial configuration");
+        await dialogAgentConfigure.clickSaveConfiguration();
+    });
+
+    test("view both activities in the component", async ({ tester, page }) => {
         const homepage = new Homepage(tester, page);
         await homepage.goto(Common.CLASS_ID_9AENG);
         const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME);
 
         const allAssessmentsSelector = new RegExp(`^${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TITLE}`);
-        const activityTitle = component.getByTestId(allAssessmentsSelector).filter({ hasText: ACTIVITY_NAME });
-        await expect(activityTitle).toBeVisible();
+        const activityTitle1 = component.getByTestId(allAssessmentsSelector).filter({ hasText: ACTIVITY_NAME_1 });
+        await expect(activityTitle1).toBeVisible();
+
+        const activityTitle2 = component.getByTestId(allAssessmentsSelector).filter({ hasText: ACTIVITY_NAME_2 });
+        await expect(activityTitle2).toBeVisible();
     });
 
     test.afterAll(async ({ api, db }) => {
@@ -97,7 +136,7 @@ test.describe("Dialog Agent", () => {
 
         // Delete any activities created in this test
         const dialogAgentIds = (await db.grabColumnFromDatabase("assessment", "id", {
-            "title LIKE": `${ACTIVITY_NAME}%`,
+            "title LIKE": `${ACTIVITY_NAME_BASE}%`,
             deleted_at: null,
         })) as number[];
         await Promise.all(dialogAgentIds.map((id) => api.deleteAssessment(id)));

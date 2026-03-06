@@ -1,6 +1,6 @@
-import { expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import { expect } from "@schoolboxTest/playwright/support/integrations";
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 
 /**
@@ -12,6 +12,7 @@ export default class DialogAgentHomepage {
     static readonly EMPTY_STATE_MESSAGE_AI_DISABLED = "The Discussion feature is currently disabled";
 
     static readonly DATA_TEST_EMPTY_CREATE_BUTTON = "component-dialogAgent-empty-create-button";
+    static readonly DATA_TEST_CREATE_BUTTON = "component-dialogAgent-create-button";
 
     constructor(
         private page: Page,
@@ -40,5 +41,13 @@ export default class DialogAgentHomepage {
     async clickEmptyStateCreateButton(): Promise<void> {
         const createButton = this.component.getByTestId(DialogAgentHomepage.DATA_TEST_EMPTY_CREATE_BUTTON);
         await createButton.click();
+    }
+
+    /**
+     * Click the "Create Discussion" component action button
+     */
+    async clickCreateAction(): Promise<void> {
+        const createAction = this.component.getByTestId(DialogAgentHomepage.DATA_TEST_CREATE_BUTTON);
+        await createAction.click();
     }
 }

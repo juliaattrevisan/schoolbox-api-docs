@@ -235,6 +235,7 @@ window.Vue.onMounted(() => {
                             markdown: true,
                             toolbar: EditorToolbar.SIMPLE,
                         }"
+                        :data-test="`dac-form-field-${fieldContext.id}`"
                         @editor-loaded="
                             // When an editor loads for the first time, it will mutate the saved value for that field from markdown to HTML.
                             // This shouldn't count as a cache invalidation, so treat the first update of each field as the new value in the cache
@@ -258,6 +259,7 @@ window.Vue.onMounted(() => {
                             markdown: true,
                             toolbar: EditorToolbar.SIMPLE,
                         }"
+                        data-test="dac-form-opening-message"
                         @editor-loaded="
                             // When an editor loads for the first time, it will mutate the saved value for that field from markdown to HTML.
                             // This shouldn't count as a cache invalidation, so treat the first update of each field as the new value in the cache
@@ -280,6 +282,7 @@ window.Vue.onMounted(() => {
                             markdown: true,
                             toolbar: EditorToolbar.SIMPLE,
                         }"
+                        data-test="dac-form-rules"
                         @editor-loaded="
                             // When an editor loads for the first time, it will mutate the saved value for that field from markdown to HTML.
                             // This shouldn't count as a cache invalidation, so treat the first update of each field as the new value in the cache
@@ -297,7 +300,9 @@ window.Vue.onMounted(() => {
         <ul class="flex-list buttons">
             <li v-if="returnUrl"><a class="button" :href="returnUrl">Return</a></li>
             <li v-if="props.postUpdate">
-                <button class="button submit" type="submit" @click.prevent="onSubmit">Save</button>
+                <button class="button submit" type="submit" data-test="dac-form-save" @click.prevent="onSubmit">
+                    Save
+                </button>
             </li>
         </ul>
     </form>

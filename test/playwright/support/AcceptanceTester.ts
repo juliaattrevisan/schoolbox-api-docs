@@ -136,6 +136,53 @@ export default class AcceptanceTester extends BaseTester {
     }
 
     /**
+     * Read what is contained within a CKEditor5 based on its ID
+     * @param editorId - The ID of the CKEditor5 instance
+     * @returns The content of the CKEditor5 instance
+     */
+    async readCKEditorById(editorId: string): Promise<string> {
+        // There should be at least one ckeditor, somewhere on the page, first.
+        // The actual element of the ckeditor has no direct correlation to the editorId, but if one exists then
+        // we can proceed with the next checks to find the actual editor we want
+        await expect(this.page.locator("div.ck.ck-editor").first()).toHaveCount(1);
+
+        // Wait for the editor to be ready
+        await this.page.waitForFunction(
+            ([_editorId]) => {
+                if (window.sbProps === undefined || window.sbProps.editors === undefined) {
+                    return false;
+                }
+                if (window.sbProps.editors[_editorId] === undefined) {
+                    return false;
+                }
+                return true;
+            },
+            [editorId],
+        );
+
+        // Get the editor data
+        return this.page.evaluate(
+            ([_editorId]) => {
+                return window.sbProps.editors[_editorId]!.getData();
+            },
+            [editorId],
+        );
+    }
+
+    /**
+     * Read what is contained within a CKEditor5 based on a Locator
+     * The relevant locator should have a ID set
+     * @param locator - The locator representing the initial Textarea the editor was created from
+     * @returns The content of the CKEditor5 instance
+     */
+    async readCKEditorByLocator(locator: Locator): Promise<string> {
+        await expect(locator).toHaveCount(1);
+        const editorId = await locator.getAttribute("id");
+        expect(editorId).not.toBeNull();
+        return this.readCKEditorById(editorId as string);
+    }
+
+    /**
      * Fill in CKEditor5 based on its ID
      * @param editorId - The ID of the CKEditor5 instance
      * @param content - The content to fill the editor with
