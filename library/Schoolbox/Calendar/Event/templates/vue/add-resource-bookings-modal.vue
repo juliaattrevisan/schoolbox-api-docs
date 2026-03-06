@@ -95,6 +95,8 @@ async function createNewBooking(): Promise<void> {
             toast.timeout({
                 text: responseData.message,
                 isSuccess: responseData.isSuccess,
+                duration: 2000, // Shorter than default duration so as not to delay the page refresh too much.
+                fadeDuration: 1000, // Shorter than default fadeDuration so as not to delay the page refresh too much.
                 timeoutCallback: () => {
                     // Reload the page after the timeout expires.
                     window.location.reload();
