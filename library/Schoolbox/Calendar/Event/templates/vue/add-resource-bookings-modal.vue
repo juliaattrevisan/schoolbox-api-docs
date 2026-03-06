@@ -24,9 +24,8 @@ const props = defineProps<Props>();
  * This defines the server response to an ENDPOINTS.addBookings request.
  */
 type AddBookingsToEventResponse = {
-    nBookingsCreatedPending: number;
-    nBookingsCreatedApproved: number;
-    nBookingsCreatedRejected: number;
+    message: string;
+    isSuccess: boolean;
 };
 
 const isModalOpen = window.Vue.ref<boolean>(false);
@@ -73,42 +72,6 @@ defineExpose({
 });
 
 /**
- * @param toast The toast to update
- * @param responseData The server's response to an 'addBookings' request.
- */
-function updateToastAndRefreshPage(toast: Toast, responseData: AddBookingsToEventResponse): void {
-    const nBookingsCreated =
-        responseData.nBookingsCreatedPending +
-        responseData.nBookingsCreatedApproved +
-        responseData.nBookingsCreatedRejected;
-
-    let msg;
-    let isSuccess;
-
-    if (nBookingsCreated === 0) {
-        isSuccess = false;
-        msg = `Could not create any bookings because of clashes`;
-    } else {
-        isSuccess = true;
-        msg = `Created ${nBookingsCreated} booking${nBookingsCreated > 1 ? "s" : ""} - `;
-        msg += `${responseData.nBookingsCreatedPending} pending, `;
-        msg += `${responseData.nBookingsCreatedApproved} approved, `;
-        msg += `${responseData.nBookingsCreatedRejected} rejected.`;
-    }
-
-    toast.timeout({
-        text: msg,
-        isSuccess,
-        duration: 2000,
-        fadeDuration: 1000,
-        timeoutCallback: () => {
-            // Reload the page after the timeout expires.
-            window.location.reload();
-        },
-    });
-}
-
-/**
  * Post the booking creation form.
  */
 async function createNewBooking(): Promise<void> {
@@ -129,7 +92,14 @@ async function createNewBooking(): Promise<void> {
         });
         const responseData = (await response.json()) as AddBookingsToEventResponse;
         if (response.ok) {
-            updateToastAndRefreshPage(toast, responseData);
+            toast.timeout({
+                text: responseData.message,
+                isSuccess: responseData.isSuccess,
+                //                timeoutCallback: () => {
+                //                    // Reload the page after the timeout expires.
+                //                    window.location.reload();
+                //                },
+            });
             isModalOpen.value = false; // Close the modal only on success.
         } else {
             toast.timeout({ text: "Unable to create booking(s)", isSuccess: false });

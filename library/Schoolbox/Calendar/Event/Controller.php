@@ -46,6 +46,7 @@ use Schoolbox\ResourceBooking\Item\Model as BookingItemModel;
 use Schoolbox\ResourceBooking\Booking\Model as BookingModel;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as BookingStatusMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatusModel;
+use Schoolbox\ResourceBooking\Booking\Util\ResponseHelper as BookingResponseHelper;
 use Schoolbox\ResourceBooking\Booking\Validation as BookingValidation;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderLinkOnlyTranslator;
@@ -119,6 +120,7 @@ class Controller extends Base
         private TermMapper $termMapper,
         private ExternalEventMapper $externalEventMapper,
         private External_Timetable $externalTimetable,
+        private BookingResponseHelper $bookingResponseHelper,
     ) {
     }
 
@@ -1174,9 +1176,10 @@ class Controller extends Base
         $this->response = $this->responseAsJson(
             // This data structure must match type 'AddBookingsToEventResponse' defined in add-resource-bookings-modal.vue.
             [
-                'nBookingsCreatedPending' => $results['nBookingsCreatedPending'],
-                'nBookingsCreatedApproved' => $results['nBookingsCreatedApproved'],
-                'nBookingsCreatedRejected' => $results['nBookingsCreatedRejected'],
+                'message' => $this->bookingResponseHelper->getResponseMessage(
+                    $results['nBookingsCreatedByStatusId'],
+                    false
+                )
             ]
         )->withStatus($results['httpStatusCode']);
     }
@@ -1306,9 +1309,7 @@ class Controller extends Base
         }
 
         return [
-            'nBookingsCreatedPending' => $nBookingsCreatedByStatusId[BookingStatusModel::STATUS_PENDING],
-            'nBookingsCreatedApproved' => $nBookingsCreatedByStatusId[BookingStatusModel::STATUS_APPROVED],
-            'nBookingsCreatedRejected' => $nBookingsCreatedByStatusId[BookingStatusModel::STATUS_REJECTED],
+            'nBookingsCreatedByStatusId' => $nBookingsCreatedByStatusId,
             'httpStatusCode' => $httpStatusCode,
         ];
     }
