@@ -67,10 +67,16 @@ class Mapper extends AbstractFolderMapper implements ILocator
      */
     public function findByParentId($nodeId)
     {
-        return $this->findByColumnList([
-            'parent' => $nodeId ?: null,
-            'owner'  => $_SESSION['id'] // TODO: FIX. DO NOT MERGE THIS
-        ]);
+        $userId = $this->getSessionUser()?->getId();
+
+        // Can't possibly have folders belonging to a null user
+        return isset($userId)
+            ? $this->findByColumnList([
+                'parent' => $nodeId ?: null,
+                'owner'  => $userId,
+            ])
+            : $this->createCollection()
+        ;
     }
 
 
