@@ -150,6 +150,15 @@ class Model implements IAssessableDataModel, ISoftDeletable
 
 
     /**
+     * This decides whether the Reporting activity's feedback screen shows an aggregated markbook from students'
+     * homepages. This is optional for reporting activities that are for attendance and don't require academic details
+     *
+     * @var bool|null
+     */
+    private ?bool $supportingDataMarkbookEnable = null;
+
+
+    /**
      * @return MarkType|null
      */
     public function getInstructorMarkType(): ?MarkType
@@ -405,6 +414,26 @@ class Model implements IAssessableDataModel, ISoftDeletable
     public function setSupportingDataWorkTypes(?GenericCollection $supportingDataWorkTypes): self
     {
         $this->supportingDataWorkTypes = $supportingDataWorkTypes;
+        return $this;
+    }
+
+
+    /**
+     * @return bool|null
+     */
+    public function getSupportingDataMarkbookEnable(): ?bool
+    {
+        return $this->supportingDataMarkbookEnable;
+    }
+
+
+    /**
+     * @param bool|null $supportingDataMarkbookEnable
+     * @return $this
+     */
+    public function setSupportingDataMarkbookEnable(?bool $supportingDataMarkbookEnable): self
+    {
+        $this->supportingDataMarkbookEnable = $supportingDataMarkbookEnable;
         return $this;
     }
 }

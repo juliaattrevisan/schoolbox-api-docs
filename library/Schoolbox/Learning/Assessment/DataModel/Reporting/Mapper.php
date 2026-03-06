@@ -46,6 +46,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('feedback_comments_enable', self::TYPE_BOOLEAN);
         $this->uses('supporting_data_enable', self::TYPE_BOOLEAN);
         $this->uses('supporting_data_range', self::TYPE_STRING);
+        $this->uses('supporting_data_markbook_enable', self::TYPE_BOOLEAN);
 
         /* Auditor fields
          */
@@ -66,7 +67,7 @@ class Mapper extends \Schoolbox\Mapper
             'assessmentModel',
         );
 
-        /* Add join for Feedbacks
+        /* TODO Add join for Feedbacks
          */
 
         /* Created/Updated/Deleted By fields need special treatment due to swampy reasons

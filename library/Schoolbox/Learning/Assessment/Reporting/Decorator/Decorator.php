@@ -45,7 +45,7 @@ class Decorator implements DecoratorInterface
         private ?array $supportingDataCurriculumNodes,
         private ?array $supportingDataFolders,
         private ?array $supportingDataWorkTypes,
-        private ?bool $supportingDataMegamarkbook,
+        private ?bool $supportingDataMarkbookEnable,
     ) {
     }
 
@@ -109,7 +109,6 @@ class Decorator implements DecoratorInterface
         $assessment->setMarkVisibility(IAssessable::MARK_VISIBILITY_PRIVATE);
 
         /* Reporting-specific stuffs
-         * TODO assign these and make translation layer functional
          */
         $assessment->setFeedbackCommentsEnable($this->feedbackCommentsEnable);
         $assessment->setSupportingDataEnable($this->supportingDataEnable);
@@ -135,6 +134,6 @@ class Decorator implements DecoratorInterface
             $assessment->setSupportingDataWorkTypes(WorkTypeMapper::getInstance()->findByColumn('id', $this->supportingDataWorkTypes));
         }
 
-        // supporting data megamarkbook
+        $assessment->setSupportingDataMarkbookEnable($this->supportingDataMarkbookEnable);
     }
 }

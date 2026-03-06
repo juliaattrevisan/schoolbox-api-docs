@@ -253,7 +253,7 @@ class Factory
      * (Reporting activity specific)
      * @var bool|null
      */
-    private ?bool $supportingDataMegamarkbook = null;
+    private ?bool $supportingDataMarkbookEnable = null;
 
 
     /**
@@ -496,7 +496,7 @@ class Factory
         $this->setSupportingDataCurriculumNodes(explode(',', $post['reporting']['supporting']['curriculumNodes'][0] ?? []));
         $this->setSupportingDataFolders($post['reporting']['supporting']['folders'] ?? null);
         $this->setSupportingDataWorkTypes($post['reporting']['supporting']['workTypes'] ?? null);
-        $this->setSupportingDataMegamarkbook('on' === ($post['reporting']['supporting']['megamarkbook'] ?? null));
+        $this->setSupportingDataMarkbookEnable('on' === ($post['reporting']['supporting']['markbook']['enable'] ?? null));
 
         /* TODO Explain what this thing means: custom fields, line items, what it's supposed to be doing here
          */
@@ -707,7 +707,7 @@ class Factory
                 $this->getSupportingDataCurriculumNodes(),
                 $this->getSupportingDataFolders(),
                 $this->getSupportingDataWorkTypes(),
-                $this->getSupportingDataMegamarkbook(),
+                $this->getSupportingDataMarkbookEnable(),
             );
         } else {
             throw new DomainException('Please select an assessment type');
@@ -1288,19 +1288,19 @@ class Factory
     /**
      * @return bool|null
      */
-    public function getSupportingDataMegamarkbook(): ?bool
+    public function getSupportingDataMarkbookEnable(): ?bool
     {
-        return $this->supportingDataMegamarkbook;
+        return $this->supportingDataMarkbookEnable;
     }
 
 
     /**
-     * @param bool|null $supportingDataMegamarkbook
+     * @param bool|null $supportingDataMarkbookEnable
      * @return $this
      */
-    public function setSupportingDataMegamarkbook(?bool $supportingDataMegamarkbook): self
+    public function setSupportingDataMarkbookEnable(?bool $supportingDataMarkbookEnable): self
     {
-        $this->supportingDataMegamarkbook = $supportingDataMegamarkbook;
+        $this->supportingDataMarkbookEnable = $supportingDataMarkbookEnable;
         return $this;
     }
 
