@@ -1179,7 +1179,8 @@ class Controller extends Base
                 'message' => $this->bookingResponseHelper->getResponseMessage(
                     $results['nBookingsCreatedByStatusId'],
                     false
-                )
+                ),
+                'isSuccess' => array_sum(array_values($results['nBookingsCreatedByStatusId'])) > 0,
             ]
         )->withStatus($results['httpStatusCode']);
     }
