@@ -8,10 +8,10 @@
  (these are Skin Builder vars)
  ****************************/
 $navigation-foreground: var(--sbx-config-color-menu-foreground, var(--navigation-foreground)) !default;
-$navigation-background: var(--sbx-config-color-menu-background, var(--navigation-background)) !default;
+$navigation-background: var(--sbx-config-color-menu-primary, var(--navigation-background)) !default;
 $navigation-hover: var(--sbx-config-color-menu-hover, var(--navigation-hover)) !default;
 
-$off-canvas-foreground: var(--sbx-config-color-menu-background, var(--off-canvas-foreground)) !default;
+$off-canvas-foreground: var(--sbx-config-color-menu-primary, var(--off-canvas-foreground)) !default;
 $off-canvas-background: var(--sbx-config-color-menu-foreground, var(--off-canvas-background)) !default;
 $off-canvas-hover: var(--sbx-config-color-menu-hover, var(--off-canvas-hover)) !default;
 
@@ -36,7 +36,7 @@ $body-bg: var(--sbx-config-color-body-background, var(--body-background)) !defau
 
 $login-form-background: var(--sbx-config-login-form-background, var(--login-form-background)) !default;
 
-$accounts-menu-foreground: var(--sbx-config-color-menu-background, var(--accounts-menu-foreground)) !default;
+$accounts-menu-foreground: var(--sbx-config-color-menu-primary, var(--accounts-menu-foreground)) !default;
 $accounts-menu-background: var(--sbx-config-color-menu-foreground, var(--accounts-menu-background)) !default;
 $accounts-menu-hover: var(--sbx-config-color-menu-hover, var(--accounts-menu-hover)) !default;
 
