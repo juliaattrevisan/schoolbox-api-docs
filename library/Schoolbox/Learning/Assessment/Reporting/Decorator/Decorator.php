@@ -43,7 +43,7 @@ class Decorator implements DecoratorInterface
         private ?bool $supportingDataEnable,
         private ?string $supportingDataRange,
         private ?array $supportingDataCurriculumNodes,
-        private ?array $supportingDataFolders,
+        private ?string $supportingDataFolders,
         private ?array $supportingDataWorkTypes,
         private ?bool $supportingDataMarkbookEnable,
     ) {
