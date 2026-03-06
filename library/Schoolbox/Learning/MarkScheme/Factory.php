@@ -193,14 +193,13 @@ class Factory
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      * @throws RangeException
-     * @throws Mapper\Exception
      */
     public function spawnInstructorMarkSchemeFor(IAssessable $assessable): ?IMarkScheme
     {
         // only due work has instructor mark type for now
         // when we eventually add more, we can add more cases here
-        if (!($assessable instanceof DueWork)) {
-            throw new InvalidArgumentException('Unknown IAssessable class: ' . \get_class($assessable));
+        if (!($assessable instanceof DueWork || $assessable instanceof Reporting)) {
+            throw new InvalidArgumentException('Instructor mark scheme not supported in ' . \get_class($assessable));
         }
 
         $markType = $assessable->getInstructorMarkType();
@@ -209,8 +208,11 @@ class Factory
             return null;
         }
 
+        if ($assessable instanceof DueWorK) {
+            return $this->spawnForDueWork($assessable, true);
+        }
 
-        return $this->spawnForDueWork($assessable, true);
+        return $this->spawnForReporting($assessable, true);
     }
 
 
