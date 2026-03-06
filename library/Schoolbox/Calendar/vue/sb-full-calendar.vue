@@ -255,9 +255,10 @@ export default {
             const customSuccessMessage = this.pendingReloadToastMessage;
             this.pendingReloadToastMessage = null;
 
-            const toast = (this.suppressNextReloadEventsToast && customSuccessMessage === null)
-                ? null
-                : window.sbProps.toastActivate("Retrieving calendar events...");
+            const toast =
+                this.suppressNextReloadEventsToast && customSuccessMessage === null
+                    ? null
+                    : window.sbProps.toastActivate("Retrieving calendar events...");
             this.suppressNextReloadEventsToast = false;
             const params = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
