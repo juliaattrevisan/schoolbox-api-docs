@@ -317,6 +317,7 @@ test.describe("Dialog Agent", () => {
         await dialogAgentResponse.clickConfirmSubmission();
 
         tester.isGoingTo("expect to see the attempt in submission history");
+        await homepage.clickAssessmentComponentTitle(activity2Id);
         await expect(discussionHistory.locateAllInteractions()).toHaveCount(1);
     });
 
