@@ -491,25 +491,51 @@ class Controller extends Base
         }
 
         $units = [];
+        $newUnitSpecs = [];
+
+        /* Finding the textbox definition ID from the Unit Template
+         */
+        $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
+        $class = Textbox\Component\Homepage\Controller::class;
         try {
-            /* Finding the textbox definition ID from the Unit Template
-             */
-            $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
-            $class = Textbox\Component\Homepage\Controller::class;
             $unitTextboxComp = $this->componentInstanceMapper->findByContextAndClass(
                 $module,
                 $course->getTemplate()->getUnitTemplate()->getId(),
                 $class
             );
             $textboxDefId = $unitTextboxComp->first()?->getDefinitionId();
+        } catch (\Exception $e) {
+            $problem = (new ApiProblem('Could not find component instance.'))
+                ->setStatus(500)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus(500);
+            return;
+        }
+
+        // Create units within a transaction
+        try {
             $this->unitSpecificationMapper->getDatabase()->beginTransaction();
             foreach ($names as $name) {
-                $newUnit = ($this->createUnit(trim($name ?? ''), $course));
-                $units[] = $this->getTranslatedUnitData($newUnit, $course, $textboxDefId);
+                $newUnitSpecs[] = $this->createUnit(trim($name ?? ''), $course);
             }
             $this->unitSpecificationMapper->getDatabase()->commit();
         } catch (\Exception $e) {
             $this->unitSpecificationMapper->getDatabase()->rollBack();
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus($e->getCode())
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                                   ->withStatus($e->getCode());
+            return;
+        }
+
+        // Now that the transaction is committed, fetch the unit data with component IDs
+        try {
+            foreach ($newUnitSpecs as $newUnit) {
+                $units[] = $this->getTranslatedUnitData($newUnit, $course, $textboxDefId);
+            }
+        } catch (\Exception $e) {
             $problem = (new ApiProblem($e->getMessage()))
                 ->setStatus($e->getCode())
                 ->asArray();
