@@ -44,6 +44,7 @@ const formRef = window.Vue.ref<InstanceType<typeof DacForm> | null>(null);
  */
 const sandboxVisible = sbProps.aiFeatures.dialogagent === undefined || sbProps.aiFeatures.dialogagent.enabled;
 
+const sandboxContainerEl = window.Vue.useTemplateRef<HTMLDivElement>("sandboxContainerRef");
 const sandboxRef = window.Vue.ref<InstanceType<typeof DacSandbox> | null>(null);
 const sandboxData = window.Vue.ref({
     /**
@@ -65,6 +66,7 @@ function onConfigurationSaved(data: DialogAgentConfigureApiResponse): void {
     sandboxData.value._routes.postSandboxMessage = data._routes.postSandboxMessage;
 
     sandboxRef.value?.resetFeed();
+    sandboxContainerEl.value?.scrollIntoView({ behavior: "smooth" });
 }
 
 const isGeneratingFields = window.Vue.ref<boolean>(false);
@@ -173,16 +175,13 @@ window.Vue.onMounted(async () => {
             />
         </div>
 
-        <div v-if="sandboxVisible" class="small-12 large-6 island">
+        <div v-if="sandboxVisible" ref="sandboxContainerRef" class="small-12 large-6 island">
             <h2 class="subheader">Sandbox</h2>
 
             <section v-if="isSubmitting">
                 <div class="loader"></div>
             </section>
-            <div
-                v-else-if="!sandboxData._routes.postSandboxMessage || !sandboxData.openingMessage"
-                class="empty-state"
-            >
+            <div v-else-if="!sandboxData._routes.postSandboxMessage || !sandboxData.openingMessage" class="empty-state">
                 <i class="icon-dialog-agent"></i>
                 <p>Sandbox will be available once the agent configuration has been saved.</p>
             </div>
