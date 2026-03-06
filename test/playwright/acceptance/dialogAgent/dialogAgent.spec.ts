@@ -228,6 +228,81 @@ test.describe("Dialog Agent", () => {
         });
     });
 
+    let activity2OpeningMessage: string;
+
+    test("sandbox chat & reset functionality", async ({ tester, page }) => {
+        const homepage = new Homepage(tester, page);
+        await homepage.goto(Common.CLASS_ID_9AENG);
+        const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME);
+        const dialogAgentConfigure = new DialogAgentConfigure(page, tester);
+
+        tester.isGoingTo("open the configure page for the 2nd activity");
+        const activity2 = homepage.locateAssessmentRow(component, ACTIVITY_NAME_2);
+        const activity2Id = await Homepage.getAssessmentId(activity2);
+
+        await homepage.clickAssessmentComponentTOTMenu(activity2Id);
+        await homepage.clickAssessmentComponentTOTMenuConfigureAgent(activity2Id);
+
+        const agentChatFeed = new AgentChatFeed(page, tester);
+        const agentChatPrompt = new AgentChatPrompt(page, tester);
+
+        const allRequestMessages = agentChatFeed.locateMessagesWithType(AgentChatMessageType.REQUEST);
+        const allResponseMessages = agentChatFeed.locateMessagesWithType(AgentChatMessageType.RESPONSE);
+
+        const openingMessageTextarea = dialogAgentConfigure.locateFormOpeningMessageTextarea();
+        await test.step("expect to only see the opening message in the feed", async () => {
+            activity2OpeningMessage = await tester.readCKEditorByLocator(openingMessageTextarea);
+
+            await agentChatFeed.expectOpeningMessageToHaveText(activity2OpeningMessage);
+            await expect(allRequestMessages).toHaveCount(0);
+            await expect(allResponseMessages).toHaveCount(1);
+        });
+
+        await test.step("send a message in the chat, expect to see the prompt and response", async () => {
+            const prompt1 = "What does the python look like?";
+            await agentChatPrompt.typePrompt(prompt1);
+            await agentChatPrompt.send();
+
+            await AgentChatFeed.expectMessageToHaveText(allRequestMessages.last(), prompt1);
+            await AgentChatFeed.expectMessageIsLoading(allResponseMessages.last());
+            await AgentChatFeed.waitForMessageLoaded(allResponseMessages.last());
+
+            await expect(allRequestMessages).toHaveCount(1);
+            await expect(allResponseMessages).toHaveCount(2);
+        });
+
+        await test.step("reset the sandbox by saving the configuration, expect to only see the opening message again", async () => {
+            await dialogAgentConfigure.clickSaveConfiguration();
+
+            await agentChatFeed.expectOpeningMessageToHaveText(activity2OpeningMessage);
+            await expect(allRequestMessages).toHaveCount(0);
+            await expect(allResponseMessages).toHaveCount(1);
+        });
+
+        await test.step("send another message in the chat", async () => {
+            const prompt2 = "How long do they grow?";
+            await agentChatPrompt.typePrompt(prompt2);
+            await agentChatPrompt.send();
+
+            await AgentChatFeed.expectMessageToHaveText(allRequestMessages.last(), prompt2);
+            await AgentChatFeed.expectMessageIsLoading(allResponseMessages.last());
+            await AgentChatFeed.waitForMessageLoaded(allResponseMessages.last());
+
+            await expect(allRequestMessages).toHaveCount(1);
+            await expect(allResponseMessages).toHaveCount(2);
+        });
+
+        await test.step("alter the opening message, reset the sandbox without saving, expect the original opening message to remain", async () => {
+            await tester.fillCKEditorByLocator(openingMessageTextarea, "A different opening message");
+            await dialogAgentConfigure.clickResetSandbox();
+            await dialogAgentConfigure.clickConfirmResetSandbox();
+
+            await agentChatFeed.expectOpeningMessageToHaveText(activity2OpeningMessage);
+            await expect(allRequestMessages).toHaveCount(0);
+            await expect(allResponseMessages).toHaveCount(1);
+        });
+    });
+
     test("as a student, complete an attempt", async ({ tester, page, context }) => {
         await tester.impersonate(Common.USER_JANAREED);
 
@@ -256,6 +331,7 @@ test.describe("Dialog Agent", () => {
 
         await expect(allRequestMessages).toHaveCount(0);
         await expect(allResponseMessages).toHaveCount(1);
+        await agentChatFeed.expectOpeningMessageToHaveText(activity2OpeningMessage);
 
         await test.step("send a message in the chat", async () => {
             const prompt1 = "What is the python's habitat?";

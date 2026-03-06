@@ -8,6 +8,8 @@ export default class DialogAgentConfigure {
 
     static readonly DATA_TEST_SANDBOX_DISABLED = "dac-sandbox-disabled";
     static readonly DATA_TEST_SANDBOX_ALERT_DIRTY = "dac-sandbox-alert-dirty";
+    static readonly DATA_TEST_SANDBOX_RESET = "dac-sandbox-reset";
+    static readonly DATA_TEST_SANDBOX_RESET_CONFIRM = "dac-sandbox-reset-confirm";
 
     static readonly DATA_TEST_FORM_HELPFULNESS_SELECT = "dac-form-helpfulness";
     static readonly DATA_TEST_FORM_LANGUAGE_SELECT = "dac-form-language";
@@ -114,5 +116,21 @@ export default class DialogAgentConfigure {
     public async setLanguage(option: string): Promise<void> {
         const select = this.locateContainer().getByTestId(DialogAgentConfigure.DATA_TEST_FORM_LANGUAGE_SELECT);
         await select.selectOption({ value: option });
+    }
+
+    /**
+     * Click the reset sandbox button
+     */
+    public async clickResetSandbox(): Promise<void> {
+        const resetButton = this.locateContainer().getByTestId(DialogAgentConfigure.DATA_TEST_SANDBOX_RESET);
+        await resetButton.click();
+    }
+
+    /**
+     * Click the confirm button in the reset sandbox confirmation modal
+     */
+    public async clickConfirmResetSandbox(): Promise<void> {
+        const confirmButton = this.page.getByTestId(DialogAgentConfigure.DATA_TEST_SANDBOX_RESET_CONFIRM);
+        await confirmButton.click();
     }
 }
