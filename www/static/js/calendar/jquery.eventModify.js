@@ -197,6 +197,27 @@
                 return false;
             };
 
+            /**
+             * AlaressValidate requirement to determine if the current field is a datepicker set to "all-day" mode
+             * @param {HTMLInputElement} element the element being validated
+             * @returns {boolean} true if all day
+             */
+            function isDatepickerAllDay(element) {
+                const isTimeUndefined = typeof $(element).attr("data-datepicker-time") == "undefined";
+                const isAllDayInput = $("#" + $(element).attr("data-datepicker-alldayinput")).val() == 1;
+
+                return isTimeUndefined || isAllDayInput;
+            }
+
+            /**
+             * The inverse of isDatepickerAllDay
+             * @param {HTMLInputElement} element the element being validated
+             * @returns {boolean} true if not all day
+             */
+            function isDatepickerNotAllDay(element) {
+                return !isDatepickerAllDay(element);
+            }
+
             const startDateField = config.element.find('input[name="startDate"]');
 
             $(config.element).alaressValidate({
@@ -235,7 +256,10 @@
                     endDate: {
                         required: true,
                         datepickerDate: true,
-                        datepickerDateNotBefore: startDateField,
+                        datepickerDateNotBefore: {
+                            param: startDateField,
+                            depends: isDatepickerAllDay,
+                        },
                         /**
                          * When the event isn't an all-day event, the end date and time must be after (not before)
                          * the start date and time.
@@ -244,13 +268,7 @@
                          */
                         datepickerDateTimeNotBeforeOrEqual: {
                             param: startDateField,
-                            depends: (element) => {
-                                const isDateOnly =
-                                    typeof $(element).attr("data-datepicker-time") == "undefined" ||
-                                    $("#" + $(element).attr("data-datepicker-alldayinput")).val() == 1;
-
-                                return !isDateOnly;
-                            },
+                            depends: isDatepickerNotAllDay,
                         },
                     },
                     repeat_until: {
