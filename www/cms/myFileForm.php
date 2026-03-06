@@ -112,7 +112,7 @@ if (isset($_POST['description'])) {
     $parentFolder = null;
     if (!empty($_POST['parent'])) {
         try {
-            $parent = MyFolderMapper::getInstance()->findByColumnList([
+            $parentFolder = MyFolderMapper::getInstance()->findOneByColumnList([
                 'id'    => $_POST['parent'],
                 'owner' => $user->getId(),
             ]);
