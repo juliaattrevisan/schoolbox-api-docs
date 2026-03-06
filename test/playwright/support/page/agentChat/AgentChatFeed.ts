@@ -68,10 +68,25 @@ export default class AgentChatFeed {
         await expect(contentLocator).toContainText(expectedText);
     }
 
+    /**
+     * Verify that a particular message is of a given type
+     * @param messageLocator - Locator for the message to check
+     * @param type - The type expected for the message
+     */
     public static async expectMessageIsType(messageLocator: Locator, type: AgentChatMessageType): Promise<void> {
         const dataTest = await messageLocator.getAttribute("data-test");
         const matchingDataTestPrefix = AgentChatFeed.dataTestForType(type);
         const matchingDataTests = new RegExp(`^${matchingDataTestPrefix}-`);
         expect(dataTest).toMatch(matchingDataTests);
+    }
+
+    /**
+     * Verify that the opening message in the feed matches the given text
+     * @param expectedText - The expected opening message text
+     */
+    public async expectOpeningMessageToHaveText(expectedText: string): Promise<void> {
+        const firstMessage = this.locateAllMessages().first();
+        await AgentChatFeed.expectMessageIsType(firstMessage, AgentChatMessageType.RESPONSE);
+        await AgentChatFeed.expectMessageToHaveText(firstMessage, expectedText);
     }
 }

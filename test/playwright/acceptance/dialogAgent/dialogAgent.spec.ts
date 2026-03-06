@@ -1,5 +1,4 @@
 import { AiFeature } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
-import { AgentChatMessageType } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import AIServices, { AiProvider } from "@schoolboxTest/playwright/support/page/admin/ai/AIServices";
 import AgentChatFeed from "@schoolboxTest/playwright/support/page/agentChat/AgentChatFeed";
@@ -119,20 +118,73 @@ test.describe("Dialog Agent", () => {
         tester.isGoingTo("save the initial configuration");
         await dialogAgentConfigure.clickSaveConfiguration();
 
-        // TODO: SA-22047
-        // tester.isGoingTo("confirm the sandbox doesn't show the unsaved changes alert");
-        // await dialogAgentConfigure.assertSandboxUnsavedAlertNotVisible();
+        tester.isGoingTo("confirm the sandbox doesn't show the unsaved changes alert");
+        await dialogAgentConfigure.assertSandboxUnsavedAlertNotVisible();
+
+        tester.isGoingTo("confirm there's exactly 1 message in the feed");
+        const agentChatFeed = new AgentChatFeed(page, tester);
+        await expect(agentChatFeed.locateAllMessages()).toHaveCount(1);
 
         tester.isGoingTo("confirm the opening message is shown in the sandbox");
         const openingMessage = await tester.readCKEditorByLocator(openingMessageTextarea);
+        await agentChatFeed.expectOpeningMessageToHaveText(openingMessage);
+    });
+
+    test("configuration sandbox unsaved changes alert", async ({ tester, page }) => {
+        const homepage = new Homepage(tester, page);
+        await homepage.goto(Common.CLASS_ID_9AENG);
+        const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME);
+        const dialogAgentConfigure = new DialogAgentConfigure(page, tester);
+
+        tester.isGoingTo("open the configure page for the 2nd activity");
+        const activity2 = homepage.locateAssessmentRow(component, "test");
+        const activity2Id = await Homepage.getAssessmentId(activity2);
+
+        await homepage.clickAssessmentComponentTOTMenu(activity2Id);
+        await homepage.clickAssessmentComponentTOTMenuConfigureAgent(activity2Id);
+
+        tester.isGoingTo("expect no unsaved changes alert on page load");
+        await dialogAgentConfigure.assertSandboxUnsavedAlertNotVisible();
 
         const agentChatFeed = new AgentChatFeed(page, tester);
-        const feedMessages = agentChatFeed.locateAllMessages();
-        await expect(feedMessages).toHaveCount(1);
 
-        const firstFeedMessage = feedMessages.first();
-        await AgentChatFeed.expectMessageIsType(firstFeedMessage, AgentChatMessageType.RESPONSE);
-        await AgentChatFeed.expectMessageToHaveText(firstFeedMessage, openingMessage);
+        await test.step("opening message", async () => {
+            tester.isGoingTo("confirm the opening message is shown in the sandbox");
+            const openingMessageTextarea = dialogAgentConfigure.locateFormOpeningMessageTextarea();
+            const openingMessage = await tester.readCKEditorByLocator(openingMessageTextarea);
+            await agentChatFeed.expectOpeningMessageToHaveText(openingMessage);
+
+            tester.isGoingTo("confirm the opening message is shown in the sandbox");
+
+            tester.isGoingTo("add 1 character, expect alert to be visible");
+            await tester.focusCKEditorByLocator(openingMessageTextarea);
+
+            await page.keyboard.press("a");
+            await dialogAgentConfigure.assertSandboxUnsavedAlertVisible();
+
+            tester.isGoingTo("remove the character (back to original message), expect alert to be hidden");
+            await page.keyboard.press("Backspace");
+            await dialogAgentConfigure.assertSandboxUnsavedAlertNotVisible();
+
+            tester.isGoingTo("remove another character, expect alert to be visible");
+            await page.keyboard.press("Delete"); // note that ckeditor puts the cursor at the START, so this needs to be Delete
+            await dialogAgentConfigure.assertSandboxUnsavedAlertVisible();
+
+            tester.isGoingTo(
+                "add a different character (same length but different value), expect alert to remain visible",
+            );
+            const newChar = openingMessage.slice(0, 1) === "a" ? "b" : "a"; // since AI generates dynamic content, make sure it differs...
+            await page.keyboard.type(newChar);
+            await dialogAgentConfigure.assertSandboxUnsavedAlertVisible();
+
+            tester.isGoingTo("save changes, expect alert to be hidden");
+            await dialogAgentConfigure.clickSaveConfiguration();
+            await dialogAgentConfigure.assertSandboxUnsavedAlertNotVisible();
+
+            tester.isGoingTo("confirm the new opening message is shown in the sandbox");
+            const updatedOpeningMessage = `${newChar}${openingMessage.slice(1)}`;
+            await agentChatFeed.expectOpeningMessageToHaveText(updatedOpeningMessage);
+        });
     });
 
     test("view both activities in the component", async ({ tester, page }) => {
@@ -140,12 +192,11 @@ test.describe("Dialog Agent", () => {
         await homepage.goto(Common.CLASS_ID_9AENG);
         const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME);
 
-        const allAssessmentsSelector = new RegExp(`^${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TITLE}`);
-        const activityTitle1 = component.getByTestId(allAssessmentsSelector).filter({ hasText: ACTIVITY_NAME_1 });
-        await expect(activityTitle1).toBeVisible();
+        const activity1 = homepage.locateAssessmentRow(component, ACTIVITY_NAME_1);
+        const activity2 = homepage.locateAssessmentRow(component, ACTIVITY_NAME_2);
 
-        const activityTitle2 = component.getByTestId(allAssessmentsSelector).filter({ hasText: ACTIVITY_NAME_2 });
-        await expect(activityTitle2).toBeVisible();
+        await expect(activity1).toBeVisible();
+        await expect(activity2).toBeVisible();
     });
 
     test.afterAll(async ({ api, db }) => {
