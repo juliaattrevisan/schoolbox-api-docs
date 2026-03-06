@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DataModel\Reporting;
 
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
@@ -116,6 +117,12 @@ class Model implements IAssessableDataModel, ISoftDeletable
      * @var string|null
      */
     private ?string $supportingDataRange = null;
+
+
+    /**
+     * @var GenericCollection|null
+     */
+    private ?GenericCollection $supportingDataCurriculumNodes = null;
 
 
     /**
@@ -314,6 +321,26 @@ class Model implements IAssessableDataModel, ISoftDeletable
     public function setSupportingDataRange(?string $supportingDataRange): self
     {
         $this->supportingDataRange = $supportingDataRange;
+        return $this;
+    }
+
+
+    /**
+     * @return GenericCollection|null
+     */
+    public function getSupportingDataCurriculumNodes(): ?GenericCollection
+    {
+        return $this->supportingDataCurriculumNodes;
+    }
+
+
+    /**
+     * @param GenericCollection|null $supportingDataCurriculumNodes
+     * @return $this
+     */
+    public function setSupportingDataCurriculumNodes(?GenericCollection $supportingDataCurriculumNodes): self
+    {
+        $this->supportingDataCurriculumNodes = $supportingDataCurriculumNodes;
         return $this;
     }
 }

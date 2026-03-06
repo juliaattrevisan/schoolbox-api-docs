@@ -12,6 +12,7 @@ use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
@@ -108,6 +109,12 @@ class Model extends AbstractAssessment
      * @var string|null
      */
     private ?string $supportingDataRange = null;
+
+
+    /**
+     * @var GenericCollection|null
+     */
+    private ?GenericCollection $supportingDataCurriculumNodes = null;
 
 
     /**
@@ -548,6 +555,26 @@ class Model extends AbstractAssessment
     public function setSupportingDataRange(?string $supportingDataRange): self
     {
         $this->supportingDataRange = $supportingDataRange;
+        return $this;
+    }
+
+
+    /**
+     * @return GenericCollection|null
+     */
+    public function getSupportingDataCurriculumNodes(): ?GenericCollection
+    {
+        return $this->supportingDataCurriculumNodes;
+    }
+
+
+    /**
+     * @param GenericCollection|null $supportingDataCurriculumNodes
+     * @return $this
+     */
+    public function setSupportingDataCurriculumNodes(?GenericCollection $supportingDataCurriculumNodes): self
+    {
+        $this->supportingDataCurriculumNodes = $supportingDataCurriculumNodes;
         return $this;
     }
 

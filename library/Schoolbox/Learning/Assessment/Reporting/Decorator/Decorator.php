@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Reporting\Decorator;
 
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
+use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Learning\Assessment\DecoratorInterface;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Reporting\Model;
@@ -111,6 +112,18 @@ class Decorator implements DecoratorInterface
         $assessment->setFeedbackCommentsEnable($this->feedbackCommentsEnable);
         $assessment->setSupportingDataEnable($this->supportingDataEnable);
         $assessment->setSupportingDataRange($this->supportingDataRange);
+
+        /* Assemble curriculum nodes
+         */
+        $selectedNodesCsv = $this->supportingDataCurriculumNodes;
+
+        if (isset($selectedNodesCsv[0])) {
+            $selectedNodes = explode(',', $selectedNodesCsv[0]);
+
+            $assessment->setCurriculumNodes(CurriculumNodeMapper::getInstance()->findByColumn('id', $selectedNodes));
+        }
+
+
 
         // supporting data enable
         // supporting data range
