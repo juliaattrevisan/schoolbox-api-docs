@@ -122,8 +122,11 @@ async function onSubmit(): Promise<void> {
 }
 
 window.Vue.onMounted(() => {
-    // As vue loads the template after foundation has been initialised, we need to reinitialise the tooltips
-    window.jQuery(document).foundation("tooltip", "reflow");
+    if (document.readyState === "complete") {
+        // If the document isn't ready, we can't reflow tooltips yet
+        // As vue loads the template after foundation has been initialised, we need to reinitialise the tooltips
+        window.jQuery(document).foundation("tooltip", "reflow");
+    }
 });
 </script>
 
