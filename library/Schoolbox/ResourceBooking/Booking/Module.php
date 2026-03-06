@@ -11,20 +11,22 @@
 namespace Schoolbox\ResourceBooking\Booking;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Failure\Unauthorized;
-use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
+use Alaress\Module\Module as BaseModule;
+use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Calendar;
 use Schoolbox\Calendar\Event;
 use Schoolbox\CampusMapper;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
-use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
+use Schoolbox\ResourceBooking\Item\Model as ItemModel;
 
 class Module extends BaseModule
 {
@@ -138,6 +140,10 @@ class Module extends BaseModule
         $bookingEditNotCal = new Rule\All(
             $bookingEditRule,
             new Rule\Callback(function ($params) {
+                $item = $params['item'] ?? null;
+                if (!($item instanceof ItemModel)) {
+                    throw new InvalidPath('No booking item found in route params.');
+                }
                 // Bookings linked to events of variant Event::VARIANT_EVENT should be managed via the 'Modify Event' page.
                 if ($params['item']->getEvent()->getVariant() === Event::VARIANT_EVENT) {
                     throw new Unauthorized("Bookings linked to events cannot be updated by this method.");
