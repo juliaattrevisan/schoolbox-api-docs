@@ -130,7 +130,7 @@ class Decorator implements DecoratorInterface
          * Selection of work types is entirely optional for users: leaving this empty means we won't filter on work
          * types at all, letting everything through
          */
-        if (\count($this->supportingDataWorkTypes)) {
+        if ($this->supportingDataWorkTypes && \count($this->supportingDataWorkTypes)) {
             $assessment->setSupportingDataWorkTypes(WorkTypeMapper::getInstance()->findByColumn('id', $this->supportingDataWorkTypes));
         }
 
