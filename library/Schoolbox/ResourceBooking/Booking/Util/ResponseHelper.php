@@ -29,10 +29,11 @@ class ResponseHelper
         $messageStart = $createdEvent ? 'Created event with' : 'Created';
 
         if ($nTotalBookings === 1) {
-            $bookingStatus = match (true) {
-                $nApprovedBookings === 1 => 'approved',
-                $nPendingBookings === 1 => 'pending',
-                $nRejectedBookings === 1 => 'rejected',
+            $bookingStatus = match ($nTotalBookings) {
+                $nApprovedBookings => 'approved',
+                $nPendingBookings => 'pending',
+                $nRejectedBookings => 'rejected',
+                default => throw new \LogicException('This state is impossible, but must be covered to satisfy PHPStan.')
             };
             return "$messageStart one $bookingStatus booking";
         }
