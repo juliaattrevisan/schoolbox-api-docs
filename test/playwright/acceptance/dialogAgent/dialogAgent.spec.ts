@@ -395,7 +395,9 @@ test.describe("Dialog Agent", () => {
 
         tester.isGoingTo("expect to see the attempt in submission history");
         await homepage.clickAssessmentComponentTitle(activity2Id);
-        await expect(discussionHistory.locateAllInteractions()).toHaveCount(1);
+        const interactions = discussionHistory.locateAllInteractions();
+        await expect(interactions).toHaveCount(1);
+        await expect(interactions.first()).toContainText("Response by Ms Jana Reed");
     });
 
     test("as a student, view a submitted attempt", async ({ tester, page }) => {
@@ -423,6 +425,52 @@ test.describe("Dialog Agent", () => {
 
         await expect(allRequestMessages).toHaveCount(2);
         await expect(allResponseMessages).toHaveCount(3);
+    });
+
+    test("as a student, leave an attempt in progress", async ({ tester, page }) => {
+        await tester.impersonate(Common.USER_LOUISASMITH);
+
+        const homepage = new Homepage(tester, page);
+        await homepage.goto(Common.CLASS_ID_9AENG);
+
+        const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME);
+
+        tester.isGoingTo("start an attempt for activity 2");
+        const activity2 = homepage.locateAssessmentRow(component, ACTIVITY_NAME_2);
+        const activity2Id = await Homepage.getAssessmentId(activity2);
+        await homepage.clickAssessmentComponentTitle(activity2Id);
+
+        const discussionHistory = new AssessmentPage(tester, page);
+        await discussionHistory.clickCreateSubmission();
+
+        const dialogAgentResponse = new DialogAgentResponse(page, tester);
+        await dialogAgentResponse.assertIsOnResponsePage(ACTIVITY_NAME_2);
+
+        tester.isGoingTo("expect to only see the opening message in the feed");
+        const agentChatFeed = new AgentChatFeed(page, tester);
+        const agentChatPrompt = new AgentChatPrompt(page, tester);
+
+        const allRequestMessages = agentChatFeed.locateMessagesWithType(AgentChatMessageType.REQUEST);
+        const allResponseMessages = agentChatFeed.locateMessagesWithType(AgentChatMessageType.RESPONSE);
+
+        await expect(allRequestMessages).toHaveCount(0);
+        await expect(allResponseMessages).toHaveCount(1);
+        await agentChatFeed.expectOpeningMessageToHaveText(activity2OpeningMessage);
+
+        tester.isGoingTo("send a message in the chat");
+        const prompt = "How long do they live for?";
+        await agentChatPrompt.typePrompt(prompt);
+        await agentChatPrompt.send();
+
+        tester.isGoingTo("expect to see the student's prompt in the feed, and a receive response from the AI");
+        await AgentChatFeed.expectMessageToHaveText(allRequestMessages.last(), prompt);
+        await AgentChatFeed.expectMessageIsLoading(allResponseMessages.last());
+        await AgentChatFeed.waitForMessageLoaded(allResponseMessages.last());
+
+        await expect(allRequestMessages).toHaveCount(1);
+        await expect(allResponseMessages).toHaveCount(2);
+
+        // leave the attempt in progress
     });
 
     test("as a staff member, see both activities in the component", async ({ tester, page }) => {
