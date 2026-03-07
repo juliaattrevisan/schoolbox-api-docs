@@ -107,7 +107,7 @@
          */
         function applyValidator() {
             $(config.element)
-                .submit(function () {
+                .on("submit", function () {
                     // update underlying textareas before submit validation
                     $.each(window.sbProps.editors, function (prop, val) {
                         window.sbProps.editors[prop].updateSourceElement();
@@ -324,7 +324,7 @@
 
                     /* Bring focus to the new clone
                      */
-                    $(config.answerCollectionList).find("[data-answer-description]").last().focus();
+                    $(config.answerCollectionList).find("[data-answer-description]").last().trigger("focus");
                 }
 
                 return false;
@@ -358,7 +358,7 @@
          */
         function applyValidator() {
             $(config.element)
-                .submit(function () {
+                .on("submit", function () {
                     // update underlying textarea before submit validation
                     window.sbProps.editors["question"].updateSourceElement();
                 })
@@ -378,8 +378,8 @@
                             $.each($(config.answerCollectionList).find("[data-input]"), function (index, element) {
                                 var elem = $(element);
 
-                                var description = $.trim(elem.find("[data-answer-description]").val());
-                                var code = $.trim(elem.find("[data-answer-code-value]").val());
+                                var description = elem.find("[data-answer-description]").val().trim();
+                                var code = elem.find("[data-answer-code-value]").val().trim();
 
                                 /* Ignore empty answers that weren't removed
                                  */

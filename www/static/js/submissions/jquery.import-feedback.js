@@ -134,7 +134,7 @@
                 }
 
                 let row = rows[i].split("\t");
-                let comment = $.trim(row[row.length - 1]);
+                let comment = row[row.length - 1].trim();
 
                 if (comment[0] === '"' && comment[comment.length - 1] === '"') {
                     row[row.length - 1] = comment.replace(/^"|"$/g, "");
@@ -217,7 +217,7 @@
                 }
 
                 let input = preprocessed[i].split("\t");
-                let id = $.trim(input[0]);
+                let id = input[0].trim();
 
                 if (id) {
                     selectAssignation()(

@@ -332,7 +332,7 @@
         "ckeRequired",
         function (value, element) {
             var textboxId = $(element).attr("id");
-            return $.trim($(window.sbProps.editors[textboxId].getData())).length > 0;
+            return window.sbProps.editors[textboxId].getData().trim().length > 0;
         },
         "This field is required",
     );
@@ -351,7 +351,7 @@
              */
             jQuery.validator.methods.required.call(this, value, element);
 
-            return $.trim(value).length;
+            return value.trim().length;
         },
         "This field cannot be blank",
     );
@@ -385,10 +385,10 @@
         "emailTrimmed",
         function (value, element) {
             // If field contains just whitespace...pass
-            if ($.trim(value).length < 1) {
+            if (value.trim().length < 1) {
                 return true;
             }
-            return jQuery.validator.methods.email.call(this, $.trim(value), element);
+            return jQuery.validator.methods.email.call(this, value.trim(), element);
         },
         "Please enter a valid email address",
     );
@@ -400,13 +400,13 @@
     $.validator.addMethod(
         "notInList",
         function (value, element, list) {
-            value = $.trim(value);
+            value = value.trim();
 
             if (!Array.isArray(list)) {
                 list = JSON.parse(list);
             }
 
-            return list.indexOf($.trim(value)) < 0;
+            return list.indexOf(value.trim()) < 0;
         },
         "This heading is already in use - please choose another.",
     );
@@ -417,7 +417,7 @@
     $.validator.addMethod(
         "notInSlugList",
         function (value, element, list) {
-            value = $.trim(value).toLowerCase();
+            value = value.trim().toLowerCase();
 
             if (!Array.isArray(list)) {
                 list = JSON.parse(list);
@@ -434,7 +434,7 @@
 
             newValue = newValue.replace(pattern, replace);
 
-            return list.indexOf($.trim(newValue)) < 0;
+            return list.indexOf(newValue.trim()) < 0;
         },
         "This heading is already in use - please choose another.",
     );

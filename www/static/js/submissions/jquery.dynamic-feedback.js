@@ -158,7 +158,7 @@
                     if (event.keyCode === 13) {
                         event.preventDefault();
 
-                        $(element).blur();
+                        $(element).trigger("blur");
                     }
                 });
             });
@@ -254,7 +254,7 @@
             /* Force blur in case you directly go from fiddling with the mark
              * straight to the publish
              */
-            $participant.find("[data-mark-input]").blur();
+            $participant.find("[data-mark-input]").trigger("blur");
 
             // We can safely clear this timeout now that we're publishing
             window.clearTimeout(commentBoxTimeouts[commentBoxId]);
@@ -549,10 +549,10 @@
         function disableFormSubmit() {
             $(config.assessmentList)
                 .find("form[data-feedback-form]")
-                .submit(function (e) {
+                .on("submit", function (e) {
                     e.preventDefault();
 
-                    $(this).find("[data-mark-input]").blur();
+                    $(this).find("[data-mark-input]").trigger("blur");
                 });
         }
 

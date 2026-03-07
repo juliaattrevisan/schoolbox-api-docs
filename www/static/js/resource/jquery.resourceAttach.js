@@ -694,7 +694,7 @@
 
         setTimeout(function () {
             elem.remove();
-            if ($.isFunction(then)) {
+            if (typeof then === "function") {
                 then();
             }
         }, this.options.detachDelay);

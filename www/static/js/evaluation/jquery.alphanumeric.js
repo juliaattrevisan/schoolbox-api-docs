@@ -21,7 +21,7 @@
             var ch = p.ichars + p.nchars;
             ch = ch.replace(reg, "");
 
-            $(this).keypress(function (e) {
+            $(this).on("keypress", function (e) {
                 if (!e.charCode) k = String.fromCharCode(e.which);
                 else k = String.fromCharCode(e.charCode);
 
@@ -29,7 +29,7 @@
                 if (e.ctrlKey && k == "v") e.preventDefault();
             });
 
-            $(this).bind("contextmenu", function () {
+            $(this).on("contextmenu", function () {
                 return false;
             });
         });

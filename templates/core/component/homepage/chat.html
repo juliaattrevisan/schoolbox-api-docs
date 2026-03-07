@@ -16,7 +16,7 @@
                 users_el: 'ul[data-chat-users]'
             });
 
-            $('.show-users').click(function (event) {
+            $('.show-users').on("click", function (event) {
                 event.preventDefault();
                 $('.chat-users').slideToggle();
                 $(this).toggleClass('active')

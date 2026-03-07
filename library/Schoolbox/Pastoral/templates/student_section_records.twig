@@ -129,7 +129,7 @@
                     confirmEvent: function (element) {
                         $('#deletePastoralId').val();
                         $('#deletePastoralForm').attr('action', element.attr('href'));
-                        $('#deletePastoralForm').submit();
+                        $('#deletePastoralForm').trigger('submit');
                     }
                 });
             });

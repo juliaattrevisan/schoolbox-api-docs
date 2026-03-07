@@ -90,7 +90,7 @@
         var type = typeof options;
 
         // the options given is a deferred
-        if (type === "object" && "then" in options && $.isFunction(options.then)) {
+        if (type === "object" && "then" in options && typeof options.then === "function") {
             // attach this deferred to each instance given
             return this.each(function () {
                 if (!$.data(this, plugin)) {

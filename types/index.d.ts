@@ -22,6 +22,7 @@ import type { AiFeature } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/p
 import type { Toast } from "@schoolboxVue/components/toast/sbxToastTypes";
 import type { ActivityType } from "@schoolboxAssessment/Types/assessmentTypes";
 import type { SbxGlobalDocumentEventHandlerMap, SbxGlobalElementEventHandlerMap } from "./sbxEvents";
+import type { chained } from "@js/chained/chained";
 
 type Dropzone = {
     addFile(file: File): void;
@@ -117,6 +118,9 @@ declare global {
         siteVersion: string;
         STORYBOOK_ENV: string;
         Vue: typeof Vue;
+        sbx: {
+            chained: typeof chained;
+        };
     }
 
     // Add our custom events to the DocumentEventMap, so we can use them in event listeners

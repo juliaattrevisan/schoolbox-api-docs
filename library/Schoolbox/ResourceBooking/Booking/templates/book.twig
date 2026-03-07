@@ -300,7 +300,7 @@ $(function() {
     // This should be in a different form to everything else.
     form.on('click', '#resource-booking-cancel', function(event) {
         event.preventDefault();
-        $('#resource-booking-cancel-form').submit();
+        $('#resource-booking-cancel-form').trigger('submit');
     });
 
     // Show/hide the repeat until input, depending on if a repeat is chosen.

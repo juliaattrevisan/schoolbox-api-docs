@@ -22,7 +22,7 @@
                 input.setAttribute('value', $(this).attr('data-student-id'));
                 form.append(input);
             })
-            form.submit();
+            form.trigger('submit');
         });
 
         /* Get the list of values that exist per type

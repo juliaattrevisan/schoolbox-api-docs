@@ -1,7 +1,7 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
     $(function() {
-        $('[data-delete-wiki]').click(function(event) {
+        $('[data-delete-wiki]').on("click", function(event) {
             event.preventDefault();
 
             var element = $(this);
@@ -15,7 +15,7 @@
             });
         });
 
-        $('[data-revert]').click(function(event) {
+        $('[data-revert]').on("click", function(event) {
             event.preventDefault();
 
             var element = $(this);

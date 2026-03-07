@@ -107,7 +107,7 @@
 
                 // No available options selected?
                 if(!countAvailable){
-                    $elem.focus();
+                    $elem.trigger('focus');
                     return false;
                 }
                 return true;

@@ -223,7 +223,7 @@
                     var old_success = typeof ajax_settings.success !== "undefined" ? ajax_settings.success : null;
                     $.extend(ajax_settings, {
                         success: function (data, textStatus, jqXHR) {
-                            if ($.isFunction(old_success)) {
+                            if (typeof old_success === "function") {
                                 var result = old_success(data, textStatus, jqXHR);
                                 if (typeof result == "string") {
                                     data = result;
@@ -344,7 +344,7 @@
 
                     el.on("closed.fndtn.reveal.wrapped", function () {
                         el.detach().appendTo(placeholder);
-                        el.unwrap().unbind("closed.fndtn.reveal.wrapped");
+                        el.unwrap().off("closed.fndtn.reveal.wrapped");
                     });
 
                     el.detach().appendTo(root_element);

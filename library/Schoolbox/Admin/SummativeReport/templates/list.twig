@@ -104,7 +104,7 @@
                                                                 location.reload();
                                                             })
                                                             .fail(function(response) {
-                                                                let temp = $.parseJSON(response.responseText);
+                                                                let temp = JSON.parse(response.responseText);
 
                                                                 toast.toastTimeout({
                                                                     text: 'Could not save: ' + temp.error,

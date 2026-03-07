@@ -144,7 +144,7 @@
             confirmCallback = function (el) {
                 // Submit the element's form
                 let $form = $('#' + el.attr('data-form-id'));
-                $form.submit();
+                $form.trigger('submit');
             };
         $importList
             .on('click', '[data-action="run"]', function(event) {

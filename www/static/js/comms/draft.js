@@ -277,7 +277,7 @@
                     deferred.resolve();
                 })
                 .fail(function (response) {
-                    var temp = $.parseJSON(response.responseText);
+                    var temp = JSON.parse(response.responseText);
 
                     config.toaster.toastTimeout({
                         text: "Error: " + temp.message,

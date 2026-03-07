@@ -31,7 +31,7 @@
         });
 
         // On choosing a new icon
-        $('[data-interaction="select-icon"]').click(function () {
+        $('[data-interaction="select-icon"]').on("click", function () {
             // Update the button
             $('#icon-choice-'+selectingIconId).empty().append($(this).children().clone());
             // and the form
@@ -120,7 +120,7 @@
 
             var form = $(this).closest('[data-interaction-container]').find('form');
             form.find('input[name=enable]').val(enable);
-            form.submit();
+            form.trigger('submit');
         });
 
         // form buttons

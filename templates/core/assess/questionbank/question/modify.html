@@ -14,7 +14,7 @@
 
         /* Enforce two decimal places
          */
-        $('input[name=marks]').change(function() {
+        $('input[name=marks]').on("change", function() {
             var val = $(this).val();
 
             /* Empty string is classified as a number

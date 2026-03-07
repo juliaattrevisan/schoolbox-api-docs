@@ -340,7 +340,7 @@
             }
         });
 
-        $('[data-interaction="delete"]').click(function(e){
+        $('[data-interaction="delete"]').on("click", function(e){
             e.preventDefault();
             $(this).confirmDialog({
                 text: "Are you sure you wish to delete this page from your ePortfolio?",

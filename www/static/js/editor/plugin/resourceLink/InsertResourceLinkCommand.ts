@@ -51,7 +51,7 @@ export default class InsertResourceLinkCommand extends Command {
          * Ensure that selected files are not received by other event listeners made by other schoolboxResource functions on the page
          * For example, this prevents file drops from receiving the file selected in the editor.
          */
-        $(window).unbind("message");
+        $(window).off("message");
         /**
          * Fire of the jQuery plugin to display the resource modal
          */

@@ -101,9 +101,8 @@
                                          */
                                         let cdnPrefix = "{{ CDN_PREFIX }}";
                                         $('#icon-modal').iconModal({
-                                            registry: $.parseJSON('{{ iconRegistry.registry|json_encode|escape('js') }}'),
+                                            registry: JSON.parse('{{ iconRegistry.registry|json_encode|escape('js') }}'),
                                             pageLength: {{ iconRegistry.pageLength }},
-
                                             root: cdnPrefix + "/images/badges",
 
                                             /* Inflict it upon the form

@@ -111,6 +111,7 @@ module.exports = {
         clipboard: "./www/static/js/clipboard/clipboard.js",
         highcharts: "./www/static/js/vendors/highcharts/highcharts.js",
         highchartsMore: "./www/static/js/vendors/highcharts/highchartsMore.js",
+        chained: "./www/static/js/chained/chained.ts",
 
         // Search
         headerSearch: "./templates/core/include/vue/headerSearch.ts",

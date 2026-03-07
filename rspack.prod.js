@@ -26,8 +26,6 @@ module.exports = merge(common, {
                     "./node_modules/jquery-validation/dist/jquery.validate.min.js",
                     // jQuery UI
                     "./node_modules/jquery-ui/dist/jquery-ui.min.js",
-                    // jQueryUI Touch Punch
-                    "./node_modules/@andxor/jquery-ui-touch-punch-fix/jquery.ui.touch-punch.js",
                     // Sound / video player
                     "./node_modules/mediaelement/build/mediaelement-and-player.min.js",
                     // For drag/drop of resources

@@ -94,11 +94,17 @@
         /* Get the current entry tip when modifying the record
          */
         if (subtypeDropdown.val() === null) {
-            updateEntryTip($.trim(typesIndexEntryTip[typeDropdown.val()]));
-            updateExpiresAt($.trim(typesIndexDefaultExpiry[typeDropdown.val()]));
+            const typeVal = String(typeDropdown.val() ?? "").trim();
+            const typeEntryTip = typesIndexEntryTip[typeVal];
+            const typeExpiry = typesIndexDefaultExpiry[typeVal];
+            updateEntryTip(typeEntryTip != null ? String(typeEntryTip).trim() : "");
+            updateExpiresAt(typeExpiry != null ? String(typeExpiry).trim() : "");
         } else {
-            updateEntryTip($.trim(subtypesIndexEntryTip[subtypeDropdown.val()]));
-            updateExpiresAt($.trim(subtypesIndexDefaultExpiry[subtypeDropdown.val()]));
+            const subtypeVal = String(subtypeDropdown.val() ?? "").trim();
+            const subtypeEntryTip = subtypesIndexEntryTip[subtypeVal];
+            const subtypeExpiry = subtypesIndexDefaultExpiry[subtypeVal];
+            updateEntryTip(subtypeEntryTip != null ? String(subtypeEntryTip).trim() : "");
+            updateExpiresAt(subtypeExpiry != null ? String(subtypeExpiry).trim() : "");
         }
         {% endif %}
 
@@ -107,11 +113,15 @@
          */
         function init(typeVal, subtypeVal) {
             if (null !== subtypeVal) {
-                updateEntryTip($.trim(subtypesIndexEntryTip[subtypeVal]));
-                updateExpiresAt($.trim(subtypesIndexDefaultExpiry[subtypeVal]));
+                let subtypeEntryTip = subtypesIndexEntryTip[subtypeVal];
+                let subtypeExpiry = subtypesIndexDefaultExpiry[subtypeVal];
+                updateEntryTip(subtypeEntryTip != null ? String(subtypeEntryTip).trim() : "");
+                updateExpiresAt(subtypeExpiry != null ? String(subtypeExpiry).trim() : "");
             } else {
-                updateEntryTip($.trim(typesIndexEntryTip[typeVal]));
-                updateExpiresAt($.trim(typesIndexDefaultExpiry[typeVal]));
+                let typeEntryTip = typesIndexEntryTip[typeVal];
+                let typeExpiry = typesIndexDefaultExpiry[typeVal];
+                updateEntryTip(typeEntryTip != null ? String(typeEntryTip).trim() : "");
+                updateExpiresAt(typeExpiry != null ? String(typeExpiry).trim() : "");
             }
         }
 

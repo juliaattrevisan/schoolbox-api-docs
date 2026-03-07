@@ -103,7 +103,7 @@ $(parentCheckboxSelector).each(function(index, parentCheckbox) {
 
 // When a parent type checkbox is changed, show or hide its subtypes
 // and check them by default when shown
-$(parentCheckboxSelector).change(function(e) {
+$(parentCheckboxSelector).on('change', function(e) {
     var parentCheckbox = e.target;
     var $subCheckboxes = $(parentCheckbox).siblings(childGroupSelector).find(childCheckboxSelector);
 

@@ -11,7 +11,7 @@
                     }
                 })
                 .on('selectize.item_add', function() {
-                    modifyForm.find(':submit').prop('disabled', false).focus();
+                    modifyForm.find(':submit').prop('disabled', false).trigger('focus');
                 })
                 .on('selectize.item_remove', function() {
                     modifyForm.find(':submit').prop('disabled', true);
@@ -21,7 +21,7 @@
             event.preventDefault();
             window.location.href = '/adminv2/user/'+modifyForm.find(':input[name="userId"]').val() + '/modify';
         };
-        modifyForm.submit(openModifyScreen);
+        modifyForm.on('submit', openModifyScreen);
 
         // The clone form
         var cloneForm = $('form[data-action="clone"]');

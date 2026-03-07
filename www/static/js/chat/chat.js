@@ -79,7 +79,7 @@ String.prototype.format = function () {
                 }
             });
 
-            this.options.body_el.keypress(function (event) {
+            this.options.body_el.on("keypress", function (event) {
                 /* Execute send on enter key pressed */
                 if (event.keyCode == 13) {
                     var $body_el = $self.options.body_el;
@@ -343,7 +343,7 @@ String.prototype.format = function () {
 
                     var componentID = "component" + $self.options.component_id;
                     if (document.activeElement.id == componentID) {
-                        $("#" + componentID + "-chatmessage").focus();
+                        $("#" + componentID + "-chatmessage").trigger("focus");
                     }
                 },
                 dataType: "json",

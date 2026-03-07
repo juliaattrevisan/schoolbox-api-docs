@@ -27,7 +27,7 @@
                 var fieldsAreFilled = true;
 
                 $.each($(config.answerCollectionList).find("[data-input]"), function (index, element) {
-                    var description = $.trim($(element).find("[data-answer-description]").val());
+                    var description = $(element).find("[data-answer-description]").val().trim();
 
                     /* Ignore empty answers that weren't removed
                      */
@@ -68,7 +68,7 @@
             function (value, element) {
                 var fieldsAreFilled = true;
 
-                var description = $.trim($("[data-answer-description]").val());
+                var description = $("[data-answer-description]").val().trim();
 
                 /* Ignore empty answers that weren't removed
                  */

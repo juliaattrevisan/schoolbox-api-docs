@@ -1,7 +1,7 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component data-component-definition-id="{COMPONENT_DEFINITION_ID}">
     <script type="text/javascript">
         $(function() {
-            $('#component{COMPONENT_INSTANCE_ID}').find('[data-delete]').click(function(event) {
+            $('#component{COMPONENT_INSTANCE_ID}').find('[data-delete]').on("click", function(event) {
                 event.preventDefault();
                 var element = $(this);
                 $(this).confirmDialog({

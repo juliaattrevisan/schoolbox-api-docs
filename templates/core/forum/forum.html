@@ -2,7 +2,7 @@
 <script type="text/javascript">
     $(function() {
         // Confirmation of delete button
-        $('[data-action="delete"]').click(function(event) {
+        $('[data-action="delete"]').on("click", function(event) {
             event.preventDefault();
             $(this).confirmDialog({
                 confirmEvent: $.confirmDialog.submitForm

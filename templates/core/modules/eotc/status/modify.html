@@ -26,12 +26,12 @@
                     format: 'html',
                     text: 'There are '  + seriesData.num + ' events in a recurring series which repeats ' + seriesData.description + '. Are you sure you want to synchronise <strong>all the events</strong> in this series into your SIS?',
                     confirmEvent: function() {
-                        form.submit();
+                        form.trigger('submit');
                     }
                 });
             }
             else {
-                form.submit();
+                form.trigger('submit');
             }
         });
     });

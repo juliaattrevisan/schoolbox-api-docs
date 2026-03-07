@@ -45,7 +45,7 @@
 
             /* Prevent accidental form submission via Enter key
              */
-            config.questionForm.find("input[type=text]").keydown(function (event) {
+            config.questionForm.find("input[type=text]").on("keydown", function (event) {
                 if (event.keyCode == 13) {
                     event.preventDefault();
                 }

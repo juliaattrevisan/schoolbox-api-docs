@@ -181,7 +181,7 @@
                                 tabindex: "0",
                                 "aria-selected": true,
                             })
-                            .focus();
+                            .trigger("focus");
                     }
 
                     // Hide panels

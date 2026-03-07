@@ -228,7 +228,7 @@
                 $textarea = $cell.find("textarea");
 
             $check.prop("checked", true).trigger("change");
-            $textarea.focus().trigger("focus");
+            $textarea.trigger("focus");
             //limit all descriptors to the max lenght, not just $textbox, as it won't add the attribute to the one directly next to it...
             $("[data-descriptor-text]").on("change", (event) => {
                 event.target.setAttribute("maxlength", maxDescriptorLength);
@@ -388,7 +388,7 @@
 
         // focus on the newly-created level input
         var $levels = $rb.children("thead").find("input[data-level]");
-        $levels.eq(-1).focus();
+        $levels.eq(-1).trigger("focus");
 
         // Once level is added, scroll to it
         $rb.closest(".scrollable").scrollTo($rb.find('[data-spawn="level"]'), {

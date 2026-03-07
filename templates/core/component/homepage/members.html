@@ -70,9 +70,9 @@
                     </form>
                     <script>
                         $(function() {
-                            $('[data-email-members={COMPONENT_INSTANCE_ID}]').click(function(event) {
+                            $('[data-email-members={COMPONENT_INSTANCE_ID}]').on("click", function(event) {
                                 event.preventDefault();
-                                $('#email-all-members-{COMPONENT_INSTANCE_ID}').submit();
+                                $('#email-all-members-{COMPONENT_INSTANCE_ID}').trigger('submit');
                             });
                         });
                     </script>

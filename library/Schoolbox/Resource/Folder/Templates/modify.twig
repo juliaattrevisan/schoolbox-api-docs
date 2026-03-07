@@ -82,7 +82,7 @@
                     $(form).confirmDialog({
                         text: 'You do not currently have write access to this folder. Do you wish to continue?',
                         confirmEvent: function() {
-                            form.submit();
+                            form.trigger('submit');
                         },
                         cancelEvent: function() {
                             // Allow user to resubmit the form if they cancel out of the dialog
@@ -90,7 +90,7 @@
                         }
                     });
                 } else {
-                    form.submit();
+                    form.trigger('submit');
                 }
             }
         });
@@ -199,7 +199,7 @@
             var shortEnough = true;
 
             explodeCodes.forEach(function(code){
-                if($.trim(code).length > 64) {
+                if((code).trim().length > 64) {
                     shortEnough = false;
                 }
             });

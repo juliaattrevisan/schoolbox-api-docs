@@ -63,8 +63,8 @@
                             </form>
                             <script>
                                 $(function() {
-                                    $('[data-students-email]').click(function() {
-                                        $('#form-students').submit();
+                                    $('[data-students-email]').on("click", function() {
+                                        $('#form-students').trigger('submit');
                                     });
                                 })
                             </script>
@@ -79,8 +79,8 @@
                             </form>
                         <script>
                             $(function() {
-                                $('[data-parents-email]').click(function() {
-                                    $('#form-parents').submit();
+                                $('[data-parents-email]').on("click", function() {
+                                    $('#form-parents').trigger('submit');
                                 });
                             })
                         </script>

@@ -59,7 +59,7 @@ var calendar = {
                     self.refresh();
                 });
             } else {
-                $(this).parent().find('input[value=""]').focus();
+                $(this).parent().find('input[value=""]').trigger("focus");
             }
         });
     },

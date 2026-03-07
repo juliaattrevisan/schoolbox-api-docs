@@ -226,20 +226,23 @@
         /* Get the current entry tip when modifying the record
          */
         if (subtypeDropdown.val() === null) {
-            updateExpiresAt($.trim(typesIndexEntryTip[typeDropdown.val()]));
+            let typeEntryTip = typesIndexEntryTip[typeDropdown.val()];
+            updateExpiresAt(typeEntryTip != null ? typeEntryTip.trim() : null);
         } else {
-            updateExpiresAt($.trim(subtypesIndexEntryTip[subtypeDropdown.val()]));
+            let subtypeEntryTip = subtypesIndexEntryTip[subtypeDropdown.val()];
+            updateExpiresAt(subtypeEntryTip != null ? subtypeEntryTip.trim() : null);
         }
         {% endif %}
-
         /**
          * Update the entry tip and expires at date based on the type / subtype selection
          */
         function init(typeVal, subtypeVal) {
             if (null !== subtypeVal) {
-                updateExpiresAt($.trim(subtypesIndexDefaultExpiry[subtypeVal]));
+                let subtypeExpiry = subtypesIndexDefaultExpiry[subtypeVal];
+                updateExpiresAt(subtypeExpiry != null ? subtypeExpiry.trim() : null);
             } else {
-                updateExpiresAt($.trim(typesIndexDefaultExpiry[typeVal]));
+                let typeExpiry = typesIndexDefaultExpiry[typeVal];
+                updateExpiresAt(typeExpiry != null ? typeExpiry.trim() : null);
             }
         }
     })

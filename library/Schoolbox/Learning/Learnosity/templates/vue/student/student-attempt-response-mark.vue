@@ -5,7 +5,7 @@
  * It's referred to the 'mark' in the backend, but the front end element is called 'grade', hence the variation.
  */
 
-import { watchDebounced, computedEager } from "@vueuse/core";
+import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
 import { getPercentage } from "@js/util/mathUtils";
 import { getLetterGrade } from "@js/util/sbx/markUtils";
@@ -181,7 +181,7 @@ const currentScore = window.Vue.computed(() => {
  * representation of the calculated score, not something overridden by the user
  * @returns {string} - the current mark
  */
-const actualMark = computedEager(() => {
+const actualMark = window.Vue.computed(() => {
     if (props.markData.type.slug === MARK_TYPE_PERCENTAGE) {
         const percentage = getPercentage(currentScore.value, props.student.attemptResponse.maxMarks as number);
         // percentage is returned from the back end with a space between the value and the %
@@ -217,7 +217,7 @@ const hasNoMark = window.Vue.computed(() => {
  * so users can easily re-assign the mark from the item scores
  * @returns {boolean} - whether to show the assign button
  */
-const showAssignButton = computedEager(() => {
+const showAssignButton = window.Vue.computed(() => {
     if (hasNoMark.value || getAttemptMaxScore(props.student) === 0) {
         return false;
     }

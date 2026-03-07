@@ -33,7 +33,7 @@
                         $(event.target).prop('checked', true).prop('disabled', true);
                     })
                     .fail(function(response) {
-                        var temp = $.parseJSON(response.responseText);
+                        var temp = JSON.parse(response.responseText);
 
                         /** package failed, allow this package to be re-installed */
                         $(event.target).prop('checked', false).prop('disabled', false);

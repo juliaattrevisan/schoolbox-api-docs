@@ -188,7 +188,7 @@
         }
 
         // If a single value is passed, set that as value?
-        if (!$.isArray(settings.value)) {
+        if (!Array.isArray(settings.value)) {
             settings.value = [settings.value]
         }
 
@@ -253,4 +253,3 @@
         return this;
     };
 }(jQuery));
-

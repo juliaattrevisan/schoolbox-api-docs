@@ -130,7 +130,7 @@
                 setTimeout(function(){frm.detach();},0);
             });
 
-            frm.appendTo($('body')).submit();
+            frm.appendTo($('body')).trigger('submit');
         });
         {% endif %}
     });

@@ -29,7 +29,7 @@
                             $(event.target).closest('tr').remove();
                         })
                         .fail(function(response) {
-                            var temp = $.parseJSON(response.responseText);
+                            var temp = JSON.parse(response.responseText);
 
                             $toast.toastTimeout({
                                 text: temp.message,

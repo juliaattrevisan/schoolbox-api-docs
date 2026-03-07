@@ -168,7 +168,7 @@
             {# After the search modal is revealed automatically highlight the search box #}
 
             $(document).on('opened.fndtn.reveal', '#userSearchModal{{ guid }}', function () {
-                userSearch.focus();
+                userSearch.trigger('focus');
             });
 
             {# --------------------------------------------------------------------------------------------------------------------------------------------#}
@@ -290,7 +290,7 @@
 
                 {# Wire up the event to add members to the group list #}
 
-                $('[data-user-add="{{ guid }}"]').click(window.addClickEvent['{{ guid }}']);
+                $('[data-user-add="{{ guid }}"]').on('click', window.addClickEvent['{{ guid }}']);
             }
 
             {# --------------------------------------------------------------------------------------------------------------------------------------------#}
@@ -416,7 +416,7 @@
 
                     {# Add click event to this new search result #}
 
-                    $('[data-user-add="{{ guid }}"]').click(window.addClickEvent['{{ guid }}']);
+                    $('[data-user-add="{{ guid }}"]').on('click', window.addClickEvent['{{ guid }}']);
                 }
 
                 {# If there are no results left display the empty state #}
@@ -428,7 +428,9 @@
 
                 {# Put focus back on the search box so they can keep typing #}
 
-                userSearch.focus();
+                userSearch.trigger('focus');
+
+                {# Execute the callback function to let the page know a user has been added #}
 
                 {# Execute requested callback #}
 

@@ -1,7 +1,7 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component data-component-definition-id="{COMPONENT_DEFINITION_ID}">
     <script type='text/javascript'>
         $(function() {
-            $('#component{COMPONENT_INSTANCE_ID}').find('[data-list-item-id]').click(function() {
+            $('#component{COMPONENT_INSTANCE_ID}').find('[data-list-item-id]').on("click", function() {
                 event.preventDefault();
 
                 var id = $(this).attr('data-list-item-id');
@@ -25,7 +25,7 @@
                 else {
                     allPanels.addClass('hide');
                     panel.removeClass('hide');
-                    panel.find('[data-first-focus]').focus();
+                    panel.find('[data-first-focus]').trigger('focus');
 
                     allContent.removeClass('hide');
                     content.addClass('hide');
@@ -34,14 +34,14 @@
 
             /* Create button, swap form in
              */
-            $('#component{COMPONENT_INSTANCE_ID}').find('[data-create]').click(function(event) {
+            $('#component{COMPONENT_INSTANCE_ID}').find('[data-create]').on("click", function(event) {
                 event.preventDefault();
 
                 $(this).hide();
                 $('#component{COMPONENT_INSTANCE_ID}').find('[data-create-panel=new]').removeClass('hide');
             });
 
-            $('#component{COMPONENT_INSTANCE_ID}').find('[data-delete]').click(function(event) {
+            $('#component{COMPONENT_INSTANCE_ID}').find('[data-delete]').on("click", function(event) {
                 event.preventDefault();
 
                 var element = $(this);

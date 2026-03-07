@@ -347,7 +347,7 @@
                 }
             }
 
-            S(window).on("load", function () {
+            var triggerResizeEvents = function () {
                 S(window)
                     .trigger("resize.fndtn.clearing")
                     .trigger("resize.fndtn.dropdown")
@@ -357,7 +357,14 @@
                     .trigger("resize.fndtn.magellan")
                     .trigger("resize.fndtn.topbar")
                     .trigger("resize.fndtn.slider");
-            });
+            };
+
+            // Check if page is already loaded, otherwise attach load handler
+            if (document.readyState === "complete") {
+                triggerResizeEvents();
+            } else {
+                S(window).on("load", triggerResizeEvents);
+            }
 
             return scope;
         },
@@ -549,7 +556,7 @@
 
                 function trim(str) {
                     if (typeof str === "string") {
-                        return $.trim(str);
+                        return str.trim();
                     }
                     return str;
                 }

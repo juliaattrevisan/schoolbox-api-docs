@@ -4,7 +4,7 @@
 
         /* Calendar controls
          */
-        $('[data-type=calendar-controls]').submit(function(event) {
+        $('[data-type=calendar-controls]').on("submit", function(event) {
             event.preventDefault();
 
             var id = $('[data-type=calendar-controls]').find('input[name=userKey]').val();

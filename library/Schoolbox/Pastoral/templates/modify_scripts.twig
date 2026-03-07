@@ -2,7 +2,7 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/attacher.select-all.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/chained/jquery.chained.min.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/chained.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/form/jquery.alaressValidate.js?v={{ config.site_version }}"></script>
 {% autoescape('js') %}
 <script type="text/javascript">
@@ -245,7 +245,7 @@
 
         {# Chain Pastoral Type/Subtype Dropdowns #}
 
-        $('#subtypeId').chained('#typeId');
+        window.sbx.chained('#subtypeId', '#typeId');
 
         {# Update record permissions section #}
 
@@ -450,8 +450,14 @@
                  * Template's current value is empty string
                  * same above with the Confidential Templates
                  */
-                replaceTemplate($.trim(subtypesIndex[subtypeVal]), $.trim(subtypesIndexPrivate[subtypeVal]));
-                updatePoints($.trim(subtypesIndexDefaultPoints[subtypeVal]));
+                let subtypeTemplate = subtypesIndex[subtypeVal];
+                let subtypeTemplatePrivate = subtypesIndexPrivate[subtypeVal];
+                replaceTemplate(
+                    subtypeTemplate != null ? subtypeTemplate.trim() : '',
+                    subtypeTemplatePrivate != null ? subtypeTemplatePrivate.trim() : ''
+                );
+                let subtypePoints = subtypesIndexDefaultPoints[subtypeVal];
+                updatePoints(subtypePoints != null ? String(subtypePoints).trim() : null);
             } else {
 
                 /* If subtypeId == null, look at the parent typeId. load its template
@@ -459,8 +465,14 @@
                  * Type template or if the General Template's current value is empty string
                  * same above with the Confidential Templates
                  */
-                replaceTemplate($.trim(typesIndex[typeVal]), $.trim(typesIndexPrivate[typeVal]));
-                updatePoints($.trim(typesIndexDefaultPoints[typeVal]));
+                let typeTemplate = typesIndex[typeVal];
+                let typeTemplatePrivate = typesIndexPrivate[typeVal];
+                replaceTemplate(
+                    typeTemplate != null ? typeTemplate.trim() : '',
+                    typeTemplatePrivate != null ? typeTemplatePrivate.trim() : ''
+                );
+                let typePoints = typesIndexDefaultPoints[typeVal];
+                updatePoints(typePoints != null ? String(typePoints).trim() : null);
             }
         }
 
@@ -480,7 +492,7 @@
              * @returns {String}
              */
             let normalizeSpace = function (value) {
-                return $.trim(value.replace(/\s+/g, ' '));
+                return (value.replace(/\s+/g, ' ').trim());
             };
 
             /* If the current data is the same as the template contents,

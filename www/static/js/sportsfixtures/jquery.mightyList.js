@@ -162,7 +162,7 @@
                 if (canSpawnRow()) {
                     spawnNewRow();
                 } else {
-                    $(config.element).find(config.focusSelector).last().focus();
+                    $(config.element).find(config.focusSelector).last().trigger("focus");
                 }
             });
         }
@@ -188,7 +188,7 @@
 
                 /* Force trim
                  */
-                element.val($.trim(element.val()));
+                element.val(element.val().trim());
 
                 element.attr("data-item-original-value", element.val());
             });
@@ -222,7 +222,7 @@
 
             /* Force trim
              */
-            $element.val($.trim($element.val()));
+            $element.val($element.val().trim());
 
             /* Only execute if there is data to send
              */
@@ -330,7 +330,7 @@
 
             /* Focus it, to save you needing to do it manually
              */
-            $element.find(config.focusSelector).last().focus();
+            $element.find(config.focusSelector).last().trigger("focus");
 
             refreshEmptyStates();
 

@@ -133,7 +133,7 @@
             /* Steal focus when reply modal opens
              */
             config.replyModal.on("opened.fndtn.reveal", function () {
-                config.replyModal.find("textarea[name=body]").focus();
+                config.replyModal.find("textarea[name=body]").trigger("focus");
             });
 
             config.element.on("click", config.addPostLink, function (e) {

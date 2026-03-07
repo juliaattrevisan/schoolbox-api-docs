@@ -9,7 +9,7 @@
      */
     $.fn.getExportCalendarLink = function (token, values) {
         // If from serializeArray: convert to object
-        if ($.isArray(values)) {
+        if (Array.isArray(values)) {
             var new_values = {};
 
             $.each(values, function (k, v) {
