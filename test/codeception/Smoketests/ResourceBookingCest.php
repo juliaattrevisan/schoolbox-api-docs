@@ -811,8 +811,10 @@ class ResourceBookingCest
             $i->amGoingTo('confirm that the clash bookings have been created since they are allowed');
             $clashBookings = $bookingMapper->findByColumn('name', $clashBookingsName);
             $i->comment('Found ' . count($clashBookings) . ' clash bookings');
-            $i->amGoingTo("confirm that 'bookedPendingBecauseClashes' is true");
-            $i->canSeeResponseContainsJson(['bookedPendingBecauseClashes' => true]);
+            $nClashBookings = $clashOnFirstEvent ? 2 : 1;
+            $nApprovedBookings = 4 - $nClashBookings;
+            $i->amGoingTo('confirm that the message includes the count of bookings created with each status');
+            $i->canSeeResponseContainsJson(['message' => "Created 4 bookings - $nApprovedBookings approved, $nClashBookings pending"]);
 
             foreach ($clashBookings as $clashBooking) {
                 $event = $eventMapper->findOneByColumn('id', $clashBooking->getEvent()->getId());
@@ -958,8 +960,8 @@ class ResourceBookingCest
         $payload->setFormParam('startDate', date('d/m/Y g:ia', strtotime('2050-01-01 12:00:00')));
         $payload->setFormParam('endDate', date('d/m/Y g:ia', strtotime('2050-01-01 16:00:00')));
         $i->sendRequest($payload);
-        $i->amGoingTo("confirm that 'bookedPendingBecauseClashes' is false");
-        $i->canSeeResponseContainsJson(['bookedPendingBecauseClashes' => false]);
+        $i->amGoingTo('confirm that the message indicates a pending booking was created');
+        $i->canSeeResponseContainsJson(['message' => 'Created one pending booking']);
 
         $i->amGoingTo('confirm that the clash booking has been created');
         $clashBooking = $bookingMapper->findOneByColumn('name', $clashBookingsName);
@@ -992,8 +994,8 @@ class ResourceBookingCest
         $payload->setFormParam('startDate', date('d/m/Y g:ia', strtotime('2050-01-01 12:00:00')));
         $payload->setFormParam('endDate', date('d/m/Y g:ia', strtotime('2050-01-01 16:00:00')));
         $i->sendRequest($payload);
-        $i->amGoingTo("confirm that 'bookedPendingBecauseClashes' is false");
-        $i->canSeeResponseContainsJson(['bookedPendingBecauseClashes' => false]);
+        $i->amGoingTo('confirm that the message indicates an approved booking was created');
+        $i->canSeeResponseContainsJson(['message' => 'Created one approved booking']);
 
         $i->amGoingTo('confirm that the clash booking has been created');
         $clashBooking = $bookingMapper->findOneByColumn('name', $clashBookingsName);
