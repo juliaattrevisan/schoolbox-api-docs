@@ -7,7 +7,6 @@
 
 use Eportfolio\PageMapper;
 use Schoolbox\Breadcrumbs;
-use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 use Schoolbox\Resource\My\Folder\Mapper as MyFolderMapper;
@@ -63,17 +62,21 @@ if ($this->arg[0] == 'new') {
     $publishComponent = $this->arg[3] ?? false;
 
     $parentFolder = null;
+    $parentId = null;
     if ($myFolderId) {
-        try {
-            $parentFolder = $folderMapper->findOneByColumnList([
-                'id' => $myFolderId,
-                'owner' => $sessionUser->getId(),
-            ]);
-        } catch (Deleted $e) {
+        $folders = $folderMapper->findByColumnList([
+            'id'    => $myFolderId,
+            'owner' => $sessionUser->getId(),
+        ]);
+        $parentId = $folders->first()?->getId();
+        if (!isset($parentId)) {
             $this->error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            $this->error(\Schoolbox\Error\Mapper::ERROR_RESOURCE_NOT_FOUND);
         }
+    } else {
+        $folders = $folderMapper->findByColumnList([
+            'owner'  => $sessionUser->getId(),
+            'parent' => null,
+        ]);
     }
 
     $this->setTitle('Add File');
@@ -84,7 +87,7 @@ if ($this->arg[0] == 'new') {
         'FILE_ID' => '',
         'DESCRIPTION' => '',
         'MAX_FILE_SIZE' => Config::get('max_file_size'),
-        'PARENT_ID' => $parentFolder->getId() ?? 0,
+        'PARENT_ID' => $parentId ?? 0,
         "COMPONENT_INSTANCE_ID" => $publishComponent,
         "USER_ID" => $fileOwner->getId(),
         'RETURN_URL' => $_GET['returnUrl'] ?? ''
@@ -95,7 +98,7 @@ if ($this->arg[0] == 'new') {
     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
     $folderTree = $folderHandler->getFolderTree();
-    renderTreeSelect($this, $folderTree, $parentFolder->getId() ?? 0);
+    renderTreeSelect($this, $folderTree, $parentId ?? 0);
     renderPublishingOptions($this, null, $fileOwner->getId(), true, $publishComponent);
 
     /* Render out breadcrumbs
