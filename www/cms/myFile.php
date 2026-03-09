@@ -25,8 +25,10 @@ $this->setTab('myfiles');
  * @uri /cms/myFile/:myFileId/:userId
  */
 
-$zone = new GenericZone('cms', MyFileMapper::getInstance());
-$zone->setAttachmentsLabel('')
+$fileMapper   = MyFileMapper::getInstance();
+$folderMapper = MyFolderMapper::getInstance();
+$zone         = new GenericZone('cms', $fileMapper)
+    ->setAttachmentsLabel('')
      ->setAttachPrompt('Post file')
      ->setMimeFilter('*/*')
      ->setMulti(false)
@@ -54,9 +56,7 @@ if (!($sessionUser->getRole()->isStaff() || $fileOwner->getId() === $sessionUser
 }
 
 // instantiate handlers
-$fileHandler = new MyFile($fileOwner->getId());
 $folderHandler = new MyFolder($fileOwner->getId());
-$folderMapper = MyFolderMapper::getInstance();
 
 // create a new file
 if ($this->arg[0] == 'new') {
@@ -72,9 +72,7 @@ if ($this->arg[0] == 'new') {
                 'owner' => $sessionUser->getId(),
             ]);
             $parentId = $folder->getId();
-        } catch (Deleted $e) {
-            $this->error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
-        } catch (NotFound $e) {
+        } catch (NotFound | Deleted $e) {
             $this->error(\Schoolbox\Error\Mapper::ERROR_RESOURCE_NOT_FOUND);
         }
     }
@@ -125,9 +123,13 @@ if ($this->arg[0] == 'new') {
     // modify an existing file
     $myFileId = $this->arg[0];
 
-    $file = $fileHandler->getByID($myFileId);
-    if (!is_array($file) || (int)$file['owner'] !== $fileOwner->getId()) {
-        error(\Schoolbox\Error\Mapper::ERROR_FILE_NOT_FOUND);
+    try {
+        $file = $fileMapper->findOneByColumnList([
+            'id'    => $myFileId,
+            'owner' => $sessionUser->getId(),
+        ]);
+    } catch (NotFound | Deleted $e) {
+        $this->error(\Schoolbox\Error\Mapper::ERROR_FILE_NOT_FOUND);
     }
 
     $zone->attachFiles(array($myFileId));
@@ -137,10 +139,10 @@ if ($this->arg[0] == 'new') {
 
     $output = array(
         'ACTION' => 'Modify',
-        'FILE_ID' => $file['id'],
-        'DESCRIPTION' => Scrub::text($file['description']),
+        'FILE_ID' => $file->getId(),
+        'DESCRIPTION' => Scrub::text($file->getTitle()),
         'MAX_FILE_SIZE' => Config::get('max_file_size'),
-        'PARENT_ID' => $file['parent'],
+        'PARENT_ID' => $file->getFolder()->getId(),
         'RETURN_URL' => $_GET['returnUrl'] ? \Schoolbox\Learning\Assessment\Redirect::decode($_GET['returnUrl']) : ''
     );
     $this->setVar($output);
@@ -148,8 +150,8 @@ if ($this->arg[0] == 'new') {
     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
     $folderTree = $folderHandler->getFolderTree();
-    renderTreeSelect($this, $folderTree, $file['parent']);
-    renderPublishingOptions($this, (int)$file['id'], $fileOwner->getId(), true);
+    renderTreeSelect($this, $folderTree, $file->getFolder()->getId());
+    renderPublishingOptions($this, $file->getId(), $fileOwner->getId(), true);
 
     /* Render out breadcrumbs
      */
