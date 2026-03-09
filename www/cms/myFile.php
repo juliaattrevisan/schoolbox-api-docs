@@ -7,8 +7,10 @@
 
 use Eportfolio\PageMapper;
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
+use Schoolbox\Resource\My\Folder\Mapper as MyFolderMapper;
 
 /** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'cms/myFile.html');
@@ -53,16 +55,25 @@ if (!($sessionUser->getRole()->isStaff() || $fileOwner->getId() === $sessionUser
 // instantiate handlers
 $fileHandler = new MyFile($fileOwner->getId());
 $folderHandler = new MyFolder($fileOwner->getId());
+$folderMapper = MyFolderMapper::getInstance();
 
 // create a new file
 if ($this->arg[0] == 'new') {
     $myFolderId = $this->arg[2] ?? 0;
     $publishComponent = $this->arg[3] ?? false;
 
-    if ($myFolderId == 0) {
-        $parent = array('id' => 0);
-    } elseif (!$parent = $folderHandler->getByID($myFolderId)) {
-        error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
+    $parentFolder = null;
+    if ($myFolderId) {
+        try {
+            $parentFolder = $folderMapper->findOneByColumnList([
+                'id' => $myFolderId,
+                'owner' => $sessionUser->getId(),
+            ]);
+        } catch (Deleted $e) {
+            $this->error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->error(\Schoolbox\Error\Mapper::ERROR_RESOURCE_NOT_FOUND);
+        }
     }
 
     $this->setTitle('Add File');
@@ -73,7 +84,7 @@ if ($this->arg[0] == 'new') {
         'FILE_ID' => '',
         'DESCRIPTION' => '',
         'MAX_FILE_SIZE' => Config::get('max_file_size'),
-        'PARENT_ID' => $parent['id'],
+        'PARENT_ID' => $parentFolder->getId() ?? 0,
         "COMPONENT_INSTANCE_ID" => $publishComponent,
         "USER_ID" => $fileOwner->getId(),
         'RETURN_URL' => $_GET['returnUrl'] ?? ''
@@ -84,7 +95,7 @@ if ($this->arg[0] == 'new') {
     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
     $folderTree = $folderHandler->getFolderTree();
-    renderTreeSelect($this, $folderTree, $parent['id']);
+    renderTreeSelect($this, $folderTree, $parentFolder->getId() ?? 0);
     renderPublishingOptions($this, null, $fileOwner->getId(), true, $publishComponent);
 
     /* Render out breadcrumbs
