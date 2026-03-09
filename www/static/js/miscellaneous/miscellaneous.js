@@ -128,10 +128,10 @@ $(function () {
 
         // Toggle twig template names showing on click of the button
         $("#showTwigNames").on("click", function () {
-            if ($(".twigName").attr("hidden")) {
-                $(".twigName").removeAttr("hidden");
+            if ($(".twigName").prop("hidden")) {
+                $(".twigName").prop("hidden", false);
             } else {
-                $(".twigName").attr("hidden", true);
+                $(".twigName").prop("hidden", true);
             }
         });
     }

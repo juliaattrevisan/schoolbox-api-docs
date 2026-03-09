@@ -18,11 +18,11 @@
             const datesContainer = $('#course-' + courseId + '-dates');
 
             if ($checkbox.prop('checked') && !$checkbox.prop('disabled')) {
-                datesContainer.removeAttr('hidden');
+                datesContainer.prop('hidden', false);
                 datesContainer.find('input').prop('required', true);
             } else {
-                datesContainer.attr('hidden', true);
-                datesContainer.find('input').removeAttr('required');
+                datesContainer.prop('hidden', true);
+                datesContainer.find('input').prop('required', false);
             }
         });
 
