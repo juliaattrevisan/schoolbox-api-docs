@@ -139,7 +139,10 @@ export default {
 
             // Focus the new textbox's heading input immediately
             this.$nextTick(() => {
-                jQuery(this.$el).find('input[name$="[heading]"]').last().focus();
+                const inputs = this.$el.querySelectorAll('input[name$="[heading]"]');
+                if (inputs.length) {
+                    inputs[inputs.length - 1].focus();
+                }
             });
         },
 
