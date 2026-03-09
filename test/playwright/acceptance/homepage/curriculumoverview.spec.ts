@@ -46,6 +46,11 @@ test.describe("Curriculum Overview Component Tests", () => {
         await Homepage.clickComponentSettings(curriculumOverviewComponent);
         tester.isGoingTo("Select All from curriculum dropdown and update");
         await CurriculumOverview.setLinkLimit(curriculumOverviewComponent, "All");
+
+        tester.isGoingTo("Verify component shows exactly 3 curriculum codes");
+        await expect(curriculumOverviewComponent.locator('a[href*="/curriculum#"]'),).toHaveCount(3);
+        tester.isGoingTo("Verify component shows exactly 3 curriculum descriptions");
+        await expect(curriculumOverviewComponent.locator("p.no-margin")).toHaveCount(3);
         tester.isGoingTo("Verify all curriculum rows are shown");
         await CurriculumOverview.verifyCurriculumLinkCode(curriculumOverviewComponent, "ACELA1556");
         await CurriculumOverview.verifyCurriculumCodeWithDescription(curriculumOverviewComponent, "Understand how punctuation is used",);
@@ -77,7 +82,8 @@ test.describe("Curriculum Overview Component Tests", () => {
 
         tester.isGoingTo("Login as student and check the header and buttons are not visible");
         await tester.impersonate("Jana Reed");
-        await homepage.goto(83);
+        await homepage.goto(87);
+        await homepage.seeInComponentHeading(curriculumOverviewTitle, Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1,);
 
 
 
@@ -91,12 +97,12 @@ test.describe("Curriculum Overview Component Tests", () => {
 
 
 
-    test.afterAll(async ({ baseTester, db, api }) => {
-        baseTester.isGoingTo("clean up: remove Curriculum Overview component and restore curriculum node");
+    // test.afterAll(async ({ baseTester, db, api }) => {
+    //     baseTester.isGoingTo("clean up: remove Curriculum Overview component and restore curriculum node");
 
-        // await db.updateInDatabase("curriculum_node", { enabled: 1 }, { id: 155, code: "ELBE1178" });
-        // await api.deleteHomepageComponent(87, curriculumOverviewComponentId);
-    });
+    //     // await db.updateInDatabase("curriculum_node", { enabled: 1 }, { id: 155, code: "ELBE1178" });
+    //     // await api.deleteHomepageComponent(87, curriculumOverviewComponentId);
+    // });
 
 
 });
