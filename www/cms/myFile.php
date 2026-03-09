@@ -7,6 +7,8 @@
 
 use Eportfolio\PageMapper;
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 use Schoolbox\Resource\My\Folder\Mapper as MyFolderMapper;
@@ -64,20 +66,22 @@ if ($this->arg[0] == 'new') {
     $parentFolder = null;
     $parentId = null;
     if ($myFolderId) {
-        $folders = $folderMapper->findByColumnList([
-            'id'    => $myFolderId,
-            'owner' => $sessionUser->getId(),
-        ]);
-        $parentId = $folders->first()?->getId();
-        if (!isset($parentId)) {
+        try {
+            $folder = $folderMapper->findOneByColumnList([
+                'id'    => $myFolderId,
+                'owner' => $sessionUser->getId(),
+            ]);
+            $parentId = $folder->getId();
+        } catch (Deleted $e) {
             $this->error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
+        } catch (NotFound $e) {
+            $this->error(\Schoolbox\Error\Mapper::ERROR_RESOURCE_NOT_FOUND);
         }
-    } else {
-        $folders = $folderMapper->findByColumnList([
-            'owner'  => $sessionUser->getId(),
-            'parent' => null,
-        ]);
     }
+    $folders = $folderMapper->findByColumnList([
+        'owner'  => $sessionUser->getId(),
+        'parent' => null,
+    ]);
 
     $this->setTitle('Add File');
     $this->parse('browse_row_block', 'browse_row');
@@ -97,6 +101,7 @@ if ($this->arg[0] == 'new') {
 
     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
+//    $folderTree = $folderMapper->loadDescendants($folders);
     $folderTree = $folderHandler->getFolderTree();
     renderTreeSelect($this, $folderTree, $parentId ?? 0);
     renderPublishingOptions($this, null, $fileOwner->getId(), true, $publishComponent);
