@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Resource\My\Folder;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Browser\NodeInterface;
@@ -26,6 +27,24 @@ class Model extends AbstractFolder implements ISoftDeletable
     /** @var User */
     protected $owner;
 
+    /**
+     * This folder's children (if it has any)
+     *
+     * @todo consider moving to AbstractFolder, and implementing in resource
+     *       browser folder mapper/model
+     *
+     * @var GenericCollection<Model>
+     */
+    private GenericCollection $children;
+
+    /**
+     * Constructor: build this element with a new, empty collection of child
+     * folders.
+     */
+    public function __construct()
+    {
+        $this->children = new GenericCollection(self::class);
+    }
 
     /**
      * @return User
@@ -53,5 +72,24 @@ class Model extends AbstractFolder implements ISoftDeletable
     public function getNodeType(): string
     {
         return NodeInterface::TYPE_FOLDER;
+    }
+
+
+    /**
+     * @return GenericCollection
+     */
+    public function getChildren(): GenericCollection
+    {
+        return $this->children;
+    }
+
+    /**
+     * @param GenericCollection $children
+     * @return $this
+     */
+    public function setChildren(GenericCollection $children): self
+    {
+        $this->children = $children;
+        return $this;
     }
 }
