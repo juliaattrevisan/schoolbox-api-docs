@@ -177,6 +177,8 @@ $(function() {
             const toast = window.sbProps.toastActivate();
             if (jqXHR?.responseJSON?.errors) {
                 errors = jqXHR?.responseJSON?.errors; // IMPORTANT: This variable is used by the jQuery validate code above.  See getValidatorRemoteMethod().
+            } else {
+                errors = {}; // Reset errors since no errors were found in responseJSON.
             }
             toast.timeout({ text: "Unable to update booking", isSuccess: false });
             form.valid()
