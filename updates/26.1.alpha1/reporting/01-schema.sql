@@ -126,3 +126,23 @@ CREATE TABLE `reporting_feedback` (
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 );
+
+
+-- Reporting is a Terminology row
+INSERT INTO
+    localisation (
+    term,
+    title,
+    singular_form,
+    plural_form,
+    capitalise_first,
+    indefinite_article
+)
+VALUES (
+   'reporting',
+   'Reporting',
+   'reporting activity',
+   'reporting activities',
+   1,
+   'a'
+);
