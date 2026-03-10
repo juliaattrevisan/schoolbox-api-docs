@@ -146,7 +146,7 @@ if (!empty($resourceIds)) {
 
         // Validate this item.
         try {
-            [$errorsStruct, $clashBookingStartDatesAsKeys] = $validation->validateBookingIgnoringClashesIfClashesAllowed($item, $postVars);
+            [$errorsStructIgnored, $clashBookingStartDatesAsKeys] = $validation->validateBookingIgnoringClashesIfClashesAllowed($item, $postVars);
             $booking = getBookingFromEvent($item, $event);
             $isClash = count($clashBookingStartDatesAsKeys) > 0;
             $bookingStatusId = $validation->getNewStatusIdForBooking($booking, $isClash, $user);
