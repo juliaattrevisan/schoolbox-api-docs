@@ -618,7 +618,7 @@ export default {
 
         /**
          * Same as reloadEvents(), except that no toast is shown.
-         * This should be used if relaoding events in response to another event that already has a toast.
+         * This should be used if reloading events in response to another event that already has a toast.
          */
         reloadEventsWithoutToast() {
             this.suppressNextReloadEventsToast = true;
