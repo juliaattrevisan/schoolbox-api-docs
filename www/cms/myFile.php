@@ -57,9 +57,6 @@ if (!($sessionUser->getRole()->isStaff() || $fileOwner->getId() === $sessionUser
     error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
 }
 
-// instantiate handlers
-$folderHandler = new MyFolder($fileOwner->getId());
-
 // create a new file
 if ($this->arg[0] == 'new') {
     $myFolderId = $this->arg[2] ?? 0;
