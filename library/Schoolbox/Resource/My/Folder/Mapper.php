@@ -49,7 +49,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
     {
         parent::mapping();
 
-        $this->hasTable('myFolder');
+        $this->hasTable('my_folder');
 
         $this->hasModel(Model::class);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
