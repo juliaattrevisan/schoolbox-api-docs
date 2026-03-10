@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DataModel\Reporting;
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
@@ -183,7 +184,26 @@ class Mapper extends \Schoolbox\Mapper
     {
         $reportingIds = $collection->keys();
 
+        /* For some reason, I have to do this first
+         * This feels like a solved problem, but I can't find something similar across the mappers
+         *
+         * TODO check in with amri
+         */
+        $placeholders = Builder::getArrayPlaceholders($reportingIds, 'reportingIds');
+        $parameters = Builder::getArrayParameters($reportingIds, 'reportingIds');
+
+        $query = "
+            DELETE FROM reporting_curriculum_node
+            WHERE reporting_id IN {$placeholders}
+        ";
+
+        $this->database->query($query, $parameters);
+
+        /* Reinsert the ones we chose. Surely there was a more elegant way of doing this, but I can't remember/find one
+         * specifically using joinsVia
+         */
         $pb = $this->getPredicateBuilder()->in('id', $reportingIds);
+
         $query = "
             SELECT
                 {$this->getColumnString()},
