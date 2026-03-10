@@ -184,7 +184,7 @@
 
             return date.isValid() && date.isAfter(otherDate);
         },
-        "Please enter a date that is <i>after</i> the previous date",
+        "Please enter a date/time that is <i>after</i> the previous date/time",
     );
 
     /**
