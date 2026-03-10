@@ -2,25 +2,29 @@
 
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
+use Schoolbox\Resource\My\Folder\Model as MyFolderModel;
 
 $folderHandler = new MyFolder();
 $userMapper = new Schoolbox\UserMapper();
-$folderMapper = new Schoolbox\Resource\My\Folder\Mapper();
+$folderMapper = Schoolbox\Resource\My\Folder\Mapper::getInstance();
+
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
 
 /** @var SitePage $this */
 if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     try {
         /** @var Schoolbox\Resource\My\Folder\Model $folder */
-        $folder = $folderMapper->findById($this->arg[0]);
-        // if folder exists and owner is different
-        if ((int)$folder->getOwner()->getId() !== (int)$_SESSION['id']) {
-            $this->error(ErrorMapper::ERROR_PAGE_NOT_FOUND);
-        }
-        try {
-            $folder->setOwner($userMapper->findById($folder->getOwner()->getId()));
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // Has no owner, and that's okay
-        }
+        $folder = $folderMapper->findOneByColumnList([
+            'id'    => $this->arg[0],
+            'owner' => $sessionUser->getId(),
+        ]);
+//        try {
+//            $folder->setOwner($userMapper->findById($folder->getOwner()->getId()));
+//        } catch (\Schoolbox\Mapper\Exception $e) {
+//            // Has no owner, and that's okay
+//        }
     } catch (\Schoolbox\Mapper\Exception $e) {
         $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
@@ -44,19 +48,26 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         $this->setBlock(TEMPLATE_content, 'location', 'location_block');
         $this->setVar('location_block', '');
     } else {
-        $parentTree = $folderHandler->getFolderTree(0, 0, $folder->getId());
-        $parentTree = is_array($parentTree) ? $parentTree : array();
-        array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
-        foreach ($parentTree as $parent) {
-            $output = array(
-                'PARENT_ID' => $parent['id'],
-                'PARENT_NAME' => Scrub::text($parent['name']),
-                'PARENT_INDENT' => str_repeat('&nbsp;', ($parent['depth'] + 1) * 4),
-                'PARENT_SELECTED' => $parent['id'] == $folder->getParent() ? 'selected="selected"' : '',
-            );
-            $this->setVar($output);
-            $this->parse('parent_list_block', 'parent_list', true);
-        }
+        $folderTree = $folderMapper->loadDescendants(
+            $folderMapper->findByColumnList([
+                'owner'  => $sessionUser->getId(),
+                'parent' => null,
+            ]),
+        );
+        renderTreeSelect($this, $folderTree, $folder->getParent()->getId());
+//        $parentTree = $folderHandler->getFolderTree(0, 0, $folder->getId());
+//        $parentTree = is_array($parentTree) ? $parentTree : array();
+//        array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
+//        foreach ($parentTree as $parent) {
+//            $output = array(
+//                'PARENT_ID' => $parent['id'],
+//                'PARENT_NAME' => Scrub::text($parent['name']),
+//                'PARENT_INDENT' => str_repeat('&nbsp;', ($parent['depth'] + 1) * 4),
+//                'PARENT_SELECTED' => $parent['id'] == $folder->getParent() ? 'selected="selected"' : '',
+//            );
+//            $this->setVar($output);
+//            $this->parse('parent_list_block', 'parent_list', true);
+//        }
     }
 
     // Assume that you may edit someone else's file
@@ -120,19 +131,26 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         $this->setBlock(TEMPLATE_content, 'location', 'location_block');
         $this->setVar('location_block', '');
     } else {
-        $parentTree = $folderHandler->getFolderTree();
-        $parentTree = is_array($parentTree) ? $parentTree : array();
-        array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
-        foreach ($parentTree as $parent) {
-            $output = array(
-                'PARENT_ID' => $parent['id'],
-                'PARENT_NAME' => Scrub::text($parent['name']),
-                'PARENT_INDENT' => str_repeat('&nbsp;', ($parent['depth'] + 1) * 4),
-                'PARENT_SELECTED' => $parent['id'] == $parentId ? 'selected="selected"' : '',
-            );
-            $this->setVar($output);
-            $this->parse('parent_list_block', 'parent_list', true);
-        }
+        $folderTree = $folderMapper->loadDescendants(
+            $folderMapper->findByColumnList([
+                'owner'  => $sessionUser->getId(),
+                'parent' => null,
+            ]),
+        );
+        renderTreeSelect($this, $folderTree, $parentId);
+//        $parentTree = $folderHandler->getFolderTree();
+//        $parentTree = is_array($parentTree) ? $parentTree : array();
+//        array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
+//        foreach ($parentTree as $parent) {
+//            $output = array(
+//                'PARENT_ID' => $parent['id'],
+//                'PARENT_NAME' => Scrub::text($parent['name']),
+//                'PARENT_INDENT' => str_repeat('&nbsp;', ($parent['depth'] + 1) * 4),
+//                'PARENT_SELECTED' => $parent['id'] == $parentId ? 'selected="selected"' : '',
+//            );
+//            $this->setVar($output);
+//            $this->parse('parent_list_block', 'parent_list', true);
+//        }
     }
 
     // Assume that you may edit someone else's file
@@ -151,4 +169,43 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     ]);
 } else {
     $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
+}
+
+/**
+ * Render the <select> element with the tree structure defined,
+ * or just a default "top level" if there is none.
+ *
+ * @param SitePage                         $page       The SitePage object to render into
+ * @param GenericCollection<MyFolderModel> $tree       A list of folders to display, each of which may have its own
+ *                                                     children (which are rendered recursively)
+ * @param int                              $selectedId The currently selected folder
+ * @param int                              $depth      The current tree depth: used to indent child folders
+ * @return void
+ */
+function renderTreeSelect(SitePage $page, GenericCollection $tree, int $selectedId = 0, int $depth = 0): void
+{
+    if ($depth === 0) {
+        $output = [
+            'PARENT_ID'       => 0,
+            'PARENT_NAME'     => 'Top Level',
+            'PARENT_INDENT'   => '',
+            'PARENT_SELECTED' => $selectedId === 0 ? 'selected="selected"' : '',
+        ];
+        $page->setVar($output);
+        $page->parse('parent_list_block', 'parent_list', true);
+    }
+    foreach ($tree as $folder) {
+        /** @var MyFolderModel $folder */
+        $output = [
+            'PARENT_ID'       => $folder->getId(),
+            'PARENT_NAME'     => Scrub::text($folder->getName()),
+            'PARENT_INDENT'   => str_repeat('&nbsp;', ($depth + 1) * 4),
+            'PARENT_SELECTED' => $folder->getId() === $selectedId ? 'selected="selected"' : '',
+        ];
+        $page->setVar($output);
+        $page->parse('parent_list_block', 'parent_list', true);
+        if ($folder->getChildren()->count() > 0) {
+            renderTreeSelect($page, $folder->getChildren(), $selectedId, $depth + 1);
+        }
+    }
 }

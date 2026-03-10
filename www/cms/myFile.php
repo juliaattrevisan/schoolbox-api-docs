@@ -7,6 +7,7 @@
 
 use Eportfolio\PageMapper;
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
@@ -72,7 +73,7 @@ if ($this->arg[0] == 'new') {
             ]);
             $parentId = $folder->getId();
         } catch (NotFound | Deleted $e) {
-            $this->error(\Schoolbox\Error\Mapper::ERROR_RESOURCE_NOT_FOUND);
+            $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
     }
 
