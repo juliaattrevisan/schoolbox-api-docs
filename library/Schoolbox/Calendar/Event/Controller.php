@@ -964,7 +964,7 @@ class Controller extends Base
         }
 
         // Add bookings if necessary.
-        $addBookingsResults = null;
+        $addBookingsResults = [];
         if (count($resourceIdsToAdd) > 0) {
             try {
                 $addBookingsResults = $this->addBookingsSlave($event, $resourceIdsToAdd, $efficacy);
