@@ -94,13 +94,13 @@ if ($this->arg[0] == 'new') {
 
     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
-    $folders = $folderMapper->loadDescendants(
+    $folderTree = $folderMapper->loadDescendants(
         $folderMapper->findByColumnList([
             'owner'  => $sessionUser->getId(),
             'parent' => null,
         ]),
     );
-    renderTreeSelect($this, $folders, $parentId ?? 0);
+    renderTreeSelect($this, $folderTree, $parentId ?? 0);
     renderPublishingOptions($this, null, $fileOwner->getId(), true, $publishComponent);
 
     /* Render out breadcrumbs
@@ -148,13 +148,13 @@ if ($this->arg[0] == 'new') {
 
     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
-    $folders = $folderMapper->loadDescendants(
+    $folderTree = $folderMapper->loadDescendants(
         $folderMapper->findByColumnList([
             'owner'  => $sessionUser->getId(),
             'parent' => null,
         ]),
     );
-    renderTreeSelect($this, $folders, $file->getFolder()->getId());
+    renderTreeSelect($this, $folderTree, $file->getFolder()->getId());
     renderPublishingOptions($this, $file->getId(), $fileOwner->getId(), true);
 
     /* Render out breadcrumbs
