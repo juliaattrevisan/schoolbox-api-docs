@@ -116,14 +116,15 @@ class Mapper extends AbstractFolderMapper implements ILocator
         $ancestry = [];
 
         // Climb inheritance tree
-        $parent                      = $this->findById($possibleDescendant->getParent()->getId());
-        $ancestry[$parent->getId()] = true;
-        while (IFolder::ROOT_ID !== (int)$parent->getId()) {
-            if ((int)$parent->getId() === (int)$possibleAncestor->getId()) {
+        $parentId            = $possibleDescendant->getParent()?->getId() ?? 0;
+        $parent              = $this->findById($parentId);
+        $ancestry[$parentId] = true;
+        while (IFolder::ROOT_ID !== (int)$parentId) {
+            if ((int)$parentId === (int)$possibleAncestor->getId()) {
                 return true;
             }
-            $parent   = $this->findById($parent->getParent()->getId());
-            $parentId = $parent->getId();
+            $parentId = $parent->getParent()?->getId() ?? 0;
+            $parent   = $this->findById($parentId);
             // Have we see this parent before?
             if (array_key_exists($parentId, $ancestry)) {
                 $loop = "{$possibleDescendant->getId()}," . implode(',', array_keys($ancestry));
