@@ -40,7 +40,7 @@ const isExpanded = window.Vue.ref(false);
                                         :id="`mf-checkbox-${folder.id}`"
                                         type="checkbox"
                                         :checked="mfStore.selectedFolders.includes(folder.id)"
-                                        @change="mfStore.toggleFolderSelection(folder.id)"
+                                        @click.stop="mfStore.toggleFolderSelection(folder.id)"
                                     />
                                     <label :for="`mf-checkbox-${folder.id}`"></label>
                                 </div>
