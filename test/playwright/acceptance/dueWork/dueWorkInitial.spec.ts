@@ -26,8 +26,8 @@ const SELECTOR_COMPONENT_ASSESSMENT_ACTIONS_DELETE = "component-assessment-actio
 const SELECTOR_COMPONENT_ASSESSMENT_ACTIONS_VIEWSTATUS = "component-assessment-actions-viewStatus"; // Append "-[assessmentID]"
 
 const SELECTOR_MANAGEGROUP_CONTAINER = "manage-group-container";
-const SELECTOR_MANAGEGROUP_SEARCH_TEXT = "manage-group-search-text";
-const SELECTOR_MANAGEGROUP_SEARCH_RESULT = "manage-group-search-result"; // Append "-[userID]"
+const SELECTOR_MANAGEGROUP_SEARCH_TEXT = "ss-query-input";
+const SELECTOR_MANAGEGROUP_SEARCH_RESULT = "ss-results-item-checkbox"; // Append "-[userID]"
 const SELECTOR_MANAGEGROUP_ADD_MEMBERS_SUBMIT = "manage-group-add-members-submit";
 const SELECTOR_MANAGEGROUP_CURRENT_MEMBERS = "manage-group-current-members";
 

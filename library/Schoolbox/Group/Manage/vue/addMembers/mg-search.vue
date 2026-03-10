@@ -7,15 +7,17 @@
  * To search for members to add
  */
 
-import { debounce } from "es-toolkit";
+import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
+import { useStore } from "../store/manageGroupStore";
+import { useMembersStore } from "../store/mgMembersStore";
 import { useAddMembersStore } from "../store/mgAddMembersStore";
-import { useSearchStore, DEBOUNCE_AMOUNT } from "../store/mgSearchStore";
+import { useSearchStore } from "../store/mgSearchStore";
 import FromTypes from "./mgAddMembersFromTypes";
-import MgSearchResults from "./mg-search-results.vue";
 
+const store = useStore();
+const membersStore = useMembersStore();
 const addMembersStore = useAddMembersStore();
 const searchStore = useSearchStore();
-const searchEl = window.Vue.ref(null);
 
 /**
  * Update the input place holder text depending on the currentFromSelect
@@ -33,101 +35,94 @@ const inputPlaceholder = window.Vue.computed(() => {
 });
 
 /**
- * add relevant keyboard and mouse events
- */
-window.Vue.onMounted(() => {
-    document.addEventListener("keyup", onKeyUp);
-    document.addEventListener("click", onMouseClick);
-});
-
-/**
- * remove relevant keyboard and mouse events
- */
-window.Vue.onUnmounted(() => {
-    document.removeEventListener("keyup", onKeyUp);
-    document.removeEventListener("click", onMouseClick);
-});
-
-/**
- * so we can select enter when adding codes
- * useful if we copy/paste a bunch of codes,
- * then we can just select enter to add them all
+ * Get the search endpoint without the query parameter
+ * search-select will append the query parameter automatically
  *
- * @param { Event }
+ * @returns { String }
  */
-function onKeyUp(event) {
-    const keyName = event.key;
-    const keyOptions = {
-        Escape: () => onEscapeKeySelected(),
+const searchEndpoint = window.Vue.computed(() => {
+    const endpoints = {
+        [FromTypes.NAME]: "/ajax/user.php?groupID=0&",
+        [FromTypes.GROUP]: "/group/searchGroups",
+        [FromTypes.ROLE]: "/group/searchRoles",
+        [FromTypes.LIST]: "/group/searchUsers",
     };
-    if (keyOptions[keyName]) {
-        //ensure search input has focus
-        // if (keyOptions[keyName] && document.activeElement === queryInputEl.value) { //ensure search input has focus
-        event.preventDefault();
-        keyOptions[keyName](event);
-    }
-}
+    return endpoints[addMembersStore.fromType];
+});
 
 /**
- * to close the results when selected
+ * Handle the search response from the API
+ * Filter out members that are already in the group before displaying
  *
- * @param { Event }
+ * @param { unknown } json - The search response
  */
-function onEscapeKeySelected(event) {
-    if (searchStore.isSearchActive) {
-        searchStore.clear();
+function onSearchResponse(json) {
+    // Store raw results
+    let rawResults = [];
+    if (json instanceof Array) {
+        rawResults = json;
+    } else if (typeof json === "object" && json !== null && "data" in json) {
+        rawResults = json.data;
     }
+
+    // Apply filtering logic based on fromType
+    let filteredResults = rawResults;
+    if (addMembersStore.fromType === FromTypes.NAME || addMembersStore.fromType === FromTypes.LIST) {
+        // Filter out users already in the group
+        const memberIdList = membersStore.members.map((member) => member.id);
+        filteredResults = rawResults.filter((result) => !memberIdList.includes(result.id));
+    } else if (addMembersStore.fromType === FromTypes.GROUP) {
+        // Filter out the current group itself
+        filteredResults = rawResults.filter((result) => result.id !== store.id);
+    }
+
+    // Update the results in the search-select component
+    searchStore.results = filteredResults;
 }
 
 /**
- * to be able to close the search results
- * when selection outside is made
- *
- * @param { Event }
- */
-function onMouseClick(event) {
-    if (searchStore.isSearchActive && searchEl.value && !searchEl.value.contains(event.target)) {
-        searchStore.clear();
-    }
-}
-
-/**
- * start searching once the search is active, watching the query string for input
+ * Watch for changes to selectedResults and ensure each item has the fromType property
+ * This is needed because the store's addMembers action expects fromType on each selected result
  */
 window.Vue.watch(
-    () => searchStore.query,
-    () => {
-        if (searchStore.isSearchActive) {
-            searchStore.enableSearch();
-            debounceSearch();
+    () => searchStore.selectedResults,
+    (newSelectedResults) => {
+        // Check if any items are missing fromType and add it
+        let needsUpdate = false;
+        const updatedResults = newSelectedResults.map((result) => {
+            if (!result.fromType) {
+                needsUpdate = true;
+                return {
+                    ...result,
+                    fromType: addMembersStore.fromType === "list" ? "name" : addMembersStore.fromType,
+                };
+            }
+            return result;
+        });
+
+        // Only update if we actually added fromType to prevent infinite loops
+        if (needsUpdate) {
+            searchStore.selectedResults = updatedResults;
         }
     },
+    { deep: true },
 );
-
-/**
- * debounce to avoid constant polling while the user is typing
- */
-const debounceSearch = debounce(() => {
-    searchStore.search();
-}, DEBOUNCE_AMOUNT);
 </script>
 
 <template>
-    <div ref="searchEl">
-        <input
-            id="search-text"
-            v-model="searchStore.query"
-            type="text"
-            data-test="manage-group-search-text"
-            :placeholder="inputPlaceholder"
-            @input="searchStore.query = $event.target.value /* Fix Android events SA-12170 */"
-        />
-        <mg-search-results />
-    </div>
+    <search-select
+        v-model:selected="searchStore.selectedResults"
+        v-model:results="searchStore.results"
+        :endpoint="searchEndpoint"
+        :placeholder="inputPlaceholder"
+        :show-selected="false"
+        :manage-search-response="true"
+        label-id="manage-group-search"
+        data-test="manage-group-search-text"
+        @search-response="onSearchResponse"
+    />
 </template>
 
 <style lang="scss" scoped>
-input {
-    margin-bottom: 0; //so search-results can butt right up
-}
+// Styles handled by search-select component
 </style>
