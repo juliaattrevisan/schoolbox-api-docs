@@ -167,7 +167,12 @@
             </p>
             <select id="supporting-folders" name="reporting[supporting][folders]">
                 {% for key, label in reporting.availableFolderOptions %}
-                    <option value="{{ key }}">{{ label }}</option>
+                    {% set selected = '' %}
+
+                    {% if key == assessment.supportingDataFolders %}
+                        {% set selected = 'selected="selected"' %}
+                    {% endif %}
+                    <option value="{{ key }}" {{ selected }}>{{ label }}</option>
                 {% endfor %}
             </select>
         </div>
