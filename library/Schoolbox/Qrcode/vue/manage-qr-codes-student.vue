@@ -90,8 +90,13 @@ export default {
     methods: {
         /**
          * Update the selected student list with the selected or unselected student
+         * @param {Event} event - the click event
          */
-        onStudentSelected() {
+        onStudentSelected(event) {
+            // Ignore label clicks as they naturally trigger the checkbox
+            if (event && event.target && event.target.nodeName === "LABEL") {
+                return;
+            }
             this.$emit("student-selected", this.student);
         },
 
@@ -117,13 +122,13 @@ export default {
 </script>
 
 <template>
-    <div :class="`student ${hasQrCode ? 'has-qr-code' : 'no-qr-code'}`" @click="onStudentSelected()">
+    <div :class="`student ${hasQrCode ? 'has-qr-code' : 'no-qr-code'}`" @click="onStudentSelected">
         <div class="student__checkbox">
             <input
                 type="checkbox"
                 :id="`selectStudent-${student.id}`"
                 :checked="isInSelectedStudents"
-                @change="onStudentSelected()"
+                @click.stop="onStudentSelected"
             />
             <label :for="`selectStudent-${student.id}`" class="checkbox-label"></label>
         </div>
