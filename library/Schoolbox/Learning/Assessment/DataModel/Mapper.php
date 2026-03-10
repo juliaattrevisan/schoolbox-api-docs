@@ -1244,6 +1244,7 @@ class Mapper extends BaseMapper
         /* Reporting Activities need Supporting Data hydrated here
          */
         $modelList = $this->augmentListWithReportingSupportingDataCurriculumNodes($modelList, $reportingIds);
+        $modelList = $this->augmentListWithReportingSupportingDataWorkTypes($modelList, $reportingIds);
 
         return $modelList;
     }
@@ -1542,6 +1543,73 @@ class Mapper extends BaseMapper
         /** @var \Schoolbox\Learning\Assessment\DataModel\Model $model */
         foreach ($modelList as $model) {
             $model->getReporting()->setSupportingDataCurriculumNodes($curriculumNodes[$model->getReporting()->getId()]);
+        }
+
+        return $modelList;
+    }
+
+
+
+    /**
+     * Hydrates Work Types for each reporting activity's Supporting Data
+     *
+     * @param GenericCollection $modelList
+     * @param array $reportingIds
+     * @return GenericCollection
+     * @throws Exception
+     */
+    private function augmentListWithReportingSupportingDataWorkTypes(GenericCollection $modelList, array $reportingIds): GenericCollection
+    {
+        /* No reporting activities? No trabajo
+         * Exit early
+         */
+        if (!count($reportingIds)) {
+            return $modelList;
+        }
+
+        /* Manually obtain supporting data curriculum nodes
+         */
+        $placeholders = Builder::getArrayPlaceholders($reportingIds, 'reportingIds');
+        $parameters = Builder::getArrayParameters($reportingIds, 'reportingIds');
+
+        /* $this->>getTable() is the assessment table
+         */
+        $query = "
+            SELECT 
+                rwt.reporting_id AS reporting_id,
+                lwt.*
+            FROM reporting_work_type rwt
+            INNER JOIN lu_work_type lwt ON rwt.work_type_id = lwt.id
+            WHERE rwt.reporting_id IN {$placeholders}
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($parameters);
+
+        /* This is a bit awkward since supporting data work types are using a relationship table that doesn't actually
+         * have a join name, nor does it have its own mapper, and it's not shared among all activities...which means I
+         * kind of have to do it like this, afaict
+         */
+        $workTypeMapper = WorkTypeMapper::getInstance();
+
+        $workTypes = [];
+
+        foreach ($statement as $row) {
+            $reportingId = $row['reporting_id'];
+
+            if (!isset($workTypes[$reportingId])) {
+                $workTypes[$reportingId] = $workTypeMapper->createCollection();
+            }
+
+            $workTypes[$reportingId]->add($workTypeMapper->hydrate($row));
+        }
+
+        /* Assign them to each reporting subobject in the model list, replacing whatever was there before
+         * This is pretty unique: nothing really exists like this outside of Reporting.
+         */
+        /** @var \Schoolbox\Learning\Assessment\DataModel\Model $model */
+        foreach ($modelList as $model) {
+            $model->getReporting()->setSupportingDataWorkTypes($workTypes[$model->getReporting()->getId()]);
         }
 
         return $modelList;
