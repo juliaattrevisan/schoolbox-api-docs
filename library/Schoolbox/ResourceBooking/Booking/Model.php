@@ -332,7 +332,7 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * See comments in docblock for canUserModifyBooking().
+     * @see canUserModifyBooking()
      * @param User $user
      * @return bool
      */
@@ -342,7 +342,7 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * See comments in docblock for canUserModifyBooking().
+     * @see canUserModifyBooking()
      * @param User $user
      * @return bool
      */
@@ -357,7 +357,7 @@ class Model implements ISoftDeletable, JsonSerializable
      * permission to access a specific route (e.g. 'resourceBooking.edit').  Route permissions should only be used to
      * check access to that route.
      * The name 'modify' is intended to include 'update' and 'delete' operations.
-     * A similar function canUserModerateThisItem() exists in ResourceBooking\Item\Model.
+     * @see Item\Model::canUserModerateThisItem() (similar function).
      *
      * @param User $user
      * @return bool - true means the user has permission to edit or delete this booking.
