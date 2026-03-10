@@ -202,7 +202,7 @@ if (isset($_POST['description'])) {
         header('Content-Type: text/html');
         die($e);
     }
-} elseif (is_numeric($_GET['delete'])) {
+} elseif (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     // delete a single file
     try {
         $parent = deleteMyFile($_GET['delete']);
@@ -214,7 +214,11 @@ if (isset($_POST['description'])) {
     } else {
         SitePage::localRedir("/my-files/$parent");
     }
-} elseif (isset($_GET['fileList']) && is_numeric($_GET['deleteList'])) {
+} elseif (
+    isset($_GET['fileList'])
+    && isset($_GET['deleteList'])
+    && is_numeric($_GET['deleteList'])
+) {
     // delete multiple files
     $fileList  = array_values(array_filter(explode(',', $_GET['fileList'])));
     $errorList = [];
@@ -235,7 +239,11 @@ if (isset($_POST['description'])) {
     } else {
         $page->error(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
-} elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
+} elseif (
+    isset($_POST['move'], $_POST['categoryID'])
+    && is_numeric($_POST['move'])
+    && is_numeric($_POST['categoryID'])
+) {
     /* Move file from one category to another, after checking permission on both from and to categories
       */
     try {

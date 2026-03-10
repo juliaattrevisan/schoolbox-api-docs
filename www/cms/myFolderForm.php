@@ -29,7 +29,7 @@ if (isset($_POST['name'])) {
     $myFolder->setName($_POST['name']);
     $myFolderMapper->save($myFolder);
     SitePage::localRedir("/my-files/{$myFolder->getId()}");
-} elseif (is_numeric($_GET['delete'] ?? null)) {
+} elseif (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     // Delete
     try {
         $folder = $myFolderMapper->findById($_GET['delete']);
@@ -48,7 +48,11 @@ if (isset($_POST['name'])) {
         die(json_encode(['result' => 'success']));
     }
     SitePage::localRedir("/my-files/{$folder->getParent()->getId()}");
-} elseif (is_numeric($_POST['move'] ?? null) && is_numeric($_POST['categoryID'] ?? null)) {
+} elseif (
+    isset($_POST['move'], $_POST['categoryID'])
+    && is_numeric($_POST['move'])
+    && is_numeric($_POST['categoryID'])
+) {
     // Move (via JS tree)
     $isAjax        = isset($_REQUEST['ajax']) && $_REQUEST['ajax'];
     $folderId      = (int)$_POST['move'];
