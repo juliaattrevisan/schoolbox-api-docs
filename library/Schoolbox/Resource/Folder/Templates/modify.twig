@@ -82,7 +82,7 @@
                     $(form).confirmDialog({
                         text: 'You do not currently have write access to this folder. Do you wish to continue?',
                         confirmEvent: function() {
-                            form.trigger('submit');
+                            form.submit();
                         },
                         cancelEvent: function() {
                             // Allow user to resubmit the form if they cancel out of the dialog
@@ -90,7 +90,7 @@
                         }
                     });
                 } else {
-                    form.trigger('submit');
+                    form.submit();
                 }
             }
         });

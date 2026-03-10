@@ -76,7 +76,7 @@
             if (typeof sequenceId !== "undefined") {
                 sequenceIds = [sequenceId];
             } else {
-                sequenceIds = $.unique(
+                sequenceIds = $.uniqueSort(
                     Array.prototype.slice.call(
                         elem.find("[data-" + hook + "]").map(function () {
                             return $(this).data(hook);

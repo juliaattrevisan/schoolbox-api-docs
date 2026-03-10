@@ -21,9 +21,9 @@
         // Toggle date fields
         $checkbox.on('change', function () {
             if ($checkbox.prop('checked') && !$checkbox.prop('disabled')) {
-                $('#unit-' + unitId + '-dates').removeAttr('hidden');
+                $('#unit-' + unitId + '-dates').prop('hidden', false);
             } else {
-                $('#unit-' + unitId + '-dates').attr('hidden', true);
+                $('#unit-' + unitId + '-dates').prop('hidden', true);
             }
         });
 
