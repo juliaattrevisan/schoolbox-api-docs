@@ -7,11 +7,14 @@
 
 use Eportfolio\PageMapper;
 use Schoolbox\Breadcrumbs;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
+use Schoolbox\Resource\My\File\Model as MyFileModel;
 use Schoolbox\Resource\My\Folder\Mapper as MyFolderMapper;
+use Schoolbox\Resource\My\Folder\Model as MyFolderModel;
 
 /** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'cms/myFile.html');
@@ -76,10 +79,6 @@ if ($this->arg[0] == 'new') {
             $this->error(\Schoolbox\Error\Mapper::ERROR_RESOURCE_NOT_FOUND);
         }
     }
-    $folders = $folderMapper->findByColumnList([
-        'owner'  => $sessionUser->getId(),
-        'parent' => null,
-    ]);
 
     $this->setTitle('Add File');
     $this->parse('browse_row_block', 'browse_row');
@@ -99,9 +98,13 @@ if ($this->arg[0] == 'new') {
 
     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
-//    $folderTree = $folderMapper->loadDescendants($folders);
-    $folderTree = $folderHandler->getFolderTree();
-    renderTreeSelect($this, $folderTree, $parentId ?? 0);
+    $folders = $folderMapper->loadDescendants(
+        $folderMapper->findByColumnList([
+            'owner'  => $sessionUser->getId(),
+            'parent' => null,
+        ]),
+    );
+    renderTreeSelectRecursive($this, $folders, $parentId ?? 0);
     renderPublishingOptions($this, null, $fileOwner->getId(), true, $publishComponent);
 
     /* Render out breadcrumbs
@@ -149,8 +152,13 @@ if ($this->arg[0] == 'new') {
 
     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
-    $folderTree = $folderHandler->getFolderTree();
-    renderTreeSelect($this, $folderTree, $file->getFolder()->getId());
+    $folders = $folderMapper->loadDescendants(
+        $folderMapper->findByColumnList([
+            'owner'  => $sessionUser->getId(),
+            'parent' => null,
+        ]),
+    );
+    renderTreeSelectRecursive($this, $folders, $file->getFolder()->getId());
     renderPublishingOptions($this, $file->getId(), $fileOwner->getId(), true);
 
     /* Render out breadcrumbs
@@ -204,6 +212,45 @@ function renderTreeSelect($page, $tree, $selected = 0)
         );
         $page->setVar($output);
         $page->parse('folder_list_block', 'folder_list', false);
+    }
+}
+
+/**
+ * Render the <select> element with the tree structure defined,
+ * or just a default "top level" if there is none.
+ *
+ * @param SitePage                         $page       The SitePage object to render into
+ * @param GenericCollection<MyFolderModel> $tree       A list of folders to display, each of which may have its own
+ *                                                     children (which are rendered recursively)
+ * @param int                              $selectedId The currently selected folder
+ * @param int                              $depth      The current tree depth: used to indent child folders
+ * @return void
+ */
+function renderTreeSelectRecursive(SitePage $page, GenericCollection $tree, int $selectedId = 0, int $depth = 0): void
+{
+    if ($depth === 0) {
+        $output = [
+            'FOLDER_ID'       => 0,
+            'FOLDER_NAME'     => 'Top Level',
+            'FOLDER_INDENT'   => '',
+            'FOLDER_SELECTED' => $selectedId === 0 ? 'selected="selected"' : '',
+        ];
+        $page->setVar($output);
+        $page->parse('folder_list_block', 'folder_list', true);
+    }
+    foreach ($tree as $folder) {
+        /** @var MyFolderModel $folder */
+        $output = [
+            'FOLDER_ID'       => $folder->getId(),
+            'FOLDER_NAME'     => Scrub::text($folder->getName()),
+            'FOLDER_INDENT'   => str_repeat('&nbsp;', ($depth + 1) * 4),
+            'FOLDER_SELECTED' => $folder->getId() === $selectedId ? 'selected="selected"' : '',
+        ];
+        $page->setVar($output);
+        $page->parse('folder_list_block', 'folder_list', true);
+        if ($folder->getChildren()->count() > 0) {
+            renderTreeSelectRecursive($page, $folder->getChildren(), $selectedId, $depth + 1);
+        }
     }
 }
 
