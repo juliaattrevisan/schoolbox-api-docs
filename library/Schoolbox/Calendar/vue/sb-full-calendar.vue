@@ -82,7 +82,6 @@ export default {
                 end: null,
             },
             calendarOptions: {},
-            suppressNextReloadEventsToast: false,
             pendingReloadToastMessage: null,
         };
     },
@@ -256,7 +255,6 @@ export default {
             this.pendingReloadToastMessage = null;
 
             const toast = window.sbProps.toastActivate("Retrieving calendar events...");
-            this.suppressNextReloadEventsToast = false;
             const params = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                 end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
@@ -277,8 +275,8 @@ export default {
                     toast?.timeout({ text: customSuccessMessage ?? "Events retrieved successfully" });
                 })
                 .catch((error) => {
-                    toast?.timeout({ text: "Events could not be retrieved", isSuccess: false });
                     console.error(error);
+                    toast?.timeout({ text: "Events could not be retrieved", isSuccess: false });
                 });
         },
 
@@ -610,15 +608,6 @@ export default {
          * @see https://fullcalendar.io/docs/Calendar-refetchEvents
          */
         reloadEvents() {
-            this.calendarApi.refetchEvents();
-        },
-
-        /**
-         * Same as reloadEvents(), except that no toast is shown.
-         * This should be used if reloading events in response to another event that already has a toast.
-         */
-        reloadEventsWithoutToast() {
-            this.suppressNextReloadEventsToast = true;
             this.calendarApi.refetchEvents();
         },
 
