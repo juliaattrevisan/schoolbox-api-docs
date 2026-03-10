@@ -5,7 +5,7 @@
 Schoolbox is a school management platform combining LMS and SIS functionality.
 It is deployed internally and not shipped in client packages.
 
-- **Backend:** PHP (actively supported version — see [php.net/supported-versions](https://www.php.net/supported-versions.php); currently 8.4)
+- **Backend:** PHP (actively supported version — see [php.net/supported-versions](https://www.php.net/supported-versions.php))
 - **Frontend:** Vue 3 + TypeScript
 - **Data stores:** MySQL/MariaDB, Redis
 - **Deployment:** APT packages managed via Puppet
