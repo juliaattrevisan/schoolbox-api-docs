@@ -95,7 +95,7 @@ function onSearchSuccess(json: unknown): void {
     }
 }
 const { query, isActive, isSearching, hasNoResults, hasError } = useQuerySearch(
-    props.endpoint,
+    toRef(() => props.endpoint),
     props.queryKey,
     results,
     onSearchSuccess,
