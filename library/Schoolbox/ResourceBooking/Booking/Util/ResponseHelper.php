@@ -72,9 +72,9 @@ class ResponseHelper
 
         $messageStart = match ($responseType) {
             self::RESPONSE_TYPE_CREATE => match ($nCreatedEvents) {
-               0 => 'Created',
-               1 => "Created one event with",
-               default => "Created $nCreatedEvents events and",
+                0 => 'Created',
+                1 => "Created one event with",
+                default => "Created $nCreatedEvents events and",
             },
             self::RESPONSE_TYPE_UPDATE => 'Updated',
             default => throw new \UnexpectedValueException('Unexpected response type: ' . $responseType),
