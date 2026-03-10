@@ -165,6 +165,7 @@ jQuery is being removed in favour of modern vanilla JS and Vue 3. Do not add new
 
 ### Avoid
 
+- Writing files to disk during web requests (containers do not share filesystems — use temp files only)
 - Editing `vendor/` or `node_modules/` directly
 - Committing `.env` files, secrets, or credentials
 - Refactoring code outside the scope of the current ticket
