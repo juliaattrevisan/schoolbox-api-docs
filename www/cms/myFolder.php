@@ -5,7 +5,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\My\Folder\Model as MyFolderModel;
 
-$folderHandler = new MyFolder();
 $userMapper = new Schoolbox\UserMapper();
 $folderMapper = Schoolbox\Resource\My\Folder\Mapper::getInstance();
 
