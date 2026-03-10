@@ -1547,7 +1547,8 @@ class Controller extends Base
             if ($resourceById->offsetExists($booking->getResource()->getId())) {
                 $booking->setResource($resourceById[$booking->getResource()->getId()]);
             } else {
-                throw new UnexpectedValueException('Resource not found for booking to be deleted, so cannot check permission.');
+                // The permission cannot be checked since the resource can't be found, so treat as forbidden.
+                throw new Forbidden('Resource not found for booking to be deleted, so cannot check permission.');
             }
         }
 
