@@ -12,7 +12,6 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
-use Schoolbox\Resource\My\File\Model as MyFileModel;
 use Schoolbox\Resource\My\Folder\Mapper as MyFolderMapper;
 use Schoolbox\Resource\My\Folder\Model as MyFolderModel;
 
