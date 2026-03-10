@@ -46,6 +46,12 @@
     null,
 ] %}
 
+{# This ends up being computed into someting like "medium-6" if you set $divisor to 6. It's so you can arbitrarily
+ # manipulate the foundation grid for a particular kind of layout. By default, divisor is 12 which represents the full
+ # width of a row (ie. small-12, medium-12, large-12, etc)
+ #}
+{% set divisor = 12 %}
+
 {# Ideally these fragments would be somewhere in each assessment's folder, but that's part of a bigger
  # swamp problem where we need to reorganise how features interrogate activities' particular behaviours
  #}
@@ -71,6 +77,13 @@
         { 'type': 'due', 'label': 'Due' },
         { 'type': 'close', 'label': 'Late' },
     ] %}
+{% elseif assessment is lessonPlan %}
+    {% set dates = [
+        { 'type': 'publish', 'label': 'Publish' },
+        null,
+        { 'type': 'due', 'label': locale.translate('lessonPlan', false, true) },
+        null,
+    ] %}
 {% elseif assessment is dialogAgent %}
     {# Dialog Agents are unique in that they only use three dates (due is renamed to Close in the ui)
      # ...and the due date is put in the same place as Close Date, for cosmetic reasons only: it still retains
@@ -89,60 +102,64 @@
         null,
         { 'type': 'due', 'label': 'Close' },
     ] %}
-{% elseif assessment is lessonPlan %}
-    {% set dates = [
-        { 'type': 'publish', 'label': 'Publish' },
-        null,
-        { 'type': 'due', 'label': locale.translate('lessonPlan', false, true) },
-        null,
-    ] %}
+
+    {% set divisor = 4 %}
+{% elseif assessment is reporting %}
+    {# These are actually the same as the defaults: we enforce publish == open and close == due, elsewhere #}
+    {% set divisor = 6 %}
 {% endif %}
 
-{# Process each assessment's date scheme algorithmically #}
-{% for struct in dates %}
-    {# YES I know this is a bit ugly-looking but twig just isn't that great
-     # The idea here is that there are only four canonical dates, a fixed domain-limited quantity,
-     # which won't expand trivially: we'd have to invest A LOT to make a fifth date or remove one
-     # of them (this is consequential on a galactic level)
-     #
-     # So to save a bunch of kerfuffle around twig for loops we can count on this somewhat assumed
-     # rule of the universe and just look ahead (or look behind) to find the nearest non-null
-     # neighbouring date to sync against. This is super cheap, not super artistic.
-     #}
-    {% set next = dates[loop.index0 + 1]['type'] ?? dates[loop.index0 + 2]['type'] ?? dates[loop.index0 + 3]['type'] ?? null %}
-    {% set prev = dates[loop.index0 - 1]['type'] ?? dates[loop.index0 - 2]['type'] ?? dates[loop.index0 - 3]['type'] ?? null %}
+{# This div class='row' sits out here because the $divisor lets you control each column's dimensions in accordance with
+ # the Foundation grid: otherwise, if you push this further down into date.twig, you'll have one column per row
+ #}
+<div class="row">
+    {# Process each assessment's date scheme algorithmically #}
+    {% for struct in dates %}
+        {# YES I know this is a bit ugly-looking but twig just isn't that great
+         # The idea here is that there are only four canonical dates, a fixed domain-limited quantity,
+         # which won't expand trivially: we'd have to invest A LOT to make a fifth date or remove one
+         # of them (this is consequential on a galactic level)
+         #
+         # So to save a bunch of kerfuffle around twig for loops we can count on this somewhat assumed
+         # rule of the universe and just look ahead (or look behind) to find the nearest non-null
+         # neighbouring date to sync against. This is super cheap, not super artistic.
+         #}
+        {% set next = dates[loop.index0 + 1]['type'] ?? dates[loop.index0 + 2]['type'] ?? dates[loop.index0 + 3]['type'] ?? null %}
+        {% set prev = dates[loop.index0 - 1]['type'] ?? dates[loop.index0 - 2]['type'] ?? dates[loop.index0 - 3]['type'] ?? null %}
 
-    {# Some assessments (due work) have optional submission requirements,
-     # you don't need the open/close (late) dates if it doesn't require submissions
-     #
-     # On the course import page, these are never shown if not required
-     # HOWEVER on the create/modify page, there's an actual toggle to change this requirement
-     # which uses JS to hide or show the fields, so they must be "hidden" away rather than not
-     # there at all.
-     #}
-    {% set hide = struct.hide is defined and struct.hide %}
+        {# Some assessments (due work) have optional submission requirements,
+         # you don't need the open/close (late) dates if it doesn't require submissions
+         #
+         # On the course import page, these are never shown if not required
+         # HOWEVER on the create/modify page, there's an actual toggle to change this requirement
+         # which uses JS to hide or show the fields, so they must be "hidden" away rather than not
+         # there at all.
+         #}
+        {% set hide = struct.hide is defined and struct.hide %}
 
-    {% if struct is null %}
-        {% block emptyDateField %}{% endblock %}
-    {% elseif 'publish' == struct.type %}
-        {% set dateValue = publishAt is defined and publishAt ? publishAt : assessment.publishAt %}
-        {% block publishDateField %}
-            {{ dateForm.dateField(struct.label, struct.type, hide, dateValue, prev, next) }}
-        {% endblock %}
-    {% elseif 'open' == struct.type %}
-        {% set dateValue = openAt is defined and openAt ? openAt : assessment.openAt %}
-        {% block openDateField %}
-            {{ dateForm.dateField(struct.label, struct.type, hide, dateValue, prev, next )}}
-        {% endblock %}
-    {% elseif 'due' == struct.type %}
-        {% set dateValue = dueAt is defined and dueAt ? dueAt : assessment.dueAt %}
-        {% block dueDateField %}
-            {{ dateForm.dateField(struct.label, struct.type, hide, dateValue, prev, next )}}
-        {% endblock %}
-    {% elseif 'close' == struct.type %}
-        {% set dateValue = closeAt is defined and closeAt ? closeAt : assessment.closeAt %}
-        {% block closeDateField %}
-            {{ dateForm.dateField(struct.label, struct.type, hide, dateValue, prev, next )}}
-        {% endblock %}
-    {% endif %}
-{% endfor %}
+        {% if struct is null %}
+            {% block emptyDateField %}{% endblock %}
+        {% elseif 'publish' == struct.type %}
+            {% set dateValue = publishAt is defined and publishAt ? publishAt : assessment.publishAt %}
+            {% block publishDateField %}
+                {{ dateForm.dateField(struct.label, struct.type, hide, dateValue, prev, next, divisor) }}
+            {% endblock %}
+        {% elseif 'open' == struct.type %}
+            {% set dateValue = openAt is defined and openAt ? openAt : assessment.openAt %}
+            {% block openDateField %}
+                {{ dateForm.dateField(struct.label, struct.type, hide, dateValue, prev, next, divisor)}}
+            {% endblock %}
+        {% elseif 'due' == struct.type %}
+            {% set dateValue = dueAt is defined and dueAt ? dueAt : assessment.dueAt %}
+            {% block dueDateField %}
+                {{ dateForm.dateField(struct.label, struct.type, hide, dateValue, prev, next, divisor)}}
+            {% endblock %}
+        {% elseif 'close' == struct.type %}
+            {% set dateValue = closeAt is defined and closeAt ? closeAt : assessment.closeAt %}
+            {% block closeDateField %}
+                {{ dateForm.dateField(struct.label, struct.type, hide, dateValue, prev, next, divisor)}}
+            {% endblock %}
+        {% endif %}
+    {% endfor %}
+
+</div>

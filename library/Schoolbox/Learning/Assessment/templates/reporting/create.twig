@@ -85,8 +85,8 @@
     <fieldset>
         <legend>Submission Dates</legend>
         {% include '@learningAssessment/fragments/dates.twig' with {
-            assessment: assessment
-        }%}
+            assessment: assessment,
+        } %}
     </fieldset>
 {% endif %}
 
@@ -102,7 +102,7 @@
 
                 {% set checked = '' %}
 
-                {% if assessment.supportingDataenable %}
+                {% if assessment.supportingDataEnable %}
                     {% set checked = 'checked="checked"' %}
                 {% endif %}
 

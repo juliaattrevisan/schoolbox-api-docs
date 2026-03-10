@@ -63,7 +63,9 @@
          #}
         <template v-slot:date>
             {% if context.baseContext is not unitSpecification %}
-                {{ dateForm.dateField(locale.translate('lessonPlan', false, true), 'due', false, assessment.dueAt, 'publish', '') }}
+                <div class="row">
+                    {{ dateForm.dateField(locale.translate('lessonPlan', false, true), 'due', false, assessment.dueAt, 'publish', '') }}
+                </div>
             {% endif %}
         </template>
 
@@ -129,7 +131,9 @@
         </div>
         <div class="small-12 medium-9 columns">
             {% if context.baseContext is not unitSpecification %}
-                {{ dateForm.dateField('Publish', 'publish', false, assessment.publishAt, '', 'due') }}
+                <div class="row">
+                    {{ dateForm.dateField('Publish', 'publish', false, assessment.publishAt, '', 'due') }}
+                </div>
             {% endif %}
         </div>
     </div>

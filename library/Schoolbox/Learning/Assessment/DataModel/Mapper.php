@@ -1243,8 +1243,8 @@ class Mapper extends BaseMapper
 
         /* Reporting Activities need Supporting Data hydrated here
          */
-        $modelList = $this->augmentListWithReportingSupportingDataCurriculumNodes($modelList, $reportingIds);
-        $modelList = $this->augmentListWithReportingSupportingDataWorkTypes($modelList, $reportingIds);
+        $modelList = $this->augmentListWithReportingSupportingDataCurriculumNodes($modelList, $reportingIds ?? []);
+        $modelList = $this->augmentListWithReportingSupportingDataWorkTypes($modelList, $reportingIds ?? []);
 
         return $modelList;
     }
