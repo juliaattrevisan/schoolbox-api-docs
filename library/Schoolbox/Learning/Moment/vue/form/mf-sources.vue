@@ -4,6 +4,19 @@ import { useMomentFormStore } from "./store/momentFormStore";
 
 const mfStore = useMomentFormStore();
 const isExpanded = window.Vue.ref(false);
+
+/**
+ * Toggle folder selection, filtering out label clicks
+ * @param folderId - the folder id to toggle
+ * @param event - the click event
+ */
+function onFolderSelected(folderId: number, event?: MouseEvent): void {
+    // Ignore label clicks as they naturally trigger the checkbox
+    if (event && event.target && (event.target as HTMLElement).nodeName === "LABEL") {
+        return;
+    }
+    mfStore.toggleFolderSelection(folderId);
+}
 </script>
 
 <template>
@@ -33,14 +46,14 @@ const isExpanded = window.Vue.ref(false);
                                     backgroundRepeat: folder.coverImage ? 'no-repeat' : undefined,
                                     backgroundPosition: folder.coverImage ? 'center' : undefined,
                                 }"
-                                @click="mfStore.toggleFolderSelection(folder.id)"
+                                @click="(event) => onFolderSelected(folder.id, event)"
                             >
                                 <div class="mf-source-checkbox">
                                     <input
                                         :id="`mf-checkbox-${folder.id}`"
                                         type="checkbox"
                                         :checked="mfStore.selectedFolders.includes(folder.id)"
-                                        @click.stop="mfStore.toggleFolderSelection(folder.id)"
+                                        @click.stop="(event) => onFolderSelected(folder.id, event)"
                                     />
                                     <label :for="`mf-checkbox-${folder.id}`"></label>
                                 </div>
