@@ -417,9 +417,21 @@ class Factory
         /* Assemble a GenericCollection of supporting data curriculum nodes
          */
         $supportingCurriculumNodes = null;
-        $supportingCurriculumNodeIds = explode(',', $post['reporting']['supporting']['curriculumNodes'][0] ?? []);
+        $supportingCurriculumNodeIds = null;
 
-        if (\count($supportingCurriculumNodeIds)) {
+        /* For some reason this curric node selector sends you back an empty string if you didn't select anything,
+         * forcing you to specially handle this in all usages...but why? Might be something to do with [] in the curric
+         * selector's name= attribute, cos I've seen them come through as nodes[][] instead of nodes[].
+         *
+         * TODO find out why the curriculum selector is broken
+         */
+        $formCnodes = $post['reporting']['supporting']['curriculumNodes'][0] ?? null;
+
+        if ('' !== trim((string)$formCnodes)) {
+            $supportingCurriculumNodeIds = explode(',', $formCnodes);
+        }
+
+        if ($supportingCurriculumNodeIds && \count($supportingCurriculumNodeIds)) {
             $supportingCurriculumNodes = CurriculumNodeMapper::getInstance()->findByColumn('id', $supportingCurriculumNodeIds);
         }
 
