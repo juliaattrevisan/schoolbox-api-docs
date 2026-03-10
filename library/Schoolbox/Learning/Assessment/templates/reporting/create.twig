@@ -84,7 +84,9 @@
      #}
     <fieldset>
         <legend>Submission Dates</legend>
-        {% include '@learningAssessment/fragments/dates.twig' %}
+        {% include '@learningAssessment/fragments/dates.twig' with {
+            assessment: assessment
+        }%}
     </fieldset>
 {% endif %}
 
