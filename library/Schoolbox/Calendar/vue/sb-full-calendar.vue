@@ -82,6 +82,7 @@ export default {
                 end: null,
             },
             calendarOptions: {},
+            suppressNextReloadEventsToast: false,
             pendingReloadToastMessage: null,
         };
     },
@@ -251,10 +252,13 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
+            const suppress = this.suppressNextReloadEventsToast;
+            this.suppressNextReloadEventsToast = false;
+
             const customSuccessMessage = this.pendingReloadToastMessage;
             this.pendingReloadToastMessage = null;
 
-            const toast = window.sbProps.toastActivate("Retrieving calendar events...");
+            const toast = suppress ? null : window.sbProps.toastActivate("Retrieving calendar events...");
             const params = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                 end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
@@ -276,7 +280,10 @@ export default {
                 })
                 .catch((error) => {
                     console.error(error);
-                    toast?.timeout({ text: "Events could not be retrieved", isSuccess: false });
+                    (toast ?? window.sbProps.toastActivate())?.timeout({
+                        text: "Events could not be retrieved",
+                        isSuccess: false,
+                    });
                 });
         },
 
@@ -608,6 +615,11 @@ export default {
          * @see https://fullcalendar.io/docs/Calendar-refetchEvents
          */
         reloadEvents() {
+            this.calendarApi.refetchEvents();
+        },
+
+        reloadEventsWithoutToast() {
+            this.suppressNextReloadEventsToast = true;
             this.calendarApi.refetchEvents();
         },
 
