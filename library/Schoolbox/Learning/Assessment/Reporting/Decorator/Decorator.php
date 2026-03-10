@@ -10,11 +10,10 @@ namespace Schoolbox\Learning\Assessment\Reporting\Decorator;
 
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
-use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DecoratorInterface;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Reporting\Model;
-use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Mapper\Exception;
 
@@ -42,9 +41,9 @@ class Decorator implements DecoratorInterface
         private ?bool $feedbackCommentsEnable,
         private ?bool $supportingDataEnable,
         private ?string $supportingDataRange,
-        private ?array $supportingDataCurriculumNodes,
+        private ?GenericCollection $supportingDataCurriculumNodes,
         private ?string $supportingDataFolders,
-        private ?array $supportingDataWorkTypes,
+        private ?GenericCollection $supportingDataWorkTypes,
         private ?bool $supportingDataMarkbookEnable,
     ) {
     }
@@ -118,9 +117,7 @@ class Decorator implements DecoratorInterface
          * Selection of curriculum nodes is entirely optional for users: leaving this empty means we won't filter on
          * curriculum nodes at all, letting everything through
          */
-        if ($this->supportingDataCurriculumNodes && \count($this->supportingDataCurriculumNodes)) {
-            $assessment->setSupportingDataCurriculumNodes(CurriculumNodeMapper::getInstance()->findByColumn('id', $this->supportingDataCurriculumNodes));
-        }
+        $assessment->setSupportingDataCurriculumNodes($this->supportingDataCurriculumNodes);
 
         $assessment->setSupportingDataFolders($this->supportingDataFolders);
 
@@ -128,9 +125,7 @@ class Decorator implements DecoratorInterface
          * Selection of work types is entirely optional for users: leaving this empty means we won't filter on work
          * types at all, letting everything through
          */
-        if ($this->supportingDataWorkTypes && \count($this->supportingDataWorkTypes)) {
-            $assessment->setSupportingDataWorkTypes(WorkTypeMapper::getInstance()->findByColumn('id', $this->supportingDataWorkTypes));
-        }
+        $assessment->setSupportingDataWorkTypes($this->supportingDataWorkTypes);
 
         $assessment->setSupportingDataMarkbookEnable($this->supportingDataMarkbookEnable);
     }

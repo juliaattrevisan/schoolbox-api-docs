@@ -31,6 +31,7 @@ use Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait;
 use Schoolbox\Learning\Assessment\Quiz\Decorator\Decorator as QuizDecorator;
 use Schoolbox\Learning\Assessment\Quiz\Decorator\QuizTrait;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Reporting\Decorator\ReportingTrait;
 use Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 use Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
 use Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait;
@@ -62,6 +63,7 @@ class Factory
     use AttachedFilesTrait;
     use LtiTrait;
     use LessonPlanTrait;
+    use ReportingTrait;
 
     /**
      * Unique identifier
@@ -183,88 +185,6 @@ class Factory
      * @var int|null
      */
     private ?int $scenarioId = null;
-
-
-    /**
-     * Supporting Data Enable
-     * A bool that basically represents the mega markbook and other academic details. This is optional; some reporting
-     * activities will not require it (such as a reporting activity that records someone attendances)
-     *
-     * (Reporting activity specific)
-     */
-    private ?bool $supportingDataEnable = null;
-
-
-    /**
-     * Supporting Data Date Range
-     * The multiple options here help inform how we derive From and To dates for the swamp to retrieve data.
-     * This date range helps constrain how much data is fetched, hydrated and collated in the mega markbook for
-     * performance reasons...since we're looking at a LOT of objects here, anything we do to minimise waste is nice
-     *
-     * (Reporting activity specific)
-     */
-    private ?string $supportingDataRange = null;
-
-
-    /**
-     * Supporting Data Curriculum Nodes
-     * The work types option here helps constrain the mega markbook to look in particular folders for assessments that
-     * were associated with any of the selected curriculum to minimise wasted hydration
-     *
-     * Note that this might be a parent node containing multiple descendents and not have its own curriculum code: such
-     * a node would be a subject area or subtree of a curriculum hierarchy.. If chosen, we'll look for assessments that
-     * were associated with *any* of this node's descendents.
-     *
-     * (Reporting activity specific)
-     *
-     * @var array|null
-     */
-    private ?array $supportingDataCurriculumNodes = null;
-
-
-    /**
-     * Supporting Data Folders
-     * The folder option here helps constrain the mega markbook to look in particular folders for assessments that were
-     * due within the Supporting Data Date Range and for feedbacks that were published within the Supporting Data Date
-     * Range, to minimise wasted hydration
-     *
-     * (Reporting activity specific)
-     */
-    private ?string $supportingDataFolders = null;
-
-
-    /**
-     * Supporting Data Work Types
-     * The work types option here helps constrain the mega markbook to look in particular folders for assessments that
-     * were associated with any of the selected worktypes to minimise wasted hydration
-     *
-     * (Reporting activity specific)
-     */
-    private ?array $supportingDataWorkTypes = null;
-
-
-    /**
-     * Supporting Data Activity Grades
-     * This decides whether to render the mega aggregation of students' grades across all their markbooks as derived by
-     * the folder/date/worktype selected
-     *
-     * This is optional for Reporting activities that aren't specifically academically oriented, such as attendances
-     *
-     * (Reporting activity specific)
-     * @var bool|null
-     */
-    private ?bool $supportingDataMarkbookEnable = null;
-
-
-    /**
-     * Feedback Comments Enable
-     * This decides whether to provide a ckeditor to staff for writing arbitrary Comments in the feedback area. This is
-     * optional for all those reporting activities that just tell you a value, rather than provide any meaningful
-     * feedback, such as attendance data.
-     *
-     * @var bool|null
-     */
-    private ?bool $feedbackCommentsEnable = null;
 
 
     /**
@@ -493,9 +413,30 @@ class Factory
         $this->setFeedbackCommentsEnable('on' === ($post['reporting']['comments']['enable'] ?? null));
         $this->setSupportingDataEnable('on' === ($post['reporting']['supporting']['enable'] ?? null));
         $this->setSupportingDataRange($post['reporting']['supporting']['range'] ?? null);
-        $this->setSupportingDataCurriculumNodes(explode(',', $post['reporting']['supporting']['curriculumNodes'][0] ?? []));
+
+        /* Assemble a GenericCollection of supporting data curriculum nodes
+         */
+        $supportingCurriculumNodes = null;
+        $supportingCurriculumNodeIds = explode(',', $post['reporting']['supporting']['curriculumNodes'][0] ?? []);
+
+        if (\count($supportingCurriculumNodeIds)) {
+            $supportingCurriculumNodes = CurriculumNodeMapper::getInstance()->findByColumn('id', $supportingCurriculumNodeIds);
+        }
+
+        $this->setSupportingDataCurriculumNodes($supportingCurriculumNodes);
         $this->setSupportingDataFolders($post['reporting']['supporting']['folders'] ?? null);
-        $this->setSupportingDataWorkTypes($post['reporting']['supporting']['workTypes'] ?? null);
+
+        /* Assemble a GenericCollection of supporting data work types
+         */
+        $supportingWorkTypes = null;
+        $supportingWorkTypeIds = $post['reporting']['supporting']['workTypes'] ?? null;
+
+        if ($supportingWorkTypeIds && \count($supportingWorkTypeIds)) {
+            $supportingWorkTypes = WorkTypeMapper::getInstance()->findByColumn('id', $supportingWorkTypeIds);
+        }
+
+        $this->setSupportingDataWorkTypes($supportingWorkTypes);
+
         $this->setSupportingDataMarkbookEnable('on' === ($post['reporting']['supporting']['markbook']['enable'] ?? null));
 
         /* TODO Explain what this thing means: custom fields, line items, what it's supposed to be doing here
@@ -1182,145 +1123,6 @@ class Factory
     }
 
 
-    /* Reporting activity specific
+    /* Reporting activity specific: fulfilled by the trait
      */
-
-    /**
-     * @return bool|null
-     */
-    public function getSupportingDataEnable(): ?bool
-    {
-        return $this->supportingDataEnable;
-    }
-
-
-    /**
-     * @param bool|null $supportingDataEnable
-     * @return $this
-     */
-    public function setSupportingDataEnable(?bool $supportingDataEnable): self
-    {
-        $this->supportingDataEnable = $supportingDataEnable;
-        return $this;
-    }
-
-
-    /**
-     * @return string|null
-     */
-    public function getSupportingDataRange(): ?string
-    {
-        return $this->supportingDataRange;
-    }
-
-
-    /**
-     * @param string|null $supportingDataRange
-     * @return $this
-     */
-    public function setSupportingDataRange(?string $supportingDataRange): self
-    {
-        $this->supportingDataRange = $supportingDataRange;
-        return $this;
-    }
-
-
-    /**
-     * @return array|null
-     */
-    public function getSupportingDataCurriculumNodes(): ?array
-    {
-        return $this->supportingDataCurriculumNodes;
-    }
-
-
-    /**
-     * @param array|null $supportingDataCurriculumNodes
-     * @return $this
-     */
-    public function setSupportingDataCurriculumNodes(?array $supportingDataCurriculumNodes): self
-    {
-        $this->supportingDataCurriculumNodes = $supportingDataCurriculumNodes;
-        return $this;
-    }
-
-
-    /**
-     * @return string|null
-     */
-    public function getSupportingDataFolders(): ?string
-    {
-        return $this->supportingDataFolders;
-    }
-
-
-    /**
-     * @param string|null $supportingDataFolders
-     * @return $this
-     */
-    public function setSupportingDataFolders(?string $supportingDataFolders): self
-    {
-        $this->supportingDataFolders = $supportingDataFolders;
-        return $this;
-    }
-
-
-    /**
-     * @return array|null
-     */
-    public function getSupportingDataWorkTypes(): ?array
-    {
-        return $this->supportingDataWorkTypes;
-    }
-
-
-    /**
-     * @param array|null $supportingDataWorkTypes
-     * @return $this
-     */
-    public function setSupportingDataWorkTypes(?array $supportingDataWorkTypes): self
-    {
-        $this->supportingDataWorkTypes = $supportingDataWorkTypes;
-        return $this;
-    }
-
-
-    /**
-     * @return bool|null
-     */
-    public function getSupportingDataMarkbookEnable(): ?bool
-    {
-        return $this->supportingDataMarkbookEnable;
-    }
-
-
-    /**
-     * @param bool|null $supportingDataMarkbookEnable
-     * @return $this
-     */
-    public function setSupportingDataMarkbookEnable(?bool $supportingDataMarkbookEnable): self
-    {
-        $this->supportingDataMarkbookEnable = $supportingDataMarkbookEnable;
-        return $this;
-    }
-
-
-    /**
-     * @return bool|null
-     */
-    public function getFeedbackCommentsEnable(): ?bool
-    {
-        return $this->feedbackCommentsEnable;
-    }
-
-
-    /**
-     * @param bool|null $feedbackCommentsEnable
-     * @return $this
-     */
-    public function setFeedbackCommentsEnable(?bool $feedbackCommentsEnable): self
-    {
-        $this->feedbackCommentsEnable = $feedbackCommentsEnable;
-        return $this;
-    }
 }
