@@ -20,11 +20,6 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
             'id'    => $this->arg[0],
             'owner' => $sessionUser->getId(),
         ]);
-//        try {
-//            $folder->setOwner($userMapper->findById($folder->getOwner()->getId()));
-//        } catch (\Schoolbox\Mapper\Exception $e) {
-//            // Has no owner, and that's okay
-//        }
     } catch (\Schoolbox\Mapper\Exception $e) {
         $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
@@ -55,19 +50,6 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
             ]),
         );
         renderTreeSelect($this, $folderTree, $folder->getParent()->getId());
-//        $parentTree = $folderHandler->getFolderTree(0, 0, $folder->getId());
-//        $parentTree = is_array($parentTree) ? $parentTree : array();
-//        array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
-//        foreach ($parentTree as $parent) {
-//            $output = array(
-//                'PARENT_ID' => $parent['id'],
-//                'PARENT_NAME' => Scrub::text($parent['name']),
-//                'PARENT_INDENT' => str_repeat('&nbsp;', ($parent['depth'] + 1) * 4),
-//                'PARENT_SELECTED' => $parent['id'] == $folder->getParent() ? 'selected="selected"' : '',
-//            );
-//            $this->setVar($output);
-//            $this->parse('parent_list_block', 'parent_list', true);
-//        }
     }
 
     // Assume that you may edit someone else's file
@@ -138,19 +120,6 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
             ]),
         );
         renderTreeSelect($this, $folderTree, $parentId);
-//        $parentTree = $folderHandler->getFolderTree();
-//        $parentTree = is_array($parentTree) ? $parentTree : array();
-//        array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
-//        foreach ($parentTree as $parent) {
-//            $output = array(
-//                'PARENT_ID' => $parent['id'],
-//                'PARENT_NAME' => Scrub::text($parent['name']),
-//                'PARENT_INDENT' => str_repeat('&nbsp;', ($parent['depth'] + 1) * 4),
-//                'PARENT_SELECTED' => $parent['id'] == $parentId ? 'selected="selected"' : '',
-//            );
-//            $this->setVar($output);
-//            $this->parse('parent_list_block', 'parent_list', true);
-//        }
     }
 
     // Assume that you may edit someone else's file
