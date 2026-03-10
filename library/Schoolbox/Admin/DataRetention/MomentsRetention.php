@@ -94,7 +94,7 @@ class MomentsRetention extends StrategyBase
             id,
             discussion_thread_id
         FROM moment
-        WHERE moment.deleted_at < :old
+        WHERE moment.deleted_at IS NOT NULL AND moment.deleted_at < :old
     ";
 
         $statement = $this->database->prepare($query);

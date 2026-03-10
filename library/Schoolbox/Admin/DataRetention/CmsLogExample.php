@@ -54,7 +54,7 @@ class CmsLogExample extends StrategyBase
         $query = "
             SELECT COUNT(*)
             FROM cmsLog
-            WHERE time < :old
+            WHERE time IS NOT NULL AND time < :old
         ";
 
         $statement = $this->database->prepare($query);
