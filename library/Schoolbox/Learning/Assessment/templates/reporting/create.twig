@@ -200,7 +200,14 @@
             </p>
             <div class="switch">
                 <input type="hidden" name="reporting[supporting][markbook][enable]" value="0" />
-                <input id="supporting-megamarkbook" name="reporting[supporting][markbook][enable]" type="checkbox" checked="">
+
+                {% set checked = '' %}
+
+                {% if assessment.supportingDataMarkbookEnable %}
+                    {% set checked = 'checked="checked"' %}
+                {% endif %}
+
+                <input id="supporting-megamarkbook" name="reporting[supporting][markbook][enable]" type="checkbox" {{ checked }}>
                 <label for="supporting-megamarkbook">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>
