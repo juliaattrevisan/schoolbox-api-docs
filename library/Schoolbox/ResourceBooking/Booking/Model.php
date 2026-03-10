@@ -19,6 +19,7 @@ use Schoolbox\Calendar;
 use Alaress_Date_Format;
 use Schoolbox\User;
 use JsonSerializable;
+use UnexpectedValueException;
 
 class Model implements ISoftDeletable, JsonSerializable
 {
@@ -332,9 +333,10 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @see canUserModifyBooking()
      * @param User $user
      * @return bool
+     * @throws UnexpectedValueException
+     * @see canUserModifyBooking()
      */
     public function canUserEditBooking(User $user): bool
     {
@@ -342,9 +344,10 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @see canUserModifyBooking()
      * @param User $user
      * @return bool
+     * @throws UnexpectedValueException
+     * @see canUserModifyBooking()
      */
     public function canUserDeleteBooking(User $user): bool
     {
@@ -361,6 +364,7 @@ class Model implements ISoftDeletable, JsonSerializable
      *
      * @param User $user
      * @return bool - true means the user has permission to edit or delete this booking.
+     * @throws UnexpectedValueException
      */
     private function canUserModifyBooking(User $user): bool
     {
@@ -371,7 +375,7 @@ class Model implements ISoftDeletable, JsonSerializable
         try {
             $bookingOwner = $this->getEvent()->getOwner();
         } catch (\TypeError) {
-            throw new \UnexpectedValueException('Booking object does not have event owner set');
+            throw new UnexpectedValueException('Booking object does not have event owner set');
         }
 
         // If the user is the owner of the event, he/she can modify (edit or delete) the booking.
