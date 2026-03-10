@@ -256,17 +256,24 @@
                     endDate: {
                         required: true,
                         datepickerDate: true,
+                        /**
+                         * When the event is an all-day event, startDate and endDate are date values.
+                         * startDate and endDate are allowed to have the same value in this case.
+                         * The datetime picker lets you switch between all-day and timed, so only apply this rule
+                         * when it's set to an all-day event.
+                         */
                         datepickerDateNotBefore: {
                             param: startDateField,
                             depends: isDatepickerAllDay,
                         },
                         /**
-                         * When the event isn't an all-day event, the end date and time must be after (not before)
-                         * the start date and time.
+                         * When the event is not an all-day event, startDate and endDate are datetime values.
+                         * startDate and endDate are not allowed to have the same value in this case,
+                         * because we disallow zero-duration events.
                          * The datetime picker lets you switch between all-day and timed, so only apply this rule
                          * when it's set to a timed (not all-day) event.
                          */
-                        datepickerDateTimeNotBeforeOrEqual: {
+                        datepickerDateTimeAfter: {
                             param: startDateField,
                             depends: isDatepickerNotAllDay,
                         },

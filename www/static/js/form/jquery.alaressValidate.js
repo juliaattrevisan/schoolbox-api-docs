@@ -161,11 +161,11 @@
     );
 
     /**
-     * Extension of datepickerDate for checking that the date and time (if applicable) is not earlier than or equal to
+     * Extension of datepickerDate for checking that the date and time (if applicable) is after
      * another element's date and time.
      */
     $.validator.addMethod(
-        "datepickerDateTimeNotBeforeOrEqual",
+        "datepickerDateTimeAfter",
         function (value, element, other_element_selector) {
             // If the field is date only or allday event value is on
             const isDateOnly =
