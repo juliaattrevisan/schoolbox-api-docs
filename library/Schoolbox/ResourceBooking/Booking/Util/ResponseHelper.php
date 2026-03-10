@@ -63,7 +63,7 @@ class ResponseHelper
                 self::RESPONSE_TYPE_CREATE => match ($nCreatedEvents) {
                     0 => 'Could not create any bookings', // Handle this
                     1 => "Created 1 event with no bookings",
-                    default => "Created $nCreatedEvents events (in a series) with no bookings"
+                    default => "Created $nCreatedEvents events with no bookings"
                 },
                 self::RESPONSE_TYPE_UPDATE => 'Could not update any bookings',
                 default => throw new \UnexpectedValueException('Unexpected response type: ' . $responseType),
@@ -74,7 +74,7 @@ class ResponseHelper
             self::RESPONSE_TYPE_CREATE => match ($nCreatedEvents) {
                0 => 'Created',
                1 => "Created 1 event with",
-               default => "Created $nCreatedEvents events (in a series) and",
+               default => "Created $nCreatedEvents events and",
             },
             self::RESPONSE_TYPE_UPDATE => 'Updated',
             default => throw new \UnexpectedValueException('Unexpected response type: ' . $responseType),
