@@ -183,7 +183,7 @@ $personalRelationMapper->save($personalRelation);
 
 // manually craft a json response, to contain logs and the generated event below..
 $output = [
-    'message' => new BookingResponseHelper()->getCreateResponseMessage($nBookingsCreatedByStatusId, true),
+    'message' => new BookingResponseHelper()->getCreateResponseMessage($nBookingsCreatedByStatusId, 1),
     'event'  => null,
 ];
 

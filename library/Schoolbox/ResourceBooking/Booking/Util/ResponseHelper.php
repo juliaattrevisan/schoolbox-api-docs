@@ -15,12 +15,16 @@ class ResponseHelper
 
     /**
      * @param array<int, int> $nBookingsCreatedByStatusId - The number of bookings created, indexed by bookingStatusId.
-     * @param bool            $createdEvent - Whether an event was created also.
+     * @param int $nCreatedEvents - The number of events created.
      * @return string
      */
-    public function getCreateResponseMessage(array $nBookingsCreatedByStatusId, bool $createdEvent): string
+    public function getCreateResponseMessage(array $nBookingsCreatedByStatusId, int $nCreatedEvents): string
     {
-        return $this->getCreateOrUpdateResponseMessage($nBookingsCreatedByStatusId, self::RESPONSE_TYPE_CREATE, $createdEvent);
+        return $this->getCreateOrUpdateResponseMessage(
+            $nBookingsCreatedByStatusId,
+            self::RESPONSE_TYPE_CREATE,
+            $nCreatedEvents
+        );
     }
 
     /**
@@ -35,35 +39,43 @@ class ResponseHelper
     /**
      * @param array  $nBookingsModifiedByStatusId - The number of bookings updated, indexed by bookingStatusId.
      * @param string $responseType
-     * @param bool   $createdEvent
+     * @param int    $nCreatedEvents - The number of events created.
      * @return string
      */
     private function getCreateOrUpdateResponseMessage(
         array $nBookingsModifiedByStatusId,
         string $responseType,
-        bool $createdEvent = false
+        int $nCreatedEvents = 0
     ): string {
         $nApprovedBookings = $nBookingsModifiedByStatusId[Status\Model::STATUS_APPROVED] ?? 0;
         $nPendingBookings = $nBookingsModifiedByStatusId[Status\Model::STATUS_PENDING] ?? 0;
         $nRejectedBookings = $nBookingsModifiedByStatusId[Status\Model::STATUS_REJECTED] ?? 0;
         $nTotalBookings = $nPendingBookings + $nApprovedBookings + $nRejectedBookings;
 
-        if ($createdEvent && $responseType === self::RESPONSE_TYPE_UPDATE) {
+        if ($nCreatedEvents !== 0 && $responseType === self::RESPONSE_TYPE_UPDATE) {
             throw new \UnexpectedValueException(
-                'Parameter $createdEvent should only be true if response type is RESPONSE_TYPE_CREATE.'
+                'Parameter $nCreatedEvents should only be non-zero if response type is RESPONSE_TYPE_CREATE.'
             );
         }
 
         if ($nTotalBookings === 0) {
             return match ($responseType) {
-                self::RESPONSE_TYPE_CREATE => $createdEvent ? 'Created event with no bookings' : 'Could not create any bookings',
+                self::RESPONSE_TYPE_CREATE => match ($nCreatedEvents) {
+                    0 => 'Could not create any bookings', // Handle this
+                    1 => "Created 1 event with no bookings",
+                    default => "Created $nCreatedEvents events (in a series) with no bookings"
+                },
                 self::RESPONSE_TYPE_UPDATE => 'Could not update any bookings',
                 default => throw new \UnexpectedValueException('Unexpected response type: ' . $responseType),
             };
         }
 
         $messageStart = match ($responseType) {
-            self::RESPONSE_TYPE_CREATE => $createdEvent ? 'Created event with' : 'Created',
+            self::RESPONSE_TYPE_CREATE => match ($nCreatedEvents) {
+               0 => 'Created',
+               1 => "Created 1 event with",
+               default => "Created $nCreatedEvents events (in a series) and",
+            },
             self::RESPONSE_TYPE_UPDATE => 'Updated',
             default => throw new \UnexpectedValueException('Unexpected response type: ' . $responseType),
         };
@@ -75,7 +87,7 @@ class ResponseHelper
                 $nRejectedBookings => 'rejected',
                 default => throw new \LogicException('This state is impossible, but must be covered to satisfy PHPStan.')
             };
-            return "$messageStart one $bookingStatus booking";
+            return "$messageStart 1 $bookingStatus booking";
         }
 
         $messageEndingParts = [

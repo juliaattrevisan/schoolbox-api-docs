@@ -336,7 +336,7 @@ class Controller extends Base
                 [
                     'item' => $bookingList,
                     'errors' => $errors,
-                    'message' => $this->bookingResponseHelper->getCreateResponseMessage($nBookingsCreatedByStatusId, false),
+                    'message' => $this->bookingResponseHelper->getCreateResponseMessage($nBookingsCreatedByStatusId, 0),
                     'returnUrl' => (string)$returnUrl,
                 ],
             )->withStatus($code);
