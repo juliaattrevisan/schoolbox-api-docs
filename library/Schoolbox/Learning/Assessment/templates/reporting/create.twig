@@ -221,7 +221,13 @@
             <p class="meta">If on, a place for written feedback will be available to staff.</p>
             <div class="switch">
                 <input type="hidden" name="reporting[comments][enable]" value="0" />
-                <input id="supporting-comments" name="reporting[comments][enable]" type="checkbox" checked="">
+                {% set checked = '' %}
+
+                {% if assessment.feedbackCommentsEnable %}
+                    {% set checked = 'checked="checked"' %}
+                {% endif %}
+
+                <input id="supporting-comments" name="reporting[comments][enable]" type="checkbox" {{ checked }} />
                 <label for="supporting-comments">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>
