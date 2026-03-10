@@ -10,7 +10,7 @@ It is deployed internally and not shipped in client packages.
 - **Data stores:** MySQL/MariaDB, Redis
 - **Deployment:** two environments:
   - **client-hosted** — school's own infrastructure (cloud or physical servers); deployed as APT packages managed via Puppet
-  - **cloud-saas** — Schoolbox-managed cloud infrastructure; deployed as container images built via GitHub Actions
+  - **cloud-saas** — Schoolbox-managed cloud infrastructure; hybrid: web requests served by container images built via GitHub Actions, background tasks and daemons run on a Puppet-managed server
 
 ---
 
