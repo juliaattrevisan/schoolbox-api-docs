@@ -1538,8 +1538,9 @@ class Controller extends Base
         // The $bookings obtained above will not have their event and resource hydrated.
         // Fix that, because hydrated objects are required in $booking->canUserDeleteBooking() (checked below).
         // (The hydrated resource is needed for its moderator list.)
-        $resourceIdsToHydrate = $bookings->map(fn ($booking) => $booking->getResource()->getId());
-        $resourceIdsToHydrateDeduped = array_values(array_unique($resourceIdsToHydrate->getAll()));
+        $resourcesToHydrate = $bookings->map(fn ($booking) => $booking->getResource());
+        $resourceIdsToHydrateDeduped = $resourcesToHydrate->getUnique('id')->getPropertyValues('id');
+
         /** @var GenericCollection<BookingItemModel> $resourceById */
         $resourceById = $this->bookingItemMapper->findByColumn('id', $resourceIdsToHydrateDeduped)->indexBy('id');
         foreach ($bookings as $booking) {
