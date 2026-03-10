@@ -104,7 +104,7 @@ if ($this->arg[0] == 'new') {
             'parent' => null,
         ]),
     );
-    renderTreeSelectRecursive($this, $folders, $parentId ?? 0);
+    renderTreeSelect($this, $folders, $parentId ?? 0);
     renderPublishingOptions($this, null, $fileOwner->getId(), true, $publishComponent);
 
     /* Render out breadcrumbs
@@ -158,7 +158,7 @@ if ($this->arg[0] == 'new') {
             'parent' => null,
         ]),
     );
-    renderTreeSelectRecursive($this, $folders, $file->getFolder()->getId());
+    renderTreeSelect($this, $folders, $file->getFolder()->getId());
     renderPublishingOptions($this, $file->getId(), $fileOwner->getId(), true);
 
     /* Render out breadcrumbs
@@ -183,39 +183,6 @@ if ($this->arg[0] == 'new') {
 
 
 /**
- * Render the <select> element with the tree structure defined, or just a default "top level" if there is none
- *
- * @param SitePage $page
- * @param array|bool $tree
- * @param int $selected
- */
-function renderTreeSelect($page, $tree, $selected = 0)
-{
-    if (is_array($tree)) {
-        array_unshift($tree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
-        foreach ($tree as $folder) {
-            $output = array(
-                'FOLDER_ID' => $folder['id'],
-                'FOLDER_NAME' => Scrub::text($folder['name']),
-                'FOLDER_INDENT' => str_repeat('&nbsp;', ($folder['depth'] + 1) * 4),
-                'FOLDER_SELECTED' => $folder['id'] == $selected ? 'selected="selected"' : '',
-            );
-            $page->setVar($output);
-            $page->parse('folder_list_block', 'folder_list', true);
-        }
-    } else {
-        $output = array(
-            'FOLDER_ID' => 0,
-            'FOLDER_NAME' => 'Top Level',
-            'FOLDER_INDENT' => '',
-            'FOLDER_SELECTED' => 'selected="selected"',
-        );
-        $page->setVar($output);
-        $page->parse('folder_list_block', 'folder_list', false);
-    }
-}
-
-/**
  * Render the <select> element with the tree structure defined,
  * or just a default "top level" if there is none.
  *
@@ -226,7 +193,7 @@ function renderTreeSelect($page, $tree, $selected = 0)
  * @param int                              $depth      The current tree depth: used to indent child folders
  * @return void
  */
-function renderTreeSelectRecursive(SitePage $page, GenericCollection $tree, int $selectedId = 0, int $depth = 0): void
+function renderTreeSelect(SitePage $page, GenericCollection $tree, int $selectedId = 0, int $depth = 0): void
 {
     if ($depth === 0) {
         $output = [
@@ -249,7 +216,7 @@ function renderTreeSelectRecursive(SitePage $page, GenericCollection $tree, int 
         $page->setVar($output);
         $page->parse('folder_list_block', 'folder_list', true);
         if ($folder->getChildren()->count() > 0) {
-            renderTreeSelectRecursive($page, $folder->getChildren(), $selectedId, $depth + 1);
+            renderTreeSelect($page, $folder->getChildren(), $selectedId, $depth + 1);
         }
     }
 }
