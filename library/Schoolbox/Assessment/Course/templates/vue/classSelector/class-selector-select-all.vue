@@ -38,8 +38,13 @@ const isChecked = window.Vue.computed(() => {
 
 /**
  * dispatch to parent so can move to relevant settings page
+ * @param {Event} event - the click event
  */
-function onSelectAll() {
+function onSelectAll(event) {
+    // Ignore label clicks as they naturally trigger the checkbox
+    if (event && event.target && event.target.nodeName === "LABEL") {
+        return;
+    }
     emit("select-all");
 }
 </script>
@@ -52,6 +57,7 @@ function onSelectAll() {
                 type="checkbox"
                 :checked="isChecked"
                 :class="{ indeterminate: isSomeResultsSelected }"
+                @click.stop="onSelectAll"
             />
             <label for="checkbox-select-all"></label>
         </div>
