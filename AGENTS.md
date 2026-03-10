@@ -8,9 +8,9 @@ It is deployed internally and not shipped in client packages.
 - **Backend:** PHP (version as per `composer.json`; expected to track an actively supported version — see [php.net/supported-versions](https://www.php.net/supported-versions.php))
 - **Frontend:** Vue 3 + TypeScript
 - **Data stores:** MySQL/MariaDB, Redis
-- **Deployment:** APT packages managed via Puppet; two environments:
-  - **client-hosted** — school's own infrastructure (cloud or physical servers)
-  - **cloud-saas** — Schoolbox-managed cloud infrastructure
+- **Deployment:** two environments:
+  - **client-hosted** — school's own infrastructure (cloud or physical servers); deployed as APT packages managed via Puppet
+  - **cloud-saas** — Schoolbox-managed cloud infrastructure; deployed as container images built via GitHub Actions
 
 ---
 
