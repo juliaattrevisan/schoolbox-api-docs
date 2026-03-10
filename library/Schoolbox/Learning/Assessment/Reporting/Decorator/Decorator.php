@@ -83,6 +83,15 @@ class Decorator implements DecoratorInterface
         $assessment->setGradeGroup($gradingGroup);
         $assessment->setInstructorGradeGroup($instructorGradingGroup);
 
+        /* Both variants of maximum available marks
+         *
+         * Note that these *must* be set before the MarkSchemeFactory spawns an instance as it dirtily relies on a
+         * hydrated $assessment to put the max marks into the MarkScheme instance. It's not obvious from here that this
+         * happens deeper inside the MarkSchemeFactory.
+         */
+        $assessment->setMaxMark($this->maxMark);
+        $assessment->setInstructorMaxMark($this->instructorMaxMark);
+
         /* Both variants of Mark Scheme which is used to convert normalised to human-readable and vice versa
          *
          * Only spawn the mark scheme after the max mark is finalized
@@ -91,11 +100,6 @@ class Decorator implements DecoratorInterface
         $markSchemeFactory = new MarkSchemeFactory();
         $assessment->setMarkScheme($markSchemeFactory->spawnMarkSchemeFor($assessment));
         $assessment->setInstructorMarkScheme($markSchemeFactory->spawnInstructorMarkSchemeFor($assessment));
-
-        /* Both variants of maximum available marks
-         */
-        $assessment->setMaxMark($this->maxMark);
-        $assessment->setInstructorMaxMark($this->instructorMaxMark);
 
         /* Reporting activities never have a meaningful weighting
          */

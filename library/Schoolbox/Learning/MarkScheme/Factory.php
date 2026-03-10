@@ -446,7 +446,7 @@ class Factory
             case MarkType::TYPE_LETTER:
                 return new LetterGrade($reporting->{$methods['gradeGroup'][$userType]}());
             default:
-                throw new DomainException('Invalid MarkType for DueWork: ' . $markType->getName());
+                throw new DomainException('Invalid MarkType for Reporting: ' . $markType->getName());
         }
     }
 
