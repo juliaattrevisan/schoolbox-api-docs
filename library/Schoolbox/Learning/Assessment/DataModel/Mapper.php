@@ -1138,6 +1138,11 @@ class Mapper extends BaseMapper
                 $reporting = $this->hydrateJoin($row, 'reporting', 'reporting');
 
                 $model->setReporting($reporting);
+
+                /* We need this to add joined relationships to each Reporting activity in the set in a convenient manner
+                 * that doesn't result in millions of rows LEFT JOINed onto everything
+                 */
+                $reportingIds[] = $row['reporting.id'];
             } else {
                 $model->setReporting(null);
             }
@@ -1235,6 +1240,11 @@ class Mapper extends BaseMapper
         }
         // Lesson Plan Linked Assessments
         $modelList = $this->augmentWithLessonPlanAssessments($modelList, $lessonPlanIds);
+
+        /* Reporting Activities need Supporting Data hydrated here
+         */
+        $modelList = $this->augmentListWithReportingSupportingDataCurriculumNodes($modelList, $reportingIds);
+
         return $modelList;
     }
 
@@ -1469,6 +1479,72 @@ class Mapper extends BaseMapper
             ",
             fn ($row) => $mapper->hydrate($row),
         );
+    }
+
+
+    /**
+     * Hydrates Curriculum Nodes for each reporting activity's Supporting Data
+     *
+     * @param GenericCollection $modelList
+     * @param array $reportingIds
+     * @return GenericCollection
+     * @throws Exception
+     */
+    private function augmentListWithReportingSupportingDataCurriculumNodes(GenericCollection $modelList, array $reportingIds): GenericCollection
+    {
+        /* No reporting activities? No trabajo
+         * Exit early
+         */
+        if (!count($reportingIds)) {
+            return $modelList;
+        }
+
+        /* Manually obtain supporting data curriculum nodes
+         */
+        $placeholders = Builder::getArrayPlaceholders($reportingIds, 'reportingIds');
+        $parameters = Builder::getArrayParameters($reportingIds, 'reportingIds');
+
+        /* $this->>getTable() is the assessment table
+         */
+        $query = "
+            SELECT 
+                rcn.reporting_id AS reporting_id,
+                cn.*
+            FROM reporting_curriculum_node rcn
+            INNER JOIN curriculum_node cn ON rcn.curriculum_node_id = cn.id
+            WHERE rcn.reporting_id IN {$placeholders}
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($parameters);
+
+        /* This is a bit awkward since supporting data curric nodes are using a relationship table that doesn't actually
+         * have a join name, nor does it have its own mapper, and it's not shared among all activities...which means I
+         * kind of have to do it like this, afaict
+         */
+        $curriculumNodeMapper = CurriculumNodeMapper::getInstance();
+
+        $curriculumNodes = [];
+
+        foreach ($statement as $row) {
+            $reportingId = $row['reporting_id'];
+
+            if (!isset($curriculumNodes[$reportingId])) {
+                $curriculumNodes[$reportingId] = $curriculumNodeMapper->createCollection();
+            }
+
+            $curriculumNodes[$reportingId]->add($curriculumNodeMapper->hydrate($row));
+        }
+
+        /* Assign them to each reporting subobject in the model list, replacing whatever was there before
+         * This is pretty unique: nothing really exists like this outside of Reporting.
+         */
+        /** @var \Schoolbox\Learning\Assessment\DataModel\Model $model */
+        foreach ($modelList as $model) {
+            $model->getReporting()->setSupportingDataCurriculumNodes($curriculumNodes[$model->getReporting()->getId()]);
+        }
+
+        return $modelList;
     }
 
 
