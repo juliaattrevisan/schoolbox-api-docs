@@ -9,8 +9,8 @@ export default class CurriculumOverview {
     static readonly ELEMENT_TITLE_TEXTBOX = 'input[name="componentname"]';
     static readonly ELEMENT_UPDATE_BUTTON = 'input[value="Update"]';
     static readonly ELEMENT_CURRICULUM_CODE_DROPDOWN = 'select[name="curriculumCode"]';
-    static readonly ELEMENT_CURRICULUM_CODE_LINKS = '[class="information-list"] li.content p.no-margin a[title="View in Manage Curriculum"]';
-    static readonly ELEMENT_CURRICULUM_ROWS_WITH_DESCRIPTION = '[class="information-list"] li.content p.no-margin';
+    static readonly ELEMENT_CURRICULUM_CODE_LINKS = 'a[title="View in Manage Curriculum"]';
+    static readonly ELEMENT_CURRICULUM_DESCRIPTION_ROWS = 'p:has(a[title="View in Manage Curriculum"])';
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -18,72 +18,66 @@ export default class CurriculumOverview {
     }
 
     /**
-     *
-     * @param curriculumOverviewComponent - The curriculum overview component
-     * @param title - The title of the link
+     * Fill the component title field
+     * @param curriculumOverviewComponent - The curriculum overview component locator
+     * @param title - The component title
      */
 
     public async addTitle(curriculumOverviewComponent: Locator, title: string,): Promise<void> {
-        this.tester.isGoingTo("Add a title and click Update");
+        this.tester.isGoingTo("Add a title");
         await curriculumOverviewComponent.locator(CurriculumOverview.ELEMENT_TITLE_TEXTBOX).fill(title);
     }
 
-
     /**
-     *
-     * @param curriculumOverviewComponent - The curriculum overview component
-     * @param curriculumCode - The curriculum code to set
+     * Select a curriculum code from the dropdown and click Update
+     * @param curriculumOverviewComponent - The curriculum overview component locator
+     * @param curriculumCode - The curriculum code to select
      */
 
-    public static async setLinkLimit(curriculumOverviewComponent: Locator, curriculumCode: string,): Promise<void> {
+    public static async setCurriculumCode(curriculumOverviewComponent: Locator, curriculumCode: string,): Promise<void> {
         await curriculumOverviewComponent.locator(CurriculumOverview.ELEMENT_CURRICULUM_CODE_DROPDOWN).selectOption(curriculumCode);
         await curriculumOverviewComponent.locator(CurriculumOverview.ELEMENT_UPDATE_BUTTON).click();
     }
+
     /**
      * Verify if a curriculum code link is present in the component
      * @param curriculumOverviewComponent - The curriculum overview component locator
      * @param code - The curriculum code (e.g. ACELA1556)
      */
     public static async verifyCurriculumLinkCode(curriculumOverviewComponent: Locator, code: string,): Promise<void> {
+
+        const codeLink = curriculumOverviewComponent.locator(CurriculumOverview.ELEMENT_CURRICULUM_CODE_LINKS, { hasText: code },);
         const actualCodes = (await curriculumOverviewComponent.locator(CurriculumOverview.ELEMENT_CURRICULUM_CODE_LINKS).allTextContents()).map(text => text.replace(/\s+/g, " ").trim());
         console.log("Expected code:", code);
         console.log("Actual curriculum codes:", actualCodes);
-
-        await expect(curriculumOverviewComponent.locator(CurriculumOverview.ELEMENT_CURRICULUM_CODE_LINKS, { hasText: code },),).toBeVisible();
-        await expect(curriculumOverviewComponent.locator(CurriculumOverview.ELEMENT_CURRICULUM_CODE_LINKS, { hasText: code },),).toContainText(code);
+        await expect(codeLink).toBeVisible();
+        await expect(codeLink).toContainText(code);
     }
 
     /**
      * Verify if a curriculum row (code + description) is present in the component
      * @param curriculumOverviewComponent - The curriculum overview component locator
-     * @param code - The curriculum code (e.g. ACELA1556)
      * @param descriptionContains - any text you expect in the description
      */
-    public static async verifyCurriculumCodeWithDescription(curriculumOverviewComponent: Locator, descriptionContains: string,): Promise<void> {
-        const actualRows = (await curriculumOverviewComponent.locator(CurriculumOverview.ELEMENT_CURRICULUM_ROWS_WITH_DESCRIPTION).allTextContents()).map(text => text.replace(/\s+/g, " ").trim());
+    public static async verifyCurriculumDescriptionRow(curriculumOverviewComponent: Locator, descriptionContains: string,): Promise<void> {
+        const descriptionRow = curriculumOverviewComponent.locator(CurriculumOverview.ELEMENT_CURRICULUM_DESCRIPTION_ROWS, { hasText: descriptionContains },);
+        const actualRows = (await curriculumOverviewComponent.locator(CurriculumOverview.ELEMENT_CURRICULUM_DESCRIPTION_ROWS).allTextContents()).map(text => text.replace(/\s+/g, " ").trim());
         console.log("Expected description:", descriptionContains);
         console.log("Actual curriculum rows:", actualRows);
-        await expect(curriculumOverviewComponent.locator(CurriculumOverview.ELEMENT_CURRICULUM_ROWS_WITH_DESCRIPTION, { hasText: descriptionContains },),).toBeVisible();
-        await expect(curriculumOverviewComponent.locator(CurriculumOverview.ELEMENT_CURRICULUM_ROWS_WITH_DESCRIPTION, { hasText: descriptionContains },),).toContainText(descriptionContains);
-
+        await expect(descriptionRow).toBeVisible();
+        await expect(descriptionRow).toContainText(descriptionContains);
 
     }
+
     /**
          * Verify if a curriculum row (code + description) is present in the component
          * @param curriculumOverviewComponent - The curriculum overview component locator
          * @param code - The curriculum code (e.g. ACELA1556)
          */
-
-    public async clickCurriculumCodeLink(curriculumOverviewComponent: Locator, code: string,
-    ): Promise<void> {
-        await curriculumOverviewComponent.locator(CurriculumOverview.ELEMENT_CURRICULUM_CODE_LINKS, { hasText: code }).click();
+    public async clickCurriculumCodeLink(curriculumOverviewComponent: Locator, code: string,): Promise<void> {
+        const codeLink = curriculumOverviewComponent.locator(CurriculumOverview.ELEMENT_CURRICULUM_CODE_LINKS, { hasText: code },);
+        console.log("Clicking curriculum code:", code);
+        await expect(codeLink).toBeVisible();
+        await codeLink.click();
     }
-
-
-
-
-
-
-
-
 }
