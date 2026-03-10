@@ -97,7 +97,14 @@
             <p class="meta">If on, shows academic grades from various sources to help staff provide feedback.</p>
             <div class="switch">
                 <input type="hidden" name="reporting[supporting][enable]" value="0" />
-                <input id="supporting-enable" name="reporting[supporting][enable]" type="checkbox" checked="">
+
+                {% set checked = '' %}
+
+                {% if assessment.supportingDataenable %}
+                    {% set checked = 'checked="checked"' %}
+                {% endif %}
+
+                <input id="supporting-enable" name="reporting[supporting][enable]" type="checkbox" {{ checked }} />
                 <label for="supporting-enable">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>
