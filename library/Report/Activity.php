@@ -203,8 +203,8 @@ OR ml.name        LIKE :keyword
             LEFT JOIN folder cfile ON f.category = cfile.id
             LEFT JOIN `link` l    ON cl.objectID = l.id  AND cl.object = 'link'
             LEFT JOIN folder clink ON l.category = clink.id
-            LEFT JOIN myFile mf   ON cl.objectID = mf.id AND cl.object = 'myFile'
-            LEFT JOIN myFolder ml ON cl.objectID = ml.id AND cl.object = 'myFolder'
+            LEFT JOIN my_file mf   ON cl.objectID = mf.id AND cl.object = 'myFile'
+            LEFT JOIN my_folder ml ON cl.objectID = ml.id AND cl.object = 'myFolder'
             LEFT JOIN textBox t   ON cl.objectID = t.textBoxId AND cl.object = 'content'
         ";
 

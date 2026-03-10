@@ -55,7 +55,7 @@ class FileTypePayload
     public function generate(User $user): array
     {
         $query = "
-            SELECT 
+            SELECT
                 'Image' AS label,
                 SUM(filesize) AS size
             FROM (
@@ -67,20 +67,20 @@ class FileTypePayload
                 WHERE mime LIKE 'image/%'
                 AND f.deleted_at IS NULL
                 AND f.owner = :userId
-    
-                UNION 
-                            
+
+                UNION
+
                 SELECT SUM(filesize) AS filesize
                 FROM storage
-                INNER JOIN myFile mf ON storage.hash = mf.hash
+                INNER JOIN my_file mf ON storage.hash = mf.hash
                 INNER JOIN allowedFileExtension afe on storage.ext = afe.extension
                 INNER JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
                 WHERE mime LIKE 'image/%'
                 AND mf.deleted_at IS NULL
                 AND mf.owner = :userId
-                
-                UNION 
-                            
+
+                UNION
+
                 SELECT SUM(filesize) AS filesize
                 FROM storage
                 INNER JOIN student_submission_file ssf ON storage.hash = ssf.hash
@@ -91,9 +91,9 @@ class FileTypePayload
                 AND ssf.deleted_at IS NULL
                 AND ss.deleted_at IS NULL
                 AND ss.owner = :userId
-                
-                UNION 
-                            
+
+                UNION
+
                 SELECT SUM(filesize) AS filesize
                 FROM storage
                 INNER JOIN submission_return_file srf ON storage.hash = srf.hash
@@ -105,10 +105,10 @@ class FileTypePayload
                 AND sr.deleted_at IS NULL
                 AND sr.owner = :userId
             ) imageUsage
-            
+
             UNION
-            
-            SELECT 
+
+            SELECT
                 'Video' AS label,
                 SUM(filesize) AS size
             FROM (
@@ -120,20 +120,20 @@ class FileTypePayload
                 WHERE mime LIKE 'video/%'
                 AND f.deleted_at IS NULL
                 AND f.owner = :userId
-    
-                UNION 
-                            
+
+                UNION
+
                 SELECT SUM(filesize) AS filesize
                 FROM storage
-                INNER JOIN myFile mf ON storage.hash = mf.hash
+                INNER JOIN my_file mf ON storage.hash = mf.hash
                 INNER JOIN allowedFileExtension afe on storage.ext = afe.extension
                 INNER JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
                 WHERE mime LIKE 'video/%'
                 AND mf.deleted_at IS NULL
                 AND mf.owner = :userId
-                
-                UNION 
-                            
+
+                UNION
+
                 SELECT SUM(filesize) AS filesize
                 FROM storage
                 INNER JOIN student_submission_file ssf ON storage.hash = ssf.hash
@@ -144,9 +144,9 @@ class FileTypePayload
                 AND ssf.deleted_at IS NULL
                 AND ss.deleted_at IS NULL
                 AND ss.owner = :userId
-                
-                UNION 
-                            
+
+                UNION
+
                 SELECT SUM(filesize) AS filesize
                 FROM storage
                 INNER JOIN submission_return_file srf ON storage.hash = srf.hash
@@ -158,10 +158,10 @@ class FileTypePayload
                 AND sr.deleted_at IS NULL
                 AND sr.owner = :userId
             ) videoUsage
-            
+
             UNION
-            
-            SELECT 
+
+            SELECT
                 'Application' AS label,
                 SUM(filesize) AS size
             FROM (
@@ -173,20 +173,20 @@ class FileTypePayload
                 WHERE mime LIKE 'application/%'
                 AND f.deleted_at IS NULL
                 AND f.owner = :userId
-    
-                UNION 
-                            
+
+                UNION
+
                 SELECT SUM(filesize) AS filesize
                 FROM storage
-                INNER JOIN myFile mf ON storage.hash = mf.hash
+                INNER JOIN my_file mf ON storage.hash = mf.hash
                 INNER JOIN allowedFileExtension afe on storage.ext = afe.extension
                 INNER JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
                 WHERE mime LIKE 'application/%'
                 AND mf.deleted_at IS NULL
                 AND mf.owner = :userId
-                
-                UNION 
-                            
+
+                UNION
+
                 SELECT SUM(filesize) AS filesize
                 FROM storage
                 INNER JOIN student_submission_file ssf ON storage.hash = ssf.hash
@@ -197,9 +197,9 @@ class FileTypePayload
                 AND ssf.deleted_at IS NULL
                 AND ss.deleted_at IS NULL
                 AND ss.owner = :userId
-                
-                UNION 
-                            
+
+                UNION
+
                 SELECT SUM(filesize) AS filesize
                 FROM storage
                 INNER JOIN submission_return_file srf ON storage.hash = srf.hash
@@ -211,10 +211,10 @@ class FileTypePayload
                 AND sr.deleted_at IS NULL
                 AND sr.owner = :userId
             ) applicationUsage
-            
+
             UNION
-            
-            SELECT 
+
+            SELECT
                 'Audio' AS label,
                 SUM(filesize) AS size
             FROM (
@@ -226,20 +226,20 @@ class FileTypePayload
                 WHERE mime LIKE 'audio/%'
                 AND f.deleted_at IS NULL
                 AND f.owner = :userId
-    
-                UNION 
-                            
+
+                UNION
+
                 SELECT SUM(filesize) AS filesize
                 FROM storage
-                INNER JOIN myFile mf ON storage.hash = mf.hash
+                INNER JOIN my_file mf ON storage.hash = mf.hash
                 INNER JOIN allowedFileExtension afe on storage.ext = afe.extension
                 INNER JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
                 WHERE mime LIKE 'audio/%'
                 AND mf.deleted_at IS NULL
                 AND mf.owner = :userId
-                
-                UNION 
-                            
+
+                UNION
+
                 SELECT SUM(filesize) AS filesize
                 FROM storage
                 INNER JOIN student_submission_file ssf ON storage.hash = ssf.hash
@@ -250,9 +250,9 @@ class FileTypePayload
                 AND ssf.deleted_at IS NULL
                 AND ss.deleted_at IS NULL
                 AND ss.owner = :userId
-                
-                UNION 
-                            
+
+                UNION
+
                 SELECT SUM(filesize) AS filesize
                 FROM storage
                 INNER JOIN submission_return_file srf ON storage.hash = srf.hash
@@ -264,10 +264,10 @@ class FileTypePayload
                 AND sr.deleted_at IS NULL
                 AND sr.owner = :userId
             ) audioUsage
-            
+
             UNION
-            
-            SELECT 
+
+            SELECT
                 'Text' AS label,
                 SUM(filesize) AS size
             FROM (
@@ -279,20 +279,20 @@ class FileTypePayload
                 WHERE mime LIKE 'text/%'
                 AND f.deleted_at IS NULL
                 AND f.owner = :userId
-    
-                UNION 
-                            
+
+                UNION
+
                 SELECT SUM(filesize) AS filesize
                 FROM storage
-                INNER JOIN myFile mf ON storage.hash = mf.hash
+                INNER JOIN my_file mf ON storage.hash = mf.hash
                 INNER JOIN allowedFileExtension afe on storage.ext = afe.extension
                 INNER JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
                 WHERE mime LIKE 'text/%'
                 AND mf.deleted_at IS NULL
                 AND mf.owner = :userId
-                
-                UNION 
-                            
+
+                UNION
+
                 SELECT SUM(filesize) AS filesize
                 FROM storage
                 INNER JOIN student_submission_file ssf ON storage.hash = ssf.hash
@@ -303,9 +303,9 @@ class FileTypePayload
                 AND ssf.deleted_at IS NULL
                 AND ss.deleted_at IS NULL
                 AND ss.owner = :userId
-                
-                UNION 
-                            
+
+                UNION
+
                 SELECT SUM(filesize) AS filesize
                 FROM storage
                 INNER JOIN submission_return_file srf ON storage.hash = srf.hash
