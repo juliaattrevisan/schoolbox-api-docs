@@ -388,7 +388,7 @@ class Controller extends Base
         $originalStart = clone $item->getEvent()->getStartDateTime()->getDateTimeObject();
         $originalEnd   = clone $item->getEvent()->getEndDateTime()->getDateTimeObject();
         $code = self::HTTP_STATUS_CODE_OK;
-        $nBookingsCreatedByStatusId = [];
+        $nBookingsUpdatedByStatusId = [];
 
         if (empty($errors)) {
             $item
@@ -466,10 +466,10 @@ class Controller extends Base
             $this->bookingMapper->save($bookingList);
 
             foreach ($bookingList as $booking) {
-                if (!array_key_exists($booking->getStatus()->getId(), $nBookingsCreatedByStatusId)) {
-                    $nBookingsCreatedByStatusId[$booking->getStatus()->getId()] = 0;
+                if (!array_key_exists($booking->getStatus()->getId(), $nBookingsUpdatedByStatusId)) {
+                    $nBookingsUpdatedByStatusId[$booking->getStatus()->getId()] = 0;
                 }
-                ++$nBookingsCreatedByStatusId[$booking->getStatus()->getId()];
+                ++$nBookingsUpdatedByStatusId[$booking->getStatus()->getId()];
             }
 
             // Now delete deleted series
@@ -503,7 +503,7 @@ class Controller extends Base
                 [
                     'item' => $item,
                     'errors' => $errors,
-                    'message' => $this->bookingResponseHelper->getUpdateResponseMessage($nBookingsCreatedByStatusId),
+                    'message' => $this->bookingResponseHelper->getUpdateResponseMessage($nBookingsUpdatedByStatusId),
                     'returnUrl' => $returnUrl,
                 ],
             )->withStatus($code);
