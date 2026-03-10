@@ -107,7 +107,7 @@ class SystemPayload
                 'My Files' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
             FROM storage
-            WHERE hash in (SELECT hash FROM myFile)";
+            WHERE hash in (SELECT hash FROM my_file)";
         $result = $this->database->executeQuery($query);
         return $result->fetch();
     }

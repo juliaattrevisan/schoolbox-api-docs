@@ -57,30 +57,30 @@ class TotalPayload
               COALESCE(SUM(size), 0) AS size,
               COALESCE(SUM(num), 0) AS num
             FROM (
-                (SELECT 
-                    SUM(`s`.`filesize`) AS size, 
+                (SELECT
+                    SUM(`s`.`filesize`) AS size,
                     COUNT(*) AS num
                  FROM `file` `f`
                    INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
                  WHERE `f`.`owner` = :userId
                        AND `f`.`deleted_at` IS NULL
                  GROUP BY `f`.`owner`)
-                 
+
                 UNION
-                
-                (SELECT 
-                    SUM(`s`.`filesize`) AS size, 
+
+                (SELECT
+                    SUM(`s`.`filesize`) AS size,
                     COUNT(*) AS num
-                 FROM `myFile` `f`
+                 FROM my_file `f`
                    INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
                  WHERE `f`.`owner` = :userId
                        AND `f`.`deleted_at` IS NULL
                  GROUP BY `f`.`owner`)
-                 
+
                 UNION
-                
-                (SELECT 
-                    SUM(`s`.`filesize`) AS size, 
+
+                (SELECT
+                    SUM(`s`.`filesize`) AS size,
                     COUNT(*) AS num
                  FROM `student_submission` `f`
                    INNER JOIN `student_submission_file` ON `student_submission_file`.student_submission_id = `f`.id
@@ -88,11 +88,11 @@ class TotalPayload
                  WHERE `f`.`owner` = :userId
                  AND `student_submission_file`.`deleted_at` IS NULL
                  GROUP BY `f`.`owner`)
-                 
+
                 UNION
-                
-                (SELECT 
-                    SUM(`s`.`filesize`) AS size, 
+
+                (SELECT
+                    SUM(`s`.`filesize`) AS size,
                     COUNT(*) AS num
                  FROM `submission_return` `f`
                    INNER JOIN `submission_return_file` ON `submission_return_file`.submission_return_id = `f`.id

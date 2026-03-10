@@ -330,8 +330,8 @@ $app = new class extends CliTool\App {
             'files_size'        => 'SELECT sum(filesize) FROM file JOIN storage ON file.hash = storage.hash',
             'links'             => 'SELECT count(*) FROM link WHERE deleted_at IS NULL',
             'folders'           => 'SELECT count(*) FROM folder WHERE deleted_at IS NULL',
-            'myfile'            => 'SELECT count(*) FROM myFile WHERE deleted_at IS NULL',
-            'myfile_size'       => 'SELECT sum(filesize) FROM myFile JOIN storage ON myFile.hash = storage.hash',
+            'myfile'            => 'SELECT count(*) FROM my_file WHERE deleted_at IS NULL',
+            'myfile_size'       => 'SELECT sum(filesize) FROM my_file JOIN storage ON my_file.hash = storage.hash',
             'editor_templates'  => 'SELECT count(*) FROM editor_template WHERE deleted_at IS NULL',
 
             //Learning Moments / Evidence
