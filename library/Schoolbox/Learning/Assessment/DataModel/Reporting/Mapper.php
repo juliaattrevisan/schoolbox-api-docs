@@ -160,7 +160,6 @@ class Mapper extends \Schoolbox\Mapper
 
                 $stack[$subobject->getId()] = $subobject;
             }
-
         }
 
         /* Supporting Data nodes (sry, there isn't a shorter name...)
@@ -203,6 +202,12 @@ class Mapper extends \Schoolbox\Mapper
             $collection[$row['id']]->getSupportingDataCurriculumNodes()->setOffset($curriculumNode->getId(), $curriculumNode);
         }
 
+        /* Remove (key, value) relationship that was used for deduping, returning this as a stack
+         */
+        foreach ($collection as $reporting) {
+            $reporting->setSupportingDataCurriculumNodes($reporting->getSupportingDataCurriculumNodes()->reindex());
+        }
+
         return $collection;
     }
 
@@ -232,9 +237,15 @@ class Mapper extends \Schoolbox\Mapper
         $workTypeStatement = $this->database->query($query, $pb->getParams());
 
         foreach ($workTypeStatement as $row) {
-            /** @var \Schoolbox\Learning\Assessment\WorkType\Model */
+            /** @var \Schoolbox\Learning\Assessment\WorkType\Model $workType */
             $workType = $this->hydrateJoin($row, 'reporting_work_type', 'lwt');
             $collection[$row['id']]->getSupportingDataWorkTypes()->setOffset($workType->getId(), $workType);
+        }
+
+        /* Remove (key, value) relationship that was used for deduping, returning this as a stack
+         */
+        foreach ($collection as $reporting) {
+            $reporting->setSupportingDataWorkTypes($reporting->getSupportingDataWorkTypes()->reindex());
         }
 
         return $collection;
