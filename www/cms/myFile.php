@@ -69,7 +69,7 @@ if ($this->arg[0] == 'new') {
         try {
             $folder = $folderMapper->findOneByColumnList([
                 'id'    => $myFolderId,
-                'owner' => $sessionUser->getId(),
+                'owner' => $fileOwner->getId(),
             ]);
             $parentId = $folder->getId();
         } catch (NotFound | Deleted $e) {
@@ -97,7 +97,7 @@ if ($this->arg[0] == 'new') {
 
     $folderTree = $folderMapper->loadDescendants(
         $folderMapper->findByColumnList([
-            'owner'  => $sessionUser->getId(),
+            'owner'  => $fileOwner->getId(),
             'parent' => null,
         ]),
     );
@@ -126,7 +126,7 @@ if ($this->arg[0] == 'new') {
     try {
         $file = $fileMapper->findOneByColumnList([
             'id'    => $myFileId,
-            'owner' => $sessionUser->getId(),
+            'owner' => $fileOwner->getId(),
         ]);
     } catch (NotFound | Deleted $e) {
         $this->error(\Schoolbox\Error\Mapper::ERROR_FILE_NOT_FOUND);
@@ -151,7 +151,7 @@ if ($this->arg[0] == 'new') {
 
     $folderTree = $folderMapper->loadDescendants(
         $folderMapper->findByColumnList([
-            'owner'  => $sessionUser->getId(),
+            'owner'  => $fileOwner->getId(),
             'parent' => null,
         ]),
     );
