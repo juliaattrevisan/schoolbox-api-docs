@@ -100,6 +100,14 @@ abstract class StrategyBase implements IStrategy
                 $this->log->notice(sprintf("[%s/%s] Processing chunk", $chunkNum + 1, $chunkCount));
 
                 $this->deleteChunk($chunk);
+
+                if ($this->perform) {
+                    // perform the transaction for the chunk
+                    $this->database->commit();
+                } else {
+                    // if not performing, roll back the transaction to avoid making changes
+                    $this->database->rollBack();
+                }
             } catch (\PDOException | \Schoolbox\Mapper\Exception $e) {
                 $this->database->rollBack();
                 $this->log->error(sprintf("Error processing chunk: %s", $e->getMessage()));

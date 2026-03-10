@@ -193,9 +193,6 @@ class MomentsRetention extends StrategyBase
 
         // if perform is true, delete learning moments older than the retention period
         if ($this->perform) {
-            // perform the transaction for the chunk
-            $this->database->commit();
-
             $this->log->notice(
                 sprintf(
                     "Deleted '%s' moments, '%s' moment_evidence, '%s' moment_folders, '%s' moment_tags '%s' discussion_threads, '%s' discussion_thread_comments",
@@ -208,9 +205,6 @@ class MomentsRetention extends StrategyBase
                 )
             );
         } else {
-            // if not performing, roll back the transaction to avoid making changes
-            $this->database->rollBack();
-
             $this->log->notice(
                 sprintf(
                     "Would have deleted '%s' moments, '%s' moment_evidence, '%s' moment_folders, '%s' moment_tags '%s' discussion_threads, '%s' discussion_thread_comments",

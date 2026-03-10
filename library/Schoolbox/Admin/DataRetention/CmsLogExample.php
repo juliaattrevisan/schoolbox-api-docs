@@ -119,9 +119,6 @@ class CmsLogExample extends StrategyBase
 
         // if perform is true, delete cmsLogs older than the retention period
         if ($this->perform) {
-            // perform the transaction for the chunk
-            $this->database->commit();
-
             $this->log->notice(
                 sprintf(
                     "Deleted '%s' cmsLogs",
@@ -129,9 +126,6 @@ class CmsLogExample extends StrategyBase
                 )
             );
         } else {
-            // if not performing, roll back the transaction to avoid making changes
-            $this->database->rollBack();
-
             $this->log->notice(
                 sprintf(
                     "Would have deleted '%s' cmsLogs",
