@@ -133,6 +133,24 @@ Short imperative description [SA-XXXXX]
 
 ---
 
+## Legacy & Deprecated Patterns
+
+Avoid introducing these patterns in new code. When touching files that use them, prefer migrating away where it is within the scope of the ticket.
+
+### `SitePage` (`library/SitePage.php`)
+
+A monolithic legacy class that mixes routing, session management, template rendering, and HTTP concerns in a single object. It predates the current MVC architecture and is tied to the old PHPLib templating engine.
+
+- **Do not** use `SitePage` in new controllers or pages
+- New code should use the Aura-based MVC stack (controllers in `conf/`, `WebRequest\Kernel` for request handling)
+- Existing `SitePage`-based pages are candidates for migration; migrate within ticket scope when practical
+
+### jQuery
+
+jQuery is being removed in favour of modern vanilla JS and Vue 3. Do not add new jQuery usage. Replace jQuery calls when touching existing code where it is within ticket scope.
+
+---
+
 ## Agent Guidelines
 
 ### Do
