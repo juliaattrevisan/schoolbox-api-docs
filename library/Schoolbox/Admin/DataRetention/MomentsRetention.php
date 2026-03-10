@@ -229,10 +229,10 @@ class MomentsRetention extends StrategyBase
         // build an array length of the chunk size
         $chunkSize = array_fill(0, $this->chunkSize, 0);
         $delPlaceholders = Builder::getArrayPlaceholders($chunkSize, 'moment_id');
-        $statementEvidence = $this->database->prepare("DELETE FROM moment_evidence WHERE moment_id IN {$delPlaceholders}");
-        $statementFolder = $this->database->prepare("DELETE FROM moment_folder WHERE moment_id IN {$delPlaceholders}");
-        $statementTag = $this->database->prepare("DELETE FROM moment_tag WHERE moment_id IN {$delPlaceholders}");
-        $statementMoment = $this->database->prepare("DELETE FROM moment WHERE id IN {$delPlaceholders}");
+        $statementEvidence = $this->database->prepare($this->deleteStatement() . " FROM moment_evidence WHERE moment_id IN {$delPlaceholders}");
+        $statementFolder = $this->database->prepare($this->deleteStatement() . " FROM moment_folder WHERE moment_id IN {$delPlaceholders}");
+        $statementTag = $this->database->prepare($this->deleteStatement() . " FROM moment_tag WHERE moment_id IN {$delPlaceholders}");
+        $statementMoment = $this->database->prepare($this->deleteStatement() . " FROM moment WHERE id IN {$delPlaceholders}");
 
         return [
             'evidence' => $statementEvidence,
@@ -250,10 +250,10 @@ class MomentsRetention extends StrategyBase
     private function preparePartChunkMomentQueries(array $chunkIds): array
     {
         $delPlaceholders = Builder::getArrayPlaceholders($chunkIds, 'moment_id');
-        $statementEvidence = $this->database->prepare("DELETE FROM moment_evidence WHERE moment_id IN {$delPlaceholders}");
-        $statementFolder = $this->database->prepare("DELETE FROM moment_folder WHERE moment_id IN {$delPlaceholders}");
-        $statementTag = $this->database->prepare("DELETE FROM moment_tag WHERE moment_id IN {$delPlaceholders}");
-        $statementMoment = $this->database->prepare("DELETE FROM moment WHERE id IN {$delPlaceholders}");
+        $statementEvidence = $this->database->prepare($this->deleteStatement() . " FROM moment_evidence WHERE moment_id IN {$delPlaceholders}");
+        $statementFolder = $this->database->prepare($this->deleteStatement() . " FROM moment_folder WHERE moment_id IN {$delPlaceholders}");
+        $statementTag = $this->database->prepare($this->deleteStatement() . " FROM moment_tag WHERE moment_id IN {$delPlaceholders}");
+        $statementMoment = $this->database->prepare($this->deleteStatement() . " FROM moment WHERE id IN {$delPlaceholders}");
 
         return [
             'evidence' => $statementEvidence,
@@ -274,9 +274,9 @@ class MomentsRetention extends StrategyBase
         $chunkSize = array_fill(0, $this->chunkSize, 0);
         $discussionPlaceholders = Builder::getArrayPlaceholders($chunkSize, 'moment_id');
         // delete the discussion thread comments // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads comments that were not... but they do match to the moment...
-        $statementComment = $this->database->prepare("DELETE FROM discussion_thread_comment WHERE discussion_thread_id IN {$discussionPlaceholders}");
+        $statementComment = $this->database->prepare($this->deleteStatement() . " FROM discussion_thread_comment WHERE discussion_thread_id IN {$discussionPlaceholders}");
         // delete the discussion threads // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads that were not... but they do match to the moment...
-        $statementThread = $this->database->prepare("DELETE FROM discussion_thread WHERE id IN {$discussionPlaceholders}");
+        $statementThread = $this->database->prepare($this->deleteStatement() . " FROM discussion_thread WHERE id IN {$discussionPlaceholders}");
 
         return [
             'comment' => $statementComment,
@@ -293,9 +293,9 @@ class MomentsRetention extends StrategyBase
     {
         $discussionPlaceholders = Builder::getArrayPlaceholders($discussionThreadIds, 'moment_id');
         // delete the discussion thread comments // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads comments that were not... but they do match to the moment...
-        $statementComment = $this->database->prepare("DELETE FROM discussion_thread_comment WHERE discussion_thread_id IN {$discussionPlaceholders}");
+        $statementComment = $this->database->prepare($this->deleteStatement() . " FROM discussion_thread_comment WHERE discussion_thread_id IN {$discussionPlaceholders}");
         // delete the discussion threads // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads that were not... but they do match to the moment...
-        $statementThread = $this->database->prepare("DELETE FROM discussion_thread WHERE id IN {$discussionPlaceholders}");
+        $statementThread = $this->database->prepare($this->deleteStatement() . " FROM discussion_thread WHERE id IN {$discussionPlaceholders}");
 
         return [
             'comment' => $statementComment,

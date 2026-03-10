@@ -203,4 +203,16 @@ abstract class StrategyBase implements IStrategy
      * @return string
      */
     abstract public function getStrategyName(): string;
+
+    /**
+     * Get the delete statement to use, rather than rely exclusively on rollback
+     * @return string
+     */
+    protected function deleteStatement(): string
+    {
+        if (!$this->perform) {
+            return 'SELECT';
+        }
+        return 'DELETE';
+    }
 }
