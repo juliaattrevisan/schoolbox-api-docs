@@ -662,7 +662,7 @@ class Controller extends Base
             $this->requestPost->offsetSet('showAttendees', false);
         }
 
-        $this->postModify($event, false);
+        $this->postModify($event);
     }
 
 
@@ -671,12 +671,16 @@ class Controller extends Base
      * Partial updates are supported, so the $_POST data may contain a subset of fields from the 'Create/Event Form'.
      *
      * @param Event $event
-     * @param bool  $isCreateRequest
+     * @param ?bool  $isCreateRequest
      * @throws MapperException
      * @throws Deleted
      */
-    public function postModify(Event $event, bool $isCreateRequest): void
+    public function postModify(Event $event, ?bool $isCreateRequest = false): void
     {
+        // Parameter $isCreateRequest allows null because when WebRequest\Kernel->outputAuraContent() invokes the
+        // controller, any parameters not supplied in the request are given null values.  Fix so value is boolean.
+        $isCreateRequest = $isCreateRequest ?? false;
+
         // This will throw a SchoolboxException with a helpful message if the request is invalid,
         // and return a possibly modified request with compatible strings converted to ints or bools for example.
         // The $validRequestPost does not contain all possible fields, but all fields contained in the validRequestPost
