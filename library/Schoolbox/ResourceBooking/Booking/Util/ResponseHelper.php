@@ -62,7 +62,7 @@ class ResponseHelper
             return match ($responseType) {
                 self::RESPONSE_TYPE_CREATE => match ($nCreatedEvents) {
                     0 => 'Could not create any bookings', // Handle this
-                    1 => "Created 1 event with no bookings",
+                    1 => "Created one event with no bookings",
                     default => "Created $nCreatedEvents events with no bookings"
                 },
                 self::RESPONSE_TYPE_UPDATE => 'Could not update any bookings',
@@ -73,7 +73,7 @@ class ResponseHelper
         $messageStart = match ($responseType) {
             self::RESPONSE_TYPE_CREATE => match ($nCreatedEvents) {
                0 => 'Created',
-               1 => "Created 1 event with",
+               1 => "Created one event with",
                default => "Created $nCreatedEvents events and",
             },
             self::RESPONSE_TYPE_UPDATE => 'Updated',
@@ -87,7 +87,7 @@ class ResponseHelper
                 $nRejectedBookings => 'rejected',
                 default => throw new \LogicException('This state is impossible, but must be covered to satisfy PHPStan.')
             };
-            return "$messageStart 1 $bookingStatus booking";
+            return "$messageStart one $bookingStatus booking";
         }
 
         $messageEndingParts = [
