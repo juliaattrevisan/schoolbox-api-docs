@@ -190,7 +190,7 @@ class Factory
     /**
      * Factory constructor.
      * @param User $creator
-     * @param array $post (an array of post vars from the create/update forms)
+     * @param array|\Alaress\Web\Request\Values $post (an array of post vars from the create/update forms)
      * @param string|null $assessmentType
      * @param IAssessable|null $original
      * @param Mapper $errorMapper
@@ -198,7 +198,7 @@ class Factory
      */
     public function __construct(
         User $creator,
-        array $post,
+        array|\Alaress\Web\Request\Values $post,
         ?string $assessmentType,
         ?IAssessable $original,
         private \Schoolbox\Error\Mapper $errorMapper
