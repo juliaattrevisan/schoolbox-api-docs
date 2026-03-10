@@ -141,11 +141,14 @@ abstract class AbstractController extends BaseController
 
 
     /**
-     * @param FolderInterface $folder
+     * @param FolderInterface|null $folder
      * @return array
      */
-    protected function getBreadcrumbs(FolderInterface $folder)
+    protected function getBreadcrumbs(?FolderInterface $folder)
     {
+        if (!$folder) {
+            return [];
+        }
         try {
             $node = $this->nodeFactory->build($this->nodeType, $folder->getId());
             $tree = $node->render();
@@ -337,7 +340,7 @@ abstract class AbstractController extends BaseController
     {
         $file = $this->getFile($fileId);
 
-        $folderId = $file->getFolder()->getId();
+        $folderId = $file->getFolder()?->getId() ?? 0;
         $folderUrl = sprintf("/%s/$folderId", ($this->nodeType === NodeFactory::MYFILE) ? 'my-files' : 'resources');
 
         $server = $this->request->getServerParams();
