@@ -125,7 +125,13 @@
 
             <select name="reporting[supporting][range]" id="reporting-range">
                 {% for key, label in reporting.availableRangeOptions %}
-                    <option value="{{ key }}">{{ label }}</option>
+                    {% set selected = '' %}
+
+                    {% if key == assessment.supportingDataRange %}
+                        {% set selected = 'selected="selected"' %}
+                    {% endif %}
+
+                    <option value="{{ key }}" {{ selected }}>{{ label }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -172,6 +178,7 @@
                     {% if key == assessment.supportingDataFolders %}
                         {% set selected = 'selected="selected"' %}
                     {% endif %}
+
                     <option value="{{ key }}" {{ selected }}>{{ label }}</option>
                 {% endfor %}
             </select>
