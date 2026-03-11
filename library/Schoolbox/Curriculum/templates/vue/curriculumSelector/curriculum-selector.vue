@@ -36,7 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
     dataEndpoint: "",
     selectedNodes: () => [],
     isReadOnly: true,
-    includeWithoutCode: true,
+    includeWithoutCode: false,
     formValueName: "curriculumCodes[]",
     selectedOriginal: () => [],
     selectedDefault: () => [],

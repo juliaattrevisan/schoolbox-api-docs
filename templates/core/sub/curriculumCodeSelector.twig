@@ -31,7 +31,6 @@
         :has-tabs="{{ hasTabs ? 'true' : 'false' }}"
         {% if formValueName is defined and formValueName is not null %}form-value-name="{{ formValueName }}"{% endif %}
         {% if parentFolderId is defined and parentFolderId is not null %}:parent-folder-id="{{ parentFolderId }}"{% endif %}
-        {% if includeWithoutCode is defined and includeWithoutCode is not null %}:include-without-code="{{ includeWithoutCode }}"{% endif %}
     />
 {% if not vueSlot %}
     </div>
