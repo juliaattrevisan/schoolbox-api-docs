@@ -229,15 +229,20 @@ abstract class BaseApp extends App
     {
         // Old options might have the : suffix: if so, remove it
         $trimmedName = rtrim($name, ':');
-        $result      = $this->optionResult->get($trimmedName);
-        if (isset($result)) {
-            return $result;
-        }
 
-        // This might be a short value, which has a long value alias?
+        // Option `$name` might have been defined as:
+        // * a single option only
+        // * a short option within a short|long pair
+        // * a long option within a short|long pair
+        // Need to handle all of these cases
         $option = $this->optionCollection->get($trimmedName);
         if ($option instanceof Option) {
-            return $this->optionResult->get($option->long);
+            if (isset($option->long)) {
+                return $this->optionResult->get($option->long);
+            }
+            if (isset($option->short)) {
+                return $this->optionResult->get($option->short);
+            }
         }
 
         // Otherwise return nothing
