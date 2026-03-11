@@ -92,8 +92,7 @@ class BaseAppTest extends TestCase
 
             protected function hasPerformMode(): bool
             {
-                // TODO set from data provider?
-                return false;
+                return true;
             }
         };
 
@@ -129,13 +128,101 @@ class BaseAppTest extends TestCase
      */
     public static function getTestGetOptData(): iterable
     {
-        yield 'default options only, no arguments provided' => [
+        yield 'default options, no arguments provided' => [
             [],
             [],
             [
                 'v'         => 0,
                 'p'         => false,
                 'perform'   => false,
+                'porcelain' => false,
+            ],
+        ];
+
+        yield 'default options, --perform provided' => [
+            [],
+            ['--perform'],
+            [
+                'v'         => 0,
+                'p'         => true,
+                'perform'   => true,
+                'porcelain' => false,
+            ],
+        ];
+
+        yield 'default options, -p provided' => [
+            [],
+            ['-p'],
+            [
+                'v'         => 0,
+                'p'         => true,
+                'perform'   => true,
+                'porcelain' => false,
+            ],
+        ];
+
+        yield 'default options, --porcelain provided' => [
+            [],
+            ['--porcelain'],
+            [
+                'v'         => 0,
+                'p'         => false,
+                'perform'   => false,
+                'porcelain' => true,
+            ],
+        ];
+
+        yield 'default options, -v provided' => [
+            [],
+            ['-v'],
+            [
+                'v'         => 1,
+                'p'         => false,
+                'perform'   => false,
+                'porcelain' => false,
+            ],
+        ];
+
+        yield 'default options, -vv provided' => [
+            [],
+            ['-vv'],
+            [
+                'v'         => 2,
+                'p'         => false,
+                'perform'   => false,
+                'porcelain' => false,
+            ],
+        ];
+
+        yield 'default options, -vvv provided' => [
+            [],
+            ['-vvv'],
+            [
+                'v'         => 3,
+                'p'         => false,
+                'perform'   => false,
+                'porcelain' => false,
+            ],
+        ];
+
+        yield 'default options, -v -v provided' => [
+            [],
+            ['-v', '-v'],
+            [
+                'v'         => 2,
+                'p'         => false,
+                'perform'   => false,
+                'porcelain' => false,
+            ],
+        ];
+
+        yield 'default options, -vvvp provided' => [
+            [],
+            ['-vvvp'],
+            [
+                'v'         => 3,
+                'p'         => true,
+                'perform'   => true,
                 'porcelain' => false,
             ],
         ];
