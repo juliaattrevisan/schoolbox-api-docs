@@ -1482,7 +1482,11 @@ class Controller extends Base
     public function deleteBooking(Event $event, int $bookingId): void
     {
         $data = $this->request->getParsedBody();
-        $efficacy = $data['efficacy'] ?? null;
+
+        // The fallback of getting efficacy from the query params was added to
+        // allow this function to be testable by EventResourceBookingCest.php.
+        $efficacy = $data['efficacy'] ?? $this->request->getQueryParams()['efficacy'] ?? null;
+
         $responseData = [
             // The data structure here must match type 'DeleteBookingResponse' in resource-booking-row.vue.
             'success' => false,
