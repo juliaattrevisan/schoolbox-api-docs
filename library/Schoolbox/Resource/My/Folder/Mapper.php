@@ -32,7 +32,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
     public function findById($id)
     {
         // special case: 0 == root, but not in db
-        if ($id == 0) {
+        if ($id == IFolder::ROOT_ID) {
             return $this->createModel()
                         ->setId(null)
                         ->setName('Top Level')
@@ -116,14 +116,14 @@ class Mapper extends AbstractFolderMapper implements ILocator
         $ancestry = [];
 
         // Climb inheritance tree
-        $parentId            = $possibleDescendant->getParent()?->getId() ?? 0;
+        $parentId            = $possibleDescendant->getParent()?->getId() ?? IFolder::ROOT_ID;
         $parent              = $this->findById($parentId);
         $ancestry[$parentId] = true;
         while (IFolder::ROOT_ID !== (int)$parentId) {
             if ((int)$parentId === (int)$possibleAncestor->getId()) {
                 return true;
             }
-            $parentId = $parent->getParent()?->getId() ?? 0;
+            $parentId = $parent->getParent()?->getId() ?? IFolder::ROOT_ID;
             $parent   = $this->findById($parentId);
             // Have we see this parent before?
             if (array_key_exists($parentId, $ancestry)) {

@@ -14,7 +14,6 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
-use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\User;
@@ -69,7 +68,7 @@ class TreeBuilder extends AbstractTreeBuilder
     {
         /** @var Mapper $locator */
         $locator = $this->folderLocator;
-        if (intval($nodeId) === 0) {
+        if (intval($nodeId) === IFolder::ROOT_ID) {
             $nodeId = null;
         }
 
@@ -90,7 +89,7 @@ class TreeBuilder extends AbstractTreeBuilder
     {
         /** @var Mapper $locator */
         $locator = $this->fileLocator;
-        if (intval($nodeId) === 0) {
+        if (intval($nodeId) === IFolder::ROOT_ID) {
             $nodeId = null;
         }
 

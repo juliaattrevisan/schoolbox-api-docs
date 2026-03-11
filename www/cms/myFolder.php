@@ -3,6 +3,7 @@
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\My\Folder\Model as MyFolderModel;
 
 $userMapper = new Schoolbox\UserMapper();
@@ -52,7 +53,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
             'parent_list',
             'PARENT_',
             $folderTree,
-            (int)($folder->getParent()->getId()),
+            $folder->getParent()->getId() ?? IFolder::ROOT_ID,
             fn (MyFolderModel $f) => $f->getId(),
             fn (MyFolderModel $f) => $f->getName(),
             fn (MyFolderModel $f) => $f->getChildren(),
@@ -75,7 +76,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         ]
     ]);
 } else if ($this->arg[0] == 'new') {
-    $parentId = $this->arg[1] ?? 0;
+    $parentId = $this->arg[1] ?? IFolder::ROOT_ID;
     if (!is_numeric($parentId)) {
         $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
     }

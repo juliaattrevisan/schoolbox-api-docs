@@ -12,6 +12,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Resource\Attachment\GenericZone;
+use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 use Schoolbox\Resource\My\Folder\Mapper as MyFolderMapper;
 use Schoolbox\Resource\My\Folder\Model as MyFolderModel;
@@ -64,7 +65,7 @@ if ($this->arg[0] == 'new') {
     $publishComponent = $this->arg[3] ?? false;
 
     $parentFolder = null;
-    $parentId = null;
+    $parentId     = null;
     if ($myFolderId) {
         try {
             $folder = $folderMapper->findOneByColumnList([
@@ -76,6 +77,7 @@ if ($this->arg[0] == 'new') {
             $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
     }
+    $parentId ??= IFolder::ROOT_ID;
 
     $this->setTitle('Add File');
     $this->parse('browse_row_block', 'browse_row');
@@ -85,7 +87,7 @@ if ($this->arg[0] == 'new') {
         'FILE_ID' => '',
         'DESCRIPTION' => '',
         'MAX_FILE_SIZE' => Config::get('max_file_size'),
-        'PARENT_ID' => $parentId ?? 0,
+        'PARENT_ID' => $parentId,
         "COMPONENT_INSTANCE_ID" => $publishComponent,
         "USER_ID" => $fileOwner->getId(),
         'RETURN_URL' => $_GET['returnUrl'] ?? ''
@@ -105,7 +107,7 @@ if ($this->arg[0] == 'new') {
         'folder_list',
         'FOLDER_',
         $folderTree,
-        (int)($parentId ?? 0),
+        $parentId,
         fn (MyFolderModel $f) => $f->getId(),
         fn (MyFolderModel $f) => $f->getName(),
         fn (MyFolderModel $f) => $f->getChildren(),

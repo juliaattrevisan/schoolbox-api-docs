@@ -450,14 +450,14 @@ abstract class AbstractTreeBuilder
         int $sequence = 0,
         ?Alaress_Date_Format $createdAt = null,
     ): array {
-        $outputNodeId = $nodeId ?? 0;
+        $outputNodeId = $nodeId ?? IFolder::ROOT_ID;
         $array = [
             'id' => $outputNodeId,
             'parent' => $parentId ?: '0',
             'text' => $name,
             'children' => 0,
             'type' => $type,
-            'colour' => $colour ? $colour->__toString() : null,
+            'colour' => $colour?->__toString(),
             'coverImage' => $coverImage,
             'sequence' => $sequence,
             'createdAt' => $createdAt,

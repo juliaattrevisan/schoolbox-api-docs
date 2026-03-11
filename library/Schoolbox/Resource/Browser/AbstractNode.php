@@ -17,6 +17,7 @@ use InvalidArgumentException;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Resource\File\ILocator as FileLocatorInterface;
 use Schoolbox\Resource\Folder\ILocator as FolderLocatorInterface;
@@ -144,7 +145,7 @@ abstract class AbstractNode implements NodeInterface
                 'name'       => $folder->getName(),
             );
 
-            for ($i = 0; (($folder->getParent()?->getId() ?? 0) > 0) && ($i < self::MAX_DEPTH); $i++) {
+            for ($i = 0; (($folder->getParent()?->getId() ?? IFolder::ROOT_ID) > 0) && ($i < self::MAX_DEPTH); $i++) {
                 $parentId      = $folder->getParent()?->getId();
                 $currentFolder = $this->getFolderLocator()->findById($parentId);
 

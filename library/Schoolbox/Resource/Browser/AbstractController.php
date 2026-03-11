@@ -340,7 +340,7 @@ abstract class AbstractController extends BaseController
     {
         $file = $this->getFile($fileId);
 
-        $folderId = $file->getFolder()?->getId() ?? 0;
+        $folderId = $file->getFolder()?->getId() ?? IFolder::ROOT_ID;
         $folderUrl = sprintf("/%s/$folderId", ($this->nodeType === NodeFactory::MYFILE) ? 'my-files' : 'resources');
 
         $server = $this->request->getServerParams();
