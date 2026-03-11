@@ -146,8 +146,10 @@ abstract class BaseApp extends App
         foreach ($shortOptions as $shortOption) {
             // What type of option is this?
             // No value, mandatory value, optional value?
-            $hasOptions = str_ends_with($shortOption, ':');
-            $this->optionCollection->add($shortOption);
+            if (str_ends_with($shortOption, '::')) {
+                $shortOption = rtrim($shortOption, ':') . '?';
+            }
+            $this->optionCollection->add($shortOption, 'Undocumented short option: please set in setOptions instead');
         }
 
         $longOptions = $this->getLongOpts();
@@ -159,8 +161,10 @@ abstract class BaseApp extends App
             );
         }
         foreach ($longOptions as $longOption) {
-            $hasOptions = str_ends_with($longOption, ':');
-            $this->optionCollection->add($longOption);
+            if (str_ends_with($longOption, '::')) {
+                $longOption = rtrim($longOption, ':') . '?';
+            }
+            $this->optionCollection->add($longOption, 'Undocumented long option: please set in setOptions instead');
         }
     }
 
