@@ -11,9 +11,9 @@
     <li>
         {% if isUserConfigurable %}
             <sbx-search-select
-                    id="studentSearch"
+                    id="search-{{ definition.filter.id }}"
                     label="Search"
-                    label-id="Search"
+                    label-id="search-label-{{ definition.filter.id }}"
                     form-value-name="filter_selection[{{ definition.filter.id }}]"
                     endpoint="/ajax/user.php?roleTypeID=student&"
                     for-filter-panel
@@ -21,7 +21,7 @@
             </sbx-search-select>
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
-                    const searchSelect = document.getElementById('studentSearch');
+                    const searchSelect = document.getElementById('search-{{ definition.filter.id }}');
                     // Pre-populating the search select with any existing user selection
                     searchSelect.selected = {{ userSelectionIds | json_encode | raw }};
                 });
