@@ -533,7 +533,7 @@ try {
                 $sentry
             ));
 
-            $filename = ExportType::EXTERNAL;
+            $filename = ExportType::EXTERNAL_FILE;
             break;
 
         /* All EOTC Events
