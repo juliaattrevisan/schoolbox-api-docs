@@ -17,6 +17,8 @@ use Tests\Support\IntegrationTester;
 use Tests\Support\Payload;
 
 /**
+ * This class contains tests for the resource-booking-related functions in @see Calendar/Event/Controller.php.
+ *
  * Tests:
  * * Create a series of events with bookings
  * * Edit a booking on a single event in a series
