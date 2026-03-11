@@ -168,72 +168,25 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * Assessment Summary Screen for a Reporting
+     * Assessment Summary Screen for a Reporting activity: not used by anyone.
+     *
+     * At most it'd contain the metadata at the top and a list of feedbacks received, but staff should be favouring the
+     * status screen instead, afaict.
      *
      * @param Model|IAssessable $assessment
      * @param User              $student
      * @return void
-     * @throws Deleted
      * @throws Exception
-     * @throws RouteNotFound
-     * @throws Error
      */
     public function getSummary(Model|IAssessable $assessment, User $student): void
     {
-        /** @var Model $assessment */
-        $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder());
-
-        /* Craft a returnUrl, to redirect back to the place from whence you came
+        /* Summary screens aren't used by anyone for Reporting Activities.
+         *
+         * jez.gray [11:59 AM, 11 March 2026]
+         * I do not think it is required at this stage for anyone because we said students and parents couldn't access it at all at the minute.
+         * Staff don't need it as there won't be a description or a submission history. So all it would have is their own grading - which shouldn't be needed.
          */
-        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
-            $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
-        } else {
-            $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
-        }
-
-        /* Remember when someone last looked at this summary screen (normally parents and students)
-         * This is used as proof that someone looked at the information here so they can't plead ignorance
-         */
-        $lastView = new Assessment\Views\LatestView(
-            $this->getAccess(),
-            $this->latestViewMapper,
-            new \Schoolbox\External\User(
-                $this->getConfigLoader()->get('external_type'),
-                new \External_Class(),
-                new \External_User(),
-                $this->getUserMapper()
-            )
-        );
-
-        $lastView->addNewView($assessment, $student, $this->getUser());
-
-        $participant = $assessment->getParticipantIfExtant($student);
-
-        $twigData = [
-            'lastViews'         => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
-            'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
-            'assessment'        => $assessment,
-            'student'           => $student,
-            'returnUrl'         => $returnUrl,
-            'returnUrlEncoded'  => Redirect::encode($returnUrl),
-            'participant'       => $participant,
-            /* The full history of interactions for this reporting activity
-             * Note that this should only contain feedbacks, by nature of this activity
-             */
-            'timeline' => $participant ? (new FullTimeline($participant))->getForUser($this->getUser()) : null,
-
-            /* FIXME Controversial:
-             *  whether "staff-only fields" really means "instructor-only fields",
-             *  or whether it's strictly for the Role::STAFF demographic? Non-staff
-             *  roletypes can end up fulfilling Instructor responsibilities
-             */
-            'isInstructor' => $isViewerAnInstructor,
-        ];
-
-        $this->response = $this->responseFromTemplate(
-            '@learningAssessment/dialogAgent/summary/student.twig',
-            $twigData
-        );
+        throw new NotFound();
     }
 
 
