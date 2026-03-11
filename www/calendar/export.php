@@ -134,7 +134,7 @@ try {
     // Actually build the export
     $token              = $_GET['token'] ?? null;
     $export_type        = $_GET['export'] ?? null;
-    $filename           = 'calendar';
+    $filename           = ExportType::DEFAULT_FILE;
     $resourceId         = (int)($_GET['resource_id'] ?? 0);
     $resourceCategoryId = (int)($_GET['resource_category_id'] ?? 0);
     $eventTypeId        = (int)($_GET['event_type'] ?? 0);

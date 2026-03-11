@@ -12,6 +12,8 @@ class ExportType
     // That is because at the time this file was created, the export files generated in calendar/export.php were inconsistently named.
     // The addition of this file was not meant to change behaviour, so the export filenames have been left in their inconsistent state.
 
+    public const string DEFAULT_FILE = 'calendar';
+
     // This is the 'All' option in the export modal on the main calendar page.
     public const string ALL = 'all';
     public const string ALL_FILE = self::ALL;
