@@ -294,6 +294,21 @@ class BaseAppTest extends TestCase
             ],
         ];
 
+        yield 'simple options, -bi1 provided' => [
+            $simpleOptions,
+            ['-bi1'],
+            [
+                'b'        => true,
+                'bool'     => true,
+                'i'        => 1,
+                'int'      => 1,
+                'm'        => null,
+                'multiple' => null,
+                'o'        => null,
+                'optional' => null,
+            ],
+        ];
+
         yield 'simple options, -i=1 provided' => [
             $simpleOptions,
             ['-i=1'],
