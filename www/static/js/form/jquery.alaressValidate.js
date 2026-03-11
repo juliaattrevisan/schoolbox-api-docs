@@ -157,7 +157,34 @@
 
             return date.isValid() && date.isSameOrAfter(other_date);
         },
-        "Please enter a date that is <i>after</i> the previous date",
+        "Please enter a date that is <i>not before</i> the previous date",
+    );
+
+    /**
+     * Extension of datepickerDate for checking that the date and time (if applicable) is after
+     * another element's date and time.
+     */
+    $.validator.addMethod(
+        "datepickerDateTimeAfter",
+        function (value, element, other_element_selector) {
+            // If the field is date only or allday event value is on
+            const isDateOnly =
+                typeof $(element).attr("data-datepicker-time") == "undefined" ||
+                $("#" + $(element).attr("data-datepicker-alldayinput")).val() == 1;
+
+            const format = isDateOnly ? dateDisplayFormats.dayjs : dateDisplayFormats.dayjsDatetime;
+            const date = dayjs(value, format, true);
+            const otherDate = dayjs(other_element_selector.val(), format, true);
+
+            // If the other date is empty or not valid, return valid for this and leave the error for that field for now
+            // Otherwise we end up with an error message on this field when the user is still working on the other one
+            if (!otherDate.isValid()) {
+                return true;
+            }
+
+            return date.isValid() && date.isAfter(otherDate);
+        },
+        "Please enter a date/time that is <i>after</i> the previous date/time",
     );
 
     /**
