@@ -40,16 +40,16 @@ abstract class BaseApp extends App
     // Command line options handled at the kernel level, rather than at the app:
     // duplicated here for help text.
 
-//    /**
-//     * Should log items be formatted for text file rather than terminal?
-//     *
-//     * If set, causes severity level (as per the values of the `\Monolog\Level`
-//     * enum) to be prefixed to field value, so that logs may be made parsable by
-//     * scripts:
-//     * * without: '[!][2019-02-26 00:29:22.72907][13746]'
-//     * * with:    '[!][@550][2019-02-26 00:29:22.72907][pid:13746]'.
-//     */
-//    private const OPT_LONG_PORCELAIN = 'porcelain';
+    /**
+     * Should log items be formatted for text file rather than terminal?
+     *
+     * If set, causes severity level (as per the values of the `\Monolog\Level`
+     * enum) to be prefixed to field value, so that logs may be made parsable by
+     * scripts:
+     * * without: '[!][2019-02-26 00:29:22.72907][13746]'
+     * * with:    '[!][@550][2019-02-26 00:29:22.72907][pid:13746]'.
+     */
+    private const OPT_LONG_PORCELAIN = 'porcelain';
 
     /**
      * What level of log messages should be output?
@@ -104,11 +104,8 @@ abstract class BaseApp extends App
         )->incremental();
         $this->assignDeprecatedOptions();
 
-//        // ... including an esoteric option I forgot existed
-//        $this->optionParser = $this->optionParser->addOption(
-//            new GetOpt\Option(null, self::OPT_LONG_PORCELAIN, GetOpt\GetOpt::NO_ARGUMENT)
-//                ->setDescription('Porcelain log output')
-//        );
+        // ... including an esoteric option I forgot existed
+        $this->optionCollection->add(self::OPT_LONG_PORCELAIN, 'Porcelain log output');
 
         $this->setOptions();
         $this->optionResult = new OptionParser($this->optionCollection)->parse($_SERVER['argv']);
