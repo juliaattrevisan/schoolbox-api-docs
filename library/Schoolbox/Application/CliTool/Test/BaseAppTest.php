@@ -116,7 +116,17 @@ class BaseAppTest extends TestCase
         // Do tests here
         $actualOptionValues = [];
         foreach ($expectedOptionValues as $option => $expectedValue) {
-            $actualOptionValues[$option] = $testCliTool->getOpt($option);
+            $actualOptionValue = $testCliTool->getOpt($option);
+
+            // As mentioned in the data provider, the underlying library parses
+            // multiples of the same option strangely:
+            // previous options will be re-added to the value.
+            // Thus something like `-m1 -m2 -m3` will be something like
+            // `[1, 1, 2, 1, 2, 3]`: we are only interested in unique values.
+            if (is_array($actualOptionValue)) {
+                $actualOptionValue = array_values(array_unique($actualOptionValue));
+            }
+            $actualOptionValues[$option] = $actualOptionValue;
         }
         $this->assertSame($expectedOptionValues, $actualOptionValues);
     }
@@ -364,6 +374,55 @@ class BaseAppTest extends TestCase
                 'int'      => 1,
                 'm'        => null,
                 'multiple' => null,
+                'o'        => null,
+                'optional' => null,
+            ],
+        ];
+
+        yield 'simple options, -m 1 provided' => [
+            $simpleOptions,
+            ['-m', '1'],
+            [
+                'b'        => null,
+                'bool'     => null,
+                'i'        => null,
+                'int'      => null,
+                'm'        => ['1'],
+                'multiple' => ['1'],
+                'o'        => null,
+                'optional' => null,
+            ],
+        ];
+
+        // Multiple options are parsed strangely:
+        // when a multiple option is added, its previous value is re-added.
+        // Thus the below option actually parses to `[1, 1, 2]`: the test will
+        // strip duplicates.
+        yield 'simple options, -m 1 -m=2 provided' => [
+            $simpleOptions,
+            ['-m', '1', '-m=2'],
+            [
+                'b'        => null,
+                'bool'     => null,
+                'i'        => null,
+                'int'      => null,
+                'm'        => ['1', '2'],
+                'multiple' => ['1', '2'],
+                'o'        => null,
+                'optional' => null,
+            ],
+        ];
+
+        yield 'simple options, -m 1 -m=2 -m3 provided' => [
+            $simpleOptions,
+            ['-m', '1', '-m=2', '-m3'],
+            [
+                'b'        => null,
+                'bool'     => null,
+                'i'        => null,
+                'int'      => null,
+                'm'        => ['1', '2', '3'],
+                'multiple' => ['1', '2', '3'],
                 'o'        => null,
                 'optional' => null,
             ],
