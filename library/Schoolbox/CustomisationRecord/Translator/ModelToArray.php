@@ -81,6 +81,9 @@ class ModelToArray
             'type' => [
                 'title' => $plan->isCustomParticipation() ? 'New Activity' : 'Modified Activity'
             ],
+            'work_type' => [
+                'title' => $plan->getAssessment()->getWorkType()?->getName() ?? 'None'
+            ],
             'unit' => [
                 'title' => $context?->getTitle(),
             ],

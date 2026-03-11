@@ -80,6 +80,8 @@ class Finder extends AbstractIdFinder
 
         $customisationRecordTerm = $completeFilters[Term\Definition::class]?->getAll();
 
+        $customisationRecordWorkTypes = $completeFilters[WorkType\Definition::class]?->getAll();
+
         /** @var Mapper $mapper */
         $mapper = $this->getMapper();
         return $mapper->findByFilters(
@@ -89,6 +91,7 @@ class Finder extends AbstractIdFinder
             $customisationRecordAdjustmentCategories,
             $customisationRecordAdjustmentLevels,
             $customisationRecordTerm,
+            $customisationRecordWorkTypes,
             $cursor,
             $order,
             $limit

@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\DifferentiationProfile\AdjustmentCategories\Mapper as AdjustmentCategoryMapper;
 use Schoolbox\DifferentiationProfile\AdjustmentLevels\Mapper as AdjustmentLevelMapper;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\CustomisationRecord;
 use Schoolbox\Filter;
 use Schoolbox\Filter\IFactory;
@@ -96,6 +97,13 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper(),
                     $this->getTermMapper()
+                );
+            case WorkType\Definition::class:
+                return new WorkType\Factory(
+                    $this->getOptionMapper(),
+                    $this->getDefaultsMapper(),
+                    $this->getSelectionMapper(),
+                    $this->getMapperFactory()->get(WorkTypeMapper::class)
                 );
         }
         throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
