@@ -32,6 +32,8 @@ const isSubmitting = window.Vue.ref<boolean>(false);
 
 const isPromptModalOpen = window.Vue.ref<boolean>(false);
 
+const formRef = window.Vue.ref<InstanceType<typeof DacForm> | null>(null);
+
 /**
  * Whether the sandbox section is visible, not necessarily whether it can be used
  * The sandbox won't be visible if the dialog agent AI feature is disabled
@@ -42,24 +44,29 @@ const isPromptModalOpen = window.Vue.ref<boolean>(false);
  */
 const sandboxVisible = sbProps.aiFeatures.dialogagent === undefined || sbProps.aiFeatures.dialogagent.enabled;
 
+const sandboxContainerEl = window.Vue.useTemplateRef<HTMLDivElement>("sandboxContainerRef");
 const sandboxRef = window.Vue.ref<InstanceType<typeof DacSandbox> | null>(null);
-
-/**
- * The sandbox should warn if there are unsaved changes (and hence it's not actually reflecting the current config)
- */
-const sandboxDataCache = window.Vue.ref(cloneDeep(assessmentConfigInfo.value));
-const isSandboxDirty = window.Vue.computed(() => {
-    return JSON.stringify(sandboxDataCache.value) !== JSON.stringify(assessmentConfigInfo.value);
+const sandboxData = window.Vue.ref({
+    /**
+     * Note: After mount, sandboxData.openingMessage will differ to assessmentConfigInfo.openingMessage
+     * as the sandbox requires the (scrubbed) HTML version rather than the markdown version that the editor converts to
+     */
+    openingMessage: assessmentConfigInfo.value.openingMessage,
+    _routes: {
+        postSandboxMessage: assessmentConfigInfo.value._routes.postSandboxMessage,
+    },
 });
 
 /**
  * Update the sandbox cache when the form is successfully submitted
  * @param data - The data returned from the form submission
  */
-function updateSandbox(data: DialogAgentConfigureApiResponse): void {
-    sandboxDataCache.value = cloneDeep(assessmentConfigInfo.value);
-    sandboxDataCache.value.openingMessage = data.openingMessage;
+function onConfigurationSaved(data: DialogAgentConfigureApiResponse): void {
+    sandboxData.value.openingMessage = data.openingMessage;
+    sandboxData.value._routes.postSandboxMessage = data._routes.postSandboxMessage;
+
     sandboxRef.value?.resetFeed();
+    sandboxContainerEl.value?.scrollIntoView({ behavior: "smooth" });
 }
 
 const isGeneratingFields = window.Vue.ref<boolean>(false);
@@ -156,6 +163,7 @@ window.Vue.onMounted(async () => {
                 <a href="" class="close" @click.prevent="generateFieldsError = null">×</a>
             </div>
             <dac-form
+                ref="formRef"
                 v-model:assessment-config="assessmentConfigInfo"
                 v-model:is-submitting="isSubmitting"
                 :scenario="props.scenario"
@@ -163,29 +171,26 @@ window.Vue.onMounted(async () => {
                 :language-options="props.languageOptions"
                 :differentiation-profiles-enabled="props.differentiationProfilesEnabled"
                 :post-update="props.postUpdate"
-                @saved="updateSandbox"
+                @saved="onConfigurationSaved"
             />
         </div>
 
-        <div v-if="sandboxVisible" class="small-12 large-6 island">
+        <div v-if="sandboxVisible" ref="sandboxContainerRef" class="small-12 large-6 island">
             <h2 class="subheader">Sandbox</h2>
 
             <section v-if="isSubmitting">
                 <div class="loader"></div>
             </section>
-            <div
-                v-else-if="!sandboxDataCache._routes.postSandboxMessage || !sandboxDataCache.openingMessage"
-                class="empty-state"
-            >
+            <div v-else-if="!sandboxData._routes.postSandboxMessage || !sandboxData.openingMessage" class="empty-state">
                 <i class="icon-dialog-agent"></i>
                 <p>Sandbox will be available once the agent configuration has been saved.</p>
             </div>
             <section v-else>
                 <dac-sandbox
                     ref="sandboxRef"
-                    :opening-message="sandboxDataCache.openingMessage"
-                    :post-message="sandboxDataCache._routes.postSandboxMessage"
-                    :is-dirty="isSandboxDirty"
+                    :opening-message="sandboxData.openingMessage"
+                    :post-message="sandboxData._routes.postSandboxMessage"
+                    :is-dirty="formRef?.isAssessmentConfigDirty || false"
                 />
             </section>
         </div>

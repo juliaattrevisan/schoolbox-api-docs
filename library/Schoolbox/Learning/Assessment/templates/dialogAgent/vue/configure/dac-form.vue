@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { cloneDeep } from "es-toolkit";
 import locale from "@js/terminology/rosettaStone";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import { getPageReturnUrl } from "@js/util/sbx/urlUtils";
@@ -34,6 +35,16 @@ const submitError = window.Vue.ref<string | null>(null);
 
 const formEl = window.Vue.useTemplateRef<HTMLFormElement>("formRef");
 const validator = window.Vue.ref<ReturnType<ReturnType<typeof $>["alaressValidate"]> | null>(null);
+
+/**
+ * The sandbox should warn if there are unsaved changes (and hence it's not actually reflecting the current config)
+ */
+const assessmentConfigCache = window.Vue.ref(cloneDeep(assessmentConfig.value));
+const isAssessmentConfigDirty = window.Vue.computed(() => {
+    return JSON.stringify(assessmentConfigCache.value) !== JSON.stringify(assessmentConfig.value);
+});
+
+defineExpose({ isAssessmentConfigDirty });
 
 /**
  * Submit the new configuration
@@ -104,12 +115,18 @@ async function onSubmit(): Promise<void> {
      */
     assessmentConfig.value.prompt = response.data.prompt;
     assessmentConfig.value._routes.postSandboxMessage = response.data._routes.postSandboxMessage;
+
+    assessmentConfigCache.value = cloneDeep(assessmentConfig.value);
+
     emit("saved", response.data);
 }
 
 window.Vue.onMounted(() => {
-    // As vue loads the template after foundation has been initialised, we need to reinitialise the tooltips
-    window.jQuery(document).foundation("tooltip", "reflow");
+    if (document.readyState === "complete") {
+        // If the document isn't ready, we can't reflow tooltips yet
+        // As vue loads the template after foundation has been initialised, we need to reinitialise the tooltips
+        window.jQuery(document).foundation("tooltip", "reflow");
+    }
 });
 </script>
 
@@ -200,7 +217,7 @@ window.Vue.onMounted(() => {
                 :disabled="isSubmitting || undefined"
             >
                 <div
-                    v-for="fieldContext in assessmentConfig.fieldContexts"
+                    v-for="(fieldContext, index) in assessmentConfig.fieldContexts"
                     :key="fieldContext.id"
                     class="small-12 columns"
                 >
@@ -218,6 +235,13 @@ window.Vue.onMounted(() => {
                             markdown: true,
                             toolbar: EditorToolbar.SIMPLE,
                         }"
+                        @editor-loaded="
+                            // When an editor loads for the first time, it will mutate the saved value for that field from markdown to HTML.
+                            // This shouldn't count as a cache invalidation, so treat the first update of each field as the new value in the cache
+                            () =>
+                                (assessmentConfigCache.fieldContexts[index].body =
+                                    assessmentConfig.fieldContexts[index].body)
+                        "
                     />
                 </div>
             </fieldset>
@@ -234,6 +258,11 @@ window.Vue.onMounted(() => {
                             markdown: true,
                             toolbar: EditorToolbar.SIMPLE,
                         }"
+                        @editor-loaded="
+                            // When an editor loads for the first time, it will mutate the saved value for that field from markdown to HTML.
+                            // This shouldn't count as a cache invalidation, so treat the first update of each field as the new value in the cache
+                            () => (assessmentConfigCache.openingMessage = assessmentConfig.openingMessage)
+                        "
                     />
                 </div>
 
@@ -251,6 +280,11 @@ window.Vue.onMounted(() => {
                             markdown: true,
                             toolbar: EditorToolbar.SIMPLE,
                         }"
+                        @editor-loaded="
+                            // When an editor loads for the first time, it will mutate the saved value for that field from markdown to HTML.
+                            // This shouldn't count as a cache invalidation, so treat the first update of each field as the new value in the cache
+                            () => (assessmentConfigCache.rules = assessmentConfig.rules)
+                        "
                     />
                 </div>
             </fieldset>
