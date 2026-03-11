@@ -859,6 +859,13 @@ class ListController extends Web\Controller\Base
                 $planData['close_date'] = $planData['due_date'];
             }
 
+            /* Artificially enforce open = publish, and close = due, for reporting activities
+             */
+            if ($assessment instanceof Reporting) {
+                $planData['open_date'] = $planData['publish_date'];
+                $planData['close_date'] = $planData['due_date'];
+            }
+
             if ($planId > 0 && isset($plans[$planId])) {
                 // existing plan updates
                 $plans[$planId]

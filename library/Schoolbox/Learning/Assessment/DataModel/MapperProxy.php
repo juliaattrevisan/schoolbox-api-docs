@@ -27,11 +27,13 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\CourseManagedFields;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgentObject;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizObject;
+use Schoolbox\Learning\Assessment\Reporting\Model as ReportingObject;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -1274,7 +1276,14 @@ class MapperProxy
         /* Artificially enforce close = due for dialog agents *specifically before* translation because something
          * else will persist $assessable specially, not just the $dataModel itself.
          */
-        if ($assessable instanceof \Schoolbox\Learning\Assessment\DialogAgent\Model) {
+        if ($assessable instanceof DialogAgentObject) {
+            $assessable->setCloseAt($assessable->getDueAt());
+        }
+
+        /* Artificially enforce open = publish, and close = due, for reporting activities
+         */
+        if ($assessable instanceof ReportingObject) {
+            $assessable->setOpenAt($assessable->getPublishAt());
             $assessable->setCloseAt($assessable->getDueAt());
         }
 
