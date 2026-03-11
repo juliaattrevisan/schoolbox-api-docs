@@ -1,13 +1,13 @@
 <?php
 
-declare(strict_types = 1);
-
 /**
  * Representation of a color.
  *
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.education
  */
+
+declare(strict_types=1);
 
 namespace Alaress\Color;
 
