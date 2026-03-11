@@ -198,7 +198,7 @@ function onButtonSelected(): void {
         <template v-if="props.showInput">
             <label :for="props.labelId" :class="`${props.isRequired ? 'required' : ''}`">{{ props.label }}</label>
             <slot name="meta"></slot>
-            <label v-if="props.hasError" class="error" :for="props.labelId">{{ errorMessage }}</label>
+            <label v-if="props.hasError" class="error" :for="props.labelId">{{ props.errorMessage }}</label>
         </template>
         <ss-selected
             v-if="props.showSelected"
