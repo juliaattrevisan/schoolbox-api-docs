@@ -9,11 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Application\CliTool;
 
-use GetOpt;
 use GetOptionKit\Option;
 use GetOptionKit\OptionCollection;
 use GetOptionKit\OptionParser;
-use GetOptionKit\OptionPrinter\ConsoleOptionPrinter;
 use GetOptionKit\OptionResult;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -70,11 +68,6 @@ abstract class BaseApp extends App
     private const OPT_SHORT_VERBOSITY = 'v';
 
     /**
-     * Command-line option parser
-     */
-    protected GetOpt\GetOpt $optionParser;
-
-    /**
      * Collection of command-line options
      */
     protected OptionCollection $optionCollection;
@@ -93,39 +86,18 @@ abstract class BaseApp extends App
     {
         parent::setup($appOptions, $di, $outStream, $logger, $perform);
 
-        // Set up the CLI argument parser
-        $this->optionParser = new GetOpt\GetOpt()
-            ->set(GetOpt\GetOpt::SETTING_STRICT_OPERANDS, true);
-        $help = new Help()
-            ->setName($this->getName())
-            ->setDescription($this->getDescription());
-        $this->optionParser->setHelp($help);
-
-        $this->optionCollection = new OptionCollection();
-
         // Set up command-line options common to all scripts
-        $this->optionParser = $this->optionParser->addOption(
-            new GetOpt\Option(self::OPT_SHORT_HELP, self::OPT_LONG_HELP, GetOpt\GetOpt::NO_ARGUMENT)
-                ->setDescription('Display help text and exit')
-        );
+        $this->optionCollection = new OptionCollection();
         $this->optionCollection->add(
             self::OPT_SHORT_HELP . '|' . self::OPT_LONG_HELP,
             'Display help text and exit',
         );
         if ($this->hasPerformMode()) {
-            $this->optionParser = $this->optionParser->addOption(
-                new GetOpt\Option(self::OPT_SHORT_PERFORM, self::OPT_LONG_PERFORM, GetOpt\GetOpt::NO_ARGUMENT)
-                    ->setDescription('Perform mode: if not provided, no changes will be written')
-            );
             $this->optionCollection->add(
                 self::OPT_SHORT_PERFORM . '|' . self::OPT_LONG_PERFORM,
                 'Perform mode: if not provided, no changes will be written',
             );
         }
-        $this->optionParser = $this->optionParser->addOption(
-            new GetOpt\Option(self::OPT_SHORT_VERBOSITY, null, GetOpt\GetOpt::NO_ARGUMENT)
-                ->setDescription('Verbosity (up to 3 times)')
-        );
         $this->optionCollection->add(
             self::OPT_SHORT_VERBOSITY,
             'Verbosity (up to 3 times)',
@@ -139,8 +111,6 @@ abstract class BaseApp extends App
 //        );
 
         $this->setOptions();
-        $this->optionParser->process();
-
         $this->optionResult = new OptionParser($this->optionCollection)->parse($_SERVER['argv']);
 
         return $this;
@@ -157,10 +127,6 @@ abstract class BaseApp extends App
         if ($this->getOpt(self::OPT_SHORT_HELP)) {
             $printer = new HelpPrinter($this->getName(), $this->getDescription());
             echo $printer->render($this->optionCollection);
-            exit(CliKernelAbstract::EXIT_STATUS_OK);
-        }
-        if ($this->optionParser->getOption(self::OPT_SHORT_HELP)) {
-            echo $this->optionParser->getHelpText();
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
     }
@@ -184,13 +150,6 @@ abstract class BaseApp extends App
             // What type of option is this?
             // No value, mandatory value, optional value?
             $hasOptions = str_ends_with($shortOption, ':');
-            $this->optionParser = $this->optionParser->addOption(
-                new GetOpt\Option(
-                    rtrim($shortOption, ':'),
-                    null,
-                    $hasOptions ? GetOpt\GetOpt::REQUIRED_ARGUMENT : GetOpt\GetOpt::NO_ARGUMENT,
-                )
-            );
             $this->optionCollection->add($shortOption);
         }
 
@@ -204,13 +163,6 @@ abstract class BaseApp extends App
         }
         foreach ($longOptions as $longOption) {
             $hasOptions = str_ends_with($longOption, ':');
-            $this->optionParser = $this->optionParser->addOption(
-                new GetOpt\Option(
-                    null,
-                    rtrim($longOption, ':'),
-                    $hasOptions ? GetOpt\GetOpt::REQUIRED_ARGUMENT : GetOpt\GetOpt::NO_ARGUMENT,
-                )
-            );
             $this->optionCollection->add($longOption);
         }
     }
@@ -264,7 +216,6 @@ abstract class BaseApp extends App
             throw new \LogicException('This application does not have a perform mode.');
         }
         return $this->optionResult->get('p');
-//        return $this->optionParser->get('p');
     }
 
     /**
@@ -290,7 +241,5 @@ abstract class BaseApp extends App
 
         // Otherwise return nothing
         return null;
-
-//        return $this->optionParser->getOption(rtrim($name, ':'));
     }
 }
