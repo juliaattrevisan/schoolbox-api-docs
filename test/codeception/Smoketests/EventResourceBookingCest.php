@@ -5,9 +5,6 @@
  * @link      https://schoolbox.com.au/
  */
 
-/** @noinspection PhpDocMissingThrowsInspection */
-/** @noinspection PhpUnhandledExceptionInspection */
-/** @noinspection PhpUnused */
 declare(strict_types=1);
 
 namespace Tests\Smoketests;
