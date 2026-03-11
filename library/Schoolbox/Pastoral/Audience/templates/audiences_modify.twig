@@ -104,10 +104,10 @@
                                 {% set currentContribute = (subtype ? subtype.contributeDifferentiationProfile : type.contributeDifferentiationProfile) %}
 
                                 <label for="contributeDifferentiationProfile">
-                                    Contributes to {{ locale.differentiationProfile }}
+                                    Contributes to {{ locale.differentiationProfile.proper }}
                                 </label>
                                 <p class="meta">
-                                    When enabled, records of this type will be linked to students' {{ locale.differentiationProfile.plural }}.
+                                    When enabled, records of this type will be linked to students' {{ locale.differentiationProfile.properPlural }}.
                                 </p>
 
                                 <div class="switch">
