@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Lti\Model as Lti;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Learning\Markbook\SortForMarkbook;
@@ -151,6 +152,9 @@ class Helper
             foreach ($folderAssessments as $folderAssessment) {
                 if (
                     /* Filters swamp - only allow worktypes that show on the grades page (check Work Types in admin)
+                     *
+                     * Note that Reporting Activity -does not- show up on the grades page atm: if it is meant to show
+                     * there, add another instanceof check below, for reporting activities (ugh)
                      */
                     ($folderAssessment instanceof Project || $folderAssessment instanceof DueWork || $folderAssessment instanceof Quiz || $folderAssessment instanceof Lti || $folderAssessment instanceof DialogAgent) &&
                     $folderAssessment->getWorkType() &&

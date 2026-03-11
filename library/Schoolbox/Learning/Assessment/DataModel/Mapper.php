@@ -1542,6 +1542,13 @@ class Mapper extends BaseMapper
          */
         /** @var \Schoolbox\Learning\Assessment\DataModel\Model $model */
         foreach ($modelList as $model) {
+            /* $modelList might contain non-reporting items, such as for the Pending Assessments screen: we don't care
+             * about those ones and they won't return a meaningful value from getReporting() obviously
+             */
+            if (!$model->getSubObject() instanceof \Schoolbox\Learning\Assessment\DataModel\Reporting\Model) {
+                continue;
+            }
+
             /* Assign new nodes or an empty collection if you tried to clear them all
              */
             $model->getReporting()->setSupportingDataCurriculumNodes($curriculumNodes[$model->getReporting()->getId()] ?? $curriculumNodeMapper->createCollection());
@@ -1611,6 +1618,13 @@ class Mapper extends BaseMapper
          */
         /** @var \Schoolbox\Learning\Assessment\DataModel\Model $model */
         foreach ($modelList as $model) {
+            /* $modelList might contain non-reporting items, such as for the Pending Assessments screen: we don't care
+             * about those ones and they won't return a meaningful value from getReporting() obviously
+             */
+            if (!$model->getSubObject() instanceof \Schoolbox\Learning\Assessment\DataModel\Reporting\Model) {
+                continue;
+            }
+
             $model->getReporting()->setSupportingDataWorkTypes($workTypes[$model->getReporting()->getId()] ?? $workTypeMapper->createCollection());
         }
 

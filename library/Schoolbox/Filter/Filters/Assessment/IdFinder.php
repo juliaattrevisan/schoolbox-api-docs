@@ -625,6 +625,17 @@ class IdFinder extends Filter\AbstractIdFinder
             }
         }
 
+        /* Reporting Activity - filters swamp
+         */
+        if ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_REPORTING)) {
+            $joinClause .= "
+                $joinType JOIN reporting reporting ON reporting.assessment_id = a.id
+            ";
+            if ($builder) {
+                $builder->notNull('reporting.id');
+            }
+        }
+
         // Project
         if ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_PROJECT)) {
             $joinClause .= "
@@ -634,6 +645,7 @@ class IdFinder extends Filter\AbstractIdFinder
                 $builder->notNull('pr.id');
             }
         }
+
         return [$joinClause, $builder ? '(' . implode(' OR ', $builder->getWhere()) . ')' : 'TRUE'];
     }
 
