@@ -105,13 +105,20 @@ CREATE TABLE `reporting_work_type` (
 CREATE TABLE `reporting_feedback` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `reporting_id` INT NOT NULL,
+    `learner_id` INT UNSIGNED NOT NULL,
+    `instructor_id` INT UNSIGNED NOT NULL,
     `norm_mark` DECIMAL(14, 11),
     `mark` VARCHAR(255),
+    `instructor_mark` VARCHAR(255),
     `comment` MEDIUMTEXT,
-    `learner_id` INT UNSIGNED NOT NULL,
+    `published_at` DATETIME,
+    `published_by` INT UNSIGNED,
     `created_at` DATETIME NOT NULL,
+    `created_by` INT UNSIGNED,
     `updated_at` DATETIME NOT NULL,
+    `updated_by` INT UNSIGNED,
     `deleted_at` DATETIME,
+    `deleted_by` INT UNSIGNED,
     PRIMARY KEY (`id`),
     INDEX `fk_rf_reporting_idx` (`reporting_id` ASC),
     CONSTRAINT `fk_rf_reporting`
@@ -122,6 +129,18 @@ CREATE TABLE `reporting_feedback` (
     INDEX `fk_rf_learner_idx` (`learner_id` ASC),
     CONSTRAINT `fk_rf_learner`
         FOREIGN KEY (`learner_id`)
+            REFERENCES `user` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    INDEX `fk_rf_instructor_idx` (`instructor_id` ASC),
+    CONSTRAINT `fk_rf_instructor`
+        FOREIGN KEY (`instructor_id`)
+            REFERENCES `user` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    INDEX `fk_rf_publisher_idx` (`published_by` ASC),
+    CONSTRAINT `fk_rf_publisher`
+        FOREIGN KEY (`published_by`)
             REFERENCES `user` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION

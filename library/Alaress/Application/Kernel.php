@@ -103,6 +103,7 @@ use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgen
 use Schoolbox\Learning\Assessment\DialogAgent\Feedback\MapperProxy as DialogAgentFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Mapper as DialogAgentResponseMapper;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Mapper as DialogAgentFeedbackMapper;
+use Schoolbox\Learning\Assessment\DataModel\Reporting\Feedback\Mapper as ReportingFeedbackMapper;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkSubmissionMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as AssessmentFeedbackDataSource;
@@ -111,6 +112,7 @@ use Schoolbox\Learning\Assessment\Feedback\SubSource\Lti as FeedbackSubSourceLti
 use Schoolbox\Learning\Assessment\Feedback\SubSource\Quiz as FeedbackSubSourceQuiz;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\Task as FeedbackSubSourceTask;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\DialogAgent as FeedbackSubSourceDialogAgent;
+//use Schoolbox\Learning\Assessment\Feedback\SubSource\Reporting as FeedbackSubSourceReporting;
 use Schoolbox\Learning\Assessment\Lti\Feedback\MapperProxy as LtiFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\Lti\Response\MapperProxy as LtiResponseMapperProxy;
 use Schoolbox\Learning\Assessment\Overwriter;
@@ -119,6 +121,7 @@ use Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy as QuizAttemptMapperP
 use Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy as QuizFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
+//use Schoolbox\Learning\Assessment\Reporting\Feedback\MapperProxy as ReportingFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\Response\DataSource as AssessmentResponseDataSource;
 use Schoolbox\Learning\Assessment\Response\SubSource\DialogAgent as ResponseSubSourceDialogAgent;
 use Schoolbox\Learning\Assessment\Response\SubSource\DueWork as ResponseSubSourceDueWork;
@@ -1671,6 +1674,17 @@ abstract class Kernel
             )
         );
 
+        /* Reporting Activity subsources
+         * Reporting Activities don't have responses: no datasource to register here
+         */
+//        $di->set(
+//            'reportingFeedbackDataSource',
+//            $di->lazyNew(
+//                ReportingFeedbackMapperProxy::class,
+//                ['mapper' => $mapperFactory->getLazy(ReportingFeedbackMapper::class)]
+//            )
+//        );
+
         // Register response data source
         $di->set(
             'responseDataSource',
@@ -1691,6 +1705,9 @@ abstract class Kernel
 
                     /** @var DialogAgentResponseMapperProxy $dialogAgentResponseDataSource */
                     $dialogAgentResponseDataSource = $di->get('dialogAgentResponseDataSource');
+
+                    /* Reporting Activities don't have responses: no datasource to register here
+                     */
 
                     return (new AssessmentResponseDataSource())
                         ->addSubSource(new ResponseSubSourceDueWork($submissionDataSource))
@@ -1723,12 +1740,16 @@ abstract class Kernel
                     /** @var DialogAgentFeedbackMapperProxy $dialogAgentFeedbackDataSource */
                     $dialogAgentFeedbackDataSource = $di->get('dialogAgentFeedbackDataSource');
 
+//                    /** @var ReportingFeedbackMapperProxy $reportingFeedbackDataSource */
+//                    $reportingFeedbackDataSource = $di->get('reportingFeedbackDataSource');
+
                     return (new AssessmentFeedbackDataSource())
                         ->addSubSource(new FeedbackSubSourceDueWork($returnDataSource))
                         ->addSubSource(new FeedbackSubSourceTask($ratificationDataSource))
                         ->addSubSource(new FeedbackSubSourceQuiz($reviewDataSource))
                         ->addSubSource(new FeedbackSubSourceLti($ltiFeedbackDataSource))
                         ->addSubSource(new FeedbackSubSourceDialogAgent($dialogAgentFeedbackDataSource));
+//                        ->addSubSource(new FeedbackSubSourceReporting($reportingFeedbackDataSource));
                 }
             )
         );
