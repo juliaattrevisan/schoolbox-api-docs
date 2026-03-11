@@ -217,8 +217,7 @@ try {
                 true,
                 $sentry
             );
-
-            $filename = ExportType::PERSONAL;
+            $filename = ExportType::PERSONAL_FILE;
             break;
 
         case ExportType::GROUP:
@@ -282,7 +281,7 @@ try {
                 $sentry
             ));
 
-            $filename = ExportType::GROUP . $export_id;
+            $filename = sprintf(ExportType::GROUP_FILE, $export_id);
             break;
 
         case ExportType::CAMPUS:
@@ -298,7 +297,7 @@ try {
                 $sentry
             );
 
-            $filename = ExportType::CAMPUS . $export_id;
+            $filename = sprintf(ExportType::CAMPUS_FILE, $export_id);
             break;
 
         case ExportType::DUE_WORK:
@@ -313,7 +312,7 @@ try {
                 $sentry
             );
 
-            $filename = ExportType::DUE_WORK;
+            $filename = ExportType::DUE_WORK_FILE;
             break;
 
         case ExportType::TIMETABLE:
@@ -352,7 +351,7 @@ try {
                 $sentry
             ));
 
-            $filename       = ExportType::TIMETABLE;
+            $filename       = ExportType::TIMETABLE_FILE;
             $startTimestamp = $_SERVER['REQUEST_TIME'];
             $endTimestamp   = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             break;
@@ -365,7 +364,7 @@ try {
                 $sentry
             );
 
-            $filename       = ExportType::TIMETABLE_DAYS;
+            $filename       = ExportType::TIMETABLE_DAYS_FILE;
             $startTimestamp = $_SERVER['REQUEST_TIME'];
             $endTimestamp   = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             break;
@@ -380,7 +379,7 @@ try {
                 $sentry
             );
 
-            $filename = ExportType::RESOURCES;
+            $filename = ExportType::RESOURCES_FILE;
             break;
 
         case ExportType::RESOURCE:
@@ -418,7 +417,7 @@ try {
 
             $endTimestamp = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
 
-            $filename = ExportType::RESOURCE . $resourceId;
+            $filename = sprintf(ExportType::RESOURCE_FILE, $resourceId);
             break;
 
         case ExportType::RESOURCE_CATEGORY:
@@ -439,7 +438,7 @@ try {
                 $api = new Calendar_Api_Composite();
             }
 
-            $filename = 'resourceCategory' . $resourceCategoryId;
+            $filename = sprintf(ExportType::RESOURCE_CATEGORY_FILE, $resourceCategoryId);
             break;
 
         case ExportType::EVENT_TYPE:
@@ -457,7 +456,7 @@ try {
                 $sentry
             );
 
-            $filename = 'eventType' . $eventTypeId;
+            $filename = sprintf(ExportType::EVENT_TYPE_FILE, $eventTypeId);
             break;
 
         case ExportType::EXTERNAL:
