@@ -58,7 +58,6 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
             fn (MyFolderModel $f) => $f->getName(),
             fn (MyFolderModel $f) => $f->getChildren(),
         );
-//        renderTreeSelect($this, $folderTree, $folder->getParent()->getId());
     }
 
     // Assume that you may edit someone else's file
@@ -137,7 +136,6 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
             fn (MyFolderModel $f) => $f->getName(),
             fn (MyFolderModel $f) => $f->getChildren(),
         );
-//        renderTreeSelect($this, $folderTree, $parentId);
     }
 
     // Assume that you may edit someone else's file
@@ -157,42 +155,3 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
 } else {
     $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
-
-///**
-// * Render the <select> element with the tree structure defined,
-// * or just a default "top level" if there is none.
-// *
-// * @param SitePage                         $page       The SitePage object to render into
-// * @param GenericCollection<MyFolderModel> $tree       A list of folders to display, each of which may have its own
-// *                                                     children (which are rendered recursively)
-// * @param int                              $selectedId The currently selected folder
-// * @param int                              $depth      The current tree depth: used to indent child folders
-// * @return void
-// */
-//function renderTreeSelect(SitePage $page, GenericCollection $tree, int $selectedId = 0, int $depth = 0): void
-//{
-//    if ($depth === 0) {
-//        $output = [
-//            'PARENT_ID'       => 0,
-//            'PARENT_NAME'     => 'Top Level',
-//            'PARENT_INDENT'   => '',
-//            'PARENT_SELECTED' => $selectedId === 0 ? 'selected="selected"' : '',
-//        ];
-//        $page->setVar($output);
-//        $page->parse('parent_list_block', 'parent_list', true);
-//    }
-//    foreach ($tree as $folder) {
-//        /** @var MyFolderModel $folder */
-//        $output = [
-//            'PARENT_ID'       => $folder->getId(),
-//            'PARENT_NAME'     => Scrub::text($folder->getName()),
-//            'PARENT_INDENT'   => str_repeat('&nbsp;', ($depth + 1) * 4),
-//            'PARENT_SELECTED' => $folder->getId() === $selectedId ? 'selected="selected"' : '',
-//        ];
-//        $page->setVar($output);
-//        $page->parse('parent_list_block', 'parent_list', true);
-//        if ($folder->getChildren()->count() > 0) {
-//            renderTreeSelect($page, $folder->getChildren(), $selectedId, $depth + 1);
-//        }
-//    }
-//}

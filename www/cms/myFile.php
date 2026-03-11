@@ -112,7 +112,6 @@ if ($this->arg[0] == 'new') {
         fn (MyFolderModel $f) => $f->getName(),
         fn (MyFolderModel $f) => $f->getChildren(),
     );
-//    renderTreeSelect($this, $folderTree, $parentId ?? 0);
     renderPublishingOptions($this, null, $fileOwner->getId(), true, $publishComponent);
 
     /* Render out breadcrumbs
@@ -175,7 +174,6 @@ if ($this->arg[0] == 'new') {
         fn (MyFolderModel $f) => $f->getName(),
         fn (MyFolderModel $f) => $f->getChildren(),
     );
-//    renderTreeSelect($this, $folderTree, $file->getFolder()->getId());
     renderPublishingOptions($this, $file->getId(), $fileOwner->getId(), true);
 
     /* Render out breadcrumbs
@@ -198,45 +196,6 @@ if ($this->arg[0] == 'new') {
     $this->error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
 }
 
-
-///**
-// * Render the <select> element with the tree structure defined,
-// * or just a default "top level" if there is none.
-// *
-// * @param SitePage                         $page       The SitePage object to render into
-// * @param GenericCollection<MyFolderModel> $tree       A list of folders to display, each of which may have its own
-// *                                                     children (which are rendered recursively)
-// * @param int                              $selectedId The currently selected folder
-// * @param int                              $depth      The current tree depth: used to indent child folders
-// * @return void
-// */
-//function renderTreeSelect(SitePage $page, GenericCollection $tree, int $selectedId = 0, int $depth = 0): void
-//{
-//    if ($depth === 0) {
-//        $output = [
-//            'FOLDER_ID'       => 0,
-//            'FOLDER_NAME'     => 'Top Level',
-//            'FOLDER_INDENT'   => '',
-//            'FOLDER_SELECTED' => $selectedId === 0 ? 'selected="selected"' : '',
-//        ];
-//        $page->setVar($output);
-//        $page->parse('folder_list_block', 'folder_list', true);
-//    }
-//    foreach ($tree as $folder) {
-//        /** @var MyFolderModel $folder */
-//        $output = [
-//            'FOLDER_ID'       => $folder->getId(),
-//            'FOLDER_NAME'     => Scrub::text($folder->getName()),
-//            'FOLDER_INDENT'   => str_repeat('&nbsp;', ($depth + 1) * 4),
-//            'FOLDER_SELECTED' => $folder->getId() === $selectedId ? 'selected="selected"' : '',
-//        ];
-//        $page->setVar($output);
-//        $page->parse('folder_list_block', 'folder_list', true);
-//        if ($folder->getChildren()->count() > 0) {
-//            renderTreeSelect($page, $folder->getChildren(), $selectedId, $depth + 1);
-//        }
-//    }
-//}
 
 /**
  * Render the UI options for publishing, if there are any
