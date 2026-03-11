@@ -52,7 +52,7 @@ const textData = window.Vue.ref<TextItem[]>([]);
  * Load the DP
  */
 async function load(): Promise<void> {
-    if (props.dpRoute === "") {
+    if (!props.dpRoute || props.dpRoute === "") {
         loadError.value = "No route specified";
         return;
     }
