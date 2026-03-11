@@ -1611,7 +1611,7 @@ class Mapper extends BaseMapper
          */
         /** @var \Schoolbox\Learning\Assessment\DataModel\Model $model */
         foreach ($modelList as $model) {
-            $model->getReporting()->setSupportingDataWorkTypes($workTypes[$model->getReporting()->getId()]);
+            $model->getReporting()->setSupportingDataWorkTypes($workTypes[$model->getReporting()->getId()] ?? new GenericCollection(\Schoolbox\Curriculum\Node\Model::class));
         }
 
         return $modelList;

@@ -244,6 +244,22 @@ class Mapper extends \Schoolbox\Mapper
         $reportingIds = $collection->keys();
 
         $pb = $this->getPredicateBuilder()->in('id', $reportingIds);
+
+        /* For some reason, I have to do this first
+         * This feels like a solved problem, but I can't find something similar across the mappers
+         *
+         * TODO check in with amri
+         */
+        $placeholders = Builder::getArrayPlaceholders($reportingIds, 'reportingIds');
+        $parameters = Builder::getArrayParameters($reportingIds, 'reportingIds');
+
+        $query = "
+            DELETE FROM reporting_work_type
+            WHERE reporting_id IN {$placeholders}
+        ";
+
+        $this->database->query($query, $parameters);
+
         $query = "
             SELECT
                 {$this->getColumnString()},
