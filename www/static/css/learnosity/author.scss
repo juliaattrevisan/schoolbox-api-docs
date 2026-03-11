@@ -31,13 +31,13 @@
 }
 .lrn .lrn-author-ui .lrn-author-widget-sidebar li button [class^="lrn-author-i-"] {
     border-top-color: transparent;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn .lrn-author-ui .lrn-author-widget-sidebar button:hover,
 .lrn .lrn-author-ui .lrn-author-widget-sidebar button:focus,
 .lrn .lrn-author-ui .lrn-author-widget-sidebar button:active {
     background: var(--content-ui-background);
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 
 /* remove the padding from the right of the questions view */
@@ -64,7 +64,7 @@ button.lrn-author-btn-save-dropdown {
 }
 .lrn .lrn-author-ui .lrn-author-btn-default[data-authorapi-selector="back"]:not([aria-disabled="true"]):hover {
     background-color: var(--content-ui-hover) !important;
-    color: var(--content-ui-foreground) !important;
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
     padding-left: 30px;
     text-decoration: none !important;
 }
@@ -135,7 +135,7 @@ ul.lrn-author-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable 
 }
 
 .lrn-qe .lrn-qe-ui .lrn-qe-tile-header {
-    background: var(--content-ui-foreground);
+    background: var(--sbx-config-color-accent, var(--content-ui-foreground));
     border-radius: 0px;
 }
 
@@ -162,7 +162,7 @@ ul.lrn-author-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable 
 
 /* replace icons with sb icons */
 .lrn-author-i-preview::before {
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     content: "\e901";
     font-family: "schoolbox";
 }
@@ -173,7 +173,7 @@ ul.lrn-author-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable 
 .lrn-author-i-drag::before {
     content: "\e62f";
     font-family: "schoolbox";
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn .lrn-author-ui .lrn-btn:focus,
 .lrn .lrn-author-ui a.lrn-btn:focus {
@@ -195,14 +195,14 @@ ul.lrn-author-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable 
     background-color: var(--content-ui-background);
     border: none;
     border-radius: 0px;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: 1rem;
 }
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-toggle-active,
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-input:not(:checked) ~ .lrn-author-toggle-right,
 .lrn .lrn-author-ui .lrn-author-toolbar-toggle .lrn-author-input:checked ~ .lrn-author-toggle-left {
     background-color: var(--content-ui-selected);
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: 1rem;
 }
 
@@ -213,14 +213,14 @@ ul.lrn-author-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable 
     background: var(--content-ui-background);
     border-radius: 0px !important;
     border: none;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: 1rem !important;
 }
 .lrn .lrn-author-ui .lrn-author-btn-primary:hover,
 .lrn .lrn-author-ui .lrn-author-btn-sec:hover,
 .lrn .lrn-author-ui .lrn-author-activity-button:not(.lrn-author-btn-primary):not(.lrn-author-btn-sec):hover {
     background-color: var(--content-ui-hover);
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     text-decoration: none !important;
     font-size: 1rem !important;
 }
@@ -229,7 +229,7 @@ button.lrn-author-activity-button.lrn-author-btn-i-xs.lrn-author-col-xs-none.lrn
     border-color: transparent;
     border-radius: 0px;
     box-shadow: none;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     cursor: default;
     opacity: 0.5;
     font-size: 1rem;
@@ -264,7 +264,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right {
     background: var(--content-ui-background);
     border: none;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-btn.lrn-qe-checkbox-btn,
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-btn.lrn-qe-checkbox-btn,
@@ -275,7 +275,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     background-color: var(--content-ui-background);
     border-radius: 0px !important;
     border: none;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: 1rem;
     line-height: inherit;
 }
@@ -283,7 +283,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-active {
     background-color: var(--content-ui-selected);
     border: 0px;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-custom-dropdown .lrn-qe-custom-dropdown-toggle:focus::after,
 .lrn-qe .lrn-qe-ui .lrn-qe-btn.lrn-qe-checkbox-btn span:focus::after,
@@ -317,7 +317,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     background-color: var(--content-ui-background);
     border-radius: 0px;
     border: 0px;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-family:
         -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial,
         sans-serif !important;
@@ -330,11 +330,11 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked span,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked span {
     background-color: var(--content-ui-background);
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-button:hover:enabled {
     background-color: var(--content-ui-background);
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked span:hover,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked span:hover {
@@ -363,8 +363,8 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 
 /* form styles */
 .lrn-qe .lrn-qe-ui .lrn-qe-form-control {
-    border: 1px solid var(--form-border-color);
-    border-color: var(--form-border-color);
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
+    border-color: var(--sbx-config-color-accent, var(--form-border-color));
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-form-control:hover {
     background-color: var(--form-bg-hover-color);
@@ -378,14 +378,14 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     outline: none;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-form-el-reorderable .lrn-qe-form-el-reorder-handle {
-    border: 1px solid var(--form-border-color);
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-btn-primary {
     background-color: var(--content-ui-background) !important;
     background: var(--content-ui-background);
     border-radius: 0px;
     border: none;
-    color: var(--content-ui-foreground) !important;
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
     font-family:
         -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial,
         sans-serif !important;
@@ -402,11 +402,11 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-btn-primary:hover {
     background-color: var(--content-ui-hover) !important;
-    color: var(--content-ui-foreground) !important;
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
     text-decoration: none !important;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-switch-trigger {
-    border: 1px solid var(--content-ui-foreground);
+    border: 1px solid var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-form-control-ckeditor .cke_textarea_inline:focus {
     background: var(--form-bg-hover-color);
@@ -423,13 +423,13 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn-qe .lrn-qe-ui button.lrn-qe-more-options,
 .lrn-qe .lrn-qe-ui .lrn-qe-more-options {
     background: var(--content-ui-background);
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn-qe .lrn-qe-ui button.lrn-qe-more-options:hover,
 .lrn-qe .lrn-qe-ui button.lrn-qe-more-options:focus,
 .lrn-qe .lrn-qe-ui .lrn-qe-more-options:hover,
 .lrn-qe .lrn-qe-ui .lrn-qe-more-options:focus {
-    border-color: var(--content-ui-foreground);
+    border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn-qe .lrn-qe-ui button.lrn-qe-more-options:active:hover,
 .lrn-qe .lrn-qe-ui button.lrn-qe-more-options:active:focus,
@@ -439,16 +439,16 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 .lrn-qe .lrn-qe-ui .lrn-qe-more-options:active:focus,
 .lrn-qe .lrn-qe-ui .lrn-qe-more-options.lrn-active:hover,
 .lrn-qe .lrn-qe-ui .lrn-qe-more-options.lrn-active:focus {
-    border-color: var(--content-ui-foreground);
+    border-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 span.lrn-qe-i-trash {
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 
 /* select drop down styles */
 .lrn-qe .lrn-qe-ui .lrn-qe-custom-select select {
-    border: 1px solid var(--form-border-color);
-    border-color: var(--form-border-color);
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
+    border-color: var(--sbx-config-color-accent, var(--form-border-color));
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-custom-select select:hover,
 .lrn-qe .lrn-qe-ui .lrn-qe-custom-select select:focus {
@@ -494,14 +494,14 @@ span.lrn-qe-i-trash {
 }
 .lrn.lrn-author .lrn-author-item-for-activity-list .lrn-author-check-box-wrapper .lrn-author-check-box-span {
     background: none;
-    border: 1px solid var(--form-border-color);
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
     border-radius: 0px;
     color: transparent;
 }
 
 /* change checkbox and rows selection background color */
 .lrn.lrn-author .lrn-item-for-activity-list .lrn-check-box-wrapper .lrn-check-box-input:checked + .lrn-check-box-span {
-    color: var(--content-ui-foreground) !important;
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
     background-color: var(--content-ui-background);
 }
 .lrn.lrn-author
@@ -509,7 +509,7 @@ span.lrn-qe-i-trash {
     .lrn-check-box-wrapper
     .lrn-check-box-input:checked
     + .lrn-check-box-span:hover {
-    background-color: var(--form-border-color);
+    background-color: var(--sbx-config-color-accent, var(--form-border-color));
 }
 
 .lrn
@@ -548,14 +548,14 @@ button.lrn-author-activity-button.lrn-author-btn-i-xs.lrn-author-btn-primary.lrn
     z-index: var(--sbx-depth-default);
 }
 span.lrn-author-name-wrapper {
-    border: 1px solid var(--form-border-color);
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
 }
 
 /* questions and features button styles */
 .lrn .lrn-author-ui .lrn-author-btn-outline {
     background-color: var(--content-ui-background);
     border: none;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     line-height: inherit;
     min-height: 2.5rem;
     overflow: hidden;
@@ -565,12 +565,12 @@ span.lrn-author-name-wrapper {
 }
 .lrn .lrn-author-ui .lrn-author-btn-outline:hover {
     background-color: var(--content-ui-hover);
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     text-decoration: none !important;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-nav-pills .lrn-qe-nav-link.lrn-active {
     background: var(--content-ui-selected);
-    border-left-color: var(--content-ui-foreground);
+    border-left-color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-nav-pills .lrn-qe-nav-link {
     border-radius: 0px;
@@ -613,23 +613,23 @@ li.lrn-author-list-view-item.lrn-author-flyout-wrapper {
 }
 .lrn .lrn-author-ui .lrn-form-control-padded,
 .lrn .lrn-author-ui .lrn-form-control {
-    border: 1px solid var(--form-border-color);
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
 }
 .lrn .lrn-author-ui .lrn-author-input-group-lg .lrn-author-input-group-btn {
-    border: 1px solid var(--form-border-color);
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
     padding: 0.5rem 1rem;
 }
 .lrn .lrn-author-ui .lrn-author-input-group-lg .lrn-author-form-control {
     background-color: #fff;
-    border: 1px solid var(--form-border-color);
-    border-color: var(--form-border-color);
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
+    border-color: var(--sbx-config-color-accent, var(--form-border-color));
     padding: 0.5rem;
 }
 .lrn .lrn-author-ui .lrn-author-btn-save.lrn-author-btn-saving {
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 .lrn-author-i-cross::before {
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 
 /* removed min-height for add question section */
@@ -648,23 +648,23 @@ li.lrn-author-list-view-item.lrn-author-flyout-wrapper {
     background-color: var(--content-ui-background);
     border-radius: 0;
     border: none;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: 16px;
 }
 
 /* update search form dropdown styles */
 .lrn .lrn-author-ui .lrn-custom-select select {
-    border: 1px solid var(--form-border-color);
-    border-color: var(--form-border-color);
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
+    border-color: var(--sbx-config-color-accent, var(--form-border-color));
 }
 .lrn .lrn-author-ui .lrn-custom-select select:hover {
     background-color: var(--form-bg-hover-color);
-    border-color: var(--form-border-color);
+    border-color: var(--sbx-config-color-accent, var(--form-border-color));
     color: #000000;
 }
 .lrn .lrn-author-ui .lrn-sort-author-button {
-    border: 1px solid var(--form-border-color);
-    border-color: var(--form-border-color);
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
+    border-color: var(--sbx-config-color-accent, var(--form-border-color));
 }
 
 /* update search button text transformation from uppercase to unset  */
@@ -699,7 +699,7 @@ li.lrn-author-list-view-item.lrn-author-flyout-wrapper {
 span.lrn-author-pagination-btn-txt,
 span.lrn-author-i-previous,
 span.lrn-author-i-next {
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 
 /* create empty state */
@@ -801,11 +801,11 @@ form.lrn-form.lrn-form-list-search
     background: var(--content-ui-background);
     border-radius: 0px !important;
     border: none;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: 1rem;
 }
 .lrn .lrn-author-ui .lrn-author-btn-default:hover {
-    color: var(--content-ui-foreground) !important;
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
     background-color: var(--content-ui-hover) !important;
     text-decoration: none !important;
 }
@@ -827,7 +827,7 @@ button.lrn-btn.lrn-author-btn-default.lrn-author-btn-full-width::before {
     border-color: transparent;
     border-radius: 0px;
     box-shadow: none;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     cursor: default;
     opacity: 0.5;
     font-size: 1rem;
@@ -898,7 +898,7 @@ span.lrn-author-widget-icon.lrn-author-i-plus::before {
 
 /* Made item titles foreground color to make it more clear it is clickable */
 button.lrn-h3.lrn-author-list-view-heading.lrn-ellipses.lrn-author-editable-item {
-    color: var(--content-ui-foreground) !important;
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
 }
 
 /* Updated the save button border color to match with new submit button color */
@@ -941,13 +941,13 @@ button.lrn-author-activity-button.lrn-author-btn-i-xs.lrn-author-btn-sec {
     background: var(--content-ui-background);
     border: none;
     border-radius: 0px !important;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: 1rem !important;
     padding: 0.5rem;
 }
 .lrn .lrn-author-ui-no-preview .lrn-label-group-btn:hover {
     background-color: var(--content-ui-hover) !important;
-    color: var(--content-ui-foreground) !important;
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground)) !important;
     text-decoration: none !important;
 }
 .lrn .lrn-author-ui .lrn-dl-inline dt {

@@ -2,46 +2,49 @@
  * Breadcrumbs Styles
  * Scope: UI Uplift
  */
-.breadcrumb {
-    margin-left: 1rem !important;
 
-    & li {
-        &:not(.active) a::after {
-            background-color: var(--sbx-color-accent);
-            border: 0;
-            clip-path: polygon(40% 0, 60% 50%, 40% 100%, 0% 100%, 25% 50%, 0% 0%);
-            content: "";
-            display: inline-block;
-            height: 10px !important;
-            margin-left: 1rem;
-            position: static;
-            width: 10px !important;
+body.sbx-body {
+    .breadcrumb {
+        margin-left: 1rem !important;
+
+        & li {
+            &:not(.active) a::after {
+                background-color: var(--sbx-config-color-accent);
+                border: 0;
+                clip-path: polygon(40% 0, 60% 50%, 40% 100%, 0% 100%, 25% 50%, 0% 0%);
+                content: "";
+                display: inline-block;
+                height: 10px !important;
+                margin-left: 1rem;
+                position: static;
+                width: 10px !important;
+            }
+
+            &.active :where(span, a),
+            &.active :where(span, a) {
+                &::before,
+                &::after {
+                    content: none !important;
+                }
+                padding-inline: 0;
+            }
+
+            & a::before {
+                content: none;
+            }
         }
 
-        &.active :where(span, a),
-        &.active :where(span, a) {
-            &::before,
-            &::after {
-                content: none !important;
-            }
+        & li a,
+        & span {
+            background-color: transparent !important;
+            margin-inline-end: 1rem;
             padding-inline: 0;
         }
 
-        & a::before {
-            content: none;
+        & li a:focus-visible {
+            outline: 1px solid var(--sbx-config-color-accent);
+            outline-offset: 1px;
+            border-radius: var(--sbx-config-field-roundness);
         }
-    }
-
-    & li a,
-    & span {
-        background-color: transparent !important;
-        margin-inline-end: 1rem;
-        padding-inline: 0;
-    }
-
-    & li a:focus-visible {
-        outline: 1px solid var(--sbx-color-accent);
-        outline-offset: 1px;
-        border-radius: var(--sbx-config-field-roundness);
     }
 }

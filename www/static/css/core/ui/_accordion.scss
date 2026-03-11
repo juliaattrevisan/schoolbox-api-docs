@@ -13,7 +13,7 @@ $accordion-navigation-bg-color: $content-ui-background;
 $accordion-navigation-hover-bg-color: $content-ui-hover;
 $accordion-navigation-active-bg-color: $content-ui-background;
 $accordion-navigation-active-font-color: $jet !default;
-$accordion-navigation-font-color: $content-ui-foreground;
+$accordion-navigation-font-color: var(--sbx-config-color-accent, $content-ui-foreground);
 $accordion-navigation-font-size: rem-calc(($base-font-size));
 $accordion-navigation-font-family: $body-font-family !default;
 
@@ -142,19 +142,19 @@ $accordion-content-active-bg-color: $white !default;
                 display: block;
                 margin-bottom: 0 !important;
                 &.active > a {
-                    background: $content-ui-selected;
-                    color: $accordion-navigation-font-color;
+                    background: var(--sbx-color-foreground-primary, $content-ui-selected);
+                    color: var(--sbx-config-color-accent, $accordion-navigation-font-color);
                 }
                 > a {
-                    background: $accordion-navigation-bg-color;
-                    color: $accordion-navigation-font-color;
+                    background: var(--sbx-color-foreground-primary, $accordion-navigation-bg-color);
+                    color: var(--sbx-config-color-accent, $accordion-navigation-font-color);
                     display: block;
                     font-family: $accordion-navigation-font-family;
                     font-size: $accordion-navigation-font-size;
                     padding: $accordion-navigation-padding;
                     transition: all 0.15s linear;
                     &:hover {
-                        background: $accordion-navigation-hover-bg-color;
+                        background: var(--sbx-config-color-active, $accordion-navigation-hover-bg-color);
                     }
                 }
 
@@ -162,7 +162,7 @@ $accordion-content-active-bg-color: $white !default;
                     display: none;
                     padding: $accordion-content-padding;
                     &.active {
-                        background: $accordion-content-active-bg-color;
+                        background: var(--sbx-color-foreground-primary, $accordion-content-active-bg-color);
                         display: block;
                     }
                 }

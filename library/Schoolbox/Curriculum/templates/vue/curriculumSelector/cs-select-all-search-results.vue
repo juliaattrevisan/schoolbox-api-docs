@@ -82,7 +82,7 @@ function onSelectAll() {
 
 <style lang="scss" scoped>
 .search-result {
-    background: white;
+    background: var(--sbx-color-foreground-primary, #fff);
     display: flex;
     font-size: 0.825rem;
     margin: 0;

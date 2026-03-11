@@ -75,8 +75,7 @@ export default {
     <div class="filters">
         <div class="checklist">
             <label class="title">Filter to:</label>
-
-            <ul class="option-list">
+            <ul class="option-list l-flex-row l-gap-s">
                 <li>
                     <input
                         type="checkbox"
@@ -129,13 +128,12 @@ export default {
 
 <style lang="scss" scoped>
 .filters {
-    background: white;
+    background: var(--sbx-color-foreground-primary, #fff);
     display: flex;
     padding: 0 1rem;
 }
 
 .title,
-.option-list,
 .option-list li {
     display: inline-block; //line up along the bottom of the search field input
 }

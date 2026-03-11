@@ -99,8 +99,8 @@ function onSortSelected(key: string): void {
 .lazy-grid__row {
     display: contents; // Allow the children to be displayed as a grid
     > div {
-        background-color: #fff;
-        border-color: var(--body-background);
+        background-color: var(--sbx-color-foreground-primary, #fff);
+        border-color: var(--sbx-color-border, var(--body-background));
         border-style: solid;
         border-width: 1px 0 1px 0; // Unless overridden below
         font-size: 0.8125rem;

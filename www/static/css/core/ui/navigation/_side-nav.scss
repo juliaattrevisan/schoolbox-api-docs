@@ -20,7 +20,7 @@ $side-nav-list-margin: 0;
 $side-nav-link-color: $anchor-font-color;
 $side-nav-link-color-active: $side-nav-link-color;
 $side-nav-link-color-hover: $body-font-color;
-$side-nav-link-bg-hover: hsla(0, 0%, 0%, 0.025) !default;
+$side-nav-link-bg-hover: var(--sbx-color-foreground-primary, hsla(0, 0%, 0%, 0.025)) !default;
 $side-nav-link-margin: 0 !default;
 $side-nav-link-padding: rem-calc(7 14) !default;
 $side-nav-font-size: rem-calc(13);
@@ -128,7 +128,7 @@ $side-nav-divider-color: scale-color(#fff, $lightness: 10%);
 $border-bottom-width: 2px;
 
 .side-nav {
-    background-color: $white;
+    background-color: var(--sbx-color-foreground-primary, $white);
     li {
         a {
             padding: 0.5rem 0.75rem;
@@ -137,7 +137,7 @@ $border-bottom-width: 2px;
             @media #{$medium-up} {
                 //ensure isn't applied on desktop
                 &:hover {
-                    border-left: $border-bottom-width solid $content-ui-hover;
+                    border-left: $border-bottom-width solid var(--sbx-config-color-accent, $content-ui-hover);
                     color: $side-nav-link-color-hover;
                 }
             }
@@ -163,7 +163,7 @@ $border-bottom-width: 2px;
             }
             &.flyout {
                 display: none;
-                background-color: $side-nav-link-bg-hover;
+                background-color: var(--sbx-color-foreground-secondary, $side-nav-link-bg-hover);
                 width: 100%;
                 z-index: var(--sbx-depth-pop-over);
 

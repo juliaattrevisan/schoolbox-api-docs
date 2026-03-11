@@ -305,7 +305,7 @@ export default {
     width: 100%;
     border: 2px solid $form-border-color;
     padding: 1rem;
-    background: white;
+    background: var(--sbx-color-foreground-primary, #fff);
 }
 
 .close-button {

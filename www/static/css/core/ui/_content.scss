@@ -7,8 +7,8 @@
 
 // usually used for when a component has been added to a home page and nothing has been added to it yet
 .empty-state {
-    background-color: $gainsboro;
-    color: $aluminum;
+    background-color: var(--sbx-color-foreground-secondary, $gainsboro);
+    color: var(--sbx-color-text-secondary, $aluminum);
     padding: 1rem;
     font-style: italic;
     text-align: center;
@@ -17,7 +17,7 @@
     [class^="icon-"],
     [class*=" icon-"] {
         @extend .size-48;
-        color: $aluminum;
+        color: var(--sbx-color-text-secondary, $aluminum);
         margin-bottom: 0.5rem;
         display: block;
 
@@ -30,7 +30,7 @@
     }
     h1 {
         // default override
-        color: $aluminum;
+        color: var(--sbx-color-text-secondary, $aluminum);
     }
     p,
     a,
@@ -70,11 +70,11 @@
 // a general error display notifying something couldn't be processed
 .error-state section {
     background-color: transparent;
-    color: $jet;
+    color: var(--sbx-color-text-primary, $jet);
     padding: 2rem;
     h1,
     h2 {
-        color: $jet;
+        color: var(--sbx-color-text-primary, $jet);
     }
     .row {
         display: flex;
@@ -119,7 +119,7 @@
 
 // To highlight the list item is in a disabled / archived state
 .faded {
-    background-color: $vapor;
+    background-color: var(--sbx-color-foreground-secondary, $vapor);
 
     .card.small-12 {
         opacity: 0.75;
@@ -129,14 +129,14 @@
         }
 
         .meta {
-            color: $aluminum;
+            color: var(--sbx-color-text-secondary, $aluminum);
         }
     }
 }
 
 $container-bg: white;
 %container {
-    background-color: $container-bg;
+    background-color: var(--sbx-color-foreground-primary, $container-bg);
     margin-bottom: $base-font-size;
 }
 
@@ -194,8 +194,8 @@ $container-bg: white;
     margin: 0 rem-calc(($base-font-size - 8)) rem-calc(($base-font-size - 8)) 0;
     // A generic label used to indicate something is taking place, used mainly in label-timeout indicators
     &.highlight {
-        color: $accent-foreground;
-        background-color: $accent-background;
+        color: var(--sbx-color-highlight-text, $accent-foreground);
+        background-color: var(--sbx-color-highlight, $accent-background);
     }
     &.filter {
         @extend .highlight;
@@ -207,22 +207,22 @@ $container-bg: white;
             right: 10px;
             top: -2px;
             &:hover {
-                color: $alert-color;
+                color: var(--sbx-config-color-accent, $alert-color);
             }
         }
     }
     // Label colors
     &.reviewed {
         @include label($bg: tint($success-color, 74%));
-        color: $success-color;
+        color: var(--sbx-color-success, $success-color);
     }
     &.submitted {
         @include label($bg: tint($warning-color, 74%));
-        color: $warning-color;
+        color: var(--sbx-color-warning, $warning-color);
     }
     &.submitted-late {
         @include label($bg: tint($alert-color, 74%));
-        color: $alert-color;
+        color: var(--sbx-color-alert, $alert-color);
     }
     &.unsubmitted {
         @include label($bg: $gainsboro);
@@ -230,7 +230,7 @@ $container-bg: white;
     }
     &.warning {
         @include label($bg: tint($warning-color, 74%));
-        color: $warning-color;
+        color: var(--sbx-color-warning, $warning-color);
     }
     &.neutral {
         @include label($bg: $neutral-color);
@@ -241,15 +241,15 @@ $container-bg: white;
     // (Colors for this section were copied from 'Label colors' above - 'approved' to match 'reviewed' etc.)
     &.approved {
         @include label($bg: tint($success-color, 74%));
-        color: $success-color;
+        color: var(--sbx-color-success, $success-color);
     }
     &.pending {
         @include label($bg: tint($warning-color, 74%));
-        color: $warning-color;
+        color: var(--sbx-color-warning, $warning-color);
     }
     &.rejected {
         @include label($bg: tint($alert-color, 74%));
-        color: $alert-color;
+        color: var(--sbx-color-alert, $alert-color);
     }
 
     /* Learning Moment Moderation
@@ -262,18 +262,18 @@ $container-bg: white;
 
     &--moment-submitted {
         @include label($bg: tint($warning-color, 74%));
-        color: $warning-color;
+        color: var(--sbx-color-warning, $warning-color);
     }
 
     &--moment-rejected {
         @include label($bg: tint($alert-color, 74%));
-        color: $alert-color;
+        color: var(--sbx-color-alert, $alert-color);
     }
 }
 
 // For individual student learning plan notes
 .individualisation {
-    background-color: #9a9a9a;
+    background-color: var(--sbx-color-foreground-secondary, #9a9a9a);
     display: inline-block;
     width: rem-calc($base-font-size - 2);
     height: rem-calc($base-font-size - 2);
@@ -283,10 +283,10 @@ $container-bg: white;
     text-align: center;
     &.has-tip {
         border-bottom: 0;
-        color: $white;
+        color: var(--sbx-color-text-primary, $white);
         font-weight: 400;
         &:hover {
-            color: $white;
+            color: var(--sbx-color-text-primary, $white);
         }
     }
 }
@@ -307,7 +307,7 @@ $container-bg: white;
 // Tooltips that reveal further information on selection
 // Typically they sit next to a label
 .hint {
-    color: $content-ui-foreground !important;
+    color: var(--sbx-config-color-accent-text, $content-ui-foreground);
     top: -1px;
     margin-left: 4px;
     width: 1rem;
@@ -320,10 +320,10 @@ $container-bg: white;
     position: relative;
     margin-bottom: auto;
     font-size: $small-font-size;
-    background-color: $content-ui-background;
+    background-color: var(--sbx-config-color-accent, $content-ui-background);
     border-radius: 0.5rem;
     &.icon-help:before {
-        color: $monsoon;
+        color: var(--sbx-color-text-primary, $monsoon);
     }
     &.has-tip:hover {
         border-bottom: none;
@@ -340,7 +340,7 @@ $container-bg: white;
 
 // reveal more info on selection, see Expandable on: https://vagrant.dev.schoolbox.cloud/pantry
 .expander {
-    color: $content-ui-foreground;
+    color: var(--sbx-config-color-accent, $content-ui-foreground);
     line-height: 1;
     font-size: 1rem;
     text-decoration: none;
@@ -371,7 +371,7 @@ nav {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
     &.gradient-none-bg {
-        background-color: $aluminum;
+        background-color: var(--sbx-color-foreground-secondary, $aluminum);
     }
     span {
         display: block;
@@ -408,7 +408,7 @@ nav {
         padding: 0.5rem 0.75rem;
     }
     .gradient-none-bg {
-        background-color: $aluminum;
+        background-color: var(--sbx-color-foreground-secondary, $aluminum);
     }
     .grade {
         align-items: center;
@@ -417,14 +417,14 @@ nav {
         justify-content: center;
         margin-left: 0.75rem;
         span {
-            color: $white;
+            color: var(--sbx-color-foreground-primary, $white);
             line-height: inherit;
         }
         &.review {
-            background-color: $warning-color;
+            background-color: var(--sbx-color-warning, $warning-color);
         }
         &.in-progress {
-            background-color: $base;
+            background-color: var(--sbx-color-foreground-secondary, $base);
         }
     }
     @media not print {
@@ -461,7 +461,7 @@ nav {
 
 // Schoolbox Loader: https://vagrant.dev.schoolbox.cloud/pantry
 .loader {
-    background-color: $accent-foreground;
+    background-color: var(--sbx-config-color-accent, $accent-foreground);
     border-radius: 0.5rem;
     margin: 2rem auto;
     width: 3rem;
@@ -546,13 +546,13 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
 .action-list nav a.progress-tick {
     @include progress-tick($progress-tick-size-regular);
     display: block;
-    background-color: $base;
+    background-color: var(--sbx-color-highlight, $base);
     margin: 0.25rem;
     transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
     @extend .no-text;
     @extend .icon-approve;
     &:before {
-        color: $white;
+        color: var(--sbx-color-text-primary, $white);
         text-align: center;
         width: 100%;
         height: 100%;
@@ -582,9 +582,10 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
      */
     &.pending {
         @extend .icon-approve;
-        background-color: $warning-color;
+        background-color: var(--sbx-color-warning, $warning-color);
         transform: rotate(135deg);
         &:before {
+            color: var(--sbx-color-warning-text, $white);
             visibility: visible;
             // counter-rotation
             transform: rotate(-135deg);
@@ -593,16 +594,18 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
     &.reviewed,
     &.submitted {
         @extend .icon-approve;
-        background-color: $success-color;
+        background-color: var(--sbx-color-success, $success-color);
         border-radius: $progress-tick-size-regular;
         transform: rotate(360deg);
         &:before {
+            color: var(--sbx-color-success-text, $white);
             visibility: visible;
         }
     }
     &.failed {
-        background-color: $alert-color;
+        background-color: var(--sbx-color-alert, $alert-color);
         &:before {
+            color: var(--sbx-color-alert-text, $white);
             visibility: visible;
             content: "\0021";
             font-weight: $font-weight-bold;
@@ -616,9 +619,10 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
     }
     &.in-progress {
         @extend .icon-time-value;
-        background-color: #0c78cf;
+        background-color: var(--sbx-color-highlight, #0c78cf);
         transform: rotate(-135deg);
         &:before {
+            color: var(--sbx-color-highlight-text, #fff);
             visibility: visible;
             // counter-rotation
             transform: rotate(135deg);
@@ -626,9 +630,10 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
     }
     &.requires-assistance {
         @extend .icon-alert;
-        background-color: $warning-color;
+        background-color: var(--sbx-color-warning, $warning-color);
         transform: rotate(135deg);
         &:before {
+            color: var(--sbx-color-warning-text, $white);
             visibility: visible;
             // counter-rotation
             transform: rotate(-135deg);
@@ -673,7 +678,7 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
 $train-line-segment-maxlength: 15rem;
 $train-line-stop-size: 2rem;
 $train-line-segment-width: 0.25rem;
-$train-line-visited-color: $content-ui-foreground;
+$train-line-visited-color: var(--sbx-config-color-accent, $content-ui-foreground);
 $train-line-visited-glow-blur: 0.5rem;
 $train-line-unvisited-color: $content-ui-background;
 .train-line {
@@ -700,7 +705,7 @@ $train-line-unvisited-color: $content-ui-background;
             width: 50%;
             position: absolute;
             top: 0;
-            background: $content-ui-foreground;
+            background: var(--sbx-config-color-accent, $content-ui-foreground);
         }
         &:before {
             left: 0;
@@ -714,19 +719,20 @@ $train-line-unvisited-color: $content-ui-background;
         }
         &.current-stop {
             &:after {
-                background: $content-ui-background;
+                background: var(--sbx-config-color-active, $content-ui-background);
             }
             ~ li {
                 &:before,
                 &:after {
-                    background: $content-ui-background;
+                    background: var(--sbx-config-color-active, $content-ui-background);
                 }
                 a span {
-                    background: $content-ui-background;
+                    background: var(--sbx-config-color-active, $content-ui-background);
                 }
             }
             a span {
-                box-shadow: 0 0 $train-line-visited-glow-blur $content-ui-foreground;
+                box-shadow: 0 0 $train-line-visited-glow-blur var(--sbx-config-color-accent, $content-ui-foreground);
+                color: var(--sbx-config-color-accent-text, $content-ui-foreground-contrast);
             }
         }
         a {
@@ -736,10 +742,10 @@ $train-line-unvisited-color: $content-ui-background;
             // The 0.4 multiplier and offset is empirical - I don't know what the math is
             // to derive it from the stop size or segment width
             span {
-                background: $content-ui-foreground;
+                background: var(--sbx-config-color-accent, $content-ui-foreground);
                 border-radius: calc($train-line-stop-size / 2);
                 // DONE use contrasting color
-                color: $content-ui-foreground-contrast;
+                color: var(--sbx-color-text-primary, $content-ui-foreground-contrast);
                 height: 0.5 * $train-line-stop-size;
                 left: calc(50% - (#{calc($train-line-stop-size / 2)}) + 0.4rem);
                 padding: calc(($train-line-stop-size - (rem-calc($base-font-size) * 1.5)) / 2)
@@ -814,5 +820,6 @@ li.feed-item article ol {
 
 //this highlights the selected section
 .highlight-selection {
-    background-color: #ffa;
+    background-color: var(--sbx-color-highlight, #ffa);
+    color: var(--sbx-color-highlight-text, #000);
 }

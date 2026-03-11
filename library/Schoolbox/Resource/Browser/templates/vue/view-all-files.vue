@@ -632,7 +632,7 @@ body:not(.sbx-body) {
 }
 
 .edit a {
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     line-height: 2.5;
     opacity: 0.7;
     padding-left: 8px; //move the pencil into the centre
@@ -640,7 +640,7 @@ body:not(.sbx-body) {
 
 .button-toggle-visibility {
     background: none;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: 0rem;
     line-height: 2.5;
     padding: 0px 2px 0px 10px;
@@ -689,10 +689,10 @@ body:not(.sbx-body) {
 
 @keyframes fadeOutBackgroundColour {
     0% {
-        background-color: #4fa74f;
-    } //is $success-color from _colors.scss
+        background-color: var(--sbx-color-success, #4fa74f);
+    }
     100% {
-        background-color: white;
+        background-color: var(--sbx-color-foreground-primary, #fff);
     }
 }
 </style>

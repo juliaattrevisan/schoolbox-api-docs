@@ -181,28 +181,28 @@ $alert-default-background: css-darken($body-bg, 10%);
         color: $accent-foreground;
     }
     &.success {
-        background-color: $success-color;
+        background-color: var(--sbx-color-success, $success-color);
         color: $white;
     }
     &.success-tint {
         background-color: tint($success-color, $alert-tint-amount);
-        color: $success-color;
+        color: var(--sbx-color-success, $success-color);
     }
     &.warning {
-        background-color: $warning-color;
+        background-color: var(--sbx-color-warning, $warning-color);
         color: $white;
     }
     &.warning-tint {
         background-color: tint($warning-color, $alert-tint-amount);
-        color: $warning-color;
+        color: var(--sbx-color-warning, $warning-color);
     }
     &.alert {
-        background-color: $alert-color;
+        background-color: var(--sbx-color-alert, $alert-color);
         color: $white;
     }
     &.alert-tint {
         background-color: tint($alert-color, $alert-tint-amount);
-        color: $alert-color;
+        color: var(--sbx-color-alert, $alert-color);
     }
 }
 
@@ -218,7 +218,7 @@ $alert-default-background: css-darken($body-bg, 10%);
     [class^="icon-"],
     [class*=" icon-"] {
         &:before {
-            color: $white;
+            color: var(--sbx-color-foreground-primary, $white);
             padding-right: 0;
         }
     }
@@ -235,9 +235,9 @@ $alert-default-background: css-darken($body-bg, 10%);
 // Toast pop-up alert...
 // A less obnoxious pop-up alert
 .toast {
-    background-color: $tuatara;
+    background-color: var(--sbx-color-foreground-primary, $tuatara);
     bottom: 1rem;
-    color: $white !important;
+    color: var(--sbx-color-text-primary, $white);
     display: block;
     font-size: $base-font-size - 2;
     opacity: 0;
@@ -257,9 +257,12 @@ $alert-default-background: css-darken($body-bg, 10%);
             animation: pulse 1.5s infinite;
         }
     }
+    &.success {
+        color: var(--sbx-color-text-primary, $white);
+    }
 
     &::before {
-        background-color: $white;
+        background-color: var(--sbx-color-warning, $white);
         border-radius: 0.75rem;
         content: "";
         display: inline-block;
@@ -269,15 +272,15 @@ $alert-default-background: css-darken($body-bg, 10%);
     }
 
     &.success::before {
-        background-color: $success-color;
+        background-color: var(--sbx-color-success, $success-color);
         animation: none;
     }
     &.warning::before {
-        background-color: $warning-color;
+        background-color: var(--sbx-color-warning, $warning-color);
         animation: none;
     }
     &.alert::before {
-        background-color: $alert-color;
+        background-color: var(--sbx-color-alert, $alert-color);
         animation: none;
     }
 }

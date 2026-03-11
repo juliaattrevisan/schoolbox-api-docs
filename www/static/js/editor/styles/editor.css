@@ -10,8 +10,8 @@
     --ck-border-radius: 0px;
 
     /* -- Border colours */
-    --ck-color-toolbar-border: var(--form-border-color);
-    --ck-color-base-border: var(--form-border-color);
+    --ck-color-toolbar-border: var(--sbx-config-color-accent, var(--form-border-color));
+    --ck-color-base-border: var(--sbx-config-color-accent, var(--form-border-color));
 
     /* Button hover colour */
     --ck-color-button-default-hover-background: var(--form-bg-hover-color);
@@ -145,7 +145,7 @@ body.ck-fullscreen {
  * Style for the word count UI that sits at the bottom of the editor
  */
 .ck.ck-word-count {
-    background: var(--ck-color-toolbar-background);
+    background: var(--sbx-color-foreground-primary, var(--ck-color-toolbar-background));
     border: 1px solid var(--ck-color-toolbar-border);
     border-radius: 0 0 var(--ck-border-radius) var(--ck-border-radius);
     border-top-width: 0;

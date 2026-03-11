@@ -75,7 +75,7 @@ function onToggleSelected(): void {
 <style scoped>
 .toggle-button {
     background: none;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     height: 2.5rem;
     width: 2.5rem;
 }

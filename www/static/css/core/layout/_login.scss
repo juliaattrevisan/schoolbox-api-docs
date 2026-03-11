@@ -46,7 +46,7 @@ $login-img-max-height: 12rem !default; // 192px
             form {
                 margin: 0;
                 padding: $login-form-padding;
-                background-color: $login-form-background;
+                background-color: var(--sbx-config-login-form-background, $login-form-background);
                 transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
                 position: relative;
             }
@@ -106,7 +106,7 @@ $login-img-max-height: 12rem !default; // 192px
 
         a.button {
             @extend .expand;
-            color: $content-ui-foreground;
+            color: var(--sbx-config-color-accent, $content-ui-foreground);
             margin-top: 1rem;
         }
 
@@ -162,7 +162,7 @@ $login-img-max-height: 12rem !default; // 192px
                     min-height: 100%;
                     max-width: 360px;
                     margin: 0 0 0 auto;
-                    background: $login-form-background;
+                    background: var(--sbx-config-login-form-background, $login-form-background);
                     form {
                         background: transparent;
                     }

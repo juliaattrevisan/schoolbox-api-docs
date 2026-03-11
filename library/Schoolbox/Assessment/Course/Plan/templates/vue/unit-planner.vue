@@ -254,8 +254,8 @@ window.Vue.onUnmounted(() => {
     display: contents; // Allow the children to be displayed as a grid
 
     > div {
-        background-color: #fff;
-        border-color: var(--body-background);
+        background-color: var(--sbx-color-foreground-primary, #fff);
+        border-color: var(--sbx-color-border, var(--body-background));
         border-style: solid;
         border-width: 1px 0 1px 0; // Unless overridden below
         font-size: 0.8125rem;
@@ -311,7 +311,7 @@ window.Vue.onUnmounted(() => {
 }
 
 .unit-planner-sortable-placeholder {
-    background: white;
+    background: var(--sbx-color-foreground-primary, #fff);
     grid-template-columns: 200px repeat(var(--UnitPlannerVisibleColumns), minmax(400px, 1fr));
     position: absolute;
     width: 100%;

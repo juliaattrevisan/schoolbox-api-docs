@@ -1,0 +1,185 @@
+/**
+ * Color overrides for Storybook UI Uplift
+ * Scope: UI Uplift
+ * The majority of colour overrides are applied directly on the element to avoid specificity issues,
+ * adding the new color while falling back to the old color if the new one isn't set.
+ */
+
+body.sbx-body {
+    // Highchart fill - directly override the white background
+    .highcharts-background {
+        fill: var(--sbx-color-foreground-primary);
+    }
+
+    // Highlight - overridden as they currently implement Sass methods which are not compatible with CSS variables
+    .highlight.label,
+    .alert-box,
+    .alert-box.highlight,
+    mark {
+        background-color: var(--sbx-color-highlight);
+        color: var(--sbx-color-highlight-text);
+    }
+
+    // Alert labels/boxes - overridden as they currently implement Sass methods which are not compatible with CSS variables
+    .alert.label,
+    .rejected.label,
+    .submitted-late.label,
+    .alert-box.alert,
+    .alert-box.alert-tint,
+    .label--moment-rejected {
+        background-color: var(--sbx-color-alert);
+        color: var(--sbx-color-alert-text);
+    }
+
+    // Success labels/boxes - overridden as they currently implement Sass methods which are not compatible with CSS variables
+    .success.label,
+    .approved.label,
+    .reviewed.label,
+    .alert-box.success,
+    .alert-box.success-tint {
+        background-color: var(--sbx-color-success);
+        color: var(--sbx-color-success-text);
+    }
+
+    // Warning labels/boxes - overridden as they currently implement Sass methods which are not compatible with CSS variables
+    .warning.label,
+    .submitted.label,
+    .pending.label,
+    .alert-box.warning,
+    .alert-box.warning-tint,
+    .label--moment-submitted {
+        background-color: var(--sbx-color-warning);
+        color: var(--sbx-color-warning-text);
+    }
+
+    // Neutral labels - overridden as they currently implement Sass methods which are not compatible with CSS variables
+    .unsubmitted.label,
+    .neutral.label,
+    .label--moment-draft {
+        background-color: var(--sbx-color-foreground-secondary);
+        color: var(--sbx-color-text-secondary);
+    }
+
+    // Add colour alternating rows for better readability
+    table:not([class]) tr:nth-child(even),
+    table.rubric tr:nth-child(even),
+    table.diagonal-headings-table tr:nth-child(even),
+    table.VueTables__table tr:nth-child(even),
+    .action-list li:nth-child(even),
+    .information-list li:nth-child(even):not(:has(.information-list)) {
+        background-color: var(--sbx-color-foreground-secondary);
+    }
+
+    // Use highlight instead of pinky red of alert with Sass tint()
+    tr.alert {
+        background-color: var(--sbx-color-highlight);
+    }
+
+    // bring back the pipe
+    .pipe-meter {
+        background-color: var(--sbx-color-text-secondary);
+    }
+
+    // switch from the highlight color
+    .label.filter {
+        background: var(--sbx-config-color-active);
+    }
+
+    // gradient colours - overridden as they currently implement Sass methods which are not compatible with CSS variables
+    .gradient-10,
+    .plagscan-ok {
+        color: var(--sbx-color-gradient-10);
+    }
+    .gradient-10-bg {
+        background-color: var(--sbx-color-gradient-10);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-10);
+    }
+    .gradient-9 {
+        color: var(--sbx-color-gradient-9);
+    }
+    .gradient-9-bg {
+        background-color: var(--sbx-color-gradient-9);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-9);
+    }
+    .gradient-8 {
+        color: var(--sbx-color-gradient-8);
+    }
+    .gradient-8-bg {
+        background-color: var(--sbx-color-gradient-8);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-8);
+    }
+    .gradient-7 {
+        color: var(--sbx-color-gradient-7);
+    }
+    .gradient-7-bg {
+        background-color: var(--sbx-color-gradient-7);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-7);
+    }
+    .gradient-6 {
+        color: var(--sbx-color-gradient-6);
+    }
+    .gradient-6-bg {
+        background-color: var(--sbx-color-gradient-6);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-6);
+    }
+    .gradient-5 {
+        color: var(--sbx-color-gradient-5);
+    }
+    .gradient-5-bg {
+        background-color: var(--sbx-color-gradient-5);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-5);
+    }
+    .gradient-4 {
+        color: var(--sbx-color-gradient-4);
+    }
+    .gradient-4-bg,
+    .plagscan-warning {
+        background-color: var(--sbx-color-gradient-4);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-4);
+    }
+    .gradient-3 {
+        color: var(--sbx-color-gradient-3);
+    }
+    .gradient-3-bg {
+        background-color: var(--sbx-color-gradient-3);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-3);
+    }
+    .gradient-2 {
+        color: var(--sbx-color-gradient-2);
+    }
+    .gradient-2-bg {
+        background-color: var(--sbx-color-gradient-2);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-2);
+    }
+    .gradient-1 {
+        color: var(--sbx-color-gradient-1);
+    }
+    .gradient-1-bg {
+        background-color: var(--sbx-color-gradient-1);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-1);
+    }
+    .gradient-0,
+    .plagscan-critical {
+        color: var(--sbx-color-gradient-0);
+    }
+    .gradient-0-bg {
+        background-color: var(--sbx-color-gradient-0);
+        color: var(--sbx-color-foreground-primary);
+        fill: var(--sbx-color-gradient-0);
+    }
+
+    // remove the borders off fieldsets that sit on the background colour
+    fieldset.no-pad {
+        border: none;
+    }
+}

@@ -10,22 +10,22 @@
 
         &.active {
             & a {
-                background-color: var(--sbx-color-accent) !important;
-                color: var(--sbx-color-accent-text) !important;
+                background-color: var(--sbx-config-color-accent) !important;
+                color: var(--sbx-config-color-accent-text) !important;
             }
         }
 
         & a,
         button {
             background: var(--sbx-color-foreground-primary) !important;
-            border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+            border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
             border-radius: var(--sbx-config-field-roundness) !important;
-            color: var(--sbx-color-accent);
+            color: var(--sbx-config-color-accent);
             padding-block: 0.4rem !important;
             padding-inline: 0.8rem !important;
 
             &:focus-visible {
-                outline: 1px solid var(--sbx-color-accent);
+                outline: 1px solid var(--sbx-config-color-accent);
                 outline-offset: 1px;
             }
         }

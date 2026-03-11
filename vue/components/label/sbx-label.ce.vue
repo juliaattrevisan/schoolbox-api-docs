@@ -138,20 +138,20 @@ Long term they will reference the design colour tokens
 }
 
 .sbx-label--success {
-    background-color: #4fa74f;
+    background-color: var(--sbx-color-success, #4fa74f);
 }
 
 .sbx-label--warning {
-    background-color: #ff7d00;
+    background-color: var(--sbx-color-warning, #ff7d00);
 }
 
 .sbx-label--alert {
-    background-color: #fa4a47;
+    background-color: var(--sbx-color-alert, #fa4a47);
 }
 
 .sbx-label--neutral {
-    background-color: #dddddd;
-    color: #474747;
+    background-color: var(--sbx-color-foreground-secondary, #dddddd);
+    color: var(--sbx-color-text-secondary, #474747);
 }
 
 .sbx-label__icon {

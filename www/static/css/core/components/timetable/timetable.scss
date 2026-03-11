@@ -61,7 +61,7 @@ $timetable-cell-border: $body-bg;
      * Applies to all viewport sizes
      */
     th {
-        background-color: #fff;
+        background-color: var(--sbx-color-foreground-primary, #fff);
     }
 
     /* For subtext under period names to sit correctly

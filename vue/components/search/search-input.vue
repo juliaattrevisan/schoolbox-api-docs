@@ -157,9 +157,9 @@ function onMouseOut(event: MouseEvent): void {
     grid-template-columns: 1fr 4.5rem;
 
     input[type="text"].c-search-input__field {
-        border: 2px solid var(--form-border-color);
-        background-color: var(--color-foreground-primary);
-        color: var(--color-text-primary);
+        border: 2px solid var(--sbx-config-color-accent, var(--form-border-color));
+        background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
+        color: var(--sbx-color-text-primary, var(--color-text-primary));
         font-size: var(--base-font-size);
         height: var(--tabbar-height);
         padding: var(--base-font-size);

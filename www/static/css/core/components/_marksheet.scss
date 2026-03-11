@@ -75,15 +75,15 @@
         border-left: 0.75rem solid transparent;
     }
     .legend-indicator.indicator-pending {
-        border-top: 0.75rem solid $warning-color;
+        border-top: 0.75rem solid var(--sbx-color-warning, $warning-color);
         border-left: 0.75rem solid transparent;
     }
     .legend-indicator.indicator-published {
-        border-top: 0.75rem solid $success-color;
+        border-top: 0.75rem solid var(--sbx-color-success, $success-color);
         border-left: 0.75rem solid transparent;
     }
     .legend-indicator.indicator-resubmit {
-        border-top: 0.75rem solid $alert-color;
+        border-top: 0.75rem solid var(--sbx-color-alert, $alert-color);
         border-left: 0.75rem solid transparent;
     }
 
@@ -126,7 +126,7 @@
 
         td.gradient-none-bg a,
         td.gradient-off-bg a {
-            color: $content-ui-foreground;
+            color: var(--sbx-config-color-accent, $content-ui-foreground);
         }
 
         th.gradient-none-bg,
@@ -161,11 +161,11 @@
         // Various rows and headers
         .course-row {
             background: $content-ui-background;
-            color: $body-font-color;
+            color: var(--sbx-color-text-primary, $body-font-color);
         }
         .class-row {
             background: $content-ui-selected;
-            color: $body-font-color;
+            color: var(--sbx-color-text-primary, $body-font-color);
         }
         .class-row-heading {
             font-weight: 700;

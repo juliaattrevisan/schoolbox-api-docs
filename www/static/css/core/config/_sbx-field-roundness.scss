@@ -8,7 +8,7 @@
     --sbx-config-field-roundness: var(--sbx-border-radius-normal);
 }
 
-.sbx-body {
+body.sbx-body {
     // Core elements
     select,
     textarea,
@@ -31,6 +31,7 @@
     .filters label,
     .tooltip,
     .f-dropdown,
+    .toast,
 
     // Labels
     .label,
@@ -49,7 +50,8 @@
     .eotc-status .close,
     .alert-box-icon .close,
     .selected-item,
-    .selected-nodes-container {
+    .selected-nodes-container,
+    blockquote {
         border-radius: var(--sbx-config-field-roundness) !important;
     }
 }

@@ -318,19 +318,19 @@ const showUsage = window.Vue.computed(() => props.node.id !== UNSET_ID);
 
 @keyframes isNewAnimation {
     0% {
-        background-color: #4fa74f;
-    } //is $success-color from _colors.scss
+        background-color: var(--sbx-color-success, #4fa74f);
+    }
     100% {
-        background-color: white;
+        background-color: var(--sbx-color-foreground-primary, #fff);
     }
 }
 
 @keyframes justUpdatedAnimation {
     0% {
-        background-color: var(--accent-background);
+        background-color: var(--sbx-config-color-active, var(--accent-background));
     }
     100% {
-        background-color: white;
+        background-color: var(--sbx-color-foreground-primary, #fff);
     }
 }
 </style>

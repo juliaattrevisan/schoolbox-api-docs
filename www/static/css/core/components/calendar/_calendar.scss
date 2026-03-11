@@ -60,7 +60,7 @@
         &:hover,
         &.fc-button-active {
             background-color: $content-ui-hover !important;
-            color: $content-ui-foreground !important;
+            color: var(--sbx-config-color-accent, $content-ui-foreground) !important;
         }
     }
 }

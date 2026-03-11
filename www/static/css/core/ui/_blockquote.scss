@@ -9,8 +9,8 @@ blockquote {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
 
-    background-color: $vapor;
-    border-#{$default-float}: 6px solid $base;
+    background-color: var(--sbx-color-foreground-secondary, $vapor);
+    border-#{$default-float}: 6px solid var(--sbx-color-border, $base);
     font-size: rem-calc(($base-font-size - 3));
     margin: 0 0 $paragraph-margin-bottom;
     /*  Necessary to encase floating elements within a blockquote (tables).
@@ -18,7 +18,7 @@ blockquote {
     overflow: hidden;
     padding: rem-calc(9 20 9 19);
     &:before {
-        color: $base;
+        color: var(--sbx-color-text-secondary, $base);
         content: "\201C";
         font-family: Georgia, serif;
         font-size: 4rem;
@@ -27,7 +27,7 @@ blockquote {
         vertical-align: -2rem;
     }
     cite {
-        color: $blockquote-cite-font-color;
+        color: var(--sbx-color-text-secondary, $blockquote-cite-font-color);
         display: block;
         font-size: rem-calc(13);
         &:before {
@@ -35,7 +35,7 @@ blockquote {
         }
         a,
         a:visited {
-            color: $blockquote-cite-font-color;
+            color: var(--sbx-color-text-secondary, $blockquote-cite-font-color);
         }
     }
     p {
@@ -47,7 +47,7 @@ blockquote {
 
 blockquote,
 blockquote p {
-    color: scale-color($header-font-color, $lightness: 35%);
+    color: var(--sbx-color-text-secondary, scale-color($header-font-color, $lightness: 35%));
     line-height: $paragraph-line-height;
 }
 
@@ -56,7 +56,7 @@ blockquote p {
  *  tags but still wrap properly around the " mark
 **/
 blockquote {
-    border-left: 6px solid $base !important;
+    border-left: 6px solid var(--sbx-color-border, $base);
     position: relative;
     padding-left: 2.5rem !important;
 

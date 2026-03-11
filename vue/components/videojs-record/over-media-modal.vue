@@ -110,7 +110,7 @@ export default {
     max-width: 90%;
     min-width: 50%;
     padding: 20px;
-    background: white;
+    background: var(--sbx-color-foreground-primary, #fff);
     button {
         width: 100%;
     }

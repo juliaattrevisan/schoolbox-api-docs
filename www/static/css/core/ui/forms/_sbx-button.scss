@@ -10,225 +10,220 @@
 
 @use "sbx-form";
 
-/**
- * Primary button, which is considered those with the .submit class or [type="submit"]
- * Also previously those buttons with the --content-ui-submit-foreground config colour
- */
-.sbx-body [type="submit"],
-.sbx-body a.submit,
-.sbx-body button.submit,
-.sbx-body .flex-list.buttons a.submit,
-.sbx-body .flex-list.buttons button.submit,
-.sbx-body .introjs-nextbutton.introjs-fullbutton,
-.sbx-body .introjs-skipbutton,
-.sbx-body .introjs-prevbutton,
-.sbx-body .introjs-button,
-.sbx-body .fc .fc-button {
-    background: var(--sbx-color-accent);
-    border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
-    border-radius: var(--sbx-config-field-roundness);
-    color: var(--sbx-color-foreground-primary);
-    &:hover,
-    &:active {
-        background: var(--sbx-color-accent); // ^foundation-fixes^ - remove the use of --content-ui-hover
-        color: var(--sbx-color-foreground-primary); // ^foundation-fixes^ - remove the change of text colour on hover
-        filter: brightness(1.1);
-    }
-    &:focus {
-        @include sbx-form.form-input-focus;
-        background: var(--sbx-color-accent);
-        color: var(--sbx-color-foreground-primary);
-    }
-    &:disabled,
-    &.disabled {
-        @include sbx-form.form-input-disabled;
-        border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
-        background-color: var(--sbx-color-foreground-secondary) !important;
-        color: var(--sbx-color-accent) !important;
-        pointer-events: none;
+body.sbx-body {
+    /**
+     * Primary button, which is considered those with the .submit class or [type="submit"]
+     * Also previously those buttons with the --content-ui-submit-foreground config colour
+     */
+    [type="submit"],
+    a.submit,
+    button.submit,
+    .flex-list.buttons a.submit,
+    .flex-list.buttons button.submit,
+    .introjs-nextbutton.introjs-fullbutton,
+    .introjs-skipbutton,
+    .introjs-prevbutton,
+    .introjs-button,
+    .fc .fc-button {
+        background: var(--sbx-config-color-accent);
+        border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
+        border-radius: var(--sbx-config-field-roundness);
+        color: var(--sbx-config-color-accent-text);
         &:hover,
         &:active {
-            background-color: var(--sbx-color-foreground-secondary) !important;
-            color: var(--sbx-color-accent) !important;
-            filter: none !important;
+            background: var(--sbx-config-color-accent); // ^foundation-fixes^ - remove the use of --content-ui-hover
+            color: var(
+                --sbx-config-color-accent-text
+            ); // ^foundation-fixes^ - remove the change of text colour on hover
+            filter: brightness(1.1);
+        }
+        &:focus {
+            @include sbx-form.form-input-focus;
+            background: var(--sbx-config-color-accent);
+            color: var(--sbx-config-color-accent-text);
+        }
+        &:disabled,
+        &.disabled {
+            @include sbx-form.form-input-disabled;
+            border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
+            &:hover,
+            &:active {
+                filter: none !important;
+            }
         }
     }
-}
 
-/**
- * Secondary buttons, which are considered all other buttons
- */
-.sbx-body .button,
-.sbx-body .flex-list.buttons a,
-.sbx-body .flex-list.buttons button,
-.sbx-body .sub-nav li a,
-.sbx-body .input-group a,
-.sbx-body .cursor-pagination button,
-.sbx-body .avatar-switch nav a,
-.sbx-body .context-switch nav a,
-.sbx-body .sub-nav li a,
-.sbx-body .sub-nav dd a,
-.sbx-body .sub-nav li.active a,
-.sbx-body .sub-nav dd.active a {
-    background: var(--sbx-color-foreground-primary);
-    border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
-    border-radius: var(--sbx-config-field-roundness);
-    color: var(--sbx-color-accent);
-    font-size: var(--sbx-font-size-s);
-    text-transform: none;
-    &:hover,
-    &:active {
-        background-color: var(
-            --sbx-color-foreground-primary
-        ); // ^foundation-fixes^ - remove the use of --content-ui-hover
-        color: var(--sbx-color-accent); // ^foundation-fixes^ - remove the change of text colour on hover
-        filter: brightness(1.1);
-    }
-    &:focus {
-        @include sbx-form.form-input-focus;
-    }
-    &:disabled,
-    &.disabled {
-        @include sbx-form.form-input-disabled;
-        border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
-        background-color: var(--sbx-color-foreground-secondary) !important;
-        color: var(--sbx-color-accent) !important;
-        pointer-events: none;
+    /**
+     * Secondary buttons, which are considered all other buttons
+     */
+    .button,
+    .flex-list.buttons a,
+    .flex-list.buttons button,
+    .sub-nav li a,
+    .input-group a,
+    .cursor-pagination button,
+    .avatar-switch nav a,
+    .context-switch nav a,
+    .sub-nav li a,
+    .sub-nav dd a,
+    .sub-nav li.active a,
+    .sub-nav dd.active a,
+    button.load-more {
+        background: var(--sbx-color-foreground-primary);
+        border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
+        border-radius: var(--sbx-config-field-roundness);
+        color: var(--sbx-config-color-accent);
+        font-size: var(--sbx-font-size-s);
+        text-transform: none;
         &:hover,
         &:active {
-            background-color: var(--sbx-color-foreground-secondary) !important;
-            color: var(--sbx-color-accent) !important;
-            filter: none !important;
+            background-color: var(
+                --sbx-color-foreground-primary
+            ); // ^foundation-fixes^ - remove the use of --content-ui-hover
+            color: var(--sbx-config-color-accent); // ^foundation-fixes^ - remove the change of text colour on hover
+            filter: brightness(1.1);
+        }
+        &:focus {
+            @include sbx-form.form-input-focus;
+        }
+        &:disabled,
+        &.disabled {
+            @include sbx-form.form-input-disabled;
+            border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
+            pointer-events: none;
+            &:hover,
+            &:active {
+                filter: none !important;
+            }
         }
     }
-}
 
-/**
- * Secondary button active state, just make it bold
- */
-.sbx-body .sub-nav li.active a {
-    font-weight: bold;
-}
+    /**
+     * Secondary button active state, just make it bold
+     */
+    .sub-nav li.active a {
+        font-weight: bold;
+    }
 
-/**
- * Make some buttons smaller for better visual hierarchy, can be considered 'tertiary' buttons
- * currently only used for the 'View more' buttons in Unit planner/ Manage DP page
- */
-.sbx-body .sbx-button--smaller {
-    font-size: var(--sbx-font-size-xs);
-}
+    /**
+     * Make some buttons smaller for better visual hierarchy, can be considered 'tertiary' buttons
+     * currently only used for the 'View more' buttons in Unit planner/ Manage DP page
+     */
+    .sbx-button--smaller {
+        font-size: var(--sbx-font-size-xs);
+    }
 
-/**
- * When a button sits next to an input (e.g. search bars)
- * We need to tweak the rounding of the corners so they align properly
- */
-.sbx-body .input-group .button,
-.sbx-body .input-group a {
-    border-left: none;
-    border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
-    line-height: 1;
-}
+    /**
+     * A horizontal list of buttons, adding some gap between them
+     */
+    .sub-nav {
+        flex-wrap: wrap;
+        gap: var(--sbx-size-xs);
+    }
 
-/**
- * A horizontal list of buttons, adding some gap between them
- */
-.sbx-body .sub-nav {
-    flex-wrap: wrap;
-    gap: var(--sbx-size-xs);
-}
+    /**
+     * An existing flex list of buttons, just add some gap
+     */
+    .flex-list.buttons {
+        gap: var(--sbx-size-xs);
+    }
 
-/**
- * An existing flex list of buttons, just add some gap
- */
-.sbx-body .flex-list.buttons {
-    gap: var(--sbx-size-xs);
-}
+    /**
+     * Component action section buttons, giving some gap like other button groups
+     */
+    .component-action section {
+        background: var(--sbx-color-foreground-primary);
+        padding: var(--sbx-size-s);
+        gap: var(--sbx-size-s);
+        button,
+        .button {
+            font-weight: normal; // for better readability and consistency with other buttons
+            text-transform: none;
+        }
+    }
 
-/**
- * Component action section buttons, giving some gap like other button groups
- */
-.sbx-body .component-action section {
-    background: var(--sbx-color-foreground-primary);
-    padding: var(--sbx-size-s);
-    gap: var(--sbx-size-s);
-    button,
-    .button {
-        font-weight: normal; // for better readability and consistency with other buttons
+    /**
+     * Icon only buttons
+     * These need to be treated differently to standard buttons
+     * as they have no text content and so need a border to define their shape
+     */
+    .button[class*="icon-"],
+    .dz-remove,
+    .ab-upload .dz-remove {
+        border: none;
+    }
+
+    .button[class*="icon-"]:not(:empty) {
+        border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent); // add border back in for icon and text buttons
+    }
+
+    /**
+     * When a button sits next to an input (e.g. search bars)
+     * We need to tweak the rounding of the corners so they align properly
+     */
+    .input-group .button,
+    .input-group a,
+    .input-group .button[class*="icon-"]:not(:empty) {
+        border-left: none;
+        border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
+        line-height: 1;
+    }
+
+    /**
+     * Specific style for the search button to match design
+     */
+    .c-filter-search-term__button {
+        background-color: var(--sbx-config-color-accent);
+        border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
+        height: auto;
+    }
+
+    /**
+     * Chips component buttons
+     * These need to hide the checkbox input to match design
+     */
+    .c-chips li > input[type="checkbox"] {
+        display: none;
+    }
+
+    /**
+     * Small action buttons with icons
+     * These need a border radius on hover to match design
+     */
+    nav a[class*="icon-"]:hover,
+    nav a[class^="icon-"]:hover {
+        border-radius: var(--sbx-config-field-roundness) !important;
+    }
+
+    /**
+     *  Dropdown separators
+     */
+    #tab-control .separator,
+    .f-dropdown .separator {
+        background-color: var(--sbx-color-foreground-primary);
+        color: var(--sbx-color-text-secondary);
+        font-weight: bold;
         text-transform: none;
     }
-}
 
-/**
- * Icon only buttons
- * These need to be treated differently to standard buttons
- * as they have no text content and so need a border to define their shape
- */
-.sbx-body button.button[class*="icon-"],
-.sbx-body .dz-remove,
-.sbx-body .ab-upload .dz-remove {
-    border: none;
-}
+    /**
+     * Dropdown list buttons, ensure they use the correct background colour
+     */
+    .f-dropdown,
+    .f-dropdown li,
+    .f-dropdown button {
+        background-color: var(--sbx-color-foreground-primary);
+    }
 
-.sbx-body button.button[class*="icon-"]:not(:empty) {
-    border: var(--sbx-border-width-normal) solid var(--sbx-color-accent); // add border back in for icon and text buttons
-}
+    // Ensure the colour is the accent colour
+    &.f-dropdown li :is(a, button),
+    .f-dropdown li :is(a, button)::before {
+        color: var(--sbx-config-color-accent);
+    }
 
-/**
- * Specific style for the search button to match design
- */
-.sbx-body .c-filter-search-term__button {
-    background-color: var(--sbx-color-accent);
-    border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
-    height: auto;
-}
-
-/**
- * Chips component buttons
- * These need to hide the checkbox input to match design
- */
-.sbx-body .c-chips li > input[type="checkbox"] {
-    display: none;
-}
-
-/**
- * Small action buttons with icons
- * These need a border radius on hover to match design
- */
-.sbx-body nav a[class*="icon-"]:hover,
-.sbx-body nav a[class^="icon-"]:hover {
-    border-radius: var(--sbx-config-field-roundness) !important;
-}
-
-/**
- *  Dropdown separators
- */
-.sbx-body #tab-control .separator,
-.sbx-body .f-dropdown .separator {
-    background-color: var(--sbx-color-foreground-primary);
-    color: var(--sbx-color-text-secondary);
-    font-weight: bold;
-    text-transform: none;
-}
-
-/**
- * Dropdown list buttons, ensure they use the correct background colour
- */
-.sbx-body .f-dropdown,
-.sbx-body .f-dropdown li,
-.sbx-body .f-dropdown button {
-    background-color: var(--sbx-color-foreground-primary);
-}
-
-// Ensure the colour is the accent colour
-.sbx-body.f-dropdown li :is(a, button),
-.sbx-body .f-dropdown li :is(a, button)::before {
-    color: var(--sbx-color-accent);
-}
-
-/**
- *  Flatpickr button fixes
- */
-.sbx-body {
+    /**
+     *  Flatpickr button fixes
+     */
     .flatpickr-current-month {
         .numInputWrapper {
             input.numInput {
@@ -244,27 +239,32 @@
             }
         }
     }
-}
 
-/**
- *  notification advanced settings buttons alignment fix
- */
-.sbx-body .actions-small-6 > nav > [data-perm-container] {
-    display: inline-flex;
-    align-items: center;
-}
+    /**
+     *  notification advanced settings buttons alignment fix
+     */
+    .actions-small-6 > nav > [data-perm-container] {
+        display: inline-flex;
+        align-items: center;
+    }
 
-/**
- * FullCalendar button hover border radius fix
- */
-.sbx-body .fc-event,
-.sbx-body .fc-event:hover {
-    border-radius: var(--sbx-config-field-roundness) !important;
-}
+    /**
+     * FullCalendar button hover border radius fix
+     */
+    .fc-event,
+    .fc-event:hover {
+        border-radius: var(--sbx-config-field-roundness) !important;
+    }
 
-/**
- * Add some gap otherwise the checkbox and text within these buttons are too close together
- */
-.sbx-body .search-result {
-    gap: var(--sbx-size-s);
+    /**
+     * Add some gap otherwise the checkbox and text within these buttons are too close together
+     */
+    .search-result {
+        gap: var(--sbx-size-s);
+    }
+
+    // add spacing to pagination buttons on pastoral class report
+    .count-filter {
+        gap: var(--sbx-size-xs);
+    }
 }

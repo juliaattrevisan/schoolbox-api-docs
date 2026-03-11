@@ -58,7 +58,7 @@ function onSelected() {
 
 <style lang="scss" scoped>
 .search-result {
-    background: white;
+    background: var(--sbx-color-foreground-primary, #fff);
     border: none;
     display: flex;
     font-size: 0.825rem;

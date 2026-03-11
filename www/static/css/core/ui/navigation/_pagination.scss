@@ -14,13 +14,13 @@ $pagination-margin: rem-calc(0);
 // We use these to set the list-item properties
 $pagination-li-float: $default-float !default;
 $pagination-li-height: rem-calc(($base-font-size + 21));
-$pagination-li-font-color: $content-ui-foreground;
+$pagination-li-font-color: var(--sbx-config-color-accent, $content-ui-foreground);
 $pagination-li-font-size: $base-font-size;
 $pagination-li-margin: rem-calc(0);
 
 // We use these for the pagination anchor links
 $pagination-link-pad: rem-calc(($base-font-size - 9, $base-font-size - 2));
-$pagination-link-font-color: $content-ui-foreground;
+$pagination-link-font-color: var(--sbx-config-color-accent, $content-ui-foreground);
 $pagination-link-active-bg: $content-ui-selected;
 
 // We use these for disabled anchor links
@@ -30,7 +30,7 @@ $pagination-link-unavailable-bg-active: css-scale-color($content-ui-background, 
 
 // We use these for currently selected anchor links
 $pagination-link-current-background: $content-ui-selected;
-$pagination-link-current-font-color: $content-ui-foreground;
+$pagination-link-current-font-color: var(--sbx-config-color-accent, $content-ui-foreground);
 $pagination-link-current-font-weight: $font-weight-bold !default;
 $pagination-link-current-cursor: default !default;
 $pagination-link-current-active-bg: $content-ui-selected;

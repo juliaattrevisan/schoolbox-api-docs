@@ -15,7 +15,7 @@ $allow-notification-stash: $xlarge-up;
     /* The Notification Bell
      */
     &[data-unread] {
-        color: $navigation-foreground;
+        color: var(--sbx-config-color-menu-secondary, $navigation-foreground);
 
         /* The colour of the bell in its idle state
          */
@@ -72,7 +72,7 @@ $allow-notification-stash: $xlarge-up;
         ul.off-canvas-list {
             #notification-toggle-full {
                 background: $notification-header-background;
-                color: $navigation-foreground;
+                color: var(--sbx-config-color-menu-secondary, $navigation-foreground);
             }
 
             /* Hide gap from ".island section" definition
@@ -113,7 +113,7 @@ $allow-notification-stash: $xlarge-up;
         }
         &[data-unread="0"] {
             .right-menu-dock {
-                color: $navigation-foreground;
+                color: var(--sbx-config-color-menu-secondary, $navigation-foreground);
             }
         }
     }
@@ -188,7 +188,7 @@ $allow-notification-stash: $xlarge-up;
 }
 
 .pwa-side-panel {
-    background: white; // to ensure the pwa prompt is visible if the skin config has a different var(--off-canvas-background);
+    background: var(--sbx-color-foreground-primary, #fff);
     border-bottom: 1px solid var(--body-background); // to separate pwa section from rest of the notification bar
     .alert-box.warning {
         padding-right: 0.875rem; // reduce the padding that allows the close button to be visible, as we don't have it here

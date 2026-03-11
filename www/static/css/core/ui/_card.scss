@@ -3,12 +3,12 @@
 */
 
 :root {
-    --alt-foreground-colour: #f9f9f9;
-    --border-colour: #aaaaaa;
+    --alt-foreground-colour: var(--sbx-color-foreground-secondary, #f9f9f9);
+    --border-colour: var(--sbx-color-text-secondary, #aaaaaa);
 }
 
 .c-card {
-    background-color: var(--color-foreground-primary);
+    background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
     border-radius: 0;
     line-height: var(--base-line-height);
     position: relative;
@@ -86,7 +86,7 @@
         animation: shine-lines 1.6s ease infinite !important;
         background-size: 400% 100% !important;
         .l-flex-row {
-            background-color: var(--color-foreground-primary);
+            background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
         }
         .img-placeholder,
         h3,
@@ -98,7 +98,7 @@
             background: repeating-linear-gradient(
                 to right,
                 var(--color-loading) 0%,
-                var(--color-foreground-primary) 50%,
+                var(--sbx-color-foreground-primary, var(--color-foreground-primary)) 50%,
                 var(--color-loading) 100%
             );
             background-size: 200% auto;
@@ -125,15 +125,15 @@
     }
 
     &--border-end {
-        border-block-end: 1px solid var(--border-colour);
+        border-block-end: 1px solid var(--sbx-color-border, var(--border-colour));
     }
 
     &--border-end-alt {
-        border-block-end: 1px solid var(--body-background);
+        border-block-end: 1px solid var(--sbx-color-border, var(--body-background));
     }
 
     &--alt-bkg {
-        background-color: var(--alt-foreground-colour);
+        background-color: var(--sbx-color-foreground-secondary, var(--alt-foreground-colour));
     }
 }
 

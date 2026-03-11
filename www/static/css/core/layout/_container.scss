@@ -117,7 +117,7 @@
 
 // to identify 'islands' of content, sitting on --color-foreground-primary
 .c-island {
-    background-color: var(--color-foreground-primary);
+    background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
 }
 
 // default styling for a vertically scrollable container, typically used within a modal

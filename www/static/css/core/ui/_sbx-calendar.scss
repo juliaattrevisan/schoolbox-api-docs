@@ -3,67 +3,69 @@
  * Scope: UI Uplift
  */
 
-.fc {
-    border: var(--border);
-    border-radius: var(--sbx-config-field-roundness);
+body.sbx-body {
+    .fc {
+        border: var(--border);
+        border-radius: var(--sbx-config-field-roundness);
 
-    & .fc-button-group {
-        display: flex;
-        gap: 0.5rem;
+        & .fc-button-group {
+            display: flex;
+            gap: 0.5rem;
 
-        & button {
-            border-radius: var(--sbx-config-field-roundness) !important;
-            padding-inline: 1rem;
+            & button {
+                border-radius: var(--sbx-config-field-roundness) !important;
+                padding-inline: 1rem;
 
-            &.fc-customNext-button,
-            &.fc-customPrev-button {
-                background-color: transparent;
-                border: 1px solid var(--sbx-color-accent);
-                border-radius: var(--sbx-config-field-roundness);
+                &.fc-customNext-button,
+                &.fc-customPrev-button {
+                    background-color: transparent;
+                    border: 1px solid var(--sbx-config-color-accent);
+                    border-radius: var(--sbx-config-field-roundness);
 
-                & a {
+                    & a {
+                        background-color: transparent !important;
+                    }
+                }
+
+                &.fc-customToday-button {
+                    background-color: var(--sbx-config-color-accent);
+                    color: var(--sbx-config-color-accent-text);
+                }
+
+                &.fc-quickSwitchButton-button {
                     background-color: transparent !important;
+                    border: 1px solid var(--sbx-config-color-accent);
+
+                    & a {
+                        background-color: transparent !important;
+                    }
                 }
             }
 
-            &.fc-customToday-button {
-                background-color: var(--sbx-color-accent);
-                color: var(--sbx-color-accent-text);
-            }
+            & .fc-button-active {
+                color: var(--sbx-color-text-primary) !important;
+                overflow: visible;
+                position: relative;
 
-            &.fc-quickSwitchButton-button {
-                background-color: transparent !important;
-                border: 1px solid var(--sbx-color-accent);
-
-                & a {
-                    background-color: transparent !important;
+                &::before {
+                    background-color: var(--sbx-config-color-accent);
+                    bottom: -18px;
+                    content: "";
+                    height: 2px;
+                    left: 0;
+                    position: absolute;
+                    width: 100%;
                 }
             }
         }
 
-        & .fc-button-active {
-            color: var(--sbx-color-text-primary) !important;
-            overflow: visible;
-            position: relative;
-
-            &::before {
-                background-color: var(--sbx-color-accent);
-                bottom: -18px;
-                content: "";
-                height: 2px;
-                left: 0;
-                position: absolute;
-                width: 100%;
-            }
+        & .fc-daygrid-day-events {
+            margin-inline: 0.5rem;
+            width: calc(100% - 1rem);
         }
-    }
 
-    & .fc-daygrid-day-events {
-        margin-inline: 0.5rem;
-        width: calc(100% - 1rem);
-    }
-
-    & .fc-toolbar-title {
-        font-weight: 600;
+        & .fc-toolbar-title {
+            font-weight: 600;
+        }
     }
 }

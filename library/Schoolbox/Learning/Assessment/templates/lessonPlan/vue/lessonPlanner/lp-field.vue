@@ -116,6 +116,6 @@ window.Vue.onMounted(async () => {
 <style scoped>
 .lp-field-regenerate {
     float: right;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 </style>

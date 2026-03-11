@@ -158,7 +158,7 @@ async function applyFilters(): Promise<void> {
     }
     &__toggle-button {
         background: none;
-        color: var(--content-ui-foreground);
+        color: var(--sbx-config-color-accent, var(--content-ui-foreground));
         font-weight: bold;
         padding: var(--spacing-xs) 0;
         text-align: left;

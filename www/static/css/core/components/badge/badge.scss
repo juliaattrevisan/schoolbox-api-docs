@@ -16,14 +16,14 @@
 .badge-grid {
     .badge {
         flex: 1 0 250px;
-        border: 1px solid #ededed;
+        border: 1px solid var(--sbx-color-border, #ededed);
         box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
         padding: 0;
         margin: 0 1rem 1rem 0;
         max-width: 250px;
 
         .card-feature-image {
-            background-color: $vapor;
+            background-color: var(--sbx-color-foreground-secondary, $vapor);
             position: relative;
 
             > a > div {

@@ -225,7 +225,7 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
 }
 
 .cr-result-entry {
-    border: 1px solid var(--form-border-color);
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
 
     &--loading {
         opacity: 0.5;
@@ -237,11 +237,11 @@ async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void>
     }
 
     &--submitted {
-        border-color: $warning-color;
+        border-color: var(--sbx-color-warning, $warning-color);
     }
 
     &--rejected {
-        border-color: $alert-color;
+        border-color: var(--sbx-color-alert, $alert-color);
     }
 }
 </style>

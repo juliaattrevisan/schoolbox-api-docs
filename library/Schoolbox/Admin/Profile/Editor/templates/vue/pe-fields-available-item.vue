@@ -34,7 +34,7 @@ const disabled = window.Vue.computed(() => peFieldsStore.getActiveFieldType(prop
 
 <style scoped lang="scss">
 .pe-palette-item {
-    background-color: #ffffff;
+    background-color: var(--sbx-color-foreground-primary, #ffffff);
     height: 100%; // To avoid a gap between the items
 
     &.disabled {
@@ -44,7 +44,7 @@ const disabled = window.Vue.computed(() => peFieldsStore.getActiveFieldType(prop
 
     &:not(.disabled) {
         cursor: grab;
-        color: var(--content-ui-foreground);
+        color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 
         /* Hover effect on the items in the palette */
         &:hover {

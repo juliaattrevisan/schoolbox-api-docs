@@ -75,7 +75,7 @@ function onNextSelected(): void {
 
 <style scoped>
 .cursor-pagination {
-    background-color: white;
+    background-color: var(--sbx-color-foreground-primary, #fff);
     left: 0;
     position: sticky;
 }

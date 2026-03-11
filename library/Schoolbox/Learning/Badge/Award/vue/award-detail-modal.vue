@@ -460,7 +460,7 @@ export default {
 <style scoped>
 .modify-link {
     background: none;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     float: right;
 }
 

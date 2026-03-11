@@ -69,7 +69,7 @@ const emit = defineEmits(["selected"]);
 @import "@css/core/base/icon-colours";
 .button-action-option {
     @extend .button;
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     font-size: 0rem;
     opacity: 0.7;
     padding: 0px 2px 0px 12px;

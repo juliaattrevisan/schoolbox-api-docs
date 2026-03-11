@@ -82,8 +82,8 @@ table.rb {
         }
 
         input[type="tel"] {
-            border-color: $input-border-color;
-            background-color: $container-bg;
+            border-color: var(--sbx-config-color-accent, $input-border-color);
+            background-color: var(--sbx-color-foreground-primary, $container-bg);
         }
     }
 
@@ -141,14 +141,6 @@ table.rb {
         border-left: 1px solid $body-bg;
         transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
         min-width: 100px;
-        &:hover {
-            input[type="text"],
-            input[type="tel"],
-            textarea {
-                border-color: $input-border-color;
-                background-color: $container-bg;
-            }
-        }
         .fieldAssign {
             font-weight: normal;
             padding-left: 1rem;
@@ -179,28 +171,19 @@ table.rb {
         overflow-y: auto;
         height: 100px; /* yes, I used pixels. wanna fight about it? */
         min-width: 5rem;
-        &:focus {
-            color: calc-text-color($container-bg);
-            background-color: $container-bg;
-        }
     }
     textarea,
     input[type="text"],
     input[type="tel"] {
         border-color: transparent;
         background-color: transparent;
-        &:focus {
-            border-color: $input-focus-border-color !important;
-            color: calc-text-color($container-bg);
-            background-color: $container-bg;
-        }
     }
 
     .rb-group-summary {
         // DONE use CSS lighten
         //background-color: $form-bg-hover-color !important;
         // DONE use contrasting color
-        color: $form-bg-hover-color-contrast;
+        color: var(--sbx-color-text-primary, $form-bg-hover-color-contrast);
 
         label {
             //color: $form-bg-hover-color-contrast;
@@ -209,9 +192,8 @@ table.rb {
         }
 
         input[type="tel"] {
-            border-color: $input-border-color;
-            color: calc-text-color($container-bg);
-            background-color: $container-bg;
+            border-color: var(--sbx-config-color-accent, $input-border-color);
+            background-color: var(--sbx-color-foreground-primary, $container-bg);
             width: 5rem;
             display: inline-block;
         }
@@ -342,8 +324,8 @@ table.rb {
     //Background stripes for blank rubric
     background-image: repeating-linear-gradient(
         135deg,
-        var(--content-ui-foreground) 0px,
-        var(--content-ui-foreground) 5px,
+        var(--sbx-config-color-accent, var(--content-ui-foreground)) 0px,
+        var(--sbx-config-color-accent, var(--content-ui-foreground)) 5px,
         #fff 5px,
         #fff 20px
     );
@@ -353,16 +335,14 @@ table.rb {
     opacity: 0.25;
 }
 .rb-final-summary {
-    background-color: $input-border-color !important;
-    // DONE use contrasting color
-    color: $input-border-color-contrast;
+    font-weight: var(--sbx-font-weight-active);
 }
 
 .rb-description,
 .rb-value {
     display: block;
     &.error {
-        border-color: $alert-color !important;
+        border-color: var(--sbx-color-alert, $alert-color) !important;
     }
 }
 .rb-value {

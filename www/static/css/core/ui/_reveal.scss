@@ -140,7 +140,7 @@ $z-index-base: var(--sbx-depth-modal);
     $top-offset: false
 ) {
     @if $bg {
-        background-color: $bg;
+        background-color: var(--sbx-color-foreground-primary, $bg);
     }
     @if $padding != false {
         padding: $padding;
@@ -333,7 +333,7 @@ $z-index-base: var(--sbx-depth-modal);
         font-size: rem-calc($base-font-size - 2);
         vertical-align: top;
         font-weight: $font-weight-semibold;
-        color: $body-font-color;
+        color: var(--sbx-color-text-primary, $body-font-color);
         padding: 0.5rem 0.75rem;
         &:hover {
             background-color: transparent;
@@ -350,7 +350,7 @@ $z-index-base: var(--sbx-depth-modal);
         position: relative;
         line-height: 1.375rem;
         font-weight: $font-weight-semibold;
-        color: $body-font-color;
+        color: var(--sbx-color-foreground-primary, $body-font-color);
     }
 }
 

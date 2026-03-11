@@ -8,7 +8,7 @@
     --sbx-config-box-roundness: var(--sbx-border-radius-normal);
 }
 
-.sbx-body {
+body.sbx-body {
     //Base box surfaces
     .island,
     .component,
@@ -20,7 +20,6 @@
     .tabs,
     .accordion,
     .accordion__item,
-    .filters,
     .filters-container,
     .table,
     .table-wrapper,
@@ -44,8 +43,14 @@
     .accordion .accordion-navigation:first-of-type > a,
     .v-card .card-class-image,
     .v-card > a .card-class-image,
-    .feed .subheader {
+    .feed .subheader,
+    .tabs {
         border-radius: var(--sbx-config-box-roundness) var(--sbx-config-box-roundness) 0 0;
+    }
+
+    // bottom only rounded elements
+    .reveal-modal .component-action section {
+        border-radius: 0 0 var(--sbx-config-box-roundness) var(--sbx-config-box-roundness);
     }
 
     // Component layout fixes
@@ -57,5 +62,24 @@
     // Hybrid bar /top menu
     #hybrid-bar .tab-bar {
         border-radius: var(--sbx-config-box-roundness);
+    }
+
+    // tables need to be rounded uniquely
+    table {
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: var(--sbx-config-box-roundness);
+    }
+    thead tr:first-child th:first-child {
+        border-top-left-radius: var(--sbx-config-box-roundness);
+    }
+    thead tr:first-child th:last-child {
+        border-top-right-radius: var(--sbx-config-box-roundness);
+    }
+    tbody tr:last-child td:first-child {
+        border-bottom-left-radius: var(--sbx-config-box-roundness);
+    }
+    tbody tr:last-child td:last-child {
+        border-bottom-right-radius: var(--sbx-config-box-roundness);
     }
 }

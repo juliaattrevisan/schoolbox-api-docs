@@ -3,7 +3,7 @@
 */
 
 @mixin subheader {
-    color: $body-foreground;
+    color: var(--sbx-color-text-primary, $body-foreground);
     font-weight: $header-font-weight;
     line-height: 1.4;
     margin-bottom: 0.5rem;
@@ -12,10 +12,10 @@
 
 $anchor-text-decoration: none;
 $anchor-text-decoration-hover: none;
-$anchor-font-color: $content-ui-foreground;
-$anchor-font-color-hover: $content-ui-foreground;
+$anchor-font-color: var(--sbx-config-color-accent, $content-ui-foreground);
+$anchor-font-color-hover: var(--sbx-config-color-accent, $content-ui-foreground);
 a {
-    color: $anchor-font-color;
+    color: var(--sbx-config-color-accent, $anchor-font-color);
     line-height: inherit;
     text-decoration: $anchor-text-decoration;
     transition: all 0.15s linear;
@@ -24,7 +24,7 @@ a {
     }
     &:hover,
     &:focus {
-        color: $anchor-font-color-hover;
+        color: var(--sbx-config-color-accent, $anchor-font-color-hover);
         @if $anchor-text-decoration-hover != $anchor-text-decoration {
             text-decoration: $anchor-text-decoration-hover;
         }
@@ -81,7 +81,7 @@ h3,
 h4,
 h5,
 h6 {
-    color: $header-font-color;
+    color: var(--sbx-color-text-primary, $header-font-color);
     font-family: $body-font-family;
     font-style: normal;
     font-weight: $header-font-weight;
@@ -89,7 +89,7 @@ h6 {
     margin-bottom: $header-bottom-margin;
     text-rendering: auto;
     small {
-        color: scale-color($header-font-color, $lightness: 35%);
+        color: var(--sbx-color-text-primary, $header-font-color);
         font-size: $small-font-size;
         line-height: 0;
     }
@@ -111,7 +111,7 @@ h6 {
 $h1-font-size: rem-calc(($base-font-size + 12));
 $h1-font-reduction: rem-calc(8);
 h1 {
-    color: $body-foreground-h1;
+    color: var(--sbx-color-text-primary, $body-foreground-h1);
     font-size: $h1-font-size - $h1-font-reduction;
     @media #{$medium-up} {
         font-size: $h1-font-size;
@@ -151,7 +151,7 @@ h6 {
 $hr-margin: rem-calc(16);
 $hr-border-width: 1px;
 hr {
-    border: solid $gainsboro;
+    border: solid var(--sbx-color-border, $gainsboro);
     border-width: $hr-border-width 0 0;
     clear: both;
     height: 0;
@@ -177,11 +177,11 @@ small {
 }
 
 code {
-    background-color: $accent-background;
-    border-color: $accent-foreground;
+    background-color: var(--sbx-color-foreground-secondary, $accent-background);
+    border-color: var(--sbx-color-text-secondary, $accent-foreground);
     border-style: solid;
     border-width: 1px;
-    color: $accent-foreground;
+    color: var(--sbx-color-text-secondary, $accent-foreground);
     font-family: $font-family-monospace;
     font-weight: $font-weight-normal;
     padding: rem-calc(2) rem-calc(5) rem-calc(1);
@@ -252,7 +252,7 @@ ol {
 //Abbreviations
 abbr,
 acronym {
-    color: $body-font-color;
+    color: var(--sbx-color-text-primary, $body-font-color);
     cursor: $cursor-help-value;
     font-size: 90%;
     text-transform: uppercase;
@@ -261,18 +261,18 @@ acronym {
 abbr {
     text-transform: none;
     &[title] {
-        border-bottom: 1px dotted $gainsboro;
+        border-bottom: 1px dotted var(--sbx-color-text-secondary, $gainsboro);
     }
 }
 
 //Microformats
 .meta {
-    color: $body-foreground;
+    color: var(--sbx-color-text-secondary, $body-foreground);
     font-size: $paragraph-font-size;
     font-style: italic;
     margin: 0 0 rem-calc(($base-font-size - 10)) 0;
     &.title {
-        color: $black !important;
+        color: var(--sbx-color-text-primary, $black);
         font-style: normal;
         font-weight: bold;
     }
@@ -301,7 +301,7 @@ abbr {
 .del {
     text-decoration: line-through;
     &[disabled] {
-        color: $aluminum;
+        color: var(--sbx-color-text-secondary, $aluminum);
     }
 }
 
@@ -312,7 +312,7 @@ abbr {
 
 // .info.card is not the same thing as .info
 .info:not(.card) {
-    color: $info-color;
+    color: var(--sbx-color-text-secondary, $info-color);
 }
 
 .noselect {

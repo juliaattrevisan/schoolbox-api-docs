@@ -56,7 +56,7 @@ export const trendOptions: Options = {
         plotLines: [
             // Force the axis to always include 0
             {
-                color: "#000",
+                color: "var(--sbx-color-text-primary, #000)",
                 width: 2,
                 value: 0,
             },
@@ -85,10 +85,16 @@ export function getChartOptions(rowData: Record<string, RowOptions>, recordsOrPo
         ...trendOptions,
         series: [
             {
-                color: recordsOrPoints === "points" ? "#4fa74f" : "var(--accent-foreground)",
+                color:
+                    recordsOrPoints === "points"
+                        ? "var(--sbx-color-success, #4fa74f)"
+                        : "var(--sbx-config-color-accent, var(--accent-foreground))",
                 data: trend.line,
                 name: recordsOrPoints,
-                negativeColor: recordsOrPoints === "points" ? "#fa4a47" : "var(--accent-foreground)",
+                negativeColor:
+                    recordsOrPoints === "points"
+                        ? "var(--sbx-color-alert, #fa4a47)"
+                        : "var(--sbx-config-color-accent, var(--accent-foreground))",
                 point: {
                     events: {
                         click(this: Point): void {

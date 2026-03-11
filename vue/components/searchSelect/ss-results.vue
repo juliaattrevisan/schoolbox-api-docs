@@ -192,12 +192,12 @@ window.Vue.watch(
 
 <style lang="scss" scoped>
 .results {
-    border: 1px solid var(--form-border-color);
+    border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
     max-height: 400px;
     overflow: auto;
     width: 100%;
     &__status {
-        background: var(--color-foreground-primary);
+        background: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
         font-size: 0.825rem;
         font-style: italic;
         padding: var(--spacing-s);

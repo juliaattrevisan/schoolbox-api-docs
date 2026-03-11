@@ -34,14 +34,14 @@ $tooltip-max-width: 300px !default;
         /* Tooltips */
         .has-tip {
             border-bottom: $has-tip-border-bottom;
-            color: $has-tip-font-color;
+            color: var(--sbx-config-color-accent-text, $has-tip-font-color);
             cursor: $has-tip-cursor-type;
             font-weight: $has-tip-font-weight;
 
             &:hover,
             &:focus {
                 border-bottom: $has-tip-border-bottom-hover;
-                color: $has-tip-font-color-hover;
+                color: var(--sbx-config-color-accent-text, $has-tip-font-color-hover);
             }
 
             &.tip-left,
@@ -51,14 +51,15 @@ $tooltip-max-width: 300px !default;
         }
 
         span.tooltip {
-            background: $tooltip-bg;
-            color: $tooltip-font-color;
+            background: var(--sbx-color-text-primary, $tooltip-bg);
+            box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
+            color: var(--sbx-color-foreground-primary, $tooltip-font-color);
             display: none;
             font-size: $tooltip-font-size;
             font-weight: $tooltip-font-weight;
             line-height: $tooltip-line-height;
             max-width: $tooltip-max-width;
-            padding: $tooltip-padding;
+            padding: var(--sbx-size-m, $tooltip-padding);
             position: absolute;
             width: 100%;
             z-index: var(--sbx-depth-modal-ui-overlay);
@@ -66,7 +67,7 @@ $tooltip-max-width: 300px !default;
 
             > .nub {
                 border: solid $tooltip-pip-size;
-                border-color: transparent transparent $tooltip-bg transparent;
+                border-color: transparent transparent var(--sbx-color-foreground-primary, $tooltip-bg) transparent;
                 display: block;
                 height: 0;
                 pointer-events: none;

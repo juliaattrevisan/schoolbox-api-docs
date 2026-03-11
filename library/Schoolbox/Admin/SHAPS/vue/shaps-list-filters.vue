@@ -115,7 +115,7 @@ export default {
 $toWrapFlex: 1000px;
 
 .filters {
-    background: white;
+    background: var(--sbx-color-foreground-primary, #fff);
     display: flex;
     gap: 1rem;
     padding: 0 1rem 1rem 1rem;

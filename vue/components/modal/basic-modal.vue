@@ -127,7 +127,7 @@ function onBackgroundClick(): void {
         width: 100%;
     }
     &__container {
-        background: white;
+        background: var(--sbx-color-foreground-primary, #fff);
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
         margin: 0 auto;
         position: relative;

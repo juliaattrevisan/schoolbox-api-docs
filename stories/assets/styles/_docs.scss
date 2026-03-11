@@ -65,7 +65,7 @@ table.docblock-argstable tr td,
  * Specific styles for the icon stories
  */
 .box-icon-wrapper {
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     height: 5rem;
     text-align: center;
     width: 6rem;
@@ -81,7 +81,7 @@ table.docblock-argstable tr td,
     align-items: center;
     background-color: #fff;
     border: 1px solid var(--content-ui-background);
-    color: var(--content-ui-foreground);
+    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     display: flex;
     justify-content: center;
     line-height: inherit;

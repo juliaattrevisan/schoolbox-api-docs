@@ -504,7 +504,7 @@ export default {
     height: 200px; //updated on mounted()
     margin-bottom: 1rem;
     overflow: hidden;
-    background: white;
+    background: var(--sbx-color-foreground-primary, #fff);
     transition: 0.2s height ease-out; //don't jar the height as much, provide a slight ease
     h2,
     h3 {

@@ -28,7 +28,7 @@
         width: 100%;
 
         &-item {
-            color: var(--body-foreground);
+            color: var(--sbx-color-text-secondary, var(--body-foreground));
 
             &:last-child {
                 margin-left: auto;
@@ -39,27 +39,27 @@
             }
 
             &.success:before {
-                background-color: $gradient-8;
+                background-color: var(--sbx-color-success, $gradient-8);
             }
 
             &.info:before {
-                background-color: var(--accent-background);
+                background-color: var(--sbx-config-color-active, var(--accent-background));
             }
 
             &.neutral:before {
-                background-color: $neutral-color;
+                background-color: var(--sbx-color-foreground-secondary, $neutral-color);
             }
 
             &.alert:before {
-                background-color: $alert-color;
+                background-color: var(--sbx-color-alert, $alert-color);
             }
 
             &.warning:before {
-                background-color: $gradient-2;
+                background-color: var(--sbx-color-warning, $gradient-2);
             }
 
             &:before {
-                background-color: var(--body-foreground);
+                background-color: var(--sbx-color-text-secondary, var(--body-foreground));
                 border-radius: 1rem;
                 content: "";
                 display: inline-block;
@@ -71,7 +71,7 @@
     }
 
     .bar {
-        background-color: $smoke;
+        background-color: var(--sbx-color-foreground-secondary, $smoke);
         box-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, 0.025);
         border-radius: 1rem;
         height: 1.5rem;
@@ -79,13 +79,13 @@
         position: relative;
 
         &.alert {
-            background-color: $gradient-0;
+            background-color: var(--sbx-color-alert, $gradient-0);
         }
     }
 
     .meter {
         align-items: center;
-        background-color: $neutral-color;
+        background-color: var(--sbx-color-foreground-secondary, $neutral-color);
         border-radius: 1rem;
         box-sizing: border-box;
         display: flex;
@@ -99,24 +99,24 @@
         }
 
         &.neutral {
-            background-color: $neutral-color;
+            background-color: var(--sbx-color-foreground-secondary, $neutral-color);
         }
 
         &.info {
-            background-color: var(--accent-background);
-            color: var(--accent-foreground);
+            background-color: var(--sbx-config-color-active, var(--accent-background));
+            color: var(--sbx-color-text-primary, var(--accent-foreground));
         }
 
         &.alert {
-            background-color: $alert-color;
+            background-color: var(--sbx-color-alert, $alert-color);
         }
 
         &.warning {
-            background-color: $gradient-2;
+            background-color: var(--sbx-color-warning, $gradient-2);
         }
 
         &.success {
-            background-color: $gradient-8;
+            background-color: var(--sbx-color-success, $gradient-8);
         }
 
         div {
