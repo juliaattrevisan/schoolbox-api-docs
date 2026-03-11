@@ -114,11 +114,8 @@ CREATE TABLE `reporting_feedback` (
     `published_at` DATETIME,
     `published_by` INT UNSIGNED,
     `created_at` DATETIME NOT NULL,
-    `created_by` INT UNSIGNED,
     `updated_at` DATETIME NOT NULL,
-    `updated_by` INT UNSIGNED,
     `deleted_at` DATETIME,
-    `deleted_by` INT UNSIGNED,
     PRIMARY KEY (`id`),
     INDEX `fk_rf_reporting_idx` (`reporting_id` ASC),
     CONSTRAINT `fk_rf_reporting`

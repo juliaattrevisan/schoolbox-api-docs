@@ -72,17 +72,8 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('published_at', self::TYPE_DATETIME);
         $this->uses('published_by', self::TYPE_INTEGER, null, 'publishedBy');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('created_by', self::TYPE_INTEGER, null, 'createdBy');
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('updated_by', self::TYPE_INTEGER, null, 'updatedBy');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->uses('deleted_by', self::TYPE_INTEGER, null, 'deletedBy');
-
-        /* Created/Updated/Deleted By fields need special treatment due to swampy reasons
-         */
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'auditorFields']);
-        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'deleterFields']);
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreDeleterFields']);
     }
 
 
@@ -140,68 +131,10 @@ class Mapper extends \Schoolbox\Mapper
                     ->setLearner($this->hydrateJoin($row, 'learner', 'learner'))
                     ->setInstructor($this->hydrateJoin($row, 'instructor', 'instructor'));
 
-                /* Not entirely sure why we set this but it must be a convenient shortcut elsewhere.
-                 * There's also a ->setAssessable() here, but nobody seems to use it
-                 */
-                $feedback->setAssessmentModel($assessmentModel);
-
                 $stack->setOffset($feedback->getId(), $feedback);
             }
         }
 
         return $stack;
-    }
-
-
-
-    /**
-     * Prefill auditor fields (the Swamp shouldn't need to know about this)
-     */
-    protected function auditorFields(Model $feedback): void
-    {
-        /* TODO Technical Uplift Candidate
-         *  The traits are wrong and should have accepted a user instance rather than just an id
-         *  All usages of the trait require you to ->getId() anyway, which means you have the user instance already.
-         *  WHy not just supply that instead?
-         */
-        if (null === $feedback->getCreatedBy()) {
-            $feedback->setCreatedBy($this->getSessionUser()->getId());
-        }
-
-        if (null === $feedback->getUpdatedBy()) {
-            $feedback->setUpdatedBy($this->getSessionUser()->getId());
-        }
-    }
-
-
-    /**
-     * Prefill deleter fields (the Swamp shouldn't need to know about this)
-     *
-     * @param Model $feedback
-     * @return void
-     * @throws Exception
-     */
-    protected function deleterFields(Model $feedback): void
-    {
-        /* Remember who deleted this thing, in a dirty doubletap
-         */
-        $feedback->setDeletedBy($this->getSessionUser()->getId());
-        $this->save($feedback);
-    }
-
-
-    /**
-     * Forget who deleted this. Used when undeleting
-     *
-     * @param Model $feedback
-     * @return void
-     * @throws Exception
-     */
-    public function restoreDeleterFields(Model $feedback): void
-    {
-        /* Forget who deleted this thing, in a dirty doubletap
-         */
-        $feedback->setDeletedBy(null);
-        $this->save($feedback);
     }
 }
