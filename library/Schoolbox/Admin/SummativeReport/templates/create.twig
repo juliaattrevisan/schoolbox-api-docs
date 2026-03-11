@@ -486,7 +486,7 @@
                                 Add a title to customise the name of the summary page.
                                 Leaving this field blank will omit a title for the summary section on the summative report.
                             </p>
-                            <input type="text" name="summary[heading]" value="{{ options.summary.heading ?? '' }}" />
+                            <input type="text" name="summary[heading]" value="{{ options.summary.heading ?? '' }}" data-test="report-summary-heading" />
                         </div>
                     </fieldset>
                     <fieldset class="content">
@@ -527,27 +527,27 @@
                                     <td>
                                         <input name="summary[workType][{{ worktype.id }}][show]" type="hidden" value="0" />
                                         <input data-summary-worktype-show="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-show" name="summary[workType][{{ worktype.id }}][show]" type="checkbox" value="1" {% if worktype.show ?? false %}checked="checked"{% endif %}/>
-                                        <label for="report-summary-worktype-{{ worktype.id }}-show" class="checkbox-label"></label>
+                                        <label for="report-summary-worktype-{{ worktype.id }}-show" class="checkbox-label" data-test="report-summary-worktype-{{ worktype.name }}-show"></label>
                                     </td>
                                     <td>
                                         <input name="summary[workType][{{ worktype.id }}][grades]" type="hidden" value="0" />
                                         <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-grades="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-grades" name="summary[workType][{{ worktype.id }}][grades]" type="checkbox" value="1" {% if worktype.grades ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
-                                        <label for="report-summary-worktype-{{ worktype.id }}-grades" class="checkbox-label"></label>
+                                        <label for="report-summary-worktype-{{ worktype.id }}-grades" class="checkbox-label" data-test="report-summary-worktype-{{ worktype.name }}-grades"></label>
                                     </td>
                                     <td>
                                         <input name="summary[workType][{{ worktype.id }}][comments]" type="hidden" value="0" />
                                         <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-comments="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-comments" name="summary[workType][{{ worktype.id }}][comments]" type="checkbox" value="1" {% if worktype.comments ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
-                                        <label for="report-summary-worktype-{{ worktype.id }}-comments" class="checkbox-label"></label>
+                                        <label for="report-summary-worktype-{{ worktype.id }}-comments" class="checkbox-label" data-test="report-summary-worktype-{{ worktype.name }}-comments"></label>
                                     </td>
                                     <td>
                                         <input name="summary[workType][{{ worktype.id }}][rubrics]" type="hidden" value="0" />
                                         <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-rubrics="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-rubrics" name="summary[workType][{{ worktype.id }}][rubrics]" type="checkbox" value="1" {% if worktype.rubrics ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
-                                        <label for="report-summary-worktype-{{ worktype.id }}-rubrics" class="checkbox-label"></label>
+                                        <label for="report-summary-worktype-{{ worktype.id }}-rubrics" class="checkbox-label" data-test="report-summary-worktype-{{ worktype.name }}-rubrics"></label>
                                     </td>
                                     <td>
                                         <input name="summary[workType][{{ worktype.id }}][graph]" type="hidden" value="0" />
                                         <input data-summary-worktype-option="{{ worktype.id }}" data-summary-worktype-graph="{{ worktype.id }}" id="report-summary-worktype-{{ worktype.id }}-graph" name="summary[workType][{{ worktype.id }}][graph]" type="checkbox" value="1" {% if worktype.graph ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
-                                        <label for="report-summary-worktype-{{ worktype.id }}-graph" class="checkbox-label"></label>
+                                        <label for="report-summary-worktype-{{ worktype.id }}-graph" class="checkbox-label" data-test="report-summary-worktype-{{ worktype.name }}-graph"></label>
                                     </td>
                                 </tr>
                                 {% endfor %}

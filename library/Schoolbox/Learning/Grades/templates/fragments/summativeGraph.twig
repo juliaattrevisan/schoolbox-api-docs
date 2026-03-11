@@ -79,13 +79,13 @@
 </script>
 
 <div class="row" id="chart_row_{{ graphId }}">
-    <p class="summative-graph-type">{{ folderType }} distribution</p>
+    <p class="summative-graph-type" data-test="summative-preview-summary-class-distribution">{{ folderType }} distribution</p>
         <div class="small-12 island">
-            <section class="content summative-graph-container">
+            <section class="content summative-graph-container" data-test="summative-preview-summary-graph-container">
                 <div id="{{ graphId }}"></div>
             </section>
         </div>
     {% if location == 'summary' %}
-        <p class="summative-graph-type">Results</p>
+        <p class="summative-graph-type" data-test="summative-preview-summary-results">Results</p>
     {% endif %}
 </div>
