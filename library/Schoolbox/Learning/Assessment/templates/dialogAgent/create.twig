@@ -169,6 +169,11 @@
     </fieldset>
 {% endif %}
 
+{# Participation #}
+{% if context.baseContext is not unitSpecification and custom_assessment_participation %}
+    {% include '@learningAssessment/fragments/participation.twig' %}
+{% endif %}
+
 {# Submit #}
 {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
 
