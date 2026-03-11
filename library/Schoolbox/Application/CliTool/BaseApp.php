@@ -114,7 +114,8 @@ abstract class BaseApp extends App
             ->defaultValue(false);
 
         $this->setOptions();
-        $this->optionResult = new OptionParser($this->optionCollection)->parse($_SERVER['argv']);
+        $this->optionResult = new OptionParser($this->optionCollection)
+            ->parse($this->preprocessArgs($_SERVER['argv']));
 
         return $this;
     }
@@ -172,6 +173,84 @@ abstract class BaseApp extends App
             }
             $this->optionCollection->add($longOption, 'Undocumented long option: please set in setOptions instead');
         }
+    }
+
+    /**
+     * Pre-process the args passed into the script, so that the option parser
+     * can better understand them.
+     *
+     * In particular: this expands args in the form of `-{shortOpt}{value}` to
+     * `-{shortOpt}={value}`, as the underlying GetOptionKit library can't
+     * properly parse the former.
+     *
+     * @param array $args
+     * @return array
+     */
+    private function preprocessArgs(array $args): array
+    {
+        // Short opts with arguments should be allowed to be provided as:
+        // -{opt}{value}, e.g. -i1 is -i=1
+        // This is opposed opts without arguments, which may be provided as:
+        // -{opt}{opt}, e.g. -v is -v -v
+        $splitTokens = [];
+        foreach ($args as $arg) {
+            $splitTokens = array_merge($splitTokens, $this->splitArg($arg));
+        }
+        return $splitTokens;
+    }
+
+    /**
+     * Splits a single command-line arg into a form which the GetOptionKit
+     * library can understand.
+     *
+     * @param string $arg
+     * @return array|string[]
+     */
+    private function splitArg(string $arg): array
+    {
+        // Long opt: return as-is
+        if (str_starts_with($arg, '--')) {
+            return [$arg];
+        }
+
+        // Not an opt: return as-is
+        if (!str_starts_with($arg, '-')) {
+            return [$arg];
+        }
+
+        // Short opt:
+        // if the opt takes values, treat the remainder as the value:
+        // otherwise, treat the remainder as more options
+        $firstOpt  = mb_substr($arg, 0, 2);
+        $remainder = mb_substr($arg, 2);
+
+        // Nothing left: return as-is
+        if ($remainder === '') {
+            return [$arg];
+        }
+
+        // Rest starts with a = char: return as-is, as the rest must be the
+        // option value
+        if (str_starts_with($remainder, '=')) {
+            return [$arg];
+        }
+
+        // Otherwise, figure out what type of option was passed:
+        // * if it's a flag (i.e. it takes no arguments), treat the remainder as
+        //   options to themselves be split
+        // * otherwise, treat the remainder as the option value
+        $option = $this->optionCollection->get(trim($firstOpt, '-'));
+        if ($option instanceof Option) {
+            if ($option->isFlag()) {
+                return [$firstOpt, ...$this->splitArg('-' . $remainder)];
+            } else {
+                return [$firstOpt . '=' . $remainder];
+            }
+        }
+
+        // Fall through, if somehow option wasn't an arg:
+        // likely an exception will be raised earlier if this is the case though
+        return [$arg];
     }
 
     /**
