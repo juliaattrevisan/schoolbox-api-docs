@@ -226,5 +226,132 @@ class BaseAppTest extends TestCase
                 'porcelain' => false,
             ],
         ];
+
+        $simpleOptions = [
+            new Option('b|bool')->isa('boolean'),
+            new Option('i|int:')->isa('number'),
+            new Option('m|multiple+'),
+            new Option('o|optional?'),
+        ];
+
+        yield 'simple options, no arguments provided' => [
+            $simpleOptions,
+            [],
+            [
+                'b'        => null,
+                'bool'     => null,
+                'i'        => null,
+                'int'      => null,
+                'm'        => null,
+                'multiple' => null,
+                'o'        => null,
+                'optional' => null,
+            ],
+        ];
+
+        yield 'simple options, -b provided' => [
+            $simpleOptions,
+            ['-b'],
+            [
+                'b'        => true,
+                'bool'     => true,
+                'i'        => null,
+                'int'      => null,
+                'm'        => null,
+                'multiple' => null,
+                'o'        => null,
+                'optional' => null,
+            ],
+        ];
+
+        yield 'simple options, --bool provided' => [
+            $simpleOptions,
+            ['--bool'],
+            [
+                'b'        => true,
+                'bool'     => true,
+                'i'        => null,
+                'int'      => null,
+                'm'        => null,
+                'multiple' => null,
+                'o'        => null,
+                'optional' => null,
+            ],
+        ];
+
+        yield 'simple options, -i1 provided' => [
+            $simpleOptions,
+            ['-i1'],
+            [
+                'b'        => null,
+                'bool'     => null,
+                'i'        => 1,
+                'int'      => 1,
+                'm'        => null,
+                'multiple' => null,
+                'o'        => null,
+                'optional' => null,
+            ],
+        ];
+
+        yield 'simple options, -i=1 provided' => [
+            $simpleOptions,
+            ['-i=1'],
+            [
+                'b'        => null,
+                'bool'     => null,
+                'i'        => 1,
+                'int'      => 1,
+                'm'        => null,
+                'multiple' => null,
+                'o'        => null,
+                'optional' => null,
+            ],
+        ];
+
+        yield 'simple options, --int=1 provided' => [
+            $simpleOptions,
+            ['--int=1'],
+            [
+                'b'        => null,
+                'bool'     => null,
+                'i'        => 1,
+                'int'      => 1,
+                'm'        => null,
+                'multiple' => null,
+                'o'        => null,
+                'optional' => null,
+            ],
+        ];
+
+        yield 'simple options, -i 1 provided' => [
+            $simpleOptions,
+            ['-i', '1'],
+            [
+                'b'        => null,
+                'bool'     => null,
+                'i'        => 1,
+                'int'      => 1,
+                'm'        => null,
+                'multiple' => null,
+                'o'        => null,
+                'optional' => null,
+            ],
+        ];
+
+        yield 'simple options, --int 1 provided' => [
+            $simpleOptions,
+            ['--int', '1'],
+            [
+                'b'        => null,
+                'bool'     => null,
+                'i'        => 1,
+                'int'      => 1,
+                'm'        => null,
+                'multiple' => null,
+                'o'        => null,
+                'optional' => null,
+            ],
+        ];
     }
 }
