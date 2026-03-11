@@ -93,19 +93,25 @@ abstract class BaseApp extends App
             'Display help text and exit',
         );
         if ($this->hasPerformMode()) {
-            $this->optionCollection->add(
-                self::OPT_SHORT_PERFORM . '|' . self::OPT_LONG_PERFORM,
-                'Perform mode: if not provided, no changes will be written',
-            );
+            $this->optionCollection
+                ->add(
+                    self::OPT_SHORT_PERFORM . '|' . self::OPT_LONG_PERFORM,
+                    'Perform mode: if not provided, no changes will be written',
+                )
+                ->isa('boolean')
+                ->defaultValue(false);
         }
-        $this->optionCollection->add(
-            self::OPT_SHORT_VERBOSITY,
-            'Verbosity (up to 3 times)',
-        )->incremental();
+        $this->optionCollection
+            ->add(self::OPT_SHORT_VERBOSITY, 'Verbosity (up to 3 times)')
+            ->incremental()
+            ->defaultValue(0);
         $this->assignDeprecatedOptions();
 
         // ... including an esoteric option I forgot existed
-        $this->optionCollection->add(self::OPT_LONG_PORCELAIN, 'Porcelain log output');
+        $this->optionCollection
+            ->add(self::OPT_LONG_PORCELAIN, 'Porcelain log output')
+            ->isa('boolean')
+            ->defaultValue(false);
 
         $this->setOptions();
         $this->optionResult = new OptionParser($this->optionCollection)->parse($_SERVER['argv']);
