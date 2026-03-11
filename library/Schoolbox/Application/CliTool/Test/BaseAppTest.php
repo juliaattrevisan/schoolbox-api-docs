@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Schoolbox\Application\CliTool\BaseApp;
+use Schoolbox\Config\ArrayLoader;
 
 #[CoversClass(BaseApp::class)]
 class BaseAppTest extends TestCase
@@ -24,98 +25,46 @@ class BaseAppTest extends TestCase
     /**
      * Backup for `$_SERVER['argv']`: set before running each test, and restored
      * after completion.
-     *
-     * @var array
      */
     private array $argvBackup = [];
 
     /**
-     * Set backup for `$_SERVER['argv']`
+     * Backup for `$_SERVER['argc']`: set before running each test, and restored
+     * after completion.
+     */
+    private int $argcBackup = 0;
+
+    /**
+     * Set backup for argv and argc
      *
      * @return void
      */
     public function setUp(): void
     {
         $this->argvBackup = $_SERVER['argv'];
+        $this->argcBackup = $_SERVER['argc'];
     }
 
     /**
-     * Restore `$_SERVER['argv']` from backup
+     * Restore argv and argc from backup
      *
      * @return void
      */
     public function tearDown(): void
     {
         $_SERVER['argv'] = $this->argvBackup;
+        $_SERVER['argc'] = $this->argcBackup;
     }
 
     #[DataProvider('getTestGetOptData')]
     public function testGetOpt(array $options, array $arguments, array $expectedOptionValues): void
     {
-        $testCliTool = new class (...$options) extends BaseApp {
-            /**
-             * @var array<Option>
-             */
-            private array $options;
-
-            public function __construct(Option ...$options)
-            {
-                $this->options = $options;
-            }
-
-            public function run(): void
-            {
-            }
-
-            public function getOpt(string $name)
-            {
-                return parent::getOpt($name);
-            }
-
-            protected function getName(): string
-            {
-                return 'name';
-            }
-
-            protected function getDescription(): string
-            {
-                return 'description';
-            }
-
-            protected function setOptions(): BaseApp
-            {
-                foreach ($this->options as $option) {
-                    $this->optionCollection->addOption($option);
-                }
-                return $this;
-            }
-
-            protected function hasPerformMode(): bool
-            {
-                return true;
-            }
-        };
-
-        // Somehow set argv here
-        $di = new ContainerBuilder()->newInstance()
-            ->set('config', new \Schoolbox\Config\ArrayLoader())
-            ->set('databaseInternal', new NullConnector());
-
-        // Override argv manually for now:
-        // setup reads argv from these settings
-        $_SERVER['argv'] = array_merge([__FILE__], $arguments);
-        $testCliTool->setup(
-            [],
-            $di,
-            STDERR,
-            new NullLogger(),
-            true,
-        );
-        $testCliTool->run();
+        $testCliTool = $this->buildTestCliTool($options, $arguments, true);
 
         // Do tests here
         $actualOptionValues = [];
         foreach ($expectedOptionValues as $option => $expectedValue) {
+            // @phpstan-ignore-next-line - getOpt is public in $testCliTool
             $actualOptionValue = $testCliTool->getOpt($option);
 
             // As mentioned in the data provider, the underlying library parses
@@ -459,5 +408,75 @@ class BaseAppTest extends TestCase
                 'optional' => '1',
             ],
         ];
+    }
+
+    /**
+     * Build and run a CLI tool for the purpose of testing option parsing.
+     *
+     * @param array<Option> $options    The options the tool accepts.
+     * @param array<string> $arguments  The arguments to pass to the tool.
+     * @param bool          $hasPerform Does the tool have perform mode?
+     * @return BaseApp
+     */
+    private function buildTestCliTool(array $options, array $arguments, bool $hasPerform): BaseApp
+    {
+        // This test tool simply sets options based on `$options`, and exposes
+        // `getOpt` so they can be retrieved.
+        $testCliTool = new class ($hasPerform, ...$options) extends BaseApp {
+            /**
+             * @var array<Option>
+             */
+            private array $options;
+
+            public function __construct(private bool $hasPerform, Option ...$options)
+            {
+                $this->options = $options;
+            }
+
+            public function run(): void
+            {
+            }
+
+            public function getOpt(string $name)
+            {
+                return parent::getOpt($name);
+            }
+
+            protected function getName(): string
+            {
+                return 'name';
+            }
+
+            protected function getDescription(): string
+            {
+                return 'description';
+            }
+
+            protected function setOptions(): BaseApp
+            {
+                foreach ($this->options as $option) {
+                    $this->optionCollection->addOption($option);
+                }
+                return $this;
+            }
+
+            protected function hasPerformMode(): bool
+            {
+                return $this->hasPerform;
+            }
+        };
+
+        // Build dummy DI container with dummy config and DB connection
+        $di = new ContainerBuilder()->newInstance()
+            ->set('config', new ArrayLoader())
+            ->set('databaseInternal', new NullConnector());
+
+        // Override argv and argc manually: setup reads argv from these settings
+        $_SERVER['argv'] = array_merge([__FILE__], $arguments);
+        $_SERVER['argc'] = count($_SERVER['argv']);
+
+        // Setup, so that CLI args are parsed
+        $testCliTool->setup([], $di, STDERR, new NullLogger(), true);
+        return $testCliTool;
     }
 }
