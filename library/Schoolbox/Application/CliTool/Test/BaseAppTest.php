@@ -10,9 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Application\CliTool\Test;
 
 use Alaress\Database\Connector\NullConnector;
-use Aura\Di\Container;
 use Aura\Di\ContainerBuilder;
+use GetOptionKit\Option;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Schoolbox\Application\CliTool\BaseApp;
@@ -20,12 +21,55 @@ use Schoolbox\Application\CliTool\BaseApp;
 #[CoversClass(BaseApp::class)]
 class BaseAppTest extends TestCase
 {
-    public function testGetOpt(): void
+    /**
+     * Backup for `$_SERVER['argv']`: set before running each test, and restored
+     * after completion.
+     *
+     * @var array
+     */
+    private array $argvBackup = [];
+
+    /**
+     * Set backup for `$_SERVER['argv']`
+     *
+     * @return void
+     */
+    public function setUp(): void
     {
-        $testCliTool = new class extends BaseApp {
+        $this->argvBackup = $_SERVER['argv'];
+    }
+
+    /**
+     * Restore `$_SERVER['argv']` from backup
+     *
+     * @return void
+     */
+    public function tearDown(): void
+    {
+        $_SERVER['argv'] = $this->argvBackup;
+    }
+
+    #[DataProvider('getTestGetOptData')]
+    public function testGetOpt(array $options, array $arguments, array $expectedOptionValues): void
+    {
+        $testCliTool = new class (...$options) extends BaseApp {
+            /**
+             * @var array<Option>
+             */
+            private array $options;
+
+            public function __construct(Option ...$options)
+            {
+                $this->options = $options;
+            }
+
             public function run(): void
             {
-                // Parse this tool's options I guess?
+            }
+
+            public function getOpt(string $name)
+            {
+                return parent::getOpt($name);
             }
 
             protected function getName(): string
@@ -40,13 +84,15 @@ class BaseAppTest extends TestCase
 
             protected function setOptions(): BaseApp
             {
-                // TODO set from data provider
+                foreach ($this->options as $option) {
+                    $this->optionCollection->addOption($option);
+                }
                 return $this;
             }
 
             protected function hasPerformMode(): bool
             {
-                // TODO set from data provider
+                // TODO set from data provider?
                 return false;
             }
         };
@@ -55,17 +101,43 @@ class BaseAppTest extends TestCase
         $di = new ContainerBuilder()->newInstance()
             ->set('config', new \Schoolbox\Config\ArrayLoader())
             ->set('databaseInternal', new NullConnector());
+
+        // Override argv manually for now:
+        // setup reads argv from these settings
+        $_SERVER['argv'] = array_merge([__FILE__], $arguments);
         $testCliTool->setup(
             [],
             $di,
             STDERR,
             new NullLogger(),
-            false,
+            true,
         );
-
         $testCliTool->run();
 
         // Do tests here
-        $this->assertSame('v', 'r');
+        $actualOptionValues = [];
+        foreach ($expectedOptionValues as $option => $expectedValue) {
+            $actualOptionValues[$option] = $testCliTool->getOpt($option);
+        }
+        $this->assertSame($expectedOptionValues, $actualOptionValues);
+    }
+
+    /**
+     * Data provider for `testGetOpt`
+     *
+     * @return iterable
+     */
+    public static function getTestGetOptData(): iterable
+    {
+        yield 'default options only, no arguments provided' => [
+            [],
+            [],
+            [
+                'v'         => 0,
+                'p'         => false,
+                'perform'   => false,
+                'porcelain' => false,
+            ],
+        ];
     }
 }
