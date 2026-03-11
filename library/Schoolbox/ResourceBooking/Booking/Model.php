@@ -368,18 +368,25 @@ class Model implements ISoftDeletable, JsonSerializable
      */
     private function canUserModifyBooking(User $user): bool
     {
-        if ($this->getResource()->canUserModerateThisItem($user)) {
-            return true;
-        }
-
         try {
+            // Check this first, because this function should never be called on a booking whose event owner is not set.
+            // (So if this ever does happen, we want to catch the problem in testing.)
+            // Note a stub object for event owner is okay, because we only need the owner's id.
             $bookingOwner = $this->getEvent()->getOwner();
         } catch (\TypeError) {
             throw new UnexpectedValueException('Booking object does not have event owner set');
         }
 
         // If the user is the owner of the event, he/she can modify (edit or delete) the booking.
-        return ($bookingOwner->getId() === $user->getId());
+        if ($bookingOwner->getId() === $user->getId()) {
+            return true;
+        }
+
+        if ($this->getResource()->canUserModerateThisItem($user)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
