@@ -427,5 +427,37 @@ class BaseAppTest extends TestCase
                 'optional' => null,
             ],
         ];
+
+        // Unexpectedly, this parses to `null` rather than something truthy:
+        // I don't expect optional args will be used much anyway
+        yield 'simple options, -o provided' => [
+            $simpleOptions,
+            ['-o'],
+            [
+                'b'        => null,
+                'bool'     => null,
+                'i'        => null,
+                'int'      => null,
+                'm'        => null,
+                'multiple' => null,
+                'o'        => null,
+                'optional' => null,
+            ],
+        ];
+
+        yield 'simple options, -o=1 provided' => [
+            $simpleOptions,
+            ['-o=1'],
+            [
+                'b'        => null,
+                'bool'     => null,
+                'i'        => null,
+                'int'      => null,
+                'm'        => null,
+                'multiple' => null,
+                'o'        => '1',
+                'optional' => '1',
+            ],
+        ];
     }
 }
