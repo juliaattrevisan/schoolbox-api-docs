@@ -124,6 +124,8 @@ class CommandLineTool extends CliTool\App
             );
             return;
         }
+
+        // register shutdown function to release lock when the script ends, either naturally or through an error, to avoid leaving a stale lock
         register_shutdown_function(fn () => $this->releaseLock($lock));
 
         // get the number of loops to run for each strategy, default 3
@@ -236,9 +238,11 @@ class CommandLineTool extends CliTool\App
             }
 
 
-            // log that we have finished and release the lock
-            $logger->notice("Finished processing all chunks");
-            $this->releaseLock($lock);
+            // log that we have finished
+            $logger->notice("Finished processing all strats");
+            /* lock will be released by the shutdown
+             * register_shutdown_function(fn () => $this->releaseLock($lock));
+             */
         } else {
             $logger->notice('No data retention strategies to run');
         }
