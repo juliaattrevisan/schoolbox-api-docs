@@ -2,6 +2,8 @@
 
 {% block filterName %}Name{% endblock %}
 
+{% block dropdownClass %} f-dropdown--wider{% endblock %}
+
 {% block filterComponent %}
     {% set isDisabled = false %}
     {{ parent() }}
@@ -11,13 +13,14 @@
     <li>
         {% if isUserConfigurable %}
             <sbx-search-select
-                    id="search-{{ definition.filter.id }}"
-                    label="Search"
-                    label-id="search-label-{{ definition.filter.id }}"
-                    form-value-name="filter_selection[{{ definition.filter.id }}]"
-                    endpoint="/ajax/user.php?roleTypeID=student&"
-                    for-filter-panel
-                    placeholder="Search for students...">
+                id="search-{{ definition.filter.id }}"
+                class="l-width-100"
+                label="Search"
+                label-id="search-label-{{ definition.filter.id }}"
+                form-value-name="filter_selection[{{ definition.filter.id }}]"
+                endpoint="/ajax/user.php?roleTypeID=student&"
+                for-filter-panel
+                placeholder="Search for students...">
             </sbx-search-select>
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
