@@ -17,7 +17,11 @@ use Schoolbox\DifferentiationProfile\AdjustmentLevels\Mapper as AdjustmentLevelM
 use Schoolbox\CustomisationRecord;
 use Schoolbox\Filter;
 use Schoolbox\Filter\IFactory;
+use Schoolbox\IConfigLoader;
+use Schoolbox\L10n\RosettaStone;
+use Schoolbox\MapperFactory;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 /**
  * Factory class responsible for building customisation record filter factories.
@@ -31,6 +35,20 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
 
     /**
+     * Constructor
+     *
+     * @param MapperFactory $mapperFactory
+     * @param IConfigLoader $configLoader
+     * @param RosettaStone  $rosettaStone
+     */
+    public function __construct(
+        MapperFactory $mapperFactory,
+        IConfigLoader $configLoader,
+        private RosettaStone $rosettaStone
+    ) {
+        parent::__construct($mapperFactory, $configLoader);
+    }
+    /**
      * @inheritdoc
      */
     public function buildFilterFactoryForFilter(string $filterDefinitionClass): IFactory
@@ -41,6 +59,8 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getOptionMapper(),
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper(),
+                    $this->getMapperFactory()->get(UserMapper::class),
+                    $this->rosettaStone,
                 );
             case AdjustmentCategory\Definition::class:
                 return new AdjustmentCategory\Factory(

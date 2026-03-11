@@ -16,10 +16,16 @@
                     label-id="Search"
                     form-value-name="filter_selection[{{ definition.filter.id }}]"
                     endpoint="/ajax/user.php?roleTypeID=student&"
-                    :selected-default="[]"
                     for-filter-panel
                     placeholder="Search for students...">
             </sbx-search-select>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const searchSelect = document.getElementById('studentSearch');
+                    // Pre-populating the search select with any existing user selection
+                    searchSelect.selected = {{ userSelectionIds | json_encode | raw }};
+                });
+            </script>
         {% else %}
             {# Empty input is required so that filter works if not user-configurable, or
             nothing is selected #}
