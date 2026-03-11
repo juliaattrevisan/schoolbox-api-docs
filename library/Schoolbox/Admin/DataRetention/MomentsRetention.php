@@ -222,7 +222,7 @@ class MomentsRetention extends StrategyBase
     /**
      * Prepare the queries we will need to delete a full chunk of moments and their related data
      * this is reused to assist with not preparing each time for multiple chunks
-     * @return array
+     * @return array<\PDOStatement>
      */
     private function prepareFullChunkMomentQueries(): array
     {
@@ -245,7 +245,7 @@ class MomentsRetention extends StrategyBase
     /**
      * Prepare the queries we will need to delete a chunk of moments and their related data, with the specific chunk ids
      * @param array $chunkIds
-     * @return array
+     * @return array<\PDOStatement>
      */
     private function preparePartChunkMomentQueries(array $chunkIds): array
     {

@@ -212,8 +212,8 @@ abstract class StrategyBase implements IStrategy
     protected function deleteStatement(): string
     {
         if (!$this->perform) {
-            return 'SELECT';
+            return 'SELECT * ';
         }
-        return 'DELETE';
+        return 'DELETE ';
     }
 }
