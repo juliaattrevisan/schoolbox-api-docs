@@ -109,6 +109,9 @@ class EmbedReplacer
         // Process each embed
         $replacementsApplied = false;
         foreach ($embeds as $embed) {
+            if (!$embed instanceof Element) {
+                continue;
+            }
             foreach (self::IFRAMELY_EMBED_CONTAINER_SOURCE_ATTRIBUTES as $attribute) {
                 $replacementHtml = $this->findReplacementHtml($embed, $attribute);
                 // Replace the Iframely element's HTML with the new embed
@@ -137,11 +140,11 @@ class EmbedReplacer
      * Determine what the replacement HTML should be for elements within an
      * Iframely embed.
      *
-     * @param Node    $srcNode   The HTML element for the Iframely embed.
+     * @param Element $srcNode   The HTML element for the Iframely embed.
      * @param string  $attribute The attribute to search for within the embed.
      * @return string|null
      */
-    private function findReplacementHtml(Node $srcNode, string $attribute): ?string
+    private function findReplacementHtml(Element $srcNode, string $attribute): ?string
     {
         // If there are attributes, check if any of those URLs point to the
         // Iframely CDN.
@@ -157,7 +160,10 @@ class EmbedReplacer
             $apiUrl = new Uri(self::IFRAMELY_API_ENDPOINT);
             if (strtolower($srcNode->tagName) === 'oembed') {
                 // We are in an oembed ckeditor5 object so we need to add different query strings
-                $apiUrl = $apiUrl->appendQueryParameters($paramsSet + ['api_key' => $this->iframelyLicenseKey, 'url' => $srcNode->getAttribute($attribute)]);
+                $apiUrl = $apiUrl->appendQueryParameters(
+                    $paramsSet
+                    + ['api_key' => $this->iframelyLicenseKey, 'url' => $srcNode->getAttribute($attribute)],
+                );
             } else if ($srcUrl->getHost() === self::IFRAMELY_CDN_HOST) {
                 //ckeditor4 the iframe tag contains the required iframe url with the key already there
                 $apiUrl = $apiUrl->appendQueryParameters($paramsSet + $srcUrl->getQueryAsArray());
