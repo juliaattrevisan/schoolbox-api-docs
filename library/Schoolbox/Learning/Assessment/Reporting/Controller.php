@@ -31,7 +31,7 @@ use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Transla
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DialogAgent\Button;
-use Schoolbox\Learning\Assessment\DialogAgent\Model;
+use Schoolbox\Learning\Assessment\Reporting\Model;
 use Schoolbox\Learning\Assessment\DialogAgent\Response;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -186,7 +186,7 @@ class Controller extends Assessment\Controller
          * I do not think it is required at this stage for anyone because we said students and parents couldn't access it at all at the minute.
          * Staff don't need it as there won't be a description or a submission history. So all it would have is their own grading - which shouldn't be needed.
          */
-        throw new NotFound();
+        throw new Exception\NotFound();
     }
 
 
