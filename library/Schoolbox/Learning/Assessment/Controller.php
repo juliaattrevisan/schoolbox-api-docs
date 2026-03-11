@@ -400,13 +400,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
             /* There are numerous date range options of which numerous could be enabled
              */
             $data['reporting']['availableRangeOptions'] = Range::lookup();
-
-            $data['reporting']['curriculumSelector'] = [
-                'contextId' => $assessment->getContext()->getFolder()->getId(),
-                'selectedNodes' => $assessment->getSupportingDataCurriculumNodes(),
-                'curriculumTreeFilter' => null,
-                'curriculumTagging' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
-            ];
         }
 
         /* TODO lol why is this outside the AssessmentType check?
