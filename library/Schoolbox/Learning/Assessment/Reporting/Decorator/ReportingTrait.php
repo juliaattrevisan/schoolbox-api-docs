@@ -17,7 +17,7 @@ trait ReportingTrait
      *
      * @var bool|null
      */
-    private ?bool $supportingDataEnable;
+    private ?bool $supportingDataEnable = null;
 
 
     /**
@@ -25,7 +25,7 @@ trait ReportingTrait
      *
      * @var string|null
      */
-    private ?string $supportingDataRange;
+    private ?string $supportingDataRange = null;
 
 
     /**
@@ -36,7 +36,7 @@ trait ReportingTrait
      *
      * @var GenericCollection|null
      */
-    private ?GenericCollection $supportingDataCurriculumNodes;
+    private ?GenericCollection $supportingDataCurriculumNodes = null;
 
 
     /**
@@ -49,7 +49,7 @@ trait ReportingTrait
      *
      * @var string|null
      */
-    private ?string $supportingDataFolders;
+    private ?string $supportingDataFolders = null;
 
 
     /**
@@ -60,7 +60,7 @@ trait ReportingTrait
      *
      * @var GenericCollection|null
      */
-    private ?GenericCollection $supportingDataWorkTypes;
+    private ?GenericCollection $supportingDataWorkTypes = null;
 
 
     /**
@@ -69,7 +69,7 @@ trait ReportingTrait
      *
      * @var bool|null
      */
-    private ?bool $supportingDataMarkbookEnable;
+    private ?bool $supportingDataMarkbookEnable = null;
 
 
     /**
@@ -78,7 +78,7 @@ trait ReportingTrait
      *
      * @var bool|null
      */
-    private ?bool $feedbackCommentsEnable;
+    private ?bool $feedbackCommentsEnable = null;
 
 
     /**
