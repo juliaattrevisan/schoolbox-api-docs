@@ -138,25 +138,43 @@
     </div>
 
     <div class="row">
-        <div class="small-12 columns">
-            {# Curriculum Nodes for Supporting Data
-             # TODO set this entity type somewhere
-             #}
-            {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
-                curriculumNodes: assessment.supportingDataCurriculumNodes,
-                entityType: locale.reporting.proper,
-                courseManagedReadonly: courseManaged.isReadonly,
-                excludeLegend: true,
-                hasTabs: true,
-                parentFolderId: parentFolderId ?? null,
-                tooltip:
-                    'Select branches of the curriculum to have supporting data appear to staff when entering feedback for this ' ~
-                    locale.reporting ~ '. This data can come from ' ~ locale.activity.plural ~ ' and rubrics that have been tagged
-                    with curriculum codes matching the selection below. It is possible to select both a branch of a curriculum or
-                    specific curriculum codes. If you select a branch, all nodes contained within will be applied.',
-                useMetaTooltip: true,
-                formValueName: 'reporting[supporting][curriculumNodes]',
-            } %}
+        <div class="small-12 columns" id="componentreportingcontainer">
+            <div data-overview-component>
+                <overview-component
+                    :folder-id="{{ reporting.curriculumSelector.contextId }}"
+                    component-instance-id="reportingcontainer"
+                    :nodes="{{ [] | json_encode }}"
+                    :selected-nodes="{{ (reporting.curriculumSelector.selectedNodes ?? []) | json_encode }}"
+                    :filter="{{ reporting.curriculumSelector.curriculumTreeFilter | json_encode }}"
+                    data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
+                    :is-read-only="false"
+                    :is-super-user="{{ USER.isSuperuser ? "true" : "false" }}"
+                    :has-tagging="{{ reporting.curriculumSelector.curriculumTagging ? "true" : "false" }}"
+                    locale-unit="{{ locale.unit }}"
+                    {% if parentFolderId is defined  and parentFolderId is not null %}:parent-folder-id="{{ parentFolderId }}"{% endif %}
+                />
+            </div>
+            <script src="{{ CDN_PREFIX }}/js/bundle/overviewComponent.js?v={{ config.site_version }}"></script>
+
+
+            {#            #}{# Curriculum Nodes for Supporting Data#}
+{#             # TODO set this entity type somewhere#}
+{#             #}
+{#            {% include '@learningAssessment/fragments/curriculumCodes.twig' with {#}
+{#                curriculumNodes: assessment.supportingDataCurriculumNodes,#}
+{#                entityType: locale.reporting.proper,#}
+{#                courseManagedReadonly: courseManaged.isReadonly,#}
+{#                excludeLegend: true,#}
+{#                hasTabs: true,#}
+{#                parentFolderId: parentFolderId ?? null,#}
+{#                tooltip:#}
+{#                    'Select branches of the curriculum to have supporting data appear to staff when entering feedback for this ' ~#}
+{#                    locale.reporting ~ '. This data can come from ' ~ locale.activity.plural ~ ' and rubrics that have been tagged#}
+{#                    with curriculum codes matching the selection below. It is possible to select both a branch of a curriculum or#}
+{#                    specific curriculum codes. If you select a branch, all nodes contained within will be applied.',#}
+{#                useMetaTooltip: true,#}
+{#                formValueName: 'reporting[supporting][curriculumNodes]',#}
+{#            } %}#}
         </div>
     </div>
 
@@ -197,7 +215,7 @@
                     {% for workType in reporting.workTypes %}
                         {% set checked = '' %}
 
-                        {% if workType.id in assessment.supportingDataWorkTypes.propertyValues('id') %}
+                        {% if workType.id in assessment.supportingDataWorkTypes.propertyValues('id') ?? [] %}
                             {% set checked = 'checked="checked"' %}
                         {% endif %}
                         <li>
