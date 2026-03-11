@@ -2,10 +2,12 @@
 
 /**
  * IB Qualification Mapper
- * @author    [Your Name]
- * @copyright Copyright 2024, Schoolbox Pty Ltd
+ * @author    Haris Ali
+ * @copyright Copyright 2026, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\IB\Qualification;
 
@@ -39,48 +41,13 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Find all qualifications ordered by sequence
-     *
-     * @param array $options
-     * @return GenericCollection|Model[]
+     * @inheritdoc
      */
-    public function findAllOrderedBySequence(array $options = []): GenericCollection
+    protected function getDefaultOrderByParams(): array
     {
-        $options['order'] = ['sequence' => 'ASC', 'name' => 'ASC'];
-        return $this->findAll($options);
-    }
-
-    /**
-     * Find qualification by system purpose
-     *
-     * @param string $systemPurpose
-     * @param array $options
-     * @return GenericCollection|Model[]
-     */
-    public function findBySystemPurpose(string $systemPurpose, array $options = []): GenericCollection
-    {
-        $options['where'] = ['system_purpose' => $systemPurpose];
-        return $this->findAll($options);
-    }
-
-    /**
-     * Get qualification lookup data for admin lists
-     *
-     * @return array
-     */
-    public function getLookupData(): array
-    {
-        $qualifications = $this->findAllOrderedBySequence(['deleted' => true]);
-        $lookupData = [];
-
-        foreach ($qualifications as $qualification) {
-            $lookupData[] = [
-                'key' => $qualification->getId(),
-                'value' => $qualification->getName(),
-                'deleted' => $qualification->isDeleted(),
-            ];
-        }
-
-        return $lookupData;
+        return [
+            'sequence' => 'ASC',
+            'name' => 'ASC',
+        ];
     }
 }

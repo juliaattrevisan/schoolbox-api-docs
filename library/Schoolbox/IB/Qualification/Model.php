@@ -2,10 +2,11 @@
 
 /**
  * IB Qualification Model
- * @author    [Your Name]
- * @copyright Copyright 2024, Schoolbox Pty Ltd
+ * @copyright Copyright 2026, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\IB\Qualification;
 
@@ -30,14 +31,14 @@ class Model implements ISoftDeletable, Sequential, JsonSerializable
     /**
      * System Purpose Constants
      */
-    public const SYSTEM_PURPOSE_DIPLOMA = 'DIPLOMA';
-    public const SYSTEM_PURPOSE_ANTICIPATED = 'ANTICIPATED';
-    public const SYSTEM_PURPOSE_COURSE = 'COURSE';
+    public const string SYSTEM_PURPOSE_DIPLOMA = 'DIPLOMA';
+    public const string SYSTEM_PURPOSE_ANTICIPATED = 'ANTICIPATED';
+    public const string SYSTEM_PURPOSE_COURSE = 'COURSE';
 
     /**
      * Available system purposes
      */
-    public const VALID_SYSTEM_PURPOSES = [
+    public const array VALID_SYSTEM_PURPOSES = [
         self::SYSTEM_PURPOSE_DIPLOMA,
         self::SYSTEM_PURPOSE_ANTICIPATED,
         self::SYSTEM_PURPOSE_COURSE,
@@ -65,9 +66,9 @@ class Model implements ISoftDeletable, Sequential, JsonSerializable
 
     /**
      * @param string|null $name
-     * @return static
+     * @return self
      */
-    public function setName(?string $name): static
+    public function setName(?string $name): self
     {
         $this->name = $name;
         return $this;
@@ -83,9 +84,9 @@ class Model implements ISoftDeletable, Sequential, JsonSerializable
 
     /**
      * @param string|null $systemPurpose
-     * @return static
+     * @return self
      */
-    public function setSystemPurpose(?string $systemPurpose): static
+    public function setSystemPurpose(?string $systemPurpose): self
     {
         $this->systemPurpose = $systemPurpose;
         return $this;

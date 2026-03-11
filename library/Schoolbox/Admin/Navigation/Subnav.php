@@ -160,6 +160,9 @@ class Subnav
         $userHasServicePermissionDifferentiationProfile = (
             $this->user->hasServicePermission(UserAccess::SERVICE_DIFFERENTIATION, UserAccess::ACCESS_FULL)
         );
+        $userHasServicePermissionIbCoordinator = (
+            $this->user->hasServicePermission(UserAccess::SERVICE_IB_COORDINATOR, UserAccess::ACCESS_FULL)
+        );
         $userHasAnyModeratorServicePermission = (
             $userHasServicePermissionNews ||
             $userHasServicePermissionCalendar ||
@@ -986,7 +989,7 @@ class Subnav
                     ],
                     '/adminv2/lists/qualification' => [
                         'name'        => 'Lists - Qualifications',
-                        'visible'     => true,
+                        'visible'     => $userHasServicePermissionIbCoordinator || $userIsSuperuser,
                         'description' => 'Enable and configure the types of qualification that are offered at the school.',
                     ],
                     '/adminv2/lists/residential-house' => [
