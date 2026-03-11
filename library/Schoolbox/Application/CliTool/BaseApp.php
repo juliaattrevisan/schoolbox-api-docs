@@ -213,7 +213,10 @@ abstract class BaseApp extends App
     abstract protected function hasPerformMode(): bool;
 
     /**
-     * Overridden to look up from option parser.
+     * Overridden to throw if this application has no perform mode.
+     *
+     * This used to fetch from the options object, but perform mode is handled
+     * in the kernel.
      *
      * @return bool
      */
@@ -222,7 +225,7 @@ abstract class BaseApp extends App
         if (!$this->hasPerformMode()) {
             throw new \LogicException('This application does not have a perform mode.');
         }
-        return $this->optionResult->get('p');
+        return parent::perform();
     }
 
     /**
