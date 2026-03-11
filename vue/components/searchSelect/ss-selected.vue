@@ -73,7 +73,6 @@ if (props.forFilterPanel) {
     window.Vue.onMounted(() => {
         document.addEventListener(ON_FILTER_CHANGE, (event) => {
             if (selectEl.value?.getAttribute("id") === event.detail.elementId) {
-                console.warn(event.detail.selection);
                 // just in case there are multiple on the page
                 const currentSelection = props.selected;
                 const newSelection = JSON.parse(event.detail.selection) as SearchSelectItem[];
@@ -117,7 +116,7 @@ if (props.forFilterPanel) {
         ref="selectEl"
         :name="`${props.formValueName}[]`"
         :data-selected-original="JSON.stringify(props.selected)"
-        :data-selected-default="JSON.stringify(props.selected)"
+        :data-selected-default="JSON.stringify([])"
         tabindex="-1"
         multiple
         data-search-select
