@@ -1,1 +1,1 @@
-RENAME TABLE my_folder TO my_folder;
+RENAME TABLE myFolder TO my_folder;
