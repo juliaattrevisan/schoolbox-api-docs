@@ -54,29 +54,8 @@ $kernel = new CliTool\Kernel(new class extends CliTool\BaseApp {
      */
     protected function setOptions(): CliTool\BaseApp
     {
-        $this->optionParser->addOption(
-            new GetOpt\Option(
-                't',
-                null,
-                GetOpt\GetOpt::NO_ARGUMENT,
-            )->setDescription('Test mode')
-        );
         $this->optionCollection->add('t', 'Test mode');
-        $this->optionParser->addOption(
-            new GetOpt\Option(
-                'f',
-                'folder',
-                GetOpt\GetOpt::REQUIRED_ARGUMENT,
-            )->setDescription('Folder on which to operate: a very long text output goes here but I do not know why, because it\'s only for testing whether text wraps')
-        );
         $this->optionCollection->add('f|folder:', 'Folder on which to operate: a very long text output goes here but I do not know why, because it\'s only for testing whether text wraps');
-        $this->optionParser->addOption(
-            new GetOpt\Option(
-                null,
-                'dry-run',
-                GetOpt\GetOpt::OPTIONAL_ARGUMENT,
-            )->setDescription('Dry run?')
-        );
         $this->optionCollection->add('dry-run?', 'Dry run?');
         return $this;
     }
