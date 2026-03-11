@@ -1544,7 +1544,7 @@ class Mapper extends BaseMapper
         foreach ($modelList as $model) {
             /* Assign new nodes or an empty collection if you tried to clear them all
              */
-            $model->getReporting()->setSupportingDataCurriculumNodes($curriculumNodes[$model->getReporting()->getId()] ?? new GenericCollection(\Schoolbox\Curriculum\Node\Model::class));
+            $model->getReporting()->setSupportingDataCurriculumNodes($curriculumNodes[$model->getReporting()->getId()] ?? $curriculumNodeMapper->createCollection());
         }
 
         return $modelList;
@@ -1611,7 +1611,7 @@ class Mapper extends BaseMapper
          */
         /** @var \Schoolbox\Learning\Assessment\DataModel\Model $model */
         foreach ($modelList as $model) {
-            $model->getReporting()->setSupportingDataWorkTypes($workTypes[$model->getReporting()->getId()] ?? new GenericCollection(\Schoolbox\Curriculum\Node\Model::class));
+            $model->getReporting()->setSupportingDataWorkTypes($workTypes[$model->getReporting()->getId()] ?? $workTypeMapper->createCollection());
         }
 
         return $modelList;
