@@ -989,7 +989,7 @@ class Subnav
                     ],
                     '/adminv2/lists/qualification' => [
                         'name'        => 'Lists - Qualifications',
-                        'visible'     => $userHasServicePermissionIbCoordinator || $userIsSuperuser,
+                        'visible'     =>  $userIsSuperuser,
                         'description' => 'Enable and configure the types of qualification that are offered at the school.',
                     ],
                     '/adminv2/lists/residential-house' => [
