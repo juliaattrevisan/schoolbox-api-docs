@@ -11,6 +11,10 @@ namespace Schoolbox\Application\CliTool\Test;
 
 use Alaress\Database\Connector\NullConnector;
 use Aura\Di\ContainerBuilder;
+use GetOptionKit\Exception\InvalidOptionException;
+use GetOptionKit\Exception\InvalidOptionValueException;
+use GetOptionKit\Exception\OptionConflictException;
+use GetOptionKit\Exception\RequireValueException;
 use GetOptionKit\Option;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -59,24 +63,8 @@ class BaseAppTest extends TestCase
     #[DataProvider('getTestGetOptData')]
     public function testGetOpt(array $options, array $arguments, array $expectedOptionValues): void
     {
-        $testCliTool = $this->buildTestCliTool($options, $arguments, true);
-
-        // Do tests here
-        $actualOptionValues = [];
-        foreach ($expectedOptionValues as $option => $expectedValue) {
-            // @phpstan-ignore-next-line - getOpt is public in $testCliTool
-            $actualOptionValue = $testCliTool->getOpt($option);
-
-            // As mentioned in the data provider, the underlying library parses
-            // multiples of the same option strangely:
-            // previous options will be re-added to the value.
-            // Thus something like `-m1 -m2 -m3` will be something like
-            // `[1, 1, 2, 1, 2, 3]`: we are only interested in unique values.
-            if (is_array($actualOptionValue)) {
-                $actualOptionValue = array_values(array_unique($actualOptionValue));
-            }
-            $actualOptionValues[$option] = $actualOptionValue;
-        }
+        $testCliTool        = $this->buildTestCliTool($options, $arguments, true);
+        $actualOptionValues = $this->extractActualOptionValues($expectedOptionValues, $testCliTool);
         $this->assertSame($expectedOptionValues, $actualOptionValues);
     }
 
@@ -410,6 +398,79 @@ class BaseAppTest extends TestCase
         ];
     }
 
+    #[DataProvider('getTestGetOptErrorData')]
+    public function testGetOptError(
+        array $options,
+        array $arguments,
+        bool $hasPerform,
+        string $expectedExceptionClass,
+    ): void {
+        $this->expectException($expectedExceptionClass);
+        $this->buildTestCliTool($options, $arguments, $hasPerform);
+    }
+
+    /**
+     * Data provider for `testGetOptError`
+     */
+    public static function getTestGetOptErrorData(): iterable
+    {
+        yield 'unknown opt -x provided' => [
+            [],
+            ['-x'],
+            true,
+            InvalidOptionException::class,
+        ];
+
+        yield 'unknown opt --xxx provided' => [
+            [],
+            ['--xxx'],
+            true,
+            InvalidOptionException::class,
+        ];
+
+        yield 'perform mode disabled, -p provided' => [
+            [],
+            ['-p'],
+            false,
+            InvalidOptionException::class,
+        ];
+
+        yield 'known and unknown opts -v --xxx provided' => [
+            [],
+            ['-v', '--xxx'],
+            true,
+            InvalidOptionException::class,
+        ];
+
+        yield 'opt with required arg -f provided with no arg' => [
+            [
+                new Option('f:'),
+            ],
+            ['-f'],
+            true,
+            RequireValueException::class,
+        ];
+
+        yield 'opt with number arg -n provided with non-number arg' => [
+            [
+                new Option('n:=number'),
+            ],
+            ['-n=blah'],
+            true,
+            InvalidOptionValueException::class,
+        ];
+
+        yield 'conflicting options' => [
+            [
+                new Option('n'),
+                new Option('n'),
+            ],
+            [],
+            true,
+            OptionConflictException::class,
+        ];
+    }
+
     /**
      * Build and run a CLI tool for the purpose of testing option parsing.
      *
@@ -478,5 +539,32 @@ class BaseAppTest extends TestCase
         // Setup, so that CLI args are parsed
         $testCliTool->setup([], $di, STDERR, new NullLogger(), true);
         return $testCliTool;
+    }
+
+    /**
+     * Extract actual option values out of the CLI tool.
+     *
+     * @param array   $expectedOptionValues
+     * @param BaseApp $testCliTool
+     * @return array
+     */
+    private function extractActualOptionValues(array $expectedOptionValues, BaseApp $testCliTool): array
+    {
+        $actualOptionValues = [];
+        foreach ($expectedOptionValues as $option => $expectedValue) {
+            // @phpstan-ignore-next-line - getOpt is public in $testCliTool
+            $actualOptionValue = $testCliTool->getOpt($option);
+
+            // As mentioned in the data provider, the underlying library parses
+            // multiples of the same option strangely:
+            // previous options will be re-added to the value.
+            // Thus something like `-m1 -m2 -m3` will be something like
+            // `[1, 1, 2, 1, 2, 3]`: we are only interested in unique values.
+            if (is_array($actualOptionValue)) {
+                $actualOptionValue = array_values(array_unique($actualOptionValue));
+            }
+            $actualOptionValues[$option] = $actualOptionValue;
+        }
+        return $actualOptionValues;
     }
 }
