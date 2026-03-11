@@ -1,28 +1,27 @@
 <?php
 
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Folder\IFolder;
+use Schoolbox\Resource\My\Folder\Model as MyFolderModel;
 
-$folderHandler = new MyFolder();
 $userMapper = new Schoolbox\UserMapper();
-$folderMapper = new Schoolbox\Resource\My\Folder\Mapper();
+$folderMapper = Schoolbox\Resource\My\Folder\Mapper::getInstance();
+
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
 
 /** @var SitePage $this */
 if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     try {
         /** @var Schoolbox\Resource\My\Folder\Model $folder */
-        $folder = $folderMapper->findById($this->arg[0]);
-        // if folder exists and owner is different
-        if ((int)$folder->getOwner()->getId() !== (int)$_SESSION['id']) {
-            $this->error(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
-        }
-        try {
-            $folder->setOwner($userMapper->findById($folder->getOwner()->getId()));
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // Has no owner, and that's okay
-        }
+        $folder = $folderMapper->findOneByColumnList([
+            'id'    => $this->arg[0],
+            'owner' => $sessionUser->getId(),
+        ]);
     } catch (\Schoolbox\Mapper\Exception $e) {
-        error(2);
-        exit;
+        $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 
     $this->setFile(TEMPLATE_content, "cms/myFolder.html");
@@ -44,19 +43,21 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         $this->setBlock(TEMPLATE_content, 'location', 'location_block');
         $this->setVar('location_block', '');
     } else {
-        $parentTree = $folderHandler->getFolderTree(0, 0, $folder->getId());
-        $parentTree = is_array($parentTree) ? $parentTree : array();
-        array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
-        foreach ($parentTree as $parent) {
-            $output = array(
-                'PARENT_ID' => $parent['id'],
-                'PARENT_NAME' => Scrub::text($parent['name']),
-                'PARENT_INDENT' => str_repeat('&nbsp;', ($parent['depth'] + 1) * 4),
-                'PARENT_SELECTED' => $parent['id'] == $folder->getParent() ? 'selected="selected"' : '',
-            );
-            $this->setVar($output);
-            $this->parse('parent_list_block', 'parent_list', true);
-        }
+        $folderTree = $folderMapper->loadDescendants(
+            $folderMapper->findByColumnList([
+                'owner'  => $sessionUser->getId(),
+                'parent' => null,
+            ]),
+        );
+        $this->renderTreeSelect(
+            'parent_list',
+            'PARENT_',
+            $folderTree,
+            $folder->getParent()->getId() ?? IFolder::ROOT_ID,
+            fn (MyFolderModel $f) => $f->getId(),
+            fn (MyFolderModel $f) => $f->getName(),
+            fn (MyFolderModel $f) => $f->getChildren(),
+        );
     }
 
     // Assume that you may edit someone else's file
@@ -73,7 +74,11 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
             'class' => 'active',
         ]
     ]);
-} else if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+} else if ($this->arg[0] == 'new') {
+    $parentId = $this->arg[1] ?? IFolder::ROOT_ID;
+    if (!is_numeric($parentId)) {
+        $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
+    }
     $this->setFile(TEMPLATE_content, 'cms/myFolder.html');
     $this->setBlock(TEMPLATE_content, 'parent_list', 'parent_list_block');
 
@@ -82,13 +87,13 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     $this->setTab('resources');
 
 
-    if ($this->arg[1]) {
+    if ($parentId) {
         try {
             /** @var Schoolbox\Resource\My\Folder\Model $folder */
-            $folder = $folderMapper->findById($this->arg[1]);
+            $folder = $folderMapper->findById($parentId);
             // if folder exists and owner is different
             if ((int)$folder->getOwner()->getId() !== (int)$_SESSION['id']) {
-                $this->error(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
+                $this->error(ErrorMapper::ERROR_PAGE_NOT_FOUND);
             }
             try {
                 $folder->setOwner($userMapper->findById($folder->getOwner()->getId()));
@@ -97,8 +102,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
             }
             $owner = $folder->getOwner();
         } catch (\Schoolbox\Mapper\Exception $e) {
-            error(2);
-            exit;
+            $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
     } else {
         $owner = $_SESSION['user'];
@@ -108,7 +112,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         'ACTION' => 'Add',
         'FOLDER_ID' => '',
         'NAME' => '',
-        'PARENT_ID' => $this->arg[1],
+        'PARENT_ID' => $parentId,
     );
     $this->setVar($output);
 
@@ -117,19 +121,21 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         $this->setBlock(TEMPLATE_content, 'location', 'location_block');
         $this->setVar('location_block', '');
     } else {
-        $parentTree = $folderHandler->getFolderTree();
-        $parentTree = is_array($parentTree) ? $parentTree : array();
-        array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
-        foreach ($parentTree as $parent) {
-            $output = array(
-                'PARENT_ID' => $parent['id'],
-                'PARENT_NAME' => Scrub::text($parent['name']),
-                'PARENT_INDENT' => str_repeat('&nbsp;', ($parent['depth'] + 1) * 4),
-                'PARENT_SELECTED' => $parent['id'] == $this->arg[1] ? 'selected="selected"' : '',
-            );
-            $this->setVar($output);
-            $this->parse('parent_list_block', 'parent_list', true);
-        }
+        $folderTree = $folderMapper->loadDescendants(
+            $folderMapper->findByColumnList([
+                'owner'  => $sessionUser->getId(),
+                'parent' => null,
+            ]),
+        );
+        $this->renderTreeSelect(
+            'parent_list',
+            'PARENT_',
+            $folderTree,
+            (int)$parentId,
+            fn (MyFolderModel $f) => $f->getId(),
+            fn (MyFolderModel $f) => $f->getName(),
+            fn (MyFolderModel $f) => $f->getChildren(),
+        );
     }
 
     // Assume that you may edit someone else's file
@@ -147,5 +153,5 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         ]
     ]);
 } else {
-    $this->error(2);
+    $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }

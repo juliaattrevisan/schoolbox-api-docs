@@ -68,7 +68,7 @@ class Module extends AbstractModule
                         if (
                             isset($params['folder'])
                             && $params['folder'] instanceof My\Folder\Model
-                            && ($params['folder']->getId() === IFolder::ROOT_ID
+                            && (($params['folder']->getId() === IFolder::ROOT_ID || $params['folder']->getId() === null)
                                 || $params['folder']->getOwner()->getId() === $user->getId())
                         ) {
                             return true;

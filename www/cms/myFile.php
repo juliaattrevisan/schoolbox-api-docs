@@ -7,8 +7,15 @@
 
 use Eportfolio\PageMapper;
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Resource\Attachment\GenericZone;
+use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
+use Schoolbox\Resource\My\Folder\Mapper as MyFolderMapper;
+use Schoolbox\Resource\My\Folder\Model as MyFolderModel;
 
 /** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'cms/myFile.html');
@@ -22,8 +29,10 @@ $this->setTab('myfiles');
  * @uri /cms/myFile/:myFileId/:userId
  */
 
-$zone = new GenericZone('cms', MyFileMapper::getInstance());
-$zone->setAttachmentsLabel('')
+$fileMapper   = MyFileMapper::getInstance();
+$folderMapper = MyFolderMapper::getInstance();
+$zone         = new GenericZone('cms', $fileMapper)
+    ->setAttachmentsLabel('')
      ->setAttachPrompt('Post file')
      ->setMimeFilter('*/*')
      ->setMulti(false)
@@ -50,20 +59,25 @@ if (!($sessionUser->getRole()->isStaff() || $fileOwner->getId() === $sessionUser
     error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
 }
 
-// instantiate handlers
-$fileHandler = new MyFile($fileOwner->getId());
-$folderHandler = new MyFolder($fileOwner->getId());
-
 // create a new file
 if ($this->arg[0] == 'new') {
     $myFolderId = $this->arg[2] ?? 0;
     $publishComponent = $this->arg[3] ?? false;
 
-    if ($myFolderId == 0) {
-        $parent = array('id' => 0);
-    } elseif (!$parent = $folderHandler->getByID($myFolderId)) {
-        error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
+    $parentFolder = null;
+    $parentId     = null;
+    if ($myFolderId) {
+        try {
+            $folder = $folderMapper->findOneByColumnList([
+                'id'    => $myFolderId,
+                'owner' => $fileOwner->getId(),
+            ]);
+            $parentId = $folder->getId();
+        } catch (NotFound | Deleted $e) {
+            $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
     }
+    $parentId ??= IFolder::ROOT_ID;
 
     $this->setTitle('Add File');
     $this->parse('browse_row_block', 'browse_row');
@@ -73,7 +87,7 @@ if ($this->arg[0] == 'new') {
         'FILE_ID' => '',
         'DESCRIPTION' => '',
         'MAX_FILE_SIZE' => Config::get('max_file_size'),
-        'PARENT_ID' => $parent['id'],
+        'PARENT_ID' => $parentId,
         "COMPONENT_INSTANCE_ID" => $publishComponent,
         "USER_ID" => $fileOwner->getId(),
         'RETURN_URL' => $_GET['returnUrl'] ?? ''
@@ -83,8 +97,21 @@ if ($this->arg[0] == 'new') {
 
     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
-    $folderTree = $folderHandler->getFolderTree();
-    renderTreeSelect($this, $folderTree, $parent['id']);
+    $folderTree = $folderMapper->loadDescendants(
+        $folderMapper->findByColumnList([
+            'owner'  => $fileOwner->getId(),
+            'parent' => null,
+        ]),
+    );
+    $this->renderTreeSelect(
+        'folder_list',
+        'FOLDER_',
+        $folderTree,
+        $parentId,
+        fn (MyFolderModel $f) => $f->getId(),
+        fn (MyFolderModel $f) => $f->getName(),
+        fn (MyFolderModel $f) => $f->getChildren(),
+    );
     renderPublishingOptions($this, null, $fileOwner->getId(), true, $publishComponent);
 
     /* Render out breadcrumbs
@@ -106,9 +133,13 @@ if ($this->arg[0] == 'new') {
     // modify an existing file
     $myFileId = $this->arg[0];
 
-    $file = $fileHandler->getByID($myFileId);
-    if (!is_array($file) || (int)$file['owner'] !== $fileOwner->getId()) {
-        error(\Schoolbox\Error\Mapper::ERROR_FILE_NOT_FOUND);
+    try {
+        $file = $fileMapper->findOneByColumnList([
+            'id'    => $myFileId,
+            'owner' => $fileOwner->getId(),
+        ]);
+    } catch (NotFound | Deleted $e) {
+        $this->error(\Schoolbox\Error\Mapper::ERROR_FILE_NOT_FOUND);
     }
 
     $zone->attachFiles(array($myFileId));
@@ -118,19 +149,32 @@ if ($this->arg[0] == 'new') {
 
     $output = array(
         'ACTION' => 'Modify',
-        'FILE_ID' => $file['id'],
-        'DESCRIPTION' => Scrub::text($file['description']),
+        'FILE_ID' => $file->getId(),
+        'DESCRIPTION' => Scrub::text($file->getTitle()),
         'MAX_FILE_SIZE' => Config::get('max_file_size'),
-        'PARENT_ID' => $file['parent'],
+        'PARENT_ID' => $file->getFolder()->getId(),
         'RETURN_URL' => $_GET['returnUrl'] ? \Schoolbox\Learning\Assessment\Redirect::decode($_GET['returnUrl']) : ''
     );
     $this->setVar($output);
 
     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
-    $folderTree = $folderHandler->getFolderTree();
-    renderTreeSelect($this, $folderTree, $file['parent']);
-    renderPublishingOptions($this, (int)$file['id'], $fileOwner->getId(), true);
+    $folderTree = $folderMapper->loadDescendants(
+        $folderMapper->findByColumnList([
+            'owner'  => $fileOwner->getId(),
+            'parent' => null,
+        ]),
+    );
+    $this->renderTreeSelect(
+        'folder_list',
+        'FOLDER_',
+        $folderTree,
+        (int)($file->getFolder()->getId()),
+        fn (MyFolderModel $f) => $f->getId(),
+        fn (MyFolderModel $f) => $f->getName(),
+        fn (MyFolderModel $f) => $f->getChildren(),
+    );
+    renderPublishingOptions($this, $file->getId(), $fileOwner->getId(), true);
 
     /* Render out breadcrumbs
      */
@@ -149,42 +193,9 @@ if ($this->arg[0] == 'new') {
     ]);
 } else {
     // unknown case
-    error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+    $this->error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
 }
 
-
-/**
- * Render the <select> element with the tree structure defined, or just a default "top level" if there is none
- *
- * @param SitePage $page
- * @param array|bool $tree
- * @param int $selected
- */
-function renderTreeSelect($page, $tree, $selected = 0)
-{
-    if (is_array($tree)) {
-        array_unshift($tree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
-        foreach ($tree as $folder) {
-            $output = array(
-                'FOLDER_ID' => $folder['id'],
-                'FOLDER_NAME' => Scrub::text($folder['name']),
-                'FOLDER_INDENT' => str_repeat('&nbsp;', ($folder['depth'] + 1) * 4),
-                'FOLDER_SELECTED' => $folder['id'] == $selected ? 'selected="selected"' : '',
-            );
-            $page->setVar($output);
-            $page->parse('folder_list_block', 'folder_list', true);
-        }
-    } else {
-        $output = array(
-            'FOLDER_ID' => 0,
-            'FOLDER_NAME' => 'Top Level',
-            'FOLDER_INDENT' => '',
-            'FOLDER_SELECTED' => 'selected="selected"',
-        );
-        $page->setVar($output);
-        $page->parse('folder_list_block', 'folder_list', false);
-    }
-}
 
 /**
  * Render the UI options for publishing, if there are any

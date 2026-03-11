@@ -477,6 +477,7 @@ class SitePage
      *                        null: outputs whatever's in $message as error
      * @param string $message Replaces '%MESSAGE%' in $ec
      * @param int    $code    HTTP response code, defaults to 400 (Bad Request)
+     * @return never-return
      * @throws SchoolboxException
      */
     public function error($ec, $message = '', $code = 400)
@@ -826,6 +827,83 @@ class SitePage
             $this->setVar($handle . '_block', '');
         }
     }
+
+
+
+    /**
+     * Render the <select> element with the tree structure defined,
+     * or just a default "top level" if there is none.
+     *
+     * @param string   $handle          The handle-thing into which this tree is rendered.
+     * @param string   $varPrefix       A prefix for the PHPLib template vars: the var names `ID`, `NAME`, `INDENT` and
+     *                                  `SELECTED` are expected with this prefix.
+     * @param iterable $tree            The list of items.
+     * @param mixed    $selectedId      The currently selected item ID.
+     * @param callable $itemGetId       A callback for getting the ID of an item within `$tree`.
+     * @param callable $itemGetName     A callback for getting the name of an item within `$tree`.
+     * @param callable $itemGetChildren A callback for getting the children of an item within `$tree`.
+     * @param mixed    $topLevelId      The ID of the top-level item in the tree: this is assumed to _not_ exist in
+     *                                  `$tree`.
+     * @param string   $topLevelName    The name of the top-level item in the tree.
+     * @param string   $indentString    A string used to indent the name of the item: will be repeated `$depth` times.
+     * @param int      $depth           The current tree depth: used to indent child element output.
+     * @return void
+     */
+    public function renderTreeSelect(
+        string $handle,
+        string $varPrefix,
+        iterable $tree,
+        mixed $selectedId,
+        callable $itemGetId,
+        callable $itemGetName,
+        callable $itemGetChildren,
+        mixed $topLevelId = 0,
+        string $topLevelName = 'Top Level',
+        string $indentString = '&nbsp;&nbsp;&nbsp;&nbsp;',
+        int $depth = 0,
+    ): void {
+        if ($depth === 0) {
+            $output = [
+                $varPrefix . 'ID'       => $topLevelId,
+                $varPrefix . 'NAME'     => $topLevelName,
+                $varPrefix . 'INDENT'   => '',
+                $varPrefix . 'SELECTED' => $selectedId === $topLevelId ? 'selected="selected"' : '',
+            ];
+            $this->setVar($output);
+            $this->parse($handle . '_block', $handle, true);
+        }
+        foreach ($tree as $item) {
+            $itemId   = call_user_func($itemGetId, $item);
+            $itemName = call_user_func($itemGetName, $item);
+            $output = [
+                $varPrefix . 'ID'       => Scrub::text($itemId),
+                $varPrefix . 'NAME'     => Scrub::text($itemName),
+                $varPrefix . 'INDENT'   => str_repeat($indentString, $depth + 1),
+                $varPrefix . 'SELECTED' => $selectedId === $itemId ? 'selected="selected"' : '',
+            ];
+            $this->setVar($output);
+            $this->parse($handle . '_block', $handle, true);
+
+            // Render children as well
+            $children = call_user_func($itemGetChildren, $item);
+            if (is_iterable($children) && count($children) > 0) {
+                $this->renderTreeSelect(
+                    $handle,
+                    $varPrefix,
+                    $children,
+                    $selectedId,
+                    $itemGetId,
+                    $itemGetName,
+                    $itemGetChildren,
+                    $topLevelId,
+                    $topLevelName,
+                    $indentString,
+                    $depth + 1,
+                );
+            }
+        }
+    }
+
 
 
     /**

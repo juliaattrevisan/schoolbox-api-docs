@@ -9,6 +9,7 @@ use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 use Schoolbox\Resource\My\File\Model as MyFile;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Resource\My\Folder\Mapper as MyFolderMapper;
 
 $ajax = isset($_GET['ajax']) && $_GET['ajax'];
 
@@ -26,8 +27,7 @@ if (isset($_POST['user'])) {
     try {
         $user = \Schoolbox\UserMapper::getInstance()->findById($_POST['user']);
     } catch (\Schoolbox\Mapper\Exception $e) {
-        error(41);
-        exit; // shut UP, storm.
+        $page->error(ErrorMapper::ERROR_FILE_NOT_FOUND);
     }
 } else {
     $user = $_SESSION['user'];
@@ -40,7 +40,7 @@ if (!($groupHandler->isStaff() || $_SESSION['user']->getId() == $user->getId()))
         http_response_code(400);
         die(json_encode('You do not have write permission to this ePortfolio.'));
     } else {
-        error(47);
+        $page->error(ErrorMapper::ERROR_PERM_FILE_MODIFY);
     }
 }
 
@@ -71,29 +71,13 @@ if (isset($_POST['description'])) {
 
                 // Yes, we may have just overridden the result of findById(), but that was also for additional safety checks
                 $file = $result;
-            } elseif ($_FILES['file']['name'] && is_uploaded_file($_FILES['file']['tmp_name'])) {
-                // if file was synchronously uploaded
-                try {
-                    // fake this momentarily
-                    $file->setFilename($_FILES['file']['name']);
-
-                    // dump into storage
-                    $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->accept($_FILES['file']['name'], $_FILES['file']['tmp_name'], false);
-
-                    // and link onto a fresh object
-                    $file = MyFileMapper::getInstance()->createModel()->setStorage($storage);
-                } catch (Exception $e) {
-                    outputException($e, $file, $ajax);
-                }
             } else {
                 throw new InvalidArgumentException('No file attachment supplied');
             }
         } catch (\Schoolbox\Mapper\Exception $e) {
-            error(ErrorMapper::ERROR_FILE_NOT_FOUND);
-            exit; // shut UP, storm.
+            $page->error(ErrorMapper::ERROR_FILE_NOT_FOUND);
         } catch (\InvalidArgumentException $e) {
-            error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
-            exit;
+            $page->error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
         }
     }
 
@@ -105,7 +89,21 @@ if (isset($_POST['description'])) {
     $file->setCreatedAt(Alaress_Date_Format::now());
     $file->setOwner($user);
     $file->setTitle($_POST['description']);
-    $file->setFolder(\Schoolbox\Resource\My\Folder\Mapper::getInstance()->createModel()->setId($_POST['parent']));
+
+    // Set and verify parent folder
+    $folderMapper = MyFolderMapper::getInstance();
+    $parentFolder = null;
+    if (!empty($_POST['parent'])) {
+        try {
+            $parentFolder = MyFolderMapper::getInstance()->findOneByColumnList([
+                'id'    => $_POST['parent'],
+                'owner' => $user->getId(),
+            ]);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $page->error(ErrorMapper::ERROR_FILE_NOT_FOUND);
+        }
+    }
+    $file->setFolder($parentFolder);
 
     try {
         /* Spawn a new file if creating; reuse the existing one if modifying
@@ -204,20 +202,23 @@ if (isset($_POST['description'])) {
         header('Content-Type: text/html');
         die($e);
     }
-} elseif (is_numeric($_GET['delete'])) {
+} elseif (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     // delete a single file
     try {
         $parent = deleteMyFile($_GET['delete']);
     } catch (Schoolbox\Resource\Exception $e) {
-        error($e->getCode());
-        exit;
+        $page->error($e->getCode());
     }
     if (isset($_REQUEST['ajax'])) {
         die(json_encode(['result' => 'success']));
     } else {
         SitePage::localRedir("/my-files/$parent");
     }
-} elseif (isset($_GET['fileList']) && is_numeric($_GET['deleteList'])) {
+} elseif (
+    isset($_GET['fileList'])
+    && isset($_GET['deleteList'])
+    && is_numeric($_GET['deleteList'])
+) {
     // delete multiple files
     $fileList  = array_values(array_filter(explode(',', $_GET['fileList'])));
     $errorList = [];
@@ -232,13 +233,17 @@ if (isset($_POST['description'])) {
             }
         }
         if (count($errorList)) {
-            error($errorList[0]);
+            $page->error($errorList[0]);
         }
         SitePage::localRedir("/my-files/$parent");
     } else {
-        error(2);
+        $page->error(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
-} elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
+} elseif (
+    isset($_POST['move'], $_POST['categoryID'])
+    && is_numeric($_POST['move'])
+    && is_numeric($_POST['categoryID'])
+) {
     /* Move file from one category to another, after checking permission on both from and to categories
       */
     try {
@@ -301,14 +306,14 @@ function outputException(Exception $e, IFile $file, $ajax = false)
 {
     // Output errors
     if ($e->getCode() === \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
-        $code = 11;
+        $code = ErrorMapper::ERROR_FILE_TYPE;
         $msg  = "Your file, '{$file->getFilename()}' is not a valid filetype";
     } elseif ($e->getCode() === \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE) {
-        $code = 10;
+        $code = ErrorMapper::ERROR_FILE_SIZE;
         $msg  = 'The size of the uploaded file exceeds the file size restrictions of '
             . Alaress_Byte_Format::bytesToString($file->getMimetype()->getActualMaxFileSize()) . '.';
     } else {
-        $code = 9;
+        $code = ErrorMapper::ERROR_PROCESSING;
         $msg  = $e->getMessage();
     }
 
@@ -316,6 +321,6 @@ function outputException(Exception $e, IFile $file, $ajax = false)
         http_response_code(400);
         die(json_encode(['code' => $code, 'error' => $msg]));
     } else {
-        error($code, $msg);
+        throw ErrorMapper::getInstance()->generateException($code, null, $msg);
     }
 }

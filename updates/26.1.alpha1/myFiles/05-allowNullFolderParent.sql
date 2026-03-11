@@ -1,0 +1,1 @@
+ALTER TABLE myFolder MODIFY parent INT NULL;

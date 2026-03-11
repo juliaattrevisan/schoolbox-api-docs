@@ -89,7 +89,12 @@ abstract class AbstractTreeBuilder
                 break;
             }
             try {
-                $parentList[] = $parentId = $this->folderLocator->findById($parentId)->getParent()->getId();
+                $parentId = $this->folderLocator->findById($parentId)->getParent()?->getId();
+                if (isset($parentId)) {
+                    $parentList[] = $parentId;
+                } else {
+                    break;
+                }
             } catch (Mapper\Exception $e) {
                 break;
             }
@@ -171,7 +176,7 @@ abstract class AbstractTreeBuilder
         $output = [];
 
         // Did I ask for the root node? get it
-        if ($folderId === IFolder::ROOT_PARENT_ID) {
+        if ($folderId === IFolder::ROOT_PARENT_ID || !isset($folderId)) {
             $folder = $this->folderLocator->findById(IFolder::ROOT_ID);
 
             if ($folder instanceof Folder\Model) {
@@ -184,7 +189,7 @@ abstract class AbstractTreeBuilder
 
             $output[] = $this->generateNodeArray(
                 $folder->getId(),
-                $folder->getParent()->getId(),
+                $folder->getParent()?->getId(),
                 NodeInterface::TYPE_ROOT,
                 $this->getRootNodeLabel(),
                 null,
@@ -373,7 +378,7 @@ abstract class AbstractTreeBuilder
     ): array {
         return $this->generateNodeArray(
             $folder->getId(),
-            $folder->getParent()->getId(),
+            $folder->getParent()?->getId(),
             $type,
             $name ?: $folder->getName(),
             $colour,
@@ -445,20 +450,21 @@ abstract class AbstractTreeBuilder
         int $sequence = 0,
         ?Alaress_Date_Format $createdAt = null,
     ): array {
-        $array = array(
-            'id' => $nodeId,
+        $outputNodeId = $nodeId ?? IFolder::ROOT_ID;
+        $array = [
+            'id' => $outputNodeId,
             'parent' => $parentId ?: '0',
             'text' => $name,
             'children' => 0,
             'type' => $type,
-            'colour' => $colour ? $colour->__toString() : null,
+            'colour' => $colour?->__toString(),
             'coverImage' => $coverImage,
             'sequence' => $sequence,
             'createdAt' => $createdAt,
-        );
+        ];
 
         if ($type === NodeInterface::TYPE_FILE || $type === NodeInterface::TYPE_LINK) {
-            $array['id'] = "{$this->namespace}-$type-$nodeId";
+            $array['id'] = "{$this->namespace}-$type-{$outputNodeId}";
         } else {
             $array['children'] = $this->getNodeHasChildren($nodeId, $parentList);
         }
@@ -472,7 +478,7 @@ abstract class AbstractTreeBuilder
         }
 
         if (empty($liAttributes['data-id'])) {
-            $array['li_attr']['data-id'] = $nodeId;
+            $array['li_attr']['data-id'] = $outputNodeId;
         }
 
         return $array;

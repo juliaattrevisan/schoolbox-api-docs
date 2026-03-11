@@ -32,9 +32,9 @@ class Mapper extends AbstractFolderMapper implements ILocator
     public function findById($id)
     {
         // special case: 0 == root, but not in db
-        if ($id == 0) {
+        if ($id == IFolder::ROOT_ID) {
             return $this->createModel()
-                        ->setId(0)
+                        ->setId(null)
                         ->setName('Top Level')
                         ->setParent($this->createModel()->setId(IFolder::ROOT_PARENT_ID));
         }
@@ -67,10 +67,16 @@ class Mapper extends AbstractFolderMapper implements ILocator
      */
     public function findByParentId($nodeId)
     {
-        return $this->findByColumnList([
-            'parent' => $nodeId,
-            'owner'  => $_SESSION['id'] // TODO: FIX. DO NOT MERGE THIS
-        ]);
+        $userId = $this->getSessionUser()?->getId();
+
+        // Can't possibly have folders belonging to a null user
+        return isset($userId)
+            ? $this->findByColumnList([
+                'parent' => $nodeId ?: null,
+                'owner'  => $userId,
+            ])
+            : $this->createCollection()
+        ;
     }
 
 
@@ -110,14 +116,15 @@ class Mapper extends AbstractFolderMapper implements ILocator
         $ancestry = [];
 
         // Climb inheritance tree
-        $parent                      = $this->findById($possibleDescendant->getParent()->getId());
-        $ancestry[$parent->getId()] = true;
-        while (IFolder::ROOT_ID !== (int)$parent->getId()) {
-            if ((int)$parent->getId() === (int)$possibleAncestor->getId()) {
+        $parentId            = $possibleDescendant->getParent()?->getId() ?? IFolder::ROOT_ID;
+        $parent              = $this->findById($parentId);
+        $ancestry[$parentId] = true;
+        while (IFolder::ROOT_ID !== (int)$parentId) {
+            if ((int)$parentId === (int)$possibleAncestor->getId()) {
                 return true;
             }
-            $parent   = $this->findById($parent->getParent()->getId());
-            $parentId = $parent->getId();
+            $parentId = $parent->getParent()?->getId() ?? IFolder::ROOT_ID;
+            $parent   = $this->findById($parentId);
             // Have we see this parent before?
             if (array_key_exists($parentId, $ancestry)) {
                 $loop = "{$possibleDescendant->getId()}," . implode(',', array_keys($ancestry));
