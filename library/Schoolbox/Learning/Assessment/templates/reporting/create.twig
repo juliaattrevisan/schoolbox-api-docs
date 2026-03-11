@@ -53,7 +53,7 @@
     {# Curriculum Nodes for this Reporting Activity #}
     {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
         curriculumNodes: curriculumNodes,
-        entityType: 'reporting',
+        entityType: locale.reporting,
         courseManagedReadonly: courseManaged.isReadonly,
         excludeLegend: true,
         hasTabs: true,
@@ -144,14 +144,14 @@
              #}
             {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
                 curriculumNodes: assessment.supportingDataCurriculumNodes,
-                entityType: 'reporting',
+                entityType: locale.reporting.proper,
                 courseManagedReadonly: courseManaged.isReadonly,
                 excludeLegend: true,
                 hasTabs: true,
                 parentFolderId: parentFolderId ?? null,
                 tooltip:
                     'Select branches of the curriculum to have supporting data appear to staff when entering feedback for this ' ~
-                    locale.activity ~ '. This data can come from ' ~ locale.activity.plural ~ ' and rubrics that have been tagged
+                    locale.reporting ~ '. This data can come from ' ~ locale.activity.plural ~ ' and rubrics that have been tagged
                     with curriculum codes matching the selection below. It is possible to select both a branch of a curriculum or
                     specific curriculum codes. If you select a branch, all nodes contained within will be applied.',
                 useMetaTooltip: true,
@@ -159,7 +159,6 @@
             } %}
         </div>
     </div>
-{#    formValueName: 'reporting[supporting][curriculumNodes]'#}
 
     <div class="row">
         <div class="small-12 columns">

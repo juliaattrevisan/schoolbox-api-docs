@@ -2,16 +2,17 @@
  # Curriculum Code Selectize
  #
  # @param GenericCollection $curriculumNodes  A collection of curriculum nodes used to preselect the form element
- # @param bool $courseManagedReadonly
- # @param ?bool $excludeLegend        Whether the legend should be excluded (defaults to false)
- # @param ?bool $vueSlot              Whether this is being rendered as a vue slot, (defaults to false)
- #                                    if so, the relevant createApp() must have CurriculumSelector included as an available component
- #                                    Otherwise, this will render it as an independent vue app
- # @param bool $hasTabs               Whether the curriculum code selector should have tabs
- # @param int|null $parentFolderId    The folder ID to use for the current curriculum selector tab to display nodes linked to the relevant course/unit folder
- # @param string|null $tooltip        If provided, use this exact text in the tooltip; otherwise reverts back to the default phrasing
- # @param bool|null $useMetaTooltip   If true, puts the tooltip as a grey meta text underneath the label instead of a foundation tooltip.
- # @param string|null $formValueName  If provided, becomes the element's name= attribute
+ # @param string $entityType                  A string that's used in a tooltip; contextual to the thing that receives curriculum nodes
+ # @param bool $courseManagedReadonly         A bool that decides whether settings are managed elsewhere
+ # @param ?bool $excludeLegend                Whether the legend should be excluded (defaults to false)
+ # @param ?bool $vueSlot                      Whether this is being rendered as a vue slot, (defaults to false)
+ #                                            if so, the relevant createApp() must have CurriculumSelector included as an available component
+ #                                            Otherwise, this will render it as an independent vue app
+ # @param bool $hasTabs                       Whether the curriculum code selector should have tabs
+ # @param int|null $parentFolderId            The folder ID to use for the current curriculum selector tab to display nodes linked to the relevant course/unit folder
+ # @param string|null $tooltip                If provided, use this exact text in the tooltip; otherwise reverts back to the default phrasing
+ # @param bool|null $useMetaTooltip           If true, puts the tooltip as a grey meta text underneath the label instead of a foundation tooltip.
+ # @param string|null $formValueName          If provided, becomes the element's name= attribute
  #}
 {% set entityType = entityType ?: 'Folder' %}
 {% set excludeLegend = excludeLegend ?? false %}
