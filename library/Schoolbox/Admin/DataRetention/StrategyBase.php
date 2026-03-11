@@ -111,6 +111,7 @@ abstract class StrategyBase implements IStrategy
             } catch (\PDOException | \Schoolbox\Mapper\Exception $e) {
                 $this->database->rollBack();
                 $this->log->error(sprintf("Error processing chunk: %s", $e->getMessage()));
+                $this->log->debug($e->getTraceAsString());
             }
 
             // log how long the chunk took to process
