@@ -27,7 +27,10 @@ $dbSchemaRead   = null;
 $dbUserRead     = null;
 $dbPassRead     = null;
 if (PHP_SAPI === 'cli') {
-    // CLI invocation.
+    // CLI invocation:
+    // instance ID should only be set via the env var, but some older scripts
+    // allow it to be set via the `--instance` parameter.
+    // Keep this for now, but consider deprecating it.
     $instanceOpt = getopt('', ['instance:']);
     $instanceId  = $instanceOpt['instance'] ?? (getenv('INSTANCE_ID', true) ?: null);
 
