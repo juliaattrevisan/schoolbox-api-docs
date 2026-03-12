@@ -47,19 +47,19 @@ class ColorTest extends TestCase
     public static function getAssertColorFailureData()
     {
         return array(
-            array(-1),
-            array(0.1),
-            array(0xfff),
-            array('cheese'),
-            array(''),
+            array(-1, InvalidArgumentException::class),
+            array(0.1, TypeError::class),
+            array(0xfff, InvalidArgumentException::class),
+            array('cheese', TypeError::class),
+            array('', TypeError::class),
         );
     }
 
 
     #[\PHPUnit\Framework\Attributes\DataProvider('getAssertColorFailureData')]
-    public function testAssertColorFailure($value)
+    public function testAssertColorFailure($value, string $expectedExceptionClass)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException($expectedExceptionClass);
         $this->color->setGreen($value);
     }
 
