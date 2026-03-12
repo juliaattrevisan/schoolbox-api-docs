@@ -27,7 +27,10 @@ $dbSchemaRead   = null;
 $dbUserRead     = null;
 $dbPassRead     = null;
 if (PHP_SAPI === 'cli') {
-    // CLI invocation.
+    // CLI invocation:
+    // instance ID should only be set via the env var, but some older scripts
+    // allow it to be set via the `--instance` parameter.
+    // Keep this for now, but consider deprecating it.
     $instanceOpt = getopt('', ['instance:']);
     $instanceId  = $instanceOpt['instance'] ?? (getenv('INSTANCE_ID', true) ?: null);
 
@@ -66,6 +69,9 @@ if (PHP_SAPI === 'cli') {
     $hostname = ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? '') ?: $_SERVER['HTTP_HOST'];
     $hostname = explode(':', $hostname)[0];
     foreach ($instances as $instanceIdKey => $instance) {
+        // Instance ID must be a string, even if it's a numeric value
+        $instanceIdKey = strval($instanceIdKey);
+
         // Is this a fallback instance?
         // If so, use it but only if no actual hostnames match
         if (!empty($instance['fallback'])) {
@@ -94,7 +100,7 @@ if (PHP_SAPI === 'cli') {
     }
 }
 
-define('INSTANCE_ID_LIST', array_keys($instances));
+define('INSTANCE_ID_LIST', array_map(strval(...), array_keys($instances)));
 define('INSTANCE_ID', $instanceId);
 define('SQL_host', $dbHost);
 define('SQL_user', $dbUser);
