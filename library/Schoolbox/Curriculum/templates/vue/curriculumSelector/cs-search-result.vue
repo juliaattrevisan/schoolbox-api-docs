@@ -62,8 +62,13 @@ const isNodeSelected = window.Vue.computed(() => {
 /**
  * To determine the display of the checkbox based on whether
  * the node is currently selected
+ * @param {Event} event - the click event
  */
-function onSelected() {
+function onSelected(event) {
+    // Ignore label clicks as they naturally trigger the checkbox
+    if (event && event.target && event.target.nodeName === "LABEL") {
+        return;
+    }
     if (props.isSingleSelect) {
         selectedNodesStore.addSingle(props.result);
     } else {
@@ -75,8 +80,20 @@ function onSelected() {
 <template>
     <button class="search-result" :title="title" @click.prevent="onSelected">
         <div class="checklist">
-            <input v-if="props.isSingleSelect" :id="`checkbox-${result.id}`" type="radio" :checked="isNodeSelected" />
-            <input v-else :id="`checkbox-${result.id}`" type="checkbox" :checked="isNodeSelected" />
+            <input
+                v-if="props.isSingleSelect"
+                :id="`checkbox-${result.id}`"
+                type="radio"
+                :checked="isNodeSelected"
+                @click.stop="onSelected"
+            />
+            <input
+                v-else
+                :id="`checkbox-${result.id}`"
+                type="checkbox"
+                :checked="isNodeSelected"
+                @click.stop="onSelected"
+            />
             <label :for="`checkbox-${result.id}`"></label>
         </div>
         <div>
