@@ -29,7 +29,7 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasTable('lu_ibis_qualification');
+        $this->hasTable('lu_qualification');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);

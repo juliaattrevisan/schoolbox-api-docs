@@ -16,7 +16,7 @@ CREATE TABLE `lu_qualification` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- Insert initial qualification data that was previously hardcoded
-INSERT INTO `lu_ibis_qualification` (`name`, `system_purpose`, `sequence`) VALUES
+INSERT INTO `lu_qualification` (`name`, `system_purpose`, `sequence`) VALUES
 ('DP Year 1', 'ANTICIPATED', 1),
 ('DP Year 2', 'DIPLOMA', 2),
 ('VCE', 'COURSE', 3);
