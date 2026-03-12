@@ -14,6 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use HouseMapper;
 use Schoolbox\CampusMapper;
+use Schoolbox\IB\Qualification\Mapper as QualificationMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\YearLevel;
 
@@ -56,11 +57,15 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->injector->get('subscriptionCache'),
-            new \Schoolbox\UserBulkMapper($this->getMapperFactory()->get(\Schoolbox\UserMapper::class)),
+            new \Schoolbox\UserBulkMapper(
+                $this->getMapperFactory()->get(\Schoolbox\UserMapper::class),
+                $this->getMapperFactory()->get(QualificationMapper::class)
+            ),
             $this->getMapperFactory()->get(CampusMapper::class),
             $this->getMapperFactory()->get(RoleMapper::class),
             $this->getMapperFactory()->get(HouseMapper::class),
-            $this->getMapperFactory()->get(YearLevel\Mapper::class)
+            $this->getMapperFactory()->get(YearLevel\Mapper::class),
+            $this->getMapperFactory()->get(QualificationMapper::class)
         );
     }
 
