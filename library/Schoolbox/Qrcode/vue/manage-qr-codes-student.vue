@@ -150,7 +150,8 @@ export default {
 <style lang="scss" scoped>
 .student {
     border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
-    padding: 1rem;
+    border-radius: var(--sbx-config-field-roundness, 0px);
+    padding: var(--sbx-size-m, 1rem);
     transition: background-color 0.3s; //shows that the student can be selected to toggle selection status
     width: calc(v-bind(qrCodeSizeWithPx) + 2rem); //the width of the qr code plus 1rem padding left and right
     &:hover {

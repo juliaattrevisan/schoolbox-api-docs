@@ -58,10 +58,11 @@ function onRemoveSelected() {
 
 <style lang="scss" scoped>
 .selected-class {
-    background: var(--body-background);
-    color: #000;
+    background: var(--sbx-config-color-active, var(--body-background));
+    border-radius: var(--sbx-config-field-roundness, 0px);
+    color: var(--sbx-color-text-primary, #000);
     display: flex;
-    font-size: 0.8125rem;
+    font-size: var(--sbx-font-size-xs, 0.8125rem);
     min-height: auto;
     margin: 0 0.5rem 0.5rem 0;
     padding: 5px 10px;
@@ -70,7 +71,7 @@ function onRemoveSelected() {
 }
 
 .remove-button {
-    background: var(--body-background);
+    background: var(--sbx-config-color-active, var(--body-background));
     border-radius: 1rem;
     flex: 0 0 1rem;
     height: 1rem;

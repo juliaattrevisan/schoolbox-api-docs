@@ -527,28 +527,29 @@ function onClearAllSelected() {
         list-style: none;
         margin: 0;
         li {
-            border-bottom: 1px solid var(--body-background);
-            border-left: 1px solid var(--navigation-hover);
-            border-right: 1px solid var(--navigation-hover);
+            border-bottom: 1px solid var(--sbx-color-border, var(--body-background));
+            border-left: 1px solid var(--sbx-config-color-accent, var(--navigation-hover));
+            border-right: 1px solid var(--sbx-config-color-accent, var(--navigation-hover));
             transform: none !important;
             &:first-child {
-                border-top: 1px solid var(--navigation-hover);
+                border-top: 1px solid var(--sbx-config-color-accent, var(--navigation-hover));
             }
             &:last-child {
-                border-bottom: 1px solid var(--navigation-hover);
+                border-bottom: 1px solid var(--sbx-config-color-accent, var(--navigation-hover));
             }
         }
     }
 }
 
 .search-refine-note {
-    background-color: #fafafa;
+    background-color: var(--sbx-color-foreground-secondary, #fafafa);
     padding: 0.75rem;
     font-style: italic;
 }
 
 .selected-classes-container {
     border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
+    border-radius: var(--sbx-config-field-roundness, 0px);
     display: flex;
     flex-wrap: wrap;
     margin-top: -1px; //to sit against .search-input
@@ -566,9 +567,9 @@ function onClearAllSelected() {
 }
 
 .clear-all-button {
-    font-size: 0.825rem;
+    font-size: var(--sbx-font-size-xs, 0.825rem);
     &:before {
-        font-size: 0.825rem;
+        font-size: var(--sbx-font-size-xs, 0.825rem);
     }
 }
 </style>
