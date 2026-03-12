@@ -142,8 +142,7 @@ abstract class BaseApp extends App
     private function assignDeprecatedOptions(): void
     {
         // Extract app options, exc. help
-        $shortOptions = $this->getShortOpts();
-        unset($shortOptions[self::OPT_SHORT_HELP]);
+        $shortOptions = array_diff($this->getShortOpts(), [self::OPT_SHORT_HELP]);
         if (!empty($shortOptions)) {
             trigger_error(
                 'Setting options via getShortOpts is deprecated: all options should be set in setOptions instead',
@@ -159,8 +158,7 @@ abstract class BaseApp extends App
             $this->optionCollection->add($shortOption, 'Undocumented short option: please set in setOptions instead');
         }
 
-        $longOptions = $this->getLongOpts();
-        unset($longOptions[self::OPT_LONG_HELP]);
+        $longOptions = array_diff($this->getLongOpts(), [self::OPT_LONG_HELP]);
         if (!empty($longOptions)) {
             trigger_error(
                 'Setting options via getLongOpts is deprecated: all options should be set in setOptions instead',
