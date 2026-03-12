@@ -19,15 +19,19 @@ const isSaving = window.Vue.ref<boolean>(false);
 const currentValues = window.Vue.ref<{ [key: string]: string }>({});
 
 // Initialize form values
-window.Vue.watch(() => props.configurations, (newConfigs) => {
-    newConfigs.forEach((config) => {
-        currentValues.value[config.key] = config.value || "";
-    });
-}, { immediate: true, deep: true });
+window.Vue.watch(
+    () => props.configurations,
+    (newConfigs) => {
+        newConfigs.forEach((config) => {
+            currentValues.value[config.key] = config.value || "";
+        });
+    },
+    { immediate: true, deep: true },
+);
 
 function onInputChange(config: IBConfiguration, newValue: string): void {
     currentValues.value[config.key] = newValue;
-    emit('configChange', config, newValue);
+    emit("configChange", config, newValue);
 }
 
 async function saveGeneralConfig(): Promise<void> {
@@ -38,7 +42,7 @@ async function saveGeneralConfig(): Promise<void> {
 
         for (const config of props.configurations) {
             const newValue = currentValues.value[config.key];
-            
+
             const response = await fetch(props.saveEndpoint, {
                 method: "POST",
                 headers: {
@@ -107,14 +111,9 @@ async function saveGeneralConfig(): Promise<void> {
             </div>
 
             <div class="form-actions">
-                <button 
-                    type="button" 
-                    class="button submit"
-                    :disabled="isSaving"
-                    @click="saveGeneralConfig"
-                >
+                <button type="button" class="button submit" :disabled="isSaving" @click="saveGeneralConfig">
                     <i v-if="isSaving" class="fa fa-spinner fa-spin"></i>
-                    {{ isSaving ? 'Saving...' : 'Save General Configuration' }}
+                    {{ isSaving ? "Saving..." : "Save General Configuration" }}
                 </button>
             </div>
         </form>

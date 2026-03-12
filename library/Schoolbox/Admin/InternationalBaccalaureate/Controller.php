@@ -25,7 +25,6 @@ class Controller extends BaseController
     public function getConfiguration(): void
     {
         $pageCurrent = '/adminv2/international-baccalaureate/configuration';
-        
         // Define IB configuration categories (DP subject groups)
         $categories = [
             [
@@ -69,7 +68,7 @@ class Controller extends BaseController
                 'title' => 'Core'
             ]
         ];
-        
+
         $this->response = $this->responseFromTemplate(
             '@internationalBaccalaureate/configuration.twig',
             [
@@ -93,9 +92,9 @@ class Controller extends BaseController
         if (preg_match('/\/configuration\/api\/(\d+)/', $requestUri, $matches)) {
             $categoryId = (int) $matches[1];
         }
-        
+
         $configurations = [];
-        
+
         if ($categoryId === 1) { // General tab - show actual form fields
             $configurations = [
                 [
@@ -121,13 +120,13 @@ class Controller extends BaseController
             // All other tabs - return empty array for dummy content
             $configurations = [];
         }
-        
+
         // Set proper headers
         header('Content-Type: application/json');
         echo json_encode($configurations);
         exit;
     }
-    
+
     /**
      * Save configuration data
      *
@@ -137,7 +136,7 @@ class Controller extends BaseController
     {
         // TODO: Validate and save to database
         // For now, just return success
-        
+
         header('Content-Type: application/json');
         echo json_encode([
             'success' => true,

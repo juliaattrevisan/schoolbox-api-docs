@@ -74,7 +74,7 @@ const ibSubjectsByCategory: Record<string, Array<{ subject: string; level: strin
         { subject: "Social and cultural anthropology", level: "HL" },
         { subject: "World religions", level: "SL" },
     ],
-    "sciences": [
+    sciences: [
         { subject: "Biology", level: "SL" },
         { subject: "Biology", level: "HL" },
         { subject: "Chemistry", level: "SL" },
@@ -90,7 +90,7 @@ const ibSubjectsByCategory: Record<string, Array<{ subject: string; level: strin
         { subject: "Sports, exercise and health science", level: "SL" },
         { subject: "Sports, exercise and health science", level: "HL" },
     ],
-    "mathematics": [
+    mathematics: [
         { subject: "Analysis and approaches", level: "SL" },
         { subject: "Analysis and approaches", level: "HL" },
         { subject: "Applications and interpretation", level: "SL" },
@@ -108,7 +108,7 @@ const ibSubjectsByCategory: Record<string, Array<{ subject: string; level: strin
         { subject: "Visual arts", level: "SL" },
         { subject: "Visual arts", level: "HL" },
     ],
-    "core": [
+    core: [
         { subject: "Theory of Knowledge (TOK)", level: "" },
         { subject: "Extended Essay (EE)", level: "" },
         { subject: "Creativity, Activity, Service (CAS)", level: "" },
@@ -121,10 +121,16 @@ const currentSubjects = window.Vue.computed(() => {
     return ibSubjectsByCategory[categoryName] || [];
 });
 
+/**
+ * Handles configuration changes for general tab
+ * @param config - The configuration object that changed
+ * @param newValue - The new value for the configuration
+ */
 function onConfigChange(config: IBConfiguration, newValue: string): void {
     // Handle configuration changes for general tab
     // This can be extended if needed for form tracking
-    console.log('Config changed:', config.key, newValue);
+    // eslint-disable-next-line no-console
+    console.info("Config changed:", config.key, newValue);
 }
 
 /**
@@ -247,7 +253,5 @@ window.Vue.onMounted((): void => {
                 />
             </div>
         </section>
-
     </div>
 </template>
-
