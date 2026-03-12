@@ -48,6 +48,8 @@ use Schoolbox\RoleMapper;
 use Schoolbox\Sequential;
 use Schoolbox\WebDav\Mapper as WebDavMapper;
 use Schoolbox\YearLevel;
+use Schoolbox\IB\Qualification\Mapper as QualificationMapper;
+use Schoolbox\IB\Qualification\Model as QualificationModel;
 use Timetable_ColourMapper;
 use Twig\Error\Error;
 use UnexpectedValueException;
@@ -1754,20 +1756,13 @@ class Controller extends Base
             ]
         ];
 
-        // TODO: Remove after DB connection - SA-21926
-        // For now, hardcoded data for frontend demonstration
         $return['qualification'] = [
             'title'             => 'Qualifications',
-            'hardcoded'         => true, // Flag to indicate this is hardcoded
+            'mapper'            => QualificationMapper::class,
             'delete'            => true,
             'showId'            => true,
             'sortable'          => true, // Enable drag and drop functionality
             'deleteFailMsg'     => 'This qualification cannot be deleted as it may be in use.',
-            'data'              => [
-                ['id' => 1, 'name' => 'DP Year 1', 'systemPurpose' => 'DIPLOMA'],
-                ['id' => 2, 'name' => 'DP Year 2', 'systemPurpose' => 'ANTICIPATED'],
-                ['id' => 3, 'name' => 'VCE', 'systemPurpose' => 'COURSE'],
-            ],
             'fields'            => [
                 'id' => [
                     'caption'   => 'ID',
@@ -1777,7 +1772,7 @@ class Controller extends Base
                 'name'          => [
                     'caption'   => 'Name',
                     'width'     => 5,
-                    'maxLength' => 64,
+                    'maxLength' => 255,
                     'mandatory' => true,
                     'default'   => '',
                 ],
@@ -1788,9 +1783,9 @@ class Controller extends Base
                     'nullable'  => true,
                     'nullable_label' => 'Not Selected',
                     'lookup'    => [
-                        ['key' => 'DIPLOMA', 'value' => 'Diploma Programme Year 2 [DIPLOMA]'],
-                        ['key' => 'ANTICIPATED', 'value' => 'Diploma Programme Year 1 [ANTICIPATED]'],
-                        ['key' => 'COURSE', 'value' => 'Diploma Course [COURSE]'],
+                        ['key' => QualificationModel::SYSTEM_PURPOSE_DIPLOMA, 'value' => 'Diploma Programme Year 2 [DIPLOMA]'],
+                        ['key' => QualificationModel::SYSTEM_PURPOSE_ANTICIPATED, 'value' => 'Diploma Programme Year 1 [ANTICIPATED]'],
+                        ['key' => QualificationModel::SYSTEM_PURPOSE_COURSE, 'value' => 'Diploma Course [COURSE]'],
                     ],
                 ],
             ]

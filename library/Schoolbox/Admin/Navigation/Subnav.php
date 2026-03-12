@@ -160,6 +160,9 @@ class Subnav
         $userHasServicePermissionDifferentiationProfile = (
             $this->user->hasServicePermission(UserAccess::SERVICE_DIFFERENTIATION, UserAccess::ACCESS_FULL)
         );
+        $userHasServicePermissionIbCoordinator = (
+            $this->user->hasServicePermission(UserAccess::SERVICE_IB_COORDINATOR, UserAccess::ACCESS_FULL)
+        );
         $userHasAnyModeratorServicePermission = (
             $userHasServicePermissionNews ||
             $userHasServicePermissionCalendar ||
@@ -984,6 +987,11 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Setup the school pastoral houses.',
                     ],
+                    '/adminv2/lists/qualification' => [
+                        'name'        => 'Lists - Qualifications',
+                        'visible'     =>  $userIsSuperuser,
+                        'description' => 'Enable and configure the types of qualification that are offered at the school.',
+                    ],
                     '/adminv2/lists/residential-house' => [
                         'name'        => 'Lists - Residential Houses',
                         'visible'     => true,
@@ -993,11 +1001,6 @@ class Subnav
                         'name'        => 'Lists - Roles',
                         'visible'     => true,
                         'description' => 'Configure user roles within the system, the type of access they have and permissions.',
-                    ],
-                    '/adminv2/lists/qualification' => [
-                        'name'        => 'Lists - Qualifications',
-                        'visible'     => true,
-                        'description' => 'Enable and configure the types of qualification that are offered at the school',
                     ],
                     '/adminv2/lists/user-pronoun' => [
                         'name'        => 'Lists - User Pronouns',
