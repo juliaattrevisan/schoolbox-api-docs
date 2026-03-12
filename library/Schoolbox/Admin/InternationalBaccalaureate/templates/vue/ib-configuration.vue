@@ -129,7 +129,6 @@ const currentSubjects = window.Vue.computed(() => {
 function onConfigChange(config: IBConfiguration, newValue: string): void {
     // Handle configuration changes for general tab
     // This can be extended if needed for form tracking
-    // eslint-disable-next-line no-console
     console.info("Config changed:", config.key, newValue);
 }
 

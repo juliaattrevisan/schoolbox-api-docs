@@ -278,8 +278,8 @@ async function saveSubjectConfiguration(): Promise<void> {
                                         aria-label="Edit languages"
                                         title="Edit languages"
                                         :data-test="`ib-language-edit-${row.id}`"
-                                        @click="openLanguageModal(row.id)"
                                         :disabled="isSaving"
+                                        @click="openLanguageModal(row.id)"
                                     >
                                         <sbx-icon name="modify"></sbx-icon>
                                     </button>
@@ -336,7 +336,7 @@ async function saveSubjectConfiguration(): Promise<void> {
             </div>
 
             <div class="form-actions">
-                <button type="button" class="button submit" @click="saveSubjectConfiguration" :disabled="isSaving">
+                <button type="button" class="button submit" :disabled="isSaving" @click="saveSubjectConfiguration">
                     <i v-if="isSaving" class="fa fa-spinner fa-spin"></i>
                     {{ isSaving ? "Saving..." : `Save ${categoryTitle} Configuration` }}
                 </button>

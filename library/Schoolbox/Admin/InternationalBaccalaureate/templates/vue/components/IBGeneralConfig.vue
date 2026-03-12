@@ -29,11 +29,19 @@ window.Vue.watch(
     { immediate: true, deep: true },
 );
 
+/**
+ * Handles input changes for configuration fields
+ * @param config - The configuration object that changed
+ * @param newValue - The new value for the configuration
+ */
 function onInputChange(config: IBConfiguration, newValue: string): void {
     currentValues.value[config.key] = newValue;
     emit("configChange", config, newValue);
 }
 
+/**
+ * Saves the general configuration to the server
+ */
 async function saveGeneralConfig(): Promise<void> {
     if (!props.saveEndpoint) return;
 
