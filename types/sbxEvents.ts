@@ -11,6 +11,7 @@ import type { ImageLightboxDocumentEventHandlerMap } from "@js/image-lightbox/im
 import type { SwiperDocumentEventHandlerMap } from "@js/slideshow/slideshowEvent";
 import type { ActivityStatusPageDocumentEventHandlerMap } from "@schoolboxLibrary/Learning/Assessment/templates/status/activityStatusPageEvent";
 import type { FiltersChangeEventHandlerMap } from "@schoolboxVue/components/grid/lazyGrid/event/LazyGridEvent";
+import type { SbxSearchSelectFiltersChangeEventHandlerMap } from "@schoolboxVue/components/searchSelect/event/SbxSearchSelectEvent";
 import type { FilterEventHandlerMap } from "@schoolboxLibrary/Filter/templates/ts/filterEvent";
 
 /**
@@ -26,6 +27,7 @@ export interface SbxGlobalDocumentEventHandlerMap
         SwiperDocumentEventHandlerMap,
         ActivityStatusPageDocumentEventHandlerMap,
         FiltersChangeEventHandlerMap,
+        SbxSearchSelectFiltersChangeEventHandlerMap,
         FilterEventHandlerMap {}
 
 /**

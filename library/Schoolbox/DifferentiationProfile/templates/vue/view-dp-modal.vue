@@ -36,7 +36,8 @@ type TextItem = {
 };
 
 const props = defineProps<{
-    route: string;
+    dpRoute: string;
+    customisationsRoute: string;
 }>();
 
 const student = defineModel<User | null>("student", { default: null });
@@ -51,7 +52,7 @@ const textData = window.Vue.ref<TextItem[]>([]);
  * Load the DP
  */
 async function load(): Promise<void> {
-    if (props.route === "") {
+    if (!props.dpRoute || props.dpRoute === "") {
         loadError.value = "No route specified";
         return;
     }
@@ -59,7 +60,7 @@ async function load(): Promise<void> {
         isProcessing.value = true;
         loadError.value = null;
         const response = await apiRequest<Item[]>({
-            url: props.route,
+            url: props.dpRoute,
             method: "GET",
         });
         if (!response.success) {
@@ -116,10 +117,20 @@ function onClose(): void {
         />
         <div v-else-if="student && data.length > 0" class="l-flex-col l-gap-m f-no-margins">
             <div class="l-flex-col l-gap-s f-no-margins">
-                <h2>
-                    {{ locale.differentiationProfile.translate(false, true) }} for {{ getFirstName(student) }}
-                    {{ student.lastname }}
-                </h2>
+                <div class="l-flex-row l-flex--justify-space">
+                    <h2>
+                        {{ locale.differentiationProfile.translate(false, true) }} for {{ getFirstName(student) }}
+                        {{ student.lastname }}
+                    </h2>
+                    <a
+                        v-if="props.customisationsRoute"
+                        :href="`${props.customisationsRoute}`"
+                        class="button l-flex l-gap-s"
+                    >
+                        <sbx-icon name="group"></sbx-icon>
+                        View Customisations
+                    </a>
+                </div>
             </div>
             <div class="c-vert-scroll-container l-flex-col l-gap-s" data-test="view-dp-modal-fields-container">
                 <div class="l-flex-col l-gap-s f-no-margins">

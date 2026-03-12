@@ -212,23 +212,7 @@ class Mapper extends BaseMapper
      */
     private function buildNameSearchPredicate(Builder $pb, array $nameSearch): Builder
     {
-        // Just use the first one, and split it into tokens
-        foreach ($nameSearch as $nameSearchString => $_) {
-            $names = array_map('trim', preg_split('/\\s+/', (string)$nameSearchString));
-            foreach ($names as $name) {
-                if (strlen($name) > 0 && $name !== CustomisationRecord\Name\Definition::KEY_ALL) {
-                    $pb = $pb->any(
-                        $this->getPredicateBuilder()->like(
-                            'u.chosen_name',
-                            '%' . $this->getDatabase()->getQuoter()->escapeForLike($name) . '%'
-                        )->like(
-                            'u.lastname',
-                            '%' . $this->getDatabase()->getQuoter()->escapeForLike($name) . '%'
-                        )
-                    );
-                }
-            }
-        }
+        $pb->in('user_id', $nameSearch);
         return $pb;
     }
 

@@ -211,5 +211,8 @@ const isActive = window.Vue.computed(() => {
 
 .input-group[data-is-small-container="true"] {
     flex-direction: column; /*stack the input and button when the container is small */
+    .search-input {
+        margin-bottom: 0;
+    }
 }
 </style>

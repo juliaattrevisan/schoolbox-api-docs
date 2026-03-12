@@ -15,14 +15,35 @@ use Schoolbox\Filter\IDefinition;
 use Schoolbox\Filter\IKeyConverter;
 use Schoolbox\Filter\Model;
 use Schoolbox\Filter\Page;
+use Schoolbox\Filter\Selection;
 use Schoolbox\GenericCollection;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 /**
  * Factory for the customisation record student name filter.
  */
 class Factory extends AbstractFactory
 {
+    /**
+     * Constructor
+     *
+     * @param Page\Option\Mapper          $optionMapper
+     * @param Page\Option\Defaults\Mapper $defaultMapper
+     * @param Selection\Mapper            $selectionMapper
+     * @param UserMapper                  $userMapper
+     * @param RosettaStone                $rosettaStone
+     */
+    public function __construct(
+        Page\Option\Mapper $optionMapper,
+        Page\Option\Defaults\Mapper $defaultMapper,
+        Selection\Mapper $selectionMapper,
+        private UserMapper $userMapper,
+        private RosettaStone $rosettaStone,
+    ) {
+        parent::__construct($optionMapper, $defaultMapper, $selectionMapper);
+    }
     /**
      * @inheritdoc
      */
@@ -61,7 +82,9 @@ class Factory extends AbstractFactory
             $pageFilter,
             $selections,
             $overrides[$pageFilter->getFilter()->getId()],
-            $this->getSelectionMapper()
+            $this->getSelectionMapper(),
+            $this->userMapper,
+            $this->rosettaStone,
         );
     }
 }

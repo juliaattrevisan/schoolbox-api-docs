@@ -78,6 +78,8 @@ class Controller extends BaseController
      * @param Mapper                                     $fieldMapper
      * @param \Schoolbox\Admin\Profile\Editor\Tab\Mapper $tabMapper
      * @param Calendar_Api_Factory                       $calendarApiFactory
+     * @param RosettaStone                               $rosettaStone
+     * @param EditorTemplateHelper                       $editorTemplateHelper
      * @param \Schoolbox\DifferentiationProfile\Mapper   $differentiationProfileMapper
      */
     public function __construct(
@@ -240,17 +242,27 @@ class Controller extends BaseController
                         return null;
                     }
 
+                    $viewCustomisationsForStudent = $this->getRouteIfAuthorized(
+                        'customisationRecord.viewRecordByStudent',
+                        [
+                            'studentId' => $viewee->getId(),
+                        ]
+                    );
+
                     /* Otherwise return the data needed to view the differentiation profile in the modal
                      */
                     return [
                         'student' => $viewee,
-                        'route' => $this->getRouteIfAuthorized(
-                            'differentiationProfiles.viewDifferentiationProfileData',
-                            [
-                                'student' => $viewee,
-                                'studentId' => $viewee->getId()
-                            ],
-                        )
+                        '_routes' => [
+                            'viewDp' => $this->getRouteIfAuthorized(
+                                'differentiationProfiles.viewDifferentiationProfileData',
+                                [
+                                    'student' => $viewee,
+                                    'studentId' => $viewee->getId()
+                                ],
+                            ),
+                            'viewCustomisations' => $viewCustomisationsForStudent
+                        ]
                     ];
                 }
             ]);

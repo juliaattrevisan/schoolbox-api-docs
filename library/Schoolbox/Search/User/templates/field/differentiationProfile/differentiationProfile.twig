@@ -5,11 +5,11 @@
  # @param array differentiationProfile - The differentiation profile data containing the student and route to the students DP
  #}
 
-
 <div id="view-differentiation-profile-container">
     <view-differentiation-profile
         :student="{{ differentiationProfile.student|json_encode }}"
-        :route="{{ differentiationProfile.route|json_encode }}"
+        :dp-route="{{ differentiationProfile._routes.viewDp|json_encode }}"
+        :customisations-route="{{ differentiationProfile._routes.viewCustomisations|json_encode }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/viewDifferentiationProfile.js?v={{ config.site_version }}"></script>

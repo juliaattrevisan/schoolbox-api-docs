@@ -43,6 +43,10 @@ $f-dropdown-line-height: rem-calc(18) !default;
         margin-bottom: 0;
     }
 
+    &--wider {
+        max-width: 500px;
+    }
+
     li {
         cursor: $cursor-pointer-value;
         display: block;
