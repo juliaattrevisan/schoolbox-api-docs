@@ -98,7 +98,6 @@ abstract class BaseApp extends App
                     self::OPT_SHORT_PERFORM . '|' . self::OPT_LONG_PERFORM,
                     'Perform mode: if not provided, no changes will be written',
                 )
-                ->isa('boolean')
                 ->defaultValue(false);
         }
         $this->optionCollection
@@ -110,7 +109,6 @@ abstract class BaseApp extends App
         // ... including an esoteric option I forgot existed
         $this->optionCollection
             ->add(self::OPT_LONG_PORCELAIN, 'Porcelain log output')
-            ->isa('boolean')
             ->defaultValue(false);
 
         $this->setOptions();
