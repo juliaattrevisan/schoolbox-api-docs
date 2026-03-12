@@ -11,7 +11,9 @@
 namespace Alaress\Color\Test;
 
 use Alaress\Color\Color;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use TypeError;
 
 class ColorTest extends TestCase
 {
@@ -57,7 +59,7 @@ class ColorTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('getAssertColorFailureData')]
     public function testAssertColorFailure($value)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->color->setGreen($value);
     }
 
@@ -80,18 +82,18 @@ class ColorTest extends TestCase
     public static function getAssertAlphaFailureData()
     {
         return array(
-            array(-1),
-            array(1.1),
-            array(99999),
-            array('cheese'),
+            array(-1, InvalidArgumentException::class),
+            array(1.1, InvalidArgumentException::class),
+            array(99999, InvalidArgumentException::class),
+            array('cheese', TypeError::class),
         );
     }
 
 
     #[\PHPUnit\Framework\Attributes\DataProvider('getAssertAlphaFailureData')]
-    public function testAssertAlphaFailure($value)
+    public function testAssertAlphaFailure($value, string $expectedExceptionClass)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException($expectedExceptionClass);
         $this->color->setAlpha($value);
     }
 
