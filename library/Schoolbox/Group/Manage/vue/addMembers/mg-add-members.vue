@@ -11,7 +11,6 @@ import { useStore } from "../store/manageGroupStore";
 import { useAddMembersStore } from "../store/mgAddMembersStore";
 import { useSearchStore } from "../store/mgSearchStore";
 import FromTypes from "./mgAddMembersFromTypes";
-import MgSelectedSearchResults from "./mg-selected-search-results.vue";
 import MgSearch from "./mg-search.vue";
 
 const store = useStore();
@@ -117,8 +116,7 @@ const addButtonText = window.Vue.computed(() => (addMembersStore.isProcessing ? 
                             </ul>
                         </div>
                     </div>
-                    <mg-selected-search-results />
-                    <MgSearch />
+                    <mg-search />
                     <p class="meta">{{ inputDetails }}</p>
                     <button
                         class="button submit"

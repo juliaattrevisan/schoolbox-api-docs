@@ -115,7 +115,6 @@ window.Vue.watch(
         v-model:results="searchStore.results"
         :endpoint="searchEndpoint"
         :placeholder="inputPlaceholder"
-        :show-selected="false"
         :manage-search-response="true"
         label-id="manage-group-search"
         data-test="manage-group-search-text"
