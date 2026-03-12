@@ -1,7 +1,7 @@
 -- Create lu_ibis_qualification table for IB Qualifications
 -- This table will store qualification information as per SA-21623
 
-CREATE TABLE `lu_ibis_qualification` (
+CREATE TABLE `lu_qualification` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `name` varchar(255) NOT NULL,
     `system_purpose` text DEFAULT NULL,
