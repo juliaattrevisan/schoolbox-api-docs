@@ -61,16 +61,16 @@ function onSearchResponse(json) {
     let rawResults = [];
     if (json instanceof Array) {
         rawResults = json;
-    } else if (typeof json === "object" && json !== null && "data" in json) {
+    } else if (typeof json === "object" && json !== null && "data" in json && Array.isArray(json.data)) {
         rawResults = json.data;
     }
 
     // Apply filtering logic based on fromType
     let filteredResults = rawResults;
     if (addMembersStore.fromType === FromTypes.NAME || addMembersStore.fromType === FromTypes.LIST) {
-        // Filter out users already in the group
-        const memberIdList = membersStore.members.map((member) => member.id);
-        filteredResults = rawResults.filter((result) => !memberIdList.includes(result.id));
+        // Filter out users already in the group (use Set for O(1) lookups)
+        const memberIdSet = new Set(membersStore.members.map((member) => member.id));
+        filteredResults = rawResults.filter((result) => !memberIdSet.has(result.id));
     } else if (addMembersStore.fromType === FromTypes.GROUP) {
         // Filter out the current group itself
         filteredResults = rawResults.filter((result) => result.id !== store.id);
