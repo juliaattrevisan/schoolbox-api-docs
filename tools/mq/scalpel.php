@@ -9,6 +9,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Notification;
 use Alaress\Redis;
@@ -17,8 +19,8 @@ use Schoolbox\Realtime\Notification\Decorator;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$app = new class extends CliTool\App{
-    /** @var string|null $instanceId */
+$app = new class extends CliTool\BaseApp
+{
     private ?string $instanceId;
 
     /** @inheritDoc */
@@ -27,26 +29,46 @@ $app = new class extends CliTool\App{
         return null;
     }
 
-    /** @inheritDoc */
-    public function getShortOpts(): array
+    /** @inheritdoc */
+    protected function getName(): string
     {
-        return ['h','r'];
+        return 'MQ Scalpel';
     }
 
-    /** @inheritDoc */
-    public function getLongOpts(): array
+    /** @inheritdoc */
+    protected function getDescription(): string
     {
-        return ['help', 'title:', 'topic:', 'action:', 'href:', 'start:', 'end:', 'instance-id:', 'output-hash'];
+        return <<<DESC
+            Searches for Redis notification messages matching the given pattern(s) and permanently deletes them.
+            Specify as many parameters as possible to limit the search space.
+            Always do a dry run before performing deletions, as this operation is unrecoverable.
+            DESC;
+    }
+
+    /** @inheritdoc */
+    protected function setOptions(): CliTool\BaseApp
+    {
+        $this->optionCollection->add('r', 'Use regex matching for --title and --href filters')->defaultValue(false);
+        $this->optionCollection->add('instance-id:', 'Match notifications from this instance; defaults to INSTANCE_ID');
+        $this->optionCollection->add('title:', 'Delete notifications containing this in the title text');
+        $this->optionCollection->add('topic:', 'Delete notifications containing this in their topic');
+        $this->optionCollection->add('action:', 'Delete notifications with this action (e.g. send, retract-single, retract-all)');
+        $this->optionCollection->add('href:', 'Delete notifications with this URL');
+        $this->optionCollection->add('start:', 'Only match notifications delivered after this date');
+        $this->optionCollection->add('end:', 'Only match notifications delivered before this date');
+        $this->optionCollection->add('output-hash', 'Also output each matched message\'s hash to stdout (pipeable to read-msgdata.php)');
+        return $this;
+    }
+
+    /** @inheritdoc */
+    protected function hasPerformMode(): bool
+    {
+        return true;
     }
 
     /** @inheritDoc */
     public function run(): void
     {
-        if ($this->getOpt('h') || $this->getOpt('help')) {
-            $this->printHelp();
-            exit(CliTool\Kernel::EXIT_STATUS_OK);
-        }
-
         $this->instanceId = $this->getOpt('instance-id:');
         if (empty($this->instanceId)) {
             $this->instanceId = INSTANCE_ID;
@@ -231,50 +253,6 @@ $app = new class extends CliTool\App{
             return $test <= $time;
         }
         return $test >= $time;
-    }
-
-    /**
-     * Print a help message of available options
-     */
-    private function printHelp(): void
-    {
-        echo "
-This script is used to remove notifications from the system PERMANENTLY. It will search the entire notification message
-list and delete any records it matches. To avoid unnecessary damage specify as many parameters as possible to limit
-the search space. Please ensure you do a dry run before you run the script as this is unrecoverable.
-
-Usage: scalpel.php [--title='posted by'] [--href='/news/483'] [--start='2021-02-02 10:00am'] [--end='2021-02-02 14:00'] [-p]
-
-Options:
-    -h, --help
-        Print help message and exit.
-    --instance-id
-        If set, match notifications from this instance.
-        If not set, falls back to:
-        * the INSTANCE_ID environment variable
-        * the first instance defined for this system, if INSTANCE_ID is not set
-    --title
-        If set, delete notifications that contain this in the title text of the notification
-    --topic
-        If set, delete notifications that contain this in their topic
-    --action
-        If set, delete notifications that have this action.
-        Valid values: send, retract-single, retract-all
-    --href
-        If set, delete notifications that have this URL
-    --start
-        Only notifications delivered after this date will be matched
-    --end
-        Only notifications delivered before this time will be matched
-    -r
-        If present, title and href will be treated as preg expression strings and matches done as regexps
-    --output-hash
-        If present, also output each msg's hash to stdout.
-        This can then be piped to `read-msgdata.php` to view the full message dump:
-        `scalpel.php --output-hash ... | read-msgdata.php`
-    -p, --perform
-        Without this flag, tool will not delete messages
-";
     }
 };
 
