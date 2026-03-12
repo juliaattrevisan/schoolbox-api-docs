@@ -231,12 +231,17 @@ class AssessmentType implements IType
             unset($list[self::TYPE_LTI_ASSESSMENT]);
         }
 
+        /* Remove Dialog Agent if it wasn't configured properly in admin
+         */
         if (!new ValidDialogAgentEnabled($configLoader)->isSatisfied()) {
             unset($list[self::TYPE_DIALOG_AGENT]);
         }
 
-        /* TODO Add feature flag for Reporting activity
+        /* Remove Reporting Activity if it was disabled in admin
          */
+        if (!$configLoader->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE)) {
+            unset($list[self::TYPE_REPORTING]);
+        }
 
         return $list;
     }
