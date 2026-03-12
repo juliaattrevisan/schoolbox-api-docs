@@ -50,7 +50,7 @@ function onSelectAll(event) {
 </script>
 
 <template>
-    <button class="search-result" @click.prevent="onSelectAll">
+    <button class="search-result" type="button" @click="onSelectAll">
         <div class="checklist">
             <input
                 id="checkbox-select-all"

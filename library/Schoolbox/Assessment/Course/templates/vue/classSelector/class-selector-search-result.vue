@@ -69,7 +69,7 @@ function onSelect(event) {
 </script>
 
 <template>
-    <button class="search-result" @click.prevent="onSelect">
+    <button class="search-result" type="button" @click="onSelect">
         <div class="checklist">
             <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isChecked" @click.stop="onSelect" />
             <label :for="`checkbox-${result.id}`"></label>

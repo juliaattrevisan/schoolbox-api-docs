@@ -65,8 +65,11 @@ const isNodeSelected = window.Vue.computed(() => {
  * @param {Event} event - the click event
  */
 function onSelected(event) {
-    // Ignore label clicks as they naturally trigger the checkbox
-    if (event && event.target && event.target.nodeName === "LABEL") {
+    if (!event || !event.target) {
+        return;
+    }
+    // ignore input label and mark clicks, which get picked up due to the click listener on the parent div
+    if (event.target.nodeName === "LABEL" || event.target.nodeName === "MARK") {
         return;
     }
     if (props.isSingleSelect) {
@@ -78,7 +81,7 @@ function onSelected(event) {
 </script>
 
 <template>
-    <button class="search-result" :title="title" @click.prevent="onSelected">
+    <button class="search-result" type="button" :title="title" @click="onSelected">
         <div class="checklist">
             <input
                 v-if="props.isSingleSelect"
