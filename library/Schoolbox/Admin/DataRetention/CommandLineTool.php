@@ -164,6 +164,8 @@ class CommandLineTool extends CliTool\App
         );
 
         if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
+            // release this manually, so we don't trigger the notice in the shutdown function
+            $lock->release();
             $this->getHelp($validStrats);
         }
 
@@ -258,8 +260,11 @@ class CommandLineTool extends CliTool\App
      */
     private function releaseLock(LockInterface $lock): void
     {
+        // if lock exists
+        if ($lock->isAcquired()) {
+            $this->getLogger()->notice('Data Retention cleanup complete: released process lock');
+        }
         $lock->release();
-        $this->getLogger()->notice('Data Retention cleanup complete: released process lock');
     }
 
     /**
