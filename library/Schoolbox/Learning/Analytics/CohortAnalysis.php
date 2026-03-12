@@ -47,23 +47,23 @@ class CohortAnalysis
     /**
      * Indexed by unitSpec.id
      *
-     * @var Collection|UnitSpecification[]
+     * @var GenericCollection<UnitSpecification>
      */
-    private $unitSpecCache;
+    private GenericCollection $unitSpecCache;
 
     /**
      * Folders relevant for retrieving hit counts from
      *
-     * @var Collection|Folder[]
+     * @var GenericCollection<Folder>
      */
-    private $classFolderCache;
+    private GenericCollection $classFolderCache;
 
     /**
      * Indexed by user.id
      *
      * @var float[]
      */
-    private $courseGrades = [];
+    private array $courseGrades = [];
 
     /**
      * Indexed by assessment.id, then user.id
@@ -72,7 +72,7 @@ class CohortAnalysis
      *
      * @var float[][]
      */
-    private $assessmentGrades = [];
+    private array $assessmentGrades = [];
 
     /**
      * Indexed by unitSpec.id, assessment.id, user.id
@@ -81,7 +81,7 @@ class CohortAnalysis
      *
      * @var float[][][]|null[][][]
      */
-    private $grades = [];
+    private array $grades = [];
 
     /**
      * Indexed by unitSpec.id, assessment.id, user.id
@@ -90,68 +90,68 @@ class CohortAnalysis
      * 0 => incomplete, 1 => complete
      * @var int[][][]
      */
-    private $completions = [];
+    private array $completions = [];
 
     /**
      * @var float[][] indexed by unitSpec.id, then user.id
      */
-    private $unitProgress = [];
+    private array $unitProgress = [];
 
     /**
      * @var float[] indexed by user.id
      */
-    private $courseProgress = [];
+    private array $courseProgress = [];
 
     /**
      * Average progress for all students in the course/class
      *
      * @var float
      */
-    private $averageCourseProgress;
+    private float $averageCourseProgress;
 
     /**
      * Most advanced student progress in the course/class
      *
      * @var float
      */
-    private $highestCourseProgress;
+    private float $highestCourseProgress;
 
     /**
      * All students participating in the class/course - indexed by user.id
      *
-     * @var Collection|User[] $userCache
+     * @var GenericCollection<User> $userCache
      */
-    private $userCache;
+    private GenericCollection $userCache;
 
     /**
      * Aggregated Assessments, indexed by assessment.ID, sorted by sequence, then title
      * Spec ID if it exists, Impl.ID if created in UnitImpl
      *
-     * @var Collection|IAssessable[]
+     * @var Collection<IAssessable>
      */
-    private $assessmentCache;
+    private Collection $assessmentCache;
 
     /**
      * If non-null, filter results for box-plot of DueWork that does not match this type
      *
      * @var null|WorkType\Model
      */
-    private $submissionTypeResultFilter;
+    private ?WorkType\Model $submissionTypeResultFilter;
 
     /**
      * Are we filtering from cohort down to class level?
      * @var null|Folder
      */
-    private $classFolder;
+    private ?Folder $classFolder;
 
 
     /**
      * You need to have FULLY hydrated and linked up your units.
      * This class depends on all unit, assessment, participation, response and feedback references being fully accounted for.
      *
-     * @param Collection|IAssessable[] $dueAssessments IAssessable implementations due in selected Term and cohort/class
-     * @param Folder|null              $classFolder
-     * @param null|WorkType\Model      $resultFilter   If supplied, filter results for box-plot of DueWork that does not match this type
+     * @param Collection<IAssessable> $dueAssessments IAssessable implementations due in selected Term and cohort/class
+     * @param Folder|null             $classFolder
+     * @param null|WorkType\Model     $resultFilter   If supplied, filter results for box-plot of DueWork that does not match this type
      * @throws \DomainException
      * @todo inject mapper dependencies
      */
@@ -171,7 +171,7 @@ class CohortAnalysis
     /**
      * Copies all assessments to a cache, indexed by assessment.id, so we can grab retrieve O(1)
      *
-     * @param Collection|IAssessable[] $dueAssessments
+     * @param Collection<IAssessable> $dueAssessments
      */
     protected function buildCaches(Collection $dueAssessments)
     {
@@ -221,7 +221,7 @@ class CohortAnalysis
      * * Assessments with zero-weight
      * * Assessments with markType = 'None'
      */
-    protected function calculateNormalisedMarks()
+    protected function calculateNormalisedMarks(): void
     {
         /**
          * Sets of Assessment + normMark, grouped by user.id
@@ -286,7 +286,7 @@ class CohortAnalysis
      * @param IAssessable $right
      * @return int
      */
-    public function compareAssessments(IAssessable $left, IAssessable $right)
+    public function compareAssessments(IAssessable $left, IAssessable $right): int
     {
         if ($left->getSequence() < $right->getSequence()) {
             return -1;
@@ -310,7 +310,7 @@ class CohortAnalysis
      *
      * @throws \DomainException
      */
-    protected function calculateCompletionProgress()
+    protected function calculateCompletionProgress(): void
     {
         /** @var int[] $countCourseAssessmentsInvolved indexed by user.id */
         $countCourseAssessmentsInvolved = [];
@@ -387,10 +387,10 @@ class CohortAnalysis
      * * use assessment.weight from AssessmentSpec
      * * student mark = max max from non-zero-weight implementation
      *
-     * @param Collection|IAssessable[] $dueAssessments
+     * @param Collection<IAssessable> $dueAssessments
      * @throws \DomainException
      */
-    protected function aggregateAssessments(Collection $dueAssessments)
+    protected function aggregateAssessments(Collection $dueAssessments): void
     {
         foreach ($dueAssessments as $assessmentImpl) {
 
@@ -456,7 +456,7 @@ class CohortAnalysis
      * @var float return['mostAdvancedStudent']
      * @var float return['classCompletions']
      */
-    public function getProgressByUnit()
+    public function getProgressByUnit(): array
     {
         $progress = [];
 
@@ -483,9 +483,9 @@ class CohortAnalysis
     /**
      * Get all students participating in the course/class, indexed by user.id
      *
-     * @return GenericCollection|User[]
+     * @return GenericCollection<User>
      */
-    public function getParticipatingStudents()
+    public function getParticipatingStudents(): GenericCollection
     {
         return $this->userCache;
     }
@@ -502,7 +502,7 @@ class CohortAnalysis
      * @var float return['mostAdvancedStudent']
      * @var float return['classCompletions']
      */
-    public function getOverallProgress()
+    public function getOverallProgress(): array
     {
         return [
             'mostAdvancedStudent' => $this->highestCourseProgress,
@@ -518,7 +518,7 @@ class CohortAnalysis
      * @param int $sort
      * @return mixed[][] Sets of User + normMark pairs, grouped by user.id
      */
-    public function getCohortRankings($sort = SORT_DESC)
+    public function getCohortRankings($sort = SORT_DESC): array
     {
         $courseGrades = $this->courseGrades;
 
@@ -545,9 +545,9 @@ class CohortAnalysis
      * Respects SubmissionType filtering
      *
      * @param bool $filterBySubmissionType
-     * @return Collection|IAssessable[]
+     * @return Collection<IAssessable>
      */
-    public function getGradableAssessments($filterBySubmissionType)
+    public function getGradableAssessments(bool $filterBySubmissionType): Collection
     {
         $filteredAssessments = $this->assessmentCache->emptyClone();
 
@@ -582,7 +582,7 @@ class CohortAnalysis
      * @var User    $results [$assessmentId][$userId]['user']
      * @var float   $results [$assessmentId][$userId]['grade']
      */
-    public function getAssessmentMarks($filterBySubmissionType)
+    public function getAssessmentMarks(bool $filterBySubmissionType): array
     {
         $results = [];
 
@@ -609,7 +609,7 @@ class CohortAnalysis
      * @param IAssessable $assessment
      * @return bool
      */
-    protected function isExcludedForGrades(IAssessable $assessment)
+    protected function isExcludedForGrades(IAssessable $assessment): bool
     {
         /* Some learning activities don't contribute toward learning analytics:
          *    - Tasks (they're just misc stuff to do most of the time)
@@ -641,7 +641,7 @@ class CohortAnalysis
      *
      * (Cuts the same data as getCohortGradesByAssessment() but by indicators instead of assessment.)
      *
-     * @param Collection|UnitImplementation[] $unitImplementations
+     * @param Collection<UnitImplementation> $unitImplementations
      * @param Term\Model                      $term
      * @return array
      */
