@@ -36,7 +36,7 @@
             text-transform: uppercase;
 
             &:hover {
-                background-color: var(--content-ui-hover);
+                background-color: var(--sbx-config-color-active, var(--content-ui-hover));
             }
         }
     }
@@ -52,7 +52,7 @@
         transition: background-color 0.2s ease-in-out;
         &:hover,
         :focus {
-            background-color: var(--content-ui-hover);
+            background-color: var(--sbx-config-color-active, var(--content-ui-hover));
             filter: grayscale(0%);
         }
         // To make the entire card clickable, we make the anchor fill the card
@@ -75,7 +75,7 @@
 
     // To highlight that the card is active, could be used when the card is selected via arrow navigation for example
     &--active {
-        background-color: var(--content-ui-hover);
+        background-color: var(--sbx-config-color-active, var(--content-ui-hover));
         filter: grayscale(20%);
     }
 

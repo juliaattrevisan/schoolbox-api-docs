@@ -76,11 +76,11 @@ function onSelectAll(event) {
     transition: background 0.2s;
     width: 100%;
     &:hover {
-        background: var(--content-ui-hover);
+        background: var(--sbx-config-color-active, var(--content-ui-hover));
     }
 }
 .search-result-active {
-    background: var(--content-ui-hover);
+    background: var(--sbx-config-color-active, var(--content-ui-hover));
 }
 input[type="checkbox"]:not(.plain) + label {
     margin: 0;

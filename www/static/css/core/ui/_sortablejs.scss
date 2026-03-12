@@ -9,6 +9,6 @@ li.dragging {
 
 /* The item held by the mouse when dragging */
 .dragged-item {
-    background-color: var(--content-ui-hover);
+    background-color: var(--sbx-config-color-active, var(--content-ui-hover));
     height: auto !important;
 }

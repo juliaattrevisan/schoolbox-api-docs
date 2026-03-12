@@ -52,7 +52,7 @@ $f-dropdown-line-height: rem-calc(18) !default;
         width: 100%;
         &:hover,
         &:focus {
-            background: var(--content-ui-hover);
+            background: var(--sbx-config-color-active, var(--content-ui-hover));
         }
         a,
         button {
@@ -63,7 +63,7 @@ $f-dropdown-line-height: rem-calc(18) !default;
             text-align: left;
             width: 100%;
             &:hover {
-                background-color: var(--content-ui-hover);
+                background-color: var(--sbx-config-color-active, var(--content-ui-hover));
                 text-decoration: none;
             }
             &::before {

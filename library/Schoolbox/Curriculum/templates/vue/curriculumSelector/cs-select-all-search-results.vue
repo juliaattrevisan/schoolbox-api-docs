@@ -91,7 +91,7 @@ function onSelectAll() {
     transition: background 0.2s;
     width: 100%;
     &:hover {
-        background: var(--content-ui-hover);
+        background: var(--sbx-config-color-active, var(--content-ui-hover));
     }
 }
 

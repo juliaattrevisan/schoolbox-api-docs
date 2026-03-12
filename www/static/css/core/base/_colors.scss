@@ -12,7 +12,7 @@
     --color-success: #298129;
     --color-warning: #ff7d00;
     --color-buttons: var(--sbx-config-color-accent, var(--content-ui-foreground));
-    --color-buttons-hover: var(--content-ui-hover);
+    --color-buttons-hover: var(--sbx-config-color-active, var(--content-ui-hover));
 
     --color-icon-badge: darkorange;
     --color-icon-course: #008600;
