@@ -79,6 +79,7 @@ config:
   lms_duetime_default: {hide: false }
   lms_seb_enable: {hide: false}
   lti_assessments_enable: {value: false, edit: false}
+  reporting_activity_enable: {value: false, edit: false}
 
   #Comms
   comms_comments_enabled: { hide: false }
