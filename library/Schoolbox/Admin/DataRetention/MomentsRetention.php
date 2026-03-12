@@ -57,7 +57,7 @@ class MomentsRetention extends StrategyBase
              LEFT JOIN moment_tag ON moment.id = moment_tag.moment_id
              LEFT JOIN discussion_thread ON moment.discussion_thread_id = discussion_thread.id
              LEFT JOIN discussion_thread_comment ON moment.discussion_thread_id = discussion_thread_comment.discussion_thread_id
-            WHERE moment.deleted_at < :old
+            WHERE moment.deleted_at IS NOT NULL AND moment.deleted_at < :old
         ";
 
         $statement = $this->database->prepare($query);

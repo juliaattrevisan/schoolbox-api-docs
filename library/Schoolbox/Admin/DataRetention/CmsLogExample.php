@@ -79,7 +79,7 @@ class CmsLogExample extends StrategyBase
         SELECT
             id
         FROM cmsLog
-        WHERE cmsLog.time < :old
+        WHERE time IS NOT NULL AND time < :old
     ";
 
         $statement = $this->database->prepare($query);
