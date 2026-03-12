@@ -18,6 +18,7 @@
 {% set isQuiz = isQuiz ?? assessment is quiz %}
 {% set isDueWork = isDueWork ?? assessment is dueWork %}
 {% set isDialogAgent = isDialogAgent ?? assessment is dialogAgent %}
+{% set isReporting = isReporting ?? assessment is reporting %}
 
 <section data-assessment="{{ assessment.id }}" data-due-timestamp="{{ assessment.dueAt ? assessment.dueAt.unixTimeStamp : '' }}">
     <div class="content collapsible">
@@ -55,6 +56,13 @@
                  #}
                 {% set submitTitleSuffix = 'completed this ' ~ locale.dialogAgent -%}
                 {% set markedTitleSuffix = 'processing' -%}
+                {% set markedPastTense = 'feedback provided' %}
+            {% elseif isReporting %}
+                {# TODO I had to make up the langauge for this on the spot...
+                 # TODO jezwords, maybe
+                 #}
+                {% set submitTitleSuffix = '' -%}
+                {% set markedTitleSuffix = 'feedback' -%}
                 {% set markedPastTense = 'feedback provided' %}
             {%- else -%}
                 {% set submitTitleSuffix = '' -%}

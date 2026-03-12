@@ -163,20 +163,20 @@ class Model extends AbstractAssessment
      */
     public function getNormalisedMark(Participant $participant, $publishedOnly): ?float
     {
-        /* TODO Implement this
-         */
-        return null;
+        return $this->getAuthoritativeFeedback($participant, $publishedOnly)?->getNormalisedMark();
     }
 
 
     /**
+     * There are no responses for reporting activities
+     *
      * @param Participant $participant
      * @param $publishedOnly
      * @return IResponse|null
      */
     public function getAuthoritativeResponse(Participant $participant, $publishedOnly): ?IResponse
     {
-        /* TODO Implement this
+        /* There are no responses for reporting activities
          */
         return null;
     }
@@ -191,9 +191,9 @@ class Model extends AbstractAssessment
     {
         $this->assertSameAssessment($participant);
 
-        /* TODO Implement this
-         */
-        return null;
+        return $publishedOnly
+            ? $participant->findMostRecentInstructorGivenPublishedFeedback()
+            : $participant->findMostRecentInstructorGivenFeedback();
     }
 
 
@@ -206,26 +206,9 @@ class Model extends AbstractAssessment
     {
         $this->assertSameAssessment($participant);
 
-        /* TODO Implement this
-         */
-        return false;
-    }
+        $feedback = $this->getAuthoritativeFeedback($participant, true);
 
-
-    /**
-     * Decide if this participant has a published feedback. That's a bit of a weird hair-splitting given that
-     * isFeedbackRequired() also exists, but ok
-     *
-     * @param Participant $participant
-     * @return bool
-     */
-    public function hasPublishedFeedback(Participant $participant)
-    {
-        $this->assertSameAssessment($participant);
-
-        /* TODO Implement this
-         */
-        return false;
+        return !$feedback;
     }
 
 
@@ -235,8 +218,21 @@ class Model extends AbstractAssessment
      */
     public function hasPendingDraftAuthoritativeFeedback(Participant $participant): bool
     {
-        /* TODO implement this
-         */
+        $this->assertSameAssessment($participant);
+
+        $anyAuthoritativeFeedback = $this->getAuthoritativeFeedback($participant, false);
+
+        if (!$anyAuthoritativeFeedback) {
+            // No feedback at all? Then there cannot be a pending draft.
+            return false;
+        }
+
+        if ($anyAuthoritativeFeedback->isDraft()) {
+            // Latest feedback is a draft.
+            return true;
+        }
+
+        // latest feedback is published. No draft pending.
         return false;
     }
 
@@ -302,8 +298,8 @@ class Model extends AbstractAssessment
      */
     public function isCustomParticipationCopyable(): bool
     {
-        /* At the moment, we want to restrict the copying of custom participation
-         * for reporting, which will be handled in the future, so for the time being, we will leave it out.
+        /* At the moment, we want to restrict the copying of custom participation or reporting, which will be handled in
+         * the future, so for the time being, we will leave it out.
          */
         return false;
     }

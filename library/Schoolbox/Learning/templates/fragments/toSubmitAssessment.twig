@@ -19,6 +19,7 @@
 {% set isQuiz    = isQuiz    ?? assessment is quiz %}
 {% set isDueWork = isDueWork ?? assessment is dueWork %}
 {% set isDialogAgent = isDialogAgent ?? assessment is dialogAgent %}
+{% set isReporting = isReporting ?? assessment is reporting %}
 
 {%- set state = isQuiz ? 'unattempted' : 'unsubmitted' -%}
 
@@ -49,6 +50,13 @@
     {%- set submitTitleSuffix    = 'completed this ' ~ locale.dialogAgent -%}
     {%- set markedTitleSuffix    = 'processing' -%}
     {%- set noResultsTitleSuffix = 'completed this ' ~ locale.dialogAgent -%}
+    {% set markedPastTense = 'feedback provided' %}
+{% elseif isReporting %}
+    {# TODO I had to make up the langauge for this on the spot...
+     # TODO jezwords, maybe
+     #}
+    {% set submitTitleSuffix = '' -%}
+    {% set markedTitleSuffix = 'feedback' -%}
     {% set markedPastTense = 'feedback provided' %}
 {%- endif -%}
 

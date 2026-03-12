@@ -1,6 +1,5 @@
 {# Generates the local URL to review an Assessment Response #}
-{% macro localUrl(response) -%}
-
+{% macro localUrl(response, assessable) -%}
     {%- if response and response.assessable is quiz -%}
         {% set argList = {assessmentId: response.assessable.id, firstSectionId: response.firstSectionId, responseId: response.id} -%}
         {{ routeLookup('learningQuiz.getQuizResponseFirstSection', argList) }}
@@ -10,18 +9,28 @@
         {# no link. Caller should not render a link if assessable is a task #}
     {%- elseif response and response.assessable is dialogAgent -%}
         {{ routeLookup('learningAssessment.getStatus', {assessment: response.assessable, assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id }) }}
+    {% elseif assessable is reporting %}
+        {# Reporting activities don't have responses from students so I guess we go to the Status screen which is
+         # where you would have supplied the feedback(s) in the first place. There's also supporting data there which
+         # is meant to inform your feedbacks' contents anyway
+         #}
+        {{ routeLookup('learningAssessment.getStatus', {assessment: assessable, assessmentId: assessable.id}) }}
     {%- endif -%}
 {% endmacro %}
 
 {# Generates the hover title text shown over the link to Review a Student Response #}
 {% macro reviewResponseTitle(response) -%}
-    {%- if response.assessable is quiz -%}
-        Review Quiz Attempt
-    {%- elseif response.assessable is dueWork -%}
-        Review Student Submission
-    {%- elseif response.assessable is task -%}
-        Review Task Completion
-    {%- elseif response.assessable is dialogAgent -%}
-        View {{ locale.dialogAgent }} status
-    {%- endif -%}
+    {% if response %}
+        {%- if response.assessable is quiz -%}
+            Review Quiz Attempt
+        {%- elseif response.assessable is dueWork -%}
+            Review Student Submission
+        {%- elseif response.assessable is task -%}
+            Review Task Completion
+        {%- elseif response.assessable is dialogAgent -%}
+            View {{ locale.dialogAgent }} status
+        {%- elseif response.assessable is reporting -%}
+            View {{ locale.reporting }} status
+        {%- endif -%}
+    {% endif %}
 {% endmacro %}
