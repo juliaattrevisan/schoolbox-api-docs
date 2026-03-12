@@ -8,6 +8,8 @@
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Alaress\Color\Test;
 
 use Alaress\Color\Color;
@@ -33,7 +35,6 @@ class ColorTest extends TestCase
             array(0, 0),
             array(1, 1),
             array(0Xff, 255),
-            array('16', 16),
         );
     }
 
@@ -52,6 +53,7 @@ class ColorTest extends TestCase
             array(0xfff, InvalidArgumentException::class),
             array('cheese', TypeError::class),
             array('', TypeError::class),
+            array('16', TypeError::class),
         );
     }
 
@@ -68,7 +70,6 @@ class ColorTest extends TestCase
         return array(
             array(0, 0.0),
             array(1, 1.0),
-            array('0.1', 0.1),
         );
     }
 
@@ -86,6 +87,7 @@ class ColorTest extends TestCase
             array(1.1, InvalidArgumentException::class),
             array(99999, InvalidArgumentException::class),
             array('cheese', TypeError::class),
+            array('0.1', TypeError::class),
         );
     }
 
