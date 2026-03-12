@@ -50,13 +50,15 @@ class MomentsRetention extends StrategyBase
                 count(moment_folder.moment_id) AS folders,
                 count(moment_tag.moment_id) AS tags,
                 count(discussion_thread.id) AS threads,
-                count(discussion_thread_comment.discussion_thread_id) AS comments
+                count(discussion_thread_comment.discussion_thread_id) AS comments,
+                count(curriculum_moment.moment_id) AS curriculum_moments
             FROM moment
              LEFT JOIN moment_evidence ON moment.id = moment_evidence.moment_id
              LEFT JOIN moment_folder ON moment.id = moment_folder.moment_id
              LEFT JOIN moment_tag ON moment.id = moment_tag.moment_id
              LEFT JOIN discussion_thread ON moment.discussion_thread_id = discussion_thread.id
              LEFT JOIN discussion_thread_comment ON moment.discussion_thread_id = discussion_thread_comment.discussion_thread_id
+             LEFT JOIN curriculum_moment ON moment.id = curriculum_moment.moment_id
             WHERE moment.deleted_at IS NOT NULL AND moment.deleted_at < :old
         ";
 
@@ -78,6 +80,7 @@ class MomentsRetention extends StrategyBase
         $this->log->info(sprintf("With '%s' moment_tags to delete", $toDelete['tags']));
         $this->log->info(sprintf("With '%s' discussion_threads to delete", $toDelete['threads']));
         $this->log->info(sprintf("With '%s' discussion_thread_comments to delete", $toDelete['comments']));
+        $this->log->info(sprintf("With '%s' curriculum_moments to delete", $toDelete['curriculum_moments']));
 
         return true;
     }
@@ -145,6 +148,7 @@ class MomentsRetention extends StrategyBase
         $statementEvidence = $this->database->prepare($this->deleteStatement() . " FROM moment_evidence WHERE moment_id IN {$delPlaceholders}");
         $statementFolder = $this->database->prepare($this->deleteStatement() . " FROM moment_folder WHERE moment_id IN {$delPlaceholders}");
         $statementTag = $this->database->prepare($this->deleteStatement() . " FROM moment_tag WHERE moment_id IN {$delPlaceholders}");
+        $statementCurriculum = $this->database->prepare($this->deleteStatement() . " FROM curriculum_moment WHERE moment_id IN {$delPlaceholders}");
         $statementMoment = $this->database->prepare($this->deleteStatement() . " FROM moment WHERE id IN {$delPlaceholders}");
 
         // build params
@@ -158,6 +162,9 @@ class MomentsRetention extends StrategyBase
 
         // unlink tags
         $statementTag->execute($delParams);
+
+        // unlink curriculum node relations
+        $statementCurriculum->execute($delParams);
 
         // delete the moments
         $statementMoment->execute($delParams);
@@ -188,11 +195,12 @@ class MomentsRetention extends StrategyBase
         if ($this->perform) {
             $this->log->notice(
                 sprintf(
-                    "Deleted '%s' moments, '%s' moment_evidence, '%s' moment_folders, '%s' moment_tags '%s' discussion_threads, '%s' discussion_thread_comments",
+                    "Deleted '%s' moments, '%s' moment_evidence, '%s' moment_folders, '%s' moment_tags, '%s' curriculum_moments, '%s' discussion_threads, '%s' discussion_thread_comments",
                     $statementMoment->rowCount(),
                     $statementEvidence->rowCount(),
                     $statementFolder->rowCount(),
                     $statementTag->rowCount(),
+                    $statementCurriculum->rowCount(),
                     $statementThread?->rowCount() ?? 0,
                     $statementComment?->rowCount() ?? 0
                 )
@@ -200,11 +208,12 @@ class MomentsRetention extends StrategyBase
         } else {
             $this->log->notice(
                 sprintf(
-                    "Would have deleted '%s' moments, '%s' moment_evidence, '%s' moment_folders, '%s' moment_tags '%s' discussion_threads, '%s' discussion_thread_comments",
+                    "Would have deleted '%s' moments, '%s' moment_evidence, '%s' moment_folders, '%s' moment_tags, '%s' curriculum_moments, '%s' discussion_threads, '%s' discussion_thread_comments",
                     $statementMoment->rowCount(),
                     $statementEvidence->rowCount(),
                     $statementFolder->rowCount(),
                     $statementTag->rowCount(),
+                    $statementCurriculum->rowCount(),
                     $statementThread?->rowCount() ?? 0,
                     $statementComment?->rowCount() ?? 0
                 )
