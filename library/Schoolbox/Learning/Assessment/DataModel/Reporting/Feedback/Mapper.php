@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DataModel\Reporting\Feedback;
 
+use Schoolbox\Assessment\Participant;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
@@ -23,6 +24,12 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends \Schoolbox\Mapper
 {
+    /**
+     * @var Participant\Plan\InteractionIntegrityChecker
+     */
+    private Participant\Plan\InteractionIntegrityChecker $interactionChecker;
+
+
     /**
      * @inheritDoc
      */
@@ -74,6 +81,34 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        /* Add participation records whenever someone creates a new object via this mapper
+         *
+         * Note this method typically assumes participation to exist when updating a record; this might have implications
+         * for multiplayer schoolbox but we haven't encountered that yet.
+         */
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'insertParticipation']);
+
+        /* Un-inset a participation whenever all the responses made by a student are deleted; this makes them no longer
+         * an official participant of this assessment. When (if) they ever make a Response, insertParticipation will
+         * once again restore their participation status.
+         */
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
+    }
+
+
+    /**
+     * Adds some dependencies arbitrarily
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->interactionChecker = new Participant\Plan\InteractionIntegrityChecker(
+            Participant\Plan\Mapper::getInstance(),
+            Participant\Mapper::getInstance()
+        );
     }
 
 
@@ -137,4 +172,75 @@ class Mapper extends \Schoolbox\Mapper
 
         return $stack;
     }
+
+
+    /* Callback implementations
+     */
+
+    /**
+     * Add a participation record for a given $learner if a response is being created
+     *
+     * Updates to existing responses _presume_ a participation record already existed (created earlier) which maybe has
+     * some implications for multiplayer schoolbox in a timing scenario
+     *
+     * @param Model $object
+     * @param Model|null $previous
+     * @return bool
+     * @throws Exception
+     */
+    public function insertParticipation(Model $object, ?Model $previous = null): bool
+    {
+        if ($previous) {
+            // If an update, assume the participation record already exists
+            return true;
+        }
+
+        $assessment = $this->getJoinMapper('reporting')
+            ->findById($object->getReporting()->getId())
+            ->getAssessmentModel();
+
+        return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getLearner(), $assessment);
+    }
+
+
+    /**
+     * Remove the $learner's participant row if $learner should no longer be a participant in $assessment.
+     *
+     * @param Model $object
+     * @return bool - Return true on success - whether or not a participation was removed.
+     *                This is the expected behaviour for callbacks registered with Schoolbox\Mapper.
+     * @throws Exception
+     */
+    public function removeParticipationIfNecessary(Model $object): bool
+    {
+        /* See how many living feedbacks exist for this learner; if they have none remaining then we can remove their
+         * participation record entirely
+         */
+        $query = "
+            SELECT COUNT(*) AS num
+            FROM {$this->getTable()}
+            WHERE learner_id = :learner_id
+            AND deleted_at IS NULL
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'learner_id' => $object->getLearner()->getId()
+        ]);
+
+        $numFeedbacks = (int)$statement->fetchColumn();
+
+        /* No living feedbacks remain: student is "no longer participating" for the time being
+         */
+        if (!$numFeedbacks) {
+            $assessment = $this->getJoinMapper('reporting')
+                ->findById($object->getReporting()->getId())
+                ->getAssessmentModel();
+
+            $this->interactionChecker->removeParticipationFromDynamicPlan($object->getLearner(), $assessment);
+        }
+
+        return true;
+    }
+
 }
