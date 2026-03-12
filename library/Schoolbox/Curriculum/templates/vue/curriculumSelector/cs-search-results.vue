@@ -104,15 +104,15 @@ window.Vue.watch(
         margin: 0;
         transition: height 0.3s;
         li {
-            border-bottom: 1px solid var(--body-background);
-            border-left: 1px solid var(--navigation-hover);
-            border-right: 1px solid var(--navigation-hover);
+            border-bottom: 1px solid var(--sbx-color-border, var(--body-background));
+            border-left: 1px solid var(--sbx-config-color-accent, var(--navigation-hover));
+            border-right: 1px solid var(--sbx-config-color-accent, var(--navigation-hover));
             transform: none !important;
             &:first-child {
-                border-top: 1px solid var(--navigation-hover);
+                border-top: 1px solid var(--sbx-config-color-accent, var(--navigation-hover));
             }
             &:last-child {
-                border-bottom: 1px solid var(--navigation-hover);
+                border-bottom: 1px solid var(--sbx-config-color-accent, var(--navigation-hover));
             }
         }
     }
