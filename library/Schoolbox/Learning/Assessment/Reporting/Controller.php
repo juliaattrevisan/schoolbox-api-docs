@@ -181,6 +181,15 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(Model|IAssessable $assessment, User $student): void
     {
+        if ($this->getUser()->getRole()->isStaff()) {
+            $this->response = $this->redirectFound($this->routeGenerator->generate('learningAssessment.getStatus', [
+                'assessment' => $assessment,
+                'assessmentId' => $assessment->getId()
+            ]));
+
+            return;
+        }
+
         /* Summary screens aren't used by anyone for Reporting Activities.
          *
          * jez.gray [11:59 AM, 11 March 2026]
@@ -266,7 +275,7 @@ class Controller extends Assessment\Controller
     {
         /* Feature flag must be enabled; if so, any staff can get in here and do the marking stuff
          */
-        if ($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE)) {
+        if (!$this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE)) {
             throw new Exception\NotFound();
         }
 
