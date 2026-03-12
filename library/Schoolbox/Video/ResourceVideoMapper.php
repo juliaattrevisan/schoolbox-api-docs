@@ -184,7 +184,7 @@ class ResourceVideoMapper extends Mapper
                 {$fileListMapper->getJoinMapper('myfile')->getColumnString('mf')},
                 {$myFileMapper->getJoinMapper('owner')->getColumnString('o')}
             FROM `{$this->getTable()}` vq
-            JOIN `myFile` AS `mf` ON `vq`.`hash` = `mf`.`hash` AND `mf`.`deleted_at` IS NULL
+            JOIN my_file AS `mf` ON `vq`.`hash` = `mf`.`hash` AND `mf`.`deleted_at` IS NULL
             JOIN {$this->getJoinSQL('eportfolio_filelist', 'mf', 'fl')}
             LEFT JOIN {$myFileMapper->getJoinSQL('owner', 'mf', 'o')}
             WHERE fl.page_id = :pageId

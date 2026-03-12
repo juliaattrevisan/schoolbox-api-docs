@@ -14,7 +14,6 @@ use Schoolbox\Resource;
 use Schoolbox\Resource\AbstractFileMapper;
 use Schoolbox\Resource\File\IFileMapper;
 use Schoolbox\Resource\File\ILocator;
-use Schoolbox\User;
 
 /**
  * Class Mapper
@@ -47,7 +46,7 @@ class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
     {
         parent::mapping();
 
-        $this->hasTable('myFile');
+        $this->hasTable('my_file');
         $this->hasModel(Model::class);
 
         $this->uses('published', self::TYPE_DATETIME, null, 'publishedAt');

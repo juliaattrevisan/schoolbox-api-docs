@@ -199,7 +199,7 @@ class UserPayload
                  GROUP BY `f`.`owner`)
                 UNION
                 (SELECT owner AS userId, SUM(`s`.`filesize`) AS size
-                 FROM `myFile` `f`
+                 FROM my_file `f`
                    INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
                  WHERE `f`.`deleted_at` IS NULL
                  GROUP BY `f`.`owner`)
@@ -259,7 +259,7 @@ class UserPayload
     private function getMyFile(): \Alaress\Database\Statement\Query\IQuery|\Alaress\Database\Statement\Query\Base
     {
         $query = "SELECT owner AS userId, SUM(`s`.`filesize`) AS size
-                 FROM `myFile` `f`
+                 FROM my_file `f`
                    INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
                  WHERE `f`.`deleted_at` IS NULL
                  GROUP BY `f`.`owner`";

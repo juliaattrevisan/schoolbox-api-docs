@@ -78,7 +78,7 @@ class FilePayload
                     `s`.`hash`,
                     '' AS folderId,
                     '' AS folder
-                FROM `myFile` `f`
+                FROM my_file `f`
                 INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
                 LEFT JOIN `allowedFileExtension` `e` ON `s`.`ext` = `e`.`extension`
                 LEFT JOIN `allowedFileTypes` `t` ON `e`.`fileTypeId` = `t`.`fileTypeId`

@@ -136,11 +136,11 @@ class RolePayload
                  GROUP BY `groups`.id)
                 UNION
                 (SELECT `groups`.id, `groups`.name, SUM(`storage`.`filesize`) AS size
-                 FROM `myFile`
-                   INNER JOIN `user` ON `user`.id = `myFile`.owner
+                 FROM my_file
+                   INNER JOIN `user` ON `user`.id = my_file.owner
                    INNER JOIN `groups` ON `user`.group_id = `groups`.id
-                   INNER JOIN `storage` ON `myFile`.`hash` = `storage`.`hash`
-                 WHERE `myFile`.`deleted_at` IS NULL
+                   INNER JOIN `storage` ON my_file.`hash` = `storage`.`hash`
+                 WHERE my_file.`deleted_at` IS NULL
                  GROUP BY `groups`.id)
                 UNION
                 (SELECT `groups`.id, `groups`.name, SUM(`storage`.`filesize`) AS size
@@ -201,11 +201,11 @@ class RolePayload
     private function getMyFile()
     {
         $query = "SELECT `groups`.id, `groups`.name, `groups`.sequence, SUM(`storage`.`filesize`) AS size
-                 FROM `myFile`
-                   INNER JOIN `user` ON `user`.id = `myFile`.owner
+                 FROM my_file
+                   INNER JOIN `user` ON `user`.id = my_file.owner
                    INNER JOIN `groups` ON `user`.group_id = `groups`.id
-                   INNER JOIN `storage` ON `myFile`.`hash` = `storage`.`hash`
-                 WHERE `myFile`.`deleted_at` IS NULL
+                   INNER JOIN `storage` ON my_file.`hash` = `storage`.`hash`
+                 WHERE my_file.`deleted_at` IS NULL
                  GROUP BY `groups`.id";
 
         return $this->database->executeQuery($query);
