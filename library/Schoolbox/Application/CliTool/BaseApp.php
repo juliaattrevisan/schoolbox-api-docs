@@ -263,7 +263,7 @@ abstract class BaseApp extends App
     abstract protected function getName(): string;
 
     /**
-     * Get this application's name.
+     * Get this application's description.
      *
      * (Abstract as the application must be described.)
      *
