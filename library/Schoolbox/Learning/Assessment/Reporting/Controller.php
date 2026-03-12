@@ -17,6 +17,7 @@ use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\Misconfigured;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter;
@@ -263,6 +264,12 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable|Model $assessment): void
     {
+        /* Feature flag must be enabled; if so, any staff can get in here and do the marking stuff
+         */
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE)) {
+            throw new Exception\NotFound();
+        }
+
         /** All implementations if $assessment is a spec, or $assessment itself if it's already one */
         $implementations = new \Schoolbox\GenericCollection(Model::class);
 

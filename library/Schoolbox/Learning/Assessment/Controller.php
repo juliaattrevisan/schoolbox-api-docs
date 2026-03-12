@@ -21,6 +21,7 @@ use Schoolbox\Filter\CompositeFactoryFactory;
 use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\Learning\Assessment\Reporting\Folder;
 use Schoolbox\Learning\Assessment\Reporting\Range;
+use Schoolbox\Learning\Assessment\Reporting\ValidModerateActivity;
 use Schoolbox\Learning\Assessment\Translator\ParticipationPlans;
 use Schoolbox\Learning\Assessment\Translator\Participations;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
@@ -389,6 +390,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /* Reporting Activity specific settings/data are here
          */
         if (AssessmentType::TYPE_REPORTING === $type) {
+            /* You have to fulfil these preconditions to alter something about a reporting activity
+             * Normally we'd exit earlier, but this assessment controller is obese and needs refactoring: SA-21446
+             */
+            if (!(new ValidModerateActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
+                throw new \Schoolbox\Mapper\Exception\NotFound();
+            }
+
             /* Reporting activities need to know about all the available Work Types that could be selected
              */
             $data['reporting']['workTypes'] = $this->workTypeMapper->findAll();
@@ -740,6 +748,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /* Reporting Activity specific settings/data are here
          */
         if ($assessment instanceof Reporting\Model) {
+            /* You have to fulfil these preconditions to alter something about a reporting activity
+             * Normally we'd exit earlier, but this assessment controller is obese and needs refactoring: SA-21446
+             */
+            if (!(new ValidModerateActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
+                throw new \Schoolbox\Mapper\Exception\NotFound();
+            }
+
             /* Reporting activities need to know about all the available Work Types that could be selected
              */
             $data['reporting']['workTypes'] = $this->workTypeMapper->findAll();
@@ -842,6 +857,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /* Enforce Open Date = Publish Date for Reporting
          */
         if ($assessment instanceof Reporting\Model) {
+            /* You have to fulfil these preconditions to alter something about a reporting activity
+             * Normally we'd exit earlier, but this assessment controller is obese and needs refactoring: SA-21446
+             */
+            if (!(new ValidModerateActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
+                throw new \Schoolbox\Mapper\Exception\NotFound();
+            }
+
             $assessment->setOpenAt($assessment->getPublishAt());
         }
 
@@ -962,6 +984,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function postDeleteAssessment(IAssessable $assessment): void
     {
+        if ($assessment instanceof Reporting\Model) {
+            /* You have to fulfil these preconditions to alter something about a reporting activity
+             * Normally we'd exit earlier, but this assessment controller is obese and needs refactoring: SA-21446
+             */
+            if (!(new ValidModerateActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
+                throw new \Schoolbox\Mapper\Exception\NotFound();
+            }
+        }
+
         /* Deleting assessments from inside a project always affects
          * its outcome; update the cache accordingly
          */
