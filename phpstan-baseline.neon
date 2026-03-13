@@ -6151,22 +6151,10 @@ parameters:
 			path: tools/parentClassAccess.php
 
 		-
-			message: '#^Call to an undefined method Schoolbox\\ISoftDeletable\:\:setDeletedAt\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: tools/pastoral/generateTestData.php
-
-		-
 			message: '#^Dead catch - Alaress\\Database\\Exception is never thrown in the try block.$#'
 			identifier: catch.neverThrown
 			count: 1
 			path: library/External/Canvas/Importer/Cli/AnnouncementsTool.php
-
-		-
-			message: '#^Comparison operation "\>\=" between int\<3, max\> and 3 is always true\.$#'
-			identifier: greaterOrEqual.alwaysTrue
-			count: 1
-			path: tools/rubric/repairSpecAssessments.php
 
 		-
 			message: '#^Strict comparison using \=\=\= between non-empty-string and '''' will always evaluate to false\.$#'

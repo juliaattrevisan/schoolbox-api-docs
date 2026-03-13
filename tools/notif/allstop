@@ -13,7 +13,7 @@ if [ "${HOST_TYPE}" = "docker" ]; then
 fi
 
 # Stop all schoolbox notif daemons (supports both old+new single/multi instance style)
-for daemon in digestd scheduled mobiled belld; do
+for daemon in digestd scheduled mobiled; do
     # Old single-instance style
     for service in $(systemctl --plain --no-legend | grep -E "schoolbox(dev)?-$daemon.service" | awk '{print $1}'); do
         echo "stopping $service"
