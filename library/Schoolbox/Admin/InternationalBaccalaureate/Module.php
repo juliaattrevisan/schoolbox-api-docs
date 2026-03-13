@@ -27,10 +27,12 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        // IB coordinator service permission pending - temporarily simplified for testing
         $ruleIBCoordinatorAccess = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_IB_COORDINATOR, UserAccess::ACCESS_FULL)
+            )
         );
 
         $this->register('GET', '/configuration', 'getConfiguration', $ruleIBCoordinatorAccess);

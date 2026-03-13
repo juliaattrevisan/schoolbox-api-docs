@@ -236,6 +236,7 @@ async function saveSubjectConfiguration(): Promise<void> {
 }
 </script>
 
+<!--
 <template>
     <div class="subject-table-container">
         <div v-if="subjectRows.length === 0" class="alert alert-info">
@@ -351,3 +352,4 @@ async function saveSubjectConfiguration(): Promise<void> {
         />
     </div>
 </template>
+-->

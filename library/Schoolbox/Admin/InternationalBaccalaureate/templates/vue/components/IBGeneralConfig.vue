@@ -82,6 +82,7 @@ async function saveGeneralConfig(): Promise<void> {
 }
 </script>
 
+<!--
 <template>
     <div class="general-config">
         <div v-if="configurations.length === 0" class="alert alert-info">
@@ -127,3 +128,4 @@ async function saveGeneralConfig(): Promise<void> {
         </form>
     </div>
 </template>
+-->
