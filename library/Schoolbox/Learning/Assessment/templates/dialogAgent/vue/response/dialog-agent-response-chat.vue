@@ -306,6 +306,7 @@ window.Vue.watch(
             class="button"
             type="button"
             :disabled="isHelpRequestChanging || isLoading || undefined"
+            data-test="dialog-agent-response-request-help"
             @click="changeHelpRequest(currentResponse._routes.assistanceRequest)"
         >
             {{ isHelpRequestChanging ? "Requesting Assistance..." : "Request Teacher Help" }}
@@ -346,6 +347,7 @@ window.Vue.watch(
                         class="button highlight l-mar--0"
                         type="button"
                         :disabled="isHelpRequestChanging || isLoading || undefined"
+                        data-test="dialog-agent-response-request-help-dismiss"
                         @click="changeHelpRequest(currentResponse._routes.assistanceResolve)"
                     >
                         Help No Longer Needed

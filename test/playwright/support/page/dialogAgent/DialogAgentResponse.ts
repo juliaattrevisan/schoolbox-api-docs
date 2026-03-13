@@ -6,6 +6,8 @@ export default class DialogAgentResponse {
     static readonly DATA_TEST_CONTAINER = "dialog-agent-response-container";
     static readonly DATA_TEST_SUBMIT = "dialog-agent-response-submit";
     static readonly DATA_TEST_SUBMIT_CONFIRM = "dialog-agent-response-submit-confirm";
+    static readonly DATA_TEST_REQUEST_HELP = "dialog-agent-response-request-help";
+    static readonly DATA_TEST_REQUEST_HELP_DISMISS = "dialog-agent-response-request-help-dismiss";
 
     constructor(
         private page: Page,
@@ -46,5 +48,33 @@ export default class DialogAgentResponse {
     public async clickConfirmSubmission(): Promise<void> {
         const confirmSubmissionButton = this.page.getByTestId(DialogAgentResponse.DATA_TEST_SUBMIT_CONFIRM);
         await confirmSubmissionButton.click();
+    }
+
+    /**
+     * @returns Locator for the request help button
+     */
+    public locateRequestHelpButton(): Locator {
+        return this.page.getByTestId(DialogAgentResponse.DATA_TEST_REQUEST_HELP);
+    }
+
+    /**
+     * Click the request help button to request teacher help
+     */
+    public async clickRequestHelp(): Promise<void> {
+        await this.locateRequestHelpButton().click();
+    }
+
+    /**
+     * @returns Locator for the dismiss request help button
+     */
+    public locateDismissRequestHelpButton(): Locator {
+        return this.page.getByTestId(DialogAgentResponse.DATA_TEST_REQUEST_HELP_DISMISS);
+    }
+
+    /**
+     * Click the dismiss request help button to dismiss a previously made teacher help request
+     */
+    public async clickDismissRequestHelp(): Promise<void> {
+        await this.locateDismissRequestHelpButton().click();
     }
 }

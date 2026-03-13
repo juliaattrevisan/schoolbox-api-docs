@@ -1,6 +1,8 @@
+import { DialogAgentResponseStatus } from "@schoolboxAssessment/Types/dialogAgent";
 import { AiFeature } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import { AgentChatMessageType } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import { DialogAgentHelpfulness } from "@schoolboxLibrary/Learning/Assessment/templates/dialogAgent/vue/configure/dacTypes";
+import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import AIServices, { AiProvider } from "@schoolboxTest/playwright/support/page/admin/ai/AIServices";
 import AgentChatFeed from "@schoolboxTest/playwright/support/page/agentChat/AgentChatFeed";
@@ -10,6 +12,9 @@ import DialogAgentConfigure from "@schoolboxTest/playwright/support/page/dialogA
 import DialogAgentHomepage from "@schoolboxTest/playwright/support/page/dialogAgent/DialogAgentHomepage";
 import DialogAgentModify from "@schoolboxTest/playwright/support/page/dialogAgent/DialogAgentModify";
 import DialogAgentResponse from "@schoolboxTest/playwright/support/page/dialogAgent/DialogAgentResponse";
+import DialogAgentStatus, {
+    DialogAgentStatusAction,
+} from "@schoolboxTest/playwright/support/page/dialogAgent/DialogAgentStatus";
 import DialogAgentViewResponse from "@schoolboxTest/playwright/support/page/dialogAgent/DialogAgentViewResponse";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 import AssessmentPage from "@schoolboxTest/playwright/support/page/dueWork/AssessmentPage";
@@ -397,7 +402,7 @@ test.describe("Dialog Agent", () => {
         await homepage.clickAssessmentComponentTitle(activity2Id);
         const interactions = discussionHistory.locateAllInteractions();
         await expect(interactions).toHaveCount(1);
-        await expect(interactions.first()).toContainText("Response by Ms Jana Reed");
+        await expect(interactions.first()).toContainText(`Response by ${Common.USER_JANAREED}`);
     });
 
     test("as a student, view a submitted attempt", async ({ tester, page }) => {
@@ -428,7 +433,7 @@ test.describe("Dialog Agent", () => {
     });
 
     test("as a student, leave an attempt in progress", async ({ tester, page }) => {
-        await tester.impersonate(Common.USER_LOUISASMITH);
+        await tester.impersonateViaUserProfilePage(Common.USER_LOUISASMITH);
 
         const homepage = new Homepage(tester, page);
         await homepage.goto(Common.CLASS_ID_9AENG);
@@ -474,7 +479,7 @@ test.describe("Dialog Agent", () => {
     });
 
     test("as a student, resume an in progress attempt", async ({ tester, page }) => {
-        await tester.impersonate(Common.USER_LOUISASMITH);
+        await tester.impersonateViaUserProfilePage(Common.USER_LOUISASMITH);
 
         const homepage = new Homepage(tester, page);
         await homepage.goto(Common.CLASS_ID_9AENG);
@@ -493,6 +498,279 @@ test.describe("Dialog Agent", () => {
 
         const dialogAgentResponse = new DialogAgentResponse(page, tester);
         await dialogAgentResponse.assertIsOnResponsePage(ACTIVITY_NAME_2);
+    });
+
+    test("student requests assistance / staff resolves request / staff checks status & actions", async ({
+        tester,
+        page,
+        browser,
+    }) => {
+        await tester.impersonateViaUserProfilePage(Common.USER_JAMALALI);
+
+        const homepage = new Homepage(tester, page);
+        await homepage.goto(Common.CLASS_ID_9AENG);
+
+        tester.isGoingTo("open the submission history page for activity 2");
+        const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME);
+        const activity2 = homepage.locateAssessmentRow(component, ACTIVITY_NAME_2);
+        const activity2Id = await Homepage.getAssessmentId(activity2);
+        await homepage.clickAssessmentComponentTitle(activity2Id);
+
+        const discussionHistory = new AssessmentPage(tester, page);
+        const interactions = discussionHistory.locateAllInteractions();
+        await expect(interactions).toHaveCount(0);
+
+        /* For speed, avoid switching user accounts constantly by having a separate browser context for staff */
+        tester.isGoingTo("create a new browser context to avoid switching user accounts constantly");
+        const staffBrowserCtx = await browser.newContext();
+        const staffPage = await staffBrowserCtx.newPage();
+        const staffTester = new AcceptanceTester(staffPage);
+        await staffTester.loginAsAdmin();
+        await staffTester.impersonateTeacher();
+
+        staffTester.isGoingTo("as staff, visit the status page and check the student has the 'incomplete' status");
+        const staffHomepage = new Homepage(staffTester, staffPage);
+        await staffHomepage.goto(Common.CLASS_ID_9AENG);
+        await staffHomepage.clickAssessmentComponentTOTMenu(activity2Id);
+        await staffHomepage.clickAssessmentComponentTOTMenuViewStatus(activity2Id);
+        const statusPage = new DialogAgentStatus(staffPage, staffTester);
+        const statusPageStudent = statusPage.locateGridRowForParticipant(Common.USER_JAMALALI);
+        await DialogAgentStatus.expectParticipantStatus(statusPageStudent, DialogAgentResponseStatus.INCOMPLETE);
+
+        // When no attempt exists, only the "Discussion History" action should exist
+        staffTester.isGoingTo("confirm visible actions when no attempt exists");
+        await DialogAgentStatus.clickParticipantActionMenu(statusPageStudent);
+        await statusPage.expectActionMenuOptions(statusPageStudent, [DialogAgentStatusAction.SUMMARY]);
+
+        tester.isGoingTo("start an attempt for activity 2");
+        await discussionHistory.clickCreateSubmission();
+
+        const dialogAgentResponse = new DialogAgentResponse(page, tester);
+        await dialogAgentResponse.assertIsOnResponsePage(ACTIVITY_NAME_2);
+
+        tester.isGoingTo("expect to only see the opening message in the feed");
+        const agentChatFeed = new AgentChatFeed(page, tester);
+        const agentChatPrompt = new AgentChatPrompt(page, tester);
+
+        const allRequestMessages = agentChatFeed.locateMessagesWithType(AgentChatMessageType.REQUEST);
+        const allResponseMessages = agentChatFeed.locateMessagesWithType(AgentChatMessageType.RESPONSE);
+
+        await expect(allRequestMessages).toHaveCount(0);
+        await expect(allResponseMessages).toHaveCount(1);
+        await agentChatFeed.expectOpeningMessageToHaveText(activity2OpeningMessage);
+
+        // An attempt which has been opened but not started should be viewable
+        staffTester.isGoingTo("confirm visible actions when no attempt exists");
+        await staffPage.reload();
+        await DialogAgentStatus.clickParticipantActionMenu(statusPageStudent);
+        await statusPage.expectActionMenuOptions(statusPageStudent, [
+            DialogAgentStatusAction.VIEW,
+            DialogAgentStatusAction.SUMMARY,
+        ]);
+
+        await test.step("when not started, student dismisses, staff views from status page", async () => {
+            tester.isGoingTo("as student, 'Request Teacher Help', expect to see the 'Help Requested' alert");
+            await dialogAgentResponse.clickRequestHelp();
+            await expect(dialogAgentResponse.locateRequestHelpButton()).not.toBeVisible();
+            await expect(dialogAgentResponse.locateDismissRequestHelpButton()).toBeVisible();
+
+            staffTester.isGoingTo("as staff, check the status on the status page is 'Requires Assistance'");
+            await staffPage.reload();
+            await DialogAgentStatus.expectParticipantStatus(statusPageStudent, DialogAgentResponseStatus.ASSISTANCE);
+
+            staffTester.isGoingTo("confirm visible actions when attempt is unsubmitted and requires assistance");
+            await DialogAgentStatus.clickParticipantActionMenu(statusPageStudent);
+            await statusPage.expectActionMenuOptions(statusPageStudent, [
+                DialogAgentStatusAction.VIEW,
+                DialogAgentStatusAction.SUMMARY,
+                DialogAgentStatusAction.ASSISTANCE_RESOLVE,
+            ]);
+
+            tester.isGoingTo("click the 'Help No Longer Needed' button, expect to see the request button and no alert");
+            await dialogAgentResponse.clickDismissRequestHelp();
+            await expect(dialogAgentResponse.locateRequestHelpButton()).toBeVisible();
+            await expect(dialogAgentResponse.locateDismissRequestHelpButton()).not.toBeVisible();
+
+            staffTester.isGoingTo("as staff, check the status on the status page is back to 'incomplete'");
+            await staffPage.reload();
+            await DialogAgentStatus.expectParticipantStatus(statusPageStudent, DialogAgentResponseStatus.INCOMPLETE);
+
+            staffTester.isGoingTo("confirm visible actions when attempt hasn't been started and requires assistance");
+            await DialogAgentStatus.clickParticipantActionMenu(statusPageStudent);
+            await statusPage.expectActionMenuOptions(statusPageStudent, [
+                DialogAgentStatusAction.VIEW,
+                DialogAgentStatusAction.SUMMARY,
+            ]);
+        });
+
+        await test.step("when not started, staff views and dismisses from status page", async () => {
+            tester.isGoingTo("as student, 'Request Teacher Help', expect to see the 'Help Requested' alert");
+            await dialogAgentResponse.clickRequestHelp();
+            await expect(dialogAgentResponse.locateRequestHelpButton()).not.toBeVisible();
+            await expect(dialogAgentResponse.locateDismissRequestHelpButton()).toBeVisible();
+
+            staffTester.isGoingTo("as staff, check the status on the status page is 'Requires Assistance'");
+            await staffPage.reload();
+            await DialogAgentStatus.expectParticipantStatus(statusPageStudent, DialogAgentResponseStatus.ASSISTANCE);
+
+            staffTester.isGoingTo("as staff, dismiss the request via the status page");
+            await DialogAgentStatus.clickParticipantActionMenu(statusPageStudent);
+            await statusPage.clickActionMenuOption(statusPageStudent, DialogAgentStatusAction.ASSISTANCE_RESOLVE);
+            await DialogAgentStatus.expectParticipantStatus(statusPageStudent, DialogAgentResponseStatus.INCOMPLETE);
+
+            staffTester.isGoingTo("confirm visible actions when attempt hasn't been started and requires assistance");
+            await DialogAgentStatus.clickParticipantActionMenu(statusPageStudent);
+            await statusPage.expectActionMenuOptions(statusPageStudent, [
+                DialogAgentStatusAction.VIEW,
+                DialogAgentStatusAction.SUMMARY,
+            ]);
+
+            tester.isGoingTo("as student, reload the page and check if the request was dismissed");
+            await page.reload();
+            await expect(dialogAgentResponse.locateRequestHelpButton()).toBeVisible();
+            await expect(dialogAgentResponse.locateDismissRequestHelpButton()).not.toBeVisible();
+        });
+
+        tester.isGoingTo("send a message to the agent to move the attempt to 'In Progress'");
+        const prompt = "Where are they found?";
+        await agentChatPrompt.typePrompt(prompt);
+        await agentChatPrompt.send();
+
+        await AgentChatFeed.expectMessageToHaveText(allRequestMessages.last(), prompt);
+        await AgentChatFeed.expectMessageIsLoading(allResponseMessages.last());
+        await AgentChatFeed.waitForMessageLoaded(allResponseMessages.last());
+
+        const viewResponsePage = new DialogAgentViewResponse(staffPage, staffTester);
+        const carouselRow = viewResponsePage.locateCarouselRowForParticipant(Common.USER_JAMALALI);
+
+        const viewRespPageFeed = new AgentChatFeed(staffPage, staffTester);
+        const viewRespAllRequestMessages = viewRespPageFeed.locateMessagesWithType(AgentChatMessageType.REQUEST);
+        const viewRespAllResponseMessages = viewRespPageFeed.locateMessagesWithType(AgentChatMessageType.RESPONSE);
+        const viewRespAllAlertMessages = viewRespPageFeed.locateMessagesWithType(AgentChatMessageType.ALERT);
+
+        const assistanceAlertText = `${Common.USER_JAMALALI} requested assistance`;
+
+        await test.step("when in progress, staff views and dismisses from view response page", async () => {
+            tester.isGoingTo("as student, 'Request Teacher Help', expect to see the 'Help Requested' alert");
+            await dialogAgentResponse.clickRequestHelp();
+            await expect(dialogAgentResponse.locateRequestHelpButton()).not.toBeVisible();
+            await expect(dialogAgentResponse.locateDismissRequestHelpButton()).toBeVisible();
+
+            staffTester.isGoingTo("as staff, check the status on the status page is 'Requires Assistance'");
+            await staffPage.reload();
+            await DialogAgentStatus.expectParticipantStatus(statusPageStudent, DialogAgentResponseStatus.ASSISTANCE);
+
+            staffTester.isGoingTo("confirm visible actions when attempt is unsubmitted and requires assistance");
+            await DialogAgentStatus.clickParticipantActionMenu(statusPageStudent);
+            await statusPage.expectActionMenuOptions(statusPageStudent, [
+                DialogAgentStatusAction.VIEW,
+                DialogAgentStatusAction.SUMMARY,
+                DialogAgentStatusAction.SUBMIT,
+                DialogAgentStatusAction.RESET,
+                DialogAgentStatusAction.ASSISTANCE_RESOLVE,
+            ]);
+
+            staffTester.isGoingTo("as staff, navigate to the view response page via the status page");
+            await statusPage.clickActionMenuOption(statusPageStudent, DialogAgentStatusAction.VIEW);
+
+            await viewResponsePage.assertIsOnViewResponsePage(ACTIVITY_NAME_2);
+
+            staffTester.isGoingTo("as staff, check the view response page shows the status is 'Requires Assistance'");
+            await DialogAgentViewResponse.expectParticipantStatus(carouselRow, DialogAgentResponseStatus.ASSISTANCE);
+
+            staffTester.isGoingTo("as staff, check the view response page shows the 'Help Requested' alert message");
+            await expect(viewRespAllRequestMessages).toHaveCount(1);
+            await expect(viewRespAllResponseMessages).toHaveCount(2);
+            await expect(viewRespAllAlertMessages).toHaveCount(1);
+            await expect(viewRespAllAlertMessages.first()).toContainText(assistanceAlertText);
+
+            staffTester.isGoingTo("as staff, dismiss the assistance alert from the view response page");
+            await viewResponsePage.clickActionMenu();
+            await viewResponsePage.clickActionMenuOption(DialogAgentStatusAction.ASSISTANCE_RESOLVE);
+
+            staffTester.isGoingTo("as staff, check the view response page shows the status is back to 'In Progress'");
+            await DialogAgentViewResponse.expectParticipantStatus(carouselRow, DialogAgentResponseStatus.IN_PROGRESS);
+
+            staffTester.isGoingTo(
+                "as staff, check the view response page no longer shows the 'Help Requested' alert message",
+            );
+            await expect(viewRespAllAlertMessages).toHaveCount(0);
+
+            tester.isGoingTo(
+                "as student, check the request was dismissed after staff dismissed it from the view response page",
+            );
+            await page.reload();
+            await expect(dialogAgentResponse.locateRequestHelpButton()).toBeVisible();
+            await expect(dialogAgentResponse.locateDismissRequestHelpButton()).not.toBeVisible();
+        });
+
+        await test.step("student dismisses the request after staff already dismissed it from the status page", async () => {
+            tester.isGoingTo("as student, 'Request Teacher Help', expect to see the 'Help Requested' alert");
+            await dialogAgentResponse.clickRequestHelp();
+            await expect(dialogAgentResponse.locateRequestHelpButton()).not.toBeVisible();
+            await expect(dialogAgentResponse.locateDismissRequestHelpButton()).toBeVisible();
+
+            staffTester.isGoingTo("as staff, check the status on the status page is 'Requires Assistance'");
+            await staffPage.reload();
+            await DialogAgentStatus.expectParticipantStatus(statusPageStudent, DialogAgentResponseStatus.ASSISTANCE);
+
+            staffTester.isGoingTo("as staff, dismiss the request via the status page");
+            await DialogAgentStatus.clickParticipantActionMenu(statusPageStudent);
+            await statusPage.clickActionMenuOption(statusPageStudent, DialogAgentStatusAction.ASSISTANCE_RESOLVE);
+            await DialogAgentStatus.expectParticipantStatus(statusPageStudent, DialogAgentResponseStatus.INCOMPLETE);
+
+            /**
+             * This is a specific case, the frontend must handle that the request essentially won't do anything
+             * as the state already changed, but it shouldn't error and should update the UI back to normal
+             */
+            tester.isGoingTo("as student, without reloading the page, click the 'Help No Longer Needed' button");
+            await dialogAgentResponse.clickDismissRequestHelp();
+            await expect(dialogAgentResponse.locateRequestHelpButton()).toBeVisible();
+            await expect(dialogAgentResponse.locateDismissRequestHelpButton()).not.toBeVisible();
+        });
+
+        await test.step("when requested assistance, submitting the attempt clears the request unless reopened", async () => {
+            tester.isGoingTo("as student, 'Request Teacher Help', expect to see the 'Help Requested' alert");
+            await dialogAgentResponse.clickRequestHelp();
+            await expect(dialogAgentResponse.locateRequestHelpButton()).not.toBeVisible();
+            await expect(dialogAgentResponse.locateDismissRequestHelpButton()).toBeVisible();
+
+            staffTester.isGoingTo("as staff, check the status on the status page is 'Requires Assistance'");
+            await staffPage.reload();
+            await DialogAgentStatus.expectParticipantStatus(statusPageStudent, DialogAgentResponseStatus.ASSISTANCE);
+
+            tester.isGoingTo("as student, submit the attempt");
+            await dialogAgentResponse.clickSubmit();
+            await dialogAgentResponse.clickConfirmSubmission();
+
+            tester.isGoingTo("expect to see the attempt in submission history");
+            await homepage.clickAssessmentComponentTitle(activity2Id);
+            const studentInteractions = discussionHistory.locateAllInteractions();
+            await expect(studentInteractions).toHaveCount(1);
+            await expect(studentInteractions.first()).toContainText(`Response by ${Common.USER_JAMALALI}`);
+
+            staffTester.isGoingTo("as staff, check the status on the status page is 'Submitted'");
+            await staffPage.reload();
+            await DialogAgentStatus.expectParticipantStatus(statusPageStudent, DialogAgentResponseStatus.SUBMITTED);
+
+            staffTester.isGoingTo("confirm visible actions when attempt is submitted");
+            await DialogAgentStatus.clickParticipantActionMenu(statusPageStudent);
+            await statusPage.expectActionMenuOptions(statusPageStudent, [
+                DialogAgentStatusAction.VIEW,
+                DialogAgentStatusAction.SUMMARY,
+                DialogAgentStatusAction.REOPEN,
+            ]);
+
+            staffTester.isGoingTo("as staff, reopen the attempt, expect status to go back to 'Requires Assistance'");
+            await statusPage.clickActionMenuOption(statusPageStudent, DialogAgentStatusAction.REOPEN);
+            await statusPage.clickActionConfirm();
+            await DialogAgentStatus.expectParticipantStatus(statusPageStudent, DialogAgentResponseStatus.ASSISTANCE);
+
+            staffTester.isGoingTo("as staff, dismiss the request via the status page");
+            await DialogAgentStatus.clickParticipantActionMenu(statusPageStudent);
+            await statusPage.clickActionMenuOption(statusPageStudent, DialogAgentStatusAction.ASSISTANCE_RESOLVE);
+            await DialogAgentStatus.expectParticipantStatus(statusPageStudent, DialogAgentResponseStatus.IN_PROGRESS);
+        });
     });
 
     test("as a staff member, see both activities in the component", async ({ tester, page }) => {

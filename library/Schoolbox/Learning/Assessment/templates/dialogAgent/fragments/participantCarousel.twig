@@ -13,11 +13,11 @@
 <div id="participant-carousel" class="row">
     <div class="small-12 medium-8 columns">
         <template id="participant-carousel-row-template">
-            <div class="row">
+            <div class="row" data-test="participant-carousel-row">
                 <div class="card small-10">
                     <img data-template="avatar" src="__AVATAR_SRC__" alt="View Profile" />
-                    <p data-template="fullName">__FULL_NAME__</p>
-                    <div data-template="status" class="label status">__STATUS__</div>
+                    <p data-template="fullName" data-test="participant-carousel-row-name">__FULL_NAME__</p>
+                    <div data-template="status" class="label status" data-test="participant-carousel-row-status">__STATUS__</div>
                 </div>
             </div>
         </template>

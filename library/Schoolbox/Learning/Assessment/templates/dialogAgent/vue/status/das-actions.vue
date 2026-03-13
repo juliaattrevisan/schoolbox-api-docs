@@ -187,32 +187,32 @@ async function onResolve(): Promise<void> {
 
 <template>
     <li v-if="props.showView && props.response?._routes.view">
-        <a :href="props.response._routes.view" class="icon-view">
+        <a :href="props.response._routes.view" class="icon-view" data-test="das-actions-view">
             {{ `View ${locale.dialogAgent.proper()}` }}
         </a>
     </li>
     <li v-if="props.summaryRoute">
-        <a :href="props.summaryRoute" class="icon-history">
+        <a :href="props.summaryRoute" class="icon-history" data-test="das-actions-summary">
             {{ `${locale.dialogAgent.proper()} History` }}
         </a>
     </li>
     <li v-if="props.response?._routes.submit">
-        <button class="icon-approve" @click="onSubmit">
+        <button class="icon-approve" data-test="das-actions-submit" @click="onSubmit">
             {{ isSameUser ? `Submit ${locale.dialogAgent.proper()}` : `Submit on behalf of ${props.user.fullName}` }}
         </button>
     </li>
     <li v-if="props.response?._routes.reset">
-        <button class="icon-refresh" @click="onReset">
+        <button class="icon-refresh" data-test="das-actions-reset" @click="onReset">
             {{ `Reset ${locale.dialogAgent.proper()}` }}
         </button>
     </li>
     <li v-if="props.response?._routes.reopen">
-        <button class="icon-undo" @click="onReopen">
+        <button class="icon-undo" data-test="das-actions-reopen" @click="onReopen">
             {{ `Reopen ${locale.dialogAgent.proper()}` }}
         </button>
     </li>
     <li v-if="props.response?._routes.assistanceResolve">
-        <button class="icon-medical" @click="onResolve">
+        <button class="icon-medical" data-test="das-actions-assistanceResolve" @click="onResolve">
             {{ `Resolve Assistance Request` }}
         </button>
     </li>

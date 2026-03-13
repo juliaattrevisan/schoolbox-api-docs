@@ -71,6 +71,8 @@ export default class Homepage {
 
     static readonly DATA_TEST_ASSESSMENT_COMPONENT_TITLE = "component-assessment-title-";
 
+    static readonly DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_VIEW_STATUS = "component-assessment-actions-viewStatus-"; // append "{assessmentId}"
+
     static readonly DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_MODIFY_SETTINGS = "assessment-modify-"; // append "{assessmentId}"
 
     static readonly DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_MODIFY_CONTENTS = "assessment-modify-contents-"; // append "{assessmentId}"
@@ -325,6 +327,15 @@ export default class Homepage {
      */
     async clickAssessmentComponentTitle(assessmentId: number): Promise<void> {
         await this.page.getByTestId(`${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TITLE}${assessmentId}`).click();
+    }
+
+    /**
+     * click "View Status" for an assessment in an assessment component
+     * @param assessmentId - The assessment ID.
+     */
+    async clickAssessmentComponentTOTMenuViewStatus(assessmentId: number): Promise<void> {
+        const viewStatusTestId = `${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_VIEW_STATUS}${assessmentId}`;
+        await this.page.getByTestId(viewStatusTestId).click();
     }
 
     /**
