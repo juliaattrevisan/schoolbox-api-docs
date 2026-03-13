@@ -71,8 +71,20 @@ function onConfirm(): void {
             </p>
         </div>
         <div class="l-flex l-gap-xs f-no-margins">
-            <button class="button submit l-flex__item--1" @click.prevent="onConfirm">Yes</button>
-            <button class="button l-flex__item--1" @click.prevent="onCancel">Cancel</button>
+            <button
+                class="button submit l-flex__item--1"
+                data-test="cp-confirm-modify-modal-yes-button"
+                @click.prevent="onConfirm"
+            >
+                Yes
+            </button>
+            <button
+                class="button l-flex__item--1"
+                data-test="cp-confirm-modify-modal-cancel-button"
+                @click.prevent="onCancel"
+            >
+                Cancel
+            </button>
         </div>
     </div>
 </template>

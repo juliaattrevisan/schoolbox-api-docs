@@ -20,6 +20,7 @@ import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/Asses
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 import CourseOutline from "@schoolboxTest/playwright/support/page/homepage/CourseOutline";
 import MarkbookPage from "@schoolboxTest/playwright/support/page/markbook/MarkbookPage";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 test.describe("Student Participation Tests: new activity, title validation, checks it in the participation page, markbooks and course outline", () => {
     // Run tests serially, as tests rely on prior tests to have been run
@@ -30,6 +31,7 @@ test.describe("Student Participation Tests: new activity, title validation, chec
     let homepage: Homepage;
     let courseOutline: CourseOutline;
     let markbookPage: MarkbookPage;
+    let commonPage: Common;
 
     const classActivityId = "665";
     const studentMarioId = "63"; // Izzo, Mario
@@ -47,6 +49,7 @@ test.describe("Student Participation Tests: new activity, title validation, chec
         homepage = new Homepage(tester, page);
         courseOutline = new CourseOutline(tester, page);
         markbookPage = new MarkbookPage(page);
+        commonPage = new Common(page);
 
         await tester.loginAsAdmin();
     });
@@ -78,8 +81,8 @@ test.describe("Student Participation Tests: new activity, title validation, chec
         await studentParticipation.checkCustomActivityInTable(studentNameMario, customActivityTitle);
 
         await homepage.goto(classId);
-        await courseOutline.clickUnitExpandCollapse("Persuasion and the Media", "down");
-        await courseOutline.clickActivityExpandCollapse("Persuasion and the Media", originalActivityTitle, "down");
+        await courseOutline.clickUnitExpandCollapse("Persuasion and the Media", "collapsed");
+        await courseOutline.clickActivityExpandCollapse("Persuasion and the Media", originalActivityTitle);
         await courseOutline.checkCustomActivityPresented(
             "Persuasion and the Media",
             originalActivityTitle,
@@ -91,6 +94,7 @@ test.describe("Student Participation Tests: new activity, title validation, chec
         ]);
 
         await markbookPage.gotoClassMarkbook(classId.toString());
+        await commonPage.resetFiltersToDefault();
         await markbookPage.canSeeAssessment(customActivityTitle);
         const customActivityId = (await db.grabFromDatabase("assessment", "id", {
             title: customActivityTitle,
@@ -101,6 +105,7 @@ test.describe("Student Participation Tests: new activity, title validation, chec
         await markbookPage.checkProgressTickVisibility(studentJamalId, customActivityId, false);
 
         await markbookPage.gotoCourseMarkbook(courseId.toString());
+        await commonPage.resetFiltersToDefault();
         await markbookPage.canSeeAssessment(customActivityTitle);
         // check the progress tick is shown for the student with the custom activity and not shown for another student without the custom activity
         await markbookPage.checkProgressTickVisibility(studentMarioId, customActivityId, true);
@@ -120,8 +125,8 @@ test.describe("Student Participation Tests: new activity, title validation, chec
         await studentParticipation.checkCustomActivityInTable(studentNameJamal, customActivityTitle);
 
         await homepage.goto(classId);
-        await courseOutline.clickUnitExpandCollapse("Persuasion and the Media", "down");
-        await courseOutline.clickActivityExpandCollapse("Persuasion and the Media", originalActivityTitle, "down");
+        await courseOutline.clickUnitExpandCollapse("Persuasion and the Media", "collapsed");
+        await courseOutline.clickActivityExpandCollapse("Persuasion and the Media", originalActivityTitle);
         await courseOutline.checkCustomActivityPresented(
             "Persuasion and the Media",
             originalActivityTitle,
@@ -163,8 +168,8 @@ test.describe("Student Participation Tests: new activity, title validation, chec
         await studentParticipation.checkCustomActivityInTable(studentNameMario, customActivityTitle);
 
         await homepage.goto(classId);
-        await courseOutline.clickUnitExpandCollapse("Persuasion and the Media", "down");
-        await courseOutline.clickActivityExpandCollapse("Persuasion and the Media", originalActivityTitle, "down");
+        await courseOutline.clickUnitExpandCollapse("Persuasion and the Media", "collapsed");
+        await courseOutline.clickActivityExpandCollapse("Persuasion and the Media", originalActivityTitle);
         // check the custom activity is still shown in the course outline but the meta text is updated
         await courseOutline.checkCustomActivityPresented(
             "Persuasion and the Media",

@@ -74,31 +74,24 @@ export default class CourseOutline {
     /**
      * Uses the course outline component to find an unit and click the expand/collapse arrow
      * @param unitName - The name of the unit to find in the course outline
-     * @param arrowOption - The option to select when expanding/collapsing the unit: down, up
+     * @param arrowOption - The option to select when expanding/collapsing the unit: expanded, collapsed
      */
-    async clickUnitExpandCollapse(unitName: string, arrowOption: "down" | "up"): Promise<void> {
+    async clickUnitExpandCollapse(unitName: string, arrowOption: "expanded" | "collapsed"): Promise<void> {
         // Find the course outline and the unit we created inside it
         this.tester.isGoingTo("find the unit in the course outline");
         const courseOutline = this.homepage.locateComponentByName("Course Outline");
         const courseOutlineUnit = courseOutline.locator("li[data-unit]").filter({ hasText: unitName });
 
         this.tester.isGoingTo("click to expand/collapse the unit");
-        await courseOutlineUnit
-            .locator(`a[class="expand-link icon-${arrowOption}-arrow"][data-interaction-state="collapsed"]`)
-            .click();
+        await courseOutlineUnit.getByTestId(`course-outline-expand-unit-${unitName}-${arrowOption}`).click();
     }
 
     /**
      * Uses the course outline component to find an activity under a unit and click the expand/collapse arrow to view custom activities
      * @param unitName - The name of the unit to find in the course outline
      * @param activityName - The name of the activity to find in the unit
-     * @param arrowOption - The option to select when expanding/collapsing the activity: down, up
      */
-    async clickActivityExpandCollapse(
-        unitName: string,
-        activityName: string,
-        arrowOption: "down" | "up",
-    ): Promise<void> {
+    async clickActivityExpandCollapse(unitName: string, activityName: string): Promise<void> {
         // Find the course outline and the unit we created inside it
         this.tester.isGoingTo("find the unit in the course outline");
         const courseOutline = this.homepage.locateComponentByName("Course Outline");
@@ -107,7 +100,7 @@ export default class CourseOutline {
         const activity = activities.filter({ hasText: activityName });
 
         this.tester.isGoingTo("click to expand/collapse the activity to view custom activities");
-        await activity.locator(`a[class="expand-link icon-${arrowOption}-arrow"]`).click();
+        await activity.getByTestId(`course-outline-expand-activity-${activityName}`).click();
     }
 
     /**

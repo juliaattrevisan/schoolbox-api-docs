@@ -166,15 +166,15 @@ export default class StudentParticipation {
         await customisationSelect.selectOption({ index: titleIndex });
 
         // In the modal select the button that includes the text 'Confirm'
-        await this.page.getByRole("button", { name: /Confirm/ }).click();
+        await this.page.getByTestId("cp-include-in-existing-modal-confirm-button").click();
     }
 
     /**
-     * Clicks Yes on the confirmation modal for including in existing customisation
+     * Clicks the Yes on the modal for including in existing customisation
      */
     async confirmIncludeCustomisation(): Promise<void> {
         // In the please confirm modal select the button that includes the text 'Yes'
-        await this.page.getByRole("button", { name: /Yes/ }).click();
+        await this.page.getByTestId("cp-confirm-modify-modal-yes-button").click();
     }
 
     /**
