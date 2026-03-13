@@ -849,7 +849,9 @@ test.describe("Dialog Agent", () => {
     });
 
     test.afterAll(async ({ api, db }) => {
-        await api.deleteHomepageComponent(Common.CLASS_ID_9AENG, componentId);
+        if (componentId !== undefined) {
+            await api.deleteHomepageComponent(Common.CLASS_ID_9AENG, componentId);
+        }
 
         // Delete any activities created in this test
         const dialogAgentIds = (await db.grabColumnFromDatabase("assessment", "id", {

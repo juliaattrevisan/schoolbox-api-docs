@@ -63,6 +63,7 @@ export default class DialogAgentViewResponse {
     ): Promise<void> {
         // there might be multiple rows (if it's the currently selected row, make sure they both match if so)
         const participantRows = await participantRow.all();
+        expect(participantRows.length).toBeGreaterThan(0);
         await Promise.all(
             participantRows.map(async (row) => {
                 const statusText = row.getByTestId(DialogAgentViewResponse.DATA_TEST_PARTICIPANT_CAROUSEL_ROW_STATUS);

@@ -67,7 +67,7 @@ export default class Homepage {
 
     static readonly DATA_TEST_ASSESSMENT_COMPONENT_ROW = "component-assessment-"; // append "{componentId}"
 
-    static readonly DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU = "sbx-pop-out-component-assessment-actions-";
+    static readonly DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU = "sbx-pop-out-component-assessment-actions-"; // append "{assessmentId}"-button
 
     static readonly DATA_TEST_ASSESSMENT_COMPONENT_TITLE = "component-assessment-title-";
 
@@ -318,7 +318,9 @@ export default class Homepage {
      * @param assessmentId - The assessment ID.
      */
     async clickAssessmentComponentTOTMenu(assessmentId: number): Promise<void> {
-        await this.page.getByTestId(`${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU}${assessmentId}`).click();
+        await this.page
+            .getByTestId(`${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU}${assessmentId}-button`)
+            .click();
     }
 
     /**

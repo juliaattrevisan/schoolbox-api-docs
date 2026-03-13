@@ -77,6 +77,9 @@ export default class AgentChatFeed {
      */
     public static async expectMessageIsType(messageLocator: Locator, type: AgentChatMessageType): Promise<void> {
         const dataTest = await messageLocator.getAttribute("data-test");
+        if (dataTest === null) {
+            throw new Error("Message locator is missing a data-test attribute");
+        }
         const matchingDataTestPrefix = AgentChatFeed.dataTestForType(type);
         const matchingDataTests = new RegExp(`^${matchingDataTestPrefix}-`);
         expect(dataTest).toMatch(matchingDataTests);
