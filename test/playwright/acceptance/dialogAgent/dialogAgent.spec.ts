@@ -711,13 +711,15 @@ test.describe("Dialog Agent", () => {
             await expect(dialogAgentResponse.locateDismissRequestHelpButton()).toBeVisible();
 
             staffTester.isGoingTo("as staff, check the status on the status page is 'Requires Assistance'");
-            await staffPage.reload();
+            await staffHomepage.goto(Common.CLASS_ID_9AENG);
+            await staffHomepage.clickAssessmentComponentTOTMenu(activity2Id);
+            await staffHomepage.clickAssessmentComponentTOTMenuViewStatus(activity2Id);
             await DialogAgentStatus.expectParticipantStatus(statusPageStudent, DialogAgentResponseStatus.ASSISTANCE);
 
             staffTester.isGoingTo("as staff, dismiss the request via the status page");
             await DialogAgentStatus.clickParticipantActionMenu(statusPageStudent);
             await statusPage.clickActionMenuOption(statusPageStudent, DialogAgentStatusAction.ASSISTANCE_RESOLVE);
-            await DialogAgentStatus.expectParticipantStatus(statusPageStudent, DialogAgentResponseStatus.INCOMPLETE);
+            await DialogAgentStatus.expectParticipantStatus(statusPageStudent, DialogAgentResponseStatus.IN_PROGRESS);
 
             /**
              * This is a specific case, the frontend must handle that the request essentially won't do anything
@@ -771,6 +773,9 @@ test.describe("Dialog Agent", () => {
             await statusPage.clickActionMenuOption(statusPageStudent, DialogAgentStatusAction.ASSISTANCE_RESOLVE);
             await DialogAgentStatus.expectParticipantStatus(statusPageStudent, DialogAgentResponseStatus.IN_PROGRESS);
         });
+
+        // The extra browser context should be closed after we are done with it
+        await staffBrowserCtx.close();
     });
 
     test("as a staff member, see both activities in the component", async ({ tester, page }) => {

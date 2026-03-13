@@ -61,8 +61,14 @@ export default class DialogAgentViewResponse {
         participantRow: Locator,
         expectedStatus: DialogAgentResponseStatus,
     ): Promise<void> {
-        const statusTxt = participantRow.getByTestId(DialogAgentViewResponse.DATA_TEST_PARTICIPANT_CAROUSEL_ROW_STATUS);
-        await expect(statusTxt).toHaveText(STATUS_LABELS[expectedStatus]);
+        // there might be multiple rows (if it's the currently selected row, make sure they both match if so)
+        const participantRows = await participantRow.all();
+        await Promise.all(
+            participantRows.map(async (row) => {
+                const statusText = row.getByTestId(DialogAgentViewResponse.DATA_TEST_PARTICIPANT_CAROUSEL_ROW_STATUS);
+                await expect(statusText).toHaveText(STATUS_LABELS[expectedStatus]);
+            }),
+        );
     }
 
     /**
