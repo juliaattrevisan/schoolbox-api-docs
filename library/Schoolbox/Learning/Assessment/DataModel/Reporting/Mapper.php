@@ -94,9 +94,6 @@ class Mapper extends \Schoolbox\Mapper
             'supportingDataWorkTypes'
         );
 
-        /* TODO Add join for Feedbacks
-         */
-
         /* Created/Updated/Deleted By fields need special treatment due to swampy reasons
          */
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'auditorFields']);
