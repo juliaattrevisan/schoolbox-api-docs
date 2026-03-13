@@ -59,7 +59,7 @@ class RevisionMapper extends Mapper implements FeedableMapperInterface
             {$this->getSelectString()}
             WHERE
                 `c`.`id` = :cat_id
-                AND `w`.`deleted` = 'false'
+                AND `w`.`deleted_at` IS NULL
                 AND `wikiRevision`.`created` < :time
             ORDER BY `wikiRevision`.`created` DESC
             LIMIT $offset, $limit
