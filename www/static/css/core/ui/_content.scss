@@ -619,10 +619,10 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
     }
     &.in-progress {
         @extend .icon-time-value;
-        background-color: var(--sbx-color-highlight, #0c78cf);
+        background-color: var(--sbx-color-in-progress, #0c78cf);
         transform: rotate(-135deg);
         &:before {
-            color: var(--sbx-color-highlight-text, #fff);
+            color: var(--sbx-color-in-progress-text, #fff);
             visibility: visible;
             // counter-rotation
             transform: rotate(135deg);
