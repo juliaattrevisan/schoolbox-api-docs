@@ -1,3 +1,5 @@
-# Schoolbox – Agent Guide for Claude
+# CLAUDE.md
 
-Hi, Claude: please use the standard [AGENTS.md](./AGENTS.md) file for instructions.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+See AGENTS.md for project instructions.
