@@ -53,7 +53,7 @@ class ExportType
     // An export of the calendar for a particular resource.
     // Example URL: https://docker.dev.schoolbox.cloud/resource-booking/item/8
     public const string RESOURCE = 'resource';
-    public const string RESOURCE_FILE = self::RESOURCE . '%';
+    public const string RESOURCE_FILE = self::RESOURCE . '%d';
 
     // This is the 'Resource Booking' option in the export modal on the main calendar page.
     public const string RESOURCES = 'resources';
