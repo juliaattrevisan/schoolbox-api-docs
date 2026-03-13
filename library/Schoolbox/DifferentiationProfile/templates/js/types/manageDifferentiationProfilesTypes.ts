@@ -87,6 +87,7 @@ export type Profile = {
     status: ProfileStatus[];
     _routes: {
         linkedRecords?: string;
+        customisations?: string;
         edit?: string;
         create?: string;
     };
