@@ -1,5 +1,5 @@
 import { AiFeature } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
-import { test, expect } from "@schoolboxTest/playwright/support/integrations";
+import { test } from "@schoolboxTest/playwright/support/integrations";
 import AIServices, { AiProvider } from "@schoolboxTest/playwright/support/page/admin/ai/AIServices";
 
 test.describe("Admin AI Services Settings", () => {
