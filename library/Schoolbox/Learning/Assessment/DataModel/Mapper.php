@@ -940,6 +940,7 @@ class Mapper extends BaseMapper
         if (0 === \count($ids)) {
             return $this->createCollection();
         }
+
         return $this->findByPredicates($builder->in('id', $ids), $options);
     }
 
@@ -1218,9 +1219,16 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithLessonPlanFiles($modelList, $lessonPlanIds);
         $modelList = $this->augmentWithLessonPlanFields($modelList, $lessonPlanIds);
 
+        /* Augment with Reporting Activities and their Supporting Data
+         */
+        $modelList = $this->augmentListWithReporting($modelList);
+        $modelList = $this->augmentListWithReportingSupportingDataCurriculumNodes($modelList, $reportingIds ?? []);
+        $modelList = $this->augmentListWithReportingSupportingDataWorkTypes($modelList, $reportingIds ?? []);
+
         // Augment all contexts
         $modelList = $this->augmentListWithUnitSpecContexts($modelList, $unitSpecIds);
         $modelList = $this->augmentListWithUnitImplContexts($modelList, $unitImplIds);
+
         if ($hydrateProjectContext) {
             // Infinite-cycle breakout.
             $modelList = $this->augmentListWithProjectContexts($modelList, $contextProjectIds);
@@ -1230,7 +1238,7 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithFolderCodes($modelList);
         // Specification assessments
         $modelList = $this->augmentListWithSpecifications($modelList);
-        // Grade groups
+        // Grade groups (note this requires subobjects to be hydrated FIRST
         $modelList = $this->augmentListWithGradeGroups($modelList);
         // Curriculum Nodes
         $modelList = $this->augmentListWithCurriculumNodes($modelList);
@@ -1240,11 +1248,6 @@ class Mapper extends BaseMapper
         }
         // Lesson Plan Linked Assessments
         $modelList = $this->augmentWithLessonPlanAssessments($modelList, $lessonPlanIds);
-
-        /* Reporting Activities need Supporting Data hydrated here
-         */
-        $modelList = $this->augmentListWithReportingSupportingDataCurriculumNodes($modelList, $reportingIds ?? []);
-        $modelList = $this->augmentListWithReportingSupportingDataWorkTypes($modelList, $reportingIds ?? []);
 
         return $modelList;
     }
@@ -2173,11 +2176,18 @@ class Mapper extends BaseMapper
     protected function augmentListWithGradeGroups(GenericCollection $modelList): GenericCollection
     {
         // Just load grade groups one by one - let the model cache do its thing
+        /* Note that despite this being a duework.grade_group join, the Reporting activity also uses it...
+         * TODO Amri one day we need to refactor the Grade Group and Mark Type stuff into a common area.
+         */
         /** @var SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper */
         $gradeGroupMapper = $this->getJoinMapper('duework.grade_group');
+
         foreach ($modelList as $model) {
             $submodel = $model->getSubObject();
-            if ($submodel instanceof SubmissionBox || $submodel instanceof Project\Model || $submodel instanceof Quiz\Model) {
+
+            /* Grade groups (note this requires subobjects to be hydrated FIRST because of THIS hideous instanceof check
+             */
+            if ($submodel instanceof SubmissionBox || $submodel instanceof Project\Model || $submodel instanceof Quiz\Model || $submodel instanceof Reporting\Model) {
                 if ($submodel->getGradeGroup() instanceof SubmissionBox\GradeLevel\Group\Model) {
                     $submodel->setGradeGroup(
                         $gradeGroupMapper->findByIdWithFallback($submodel->getGradeGroup()->getId())
@@ -2186,7 +2196,7 @@ class Mapper extends BaseMapper
             }
 
             // Instructor grade group only applies to submission boxes (DueWork instances)
-            if ($submodel instanceof SubmissionBox) {
+            if ($submodel instanceof SubmissionBox || $submodel instanceof Reporting\Model) {
                 if ($submodel->getInstructorGradeGroup() instanceof SubmissionBox\GradeLevel\Group\Model) {
                     $submodel->setInstructorGradeGroup(
                         $gradeGroupMapper->findByIdWithFallback($submodel->getInstructorGradeGroup()->getId())

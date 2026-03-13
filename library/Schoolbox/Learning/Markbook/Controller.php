@@ -27,6 +27,7 @@ use Schoolbox\Learning\Assessment\DialogAgent;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Reporting;
 use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\MarkScheme\Factory;
@@ -187,7 +188,7 @@ class Controller extends Base
                     ],
                     'assessments' => $markbook->getAssessments()->indexBy('id')->map(function (IAssessable $aImpl) use ($markbook, $terms) {
                         /** Only due work has the concept of "instructorMarkScheme", others just use markScheme for now */
-                        $instructorMarkScheme = $aImpl instanceof DueWork\Model
+                        $instructorMarkScheme = ($aImpl instanceof DueWork\Model || $aImpl instanceof Reporting\Model)
                             ? $aImpl->getInstructorMarkScheme()
                             : $aImpl->getMarkScheme();
 
@@ -225,8 +226,8 @@ class Controller extends Base
                             'projectId'      => $parentProject?->getId(),
                             'writable'       => $this->isAssessmentMarkable($this->getUser(), $aImpl, $terms),
                             'instructorMarkScheme' => [
-                                'template' => $instructorMarkScheme->getTemplate(),
-                                'context'  => $instructorMarkScheme->generateContext(),
+                                'template' => $instructorMarkScheme?->getTemplate(),
+                                'context'  => $instructorMarkScheme?->generateContext(),
                             ],
                             'participants'   => $markbook->getStudents()->map(
                                 function (User $student) use ($aImpl, $markbook) {

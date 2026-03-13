@@ -16,6 +16,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 
 /**
  * @method Model createModel($idValue = null)
@@ -37,10 +38,10 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Grading, Mark Types, Grade Groups
          */
-        $this->joins('instructor_mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
-        $this->joins('mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
-        $this->joins('instructor_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'instructorGradeGroup', 'instructor_grade_group');
-        $this->joins('grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'gradeGroup', 'grade_group');
+        $this->joins('instructor_mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id', null, null, 'instructorMarkType', 'instructorMarkType');
+        $this->joins('mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id', null, null, 'markType', 'markType');
+        $this->joins('instructor_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'instructorGradeGroup', 'instructorGradeGroup');
+        $this->joins('grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'gradeGroup', 'gradeGroup');
         $this->uses('instructor_max_mark', self::TYPE_DECIMAL);
         $this->uses('max_mark', self::TYPE_DECIMAL);
         $this->uses('mark_visibility', self::TYPE_INTEGER);
@@ -81,7 +82,6 @@ class Mapper extends \Schoolbox\Mapper
             'supportingDataCurriculumNodes'
         );
 
-
         $this->joinsVia(
             'reporting_work_type',
             \Schoolbox\Learning\Assessment\WorkType\Mapper::class,
@@ -121,9 +121,17 @@ class Mapper extends \Schoolbox\Mapper
         $selectString = "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('assessmentModel', 'assessmentModel')}
+                {$this->getJoinColumnString('assessmentModel', 'assessmentModel')},
+                {$this->getJoinColumnString('instructorMarkType', 'instructorMarkType')},
+                {$this->getJoinColumnString('markType', 'markType')},
+                {$this->getJoinColumnString('instructorGradeGroup', 'instructorGradeGroup')},
+                {$this->getJoinColumnString('gradeGroup', 'gradeGroup')}
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('assessmentModel', '', 'assessmentModel', true)}
+            INNER JOIN {$this->getJoinSql('instructorMarkType', '', 'instructorMarkType', true)}
+            INNER JOIN {$this->getJoinSql('markType', '', 'markType', true)}
+            LEFT JOIN {$this->getJoinSql('instructorGradeGroup', '', 'instructorGradeGroup', true)}
+            LEFT JOIN {$this->getJoinSql('gradeGroup', '', 'gradeGroup', true)}
         ";
 
         return $selectString;
@@ -154,6 +162,22 @@ class Mapper extends \Schoolbox\Mapper
             $subobject->setAssessmentModel($assessment);
 
             if (null === $stack->getBy('id', $subobject->getId())) {
+                /* Assign mark type and instructor mark type: Letter Grade thing is hydrated after the fact only for
+                 * instances that need it, saving us an enormous left join for all the levels that might exist in a
+                 * Grade Group (some schools have A LOT of grade levels)
+                 */
+                $instructorMarkType = $this->hydrateJoin($row, 'instructorMarkType', 'instructorMarkType');
+                $subobject->setInstructorMarkType($instructorMarkType);
+
+                $markType = $this->hydrateJoin($row, 'markType', 'markType');
+                $subobject->setMarkType($markType);
+
+                $instructorGradeGroup = $this->hydrateJoin($row, 'instructorGradeGroup', 'instructorGradeGroup');
+                $subobject->setInstructorGradeGroup($instructorGradeGroup);
+
+                $gradeGroup = $this->hydrateJoin($row, 'gradeGroup', 'gradeGroup');
+                $subobject->setGradeGroup($gradeGroup);
+
                 /* Initialise collections
                  */
                 $subobject->setSupportingDataCurriculumNodes($this->getJoinmapper('reporting_curriculum_node')->createcollection());
@@ -163,6 +187,10 @@ class Mapper extends \Schoolbox\Mapper
             }
         }
 
+        /* Hydrate Grade Groups with Grade Levels, if applicable
+         */
+        $stack = $this->hydrateGradeGroups($stack);
+
         /* Supporting Data nodes (sry, there isn't a shorter name...)
          */
         if ($this->getConfigLoader()->get('curriculum_tagging_enabled')) {
@@ -170,6 +198,47 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         return $this->hydrateSupportingDataWorkTypesIntoCollection($stack);
+    }
+
+
+    /**
+     * Hydrates Grade Groups with Grade Levels into $collection instances of Reporting Models
+     * I don't really know how Due Works did this, other than an ants-related comment, which is a bit mystical to me.
+     * Anyway, this gets all the mark types, grade groups and grade levels used by the $collection, and then assigns
+     * them accordingly.
+     *
+     * It relies on the mapper cache's behaviour; I wanted to ensure that each assessment got its own instance of
+     * Mark Types and Grade Groups, despite them being the same contents. This should prevent you modifying the settings
+     * in one Reporting instance and having it quietly affect another since objects pass by reference.
+     *
+     * @param GenericCollection $collection
+     * @return GenericCollection
+     * @throws Exception
+     * @throws Deleted
+     */
+    private function hydrateGradeGroups(GenericCollection $collection): GenericCollection
+    {
+        $instructorGradeGroupMapper = $this->getJoinMapper('instructorGradeGroup');
+        $gradeGroupMapper = $this->getJoinMapper('gradeGroup');
+
+        foreach ($collection as $reporting) {
+            /* Yes I know, Mark Types are in the SubmissionBox area, despite being used pretty much everywhere
+             * TODO Amri, we should refactor this into a common area along with the others currently in SubmissionBox
+             */
+            if (SubmissionBox\MarkType::SLUG_LETTER === $reporting->getInstructorMarkType()->getSlug()) {
+                $instructorGradeGroup = $instructorGradeGroupMapper->findById($reporting->getInstructorGradeGroup()->getId());
+
+                $reporting->setInstructorGradeGroup($instructorGradeGroup);
+            }
+
+            if (SubmissionBox\MarkType::SLUG_LETTER === $reporting->getMarkType()->getSlug()) {
+                $gradeGroup = $gradeGroupMapper->findById($reporting->getGradeGroup()->getId());
+
+                $reporting->setGradeGroup($gradeGroup);
+            }
+        }
+
+        return $collection;
     }
 
 
