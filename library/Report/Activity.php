@@ -228,7 +228,7 @@ OR ml.name        LIKE :keyword
             l.id AS l_id, l.category AS l_cid, l.url AS l_url, l.description AS l_description,  clink.name AS l_catname,
             mf.id AS mf_id, mf.owner AS mf_owner, mf.realname AS mf_realname, mf.description AS mf_description,
             ml.id AS ml_id, ml.owner AS ml_owner, ml.name AS ml_name,
-            t.heading as textbox_heading, t.categoryID as textbox_cid
+            t.heading as textbox_heading, t.folder_id as textbox_cid
             FROM cmsLog cl
             $joins
             $sqlFilterString

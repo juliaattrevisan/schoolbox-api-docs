@@ -1899,7 +1899,7 @@ class Controller extends Base
             tb2.updated_at AS date,
             tb2.updated_by AS updated_by,
             tb2.body AS textboxBody,
-            tb2.categoryID AS folderId
+            tb2.folder_id AS folderId
         FROM textbox tb2
                  LEFT JOIN component_config_instance cci2 ON (
             cci2.component_config_definition_id = (
@@ -1911,7 +1911,7 @@ class Controller extends Base
             )
         WHERE tb2.deleted_at IS NULL
           AND cci2.id IS NULL
-          AND tb2.categoryID in {$coursePlaceHolder}
+          AND tb2.folder_id in {$coursePlaceHolder}
         ");
 
         /**
@@ -2511,7 +2511,7 @@ class Controller extends Base
             tb2.updated_at AS date,
             tb2.updated_by AS updated_by,
             tb2.body AS textboxBody,
-            tb2.categoryID AS folderId
+            tb2.folder_id AS folderId
         FROM textbox tb2
                  LEFT JOIN component_config_instance cci2 ON (
             cci2.component_config_definition_id = (
@@ -2523,7 +2523,7 @@ class Controller extends Base
             )
         WHERE tb2.deleted_at IS NULL
           AND cci2.id IS NULL
-          AND tb2.categoryID in {$coursePlaceHolder}
+          AND tb2.folder_id in {$coursePlaceHolder}
         ");
 
         /**
