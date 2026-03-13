@@ -825,7 +825,10 @@ test.describe("Dialog Agent", () => {
         await expect(activity2).toBeVisible();
     });
 
-    test("as a student, see only configured activities in the component", async ({ tester, page }) => {
+    test("as a student, see both activities in the component, can't start if unconfigured", async ({
+        tester,
+        page,
+    }) => {
         await tester.impersonate(Common.USER_JANAREED);
 
         const homepage = new Homepage(tester, page);
@@ -835,8 +838,14 @@ test.describe("Dialog Agent", () => {
         const activity1 = homepage.locateAssessmentRow(component, ACTIVITY_NAME_1);
         const activity2 = homepage.locateAssessmentRow(component, ACTIVITY_NAME_2);
 
-        await expect(activity1).not.toBeVisible();
+        await expect(activity1).toBeVisible();
         await expect(activity2).toBeVisible();
+
+        const activity1Id = await Homepage.getAssessmentId(activity1);
+        await homepage.clickAssessmentComponentTitle(activity1Id);
+
+        const discussionHistory = new AssessmentPage(tester, page);
+        await discussionHistory.expectCreateSubmissionDisabled();
     });
 
     test.afterAll(async ({ api, db }) => {

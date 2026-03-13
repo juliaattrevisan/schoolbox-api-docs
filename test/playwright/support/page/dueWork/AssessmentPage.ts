@@ -75,10 +75,18 @@ export default class AssessmentPage {
     }
 
     /**
-     * clcik Create submission button
+     * click Create submission button
      */
     async clickCreateSubmission(): Promise<void> {
         await this.page.getByTestId(AssessmentPage.DATA_TEST_ASSESSMENT_SUMMARY_CREATE_BUTTON).click();
+    }
+
+    /**
+     * expect the create submission button to be disabled
+     */
+    async expectCreateSubmissionDisabled(): Promise<void> {
+        const createButton = this.page.getByTestId(AssessmentPage.DATA_TEST_ASSESSMENT_SUMMARY_CREATE_BUTTON);
+        await expect(createButton).toBeDisabled();
     }
 
     /**
