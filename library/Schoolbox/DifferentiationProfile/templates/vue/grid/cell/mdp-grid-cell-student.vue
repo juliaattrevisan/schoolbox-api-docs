@@ -73,7 +73,7 @@ function onGenerateSelected(): void {
             <a
                 v-if="props.profile._routes?.customisations"
                 :href="props.profile._routes.customisations"
-                class="button f-no-margins"
+                class="button icon-group f-no-margins"
             >
                 View Customisations
             </a>
