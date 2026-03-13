@@ -65,9 +65,9 @@ body.sbx-body {
     table.rubric tr:nth-child(even),
     table.diagonal-headings-table tr:nth-child(even),
     table.VueTables__table tr:nth-child(even),
-    .action-list li:nth-child(even),
-    .information-list li:nth-child(even):not(:has(.information-list)) {
-        background-color: var(--sbx-color-foreground-secondary);
+    .action-list > li:nth-child(even),
+    .information-list > li:nth-child(even):not(:has(.information-list)) {
+        background-color: var(--sbx-color-foreground-primary-alt);
     }
 
     // Use highlight instead of pinky red of alert with Sass tint()
