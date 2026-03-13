@@ -127,13 +127,17 @@ class Renderer
      * @param string         $format
      * @param string|null    $returnStr
      * @param string|null    $baseUrl
-     *
+     * @param string|null    $exportType
      * @return mixed
      * @throws \Exception If unable to find a rendering class for the specified type
      */
-    public function renderEvent($event, $format, ?string $returnStr = null, ?string $baseUrl = null)
-    {
-
+    public function renderEvent(
+        $event,
+        $format,
+        ?string $returnStr = null,
+        ?string $baseUrl = null,
+        ?string $exportType = null,
+    ) {
         $rendererClass = $event->getRendererClass($format);
 
         /** @var RendererInterface $renderObj */
@@ -149,6 +153,9 @@ class Renderer
         }
         if ($baseUrl && method_exists($renderObj, 'setBaseUrl')) {
             $renderObj->setBaseUrl($baseUrl);
+        }
+        if ($exportType && method_exists($renderObj, 'setExportType')) {
+            $renderObj->setExportType($exportType);
         }
         return $renderObj->render();
     }

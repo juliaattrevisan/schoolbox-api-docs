@@ -8,7 +8,9 @@
 
 namespace Calendar\Event\Render;
 
+use Calendar\Event\Collection\ExportType;
 use Calendar\Event\Type\EventInterface;
+use Calendar\Event\Type\ResourceBooking\Event as ResourceBookingEvent;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Component\VEvent;
 use DateTime;
@@ -91,7 +93,18 @@ trait VObjectTrait
             $vEvent->add('DTEND', $end_time->format('Ymd'), ['VALUE' => 'DATE']);
         }
 
-        $vEvent->add('SUMMARY', $event->getTitleForExport());
+        $vEvent->add(
+            'SUMMARY',
+            (
+                // Function getTitleForResourceBookingExport() should only be used for exports of
+                // resource booking calendar items, in exports from the resource booking section.
+                // Note ExportType::RESOURCES is from the main calendar, so is not included below.
+                $event instanceof ResourceBookingEvent &&
+                in_array($this->getExportType(), [ExportType::RESOURCE, ExportType::RESOURCE_CATEGORY], true)
+                ? $event->getTitleForResourceBookingExport()
+                : $event->getTitleForExport()
+            )
+        );
 
         return $vEvent->serialize();
     }
@@ -132,6 +145,16 @@ trait VObjectTrait
             }
         }
         return $this->textConverter;
+    }
+
+
+    /**
+     * This is overridden in Calendar\Event\Type\ResourceBooking\Renderer\VObject.
+     * @return ?string
+     */
+    public function getExportType(): ?string
+    {
+        return null;
     }
 
 

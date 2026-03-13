@@ -106,10 +106,20 @@ class Event extends Day\Event
 
     /**
      * @inheritDoc
+     * @see getTitleForResourceBooking for notes on the intricacies of the resource booking title.
      */
     public function getTitleForExport()
     {
         return $this->getTitle() . ($this->getBooking()->getStatus()->isPending() ? ' (Pending)' : '');
+    }
+
+    /**
+     * Since we have a special function for getting the title for resource booking events,
+     * we also need a special function for exporting the title for resource booking events.
+     */
+    public function getTitleForResourceBookingExport(): string
+    {
+        return $this->getTitleForResourceBooking() . ($this->getBooking()->getStatus()->isPending() ? ' (Pending)' : '');
     }
 
     public function getLocation()
