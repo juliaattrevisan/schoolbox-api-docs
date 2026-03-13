@@ -39,10 +39,17 @@ class Factory extends AbstractFactory
      */
     public function buildDefinition(Model $filter): IDefinition
     {
+        // Fetch all available work types for customisation records
+        $workTypes = $this->workTypeMapper->findAll([
+            'conditions' => ['deleted_at' => null],
+            'order' => ['sequence' => 'ASC', 'name' => 'ASC']
+        ]);
+
         return new Definition(
             $filter,
             $this->getOptionMapper(),
-            $this->getDefaultsMapper()
+            $this->getDefaultsMapper(),
+            $workTypes
         );
     }
 
