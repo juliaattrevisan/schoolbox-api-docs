@@ -560,7 +560,7 @@ test.describe("Dialog Agent", () => {
         await agentChatFeed.expectOpeningMessageToHaveText(activity2OpeningMessage);
 
         // An attempt which has been opened but not started should be viewable
-        staffTester.isGoingTo("confirm visible actions when no attempt exists");
+        staffTester.isGoingTo("confirm visible actions when an attempt has been opened but not started");
         await staffPage.reload();
         await DialogAgentStatus.clickParticipantActionMenu(statusPageStudent);
         await statusPage.expectActionMenuOptions(statusPageStudent, [
