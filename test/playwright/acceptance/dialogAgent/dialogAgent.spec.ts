@@ -778,6 +778,41 @@ test.describe("Dialog Agent", () => {
         await staffBrowserCtx.close();
     });
 
+    test("as a staff member, submit an attempt on behalf of a student", async ({ tester, page }) => {
+        await tester.impersonateTeacher();
+
+        const homepage = new Homepage(tester, page);
+        await homepage.goto(Common.CLASS_ID_9AENG);
+
+        const component = homepage.locateComponentByName(DialogAgentHomepage.HOMEPAGE_COMPONENT_NAME);
+        const activity2 = homepage.locateAssessmentRow(component, ACTIVITY_NAME_2);
+        const activity2Id = await Homepage.getAssessmentId(activity2);
+
+        tester.isGoingTo("visit the status page for the activity");
+        await homepage.clickAssessmentComponentTOTMenu(activity2Id);
+        await homepage.clickAssessmentComponentTOTMenuViewStatus(activity2Id);
+        const statusPage = new DialogAgentStatus(page, tester);
+        const statusPageStudent = statusPage.locateGridRowForParticipant(Common.USER_JAMALALI);
+
+        tester.isGoingTo("confirm the attempt is currently in progress");
+        await DialogAgentStatus.expectParticipantStatus(statusPageStudent, DialogAgentResponseStatus.IN_PROGRESS);
+
+        tester.isGoingTo("submit the attempt on behalf of the student");
+        await DialogAgentStatus.clickParticipantActionMenu(statusPageStudent);
+        await statusPage.clickActionMenuOption(statusPageStudent, DialogAgentStatusAction.SUBMIT);
+        await statusPage.clickActionConfirm();
+        await DialogAgentStatus.expectParticipantStatus(statusPageStudent, DialogAgentResponseStatus.SUBMITTED);
+
+        tester.isGoingTo("expect to see the submitted attempt in submission history");
+        await DialogAgentStatus.clickParticipantActionMenu(statusPageStudent);
+        await statusPage.clickActionMenuOption(statusPageStudent, DialogAgentStatusAction.SUMMARY);
+
+        const discussionHistory = new AssessmentPage(tester, page);
+        const interactions = discussionHistory.locateAllInteractions();
+        await expect(interactions).toHaveCount(1);
+        await expect(interactions.first()).toContainText(`Response by ${Common.USER_JAMALALI}`);
+    });
+
     test("as a staff member, see both activities in the component", async ({ tester, page }) => {
         const homepage = new Homepage(tester, page);
         await homepage.goto(Common.CLASS_ID_9AENG);
