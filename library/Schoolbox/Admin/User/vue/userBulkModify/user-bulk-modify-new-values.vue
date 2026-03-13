@@ -86,7 +86,7 @@ export default {
     computed: {
         locale() {
             return locale;
-        }
+        },
     },
 
     mounted() {
@@ -308,7 +308,9 @@ export default {
                                 v-model="updateFields.removeFromAllQualifications"
                                 type="checkbox"
                             />
-                            <label class="checkbox-label" for="remove_from_all_qualifications">Remove from all {{ locale.qualification.translate(true, true) }}</label>
+                            <label class="checkbox-label" for="remove_from_all_qualifications"
+                                >Remove from all {{ locale.qualification.translate(true, true) }}</label
+                            >
                         </li>
                     </ul>
                 </div>
