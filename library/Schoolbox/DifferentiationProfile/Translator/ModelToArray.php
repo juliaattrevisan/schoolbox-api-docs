@@ -94,6 +94,10 @@ class ModelToArray
                     'differentiationProfiles.getLinkedPastoralRecords',
                     ['studentId' => $student->getId()],
                 ),
+                'customisations' => $this->getRouteIfAuthorized(
+                    'customisationRecord.viewRecordByStudent',
+                    ['studentId' => $student->getId()],
+                ),
                 'create'        => $this->getRouteIfAuthorized(
                     'differentiationProfiles.createDifferentiationProfileData',
                     [
