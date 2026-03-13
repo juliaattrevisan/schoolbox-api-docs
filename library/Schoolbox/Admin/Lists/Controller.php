@@ -1096,6 +1096,13 @@ class Controller extends Base
                         'width'     => 1,
                         'readonly'  => true,
                     ],
+                    'name'          => [
+                        'caption'   => 'Name',
+                        'width'     => 6,
+                        'maxLength' => 40,
+                        'mandatory' => true,
+                        'default'   => '',
+                    ],
                     'showOnGradesPage' => [
                         'caption'   => 'Grades page',
                         'tooltip'   => 'If checked, assessments with this work type will appear on the grades summary page.',
@@ -1111,13 +1118,6 @@ class Controller extends Base
                         'width'     => 2,
                         'default'   => false,
                         'tooltipPosition' => 'right',
-                    ],
-                    'name'          => [
-                        'caption'   => 'Name',
-                        'width'     => 6,
-                        'maxLength' => 40,
-                        'mandatory' => true,
-                        'default'   => '',
                     ],
                     'externalResultType' => [
                         'caption'   => 'External SIS Type',
