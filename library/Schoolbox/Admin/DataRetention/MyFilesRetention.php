@@ -27,6 +27,11 @@ class MyFilesRetention extends StrategyBase
         return 'My Files Retention';
     }
 
+    public function getStrategyName(): string
+    {
+        return 'myFiles';
+    }
+
     protected function hasDataToDelete(): bool
     {
         // find out how many MyFiles are soft deleted for the retention period
@@ -35,7 +40,7 @@ class MyFilesRetention extends StrategyBase
             SELECT
                 count(*) AS files
             FROM myFile
-            WHERE deleted_at < :old
+            WHERE deleted_at IS NOT NULL AND deleted_at < :old
         ";
 
         $statement = $this->database->prepare($query);
@@ -49,7 +54,7 @@ class MyFilesRetention extends StrategyBase
             SELECT
                 count(*) AS folders
             FROM myFolder
-            WHERE deleted_at < :old
+            WHERE deleted_at IS NOT NULL AND deleted_at < :old
         ";
 
         $statement = $this->database->prepare($query);
@@ -76,7 +81,7 @@ class MyFilesRetention extends StrategyBase
             SELECT
                 id
             FROM myFile
-            WHERE deleted_at < :old
+            WHERE deleted_at IS NOT NULL AND deleted_at < :old
         ";
 
         $statement = $this->database->prepare($query);
@@ -98,7 +103,7 @@ class MyFilesRetention extends StrategyBase
             SELECT
                 id
             FROM myFolder
-            WHERE deleted_at < :old
+            WHERE deleted_at IS NOT NULL AND deleted_at < :old
         ";
 
         $folderStatement = $this->database->prepare($folderQuery);
@@ -132,30 +137,31 @@ class MyFilesRetention extends StrategyBase
             $this->log->debug(sprintf("Deleting myFolder ids: %s", implode(', ', $folderIds)));
         }
 
+        // Delete files and folders using the padded chunk approach to work with Builder placeholders
+        // remove any eportfolio publish links that point to these myFile rows (remove the link, leave the component)
+        $eportfolioDeleted = $this->deleteEportfolioLinks($fileIds);
+
         $filesDeleted = $this->deleteFiles($fileIds);
         $foldersDeleted = $this->deleteFolders($folderIds);
 
-        // if perform is true, delete learning moments older than the retention period
-        if ($this->perform) {
-            // perform the transaction for the chunk
-            $this->database->commit();
+        // note: transaction commit/rollback is handled by StrategyBase::process(), do not commit here
 
+        if ($this->perform) {
             $this->log->notice(
                 sprintf(
-                    "Deleted '%s' MyFolders, '%s' MyFiles",
+                    "Deleted '%s' MyFolders, '%s' MyFiles, '%s' eportfolio_links",
                     $foldersDeleted,
                     $filesDeleted,
+                    $eportfolioDeleted,
                 )
             );
         } else {
-            // if not performing, roll back the transaction to avoid making changes
-            $this->database->rollBack();
-
             $this->log->notice(
                 sprintf(
-                    "Would have deleted '%s' MyFolders, '%s' MyFiles",
+                    "Would have deleted '%s' MyFolders, '%s' MyFiles, '%s' eportfolio_links",
                     $foldersDeleted,
                     $filesDeleted,
+                    $eportfolioDeleted,
                 )
             );
         }
@@ -173,16 +179,16 @@ class MyFilesRetention extends StrategyBase
             return 0;
         }
 
-        // prepare based on the number of ids we have
-        if (count($fileIds) === $this->chunkSize) {
-            // build an array length of the chunk size
-            $chunkSize = array_fill(0, $this->chunkSize, 0);
-            $delPlaceholders = Builder::getArrayPlaceholders($chunkSize, 'id');
-        } else {
-            $delPlaceholders = Builder::getArrayPlaceholders($fileIds, 'id');
+        // some value which will never be an ID
+        $nonExistentId = -1;
+
+        // pad up to chunk size so Builder placeholders are consistent
+        if (count($fileIds) < $this->chunkSize) {
+            $fileIds = array_merge($fileIds, array_fill(0, $this->chunkSize - count($fileIds), $nonExistentId));
         }
 
-        $statement = $this->database->prepare("DELETE FROM myFile WHERE id IN {$delPlaceholders}");
+        $delPlaceholders = Builder::getArrayPlaceholders($fileIds, 'id');
+        $statement = $this->database->prepare($this->deleteStatement() . " FROM myFile WHERE id IN {$delPlaceholders}");
 
         $statement->execute(Builder::getArrayParameters($fileIds, 'id'));
 
@@ -201,16 +207,44 @@ class MyFilesRetention extends StrategyBase
             return 0;
         }
 
-        // prepare based on the number of ids we have
-        if (count($fileIds) === $this->chunkSize) {
-            // build an array length of the chunk size
-            $chunkSize = array_fill(0, $this->chunkSize, 0);
-            $delPlaceholders = Builder::getArrayPlaceholders($chunkSize, 'id');
-        } else {
-            $delPlaceholders = Builder::getArrayPlaceholders($fileIds, 'id');
+        // some value which will never be an ID
+        $nonExistentId = -1;
+
+        // pad up to chunk size so Builder placeholders are consistent
+        if (count($fileIds) < $this->chunkSize) {
+            $fileIds = array_merge($fileIds, array_fill(0, $this->chunkSize - count($fileIds), $nonExistentId));
         }
 
-        $statement = $this->database->prepare("DELETE FROM myFolder WHERE id IN {$delPlaceholders}");
+        $delPlaceholders = Builder::getArrayPlaceholders($fileIds, 'id');
+        $statement = $this->database->prepare($this->deleteStatement() . " FROM myFolder WHERE id IN {$delPlaceholders}");
+
+        $statement->execute(Builder::getArrayParameters($fileIds, 'id'));
+
+        return $statement->rowCount();
+    }
+
+    /**
+     * Delete eportfolio publish links that reference these myFile ids
+     * This removes the link but leaves the component (empty) as requested.
+     * @param array $fileIds
+     * @return int
+     */
+    private function deleteEportfolioLinks(array $fileIds): int
+    {
+        if (empty($fileIds)) {
+            return 0;
+        }
+
+        // some value which will never be an ID
+        $nonExistentId = -1;
+
+        // pad up to chunk size so Builder placeholders are consistent
+        if (count($fileIds) < $this->chunkSize) {
+            $fileIds = array_merge($fileIds, array_fill(0, $this->chunkSize - count($fileIds), $nonExistentId));
+        }
+
+        $delPlaceholders = Builder::getArrayPlaceholders($fileIds, 'id');
+        $statement = $this->database->prepare($this->deleteStatement() . " FROM eportfolio_component_filelist_item WHERE file_id IN {$delPlaceholders}");
 
         $statement->execute(Builder::getArrayParameters($fileIds, 'id'));
 

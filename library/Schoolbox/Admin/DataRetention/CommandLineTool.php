@@ -145,7 +145,7 @@ class CommandLineTool extends CliTool\App
         $bus = new GenericCollection(IStrategy::class);
 
         // add bus for cmsLogExample // clear things from the cmsLog older than 1 year (possible options are 1 Day, 30 Days, 365 Days, <null>)
-        $bus->add(new CmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig(), $endTime, $loopCount, $chunkSize));
+//        $bus->add(new CmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig(), $endTime, $loopCount, $chunkSize));
         $bus->add(new MomentsRetention(
             $logger,
             $this->perform(),
@@ -166,16 +166,16 @@ class CommandLineTool extends CliTool\App
             $loopCount,
             $chunkSize,
         ));
-        $bus->add(new OrphanedMyFilesRetention(
-                      $logger,
-                      $this->perform(),
-                      $this->getDatabaseInternal(),
-                      $lock,
-                      $this->getConfig(),
-                      $endTime,
-                      $loopCount,
-                      $chunkSize,
-                  ));
+//        $bus->add(new OrphanedMyFilesRetention(
+//                      $logger,
+//                      $this->perform(),
+//                      $this->getDatabaseInternal(),
+//                      $lock,
+//                      $this->getConfig(),
+//                      $endTime,
+//                      $loopCount,
+//                      $chunkSize,
+//                  ));
 
         // get strats to run, default all, and filter the bus to only those strats
         $validStrats = array_map(
