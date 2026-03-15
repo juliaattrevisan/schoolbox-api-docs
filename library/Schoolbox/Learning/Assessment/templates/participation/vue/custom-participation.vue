@@ -147,6 +147,9 @@ const filteredParticipants = window.Vue.computed(() => {
     if (customisationFilter.value === "new") {
         participants = participants.filter((participant) => participant.customisedPlan != null);
     }
+    if (customisationFilter.value === "modified") {
+        participants = participants.filter((participant) => participant.plan?.name != null);
+    }
 
     return participants;
 });
