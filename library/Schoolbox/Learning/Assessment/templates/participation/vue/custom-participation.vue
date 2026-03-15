@@ -126,11 +126,19 @@ function onViewSuggestedCustomisation(participant: Participant): void {
 // Filter to only show students with differentiation profiles
 const onlyShowDP = window.Vue.ref(false);
 
-const filteredParticipants = window.Vue.computed(() =>
-    onlyShowDP.value
-        ? allParticipants.value.filter((participant) => participant._links.differentiationProfile)
-        : allParticipants.value,
-);
+const filteredParticipants = window.Vue.computed(() => {
+    let participants = allParticipants.value;
+
+    if (onlyShowDP.value) {
+        participants = participants.filter((participant) => participant._links.differentiationProfile);
+    }
+
+    if (customisationFilter.value === "excluded") {
+        participants = participants.filter((participant) => participant.excludedAt !== null);
+    }
+
+    return participants;
+});
 const customisationFilter = window.Vue.ref("all");
 const customisationOptions = [
     { label: "Show All Students", value: "all" },
