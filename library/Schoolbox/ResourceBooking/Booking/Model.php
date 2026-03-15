@@ -19,6 +19,7 @@ use Schoolbox\Calendar;
 use Alaress_Date_Format;
 use Schoolbox\User;
 use JsonSerializable;
+use UnexpectedValueException;
 
 class Model implements ISoftDeletable, JsonSerializable
 {
@@ -329,6 +330,63 @@ class Model implements ISoftDeletable, JsonSerializable
     {
         $this->bookingEndAt = $bookingEndAt;
         return $this;
+    }
+
+    /**
+     * @param User $user
+     * @return bool
+     * @throws UnexpectedValueException
+     * @see canUserModifyBooking()
+     */
+    public function canUserEditBooking(User $user): bool
+    {
+        return $this->canUserModifyBooking($user);
+    }
+
+    /**
+     * @param User $user
+     * @return bool
+     * @throws UnexpectedValueException
+     * @see canUserModifyBooking()
+     */
+    public function canUserDeleteBooking(User $user): bool
+    {
+        return $this->canUserModifyBooking($user);
+    }
+
+    /**
+     * This function was added so that methods in Calendar\Event\Controller that deal with bookings could check
+     * booking permissions without having to infer a general permission (e.g. 'can a user edit a booking') from
+     * permission to access a specific route (e.g. 'resourceBooking.edit').  Route permissions should only be used to
+     * check access to that route.
+     * The name 'modify' is intended to include 'update' and 'delete' operations.
+     * @see Item\Model::canUserModerateThisItem() (similar function).
+     *
+     * @param User $user
+     * @return bool - true means the user has permission to edit or delete this booking.
+     * @throws UnexpectedValueException
+     */
+    private function canUserModifyBooking(User $user): bool
+    {
+        try {
+            // Check this first, because this function should never be called on a booking whose event owner is not set.
+            // (So if this ever does happen, we want to catch the problem in testing.)
+            // Note a stub object for event owner is okay, because we only need the owner's id.
+            $bookingOwner = $this->getEvent()->getOwner();
+        } catch (\TypeError) {
+            throw new UnexpectedValueException('Booking object does not have event owner set');
+        }
+
+        // If the user is the owner of the event, he/she can modify (edit or delete) the booking.
+        if ($bookingOwner->getId() === $user->getId()) {
+            return true;
+        }
+
+        if ($this->getResource()->canUserModerateThisItem($user)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

@@ -43,14 +43,12 @@ use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Item\Mapper as BookingItemMapper;
 use Schoolbox\ResourceBooking\Item\Model as BookingItemModel;
-use Schoolbox\ResourceBooking\Item\ModerationType\Model as BookingModerationTypeModel;
 use Schoolbox\ResourceBooking\Booking\Model as BookingModel;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as BookingStatusMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatusModel;
 use Schoolbox\ResourceBooking\Booking\Validation as BookingValidation;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderLinkOnlyTranslator;
-use Schoolbox\ResourceBooking\Item\ModerationType\Model as ResourceBookingModerationTypeModel;
 use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
 use Schoolbox\ResourceBooking\Booking\Model as ResourceBookingModel;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as ResourceBookingStatusMapper;
@@ -1361,19 +1359,7 @@ class Controller extends Base
             throw new SchoolboxException('Booking/event mismatch when saving booking.');
         }
 
-        // Check whether the user has permission to book the resource.
-        // Note the 'calendarEvent.editBooking' permission will have been checked in Calendar/Event/Module.php.
-        // A user can edit a booking in the resource booking section if they can access the 'resourceBooking.edit' route.
-        if (
-            !$this->authorizer->isPathAuthorizedForUser(
-                'resourceBooking.edit',
-                [
-                    'id' => $booking->getId(),
-                    'item' => $booking,
-                ],
-                $this->user
-            )
-        ) {
+        if (!$booking->canUserEditBooking($this->getUser())) {
             // This will occur if permissions have changed since the form page was generated.
             $this->response = $this->responseAsJson(
                 new ApiProblem('You do not have permission to edit this booking.')
@@ -1496,7 +1482,11 @@ class Controller extends Base
     public function deleteBooking(Event $event, int $bookingId): void
     {
         $data = $this->request->getParsedBody();
-        $efficacy = $data['efficacy'] ?? null;
+
+        // The fallback of getting efficacy from the query params was added to
+        // allow this function to be testable by EventResourceBookingCest.php.
+        $efficacy = $data['efficacy'] ?? $this->request->getQueryParams()['efficacy'] ?? null;
+
         $responseData = [
             // The data structure here must match type 'DeleteBookingResponse' in resource-booking-row.vue.
             'success' => false,
@@ -1549,34 +1539,37 @@ class Controller extends Base
             throw new NotFound('Booking' . (count($bookingIds) > 1 ? 's' : '') . ' not found.');
         }
 
-        // The $bookings obtained above will not have their event hydrated.  Fix that.
-        // If this step is skipped, the event owner will not be hydrated in UserOwnsBooking,
-        // when permissions for the 'resourceBooking.edit' route are checked below.
-        // @see ResourceBooking/Booking/Auth/UserOwnsBooking->authorize().
+        // The $bookings obtained above will not have their event and resource hydrated.
+        // Fix that, because hydrated objects are required in $booking->canUserDeleteBooking() (checked below).
+        // (The hydrated resource is needed for its moderator list.)
+        $resourcesToHydrate = $bookings->map(fn ($booking) => $booking->getResource());
+        $resourceIdsToHydrateDeduped = $resourcesToHydrate->getUnique('id')->getPropertyValues('id');
+
+        /** @var GenericCollection<BookingItemModel> $resourceById */
+        $resourceById = $this->bookingItemMapper->findByColumn('id', $resourceIdsToHydrateDeduped)->indexBy('id');
         foreach ($bookings as $booking) {
             $booking->setEvent($event);
+            if ($resourceById->offsetExists($booking->getResource()->getId())) {
+                $booking->setResource($resourceById[$booking->getResource()->getId()]);
+            } else {
+                // The permission cannot be checked since the resource can't be found, so treat as forbidden.
+                throw new Forbidden('Resource not found for booking to be deleted, so cannot check permission.');
+            }
         }
 
         $resourceIds = []; // Remember the set of resourceIds to be booked.  It will be used below.
+        /** @var BookingModel $booking */
         foreach ($bookings as $booking) {
             $resourceId = $booking->getResource()->getId();
             $resourceIds[] = $resourceId;
 
             // Check whether the user has permission to delete the booking.
             // Note the 'calendarEvent.deleteBooking' permission will have been checked in Calendar/Event/Module.php.
-            // A user can delete a booking in the resource booking section if they can access the 'resourceBooking.edit'
-            // route.  If the permission check fails for any resource, stop the operation.  The user can remove the
-            // offending resource from the list if he/she wants to continue.
-            if (
-                !$this->authorizer->isPathAuthorizedForUser(
-                    'resourceBooking.edit',
-                    [
-                        'id' => $booking->getId(),
-                        'item' => $booking,
-                    ],
-                    $this->user
-                )
-            ) {
+            // That checks whether a user has permission to delete bookings linked to events generally.  A user's
+            // permission to delete a booking of a specific resource might depend on the resource.
+            // If the permission check fails for any resource, stop the operation.  The user can remove the offending
+            // resource from the list if he/she wants to continue.
+            if (!$booking->canUserDeleteBooking($this->getUser())) {
                 // This will occur if permissions have changed since the form page was generated.
                 throw new Forbidden(
                     "You do not have permission to delete bookings for resource '{$booking->getResource()->getName()}'."
