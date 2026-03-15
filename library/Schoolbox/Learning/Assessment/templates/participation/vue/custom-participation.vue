@@ -122,6 +122,15 @@ function onViewSuggestedCustomisation(participant: Participant): void {
 }
 
 // #endregion AI Suggested Customisation
+
+// Filter to only show students with differentiation profiles
+const onlyShowDP = window.Vue.ref(false);
+
+const filteredParticipants = window.Vue.computed(() =>
+    onlyShowDP.value
+        ? allParticipants.value.filter((participant) => participant._links.differentiationProfile)
+        : allParticipants.value,
+);
 </script>
 
 <template>
@@ -129,6 +138,16 @@ function onViewSuggestedCustomisation(participant: Participant): void {
         <data-load-error data-title="Student Participation" :further-info="loadError" />
     </div>
     <div>
+        <div class="l-mbm">
+            <div class="l-mbs">Only show students with {{ locale.differentiationProfile.translate(false, true) }}</div>
+            <div class="switch f-no-margins">
+                <input id="only-show-dp" v-model="onlyShowDP" type="checkbox" />
+                <label for="only-show-dp">
+                    <span>On</span>
+                    <span>Off</span>
+                </label>
+            </div>
+        </div>
         <div class="scrollable">
             <table>
                 <thead>
@@ -154,7 +173,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
                 </thead>
                 <tbody>
                     <cp-participant
-                        v-for="participant in allParticipants"
+                        v-for="participant in filteredParticipants"
                         :key="participant.id"
                         v-model:selected-list="selectedList"
                         :participant="participant"
