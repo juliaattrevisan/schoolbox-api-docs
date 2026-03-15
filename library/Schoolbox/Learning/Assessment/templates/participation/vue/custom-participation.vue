@@ -144,6 +144,9 @@ const filteredParticipants = window.Vue.computed(() => {
                 participant.excludedAt == null && participant.customisedPlan == null && participant.plan?.name == null,
         );
     }
+    if (customisationFilter.value === "new") {
+        participants = participants.filter((participant) => participant.customisedPlan != null);
+    }
 
     return participants;
 });
