@@ -171,27 +171,25 @@ const customisationOptions = [
         <div class="small-12 island l-mbm">
             <h2 class="subheader">Filter Students</h2>
             <section class="content">
-                <div class="l-flex l-flex-wrap l-items-end l-gap-l l-mbm">
-                    <div class="small-12 medium-6 large-4">
-                        <label for="customisation-type">Customisation Type</label>
-                        <select id="customisation-type" v-model="customisationFilter" style="min-width: 220px">
-                            <option v-for="option in customisationOptions" :key="option.value" :value="option.value">
-                                {{ option.label }}
-                            </option>
-                        </select>
-                    </div>
+                <div class="small-12 medium-6 large-4 columns">
+                    <label for="customisation-type">Customisation Type</label>
+                    <select id="customisation-type" v-model="customisationFilter" style="min-width: 220px">
+                        <option v-for="option in customisationOptions" :key="option.value" :value="option.value">
+                            {{ option.label }}
+                        </option>
+                    </select>
+                </div>
 
-                    <div class="small-12 medium-6 large-4">
-                        <label class="l-mbs" for="only-show-dp">
-                            Only show students with {{ locale.differentiationProfile.translate(false, true) }}
+                <div class="small-12 medium-6 large-4 columns">
+                    <label class="l-mbs" for="only-show-dp">
+                        Only show students with {{ locale.differentiationProfile.translate(false, true) }}
+                    </label>
+                    <div class="switch f-no-margins">
+                        <input id="only-show-dp" v-model="onlyShowDP" type="checkbox" />
+                        <label for="only-show-dp">
+                            <span>On</span>
+                            <span>Off</span>
                         </label>
-                        <div class="switch f-no-margins">
-                            <input id="only-show-dp" v-model="onlyShowDP" type="checkbox" />
-                            <label for="only-show-dp">
-                                <span>On</span>
-                                <span>Off</span>
-                            </label>
-                        </div>
                     </div>
                 </div>
             </section>
