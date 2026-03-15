@@ -97,7 +97,7 @@ class Controller extends Base
                 :homepageDefaultComponentHeading
             ) AS componentHeading,
             cci_textbox.component_instance_id AS componentID,
-            tb.textBoxID AS textboxID,
+            tb.id AS textboxID,
             tb.body AS textboxBody ,
             tb.updated_at AS updated_at
             FROM component_definition cd
@@ -111,8 +111,8 @@ class Controller extends Base
                 cci_textbox.component_config_definition_id = ccd_textbox.id AND
                 cci_textbox.component_instance_id = ci.id
             )
-            LEFT JOIN textBox tb ON (
-                CAST(tb.textBoxID AS NCHAR)=cci_textbox.value AND
+            LEFT JOIN textbox tb ON (
+                CAST(tb.id AS NCHAR)=cci_textbox.value AND
                 tb.deleted_at IS NULL
             )
             JOIN component_config_definition ccd_componentname ON (
@@ -322,7 +322,7 @@ class Controller extends Base
         // fetch all textboxes with components from these units
         // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
         $compTextQuery = $this->rubricIndicatorMapper->getDatabase()->prepareQuery("SELECT
-            tb.textBoxID AS id,
+            tb.id AS id,
             f.id AS folder_id,
             cci_componentname.value as 'componentName',
             ci.id as 'componentId',
@@ -341,7 +341,7 @@ class Controller extends Base
             cci_textbox.component_config_definition_id = ccd_textbox.id AND
             cci_textbox.component_instance_id = ci.id
             )
-                 LEFT JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci_textbox.value
+                 LEFT JOIN textbox tb ON CAST(tb.id AS NCHAR)=cci_textbox.value
                  JOIN component_config_definition ccd_componentname ON (
             ccd_componentname.component_definition_id = cd.id AND
             ccd_componentname.key = :componentConfigComponentNameKey
@@ -409,24 +409,24 @@ class Controller extends Base
         // fetch all textboxes with no component from these units
         // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
         $textQuery = $this->rubricIndicatorMapper->getDatabase()->prepareQuery("SELECT
-            tb2.textBoxID AS id,
+            tb2.id AS id,
             tb2.heading as 'textboxHeading',
             tb2.updated_at AS date,
             tb2.updated_by AS updated_by,
             tb2.body AS textboxBody,
-            tb2.categoryID as folderId
-        FROM textBox tb2
+            tb2.folder_id as folderId
+        FROM textbox tb2
                  LEFT JOIN component_config_instance cci2 ON (
             cci2.component_config_definition_id = (
                 SELECT id
                 FROM component_config_definition ccd2
                 WHERE ccd2.key = :homepageComponentKey
             ) AND
-            cci2.value = CAST(tb2.textBoxID AS NCHAR)
+            cci2.value = CAST(tb2.id AS NCHAR)
             )
         WHERE tb2.deleted_at IS NULL
           AND cci2.id IS NULL
-          AND tb2.categoryID in {$unitPlaceHolder}
+          AND tb2.folder_id in {$unitPlaceHolder}
         ");
 
         /**
@@ -726,7 +726,7 @@ class Controller extends Base
         );
         $translatedTextboxes = $this->textboxMapper
             ->findByColumn(
-                'textBoxID',
+                'id',
                 array_filter(array_column($textboxes, 'textboxId'), fn ($id) => $id > 0),
             )
             ->indexBy('id')

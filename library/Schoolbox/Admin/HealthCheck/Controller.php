@@ -1804,7 +1804,7 @@ class Controller extends Base
         // fetch all textboxes with components from these courses
         // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
         $compTextQuery = $database->prepareQuery("SELECT
-            tb.textBoxID AS id,
+            tb.id AS id,
             f.id AS folder_id,
             cci_componentname.value AS 'componentName',
             ci.id AS 'componentId',
@@ -1823,7 +1823,7 @@ class Controller extends Base
             cci_textbox.component_config_definition_id = ccd_textbox.id AND
             cci_textbox.component_instance_id = ci.id
             )
-                 LEFT JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci_textbox.value
+                 LEFT JOIN textbox tb ON CAST(tb.id AS NCHAR)=cci_textbox.value
                  JOIN component_config_definition ccd_componentname ON (
             ccd_componentname.component_definition_id = cd.id AND
             ccd_componentname.key = :componentConfigComponentNameKey
@@ -1894,24 +1894,24 @@ class Controller extends Base
         // fetch all textboxes with no component from these units
         // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
         $textQuery = $database->prepareQuery("SELECT
-            tb2.textBoxID AS id,
+            tb2.id AS id,
             tb2.heading AS 'textboxHeading',
             tb2.updated_at AS date,
             tb2.updated_by AS updated_by,
             tb2.body AS textboxBody,
-            tb2.categoryID AS folderId
-        FROM textBox tb2
+            tb2.folder_id AS folderId
+        FROM textbox tb2
                  LEFT JOIN component_config_instance cci2 ON (
             cci2.component_config_definition_id = (
                 SELECT id
                 FROM component_config_definition ccd2
                 WHERE ccd2.key = :homepageComponentKey
             ) AND
-            cci2.value = CAST(tb2.textBoxID AS NCHAR)
+            cci2.value = CAST(tb2.id AS NCHAR)
             )
         WHERE tb2.deleted_at IS NULL
           AND cci2.id IS NULL
-          AND tb2.categoryID in {$coursePlaceHolder}
+          AND tb2.folder_id in {$coursePlaceHolder}
         ");
 
         /**
@@ -2410,7 +2410,7 @@ class Controller extends Base
         // fetch all textboxes with components from these courses
         // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
         $compTextQuery = $database->prepareQuery("SELECT
-            tb.textBoxID AS id,
+            tb.id AS id,
             f.id AS folder_id,
             cci_componentname.value AS 'componentName',
             ci.id AS 'componentId',
@@ -2429,7 +2429,7 @@ class Controller extends Base
             cci_textbox.component_config_definition_id = ccd_textbox.id AND
             cci_textbox.component_instance_id = ci.id
             )
-                 LEFT JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci_textbox.value
+                 LEFT JOIN textbox tb ON CAST(tb.id AS NCHAR)=cci_textbox.value
                  JOIN component_config_definition ccd_componentname ON (
             ccd_componentname.component_definition_id = cd.id AND
             ccd_componentname.key = :componentConfigComponentNameKey
@@ -2506,24 +2506,24 @@ class Controller extends Base
         // fetch all textboxes not currently housed in a component on the page
         // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
         $textQuery = $database->prepareQuery("SELECT
-            tb2.textBoxID AS id,
+            tb2.id AS id,
             tb2.heading AS 'textboxHeading',
             tb2.updated_at AS date,
             tb2.updated_by AS updated_by,
             tb2.body AS textboxBody,
-            tb2.categoryID AS folderId
-        FROM textBox tb2
+            tb2.folder_id AS folderId
+        FROM textbox tb2
                  LEFT JOIN component_config_instance cci2 ON (
             cci2.component_config_definition_id = (
                 SELECT id
                 FROM component_config_definition ccd2
                 WHERE ccd2.key = :homepageComponentKey
             ) AND
-            cci2.value = CAST(tb2.textBoxID AS NCHAR)
+            cci2.value = CAST(tb2.id AS NCHAR)
             )
         WHERE tb2.deleted_at IS NULL
           AND cci2.id IS NULL
-          AND tb2.categoryID in {$coursePlaceHolder}
+          AND tb2.folder_id in {$coursePlaceHolder}
         ");
 
         /**

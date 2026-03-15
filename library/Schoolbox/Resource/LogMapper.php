@@ -110,7 +110,7 @@ class LogMapper extends Mapper
         $this->hasJoin('text', array(
             'mapper'    => Textbox\Mapper::class,
             'this_key'  => 'objectId',
-            'other_key' => 'textBoxID'
+            'other_key' => 'id'
         ));
     }
 
@@ -190,7 +190,7 @@ class LogMapper extends Mapper
             self::KIND_CONTENT => "
                 INNER JOIN {$this->getJoinSql('text', 'log', 't', true)}
                 AND object = 'content'
-                AND t.categoryID = :ctxt
+                AND t.folder_id = :ctxt
             "
         );
 

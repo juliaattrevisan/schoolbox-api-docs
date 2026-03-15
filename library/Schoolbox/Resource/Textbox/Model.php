@@ -44,7 +44,7 @@ class Model implements ISoftDeletable, Serializable
      *
      * @var Folder
      */
-    private $category;
+    private $folder;
 
     /**
      * Textbox heading
@@ -65,7 +65,7 @@ class Model implements ISoftDeletable, Serializable
      */
     public function __construct()
     {
-        $this->setCategory(new Folder());
+        $this->setFolder(new Folder());
     }
 
     /* Getters/Setters
@@ -94,25 +94,25 @@ class Model implements ISoftDeletable, Serializable
     }
 
     /**
-     * Set category
+     * Set folder or homepage that textbox is located on
      *
-     * @param Folder $category
+     * @param Folder $folder
      * @return $this
      */
-    public function setCategory($category)
+    public function setFolder($folder)
     {
-        $this->category = $category;
+        $this->folder = $folder;
         return $this;
     }
 
     /**
-     * Get category
+     * Get folder or homepage that textbox is located on
      *
      * @return Folder
      */
-    public function getCategory()
+    public function getFolder()
     {
-        return $this->category;
+        return $this->folder;
     }
 
     /**
@@ -167,7 +167,7 @@ class Model implements ISoftDeletable, Serializable
     {
         return [
             'id',
-            'category',
+            'folder',
             'heading',
             'body',
             'createdAt',

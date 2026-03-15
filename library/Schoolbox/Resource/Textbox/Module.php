@@ -112,7 +112,7 @@ class Module extends BaseModule
             $textbox = $textboxMapper->findById($params['id']);
             return [
                 'textbox' => $textbox,
-                'folder'  => $textbox->getCategory(),
+                'folder'  => $textbox->getFolder(),
             ];
         };
 

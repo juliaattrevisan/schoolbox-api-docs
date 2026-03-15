@@ -88,10 +88,10 @@ class Mapper extends BaseMapper
             )
         );
         $this->hasJoin(
-            'textBox',
+            'textbox',
             array(
                 'mapper' => TextboxMapper::class,
-                'other_key' => 'textBoxId',
+                'other_key' => 'id',
                 'this_key' => 'objectId',
                 'multiple' => false,
             )
@@ -108,8 +108,8 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('folder', 'fo')},
                 {$this->getJoinColumnString('file', 'fi')},
                 {$this->getJoinColumnString('link', 'li')},
-                {$this->getJoinColumnString('textBox', 't')},
-                {$this->getJoinColumnString('myFile', 'mf')},                
+                {$this->getJoinColumnString('textbox', 't')},
+                {$this->getJoinColumnString('myFile', 'mf')},
                 {$this->getJoinColumnString('myFolder', 'ml')}
         ";
     }
@@ -123,7 +123,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('folder', '', 'fo')} AND object = 'folder'
             LEFT JOIN {$this->getJoinSql('file', '', 'fi')} AND object = 'file'
             LEFT JOIN {$this->getJoinSql('link', '', 'li')} AND object = 'link'
-            LEFT JOIN {$this->getJoinSql('textBox', '', 't')} AND object = 'content'
+            LEFT JOIN {$this->getJoinSql('textbox', '', 't')} AND object = 'content'
             LEFT JOIN {$this->getJoinSql('myFile', '', 'mf')} AND object = 'myfile'
             LEFT JOIN {$this->getJoinSql('myFolder', '', 'ml')} AND object = 'myfolder'
         ";
@@ -162,7 +162,7 @@ class Mapper extends BaseMapper
             }
             if (!empty($row['t.textboxID'])) {
                 /** @var Textbox $textbox */
-                $textbox = $this->hydrateJoin($row, 'textBox', 't');
+                $textbox = $this->hydrateJoin($row, 'textbox', 't');
                 $record->setTextbox($textbox);
             }
             if (!empty($row['mf.id'])) {

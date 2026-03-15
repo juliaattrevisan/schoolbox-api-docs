@@ -69,13 +69,13 @@ class ModelToArray
             'id'      => $textbox->getId(),
             'heading' => $textbox->getHeading(),
             'body'    => $this->purifier->purify($textbox->getBody()),
-            'folder'  => call_user_func($this->folderTranslator, $textbox->getCategory()),
+            'folder'  => call_user_func($this->folderTranslator, $textbox->getFolder()),
             '_links'  => [
                 'update' => $this->getRouteIfAuthorized(
                     'textbox.updateTextbox',
                     [
                         'textbox' => $textbox,
-                        'folder'  => $textbox->getCategory(),
+                        'folder'  => $textbox->getFolder(),
                         'id'      => $textbox->getId(),
                     ]
                 ),
@@ -83,7 +83,7 @@ class ModelToArray
                     'textbox.deleteTextbox',
                     [
                         'textbox' => $textbox,
-                        'folder'  => $textbox->getCategory(),
+                        'folder'  => $textbox->getFolder(),
                         'id'      => $textbox->getId(),
                     ]
                 ),

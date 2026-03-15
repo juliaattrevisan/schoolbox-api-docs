@@ -53,7 +53,7 @@ $app = new class extends CliTool\App {
             'body_private',
             'body_public',
         ],
-        'textBox' => [
+        'textbox' => [
             'body',
         ],
         'wikiRevision' => [

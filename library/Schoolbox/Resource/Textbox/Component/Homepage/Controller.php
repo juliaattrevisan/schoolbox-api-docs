@@ -65,7 +65,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             }
             $this->textbox = $textboxMapper
                 ->createModel()
-                ->setCategory(FolderMapper::getInstance()->createModel()->setId($this->getSource()->getId()));
+                ->setFolder(FolderMapper::getInstance()->createModel()->setId($this->getSource()->getId()));
         }
 
         // Set the component heading. In order of preference:

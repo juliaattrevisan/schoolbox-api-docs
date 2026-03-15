@@ -63,9 +63,9 @@ class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
      */
     protected function mapping()
     {
-        $this->hasTable('textBox');
+        $this->hasTable('textbox');
         $this->hasModel(Model::class);
-        $this->uses('textboxID', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->uses('heading', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
@@ -74,7 +74,7 @@ class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
         $this->uses('updated_by', self::TYPE_INTEGER);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
         $this->uses('deleted_by', self::TYPE_INTEGER);
-        $this->joins('categoryID', FolderMapper::class, 'id', null, null, 'category', 'category');
+        $this->joins('folder_id', FolderMapper::class, 'id', null, null, 'folder', 'folder');
         $this->registerPersistSearchIndexCallbacks();
     }
 
@@ -87,9 +87,9 @@ class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
     {
         return "
             SELECT {$this->getColumnString()},
-                   {$this->getJoinColumnString('category', 'f')}
+                   {$this->getJoinColumnString('folder', 'f')}
             FROM `" . $this->getTable() . "`
-            JOIN {$this->getJoinSql('category', '', 'f')}
+            JOIN {$this->getJoinSql('folder', '', 'f')}
         ";
     }
 
@@ -126,7 +126,7 @@ class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
          * other homepage textbox components might alt-source these;
          * when that happens, accumulate a list of those homepages
          */
-        $textboxes = $this->findByColumn('categoryID', $folderId);
+        $textboxes = $this->findByColumn('folder_id', $folderId);
 
         foreach ($textboxes as $textbox) {
             $stack[$textbox->getId()] = [
@@ -143,20 +143,20 @@ class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
         $homepageUsageQuery = "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('category', 'f')}
+                {$this->getJoinColumnString('folder', 'f')}
             FROM component_definition cd
             INNER JOIN component_instance ci ON cd.id = ci.component_definition_id
             INNER JOIN component_config_instance cci ON cci.component_instance_id = ci.id
             INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
-            INNER JOIN textBox ON cci.value = textBox.textBoxID
+            INNER JOIN textbox ON cci.value = textbox.id
             INNER JOIN folder f ON ci.identifier = f.id
             WHERE cd.`class` = :controller
             AND ccd.`key` = :key
-            AND textBox.deleted_at IS NULL
+            AND textbox.deleted_at IS NULL
             AND f.deleted_at IS NULL
-            AND textBox.categoryID = :folderId
-            GROUP BY textBox.textBoxID, f.id
-            ORDER BY textBox.textBoxID
+            AND textbox.folder_id = :folderId
+            GROUP BY textbox.id, f.id
+            ORDER BY textbox.id
         ";
 
         $homepageUsageStatement = $this->database->prepare($homepageUsageQuery);
@@ -168,9 +168,9 @@ class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
         ]);
 
         while ($row = $homepageUsageStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $textboxId = $row['textboxID'];
+            $textboxId = $row['id'];
 
-            $folder = $this->getJoinMapper('category')->hydrate($row, 'f');
+            $folder = $this->getJoinMapper('folder')->hydrate($row, 'f');
 
             $stack[$textboxId]['folders']->add($folder);
         }
@@ -185,14 +185,14 @@ class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
             INNER JOIN component_instance ci ON cd.id = ci.component_definition_id
             INNER JOIN component_config_instance cci ON cci.component_instance_id = ci.id
             INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
-            INNER JOIN textBox textBox ON cci.value = textBox.textBoxID
+            INNER JOIN textbox textbox ON cci.value = textbox.id
             INNER JOIN `groups` ON `groups`.id = ci.identifier
             WHERE cd.`class` = :controller
             AND ccd.`key` = :key
-            AND textBox.deleted_at IS NULL
-            AND textBox.categoryID = :folderId
+            AND textbox.deleted_at IS NULL
+            AND textbox.folder_id = :folderId
             AND `groups`.deleted_at IS NULL
-            GROUP BY `groups`.id, textBox.textBoxID
+            GROUP BY `groups`.id, textbox.id
         ";
 
         $dashboardUsageStatement = $this->database->prepare($dashboardUsageQuery);
@@ -204,7 +204,7 @@ class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
         ]);
 
         while ($row = $dashboardUsageStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $textboxId = $row['textboxID'];
+            $textboxId = $row['id'];
             $dashboardId = $row['id'];
 
             $stack[$textboxId]['dashboards'][$dashboardId] = [
@@ -243,7 +243,7 @@ class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
             INNER JOIN component_instance ON component_config_instance.component_instance_id = component_instance.id
             WHERE class = :controllerClass
             AND `key` = :key
-            AND `identifier` = :categoryId
+            AND `identifier` = :folderId
             AND `value` = :textboxId
         ';
 
@@ -252,7 +252,7 @@ class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
         $statement->execute([
             'controllerClass' => Component\Homepage\Controller::class,
             'key' => 'textbox',
-            'categoryId' => $textbox->getCategory()->getId(),
+            'folderId' => $textbox->getFolder()->getId(),
             'textboxId' => $textbox->getId()
         ]);
 
@@ -301,6 +301,6 @@ class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
      */
     public function homepageClean($cid): void
     {
-        $this->deleteByColumn('categoryID', $cid);
+        $this->deleteByColumn('folder_id', $cid);
     }
 }

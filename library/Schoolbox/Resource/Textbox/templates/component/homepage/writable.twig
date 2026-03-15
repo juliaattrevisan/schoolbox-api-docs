@@ -41,7 +41,7 @@
             {# This has a button-like styling, but isn't actually a button #}
             <button data-role="dirty-indicator" class="hide" disabled>Changes not saved</button>
 
-            {% set manageAllRoute = routeLookupIfAuthorized('textbox.getIndexForFolder', {folderId: textbox.category.id, folder: textbox.category}) %}
+            {% set manageAllRoute = routeLookupIfAuthorized('textbox.getIndexForFolder', {folderId: textbox.folder.id, folder: textbox.folder}) %}
             {% if manageAllRoute %}
             <a class='button' href="{{ manageAllRoute }}?{{ RETURN_URL.name }}={{ returnUrl }}">Manage All</a>
             {% endif %}
@@ -49,7 +49,7 @@
             <button class="button"
                     data-action="save"
                     data-form-method="put"
-                    data-form-action="{{ routeLookupIfAuthorized('textbox.updateTextbox', {id: textbox.id, textbox: textbox, folder: textbox.category}) }}"
+                    data-form-action="{{ routeLookupIfAuthorized('textbox.updateTextbox', {id: textbox.id, textbox: textbox, folder: textbox.folder}) }}"
                     data-processing-text="Saving..."
                     class="hide">Save</button>
             <button class="button" data-action="modify" data-processing-text="Modifying">Modify</button>
@@ -71,7 +71,7 @@
 
     <div id="addTextboxModal-{{ component.instance.id }}" class="reveal-modal" data-reveal aria-labelledby="addTextboxModal-{{ component.instance.id }}-title" aria-hidden="true" role="dialog">
         {# Create component in alt-source folder context, if there is one #}
-        <form method="post" action="{{ routeLookup('textbox.createTextboxInFolder', {folder: textbox.category, folderId: textbox.category.id}) }}" id="addTextboxModal-{{ component.instance.id }}-form">
+        <form method="post" action="{{ routeLookup('textbox.createTextboxInFolder', {folder: textbox.folder, folderId: textbox.folder.id}) }}" id="addTextboxModal-{{ component.instance.id }}-form">
             <section>
                 <h3 id="addTextboxModal-{{ component.instance.id }}-title">Create Text Box</h3>
                 <label class="required" for="addTextboxModal-{{ component.instance.id }}-form-heading">Title</label>
