@@ -240,6 +240,20 @@ const customisationOptions = [
                     </tbody>
                 </table>
             </div>
+            <div v-if="filteredParticipants.length === 0" class="empty-state">
+                <i class="icon-group"></i>
+                <p>
+                    No students match the current filters. Try another filter or
+                    <a
+                        href="#"
+                        @click.prevent="
+                            customisationFilter = 'all';
+                            onlyShowDP = false;
+                        "
+                        >show all students</a
+                    >.
+                </p>
+            </div>
         </div>
         <!-- container for the sbx-pop-out to be displayed in -->
         <div id="pop-out-container"></div>
