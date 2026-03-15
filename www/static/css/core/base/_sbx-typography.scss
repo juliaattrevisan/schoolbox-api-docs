@@ -46,6 +46,7 @@ body.sbx-body {
     blockquote,
     label,
     div,
+    article,
     table tr th {
         font-size: var(--sbx-font-size-s);
     }
@@ -76,5 +77,11 @@ body.sbx-body {
 
     legend {
         font-size: var(--sbx-font-size-m);
+    }
+
+    // Remove uppercase transformation for better readability
+    .article-read-more,
+    .v-card .card-actions a {
+        text-transform: none;
     }
 }
