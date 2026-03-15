@@ -134,7 +134,15 @@ const filteredParticipants = window.Vue.computed(() => {
     }
 
     if (customisationFilter.value === "excluded") {
-        participants = participants.filter((participant) => participant.excludedAt !== null);
+        participants = participants.filter(
+            (participant) => participant.excludedAt != null && participant.customisedPlan == null,
+        );
+    }
+    if (customisationFilter.value === "none") {
+        participants = participants.filter(
+            (participant) =>
+                participant.excludedAt == null && participant.customisedPlan == null && participant.plan?.name == null,
+        );
     }
 
     return participants;
