@@ -131,6 +131,14 @@ const filteredParticipants = window.Vue.computed(() =>
         ? allParticipants.value.filter((participant) => participant._links.differentiationProfile)
         : allParticipants.value,
 );
+const customisationFilter = window.Vue.ref("all");
+const customisationOptions = [
+    { label: "Show All Students", value: "all" },
+    { label: "Excluded", value: "excluded" },
+    { label: "Modified Activity", value: "modified" },
+    { label: "New Activity", value: "new" },
+    { label: "No Customisation", value: "none" },
+];
 </script>
 
 <template>
@@ -138,59 +146,80 @@ const filteredParticipants = window.Vue.computed(() =>
         <data-load-error data-title="Student Participation" :further-info="loadError" />
     </div>
     <div>
-        <div class="l-mbm">
-            <div class="l-mbs">Only show students with {{ locale.differentiationProfile.translate(false, true) }}</div>
-            <div class="switch f-no-margins">
-                <input id="only-show-dp" v-model="onlyShowDP" type="checkbox" />
-                <label for="only-show-dp">
-                    <span>On</span>
-                    <span>Off</span>
-                </label>
-            </div>
+        <div class="small-12 island l-mbm">
+            <h2 class="subheader">Filter Students</h2>
+            <section class="content">
+                <div class="l-flex l-items-end l-gap-l l-mbm">
+                    <div>
+                        <label for="customisation-type">Customisation Type</label>
+                        <select id="customisation-type" v-model="customisationFilter" style="min-width: 220px">
+                            <option v-for="option in customisationOptions" :key="option.value" :value="option.value">
+                                {{ option.label }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="l-mbs" for="only-show-dp">
+                            Only show students with {{ locale.differentiationProfile.translate(false, true) }}
+                        </label>
+                        <div class="switch f-no-margins">
+                            <input id="only-show-dp" v-model="onlyShowDP" type="checkbox" />
+                            <label for="only-show-dp">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
-        <div class="scrollable">
-            <table>
-                <thead>
-                    <tr>
-                        <th v-if="showCheckboxes" width="40" data-test="custom-participation-select-all">
-                            <input
-                                id="select-all"
-                                v-model="allSelected"
-                                type="checkbox"
-                                :class="{ indeterminate: isIndeterminate }"
-                            />
-                            <label for="select-all" class="checkbox-label"></label>
-                        </th>
-                        <td width="84"></td>
-                        <th>Name</th>
-                        <th v-if="props.differentiationEnabled">
-                            {{ locale.differentiationProfile.translate(false, true) }}
-                        </th>
-                        <th v-if="canSuggestCustomisation">Suggested Customisation</th>
-                        <th>Customisation</th>
-                        <td></td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <cp-participant
-                        v-for="participant in filteredParticipants"
-                        :key="participant.id"
-                        v-model:selected-list="selectedList"
-                        :participant="participant"
-                        :show-checkboxes="showCheckboxes"
-                        :pastoral-flags="pastoralFlags"
-                        :routes="props.routes"
-                        :assessment-id="props.assessmentId"
-                        :can-suggest-customisation="canSuggestCustomisation"
-                        :customisations="props.customisations"
-                        :differentiation-enabled="props.differentiationEnabled"
-                        @view-differentiation-profile="onViewDP"
-                        @view-suggested-customisation="onViewSuggestedCustomisation"
-                        @action-selected="onActionSelected"
-                        @open-include-in-existing-modal="openIncludeInExistingModal"
-                    />
-                </tbody>
-            </table>
+
+        <div class="small-12 island l-mbm">
+            <div class="scrollable">
+                <table>
+                    <thead>
+                        <tr>
+                            <th v-if="showCheckboxes" width="40" data-test="custom-participation-select-all">
+                                <input
+                                    id="select-all"
+                                    v-model="allSelected"
+                                    type="checkbox"
+                                    :class="{ indeterminate: isIndeterminate }"
+                                />
+                                <label for="select-all" class="checkbox-label"></label>
+                            </th>
+                            <td width="84"></td>
+                            <th>Name</th>
+                            <th v-if="props.differentiationEnabled">
+                                {{ locale.differentiationProfile.translate(false, true) }}
+                            </th>
+                            <th v-if="canSuggestCustomisation">Suggested Customisation</th>
+                            <th>Customisation</th>
+                            <td></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <cp-participant
+                            v-for="participant in filteredParticipants"
+                            :key="participant.id"
+                            v-model:selected-list="selectedList"
+                            :participant="participant"
+                            :show-checkboxes="showCheckboxes"
+                            :pastoral-flags="pastoralFlags"
+                            :routes="props.routes"
+                            :assessment-id="props.assessmentId"
+                            :can-suggest-customisation="canSuggestCustomisation"
+                            :customisations="props.customisations"
+                            :differentiation-enabled="props.differentiationEnabled"
+                            @view-differentiation-profile="onViewDP"
+                            @view-suggested-customisation="onViewSuggestedCustomisation"
+                            @action-selected="onActionSelected"
+                            @open-include-in-existing-modal="openIncludeInExistingModal"
+                        />
+                    </tbody>
+                </table>
+            </div>
         </div>
         <!-- container for the sbx-pop-out to be displayed in -->
         <div id="pop-out-container"></div>
