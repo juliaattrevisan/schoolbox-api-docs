@@ -94,17 +94,6 @@ body.sbx-body {
         cursor: auto;
     }
 
-    // Fix reveal modal checklist checkbox alignment issue (Browse curriculum modal)
-    .reveal-modal {
-        span.name {
-            white-space: normal;
-        }
-
-        .checklist {
-            overflow-y: visible;
-        }
-    }
-
     // filter styles in view status page
     ul.filters {
         display: flex;
