@@ -19,8 +19,9 @@ class MyFilesRetention extends StrategyBase
 {
     public string $retentionConfigKey = ConfigMapper::NAME_DATA_RETENTION_MYFILES;
 
-    private const TABLE_NAME_FILE = 'myFile';
-    private const TABLE_NAME_FOLDER = 'myFolder';
+    // DB table names (updated to snake_case)
+    private const TABLE_NAME_FILE = 'my_file';
+    private const TABLE_NAME_FOLDER = 'my_folder';
 
     public function getRetentionLabel(): string
     {
@@ -39,7 +40,7 @@ class MyFilesRetention extends StrategyBase
         $query = "
             SELECT
                 count(*) AS files
-            FROM myFile
+            FROM my_file
             WHERE deleted_at IS NOT NULL AND deleted_at < :old
         ";
 
@@ -53,7 +54,7 @@ class MyFilesRetention extends StrategyBase
         $query = "
             SELECT
                 count(*) AS folders
-            FROM myFolder
+            FROM my_folder
             WHERE deleted_at IS NOT NULL AND deleted_at < :old
         ";
 
@@ -80,7 +81,7 @@ class MyFilesRetention extends StrategyBase
         $query = "
             SELECT
                 id
-            FROM myFile
+            FROM my_file
             WHERE deleted_at IS NOT NULL AND deleted_at < :old
         ";
 
@@ -102,7 +103,7 @@ class MyFilesRetention extends StrategyBase
         $folderQuery = "
             SELECT
                 id
-            FROM myFolder
+            FROM my_folder
             WHERE deleted_at IS NOT NULL AND deleted_at < :old
         ";
 
@@ -130,11 +131,11 @@ class MyFilesRetention extends StrategyBase
         $folderIds = array_column(array_filter($chunk, fn($item) => $item['table'] === self::TABLE_NAME_FOLDER), 'id');
 
         // debug log the ids we are deleting in this chunk
-        $this->log->debug(sprintf("Deleting myFile ids: %s", implode(', ', $fileIds)));
+        $this->log->debug(sprintf("Deleting my_file ids: %s", implode(', ', $fileIds)));
 
         // clean up the folders if any exist...
         if (!empty($folderIds)) {
-            $this->log->debug(sprintf("Deleting myFolder ids: %s", implode(', ', $folderIds)));
+            $this->log->debug(sprintf("Deleting my_folder ids: %s", implode(', ', $folderIds)));
         }
 
         // Delete files and folders using the padded chunk approach to work with Builder placeholders
@@ -188,7 +189,7 @@ class MyFilesRetention extends StrategyBase
         }
 
         $delPlaceholders = Builder::getArrayPlaceholders($fileIds, 'id');
-        $statement = $this->database->prepare($this->deleteStatement() . " FROM myFile WHERE id IN {$delPlaceholders}");
+        $statement = $this->database->prepare($this->deleteStatement() . " FROM my_file WHERE id IN {$delPlaceholders}");
 
         $statement->execute(Builder::getArrayParameters($fileIds, 'id'));
 
@@ -216,7 +217,7 @@ class MyFilesRetention extends StrategyBase
         }
 
         $delPlaceholders = Builder::getArrayPlaceholders($fileIds, 'id');
-        $statement = $this->database->prepare($this->deleteStatement() . " FROM myFolder WHERE id IN {$delPlaceholders}");
+        $statement = $this->database->prepare($this->deleteStatement() . " FROM my_folder WHERE id IN {$delPlaceholders}");
 
         $statement->execute(Builder::getArrayParameters($fileIds, 'id'));
 
