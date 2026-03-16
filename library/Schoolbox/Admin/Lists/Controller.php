@@ -1127,7 +1127,6 @@ class Controller extends Base
                         'tooltip'   => 'Who may see this work type?',
                     ],
                     'permittedActivities' => [
-                        'getter'    => 'getPermittedActivities',
                         'caption'   => 'Permitted Activities',
                         'isPopOutList' => true,
                         'nullable'  => false,
