@@ -20,7 +20,7 @@ use Schoolbox;
 class Mapper extends Schoolbox\Mapper
 {
     const string VISIBILITY_STAFF_ONLY = 'staffOnly';
-    const string VISIBILITY_STAFF_STUDENT = 'staffAndStudents';
+    const string VISIBILITY_STAFF_STUDENTS = 'staffAndStudents';
     const string VISIBILITY_STAFF_PARENTS = 'staffAndParents';
     const string VISIBILITY_STAFF_STUDENTS_PARENTS = 'staffAndStudentsAndParents';
 

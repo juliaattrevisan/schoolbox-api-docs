@@ -1112,13 +1112,13 @@ class Controller extends Base
                         'tooltipPosition' => 'right',
                     ],
                     'visibility' => [
-                        'getter'    => 'getVisibilityString',
+                        'getter'    => 'getVisibility',
                         'caption'   => 'Visibility',
                         'lookup'    => [
-                            ['key' => 'staffOnly', 'value' => 'Staff Only'],
-                            ['key' => 'staffAndStudents', 'value' => 'Staff & Students'],
-                            ['key' => 'staffAndParents', 'value' => 'Staff & Parents'],
-                            ['key' => 'staffStudentsAndParents', 'value' => 'Staff, Students & Parents'],
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_ONLY, 'value' => 'Staff Only'],
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_STUDENTS, 'value' => 'Staff & Students'],
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_PARENTS, 'value' => 'Staff & Parents'],
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_STUDENTS_PARENTS, 'value' => 'Staff, Students & Parents'],
                         ],
                         'nullable'  => false,
                         'width'     => 3,
