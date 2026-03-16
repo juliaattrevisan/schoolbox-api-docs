@@ -248,6 +248,7 @@ class ClassResults
         $specsWithPublishedMarks = array_values($this->tuples);
 
         foreach ($this->assessments as $assessment) {
+
             /* If the assessment does not have a work type, or the work type is not in the whitelist, skip it.
              */
             if (!in_array($assessment->getWorkType()?->getId(), $workTypeWhitelist, true)) {

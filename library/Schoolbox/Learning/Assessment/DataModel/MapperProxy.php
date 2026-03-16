@@ -493,11 +493,33 @@ class MapperProxy
                 LEFT JOIN lti_assessment_score sc ON la.id = sc.lti_assessment_id AND pc.user_id = sc.student_id AND sc.deleted_at IS NULL AND sc.is_feedback = 1
            WHERE
                 la.assessment_id IN ({$assessmentIdBindings4['placeholders']})
+           
+           UNION 
+           
+           -- Reporting Activities
+           SELECT
+                'reporting' AS assessment_type,
+                reporting.assessment_id AS assessment_id,
+                a.weight AS weight,
+                reporting.mark_type AS mark_type,
+                reporting_feedback.learner_id AS user_id,
+                reporting_feedback.norm_mark AS mark,
+                reporting.max_mark AS max_mark,
+                reporting_feedback.published_at AS published_at
+           FROM reporting
+                JOIN participant_plan pp ON pp.assessment_id = reporting.assessment_id AND pp.deleted_at IS NULL
+                JOIN assessment a ON a.id = reporting.assessment_id
+                LEFT JOIN participant pc ON pp.id = pc.participant_plan_id AND pc.excluded_at IS NULL
+                LEFT JOIN reporting_feedback ON reporting.id = reporting_feedback.reporting_id 
+                    AND pc.user_id = reporting_feedback.learner_id 
+                    AND reporting_feedback.deleted_at IS NULL 
+           WHERE
+                reporting.mark_type IN ({$markTypeBindings['placeholders']})
+                AND reporting.assessment_id IN ({$assessmentIdBindings['placeholders']})
+                AND reporting_feedback.published_at IS NOT NULL
 
-        ORDER BY assessment_id, user_id, published_at DESC
-        "
-        );
-
+            ORDER BY assessment_id, user_id, published_at DESC
+        ");
         $markQuery->setFetchMode(\PDO::FETCH_ASSOC);
         $markQuery->execute(
             array_merge(
