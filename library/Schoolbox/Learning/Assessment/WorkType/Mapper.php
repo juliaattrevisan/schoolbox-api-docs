@@ -38,6 +38,13 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('_staff_or_instructor_visible_only', self::TYPE_BOOLEAN);
         $this->uses('is_visible_to_parents', self::TYPE_BOOLEAN);
         $this->uses('is_visible_to_students', self::TYPE_BOOLEAN);
+        $this->uses('permitted_project', self::TYPE_BOOLEAN);
+        $this->uses('permitted_due_work', self::TYPE_BOOLEAN);
+        $this->uses('permitted_task', self::TYPE_BOOLEAN);
+        $this->uses('permitted_quiz', self::TYPE_BOOLEAN);
+        $this->uses('permitted_lti', self::TYPE_BOOLEAN);
+        $this->uses('permitted_lesson_plan', self::TYPE_BOOLEAN);
+        $this->uses('permitted_dialog_agent', self::TYPE_BOOLEAN);
 
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('updated_by', self::TYPE_INTEGER);

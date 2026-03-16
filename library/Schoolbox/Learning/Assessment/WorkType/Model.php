@@ -61,6 +61,21 @@ class Model implements ISoftDeletable, Sequential
     /** @var bool */
     private ?bool $isVisibleToStudents = null;
 
+    /** @var ?bool */
+    private ?bool $permittedProject = null;
+    /** @var ?bool */
+    private ?bool $permittedDueWork = null;
+    /** @var ?bool */
+    private ?bool $permittedTask = null;
+    /** @var ?bool */
+    private ?bool $permittedQuiz= null;
+    /** @var ?bool */
+    private ?bool $permittedLti= null;
+    /** @var ?bool */
+    private ?bool $permittedLessonPlan = null;
+    /** @var ?bool */
+    private ?bool $permittedDialogAgent = null;
+
     /**
      * @return bool
      */
@@ -234,5 +249,145 @@ class Model implements ISoftDeletable, Sequential
             '1-1' => Mapper::VISIBILITY_STAFF_STUDENTS_PARENTS,
             default => throw new \LogicException('Impossible case.'),
         };
+    }
+
+    /**
+     * @return bool
+     */
+    public function getPermittedProject(): bool
+    {
+        if ($this->permittedProject === null) {
+            throw new InsufficientHydrationException('This WorkType object is not hydrated.');
+        }
+        return $this->permittedProject;
+    }
+
+    /**
+     * @param bool $permittedProject
+     * @return void
+     */
+    public function setPermittedProject(bool $permittedProject): void
+    {
+        $this->permittedProject = $permittedProject;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getPermittedDueWork(): bool
+    {
+        if ($this->permittedDueWork === null) {
+            throw new InsufficientHydrationException('This WorkType object is not hydrated.');
+        }
+        return $this->permittedDueWork;
+    }
+
+    /**
+     * @param bool $permittedDueWork
+     * @return void
+     */
+    public function setPermittedDueWork(bool $permittedDueWork): void
+    {
+        $this->permittedDueWork = $permittedDueWork;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getPermittedTask(): bool
+    {
+        if ($this->permittedTask === null) {
+            throw new InsufficientHydrationException('This WorkType object is not hydrated.');
+        }
+        return $this->permittedTask;
+    }
+
+    /**
+     * @param bool $permittedTask
+     * @return void
+     */
+    public function setPermittedTask(bool $permittedTask): void
+    {
+        $this->permittedTask = $permittedTask;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getPermittedQuiz(): bool
+    {
+        if ($this->permittedQuiz === null) {
+            throw new InsufficientHydrationException('This WorkType object is not hydrated.');
+        }
+        return $this->permittedQuiz;
+    }
+
+    /**
+     * @param bool $permittedQuiz
+     * @return void
+     */
+    public function setPermittedQuiz(bool $permittedQuiz): void
+    {
+        $this->permittedQuiz = $permittedQuiz;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getPermittedLti(): bool
+    {
+        if ($this->permittedLti === null) {
+            throw new InsufficientHydrationException('This WorkType object is not hydrated.');
+        }
+        return $this->permittedLti;
+    }
+
+    /**
+     * @param bool $permittedLti
+     * @return void
+     */
+    public function setPermittedLti(bool $permittedLti): void
+    {
+        $this->permittedLti = $permittedLti;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getPermittedLessonPlan(): bool
+    {
+        if ($this->permittedLessonPlan === null) {
+            throw new InsufficientHydrationException('This WorkType object is not hydrated.');
+        }
+        return $this->permittedLessonPlan;
+    }
+
+    /**
+     * @param bool $permittedLessonPlan
+     * @return void
+     */
+    public function setPermittedLessonPlan(bool $permittedLessonPlan): void
+    {
+        $this->permittedLessonPlan = $permittedLessonPlan;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getPermittedDialogAgent(): bool
+    {
+        if ($this->permittedDialogAgent === null) {
+            throw new InsufficientHydrationException('This WorkType object is not hydrated.');
+        }
+        return $this->permittedDialogAgent;
+    }
+
+    /**
+     * @param bool $permittedDialogAgent
+     * @return void
+     */
+    public function setPermittedDialogAgent(bool $permittedDialogAgent): void
+    {
+        $this->permittedDialogAgent = $permittedDialogAgent;
     }
 }
