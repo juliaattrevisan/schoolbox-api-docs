@@ -35,27 +35,51 @@ It is deployed internally and not shipped in client packages.
 
 ## Project Structure
 
-| Directory | Purpose |
-|-----------|---------|
-| `conf/` | Aura MVC module bootstrap / controller config |
-| `www/` | Web root; one subdirectory per module |
-| `library/` | Core business logic |
-| `vue/` | Shared Vue 3 components, composables, mixins |
-| `resources/` | Static assets (icon fonts, etc.) |
-| `templates/` | Default and per-client skins |
-| `tools/` | CLI scripts, daemons, build/maintenance tools |
-| `packages/` | Curriculum package definitions |
-| `test/` | Codeception, Playwright, and Behat test suites |
-| `sql/` | Initial schema; `updates/` for per-release migrations |
-| `docs/` | Developer documentation |
-| `vendor/` | Composer dependencies — do not edit |
-| `node_modules/` | NPM dependencies — do not edit |
+| Directory       | Purpose                                                  |
+|-----------------|----------------------------------------------------------|
+| `conf/`         | Aura MVC module bootstrap / controller config            |
+| `docs/`         | Developer documentation                                  |
+| `debian/`       | APT package build specification                          |
+| `docker/`       | Docker-based development environment build specification |
+| `library/`      | Core business logic                                      |
+| `node_modules/` | NPM dependencies — do not edit                           |
+| `packages/`     | Curriculum and badge package definitions                 |
+| `patches/`      | Hot-patches for Composer packages which require them     |
+| `resources/`    | Static assets (icon fonts, etc.)                         |
+| `sql/`          | Initial schema                                           |
+| `stories/`      | Examples of UI components, written in Storybook          |
+| `templates/`    | Default and per-client skins                             |
+| `test/`         | Codeception and Playwright test suites                   |
+| `tools/`        | CLI scripts, daemons, build/maintenance tools            |
+| `types/`        | Typescript type definitions                              |
+| `updates/`      | Per-release migrations                                   |
+| `vendor/`       | Composer dependencies — do not edit                      |
+| `vue/`          | Shared Vue 3 components, composables, mixins             |
+| `www/`          | Web root; one subdirectory per module                    |
 
 ---
 
 ## Development Commands
 
+### Starting the development environment
+
+At its simplest, the Docker-based development environment can be started with:
+
+```bash
+docker/up
+docker/provision
+```
+
+These scripts wrap around `docker compose`:
+* `docker/up` builds a set of environment variables required for starting the environment, before starting it
+* `docker/provision` loads the initial data set and applies any updates required in `updates/`
+
 ### Frontend
+
+These commands should be run within the Docker environment's CLI:
+```bash
+docker/ssh
+```
 
 ```bash
 npm run build           # dev build (Rspack)
@@ -69,6 +93,11 @@ npm run watch-test      # Jest watch mode
 ```
 
 ### Backend
+
+These commands should be run within the Docker environment's CLI:
+```bash
+docker/ssh
+```
 
 ```bash
 ./vendor/bin/phpcs      # PSR-12 style check
