@@ -23,6 +23,7 @@ import { useFilterParticipants } from "./composable/useFilterParticipants";
 import { useIncludeParticipant } from "./composable/useIncludeParticipant";
 import { useIncludeInExisting } from "./composable/useIncludeInExisting";
 import { usePerformAction } from "./composable/usePerformAction";
+import EmptyState from "@schoolboxVue/components/empty-state.vue";
 
 const props = defineProps<{
     allParticipants: Participant[];
@@ -160,7 +161,7 @@ const { onlyShowDP, customisationFilter, customisationOptions, filteredParticipa
         </div>
 
         <div class="small-12 island">
-            <div class="scrollable">
+            <div v-if="filteredParticipants.length > 0" class="scrollable">
                 <table>
                     <thead>
                         <tr>
@@ -204,20 +205,20 @@ const { onlyShowDP, customisationFilter, customisationOptions, filteredParticipa
                     </tbody>
                 </table>
             </div>
-            <div v-if="filteredParticipants.length === 0" class="empty-state">
-                <i class="icon-group"></i>
+            <empty-state v-else icon="icon-group">
                 <p>
                     No students match the current filters. Try another filter or
-                    <a
-                        href="#"
-                        @click.prevent="
+                    <button
+                        type="button"
+                        @click="
                             customisationFilter = 'all';
                             onlyShowDP = false;
                         "
-                        >show all students</a
+                    >
+                        show all students</button
                     >.
                 </p>
-            </div>
+            </empty-state>
         </div>
         <!-- container for the sbx-pop-out to be displayed in -->
         <div id="pop-out-container"></div>
