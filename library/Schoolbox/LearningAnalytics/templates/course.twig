@@ -306,7 +306,7 @@
 {% if rubrics | length > 0 %}
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">{{ locale.translate('rubricCriterion', true) }}</h2>
+        <h2 class="subheader">{{ locale.rubricCriterion.properPlural }}</h2>
         <section class="content">
             {% include '@learningAnalytics/fragments/rubric_box_plot.twig' with {studentMarksPerCriterion: rubrics, students: students} only %}
         </section>
