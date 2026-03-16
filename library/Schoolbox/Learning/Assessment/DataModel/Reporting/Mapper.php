@@ -102,7 +102,6 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Recursive Undeleter callbacks: deleting a dialog agent also deletes all students' responses and feedbacks
          */
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteResponses']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteFeedbacks']);
     }
 
@@ -404,23 +403,6 @@ class Mapper extends \Schoolbox\Mapper
         $subobject->setDeletedBy(null);
         $this->save($subobject);
     }
-
-
-//    /**
-//     * Soft deletes all responses
-//     *
-//     * @param Model $subobject
-//     * @return void
-//     * @throws Exception
-//     */
-//    public function softDeleteResponses(Model $subobject): void
-//    {
-//        $mapper = $this->getJoinMapper('responses');
-//
-//        $mapper->suppressNotification();
-//        $mapper->deleteByColumn('reporting_id', $subobject->getId());
-//        $mapper->restoreNotification();
-//    }
 
 
     /**
