@@ -2,11 +2,30 @@
  * CKEditor-specific utility functions/helpers for the resource plugins
  */
 
-import type { Editor, Element } from "ckeditor5";
+import type { Editor, Element, Writer } from "ckeditor5";
 import { getWithoutExtension } from "@js/util/fileUtils";
 import { getAttributes, ResourceType } from "@js/resource/resourceUtils";
 import type { Resource } from "@js/resource/resourceUtils";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
+
+/**
+ * Move the caret out of link context so the next insertion does not inherit the previous link.
+ * CKEditor's link feature uses TwoStepCaretMovement for this when users arrow out of a link.
+ * We mirror that behavior after inserting linked inline resources.
+ * @param editor - the ckeditor instance
+ * @param writer - the model writer used for the current change block
+ */
+function exitLinkContext(editor: Editor, writer: Writer): void {
+    const { selection } = editor.model.document;
+    const linkAttributes = Array.from(selection.getAttributeKeys()).filter((attribute) => attribute.startsWith("link"));
+
+    if (editor.plugins.has("TwoStepCaretMovement")) {
+        editor.plugins.get("TwoStepCaretMovement")._handleForwardMovement();
+        return;
+    }
+
+    writer.removeSelectionAttribute(linkAttributes);
+}
 
 /**
  * Add a resource into the editor
@@ -16,9 +35,10 @@ import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 export function addResource(editor: Editor, resource: Resource): void {
     const config = editor.config.get("sbConfig") as SbxEditorConfig;
     const imageUtils = editor.plugins.get("ImageUtils");
+    const resourceAttributes = getAttributes(resource, config.baseHref);
     editor.model.change((writer) => {
         const image = imageUtils.insertImage(
-            getAttributes(resource, config.baseHref),
+            resourceAttributes,
             editor.model.document.selection.getFirstPosition(),
             "imageInline",
         ) as Element;
@@ -26,9 +46,13 @@ export function addResource(editor: Editor, resource: Resource): void {
         if (resource.type === ResourceType.DOCUMENT || resource.type === ResourceType.OTHER) {
             // we get without extension for now to avoid a copy/paste issue in ckeditor
             // pasting with the extension will cause ckeditor to look to embed the file again
-            editor.model.insertContent(
-                writer.createText(`${getWithoutExtension(resource.name)} `, getAttributes(resource, config.baseHref)),
-            );
+            const label = writer.createText(`${getWithoutExtension(resource.name)} `, resourceAttributes);
+            editor.model.insertContent(label);
+            writer.setSelection(label, "after");
+        }
+
+        if ("linkHref" in resourceAttributes) {
+            exitLinkContext(editor, writer);
         }
     });
 }
