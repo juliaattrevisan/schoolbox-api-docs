@@ -256,7 +256,7 @@ export default {
                                         :key="'record-' + String(record.id)"
                                         :class="`pastoral-container ${record.isArchived ? 'faded' : ''}`"
                                     >
-                                        <div class="tiny card small-12">
+                                        <div class="tiny card small-12 wrap-down">
                                             <a
                                                 :href="record._links.read"
                                                 title="View record"
@@ -274,7 +274,7 @@ export default {
                                                 title="View record"
                                                 :class="`record-heading ${record._links.read ? '' : 'disabled'}`"
                                             >
-                                                <h3>
+                                                <h3 class="l-flex l-flex--align-center l-gap-s">
                                                     {{ record.heading }}
                                                     <span
                                                         v-if="record.severity?.color"
