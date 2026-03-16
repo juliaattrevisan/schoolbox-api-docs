@@ -133,8 +133,7 @@ const { onlyShowDP, customisationFilter, customisationOptions, filteredParticipa
         <data-load-error data-title="Student Participation" :further-info="loadError" />
     </div>
     <div>
-        <div class="small-12 island l-mbm">
-            <h2 class="subheader">Filter Students</h2>
+        <div class="small-12 island">
             <section class="content">
                 <div class="small-12 medium-6 large-4 columns">
                     <label for="customisation-type">Customisation Type</label>
@@ -160,7 +159,7 @@ const { onlyShowDP, customisationFilter, customisationOptions, filteredParticipa
             </section>
         </div>
 
-        <div class="small-12 island l-mbm">
+        <div class="small-12 island">
             <div class="scrollable">
                 <table>
                     <thead>
