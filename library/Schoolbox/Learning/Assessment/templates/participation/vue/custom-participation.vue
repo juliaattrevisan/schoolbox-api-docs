@@ -19,6 +19,7 @@ import CpSuggestedCustomisationModal from "./cp-suggested-customisation-modal.vu
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
 import { useGetPastoralFlags } from "./composable/useGetPastoralFlags";
 import { useExcludeParticipant } from "./composable/useExcludeParticipant";
+import { useFilterParticipants } from "./composable/useFilterParticipants";
 import { useIncludeParticipant } from "./composable/useIncludeParticipant";
 import { useIncludeInExisting } from "./composable/useIncludeInExisting";
 import { usePerformAction } from "./composable/usePerformAction";
@@ -123,44 +124,8 @@ function onViewSuggestedCustomisation(participant: Participant): void {
 
 // #endregion AI Suggested Customisation
 
-// Filter to only show students with differentiation profiles
-const onlyShowDP = window.Vue.ref(false);
-
-const filteredParticipants = window.Vue.computed(() => {
-    let participants = allParticipants.value;
-
-    if (onlyShowDP.value) {
-        participants = participants.filter((participant) => participant._links.differentiationProfile);
-    }
-
-    if (customisationFilter.value === "excluded") {
-        participants = participants.filter(
-            (participant) => participant.excludedAt != null && participant.customisedPlan == null,
-        );
-    }
-    if (customisationFilter.value === "none") {
-        participants = participants.filter(
-            (participant) =>
-                participant.excludedAt == null && participant.customisedPlan == null && participant.plan?.name == null,
-        );
-    }
-    if (customisationFilter.value === "new") {
-        participants = participants.filter((participant) => participant.customisedPlan != null);
-    }
-    if (customisationFilter.value === "modified") {
-        participants = participants.filter((participant) => participant.plan?.name != null);
-    }
-
-    return participants;
-});
-const customisationFilter = window.Vue.ref("all");
-const customisationOptions = [
-    { label: "Show All Students", value: "all" },
-    { label: "Excluded", value: "excluded" },
-    { label: "Modified Activity", value: "modified" },
-    { label: "New Activity", value: "new" },
-    { label: "No Customisation", value: "none" },
-];
+const { onlyShowDP, customisationFilter, customisationOptions, filteredParticipants } =
+    useFilterParticipants(allParticipants);
 </script>
 
 <template>
