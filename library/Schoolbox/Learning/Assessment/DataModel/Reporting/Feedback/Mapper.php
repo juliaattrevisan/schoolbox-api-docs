@@ -242,5 +242,4 @@ class Mapper extends \Schoolbox\Mapper
 
         return true;
     }
-
 }

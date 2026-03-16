@@ -17,7 +17,6 @@ use Schoolbox\Learning\Assessment\Reporting\Model;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Mapper\Exception;
 
-
 /**
  * Class Decorator
  *

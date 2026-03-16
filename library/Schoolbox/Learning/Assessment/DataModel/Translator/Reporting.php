@@ -16,7 +16,8 @@ use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
-use Schoolbox\Assessment\Component\SubmissionBox\MarkType; // This is actually a shared concept, so it's not a mistake
+// This is actually a shared concept, so it's not a mistake
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 
 /**
  * Sub-translator for Reporting specific fields.
