@@ -147,6 +147,21 @@ class Helper
         $visibility                  = new Visibility($this->access);
         $workTypeAssessmentsByFolder = new Collection();
 
+        /* This obnoxious set is so annoying to micromanage, but it lets you choose which learning activities get
+         * included in the filtered set. This method is used to fulfil both the Grades page and Summative Reports, which
+         * is an action at a distance, if you wanted different outcomes in both areas.
+         *
+         * TODO Parameterise based on contextual need
+         */
+        $allowedActivities = [
+            Project::class,
+            DueWork::class,
+            Quiz::class,
+            Lti::class,
+            DialogAgent::class,
+            Reporting::class
+        ];
+
         foreach ($assessments as $folderId => $folderAssessments) {
             $workTypeAssessments = new GenericCollection(IAssessable::class);
             foreach ($folderAssessments as $folderAssessment) {
@@ -158,7 +173,7 @@ class Helper
                      * making it appear on Grades page as well. Both places use this method (ugh) with this unholy
                      * set of instanceof checks (double ugh)
                      */
-                    ($folderAssessment instanceof Project || $folderAssessment instanceof DueWork || $folderAssessment instanceof Quiz || $folderAssessment instanceof Lti || $folderAssessment instanceof DialogAgent || $folderAssessment instanceof Reporting) &&
+                    in_array(get_class($folderAssessment), $allowedActivities) &&
                     $folderAssessment->getWorkType() &&
                     \in_array($folderAssessment->getWorkType()->getId(), $workTypes->getPropertyValues('id'), true) &&
                     $visibility->isVisibleToUserOrChildOfUser($folderAssessment, $viewer, true, null, !$this->access->isInstructor($viewer, $folderAssessment->getBaseContext()->getFolder()))
