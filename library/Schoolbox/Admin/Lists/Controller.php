@@ -1122,52 +1122,57 @@ class Controller extends Base
                             ['key' => WorkTypeMapper::VISIBILITY_STAFF_STUDENTS_PARENTS, 'value' => 'Staff, Students & Parents'],
                         ],
                         'nullable'  => false,
-                        'width'     => 3,
+                        'width'     => 2,
                         'tooltip'   => 'Who may see this work type?',
                     ],
                     'permittedActivities' => [
                         'getter'    => 'getPermittedActivities',
                         'caption'   => 'Permitted Activities',
-                        'lookup'    =>
-                        [
-                            [
-                                'key' => AssessmentType::TYPE_PROJECT,
-                                'value' => AssessmentType::stringToReadableName(AssessmentType::TYPE_PROJECT),
-                            ],
-                            [
-                                'key' => AssessmentType::TYPE_DUE_WORK,
-                                'value' => AssessmentType::stringToReadableName(AssessmentType::TYPE_DUE_WORK),
-                            ],
-                            [
-                                'key' => AssessmentType::TYPE_TASK,
-                                'value' => AssessmentType::stringToReadableName(AssessmentType::TYPE_TASK),
-                            ],
-                            [
-                                'key' => AssessmentType::TYPE_QUIZ,
-                                'value' => AssessmentType::stringToReadableName(AssessmentType::TYPE_QUIZ),
-                            ],
-                            [
-                                'key' => AssessmentType::TYPE_LTI_ASSESSMENT,
-                                'value' => AssessmentType::stringToReadableName(AssessmentType::TYPE_LTI_ASSESSMENT),
-                            ],
-                            [
-                                'key' => AssessmentType::TYPE_LESSON_PLAN,
-                                'value' => AssessmentType::stringToReadableName(AssessmentType::TYPE_LESSON_PLAN),
-                            ],
-                            [
-                                'key' => AssessmentType::TYPE_DIALOG_AGENT,
-                                'value' => AssessmentType::stringToReadableName(AssessmentType::TYPE_DIALOG_AGENT),
-                            ],
-                        ],
+                        'isPopOutList' => true,
                         'nullable'  => false,
-                        'width'     => 2,
+                        'width'     => 3,
                         'tooltip'   => 'Which activities are permitted?',
                     ],
                     'externalResultType' => [
                         'caption'   => 'External SIS Type',
                         'width'     => 2,
                         'default'   => '',
-                    ]
+                    ],
+                    'permittedProject' => [
+                        'caption'    => AssessmentType::stringToReadableName(AssessmentType::TYPE_PROJECT),
+                        'checkbox'   => true,
+                        'popOutList' => 'permittedActivities',
+                    ],
+                    'permittedDueWork' => [
+                        'caption'    => AssessmentType::stringToReadableName(AssessmentType::TYPE_DUE_WORK),
+                        'checkbox'   => true,
+                        'popOutList' => 'permittedActivities',
+                    ],
+                    'permittedTask' => [
+                        'caption'    => AssessmentType::stringToReadableName(AssessmentType::TYPE_TASK),
+                        'checkbox'   => true,
+                        'popOutList' => 'permittedActivities',
+                    ],
+                    'permittedQuiz' => [
+                        'caption'    => AssessmentType::stringToReadableName(AssessmentType::TYPE_QUIZ),
+                        'checkbox'   => true,
+                        'popOutList' => 'permittedActivities',
+                    ],
+                    'permittedLti' => [
+                        'caption'    => AssessmentType::stringToReadableName(AssessmentType::TYPE_LTI_ASSESSMENT),
+                        'checkbox'   => true,
+                        'popOutList' => 'permittedActivities',
+                    ],
+                    'permittedLessonPlan' => [
+                        'caption'    => AssessmentType::stringToReadableName(AssessmentType::TYPE_LESSON_PLAN),
+                        'checkbox'   => true,
+                        'popOutList' => 'permittedActivities',
+                    ],
+                    'permittedDialogAgent' => [
+                        'caption'    => AssessmentType::stringToReadableName(AssessmentType::TYPE_DIALOG_AGENT),
+                        'checkbox'   => true,
+                        'popOutList' => 'permittedActivities',
+                    ],
                 ]
             ],
             'submission-errors'     => [
