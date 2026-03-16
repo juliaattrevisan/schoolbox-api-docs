@@ -232,7 +232,7 @@ class Model implements ISoftDeletable, Sequential
         if (null === $this->isVisibleToStudents) {
             throw new InsufficientHydrationException('This WorkType object is not hydrated.');
         }
-        return $this->isVisibleToParents;
+        return $this->isVisibleToStudents;
     }
 
     /**
