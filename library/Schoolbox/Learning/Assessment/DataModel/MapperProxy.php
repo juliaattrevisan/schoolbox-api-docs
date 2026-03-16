@@ -519,7 +519,8 @@ class MapperProxy
                 AND reporting_feedback.published_at IS NOT NULL
 
             ORDER BY assessment_id, user_id, published_at DESC
-        ");
+        "
+        );
         $markQuery->setFetchMode(\PDO::FETCH_ASSOC);
         $markQuery->execute(
             array_merge(
