@@ -3,9 +3,18 @@
  * Scope: UI Uplift
  * Portraits at 48px and below render as circles.
  * Larger portraits inherit the configured field roundness.
+ * Various other images rounded to match the configured field roundness for visual consistency.
  */
 
 body.sbx-body {
+    .card img,
+    .card .card-feature-avatar,
+    .tile,
+    .c-img:not(.c-img--round):has(> .c-img__wrapper > img[src*="/portrait.php?"]) {
+        // All card images inherit the configured field roundness for visual consistency.
+        border-radius: var(--sbx-config-field-roundness);
+    }
+
     .c-img:not(.c-img--round):has(> .c-img__wrapper > img[src*="/portrait.php?"]) {
         .c-img__wrapper {
             // Larger wrapped portraits inherit the configured field roundness.
