@@ -6,9 +6,7 @@ import type { Participant } from "../../js/types/customParticipationTypes";
  * @param participants - Reactive list of participants.
  * @returns onlyShowDP, customisationFilter, customisationOptions, filteredParticipants
  */
-export function useFilterParticipants(
-    participants: Ref<Participant[]>,
-): {
+export function useFilterParticipants(participants: Ref<Participant[]>): {
     onlyShowDP: Ref<boolean>;
     customisationFilter: Ref<string>;
     customisationOptions: { label: string; value: string }[];

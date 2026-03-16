@@ -47,9 +47,8 @@ window.Vue.provide("pastoralRoutes", props.pastoralRoutes);
  * Handle selection of participants via checkboxes
  */
 const allParticipants = window.Vue.ref<Participant[]>(props.allParticipants);
-const { onlyShowDP, customisationFilter, customisationOptions, filteredParticipants } = useFilterParticipants(
-    allParticipants,
-);
+const { onlyShowDP, customisationFilter, customisationOptions, filteredParticipants } =
+    useFilterParticipants(allParticipants);
 const { showCheckboxes, selectedList, allSelected, isIndeterminate } = useSelectedList(filteredParticipants);
 
 /**
