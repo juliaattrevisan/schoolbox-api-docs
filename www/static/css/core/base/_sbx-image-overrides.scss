@@ -27,7 +27,9 @@ body.sbx-body {
     }
 
     img[src*="/portrait.php?"][src*="size=square32"],
-    img[src*="/portrait.php?"][src*="size=square48"] {
+    img[src*="/portrait.php?"][src*="size=square48"],
+    .card.compact img,
+    .threaded .child .card img {
         // Small direct portrait images render as circles at or below 48px.
         border-radius: var(--sbx-border-radius-full);
     }
