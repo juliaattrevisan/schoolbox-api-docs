@@ -340,9 +340,7 @@ test.describe("Unit Planner Tests", () => {
             }
 
             baseTester.isGoingTo(`delete the textbox with ID ${textBoxID}`);
-            await db.dontHaveInDatabase("textbox", {
-                textBoxID,
-            });
+            await db.dontHaveInDatabase("textbox", { id: textBoxID });
 
             baseTester.isGoingTo(`delete the component instance with ID ${textboxComponentInstanceId}`);
             await db.dontHaveInDatabase("component_config_instance", {
