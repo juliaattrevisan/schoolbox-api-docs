@@ -37,10 +37,6 @@ class Decorator implements DecoratorInterface
         private ?int $instructorGradeGroup,
         private ?float $maxMark,
         private ?float $instructorMaxMark,
-        /* These are also defined in the ReportingTrait so they don't have the visibility modifier here
-         * Including that introduces a definition conflict fatal, so we define what this constructor needs, but let the
-         * trait set class props - it feels like weird backdash to do it this older way, but that's php for you
-         */
         ?bool $feedbackCommentsEnable,
         ?bool $supportingDataEnable,
         ?string $supportingDataRange,
@@ -49,6 +45,10 @@ class Decorator implements DecoratorInterface
         ?GenericCollection $supportingDataWorkTypes,
         ?bool $supportingDataMarkbookEnable,
     ) {
+        /* These are also defined in the ReportingTrait so they don't have the visibility modifier here
+         * Including that introduces a definition conflict fatal, so we define what this constructor needs, but let the
+         * trait set class props - it feels like weird backdash to do it this older way, but that's php for you
+         */
         $this->feedbackCommentsEnable = $feedbackCommentsEnable;
         $this->supportingDataEnable = $supportingDataEnable;
         $this->supportingDataRange = $supportingDataRange;
