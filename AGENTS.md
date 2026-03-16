@@ -110,13 +110,12 @@ docker/ssh
 
 ## Testing
 
-| Suite | Tool | Config file |
-|-------|------|-------------|
-| PHP unit | PHPUnit | `phpunit.xml` |
-| Acceptance / integration | Codeception | `codeception.dist.yml` |
-| Behaviour | Behat | `behat.yml` (tests in `test/behavior/`) |
-| JS unit | Jest | `jest.config.js` (happy-dom environment) |
-| E2E browser | Playwright | `playwright.config.ts` |
+| Suite                    | Tool        | Config file                              |
+|--------------------------|-------------|------------------------------------------|
+| PHP unit                 | PHPUnit     | `phpunit.xml`                            |
+| Acceptance / integration | Codeception | `codeception.dist.yml`                   |
+| JS unit                  | Jest        | `jest.config.js` (happy-dom environment) |
+| E2E browser              | Playwright  | `playwright.config.ts`                   |
 
 Run the relevant suite(s) for changed code before marking work done.
 
@@ -140,14 +139,35 @@ Run the relevant suite(s) for changed code before marking work done.
 
 ## Git Conventions
 
+### Base branches
+
+- `master`: current main branch, production versions are based off of this branch
+- `develop`: future development branch, beta versions are based off this branch:
+  - when a new major version is created:
+    - a branch referencing the old major version is created from `master`
+    - the old `master` branch is replaced with a new `master` branch created from `develop`
+
+### Version naming
+
+Schoolbox version numbers are numbered thus:
+```
+{yearOfMajorVersion}.{majorVersionNumberForYear}.{patchVersion}
+```
+
+#### Examples
+
+- `26.0.1` is the 2nd patch for the 1st major version released in 2026 (counting starts from 0)
+- `25.1.0` is the 1st patch for the 2nd major version released in 2025
+
+Note that `{yearOfMajorVersion}` does not always match the current year: the major version could've been released in a previous year.
+
 ### Branch naming
 
 ```
-task-develop/SA-XXXXX     feature work targeting develop
-task-master/SA-XXXXX      feature work targeting master
-bug-develop/SA-XXXXX      bug fix targeting develop
-bug-master/SA-XXXXX       bug fix targeting master
-hotfix-develop/SA-XXXXX   urgent fix
+task-develop/SA-XXXXX           feature work targeting develop
+task-master/SA-XXXXX            feature work targeting master
+{bug,hotfix}-develop/SA-XXXXX   bug fix targeting develop
+{bug,hotfix}-master/SA-XXXXX    bug fix targeting master
 ```
 
 ### Commit format
@@ -158,8 +178,9 @@ Short imperative description [SA-XXXXX]
 
 ### Pull requests
 
-- Default target branch: `develop`
-- Some tickets require two PRs (one for `develop`, one for `master`)
+- Features usually require only a `develop` PR: occasionally they will also require a `master` PR
+  - There's no set rule for whether a feature is to be released to `master`: this will have been determined by stakeholders
+- Bug fixes usually require two PRs (one for `develop`, one for `master`)
 - PRs must be reviewed by a different developer before merge
 
 ---
