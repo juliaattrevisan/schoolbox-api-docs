@@ -11,7 +11,7 @@ export default class ManageGroup {
 
     static readonly UPDATE_BUTTON = "button.button.submit";
 
-    static readonly ELEMENT_SEARCH = "#search-text";
+    static readonly ELEMENT_SEARCH = "#manage-group-search";
 
     static readonly DATA_TEST_MANAGE_GROUP_ADD_MEMBERS = "manage-group-add-members-submit";
 
@@ -75,7 +75,7 @@ export default class ManageGroup {
      * @param userId - The user ID
      */
     async selectUser(userId: number): Promise<void> {
-        await this.page.locator(`label[for=checkbox-${userId}]`).click();
+        await this.page.locator(`label[for=search-select-result-input-${userId}]`).click();
     }
 
     /**

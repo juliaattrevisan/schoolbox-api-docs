@@ -45,7 +45,7 @@ test.describe("Course import tests", () => {
 
         const folderName = `Automation Course Import Folder1`;
         const homepageTemplateOption = "Course";
-        const schoolCode = "test1";
+        const schoolCode = "test2";
         const lessonPlanName = "Export Activity Lesson Plan for Romeo and Juliet";
         const projectName = "Export Activity Project for Romeo and Juliet";
         const dueWorkName = "Export Activity Test Due Work Project";
