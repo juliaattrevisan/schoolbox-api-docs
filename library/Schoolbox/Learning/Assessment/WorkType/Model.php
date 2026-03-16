@@ -203,7 +203,7 @@ class Model implements ISoftDeletable, Sequential
     public function getIsVisibleToParents(): bool
     {
         if (null === $this->isVisibleToParents) {
-            throw new InsufficientHydrationException('Cannot determine visibility from NULL property');
+            throw new InsufficientHydrationException('This WorkType object is not hydrated.');
         }
         return $this->isVisibleToParents;
     }
@@ -223,7 +223,7 @@ class Model implements ISoftDeletable, Sequential
     public function getIsVisibleToStudents(): bool
     {
         if (null === $this->isVisibleToStudents) {
-            throw new InsufficientHydrationException('Cannot determine visibility from NULL property');
+            throw new InsufficientHydrationException('This WorkType object is not hydrated.');
         }
         return $this->isVisibleToParents;
     }
