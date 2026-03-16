@@ -240,9 +240,9 @@ class Model implements ISoftDeletable, Sequential
     /**
      * @return string
      */
-    protected function getVisibility(): string
+    public function getVisibility(): string
     {
-        return match ($this->getIsVisibleToParents() . '-' . $this->getIsVisibleToStudents()) {
+        return match (($this->getIsVisibleToParents() ? 1 : 0) . '-' . ($this->getIsVisibleToStudents() ? 1 : 0)) {
             '0-0' => Mapper::VISIBILITY_STAFF_ONLY,
             '0-1' => Mapper::VISIBILITY_STAFF_STUDENTS,
             '1-0' => Mapper::VISIBILITY_STAFF_PARENTS,
