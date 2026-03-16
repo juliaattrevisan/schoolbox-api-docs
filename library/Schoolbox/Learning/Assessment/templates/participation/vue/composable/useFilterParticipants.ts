@@ -4,12 +4,10 @@ import type { Participant } from "../../js/types/customParticipationTypes";
 /**
  * Composable for filtering participants by customisation state and differentiation profile.
  * @param participants - Reactive list of participants.
- * @param selectedList - Reactive list of selected participants.
  * @returns onlyShowDP, customisationFilter, customisationOptions, filteredParticipants
  */
 export function useFilterParticipants(
     participants: Ref<Participant[]>,
-    selectedList: Ref<Participant[]>,
 ): {
     onlyShowDP: Ref<boolean>;
     customisationFilter: Ref<string>;
@@ -25,12 +23,6 @@ export function useFilterParticipants(
         { label: "New Activity", value: "new" },
         { label: "No Customisation", value: "none" },
     ];
-
-    window.Vue.watch([onlyShowDP, customisationFilter], ([isOnlyShowingDP, currentCustomisationFilter]) => {
-        if (isOnlyShowingDP || currentCustomisationFilter !== "all") {
-            selectedList.value = [];
-        }
-    });
 
     const filteredParticipants = window.Vue.computed(() => {
         let filtered = participants.value;

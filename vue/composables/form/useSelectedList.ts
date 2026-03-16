@@ -13,6 +13,10 @@ export function useSelectedList<T>(items: Ref<T[]>): {
 } {
     const selectedList = window.Vue.ref<T[]>([]) as Ref<T[]>; // currently selected items (checkboxes in the list)
 
+    window.Vue.watch(items, (currentItems) => {
+        selectedList.value = selectedList.value.filter((item) => currentItems.includes(item));
+    });
+
     /**
      * Show checkboxes if there are more than one item
      */

@@ -47,7 +47,10 @@ window.Vue.provide("pastoralRoutes", props.pastoralRoutes);
  * Handle selection of participants via checkboxes
  */
 const allParticipants = window.Vue.ref<Participant[]>(props.allParticipants);
-const { selectedList } = useSelectedList(allParticipants);
+const { onlyShowDP, customisationFilter, customisationOptions, filteredParticipants } = useFilterParticipants(
+    allParticipants,
+);
+const { showCheckboxes, selectedList, allSelected, isIndeterminate } = useSelectedList(filteredParticipants);
 
 /**
  * We only want to show the column on certain assessment types and when differentiation and AI features are enabled
@@ -124,24 +127,6 @@ function onViewSuggestedCustomisation(participant: Participant): void {
 }
 
 // #endregion AI Suggested Customisation
-
-const { onlyShowDP, customisationFilter, customisationOptions, filteredParticipants } = useFilterParticipants(
-    allParticipants,
-    selectedList,
-);
-
-const showCheckboxes = window.Vue.computed(() => filteredParticipants.value.length > 1);
-
-const allSelected = window.Vue.computed({
-    get: () => filteredParticipants.value.every((participant) => selectedList.value.includes(participant)),
-    set: (value: boolean) => {
-        selectedList.value = value ? [...filteredParticipants.value] : [];
-    },
-});
-
-const isIndeterminate = window.Vue.computed(() => {
-    return selectedList.value.length > 0 && selectedList.value.length < filteredParticipants.value.length;
-});
 </script>
 
 <template>
