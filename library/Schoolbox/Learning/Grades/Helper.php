@@ -153,10 +153,12 @@ class Helper
                 if (
                     /* Filters swamp - only allow worktypes that show on the grades page (check Work Types in admin)
                      *
-                     * Note that Reporting Activity -does not- show up on the grades page atm: if it is meant to show
-                     * there, add another instanceof check below, for reporting activities (ugh)
+                     * filterAssessments() turns out to be deeply coupled between the Grades page and the Summative
+                     * Report, meaning that if you want Reporting to appear in Summative, you'll be inadvertently
+                     * making it appear on Grades page as well. Both places use this method (ugh) with this unholy
+                     * set of instanceof checks (double ugh)
                      */
-                    ($folderAssessment instanceof Project || $folderAssessment instanceof DueWork || $folderAssessment instanceof Quiz || $folderAssessment instanceof Lti || $folderAssessment instanceof DialogAgent) &&
+                    ($folderAssessment instanceof Project || $folderAssessment instanceof DueWork || $folderAssessment instanceof Quiz || $folderAssessment instanceof Lti || $folderAssessment instanceof DialogAgent || $folderAssessment instanceof Reporting) &&
                     $folderAssessment->getWorkType() &&
                     \in_array($folderAssessment->getWorkType()->getId(), $workTypes->getPropertyValues('id'), true) &&
                     $visibility->isVisibleToUserOrChildOfUser($folderAssessment, $viewer, true, null, !$this->access->isInstructor($viewer, $folderAssessment->getBaseContext()->getFolder()))
