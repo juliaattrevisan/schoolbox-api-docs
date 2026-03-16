@@ -150,7 +150,7 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
     height: 80px;
     width: 80px;
     &:hover {
-        // prevent the default var(--content-ui-hover); on buttons being applied
+        // prevent the default var(--sbx-config-color-active, var(--content-ui-hover)); on buttons being applied
         background-color: transparent;
     }
 }

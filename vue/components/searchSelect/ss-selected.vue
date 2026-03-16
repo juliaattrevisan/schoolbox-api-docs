@@ -137,6 +137,7 @@ if (props.forFilterPanel) {
 <style lang="scss" scoped>
 .selected {
     border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
+    border-radius: var(--sbx-config-field-roundness, 0px);
     margin-bottom: -1px; //to butt up against the search input
     max-height: 133px;
     min-height: 50px;

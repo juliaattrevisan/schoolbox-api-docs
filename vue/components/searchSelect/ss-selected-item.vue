@@ -74,9 +74,9 @@ function onRemoveSelected(): void {
 
 <style lang="scss" scoped>
 .selected-item {
-    background: var(--body-background);
-    color: #000;
-    font-size: 0.8125rem;
+    background: var(--sbx-config-color-active, var(--body-background));
+    color: var(--sbx-color-text-primary, #000);
+    font-size: var(--sbx-font-size-xs, 0.8125rem);
     min-height: auto;
     overflow: hidden;
     text-align: left;

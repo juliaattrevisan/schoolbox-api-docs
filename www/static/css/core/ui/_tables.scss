@@ -426,7 +426,7 @@ $rotate-span-width: 11rem;
             cursor: pointer;
 
             &:hover {
-                background-color: var(--content-ui-hover);
+                background-color: var(--sbx-config-color-active, var(--content-ui-hover));
             }
         }
 

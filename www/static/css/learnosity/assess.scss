@@ -18,7 +18,7 @@
 /* general button on hover */
 .lrn.lrn-assess .lrn-region:not(.lrn-items-region) .lrn_btn:hover:not(:disabled),
 .lrn.lrn-assess .dialogs .lrn_btn:hover:not(:disabled) {
-    background-color: var(--content-ui-hover);
+    background-color: var(--sbx-config-color-active, var(--content-ui-hover));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 

@@ -90,8 +90,13 @@ export default {
     methods: {
         /**
          * Update the selected student list with the selected or unselected student
+         * @param {Event} event - the click event
          */
-        onStudentSelected() {
+        onStudentSelected(event) {
+            // Ignore label clicks as they naturally trigger the checkbox
+            if (event && event.target && event.target.nodeName === "LABEL") {
+                return;
+            }
             this.$emit("student-selected", this.student);
         },
 
@@ -117,13 +122,13 @@ export default {
 </script>
 
 <template>
-    <div :class="`student ${hasQrCode ? 'has-qr-code' : 'no-qr-code'}`" @click="onStudentSelected()">
+    <div :class="`student ${hasQrCode ? 'has-qr-code' : 'no-qr-code'}`" @click="onStudentSelected">
         <div class="student__checkbox">
             <input
                 type="checkbox"
                 :id="`selectStudent-${student.id}`"
                 :checked="isInSelectedStudents"
-                @change="onStudentSelected()"
+                @click.stop="onStudentSelected"
             />
             <label :for="`selectStudent-${student.id}`" class="checkbox-label"></label>
         </div>
@@ -145,7 +150,8 @@ export default {
 <style lang="scss" scoped>
 .student {
     border: 1px solid var(--sbx-config-color-accent, var(--form-border-color));
-    padding: 1rem;
+    border-radius: var(--sbx-config-field-roundness, 0px);
+    padding: var(--sbx-size-m, 1rem);
     transition: background-color 0.3s; //shows that the student can be selected to toggle selection status
     width: calc(v-bind(qrCodeSizeWithPx) + 2rem); //the width of the qr code plus 1rem padding left and right
     &:hover {

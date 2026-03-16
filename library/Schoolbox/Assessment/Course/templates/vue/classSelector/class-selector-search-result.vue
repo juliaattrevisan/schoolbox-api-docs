@@ -57,16 +57,21 @@ const isChecked = window.Vue.computed(() => {
 
 /**
  * dispatch to parent so can move to relevant settings page
+ * @param {Event} event - the click event
  */
-function onSelect() {
+function onSelect(event) {
+    // Ignore label clicks as they naturally trigger the checkbox
+    if (event && event.target && event.target.nodeName === "LABEL") {
+        return;
+    }
     emit("select", props.result);
 }
 </script>
 
 <template>
-    <button class="search-result" @click.prevent="onSelect">
+    <button class="search-result" type="button" @click="onSelect">
         <div class="checklist">
-            <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isChecked" />
+            <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isChecked" @click.stop="onSelect" />
             <label :for="`checkbox-${result.id}`"></label>
         </div>
         <show-matches tag="span" :text="props.result.name" :query="props.query" />
@@ -84,7 +89,7 @@ function onSelect() {
     transition: background 0.2s;
     width: 100%;
     &:hover {
-        background: var(--content-ui-hover);
+        background: var(--sbx-config-color-active, var(--content-ui-hover));
     }
 }
 

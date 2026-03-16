@@ -59,20 +59,26 @@ const isChecked = window.Vue.computed(() => (isAllResultsSelected.value ? true :
 
 /**
  * toggle all depending on current check status
+ * @param {Event} event - the click event
  */
-function onSelectAll() {
+function onSelectAll(event) {
+    // Ignore label clicks as they naturally trigger the checkbox
+    if (event && event.target && event.target.nodeName === "LABEL") {
+        return;
+    }
     isChecked.value ? searchStore.removeAllResults() : searchStore.addAllResults();
 }
 </script>
 
 <template>
-    <button class="search-result" @click.prevent="onSelectAll">
+    <button class="search-result" type="button" @click="onSelectAll">
         <div class="checklist">
             <input
                 id="checkbox-select-all"
                 type="checkbox"
                 :checked="isChecked"
                 :class="{ indeterminate: isSomeResultsSelected }"
+                @click.stop="onSelectAll"
             />
             <label for="checkbox-select-all"></label>
         </div>
@@ -91,7 +97,7 @@ function onSelectAll() {
     transition: background 0.2s;
     width: 100%;
     &:hover {
-        background: var(--content-ui-hover);
+        background: var(--sbx-config-color-active, var(--content-ui-hover));
     }
 }
 

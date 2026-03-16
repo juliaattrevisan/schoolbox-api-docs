@@ -62,8 +62,16 @@ const isNodeSelected = window.Vue.computed(() => {
 /**
  * To determine the display of the checkbox based on whether
  * the node is currently selected
+ * @param {Event} event - the click event
  */
-function onSelected() {
+function onSelected(event) {
+    if (!event || !event.target) {
+        return;
+    }
+    // ignore input label and mark clicks, which get picked up due to the click listener on the parent div
+    if (event.target.nodeName === "LABEL" || event.target.nodeName === "MARK") {
+        return;
+    }
     if (props.isSingleSelect) {
         selectedNodesStore.addSingle(props.result);
     } else {
@@ -73,10 +81,22 @@ function onSelected() {
 </script>
 
 <template>
-    <button class="search-result" :title="title" @click.prevent="onSelected">
+    <button class="search-result" type="button" :title="title" @click="onSelected">
         <div class="checklist">
-            <input v-if="props.isSingleSelect" :id="`checkbox-${result.id}`" type="radio" :checked="isNodeSelected" />
-            <input v-else :id="`checkbox-${result.id}`" type="checkbox" :checked="isNodeSelected" />
+            <input
+                v-if="props.isSingleSelect"
+                :id="`checkbox-${result.id}`"
+                type="radio"
+                :checked="isNodeSelected"
+                @click.stop="onSelected"
+            />
+            <input
+                v-else
+                :id="`checkbox-${result.id}`"
+                type="checkbox"
+                :checked="isNodeSelected"
+                @click.stop="onSelected"
+            />
             <label :for="`checkbox-${result.id}`"></label>
         </div>
         <div>
@@ -96,7 +116,7 @@ function onSelected() {
     transition: background 0.2s;
     width: 100%;
     &:hover {
-        background: var(--content-ui-hover);
+        background: var(--sbx-config-color-active, var(--content-ui-hover));
     }
 }
 

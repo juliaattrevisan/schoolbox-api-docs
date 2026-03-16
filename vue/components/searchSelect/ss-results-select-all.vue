@@ -135,7 +135,7 @@ const { isActive } = useActiveIndex(
         border-bottom: none;
     }
     &--active {
-        background: var(--content-ui-hover);
+        background: var(--sbx-config-color-active, var(--content-ui-hover));
     }
 }
 

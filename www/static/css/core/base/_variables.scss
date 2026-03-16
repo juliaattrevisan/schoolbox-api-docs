@@ -17,7 +17,10 @@ $off-canvas-hover: var(--sbx-config-color-menu-hover, var(--off-canvas-hover)) !
 
 $content-ui-foreground: var(--sbx-config-color-accent, var(--content-ui-foreground)) !default;
 $content-ui-background: var(--sbx-config-color-active, var(--content-ui-background)) !default;
-$content-ui-hover: var(--sbx-color-foreground-primary, var(--content-ui-hover)) !default;
+$content-ui-hover: var(
+    --sbx-color-foreground-primary,
+    var(--sbx-config-color-active, var(--content-ui-hover))
+) !default;
 $content-ui-selected: var(--sbx-config-color-active, var(--content-ui-selected)) !default;
 
 $content-ui-submit-foreground: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground)) !default;

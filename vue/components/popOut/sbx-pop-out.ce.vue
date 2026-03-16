@@ -153,7 +153,7 @@ window.Vue.onMounted(() => {
 
 .sbx-button:hover:not([disabled]),
 .sbx-button:active:not([disabled]) {
-    background-color: var(--content-ui-hover);
+    background-color: var(--sbx-config-color-active, var(--content-ui-hover));
 }
 
 .sbx-button:focus:not([disabled]) {
@@ -199,7 +199,7 @@ window.Vue.onMounted(() => {
 }
 
 .sbx-button--component-action:hover {
-    background-color: var(--content-ui-hover);
+    background-color: var(--sbx-config-color-active, var(--content-ui-hover));
 }
 
 .sbx-button--component-action:disabled:hover,

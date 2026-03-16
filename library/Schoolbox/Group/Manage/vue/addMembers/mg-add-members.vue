@@ -11,7 +11,6 @@ import { useStore } from "../store/manageGroupStore";
 import { useAddMembersStore } from "../store/mgAddMembersStore";
 import { useSearchStore } from "../store/mgSearchStore";
 import FromTypes from "./mgAddMembersFromTypes";
-import MgSelectedSearchResults from "./mg-selected-search-results.vue";
 import MgSearch from "./mg-search.vue";
 
 const store = useStore();
@@ -117,8 +116,7 @@ const addButtonText = window.Vue.computed(() => (addMembersStore.isProcessing ? 
                             </ul>
                         </div>
                     </div>
-                    <mg-selected-search-results />
-                    <MgSearch />
+                    <mg-search />
                     <p class="meta">{{ inputDetails }}</p>
                     <button
                         class="button submit"
@@ -137,44 +135,6 @@ const addButtonText = window.Vue.computed(() => (addMembersStore.isProcessing ? 
 </template>
 
 <style lang="scss" scoped>
-// .filters {
-//     background: var(--sbx-color-foreground-primary, #fff);
-//     display: flex;
-//     padding: 0.5rem 0 0 0;
-// }
-
-// .title {
-//     display: inline-block; //line up along the bottom of the search field input
-// }
-
-// .title,
-// label {
-//     font-size: 0.8125rem;
-// }
-
-// .title {
-//     margin-bottom: 0.5rem;
-//     margin-right: 1rem;
-// }
-
-// .title,
-// .option-list {
-//     @media (max-width: 700px) {
-//         //shift things down now as horizontal space is getting tight
-//         display: block;
-//     }
-// }
-
-// .option-list li {
-//     margin-right: 2rem;
-//     @media (max-width: 700px) {
-//         //break the list down into 2 columns to display better on mobile
-//         display: inline-block;
-//         margin-right: 0;
-//         min-width: 110px; //takes us all the way down to 320px devices
-//     }
-// }
-
 .meta {
     margin: 0.25rem 0 1rem 0;
 }
