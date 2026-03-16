@@ -10,8 +10,8 @@ body.sbx-body {
     .card img,
     .card .card-feature-avatar,
     .tile,
-    img[src*="/portrait.php?"],
-    .c-img:not(.c-img--round):has(> .c-img__wrapper > img[src*="/portrait.php?"]) {
+    .banner img,
+    img[src*="/portrait.php?"] {
         // All images inherit the configured field roundness for visual consistency.
         border-radius: var(--sbx-config-field-roundness);
     }
@@ -34,7 +34,8 @@ body.sbx-body {
     img[src*="/portrait.php?"][src*="size=square32"],
     img[src*="/portrait.php?"][src*="size=square48"],
     .card.compact img,
-    .threaded .child .card img {
+    .threaded .child .card img,
+    .tiny.card img {
         // Small direct portrait images render as circles at or below 48px.
         border-radius: var(--sbx-border-radius-full);
     }

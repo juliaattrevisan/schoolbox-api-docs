@@ -99,13 +99,6 @@ body.sbx-body {
     }
 
     /**
-     * Secondary button active state, just make it bold
-     */
-    .sub-nav li.active a {
-        font-weight: bold;
-    }
-
-    /**
      * Make some buttons smaller for better visual hierarchy, can be considered 'tertiary' buttons
      * currently only used for the 'View more' buttons in Unit planner/ Manage DP page
      */
@@ -117,8 +110,16 @@ body.sbx-body {
      * A horizontal list of buttons, adding some gap between them
      */
     .sub-nav {
+        display: flex;
         flex-wrap: wrap;
         gap: var(--sbx-size-xs);
+    }
+
+    /**
+     * Secondary button active state, just make it bold
+     */
+    .sub-nav li.active a {
+        font-weight: bold;
     }
 
     /**

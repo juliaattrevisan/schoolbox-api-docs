@@ -412,7 +412,6 @@ input[type="radio"]:not(.plain) + label.input-toggle {
                     padding: 0.75rem;
 
                     img {
-                        transform: scale(0.85);
                         float: none;
                         margin: 0;
                     }
