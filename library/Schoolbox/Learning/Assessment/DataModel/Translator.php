@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
 use Schoolbox\Learning\Assessment\DataModel\Translator\IAssessmentTypeTranslator;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -458,6 +459,21 @@ class Translator
                 $domainObject->setInstructorMarkScheme($instructorMarkScheme);
             }
         }
+
+        /* Reporting activities have both instructor- and display representations
+         */
+        if ($domainObject instanceof Reporting) {
+            /** @var Reporting $dataModel */
+            $domainObject->setInstructorMarkType($dataModel->getInstructorMarkType());
+            $domainObject->setInstructorMaxMark($dataModel->getInstructorMaxMark());
+            $domainObject->setInstructorGradeGroup($dataModel->getInstructorGradeGroup());
+
+            $instructorMarkScheme = $this->markSchemeFactory->spawnInstructorMarkSchemeFor($domainObject);
+            if ($instructorMarkScheme !== null) {
+                $domainObject->setInstructorMarkScheme($instructorMarkScheme);
+            }
+        }
+
         if ($assessmentModel->getCurriculumNodes() !== null) {
             $domainObject->setCurriculumNodes($assessmentModel->getCurriculumNodes());
         }

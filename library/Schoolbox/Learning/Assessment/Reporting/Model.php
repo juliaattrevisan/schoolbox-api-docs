@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Learning\Assessment\Reporting\Decorator\ReportingTrait;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
@@ -285,13 +286,14 @@ class Model extends AbstractAssessment
      * Copy implementation back to assessment along with any activity-specific fields beyond the ones
      * already pre-defined in AbstractAssessment's overwrite()
      */
-    public function overwrite(IAssessable $source): IAssessable
+    public function overwrite(IAssessable|Reporting $source): IAssessable
     {
         parent::overwrite($source);
 
-        /* TODO Implement clone with Reporting-specific fields
-         */
-//        $this->setInstructorMaxMark()
+        $this->setInstructorMaxMark($source->getInstructorMaxMark());
+        $this->setInstructorMarkType($source->getInstructorMarkType());
+        $this->setInstructorGradeGroup($source->getInstructorGradeGroup());
+        $this->setInstructorMarkScheme($source->getInstructorMarkScheme());
 
         return $this;
     }
