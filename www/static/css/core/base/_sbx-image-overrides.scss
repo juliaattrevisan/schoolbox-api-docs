@@ -1,0 +1,34 @@
+/**
+ * Image overrides for Storybook UI Uplift
+ * Scope: UI Uplift
+ * Portraits at 48px and below render as circles.
+ * Larger portraits inherit the configured field roundness.
+ */
+
+body.sbx-body {
+    .c-img:not(.c-img--round):has(> .c-img__wrapper > img[src*="/portrait.php?"]) {
+        .c-img__wrapper {
+            // Larger wrapped portraits inherit the configured field roundness.
+            border-radius: var(--sbx-config-field-roundness);
+        }
+    }
+
+    .c-img:not(.c-img--round):has(> .c-img__wrapper > img[src*="/portrait.php?"][src*="size=square32"]),
+    .c-img:not(.c-img--round):has(> .c-img__wrapper > img[src*="/portrait.php?"][src*="size=square48"]) {
+        .c-img__wrapper {
+            // Small wrapped portraits render as circles at or below 48px.
+            border-radius: var(--sbx-border-radius-full);
+        }
+    }
+
+    img[src*="/portrait.php?"] {
+        // Larger direct portrait images inherit the configured field roundness.
+        border-radius: var(--sbx-config-field-roundness);
+    }
+
+    img[src*="/portrait.php?"][src*="size=square32"],
+    img[src*="/portrait.php?"][src*="size=square48"] {
+        // Small direct portrait images render as circles at or below 48px.
+        border-radius: var(--sbx-border-radius-full);
+    }
+}
