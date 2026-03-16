@@ -835,6 +835,13 @@ class Connector implements IConnector
                 'show_help'              => $showHelp,
                 'show_menu'              => $showMenu,
                 'enable_annotation_bank' => $editable,
+                'tool_visibility' => [
+                    /* this controls the visibility of the 'Understand' tab in the kami,
+                     * while kami comes up with solution for BYO LLM integration, we will keep it as hidden for now
+                     * TODO: once KAMI has a solution for BYO LLM integration, we should make this configurable in schoolbox and remove the hardcoding here
+                     */
+                    'dictionary' => false,
+                ]
             ],
             'editable'       => $editable,
         ];
