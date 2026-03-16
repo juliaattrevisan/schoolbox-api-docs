@@ -260,6 +260,35 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
+     * @param string $visibility
+     * @return self
+     */
+    public function setVisibility(string $visibility): self
+    {
+        switch ($visibility) {
+            case Mapper::VISIBILITY_STAFF_ONLY:
+                $this->isVisibleToStudents = false;
+                $this->isVisibleToParents = false;
+                break;
+            case Mapper::VISIBILITY_STAFF_STUDENTS:
+                $this->isVisibleToStudents = true;
+                $this->isVisibleToParents = false;
+                break;
+            case Mapper::VISIBILITY_STAFF_PARENTS:
+                $this->isVisibleToStudents = false;
+                $this->isVisibleToParents = true;
+                break;
+            case Mapper::VISIBILITY_STAFF_STUDENTS_PARENTS:
+                $this->isVisibleToStudents = true;
+                $this->isVisibleToParents = true;
+                break;
+            default:
+                throw new \UnexpectedValueException('Unknown visibility: ' . $visibility);
+        }
+        return $this;
+    }
+
+    /**
      * @return bool
      */
     public function getPermittedProject(): bool
