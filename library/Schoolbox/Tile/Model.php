@@ -320,6 +320,24 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
+     * Get the link for this tile formatted for usage in an href
+     * Local URLs will always attempt to be relative, otherwise a base64 encoded URL via redir.php will be used
+     * in order to avoid possible XSS attacks if users add javascript: at the start.
+     *
+     * @return string
+     */
+    public function getHref()
+    {
+        $url = new \Url($this->getLink());
+
+        if ($url->isLocalUrl()) {
+            return $url->getRelativeURL();
+        }
+
+        return $url->getBase64EncodedRedirect();
+    }
+
+    /**
      * @return string
      */
     public function getLinkTarget()
