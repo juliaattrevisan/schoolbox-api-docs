@@ -55,6 +55,12 @@ class Model implements ISoftDeletable, Sequential
     /** @var bool */
     private $staffOrInstructorVisibleOnly;
 
+    /** @var bool */
+    private ?bool $isVisibleToParents = null;
+
+    /** @var bool */
+    private ?bool $isVisibleToStudents = null;
+
     /**
      * @return bool
      */
@@ -174,5 +180,59 @@ class Model implements ISoftDeletable, Sequential
     {
         $this->staffOrInstructorVisibleOnly = $staffOrInstructorVisibleOnly;
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsVisibleToParents(): bool
+    {
+        if (null === $this->isVisibleToParents) {
+            throw new InsufficientHydrationException('Cannot determine visibility from NULL property');
+        }
+        return $this->isVisibleToParents;
+    }
+
+    /**
+     * @param bool $isVisibleToParents
+     * @return bool
+     */
+    public function setIsVisibleToParents(bool $isVisibleToParents): bool
+    {
+        return $this->isVisibleToParents = $isVisibleToParents;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsVisibleToStudents(): bool
+    {
+        if (null === $this->isVisibleToStudents) {
+            throw new InsufficientHydrationException('Cannot determine visibility from NULL property');
+        }
+        return $this->isVisibleToParents;
+    }
+
+    /**
+     * @param bool $isVisibleToStudents
+     * @return bool
+     */
+    public function setIsVisibleToStudents(bool $isVisibleToStudents): bool
+    {
+        return $this->isVisibleToStudents = $isVisibleToStudents;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getVisibility(): string
+    {
+        return match ($this->getIsVisibleToParents() . '-' . $this->getIsVisibleToStudents()) {
+            '0-0' => Mapper::VISIBILITY_STAFF_ONLY,
+            '0-1' => Mapper::VISIBILITY_STAFF_STUDENT,
+            '1-0' => Mapper::VISIBILITY_STAFF_PARENTS,
+            '1-1' => Mapper::VISIBILITY_STAFF_STUDENTS_PARENTS,
+            default => throw new \LogicException('Impossible case.'),
+        };
     }
 }
