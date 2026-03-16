@@ -105,6 +105,14 @@
 
     {% set divisor = 4 %}
 {% elseif assessment is reporting %}
+    {# Reporting activities get special scary names #}
+    {% set dates = [
+        { 'type': 'publish', 'label': 'Start' },
+        null,
+        { 'type': 'due', 'label': 'Deadline' },
+        null
+    ] %}
+
     {# These are actually the same as the defaults: we enforce publish == open and close == due, elsewhere #}
     {% set divisor = 6 %}
 {% endif %}

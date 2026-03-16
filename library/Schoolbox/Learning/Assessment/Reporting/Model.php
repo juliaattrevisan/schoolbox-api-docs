@@ -289,6 +289,10 @@ class Model extends AbstractAssessment
     {
         parent::overwrite($source);
 
+        /* TODO Implement clone with Reporting-specific fields
+         */
+//        $this->setInstructorMaxMark()
+
         return $this;
     }
 
