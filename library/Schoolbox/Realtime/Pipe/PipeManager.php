@@ -297,7 +297,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         if (preg_match('`fwrite\(\): send of (\d+) bytes failed with errno=(\d+) (.+)`i', $e->getMessage(), $matches)) {
             $this->log->warning(
                 sprintf(
-                    'IOException: %s [%d] (%d bytes dropped) ("%s": "%s" occurred in %s on line %s)',
+                    'IOException: %s [%d] (%d bytes dropped) ("%s": "%s" occurred in %s on line %d)',
                     $matches[3],
                     $matches[2],
                     $matches[1],
@@ -310,7 +310,13 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             );
         } else {
             $this->log->critical(
-                sprintf('%s: "%s" occurred in %s on line %s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()),
+                sprintf(
+                    '%s: "%s" occurred in %s on line %d',
+                    get_class($e),
+                    $e->getMessage(),
+                    $e->getFile(),
+                    $e->getLine(),
+                ),
                 ['exception' => $e],
             );
         }
