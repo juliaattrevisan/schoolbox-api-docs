@@ -29,6 +29,7 @@ use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Moment\Tag\Mapper as LearningMomentEvidenceTag;
@@ -1127,14 +1128,36 @@ class Controller extends Base
                     'permittedActivities' => [
                         'getter'    => 'getPermittedActivities',
                         'caption'   => 'Permitted Activities',
-                        'lookup'    => [
-                            ['key' => 'project', 'value' => 'Project'],
-                            ['key' => 'dueWork', 'value' => 'Due Work'],
-                            ['key' => 'task', 'value' => 'Task'],
-                            ['key' => 'quiz', 'value' => 'Quiz'],
-                            ['key' => '3rdPartyAssessment', 'value' => '3rd Party Assessment'],
-                            ['key' => 'lessonPlan', 'value' => 'Lesson Plan'],
-                            ['key' => 'discussion', 'value' => 'Discussion'],
+                        'lookup'    =>
+                        [
+                            [
+                                'key' => AssessmentType::TYPE_PROJECT,
+                                'value' => AssessmentType::stringToReadableName(AssessmentType::TYPE_PROJECT),
+                            ],
+                            [
+                                'key' => AssessmentType::TYPE_DUE_WORK,
+                                'value' => AssessmentType::stringToReadableName(AssessmentType::TYPE_DUE_WORK),
+                            ],
+                            [
+                                'key' => AssessmentType::TYPE_TASK,
+                                'value' => AssessmentType::stringToReadableName(AssessmentType::TYPE_TASK),
+                            ],
+                            [
+                                'key' => AssessmentType::TYPE_QUIZ,
+                                'value' => AssessmentType::stringToReadableName(AssessmentType::TYPE_QUIZ),
+                            ],
+                            [
+                                'key' => AssessmentType::TYPE_LTI_ASSESSMENT,
+                                'value' => AssessmentType::stringToReadableName(AssessmentType::TYPE_LTI_ASSESSMENT),
+                            ],
+                            [
+                                'key' => AssessmentType::TYPE_LESSON_PLAN,
+                                'value' => AssessmentType::stringToReadableName(AssessmentType::TYPE_LESSON_PLAN),
+                            ],
+                            [
+                                'key' => AssessmentType::TYPE_DIALOG_AGENT,
+                                'value' => AssessmentType::stringToReadableName(AssessmentType::TYPE_DIALOG_AGENT),
+                            ],
                         ],
                         'nullable'  => false,
                         'width'     => 2,
