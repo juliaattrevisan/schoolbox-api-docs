@@ -217,11 +217,12 @@ class Model implements ISoftDeletable, Sequential
 
     /**
      * @param bool $isVisibleToParents
-     * @return bool
+     * @return self
      */
-    public function setIsVisibleToParents(bool $isVisibleToParents): bool
+    public function setIsVisibleToParents(bool $isVisibleToParents): self
     {
-        return $this->isVisibleToParents = $isVisibleToParents;
+        $this->isVisibleToParents = $isVisibleToParents;
+        return $this;
     }
 
     /**
@@ -237,11 +238,12 @@ class Model implements ISoftDeletable, Sequential
 
     /**
      * @param bool $isVisibleToStudents
-     * @return bool
+     * @return self
      */
-    public function setIsVisibleToStudents(bool $isVisibleToStudents): bool
+    public function setIsVisibleToStudents(bool $isVisibleToStudents): self
     {
-        return $this->isVisibleToStudents = $isVisibleToStudents;
+        $this->isVisibleToStudents = $isVisibleToStudents;
+        return $this;
     }
 
     /**
