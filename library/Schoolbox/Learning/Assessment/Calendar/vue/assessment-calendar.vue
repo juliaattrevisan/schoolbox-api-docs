@@ -142,7 +142,7 @@ export default {
                      * actually looking at when you see this displayed horizontally across multiple years.
                      */
                     if ('Jan' === val) {
-                      val += ' ' + dayjs(date.date.array).format("YYYY")
+                        val += ' ' + dayjs(date.date.array).format("YYYY");
                     }
 
                     return val;
