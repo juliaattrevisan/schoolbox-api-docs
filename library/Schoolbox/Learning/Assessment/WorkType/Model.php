@@ -63,18 +63,25 @@ class Model implements ISoftDeletable, Sequential
 
     /** @var ?bool */
     private ?bool $permittedProject = null;
+
     /** @var ?bool */
     private ?bool $permittedDueWork = null;
+
     /** @var ?bool */
     private ?bool $permittedTask = null;
+
     /** @var ?bool */
-    private ?bool $permittedQuiz= null;
+    private ?bool $permittedQuiz = null;
+
     /** @var ?bool */
-    private ?bool $permittedLti= null;
+    private ?bool $permittedLti = null;
+
     /** @var ?bool */
     private ?bool $permittedLessonPlan = null;
+
     /** @var ?bool */
     private ?bool $permittedDialogAgent = null;
+
 
     /**
      * @return bool
