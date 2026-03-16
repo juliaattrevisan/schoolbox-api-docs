@@ -566,7 +566,8 @@ class Controller extends Base
                     continue;
                 }
 
-                if ($model->$getter() !== $value[$currentIndex]) {
+                // If $model is a new record, or the value of $field has changed...
+                if ($oldModel === null || $model->$getter() !== $value[$currentIndex]) {
                     // Update values
                     $setter = $mapper->getSetMethodName($field);
                     if (!method_exists($model, $setter)) {
