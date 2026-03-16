@@ -146,7 +146,7 @@ body.sbx-body {
     }
 
     // Keep checkbox buttons hidden within rubrics, as the label is what's used to trigger the checkbox selection, and the checkbox itself is not needed visually
-    .rb input[type="checkbox"] {
+    .rb input[type="checkbox"]:not([data-criterion-name]) {
         display: none;
     }
 

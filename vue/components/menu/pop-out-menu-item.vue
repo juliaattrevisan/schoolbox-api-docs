@@ -93,7 +93,7 @@ a.c-menu-item,
 button.c-menu-item {
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     &:hover:not(.is-disabled) {
-        background-color: var(--content-ui-background);
+        background-color: var(--sbx-config-color-active, var(--content-ui-background));
     }
 }
 </style>

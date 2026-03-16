@@ -506,7 +506,7 @@
 
         a {
             align-self: center;
-            font-size: rem-calc(($base-font-size - 3));
+            font-size: var(--sbx-font-size-s, rem-calc(($base-font-size - 3)));
             text-transform: uppercase;
         }
         [class^="icon-"],

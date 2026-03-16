@@ -235,9 +235,9 @@ $alert-default-background: css-darken($body-bg, 10%);
 // Toast pop-up alert...
 // A less obnoxious pop-up alert
 .toast {
-    background-color: var(--sbx-color-foreground-primary, $tuatara);
+    background-color: var(--sbx-color-text-primary, $tuatara);
     bottom: 1rem;
-    color: var(--sbx-color-text-primary, $white);
+    color: var(--sbx-color-foreground-primary, $white);
     display: block;
     font-size: $base-font-size - 2;
     opacity: 0;
@@ -258,7 +258,7 @@ $alert-default-background: css-darken($body-bg, 10%);
         }
     }
     &.success {
-        color: var(--sbx-color-text-primary, $white);
+        color: var(--sbx-color-foreground-primary, $white);
     }
 
     &::before {

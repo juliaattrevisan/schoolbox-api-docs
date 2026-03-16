@@ -494,7 +494,7 @@ $allow-sidebar-stash: $large-up;
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 &:hover {
-                    color: $off-canvas-foreground;
+                    color: var(--sbx-config-color-menu-secondary, $off-canvas-foreground);
                     background-color: $off-canvas-hover;
                 }
             }
