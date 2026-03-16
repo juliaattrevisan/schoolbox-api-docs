@@ -254,7 +254,6 @@ class Model implements ISoftDeletable, Sequential
             '0-1' => Mapper::VISIBILITY_STAFF_STUDENTS,
             '1-0' => Mapper::VISIBILITY_STAFF_PARENTS,
             '1-1' => Mapper::VISIBILITY_STAFF_STUDENTS_PARENTS,
-            default => throw new \LogicException('Impossible case.'),
         };
     }
 
