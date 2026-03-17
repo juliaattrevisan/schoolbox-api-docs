@@ -1,4 +1,12 @@
 <script setup lang="ts">
+import {
+    calculateTextColor,
+    getColorVariableEntries,
+    getColorVariableNames,
+    getDerivedColorTargets,
+    getDerivedColorVariableNames,
+    parseColor,
+} from "@js/util/colourUtils";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { SkinConfigData, SkinConfigOption } from "../js/types/skinConfigTypes";
 
@@ -27,6 +35,26 @@ function getCategoryTitle(categoryKey: string): string {
 }
 
 /**
+ * Apply CSS custom property entries to the root element.
+ * @param colorEntries CSS property/value pairs to apply.
+ */
+function applyColorVariables(colorEntries: Array<[string, string]>): void {
+    colorEntries.forEach(([propertyName, propertyValue]) => {
+        document.documentElement.style.setProperty(propertyName, propertyValue);
+    });
+}
+
+/**
+ * Remove CSS custom properties from the root element.
+ * @param colorVariableNames CSS property names to clear.
+ */
+function clearColorVariables(colorVariableNames: string[]): void {
+    colorVariableNames.forEach((propertyName) => {
+        document.documentElement.style.removeProperty(propertyName);
+    });
+}
+
+/**
  * Apply a raw CSS custom property immediately for colour options that define one.
  * @param option The current skin config option.
  */
@@ -34,11 +62,26 @@ function applyCustomProperty(option: SkinConfigOption): void {
     if (option.customProperty === null) {
         return;
     }
-    if (option.value === null || option.value === "") {
-        document.documentElement.style.removeProperty(option.customProperty);
+
+    const color = parseColor(option.value);
+
+    if (color === null) {
+        clearColorVariables(getColorVariableNames(option.customProperty));
+        clearColorVariables(getColorVariableNames(`${option.customProperty}-contrast`));
+
+        for (const cssVar of getDerivedColorVariableNames(option.customProperty)) {
+            clearColorVariables(getColorVariableNames(cssVar));
+        }
+
         return;
     }
-    document.documentElement.style.setProperty(option.customProperty, option.value);
+
+    applyColorVariables(getColorVariableEntries(option.customProperty, color));
+    applyColorVariables(getColorVariableEntries(`${option.customProperty}-contrast`, calculateTextColor(color)));
+
+    for (const derivedColor of getDerivedColorTargets(option.customProperty, color)) {
+        applyColorVariables(getColorVariableEntries(derivedColor.cssVar, derivedColor.color));
+    }
 }
 
 /**
@@ -127,7 +170,9 @@ window.Vue.onMounted(() => {
                             v-for="option in subcategory.options"
                             :key="option.id"
                             :class="[
-                                option.type === 'textarea' ? 'small-12 columns' : 'small-12 medium-6 large-3 columns',
+                                option.type === 'textarea'
+                                    ? 'small-12 columns'
+                                    : 'small-12 medium-6 large-3 l-mar-m--bottom columns',
                             ]"
                         >
                             <label :id="option.name" :for="`${option.name}-field`" class="inline-block">
