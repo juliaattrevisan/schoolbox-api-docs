@@ -7,6 +7,7 @@ export type SkinConfigOption = {
     value: string | null;
     title: string | null;
     description: string | null;
+    type: "colour" | "textarea";
     editable: boolean;
     hidden: boolean;
 };

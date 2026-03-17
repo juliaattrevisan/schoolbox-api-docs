@@ -98,6 +98,7 @@ class Controller extends ConfigController
                 'value' => $config->getValue(),
                 'title' => $config->getTitle(),
                 'description' => $config->getDescription(),
+                'type' => $this->getOptionType($config),
                 'editable' => $config->getEditable(),
                 'hidden' => $config->getHidden(),
             ];
@@ -111,5 +112,17 @@ class Controller extends ConfigController
         }
 
         return $data;
+    }
+
+    /**
+     * Map the config field type to the frontend Skin Config input type.
+     */
+    private function getOptionType(Config $config): string
+    {
+        return match ($config->getFieldId()) {
+            ConfigMapper::FIELD_TEXT_AREA => 'textarea',
+            ConfigMapper::FIELD_COLOUR => 'colour',
+            default => 'colour',
+        };
     }
 }

@@ -74,7 +74,9 @@ window.Vue.onMounted(() => {
                         <div
                             v-for="option in subcategory.options"
                             :key="option.id"
-                            class="small-12 medium-6 large-3 columns"
+                            :class="[
+                                option.type === 'textarea' ? 'small-12 columns' : 'small-12 medium-6 large-3 columns',
+                            ]"
                         >
                             <label :id="option.name" :for="`${option.name}-field`" class="inline-block">
                                 <span>{{ option.title || option.name }}</span>
@@ -87,13 +89,22 @@ window.Vue.onMounted(() => {
                                     >?</span
                                 >
                             </label>
-                            <div>
+                            <div v-if="option.type === 'colour'">
                                 <input
                                     :id="`${option.name}-field`"
                                     v-model="option.value"
                                     type="text"
                                     :name="option.name"
                                     data-colour-picker
+                                    :disabled="!option.editable"
+                                />
+                            </div>
+                            <div v-else-if="option.type === 'textarea'">
+                                <textarea
+                                    :id="`${option.name}-field`"
+                                    v-model="option.value"
+                                    :name="option.name"
+                                    rows="8"
                                     :disabled="!option.editable"
                                 />
                             </div>
