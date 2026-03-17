@@ -195,8 +195,6 @@ class MyFilesRetention extends StrategyBase
         // Use JOIN-style delete with an alias so joins can be added safely if needed by FK changes
         $statement = $this->database->prepare($this->deleteStatement('f') . " FROM my_file AS f WHERE f.id IN {$delPlaceholders}");
 
-        $statement->debugDumpParams();
-
         $statement->execute(Builder::getArrayParameters($fileIds, 'id'));
 
         return $statement->rowCount();
