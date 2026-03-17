@@ -52,6 +52,8 @@ class Config
         "gpt-5.3-chat-latest",
         "gpt-5.4",
 //        "gpt-5.4-pro",
+        "gpt-5.4-mini",
+        "gpt-5.4-nano",
     ];
     public const array AI_MODELS_GPT4 = [
         "gpt-4o",
@@ -167,6 +169,20 @@ class Config
 //            self::REASONING_EFFORT_OPTION_MEDIUM,
 //            self::REASONING_EFFORT_OPTION_HIGH,
 //        ],
+        "gpt-5.4-mini"   => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+            self::REASONING_EFFORT_OPTION_LOW,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
+        "gpt-5.4-nano"   => [
+            self::REASONING_EFFORT_OPTION_DEFAULT,
+            self::REASONING_EFFORT_OPTION_NONE,
+            self::REASONING_EFFORT_OPTION_LOW,
+            self::REASONING_EFFORT_OPTION_MEDIUM,
+            self::REASONING_EFFORT_OPTION_HIGH,
+        ],
     ];
     public const array REASONING_EFFORT_OPTIONS = [
         self::REASONING_EFFORT_OPTION_DEFAULT,
@@ -214,6 +230,8 @@ class Config
         "gpt-5.3-chat-latest" => self::TEXT_VERBOSITY_OPTIONS_GPT5_CHAT,
         "gpt-5.4"             => self::TEXT_VERBOSITY_OPTIONS,
 //        "gpt-5.4-pro"         => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5.4-mini"          => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-5.4-nano"          => self::TEXT_VERBOSITY_OPTIONS,
     ];
 
     // field keys
