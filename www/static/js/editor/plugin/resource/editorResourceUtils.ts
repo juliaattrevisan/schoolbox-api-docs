@@ -23,11 +23,15 @@ export function exitLinkContext(editor: Editor, writer: Writer): void {
         return;
     }
 
+    // CKEditor can keep link attributes on a collapsed selection even after the visible caret
+    // appears to be outside the link. Clearing them explicitly stops the next inserted inline
+    // resource from inheriting the previous image's anchor.
     writer.removeSelectionAttribute(linkAttributes);
 
     const selectionPosition = editor.model.document.selection.getFirstPosition();
 
     if (selectionPosition) {
+        // Re-apply the collapsed selection so subsequent insertions use the cleaned selection state.
         writer.setSelection(selectionPosition);
     }
 }
@@ -59,6 +63,9 @@ export function addResource(editor: Editor, resource: Resource): void {
     const resourceAttributes = getAttributes(resource, config.baseHref);
     editor.model.change((writer) => {
         if (!("linkHref" in resourceAttributes)) {
+            // Videos/audio use image placeholders without their own link. If the caret is still carrying
+            // the previous image link, clear that state before insertion so CKEditor does not wrap the
+            // new placeholder in the old anchor.
             exitLinkContext(editor, writer);
         }
 
@@ -74,6 +81,9 @@ export function addResource(editor: Editor, resource: Resource): void {
             );
 
             inheritedLinkAttributes.forEach((attribute) => {
+                // `insertImage()` may still copy selection link attributes onto the inserted placeholder.
+                // Strip those attributes off non-linked resources so the saved HTML cannot nest them in
+                // the previous image anchor.
                 writer.removeAttribute(attribute, image);
             });
         }
