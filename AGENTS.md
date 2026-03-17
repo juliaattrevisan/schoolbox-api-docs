@@ -174,6 +174,11 @@ task-master/SA-XXXXX            feature work targeting master
 
 ```
 Short imperative description [SA-XXXXX]
+
+Optional detailed description of the commit
+
+# Commits created by a coding agent may include the following line:
+Co-Authored-By: <agent>
 ```
 
 ### Pull requests
