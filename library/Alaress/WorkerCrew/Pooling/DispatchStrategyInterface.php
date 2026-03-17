@@ -216,4 +216,12 @@ interface DispatchStrategyInterface
      * @return int
      */
     public function getMaxRequestsPerWorker(): int;
+
+
+    /**
+     * Returns the maximum time in milliseconds to wait for a worker to accept a write before killing it
+     *
+     * @return int
+     */
+    public function getWorkerWriteTimeout(): int;
 }
