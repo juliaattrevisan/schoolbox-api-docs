@@ -77,6 +77,7 @@ class Admin extends ModuleLoader
 
         // Settings
         $this->loadModule($di, \Schoolbox\Admin\Settings\Module::class, '/adminv2/setting');
+        $this->loadModule($di, \Schoolbox\Admin\SkinConfig\Module::class, '/adminv2/setting/design/Skin%20Config');
 
         // SHAPS
         $this->loadModule($di, \Schoolbox\Admin\SHAPS\Module::class, '/adminv2/shaps');

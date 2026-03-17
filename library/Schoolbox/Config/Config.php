@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Config;
 
+use Schoolbox\Admin\SkinConfig;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 class Config
@@ -58,6 +59,13 @@ class Config
     /** @var string */
     private $module;
 
+    /* Skin Configs
+     */
+    private ?SkinConfig\Subcategory\Model $skinSubcategory = null;
+
+     /**
+     * @return int|null
+     */
 
     /**
      * @return string
@@ -216,6 +224,23 @@ class Config
         return $this;
     }
 
+    /**
+     * @return SkinConfig\Subcategory\Model|null
+     */
+    public function getSkinSubcategory(): ?SkinConfig\Subcategory\Model
+    {
+        return $this->skinSubcategory;
+    }
+
+    /**
+     * @param SkinConfig\Subcategory\Model|null $skinSubcategory
+     * @return $this
+     */
+    public function setSkinSubcategory(?SkinConfig\Subcategory\Model $skinSubcategory): self
+    {
+        $this->skinSubcategory = $skinSubcategory;
+        return $this;
+    }
 
     /**
      * @return bool
