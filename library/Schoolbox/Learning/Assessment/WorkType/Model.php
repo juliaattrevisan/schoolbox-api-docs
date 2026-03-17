@@ -243,6 +243,12 @@ class Model implements ISoftDeletable, Sequential
      */
     public function getVisibility(): string
     {
+        if ($this->isVisibleToParents === null || $this->isVisibleToStudents === null) {
+            // If not for this exception, this function would return a non-null value even when the underlying data
+            // items have not been hydrated.  Avoid misleading the caller by throwing an exception.
+            throw new InsufficientHydrationException('Cannot determine visibility from NULL property');
+        }
+
         return match (($this->isVisibleToParents ? 1 : 0) . '-' . ($this->isVisibleToStudents ? 1 : 0)) {
             '0-0' => Mapper::VISIBILITY_STAFF_ONLY,
             '0-1' => Mapper::VISIBILITY_STAFF_STUDENTS,
