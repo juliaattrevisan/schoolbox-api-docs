@@ -90,9 +90,24 @@ class ConfiguredDispatchStrategyBuilder
             ? sprintf('max %d', $this->maxRequestsPerWorker)
             : 'no max';
         return [
-            'queue'  => sprintf("Q : n < %d <= %d, every %dms", $this->queueWarnSize, $this->queueMaxSize, $this->queueDelay),
-            'worker' => sprintf("W : %d <= n <= %d, %s requests/worker", $this->minWorkers, $this->maxWorkers, $maxRequestsPerWorkerOutput),
-            'task'   => sprintf("T : t < %dms <= %dms", $this->workerTimeoutSoft, $this->workerTimeoutHard),
+            'queue'  => sprintf(
+                "Queue:    %d warn, %d max, %dms check interval",
+                $this->queueWarnSize,
+                $this->queueMaxSize,
+                $this->queueDelay,
+            ),
+            'worker' => sprintf(
+                "Workers:  %d min, %d max, %s requests/worker",
+                $this->minWorkers,
+                $this->maxWorkers,
+                $maxRequestsPerWorkerOutput,
+            ),
+            'task'   => sprintf(
+                "Timeouts: %dms write accept, %dms execution (soft), %dms execution (hard)",
+                $this->workerWriteTimeout,
+                $this->workerTimeoutSoft,
+                $this->workerTimeoutHard,
+            ),
         ];
     }
 
