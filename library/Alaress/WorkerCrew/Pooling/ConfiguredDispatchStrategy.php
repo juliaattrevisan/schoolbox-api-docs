@@ -45,8 +45,20 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
      * @param int    $maxRequestsPerWorker
      * @param int    $workerWriteTimeout
      */
-    public function __construct($minWorkers, $maxWorkers, $maxFlywheel, $queueDelay, $queueWarnSize, $queueMaxSize, $idleTimeout, $workerTimeoutSoft, $workerTimeoutHard, $flags = '', $maxRequestsPerWorker = DefaultDispatchStrategy::MAX_REQUESTS_PER_WORKER, $workerWriteTimeout = DefaultDispatchStrategy::WORKER_WRITE_TIMEOUT)
-    {
+    public function __construct(
+        $minWorkers,
+        $maxWorkers,
+        $maxFlywheel,
+        $queueDelay,
+        $queueWarnSize,
+        $queueMaxSize,
+        $idleTimeout,
+        $workerTimeoutSoft,
+        $workerTimeoutHard,
+        $flags = '',
+        $maxRequestsPerWorker = DefaultDispatchStrategy::MAX_REQUESTS_PER_WORKER,
+        $workerWriteTimeout = DefaultDispatchStrategy::WORKER_WRITE_TIMEOUT,
+    ) {
         parent::__construct($flags);
         $this->flywheelSpins        = $maxFlywheel;
         $this->minWorkers           = $minWorkers;

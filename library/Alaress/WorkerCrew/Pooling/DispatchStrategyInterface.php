@@ -177,7 +177,7 @@ interface DispatchStrategyInterface
 
 
     /**
-     * Returns the number of seconds a Worker should be idle before self-destructing
+     * Returns the number of milliseconds a Worker should be idle before self-destructing
      *
      * @return int
      */
@@ -202,7 +202,8 @@ interface DispatchStrategyInterface
 
 
     /**
-     * Returns the hard or soft execution timeout for a worker task (not the life of the worker itself)
+     * Returns the hard or soft execution timeout for a worker task (not the life of the worker itself),
+     * in milliseconds.
      *
      * @param bool $hard
      * @return int
