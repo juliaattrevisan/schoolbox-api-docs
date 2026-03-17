@@ -1117,6 +1117,7 @@ class Controller extends Base
                         'getter'    => 'getVisibility',
                         'caption'   => 'Visibility',
                         'mandatory' => true,
+                        'default'   => WorkTypeMapper::VISIBILITY_STAFF_ONLY,
                         'lookup'    => [
                             ['key' => WorkTypeMapper::VISIBILITY_STAFF_ONLY, 'value' => 'Staff Only'],
                             ['key' => WorkTypeMapper::VISIBILITY_STAFF_STUDENTS, 'value' => 'Staff & Students'],
