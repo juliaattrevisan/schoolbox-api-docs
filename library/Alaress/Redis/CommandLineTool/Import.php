@@ -100,73 +100,117 @@ class Import extends CliTool\App
     }
 
     /**
-     * Read all rows from the staging table, group by key, and write to Redis.
+     * Read all rows from the staging table in chunks, group by key, and write to Redis.
+     *
+     * Keyset pagination on the auto-increment primary key keeps memory usage bounded to
+     * one chunk at a time rather than materialising all LONGBLOB payloads at once.
+     * The export inserts all rows for each key consecutively, so a key's rows are never
+     * interleaved with another key's rows; any key that straddles a chunk boundary is
+     * carried over and merged with the first rows of the next chunk.
      */
     private function importKeys(string $targetInstanceId): void
     {
-        $rows = $this->getDatabaseInternal()->executeQuery(
-            'SELECT redis_key, redis_type, redis_value, redis_ttl_abs, source_instance_id
-             FROM `' . self::STAGING_TABLE . '`
-             ORDER BY redis_key, id'
-        )->fetchAll();
+        $chunkSize = 500;
+        $lastId    = 0;
+        $carry     = []; // [ redis_key => [ rows ] ] for the key straddling the last boundary
 
-        // Group rows by redis_key to reconstruct sets (each set member is a separate row)
-        $grouped = [];
-        foreach ($rows as $row) {
-            $grouped[$row['redis_key']][] = $row;
+        while (true) {
+            $fresh = $this->getDatabaseInternal()->executeQuery(
+                'SELECT id, redis_key, redis_type, redis_value, redis_ttl_abs, source_instance_id
+                 FROM `' . self::STAGING_TABLE . '`
+                 WHERE id > :lastId
+                 ORDER BY id
+                 LIMIT ' . $chunkSize,
+                ['lastId' => $lastId]
+            )->fetchAll();
+
+            $isLastPage = count($fresh) < $chunkSize; // also true when empty
+
+            if (!empty($fresh)) {
+                $lastId  = (int) end($fresh)['id'];
+                $grouped = $carry;
+                $carry   = [];
+                foreach ($fresh as $row) {
+                    $grouped[$row['redis_key']][] = $row;
+                }
+                // On non-final pages the last key may have more rows in the next chunk.
+                if (!$isLastPage) {
+                    end($grouped);
+                    $lastKey = key($grouped);
+                    $carry   = [$lastKey => array_pop($grouped)];
+                }
+            } else {
+                // Empty page: flush any rows carried over from the previous chunk.
+                $grouped = $carry;
+                $carry   = [];
+            }
+
+            foreach ($grouped as $originalKey => $keyRows) {
+                $this->importKeyRows($originalKey, $keyRows, $targetInstanceId);
+            }
+
+            if ($isLastPage) {
+                break;
+            }
+        }
+    }
+
+    /**
+     * Evaluate a single Redis key's rows and write to Redis if appropriate.
+     *
+     * @param array<int, array<string, mixed>> $keyRows
+     */
+    private function importKeyRows(string $originalKey, array $keyRows, string $targetInstanceId): void
+    {
+        $firstRow = $keyRows[0];
+        $type     = $firstRow['redis_type'];
+        $sourceId = $firstRow['source_instance_id'];
+        $ttlAbs   = $firstRow['redis_ttl_abs'] !== null ? (int) $firstRow['redis_ttl_abs'] : null;
+
+        // Skip keys that expired in transit
+        if ($ttlAbs !== null && $ttlAbs <= time()) {
+            $this->getLogger()->debug("Skipping expired key: {$originalKey}");
+            $this->keysSkippedExpired++;
+            return;
         }
 
-        foreach ($grouped as $originalKey => $keyRows) {
-            $firstRow = $keyRows[0];
-            $type     = $firstRow['redis_type'];
-            $sourceId = $firstRow['source_instance_id'];
-            $ttlAbs   = $firstRow['redis_ttl_abs'] !== null ? (int)$firstRow['redis_ttl_abs'] : null;
+        $newKey = $this->rekey($originalKey, $sourceId, $targetInstanceId);
 
-            // Skip keys that expired in transit
-            if ($ttlAbs !== null && $ttlAbs <= time()) {
-                $this->getLogger()->debug("Skipping expired key: {$originalKey}");
-                $this->keysSkippedExpired++;
-                continue;
-            }
+        $this->getLogger()->debug(sprintf(
+            'Restoring %s key: %s → %s (TTL: %s)',
+            $type,
+            $originalKey,
+            $newKey,
+            $ttlAbs === null ? 'none' : date('Y-m-d H:i:s', $ttlAbs),
+        ));
 
-            $newKey = $this->rekey($originalKey, $sourceId, $targetInstanceId);
-
-            $this->getLogger()->debug(sprintf(
-                'Restoring %s key: %s → %s (TTL: %s)',
-                $type,
-                $originalKey,
-                $newKey,
-                $ttlAbs === null ? 'none' : date('Y-m-d H:i:s', $ttlAbs),
-            ));
-
-            if (!$this->perform()) {
-                $this->keysRestored++;
-                continue;
-            }
-
-            // Don't overwrite data that already exists in the target Redis
-            if ($this->redis->exists($newKey)) {
-                $this->getLogger()->warning("Key already exists in Redis, skipping: {$newKey}");
-                $this->keysSkippedExisting++;
-                continue;
-            }
-
-            switch ($type) {
-                case 'string':
-                    $this->restoreStringKey($newKey, $firstRow['redis_value'], $ttlAbs);
-                    break;
-
-                case 'set':
-                    $members = array_map(
-                        fn(array $row): string => $this->rekey($row['redis_value'], $sourceId, $targetInstanceId),
-                        $keyRows
-                    );
-                    $this->restoreSetKey($newKey, $members, $ttlAbs);
-                    break;
-            }
-
+        if (!$this->perform()) {
             $this->keysRestored++;
+            return;
         }
+
+        // Don't overwrite data that already exists in the target Redis
+        if ($this->redis->exists($newKey)) {
+            $this->getLogger()->warning("Key already exists in Redis, skipping: {$newKey}");
+            $this->keysSkippedExisting++;
+            return;
+        }
+
+        switch ($type) {
+            case 'string':
+                $this->restoreStringKey($newKey, $firstRow['redis_value'], $ttlAbs);
+                break;
+
+            case 'set':
+                $members = array_map(
+                    fn(array $row): string => $this->rekey($row['redis_value'], $sourceId, $targetInstanceId),
+                    $keyRows
+                );
+                $this->restoreSetKey($newKey, $members, $ttlAbs);
+                break;
+        }
+
+        $this->keysRestored++;
     }
 
     /**
