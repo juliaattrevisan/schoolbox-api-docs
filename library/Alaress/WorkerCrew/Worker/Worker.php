@@ -15,12 +15,13 @@ use RangeException;
 
 class Worker extends PipeWriter
 {
-    const READY = 0x1;
-    const BUSY  = 0x2;
-    const DONE  = 0x4;
-    const ENDED = 0x8;
-    const ERROR = 0x10;
-    const ALL   = 0x1F;
+    const READY    = 0x1;
+    const BUSY     = 0x2;
+    const DONE     = 0x4;
+    const ENDED    = 0x8;
+    const ERROR    = 0x10;
+    const SENDING  = 0x20;
+    const ALL      = self::READY | self::BUSY | self::DONE | self::ENDED | self::ERROR | self::SENDING;
 
 
     /** @var string */
@@ -133,7 +134,7 @@ class Worker extends PipeWriter
     {
         // the Map of Transition Validity
         $map = array(
-            self::BUSY  => array(
+            self::BUSY    => array(
                 self::DONE  => function ($worker) {
                         /** @var Worker $worker */
                         $worker->markTaskComplete();
@@ -144,24 +145,29 @@ class Worker extends PipeWriter
                         return true;
                 },
             ),
-            self::DONE  => array(
+            self::DONE    => array(
                 self::READY => function ($worker) {
                         /** @var Worker $worker */
                         $worker->clearTask();
                         return true;
                 },
             ),
-            self::ERROR => array(
+            self::ERROR   => array(
                 self::ENDED => function ($worker) {
                         /** @var Worker $worker */
                         $worker->clearTask();
                         return true;
                 },
             ),
-            self::READY => array(
-                self::BUSY  => function ($worker) {
+            self::READY   => array(
+                self::BUSY    => function ($worker) {
                         /** @var Worker $worker */
-                        // task must already be set (ie. use self::setTask())
+                        // task must already be set (ie. use self::prepareTask() or self::setTask())
+                        return $worker->getTask() instanceof Task;
+                },
+                self::SENDING => function ($worker) {
+                        /** @var Worker $worker */
+                        // task must already be set (ie. use self::prepareTask())
                         return $worker->getTask() instanceof Task;
                 },
                 self::ENDED => function ($worker) {
@@ -171,6 +177,17 @@ class Worker extends PipeWriter
                 },
                 self::ERROR => function ($worker) {
                         /** @var Worker $worker */
+                        return true;
+                },
+            ),
+            self::SENDING => array(
+                self::BUSY  => function ($worker) {
+                        /** @var Worker $worker */
+                        return true;
+                },
+                self::ERROR => function ($worker) {
+                        /** @var Worker $worker */
+                        $worker->clearTask();
                         return true;
                 },
             ),
@@ -195,22 +212,23 @@ class Worker extends PipeWriter
 
 
     /**
+     * Prepare a task for async dispatch: records the task, transitions to SENDING, and returns
+     * the serialised payload for Pool to write via WritableResourceStream.
+     *
      * @param object $identifier
      * @param string $cmd
      * @param string $args
      * @throws RangeException
-     * @return self
+     * @return string serialised payload ready to write to worker stdin
      */
-    public function setTask($identifier, $cmd, $args)
+    public function prepareTask($identifier, $cmd, $args): string
     {
         if ($this->getStatus() != self::READY) {
-            // go find someone else to do your dirty work
             throw new RangeException("Already tasked, cannot accept another");
         }
-        $this->write($this->strat->composeTaskString($cmd, $args));
         $this->task = new Task($identifier, $cmd, $args);
-        $this->setStatus(self::BUSY);
-        return $this;
+        $this->setStatus(self::SENDING);
+        return $this->strat->composeTaskString($cmd, $args);
     }
 
 
