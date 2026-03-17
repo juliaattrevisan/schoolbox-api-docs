@@ -27,20 +27,20 @@ export default defineConfig({
     /* Reporter to use. See https://playwright.dev/docs/test-reporters */
     reporter: process.env.CI
         ? [
-              ["html", { outputFolder: "./test/playwright/_output/html/", open: "never" }],
-              ["list", { printSteps: true }],
-          ]
+            ["html", { outputFolder: "./test/playwright/_output/html/", open: "never" }],
+            ["list", { printSteps: true }],
+        ]
         : [
-              ["html", { outputFolder: "./test/playwright/_output/html/", port: 10081, host: "0.0.0.0" }],
-              ["list", { printSteps: true }],
-          ],
+            ["html", { outputFolder: "./test/playwright/_output/html/", port: 10081, host: "0.0.0.0" }],
+            ["list", { printSteps: true }],
+        ],
     /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
     use: {
         /* Base URL to use in actions like `await page.goto('/')`. */
         // To run in docker: DOCKER=1 npx playwright test
         // To run in vagrant: npx playwright test
         baseURL:
-            process.env.DOCKER === "1" ? "https://docker.dev.schoolbox.cloud" : "https://vagrant.dev.schoolbox.cloud",
+            process.env.DOCKER === "1" ? "https://docker.dev.schoolbox.cloud" : "https://docker.dev.schoolbox.cloud",
 
         /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
         trace: "retain-on-failure",
