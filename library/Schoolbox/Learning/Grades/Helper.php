@@ -135,14 +135,20 @@ class Helper
     }
 
     /**
-     * Filter assessments with given work types
-     * @param User       $viewer
+     * Filter assessments with given work types and activity types.
+     *
+     * Note that this method is used in both the Grades page data set and Summative Report data set generation which is
+     * an unfortunate coupling. You can use $activityTypes contextually to decide which activity types (due work, quiz,
+     * reporting, etc) are allowed. If null, we'll use the default ones which basically exclude Tasks.
+     *
+     * @param User $viewer
      * @param Collection $assessments
      * @param Collection $workTypes
+     * @param null|array $activityTypes
      * @return Collection
      * @throws MapperException
      */
-    public function filterAssessments(User $viewer, Collection $assessments, Collection $workTypes)
+    public function filterAssessments(User $viewer, Collection $assessments, Collection $workTypes, ?array $activityTypes): Collection
     {
         $visibility                  = new Visibility($this->access);
         $workTypeAssessmentsByFolder = new Collection();
@@ -150,10 +156,8 @@ class Helper
         /* This obnoxious set is so annoying to micromanage, but it lets you choose which learning activities get
          * included in the filtered set. This method is used to fulfil both the Grades page and Summative Reports, which
          * is an action at a distance, if you wanted different outcomes in both areas.
-         *
-         * TODO Parameterise based on contextual need
          */
-        $allowedActivities = [
+        $allowedActivities = $activityTypes ?? [
             Project::class,
             DueWork::class,
             Quiz::class,
