@@ -34,8 +34,9 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
 
     const MAX_REQUESTS_PER_WORKER = 0; // 0 = unlimited
 
-    const WORKER_SOFT_TIMEOUT = 300000; // 5 minutes
-    const WORKER_HARD_TIMEOUT = 1200000; // 20 minutes
+    const WORKER_SOFT_TIMEOUT  = 300000; // 5 minutes
+    const WORKER_HARD_TIMEOUT  = 1200000; // 20 minutes
+    const WORKER_WRITE_TIMEOUT = 5000; // 5 seconds
 
     const TASK_FETCH     = 'fetch';
     const TASK_PUBLISH   = 'publish';
@@ -123,7 +124,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
     public function getAvailableWorker($workers, $remainingTaskCount)
     {
         // if we haven't got the min number of workers, favour starting a new one
-        if ($workers->countWhere(~(Worker::ENDED & Worker::ERROR)) < self::MIN_WORKERS) {
+        if ($workers->countWhere(~(Worker::ENDED | Worker::ERROR)) < self::MIN_WORKERS) {
             return 0;
         }
 
@@ -136,7 +137,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
         }
 
         // if number of workers THAT ARE NOT ENDED OR ERRORED is below the cap, spawn a new one
-        if ($workers->countWhere(~(Worker::ENDED & Worker::ERROR)) < self::MAX_WORKERS) {
+        if ($workers->countWhere(~(Worker::ENDED | Worker::ERROR)) < self::MAX_WORKERS) {
             return 0;
         }
 
@@ -373,5 +374,16 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
     public function getMaxRequestsPerWorker(): int
     {
         return static::MAX_REQUESTS_PER_WORKER;
+    }
+
+
+    /**
+     * Returns the maximum time in milliseconds to wait for a worker to accept a write before killing it
+     *
+     * @return int
+     */
+    public function getWorkerWriteTimeout(): int
+    {
+        return static::WORKER_WRITE_TIMEOUT;
     }
 }
