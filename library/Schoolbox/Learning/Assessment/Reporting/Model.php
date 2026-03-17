@@ -290,10 +290,23 @@ class Model extends AbstractAssessment
     {
         parent::overwrite($source);
 
+        /* Reporting-specific grading options
+         */
         $this->setInstructorMaxMark($source->getInstructorMaxMark());
         $this->setInstructorMarkType($source->getInstructorMarkType());
         $this->setInstructorGradeGroup($source->getInstructorGradeGroup());
         $this->setInstructorMarkScheme($source->getInstructorMarkScheme());
+        $this->setFeedbackCommentsEnable($source->getFeedbackCommentsEnable());
+
+        /* Supporting Data settings
+         */
+        $this->setSupportingDataEnable($source->getSupportingDataEnable());
+        $this->setSupportingDataWorkTypes($source->getSupportingDataWorkTypes());
+        $this->setSupportingDataCurriculumNodes($source->getSupportingDataCurriculumNodes());
+        $this->setSupportingDataFolders($source->getSupportingDataFolders());
+        $this->setSupportingDataRange($source->getSupportingDataRange());
+        $this->setSupportingDataWorkTypes($source->getSupportingDataWorkTypes());
+        $this->setSupportingDataMarkbookEnable($source->getSupportingDataMarkbookEnable());
 
         return $this;
     }
