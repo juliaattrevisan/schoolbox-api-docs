@@ -27,7 +27,7 @@ const SELECTOR_COMPONENT_ASSESSMENT_ACTIONS_VIEWSTATUS = "component-assessment-a
 
 const SELECTOR_MANAGEGROUP_CONTAINER = "manage-group-container";
 const SELECTOR_MANAGEGROUP_SEARCH_TEXT = "ss-query-input";
-const SELECTOR_MANAGEGROUP_SEARCH_RESULT = "ss-results-item-checkbox"; // Append "-[userID]"
+const SELECTOR_MANAGEGROUP_SEARCH_RESULT = "ss-results-item-label"; // Append "-[userID]"
 const SELECTOR_MANAGEGROUP_ADD_MEMBERS_SUBMIT = "manage-group-add-members-submit";
 const SELECTOR_MANAGEGROUP_CURRENT_MEMBERS = "manage-group-current-members";
 
