@@ -112,7 +112,7 @@ window.Vue.onMounted(() => {
                         class="content"
                         :data-test="`skin-config-subcategory-${subcategory.name}`"
                     >
-                        <div class="small-12 columns">
+                        <div v-if="subcategory.name" class="small-12 columns">
                             <h3>{{ subcategory.name }}</h3>
                         </div>
                         <div
