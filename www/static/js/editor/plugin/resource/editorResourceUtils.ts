@@ -19,12 +19,17 @@ export function exitLinkContext(editor: Editor, writer: Writer): void {
     const { selection } = editor.model.document;
     const linkAttributes = Array.from(selection.getAttributeKeys()).filter((attribute) => attribute.startsWith("link"));
 
-    if (editor.plugins.has("TwoStepCaretMovement")) {
-        editor.plugins.get("TwoStepCaretMovement")._handleForwardMovement();
+    if (linkAttributes.length === 0) {
         return;
     }
 
     writer.removeSelectionAttribute(linkAttributes);
+
+    const selectionPosition = editor.model.document.selection.getFirstPosition();
+
+    if (selectionPosition) {
+        writer.setSelection(selectionPosition);
+    }
 }
 
 /**
@@ -53,6 +58,10 @@ export function addResource(editor: Editor, resource: Resource): void {
     const imageUtils = editor.plugins.get("ImageUtils");
     const resourceAttributes = getAttributes(resource, config.baseHref);
     editor.model.change((writer) => {
+        if (!("linkHref" in resourceAttributes)) {
+            exitLinkContext(editor, writer);
+        }
+
         const image = imageUtils.insertImage(
             resourceAttributes,
             editor.model.document.selection.getFirstPosition(),
