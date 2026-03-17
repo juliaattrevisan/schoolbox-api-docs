@@ -13,7 +13,7 @@ use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Psr\Log\LoggerInterface;
 use RangeException;
 
-class Worker extends PipeWriter
+class Worker
 {
     const READY    = 0x1;
     const BUSY     = 0x2;
@@ -23,6 +23,8 @@ class Worker extends PipeWriter
     const SENDING  = 0x20;
     const ALL      = self::READY | self::BUSY | self::DONE | self::ENDED | self::ERROR | self::SENDING;
 
+    /** @var LoggerInterface */
+    protected $log;
 
     /** @var string */
     protected $cmd;
@@ -34,7 +36,7 @@ class Worker extends PipeWriter
     protected $status;
     /** @var float */
     protected $start;
-    /** @var Task */
+    /** @var Task|null */
     protected $task;
     /** @var int */
     protected int $requestCount = 0;
@@ -53,7 +55,6 @@ class Worker extends PipeWriter
      */
     public function __construct($cmd, $pp, $pipes, $strat)
     {
-        parent::__construct($strat, null, $pipes[0]);
         $this->cmd    = $cmd;
         $this->pp     = $pp;
         $this->pipes  = $pipes;
