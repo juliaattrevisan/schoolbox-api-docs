@@ -84,7 +84,7 @@ export default class Calendar {
     async clickCreateEvent(): Promise<void> {
         await this.page.waitForTimeout(3000);
         await this.page.getByTestId(Calendar.DATA_TEST_DIALOG_CREATE_BUTTON).click();
-        await expect(this.page.getByTestId("toast")).toContainText("Events retrieved successfully");
+        await expect(this.page.getByTestId("toast")).toContainText("Created ");
     }
 
     /**
