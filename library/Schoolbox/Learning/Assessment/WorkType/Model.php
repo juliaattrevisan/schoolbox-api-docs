@@ -205,13 +205,25 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
+     * Human-friendly getter.
+     *
      * @return bool
      */
-    public function getIsVisibleToParents(): bool
+    public function isVisibleToParents(): bool
     {
         if (null === $this->isVisibleToParents) {
             throw new InsufficientHydrationException('This WorkType object is not hydrated.');
         }
+        return $this->isVisibleToParents;
+    }
+
+    /**
+     * Mapper-compatible getter.
+     *
+     * @return ?bool
+     */
+    public function getIsVisibleToParents(): ?bool
+    {
         return $this->isVisibleToParents;
     }
 
@@ -226,13 +238,25 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
+     * Human-friendly getter.
+     *
      * @return bool
      */
-    public function getIsVisibleToStudents(): bool
+    public function isVisibleToStudents(): bool
     {
         if (null === $this->isVisibleToStudents) {
             throw new InsufficientHydrationException('This WorkType object is not hydrated.');
         }
+        return $this->isVisibleToStudents;
+    }
+
+    /**
+     * Mapper-compatible getter.
+     *
+     * @return ?bool
+     */
+    public function getIsVisibleToStudents(): ?bool
+    {
         return $this->isVisibleToStudents;
     }
 
@@ -251,7 +275,7 @@ class Model implements ISoftDeletable, Sequential
      */
     public function getVisibility(): string
     {
-        return match (($this->getIsVisibleToParents() ? 1 : 0) . '-' . ($this->getIsVisibleToStudents() ? 1 : 0)) {
+        return match (($this->isVisibleToParents() ? 1 : 0) . '-' . ($this->isVisibleToStudents() ? 1 : 0)) {
             '0-0' => Mapper::VISIBILITY_STAFF_ONLY,
             '0-1' => Mapper::VISIBILITY_STAFF_STUDENTS,
             '1-0' => Mapper::VISIBILITY_STAFF_PARENTS,
@@ -289,13 +313,25 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
+     * Human-friendly getter.
+     *
      * @return bool
      */
-    public function getPermittedProject(): bool
+    public function isPermittedProject(): bool
     {
         if ($this->permittedProject === null) {
             throw new InsufficientHydrationException('This WorkType object is not hydrated.');
         }
+        return $this->permittedProject;
+    }
+
+    /**
+     * Mapper-compatible getter.
+     *
+     * @return ?bool
+     */
+    public function getIsPermittedProject(): ?bool
+    {
         return $this->permittedProject;
     }
 
@@ -309,13 +345,25 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
+     * Human-friendly getter.
+     *
      * @return bool
      */
-    public function getPermittedDueWork(): bool
+    public function isPermittedDueWork(): bool
     {
         if ($this->permittedDueWork === null) {
             throw new InsufficientHydrationException('This WorkType object is not hydrated.');
         }
+        return $this->permittedDueWork;
+    }
+
+    /**
+     * Mapper-compatible getter.
+     *
+     * @return ?bool
+     */
+    public function getIsPermittedDueWork(): ?bool
+    {
         return $this->permittedDueWork;
     }
 
@@ -329,13 +377,25 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
+     * Human-friendly getter.
+     *
      * @return bool
      */
-    public function getPermittedTask(): bool
+    public function isPermittedTask(): bool
     {
         if ($this->permittedTask === null) {
             throw new InsufficientHydrationException('This WorkType object is not hydrated.');
         }
+        return $this->permittedTask;
+    }
+
+    /**
+     * Mapper-compatible getter.
+     *
+     * @return ?bool
+     */
+    public function getIsPermittedTask(): ?bool
+    {
         return $this->permittedTask;
     }
 
@@ -349,9 +409,24 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
+     * Human-friendly getter.
+     *
      * @return bool
      */
-    public function getPermittedQuiz(): bool
+    public function isPermittedQuiz(): bool
+    {
+        if ($this->permittedQuiz === null) {
+            throw new InsufficientHydrationException('This WorkType object is not hydrated.');
+        }
+        return $this->permittedQuiz;
+    }
+
+    /**
+     * Mapper-compatible getter.
+     *
+     * @return ?bool
+     */
+    public function getIsPermittedQuiz(): ?bool
     {
         if ($this->permittedQuiz === null) {
             throw new InsufficientHydrationException('This WorkType object is not hydrated.');
@@ -369,9 +444,24 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
+     * Human-friendly getter.
+     *
      * @return bool
      */
-    public function getPermittedLti(): bool
+    public function isPermittedLti(): bool
+    {
+        if ($this->permittedLti === null) {
+            throw new InsufficientHydrationException('This WorkType object is not hydrated.');
+        }
+        return $this->permittedLti;
+    }
+
+    /**
+     * Mapper-compatible getter.
+     *
+     * @return ?bool
+     */
+    public function getIsPermittedLti(): ?bool
     {
         if ($this->permittedLti === null) {
             throw new InsufficientHydrationException('This WorkType object is not hydrated.');
@@ -389,9 +479,24 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
+     * Human-friendly getter.
+     *
      * @return bool
      */
-    public function getPermittedLessonPlan(): bool
+    public function isPermittedLessonPlan(): bool
+    {
+        if ($this->permittedLessonPlan === null) {
+            throw new InsufficientHydrationException('This WorkType object is not hydrated.');
+        }
+        return $this->permittedLessonPlan;
+    }
+
+    /**
+     * Mapper-compatible getter.
+     *
+     * @return ?bool
+     */
+    public function getIsPermittedLessonPlan(): ?bool
     {
         if ($this->permittedLessonPlan === null) {
             throw new InsufficientHydrationException('This WorkType object is not hydrated.');
@@ -409,9 +514,24 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
+     * Human-friendly getter.
+     *
      * @return bool
      */
-    public function getPermittedDialogAgent(): bool
+    public function isPermittedDialogAgent(): bool
+    {
+        if ($this->permittedDialogAgent === null) {
+            throw new InsufficientHydrationException('This WorkType object is not hydrated.');
+        }
+        return $this->permittedDialogAgent;
+    }
+
+    /**
+     * Mapper-compatible getter.
+     *
+     * @return ?bool
+     */
+    public function getIsPermittedDialogAgent(): ?bool
     {
         if ($this->permittedDialogAgent === null) {
             throw new InsufficientHydrationException('This WorkType object is not hydrated.');
