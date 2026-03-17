@@ -215,25 +215,31 @@ jQuery is being removed in favour of modern vanilla JS and Vue 3. Do not add new
 
 ---
 
-## Agent Guidelines
+## Agent Rules and Guidelines
 
-### Do
+Read and understand all the rules and guidelines below, before writing any code.
 
-- Run the relevant linter and tests before considering a task complete
-- Scope changes to the ticket — one concern per PR
+### Rules
+
+- When working on this project, do not modify files outside of this project
+- Only make changes that are directly requested. Do not refactor, restructure, or clean up code beyond the scope of the task, unless explicitly asked to do so.
+- Do not guess or assume business requirements. If the intended behaviour of a new or changed feature is unclear, ask before writing code. (It is fine to infer what existing code does — only the requirements for new work need clarification.)
+- Avoid writing files to disk during web requests (containers do not share filesystems — use temp files only)
+- Avoid editing `vendor/` or `node_modules/` directly: these are managed by Composer and NPM directly
+- Avoid committing `.env` files, secrets, or credentials
+- Avoid adding comments or docblocks to code you didn't change
+- Do not commit to base branches such as `develop` or `master` directly: always create a named branch first
+- Avoid skipping pre-commit hooks (`--no-verify`)
+
+### Guidelines
+
+- Before writing code, consider its impact: performance, memory usage, and efficiency. Flag any concerns before proceeding.
 - Prefer editing existing files over creating new ones
 - Follow existing patterns in the module you're working in
 - Use `phpstan-baseline.neon` for pre-existing PHPStan issues; do not suppress new ones
-  - If a PHPStan issue cannot be avoided, a `@phpstan-ignore-next-line - <explanation>` comment is acceptable
-
-### Avoid
-
-- Writing files to disk during web requests (containers do not share filesystems — use temp files only)
-- Editing `vendor/` or `node_modules/` directly
-- Committing `.env` files, secrets, or credentials
-- Refactoring code outside the scope of the current ticket
-- Adding comments or docblocks to code you didn't change
-- Adding error handling for scenarios that can't happen
-- Over-engineering: no premature abstractions, no hypothetical future requirements
-- Skipping pre-commit hooks (`--no-verify`)
-- Force-pushing to `develop` or `master`
+- If a PHPStan issue cannot be avoided, a `@phpstan-ignore-next-line - <explanation>` comment is acceptable
+- Run the relevant linter and tests before considering a task complete
+- Scope changes to the ticket — one concern per PR
+- Avoid over-engineering: no premature abstractions, no hypothetical future requirements
+- Avoid adding error handling for scenarios that can't happen
+- If you discover that tech stack, tooling, deprecated patterns, or project structure information is missing or out of date, propose an update to this file as part of your PR
