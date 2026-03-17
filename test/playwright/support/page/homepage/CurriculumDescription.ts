@@ -12,7 +12,6 @@ export default class CurriculumDescription {
     static readonly DATA_TEST_CURRICULUM_CODE = "curriculum-code-{curriculumCode}";
     static readonly DATA_TEST_CURRICULUM_DESCRIPTION = "curriculum-description-{curriculumCode}";
 
-
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -35,7 +34,10 @@ export default class CurriculumDescription {
      * @param curriculumCode - The curriculum code to select
      */
 
-    public static async setCurriculumCode(curriculumDescriptionComponent: Locator, curriculumCode: string,): Promise<void> {
+    public static async setCurriculumCode(
+        curriculumDescriptionComponent: Locator,
+        curriculumCode: string,
+    ): Promise<void> {
         await curriculumDescriptionComponent
             .locator(CurriculumDescription.ELEMENT_CURRICULUM_CODE_DROPDOWN)
             .selectOption(curriculumCode);
@@ -56,16 +58,19 @@ export default class CurriculumDescription {
     }
 
     /**
-     * Verify if a curriculum row (code + description) is present in the component
+     * Verify a curriculum description is visible in the component
      * @param curriculumDescriptionComponent - The curriculum description component locator
-     * @param descriptionContains - The description text to verify (e.g. "Use and influence of language")  
+     * @param code - The curriculum code for the description row
+     * @param description - The description text to verify
      */
     public static async verifyCurriculumDescriptionRow(
         curriculumDescriptionComponent: Locator,
         code: string,
         description: string,
     ): Promise<void> {
-        const descriptionRow = curriculumDescriptionComponent.getByTestId(CurriculumDescription.DATA_TEST_CURRICULUM_DESCRIPTION.replace("{curriculumCode}", code,),);
+        const descriptionRow = curriculumDescriptionComponent.getByTestId(
+            CurriculumDescription.DATA_TEST_CURRICULUM_DESCRIPTION.replace("{curriculumCode}", code),
+        );
         await expect(descriptionRow).toBeVisible();
         await expect(descriptionRow).toContainText(description);
     }
@@ -75,11 +80,10 @@ export default class CurriculumDescription {
      * @param curriculumDescriptionComponent - The curriculum description component locator
      * @param code - The curriculum code to click (e.g. ACELA1556)
      */
-    public async clickCurriculumCodeLink(
-        curriculumDescriptionComponent: Locator,
-        code: string,
-    ): Promise<void> {
-        const codeLink = curriculumDescriptionComponent.getByTestId(CurriculumDescription.DATA_TEST_CURRICULUM_CODE.replace("{curriculumCode}", code),);
+    public static async clickCurriculumCodeLink(curriculumDescriptionComponent: Locator, code: string): Promise<void> {
+        const codeLink = curriculumDescriptionComponent.getByTestId(
+            CurriculumDescription.DATA_TEST_CURRICULUM_CODE.replace("{curriculumCode}", code),
+        );
         await expect(codeLink).toBeVisible();
         await codeLink.click();
     }
