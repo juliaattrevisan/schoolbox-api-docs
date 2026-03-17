@@ -18,20 +18,10 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
     badgeSelected: [value: Result];
 }>();
-
-/**
- * Whether to use a rounded image, currently only for users
- */
-const isImgRounded = window.Vue.computed(() => {
-    if (props.result.type.includes(ResultTypes.USER)) {
-        return true;
-    }
-    return false;
-});
 </script>
 
 <template>
-    <div :class="`c-img ${isImgRounded ? 'c-img--round' : ''} ${props.isSubResult ? 'c-img--s' : ''}`">
+    <div :class="`c-img ${props.isSubResult ? 'c-img--s' : ''}`">
         <a
             v-if="props.result.type === ResultTypes.BADGE"
             href="#open-badge-modal"

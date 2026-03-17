@@ -412,8 +412,6 @@ input[type="radio"]:not(.plain) + label.input-toggle {
                     padding: 0.75rem;
 
                     img {
-                        border-radius: 50%;
-                        transform: scale(0.85);
                         float: none;
                         margin: 0;
                     }
@@ -440,7 +438,7 @@ input[type="radio"]:not(.plain) + label.input-toggle {
                         .profile-img {
                             grid-area: profile-img;
                             img {
-                                border-radius: 50%;
+                                border-radius: var(--sbx-border-radius-full, 50%);
                                 margin: 0;
                                 padding: 0;
                                 width: 100%;
