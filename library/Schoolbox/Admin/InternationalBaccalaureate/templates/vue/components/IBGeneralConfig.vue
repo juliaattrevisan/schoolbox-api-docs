@@ -11,75 +11,78 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const emit = defineEmits<{
-    configChange: [config: IBConfiguration, newValue: string];
-}>();
+// Commented out unused variables since template is commented out
+// const emit = defineEmits<{
+//     configChange: [config: IBConfiguration, newValue: string];
+// }>();
 
-const isSaving = window.Vue.ref<boolean>(false);
-const currentValues = window.Vue.ref<{ [key: string]: string }>({});
+// const isSaving = window.Vue.ref<boolean>(false);
+// const currentValues = window.Vue.ref<{ [key: string]: string }>({});
 
-// Initialize form values
-window.Vue.watch(
-    () => props.configurations,
-    (newConfigs) => {
-        newConfigs.forEach((config) => {
-            currentValues.value[config.key] = config.value || "";
-        });
-    },
-    { immediate: true, deep: true },
-);
+// Commented out since variables are commented out
+// // Initialize form values
+// window.Vue.watch(
+//     () => props.configurations,
+//     (newConfigs) => {
+//         newConfigs.forEach((config) => {
+//             currentValues.value[config.key] = config.value || "";
+//         });
+//     },
+//     { immediate: true, deep: true },
+// );
 
-/**
- * Handles input changes for configuration fields
- * @param config - The configuration object that changed
- * @param newValue - The new value for the configuration
- */
-function onInputChange(config: IBConfiguration, newValue: string): void {
-    currentValues.value[config.key] = newValue;
-    emit("configChange", config, newValue);
-}
+// Commented out unused functions since template is commented out
+// /**
+//  * Handles input changes for configuration fields
+//  * @param config - The configuration object that changed
+//  * @param newValue - The new value for the configuration
+//  */
+// function onInputChange(config: IBConfiguration, newValue: string): void {
+//     currentValues.value[config.key] = newValue;
+//     emit("configChange", config, newValue);
+// }
 
-/**
- * Saves the general configuration to the server
- */
-async function saveGeneralConfig(): Promise<void> {
-    if (!props.saveEndpoint) return;
+// /**
+//  * Saves the general configuration to the server
+//  */
+// async function saveGeneralConfig(): Promise<void> {
+//     if (!props.saveEndpoint) return;
 
-    try {
-        isSaving.value = true;
+//     try {
+//         isSaving.value = true;
 
-        for (const config of props.configurations) {
-            const newValue = currentValues.value[config.key];
+//         for (const config of props.configurations) {
+//             const newValue = currentValues.value[config.key];
 
-            const response = await fetch(props.saveEndpoint, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                },
-                body: JSON.stringify({
-                    id: config.id,
-                    key: config.key,
-                    value: newValue,
-                    categoryId: config.categoryId,
-                }),
-            });
+//             const response = await fetch(props.saveEndpoint, {
+//                 method: "POST",
+//                 headers: {
+//                     "Content-Type": "application/json",
+//                     Accept: "application/json",
+//                 },
+//                 body: JSON.stringify({
+//                     id: config.id,
+//                     key: config.key,
+//                     value: newValue,
+//                     categoryId: config.categoryId,
+//                 }),
+//             });
 
-            if (!response.ok) {
-                throw new Error("Save failed");
-            }
-        }
+//             if (!response.ok) {
+//                 throw new Error("Save failed");
+//             }
+//         }
 
-        const toast = window.sbProps.toastActivate(`${props.categoryTitle} configuration saved successfully`);
-        toast.timeout({ text: "Saved" });
-    } catch (error) {
-        const toast = window.sbProps.toastActivate("Save failed");
-        toast.timeout({ text: "Save failed", isSuccess: false });
-        console.error(error);
-    } finally {
-        isSaving.value = false;
-    }
-}
+//         const toast = window.sbProps.toastActivate(`${props.categoryTitle} configuration saved successfully`);
+//         toast.timeout({ text: "Saved" });
+//     } catch (error) {
+//         const toast = window.sbProps.toastActivate("Save failed");
+//         toast.timeout({ text: "Save failed", isSuccess: false });
+//         console.error(error);
+//     } finally {
+//         isSaving.value = false;
+//     }
+// }
 </script>
 
 <!--
