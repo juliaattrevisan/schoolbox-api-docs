@@ -100,6 +100,10 @@ class Mapper extends \Schoolbox\Mapper
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'deleterFields']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreDeleterFields']);
 
+        /* Clear supporting data curric nodes and work types selections
+         */
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'clearRelations']);
+
         /* Recursive Undeleter callbacks: deleting a dialog agent also deletes all students' responses and feedbacks
          */
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteFeedbacks']);
@@ -239,6 +243,45 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
+     * Clear out supporting data curric nodes and work types prior to saving a new set, allowing you to "clear the lists"
+     * for the maybe-rare circumstance that you want zero curric nodes and zero work types selected...not sure if those
+     * scenarios actually occur at the moment.
+     *
+     * TODO you could potentially do a diff, but it's probably going to be easier to just remove and reinsert
+     *
+     * @param Model $model
+     * @param Model|null $previous
+     * @return void
+     */
+    public function clearRelations(Model $model, ?Model $previous = null): void
+    {
+        /* This feels like a solved problem, but I can't find something similar across the mappers except for
+         * persistFiles() but that doesn't use a join table.
+         */
+        $query = "
+            DELETE FROM reporting_curriculum_node
+            WHERE reporting_id = :id
+        ";
+
+        $this->database->executeQuery($query, [
+            'id' => $model->getId()
+        ]);
+
+        /* This feels like a solved problem, but I can't find something similar across the mappers except for
+         * persistFiles() but that doesn't use a join table.
+         */
+        $query = "
+            DELETE FROM reporting_work_type
+            WHERE reporting_id = :id
+        ";
+
+        $this->database->executeQuery($query, [
+            'id' => $model->getId()
+        ]);
+    }
+
+
+    /**
      * Helper method for hydrating curriculum nodes into the collection of
      * Reporting activity's supporting data, retrieved by `hydrateSelect`.
      *
@@ -248,21 +291,6 @@ class Mapper extends \Schoolbox\Mapper
     private function hydrateSupportingDataCurriculumNodesIntoCollection(GenericCollection $collection): GenericCollection
     {
         $reportingIds = $collection->keys();
-
-        /* For some reason, I have to do this first
-         * This feels like a solved problem, but I can't find something similar across the mappers
-         *
-         * TODO check in with amri
-         */
-        $placeholders = Builder::getArrayPlaceholders($reportingIds, 'reportingIds');
-        $parameters = Builder::getArrayParameters($reportingIds, 'reportingIds');
-
-        $query = "
-            DELETE FROM reporting_curriculum_node
-            WHERE reporting_id IN {$placeholders}
-        ";
-
-        $this->database->query($query, $parameters);
 
         /* Reinsert the ones we chose. Surely there was a more elegant way of doing this, but I can't remember/find one
          * specifically using joinsVia
@@ -309,21 +337,6 @@ class Mapper extends \Schoolbox\Mapper
         $reportingIds = $collection->keys();
 
         $pb = $this->getPredicateBuilder()->in('id', $reportingIds);
-
-        /* For some reason, I have to do this first
-         * This feels like a solved problem, but I can't find something similar across the mappers
-         *
-         * TODO check in with amri
-         */
-        $placeholders = Builder::getArrayPlaceholders($reportingIds, 'reportingIds');
-        $parameters = Builder::getArrayParameters($reportingIds, 'reportingIds');
-
-        $query = "
-            DELETE FROM reporting_work_type
-            WHERE reporting_id IN {$placeholders}
-        ";
-
-        $this->database->query($query, $parameters);
 
         $query = "
             SELECT
