@@ -13,6 +13,7 @@ body.sbx-body {
 
     // Highlight - overridden as they currently implement Sass methods which are not compatible with CSS variables
     .highlight.label,
+    .unsubmitted.label,
     .alert-box,
     .alert-box.highlight,
     mark {
@@ -53,7 +54,6 @@ body.sbx-body {
     }
 
     // Neutral labels - overridden as they currently implement Sass methods which are not compatible with CSS variables
-    .unsubmitted.label,
     .neutral.label,
     .label--moment-draft {
         background-color: var(--sbx-color-foreground-secondary);
