@@ -1,20 +1,5 @@
 <script setup lang="ts">
-type SkinConfigOption = {
-    id: number;
-    name: string;
-    value: string | null;
-    title: string | null;
-    description: string | null;
-    editable: boolean;
-    hidden: boolean;
-};
-
-type SkinConfigSubcategory = {
-    name: string;
-    options: SkinConfigOption[];
-};
-
-type SkinConfigData = Record<string, SkinConfigSubcategory[]>;
+import type { SkinConfigData } from "../js/types/skinConfigTypes";
 
 defineProps<{
     configs: SkinConfigData;
