@@ -209,7 +209,6 @@ class Mapper extends \Schoolbox\Mapper
      * @param Model $object
      * @return bool - Return true on success - whether or not a participation was removed.
      *                This is the expected behaviour for callbacks registered with Schoolbox\Mapper.
-     * @throws Exception
      */
     public function removeParticipationIfNecessary(Model $object): bool
     {
@@ -233,11 +232,7 @@ class Mapper extends \Schoolbox\Mapper
         /* No living feedbacks remain: student is "no longer participating" for the time being
          */
         if (!$numFeedbacks) {
-            $assessment = $this->getJoinMapper('reporting')
-                ->findById($object->getReporting()->getId())
-                ->getAssessmentModel();
-
-            $this->interactionChecker->removeParticipationFromDynamicPlan($object->getLearner(), $assessment);
+            $this->interactionChecker->removeParticipationFromDynamicPlan($object->getLearner(), $object->getReporting()->getAssessmentModel());
         }
 
         return true;
