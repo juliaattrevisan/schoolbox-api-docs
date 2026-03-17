@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { SkinConfigData } from "../js/types/skinConfigTypes";
 
 const props = defineProps<{
+    postRoute: string;
     configs: SkinConfigData;
 }>();
 
 const configs = window.Vue.ref<SkinConfigData>(props.configs);
 const isProcessing = window.Vue.ref(false);
+const loadError = window.Vue.ref<string | null>(null);
 const saveText = window.Vue.computed(() => (isProcessing.value ? "Saving..." : "Save"));
 
 /**
@@ -46,11 +49,38 @@ async function initialiseColourPickers(): Promise<void> {
 }
 
 /**
- * Placeholder submit handler for the initial Skin Config app scaffold.
+ * Persist the current Skin Config payload to the backend.
  */
-function onSaveSelected(): void {
+async function onSaveSelected(): Promise<void> {
     if (isProcessing.value) {
         return;
+    }
+
+    const toast = window.sbProps.toastActivate("Saving...");
+
+    try {
+        isProcessing.value = true;
+        loadError.value = null;
+
+        const response = await apiRequest({
+            url: props.postRoute,
+            method: "POST",
+            body: {
+                configs: configs.value,
+            },
+        });
+
+        if (!response.success) {
+            throw new Error(response.message || "Failed to save");
+        }
+
+        toast.timeout({ text: "Skin config successfully updated" });
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
+        loadError.value = errorMessage;
+        toast.timeout({ text: errorMessage, isSuccess: false });
+    } finally {
+        isProcessing.value = false;
     }
 }
 

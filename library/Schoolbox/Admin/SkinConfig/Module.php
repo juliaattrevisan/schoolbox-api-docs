@@ -41,8 +41,7 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '', 'getConfig', $perms);
-        //TODO - add POST route for saving config changes, and implement the postConfig method in the controller
-//        $this->register('POST', '', 'postConfig', $perms);
+        $this->register('POST', '', 'postConfig', $perms);
     }
 
     /**

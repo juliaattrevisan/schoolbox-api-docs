@@ -11,11 +11,13 @@ namespace Schoolbox\Admin\SkinConfig;
 
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
+use Crell\ApiProblem\ApiProblem;
 use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
+use Symfony\Component\HttpFoundation\Response;
 
 class Controller extends ConfigController
 {
@@ -46,6 +48,9 @@ class Controller extends ConfigController
                 'pageTitle' => 'Skin Config',
                 'pageCurrent'    => $pageCurrent,
                 'configs' => $configs,
+                '_routes' => [
+                    'update' => $this->getRouteIfAuthorized('adminDesignSkinConfig.postConfig'),
+                ],
                 'allBreadcrumbs' => (new Subnav(
                     $this->getConfigLoader(),
                     $this->getUser()
@@ -112,6 +117,44 @@ class Controller extends ConfigController
         }
 
         return $data;
+    }
+
+    /**
+     * Persist the submitted Skin Config payload.
+     */
+    public function postConfig(): void
+    {
+        $configs = $this->requestPost->get('configs') ?? [];
+
+        try {
+            $this->getConfigMapper()->getDatabase()->beginTransaction();
+
+            foreach ($configs as $subcategories) {
+                foreach ($subcategories as $subcategory) {
+                    foreach (($subcategory['options'] ?? []) as $option) {
+                        if (!isset($option['id'])) {
+                            continue;
+                        }
+
+                        $config = $this->getConfigMapper()->findById((int)$option['id']);
+                        $value = $option['value'] ?? null;
+
+                        $this->getConfigMapper()->save(
+                            $config->setValue(is_string($value) ? $value : null)
+                        );
+                    }
+                }
+            }
+
+            $this->getConfigMapper()->getDatabase()->commit();
+            $this->response = $this->responseAsJson(['success' => true]);
+        } catch (\Exception $e) {
+            $this->getConfigMapper()->getDatabase()->rollBack();
+            $status = Response::HTTP_BAD_REQUEST;
+            $problem = new ApiProblem($e->getMessage());
+            $problem->setStatus($status);
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus($status);
+        }
     }
 
     /**

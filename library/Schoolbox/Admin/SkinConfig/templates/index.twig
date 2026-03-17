@@ -5,7 +5,10 @@
     {{ renderAdminNavigation(pageCurrent) }}
     <div class="admin-content">
         <div id="skin-config-container">
-            <skin-config :configs="{{ configs|json_encode }}" />
+            <skin-config
+                post-route="{{ routeLookup('adminDesignSkinConfig.postConfig') }}"
+                :configs="{{ configs|json_encode }}"
+            />
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/colourPicker.js?v={{ config.site_version }}"></script>
         <script src="{{ CDN_PREFIX }}/js/bundle/skinConfig.js?v={{ config.site_version }}"></script>
