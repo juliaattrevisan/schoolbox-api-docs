@@ -209,11 +209,11 @@ abstract class StrategyBase implements IStrategy
      * Get the delete statement to use, rather than rely exclusively on rollback
      * @return string
      */
-    protected function deleteStatement(): string
+    protected function deleteStatement(string $table): string
     {
         if (!$this->perform) {
-            return 'SELECT * ';
+            return sprintf('SELECT %s.*', $table);
         }
-        return 'DELETE ';
+        return sprintf('DELETE %s ', $table);
     }
 }

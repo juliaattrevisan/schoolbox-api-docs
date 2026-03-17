@@ -145,7 +145,7 @@ class CmsLogExample extends StrategyBase
         // build an array length of the chunk size
         $chunkSize = array_fill(0, $this->chunkSize, 0);
         $delPlaceholders = Builder::getArrayPlaceholders($chunkSize, 'id');
-        return $this->database->prepare($this->deleteStatement() . " FROM cmsLog WHERE id IN {$delPlaceholders}");
+        return $this->database->prepare($this->deleteStatement('cmsLog') . " FROM cmsLog WHERE id IN {$delPlaceholders}");
     }
 
     /**
@@ -156,6 +156,6 @@ class CmsLogExample extends StrategyBase
     private function preparePartChunkQueries(array $chunkIds): \PDOStatement
     {
         $delPlaceholders = Builder::getArrayPlaceholders($chunkIds, 'id');
-        return $this->database->prepare($this->deleteStatement() . " FROM cmsLog WHERE id IN {$delPlaceholders}");
+        return $this->database->prepare($this->deleteStatement('cmsLog') . " FROM cmsLog WHERE id IN {$delPlaceholders}");
     }
 }

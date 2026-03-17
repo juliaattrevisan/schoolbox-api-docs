@@ -142,7 +142,10 @@ class MyFilesRetention extends StrategyBase
         // remove any eportfolio publish links that point to these myFile rows (remove the link, leave the component)
         $eportfolioDeleted = $this->deleteEportfolioLinks($fileIds);
 
+        // Delete files before folders so folder deletions don't fail due to my_file rows referencing them
         $filesDeleted = $this->deleteFiles($fileIds);
+
+        // Delete folders (iteratively deleting leaf folders to avoid parent FK violations)
         $foldersDeleted = $this->deleteFolders($folderIds);
 
         // note: transaction commit/rollback is handled by StrategyBase::process(), do not commit here
@@ -189,7 +192,10 @@ class MyFilesRetention extends StrategyBase
         }
 
         $delPlaceholders = Builder::getArrayPlaceholders($fileIds, 'id');
-        $statement = $this->database->prepare($this->deleteStatement() . " FROM my_file WHERE id IN {$delPlaceholders}");
+        // Use JOIN-style delete with an alias so joins can be added safely if needed by FK changes
+        $statement = $this->database->prepare($this->deleteStatement('f') . " FROM my_file AS f WHERE f.id IN {$delPlaceholders}");
+
+        $statement->debugDumpParams();
 
         $statement->execute(Builder::getArrayParameters($fileIds, 'id'));
 
@@ -211,17 +217,54 @@ class MyFilesRetention extends StrategyBase
         // some value which will never be an ID
         $nonExistentId = -1;
 
-        // pad up to chunk size so Builder placeholders are consistent
-        if (count($folderIds) < $this->chunkSize) {
-            $folderIds = array_merge($folderIds, array_fill(0, $this->chunkSize - count($folderIds), $nonExistentId));
+        $deletedTotal = 0;
+
+        // Work on a copy of the IDs so we can iteratively delete leaf folders (those with no children)
+        $remaining = array_values($folderIds);
+
+        while (!empty($remaining)) {
+            // pad up to chunk size so Builder placeholders are consistent
+            if (count($remaining) < $this->chunkSize) {
+                $padded = array_merge($remaining, array_fill(0, $this->chunkSize - count($remaining), $nonExistentId));
+            } else {
+                $padded = $remaining;
+            }
+
+            // Find leaf folders among the remaining set (folders that have no child folders)
+            $selectPlaceholders = Builder::getArrayPlaceholders($padded, 'id');
+            $selectStmt = $this->database->prepare(
+                "SELECT fo.id FROM my_folder AS fo LEFT JOIN my_folder AS ch ON ch.parent = fo.id WHERE ch.id IS NULL AND fo.id IN {$selectPlaceholders}"
+            );
+            $selectStmt->execute(Builder::getArrayParameters($padded, 'id'));
+
+            $idsToDelete = [];
+            while ($row = $selectStmt->fetch()) {
+                $idsToDelete[] = $row['id'];
+            }
+
+            // Nothing deletable this iteration -> break to avoid infinite loop
+            if (empty($idsToDelete)) {
+                break;
+            }
+
+            // pad idsToDelete to chunk size for consistent placeholders
+            if (count($idsToDelete) < $this->chunkSize) {
+                $idsToDelete = array_merge($idsToDelete, array_fill(0, $this->chunkSize - count($idsToDelete), $nonExistentId));
+            }
+
+            $delPlaceholders = Builder::getArrayPlaceholders($idsToDelete, 'id');
+            $delStmt = $this->database->prepare($this->deleteStatement('fo') . " FROM my_folder AS fo WHERE fo.id IN {$delPlaceholders}");
+
+            $delStmt->execute(Builder::getArrayParameters($idsToDelete, 'id'));
+
+            $deleted = $delStmt->rowCount();
+            $deletedTotal += $deleted;
+
+            // remove any truly deleted ids from the remaining set (ignore padded non-existent ids)
+            $remaining = array_values(array_diff($remaining, array_filter($idsToDelete, fn($id) => $id !== $nonExistentId)));
         }
 
-        $delPlaceholders = Builder::getArrayPlaceholders($folderIds, 'id');
-        $statement = $this->database->prepare($this->deleteStatement() . " FROM my_folder WHERE id IN {$delPlaceholders}");
-
-        $statement->execute(Builder::getArrayParameters($folderIds, 'id'));
-
-        return $statement->rowCount();
+        return $deletedTotal;
     }
 
     /**
@@ -245,7 +288,7 @@ class MyFilesRetention extends StrategyBase
         }
 
         $delPlaceholders = Builder::getArrayPlaceholders($fileIds, 'id');
-        $statement = $this->database->prepare($this->deleteStatement() . " FROM eportfolio_component_filelist_item WHERE file_id IN {$delPlaceholders}");
+        $statement = $this->database->prepare($this->deleteStatement('eportfolio_component_filelist_item') . " FROM eportfolio_component_filelist_item WHERE file_id IN {$delPlaceholders}");
 
         $statement->execute(Builder::getArrayParameters($fileIds, 'id'));
 
