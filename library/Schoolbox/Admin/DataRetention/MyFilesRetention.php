@@ -199,12 +199,12 @@ class MyFilesRetention extends StrategyBase
     /**
      * delete Folders by id, returns the number of rows deleted
      *
-     * @param array $fileIds
+     * @param array $folderIds
      * @return int
      */
-    private function deleteFolders(array $fileIds): int
+    private function deleteFolders(array $folderIds): int
     {
-        if (empty($fileIds)) {
+        if (empty($folderIds)) {
             return 0;
         }
 
@@ -212,14 +212,14 @@ class MyFilesRetention extends StrategyBase
         $nonExistentId = -1;
 
         // pad up to chunk size so Builder placeholders are consistent
-        if (count($fileIds) < $this->chunkSize) {
-            $fileIds = array_merge($fileIds, array_fill(0, $this->chunkSize - count($fileIds), $nonExistentId));
+        if (count($folderIds) < $this->chunkSize) {
+            $folderIds = array_merge($folderIds, array_fill(0, $this->chunkSize - count($folderIds), $nonExistentId));
         }
 
-        $delPlaceholders = Builder::getArrayPlaceholders($fileIds, 'id');
+        $delPlaceholders = Builder::getArrayPlaceholders($folderIds, 'id');
         $statement = $this->database->prepare($this->deleteStatement() . " FROM my_folder WHERE id IN {$delPlaceholders}");
 
-        $statement->execute(Builder::getArrayParameters($fileIds, 'id'));
+        $statement->execute(Builder::getArrayParameters($folderIds, 'id'));
 
         return $statement->rowCount();
     }
