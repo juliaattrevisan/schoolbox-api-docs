@@ -2,26 +2,29 @@
 // Commented out since template is commented out
 // import type LanguageSelectionModal from "./LanguageSelectionModal.vue";
 
-interface SubjectRow {
-    id: string;
-    subject: string;
-    level: string;
-    languages: string[];
-    classCode: string;
-    studentCount: number;
-    isLanguageRow?: boolean;
-    parentRowId?: string;
-}
+// Commented out since template is commented out
+// interface SubjectRow {
+//     id: string;
+//     subject: string;
+//     level: string;
+//     languages: string[];
+//     classCode: string;
+//     studentCount: number;
+//     isLanguageRow?: boolean;
+//     parentRowId?: string;
+// }
 
-interface Props {
-    categoryName: string;
-    categoryTitle: string;
-    categoryId: number;
-    saveEndpoint: string;
-    ibSubjects: Array<{ subject: string; level: string }>;
-}
+// Commented out since template is commented out
+// interface Props {
+//     categoryName: string;
+//     categoryTitle: string;
+//     categoryId: number;
+//     saveEndpoint: string;
+//     ibSubjects: Array<{ subject: string; level: string }>;
+// }
 
-const props = defineProps<Props>();
+// Commented out since template is commented out
+// const props = defineProps<Props>();
 
 // Commented out unused variables since template is commented out
 // const isSaving = window.Vue.ref<boolean>(false);
@@ -132,36 +135,36 @@ const props = defineProps<Props>();
 //     }
 // }
 
-/**
- * Gets the human-readable name for a language code
- * @param code - The language code
- * @returns The language name
- */
-function getLanguageName(code: string): string {
-    const languageNames: { [key: string]: string } = {
-        en: "English",
-        es: "Spanish",
-        fr: "French",
-        de: "German",
-        it: "Italian",
-        pt: "Portuguese",
-        ru: "Russian",
-        zh: "Chinese",
-        ja: "Japanese",
-        ko: "Korean",
-        ar: "Arabic",
-        hi: "Hindi",
-        nl: "Dutch",
-        sv: "Swedish",
-        no: "Norwegian",
-        da: "Danish",
-        fi: "Finnish",
-        pl: "Polish",
-        cs: "Czech",
-        hu: "Hungarian",
-    };
-    return languageNames[code] || code;
-}
+// /**
+//  * Gets the human-readable name for a language code
+//  * @param code - The language code
+//  * @returns The language name
+//  */
+// function getLanguageName(code: string): string {
+//     const languageNames: { [key: string]: string } = {
+//         en: "English",
+//         es: "Spanish",
+//         fr: "French",
+//         de: "German",
+//         it: "Italian",
+//         pt: "Portuguese",
+//         ru: "Russian",
+//         zh: "Chinese",
+//         ja: "Japanese",
+//         ko: "Korean",
+//         ar: "Arabic",
+//         hi: "Hindi",
+//         nl: "Dutch",
+//         sv: "Swedish",
+//         no: "Norwegian",
+//         da: "Danish",
+//         fi: "Finnish",
+//         pl: "Polish",
+//         cs: "Czech",
+//         hu: "Hungarian",
+//     };
+//     return languageNames[code] || code;
+// }
 
 // /**
 //  * Gets the languages for the currently editing row

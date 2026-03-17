@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import type { IBConfiguration } from "../../js/types/ibConfigurationTypes";
+// Commented out since template is commented out
+// import type { IBConfiguration } from "../../js/types/ibConfigurationTypes";
 
-interface Props {
-    configurations: IBConfiguration[];
-    isLoading: boolean;
-    saveError: string | null;
-    saveEndpoint: string;
-    categoryTitle: string;
-}
+// Commented out since template is commented out
+// interface Props {
+//     configurations: IBConfiguration[];
+//     isLoading: boolean;
+//     saveError: string | null;
+//     saveEndpoint: string;
+//     categoryTitle: string;
+// }
 
-const props = defineProps<Props>();
+// Commented out since template is commented out
+// const props = defineProps<Props>();
 
 // Commented out unused variables since template is commented out
 // const emit = defineEmits<{
