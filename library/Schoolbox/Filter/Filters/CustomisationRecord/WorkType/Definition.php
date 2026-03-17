@@ -78,17 +78,6 @@ class Definition extends AbstractDefinition
     }
 
     /**
-     * Is this filter mandatory for the specified page?
-     *
-     * @param string $page
-     * @return bool
-     */
-    public static function isMandatory(string $page): bool
-    {
-        return false;
-    }
-
-    /**
      * Returns the twig template to render this filter's panel component into
      *
      * @return string
@@ -96,28 +85,6 @@ class Definition extends AbstractDefinition
     public static function getPanelComponentTemplate(): string
     {
         return '@filterDefinitions/CustomisationRecord/WorkType/templates/component.twig';
-    }
-
-    /**
-     * Prior to admin-configuration, should this filter be enabled on the specified page?
-     *
-     * @param string $page
-     * @return bool
-     */
-    public static function getEnabledInitialState(string $page): bool
-    {
-        return true;
-    }
-
-    /**
-     * Prior to admin-configuration, should this filter be user-configurable on the specified page?
-     *
-     * @param string $page
-     * @return bool
-     */
-    public static function getUserConfigurableInitialState(string $page): bool
-    {
-        return true;
     }
 
     /**
@@ -216,6 +183,15 @@ class Definition extends AbstractDefinition
     public function getSequence(): int
     {
         return 100;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
+    {
+        // All work types should be unselected by default
+        return false;
     }
 
     /**

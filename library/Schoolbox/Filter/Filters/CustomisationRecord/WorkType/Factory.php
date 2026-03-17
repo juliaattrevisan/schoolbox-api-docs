@@ -41,7 +41,6 @@ class Factory extends AbstractFactory
     {
         // Fetch all available work types for customisation records
         $workTypes = $this->workTypeMapper->findAll([
-            'conditions' => ['deleted_at' => null],
             'order' => ['sequence' => 'ASC', 'name' => 'ASC']
         ]);
 
@@ -75,7 +74,6 @@ class Factory extends AbstractFactory
     ): IComponent {
         // Fetch all available work types for customisation records
         $workTypes = $this->workTypeMapper->findAll([
-            'conditions' => ['deleted_at' => null],
             'order' => ['sequence' => 'ASC', 'name' => 'ASC']
         ]);
 

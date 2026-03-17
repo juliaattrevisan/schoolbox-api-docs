@@ -42,11 +42,7 @@ class Component extends Filter\BaseComponent
 
         foreach ($this->workTypes as $workType) {
             $key = (string)$workType->getId();
-            // If no abstract option exists for this work type, default to selected
-            $isSelected = true;
-            if ($abstractOptions->offsetExists($key)) {
-                $isSelected = $abstractOptions[$key]->getDefaults()[$roleType]->isSelected();
-            }
+            $isSelected = $abstractOptions[$key]->getDefaults()[$roleType]->isSelected();
             $availableSelections[$key] = $this->createSelection($key, $isSelected);
         }
 
