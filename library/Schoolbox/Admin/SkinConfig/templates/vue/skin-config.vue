@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { apiRequest } from "@js/util/sbx/apiUtils";
-import type { SkinConfigData } from "../js/types/skinConfigTypes";
+import type { SkinConfigData, SkinConfigOption } from "../js/types/skinConfigTypes";
 
 const props = defineProps<{
     postRoute: string;
@@ -27,16 +27,29 @@ function getCategoryTitle(categoryKey: string): string {
 }
 
 /**
+ * Apply a raw CSS custom property immediately for colour options that define one.
+ * @param option The current skin config option.
+ */
+function applyCustomProperty(option: SkinConfigOption): void {
+    if (option.customProperty === null) {
+        return;
+    }
+    if (option.value === null || option.value === "") {
+        document.documentElement.style.removeProperty(option.customProperty);
+        return;
+    }
+    document.documentElement.style.setProperty(option.customProperty, option.value);
+}
+
+/**
  * Initialise colour picker inputs once the component has rendered.
  */
 async function initialiseColourPickers(): Promise<void> {
     await window.Vue.nextTick();
-
     document.querySelectorAll("[data-colour-picker]").forEach((element) => {
         if (!(element instanceof HTMLInputElement) || element.id === "") {
             return;
         }
-
         document.dispatchEvent(
             new CustomEvent("colourPickerInitialise", {
                 detail: {
@@ -55,13 +68,10 @@ async function onSaveSelected(): Promise<void> {
     if (isProcessing.value) {
         return;
     }
-
     const toast = window.sbProps.toastActivate("Saving...");
-
     try {
         isProcessing.value = true;
         loadError.value = null;
-
         const response = await apiRequest({
             url: props.postRoute,
             method: "POST",
@@ -69,11 +79,9 @@ async function onSaveSelected(): Promise<void> {
                 configs: configs.value,
             },
         });
-
         if (!response.success) {
             throw new Error(response.message || "Failed to save");
         }
-
         toast.timeout({ text: "Skin config successfully updated" });
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
@@ -141,6 +149,8 @@ window.Vue.onMounted(() => {
                                     :name="option.name"
                                     data-colour-picker
                                     :disabled="!option.editable"
+                                    @input="applyCustomProperty(option)"
+                                    @change="applyCustomProperty(option)"
                                 />
                             </div>
                             <div v-else-if="option.type === 'textarea'">

@@ -24,52 +24,78 @@ $kernel->setupSentryTrace(__FILE__);
 // Do stuff
 /** @var IConfigLoader $config */
 $config = $kernel->get('config');
+/** @var \Schoolbox\MapperFactory $mapperFactory */
+$mapperFactory = $kernel->get('mapperFactory');
+/** @var ConfigMapper $configMapper */
+$configMapper = $mapperFactory->get(ConfigMapper::class);
 
 // Now output stuff
 $colorConfigMapping = [
-    // Nav bar colors
     'skin_colour_navigation_foreground'        => '--navigation-foreground',
     'skin_colour_navigation_background'        => '--navigation-background',
     'skin_colour_navigation_hover'             => '--navigation-hover',
-
-    // Off-canvas colors
     'skin_colour_offcanvas_foreground'         => '--off-canvas-foreground',
     'skin_colour_offcanvas_background'         => '--off-canvas-background',
     'skin_colour_offcanvas_hover'              => '--off-canvas-hover',
-
-    // Accounts menu colors
     'accounts_menu_text_colour'                => '--accounts-menu-foreground',
     'accounts_menu_bg_colour'                  => '--accounts-menu-background',
     'accounts_menu_hover_colour'               => '--accounts-menu-hover',
-
-    // Content UI colors
     'skin_colour_content_ui_foreground'        => '--content-ui-foreground',
     'skin_colour_content_ui_background'        => '--content-ui-background',
     'skin_colour_content_ui_hover'             => '--content-ui-hover',
     'skin_colour_content_ui_selected'          => '--content-ui-selected',
-
-    // Content UI submit colors
     'skin_colour_content_ui_submit_foreground' => '--content-ui-submit-foreground',
     'skin_colour_content_ui_submit_background' => '--content-ui-submit-background',
-
-     // Accent colors
     'skin_colour_accent_foreground'            => '--accent-foreground',
     'skin_colour_accent_background'            => '--accent-background',
     'skin_colour_accent_hover'                 => '--accent-hover',
-
-     // Logo background color
     'skin_colour_logo_background'              => '--logo-background',
-
-    // Body background color
     'skin_colour_body_bg'                      => '--body-background',
-
-    // Login form background color
     'skin_colour_login_background'             => '--login-form-background',
-
-    // Form colors
     'skin_colour_form_input_border_color'      => '--form-border-color',
     'skin_colour_form_background_hover_color'  => '--form-bg-hover-color',
 ];
+
+$skinColourConfigs = $configMapper->findByColumnList(
+    [
+        'type_id' => ConfigMapper::TYPE_SKIN_CONFIG,
+        'field_id' => ConfigMapper::FIELD_COLOUR,
+    ],
+    [
+        'order' => [
+            'sequence' => 'ASC',
+            ConfigMapper::COL_ID => 'ASC',
+        ],
+    ]
+);
+
+$colorConfigMapping = $skinColourConfigs->reduce(
+    /** @param array<string, string> $carry */
+    static function (array $carry, Config $skinConfig): array {
+        $options = $skinConfig->getOptions();
+
+        if ($options === null || trim($options) === '') {
+            return $carry;
+        }
+
+        $decoded = json_decode($options, true);
+
+        if (!is_array($decoded)) {
+            return $carry;
+        }
+
+        $customProperty = $decoded['customProperty'] ?? null;
+
+        if (!is_string($customProperty) || $customProperty === '') {
+            return $carry;
+        }
+
+        $carry[$skinConfig->getName()] = $customProperty;
+
+        return $carry;
+    },
+    []
+);
 $colorFactory   = new ColorFactory();
 $transformer    = new Transformer();
 $twigVars       = [];

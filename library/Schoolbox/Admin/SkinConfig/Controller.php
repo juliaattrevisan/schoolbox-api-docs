@@ -103,6 +103,7 @@ class Controller extends ConfigController
                 'value' => $config->getValue(),
                 'title' => $config->getTitle(),
                 'description' => $config->getDescription(),
+                'customProperty' => $this->getCustomProperty($config),
                 'type' => $this->getOptionType($config),
                 'editable' => $config->getEditable(),
                 'hidden' => $config->getHidden(),
@@ -171,5 +172,27 @@ class Controller extends ConfigController
             ConfigMapper::FIELD_COLOUR => 'colour',
             default => 'colour',
         };
+    }
+
+    /**
+     * Extract the raw CSS custom property mapping from config options metadata.
+     */
+    private function getCustomProperty(Config $config): ?string
+    {
+        $options = $config->getOptions();
+
+        if ($options === null || trim($options) === '') {
+            return null;
+        }
+
+        $decoded = json_decode($options, true);
+
+        if (!is_array($decoded)) {
+            return null;
+        }
+
+        $customProperty = $decoded['customProperty'] ?? null;
+
+        return is_string($customProperty) && $customProperty !== '' ? $customProperty : null;
     }
 }
