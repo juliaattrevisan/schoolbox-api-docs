@@ -24,7 +24,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
 use Schoolbox\User;
-use Schoolbox\Permission\Access\Access;
 
 class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 {

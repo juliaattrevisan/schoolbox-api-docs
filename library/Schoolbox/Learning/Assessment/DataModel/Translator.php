@@ -449,7 +449,7 @@ class Translator
         // Ideally this would exist in the DueWork translator, but that would require making this method public.
         // That is too dangerous, best to perform an instanceof here.
         if ($domainObject instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
-            /** @var \Schoolbox\Learning\Assessment\DueWork\Model $dataModel */
+            /** @var \Schoolbox\Assessment\Component\SubmissionBox $dataModel */
             $domainObject->setInstructorMarkType($dataModel->getInstructorMarkType());
             $domainObject->setInstructorMaxMark($dataModel->getInstructorMaxMark());
             $domainObject->setInstructorGradeGroup($dataModel->getInstructorGradeGroup());
@@ -463,7 +463,7 @@ class Translator
         /* Reporting activities have both instructor- and display representations
          */
         if ($domainObject instanceof Reporting) {
-            /** @var Reporting $dataModel */
+            /** @var \Schoolbox\Learning\Assessment\DataModel\Reporting\Model $dataModel */
             $domainObject->setInstructorMarkType($dataModel->getInstructorMarkType());
             $domainObject->setInstructorMaxMark($dataModel->getInstructorMaxMark());
             $domainObject->setInstructorGradeGroup($dataModel->getInstructorGradeGroup());

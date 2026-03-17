@@ -3367,12 +3367,6 @@ parameters:
 			path: library/Schoolbox/InstanceRegistry/ApiClient.php
 
 		-
-			message: '#^Method Schoolbox\\Learning\\Analytics\\CohortAnalysis\:\:getParticipatingStudents\(\) should return iterable\<Schoolbox\\User\>&Schoolbox\\GenericCollection but returns iterable\<Schoolbox\\User\>&Schoolbox\\Collection\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Learning/Analytics/CohortAnalysis.php
-
-		-
 			message: '#^PHPDoc tag @var above a method has no effect\.$#'
 			identifier: varTag.misplaced
 			count: 4
@@ -3441,12 +3435,6 @@ parameters:
 		-
 			message: '#^Instanceof between Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel and Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Learning\\Assessment\\DueWork\\Model is not subtype of native type Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\.$#'
-			identifier: varTag.nativeType
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator.php
 
