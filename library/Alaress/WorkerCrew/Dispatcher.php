@@ -153,9 +153,8 @@ class Dispatcher implements DispatcherInterface
      * Fired by the periodic timer, and also re-triggered when a worker becomes ready.
      *
      * @param TimerInterface $timer
-     * @throws PDOException
      */
-    public function dispatch(TimerInterface $timer)
+    public function dispatch(TimerInterface $timer): void
     {
         // there's nothing in the queue
         if (!$this->q->count()) {
