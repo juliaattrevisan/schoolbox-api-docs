@@ -27,7 +27,7 @@ class Module extends BaseModule
 
     protected function registerRoutes(): void
     {
-        /* Superusers only
+        /* Superusers or those with Design Full Access can access this module
          */
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),

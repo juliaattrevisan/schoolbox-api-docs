@@ -125,9 +125,10 @@ class Controller extends ConfigController
     public function postConfig(): void
     {
         $configs = $this->requestPost->get('configs') ?? [];
+        $database = $this->getConfigMapper()->getDatabase();
 
         try {
-            $this->getConfigMapper()->getDatabase()->beginTransaction();
+            $database->beginTransaction();
 
             foreach ($configs as $subcategories) {
                 foreach ($subcategories as $subcategory) {
@@ -136,20 +137,23 @@ class Controller extends ConfigController
                             continue;
                         }
 
-                        $config = $this->getConfigMapper()->findById((int)$option['id']);
                         $value = $option['value'] ?? null;
 
-                        $this->getConfigMapper()->save(
-                            $config->setValue(is_string($value) ? $value : null)
-                        );
+                        $database->prepareQuery(
+                            'UPDATE config SET value = :value WHERE configID = :configID',
+                            [
+                                'configID' => (int)$option['id'],
+                                'value' => is_string($value) ? $value : null,
+                            ]
+                        )->execute();
                     }
                 }
             }
 
-            $this->getConfigMapper()->getDatabase()->commit();
+            $database->commit();
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {
-            $this->getConfigMapper()->getDatabase()->rollBack();
+            $database->rollBack();
             $status = Response::HTTP_BAD_REQUEST;
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($status);
