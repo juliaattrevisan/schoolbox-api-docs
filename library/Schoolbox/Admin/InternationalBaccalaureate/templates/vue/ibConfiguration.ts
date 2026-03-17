@@ -1,7 +1,2 @@
-import IBConfiguration from "./ib-configuration.vue";
-
-window.Vue.createApp({
-    components: {
-        "ib-configuration": IBConfiguration,
-    },
-}).mount("#ib-configuration-container");
+// Vue app placeholder for IB Configuration
+// Implementation moved to feature-develop/SA-21578

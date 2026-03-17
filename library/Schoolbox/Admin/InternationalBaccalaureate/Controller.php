@@ -81,66 +81,31 @@ class Controller extends BaseController
 
     /**
      * Get configuration data for a specific category
+     * Implementation moved to feature-develop/SA-21578
      *
      * @api GET /adminv2/international-baccalaureate/configuration/api/{categoryId}
      */
     public function getConfigurationData(): void
     {
-        // Get categoryId from URL
-        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
-        $categoryId = 1; // Default
-        if (preg_match('/\/configuration\/api\/(\d+)/', $requestUri, $matches)) {
-            $categoryId = (int) $matches[1];
-        }
-
-        $configurations = [];
-
-        if ($categoryId === 1) { // General tab - show actual form fields
-            $configurations = [
-                [
-                    'id' => 1,
-                    'categoryId' => 1,
-                    'key' => 'school_name',
-                    'value' => 'Example School',
-                    'description' => 'Enter the school\'s name as registered with the IB.',
-                    'type' => 'text',
-                    'label' => 'School Name'
-                ],
-                [
-                    'id' => 2,
-                    'categoryId' => 1,
-                    'key' => 'school_code',
-                    'value' => 'ABC123',
-                    'description' => 'Enter the school\'s code as provided by the IB.',
-                    'type' => 'text',
-                    'label' => 'School Code'
-                ]
-            ];
-        } else {
-            // All other tabs - return empty array for dummy content
-            $configurations = [];
-        }
-
-        // Set proper headers
+        // Placeholder method - implementation moved to feature-develop/SA-21578
         header('Content-Type: application/json');
-        echo json_encode($configurations);
+        echo json_encode([]);
         exit;
     }
 
     /**
      * Save configuration data
+     * Implementation moved to feature-develop/SA-21578
      *
      * @api POST /adminv2/international-baccalaureate/configuration/api/save
      */
     public function saveConfiguration(): void
     {
-        // TODO: Validate and save to database
-        // For now, just return success
-
+        // Placeholder method - implementation moved to feature-develop/SA-21578
         header('Content-Type: application/json');
         echo json_encode([
-            'success' => true,
-            'message' => 'Configuration saved successfully'
+            'success' => false,
+            'message' => 'Implementation moved to feature-develop/SA-21578'
         ]);
         exit;
     }
