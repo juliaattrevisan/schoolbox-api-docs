@@ -195,11 +195,7 @@ class Mapper extends \Schoolbox\Mapper
             return true;
         }
 
-        $assessment = $this->getJoinMapper('reporting')
-            ->findById($object->getReporting()->getId())
-            ->getAssessmentModel();
-
-        return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getLearner(), $assessment);
+        return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getLearner(), $object->getReporting()->getAssessmentModel());
     }
 
 
