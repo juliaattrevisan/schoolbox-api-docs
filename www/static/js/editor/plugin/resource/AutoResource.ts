@@ -15,7 +15,7 @@ import {
 } from "ckeditor5";
 import { slideUp } from "@js/util/animateUtils";
 import type { Resource } from "@js/resource/resourceUtils";
-import { addResource } from "@js/editor/plugin/resource/editorResourceUtils";
+import { addResource, exitLinkContext, insertSoftBreak } from "@js/editor/plugin/resource/editorResourceUtils";
 import ResourceUI from "@js/editor/plugin/resource/ResourceUI";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 import { EditorToolbar } from "@js/editor/types/editorTypes";
@@ -88,6 +88,11 @@ export default class ResourceEditing extends Plugin {
             this.editor.model.change((writer) => {
                 writer.setAttribute("alt", data.name, imageElement);
                 writer.setAttribute("linkHref", data.default, imageElement);
+
+                const insertPosition = writer.createPositionAfter(imageElement);
+                writer.setSelection(imageElement, "after");
+                insertSoftBreak(this.editor, writer, insertPosition);
+                exitLinkContext(this.editor, writer);
             });
         });
     }

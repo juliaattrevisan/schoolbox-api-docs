@@ -2,7 +2,7 @@
  * CKEditor-specific utility functions/helpers for the resource plugins
  */
 
-import type { Editor, Element, Writer } from "ckeditor5";
+import type { Editor, Element, Position, Writer } from "ckeditor5";
 import { getWithoutExtension } from "@js/util/fileUtils";
 import { getAttributes, ResourceType } from "@js/resource/resourceUtils";
 import type { Resource } from "@js/resource/resourceUtils";
@@ -15,7 +15,7 @@ import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
  * @param editor - the ckeditor instance
  * @param writer - the model writer used for the current change block
  */
-function exitLinkContext(editor: Editor, writer: Writer): void {
+export function exitLinkContext(editor: Editor, writer: Writer): void {
     const { selection } = editor.model.document;
     const linkAttributes = Array.from(selection.getAttributeKeys()).filter((attribute) => attribute.startsWith("link"));
 
@@ -25,6 +25,22 @@ function exitLinkContext(editor: Editor, writer: Writer): void {
     }
 
     writer.removeSelectionAttribute(linkAttributes);
+}
+
+/**
+ * Insert a soft break after an inline resource when the schema allows it.
+ * @param editor - the ckeditor instance
+ * @param writer - the model writer used for the current change block
+ * @param position - the insertion point after the inline resource
+ */
+export function insertSoftBreak(editor: Editor, writer: Writer, position: Position): void {
+    if (!editor.model.schema.checkChild(position, "softBreak")) {
+        return;
+    }
+
+    const softBreak = writer.createElement("softBreak");
+    editor.model.insertContent(softBreak, position);
+    writer.setSelection(softBreak, "after");
 }
 
 /**
