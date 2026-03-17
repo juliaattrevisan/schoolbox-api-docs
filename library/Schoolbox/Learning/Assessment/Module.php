@@ -1034,8 +1034,6 @@ class Module extends BaseModule
                     $lessonPlanDataModelMapper,
                     $dialogAgentDataModelMapper,
                     $dialogAgentScenarioMapper,
-                    $this->injector->get('dialogAgentResponseDataSource'),
-                    $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Mapper::class),
                     $filtersAssessmentIdFinder,
                     $filtersFactoryFactory,
                     $filterMapper,

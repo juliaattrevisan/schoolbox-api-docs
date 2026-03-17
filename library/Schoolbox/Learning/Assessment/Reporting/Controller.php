@@ -11,10 +11,8 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Reporting;
 
 use Aura\Router\Exception\RouteNotFound;
-use Schoolbox\Admin\DialogAgent\Scenario\Criterion\Model as CriteriaModel;
 use Schoolbox\Admin\DialogAgent\Scenario\Mapper as DialogAgentScenarioMapper;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
-use Schoolbox\Application\Exception\Misconfigured;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Config\ConfigMapper;
@@ -28,29 +26,21 @@ use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper as DialogAgentDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Mapper as DialogAgentResponseMessageMapper;
-use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Translator\ModelToArray as DialogAgentResponseMessageTranslator;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Assessment\DialogAgent\Button;
-use Schoolbox\Learning\Assessment\Reporting\Model;
-use Schoolbox\Learning\Assessment\DialogAgent\Response;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
-use Schoolbox\Learning\Assessment\Timeline\Full as FullTimeline;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
-use Schoolbox\Learning\Course\DataModel\AbstractUnit;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
-use Schoolbox\Learning\DialogAgent\ValidDialogAgentEnabled;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
@@ -98,8 +88,6 @@ class Controller extends Assessment\Controller
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
      * @param DialogAgentDataModelMapper $dialogAgentDataModelMapper
      * @param DialogAgentScenarioMapper $dialogAgentScenarioMapper
-     * @param DialogAgentResponseMapper $dialogAgentResponseMapper
-     * @param DialogAgentResponseMessageMapper $dialogAgentResponseMessageMapper
      * @param IdFinder $filtersAssessmentIdFinder
      * @param CompositeFactoryFactory $filtersFactoryFactory
      * @param Filter\Mapper $filterMapper
@@ -128,15 +116,13 @@ class Controller extends Assessment\Controller
         LessonPlanDataModelMapper $lessonPlanDataModelMapper,
         protected DialogAgentDataModelMapper $dialogAgentDataModelMapper,
         protected DialogAgentScenarioMapper $dialogAgentScenarioMapper,
-        private DialogAgentResponseMapper $dialogAgentResponseMapper,
-        private DialogAgentResponseMessageMapper $dialogAgentResponseMessageMapper,
         protected Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder,
         protected Filter\CompositeFactoryFactory $filtersFactoryFactory,
         protected Filter\Mapper $filterMapper,
         protected Filter\Selection\Mapper $filterSelectionMapper,
-        private CourseImplementation\Mapper $courseImplementationMapper,
-        private UnitImplementation\Mapper $unitImplementationMapper,
-        private EditorTemplateHelper $editorTemplateHelper
+        CourseImplementation\Mapper $courseImplementationMapper,
+        UnitImplementation\Mapper $unitImplementationMapper,
+        EditorTemplateHelper $editorTemplateHelper
     ) {
         parent::__construct(
             $userMapper,
