@@ -196,6 +196,12 @@ class CommandLineTool extends CliTool\App
         $csvStrats = (string)$this->getOpt(self::OPT_LONG_STRATS);
         if ('' !== $csvStrats) {
             $selectedStrats = $this->validateStrats($csvStrats, $validStrats);
+            // if no strats are valid, log and exit
+            if (count($selectedStrats) === 0) {
+                $logger->notice(sprintf("No valid strats found in '%s', exiting. Valid strats are: %s", $csvStrats, implode(', ', $validStrats)));
+                exit;
+            }
+            $logger->debug(sprintf("Selected strats from csv '%s': %s", $csvStrats, implode(', ', $selectedStrats)));
         }
 
         // if set override the retention period for all strats, for testing purposes
@@ -303,10 +309,6 @@ class CommandLineTool extends CliTool\App
          * because loosely typed data is poopy
          */
         $temp = array_map('strval', $temp);
-
-        /* Lowercase everything
-         */
-        $temp = array_map('strtolower', $temp);
 
         /* Trim all the strings in the set
          * because doing manual trimming is boring
