@@ -40,7 +40,7 @@ class MyFilesRetention extends StrategyBase
         $query = "
             SELECT
                 count(*) AS files
-            FROM my_file
+            FROM " . self::TABLE_NAME_FILE . "
             WHERE deleted_at IS NOT NULL AND deleted_at < :old
         ";
 
@@ -54,7 +54,7 @@ class MyFilesRetention extends StrategyBase
         $query = "
             SELECT
                 count(*) AS folders
-            FROM my_folder
+            FROM " . self::TABLE_NAME_FOLDER . "
             WHERE deleted_at IS NOT NULL AND deleted_at < :old
         ";
 
@@ -81,7 +81,7 @@ class MyFilesRetention extends StrategyBase
         $query = "
             SELECT
                 id
-            FROM my_file
+            FROM " . self::TABLE_NAME_FILE . "
             WHERE deleted_at IS NOT NULL AND deleted_at < :old
         ";
 
@@ -103,7 +103,7 @@ class MyFilesRetention extends StrategyBase
         $folderQuery = "
             SELECT
                 id
-            FROM my_folder
+            FROM " . self::TABLE_NAME_FOLDER . "
             WHERE deleted_at IS NOT NULL AND deleted_at < :old
         ";
 
@@ -193,7 +193,7 @@ class MyFilesRetention extends StrategyBase
 
         $delPlaceholders = Builder::getArrayPlaceholders($fileIds, 'id');
         // Use JOIN-style delete with an alias so joins can be added safely if needed by FK changes
-        $statement = $this->database->prepare($this->deleteStatement('f') . " FROM my_file AS f WHERE f.id IN {$delPlaceholders}");
+        $statement = $this->database->prepare($this->deleteStatement('f') . " FROM " . self::TABLE_NAME_FILE . " AS f WHERE f.id IN {$delPlaceholders}");
 
         $statement->execute(Builder::getArrayParameters($fileIds, 'id'));
 
@@ -231,7 +231,7 @@ class MyFilesRetention extends StrategyBase
             // Find leaf folders among the remaining set (folders that have no child folders)
             $selectPlaceholders = Builder::getArrayPlaceholders($padded, 'id');
             $selectStmt = $this->database->prepare(
-                "SELECT fo.id FROM my_folder AS fo LEFT JOIN my_folder AS ch ON ch.parent = fo.id WHERE ch.id IS NULL AND fo.id IN {$selectPlaceholders}"
+                "SELECT fo.id FROM " . self::TABLE_NAME_FOLDER . " AS fo LEFT JOIN " . self::TABLE_NAME_FOLDER . " AS ch ON ch.parent = fo.id WHERE ch.id IS NULL AND fo.id IN {$selectPlaceholders}"
             );
             $selectStmt->execute(Builder::getArrayParameters($padded, 'id'));
 
@@ -251,7 +251,7 @@ class MyFilesRetention extends StrategyBase
             }
 
             $delPlaceholders = Builder::getArrayPlaceholders($idsToDelete, 'id');
-            $delStmt = $this->database->prepare($this->deleteStatement('fo') . " FROM my_folder AS fo WHERE fo.id IN {$delPlaceholders}");
+            $delStmt = $this->database->prepare($this->deleteStatement('fo') . " FROM " . self::TABLE_NAME_FOLDER . " AS fo WHERE fo.id IN {$delPlaceholders}");
 
             $delStmt->execute(Builder::getArrayParameters($idsToDelete, 'id'));
 
