@@ -304,7 +304,9 @@ class Pool extends EventEmitter implements PoolInterface
             return;
         }
 
-        // backpressure: React has buffered the data; wait for drain before marking BUSY
+        // backpressure:
+        // React has buffered the data; wait for drain before marking BUSY.
+        // Also: release the worker if it is blocked on write
         $this->writeTimers[$pid] = $this->loop->addTimer(
             $this->strat->getWorkerWriteTimeout() / 1000,
             function () use ($pid): void {
@@ -315,6 +317,8 @@ class Pool extends EventEmitter implements PoolInterface
             },
         );
 
+        // Stream has been fully read by the worker:
+        // cancel the release worker timer
         $stream->once('drain', function () use ($pid): void {
             if (!$this->workers->contains($pid)) {
                 return;
