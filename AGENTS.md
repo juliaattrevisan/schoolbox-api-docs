@@ -202,6 +202,13 @@ A monolithic legacy class that mixes routing, session management, template rende
 - New code should use the Aura-based MVC stack (controllers in `conf/`, `WebRequest\Kernel` for request handling)
 - Existing `SitePage`-based pages are candidates for migration; migrate within ticket scope when practical
 
+### `DeprecatedModel` (`library/DeprecatedModel.php`)
+
+A historic database access class, which predates the Mapper/Model architecture in `library/Schoolbox/Mapper.php`.
+
+Where practical, replace usage of `DeprecatedModel` subclasses with their equivalent `Mapper`:
+- the `$_table` property sets the table in `DeprecatedModel`: the `Mapper` equivalent is a call to the `hasTable()` method
+
 ### jQuery
 
 jQuery is being removed in favour of modern vanilla JS and Vue 3. Do not add new jQuery usage. Replace jQuery calls when touching existing code where it is within ticket scope.
@@ -217,6 +224,7 @@ jQuery is being removed in favour of modern vanilla JS and Vue 3. Do not add new
 - Prefer editing existing files over creating new ones
 - Follow existing patterns in the module you're working in
 - Use `phpstan-baseline.neon` for pre-existing PHPStan issues; do not suppress new ones
+  - If a PHPStan issue cannot be avoided, a `@phpstan-ignore-next-line - <explanation>` comment is acceptable
 
 ### Avoid
 
