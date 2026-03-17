@@ -74,6 +74,8 @@ class Reporting implements IAssessmentTypeTranslator
      */
     public function translateToDataModel(IAssessable|ReportingObject $domainObject, IAssessableDataModel|ReportingModel $dataModel): void
     {
+        /** @var ReportingModel $dataModel */
+        /** @var ReportingObject $domainObject */
         $dataModel->setMarkVisibility($domainObject->getMarkVisibility());
 
         /* Display Mark Types (aka Mark Scheme, for some historical reason)
@@ -131,6 +133,8 @@ class Reporting implements IAssessmentTypeTranslator
      */
     public function translateToDomainModel(IAssessableDataModel|ReportingModel $dataModel, IAssessable|ReportingObject $domainObject): void
     {
+        /** @var ReportingModel $dataModel */
+        /** @var ReportingObject $domainObject */
         $domainObject->setMarkVisibility($dataModel->getMarkVisibility());
 
         /* Display Mark Types (aka Mark Scheme, for some historical reason)
