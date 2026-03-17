@@ -288,6 +288,7 @@ class Model extends AbstractAssessment
      */
     public function overwrite(IAssessable|Reporting $source): IAssessable
     {
+        /** @var Model $source */
         parent::overwrite($source);
 
         /* Reporting-specific grading options
