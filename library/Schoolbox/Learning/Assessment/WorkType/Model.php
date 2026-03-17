@@ -55,10 +55,10 @@ class Model implements ISoftDeletable, Sequential
     /** @var bool */
     private $staffOrInstructorVisibleOnly;
 
-    /** @var bool */
+    /** @var ?bool */
     private ?bool $isVisibleToParents = null;
 
-    /** @var bool */
+    /** @var ?bool */
     private ?bool $isVisibleToStudents = null;
 
     /** @var ?bool */
