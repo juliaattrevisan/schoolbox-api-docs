@@ -184,15 +184,15 @@ class Import extends CliTool\App
             $ttlAbs === null ? 'none' : date('Y-m-d H:i:s', $ttlAbs),
         ));
 
-        if (!$this->perform()) {
-            $this->keysRestored++;
-            return;
-        }
-
         // Don't overwrite data that already exists in the target Redis
         if ($this->redis->exists($newKey)) {
             $this->getLogger()->warning("Key already exists in Redis, skipping: {$newKey}");
             $this->keysSkippedExisting++;
+            return;
+        }
+
+        if (!$this->perform()) {
+            $this->keysRestored++;
             return;
         }
 
