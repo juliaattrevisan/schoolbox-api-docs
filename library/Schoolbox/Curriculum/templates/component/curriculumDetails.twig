@@ -5,17 +5,20 @@
               <p class="no-margin">
                   {% if node.code %}
                       {% if isRouteAuthorized('curriculum.browse') %}
-                          [<a title="View in Manage Curriculum"
+                          [<a title="View in Manage Curriculum" 
+                              data-test="curriculum-code-{{ node.code }}"
                               href="{{ routeLookup('curriculum.browse') }}#{{ node.id }}">{{ node.code }}</a>]
                       {% else %}
-                          [{{ node.code }}]
+                          [<span data-test="curriculum-code-{{ node.code }}">{{ node.code }}</span>]
                       {% endif %}
                   {% endif %}
-                  {{ node.name }}
+                   <span data-test="curriculum-description-{{ node.code }}">{{ node.name }}</span>
               </p>
 
               {% if node.description %}
-                  <article>{{ node.description|purify }}</article>
+                  <article data-test="curriculum-body-{{ node.code }}">
+                {{ node.description|purify }}
+            </article>
               {% endif %}
           </li>
       {% endfor %}
