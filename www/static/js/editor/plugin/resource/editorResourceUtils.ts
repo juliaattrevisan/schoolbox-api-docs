@@ -67,6 +67,17 @@ export function addResource(editor: Editor, resource: Resource): void {
             editor.model.document.selection.getFirstPosition(),
             "imageInline",
         ) as Element;
+
+        if (!("linkHref" in resourceAttributes)) {
+            const inheritedLinkAttributes = Array.from(image.getAttributeKeys()).filter((attribute) =>
+                attribute.startsWith("link"),
+            );
+
+            inheritedLinkAttributes.forEach((attribute) => {
+                writer.removeAttribute(attribute, image);
+            });
+        }
+
         writer.setSelection(image, "after"); // deselect the selected image, otherwise further actions will overwrite it
         if (resource.type === ResourceType.DOCUMENT || resource.type === ResourceType.OTHER) {
             // we get without extension for now to avoid a copy/paste issue in ckeditor
