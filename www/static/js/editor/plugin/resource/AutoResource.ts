@@ -41,7 +41,10 @@ function isSelectionStillAtUploadedImage(editor: Plugin["editor"], imageElement:
     const { selection } = editor.model.document;
     const positionAfterImage = editor.model.createPositionAfter(imageElement);
 
-    return selection.getSelectedElement() === imageElement || selection.getFirstPosition()?.isEqual(positionAfterImage) === true;
+    return (
+        selection.getSelectedElement() === imageElement ||
+        selection.getFirstPosition()?.isEqual(positionAfterImage) === true
+    );
 }
 
 export default class ResourceEditing extends Plugin {
