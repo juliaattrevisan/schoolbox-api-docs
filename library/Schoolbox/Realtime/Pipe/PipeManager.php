@@ -39,7 +39,8 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     public const REDIS_SESSION_PREFIX_BASE = 'PHPREDIS_SESSION:';
     public const REDIS_SESSION_PREFIX = self::REDIS_SESSION_PREFIX_BASE . INSTANCE_ID . ':';
 
-    private const INACTIVE_TIMEOUT     = 300; // 5 minutes
+    private const INACTIVE_TIMEOUT          = 300; // 5 minutes
+    private const INACTIVITY_SCAN_INTERVAL  = 60;
 
     public const PIPE_METHOD_ACKNOWLEDGE = 'ack';
     public const PIPE_METHOD_ALERT       = 'alert';
@@ -86,11 +87,17 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     private array $pushTransactions = [];
 
     /**
-     * User timeouts, indexed by instance ID and then by user ID
+     * Last activity timestamp per user, indexed by instance ID and then by user ID.
      *
-     * @var array<string, array<int, TimerInterface>>
+     * @var array<string, array<int, int>>
      */
-    private array $userTimeouts = [];
+    private array $userLastActivity = [];
+
+    /**
+     * Single shared timer that periodically scans for inactive users.
+     * Null when there are no active users.
+     */
+    private ?TimerInterface $inactivityScanTimer = null;
 
     /**
      * File descriptor limit: if the number of descriptors this pipe manager
@@ -264,15 +271,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         // If this was the last pipe for this user:
         // clean up any inactivity timeouts
         if (isset($instanceId, $userId) && $this->pipes->userPipeCount($instanceId, $userId) === 0) {
-            if (
-                isset($this->userTimeouts[$instanceId][$userId])
-                && $this->userTimeouts[$instanceId][$userId] instanceof TimerInterface
-            ) {
-                $this->reactLoop->cancelTimer($this->userTimeouts[$instanceId][$userId]);
-                unset($this->userTimeouts[$instanceId][$userId]);
-                if (empty($this->userTimeouts[$instanceId])) {
-                    unset($this->userTimeouts[$instanceId]);
-                }
+            unset($this->userLastActivity[$instanceId][$userId]);
+            if (empty($this->userLastActivity[$instanceId])) {
+                unset($this->userLastActivity[$instanceId]);
             }
 
             $this->subscriptionManager->removeSubscription($instanceId, $userId);
@@ -743,7 +744,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     }
 
     /**
-     * Refresh all timeouts associated with this user in this instance.
+     * Record activity for a user and ensure the inactivity scan timer is running.
      *
      * @param string $instanceId
      * @param int    $userId
@@ -751,20 +752,45 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     private function refreshUser(string $instanceId, int $userId): void
     {
-        if (
-            isset($this->userTimeouts[$instanceId][$userId])
-            && $this->userTimeouts[$instanceId][$userId] instanceof TimerInterface
-        ) {
-            $this->reactLoop->cancelTimer($this->userTimeouts[$instanceId][$userId]);
-            unset($this->userTimeouts[$instanceId][$userId]);
+        $this->userLastActivity[$instanceId][$userId] = time();
+        $this->ensureScanTimerRunning();
+    }
+
+    /**
+     * Start the inactivity scan timer if it is not already running.
+     *
+     * @return void
+     */
+    private function ensureScanTimerRunning(): void
+    {
+        if ($this->inactivityScanTimer === null) {
+            $this->inactivityScanTimer = $this->reactLoop->addPeriodicTimer(
+                self::INACTIVITY_SCAN_INTERVAL,
+                $this->scanInactiveUsers(...),
+            );
+        }
+    }
+
+    /**
+     * Scan all tracked users and time out any that have been inactive for longer than INACTIVE_TIMEOUT.
+     * Stops the scan timer once no active users remain.
+     *
+     * @return void
+     */
+    private function scanInactiveUsers(): void
+    {
+        foreach ($this->userLastActivity as $instanceId => $users) {
+            foreach ($users as $userId => $lastActivity) {
+                if ((time() - $lastActivity) >= self::INACTIVE_TIMEOUT) {
+                    $this->onTimeout($instanceId, $userId);
+                }
+            }
         }
 
-        $this->userTimeouts[$instanceId][$userId] = $this->reactLoop->addTimer(
-            self::INACTIVE_TIMEOUT,
-            function () use ($instanceId, $userId): void {
-                $this->onTimeout($instanceId, $userId);
-            }
-        );
+        if (empty($this->userLastActivity)) {
+            $this->reactLoop->cancelTimer($this->inactivityScanTimer);
+            $this->inactivityScanTimer = null;
+        }
     }
 
     /**
@@ -791,11 +817,11 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             $pipe->close();
         }
 
-        unset($this->userTimeouts[$instanceId][$userId], $this->pushTransactions[$instanceId][$userId]);
+        unset($this->userLastActivity[$instanceId][$userId], $this->pushTransactions[$instanceId][$userId]);
 
         // Clean up empty parent arrays to prevent memory accumulation
-        if (empty($this->userTimeouts[$instanceId])) {
-            unset($this->userTimeouts[$instanceId]);
+        if (empty($this->userLastActivity[$instanceId])) {
+            unset($this->userLastActivity[$instanceId]);
         }
         if (empty($this->pushTransactions[$instanceId])) {
             unset($this->pushTransactions[$instanceId]);
