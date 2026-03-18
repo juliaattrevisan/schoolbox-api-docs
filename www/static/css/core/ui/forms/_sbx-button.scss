@@ -268,4 +268,10 @@ body.sbx-body {
     .count-filter {
         gap: var(--sbx-size-xs);
     }
+
+    a.button.sbx-button {
+        display: inline-flex;
+        gap: var(--sbx-size-s);
+        align-items: center;
+    }
 }
