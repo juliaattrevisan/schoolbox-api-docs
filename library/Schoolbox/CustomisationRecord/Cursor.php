@@ -70,7 +70,7 @@ class Cursor implements ICursor
         if ($this->orderBy === self::CURSOR_ORDER_BY_CREATED_AT) {
             return $this->codec->encode([
                 self::CURSOR_ORDER_BY_CREATED_AT_COLUMN => $lastRecord->getCreatedAt()?->getDatabase(),
-                self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getUser()->getId(),
+                self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getId(),
             ]);
         }
 
@@ -87,7 +87,7 @@ class Cursor implements ICursor
         if ($this->orderBy === self::CURSOR_ORDER_BY_CLASS_NAME) {
             return $this->codec->encode([
                 self::CURSOR_ORDER_BY_CLASS_NAME_COLUMN => $context?->getTitle(),
-                self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getUser()->getId(),
+                self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getId(),
             ]);
         }
 
@@ -96,7 +96,7 @@ class Cursor implements ICursor
         if ($this->orderBy === self::CURSOR_ORDER_BY_UNIT_NAME) {
             return $this->codec->encode([
                 self::CURSOR_ORDER_BY_UNIT_NAME_COLUMN => $context?->getFolder()?->getTitle(),
-                self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getUser()->getId(),
+                self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getId(),
             ]);
         }
 
@@ -105,7 +105,7 @@ class Cursor implements ICursor
         if ($this->orderBy === self::CURSOR_ORDER_BY_CUSTOMISATION_TYPE) {
             return $this->codec->encode([
                 self::CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN => $lastRecord->getPlan()->getIsDynamic(),
-                self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getUser()->getId(),
+                self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getId(),
             ]);
         }
         /* Encode cursor for default ordering (by student name)
@@ -113,7 +113,7 @@ class Cursor implements ICursor
         return $this->codec->encode([
             'u.chosen_name' => $lastRecord->getUser()->getGivenName(),
             'u.lastname'    => $lastRecord->getUser()->getLastName(),
-            self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getUser()->getId(),
+            self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getId(),
         ]);
     }
 
