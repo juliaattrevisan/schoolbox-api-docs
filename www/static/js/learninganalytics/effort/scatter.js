@@ -86,7 +86,7 @@
                             var template =
                                 "<tr>" +
                                 "<td>" +
-                                '<span style="display:block;width:32px;height:32px;background-image:url(/portrait.php?id={UID}&size=square32);"></span>' +
+                                '<span style="display:block;width:32px;height:32px;background-image:url(/portrait.php?id={UID}&size=square32);border-radius:var(--sbx-border-radius-full, 0);"></span>' +
                                 "</td>" +
                                 "<td>" +
                                 "<em>{NAME}</em><br />{VALUE}" +
