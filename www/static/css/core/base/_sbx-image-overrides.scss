@@ -11,6 +11,7 @@ body.sbx-body {
     .card .card-feature-avatar,
     .tile,
     .banner img,
+    .img-gallery img,
     img[src*="/portrait.php?"] {
         // All images inherit the configured field roundness for visual consistency.
         border-radius: var(--sbx-config-field-roundness);
