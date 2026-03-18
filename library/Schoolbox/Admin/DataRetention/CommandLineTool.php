@@ -166,16 +166,6 @@ class CommandLineTool extends CliTool\App
             $loopCount,
             $chunkSize,
         ));
-//        $bus->add(new OrphanedMyFilesRetention(
-//                      $logger,
-//                      $this->perform(),
-//                      $this->getDatabaseInternal(),
-//                      $lock,
-//                      $this->getConfig(),
-//                      $endTime,
-//                      $loopCount,
-//                      $chunkSize,
-//                  ));
 
         // get strats to run, default all, and filter the bus to only those strats
         $validStrats = array_map(
