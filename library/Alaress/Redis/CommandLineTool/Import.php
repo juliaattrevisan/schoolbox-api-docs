@@ -99,6 +99,8 @@ class Import extends CliTool\App
         }
     }
 
+    private const PROGRESS_INTERVAL = 1000;
+
     /**
      * Read all rows from the staging table in chunks, group by key, and write to Redis.
      *
@@ -110,6 +112,11 @@ class Import extends CliTool\App
      */
     private function importKeys(string $targetInstanceId): void
     {
+        $totalKeys     = (int) $this->getDatabaseInternal()->executeQuery(
+            'SELECT COUNT(DISTINCT redis_key) FROM `' . self::STAGING_TABLE . '`'
+        )->fetchColumn();
+        $keysProcessed = 0;
+
         $chunkSize = 500;
         $lastId    = 0;
         $carry     = []; // [ redis_key => [ rows ] ] for the key straddling the last boundary
@@ -147,6 +154,15 @@ class Import extends CliTool\App
 
             foreach ($grouped as $originalKey => $keyRows) {
                 $this->importKeyRows($originalKey, $keyRows, $targetInstanceId);
+                $keysProcessed++;
+                if ($keysProcessed % self::PROGRESS_INTERVAL === 0) {
+                    $this->getLogger()->info(sprintf(
+                        'Progress: %d / %d keys (%d%%)',
+                        $keysProcessed,
+                        $totalKeys,
+                        (int) ($keysProcessed / $totalKeys * 100),
+                    ));
+                }
             }
 
             if ($isLastPage) {

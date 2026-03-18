@@ -125,6 +125,8 @@ class Export extends CliTool\App
         }
     }
 
+    private const PROGRESS_INTERVAL = 1000;
+
     /**
      * Scan Redis and write matching keys to the staging table.
      */
@@ -153,6 +155,15 @@ class Export extends CliTool\App
                         continue;
                     }
                     $this->exportKey($key, $instanceId);
+                    $keysProcessed = $this->keysExported + $this->keysSkipped;
+                    if ($keysProcessed % self::PROGRESS_INTERVAL === 0) {
+                        $this->getLogger()->info(sprintf(
+                            'Progress: %d key(s) exported (%d row(s) inserted), %d skipped',
+                            $this->keysExported,
+                            $this->rowsInserted,
+                            $this->keysSkipped,
+                        ));
+                    }
                     break;
                 }
             }
