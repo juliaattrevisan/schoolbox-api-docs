@@ -149,12 +149,7 @@ export default {
                 formData.append("users[]", item);
             });
             for (const [key, value] of Object.entries(this.updateFields)) {
-                if (Array.isArray(value)) {
-                    // Convert arrays to comma-separated strings
-                    formData.append(key, value.join(","));
-                } else {
-                    formData.append(key, value);
-                }
+                formData.append(key, value);
             }
             return formData;
         },
