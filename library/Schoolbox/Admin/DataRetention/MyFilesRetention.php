@@ -262,6 +262,16 @@ class MyFilesRetention extends StrategyBase
             $remaining = array_values(array_diff($remaining, array_filter($idsToDelete, fn($id) => $id !== $nonExistentId)));
         }
 
+        if (!empty($remaining)) {
+            $this->log->error(
+                sprintf(
+                    'Unable to delete %d folder(s); remaining IDs: %s',
+                    count($remaining),
+                    implode(',', $remaining)
+                )
+            );
+        }
+
         return $deletedTotal;
     }
 
