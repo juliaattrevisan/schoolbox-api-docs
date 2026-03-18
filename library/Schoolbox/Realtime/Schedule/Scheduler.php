@@ -143,6 +143,9 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
             }
 
             // attempt to schedule this trigger - there are a fair few things that could go wrong...
+            // This uses the scheduler's configuration:
+            // getMaxQueueLength, getWarningQueueLength, getQueueDelay only AFAICT,
+            // but also protocol and supported actions?
             $this->scheduleNotification($trigger, $resolver);
 
             // notice that we don't acknowledge the resolver here before returning

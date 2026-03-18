@@ -16,6 +16,8 @@ use Alaress\Async\Notification\Postman;
 use Alaress\Date\Clock;
 use Alaress\Scheduler\Cache\RedisCache;
 use Alaress\Sentry\Tracing\Tracer;
+use Alaress\WorkerCrew\Pooling\ConfigurationReader;
+use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategyBuilder;
 use Predis\ClientInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -35,6 +37,8 @@ $kernel = new Daemon\Kernel('Schedule', [Daemon\Kernel::OPTION_ERRORS => E_ALL,]
 
 // CREATE SCHEDULER APP
 $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) use (&$scheduler): void {
+    $configFile = $opts['c'] ?? (SITE_root . '/tools/mq/scheduled.conf');
+
     /** @var Notif $notif */
     $notif = $di->get('notif');
 
@@ -62,8 +66,10 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
 
         $postman = new Postman($log, $subscriptionCache, $loop, $flags, INSTANCE_ID, $redis);
 
-        $strat     = new DefaultDispatchStrategy($flags);
-        $scheduler = new Scheduler(
+        // Relevant config options to scheduled:
+        $stratBuilder = new ConfiguredDispatchStrategyBuilder(new ConfigurationReader($configFile)->readConfig());
+        $strat        = $stratBuilder->build($flags);
+        $scheduler    = new Scheduler(
             $loop,
             $strat,
             $log,
@@ -75,6 +81,10 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
             // future trigger time must be <= the JIT's TTL.
             min(Scheduler::DEFAULT_MAX_FUTURE_TRIGGER_TIME, RedisCache::EXPIRY_WINDOW),
         );
+
+        // Summarise strategy
+        $delim = \array_key_exists(Daemon\Kernel::OPT_LONG_PORCELAIN, $opts) ? ' ' : "\n    ";
+        $log->info(implode($delim, ['Using strategy:'] + $stratBuilder->summarise()), ['char' => '+']);
 
         // restoring from redis cache
         $jit = new RedisCache($redis, $log, INSTANCE_ID);
