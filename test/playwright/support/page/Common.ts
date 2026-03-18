@@ -19,7 +19,7 @@ export default class Common {
 
     static readonly USER_EDENREED = "Eden Reed";
 
-    static readonly USER_JANAREED = "Jana Reed";
+    static readonly USER_JANAREED = "Ms Jana Reed";
 
     static readonly USER_ID_JANAREED = 25;
 

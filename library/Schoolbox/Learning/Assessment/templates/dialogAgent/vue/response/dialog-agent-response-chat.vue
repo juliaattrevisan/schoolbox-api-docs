@@ -306,12 +306,20 @@ window.Vue.watch(
             class="button"
             type="button"
             :disabled="isHelpRequestChanging || isLoading || undefined"
+            data-test="dialog-agent-response-request-help"
             @click="changeHelpRequest(currentResponse._routes.assistanceRequest)"
         >
             {{ isHelpRequestChanging ? "Requesting Assistance..." : "Request Teacher Help" }}
         </button>
         <nav>
-            <button class="button submit icon-approve" type="submit" @click="openSubmitModal">Submit</button>
+            <button
+                class="button submit icon-approve"
+                type="submit"
+                data-test="dialog-agent-response-submit"
+                @click="openSubmitModal"
+            >
+                Submit
+            </button>
         </nav>
     </div>
 
@@ -339,6 +347,7 @@ window.Vue.watch(
                         class="button highlight l-mar--0"
                         type="button"
                         :disabled="isHelpRequestChanging || isLoading || undefined"
+                        data-test="dialog-agent-response-request-help-dismiss"
                         @click="changeHelpRequest(currentResponse._routes.assistanceResolve)"
                     >
                         Help No Longer Needed
@@ -393,6 +402,7 @@ window.Vue.watch(
                     <button
                         class="button submit"
                         :disabled="isSubmitting || undefined"
+                        data-test="dialog-agent-response-submit-confirm"
                         @click="() => submitResponse(false)"
                     >
                         {{ isSubmitting ? "Submitting... please wait" : "Submit" }}

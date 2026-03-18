@@ -20,7 +20,7 @@ const SELECTOR_HOMEPAGE_ACTIONS_FOLDER_MANAGEGROUP = "homepage-actions-folder-ma
 
 const SELECTOR_COMPONENT_DUEWORK_CREATE_BUTTON = "component-dueWork-create-button";
 const SELECTOR_COMPONENT_DUEWORK_EMPTY_CREATE_BUTTON = "component-dueWork-empty-create-button";
-const SELECTOR_COMPONENT_DUEWORK_POPOUT_BUTTON = "sbx-pop-out-duework-options"; // Append "[assessmentID]-button"
+const SELECTOR_COMPONENT_DUEWORK_POPOUT_BUTTON = "sbx-pop-out-component-assessment-actions-"; // Append "[assessmentID]-button"
 const SELECTOR_COMPONENT_ASSESSMENT_TITLE = "component-assessment-title"; // Append "-[assessmentID]"
 const SELECTOR_COMPONENT_ASSESSMENT_ACTIONS_DELETE = "component-assessment-actions-delete"; // Append "-[assessmentID]"
 const SELECTOR_COMPONENT_ASSESSMENT_ACTIONS_VIEWSTATUS = "component-assessment-actions-viewStatus"; // Append "-[assessmentID]"

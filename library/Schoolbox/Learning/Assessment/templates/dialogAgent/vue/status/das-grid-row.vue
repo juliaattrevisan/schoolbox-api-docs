@@ -42,12 +42,12 @@ function getProgressTickTitle(participant: DialogAgentParticipant): string {
 </script>
 
 <template>
-    <tr>
+    <tr data-test="das-grid-row">
         <td class="u-sticky-left u-sticky-left--first u-border-right actions-small-1">
             <div class="small-12 card">
                 <user-link :user="participant.user">
                     <user-photo :user="participant.user" render="small" />
-                    <h3 class="l-mar-xl--right">{{ participant.user.fullName }}</h3>
+                    <h3 class="l-mar-xl--right" data-test="das-grid-row-user-name">{{ participant.user.fullName }}</h3>
                 </user-link>
                 <p>
                     <span
@@ -58,6 +58,7 @@ function getProgressTickTitle(participant: DialogAgentParticipant): string {
                         class="meta"
                         :title="getProgressTickTitle(participant)"
                         :data-tooltip="getProgressTickTitle(participant) || undefined"
+                        data-test="das-grid-row-status-meta"
                     >
                         {{ STATUS_LABELS[getResponseStatus(participant.response)] }}
                     </span>

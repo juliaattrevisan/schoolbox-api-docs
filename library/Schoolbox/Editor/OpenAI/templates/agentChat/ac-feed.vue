@@ -58,7 +58,7 @@ defineExpose({ feedEl });
 </script>
 
 <template>
-    <div class="ac-feed">
+    <div class="ac-feed" data-test="ac-feed">
         <slot name="header"></slot>
 
         <div
