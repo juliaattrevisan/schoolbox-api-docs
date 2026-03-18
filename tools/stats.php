@@ -461,7 +461,7 @@ $app = new class extends CliTool\App {
         // Build the unknown model query
         $queryList['openai_model_unknown'] = [
             "SELECT COUNT(*) FROM openai_log WHERE " . implode(' AND ', array_map(fn ($model) => 'model NOT LIKE ?', OpenAiConfig::AI_MODELS)),
-            OpenAiConfig::AI_MODELS,
+            array_map(fn ($model) => $model . '%', OpenAiConfig::AI_MODELS),
         ];
 
         // Query image model usage
