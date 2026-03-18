@@ -100,15 +100,15 @@ class Import extends CliTool\App
     }
 
     private const PROGRESS_INTERVAL = 1000;
+    private const SET_MEMBER_BATCH  = 50;
 
     /**
-     * Read all rows from the staging table in chunks, group by key, and write to Redis.
+     * Stream rows from the staging table and write to Redis one key at a time.
      *
-     * Keyset pagination on the auto-increment primary key keeps memory usage bounded to
-     * one chunk at a time rather than materialising all LONGBLOB payloads at once.
-     * The export inserts all rows for each key consecutively, so a key's rows are never
-     * interleaved with another key's rows; any key that straddles a chunk boundary is
-     * carried over and merged with the first rows of the next chunk.
+     * Rows are fetched in small chunks via keyset pagination. Set keys are written
+     * incrementally — members are SADDed in batches of SET_MEMBER_BATCH as they arrive
+     * and EXPIREAT is applied once the key closes — so memory stays bounded regardless
+     * of how many members a single set contains.
      */
     private function importKeys(string $targetInstanceId): void
     {
@@ -116,10 +116,16 @@ class Import extends CliTool\App
             'SELECT COUNT(DISTINCT redis_key) FROM `' . self::STAGING_TABLE . '`'
         )->fetchColumn();
         $keysProcessed = 0;
+        $lastId        = 0;
 
-        $chunkSize = 500;
-        $lastId    = 0;
-        $carry     = []; // [ redis_key => [ rows ] ] for the key straddling the last boundary
+        // Streaming state for the key whose rows are currently being consumed
+        $streamKey      = null;
+        $streamNewKey   = null;
+        $streamType     = null;
+        $streamTtlAbs   = null;
+        $streamSourceId = null;
+        $streamSkip     = false;
+        $streamMembers  = []; // buffered set members awaiting SADD
 
         while (true) {
             $fresh = $this->getDatabaseInternal()->executeQuery(
@@ -127,106 +133,116 @@ class Import extends CliTool\App
                  FROM `' . self::STAGING_TABLE . '`
                  WHERE id > :lastId
                  ORDER BY id
-                 LIMIT ' . $chunkSize,
+                 LIMIT 500',
                 ['lastId' => $lastId]
             )->fetchAll();
 
-            $isLastPage = count($fresh) < $chunkSize; // also true when empty
+            $isLastPage = count($fresh) < 500;
 
-            if (!empty($fresh)) {
-                $lastId  = (int) end($fresh)['id'];
-                $grouped = $carry;
-                $carry   = [];
-                foreach ($fresh as $row) {
-                    $grouped[$row['redis_key']][] = $row;
-                }
-                // On non-final pages the last key may have more rows in the next chunk.
-                if (!$isLastPage) {
-                    end($grouped);
-                    $lastKey = key($grouped);
-                    $carry   = [$lastKey => array_pop($grouped)];
-                }
-            } else {
-                // Empty page: flush any rows carried over from the previous chunk.
-                $grouped = $carry;
-                $carry   = [];
-            }
+            foreach ($fresh as $row) {
+                $lastId = (int) $row['id'];
 
-            foreach ($grouped as $originalKey => $keyRows) {
-                $this->importKeyRows($originalKey, $keyRows, $targetInstanceId);
-                $keysProcessed++;
-                if ($keysProcessed % self::PROGRESS_INTERVAL === 0) {
-                    $this->getLogger()->info(sprintf(
-                        'Progress: %d / %d keys (%d%%)',
-                        $keysProcessed,
-                        $totalKeys,
-                        (int) ($keysProcessed / $totalKeys * 100),
+                if ($row['redis_key'] !== $streamKey) {
+                    // Close the previous set key before moving on
+                    if ($streamKey !== null && !$streamSkip && $streamType === 'set') {
+                        $this->closeSetKey($streamNewKey, $streamMembers, $streamTtlAbs);
+                        $this->keysRestored++;
+                        $this->logProgress(++$keysProcessed, $totalKeys);
+                    }
+
+                    $streamKey      = $row['redis_key'];
+                    $streamType     = $row['redis_type'];
+                    $streamSourceId = $row['source_instance_id'];
+                    $streamTtlAbs   = $row['redis_ttl_abs'] !== null ? (int) $row['redis_ttl_abs'] : null;
+                    $streamNewKey   = $this->rekey($streamKey, $streamSourceId, $targetInstanceId);
+                    $streamSkip     = false;
+                    $streamMembers  = [];
+
+                    if ($streamTtlAbs !== null && $streamTtlAbs <= time()) {
+                        $this->getLogger()->debug("Skipping expired key: {$streamKey}");
+                        $this->keysSkippedExpired++;
+                        $this->logProgress(++$keysProcessed, $totalKeys);
+                        $streamSkip = true;
+                        continue;
+                    }
+
+                    if ($this->redis->exists($streamNewKey)) {
+                        $this->getLogger()->warning("Key already exists in Redis, skipping: {$streamNewKey}");
+                        $this->keysSkippedExisting++;
+                        $this->logProgress(++$keysProcessed, $totalKeys);
+                        $streamSkip = true;
+                        continue;
+                    }
+
+                    $this->getLogger()->debug(sprintf(
+                        'Restoring %s key: %s → %s (TTL: %s)',
+                        $streamType,
+                        $streamKey,
+                        $streamNewKey,
+                        $streamTtlAbs === null ? 'none' : date('Y-m-d H:i:s', $streamTtlAbs),
                     ));
+                }
+
+                if ($streamSkip) {
+                    continue;
+                }
+
+                switch ($streamType) {
+                    case 'string':
+                        if ($this->perform()) {
+                            $this->restoreStringKey($streamNewKey, $row['redis_value'], $streamTtlAbs);
+                        }
+                        $this->keysRestored++;
+                        $this->logProgress(++$keysProcessed, $totalKeys);
+                        $streamSkip = true; // single-row type; no further rows expected
+                        break;
+
+                    case 'set':
+                        $streamMembers[] = $this->rekey($row['redis_value'], $streamSourceId, $targetInstanceId);
+                        if (count($streamMembers) >= self::SET_MEMBER_BATCH && $this->perform()) {
+                            $this->redis->sadd($streamNewKey, $streamMembers);
+                            $streamMembers = [];
+                        }
+                        break;
                 }
             }
 
             if ($isLastPage) {
+                // Finalize the last open set key
+                if ($streamKey !== null && !$streamSkip && $streamType === 'set') {
+                    $this->closeSetKey($streamNewKey, $streamMembers, $streamTtlAbs);
+                    $this->keysRestored++;
+                }
                 break;
             }
         }
     }
 
     /**
-     * Evaluate a single Redis key's rows and write to Redis if appropriate.
+     * Flush any remaining buffered members and apply TTL to complete a set key write.
      *
-     * @param array<int, array<string, mixed>> $keyRows
+     * @param string[] $members
      */
-    private function importKeyRows(string $originalKey, array $keyRows, string $targetInstanceId): void
+    private function closeSetKey(string $newKey, array $members, ?int $ttlAbs): void
     {
-        $firstRow = $keyRows[0];
-        $type     = $firstRow['redis_type'];
-        $sourceId = $firstRow['source_instance_id'];
-        $ttlAbs   = $firstRow['redis_ttl_abs'] !== null ? (int) $firstRow['redis_ttl_abs'] : null;
-
-        // Skip keys that expired in transit
-        if ($ttlAbs !== null && $ttlAbs <= time()) {
-            $this->getLogger()->debug("Skipping expired key: {$originalKey}");
-            $this->keysSkippedExpired++;
-            return;
+        if (!empty($members) && $this->perform()) {
+            $this->redis->sadd($newKey, $members);
         }
-
-        $newKey = $this->rekey($originalKey, $sourceId, $targetInstanceId);
-
-        $this->getLogger()->debug(sprintf(
-            'Restoring %s key: %s → %s (TTL: %s)',
-            $type,
-            $originalKey,
-            $newKey,
-            $ttlAbs === null ? 'none' : date('Y-m-d H:i:s', $ttlAbs),
-        ));
-
-        // Don't overwrite data that already exists in the target Redis
-        if ($this->redis->exists($newKey)) {
-            $this->getLogger()->warning("Key already exists in Redis, skipping: {$newKey}");
-            $this->keysSkippedExisting++;
-            return;
+        if ($ttlAbs !== null && $this->perform()) {
+            $this->redis->expireat($newKey, $ttlAbs);
         }
+    }
 
-        if (!$this->perform()) {
-            $this->keysRestored++;
-            return;
+    private function logProgress(int $keysProcessed, int $totalKeys): void
+    {
+        if ($keysProcessed % self::PROGRESS_INTERVAL === 0) {
+            $this->getLogger()->info(sprintf(
+                'Progress: %d / %d keys (%d%%)',
+                $keysProcessed,
+                $totalKeys,
+                (int) ($keysProcessed / $totalKeys * 100),
+            ));
         }
-
-        switch ($type) {
-            case 'string':
-                $this->restoreStringKey($newKey, $firstRow['redis_value'], $ttlAbs);
-                break;
-
-            case 'set':
-                $members = array_map(
-                    fn(array $row): string => $this->rekey($row['redis_value'], $sourceId, $targetInstanceId),
-                    $keyRows
-                );
-                $this->restoreSetKey($newKey, $members, $ttlAbs);
-                break;
-        }
-
-        $this->keysRestored++;
     }
 
     /**
@@ -235,22 +251,6 @@ class Import extends CliTool\App
     private function restoreStringKey(string $key, ?string $value, ?int $ttlAbs): void
     {
         $this->redis->set($key, (string)$value);
-        if ($ttlAbs !== null) {
-            $this->redis->expireat($key, $ttlAbs);
-        }
-    }
-
-    /**
-     * Write a set key to Redis with optional TTL.
-     *
-     * @param string[] $members
-     */
-    private function restoreSetKey(string $key, array $members, ?int $ttlAbs): void
-    {
-        if (empty($members)) {
-            return;
-        }
-        $this->redis->sadd($key, $members);
         if ($ttlAbs !== null) {
             $this->redis->expireat($key, $ttlAbs);
         }
