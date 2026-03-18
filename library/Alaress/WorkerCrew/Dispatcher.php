@@ -12,7 +12,6 @@ namespace Alaress\WorkerCrew;
 use Alaress\Exception\IO\IOException;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
-use PDOException;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -22,6 +21,14 @@ use SplQueue;
 
 class Dispatcher implements DispatcherInterface
 {
+    /**
+     * Only iterate the queue this many times in dispatch.
+     *
+     * It is not expected the queue will be iterated anywhere near this many
+     * times: this is simply an infinite loop protection.
+     */
+    private const QUEUE_ITERATION_LIMIT = 10_000;
+
     /** @var SplQueue */
     protected $q;
 
@@ -171,8 +178,19 @@ class Dispatcher implements DispatcherInterface
         }
 
         // Loop over the queue and dispatch commands, as long as there's workers
-        // to handle them
+        // to handle them and the iteration safeguard is not reached
+        $i = 1;
         while ($this->q->count()) {
+            $i++;
+            if ($i > self::QUEUE_ITERATION_LIMIT) {
+                $this->log->warning(
+                    sprintf(
+                        "Queue iteration limit of %d has been unexpectedly reached: stopping iteration. This is probably a code issue.",
+                        self::QUEUE_ITERATION_LIMIT,
+                    )
+                );
+                break;
+            }
             if (!$this->dispatchSingleCommand()) {
                 break;
             }
