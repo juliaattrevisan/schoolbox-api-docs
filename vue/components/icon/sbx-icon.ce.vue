@@ -443,10 +443,12 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'day-view'"
                 class="sbx-icon__svg"
-                viewBox="0 0 32 32"
+                viewBox="0 0 448 512"
                 xmlns="http://www.w3.org/2000/svg"
             >
-                <path d="M0 0h32v32h-32v-32z"></path>
+                <path
+                    d="M120 0c13.3 0 24 10.7 24 24l0 40 160 0 0-40c0-13.3 10.7-24 24-24s24 10.7 24 24l0 40 32 0c35.3 0 64 28.7 64 64l0 288c0 35.3-28.7 64-64 64L64 480c-35.3 0-64-28.7-64-64L0 128C0 92.7 28.7 64 64 64l32 0 0-40c0-13.3 10.7-24 24-24zm0 112l-56 0c-8.8 0-16 7.2-16 16l0 288c0 8.8 7.2 16 16 16l320 0c8.8 0 16-7.2 16-16l0-288c0-8.8-7.2-16-16-16l-264 0zm24 144l0 80 80 0 0-80-80 0zm-48 0c0-26.5 21.5-48 48-48l80 0c26.5 0 48 21.5 48 48l0 80c0 26.5-21.5 48-48 48l-80 0c-26.5 0-48-21.5-48-48l0-80z"
+                ></path>
             </svg>
             <svg
                 v-else-if="props.name === 'delete'"
@@ -499,10 +501,12 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'down-arrow'"
                 class="sbx-icon__svg"
-                viewBox="0 0 32 32"
+                viewBox="0 0 448 512"
                 xmlns="http://www.w3.org/2000/svg"
             >
-                <path d="M16 26l16-16-4-4-12 12-12-12-4 4z"></path>
+                <path
+                    d="M207.5 409c9.4 9.4 24.6 9.4 33.9 0l200-200c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-183 183-183-183c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l200 200z"
+                ></path>
             </svg>
             <svg
                 v-else-if="props.name === 'download'"
@@ -1084,10 +1088,12 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'menu'"
                 class="sbx-icon__svg"
-                viewBox="0 0 32 32"
+                viewBox="0 0 448 512"
                 xmlns="http://www.w3.org/2000/svg"
             >
-                <path d="M0 4h32v4h-32v-4zM0 14h32v4h-32v-4zM0 24h32v4h-32v-4z"></path>
+                <path
+                    d="M0 88C0 74.7 10.7 64 24 64l400 0c13.3 0 24 10.7 24 24s-10.7 24-24 24L24 112C10.7 112 0 101.3 0 88zM0 256c0-13.3 10.7-24 24-24l400 0c13.3 0 24 10.7 24 24s-10.7 24-24 24L24 280c-13.3 0-24-10.7-24-24zM448 424c0 13.3-10.7 24-24 24L24 448c-13.3 0-24-10.7-24-24s10.7-24 24-24l400 0c13.3 0 24 10.7 24 24z"
+                ></path>
             </svg>
             <svg
                 v-else-if="props.name === 'mic'"
@@ -1152,20 +1158,22 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'month-view'"
                 class="sbx-icon__svg"
-                viewBox="0 0 32 32"
+                viewBox="0 0 448 512"
                 xmlns="http://www.w3.org/2000/svg"
             >
                 <path
-                    d="M0 0h8v8h-8v-8zM12 0h8v8h-8v-8zM24 0h8v8h-8v-8zM0 12h8v8h-8v-8zM12 12h8v8h-8v-8zM24 12h8v8h-8v-8zM0 24h8v8h-8v-8zM12 24h8v8h-8v-8zM24 24h8v8h-8v-8z"
+                    d="M120 0c13.3 0 24 10.7 24 24l0 40 160 0 0-40c0-13.3 10.7-24 24-24s24 10.7 24 24l0 40 32 0c35.3 0 64 28.7 64 64l0 288c0 35.3-28.7 64-64 64L64 480c-35.3 0-64-28.7-64-64L0 128C0 92.7 28.7 64 64 64l32 0 0-40c0-13.3 10.7-24 24-24zM384 432c8.8 0 16-7.2 16-16l0-64-88 0 0 80 72 0zm16-128l0-80-88 0 0 80 88 0zm-136 0l0-80-80 0 0 80 80 0zm-128 0l0-80-88 0 0 80 88 0zM48 352l0 64c0 8.8 7.2 16 16 16l72 0 0-80-88 0zm136 0l0 80 80 0 0-80-80 0zM120 112l-56 0c-8.8 0-16 7.2-16 16l0 48 352 0 0-48c0-8.8-7.2-16-16-16l-264 0z"
                 ></path>
             </svg>
             <svg
                 v-else-if="props.name === 'more'"
                 class="sbx-icon__svg"
-                viewBox="0 0 32 32"
+                viewBox="0 0 128 512"
                 xmlns="http://www.w3.org/2000/svg"
             >
-                <path d="M12 0h8v8h-8v-8zM12 12h8v8h-8v-8zM12 24h8v8h-8v-8z"></path>
+                <path
+                    d="M112 80a48 48 0 1 1 -96 0 48 48 0 1 1 96 0zM16 256c0-26.5 21.5-48 48-48s48 21.5 48 48-21.5 48-48 48-48-21.5-48-48zm96 176c0 26.5-21.5 48-48 48s-48-21.5-48-48 21.5-48 48-48 48 21.5 48 48z"
+                ></path>
             </svg>
             <svg
                 v-else-if="['mostly-cloudy', 'weather'].includes(props.name)"
@@ -1470,12 +1478,14 @@ function alertInvalidIconName(): false {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'previous'"
+                v-else-if="['previous', 'return'].includes(props.name)"
                 class="sbx-icon__svg"
-                viewBox="0 0 32 32"
+                viewBox="0 0 320 512"
                 xmlns="http://www.w3.org/2000/svg"
             >
-                <path d="M6 16l16-16 4 4-12 12 12 12-4 4z"></path>
+                <path
+                    d="M7.5 239c-9.4 9.4-9.4 24.6 0 33.9l200 200c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-183-183 183-183c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0L7.5 239z"
+                ></path>
             </svg>
             <svg
                 v-else-if="props.name === 'print'"
@@ -1676,19 +1686,22 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'sort-up'"
                 class="sbx-icon__svg"
-                viewBox="0 0 32 32"
+                viewBox="0 0 384 512"
                 xmlns="http://www.w3.org/2000/svg"
             >
-                <path d="M0 24h32l-16-16z"></path>
+                <path
+                    d="M70.6 176L192 54.6 313.4 176 70.6 176zM2.4 204.2c5 12 16.6 19.8 29.6 19.8l320 0c12.9 0 24.6-7.8 29.6-19.8s2.2-25.7-6.9-34.9l-160-160c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-9.2 9.2-11.9 22.9-6.9 34.9z"
+                ></path>
             </svg>
             <svg
                 v-else-if="props.name === 'sortable'"
                 class="sbx-icon__svg"
-                viewBox="0 0 32 32"
+                viewBox="0 0 384 512"
                 xmlns="http://www.w3.org/2000/svg"
             >
-                <path d="M0 12h32L16 0z" />
-                <path d="M32 18.25H0l16 12z" />
+                <path
+                    d="M192 54.6L70.6 176 313.4 176 192 54.6zM32 224c-12.9 0-24.6-7.8-29.6-19.8S.2 178.5 9.4 169.4l160-160c12.5-12.5 32.8-12.5 45.3 0l160 160c9.2 9.2 11.9 22.9 6.9 34.9S364.9 224 352 224L32 224zM192 457.4L313.4 336 70.6 336 192 457.4zM32 288l320 0c12.9 0 24.6 7.8 29.6 19.8s2.2 25.7-6.9 34.9l-160 160c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-9.2-9.2-11.9-22.9-6.9-34.9S19.1 288 32 288z"
+                />
             </svg>
             <svg
                 v-else-if="props.name === 'sport'"
@@ -1887,19 +1900,22 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'up-arrow'"
                 class="sbx-icon__svg"
-                viewBox="0 0 32 32"
+                viewBox="0 0 448 512"
                 xmlns="http://www.w3.org/2000/svg"
             >
-                <path d="M16 6l-16 16 4 4 12-12 12 12 4-4z"></path>
+                <path
+                    d="M207.5 103c9.4-9.4 24.6-9.4 33.9 0l200 200c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-183-183-183 183c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l200-200z"
+                ></path>
             </svg>
             <svg
                 v-else-if="props.name === 'up-down'"
                 class="sbx-icon__svg"
-                viewBox="0 0 32 32"
+                viewBox="0 0 384 512"
                 xmlns="http://www.w3.org/2000/svg"
             >
-                <path d="M2 14h28l-14-14z"></path>
-                <path d="M30 18h-28l14 14z"></path>
+                <path
+                    d="M192 54.6L70.6 176 313.4 176 192 54.6zM32 224c-12.9 0-24.6-7.8-29.6-19.8S.2 178.5 9.4 169.4l160-160c12.5-12.5 32.8-12.5 45.3 0l160 160c9.2 9.2 11.9 22.9 6.9 34.9S364.9 224 352 224L32 224zM192 457.4L313.4 336 70.6 336 192 457.4zM32 288l320 0c12.9 0 24.6 7.8 29.6 19.8s2.2 25.7-6.9 34.9l-160 160c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-9.2-9.2-11.9-22.9-6.9-34.9S19.1 288 32 288z"
+                ></path>
             </svg>
             <svg
                 v-else-if="['upload', 'post'].includes(props.name)"
@@ -1961,10 +1977,12 @@ function alertInvalidIconName(): false {
             <svg
                 v-else-if="props.name === 'week-view'"
                 class="sbx-icon__svg"
-                viewBox="0 0 32 32"
+                viewBox="0 0 448 512"
                 xmlns="http://www.w3.org/2000/svg"
             >
-                <path d="M0 0h8v32h-8v-32zM12 0h8v32h-8v-32zM24 0h8v32h-8v-32z"></path>
+                <path
+                    d="M120 0c13.3 0 24 10.7 24 24l0 40 160 0 0-40c0-13.3 10.7-24 24-24s24 10.7 24 24l0 40 32 0c35.3 0 64 28.7 64 64l0 288c0 35.3-28.7 64-64 64L64 480c-35.3 0-64-28.7-64-64L0 128C0 92.7 28.7 64 64 64l32 0 0-40c0-13.3 10.7-24 24-24zm0 112l-56 0c-8.8 0-16 7.2-16 16l0 288c0 8.8 7.2 16 16 16l320 0c8.8 0 16-7.2 16-16l0-288c0-8.8-7.2-16-16-16l-264 0zm24 144l0 80 160 0 0-80-160 0zm-48 0c0-26.5 21.5-48 48-48l160 0c26.5 0 48 21.5 48 48l0 80c0 26.5-21.5 48-48 48l-160 0c-26.5 0-48-21.5-48-48l0-80z"
+                ></path>
             </svg>
             <svg
                 v-else-if="props.name === 'wiki'"
