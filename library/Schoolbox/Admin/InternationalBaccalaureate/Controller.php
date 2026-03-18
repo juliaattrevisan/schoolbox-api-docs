@@ -19,14 +19,13 @@ class Controller extends BaseController
 {
     /**
      * DP Subject Configuration page
-     * Shows empty tabs - full implementation moved to feature-develop/SA-21578
      *
      * @api GET /adminv2/international-baccalaureate/configuration
      */
     public function getConfiguration(): void
     {
         $pageCurrent = '/adminv2/international-baccalaureate/configuration';
-        // Define IB configuration categories (empty tabs for now)
+        // Define IB configuration categories
         $categories = [
             [
                 'id' => 1,

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 /**
  * IB DP Subject Configuration page. This page displays configuration options
- * organized by IB subject groups as tabs. Each category shows empty content
- * as implementation is moved to feature-develop/SA-21578.
+ * organized by IB subject groups as tabs.
  */
 
 import type { IBCategory } from "../js/types/ibConfigurationTypes";
