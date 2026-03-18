@@ -98,7 +98,8 @@ class ConfigMapper extends Mapper
     public const int TYPE_AI                = 22;
     public const int TYPE_CANVAS            = 23;
     public const int TYPE_DATA_RETENTION    = 25;
-    public const int TYPE_SONAR_SKIN_CONFIG = 26;
+    public const int TYPE_ASSETS            = 26;
+    public const int TYPE_SONAR_SKIN_CONFIG = 27;
 
     // Technically these should be prefixed with 'NAME_', but it gets a bit verbose for little extra clarity
     public const string _GLOBAL_MODERATION              = 'global_moderation';
