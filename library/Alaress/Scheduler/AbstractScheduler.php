@@ -82,7 +82,8 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         private LoopInterface $loop,
         DispatchStrategyInterface $dispatchStrategy,
         protected LoggerInterface $log,
-        private IClock $clock
+        private IClock $clock,
+        private $maxFutureTriggerTime = self::MAX_FUTURE_TRIGGER_TIME,
     ) {
         parent::__construct($loop);
 
@@ -172,14 +173,14 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
 
         // Don't schedule this trigger if it's more than a configured amount of
         // time in advance.
-        if ($interval > self::MAX_FUTURE_TRIGGER_TIME) {
+        if ($interval > $this->maxFutureTriggerTime) {
             $this->log->info(
                 sprintf(
                     "[AbstractScheduler] Trigger with timestamp too far in the future, not dispatching: %s %s (timestamp: %s, max time: %s)",
                     $trigger->getEventObjectId(),
                     $trigger->getLabel(),
                     Alaress_Date_Format::newFromTimestamp($trigger->getTimestamp())->toRfc3339String(),
-                    Alaress_Date_Format::newFromTimestamp($time + self::MAX_FUTURE_TRIGGER_TIME)->toRfc3339String(),
+                    Alaress_Date_Format::newFromTimestamp($time + $this->maxFutureTriggerTime)->toRfc3339String(),
                 )
             );
             $resolver?->acknowledge();
