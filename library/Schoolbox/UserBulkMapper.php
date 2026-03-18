@@ -88,13 +88,16 @@ class UserBulkMapper extends UserMapper
                 g.name as role,
                 c.name as campus,
                 lyl.name as year,
-                (jwt.jwt_id IS NOT NULL) as token
+                (jwt.jwt_id IS NOT NULL) as token,
+                q.name as qualification_name
             FROM {$this->getTable()} u
             LEFT JOIN `groups` g ON u.`group_id` = g.`id` AND g.deleted_at IS NULL
             LEFT JOIN `userCampus` uc ON uc.`uid` = u.`id`
             LEFT JOIN luCampus c ON c.id = uc.`campus` AND c.deleted_at IS NULL
             LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id AND lyl.deleted_at IS NULL
             LEFT JOIN user_jwt_id jwt ON u.id = jwt.user_id AND jwt.deleted_at IS NULL
+            LEFT JOIN user_qualification uq ON u.id = uq.user_id
+            LEFT JOIN lu_qualification q ON uq.qualification_id = q.id AND q.deleted_at IS NULL
         ";
 
         /* Augmented where
@@ -146,7 +149,7 @@ class UserBulkMapper extends UserMapper
         $whereList[] = " u.username != :alaress ";
         $params      = array_merge($params, ['alaress' => UserMapper::USERNAME_ALARESS_ADMIN]);
 
-        $query .= ' WHERE ' . implode(' AND ', $whereList) . ' ORDER BY u.lastname';
+        $query .= ' WHERE ' . implode(' AND ', $whereList) . ' ORDER BY u.lastname, q.sequence ASC';
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->setFetchMode(\PDO::FETCH_ASSOC);
@@ -158,7 +161,14 @@ class UserBulkMapper extends UserMapper
 
         foreach ($statement as $row) {
             if (key_exists($row['id'], $users)) {
-                $users[$row['id']]['campuses'][] = $row['campus'];
+                // Add campus if not already in array
+                if ($row['campus'] && !in_array($row['campus'], $users[$row['id']]['campuses'])) {
+                    $users[$row['id']]['campuses'][] = $row['campus'];
+                }
+                // Add qualification if not already in array
+                if ($row['qualification_name'] && !in_array($row['qualification_name'], $users[$row['id']]['qualifications'])) {
+                    $users[$row['id']]['qualifications'][] = $row['qualification_name'];
+                }
             } else {
                 $user             = $row;
                 // retrieve user instance to get full name
@@ -172,8 +182,11 @@ class UserBulkMapper extends UserMapper
                     ->setLastname($row['lastname'])
                     ->getFullName();
 
-                $user['campuses'] = [$row['campus']];
+                $user['campuses'] = $row['campus'] ? [$row['campus']] : [];
                 unset($user['campus']);
+                // Initialize qualifications array and add first qualification if present
+                $user['qualifications'] = $row['qualification_name'] ? [$row['qualification_name']] : [];
+                unset($user['qualification_name']);
                 $users[$row['id']] = $user;
             }
         }

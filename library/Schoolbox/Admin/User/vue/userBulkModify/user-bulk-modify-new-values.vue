@@ -42,6 +42,10 @@ export default {
             type: Array,
             required: true,
         },
+        qualifications: {
+            type: Array,
+            required: true,
+        },
         eportfolioEnabled: {
             type: Boolean,
             required: true,
@@ -65,6 +69,8 @@ export default {
                 roleId: -1,
                 yearLevelId: -1,
                 houseId: -1,
+                qualificationIds: [],
+                removeFromAllQualifications: false,
                 ePortfolio: -1,
                 emailFromUserName: -1,
                 externalMailClient: -1,

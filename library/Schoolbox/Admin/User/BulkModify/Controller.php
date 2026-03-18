@@ -16,6 +16,7 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\User\BulkUpdater;
 use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\IB\Qualification\Mapper as QualificationMapper;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserBulkMapper;
@@ -53,7 +54,8 @@ class Controller extends Base
         CampusMapper $campusMapper,
         RoleMapper $roleMapper,
         HouseMapper $houseMapper,
-        YearLevel\Mapper $yearLevelMapper
+        YearLevel\Mapper $yearLevelMapper,
+        protected QualificationMapper $qualificationMapper
     ) {
         $this->cache           = $cache;
         $this->userBulkMapper  = $userBulkMapper;
@@ -105,6 +107,16 @@ class Controller extends Base
             ];
         }
 
+        // Get qualifications from database
+        $qualificationList = $this->qualificationMapper->findAll()->sortBy('sequence', 'ASC');
+        $qualifications    = [];
+        foreach ($qualificationList as $qualification) {
+            $qualifications[] = [
+                'id'   => $qualification->getId(),
+                'name' => $qualification->getName(),
+            ];
+        }
+
         $this->response = $this->responseFromTemplate(
             '@adminUserBulkModify/bulkModify.twig',
             [
@@ -117,6 +129,7 @@ class Controller extends Base
                 'roles'          => $roles,
                 'yearLevels'     => $yearLevels,
                 'houses'         => $houses,
+                'qualifications' => $qualifications,
             ],
             'Admin - User Management',
         );
@@ -168,6 +181,8 @@ class Controller extends Base
                 (int)$params->get('roleId'),
                 (int)$params->get('yearLevelId'),
                 (int)$params->get('houseId'),
+                array_filter(explode(',', $params->get('qualificationIds'))),
+                $params->get('removeFromAllQualifications') === 'true' || $params->get('removeFromAllQualifications') === true,
                 (int)$params->get('ePortfolio'),
                 (int)$params->get('emailFromUserName'),
                 (int)$params->get('externalMailClient'),
