@@ -276,10 +276,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                 unset($this->userLastActivity[$instanceId]);
             }
 
-            if (empty($this->userLastActivity) && $this->inactivityScanTimer instanceof TimerInterface) {
-                $this->reactLoop->cancelTimer($this->inactivityScanTimer);
-                $this->inactivityScanTimer = null;
-            }
+            $this->cancelInactivityScanIfNoUserActivity();
 
             $this->subscriptionManager->removeSubscription($instanceId, $userId);
         }
@@ -793,10 +790,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             }
         }
 
-        if (empty($this->userLastActivity) && $this->inactivityScanTimer instanceof TimerInterface) {
-            $this->reactLoop->cancelTimer($this->inactivityScanTimer);
-            $this->inactivityScanTimer = null;
-        }
+        $this->cancelInactivityScanIfNoUserActivity();
     }
 
     /**
@@ -831,6 +825,22 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         }
         if (empty($this->pushTransactions[$instanceId])) {
             unset($this->pushTransactions[$instanceId]);
+        }
+    }
+
+    /**
+     * Cancel the inactivity scan timer, if there is no remaining user activity.
+     *
+     * There's no point keeping it, as there is nothing for it to do. It will be
+     * reinstated if another user becomes active.
+     *
+     * @return void
+     */
+    private function cancelInactivityScanIfNoUserActivity(): void
+    {
+        if (empty($this->userLastActivity) && $this->inactivityScanTimer instanceof TimerInterface) {
+            $this->reactLoop->cancelTimer($this->inactivityScanTimer);
+            $this->inactivityScanTimer = null;
         }
     }
 }
