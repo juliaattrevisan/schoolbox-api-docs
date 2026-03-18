@@ -60,20 +60,20 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param LoggerInterface           $log
      * @param IClock                    $clock
-     * @param int|null                  $maxFutureTriggerTime
      * @param IConfigLoader             $conf
      * @param Postman                   $postman
      * @param string                    $instanceId
+     * @param int|null                  $maxFutureTriggerTime
      */
     public function __construct(
         LoopInterface $loop,
         DispatchStrategyInterface $dispatchStrategy,
         LoggerInterface $log,
         IClock $clock,
-        ?int $maxFutureTriggerTime,
         private IConfigLoader $conf,
         private Postman $postman,
         string $instanceId,
+        ?int $maxFutureTriggerTime = null,
     ) {
         parent::__construct($loop, $dispatchStrategy, $log, $clock, $maxFutureTriggerTime);
         $this->instanceId = $instanceId;

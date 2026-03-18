@@ -68,10 +68,10 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
             $strat,
             $log,
             new Clock(),
-            Scheduler::DEFAULT_MAX_FUTURE_TRIGGER_TIME,
             $conf,
             $postman,
             INSTANCE_ID,
+            Scheduler::DEFAULT_MAX_FUTURE_TRIGGER_TIME,
         );
 
         // restoring from redis cache
