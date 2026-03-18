@@ -1,0 +1,18 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div id="ib-configuration-container">
+            <ib-configuration
+                :categories="{{ (categories ?? []) | json_encode }}"
+            />
+        </div>
+        <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/library/Schoolbox/Admin/InternationalBaccalaureate/templates/css/ib-configuration.css?v={{ config.site_version }}" />
+        <script src="{{ CDN_PREFIX }}/js/bundle/ibConfiguration.js?v={{ config.site_version }}"></script>
+    </div>
+</div>

@@ -161,6 +161,10 @@ class Admin extends ModuleLoader
          */
         $this->loadModule($di, \Schoolbox\Admin\DifferentiationProfiles\Module::class, '/adminv2/differentiation/differentiation-profiles');
 
+        /* International Baccalaureate
+         */
+        $this->loadModule($di, \Schoolbox\Admin\InternationalBaccalaureate\Module::class, '/adminv2/international-baccalaureate');
+
         /* Data Retention
          */
         $this->loadModule($di, \Schoolbox\Admin\DataRetention\Module::class, '/adminv2/data-retention');
