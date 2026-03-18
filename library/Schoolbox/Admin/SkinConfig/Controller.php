@@ -74,7 +74,6 @@ class Controller extends ConfigController
                         ConfigMapper::TYPE_SKIN_CONFIG,
                         ConfigMapper::TYPE_SONAR_SKIN_CONFIG,
                     ],
-                    'hidden' => 'false',
                     'editable' => 'true',
                 ],
                 [
@@ -90,17 +89,25 @@ class Controller extends ConfigController
         /* Converting to JSON format
          */
         $data = $skinConfigs->reduce(function (array $carry, Config $config): array {
-            $categoryName = $config->getSkinSubcategory()->getCategory()->getName();
-            $subcategoryId = $config->getSkinSubcategory()->getId();
-            $subcategoryName = $config->getSkinSubcategory()->getName();
+            if ($config->getName() === ConfigMapper::NAME_SONAR_UI_TOGGLE) {
+                // Skip the toggle config as it's handled separately
+                $carry['toggle'] = [
+                    'enabled' => (bool)$config->getValue(),
+                    'title' => $config->getTitle(),
+                    'description' => $config->getDescription(),
+                ];
+            } else {
+                $categoryName  = strtolower($config->getSkinSubcategory()->getCategory()->getName()); // e.g. "Colours" -> "colours"
+                $subcategoryId = $config->getSkinSubcategory()->getId();
+                $type          = $config->getType()->getId() === ConfigMapper::TYPE_SONAR_SKIN_CONFIG ? 'sonar' : 'existing';
 
-            // Create subcategory bucket once
-            $carry[$categoryName][$subcategoryId] ??= [
-                'name' => $subcategoryName,
-                'options' => [],
-            ];
+                // Create subcategory bucket once
+                $carry[$type][$categoryName][$subcategoryId] ??= [
+                    'name'    => $config->getSkinSubcategory()->getName(),
+                    'options' => [],
+                ];
 
-            $carry[$categoryName][$subcategoryId]['options'][] = [
+                $carry[$type][$categoryName][$subcategoryId]['options'][] = [
                 'id' => $config->getId(),
                 'name' => $config->getName(),
                 'value' => $config->getValue(),
@@ -110,14 +117,19 @@ class Controller extends ConfigController
                 'type' => $this->getOptionType($config),
                 'editable' => $config->getEditable(),
                 'hidden' => $config->getHidden(),
-            ];
+                ];
+            }
 
             return $carry;
         }, []);
 
-        // Convert subcategory maps to indexed arrays for JSON output while preserving DB order.
-        foreach ($data as $category => $subcategoryMap) {
-            $data[$category] = array_values($subcategoryMap);
+        // Convert subcategory maps to indexed arrays for JSON output
+        foreach ($data as $type => $categories) {
+            foreach ($categories as $category => $subcategoryMap) {
+                if (is_array($subcategoryMap)) {
+                    $data[$type][$category] = array_values($subcategoryMap);
+                }
+            }
         }
 
         return $data;
