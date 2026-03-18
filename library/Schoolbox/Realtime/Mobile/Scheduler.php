@@ -67,14 +67,15 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param LoggerInterface           $log
      * @param IClock                    $clock
-     * @param ServiceManager            $serviceManager    The mobile app service manager: used to send messages to
-     *                                                     mobile apps.
-     * @param IJitter                   $jitter            Jitter: used to determine how many times to retry send of a
-     *                                                     mobile notification, and also of how long to wait between
-     *                                                     retries.
-     * @param IConfigLoader             $config            Config loader: used to load blackout settings.
-     *                                                     These settings may be changed externally: in that case, the
-     *                                                     config will be reloaded.
+     * @param ServiceManager            $serviceManager       The mobile app service manager: used to send messages to
+     *                                                        mobile apps.
+     * @param IJitter                   $jitter               Jitter: used to determine how many times to retry send of
+     *                                                        a mobile notification, and also of how long to wait
+     *                                                        between retries.
+     * @param IConfigLoader             $config               Config loader: used to load blackout settings.
+     *                                                        These settings may be changed externally: in that case,
+     *                                                        the config will be reloaded.
+     * @param int|null                  $maxFutureTriggerTime
      */
     public function __construct(
         private LoopInterface $loop,
@@ -84,8 +85,9 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         private ServiceManager $serviceManager,
         private IJitter $jitter,
         private IConfigLoader $config,
+        ?int $maxFutureTriggerTime = null,
     ) {
-        parent::__construct($this->loop, $dispatchStrategy, $log, $clock);
+        parent::__construct($this->loop, $dispatchStrategy, $log, $clock, $maxFutureTriggerTime);
         $this->log->notice('Loading blackout period settings');
         $this->loadBlackoutSettings();
     }

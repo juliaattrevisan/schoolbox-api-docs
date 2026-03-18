@@ -65,7 +65,10 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param LoggerInterface           $log
      * @param IClock                    $clock
-     * @param int|null                  $maxFutureTriggerTime
+     * @param int|null                  $maxFutureTriggerTime The max seconds in the future to trigger a notification in
+     *                                                        `scheduleNotification`:
+     *                                                        if the notification is further in the future than this: it
+     *                                                        is ignored, and will presumably be sent later.
      */
     public function __construct(
         private LoopInterface $loop,
