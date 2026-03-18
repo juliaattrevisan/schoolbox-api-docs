@@ -1,0 +1,4 @@
+{
+    "token": "YOUR_EDLINK_INTEGRATION_ACCESS_TOKEN_HERE",
+    "import_photos": true
+}
