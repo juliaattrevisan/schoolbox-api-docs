@@ -294,6 +294,15 @@
     } %}
 </fieldset>
 
+{# Participation
+ # This is a reimplementation of SA-21908 and allows activities to turn up while doing a Custom activity for a person
+ # via Student Participation - saving the form should cause your activity customisation to turn up in the list.
+ #
+ # (Unit Implementations only)
+ #}
+{% if context.baseContext is unitImplementation and custom_assessment_participation %}
+    {% include '@learningAssessment/fragments/participation.twig' %}
+{% endif %}
 
 {# Submit #}
 {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
