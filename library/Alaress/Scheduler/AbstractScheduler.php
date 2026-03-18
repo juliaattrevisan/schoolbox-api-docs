@@ -23,6 +23,7 @@ use Alaress\WorkerCrew\DispatcherInterface;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
+use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -46,6 +47,16 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
 
     /** @var int Retry time in seconds to reschedule */
     private const RETRY_TIME = 300;
+
+    /**
+     * Maximum amount of time in the future to schedule triggers for, in
+     * milliseconds.
+     *
+     * Assumes that the time between when the daemon is restarted (and thus
+     * reloads previously stored but not scheduled notifications) is less than
+     * this.
+     */
+    private const int MAX_FUTURE_TRIGGER_TIME = 1000 * 60 * 60 * 24 * 7;
 
     /**
      * JIT handler to take care of unexpected shutdown
@@ -144,7 +155,8 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
             return;
         }
 
-        $interval = $trigger->getTimestamp() - $this->clock->time();
+        $time     = $this->clock->time();
+        $interval = $trigger->getTimestamp() - $time;
 
         if ($interval <= 0) {
             $this->log->info("[AbstractScheduler] Immediately dispatching trigger: {$trigger->getEventObjectId()} {$trigger->getLabel()}");
@@ -152,6 +164,23 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
             $this->log->debug($previousTriggerExisted ? 'Cleared previous trigger' : 'No previous trigger was set', ['char' => '-']);
 
             $this->dispatchTrigger($trigger);
+            $resolver?->acknowledge();
+            return;
+        }
+
+        // Don't schedule this trigger if it's more than a configured amount of
+        // time in advance.
+        $maxFutureTriggerSeconds = self::MAX_FUTURE_TRIGGER_TIME / 1000;
+        if ($interval > $maxFutureTriggerSeconds) {
+            $this->log->info(
+                sprintf(
+                    "[AbstractScheduler] Trigger with timestamp too far in the future, not dispatching: %s %s (timestamp: %s, max time: %s)",
+                    $trigger->getEventObjectId(),
+                    $trigger->getLabel(),
+                    Alaress_Date_Format::newFromTimestamp($trigger->getTimestamp())->toRfc3339String(),
+                    Alaress_Date_Format::newFromTimestamp($maxFutureTriggerSeconds)->toRfc3339String(),
+                )
+            );
             $resolver?->acknowledge();
             return;
         }
