@@ -453,13 +453,14 @@ $app = new class extends CliTool\App {
                 $queryParams,
             ];
         }
+
+        // Build the unknown model query
         $queryList['openai_model_unknown'] = [
-            sprintf(
-                "SELECT COUNT(*) FROM openai_log WHERE JSON_VALUE(prompt, '$.model') NOT IN (%s)",
-                implode(',', array_fill(0, count(OpenAiConfig::AI_MODELS), '?')),
-            ),
+            "SELECT COUNT(*) FROM openai_log WHERE " . implode(' AND ', array_map(fn ($model) => 'model NOT LIKE ?', OpenAiConfig::AI_MODELS)),
             OpenAiConfig::AI_MODELS,
         ];
+
+        // Query image model usage
         foreach (OpenAiConfig::AI_IMAGE_MODELS as $imageModel) {
             $queryList['openai_image_model_' . $imageModel] = [
                 "SELECT COUNT(*) FROM openai_log WHERE feature = 'image' AND JSON_VALUE(prompt, '$.tools[0].model') = ?",
