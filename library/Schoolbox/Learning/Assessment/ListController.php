@@ -566,21 +566,21 @@ class ListController extends Web\Controller\Base
                 'id'    => 'due-work',
                 'value' => AssessmentType::TYPE_DUE_WORK,
                 'label' => $this->rosettaStone->translate('dueWork', false, true),
-                'icon'  => 'due-work',
+                'icon'  => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_DUE_WORK),
                 'title' => 'Create an assessable item for students that can accept submissions',
             ],
             [
                 'id'    => 'task',
                 'value' => AssessmentType::TYPE_TASK,
                 'label' => Task::getDefaultTypeName(),
-                'icon'  => 'task',
+                'icon'  => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_TASK),
                 'title' => 'A simple activity that will track student completion',
             ],
             [
                 'id'    => 'quiz',
                 'value' => AssessmentType::TYPE_QUIZ,
                 'label' => Quiz::getDefaultTypeName(),
-                'icon'  => 'quiz',
+                'icon'  => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_QUIZ),
                 'title' => 'Ask a series of questions with automatic marking',
             ],
         ];
@@ -592,7 +592,7 @@ class ListController extends Web\Controller\Base
                 'id'    => 'reporting',
                 'value' => AssessmentType::TYPE_REPORTING,
                 'label' => $this->rosettaStone->translate('reporting', false, true),
-                'icon'  => 'reporting',
+                'icon'  => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_REPORTING),
                 /* TODO Jezwords
                  */
                 'title' => 'Provide teacher discretionary marking',
@@ -607,7 +607,7 @@ class ListController extends Web\Controller\Base
                 'id'    => 'dialog-agent',
                 'value' => AssessmentType::TYPE_DIALOG_AGENT,
                 'label' => $this->rosettaStone->translate('dialogAgent', false, true),
-                'icon'  => 'dialog-agent',
+                'icon'  => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_DIALOG_AGENT),
                 'title' => 'Create an activity for students to interact with AI about a topic',
             ];
         }
@@ -637,7 +637,7 @@ class ListController extends Web\Controller\Base
                     'id'    => 'lti',
                     'value' => AssessmentType::TYPE_LTI_ASSESSMENT,
                     'label' => LtiAssessment::getDefaultTypeName(),
-                    'icon'  => 'lti',
+                    'icon'  => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_LTI_ASSESSMENT),
                     'title' => 'Connect an assessment provided by an LTI tool',
                 ];
             }
@@ -648,7 +648,7 @@ class ListController extends Web\Controller\Base
                 'id'    => 'lesson-plan',
                 'value' => AssessmentType::TYPE_LESSON_PLAN,
                 'label' => $this->rosettaStone->translate('lessonPlan', false, true),
-                'icon'  => 'lesson-plan',
+                'icon'  => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_LESSON_PLAN),
                 'title' => 'A detailed guide that outlines a lesson\'s purpose and activities',
             ];
 
@@ -661,7 +661,7 @@ class ListController extends Web\Controller\Base
                     'id'    => 'project',
                     'value' => AssessmentType::TYPE_PROJECT,
                     'label' => $this->rosettaStone->translate('project', false, true),
-                    'icon'  => 'project',
+                    'icon'  => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_PROJECT),
                     'title' => 'Setup a container for multiple activities that are related',
                 ];
                 array_unshift($data['types'], $item);
@@ -670,7 +670,7 @@ class ListController extends Web\Controller\Base
 
         $data['contextType'] = AssessmentContextType::objectToString($context) . 's';
         $data['baseContextType'] = AssessmentContextType::objectToString($context->getBaseContext()) . 's';
-        $data['context']     = $context;
+        $data['context'] = $context;
         $data['breadcrumbs'] = $this->getBakery()->produceFromContext($context, null, $this->getUser());
 
         $this->response = $this->responseFromTemplate('@learningAssessment/create.twig', $data);
