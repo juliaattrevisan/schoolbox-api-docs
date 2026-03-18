@@ -178,7 +178,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
                     $trigger->getEventObjectId(),
                     $trigger->getLabel(),
                     Alaress_Date_Format::newFromTimestamp($trigger->getTimestamp())->toRfc3339String(),
-                    Alaress_Date_Format::newFromTimestamp($maxFutureTriggerSeconds)->toRfc3339String(),
+                    Alaress_Date_Format::newFromTimestamp($time + $maxFutureTriggerSeconds)->toRfc3339String(),
                 )
             );
             $resolver?->acknowledge();
