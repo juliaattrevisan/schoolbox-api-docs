@@ -40,7 +40,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     public const REDIS_SESSION_PREFIX = self::REDIS_SESSION_PREFIX_BASE . INSTANCE_ID . ':';
 
     private const INACTIVE_TIMEOUT          = 300; // 5 minutes
-    private const INACTIVITY_SCAN_INTERVAL  = 60;
+    private const INACTIVITY_SCAN_INTERVAL  = 10;
 
     public const PIPE_METHOD_ACKNOWLEDGE = 'ack';
     public const PIPE_METHOD_ALERT       = 'alert';
