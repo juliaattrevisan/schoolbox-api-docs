@@ -26,7 +26,6 @@ class Controller extends BaseController
     public function getConfiguration(): void
     {
         $pageCurrent = '/adminv2/international-baccalaureate/configuration';
-        
         // Define IB configuration categories (empty tabs for now)
         $categories = [
             [
@@ -70,9 +69,7 @@ class Controller extends BaseController
                 'title' => 'Core'
             ]
         ];
-        
-        $this->response = $this->responseFromTemplate(
-            '@internationalBaccalaureate/configuration.twig',
+        $this->response = $this->responseFromTemplate('@internationalBaccalaureate/configuration.twig',
             [
                 'pageCurrent' => $pageCurrent,
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
@@ -80,7 +77,6 @@ class Controller extends BaseController
             ]
         );
     }
-
     /**
      * Registration Reports page
      *
