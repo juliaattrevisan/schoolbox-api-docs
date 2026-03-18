@@ -788,7 +788,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             }
         }
 
-        if (empty($this->userLastActivity)) {
+        if (empty($this->userLastActivity) && $this->inactivityScanTimer instanceof TimerInterface) {
             $this->reactLoop->cancelTimer($this->inactivityScanTimer);
             $this->inactivityScanTimer = null;
         }
