@@ -438,13 +438,17 @@ $app = new class extends CliTool\App {
         // so it's uncertain how important they are.
         foreach (OpenAiConfig::AI_MODELS as $model) {
             // For models like `gpt-4o` with `mini` variants:
-            // need to exclude said variants
+            // need to exclude said variants.
             $queryParts  = ['model LIKE ?'];
             $queryParams = [$model . '%'];
-            foreach (OpenAiConfig::AI_MODEL_VARIANTS as $variant) {
-                if (in_array($model . '-' . $variant, OpenAIConfig::AI_MODELS)) {
+
+            // Need to exclude other models from this query,
+            // if the other model's name starts with this model's name:
+            // otherwise, `MODEL LIKE $model%' will match `$otherModel` too.
+            foreach (OpenAiConfig::AI_MODELS as $otherModel) {
+                if ($model !== $otherModel && str_starts_with($otherModel, $model)) {
                     $queryParts[]  = 'model NOT LIKE ?';
-                    $queryParams[] = $model . '-' . $variant . '%';
+                    $queryParams[] = $otherModel . '%';
                 }
             }
 
