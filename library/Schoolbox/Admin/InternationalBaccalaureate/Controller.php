@@ -69,7 +69,8 @@ class Controller extends BaseController
                 'title' => 'Core'
             ]
         ];
-        $this->response = $this->responseFromTemplate('@internationalBaccalaureate/configuration.twig',
+        $this->response = $this->responseFromTemplate(
+            '@internationalBaccalaureate/configuration.twig',
             [
                 'pageCurrent' => $pageCurrent,
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
