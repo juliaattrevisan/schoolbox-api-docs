@@ -416,37 +416,6 @@ $app = new class extends CliTool\App {
             'openai_output_tokens_image' => 'SELECT SUM(output_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
             'openai_tokens_image' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
 
-            // old ai metrics (not recording the ai feature (chat, lessonplan, image))
-//            'openai_model_gpt-4o' => "SELECT count(*) FROM openai_log WHERE (model like 'gpt-4o%' and model not like '%mini%')",
-//            'openai_model_gpt-4o-mini' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4o-mini%'",
-//            'openai_model_gpt-41' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1%' and model not like '%mini%'",
-//            'openai_model_gpt-41-mini' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1-mini%'",
-//            'openai_model_gpt-5' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-5%' and model not like '%mini%' and model not like '%nano%'",
-//            'openai_model_gpt-5-mini' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-5-mini%'",
-//            'openai_model_gpt-5-nano' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-5-nano%'",
-//            'openai_model_gpt-52' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-5.2%' and model not like '%pro%'",
-//            'openai_model_gpt-52-pro' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-5.2-pro%'",
-//            'openai_model_unknown' => "
-//                SELECT count(*) FROM openai_log WHERE
-//                not (model like 'gpt-4o%') AND
-//                not (model like 'gpt-4.1%') AND
-//                not (model like 'gpt-4o-mini%') AND
-//                not (model like 'gpt-4.1-mini%') AND
-//                not (model like 'gpt-5%') AND
-//                not (model like 'gpt-5-mini%') AND
-//                not (model like 'gpt-5-nano%') AND
-//                not (model like 'gpt-5.2%') AND
-//                not (model like 'gpt-5.2-pro%') AND
-//                not (model like 'gpt-5-mini%') AND
-//                not (model like 'gpt-5-nano%') AND
-//                not (model like 'gpt-5.2%') AND
-//                not (model like 'gpt-5.2-pro%')
-//                ",
-//            'openai_image_model_gpt-image-1' => "SELECT count(*) FROM openai_log WHERE feature = 'image' AND JSON_VALUE(prompt, '$.tools[0].model') = 'gpt-image-1'",
-//            'openai_image_model_gpt-image-1-mini' => "SELECT count(*) FROM openai_log WHERE feature = 'image' AND JSON_VALUE(prompt, '$.tools[0].model') = 'gpt-image-1-mini'",
-//            'openai_image_model_gpt-image-15' => "SELECT count(*) FROM openai_log WHERE feature = 'image' AND JSON_VALUE(prompt, '$.tools[0].model') = 'gpt-image-1.5'",
-//            'openai_image_model_unknown' => "SELECT count(*) FROM openai_log WHERE feature = 'image' AND JSON_VALUE(prompt, '$.tools[0].model') NOT IN ('gpt-image-1', 'gpt-image-1-mini', 'gpt-image-1.5')",
-
             // AI feature usage
             'openai_chat' => "SELECT count(*) FROM openai_log WHERE feature = 'chat'",
             'openai_lessonplan' => "SELECT count(*) FROM openai_log WHERE feature = 'lessonplan'",
@@ -462,7 +431,10 @@ $app = new class extends CliTool\App {
             'sonar_ui'  => "SELECT COUNT(*) FROM config WHERE name = 'advanced_ui_enabled' AND value = 1",
         ];
 
-        // Queries for finding OpenAI model usage
+        // Queries for finding OpenAI model usage.
+        // These were once referenced as queries for:
+        // "old ai metrics (not recording the ai feature (chat, lessonplan, image))",
+        // so it's uncertain how important they are.
         foreach (\Schoolbox\Admin\OpenAI\Config::AI_MODELS as $model) {
             $queryList['openai_model_' . $model] = [
                 "SELECT COUNT(*) FROM openai_log WHERE JSON_VALUE(prompt, '$.model') = ?",
