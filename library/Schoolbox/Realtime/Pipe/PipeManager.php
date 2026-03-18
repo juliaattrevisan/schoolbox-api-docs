@@ -779,9 +779,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     private function scanInactiveUsers(): void
     {
+        $now = time();
         foreach ($this->userLastActivity as $instanceId => $users) {
             foreach ($users as $userId => $lastActivity) {
-                if ((time() - $lastActivity) >= self::INACTIVE_TIMEOUT) {
+                if (($now - $lastActivity) >= self::INACTIVE_TIMEOUT) {
                     $this->onTimeout($instanceId, $userId);
                 }
             }
