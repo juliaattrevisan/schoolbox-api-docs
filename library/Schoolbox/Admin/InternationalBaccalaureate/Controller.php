@@ -19,13 +19,15 @@ class Controller extends BaseController
 {
     /**
      * DP Subject Configuration page
+     * Shows empty tabs - full implementation moved to feature-develop/SA-21578
      *
      * @api GET /adminv2/international-baccalaureate/configuration
      */
     public function getConfiguration(): void
     {
         $pageCurrent = '/adminv2/international-baccalaureate/configuration';
-        // Define IB configuration categories (DP subject groups)
+        
+        // Define IB configuration categories (empty tabs for now)
         $categories = [
             [
                 'id' => 1,
@@ -68,7 +70,7 @@ class Controller extends BaseController
                 'title' => 'Core'
             ]
         ];
-
+        
         $this->response = $this->responseFromTemplate(
             '@internationalBaccalaureate/configuration.twig',
             [
@@ -77,37 +79,6 @@ class Controller extends BaseController
                 'categories' => $categories
             ]
         );
-    }
-
-    /**
-     * Get configuration data for a specific category
-     * Implementation moved to feature-develop/SA-21578
-     *
-     * @api GET /adminv2/international-baccalaureate/configuration/api/{categoryId}
-     */
-    public function getConfigurationData(): void
-    {
-        // Placeholder method - implementation moved to feature-develop/SA-21578
-        header('Content-Type: application/json');
-        echo json_encode([]);
-        exit;
-    }
-
-    /**
-     * Save configuration data
-     * Implementation moved to feature-develop/SA-21578
-     *
-     * @api POST /adminv2/international-baccalaureate/configuration/api/save
-     */
-    public function saveConfiguration(): void
-    {
-        // Placeholder method - implementation moved to feature-develop/SA-21578
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success' => false,
-            'message' => 'Implementation moved to feature-develop/SA-21578'
-        ]);
-        exit;
     }
 
     /**

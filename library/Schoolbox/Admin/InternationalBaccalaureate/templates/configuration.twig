@@ -10,8 +10,6 @@
         <div id="ib-configuration-container">
             <ib-configuration
                 :categories="{{ (categories ?? []) | json_encode }}"
-                configuration-endpoint="{{ routeLookup('internationalBaccalaureate.getConfigurationData') }}"
-                save-endpoint="{{ routeLookup('internationalBaccalaureate.saveConfiguration') }}"
             />
         </div>
         <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/library/Schoolbox/Admin/InternationalBaccalaureate/templates/css/ib-configuration.css?v={{ config.site_version }}" />

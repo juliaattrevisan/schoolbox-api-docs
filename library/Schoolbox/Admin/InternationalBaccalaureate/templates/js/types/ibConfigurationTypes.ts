@@ -1,2 +1,8 @@
-// TypeScript types placeholder for IB Configuration
-// Implementation moved to feature-develop/SA-21578
+/**
+ * A configuration category for IB DP subjects.
+ */
+export type IBCategory = {
+    id: number;
+    name: string;
+    title: string;
+};
