@@ -585,16 +585,19 @@ class ListController extends Web\Controller\Base
             ],
         ];
 
-        /* TODO Hide behind a feature flag
-         * TODO Jezwords
+        /* Reporting Activities are hidden behind this feature flag which is on by default
          */
-        $data['types'][] = [
-            'id'    => 'reporting',
-            'value' => AssessmentType::TYPE_REPORTING,
-            'label' => Reporting::getDefaultTypeName(),
-            'icon'  => 'reporting',
-            'title' => 'Provide teacher discretionary marking',
-        ];
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE)) {
+            $data['types'][] = [
+                'id'    => 'reporting',
+                'value' => AssessmentType::TYPE_REPORTING,
+                'label' => $this->rosettaStone->translate('reporting', false, true),
+                'icon'  => 'reporting',
+                /* TODO Jezwords
+                 */
+                'title' => 'Provide teacher discretionary marking',
+            ];
+        }
 
         // TODO: avoid this AI config copypasta to check if dialog agent is enabled
         $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
