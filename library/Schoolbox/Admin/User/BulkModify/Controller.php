@@ -108,7 +108,7 @@ class Controller extends Base
         }
 
         // Get qualifications from database
-        $qualificationList = $this->qualificationMapper->findAll()->sortBy('sequence', 'ASC');
+        $qualificationList = $this->qualificationMapper->findAll();
         $qualifications    = [];
         foreach ($qualificationList as $qualification) {
             $qualifications[] = [
