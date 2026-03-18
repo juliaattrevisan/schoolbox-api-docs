@@ -31,7 +31,7 @@ class Export extends CliTool\App
             `redis_key`          VARCHAR(512)  NOT NULL,
             `redis_type`         ENUM('string','set') NOT NULL,
             `redis_value`        LONGBLOB,
-            `redis_ttl_abs`      INT UNSIGNED  DEFAULT NULL,
+            `redis_ttl_abs`      BIGINT UNSIGNED DEFAULT NULL,
             `source_instance_id` VARCHAR(64)   NOT NULL,
             `exported_at`        INT UNSIGNED  NOT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
