@@ -68,9 +68,9 @@ class Export extends CliTool\App
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
-        $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?: (defined('INSTANCE_ID') ? INSTANCE_ID : null);
+        $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?: null;
         if (!$instanceId) {
-            $this->getLogger()->error('Unable to determine instance ID. Provide --instance-id.');
+            $this->getLogger()->error('--instance-id is required.');
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
@@ -292,7 +292,7 @@ class Export extends CliTool\App
         table, so it is included in the next mariadb-dump and can be migrated to cloud.
 
         Options:
-          --instance-id [ID]   Source Schoolbox instance ID (default: current INSTANCE_ID)
+          --instance-id [ID]   Source Schoolbox instance ID (required)
           --drop-existing      Drop and recreate `_redis_migration` if it already exists
           -p, --perform        Apply changes (default: dry-run, no changes made)
           -h, --help           Print this message and exit
