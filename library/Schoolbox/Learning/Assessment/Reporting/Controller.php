@@ -122,7 +122,7 @@ class Controller extends Assessment\Controller
         protected Filter\Selection\Mapper $filterSelectionMapper,
         CourseImplementation\Mapper $courseImplementationMapper,
         UnitImplementation\Mapper $unitImplementationMapper,
-        EditorTemplateHelper $editorTemplateHelper
+        private EditorTemplateHelper $editorTemplateHelper
     ) {
         parent::__construct(
             $userMapper,
