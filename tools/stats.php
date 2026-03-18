@@ -8,6 +8,7 @@
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Admin\OpenAI\Config as OpenAiConfig;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Permission\Access\UserAccess;
@@ -435,20 +436,31 @@ $app = new class extends CliTool\App {
         // These were once referenced as queries for:
         // "old ai metrics (not recording the ai feature (chat, lessonplan, image))",
         // so it's uncertain how important they are.
-        foreach (\Schoolbox\Admin\OpenAI\Config::AI_MODELS as $model) {
+        foreach (OpenAiConfig::AI_MODELS as $model) {
+            // For models like `gpt-4o` with `mini` variants:
+            // need to exclude said variants
+            $queryParts  = ['model LIKE ?'];
+            $queryParams = [$model . '%'];
+            foreach (OpenAiConfig::AI_MODEL_VARIANTS as $variant) {
+                if (in_array($model . '-' . $variant, OpenAIConfig::AI_MODELS)) {
+                    $queryParts[]  = 'model NOT LIKE ?';
+                    $queryParams[] = $model . '-' . $variant . '%';
+                }
+            }
+
             $queryList['openai_model_' . $model] = [
-                "SELECT COUNT(*) FROM openai_log WHERE JSON_VALUE(prompt, '$.model') = ?",
-                [$model],
+                "SELECT COUNT(*) FROM openai_log WHERE " . implode(' AND ', $queryParts),
+                $queryParams,
             ];
         }
         $queryList['openai_model_unknown'] = [
             sprintf(
                 "SELECT COUNT(*) FROM openai_log WHERE JSON_VALUE(prompt, '$.model') NOT IN (%s)",
-                implode(',', array_fill(0, count(\Schoolbox\Admin\OpenAI\Config::AI_MODELS), '?')),
+                implode(',', array_fill(0, count(OpenAiConfig::AI_MODELS), '?')),
             ),
-            \Schoolbox\Admin\OpenAI\Config::AI_MODELS,
+            OpenAiConfig::AI_MODELS,
         ];
-        foreach (\Schoolbox\Admin\OpenAI\Config::AI_IMAGE_MODELS as $imageModel) {
+        foreach (OpenAiConfig::AI_IMAGE_MODELS as $imageModel) {
             $queryList['openai_image_model_' . $imageModel] = [
                 "SELECT COUNT(*) FROM openai_log WHERE feature = 'image' AND JSON_VALUE(prompt, '$.tools[0].model') = ?",
                 [$imageModel],
@@ -457,9 +469,9 @@ $app = new class extends CliTool\App {
         $queryList['openai_image_model_unknown'] = [
             sprintf(
                 "SELECT COUNT(*) FROM openai_log WHERE feature = 'image' AND JSON_VALUE(prompt, '$.tools[0].model') NOT IN (%s)",
-                implode(',', array_fill(0, count(\Schoolbox\Admin\OpenAI\Config::AI_IMAGE_MODELS), '?')),
+                implode(',', array_fill(0, count(OpenAiConfig::AI_IMAGE_MODELS), '?')),
             ),
-            \Schoolbox\Admin\OpenAI\Config::AI_IMAGE_MODELS,
+            OpenAiConfig::AI_IMAGE_MODELS,
         ];
 
 

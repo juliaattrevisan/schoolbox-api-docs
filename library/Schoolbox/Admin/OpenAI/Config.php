@@ -61,6 +61,11 @@ class Config
         "gpt-4.1",
         "gpt-4.1-mini",
     ];
+    public const array AI_MODEL_VARIANTS = [
+        'mini',
+        'nano',
+        'chat-latest',
+    ];
 
     public const string IMAGE_MODEL_DEFAULT = 'gpt-image-1';
     public const array AI_IMAGE_MODELS = [
