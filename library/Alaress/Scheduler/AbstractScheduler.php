@@ -49,18 +49,6 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
     private const RETRY_TIME = 300;
 
     /**
-     * Maximum amount of time in the future to schedule triggers for, in
-     * seconds.
-     *
-     * Assumes that the time between when the daemon is restarted (and thus
-     * reloads previously stored but not scheduled notifications) is less than
-     * this.
-     *
-     * Eventually, this will become configurable.
-     */
-    private const int MAX_FUTURE_TRIGGER_TIME = 60 * 60 * 24 * 7;
-
-    /**
      * JIT handler to take care of unexpected shutdown
      *
      * @var ICache|null

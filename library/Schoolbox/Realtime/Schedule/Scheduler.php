@@ -44,10 +44,23 @@ use Schoolbox\User;
 class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 {
     /**
+     * Default maximum amount of time in the future to schedule triggers for, in
+     * seconds.
+     *
+     * Assumes that the time between when the daemon is restarted (and thus
+     * reloads previously stored but not scheduled notifications) is less than
+     * this.
+     *
+     * Eventually, this will become configurable.
+     */
+    public const int DEFAULT_MAX_FUTURE_TRIGGER_TIME = 60 * 60 * 24 * 7;
+
+    /**
      * @param LoopInterface             $loop
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param LoggerInterface           $log
      * @param IClock                    $clock
+     * @param int|null                  $maxFutureTriggerTime
      * @param IConfigLoader             $conf
      * @param Postman                   $postman
      * @param string                    $instanceId
@@ -57,11 +70,12 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         DispatchStrategyInterface $dispatchStrategy,
         LoggerInterface $log,
         IClock $clock,
+        ?int $maxFutureTriggerTime,
         private IConfigLoader $conf,
         private Postman $postman,
-        string $instanceId
+        string $instanceId,
     ) {
-        parent::__construct($loop, $dispatchStrategy, $log, $clock);
+        parent::__construct($loop, $dispatchStrategy, $log, $clock, $maxFutureTriggerTime);
         $this->instanceId = $instanceId;
 
         // register signal listeners
