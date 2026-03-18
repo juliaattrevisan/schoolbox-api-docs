@@ -70,7 +70,10 @@ class Controller extends ConfigController
             ->getConfigMapper()
             ->findByColumnList(
                 [
-                    'type_id' => ConfigMapper::TYPE_SKIN_CONFIG,
+                    'type_id' => [
+                        ConfigMapper::TYPE_SKIN_CONFIG,
+                        ConfigMapper::TYPE_SONAR_SKIN_CONFIG,
+                    ],
                     'hidden' => 'false',
                     'editable' => 'true',
                 ],
