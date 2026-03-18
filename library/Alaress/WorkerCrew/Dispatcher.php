@@ -12,7 +12,6 @@ namespace Alaress\WorkerCrew;
 use Alaress\Exception\IO\IOException;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
-use PDOException;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -22,6 +21,14 @@ use SplQueue;
 
 class Dispatcher implements DispatcherInterface
 {
+    /**
+     * Only iterate the queue this many times in dispatch.
+     *
+     * It is not expected the queue will be iterated anywhere near this many
+     * times: this is simply an infinite loop protection.
+     */
+    private const QUEUE_ITERATION_LIMIT = 10_000;
+
     /** @var SplQueue */
     protected $q;
 
@@ -149,14 +156,13 @@ class Dispatcher implements DispatcherInterface
 
 
     /**
-     * This method will be fired every self::LOOP_DELAY millis
+     * Drain as many items from the queue as workers will accept.
+     * Fired by the periodic timer, and also re-triggered when a worker becomes ready.
      *
      * @param TimerInterface $timer
-     * @throws PDOException
      */
-    public function dispatch(TimerInterface $timer)
+    public function dispatch(TimerInterface $timer): void
     {
-
         // there's nothing in the queue
         if (!$this->q->count()) {
             if ($this->pool->canDispatcherFlywheel()) {
@@ -171,6 +177,37 @@ class Dispatcher implements DispatcherInterface
             return;
         }
 
+        // Loop over the queue and dispatch commands, as long as there's workers
+        // to handle them and the iteration safeguard is not reached
+        $i = 1;
+        while ($this->q->count()) {
+            $i++;
+            if ($i > self::QUEUE_ITERATION_LIMIT) {
+                $this->log->warning(
+                    sprintf(
+                        "Queue iteration limit of %d has been unexpectedly reached: stopping iteration. This is probably a code issue.",
+                        self::QUEUE_ITERATION_LIMIT,
+                    )
+                );
+                break;
+            }
+            if (!$this->dispatchSingleCommand()) {
+                break;
+            }
+        }
+    }
+
+
+    /**
+     * Dispatch a single command to a worker.
+     *
+     * Intended to be run within a loop whilst there are still workers available
+     * to handle commands.
+     *
+     * @return bool True if the loop should continue, false if it should break.
+     */
+    private function dispatchSingleCommand(): bool
+    {
         /**
          * @var object $identifier
          * @var string $cmd
@@ -187,9 +224,9 @@ class Dispatcher implements DispatcherInterface
                 $this->msgHandler->handleResponse($identifier, $cmd, (array)$data);
             } catch (Exception $e) {
                 // we need to catch (almost) any and all exception here, lest we explode our reactor
-                $this->log->warning(get_class($e) . " suppressed: " . $e->getMessage(), [ 'exception' => $e ]);
+                $this->log->warning(get_class($e) . " suppressed: " . $e->getMessage(), ['exception' => $e]);
             }
-            return;
+            return true;
         }
 
         // all workers are tied up and ceiling has been reached - please wait
@@ -198,18 +235,18 @@ class Dispatcher implements DispatcherInterface
             $this->log->debug("No workers available, setting healthcheck timeout for {$timeout}ms");
             // detach and wait for pool to notify us of a free worker
             $this->detach();
-            $this->pool->once('ready', [ $this, 'attach' ]);
+            $this->pool->once('ready', [$this, 'attach']);
             // attach a timer to check the health of the pool every minute until a worker returns and cancels it
-            $this->timer = $this->loop->addPeriodicTimer($timeout / 1000, [ $this->pool, 'healthCheck' ]);
-            return;
+            $this->timer = $this->loop->addPeriodicTimer($timeout / 1000, [$this->pool, 'healthCheck']);
+            return false;
         }
 
-        // pop the task from the queue and run the next task
+        // pop the task from the queue and dispatch it
         try {
             // we obtained the data from q::bottom() so just drop the reference
             $this->q->dequeue();
             $pid = $this->pool->accept($identifier, $cmd, $data, $this->q->count());
-            $this->log->debug("Command '$cmd' pushed to worker {{$pid}}", [ 'char' => '>' ]);
+            $this->log->debug("Command '$cmd' pushed to worker {{$pid}}", ['char' => '>']);
         } catch (IOException $e) {
             $this->log->warning("Could not communicate with worker: " . $e->getMessage());
         } catch (RuntimeException $e) {
@@ -225,8 +262,8 @@ class Dispatcher implements DispatcherInterface
             // (except for AMQP exceptions, as mentioned above)
             $this->log->warning(get_class($e) . " suppressed: " . $e->getMessage(), ['exception' => $e]);
         }
+        return true;
     }
-
 
     /**
      * @return array
