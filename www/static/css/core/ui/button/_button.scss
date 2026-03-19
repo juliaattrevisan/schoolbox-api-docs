@@ -364,3 +364,10 @@ button.submit {
         background: none;
     }
 }
+
+//a button with SVG icons that displays inline with text
+.button.sbx-button {
+    align-items: center;
+    display: inline-flex;
+    gap: var(--spacing-s);
+}
