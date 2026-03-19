@@ -101,8 +101,8 @@ class Module extends \Alaress\Module\Module
         $this->register('POST', '/cms/{typeLabel:Resources}', 'postSettingsCms', $ruleCms);
 
         // Routes to which users with service permission UserAccess::SERVICE_DESIGN need access.
-        $this->register('GET', '/design/{typeLabel:(Skin%20Config|Assets)}', 'getSettingsDesign', $ruleDesign);
-        $this->register('POST', '/design/{typeLabel:(Skin%20Config|Assets)}', 'postSettingsDesign', $ruleDesign);
+        $this->register('GET', '/design/{typeLabel:(Assets)}', 'getSettingsDesign', $ruleDesign);
+        $this->register('POST', '/design/{typeLabel:(Assets)}', 'postSettingsDesign', $ruleDesign);
 
         // Routes to which all moderators as well as superusers need access.
         $this->register('GET', '/search', 'searchSettings', $ruleSuperuserOrModerator);

@@ -1,0 +1,29 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+    {{ renderAdminNavigation(pageCurrent) }}
+    <div class="admin-content">
+    </div>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for config in configs %}
+        {% for category in config %}
+            <tr>
+                <td>
+                    {{ category.name }}
+                </td>
+            </tr>
+        {% endfor %}
+    {% endfor %}
+    </tbody>
+
+</table>

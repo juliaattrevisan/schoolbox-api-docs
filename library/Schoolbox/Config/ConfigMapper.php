@@ -9,6 +9,8 @@
 namespace Schoolbox\Config;
 
 use PDOStatement;
+use Schoolbox\Admin\SkinConfig\Category as SkinConfigCategory;
+use Schoolbox\Admin\SkinConfig\Subcategory as SkinConfigSubcategory;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 
@@ -379,6 +381,21 @@ class ConfigMapper extends Mapper
     public const string NAME_EMAIL_BANNER_IMAGE = 'email_banner_image';
     public const string NAME_SKIN_FAVICON = 'skin_favicon';
 
+    /* Skin Config Categories
+     */
+    public const string NAME_SKIN_CATEGORY_COLOURS = 'colours';
+    public const string NAME_SKIN_CATEGORY_CSS = 'custom css';
+
+    /* Skin Config Sub-Categories
+     */
+    public const string NAME_SKIN_SUBCATEGORY_GENERAL = 'general';
+    public const string NAME_SKIN_SUBCATEGORY_TOP_MENU = 'top menu';
+    public const string NAME_SKIN_SUBCATEGORY_SIDE_MENU = 'side menu and notifications';
+
+    /* Skin Config Junction table
+     */
+    public const string NAME_SKIN_CONFIG_JUNCTION = 'skin_config_category';
+
     /* Directories
      */
     public const string NAME_REPORT_STAFF_ACCESS = 'report_staff_access';
@@ -594,6 +611,19 @@ class ConfigMapper extends Mapper
             ]
         );
         $this->joins(self::COL_TYPE, Type\Mapper::class, 'id', self::TYPE_MODEL, null, 'type', 'type');
+
+        $this->joinsVia(
+            self::NAME_SKIN_CONFIG_JUNCTION,
+            SkinConfigSubcategory\Mapper::class,
+            'id',
+            'subcategory_id',
+            'configID',
+            null,
+            null,
+            null,
+            'skinConfigSubcategory',
+        );
+
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCache']);
     }
 
@@ -648,10 +678,15 @@ class ConfigMapper extends Mapper
     protected function getSelectString(): string
     {
         return "
-          SELECT  {$this->getColumnString()}, {$this->getJoinColumnString('type', 'lct')}
+          SELECT  {$this->getColumnString()},
+                  {$this->getJoinColumnString('type', 'lct')},
+                  {$this->getJoinColumnString(self::NAME_SKIN_CONFIG_JUNCTION, 'scs')},
+                  {$this->getJoinColumnString(self::NAME_SKIN_CONFIG_JUNCTION. '.category', 'scc')}
           FROM {$this->getTable()}
           INNER JOIN lu_config_field lcf on config.field_id = lcf.id
           LEFT  JOIN lu_config_type  lct on config.type_id  = lct.id
+          LEFT JOIN {$this->getJoinSql(self::NAME_SKIN_CONFIG_JUNCTION, '', 'scs')}
+          LEFT JOIN {$this->getJoinSql(self::NAME_SKIN_CONFIG_JUNCTION. '.category', 'scs', 'scc')}
         ";
     }
 
@@ -664,6 +699,14 @@ class ConfigMapper extends Mapper
             $type = $this->hydrateJoin($row, 'type', 'lct');
             if ($type instanceof Type\Model) {
                 $config->setType($type);
+            }
+            $skinConfigSubcategory = $this->hydrateJoin($row, self::NAME_SKIN_CONFIG_JUNCTION, 'scs');
+            if ($skinConfigSubcategory instanceof SkinConfigSubcategory\Model) {
+                $config->setSkinSubcategory($skinConfigSubcategory);
+                $skinConfigCategory = $this->hydrateJoin($row, self::NAME_SKIN_CONFIG_JUNCTION . '.category', 'scc');
+                if ($skinConfigCategory instanceof SkinConfigCategory\Model) {
+                    $skinConfigSubcategory->setCategory($skinConfigCategory);
+                }
             }
             $configs->add($config);
         }
