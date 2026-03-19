@@ -118,7 +118,14 @@ class EmbedReplacer
                 if (isset($replacementHtml)) {
                     $replacementsApplied = true;
                     $replacementDoc      = HTMLDocument::createFromString($replacementHtml, LIBXML_NOERROR, 'utf-8');
-                    $replacementNode     = $replacementDoc->querySelector('body')->firstChild;
+                    $replacementBody     = $replacementDoc->querySelector('body');
+                    if (!$replacementBody instanceof Element) {
+                        continue;
+                    }
+                    $replacementNode = $replacementBody->firstChild;
+                    if (!$replacementNode instanceof Node) {
+                        continue;
+                    }
                     $doc->adoptNode($replacementNode);
                     $embed->parentNode->replaceChild($replacementNode, $embed);
                     break;
