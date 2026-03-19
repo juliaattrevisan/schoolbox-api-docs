@@ -86,7 +86,7 @@ class Cursor implements ICursor
          */
         if ($this->orderBy === self::CURSOR_ORDER_BY_CLASS_NAME) {
             return $this->codec->encode([
-                self::CURSOR_ORDER_BY_CLASS_NAME_COLUMN => $context?->getFolder()?->getTitle(),
+                self::CURSOR_ORDER_BY_CLASS_NAME_COLUMN => $context?->getFolder()?->getName(),
                 self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getId(),
             ]);
         }
