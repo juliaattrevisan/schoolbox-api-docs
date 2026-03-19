@@ -177,10 +177,6 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
             );
 
             // Need to still cache this trigger in Redis, even if it is not scheduled
-            $model = $trigger->getEvent()->getObject();
-            $class = get_class($model);
-            $label = $trigger->getLabel();
-            $hash  = $this->hashObject($model);
             $this->cacheTrigger($trigger, $class, $label, $hash);
             $resolver?->acknowledge();
             return;
@@ -256,12 +252,10 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
             $this->unschedule($trigger);
         }
 
-        $model = $trigger->getEvent()->getObject();
-        $label = $trigger->getLabel();
-
         $interval = $interval ?: ($trigger->getTimestamp() - $this->clock->time());
         $timer    = $this->loop->addTimer($interval, $callable);
-        $this->putTimer($model, $label, $timer, $trigger);
+        $this->putTimer($trigger, $timer);
+        $this->cacheTrigger($trigger);
 
         $this->log->info(
             sprintf(
@@ -322,18 +316,19 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
 
 
     /**
-     * @param object           $model
-     * @param string           $label
-     * @param TimerInterface   $timer
+     * Store the timer for this trigger, so it may be fetched by `getTrigger`.
+     *
      * @param TriggerInterface $trigger
+     * @param TimerInterface   $timer
+     * @return void
      */
-    public function putTimer(object $model, string $label, TimerInterface $timer, TriggerInterface $trigger): void
+    public function putTimer(TriggerInterface $trigger, TimerInterface $timer): void
     {
+        $model = $trigger->getEvent()->getObject();
         $class = get_class($model);
+        $label = $trigger->getLabel();
         $hash  = $this->hashObject($model);
-
         $this->timers[$class][$label][$hash] = $timer;
-        $this->cacheTrigger($trigger, $class, $label, $hash);
     }
 
     /**
@@ -341,14 +336,15 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      * scheduler process restarts.
      *
      * @param TriggerInterface $trigger
-     * @param string           $class
-     * @param string           $label
-     * @param string           $hash
      * @return void
      */
-    private function cacheTrigger(TriggerInterface $trigger, string $class, string $label, string $hash): void
+    private function cacheTrigger(TriggerInterface $trigger): void
     {
         if ($this->instanceId && $this->jit) {
+            $model = $trigger->getEvent()->getObject();
+            $class = get_class($model);
+            $label = $trigger->getLabel();
+            $hash  = $this->hashObject($model);
             [$storageKey,] = RedisQueue::getStorage($trigger, $this->instanceId);
             $this->redisKeys[$class][$label][$hash] = $storageKey;
             $this->jit->storeCache($trigger);
