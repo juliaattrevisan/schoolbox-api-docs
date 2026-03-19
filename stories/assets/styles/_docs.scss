@@ -32,6 +32,13 @@ table.docblock-argstable tr td,
 }
 
 /**
+ * The primary story window background
+ */
+.docs-story {
+    background: white;
+}
+
+/**
  * To overwrite our foundation styles making the buttons look funky
  */
 .docblock-code-toggle:hover,
@@ -79,7 +86,6 @@ table.docblock-argstable tr td,
 
 .box-icon {
     align-items: center;
-    background-color: #fff;
     border: 1px solid var(--content-ui-background);
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     display: flex;
