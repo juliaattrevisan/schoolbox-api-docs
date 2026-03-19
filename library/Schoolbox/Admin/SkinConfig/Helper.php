@@ -32,7 +32,25 @@ class Helper
      */
     public function buildPreviewData(array $configs): array
     {
-        $configOverrides = $this->extractConfigOverrides($configs);
+        return $this->buildTwigData($this->extractConfigOverrides($configs));
+    }
+
+    /**
+     * Build the Twig payload used by the persisted skin stylesheet response.
+     *
+     * @return array{colors: array<string, array<string, mixed>>, customCss: string}
+     */
+    public function buildPersistedData(): array
+    {
+        return $this->buildTwigData([]);
+    }
+
+    /**
+     * @param array<int, string|null> $configOverrides
+     * @return array{colors: array<string, array<string, mixed>>, customCss: string}
+     */
+    private function buildTwigData(array $configOverrides): array
+    {
         $previewConfigs = $this->getPreviewConfigs();
         $colorFactory = new ColorFactory();
         $transformer = new Transformer();
