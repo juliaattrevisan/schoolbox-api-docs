@@ -47,6 +47,8 @@ class ConfiguredDispatchStrategyBuilder
     /** @var int */
     protected $metricInterval = DefaultDispatchStrategy::METRIC_INTERVAL;
 
+    /** @var int */
+    protected $maxFutureTriggerTime = DefaultDispatchStrategy::MAX_FUTURE_TRIGGER_TIME;
 
     /**
      * @param array $conf

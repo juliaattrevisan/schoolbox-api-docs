@@ -126,7 +126,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
     public function getAvailableWorker($workers, $remainingTaskCount)
     {
         // if we haven't got the min number of workers, favour starting a new one
-        if ($workers->countWhere(~(Worker::ENDED | Worker::ERROR)) < self::MIN_WORKERS) {
+        if ($workers->countWhere(~(Worker::ENDED & Worker::ERROR)) < self::MIN_WORKERS) {
             return 0;
         }
 
@@ -139,7 +139,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
         }
 
         // if number of workers THAT ARE NOT ENDED OR ERRORED is below the cap, spawn a new one
-        if ($workers->countWhere(~(Worker::ENDED | Worker::ERROR)) < self::MAX_WORKERS) {
+        if ($workers->countWhere(~(Worker::ENDED & Worker::ERROR)) < self::MAX_WORKERS) {
             return 0;
         }
 
@@ -376,27 +376,5 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
     public function getMaxRequestsPerWorker(): int
     {
         return static::MAX_REQUESTS_PER_WORKER;
-    }
-
-
-    /**
-     * Returns the maximum time in milliseconds to wait for a worker to accept a write before killing it
-     *
-     * @return int
-     */
-    public function getWorkerWriteTimeout(): int
-    {
-        return static::WORKER_WRITE_TIMEOUT;
-    }
-
-
-    /**
-     * The interval (in seconds) at which daemon metrics should be reported.
-     *
-     * @return int
-     */
-    public function getMetricInterval(): int
-    {
-        return static::METRIC_INTERVAL;
     }
 }
