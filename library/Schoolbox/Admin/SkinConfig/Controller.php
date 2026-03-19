@@ -132,10 +132,8 @@ class Controller extends ConfigController
     {
         $configs = $this->requestPost->get('configs') ?? [];
         $database = $this->getConfigMapper()->getDatabase();
-
         try {
             $database->beginTransaction();
-
             foreach ($configs as $subcategories) {
                 foreach ($subcategories as $subcategory) {
                     foreach (($subcategory['options'] ?? []) as $option) {
@@ -155,7 +153,6 @@ class Controller extends ConfigController
                     }
                 }
             }
-
             $database->commit();
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {
@@ -207,19 +204,14 @@ class Controller extends ConfigController
     private function getCustomProperty(Config $config): ?string
     {
         $options = $config->getOptions();
-
         if ($options === null || trim($options) === '') {
             return null;
         }
-
         $decoded = json_decode($options, true);
-
         if (!is_array($decoded)) {
             return null;
         }
-
         $customProperty = $decoded['customProperty'] ?? null;
-
         return is_string($customProperty) && $customProperty !== '' ? $customProperty : null;
     }
 
@@ -236,26 +228,20 @@ class Controller extends ConfigController
         $colorFactory = new ColorFactory();
         $transformer = new Transformer();
         $colors = [];
-
         foreach ($previewConfigs as $config) {
             $customProperty = $this->getCustomProperty($config);
-
             if ($customProperty === null) {
                 continue;
             }
-
             $value = $configOverrides[$config->getId()] ?? $config->getValue();
-
             if (!is_string($value) || trim($value) === '') {
                 continue;
             }
-
             $baseColor = $colorFactory->build($value);
             $colors[$config->getName()] = $this->createColorTwigVars($baseColor, $customProperty);
             $contrastColor = $transformer->calculateTextColor($baseColor);
             $colors[$config->getName() . '_contrast'] = $this->createColorTwigVars($contrastColor, $customProperty . '-contrast');
         }
-
         if (isset($colors['skin_colour_body_bg']['colorObject']) && $colors['skin_colour_body_bg']['colorObject'] instanceof Color) {
             /** @var Color $bodyBackground */
             $bodyBackground = $colors['skin_colour_body_bg']['colorObject'];
@@ -264,7 +250,6 @@ class Controller extends ConfigController
             $colors['skin_colour_body_fg'] = $this->createColorTwigVars($bodyForeground, '--body-foreground');
             $colors['skin_colour_body_h1'] = $this->createColorTwigVars($bodyHeading, '--body-foreground-h1');
         }
-
         if (isset($colors['skin_colour_navigation_background']['colorObject'])
             && $colors['skin_colour_navigation_background']['colorObject'] instanceof Color) {
             /** @var Color $navigationBackground */
@@ -276,7 +261,6 @@ class Controller extends ConfigController
                 '--navigation-foreground-highlight'
             );
         }
-
         return [
             'colors' => $colors,
             'customCss' => $this->getPreviewCustomCss($previewConfigs, $configOverrides),
@@ -290,27 +274,22 @@ class Controller extends ConfigController
     private function extractConfigOverrides(array $configs): array
     {
         $configOverrides = [];
-
         foreach ($configs as $subcategories) {
             if (!is_array($subcategories)) {
                 continue;
             }
-
             foreach ($subcategories as $subcategory) {
                 if (!is_array($subcategory) || !isset($subcategory['options']) || !is_array($subcategory['options'])) {
                     continue;
                 }
-
                 foreach ($subcategory['options'] as $option) {
                     if (!is_array($option) || !isset($option['id'])) {
                         continue;
                     }
-
                     $configOverrides[(int) $option['id']] = isset($option['value']) && is_string($option['value']) ? $option['value'] : null;
                 }
             }
         }
-
         return $configOverrides;
     }
 
@@ -320,7 +299,6 @@ class Controller extends ConfigController
     private function getPreviewConfigs(): array
     {
         $previewConfigs = [];
-
         $criteria = [
             'type_id' => ConfigMapper::TYPE_SKIN_CONFIG,
             'hidden' => 'false',
@@ -334,11 +312,9 @@ class Controller extends ConfigController
                 ConfigMapper::COL_ID => 'ASC',
             ],
         ];
-
         foreach ($this->getConfigMapper()->findByColumnList($criteria, $options) as $config) {
             $previewConfigs[] = $config;
         }
-
         return $previewConfigs;
     }
 
@@ -348,7 +324,6 @@ class Controller extends ConfigController
     private function createColorTwigVars(Color $color, string $cssVar): array
     {
         $hsl = $color->getAsHslArray();
-
         return [
             'cssVar' => $cssVar,
             'colorObject' => $color,
@@ -372,12 +347,9 @@ class Controller extends ConfigController
             if ($config->getName() !== ConfigMapper::NAME_SKIN_CUSTOM_CSS) {
                 continue;
             }
-
             $value = $configOverrides[$config->getId()] ?? $config->getValue();
-
             return is_string($value) ? $value : '';
         }
-
         return (string) $this->getConfigLoader()->get(ConfigMapper::NAME_SKIN_CUSTOM_CSS);
     }
 }
