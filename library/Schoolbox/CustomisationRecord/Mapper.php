@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 use Schoolbox\Filter\Filters\CustomisationRecord;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use PDO;
 
@@ -96,7 +97,9 @@ class Mapper extends BaseMapper
             $plan->setAssessment($assessment);
             /* Hydrate user
              */
+            /** @var User $user */
             $user = $this->getJoinMapper('user')->hydrate($row, 'u');
+            $user->setYear($this->getJoinMapper('user.year')->hydrate($row, 'y'));
 
             $participant->setPlan($plan);
             if (null !== $user) {
@@ -117,6 +120,7 @@ class Mapper extends BaseMapper
             SELECT DISTINCT {$this->getColumnString()},
                    {$this->getJoinColumnString('plan', 'pp')},
                    {$this->getJoinColumnString('user', 'u')},
+                   {$this->getJoinColumnString('user.year', 'y')},
                    {$this->getJoinColumnString('plan.assessment', 'a')},
                    {$this->getJoinColumnString('plan.assessment', 'oa')},
                    {$this->getJoinColumnString('plan.assessment.assessment_course_unit_implementation', 'cui')},
@@ -138,6 +142,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('plan', '', 'pp')}
             AND (pp.is_dynamic = '{$staticPlan}' OR pp.is_dynamic = '{$customParticipantPlan}')
             LEFT JOIN {$this->getJoinSql('user', '', 'u')}
+            LEFT JOIN {$this->getJoinSql('user.year', 'u', 'y')}
             INNER JOIN userCampus sc ON u.id = sc.uid
             INNER JOIN assessment a ON pp.assessment_id = a.id AND a.deleted_at IS NULL
             LEFT JOIN (
