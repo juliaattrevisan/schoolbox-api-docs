@@ -51,7 +51,7 @@ async function onUndoChanges(): Promise<void> {
     }
     loadError.value = null;
     configs.value = cloneConfigs(savedConfigs.value);
-    await initialiseColourPickers();
+    await updateColourPickerColours();
     schedulePreviewRefresh();
 }
 
@@ -89,6 +89,20 @@ async function initialiseColourPickers(): Promise<void> {
 }
 
 /**
+ * Trigger input events so the colour picker UI reflects the current input values.
+ * @returns A promise that resolves once the input events have been dispatched.
+ */
+async function updateColourPickerColours(): Promise<void> {
+    await window.Vue.nextTick();
+    document.querySelectorAll("[data-colour-picker]").forEach((element) => {
+        if (!(element instanceof HTMLInputElement)) {
+            return;
+        }
+        element.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+}
+
+/**
  * Persist the current Skin Config payload to the backend.
  */
 async function onSaveSelected(): Promise<void> {
@@ -111,6 +125,7 @@ async function onSaveSelected(): Promise<void> {
         }
         savedConfigs.value = cloneConfigs(configs.value);
         initialConfigSnapshot.value = serializeConfigs(savedConfigs.value);
+        await updateColourPickerColours();
         toast.timeout({ text: "Skin config successfully updated" });
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
