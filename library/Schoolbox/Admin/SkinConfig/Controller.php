@@ -92,7 +92,7 @@ class Controller extends ConfigController
         /* Converting to JSON format
          */
         $data = $skinConfigs->reduce(function (array $carry, Config $config): array {
-            $categoryName = strtolower($config->getSkinSubcategory()->getCategory()->getName());
+            $categoryName = $config->getSkinSubcategory()->getCategory()->getName();
             $subcategoryId = $config->getSkinSubcategory()->getId();
             $subcategoryName = $config->getSkinSubcategory()->getName();
 

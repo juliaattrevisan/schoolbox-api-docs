@@ -15,20 +15,6 @@ const saveText = window.Vue.computed(() => (isProcessing.value ? "Saving..." : "
 const { schedulePreviewRefresh } = useSkinPreview(configs, props.routes.preview);
 
 /**
- * Convert backend category keys to display titles for the page.
- * @param categoryKey The backend category key.
- * @returns The display title for the category.
- */
-function getCategoryTitle(categoryKey: string): string {
-    return (
-        {
-            colours: "Colours",
-            "custom css": "Custom CSS",
-        }[categoryKey] || categoryKey
-    );
-}
-
-/**
  * Initialise colour picker inputs once the component has rendered.
  */
 async function initialiseColourPickers(): Promise<void> {
@@ -99,7 +85,7 @@ window.Vue.onMounted(() => {
                 <div class="row">
                     <div class="list-item">
                         <div class="small-12 island">
-                            <h2 class="subheader">{{ getCategoryTitle(categoryKey) }}</h2>
+                            <h2 class="subheader">{{ categoryKey }}</h2>
                         </div>
                     </div>
                 </div>
