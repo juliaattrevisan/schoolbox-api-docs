@@ -50,6 +50,7 @@ class ConfigMapper extends Mapper
     public const string MODULE_FEATURE_TOURS = 'feature-tours';
     public const string MODULE_AI_SERVICES = 'ai-services';
     public const string MODULE_DIFFERENTIATION_PROFILES = 'differentiation-profiles';
+    public const string MODULE_IB = 'ib';
 
     // Field enum (kinda)
     public const int FIELD_INPUT         =  1;
@@ -608,6 +609,7 @@ class ConfigMapper extends Mapper
                 self::MODULE_FEATURE_TOURS,
                 self::MODULE_AI_SERVICES,
                 self::MODULE_DIFFERENTIATION_PROFILES,
+                self::MODULE_IB,
             ]
         );
         $this->joins(self::COL_TYPE, Type\Mapper::class, 'id', self::TYPE_MODEL, null, 'type', 'type');

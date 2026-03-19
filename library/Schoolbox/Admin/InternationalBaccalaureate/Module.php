@@ -36,6 +36,9 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '/configuration', 'getConfiguration', $ruleIBCoordinatorAccess);
+        $this->register('GET', '/configuration/api/subjects/{groupId}', 'getCategorySubjects', $ruleIBCoordinatorAccess);
+        $this->register('GET', '/configuration/api/{categoryId}', 'getConfigurationData', $ruleIBCoordinatorAccess);
+        $this->register('POST', '/configuration/api/save', 'saveConfiguration', $ruleIBCoordinatorAccess);
         $this->register('GET', '/registrations', 'getRegistrations', $ruleIBCoordinatorAccess);
     }
 
