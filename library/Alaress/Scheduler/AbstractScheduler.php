@@ -175,6 +175,13 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
                     Alaress_Date_Format::newFromTimestamp($time + $this->maxFutureTriggerTime)->toRfc3339String(),
                 )
             );
+
+            // Need to still cache this trigger in Redis, even if it is not scheduled
+            $model = $trigger->getEvent()->getObject();
+            $class = get_class($model);
+            $label = $trigger->getLabel();
+            $hash  = $this->hashObject($model);
+            $this->cacheTrigger($trigger, $class, $label, $hash);
             $resolver?->acknowledge();
             return;
         }
@@ -326,15 +333,27 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         $hash  = $this->hashObject($model);
 
         $this->timers[$class][$label][$hash] = $timer;
+        $this->cacheTrigger($trigger, $class, $label, $hash);
+    }
 
-        // Store scheduled trigger key, so that it can be referred when canceled
+    /**
+     * Store this object's trigger, so that it can be restored after the
+     * scheduler process restarts.
+     *
+     * @param TriggerInterface $trigger
+     * @param string           $class
+     * @param string           $label
+     * @param string           $hash
+     * @return void
+     */
+    private function cacheTrigger(TriggerInterface $trigger, string $class, string $label, string $hash): void
+    {
         if ($this->instanceId && $this->jit) {
             [$storageKey,] = RedisQueue::getStorage($trigger, $this->instanceId);
             $this->redisKeys[$class][$label][$hash] = $storageKey;
             $this->jit->storeCache($trigger);
         }
     }
-
 
     /**
      * @param object $model
