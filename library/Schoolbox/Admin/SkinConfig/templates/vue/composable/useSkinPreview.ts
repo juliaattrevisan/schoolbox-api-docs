@@ -1,3 +1,7 @@
+/**
+ * Composable for requesting and applying the live Skin Config preview stylesheet.
+ */
+
 import type { Ref } from "vue";
 import { debounce } from "es-toolkit";
 import type { SkinConfigData } from "../../js/types/skinConfigTypes";

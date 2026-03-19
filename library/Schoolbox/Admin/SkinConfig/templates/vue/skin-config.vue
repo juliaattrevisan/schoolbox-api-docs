@@ -1,7 +1,13 @@
 <script setup lang="ts">
+/**
+ * Vue component for rendering and managing the Skin Config form in the Schoolbox Admin interface.
+ * This component handles displaying the configuration options, tracking changes, and saving updates to the backend.
+ */
+
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { Routes, SkinConfigData } from "../js/types/skinConfigTypes";
+import { useSkinConfigState } from "./composable/useSkinConfigState";
 import { useSkinPreview } from "./composable/useSkinPreview";
 
 const props = defineProps<{
@@ -9,97 +15,22 @@ const props = defineProps<{
     configs: SkinConfigData;
 }>();
 
-const savedConfigs = window.Vue.ref(cloneConfigs(props.configs));
-const configs = window.Vue.ref<SkinConfigData>(cloneConfigs(props.configs));
-const saveContainer = window.Vue.ref<HTMLDivElement | null>(null);
 const isProcessing = window.Vue.ref(false);
-const isAtBottomOfPage = window.Vue.ref(false);
 const loadError = window.Vue.ref<string | null>(null);
-const initialConfigSnapshot = window.Vue.ref(serializeConfigs(savedConfigs.value));
 const saveText = window.Vue.computed(() => (isProcessing.value ? "Saving..." : "Save"));
-const currentConfigSnapshot = window.Vue.computed(() => serializeConfigs(configs.value));
-const hasUnsavedChanges = window.Vue.computed(() => initialConfigSnapshot.value !== currentConfigSnapshot.value);
-const showSaveDrawer = window.Vue.computed(() => hasUnsavedChanges.value || isAtBottomOfPage.value);
+const { configs, saveContainer, hasUnsavedChanges, showSaveDrawer, resetToSavedState, markCurrentAsSaved } =
+    useSkinConfigState(props.configs, isProcessing, () => {
+        schedulePreviewRefresh();
+    });
 const { schedulePreviewRefresh } = useSkinPreview(configs, props.routes.preview);
-let intersectionObserver: IntersectionObserver | null = null;
-
-/**
- * Clone the config state so form edits do not mutate the saved baseline.
- * @param value - The current Skin Config payload.
- * @returns A deep-cloned Skin Config payload.
- */
-function cloneConfigs(value: SkinConfigData): SkinConfigData {
-    return JSON.parse(serializeConfigs(value)) as SkinConfigData;
-}
-
-/**
- * Serialize the current config state for dirty-state comparison.
- * @param value - The current Skin Config payload.
- * @returns A stable serialized snapshot for dirty-state comparison.
- */
-function serializeConfigs(value: SkinConfigData): string {
-    return JSON.stringify(value);
-}
 
 /**
  * Restore the last saved config state.
  * @returns A promise that resolves once the form state and preview have been reset.
  */
 async function onUndoChanges(): Promise<void> {
-    if (isProcessing.value) {
-        return;
-    }
     loadError.value = null;
-    configs.value = cloneConfigs(savedConfigs.value);
-    await updateColourPickerColours();
-    schedulePreviewRefresh();
-}
-
-/**
- * Track whether the bottom save area is currently visible on screen.
- */
-function initIntersectionObserver(): void {
-    if (saveContainer.value === null) {
-        return;
-    }
-    intersectionObserver = new IntersectionObserver((elements) => {
-        isAtBottomOfPage.value = elements[0].intersectionRatio !== 0;
-    });
-    intersectionObserver.observe(saveContainer.value);
-}
-
-/**
- * Initialise colour picker inputs once the component has rendered.
- */
-async function initialiseColourPickers(): Promise<void> {
-    await window.Vue.nextTick();
-    document.querySelectorAll("[data-colour-picker]").forEach((element) => {
-        if (!(element instanceof HTMLInputElement) || element.id === "") {
-            return;
-        }
-        document.dispatchEvent(
-            new CustomEvent("colourPickerInitialise", {
-                detail: {
-                    el: `#${element.id}`,
-                    format: "rgb",
-                },
-            }),
-        );
-    });
-}
-
-/**
- * Trigger input events so the colour picker UI reflects the current input values.
- * @returns A promise that resolves once the input events have been dispatched.
- */
-async function updateColourPickerColours(): Promise<void> {
-    await window.Vue.nextTick();
-    document.querySelectorAll("[data-colour-picker]").forEach((element) => {
-        if (!(element instanceof HTMLInputElement)) {
-            return;
-        }
-        element.dispatchEvent(new Event("input", { bubbles: true }));
-    });
+    await resetToSavedState();
 }
 
 /**
@@ -123,9 +54,7 @@ async function onSaveSelected(): Promise<void> {
         if (!response.success) {
             throw new Error(response.message || "Failed to save");
         }
-        savedConfigs.value = cloneConfigs(configs.value);
-        initialConfigSnapshot.value = serializeConfigs(savedConfigs.value);
-        await updateColourPickerColours();
+        await markCurrentAsSaved();
         toast.timeout({ text: "Skin config successfully updated" });
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
@@ -135,18 +64,6 @@ async function onSaveSelected(): Promise<void> {
         isProcessing.value = false;
     }
 }
-
-/**
- * Initialise colour pickers when the component is mounted
- */
-window.Vue.onMounted(() => {
-    initIntersectionObserver();
-    void initialiseColourPickers();
-});
-
-window.Vue.onBeforeUnmount(() => {
-    intersectionObserver?.disconnect();
-});
 </script>
 
 <template>
