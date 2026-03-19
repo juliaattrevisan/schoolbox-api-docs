@@ -6,8 +6,7 @@
     <div class="admin-content">
         <div id="skin-config-container">
             <skin-config
-                post-route="{{ routeLookup('adminDesignSkinConfig.postConfig') }}"
-                preview-route="{{ routeLookup('adminDesignSkinConfig.previewCss') }}"
+                :routes="{{ { post: routeLookup('adminDesignSkinConfig.postConfig'), preview: routeLookup('adminDesignSkinConfig.previewCss') }|json_encode }}"
                 :configs="{{ configs|json_encode }}"
             />
         </div>

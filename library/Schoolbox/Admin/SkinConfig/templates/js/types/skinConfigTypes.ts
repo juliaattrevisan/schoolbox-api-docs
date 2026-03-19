@@ -1,4 +1,12 @@
 /**
+ * Routes used by the Skin Config app
+ */
+export type Routes = {
+    post: string;
+    preview: string;
+};
+
+/**
  * A single editable skin configuration option
  */
 export type SkinConfigOption = {

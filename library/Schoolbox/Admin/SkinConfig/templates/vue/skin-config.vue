@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { apiRequest } from "@js/util/sbx/apiUtils";
-import type { SkinConfigData } from "../js/types/skinConfigTypes";
+import type { Routes, SkinConfigData } from "../js/types/skinConfigTypes";
 
 const PREVIEW_DEBOUNCE_MS = 300;
 const PREVIEW_STYLE_ID = "skin-config-preview-style";
 
 const props = defineProps<{
-    postRoute: string;
-    previewRoute: string;
+    routes: Routes;
     configs: SkinConfigData;
 }>();
 
@@ -80,7 +79,7 @@ async function requestPreviewCss(): Promise<void> {
     previewAbortController = abortController;
     const requestSequence = ++previewRequestSequence;
     try {
-        const response = await fetch(props.previewRoute, {
+        const response = await fetch(props.routes.preview, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -155,7 +154,7 @@ async function onSaveSelected(): Promise<void> {
         isProcessing.value = true;
         loadError.value = null;
         const response = await apiRequest({
-            url: props.postRoute,
+            url: props.routes.post,
             method: "POST",
             body: {
                 configs: configs.value,
