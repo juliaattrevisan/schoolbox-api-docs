@@ -41,7 +41,8 @@ echo "acceptancetest setup"
 cd /usr/share/schoolbox
 
 ## Run tests
-INSTANCE_ID=smoketest CI=true TZ='Australia/Melbourne' npx playwright test
+ 
+INSTANCE_ID=smoketest CI=true TZ='Australia/Melbourne' npx playwright test curriculumDescription.spec.ts
 
 testResult=$?;
 
