@@ -322,7 +322,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      * @param TimerInterface   $timer
      * @return void
      */
-    public function putTimer(TriggerInterface $trigger, TimerInterface $timer): void
+    private function putTimer(TriggerInterface $trigger, TimerInterface $timer): void
     {
         $model = $trigger->getEvent()->getObject();
         $class = get_class($model);
@@ -373,7 +373,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      * @param TriggerInterface $trigger
      * @return void
      */
-    public function removeTimer(TriggerInterface $trigger): void
+    private function removeTimer(TriggerInterface $trigger): void
     {
         $model = $trigger->getEvent()->getObject();
         $class = get_class($model);
