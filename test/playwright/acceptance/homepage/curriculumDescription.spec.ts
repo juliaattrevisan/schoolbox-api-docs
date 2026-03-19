@@ -107,7 +107,7 @@ test.describe("Curriculum Description Component Tests", () => {
 
     test("Disable curriculum node from the database", async ({ tester, db }) => {
         tester.isGoingTo("Disable curriculum node ELBE1177");
-        await db.updateInDatabase("curriculum_node", { enabled: 0 }, { id: 155, code: "ELBE1177" });
+        await db.updateInDatabase("curriculum_node", { enabled: 0 }, { id: 154, code: "ELBE1177" });
     });
 
     test("Login as Jana Reed and verify student view for disabled curriculum node", async ({ tester }) => {
@@ -134,7 +134,7 @@ test.describe("Curriculum Description Component Tests", () => {
      */
     test.afterAll(async ({ baseTester, db, api }) => {
         baseTester.isGoingTo("clean up: remove Curriculum Description component and restore curriculum node");
-        await db.updateInDatabase("curriculum_node", { enabled: 1 }, { id: 155, code: "ELBE1177" });
+        await db.updateInDatabase("curriculum_node", { enabled: 1 }, { id: 154, code: "ELBE1177" });
         await api.deleteHomepageComponent(87, curriculumDescriptionComponentId);
     });
 });
