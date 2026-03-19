@@ -451,12 +451,6 @@ parameters:
 			path: library/Alaress/WorkerCrew/Worker/IO/WrappedReadableResourceStream.php
 
 		-
-			message: '#^Property Alaress\\WorkerCrew\\Worker\\Worker\:\:\$task \(Alaress\\WorkerCrew\\Worker\\Task\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Alaress/WorkerCrew/Worker/Worker.php
-
-		-
 			message: '#^Return type \(Alaress\\WorkerCrew\\Worker\\Worker\) of method Alaress\\WorkerCrew\\Worker\\WorkerArray\:\:getPidWhere\(\) should be compatible with return type \(int\) of method Alaress\\WorkerCrew\\Worker\\WorkerBundleInterface\:\:getPidWhere\(\)$#'
 			identifier: method.childReturnType
 			count: 1
