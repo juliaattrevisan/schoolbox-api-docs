@@ -284,17 +284,25 @@ class Color
      */
     public function __unserialize(array $serialized): void
     {
-        if (isset($serialized['r'])) {
-            $this->red = $serialized['r'];
+        // The channels should not ever be unset or invalid, because they could
+        // never be set to null or invalid.
+        // Nonetheless: default unserialize to black.
+        $red   = filter_var($serialized['r'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $green = filter_var($serialized['g'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $blue  = filter_var($serialized['b'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $alpha = filter_var($serialized['a'] ?? null, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
+        if (!isset($red, $green, $blue, $alpha)) {
+            trigger_error(
+                sprintf(
+                    'Invalid color value (r: %s, g: %s, b: %s, a: %s): assuming 0x00 for missing color channels, 1 for missing alpha',
+                    $serialized['r'] ?? null,
+                    $serialized['g'] ?? null,
+                    $serialized['b'] ?? null,
+                    $serialized['a'] ?? null,
+                ),
+                E_USER_WARNING,
+            );
         }
-        if (isset($serialized['g'])) {
-            $this->green = $serialized['g'];
-        }
-        if (isset($serialized['b'])) {
-            $this->blue = $serialized['b'];
-        }
-        if (isset($serialized['a'])) {
-            $this->alpha = $serialized['a'];
-        }
+        $this->__construct($red ?? 0x00, $green ?? 0x00, $blue ?? 0x00, $alpha ?? 1.0);
     }
 }
