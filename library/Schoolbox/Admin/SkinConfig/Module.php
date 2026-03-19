@@ -42,6 +42,7 @@ class Module extends BaseModule
 
         $this->register('GET', '', 'getConfig', $perms);
         $this->register('POST', '', 'postConfig', $perms);
+        $this->register('POST', '/preview', 'previewCss', $perms);
     }
 
     /**

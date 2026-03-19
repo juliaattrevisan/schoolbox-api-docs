@@ -1,5 +1,5 @@
 {% autoescape 'css' %}
-{% set customCss = config.skin_custom_css ?? '' %}
+{% set customCss = customCss ?? config.skin_custom_css ?? '' %}
 {{ customCss | raw }}
 
 :root {

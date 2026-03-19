@@ -1,17 +1,13 @@
 <script setup lang="ts">
-import {
-    calculateTextColor,
-    getColorVariableEntries,
-    getColorVariableNames,
-    getDerivedColorTargets,
-    getDerivedColorVariableNames,
-    parseColor,
-} from "@js/util/colourUtils";
 import { apiRequest } from "@js/util/sbx/apiUtils";
-import type { SkinConfigData, SkinConfigOption } from "../js/types/skinConfigTypes";
+import type { SkinConfigData } from "../js/types/skinConfigTypes";
+
+const PREVIEW_DEBOUNCE_MS = 300;
+const PREVIEW_STYLE_ID = "skin-config-preview-style";
 
 const props = defineProps<{
     postRoute: string;
+    previewRoute: string;
     configs: SkinConfigData;
 }>();
 
@@ -19,6 +15,9 @@ const configs = window.Vue.ref<SkinConfigData>(props.configs);
 const isProcessing = window.Vue.ref(false);
 const loadError = window.Vue.ref<string | null>(null);
 const saveText = window.Vue.computed(() => (isProcessing.value ? "Saving..." : "Save"));
+let previewAbortController: AbortController | null = null;
+let previewDebounceTimer: number | null = null;
+let previewRequestSequence = 0;
 
 /**
  * Convert backend category keys to display titles for the page.
@@ -35,53 +34,93 @@ function getCategoryTitle(categoryKey: string): string {
 }
 
 /**
- * Apply CSS custom property entries to the root element.
- * @param colorEntries CSS property/value pairs to apply.
+ * Ensure the preview stylesheet element exists.
+ * @returns The preview style element.
  */
-function applyColorVariables(colorEntries: Array<[string, string]>): void {
-    colorEntries.forEach(([propertyName, propertyValue]) => {
-        document.documentElement.style.setProperty(propertyName, propertyValue);
-    });
-}
-
-/**
- * Remove CSS custom properties from the root element.
- * @param colorVariableNames CSS property names to clear.
- */
-function clearColorVariables(colorVariableNames: string[]): void {
-    colorVariableNames.forEach((propertyName) => {
-        document.documentElement.style.removeProperty(propertyName);
-    });
-}
-
-/**
- * Apply a raw CSS custom property immediately for colour options that define one.
- * @param option The current skin config option.
- */
-function applyCustomProperty(option: SkinConfigOption): void {
-    if (option.customProperty === null) {
-        return;
+function getPreviewStyleElement(): HTMLStyleElement {
+    const existingElement = document.getElementById(PREVIEW_STYLE_ID);
+    if (existingElement instanceof HTMLStyleElement) {
+        return existingElement;
     }
+    const styleElement = document.createElement("style");
+    styleElement.id = PREVIEW_STYLE_ID;
+    document.head.append(styleElement);
 
-    const color = parseColor(option.value);
+    return styleElement;
+}
 
-    if (color === null) {
-        clearColorVariables(getColorVariableNames(option.customProperty));
-        clearColorVariables(getColorVariableNames(`${option.customProperty}-contrast`));
+/**
+ * Remove any pending or active preview request state.
+ */
+function cancelPendingPreview(): void {
+    if (previewDebounceTimer !== null) {
+        window.clearTimeout(previewDebounceTimer);
+        previewDebounceTimer = null;
+    }
+    previewAbortController?.abort();
+    previewAbortController = null;
+}
 
-        for (const cssVar of getDerivedColorVariableNames(option.customProperty)) {
-            clearColorVariables(getColorVariableNames(cssVar));
+/**
+ * Remove the injected preview stylesheet.
+ */
+function removePreviewStyle(): void {
+    const existingElement = document.getElementById(PREVIEW_STYLE_ID);
+    if (existingElement instanceof HTMLStyleElement) {
+        existingElement.remove();
+    }
+}
+
+/**
+ * Request the latest preview stylesheet from the backend and apply it.
+ */
+async function requestPreviewCss(): Promise<void> {
+    previewAbortController?.abort();
+    const abortController = new AbortController();
+    previewAbortController = abortController;
+    const requestSequence = ++previewRequestSequence;
+    try {
+        const response = await fetch(props.previewRoute, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "text/css, application/json",
+            },
+            body: JSON.stringify({
+                configs: configs.value,
+            }),
+            signal: abortController.signal,
+        });
+        if (!response.ok) {
+            return;
         }
-
-        return;
+        const css = await response.text();
+        if (requestSequence !== previewRequestSequence || abortController.signal.aborted) {
+            return;
+        }
+        getPreviewStyleElement().textContent = css;
+    } catch (error) {
+        if (!(error instanceof DOMException) || error.name !== "AbortError") {
+            return;
+        }
+    } finally {
+        if (previewAbortController === abortController) {
+            previewAbortController = null;
+        }
     }
+}
 
-    applyColorVariables(getColorVariableEntries(option.customProperty, color));
-    applyColorVariables(getColorVariableEntries(`${option.customProperty}-contrast`, calculateTextColor(color)));
-
-    for (const derivedColor of getDerivedColorTargets(option.customProperty, color)) {
-        applyColorVariables(getColorVariableEntries(derivedColor.cssVar, derivedColor.color));
+/**
+ * Debounce preview regeneration while the user is editing.
+ */
+function schedulePreviewRefresh(): void {
+    if (previewDebounceTimer !== null) {
+        window.clearTimeout(previewDebounceTimer);
     }
+    previewDebounceTimer = window.setTimeout(() => {
+        previewDebounceTimer = null;
+        void requestPreviewCss();
+    }, PREVIEW_DEBOUNCE_MS);
 }
 
 /**
@@ -135,8 +174,19 @@ async function onSaveSelected(): Promise<void> {
     }
 }
 
+/**
+ * Initialise colour pickers when the component is mounted
+ */
 window.Vue.onMounted(() => {
     void initialiseColourPickers();
+});
+
+/**
+ * Clean up any pending preview requests or styles when the component is unmounted to prevent memory leaks or orphaned styles.
+ */
+window.Vue.onBeforeUnmount(() => {
+    cancelPendingPreview();
+    removePreviewStyle();
 });
 </script>
 
@@ -194,8 +244,8 @@ window.Vue.onMounted(() => {
                                     :name="option.name"
                                     data-colour-picker
                                     :disabled="!option.editable"
-                                    @input="applyCustomProperty(option)"
-                                    @change="applyCustomProperty(option)"
+                                    @input="schedulePreviewRefresh"
+                                    @change="schedulePreviewRefresh"
                                 />
                             </div>
                             <div v-else-if="option.type === 'textarea'">
@@ -205,6 +255,8 @@ window.Vue.onMounted(() => {
                                     :name="option.name"
                                     rows="8"
                                     :disabled="!option.editable"
+                                    @input="schedulePreviewRefresh"
+                                    @change="schedulePreviewRefresh"
                                 />
                             </div>
                         </div>
