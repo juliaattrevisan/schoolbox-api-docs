@@ -109,7 +109,7 @@ class EmbedReplacer
         // Process each embed
         $replacementsApplied = false;
         foreach ($embeds as $embed) {
-            if (!$embed instanceof Element) {
+            if (!($embed instanceof Element && $embed->parentNode instanceof Node)) {
                 continue;
             }
             foreach (self::IFRAMELY_EMBED_CONTAINER_SOURCE_ATTRIBUTES as $attribute) {
