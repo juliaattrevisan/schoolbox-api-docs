@@ -15,7 +15,6 @@ use Alaress\Redis\Async;
 use Alaress\Async\Notification\Postman;
 use Alaress\Date\Clock;
 use Alaress\Scheduler\Cache\RedisCache;
-use Alaress\Sentry\Tracing\Tracer;
 use Alaress\WorkerCrew\Pooling\ConfigurationReader;
 use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategyBuilder;
 use Predis\ClientInterface;
@@ -28,7 +27,6 @@ use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Routing;
 use Schoolbox\Realtime\Schedule\Broker;
 use Schoolbox\Realtime\Schedule\Scheduler;
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -79,7 +77,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
             INSTANCE_ID,
             // Since future triggers are cached using the JIT cache, the max
             // future trigger time must be <= the JIT's TTL.
-            min(Scheduler::DEFAULT_MAX_FUTURE_TRIGGER_TIME, RedisCache::EXPIRY_WINDOW),
+            min($strat->getMaxFutureTriggerTime(), RedisCache::EXPIRY_WINDOW),
         );
 
         // Summarise strategy

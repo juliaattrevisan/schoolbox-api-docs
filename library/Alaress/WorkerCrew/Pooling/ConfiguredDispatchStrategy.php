@@ -30,6 +30,7 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
     protected $workerWriteTimeout;
     protected $maxRequestsPerWorker;
     protected $metricInterval;
+    protected $maxFutureTriggerTime;
 
 
     /**
@@ -45,6 +46,7 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
      * @param string $flags
      * @param int    $maxRequestsPerWorker
      * @param int    $workerWriteTimeout
+     * @param int    $maxFutureTriggerTime
      */
     public function __construct(
         $minWorkers,
@@ -60,6 +62,7 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
         $maxRequestsPerWorker = DefaultDispatchStrategy::MAX_REQUESTS_PER_WORKER,
         $workerWriteTimeout = DefaultDispatchStrategy::WORKER_WRITE_TIMEOUT,
         $metricInterval = DefaultDispatchStrategy::METRIC_INTERVAL,
+        $maxFutureTriggerTime = DefaultDispatchStrategy::MAX_FUTURE_TRIGGER_TIME,
     ) {
         parent::__construct($flags);
         $this->flywheelSpins        = $maxFlywheel;
@@ -75,6 +78,7 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
         $this->workerWriteTimeout   = $workerWriteTimeout;
         $this->maxRequestsPerWorker = $maxRequestsPerWorker;
         $this->metricInterval       = $metricInterval;
+        $this->maxFutureTriggerTime = $maxFutureTriggerTime;
         $this->protocol             = new AlaressIPCProtocol();
     }
 
@@ -210,5 +214,14 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
     public function getMetricInterval(): int
     {
         return $this->metricInterval;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getMaxFutureTriggerTime(): int
+    {
+        return $this->maxFutureTriggerTime;
     }
 }

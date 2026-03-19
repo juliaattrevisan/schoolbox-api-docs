@@ -377,4 +377,13 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
     {
         return static::MAX_REQUESTS_PER_WORKER;
     }
+
+
+    /**
+     * @return int
+     */
+    public function getMaxFutureTriggerTime(): int
+    {
+        return static::MAX_FUTURE_TRIGGER_TIME;
+    }
 }

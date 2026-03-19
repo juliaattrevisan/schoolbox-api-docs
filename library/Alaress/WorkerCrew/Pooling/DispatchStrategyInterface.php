@@ -233,4 +233,14 @@ interface DispatchStrategyInterface
      * @return int
      */
     public function getMetricInterval(): int;
+
+    /**
+     * Return the max number of milliseconds in the future for which the scheduler which uses this dispatcher should
+     * queue future triggers.
+     *
+     * If zero, then set no maximum time: always queue future triggers.
+     *
+     * @return int
+     */
+    public function getMaxFutureTriggerTime(): int;
 }
