@@ -6,6 +6,7 @@
 
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
+import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import type { Routes, SkinConfigData } from "../js/types/skinConfigTypes";
 import { useSkinConfigState } from "./composable/useSkinConfigState";
 import { useSkinPreview } from "./composable/useSkinPreview";
@@ -68,6 +69,9 @@ async function onSaveSelected(): Promise<void> {
 
 <template>
     <div data-test="skin-config-container">
+        <div v-if="loadError" class="small-12 columns" data-test="custom-participation-load-error">
+            <request-error :further-info="loadError" />
+        </div>
         <form method="post" class="skin-config-form" @submit.prevent="onSaveSelected">
             <div
                 v-for="(subcategories, categoryKey) in configs"
@@ -84,10 +88,10 @@ async function onSaveSelected(): Promise<void> {
                 </div>
                 <section>
                     <fieldset
-                        v-for="subcategory in subcategories"
-                        :key="subcategory.name"
+                        v-for="(subcategory, index) in subcategories"
+                        :key="subcategory.name || `default-${index}`"
                         class="content"
-                        :data-test="`skin-config-subcategory-${subcategory.name}`"
+                        :data-test="`skin-config-subcategory-${subcategory.name || `default-${index}`}`"
                     >
                         <div v-if="subcategory.name" class="small-12 columns">
                             <h3>{{ subcategory.name }}</h3>
