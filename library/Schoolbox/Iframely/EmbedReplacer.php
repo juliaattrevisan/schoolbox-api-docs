@@ -157,11 +157,11 @@ class EmbedReplacer
         // Iframely CDN.
         // If any do: hit the iframely API to get the HTML embed without the
         // iframe helper, or without scripts.
-        $src = $srcNode->getAttribute($attribute);
-        if (!isset($src)) {
+        if (!$srcNode->hasAttribute($attribute)) {
             return null;
         }
-        $srcUrl = new Uri($srcNode->getAttribute($attribute));
+        $src    = $srcNode->getAttribute($attribute);
+        $srcUrl = new Uri($src);
 
         foreach (self::IFRAMELY_API_PARAMS_SETS as $paramsSet) {
             $apiUrl = new Uri(self::IFRAMELY_API_ENDPOINT);
@@ -169,7 +169,7 @@ class EmbedReplacer
                 // We are in an oembed ckeditor5 object so we need to add different query strings
                 $apiUrl = $apiUrl->appendQueryParameters(
                     $paramsSet
-                    + ['api_key' => $this->iframelyLicenseKey, 'url' => $srcNode->getAttribute($attribute)],
+                    + ['api_key' => $this->iframelyLicenseKey, 'url' => $src],
                 );
             } else if ($srcUrl->getHost() === self::IFRAMELY_CDN_HOST) {
                 //ckeditor4 the iframe tag contains the required iframe url with the key already there
