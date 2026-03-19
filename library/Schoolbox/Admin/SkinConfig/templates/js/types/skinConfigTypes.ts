@@ -25,7 +25,7 @@ export type SkinConfigOption = {
  * A skin config subcategory containing a list of options
  */
 export type SkinConfigSubcategory = {
-    name: string;
+    name: string | null;
     options: SkinConfigOption[];
 };
 
