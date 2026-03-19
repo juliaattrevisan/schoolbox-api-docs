@@ -29,33 +29,6 @@ $mapperFactory = $kernel->get('mapperFactory');
 /** @var ConfigMapper $configMapper */
 $configMapper = $mapperFactory->get(ConfigMapper::class);
 
-// Now output stuff
-$colorConfigMapping = [
-    'skin_colour_navigation_foreground'        => '--navigation-foreground',
-    'skin_colour_navigation_background'        => '--navigation-background',
-    'skin_colour_navigation_hover'             => '--navigation-hover',
-    'skin_colour_offcanvas_foreground'         => '--off-canvas-foreground',
-    'skin_colour_offcanvas_background'         => '--off-canvas-background',
-    'skin_colour_offcanvas_hover'              => '--off-canvas-hover',
-    'accounts_menu_text_colour'                => '--accounts-menu-foreground',
-    'accounts_menu_bg_colour'                  => '--accounts-menu-background',
-    'accounts_menu_hover_colour'               => '--accounts-menu-hover',
-    'skin_colour_content_ui_foreground'        => '--content-ui-foreground',
-    'skin_colour_content_ui_background'        => '--content-ui-background',
-    'skin_colour_content_ui_hover'             => '--content-ui-hover',
-    'skin_colour_content_ui_selected'          => '--content-ui-selected',
-    'skin_colour_content_ui_submit_foreground' => '--content-ui-submit-foreground',
-    'skin_colour_content_ui_submit_background' => '--content-ui-submit-background',
-    'skin_colour_accent_foreground'            => '--accent-foreground',
-    'skin_colour_accent_background'            => '--accent-background',
-    'skin_colour_accent_hover'                 => '--accent-hover',
-    'skin_colour_logo_background'              => '--logo-background',
-    'skin_colour_body_bg'                      => '--body-background',
-    'skin_colour_login_background'             => '--login-form-background',
-    'skin_colour_form_input_border_color'      => '--form-border-color',
-    'skin_colour_form_background_hover_color'  => '--form-bg-hover-color',
-];
-
 $skinColourConfigs = $configMapper->findByColumnList(
     [
         'type_id' => ConfigMapper::TYPE_SKIN_CONFIG,
