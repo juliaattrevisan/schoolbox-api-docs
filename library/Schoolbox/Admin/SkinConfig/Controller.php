@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\SkinConfig;
 
+use Alaress\Database\Predicate;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Crell\ApiProblem\ApiProblem;
@@ -49,10 +50,6 @@ class Controller extends ConfigController
                 'pageTitle' => 'Skin Config',
                 'pageCurrent'    => $pageCurrent,
                 'configs' => $configs,
-                '_routes' => [
-                    'update' => $this->getRouteIfAuthorized('adminDesignSkinConfig.postConfig'),
-                    'preview' => $this->getRouteIfAuthorized('adminDesignSkinConfig.previewCss'),
-                ],
                 'allBreadcrumbs' => (new Subnav(
                     $this->getConfigLoader(),
                     $this->getUser()
@@ -127,33 +124,10 @@ class Controller extends ConfigController
      */
     public function postConfig(): void
     {
-        $configs = $this->requestPost->get('configs') ?? [];
-        $database = $this->getConfigMapper()->getDatabase();
         try {
-            $database->beginTransaction();
-            foreach ($configs as $subcategories) {
-                foreach ($subcategories as $subcategory) {
-                    foreach (($subcategory['options'] ?? []) as $option) {
-                        if (!isset($option['id'])) {
-                            continue;
-                        }
-
-                        $value = $option['value'] ?? null;
-
-                        $database->prepareQuery(
-                            'UPDATE config SET value = :value WHERE configID = :configID',
-                            [
-                                'configID' => (int)$option['id'],
-                                'value' => is_string($value) ? $value : null,
-                            ]
-                        )->execute();
-                    }
-                }
-            }
-            $database->commit();
+            $this->updateConfig($this->flattenPostedConfigs($this->requestPost->get('configs') ?? []), $this->buildConfigPredicate());
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {
-            $database->rollBack();
             $status = Response::HTTP_BAD_REQUEST;
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($status);
@@ -210,5 +184,45 @@ class Controller extends ConfigController
         }
         $customProperty = $decoded['customProperty'] ?? null;
         return is_string($customProperty) && $customProperty !== '' ? $customProperty : null;
+    }
+
+    /**
+     * Returns a predicate builder for editable, visible Skin Config rows.
+     */
+    private function buildConfigPredicate(): Predicate\Builder
+    {
+        return $this->getConfigMapper()
+            ->getPredicateBuilder()
+            ->equals('type_id', ConfigMapper::TYPE_SKIN_CONFIG)
+            ->equals('hidden', 'false')
+            ->equals('editable', 'true');
+    }
+
+    /**
+     * Flatten the posted nested Skin Config payload to the name/value map expected by updateConfig().
+     *
+     * @param array<array-key, mixed> $configs
+     * @return array<string, string|null>
+     */
+    private function flattenPostedConfigs(array $configs): array
+    {
+        $flattenedConfigs = [];
+        foreach ($configs as $subcategories) {
+            if (!is_array($subcategories)) {
+                continue;
+            }
+            foreach ($subcategories as $subcategory) {
+                if (!is_array($subcategory) || !isset($subcategory['options']) || !is_array($subcategory['options'])) {
+                    continue;
+                }
+                foreach ($subcategory['options'] as $option) {
+                    if (!is_array($option) || !isset($option['name']) || !is_string($option['name'])) {
+                        continue;
+                    }
+                    $flattenedConfigs[$option['name']] = isset($option['value']) && is_string($option['value']) ? $option['value'] : null;
+                }
+            }
+        }
+        return $flattenedConfigs;
     }
 }
