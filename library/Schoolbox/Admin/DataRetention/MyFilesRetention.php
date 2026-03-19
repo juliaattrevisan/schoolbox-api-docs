@@ -23,16 +23,25 @@ class MyFilesRetention extends StrategyBase
     private const TABLE_NAME_FILE = 'my_file';
     private const TABLE_NAME_FOLDER = 'my_folder';
 
+    /**
+     * @inheritDoc
+     */
     public function getRetentionLabel(): string
     {
         return 'My Files Retention';
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getStrategyName(): string
     {
         return 'myFiles';
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function hasDataToDelete(): bool
     {
         // find out how many MyFiles are soft deleted for the retention period
@@ -75,6 +84,9 @@ class MyFilesRetention extends StrategyBase
         return true;
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function getIdsToDelete(): array
     {
         $this->log->info('Deleting MyFiles older than ' . $this->getRetentionPeriod());
@@ -123,6 +135,9 @@ class MyFilesRetention extends StrategyBase
         return $deleteIds;
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function deleteChunk(array $chunk): void
     {
         /** from the chunk, extract the ids for files and folders, then delete them separately, to avoid issues with foreign key constraints

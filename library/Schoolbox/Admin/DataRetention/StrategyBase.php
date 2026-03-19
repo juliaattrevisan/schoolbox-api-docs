@@ -207,6 +207,7 @@ abstract class StrategyBase implements IStrategy
 
     /**
      * Get the delete statement to use, rather than rely exclusively on rollback
+     * @param string $table
      * @return string
      */
     protected function deleteStatement(string $table): string
