@@ -59,6 +59,23 @@ class Mapper extends BaseMapper
                     $assessmentMapper->hydrate($row, 'oa')
                 );
             }
+
+            /* Hydrating to code to the participant record if multiple code exists
+             */
+            /** @var \Schoolbox\Resource\Folder\Code\Model $folderCode */
+            $folderCode = $assessmentMapper->getJoinMapper('assessment_course_unit_implementation.course.folder')->hydrateJoin($row, 'codes', 'fc');
+            if ($collection->keyExists($participant->getId())) {
+                /** @var Model $participation */
+                $participation = $collection[$participant->getId()];
+                /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $assessmentContext */
+                $assessmentContext = $participation->getPlan()->getAssessment()->getAssessmentContext();
+                $folder = $assessmentContext->getCourse()->getFolder();
+                if ($folder && $folderCode !== null) {
+                    $folder->addCode($folderCode);
+                }
+                continue;
+            }
+
             /* Hydrating the unit implementation and course implementation for the assessment
              */
             /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $assessmentContext */
@@ -67,6 +84,9 @@ class Mapper extends BaseMapper
             $courseImplementation = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation.course', 'ci');
             if ($courseImplementation !== null) {
                 $folder = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'f');
+                if ($folderCode !== null) {
+                    $folder->setCodes(new GenericCollection(\Schoolbox\Resource\Folder\Code\Model::class, [$folderCode]));
+                }
                 /* Hydrating folder for class details
                  */
                 $courseImplementation->setFolder($folder);
@@ -101,7 +121,8 @@ class Mapper extends BaseMapper
                    {$this->getJoinColumnString('plan.assessment', 'oa')},
                    {$this->getJoinColumnString('plan.assessment.assessment_course_unit_implementation', 'cui')},
                    {$this->getJoinMapper('plan.assessment.assessment_course_unit_implementation')->getJoinColumnString('course', 'ci')},
-                   {$this->getJoinMapper('plan.assessment.assessment_course_unit_implementation')->getJoinColumnString('course.folder', 'f')}
+                   {$this->getJoinMapper('plan.assessment.assessment_course_unit_implementation')->getJoinColumnString('course.folder', 'f')},
+                   {$this->getJoinMapper('plan.assessment.assessment_course_unit_implementation')->getJoinColumnString('course.folder.codes', 'fc')}
         ";
     }
 
@@ -128,6 +149,7 @@ class Mapper extends BaseMapper
             LEFT JOIN course_unit_implementation cui ON ui.course_unit_implementation_id = cui.id
             LEFT JOIN course_implementation ci ON cui.course_implementation_id = ci.id
             LEFT JOIN folder f ON ci.folder_id = f.id
+            LEFT JOIN folder_code fc ON f.id = fc.folder_id
             LEFT JOIN assessment oa ON a.original_assessment_id = oa.id
             LEFT JOIN differentiation_profiles ON differentiation_profiles.student_id = u.id
             LEFT JOIN differentiation_profiles_adjustment_category ac ON FIND_IN_SET(ac.id, differentiation_profiles.adjustment_category)
