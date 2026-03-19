@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import { debounce } from "es-toolkit";
 import type { Routes, SkinConfigData } from "../js/types/skinConfigTypes";
 
 const PREVIEW_DEBOUNCE_MS = 300;
@@ -15,7 +16,6 @@ const isProcessing = window.Vue.ref(false);
 const loadError = window.Vue.ref<string | null>(null);
 const saveText = window.Vue.computed(() => (isProcessing.value ? "Saving..." : "Save"));
 let previewAbortController: AbortController | null = null;
-let previewDebounceTimer: number | null = null;
 let previewRequestSequence = 0;
 
 /**
@@ -44,7 +44,6 @@ function getPreviewStyleElement(): HTMLStyleElement {
     const styleElement = document.createElement("style");
     styleElement.id = PREVIEW_STYLE_ID;
     document.head.append(styleElement);
-
     return styleElement;
 }
 
@@ -52,10 +51,7 @@ function getPreviewStyleElement(): HTMLStyleElement {
  * Remove any pending or active preview request state.
  */
 function cancelPendingPreview(): void {
-    if (previewDebounceTimer !== null) {
-        window.clearTimeout(previewDebounceTimer);
-        previewDebounceTimer = null;
-    }
+    schedulePreviewRefresh.cancel();
     previewAbortController?.abort();
     previewAbortController = null;
 }
@@ -112,15 +108,9 @@ async function requestPreviewCss(): Promise<void> {
 /**
  * Debounce preview regeneration while the user is editing.
  */
-function schedulePreviewRefresh(): void {
-    if (previewDebounceTimer !== null) {
-        window.clearTimeout(previewDebounceTimer);
-    }
-    previewDebounceTimer = window.setTimeout(() => {
-        previewDebounceTimer = null;
-        void requestPreviewCss();
-    }, PREVIEW_DEBOUNCE_MS);
-}
+const schedulePreviewRefresh = debounce(() => {
+    void requestPreviewCss();
+}, PREVIEW_DEBOUNCE_MS);
 
 /**
  * Initialise colour picker inputs once the component has rendered.
