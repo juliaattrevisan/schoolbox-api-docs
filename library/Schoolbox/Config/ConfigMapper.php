@@ -621,7 +621,7 @@ class ConfigMapper extends Mapper
             null,
             null,
             null,
-            'skinConfigSubcategory',
+            'skinSubcategory',
         );
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCache']);
