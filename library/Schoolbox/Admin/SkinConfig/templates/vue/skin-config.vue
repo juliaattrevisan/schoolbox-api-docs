@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { apiRequest } from "@js/util/sbx/apiUtils";
-import { debounce } from "es-toolkit";
 import type { Routes, SkinConfigData } from "../js/types/skinConfigTypes";
-
-const PREVIEW_DEBOUNCE_MS = 300;
-const PREVIEW_STYLE_ID = "skin-config-preview-style";
+import { useSkinPreview } from "./composable/useSkinPreview";
 
 const props = defineProps<{
     routes: Routes;
@@ -15,8 +12,7 @@ const configs = window.Vue.ref<SkinConfigData>(props.configs);
 const isProcessing = window.Vue.ref(false);
 const loadError = window.Vue.ref<string | null>(null);
 const saveText = window.Vue.computed(() => (isProcessing.value ? "Saving..." : "Save"));
-let previewAbortController: AbortController | null = null;
-let previewRequestSequence = 0;
+const { schedulePreviewRefresh } = useSkinPreview(configs, props.routes.preview);
 
 /**
  * Convert backend category keys to display titles for the page.
@@ -31,86 +27,6 @@ function getCategoryTitle(categoryKey: string): string {
         }[categoryKey] || categoryKey
     );
 }
-
-/**
- * Ensure the preview stylesheet element exists.
- * @returns The preview style element.
- */
-function getPreviewStyleElement(): HTMLStyleElement {
-    const existingElement = document.getElementById(PREVIEW_STYLE_ID);
-    if (existingElement instanceof HTMLStyleElement) {
-        return existingElement;
-    }
-    const styleElement = document.createElement("style");
-    styleElement.id = PREVIEW_STYLE_ID;
-    document.head.append(styleElement);
-    return styleElement;
-}
-
-/**
- * Remove any pending or active preview request state.
- */
-function cancelPendingPreview(): void {
-    schedulePreviewRefresh.cancel();
-    previewAbortController?.abort();
-    previewAbortController = null;
-}
-
-/**
- * Remove the injected preview stylesheet.
- */
-function removePreviewStyle(): void {
-    const existingElement = document.getElementById(PREVIEW_STYLE_ID);
-    if (existingElement instanceof HTMLStyleElement) {
-        existingElement.remove();
-    }
-}
-
-/**
- * Request the latest preview stylesheet from the backend and apply it.
- */
-async function requestPreviewCss(): Promise<void> {
-    previewAbortController?.abort();
-    const abortController = new AbortController();
-    previewAbortController = abortController;
-    const requestSequence = ++previewRequestSequence;
-    try {
-        const response = await fetch(props.routes.preview, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "text/css, application/json",
-            },
-            body: JSON.stringify({
-                configs: configs.value,
-            }),
-            signal: abortController.signal,
-        });
-        if (!response.ok) {
-            return;
-        }
-        const css = await response.text();
-        if (requestSequence !== previewRequestSequence || abortController.signal.aborted) {
-            return;
-        }
-        getPreviewStyleElement().textContent = css;
-    } catch (error) {
-        if (!(error instanceof DOMException) || error.name !== "AbortError") {
-            return;
-        }
-    } finally {
-        if (previewAbortController === abortController) {
-            previewAbortController = null;
-        }
-    }
-}
-
-/**
- * Debounce preview regeneration while the user is editing.
- */
-const schedulePreviewRefresh = debounce(() => {
-    void requestPreviewCss();
-}, PREVIEW_DEBOUNCE_MS);
 
 /**
  * Initialise colour picker inputs once the component has rendered.
@@ -168,14 +84,6 @@ async function onSaveSelected(): Promise<void> {
  */
 window.Vue.onMounted(() => {
     void initialiseColourPickers();
-});
-
-/**
- * Clean up any pending preview requests or styles when the component is unmounted to prevent memory leaks or orphaned styles.
- */
-window.Vue.onBeforeUnmount(() => {
-    cancelPendingPreview();
-    removePreviewStyle();
 });
 </script>
 
