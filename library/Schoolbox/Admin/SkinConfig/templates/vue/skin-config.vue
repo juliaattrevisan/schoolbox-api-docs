@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { Routes, SkinConfigData } from "../js/types/skinConfigTypes";
 import { useSkinPreview } from "./composable/useSkinPreview";
 
@@ -8,11 +9,64 @@ const props = defineProps<{
     configs: SkinConfigData;
 }>();
 
-const configs = window.Vue.ref<SkinConfigData>(props.configs);
+const savedConfigs = window.Vue.ref(cloneConfigs(props.configs));
+const configs = window.Vue.ref<SkinConfigData>(cloneConfigs(props.configs));
+const saveContainer = window.Vue.ref<HTMLDivElement | null>(null);
 const isProcessing = window.Vue.ref(false);
+const isAtBottomOfPage = window.Vue.ref(false);
 const loadError = window.Vue.ref<string | null>(null);
+const initialConfigSnapshot = window.Vue.ref(serializeConfigs(savedConfigs.value));
 const saveText = window.Vue.computed(() => (isProcessing.value ? "Saving..." : "Save"));
+const currentConfigSnapshot = window.Vue.computed(() => serializeConfigs(configs.value));
+const hasUnsavedChanges = window.Vue.computed(() => initialConfigSnapshot.value !== currentConfigSnapshot.value);
+const showSaveDrawer = window.Vue.computed(() => hasUnsavedChanges.value || isAtBottomOfPage.value);
 const { schedulePreviewRefresh } = useSkinPreview(configs, props.routes.preview);
+let intersectionObserver: IntersectionObserver | null = null;
+
+/**
+ * Clone the config state so form edits do not mutate the saved baseline.
+ * @param value - The current Skin Config payload.
+ * @returns A deep-cloned Skin Config payload.
+ */
+function cloneConfigs(value: SkinConfigData): SkinConfigData {
+    return JSON.parse(serializeConfigs(value)) as SkinConfigData;
+}
+
+/**
+ * Serialize the current config state for dirty-state comparison.
+ * @param value - The current Skin Config payload.
+ * @returns A stable serialized snapshot for dirty-state comparison.
+ */
+function serializeConfigs(value: SkinConfigData): string {
+    return JSON.stringify(value);
+}
+
+/**
+ * Restore the last saved config state.
+ * @returns A promise that resolves once the form state and preview have been reset.
+ */
+async function onUndoChanges(): Promise<void> {
+    if (isProcessing.value) {
+        return;
+    }
+    loadError.value = null;
+    configs.value = cloneConfigs(savedConfigs.value);
+    await initialiseColourPickers();
+    schedulePreviewRefresh();
+}
+
+/**
+ * Track whether the bottom save area is currently visible on screen.
+ */
+function initIntersectionObserver(): void {
+    if (saveContainer.value === null) {
+        return;
+    }
+    intersectionObserver = new IntersectionObserver((elements) => {
+        isAtBottomOfPage.value = elements[0].intersectionRatio !== 0;
+    });
+    intersectionObserver.observe(saveContainer.value);
+}
 
 /**
  * Initialise colour picker inputs once the component has rendered.
@@ -55,6 +109,8 @@ async function onSaveSelected(): Promise<void> {
         if (!response.success) {
             throw new Error(response.message || "Failed to save");
         }
+        savedConfigs.value = cloneConfigs(configs.value);
+        initialConfigSnapshot.value = serializeConfigs(savedConfigs.value);
         toast.timeout({ text: "Skin config successfully updated" });
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
@@ -69,13 +125,18 @@ async function onSaveSelected(): Promise<void> {
  * Initialise colour pickers when the component is mounted
  */
 window.Vue.onMounted(() => {
+    initIntersectionObserver();
     void initialiseColourPickers();
+});
+
+window.Vue.onBeforeUnmount(() => {
+    intersectionObserver?.disconnect();
 });
 </script>
 
 <template>
     <div data-test="skin-config-container">
-        <form method="post" @submit.prevent="onSaveSelected">
+        <form method="post" class="skin-config-form" @submit.prevent="onSaveSelected">
             <div
                 v-for="(subcategories, categoryKey) in configs"
                 :key="categoryKey"
@@ -146,13 +207,37 @@ window.Vue.onMounted(() => {
                     </fieldset>
                 </section>
             </div>
-            <div class="small-12 island">
-                <div class="row">
-                    <div class="small-12 column">
-                        <input type="submit" name="btnSubmit" :value="saveText" />
+            <div ref="saveContainer" class="save-drawer-anchor">
+                <bottom-drawer :show-drawer="showSaveDrawer">
+                    <div class="l-flex l-flex--justify l-gap-xs">
+                        <button
+                            v-if="hasUnsavedChanges"
+                            type="button"
+                            class="button l-flex__item--1"
+                            @click="onUndoChanges"
+                        >
+                            Undo Changes
+                        </button>
+                        <button
+                            name="btnSubmit"
+                            class="button submit l-flex__item--1"
+                            data-test="skin-config-save-submit"
+                        >
+                            {{ saveText }}
+                        </button>
                     </div>
-                </div>
+                </bottom-drawer>
             </div>
         </form>
     </div>
 </template>
+
+<style scoped>
+.skin-config-form {
+    padding-bottom: 100px;
+}
+
+.save-drawer-anchor {
+    min-height: 30px;
+}
+</style>
