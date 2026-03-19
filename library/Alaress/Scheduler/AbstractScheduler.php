@@ -177,7 +177,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
             );
 
             // Need to still cache this trigger in Redis, even if it is not scheduled
-            $this->cacheTrigger($trigger, $class, $label, $hash);
+            $this->cacheTrigger($trigger);
             $resolver?->acknowledge();
             return;
         }
