@@ -98,7 +98,7 @@ async function onSaveSelected(): Promise<void> {
                             :class="[
                                 option.type === 'textarea'
                                     ? 'small-12 columns'
-                                    : 'small-12 medium-6 large-3 l-mar-m--bottom columns',
+                                    : 'small-12 medium-6 large-4 l-mar-m--bottom columns',
                             ]"
                         >
                             <label :id="option.name" :for="`${option.name}-field`" class="inline-block">

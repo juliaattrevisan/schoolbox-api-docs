@@ -77,8 +77,10 @@ class Helper
             $colors['skin_colour_body_fg'] = $this->createColorTwigVars($bodyForeground, '--body-foreground');
             $colors['skin_colour_body_h1'] = $this->createColorTwigVars($bodyHeading, '--body-foreground-h1');
         }
-        if (isset($colors['skin_colour_navigation_background']['colorObject'])
-            && $colors['skin_colour_navigation_background']['colorObject'] instanceof Color) {
+        if (
+            isset($colors['skin_colour_navigation_background']['colorObject'])
+            && $colors['skin_colour_navigation_background']['colorObject'] instanceof Color
+        ) {
             /** @var Color $navigationBackground */
             $navigationBackground = $colors['skin_colour_navigation_background']['colorObject'];
             $navigationForeground = $transformer->calculateForegroundColor($navigationBackground, 0.65);
