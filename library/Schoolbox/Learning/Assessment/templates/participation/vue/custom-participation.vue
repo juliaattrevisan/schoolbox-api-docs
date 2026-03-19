@@ -162,7 +162,7 @@ const isIndeterminate = window.Vue.computed(() => {
 
                 <div class="small-12 medium-6 large-4 columns">
                     <label class="l-mbs" for="only-show-dp">
-                        Only show students with {{ locale.differentiationProfile.translate(false, true) }}
+                        Only show students with {{ locale.differentiationProfile.translate(true, true) }}
                     </label>
                     <div class="switch f-no-margins">
                         <input id="only-show-dp" v-model="onlyShowDP" type="checkbox" />
