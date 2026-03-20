@@ -186,6 +186,11 @@ class Worker
                     /** @var Worker $worker */
                     return true;
                 },
+                self::DONE  => function ($worker) {
+                    /** @var Worker $worker */
+                    $worker->markTaskComplete();
+                    return true;
+                },
                 self::ERROR => function ($worker) {
                     /** @var Worker $worker */
                     $worker->clearTask();
