@@ -2064,6 +2064,15 @@ class Controller extends Assessment\Controller
         }
         $data['rubricGrid'] = $rubricGrid;
 
+        // TODO: this is mainly temporary atm to test the new vue component
+        $data['rubricGridPayload'] = [
+            'id' => $rubricGrid->getId(),
+            'levels' => $rubricGrid->getLevels()->map(fn(Level $level) => [
+                'id' => $level->getId(),
+                'name' => $level->getName(),
+            ])->reindex(),
+        ];
+
         return $data;
     }
 

@@ -369,6 +369,7 @@
 
                 {% include '@rubric/grid.twig' with {
                     rubricGrid: rubricGrid,
+                    rubricGridPayload: rubricGridPayload,
                     folderId: assessment.context.folder.id,
                     usingMarkPerCapability: assessment.isMarkPerCapability,
                     usingMarkRange: assessment.useMarkRange,
@@ -390,6 +391,7 @@
             <div class="small-12 columns no-pad">
                 {% include '@rubric/grid-csv.twig' with {
                     rubricGrid: rubricGrid,
+                    rubricGridPayload: rubricGridPayload,
                     attachzone: rubricAttachZone,
                     folderId: assessment.context.folder.id,
                     usingMarkPerCapability: assessment.isMarkPerCapability,

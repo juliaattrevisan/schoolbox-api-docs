@@ -2,7 +2,6 @@
 {%- set rubricId  = rubricId ?? ('rb-' ~ rubricGrid.id) -%}
 {%- set groupId   = rubricId ~ '-' ~ groupIndex -%}
 {%- set groupName = group.name ?? ('(no ' ~ locale.translate('rubricGroup') ~ ')') -%}
-{%- set levelLimit = levelLimit ?? config.rubric_max_levels -%}
 {%- set groupInput = groupInput ?? (formField ~ '[' ~ rubricGrid.id ~ '][group]['  ~ groupIndex ~ ']') -%}
 
 {# Don't show the max value if there are no selected criteria in the group #}
