@@ -114,11 +114,11 @@ class EmbedReplacer
             }
             foreach (self::IFRAMELY_EMBED_CONTAINER_SOURCE_ATTRIBUTES as $attribute) {
                 $replacementHtml = $this->findReplacementHtml($embed, $attribute);
-                // Replace the Iframely element's HTML with the new embed
+                // Replace the Iframely element's content with the new embed
                 if (isset($replacementHtml)) {
-                    $replacementsApplied = true;
-                    $replacementDoc      = HTMLDocument::createFromString($replacementHtml, LIBXML_NOERROR, 'utf-8');
-                    $replacementBody     = $replacementDoc->querySelector('body');
+                    // Determine what the replacement HTML should be (if any)
+                    $replacementDoc  = HTMLDocument::createFromString($replacementHtml, LIBXML_NOERROR, 'utf-8');
+                    $replacementBody = $replacementDoc->querySelector('body');
                     if (!$replacementBody instanceof Element) {
                         continue;
                     }
@@ -126,8 +126,14 @@ class EmbedReplacer
                     if (!$replacementNode instanceof Node) {
                         continue;
                     }
+
+                    // And apply the replacement
+                    $replacementsApplied = true;
                     $doc->adoptNode($replacementNode);
-                    $embed->parentNode->replaceChild($replacementNode, $embed);
+                    foreach ($embed->childNodes as $child) {
+                        $embed->removeChild($child);
+                    }
+                    $embed->appendChild($replacementNode);
                     break;
                 }
             }
@@ -138,7 +144,8 @@ class EmbedReplacer
             return $html;
         }
 
-        // Figure out how to extract body
+        // Return the HTML content, with body node intact?
+        // (but what if there was no body node?)
         $body = $doc->querySelector('body');
         return $body instanceof Element ? $doc->saveHtml($body) : $html;
     }
