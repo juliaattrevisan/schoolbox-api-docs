@@ -44,7 +44,12 @@ body.sbx-body {
     }
 
     // add the new border colour to the calendar table cells
-    .fc-theme-standard td {
+    .fc-theme-standard .fc-dayGridMonth-view td {
         border: 1px solid var(--sbx-color-border);
+    }
+
+    // add borders to the list view for better separation of events
+    .fc-list-table tr {
+        border-bottom: 1px solid var(--sbx-color-border);
     }
 }
