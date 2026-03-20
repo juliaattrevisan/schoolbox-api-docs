@@ -23,8 +23,7 @@ body.sbx-body {
     .introjs-nextbutton.introjs-fullbutton,
     .introjs-skipbutton,
     .introjs-prevbutton,
-    .introjs-button,
-    .fc .fc-button {
+    .introjs-button {
         background: var(--sbx-config-color-accent);
         border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
         border-radius: var(--sbx-config-field-roundness);
@@ -68,6 +67,7 @@ body.sbx-body {
     .sub-nav dd a,
     .sub-nav li.active a,
     .sub-nav dd.active a,
+    .fc-button,
     button.load-more {
         background: var(--sbx-color-foreground-primary);
         border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
