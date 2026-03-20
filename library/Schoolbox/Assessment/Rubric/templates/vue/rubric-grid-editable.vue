@@ -31,6 +31,19 @@ function moveLevel(level: RubricGridLevel, direction: "left" | "right"): void {
     const levels = rubricGridData.value.levels;
     [levels[index], levels[newIndex]] = [levels[newIndex], levels[index]];
 }
+
+/**
+ * Adds a level to the grid, on the right-hand side
+ */
+function addLevel(): void {
+    // TODO: other logic from RubricEditable.prototype.addLevel
+    const lowestId = Math.min(...rubricGridData.value.levels.map((l) => l.id), 0);
+    const newLevel: RubricGridLevel = {
+        id: lowestId - 1, // negative IDs are unsaved
+        name: "",
+    };
+    rubricGridData.value.levels.push(newLevel);
+}
 </script>
 
 <template>
@@ -58,7 +71,9 @@ function moveLevel(level: RubricGridLevel, direction: "left" | "right"): void {
                     />
                     <th>
                         <!-- TODO: data-spawn="level" -->
-                        <a href="#" data-test="rubric-spawn-level">&plus; {{ locale.rubricLevel.proper() }}</a>
+                        <a href="#" data-test="rubric-spawn-level" @click.prevent="addLevel">
+                            &plus; {{ locale.rubricLevel.proper() }}
+                        </a>
                     </th>
                 </tr>
             </thead>
