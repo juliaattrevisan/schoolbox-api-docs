@@ -57,4 +57,9 @@ body.sbx-body {
     .fc-list-day-text {
         color: var(--sbx-color-text-primary);
     }
+
+    // shrink from s so they fit in the event cells a bit better
+    .fc div {
+        font-size: var(--sbx-font-size-xs);
+    }
 }
