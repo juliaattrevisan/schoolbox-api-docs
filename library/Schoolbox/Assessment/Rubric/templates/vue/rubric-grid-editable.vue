@@ -11,6 +11,7 @@ const MAX_CAPABILITY_LENGTH = 900;
 
 interface Props {
     rubricGrid: RubricGrid;
+    maxLevels: number;
 }
 const props = defineProps<Props>();
 
@@ -69,8 +70,7 @@ function addLevel(): void {
                         :can-move-right="index < rubricGridData.levels.length - 1"
                         @move="(direction) => moveLevel(level, direction)"
                     />
-                    <th>
-                        <!-- TODO: data-spawn="level" -->
+                    <th v-if="rubricGridData.levels.length < props.maxLevels">
                         <a href="#" data-test="rubric-spawn-level" @click.prevent="addLevel">
                             &plus; {{ locale.rubricLevel.proper() }}
                         </a>

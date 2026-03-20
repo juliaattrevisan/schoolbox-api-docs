@@ -1,5 +1,8 @@
 <div id="rubric-grid-editable-container">
-    <rubric-grid-editable :rubric-grid="{{ rubricGridPayload|json_encode }}" />
+    <rubric-grid-editable
+        :rubric-grid="{{ rubricGridPayload|json_encode }}"
+        :max-levels="{{ config.rubric_max_levels }}"
+    />
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricGridEditable.js?v={{ config.site_version }}"></script>
 <hr>
