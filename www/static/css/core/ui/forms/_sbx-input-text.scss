@@ -61,8 +61,8 @@ body.sbx-body {
     }
 
     // When a text input is immediately followed by a button or link, remove the border radius on the right side of the input to visually connect them
-    .input-group:has(> input[type="text"] + a) input[type="text"],
-    .input-group:has(> input[type="text"] + button) input[type="text"] {
+    .input-group:has(> input + a) input,
+    .input-group:has(> input + button) input {
         border-radius: var(--sbx-config-field-roundness) 0 0 var(--sbx-config-field-roundness);
     }
 
