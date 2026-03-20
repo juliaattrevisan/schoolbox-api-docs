@@ -42,4 +42,8 @@ body.sbx-body {
     input[type="checkbox"]:not(.plain) + label[for^="eventType-"] {
         padding-left: var(--sbx-size-s);
     }
+
+    .fc-theme-standard td {
+        border: 1px solid var(--sbx-color-border);
+    }
 }

@@ -69,7 +69,6 @@ body.sbx-body {
 
     // tables need to be rounded uniquely
     table {
-        border-collapse: separate;
         border-spacing: 0;
         border-radius: var(--sbx-config-box-roundness);
     }

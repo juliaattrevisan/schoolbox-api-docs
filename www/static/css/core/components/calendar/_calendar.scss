@@ -47,7 +47,7 @@
  * Skin Builder choices
  */
 .fc-toolbar {
-    border-bottom: 2px solid #ededed;
+    border-bottom: 2px solid var(--sbx-color-border, #ededed);
     margin: 0 !important;
     padding: 1rem;
 
