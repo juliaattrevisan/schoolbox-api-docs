@@ -125,7 +125,7 @@ class Controller extends ConfigController
     public function postConfig(): void
     {
         try {
-            $this->updateConfig($this->flattenPostedConfigs($this->requestPost->get('configs') ?? []), $this->buildConfigPredicate());
+            $this->persistPostedConfigs($this->flattenPostedConfigs($this->requestPost->get('configs') ?? []));
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {
             $status = Response::HTTP_BAD_REQUEST;
@@ -199,7 +199,60 @@ class Controller extends ConfigController
     }
 
     /**
-     * Flatten the posted nested Skin Config payload to the name/value map expected by updateConfig().
+     * Validate and persist the posted Skin Config name/value payload.
+     *
+     * Uses the standard field serializers, but saves via constrained SQL updates instead of ConfigMapper::save()
+     * so Skin Config join metadata is not re-persisted during save.
+     *
+     * @param array<string, string|null> $postedConfigs
+     */
+    private function persistPostedConfigs(array $postedConfigs): void
+    {
+        $database = $this->getConfigMapper()->getDatabase();
+        $existingConfigs = $this->getConfigMapper()->findByPredicates($this->buildConfigPredicate())->indexBy(ConfigMapper::COL_NAME);
+
+        $database->beginTransaction();
+        try {
+            foreach ($postedConfigs as $name => $value) {
+                if (!$existingConfigs->keyExists($name)) {
+                    continue;
+                }
+
+                /** @var Config $existingConfig */
+                $existingConfig = $existingConfigs[$name];
+                $valueSerializer = $this->getFieldStrategyFactory()->makeValueSerializer($existingConfig->getFieldId());
+                $newValue = $valueSerializer->serializeValue($value, $existingConfig);
+
+                if ($newValue === $existingConfig->getValue()) {
+                    continue;
+                }
+
+                $database->prepareQuery(
+                    'UPDATE config
+                    SET value = :value
+                    WHERE configID = :configID
+                        AND type_id = :typeId
+                        AND hidden = :hidden
+                        AND editable = :editable',
+                    [
+                        'value' => $newValue,
+                        'configID' => $existingConfig->getId(),
+                        'typeId' => ConfigMapper::TYPE_SKIN_CONFIG,
+                        'hidden' => 'false',
+                        'editable' => 'true',
+                    ]
+                )->execute();
+            }
+
+            $database->commit();
+        } catch (\Throwable $e) {
+            $database->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Flatten the posted nested Skin Config payload to a name/value map.
      *
      * @param array<array-key, mixed> $configs
      * @return array<string, string|null>
