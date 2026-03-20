@@ -32,7 +32,12 @@ use Schoolbox\External;
 
 abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHandlerInterface
 {
-    /** @var array */
+    /**
+     * A list of timers which have been scheduled for a trigger.
+     *
+     * @var array<string, array<string, array<string, TimerInterface>>> keyed by trigger's model class, then its label,
+     *                                                                  then its model's hash
+     */
     private array $timers;
 
     /**
@@ -302,9 +307,9 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      * Get the timer for this trigger, if there is one.
      *
      * @param TriggerInterface $trigger
-     * @return mixed Should be a TriggerInterface, but is not necessarily
+     * @return TimerInterface|null
      */
-    private function getTimer(TriggerInterface $trigger): mixed
+    private function getTimer(TriggerInterface $trigger): ?TimerInterface
     {
         $model = $trigger->getEvent()->getObject();
         $label = $trigger->getLabel();
