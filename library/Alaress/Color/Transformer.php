@@ -127,7 +127,7 @@ class Transformer
     public function flattenAlpha(Color $color, Color $background): Color
     {
         $percent = $color->getAlpha() * 100;
-        $opaque  = $this->convertToIrisColor($color)->toHsla()->alpha($percent);
+        $opaque  = $this->convertToIrisColor($color)->toHsla()->alpha(1);
         return $this->convertFromIrisColor(
             $this->convertToIrisColor($background)->mix($opaque, $percent),
         );
