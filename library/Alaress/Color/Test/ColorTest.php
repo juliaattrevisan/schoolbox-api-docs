@@ -8,10 +8,14 @@
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Alaress\Color\Test;
 
 use Alaress\Color\Color;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use TypeError;
 
 class ColorTest extends TestCase
 {
@@ -27,12 +31,11 @@ class ColorTest extends TestCase
 
     public static function getAssertColorSuccessData(): array
     {
-        return array(
-            array(0, 0),
-            array(1, 1),
-            array(0Xff, 255),
-            array('16', 16),
-        );
+        return [
+            [0, 0],
+            [1, 1],
+            [0Xff, 255],
+        ];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('getAssertColorSuccessData')]
@@ -44,30 +47,30 @@ class ColorTest extends TestCase
 
     public static function getAssertColorFailureData()
     {
-        return array(
-            array(-1),
-            array(0.1),
-            array(0xfff),
-            array('cheese'),
-            array(''),
-        );
+        return [
+            [-1, InvalidArgumentException::class],
+            [0.1, TypeError::class],
+            [0xfff, InvalidArgumentException::class],
+            ['cheese', TypeError::class],
+            ['', TypeError::class],
+            ['16', TypeError::class],
+        ];
     }
 
 
     #[\PHPUnit\Framework\Attributes\DataProvider('getAssertColorFailureData')]
-    public function testAssertColorFailure($value)
+    public function testAssertColorFailure($value, string $expectedExceptionClass)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException($expectedExceptionClass);
         $this->color->setGreen($value);
     }
 
     public static function getAssertAlphaSuccessData()
     {
-        return array(
-            array(0, 0.0),
-            array(1, 1.0),
-            array('0.1', 0.1),
-        );
+        return [
+            [0, 0.0],
+            [1, 1.0],
+        ];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('getAssertAlphaSuccessData')]
@@ -79,28 +82,29 @@ class ColorTest extends TestCase
 
     public static function getAssertAlphaFailureData()
     {
-        return array(
-            array(-1),
-            array(1.1),
-            array(99999),
-            array('cheese'),
-        );
+        return [
+            [-1, InvalidArgumentException::class],
+            [1.1, InvalidArgumentException::class],
+            [99999, InvalidArgumentException::class],
+            ['cheese', TypeError::class],
+            ['0.1', TypeError::class],
+        ];
     }
 
 
     #[\PHPUnit\Framework\Attributes\DataProvider('getAssertAlphaFailureData')]
-    public function testAssertAlphaFailure($value)
+    public function testAssertAlphaFailure($value, string $expectedExceptionClass)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException($expectedExceptionClass);
         $this->color->setAlpha($value);
     }
 
     public static function getGetAsHexData()
     {
-        return array(
-            array(new Color(0xFF, 0X77, 0X00), 'FF7700'),
-            array(new Color(0, 14, 15), '000E0F'),
-        );
+        return [
+            [new Color(0xFF, 0X77, 0X00), 'FF7700'],
+            [new Color(0, 14, 15), '000E0F'],
+        ];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('getGetAsHexData')]
@@ -111,10 +115,10 @@ class ColorTest extends TestCase
 
     public static function getGetAsHexAlphaData()
     {
-        return array(
-            array(new Color(0xFF, 0X77, 0X00, 0.5), 'FF77007F'),
-            array(new Color(0, 14, 15, 0.1), '000E0F19'),
-        );
+        return [
+            [new Color(0xFF, 0X77, 0X00, 0.5), 'FF77007F'],
+            [new Color(0, 14, 15, 0.1), '000E0F19'],
+        ];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('getGetAsHexAlphaData')]
@@ -126,10 +130,10 @@ class ColorTest extends TestCase
 
     public static function getGetAsRgbData()
     {
-        return array(
-            array(new Color(0xFF, 0X77, 0X00), 'rgb(255, 119, 0)'),
-            array(new Color(0, 14, 15), 'rgb(0, 14, 15)'),
-        );
+        return [
+            [new Color(0xFF, 0X77, 0X00), 'rgb(255, 119, 0)'],
+            [new Color(0, 14, 15), 'rgb(0, 14, 15)'],
+        ];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('getGetAsRgbData')]
@@ -140,10 +144,10 @@ class ColorTest extends TestCase
 
     public static function getGetAsRgbAlphaData()
     {
-        return array(
-            array(new Color(0xFF, 0X77, 0X00, 0.5), 'rgba(255, 119, 0, 0.500)'),
-            array(new Color(0, 14, 15, 0.1), 'rgba(0, 14, 15, 0.100)'),
-        );
+        return [
+            [new Color(0xFF, 0X77, 0X00, 0.5), 'rgba(255, 119, 0, 0.500)'],
+            [new Color(0, 14, 15, 0.1), 'rgba(0, 14, 15, 0.100)'],
+        ];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('getGetAsRgbAlphaData')]
@@ -161,7 +165,7 @@ class ColorTest extends TestCase
     public function testSerialize()
     {
         // Test with ridiculous precision
-        $color = new Color(33, 44, 55, 0.9231904809857124398123045891727293479873249887987);
+        $color      = new Color(33, 44, 55, 0.9231904809857124398123045891727293479873249887987);
         $serialized = serialize($color);
         /** @var Color $unserialized */
         $unserialized = unserialize($serialized);
