@@ -731,6 +731,11 @@ $font-family-icon: var(--sbx-icon-font-family);
     font-family: $font-family-icon;
 }
 
+.icon-reporting:before {
+    content: "\e60e";
+    font-family: $font-family-icon;
+}
+
 .icon-resource-booking:before {
     content: "\e65c";
     font-family: $font-family-icon;
