@@ -1,7 +1,7 @@
 export type RubricGrid = {
     id: number; // currently the assessment ID, or 0 for new rubrics
     levels: RubricGridLevel[];
-    groups: RubricGridGroup[];
+    capabilities: RubricGridCapability[];
 };
 
 export type RubricGridLevel = {
@@ -9,7 +9,7 @@ export type RubricGridLevel = {
     name: string;
 };
 
-export type RubricGridGroup = {
+export type RubricGridCapability = {
     id: number;
     name: string;
     /**

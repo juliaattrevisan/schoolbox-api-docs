@@ -2071,14 +2071,14 @@ class Controller extends Assessment\Controller
                 'id' => $level->getId(),
                 'name' => $level->getName(),
             ])->reindex(),
-            'groups' => [],
+            'capabilities' => [],
         ];
 
-        foreach ($rubricGrid->iterateCapabilities() as $group) {
-            $rubricGridPayload['groups'][] = [
-                'id' => $group->getId(),
-                'name' => $group->getName(),
-                'inUseExcludingAssessment' => $group->isInUseExcluding($rubricGrid->getAssessment()),
+        foreach ($rubricGrid->iterateCapabilities() as $capability) {
+            $rubricGridPayload['capabilities'][] = [
+                'id' => $capability->getId(),
+                'name' => $capability->getName(),
+                'inUseExcludingAssessment' => $capability->isInUseExcluding($rubricGrid->getAssessment()),
                 'indicators' => [],
             ];
         }

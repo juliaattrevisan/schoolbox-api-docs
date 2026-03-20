@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
 import { MAX_CAPABILITY_LENGTH, MAX_INDICATOR_LENGTH } from "./types";
-import type { RubricGridGroup } from "./types";
+import type { RubricGridCapability } from "./types";
 
 interface Props {
     totalColumns: number;
-    group: RubricGridGroup;
+    capability: RubricGridCapability;
     canMovePrev: boolean;
     canMoveNext: boolean;
 }
 const props = defineProps<Props>();
 
-const groupName = defineModel<RubricGridGroup["name"]>("name", { required: true });
+const capabilityName = defineModel<RubricGridCapability["name"]>("name", { required: true });
 
 const emit = defineEmits<{ move: [direction: -1 | 1] }>();
 
@@ -48,8 +48,8 @@ window.Vue.onMounted(() => {
             </span>
 
             <!-- todo: how on earth can groupName be null? I doubt it can be... see group-editable.twig -->
-            <label v-if="props.group.inUseExcludingAssessment" class="rb-group-name">
-                {{ groupName }}
+            <label v-if="props.capability.inUseExcludingAssessment" class="rb-capability-name">
+                {{ capabilityName }}
                 <span
                     data-tooltip
                     class="hint has-tip tip-right"
@@ -62,7 +62,7 @@ window.Vue.onMounted(() => {
 
             <textarea
                 v-else
-                v-model.trim.lazy="groupName"
+                v-model.trim.lazy="capabilityName"
                 :maxlength="MAX_CAPABILITY_LENGTH"
                 :placeholder="`${locale.rubricGroup.proper()} name`"
             ></textarea>
@@ -73,7 +73,7 @@ window.Vue.onMounted(() => {
         <!-- Add a new indicator (criterion) -->
         <th :colspan="totalColumns - 1 /* subtract the capability column */">
             <textarea
-                :placeholder="`+ Type to add new ${locale.rubricCriterion.singular()} ${groupName ? `to ${groupName}` : ''}`"
+                :placeholder="`+ Type to add new ${locale.rubricCriterion.singular()} ${capabilityName ? `to ${capabilityName}` : ''}`"
                 :maxlength="MAX_INDICATOR_LENGTH"
             ></textarea>
         </th>
@@ -81,7 +81,7 @@ window.Vue.onMounted(() => {
 </template>
 
 <style scoped>
-.rb-group-name {
+.rb-capability-name {
     white-space: pre-line;
 }
 </style>
