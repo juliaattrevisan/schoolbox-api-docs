@@ -28,7 +28,7 @@ const props = defineProps<{
                 <p v-if="props.user.yearLevel || (props.user.campus && props.user.campus.length)" class="meta">
                     <template v-if="props.user.yearLevel">
                         {{ locale.year.translate(false, true) }} {{ props.user.yearLevel.name }}</template
-                    >
+                    ><template v-if="props.user.yearLevel && props.user.campus?.length">, </template>
                     <template v-if="props.user.campus && props.user.campus.length">
                         <span v-for="(campus, index) in props.user.campus" :key="campus.id">
                             {{ campus.name }} Student<span v-if="index < props.user.campus.length - 1">, </span>
