@@ -137,59 +137,59 @@ class Worker
         $map = array(
             self::BUSY    => array(
                 self::DONE  => function ($worker) {
-                        /** @var Worker $worker */
-                        $worker->markTaskComplete();
-                        return true;
+                    /** @var Worker $worker */
+                    $worker->markTaskComplete();
+                    return true;
                 },
                 self::ERROR => function ($worker) {
-                        /** @var Worker $worker */
-                        return true;
+                    /** @var Worker $worker */
+                    return true;
                 },
             ),
             self::DONE    => array(
                 self::READY => function ($worker) {
-                        /** @var Worker $worker */
-                        $worker->clearTask();
-                        return true;
+                    /** @var Worker $worker */
+                    $worker->clearTask();
+                    return true;
                 },
             ),
             self::ERROR   => array(
                 self::ENDED => function ($worker) {
-                        /** @var Worker $worker */
-                        $worker->clearTask();
-                        return true;
+                    /** @var Worker $worker */
+                    $worker->clearTask();
+                    return true;
                 },
             ),
             self::READY   => array(
                 self::BUSY    => function ($worker) {
-                        /** @var Worker $worker */
-                        // task must already be set (ie. use self::prepareTask() or self::setTask())
-                        return $worker->getTask() instanceof Task;
+                    /** @var Worker $worker */
+                    // task must already be set (ie. use self::prepareTask())
+                    return $worker->getTask() instanceof Task;
                 },
                 self::SENDING => function ($worker) {
-                        /** @var Worker $worker */
-                        // task must already be set (ie. use self::prepareTask())
-                        return $worker->getTask() instanceof Task;
+                    /** @var Worker $worker */
+                    // task must already be set (ie. use self::prepareTask())
+                    return $worker->getTask() instanceof Task;
                 },
                 self::ENDED => function ($worker) {
-                        /** @var Worker $worker */
-                        $worker->clearTask();
-                        return true;
+                    /** @var Worker $worker */
+                    $worker->clearTask();
+                    return true;
                 },
                 self::ERROR => function ($worker) {
-                        /** @var Worker $worker */
-                        return true;
+                    /** @var Worker $worker */
+                    return true;
                 },
             ),
             self::SENDING => array(
                 self::BUSY  => function ($worker) {
-                        /** @var Worker $worker */
-                        return true;
+                    /** @var Worker $worker */
+                    return true;
                 },
                 self::ERROR => function ($worker) {
-                        /** @var Worker $worker */
-                        $worker->clearTask();
-                        return true;
+                    /** @var Worker $worker */
+                    $worker->clearTask();
+                    return true;
                 },
             ),
         );
