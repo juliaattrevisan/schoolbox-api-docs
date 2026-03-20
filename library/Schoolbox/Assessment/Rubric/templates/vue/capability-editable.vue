@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
+import IndicatorEditable from "./indicator-editable.vue";
 import { MAX_CAPABILITY_LENGTH, MAX_INDICATOR_LENGTH } from "./types";
-import type { RubricGridCapability } from "./types";
+import type { RubricGridCapability, RubricGridLevel } from "./types";
 
 interface Props {
     totalColumns: number;
     capability: RubricGridCapability;
+    levels: RubricGridLevel[];
+    maxLevels: number;
     canMovePrev: boolean;
     canMoveNext: boolean;
 }
@@ -28,7 +31,7 @@ window.Vue.onMounted(() => {
     <!-- TODO: data-group data-sequencer-group data-groupname -->
     <tr class="rb-group-header">
         <!-- TODO: no criteria specified... etc -->
-        <th rowspan="2">
+        <th :rowspan="props.capability.indicators.length + 2 /* add 2 for the header + add new indicator row */">
             <!-- todo: can't sequence when no criteria, those should stay at the end... -->
             <span class="sequencer">
                 <a
@@ -69,6 +72,19 @@ window.Vue.onMounted(() => {
         </th>
     </tr>
 
+    <indicator-editable
+        v-for="(indicator, index) in props.capability.indicators"
+        :key="indicator.id"
+        v-model:name="indicator.name"
+        v-model:has-usage="indicator.hasUsage"
+        :indicator="indicator"
+        :levels="props.levels"
+        :max-levels="props.maxLevels"
+        :can-move-prev="index > 0"
+        :can-move-next="index < props.capability.indicators.length - 1"
+        @move="(direction) => console.warn('todo: move indicator')"
+    />
+
     <tr class="rb-new-criterion">
         <!-- Add a new indicator (criterion) -->
         <th :colspan="totalColumns - 1 /* subtract the capability column */">
@@ -78,6 +94,8 @@ window.Vue.onMounted(() => {
             ></textarea>
         </th>
     </tr>
+
+    <!-- TODO: input for max value (data-group-max-value-row) -->
 </template>
 
 <style scoped>

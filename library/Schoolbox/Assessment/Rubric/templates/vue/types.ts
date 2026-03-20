@@ -17,7 +17,18 @@ export type RubricGridCapability = {
      * excluding the current rubric grid's assessment?
      */
     inUseExcludingAssessment: boolean;
-    indicators: unknown[];
+    indicators: RubricGridIndicator[];
+};
+
+export type RubricGridIndicator = {
+    id: number;
+    name: string;
+    /**
+     * Is this indicator in use on any existing assessment,
+     * excluding the current rubric grid's assessment?
+     */
+    inUseExcludingAssessment: boolean;
+    hasUsage: boolean;
 };
 
 /**

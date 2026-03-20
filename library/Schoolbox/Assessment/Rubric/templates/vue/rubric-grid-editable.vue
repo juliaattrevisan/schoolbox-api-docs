@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { cloneDeep } from "es-toolkit";
 import locale from "@js/terminology/rosettaStone";
 import LevelEditable from "./level-editable.vue";
 import CapabilityEditable from "./capability-editable.vue";
@@ -11,7 +12,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const rubricGrid = window.Vue.ref(props.rubricGridPayload); // local mutable copy
+const rubricGrid = window.Vue.ref(cloneDeep(props.rubricGridPayload)); // local mutable copy
 
 /**
  * Move a level left or right
@@ -109,6 +110,8 @@ const totalColumns = window.Vue.computed(() => {
                     :key="capability.id"
                     v-model:name="capability.name"
                     :total-columns="totalColumns"
+                    :levels="rubricGrid.levels"
+                    :max-levels="props.maxLevels"
                     :capability="capability"
                     :can-move-prev="index > 0"
                     :can-move-next="index < rubricGrid.capabilities.length - 1"

@@ -2075,12 +2075,25 @@ class Controller extends Assessment\Controller
         ];
 
         foreach ($rubricGrid->iterateCapabilities() as $capability) {
-            $rubricGridPayload['capabilities'][] = [
+            $capabilityData = [
                 'id' => $capability->getId(),
                 'name' => $capability->getName(),
                 'inUseExcludingAssessment' => $capability->isInUseExcluding($rubricGrid->getAssessment()),
                 'indicators' => [],
             ];
+
+            foreach ($rubricGrid->iterateIndicators($capability) as $indicator) {
+                $indicatorUsage = $rubricGrid->retrieveIndicatorUsage($indicator);
+
+                $capabilityData['indicators'][] = [
+                    'id' => $indicator->getId(),
+                    'name' => $indicator->getName(),
+                    'inUseExcludingAssessment' => $indicator->isInUseExcluding($rubricGrid->getAssessment()),
+                    'hasUsage' => $indicatorUsage !== null,
+                ];
+            }
+
+            $rubricGridPayload['capabilities'][] = $capabilityData;
         }
 
         $data['rubricGridPayload'] = $rubricGridPayload;
