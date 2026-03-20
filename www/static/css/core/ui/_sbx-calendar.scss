@@ -37,4 +37,9 @@ body.sbx-body {
         display: flex;
         gap: var(--sbx-size-s);
     }
+
+    // so the background colours used for event types in the filters modal don't butt up against the label
+    input[type="checkbox"]:not(.plain) + label[for^="eventType-"] {
+        padding-left: var(--sbx-size-s);
+    }
 }

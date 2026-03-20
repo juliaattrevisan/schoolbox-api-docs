@@ -170,7 +170,7 @@ export default {
     <reveal-modal ref="modal" size="medium">
         <form @submit.prevent="applyFilters" action="#">
             <section>
-                <fieldset class="content option-list">
+                <fieldset class="content">
                     <div class="small-6 large-3 columns">
                         <fieldset class="checklist sources">
                             <legend>Sources</legend>
