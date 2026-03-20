@@ -140,7 +140,7 @@ class EmbedReplacer
 
         // Figure out how to extract body
         $body = $doc->querySelector('body');
-        return $body instanceof Element ? $body->innerHTML : $html;
+        return $body instanceof Element ? $doc->saveHtml($body) : $html;
     }
 
     /**
