@@ -2085,11 +2085,24 @@ class Controller extends Assessment\Controller
             foreach ($rubricGrid->iterateIndicators($capability) as $indicator) {
                 $indicatorUsage = $rubricGrid->retrieveIndicatorUsage($indicator);
 
+                $descriptors = [];
+                foreach ($rubricGrid->getLevels() as $levelIndex => $level) {
+                    $descriptor = $indicatorUsage?->retrieveDescriptor($levelIndex);
+
+                    $descriptors[] = [
+                        // fake negative ID to identify non existent descriptors in the frontend
+                        'id' => $descriptor?->getId() ?? min(array_column($descriptors, 'id'), 0) - 1,
+                        'description' => $descriptor?->getDescription() ?? '',
+                        'maxValue' => $descriptor?->getMaxValue() ?? 0,
+                    ];
+                }
+
                 $capabilityData['indicators'][] = [
                     'id' => $indicator->getId(),
                     'name' => $indicator->getName(),
                     'inUseExcludingAssessment' => $indicator->isInUseExcluding($rubricGrid->getAssessment()),
                     'hasUsage' => $indicatorUsage !== null,
+                    'descriptors' => $descriptors,
                 ];
             }
 

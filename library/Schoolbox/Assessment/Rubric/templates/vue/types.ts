@@ -29,6 +29,13 @@ export type RubricGridIndicator = {
      */
     inUseExcludingAssessment: boolean;
     hasUsage: boolean;
+    descriptors: RubricGridDescriptor[];
+};
+
+export type RubricGridDescriptor = {
+    id: number;
+    description: string;
+    maxValue: number;
 };
 
 /**

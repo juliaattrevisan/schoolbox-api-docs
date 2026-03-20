@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
+import DescriptorEditable from "./descriptor-editable.vue";
 import { MAX_INDICATOR_LENGTH } from "./types";
 import type { RubricGridIndicator, RubricGridLevel } from "./types";
 
@@ -75,15 +76,25 @@ window.Vue.onMounted(() => {
             </label>
         </th>
 
-        <td v-for="level in props.levels" :key="level.id" :class="hasUsage ? '' : 'hide-v'">
+        <!-- todo: should be clickable (check exactly when) -->
+        <td
+            v-for="(descriptor, levelIndex) in props.indicator.descriptors"
+            :key="descriptor.id"
+            :class="hasUsage ? '' : 'hide-v'"
+        >
             <!-- todo: descriptors -->
+            <descriptor-editable
+                v-model:description="descriptor.description"
+                v-model:max-value="descriptor.maxValue"
+                :level-name="props.levels[levelIndex].name"
+                :indicator-name="props.indicator.name"
+                :disabled="!hasUsage"
+            ></descriptor-editable>
         </td>
 
-        <td
-            v-if="props.levels.length < props.maxLevels"
-            :class="hasUsage ? '' : 'hide-v'"
-            @click="hasUsage = true"
-        ></td>
+        <td v-if="props.levels.length < props.maxLevels" :class="hasUsage ? '' : 'hide-v'" @click="hasUsage = true">
+            &nbsp;
+        </td>
     </tr>
 </template>
 
