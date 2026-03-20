@@ -1,36 +1,48 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
 import LevelEditable from "./level-editable.vue";
-import type { RubricGrid, RubricGridLevel } from "./types";
-
-/**
- * maxCapabilityLength is 900, due to the way browsers look at maxlength as character lenght, but mysql table looks at char byte length
- * so if there are bullet points in the textbox they count as 3 characters, and will cause issues, so lets work on 900 as the limit, and we shouldn't hit the db max..
- */
-const MAX_CAPABILITY_LENGTH = 900;
+import GroupEditable from "./group-editable.vue";
+import { MAX_CAPABILITY_LENGTH } from "./types";
+import type { RubricGrid, RubricGridGroup, RubricGridLevel } from "./types";
 
 interface Props {
-    rubricGrid: RubricGrid;
+    rubricGridPayload: RubricGrid;
     maxLevels: number;
 }
 const props = defineProps<Props>();
 
-const rubricGridData = window.Vue.ref(props.rubricGrid); // local mutable copy
+const rubricGrid = window.Vue.ref(props.rubricGridPayload); // local mutable copy
 
 /**
  * Move a level left or right in the levels array
  * @param level the level to move
  * @param direction the direction to move
  */
-function moveLevel(level: RubricGridLevel, direction: "left" | "right"): void {
-    const index = rubricGridData.value.levels.findIndex((l) => l.id === level.id);
-    const newIndex = direction === "left" ? index - 1 : index + 1;
-    if (newIndex < 0 || newIndex >= rubricGridData.value.levels.length) {
+function moveLevel(level: RubricGridLevel, direction: -1 | 1): void {
+    const index = rubricGrid.value.levels.findIndex((l) => l.id === level.id);
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= rubricGrid.value.levels.length) {
         return; // out of bounds
     }
 
-    const levels = rubricGridData.value.levels;
+    const levels = rubricGrid.value.levels;
     [levels[index], levels[newIndex]] = [levels[newIndex], levels[index]];
+}
+
+/**
+ * Move a group up or down in the groups array
+ * @param group the group to move
+ * @param direction the direction to move
+ */
+function moveGroup(group: RubricGridGroup, direction: -1 | 1): void {
+    const index = rubricGrid.value.groups.findIndex((g) => g.id === group.id);
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= rubricGrid.value.groups.length) {
+        return; // out of bounds
+    }
+
+    const groups = rubricGrid.value.groups;
+    [groups[index], groups[newIndex]] = [groups[newIndex], groups[index]];
 }
 
 /**
@@ -38,13 +50,26 @@ function moveLevel(level: RubricGridLevel, direction: "left" | "right"): void {
  */
 function addLevel(): void {
     // TODO: other logic from RubricEditable.prototype.addLevel
-    const lowestId = Math.min(...rubricGridData.value.levels.map((l) => l.id), 0);
+    const lowestId = Math.min(...rubricGrid.value.levels.map((l) => l.id), 0);
     const newLevel: RubricGridLevel = {
         id: lowestId - 1, // negative IDs are unsaved
         name: "",
     };
-    rubricGridData.value.levels.push(newLevel);
+    rubricGrid.value.levels.push(newLevel);
 }
+
+/**
+ * The total number of columns in the grid
+ */
+const totalColumns = window.Vue.computed(() => {
+    let columns = rubricGrid.value.levels.length + 2; // levels + capability + criterion columns
+
+    if (rubricGrid.value.levels.length < props.maxLevels) {
+        columns += 1; // "add level" button
+    }
+
+    return columns;
+});
 </script>
 
 <template>
@@ -63,14 +88,15 @@ function addLevel(): void {
                         {{ locale.rubricCriterion.properPlural() }}
                     </th>
                     <level-editable
-                        v-for="(level, index) in rubricGridData.levels"
+                        v-for="(level, index) in rubricGrid.levels"
                         :key="level.id"
-                        v-model:level-name="level.name"
-                        :can-move-left="index > 0"
-                        :can-move-right="index < rubricGridData.levels.length - 1"
+                        v-model:name="level.name"
+                        :can-move-prev="index > 0"
+                        :can-move-next="index < rubricGrid.levels.length - 1"
                         @move="(direction) => moveLevel(level, direction)"
                     />
-                    <th v-if="rubricGridData.levels.length < props.maxLevels">
+                    <th v-if="rubricGrid.levels.length < props.maxLevels">
+                        <!-- Add a new level -->
                         <a href="#" data-test="rubric-spawn-level" @click.prevent="addLevel">
                             &plus; {{ locale.rubricLevel.proper() }}
                         </a>
@@ -78,7 +104,27 @@ function addLevel(): void {
                 </tr>
             </thead>
             <tbody>
-                <!-- TODO: groups -->
+                <group-editable
+                    v-for="(group, index) in rubricGrid.groups"
+                    :key="group.id"
+                    v-model:name="group.name"
+                    :total-columns="totalColumns"
+                    :group="group"
+                    :can-move-prev="index > 0"
+                    :can-move-next="index < rubricGrid.groups.length - 1"
+                    @move="(direction) => moveGroup(group, direction)"
+                />
+
+                <tr class="rb-group-header rb-new-group">
+                    <!-- Add a new group -->
+                    <th :colspan="totalColumns">
+                        <!-- TODO: data-spawn="group" data-group-grid-text -->
+                        <textarea
+                            :placeholder="`+ Type to add new ${locale.rubricGroup.singular()}`"
+                            :maxlength="MAX_CAPABILITY_LENGTH"
+                        ></textarea>
+                    </th>
+                </tr>
             </tbody>
         </table>
     </div>

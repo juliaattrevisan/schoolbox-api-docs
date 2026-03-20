@@ -2,39 +2,40 @@
 import locale from "@js/terminology/rosettaStone";
 import type { RubricGridLevel } from "./types";
 
-const levelName = defineModel<RubricGridLevel["name"]>("levelName", { required: true });
-
 interface Props {
-    canMoveLeft: boolean;
-    canMoveRight: boolean;
+    canMovePrev: boolean;
+    canMoveNext: boolean;
 }
 const props = defineProps<Props>();
 
-const emit = defineEmits<{
-    move: [direction: "left" | "right"];
-}>();
+const levelName = defineModel<RubricGridLevel["name"]>("name", { required: true });
+
+const emit = defineEmits<{ move: [direction: -1 | 1] }>();
 </script>
 
 <template>
-    <!-- TODO: data-sequencer-group="levels" -->
     <th class="rb-level">
-        <input v-model="levelName" type="text" :placeholder="`${locale.rubricLevel.proper()} name`" maxlength="128" />
+        <input
+            v-model.trim="levelName"
+            type="text"
+            :placeholder="`${locale.rubricLevel.proper()} name`"
+            maxlength="128"
+        />
 
-        <!-- TODO: sequencer (data-sequencer-h="levels", data-sequencer-left, data-sequencer-right)-->
         <span class="sequencer">
             <a
                 class="icon-previous"
-                :class="{ disabled: !props.canMoveLeft }"
+                :class="{ disabled: !props.canMovePrev }"
                 title="Move left"
-                :aria-disabled="!props.canMoveLeft"
-                @click.prevent="props.canMoveLeft && emit('move', 'left')"
+                :aria-disabled="!props.canMovePrev"
+                @click.prevent="props.canMovePrev && emit('move', -1)"
             ></a>
             <a
                 class="icon-next"
-                :class="{ disabled: !props.canMoveRight }"
+                :class="{ disabled: !props.canMoveNext }"
                 title="Move right"
-                :aria-disabled="!props.canMoveRight"
-                @click.prevent="props.canMoveRight && emit('move', 'right')"
+                :aria-disabled="!props.canMoveNext"
+                @click.prevent="props.canMoveNext && emit('move', 1)"
             ></a>
         </span>
     </th>
