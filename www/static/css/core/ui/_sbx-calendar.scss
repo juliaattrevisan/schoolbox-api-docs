@@ -16,7 +16,7 @@ body.sbx-body {
     }
 
     // remove the active colour hover state, should behave just like other secondary buttons with the slight filter change on hover
-    .fc-button:hover {
+    .fc-button:hover:not(.fc-button-active) {
         background: var(--sbx-color-foreground-primary) !important;
     }
 

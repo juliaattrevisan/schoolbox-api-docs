@@ -16,8 +16,8 @@
 
 body.sbx-body {
     font-family: var(--sbx-font-primary) !important;
-    // to prevent barcode/vjs/view file modal icons override
-    & *:not(.barcode-39, button.vjs-control, [class*=" lg-"]) {
+    // then prevent it overriding specific fonts that need to be preserved for icons, barcodes, etc.
+    & *:not(.barcode-39, button.vjs-control, .fc-icon, [class*=" lg-"]) {
         font-family: var(--sbx-font-primary) !important;
     }
 
