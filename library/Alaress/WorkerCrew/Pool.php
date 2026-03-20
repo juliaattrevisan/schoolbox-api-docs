@@ -64,6 +64,9 @@ class Pool extends EventEmitter implements PoolInterface
     /** @var TimerInterface[] */
     protected $writeTimers = [];
 
+    /** @var callable[] */
+    protected $drainListeners = [];
+
 
     /**
      * @param LoopInterface                $loop
@@ -317,9 +320,14 @@ class Pool extends EventEmitter implements PoolInterface
             },
         );
 
-        // Stream has been fully read by the worker:
-        // cancel the release worker timer
-        $stream->once('drain', function () use ($pid): void {
+        // Set up a listener when the stream has been fully read by the worker:
+        // * cancel the release worker timer
+        // * cancel the listener itself
+        // * set the worker as BUSY
+        // This listener will itself be canceled when the worker is marked as
+        // DONE, to handle the case where a worker transitioned straight from
+        // SENDING to DONE.
+        $drainListener = function () use ($pid): void {
             if (!$this->workers->contains($pid)) {
                 return;
             }
@@ -327,8 +335,11 @@ class Pool extends EventEmitter implements PoolInterface
                 $this->loop->cancelTimer($this->writeTimers[$pid]);
                 unset($this->writeTimers[$pid]);
             }
+            unset($this->drainListeners[$pid]);
             $this->setWorkerStatus($pid, Worker::BUSY);
-        });
+        };
+        $this->drainListeners[$pid] = $drainListener;
+        $stream->once('drain', $drainListener);
     }
 
 
@@ -552,6 +563,21 @@ class Pool extends EventEmitter implements PoolInterface
 
         $oldStatus = $worker->getStatus();
         $newStatus = $worker->setStatus($status);
+
+        // if the worker responded before drain fired:
+        // * cancel the drain listener so it doesn't incorrectly transition a
+        //   subsequent task to BUSY
+        // * cancel the write timer so it doesn't incorrectly kill the worker
+        if ($oldStatus === Worker::SENDING && $newStatus === Worker::DONE) {
+            if (isset($this->drainListeners[$pid])) {
+                $this->inStreams[$pid]->removeListener('drain', $this->drainListeners[$pid]);
+                unset($this->drainListeners[$pid]);
+            }
+            if (isset($this->writeTimers[$pid])) {
+                $this->loop->cancelTimer($this->writeTimers[$pid]);
+                unset($this->writeTimers[$pid]);
+            }
+        }
 
         // don't bother telling us about attempts to change to the same state
         if ($status != $oldStatus) {
