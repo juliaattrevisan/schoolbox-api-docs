@@ -5,6 +5,7 @@
  */
 
 import {
+    type Element,
     Plugin,
     createImageTypeRegExp,
     type ImageUploadCompleteEvent,
@@ -15,7 +16,7 @@ import {
 } from "ckeditor5";
 import { slideUp } from "@js/util/animateUtils";
 import type { Resource } from "@js/resource/resourceUtils";
-import { addResource } from "@js/editor/plugin/resource/editorResourceUtils";
+import { addResource, exitLinkContext, insertSoftBreak } from "@js/editor/plugin/resource/editorResourceUtils";
 import ResourceUI from "@js/editor/plugin/resource/ResourceUI";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 import { EditorToolbar } from "@js/editor/types/editorTypes";
@@ -27,6 +28,23 @@ import { EditorToolbar } from "@js/editor/types/editorTypes";
  */
 function isHtmlIncluded(dataTransfer: DataTransfer): boolean {
     return Array.from(dataTransfer.types).includes("text/html") && dataTransfer.getData("text/html") !== "";
+}
+
+/**
+ * Returns true when the user is still positioned on the uploaded image, so it is safe
+ * to move the live selection to insert a break and clear the link context.
+ * @param editor - the ckeditor instance
+ * @param imageElement - the uploaded image element
+ * @returns whether the selection is still on the uploaded image
+ */
+function isSelectionStillAtUploadedImage(editor: Plugin["editor"], imageElement: Element): boolean {
+    const { selection } = editor.model.document;
+    const positionAfterImage = editor.model.createPositionAfter(imageElement);
+
+    return (
+        selection.getSelectedElement() === imageElement ||
+        selection.getFirstPosition()?.isEqual(positionAfterImage) === true
+    );
 }
 
 export default class ResourceEditing extends Plugin {
@@ -88,6 +106,23 @@ export default class ResourceEditing extends Plugin {
             this.editor.model.change((writer) => {
                 writer.setAttribute("alt", data.name, imageElement);
                 writer.setAttribute("linkHref", data.default, imageElement);
+
+                const insertPosition = writer.createPositionAfter(imageElement);
+
+                if (!isSelectionStillAtUploadedImage(this.editor, imageElement)) {
+                    const selection = writer.createSelection(this.editor.model.document.selection);
+                    const selectionAttributes = Array.from(this.editor.model.document.selection.getAttributes());
+
+                    insertSoftBreak(this.editor, writer, insertPosition);
+                    writer.setSelection(selection);
+                    writer.removeSelectionAttribute(this.editor.model.document.selection.getAttributeKeys());
+                    writer.setSelectionAttribute(selectionAttributes);
+                    return;
+                }
+
+                writer.setSelection(imageElement, "after");
+                insertSoftBreak(this.editor, writer, insertPosition);
+                exitLinkContext(this.editor, writer);
             });
         });
     }
