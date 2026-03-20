@@ -27,46 +27,6 @@ class InstallPackagesCest
     public function installPackages(IntegrationTester $i): void
     {
         #GIVEN
-        // Australian Curriculum - General Capabilities package
-        $id           = 1;
-        $packagePayload = new Payload\Admin\Modules\Packages($id);
-        #WHEN
-        $i->amGoingTo('Send request to install package "Australian Curriculum - General Capabilities"');
-        $i->sendRequest($packagePayload);
-        #THEN
-        $i->seeResponseCodeIs(200);
-
-        #GIVEN
-        // Australian Curriculum - Cross-curriculum Priorities package
-        $id           = 2;
-        $packagePayload = new Payload\Admin\Modules\Packages($id);
-        #WHEN
-        $i->amGoingTo('Send request to install package "Australian Curriculum - Cross-curriculum Priorities package"');
-        $i->sendRequest($packagePayload);
-        #THEN
-        $i->seeResponseCodeIs(200);
-
-        #GIVEN
-        // General Capability Badges package
-        $id           = 3;
-        $packagePayload = new Payload\Admin\Modules\Packages($id);
-        #WHEN
-        $i->amGoingTo('Send request to install package "General Capability Badges package"');
-        $i->sendRequest($packagePayload);
-        #THEN
-        $i->seeResponseCodeIs(200);
-
-        #GIVEN
-        // Personal Development Badges package
-        $id           = 4;
-        $packagePayload = new Payload\Admin\Modules\Packages($id);
-        #WHEN
-        $i->amGoingTo('Send request to install package "Personal Development Badges package"');
-        $i->sendRequest($packagePayload);
-        #THEN
-        $i->seeResponseCodeIs(200);
-
-        #GIVEN
         // Extra Curricular Badges package
         $id           = 5;
         $packagePayload = new Payload\Admin\Modules\Packages($id);
@@ -87,11 +47,21 @@ class InstallPackagesCest
         $i->seeResponseCodeIs(200);
 
         #GIVEN
-        // Australian Early Years Learning Framework package
-        $id           = 7;
+        // Australian Curriculum V9 package
+        $id           = 14;
         $packagePayload = new Payload\Admin\Modules\Packages($id);
         #WHEN
-        $i->amGoingTo('Send request to install package "Australian Early Years Learning Framework package"');
+        $i->amGoingTo('Send request to install package "Australian Curriculum V9 package"');
+        $i->sendRequest($packagePayload);
+        #THEN
+        $i->seeResponseCodeIs(200);
+
+        #GIVEN
+        // UK National Curriculum package
+        $id           = 32;
+        $packagePayload = new Payload\Admin\Modules\Packages($id);
+        #WHEN
+        $i->amGoingTo('Send request to install package "UK National Curriculum"');
         $i->sendRequest($packagePayload);
         #THEN
         $i->seeResponseCodeIs(200);
