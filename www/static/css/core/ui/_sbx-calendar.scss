@@ -14,4 +14,14 @@ body.sbx-body {
     .fc-button {
         border-radius: var(--sbx-config-field-roundness) !important;
     }
+
+    // remove the active colour hover state, should behave just like other secondary buttons with the slight filter change on hover
+    .fc-button:hover {
+        background: var(--sbx-color-foreground-primary) !important;
+    }
+
+    // remove the active colour, as it's used for the current calendar, not the calendar button
+    .adtp-btn {
+        background: var(--sbx-color-foreground-primary);
+    }
 }
