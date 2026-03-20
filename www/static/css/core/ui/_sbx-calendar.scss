@@ -52,4 +52,9 @@ body.sbx-body {
     .fc-list-table tr {
         border-bottom: 1px solid var(--sbx-color-border);
     }
+
+    // they're <a> tags so they have accent colour, but they have no href so they should just use the normal text colour
+    .fc-list-day-text {
+        color: var(--sbx-color-text-primary);
+    }
 }
