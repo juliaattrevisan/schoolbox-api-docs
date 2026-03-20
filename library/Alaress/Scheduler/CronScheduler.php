@@ -35,10 +35,16 @@ abstract class CronScheduler extends AbstractScheduler implements EventListener
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param LoggerInterface           $log
      * @param IClock                    $clock
+     * @param int|null                  $maxFutureTriggerTime
      */
-    public function __construct(LoopInterface $loop, DispatchStrategyInterface $dispatchStrategy, LoggerInterface $log, IClock $clock)
-    {
-        parent::__construct($loop, $dispatchStrategy, $log, $clock);
+    public function __construct(
+        LoopInterface $loop,
+        DispatchStrategyInterface $dispatchStrategy,
+        LoggerInterface $log,
+        IClock $clock,
+        ?int $maxFutureTriggerTime = null,
+    ) {
+        parent::__construct($loop, $dispatchStrategy, $log, $clock, $maxFutureTriggerTime);
 
         $this->on(SIGHUP, [ $this, 'onReload' ]);
     }
@@ -90,7 +96,7 @@ abstract class CronScheduler extends AbstractScheduler implements EventListener
         }
 
         // comes in the form 'digestd.vagrantx.reload'
-        list (, , $action) = explode('.', $event->getChannel());
+        [, , $action] = explode('.', $event->getChannel());
 
         if ($action === 'reload') {
             // this is the only action we currently know about
