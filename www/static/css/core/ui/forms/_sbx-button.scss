@@ -98,6 +98,11 @@ body.sbx-body {
         }
     }
 
+    // we don't need to show empty buttons
+    .button.disabled:empty {
+        display: none;
+    }
+
     /**
      * Make some buttons smaller for better visual hierarchy, can be considered 'tertiary' buttons
      * currently only used for the 'View more' buttons in Unit planner/ Manage DP page
