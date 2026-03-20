@@ -43,6 +43,7 @@ body.sbx-body {
         padding-left: var(--sbx-size-s);
     }
 
+    // add the new border colour to the calendar table cells
     .fc-theme-standard td {
         border: 1px solid var(--sbx-color-border);
     }
