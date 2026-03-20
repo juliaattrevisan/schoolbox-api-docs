@@ -188,7 +188,7 @@ class Mapper extends BaseMapper
             LEFT JOIN course_unit_implementation cui ON ui.course_unit_implementation_id = cui.id
             LEFT JOIN course_implementation ci ON cui.course_implementation_id = ci.id
             LEFT JOIN folder f ON ci.folder_id = f.id
-            LEFT JOIN folder_code fc ON f.id = fc.folder_id
+            LEFT JOIN folder_code fc ON f.id = fc.folder_id AND fc.deleted_at IS NULL
             LEFT JOIN assessment oa ON a.original_assessment_id = oa.id
             LEFT JOIN differentiation_profiles ON differentiation_profiles.student_id = u.id
             LEFT JOIN differentiation_profiles_adjustment_category ac ON FIND_IN_SET(ac.id, differentiation_profiles.adjustment_category)
