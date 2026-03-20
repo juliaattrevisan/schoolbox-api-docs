@@ -24,4 +24,11 @@ body.sbx-body {
     .adtp-btn {
         background: var(--sbx-color-foreground-primary);
     }
+
+    // add some spacing to the view-event-modal.vue bottom buttons
+    .component-action .rsvp,
+    .component-action .actions {
+        display: flex;
+        gap: var(--sbx-size-xs);
+    }
 }
