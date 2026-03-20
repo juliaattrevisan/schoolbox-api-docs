@@ -144,6 +144,7 @@ const icons: IconStoryEntry[] = [
     { name: "refresh", label: "refresh" },
     { name: "reply", label: "reply" },
     { name: "report", label: "report" },
+    { name: "reporting", label: "reporting" },
     { name: "resource-booking", label: "resource-booking" },
     { name: "rss", label: "rss" },
     { name: "schoolbox", label: "schoolbox" },
