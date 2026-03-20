@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
+import LevelEditable from "./level-editable.vue";
 import type { RubricGrid } from "./types";
 
 /**
@@ -29,7 +30,11 @@ const props = defineProps<Props>();
                         <!-- indicators -->
                         {{ locale.rubricCriterion.properPlural() }}
                     </th>
-                    <!-- TODO: levels -->
+                    <level-editable
+                        v-for="level in props.rubricGrid.levels"
+                        :key="level.id"
+                        v-model:level-name="level.name"
+                    />
                     <th>
                         <!-- TODO: data-spawn="level" -->
                         <a href="#" data-test="rubric-spawn-level">&plus; {{ locale.rubricLevel.proper() }}</a>
