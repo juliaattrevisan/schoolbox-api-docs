@@ -71,7 +71,9 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
             $conf,
             $postman,
             INSTANCE_ID,
-            Scheduler::DEFAULT_MAX_FUTURE_TRIGGER_TIME,
+            // Since future triggers are cached using the JIT cache, the max
+            // future trigger time must be <= the JIT's TTL.
+            min(Scheduler::DEFAULT_MAX_FUTURE_TRIGGER_TIME, RedisCache::EXPIRY_WINDOW),
         );
 
         // restoring from redis cache
