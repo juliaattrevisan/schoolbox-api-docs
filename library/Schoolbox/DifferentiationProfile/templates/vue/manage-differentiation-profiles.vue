@@ -134,7 +134,12 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
     <dummy-inline-editor />
 </template>
 
-<style scoped></style>
+<style scoped>
+/* Set minimum height to table to  to see a few students in small height screens */
+.scrollable {
+    min-height: 400px;
+}
+</style>
 
 <style>
 /* A few tweaks to adjust the filter panel to sit properly within the layout */
