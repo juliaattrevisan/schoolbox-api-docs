@@ -135,7 +135,7 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
 </template>
 
 <style scoped>
-/* Set minimum height to table to  to see a few students in small height screens */
+/* Set minimum height to table to see a few students in small height screens */
 .scrollable {
     min-height: 400px;
 }
