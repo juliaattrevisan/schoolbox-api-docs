@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\SkinConfig;
 use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Color\Transformer;
+use OzdemirBurak\Iris\Color\Hexa;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -152,16 +153,16 @@ class Helper
      */
     private function createColorTwigVars(Color $color, string $cssVar): array
     {
-        $hsl = $color->getAsHslArray();
+        $hsl = new Hexa($color->getAsHexAlpha())->toHsla();
         return [
             'cssVar' => $cssVar,
             'colorObject' => $color,
             'r' => $color->getRed(),
             'g' => $color->getGreen(),
             'b' => $color->getBlue(),
-            'h' => $hsl['hue'],
-            's' => $hsl['saturation'],
-            'l' => $hsl['lightness'],
+            'h' => $hsl->hue(),
+            's' => $hsl->saturation(),
+            'l' => $hsl->lightness(),
             'a' => $color->getAlpha(),
         ];
     }
