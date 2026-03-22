@@ -88,21 +88,15 @@ window.Vue.onMounted(() => {
             </label>
         </th>
 
-        <!-- todo: should be clickable (check exactly when) -->
-        <td
+        <descriptor-editable
             v-for="(descriptor, levelIndex) in props.indicator.descriptors"
             :key="descriptor.id"
-            :class="hasUsage ? '' : 'hide-v'"
-        >
-            <!-- todo: descriptors -->
-            <descriptor-editable
-                v-model:description="descriptor.description"
-                v-model:max-value="descriptor.maxValue"
-                :level-name="props.levels[levelIndex].name"
-                :indicator-name="props.indicator.name"
-                :disabled="!hasUsage"
-            ></descriptor-editable>
-        </td>
+            v-model:indicator-enabled="hasUsage"
+            v-model:description="descriptor.description"
+            v-model:max-value="descriptor.maxValue"
+            :level-name="props.levels[levelIndex].name"
+            :indicator-name="props.indicator.name"
+        ></descriptor-editable>
 
         <td
             v-if="props.levels.length < props.maxLevels"
