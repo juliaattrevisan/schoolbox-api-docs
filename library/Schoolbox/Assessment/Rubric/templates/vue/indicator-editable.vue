@@ -92,7 +92,12 @@ window.Vue.onMounted(() => {
             ></descriptor-editable>
         </td>
 
-        <td v-if="props.levels.length < props.maxLevels" :class="hasUsage ? '' : 'hide-v'" @click="hasUsage = true">
+        <td
+            v-if="props.levels.length < props.maxLevels"
+            class="hide-for-medium-down"
+            :class="hasUsage ? '' : 'hide-v'"
+            @click="hasUsage = true"
+        >
             &nbsp;
         </td>
     </tr>
