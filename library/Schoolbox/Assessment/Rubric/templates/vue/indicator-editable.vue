@@ -1,4 +1,16 @@
 <script setup lang="ts">
+/**
+ * Add a row in the editable rubric grid for a specific indicator (child of a capability)
+ * (also known as a "criterion" in the past)
+ *
+ * The indicator itself can be edited from the left column (which will be next
+ * to a capability already). it can have multiple descriptors, each descriptor has
+ * its own column corresponding to the associated level.
+ *
+ * There is an additional blank column at the end matching the "+ Level" column
+ * in the header if it exists
+ */
+
 import locale from "@js/terminology/rosettaStone";
 import DescriptorEditable from "./descriptor-editable.vue";
 import { MAX_INDICATOR_LENGTH } from "./types";

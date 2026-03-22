@@ -1,4 +1,9 @@
 <script setup lang="ts">
+/**
+ * The contents of a given descriptor cell (child of an indicator) in the editable rubric grid
+ * The textarea will resize vertically to always fit the current content
+ */
+
 import type { RubricGridDescriptor } from "./types";
 
 interface Props {
@@ -14,6 +19,7 @@ const descriptorMaxValue = defineModel<RubricGridDescriptor["maxValue"]>("maxVal
 
 <template>
     <!-- todo: data-descriptor-text -->
+    <!-- todo: this textarea is meant to auto resize vertically to always fit the content -->
     <textarea
         v-model.trim="descriptorDescription"
         :placeholder="`Descriptor for ${props.levelName} ${props.indicatorName}`"

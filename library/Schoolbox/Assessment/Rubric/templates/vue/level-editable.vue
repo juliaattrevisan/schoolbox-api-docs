@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * A heading cell for showing a "level" in the editable rubric grid
+ */
+
 import locale from "@js/terminology/rosettaStone";
 import type { RubricGridLevel } from "./types";
 

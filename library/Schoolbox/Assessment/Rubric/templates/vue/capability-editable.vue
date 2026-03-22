@@ -1,4 +1,15 @@
 <script setup lang="ts">
+/**
+ * Add rows in the editable rubric grid for a specific capability
+ * (also known as a "group" in the past)
+ *
+ * The capability itself can be edited from the leftmost column,
+ * it can have multiple indicators, each indicator has its own row inline with the capability.
+ * There are two additional rows:
+ * - A row inline with the capability name for adding a new indicator
+ * - A full width row for the maximum capability points, if the capability mark type is set
+ */
+
 import locale from "@js/terminology/rosettaStone";
 import IndicatorEditable from "./indicator-editable.vue";
 import { MAX_CAPABILITY_LENGTH, MAX_INDICATOR_LENGTH } from "./types";

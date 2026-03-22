@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * The editable rubric grid shown on the activity create/modify page (currently due work, soon to be more)
+ */
+
 import { cloneDeep } from "es-toolkit";
 import locale from "@js/terminology/rosettaStone";
 import LevelEditable from "./level-editable.vue";
