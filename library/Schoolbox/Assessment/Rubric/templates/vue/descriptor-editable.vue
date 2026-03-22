@@ -31,7 +31,7 @@ const descriptorMaxValue = defineModel<RubricGridDescriptor["maxValue"]>("maxVal
     <!-- todo: usingMarkRange -->
     <input
         v-model.number="descriptorMaxValue"
-        class="rb-value"
+        class="rb-value rb-value-input"
         type="number"
         min="0"
         placeholder="Points"

@@ -81,7 +81,8 @@ table.rb {
             }
         }
 
-        input[type="tel"] {
+        // TODO: remove type="tel" references in all rubric stuff once it's unused
+        input[type="tel"], .rb-value-input {
             border-color: var(--sbx-config-color-accent, $input-border-color);
             background-color: var(--sbx-color-foreground-primary, $container-bg);
         }
@@ -121,7 +122,8 @@ table.rb {
         line-height: 2.75rem;
     }
     input[type="text"],
-    input[type="tel"] {
+    input[type="tel"],
+    .rb-value-input {
         + label.rb-readonly {
             padding-left: 2.6125rem;
         }
@@ -174,7 +176,8 @@ table.rb {
     }
     textarea,
     input[type="text"],
-    input[type="tel"] {
+    input[type="tel"],
+    .rb-value-input {
         border-color: transparent;
         background-color: transparent;
     }
@@ -191,7 +194,7 @@ table.rb {
             display: block;
         }
 
-        input[type="tel"] {
+        input[type="tel"], .rb-value-input {
             border-color: var(--sbx-config-color-accent, $input-border-color);
             background-color: var(--sbx-color-foreground-primary, $container-bg);
             width: 5rem;
@@ -218,6 +221,7 @@ table.rb {
         width: 0;
         input[type="text"],
         input[type="tel"],
+        .rb-value-input,
         textarea {
             opacity: 0;
             /* far out! */
@@ -244,6 +248,7 @@ table.rb {
         }
         input[type="text"],
         input[type="tel"],
+        .rb-value-input,
         textarea {
             opacity: 0;
             /* far out! */
