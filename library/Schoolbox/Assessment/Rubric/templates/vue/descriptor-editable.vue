@@ -22,12 +22,11 @@ const descriptorMaxValue = defineModel<RubricGridDescriptor["maxValue"]>("maxVal
     ></textarea>
 
     <!-- todo: data-descriptor-value data-descriptor-value-original data-descriptor-criterion data-descriptor-level-index data-descriptor-original -->
-    <!-- todo: why tf is this a type="tel" ??? -->
     <!-- todo: usingMarkRange -->
     <input
         v-model.number="descriptorMaxValue"
         class="rb-value"
-        type="tel"
+        type="number"
         min="0"
         placeholder="Points"
         :disabled="props.disabled"
