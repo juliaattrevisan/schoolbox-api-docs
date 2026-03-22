@@ -108,10 +108,20 @@ HELP;
             $this->getLogger()->info("Quitting");
             exit;
         }
-        //fix for array base 0
-        $packageId -= 1;
         $this->getLogger()->info("Selected Id: {$packageId}");
-        $package = $allPackages[$packageId];
+        // Find the package with the matching database ID
+        $package = null;
+        foreach ($allPackages as $pkg) {
+            if ($pkg->getId() === $packageId) {
+                $package = $pkg;
+                break;
+            }
+        }
+        if ($package === null) {
+            $this->getLogger()->error("Package with ID {$packageId} not found");
+            $this->choiceInstall();
+            return;
+        }
         $this->getLogger()->info("Found {$package->getTitle()}");
 
         /**
