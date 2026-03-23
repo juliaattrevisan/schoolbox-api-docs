@@ -40,7 +40,6 @@ function moveLevel(index: number, direction: -1 | 1): void {
  * Adds a level to the grid, on the right-hand side
  */
 function addLevel(): void {
-    // TODO: other logic from RubricEditable.prototype.addLevel
     const lowestId = Math.min(...rubricGrid.value.levels.map((l) => l.id), 0);
     const newLevel: RubricGridLevel = {
         id: lowestId - 1, // negative IDs are unsaved
@@ -49,6 +48,14 @@ function addLevel(): void {
     rubricGrid.value.levels.push(newLevel);
 
     // todo: handle adding new descriptors
+
+    // todo: (from old logic) scroll the newly created level into view (for mobile)
+    // $rb.closest(".scrollable").scrollTo($rb.find('[data-spawn="level"]'), {
+    //     scrollX: true,
+    //     scrollY: false,
+    //     offsetLeft: 0,
+    //     duration: 0,
+    // });
 }
 
 /**

@@ -262,6 +262,7 @@ class Controller extends BaseController
         }
 
 
+        // TODO: json output instead
         $this->response = $this->responseFromTemplateUnthemed(
             "@rubric/$template.twig",
             $context
