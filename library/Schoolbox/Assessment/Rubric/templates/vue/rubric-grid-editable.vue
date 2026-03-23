@@ -86,6 +86,39 @@ window.Vue.onUnmounted(() => {
     const markTypeInput = document.getElementById("capability-markType");
     markTypeInput?.removeEventListener("change", onCapabilityMarkTypeChange);
 });
+
+/**
+ * Calculates the assessment's max available marks from the rubric grid
+ * based on the max value for each capability, instead of the max descriptor value for each indicator.
+ */
+const rubricSum = window.Vue.computed(() => {
+    let sum = 0;
+    for (const capability of rubricGrid.value.capabilities) {
+        if (capability.maxValue !== null) {
+            sum += capability.maxValue;
+        }
+    }
+    return parseFloat(sum.toFixed(2));
+});
+
+/**
+ * Assuming the assessment uses the "Total Mark" mark type,
+ * Keep the max mark input in sync with the rubric grid's max value
+ */
+window.Vue.watch(rubricSum, (newValue) => {
+    // TODO: note this has consequences for multiple rubrics later on, it'll need to change slightly
+
+    // TODO: ideally deal with this fully inside of vue instead
+    const maxMarkInput = document.getElementById("maxMark");
+    if (maxMarkInput instanceof HTMLInputElement) {
+        maxMarkInput.value = newValue.toString();
+    }
+
+    const instructorMaxMarkInput = document.getElementById("instructor-maxMark");
+    if (instructorMaxMarkInput instanceof HTMLInputElement) {
+        instructorMaxMarkInput.value = newValue.toString();
+    }
+});
 </script>
 
 <template>

@@ -67,7 +67,7 @@ const showCapabilityMaxValue = window.Vue.computed(() => {
  * based on the value of all indicators in the capability
  */
 const derivedMaxValue = window.Vue.computed(() => {
-    let capabilityMax = 0;
+    let indicatorMaxSum = 0;
     for (const indicator of indicators.value) {
         if (!indicator.hasUsage) {
             // Not checked? Don't count this indicator towards the total
@@ -83,10 +83,10 @@ const derivedMaxValue = window.Vue.computed(() => {
             }
         }
 
-        capabilityMax += indicatorMax;
+        indicatorMaxSum += indicatorMax;
     }
 
-    return capabilityMax;
+    return indicatorMaxSum;
 });
 
 /**
