@@ -9,7 +9,6 @@
  */
 
 import RevealModal from "@schoolboxVue/components/reveal-modal";
-import locale from "@js/terminology/rosettaStone";
 /**
  * the maximum number of users to process at once
  * we still need to keep this high enough, so that it doesn't lock database
@@ -87,12 +86,6 @@ export default {
             hasUpdated: false,
             processed: 0,
         };
-    },
-
-    computed: {
-        locale() {
-            return locale;
-        },
     },
 
     mounted() {
