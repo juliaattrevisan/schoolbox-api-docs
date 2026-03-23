@@ -44,14 +44,19 @@ class MomentsRetention extends StrategyBase
         // find out how many moments are soft deleted for the retention period
 
         $query = "
+            WITH eligible_moments AS (
+                SELECT id, discussion_thread_id
+                FROM moment
+                WHERE deleted_at IS NOT NULL AND deleted_at < :old
+            )
             SELECT
-                (SELECT COUNT(*) FROM moment WHERE moment.deleted_at IS NOT NULL AND moment.deleted_at < :old) AS moments,
-                (SELECT COUNT(*) FROM moment_evidence me WHERE EXISTS (SELECT 1 FROM moment m WHERE m.id = me.moment_id AND m.deleted_at IS NOT NULL AND m.deleted_at < :old)) AS evidence,
-                (SELECT COUNT(*) FROM moment_folder mf WHERE EXISTS (SELECT 1 FROM moment m2 WHERE m2.id = mf.moment_id AND m2.deleted_at IS NOT NULL AND m2.deleted_at < :old)) AS folders,
-                (SELECT COUNT(*) FROM moment_tag mt WHERE EXISTS (SELECT 1 FROM moment m3 WHERE m3.id = mt.moment_id AND m3.deleted_at IS NOT NULL AND m3.deleted_at < :old)) AS tags,
-                (SELECT COUNT(DISTINCT dt.id) FROM discussion_thread dt WHERE EXISTS (SELECT 1 FROM moment m4 WHERE m4.discussion_thread_id = dt.id AND m4.deleted_at IS NOT NULL AND m4.deleted_at < :old)) AS threads,
-                (SELECT COUNT(DISTINCT dtc.id) FROM discussion_thread_comment dtc WHERE EXISTS (SELECT 1 FROM moment m5 WHERE m5.discussion_thread_id = dtc.discussion_thread_id AND m5.deleted_at IS NOT NULL AND m5.deleted_at < :old)) AS comments,
-                (SELECT COUNT(*) FROM curriculum_moment cm WHERE EXISTS (SELECT 1 FROM moment m6 WHERE m6.id = cm.moment_id AND m6.deleted_at IS NOT NULL AND m6.deleted_at < :old)) AS curriculum_moments
+                (SELECT COUNT(*) FROM eligible_moments) AS moments,
+                (SELECT COUNT(*) FROM moment_evidence me WHERE me.moment_id IN (SELECT id FROM eligible_moments)) AS evidence,
+                (SELECT COUNT(*) FROM moment_folder mf WHERE mf.moment_id IN (SELECT id FROM eligible_moments)) AS folders,
+                (SELECT COUNT(*) FROM moment_tag mt WHERE mt.moment_id IN (SELECT id FROM eligible_moments)) AS tags,
+                (SELECT COUNT(DISTINCT dt.id) FROM discussion_thread dt WHERE dt.id IN (SELECT discussion_thread_id FROM eligible_moments WHERE discussion_thread_id IS NOT NULL)) AS threads,
+                (SELECT COUNT(DISTINCT dtc.id) FROM discussion_thread_comment dtc WHERE dtc.discussion_thread_id IN (SELECT discussion_thread_id FROM eligible_moments WHERE discussion_thread_id IS NOT NULL)) AS comments,
+                (SELECT COUNT(*) FROM curriculum_moment cm WHERE cm.moment_id IN (SELECT id FROM eligible_moments)) AS curriculum_moments
         ";
 
         $statement = $this->database->prepare($query);
