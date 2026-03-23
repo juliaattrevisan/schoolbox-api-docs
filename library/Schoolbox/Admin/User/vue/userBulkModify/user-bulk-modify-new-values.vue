@@ -83,12 +83,6 @@ export default {
         };
     },
 
-    computed: {
-        locale() {
-            return locale;
-        },
-    },
-
     mounted() {
         this.updateFieldsOriginal = Object.assign({}, this.updateFields); //to reset to original values
     },
@@ -233,6 +227,38 @@ export default {
                     </select>
                 </div>
                 <div>
+                    <label>
+                        {{ locale.qualification.translate(false, true) }}
+                        <span
+                            data-tooltip
+                            class="hint has-tip tip-top"
+                            :title="`One or more ${locale.qualification.translate(true, true)} can be selected for users to be involved in. Do not select anything if you don't want to update a user's ${locale.qualification.translate(true, true)}. Use the 'Remove from all' checkbox to remove users from all ${locale.qualification.translate(true, true)}.`"
+                            >?</span
+                        >
+                    </label>
+                    <ul class="option-list">
+                        <li v-for="qualification in qualifications" :key="qualification.id">
+                            <input
+                                :id="'apply_qualification-' + String(qualification.id)"
+                                name="apply_qualification[]"
+                                :value="qualification.id"
+                                v-model="updateFields.qualificationIds"
+                                type="checkbox"
+                            />
+                            <label class="checkbox-label" :for="'apply_qualification-' + String(qualification.id)">{{
+                                qualification.name
+                            }}</label>
+                        </li>
+                        <li>
+                            <input
+                                id="remove_from_all_qualifications"
+                                name="remove_from_all_qualifications"
+                                v-model="updateFields.removeFromAllQualifications"
+                                type="checkbox"
+                            />
+                            <label class="checkbox-label" for="remove_from_all_qualifications">Remove from all</label>
+                        </li>
+                    </ul>
                     <label for="apply_position_title">
                         Position Title
                         <span
@@ -273,39 +299,6 @@ export default {
                         <option value="1">Enabled</option>
                         <option value="0">Disabled</option>
                     </select>
-
-                    <label>
-                        {{ locale.qualification.translate(false, true) }}
-                        <span
-                            data-tooltip
-                            class="hint has-tip tip-top"
-                            :title="`One or more ${locale.qualification.translate(true, true)} can be selected for users to be involved in. Do not select anything if you don't want to update a user's ${locale.qualification.translate(true, true)}. Use the 'Remove from all' checkbox to remove users from all ${locale.qualification.translate(true, true)}.`"
-                            >?</span
-                        >
-                    </label>
-                    <ul class="option-list">
-                        <li v-for="qualification in qualifications" :key="qualification.id">
-                            <input
-                                :id="'apply_qualification-' + String(qualification.id)"
-                                name="apply_qualification[]"
-                                :value="qualification.id"
-                                v-model="updateFields.qualificationIds"
-                                type="checkbox"
-                            />
-                            <label class="checkbox-label" :for="'apply_qualification-' + String(qualification.id)">{{
-                                qualification.name
-                            }}</label>
-                        </li>
-                        <li>
-                            <input
-                                id="remove_from_all_qualifications"
-                                name="remove_from_all_qualifications"
-                                v-model="updateFields.removeFromAllQualifications"
-                                type="checkbox"
-                            />
-                            <label class="checkbox-label" for="remove_from_all_qualifications">Remove from all</label>
-                        </li>
-                    </ul>
                 </div>
                 <div>
                     <label for="apply_emailfromusername">Email Address From Username</label>
