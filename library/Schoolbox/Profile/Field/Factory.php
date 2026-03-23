@@ -480,7 +480,18 @@ class Factory
             'differentiationProfile' => null,
         ];
 
-        return array_merge($externalUser, $referenceFields);
+        $referenceFields = array_merge($externalUser, $referenceFields);
+
+        // If the user has Hide Timetable enabled, hide timetable related fields from everyone
+        if ($viewee->getHideTimetable()) {
+            $referenceFields['currentLocation'] = null;
+            $referenceFields['formTeacher'] = null;
+            $referenceFields['StudentForm'] = null;
+            $referenceFields['StudentTutorDescription'] = null;
+            $referenceFields['tutorTeacher'] = null;
+        }
+
+        return $referenceFields;
     }
 
 

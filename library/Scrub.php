@@ -1,9 +1,9 @@
 <?php
 
 use GuzzleHttp\Client;
+use Schoolbox\Iframely\EmbedReplacer;
 use League\CommonMark;
 use Proxy\Server as ProxyServer;
-use Schoolbox\Iframely\EmbedReplacer;
 
 /**
  * Scrub

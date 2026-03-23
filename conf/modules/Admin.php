@@ -77,6 +77,7 @@ class Admin extends ModuleLoader
 
         // Settings
         $this->loadModule($di, \Schoolbox\Admin\Settings\Module::class, '/adminv2/setting');
+        $this->loadModule($di, \Schoolbox\Admin\SkinConfig\Module::class, '/adminv2/setting/design/Skin%20Config');
 
         // SHAPS
         $this->loadModule($di, \Schoolbox\Admin\SHAPS\Module::class, '/adminv2/shaps');
@@ -160,6 +161,10 @@ class Admin extends ModuleLoader
         /* Learner Profiles
          */
         $this->loadModule($di, \Schoolbox\Admin\DifferentiationProfiles\Module::class, '/adminv2/differentiation/differentiation-profiles');
+
+        /* International Baccalaureate
+         */
+        $this->loadModule($di, \Schoolbox\Admin\InternationalBaccalaureate\Module::class, '/adminv2/international-baccalaureate');
 
         /* Data Retention
          */

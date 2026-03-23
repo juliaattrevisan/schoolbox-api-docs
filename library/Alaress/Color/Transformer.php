@@ -9,7 +9,8 @@ declare(strict_types=1);
 
 namespace Alaress\Color;
 
-use SSNepenthe\ColorUtils;
+use OzdemirBurak\Iris\BaseColor;
+use OzdemirBurak\Iris\Color\Hexa;
 
 /**
  * Functions for transforming colors.
@@ -34,12 +35,42 @@ class Transformer
         ?Color $dark = null,
         float $threshold = 0.45
     ): Color {
-        $luminance = ColorUtils\relative_luminance($this->convertToColorUtilsColor($color));
+        $luminance = $this->calculateRelativeLuminance($this->convertToIrisColor($color));
         return $luminance < $threshold
             ? ($light ?? Color::white())
             : ($dark ?? Color::black());
     }
 
+    /**
+     * Calculate relative luminance of a color, based on the definition in
+     * https://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef.
+     *
+     * @param BaseColor $color
+     * @return float
+     */
+    private function calculateRelativeLuminance(BaseColor $color): float
+    {
+        return
+            0.2126 * $this->calculateChannelLuminance($color->toRgb()->red())
+            + 0.7152 * $this->calculateChannelLuminance($color->toRgb()->green())
+            + 0.0722 * $this->calculateChannelLuminance($color->toRgb()->blue())
+        ;
+    }
+
+    /**
+     * Calculate the luminance of a color channel value.
+     *
+     * @param int $value
+     * @return float
+     */
+    private function calculateChannelLuminance(int $value): float
+    {
+        $ratio = $value / 255;
+        if ($ratio <= 0.03928) {
+            return $ratio / 12.92;
+        }
+        return (($ratio + 0.055) / 1.055) ** 2.4;
+    }
 
     /**
      * Port of Schoolbox-written SASS function `contrast-bg`.
@@ -76,11 +107,11 @@ class Transformer
 
         // flatten opacity onto the background
         // This uses another SASS function flatten-alpha
-        $flat = $this->convertToColorUtilsColor($this->flattenAlpha($translucent, $background));
+        $flat = $this->convertToIrisColor($this->flattenAlpha($translucent, $background));
 
         // boost saturation
-        $saturated = ColorUtils\saturate($flat, $saturation);
-        return $this->convertToAlaressColor($saturated);
+        $saturated = $flat->saturate($saturation);
+        return $this->convertFromIrisColor($saturated);
     }
 
 
@@ -96,13 +127,9 @@ class Transformer
     public function flattenAlpha(Color $color, Color $background): Color
     {
         $percent = $color->getAlpha() * 100;
-        $opaque  = ColorUtils\color(['alpha' => 1] + $this->convertToColorUtilsColor($color)->getHsl()->toArray());
-        return $this->convertToAlaressColor(
-            ColorUtils\mix(
-                $opaque,
-                $this->convertToColorUtilsColor($background),
-                (int)$percent
-            )
+        $opaque  = $this->convertToIrisColor($color)->toHsla()->alpha(1);
+        return $this->convertFromIrisColor(
+            $this->convertToIrisColor($background)->mix($opaque, $percent),
         );
     }
 
@@ -124,54 +151,38 @@ class Transformer
         ?Color $light = null,
         ?Color $dark = null
     ): Color {
-        $foregroundColor     = $this->convertToColorUtilsColor($foreground);
-        $foregroundHsl       = $foregroundColor->getHsl();
-        $basebackgroundColor = $this->convertToColorUtilsColor(
+        $foregroundColor     = $this->convertToIrisColor($foreground)->toHsla();
+        $basebackgroundColor = $this->convertToIrisColor(
             $this->calculateTextColor($foreground ?? Color::black(), $light, $dark)
-        );
-        $basebackgroundHsl   = $basebackgroundColor->getHsl();
+        )->toHsla();
 
-        return $this->convertToAlaressColor(
-            ColorUtils\hsla(
-                $foregroundHsl->getHue(),
-                $foregroundHsl->getSaturation(),
-                $basebackgroundHsl->getLightness(),
-                $foregroundHsl->getAlpha()
-            )
+        return $this->convertFromIrisColor(
+            (clone $foregroundColor)->lightness($basebackgroundColor->lightness()),
         );
     }
 
 
     /**
-     * Convert an Alaress color object to a ColorUtils color object.
+     * Convert an Alaress color object to an Iris color object.
      *
      * @param Color $color
-     * @return ColorUtils\Colors\Color
+     * @return BaseColor
      */
-    private function convertToColorUtilsColor(Color $color): ColorUtils\Colors\Color
+    private function convertToIrisColor(Color $color): BaseColor
     {
-        return ColorUtils\rgba(
-            $color->getRed(),
-            $color->getGreen(),
-            $color->getBlue(),
-            $color->getAlpha()
-        );
+        return new Hexa($color->getAsHexAlpha());
     }
 
 
     /**
-     * Convert a ColorUtils color object to an Alaress color object.
+     * Convert an Iris color object to an Alaress color object.
      *
-     * @param ColorUtils\Colors\Color $color
+     * @param BaseColor $color
      * @return Color
      */
-    private function convertToAlaressColor(ColorUtils\Colors\Color $color): Color
+    private function convertFromIrisColor(BaseColor $color): Color
     {
-        return new Color(
-            ColorUtils\red($color),
-            ColorUtils\green($color),
-            ColorUtils\blue($color),
-            ColorUtils\alpha($color)
-        );
+        $newColor = (clone $color)->toRgba();
+        return new Color($newColor->red(), $newColor->green(), $newColor->blue(), $newColor->alpha());
     }
 }

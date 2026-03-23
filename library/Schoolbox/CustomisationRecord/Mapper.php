@@ -13,9 +13,12 @@ use Alaress\Database\Predicate\Builder;
 use PDOStatement;
 use Schoolbox\Assessment\Participant\Model;
 use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
+use Schoolbox\Campus;
+use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Filter\Filters\CustomisationRecord;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use PDO;
 
@@ -59,14 +62,56 @@ class Mapper extends BaseMapper
                     $assessmentMapper->hydrate($row, 'oa')
                 );
             }
+
+            /* Hydrating participant if they already exist in the collection but handles
+             * where the participant might have properties that might be a collection (ie Campus or Folde Codes)
+             * that need to be added to the existing participant in the collection
+             */
+            /** @var \Schoolbox\Resource\Folder\Code\Model $folderCode */
+            $folderCode = $assessmentMapper->getJoinMapper('assessment_course_unit_implementation.course.folder')->hydrateJoin($row, 'codes', 'fc');
+            $campus =  $this->getJoinMapper('user.userCampus')->hydrate($row, 'c');
+            if ($collection->keyExists($participant->getId())) {
+                /** @var Model $participation */
+                $participation = $collection[$participant->getId()];
+                /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $assessmentContext */
+                $assessmentContext = $participation->getPlan()->getAssessment()->getAssessmentContext();
+                $folder = $assessmentContext->getCourse()->getFolder();
+                /* Append folder code
+                 */
+                if ($folder && $folderCode !== null) {
+                    $folder->addCode($folderCode);
+                }
+                /* Append campus
+                 */
+                if (null !== $campus) {
+                    $user = $participation->getUser();
+                    $campusCollection = $user->getCampusCollection();
+
+                    if (!$campusCollection->contains($campus)) {
+                        $user->setCampusCollection($campusCollection->add($campus));
+                    }
+                }
+                continue;
+            }
+
             /* Hydrating the unit implementation and course implementation for the assessment
              */
             /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $assessmentContext */
             $assessmentContext = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation', 'cui');
             /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Model $courseImplementation */
             $courseImplementation = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation.course', 'ci');
-            if ($courseImplementation !== null) {
+            if (null !== $courseImplementation) {
                 $folder = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'f');
+                /* Always create a new collection for folder codes as there
+                 * might be multiple folder codes for the same folder depending on the number
+                 * of records returned from the query
+                 */
+                $folderCodeCollection = FolderCode::createCollection();
+                if (null !== $folderCode) {
+                    $folderCodeCollection->add($folderCode);
+                }
+                $folder->setCodes($folderCodeCollection);
+
                 /* Hydrating folder for class details
                  */
                 $courseImplementation->setFolder($folder);
@@ -76,7 +121,17 @@ class Mapper extends BaseMapper
             $plan->setAssessment($assessment);
             /* Hydrate user
              */
+            /** @var User $user */
             $user = $this->getJoinMapper('user')->hydrate($row, 'u');
+            $user->setYear($this->getJoinMapper('user.year')->hydrate($row, 'y'));
+            /* Making sure the campus collection is not null and adding the campus to the collection if it exists,
+             * as there might be multiple campuses for a user depending on the number of records returned from the query
+             */
+            $campusCollection = Campus::createCollection();
+            if (null !== $campus) {
+                $campusCollection->add($campus);
+            }
+            $user->setCampusCollection($campusCollection);
 
             $participant->setPlan($plan);
             if (null !== $user) {
@@ -97,11 +152,14 @@ class Mapper extends BaseMapper
             SELECT DISTINCT {$this->getColumnString()},
                    {$this->getJoinColumnString('plan', 'pp')},
                    {$this->getJoinColumnString('user', 'u')},
+                   {$this->getJoinColumnString('user.year', 'y')},
+                   {$this->getJoinColumnString('user.userCampus', 'c')},
                    {$this->getJoinColumnString('plan.assessment', 'a')},
                    {$this->getJoinColumnString('plan.assessment', 'oa')},
                    {$this->getJoinColumnString('plan.assessment.assessment_course_unit_implementation', 'cui')},
                    {$this->getJoinMapper('plan.assessment.assessment_course_unit_implementation')->getJoinColumnString('course', 'ci')},
-                   {$this->getJoinMapper('plan.assessment.assessment_course_unit_implementation')->getJoinColumnString('course.folder', 'f')}
+                   {$this->getJoinMapper('plan.assessment.assessment_course_unit_implementation')->getJoinColumnString('course.folder', 'f')},
+                   {$this->getJoinMapper('plan.assessment.assessment_course_unit_implementation')->getJoinColumnString('course.folder.codes', 'fc')}
         ";
     }
 
@@ -117,6 +175,8 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('plan', '', 'pp')}
             AND (pp.is_dynamic = '{$staticPlan}' OR pp.is_dynamic = '{$customParticipantPlan}')
             LEFT JOIN {$this->getJoinSql('user', '', 'u')}
+            LEFT JOIN {$this->getJoinSql('user.year', 'u', 'y')}
+            LEFT JOIN {$this->getJoinSql('user.userCampus', 'u', 'c')}
             INNER JOIN userCampus sc ON u.id = sc.uid
             INNER JOIN assessment a ON pp.assessment_id = a.id AND a.deleted_at IS NULL
             LEFT JOIN (
@@ -128,6 +188,7 @@ class Mapper extends BaseMapper
             LEFT JOIN course_unit_implementation cui ON ui.course_unit_implementation_id = cui.id
             LEFT JOIN course_implementation ci ON cui.course_implementation_id = ci.id
             LEFT JOIN folder f ON ci.folder_id = f.id
+            LEFT JOIN folder_code fc ON f.id = fc.folder_id AND fc.deleted_at IS NULL
             LEFT JOIN assessment oa ON a.original_assessment_id = oa.id
             LEFT JOIN differentiation_profiles ON differentiation_profiles.student_id = u.id
             LEFT JOIN differentiation_profiles_adjustment_category ac ON FIND_IN_SET(ac.id, differentiation_profiles.adjustment_category)

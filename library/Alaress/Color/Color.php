@@ -3,26 +3,16 @@
 /**
  * Representation of a color.
  *
- * This now is just a wrapper around a `\SSNepenthe\ColorUtils\Colors\Color`
- * object.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
- * @link      https://schoolbox.com.au/
+ * @link      https://schoolbox.education
  */
+
+declare(strict_types=1);
 
 namespace Alaress\Color;
 
-use SSNepenthe\ColorUtils;
-
 class Color
 {
-    /**
-     * @var ColorUtils\Colors\Color
-     */
-    private $colorObject;
-
-
     /**
      * Constructor
      *
@@ -33,9 +23,16 @@ class Color
      * @throws \InvalidArgumentException @see $this->assertAlphaChannelValue()
      *                                   and $this->assertColorChannelValue()
      */
-    public function __construct($red, $green, $blue, $alpha = 1.0)
-    {
-        $this->colorObject = ColorUtils\rgba($red, $green, $blue, $alpha);
+    public function __construct(
+        private int $red,
+        private int $green,
+        private int $blue,
+        private float $alpha = 1.0,
+    ) {
+        $this->assertColorChannelValue($red);
+        $this->assertColorChannelValue($green);
+        $this->assertColorChannelValue($blue);
+        $this->assertAlphaChannelValue($alpha);
     }
 
 
@@ -66,11 +63,10 @@ class Color
      * @return $this
      * @throws \InvalidArgumentException @see $this->assertAlphaChannelValue()
      */
-    public function setAlpha($alpha)
+    public function setAlpha(float $alpha): self
     {
         $this->assertAlphaChannelValue($alpha);
-//        $this->alpha = $alpha;
-        $this->colorObject = ColorUtils\rgba($this->getRed(), $this->getGreen(), $this->getBlue(), $alpha);
+        $this->alpha = $alpha;
         return $this;
     }
 
@@ -78,10 +74,9 @@ class Color
     /**
      * @return float
      */
-    public function getAlpha()
+    public function getAlpha(): float
     {
-        return $this->colorObject->getRgb()->getAlpha();
-//        return $this->alpha;
+        return $this->alpha;
     }
 
 
@@ -90,11 +85,10 @@ class Color
      * @return $this
      * @throws \InvalidArgumentException @see $this->assertColorChannelValue()
      */
-    public function setBlue($blue)
+    public function setBlue(int $blue): self
     {
         $this->assertColorChannelValue($blue);
-//        $this->blue = intval($blue);
-        $this->colorObject = ColorUtils\rgba($this->getRed(), $this->getGreen(), $blue, $this->getAlpha());
+        $this->blue = $blue;
         return $this;
     }
 
@@ -102,10 +96,9 @@ class Color
     /**
      * @return int
      */
-    public function getBlue()
+    public function getBlue(): int
     {
-        return $this->colorObject->getRgb()->getBlue();
-//        return $this->blue;
+        return $this->blue;
     }
 
 
@@ -114,11 +107,10 @@ class Color
      * @return $this
      * @throws \InvalidArgumentException @see $this->assertColorChannelValue()
      */
-    public function setGreen($green)
+    public function setGreen(int $green): self
     {
         $this->assertColorChannelValue($green);
-//        $this->green = intval($green);
-        $this->colorObject = ColorUtils\rgba($this->getRed(), $green, $this->getBlue(), $this->getAlpha());
+        $this->green = $green;
         return $this;
     }
 
@@ -126,10 +118,9 @@ class Color
     /**
      * @return int
      */
-    public function getGreen()
+    public function getGreen(): int
     {
-        return $this->colorObject->getRgb()->getGreen();
-//        return $this->green;
+        return $this->green;
     }
 
 
@@ -138,11 +129,10 @@ class Color
      * @return $this
      * @throws \InvalidArgumentException @see $this->assertColorChannelValue()
      */
-    public function setRed($red)
+    public function setRed(int $red): self
     {
         $this->assertColorChannelValue($red);
-//        $this->red = intval($red);
-        $this->colorObject = ColorUtils\rgba($red, $this->getGreen(), $this->getBlue(), $this->getAlpha());
+        $this->red = $red;
         return $this;
     }
 
@@ -150,61 +140,43 @@ class Color
     /**
      * @return int
      */
-    public function getRed()
+    public function getRed(): int
     {
-        return $this->colorObject->getRgb()->getRed();
-//        return $this->red;
+        return $this->red;
     }
 
 
     /**
-     * Asserts that the value is an integer, and between 0x00 and 0xFF.
+     * Asserts that the value is between 0x00 and 0xFF.
      *
      * @param int $value
      * @throws \InvalidArgumentException if color value doesn't match above
      */
-    protected function assertColorChannelValue($value)
+    protected function assertColorChannelValue(int $value): void
     {
-        if (!preg_match('/^\\d+$/', $value)) {
-            throw new \InvalidArgumentException("Color value \"$value\" is not an integer");
-        }
-        if (intval($value) < 0x00) {
+        if ($value < 0x00) {
             throw new \InvalidArgumentException("Color value \"$value\" < 0");
         }
-        if (intval($value) > 0xFF) {
+        if ($value > 0xFF) {
             throw new \InvalidArgumentException("Color value \"$value\" > 255");
         }
     }
 
 
     /**
-     * Asserts that the value is an float between 0 and 1.
+     * Asserts that the value is between 0 and 1.
      *
      * @param float $value
      * @throws \InvalidArgumentException if alpha value doesn't match above
      */
-    protected function assertAlphaChannelValue($value)
+    protected function assertAlphaChannelValue(float $value): void
     {
-        if (!is_numeric($value)) {
-            throw new \InvalidArgumentException("Alpha value \"$value\" is not a number");
-        }
-        if (floatval($value) < 0) {
+        if ($value < 0) {
             throw new \InvalidArgumentException("Alpha value \"$value\" < 0");
         }
-        if (floatval($value) > 1) {
+        if ($value > 1) {
             throw new \InvalidArgumentException("Alpha value \"$value\" > 1");
         }
-    }
-
-
-    /**
-     * Retrieves the color's HSL values.
-     *
-     * @return array {hue: float, saturation: float, lightness: float}
-     */
-    public function getAsHslArray(): array
-    {
-        return $this->colorObject->getHsl()->toArray();
     }
 
 
@@ -213,7 +185,7 @@ class Color
      *
      * @return string
      */
-    public function getAsHex()
+    public function getAsHex(): string
     {
         return sprintf(
             '%02X%02X%02X',
@@ -229,7 +201,7 @@ class Color
      *
      * @return string
      */
-    public function getAsHexAlpha()
+    public function getAsHexAlpha(): string
     {
         return sprintf(
             '%02X%02X%02X%02X',
@@ -246,7 +218,7 @@ class Color
      *
      * @return string
      */
-    public function getAsRgb()
+    public function getAsRgb(): string
     {
         return sprintf(
             'rgb(%d, %d, %d)',
@@ -264,7 +236,7 @@ class Color
      *
      * @return string
      */
-    public function getAsRgba()
+    public function getAsRgba(): string
     {
         return sprintf(
             'rgba(%d, %d, %d, %0.3f)',
@@ -281,7 +253,7 @@ class Color
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getAsRgba();
     }
@@ -295,10 +267,10 @@ class Color
     public function __serialize(): array
     {
         return [
-            'r' => $this->getRed(),
-            'g' => $this->getGreen(),
-            'b' => $this->getBlue(),
-            'a' => $this->getAlpha(),
+            'r' => $this->red,
+            'g' => $this->green,
+            'b' => $this->blue,
+            'a' => $this->alpha,
         ];
     }
 
@@ -312,11 +284,25 @@ class Color
      */
     public function __unserialize(array $serialized): void
     {
-        $this->colorObject = ColorUtils\rgba(
-            $serialized['r'],
-            $serialized['g'],
-            $serialized['b'],
-            $serialized['a'],
-        );
+        // The channels should not ever be unset or invalid, because they could
+        // never be set to null or invalid.
+        // Nonetheless: default unserialize to black.
+        $red   = filter_var($serialized['r'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $green = filter_var($serialized['g'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $blue  = filter_var($serialized['b'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $alpha = filter_var($serialized['a'] ?? null, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
+        if (!isset($red, $green, $blue, $alpha)) {
+            trigger_error(
+                sprintf(
+                    'Invalid color value (r: %s, g: %s, b: %s, a: %s): assuming 0x00 for missing color channels, 1 for missing alpha',
+                    $serialized['r'] ?? null,
+                    $serialized['g'] ?? null,
+                    $serialized['b'] ?? null,
+                    $serialized['a'] ?? null,
+                ),
+                E_USER_WARNING,
+            );
+        }
+        $this->__construct($red ?? 0x00, $green ?? 0x00, $blue ?? 0x00, $alpha ?? 1.0);
     }
 }

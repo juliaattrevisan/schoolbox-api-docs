@@ -59,6 +59,7 @@
     class="{% block actionsClass %}{% if isActionRoutes %}actions-small-1{% endif %}{% endblock %}"
     data-assessment="{{ assessable.id }}"
     data-assessment-title="{{ assessable.title }}"
+    data-test="component-assessment-{{ assessable.id }}"
 >
     <div class="list-item">
         <div class="card small-12">
@@ -73,11 +74,11 @@
         {# TODO known bug SA-5984. Participant progress icon renders incorrectly if part of multiple actions. #}
         {% block extraNavItems %}{% endblock %}
         {% if isActionRoutes %}
-            <sbx-pop-out content-id="duework-options{{ assessable.id }}" data-test="sbx-pop-out-duework-options{{ assessable.id }}"></sbx-pop-out>
+            <sbx-pop-out content-id="component-assessment-actions-{{ assessable.id }}" data-test="sbx-pop-out-component-assessment-actions-{{ assessable.id }}"></sbx-pop-out>
         {% endif %}
     </nav>
     {% if isActionRoutes %}
-        <ul data-dropdown-content class="f-dropdown" id="duework-options{{ assessable.id }}">
+        <ul data-dropdown-content class="f-dropdown" id="component-assessment-actions-{{ assessable.id }}">
             {% apply spaceless %}
             {% if hasAssessmentRoutes %}
                 <li class="separator">{{ locale.translate('activity', false, true) }}</li>

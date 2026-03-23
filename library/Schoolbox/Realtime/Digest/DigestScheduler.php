@@ -56,6 +56,7 @@ class DigestScheduler extends CronScheduler
      * @param RoleMapper                $roleMapper
      * @param IConfigLoader             $conf
      * @param DigestTriggerFactory      $factory
+     * @param int|null                  $maxFutureTriggerTime
      */
     public function __construct(
         LoopInterface $loop,
@@ -64,9 +65,10 @@ class DigestScheduler extends CronScheduler
         IClock $clock,
         RoleMapper $roleMapper,
         IConfigLoader $conf,
-        DigestTriggerFactory $factory
+        DigestTriggerFactory $factory,
+        ?int $maxFutureTriggerTime = null,
     ) {
-        parent::__construct($loop, $dispatchStrategy, $log, $clock);
+        parent::__construct($loop, $dispatchStrategy, $log, $clock, $maxFutureTriggerTime);
         $this->roleMapper = $roleMapper;
         $this->conf       = $conf;
         $this->factory    = $factory;

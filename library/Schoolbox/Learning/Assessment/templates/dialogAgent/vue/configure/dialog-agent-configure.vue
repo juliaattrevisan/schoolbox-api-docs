@@ -181,7 +181,11 @@ window.Vue.onMounted(async () => {
             <section v-if="isSubmitting">
                 <div class="loader"></div>
             </section>
-            <div v-else-if="!sandboxData._routes.postSandboxMessage || !sandboxData.openingMessage" class="empty-state">
+            <div
+                v-else-if="!sandboxData._routes.postSandboxMessage || !sandboxData.openingMessage"
+                class="empty-state"
+                data-test="dac-sandbox-disabled"
+            >
                 <i class="icon-dialog-agent"></i>
                 <p>Sandbox will be available once the agent configuration has been saved.</p>
             </div>

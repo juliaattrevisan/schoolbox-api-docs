@@ -12,6 +12,7 @@ declare(strict_types=1);
 use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Color\Transformer;
+use OzdemirBurak\Iris\Color\Hexa;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Twig\Environment;
@@ -73,16 +74,16 @@ $colorFactory   = new ColorFactory();
 $transformer    = new Transformer();
 $twigVars       = [];
 $createTwigVars = static function (Color $color, $cssVar) {
-    $hsl = $color->getAsHslArray();
+    $hsl = new Hexa($color->getAsHexAlpha())->toHsla();
     return [
         'cssVar'      => $cssVar,
         'colorObject' => $color,
         'r'           => $color->getRed(),
         'g'           => $color->getGreen(),
         'b'           => $color->getBlue(),
-        'h'           => $hsl['hue'],
-        's'           => $hsl['saturation'],
-        'l'           => $hsl['lightness'],
+        'h'           => $hsl->hue(),
+        's'           => $hsl->saturation(),
+        'l'           => $hsl->lightness(),
         'a'           => $color->getAlpha(),
     ];
 };

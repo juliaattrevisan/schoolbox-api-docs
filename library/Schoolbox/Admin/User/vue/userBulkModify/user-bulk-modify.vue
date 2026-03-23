@@ -66,6 +66,10 @@ export default {
             type: Array,
             required: true,
         },
+        qualifications: {
+            type: Array,
+            required: true,
+        },
     },
 
     emits: ["displayLog"],
@@ -85,6 +89,7 @@ export default {
                 "campuses",
                 "role",
                 "year",
+                "qualifications",
                 "token",
                 "eportfolio_enabled",
             ],
@@ -156,6 +161,7 @@ export default {
                     campuses: "Campuses",
                     role: "Role",
                     year: "Year Level",
+                    qualifications: "Qualification",
                     token: "Token",
                     eportfolio_enabled: "ePortfolio",
                 },
@@ -180,6 +186,9 @@ export default {
                 templates: {
                     campuses: (h, row, index) => {
                         return row.campuses.join(", ");
+                    },
+                    qualifications: (h, row, index) => {
+                        return row.qualifications ? row.qualifications.join(", ") : "None";
                     },
                     token: (h, row, index) => {
                         return row.token === 1 ? "Set" : "Not set";
@@ -515,6 +524,7 @@ export default {
             :roles="roles"
             :year-levels="yearLevels"
             :houses="houses"
+            :qualifications="qualifications"
             :eportfolio-enabled="eportfolioEnabled"
             :selected-rows="selectedRows"
             :selected-rows-count-with-row-name="selectedRowsCountWithRowName"
@@ -575,5 +585,9 @@ export default {
     &:hover {
         background: none;
     }
+}
+
+.button-delete:hover {
+    background-color: rgba(240, 65, 36, 0.8) !important;
 }
 </style>

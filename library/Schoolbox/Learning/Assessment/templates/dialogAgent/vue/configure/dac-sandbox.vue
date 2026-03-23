@@ -52,7 +52,7 @@ defineExpose({ resetFeed });
 
 <template>
     <div class="content">
-        <div v-if="props.isDirty" class="alert-box highlight">
+        <div v-if="props.isDirty" class="alert-box highlight" data-test="dac-sandbox-alert-dirty">
             You have unsaved changes, this sandbox will not reflect the current configuration until you save.
         </div>
 
@@ -82,7 +82,9 @@ defineExpose({ resetFeed });
 
     <div class="component-action">
         <section>
-            <button class="button" @click="isConfirmModalOpen = true">Reset Sandbox</button>
+            <button class="button" data-test="dac-sandbox-reset" @click="isConfirmModalOpen = true">
+                Reset Sandbox
+            </button>
         </section>
     </div>
 
@@ -90,7 +92,9 @@ defineExpose({ resetFeed });
         <h2>Please Confirm</h2>
         <p>Are you sure you want to reset the sandbox? This will clear all existing messages.</p>
         <ul class="flex-list buttons">
-            <li><button class="button submit" @click="resetFeed">Reset</button></li>
+            <li>
+                <button class="button submit" data-test="dac-sandbox-reset-confirm" @click="resetFeed">Reset</button>
+            </li>
             <li><button class="button" @click="isConfirmModalOpen = false">Cancel</button></li>
         </ul>
     </basic-modal>

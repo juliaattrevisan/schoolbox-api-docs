@@ -82,7 +82,7 @@
                     {% set additionalConstraints = {
                         'student': {
                             '_default': true,
-                            'email': showEmail
+                            'email': showEmail,
                         },
                         'parent': {
                             '_default': true,
@@ -90,12 +90,11 @@
                         'staff': {
                             '_default': USER.role.viewStudentProfile,
                             'email': showEmail,
-                            'formTeacher': USER.role.viewStudentProfile and user.isShowTimetable,
-                            'hohTeacher': USER.role.viewStudentProfile and user.isShowTimetable,
+                            'formTeacher': USER.role.viewStudentProfile,
+                            'StudentForm': USER.role.viewStudentProfile,
+                            'StudentTutorDescription': USER.role.viewStudentProfile,
+                            'tutorTeacher': USER.role.viewStudentProfile,
                             'pastoralCounts': USER.role.viewStudentProfile and pastoralUrl,
-                            'StudentForm': USER.role.viewStudentProfile and user.isShowTimetable,
-                            'StudentTutorDescription': USER.role.viewStudentProfile and user.isShowTimetable,
-                            'tutorTeacher': USER.role.viewStudentProfile and user.isShowTimetable
                         }
                     } %}
 

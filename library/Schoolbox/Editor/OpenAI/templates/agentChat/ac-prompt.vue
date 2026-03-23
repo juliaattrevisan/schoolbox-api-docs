@@ -181,6 +181,7 @@ acPromptEventBus.on(({ retryRequest }) => {
             :disabled="isFormDisabled || undefined"
             :maxlength="AGENT_CHAT_MAX_PROMPT_CHARS"
             required
+            data-test="ac-prompt-textarea"
             @keydown.enter.exact.prevent="sendRequest"
         ></textarea>
     </label>
@@ -214,6 +215,7 @@ acPromptEventBus.on(({ retryRequest }) => {
                 href="#"
                 :title="props.promptButtonTitle"
                 :disabled="isSubmitDisabled || undefined"
+                data-test="ac-prompt-send-button"
                 @click.prevent="sendRequest"
             ></a>
         </nav>

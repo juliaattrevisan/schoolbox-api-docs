@@ -150,7 +150,7 @@ test.describe("Quiz Tests: create, modify, delete quiz, submit and vertical revi
         tester.isGoingTo("navigate to the class page, click the quiz dropdown and click Modify");
         await homepage.goto(parseInt(folderId, 10));
         await homepage.clickAssessmentComponentTOTMenu(quizId);
-        await homepage.clickModifyViaAssessmentComponent("Modify Settings");
+        await homepage.clickAssessmentComponentTOTMenuModifySettings(quizId);
 
         tester.isGoingTo("modify the quiz title and work type");
         await quiz.setTitle("Quiz Automation Test Updated");

@@ -174,6 +174,9 @@ class Subnav
             $userHasServicePermissionTimetable ||
             $userHasServicePermissionDifferentiationProfile
         );
+        $userHasServicePermissionIBCoordinator = (
+            $this->user->hasServicePermission(UserAccess::SERVICE_IB_COORDINATOR, UserAccess::ACCESS_FULL)
+        );
 
         /* Keys of this array uniquely identify a page and its subpages
          * Used to preselect menu options so users have a sense of where they are
@@ -415,6 +418,23 @@ class Subnav
                         'name'        => 'Templates',
                         'visible'     => true,
                         'description' => 'Clone and deploy an ePortfolio page from one user to many other users.',
+                    ],
+                ],
+            ],
+            '/adminv2/international-baccalaureate' => [
+                'name'       => 'Intl. Baccalaureate',
+                'visible'    => $userIsSuperuser || $userHasServicePermissionIBCoordinator,
+                'searchable' => false,
+                'children'   => [
+                    '/adminv2/international-baccalaureate/configuration' => [
+                        'name'        => 'DP Subject Configuration',
+                        'visible'     => true,
+                        'description' => 'Configure DP subject config.',
+                    ],
+                    '/adminv2/international-baccalaureate/registrations' => [
+                        'name'        => 'Registration Reports',
+                        'visible'     => true,
+                        'description' => 'View International Baccalaureate student registration reports.',
                     ],
                 ],
             ],

@@ -48,7 +48,7 @@ const isSameUser = window.Vue.computed(() => props.user.id === window.schoolboxU
     </p>
 
     <ul class="flex-list buttons">
-        <li><a class="button submit" @click="emit('confirm')">Proceed</a></li>
+        <li><a class="button submit" data-test="das-actions-modal-confirm" @click="emit('confirm')">Proceed</a></li>
         <li><a class="button" @click="emit('cancel')">Cancel</a></li>
     </ul>
 </template>

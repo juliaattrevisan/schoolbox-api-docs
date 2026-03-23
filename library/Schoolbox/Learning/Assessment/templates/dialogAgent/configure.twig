@@ -26,7 +26,7 @@
     { assessmentId: assessment.id, assessment: assessment }
 ) %}
 
-<div id="dialog-agent-configure-container">
+<div id="dialog-agent-configure-container" data-test="dialog-agent-configure-container">
     <dialog-agent-configure
         :assessment-title="{{ assessment.title |json_encode }}"
         :scenario="{{ scenario |json_encode }}"

@@ -46,8 +46,7 @@ export default class BaseTester {
 
             // Handle stderr data
             child.stderr.on("data", (data: string) => {
-                process.stdout.write(data);
-                output += data.toString();
+                process.stderr.write(data);
             });
 
             // Handle completion

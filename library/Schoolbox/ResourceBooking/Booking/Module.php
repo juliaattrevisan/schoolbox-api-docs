@@ -26,7 +26,6 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
-use Schoolbox\ResourceBooking\Item\Model as ItemModel;
 
 class Module extends BaseModule
 {
@@ -141,7 +140,7 @@ class Module extends BaseModule
             $bookingEditRule,
             new Rule\Callback(function ($params) {
                 $item = $params['item'] ?? null;
-                if (!($item instanceof ItemModel)) {
+                if (!($item instanceof Model)) {
                     throw new InvalidPath('No booking item found in route params.');
                 }
                 // Bookings linked to events of variant Event::VARIANT_EVENT should be managed via the 'Modify Event' page.

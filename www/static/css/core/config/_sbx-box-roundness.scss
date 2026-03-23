@@ -14,6 +14,7 @@ body.sbx-body {
     .component,
     .island section,
     .empty-state,
+    .empty-state-flex-centered,
     .modal,
     .modal-content,
     .reveal-modal,
@@ -44,12 +45,14 @@ body.sbx-body {
     .v-card .card-class-image,
     .v-card > a .card-class-image,
     .feed .subheader,
+    .form-group,
     .tabs {
         border-radius: var(--sbx-config-box-roundness) var(--sbx-config-box-roundness) 0 0;
     }
 
     // bottom only rounded elements
-    .reveal-modal .component-action section {
+    .reveal-modal .component-action section,
+    .VueTables__table-footer {
         border-radius: 0 0 var(--sbx-config-box-roundness) var(--sbx-config-box-roundness);
     }
 

@@ -65,11 +65,19 @@ export default class Homepage {
 
     static readonly REMOVE_BUTTON_CONFIRMATION_MESSAGE = "Remove";
 
-    static readonly DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU = "sbx-pop-out-duework-options";
+    static readonly DATA_TEST_ASSESSMENT_COMPONENT_ROW = "component-assessment-"; // append "{componentId}"
+
+    static readonly DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU = "sbx-pop-out-component-assessment-actions-"; // append "{assessmentId}"-button
 
     static readonly DATA_TEST_ASSESSMENT_COMPONENT_TITLE = "component-assessment-title-";
 
-    static readonly ASSESSMENT_COMPONENT_TOT_MENU_MODIFY = "a.icon-modify";
+    static readonly DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_VIEW_STATUS = "component-assessment-actions-viewStatus-"; // append "{assessmentId}"
+
+    static readonly DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_MODIFY_SETTINGS = "assessment-modify-"; // append "{assessmentId}"
+
+    static readonly DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_MODIFY_CONTENTS = "assessment-modify-contents-"; // append "{assessmentId}"
+
+    static readonly DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_CONFIGURE_AGENT = "assessment-configure-agent-"; // append "{assessmentId}"
 
     static readonly DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_DELETE = "component-assessment-actions-delete-";
 
@@ -280,11 +288,39 @@ export default class Homepage {
     }
 
     /**
+     * Locate a particular assessment in the component by its name
+     * @param component - Locator to the component in which to search for the assessment
+     * @param assessmentName - the name of the assessment to locate
+     * @returns Locator for the assessment with the given name
+     */
+    public locateAssessmentRow(component: Locator, assessmentName: string): Locator {
+        const allAssessmentsSelector = new RegExp(`^${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_ROW}`);
+        const allTitlesSelector = new RegExp(`^${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TITLE}`);
+
+        const matchingTitles = this.page.getByTestId(allTitlesSelector).filter({ hasText: assessmentName });
+        return component.getByTestId(allAssessmentsSelector).filter({ has: matchingTitles });
+    }
+
+    /**
+     * Retrieve the ID of an assessment row
+     * @param assessmentRow - Locator for the relevant assessment row
+     * @returns the assessment ID
+     */
+    public static async getAssessmentId(assessmentRow: Locator): Promise<number> {
+        const assessmentId = await assessmentRow.getAttribute("data-assessment");
+        // make sure it's a number
+        expect(assessmentId).toMatch(/^\d+$/);
+        return parseInt(assessmentId!, 10);
+    }
+
+    /**
      * Click the assessment component TOT menu
      * @param assessmentId - The assessment ID.
      */
     async clickAssessmentComponentTOTMenu(assessmentId: number): Promise<void> {
-        await this.page.getByTestId(`${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU}${assessmentId}`).click();
+        await this.page
+            .getByTestId(`${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU}${assessmentId}-button`)
+            .click();
     }
 
     /**
@@ -296,11 +332,41 @@ export default class Homepage {
     }
 
     /**
-     * click Modify Settings via Quiz Component
-     * @param modifyButtonName - The modify button name: for Due work it is "Modify", for Quizzes it is "Modify Settings"
+     * click "View Status" for an assessment in an assessment component
+     * @param assessmentId - The assessment ID.
      */
-    async clickModifyViaAssessmentComponent(modifyButtonName: string): Promise<void> {
-        await this.page.locator(Homepage.ASSESSMENT_COMPONENT_TOT_MENU_MODIFY).getByText(modifyButtonName).click();
+    async clickAssessmentComponentTOTMenuViewStatus(assessmentId: number): Promise<void> {
+        const viewStatusTestId = `${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_VIEW_STATUS}${assessmentId}`;
+        await this.page.getByTestId(viewStatusTestId).click();
+    }
+
+    /**
+     * click "Modify" / "Modify Settings" for an assessment in an assessment component
+     * @param assessmentId - The assessment ID.
+     */
+    async clickAssessmentComponentTOTMenuModifySettings(assessmentId: number): Promise<void> {
+        const modifyButtonTestId = `${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_MODIFY_SETTINGS}${assessmentId}`;
+        await this.page.getByTestId(modifyButtonTestId).click();
+    }
+
+    /**
+     * click "Modify Contents" for an assessment in an assessment component
+     * This is specifically for Quizzes
+     * @param assessmentId - The assessment ID.
+     */
+    async clickAssessmentComponentTOTMenuModifyContents(assessmentId: number): Promise<void> {
+        const modifyContentsButtonTestId = `${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_MODIFY_CONTENTS}${assessmentId}`;
+        await this.page.getByTestId(modifyContentsButtonTestId).click();
+    }
+
+    /**
+     * click "Configure Agent" for an assessment in an assessment component
+     * This is specifically for Dialog Agents
+     * @param assessmentId - The assessment ID.
+     */
+    async clickAssessmentComponentTOTMenuConfigureAgent(assessmentId: number): Promise<void> {
+        const configureAgentButtonTestId = `${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_CONFIGURE_AGENT}${assessmentId}`;
+        await this.page.getByTestId(configureAgentButtonTestId).click();
     }
 
     /**

@@ -136,11 +136,10 @@ export default class AcceptanceTester extends BaseTester {
     }
 
     /**
-     * Fill in CKEditor5 based on its ID
-     * @param editorId - The ID of the CKEditor5 instance
-     * @param content - The content to fill the editor with
+     * Wait for a particular CKEditor instance to be ready on the page
+     * @param editorId - The ID of the CKEditor to wait for
      */
-    async fillCKEditorById(editorId: string, content: string): Promise<void> {
+    async waitForCKEditor(editorId: string): Promise<void> {
         // There should be at least one ckeditor, somewhere on the page, first.
         // The actual element of the ckeditor has no direct correlation to the editorId, but if one exists then
         // we can proceed with the next checks to find the actual editor we want
@@ -159,15 +158,66 @@ export default class AcceptanceTester extends BaseTester {
             },
             [editorId],
         );
+    }
 
-        // Focus the editor, and clear all content
-        await this.page.evaluate(
-            ([_editorId]) => {
-                window.sbProps.editors[_editorId]!.focus();
-                window.sbProps.editors[_editorId]!.setData("");
-            },
-            [editorId],
-        );
+    /**
+     * Read what is contained within a CKEditor5 based on its ID
+     * @param editorId - The ID of the CKEditor5 instance
+     * @returns The content of the CKEditor5 instance
+     */
+    async readCKEditorById(editorId: string): Promise<string> {
+        await this.waitForCKEditor(editorId);
+
+        // Get the editor data
+        return this.page.evaluate(([_editorId]) => window.sbProps.editors[_editorId]!.getData(), [editorId]);
+    }
+
+    /**
+     * Read what is contained within a CKEditor5 based on a Locator
+     * The relevant locator should have a ID set
+     * @param locator - The locator representing the initial Textarea the editor was created from
+     * @returns The content of the CKEditor5 instance
+     */
+    async readCKEditorByLocator(locator: Locator): Promise<string> {
+        await expect(locator).toHaveCount(1);
+        const editorId = await locator.getAttribute("id");
+        expect(editorId).not.toBeNull();
+        return this.readCKEditorById(editorId as string);
+    }
+
+    /**
+     * Focus a CKEditor5 based on its ID
+     * @param editorId - The ID of the CKEditor5 instance
+     */
+    async focusCKEditorById(editorId: string): Promise<void> {
+        await this.waitForCKEditor(editorId);
+
+        // Focus the editor
+        await this.page.evaluate(([_editorId]) => window.sbProps.editors[_editorId]!.focus(), [editorId]);
+    }
+
+    /**
+     * Focus a CKEditor5 based on a Locator
+     * The relevant locator should have a ID set
+     * @param locator - The locator representing the initial Textarea the editor was created from
+     */
+    async focusCKEditorByLocator(locator: Locator): Promise<void> {
+        await expect(locator).toHaveCount(1);
+        const editorId = await locator.getAttribute("id");
+        expect(editorId).not.toBeNull();
+        await this.focusCKEditorById(editorId as string);
+    }
+
+    /**
+     * Fill in CKEditor5 based on its ID
+     * @param editorId - The ID of the CKEditor5 instance
+     * @param content - The content to fill the editor with
+     */
+    async fillCKEditorById(editorId: string, content: string): Promise<void> {
+        await this.focusCKEditorById(editorId);
+
+        // clear all existing editor content
+        await this.page.evaluate(([_editorId]) => window.sbProps.editors[_editorId]!.setData(""), [editorId]);
 
         // Fill the editor
         await this.page.keyboard.type(content);
@@ -204,33 +254,10 @@ export default class AcceptanceTester extends BaseTester {
      * @param templateName - The name of the template to select
      */
     async clickEditorTemplateCKEditor(editorId: string, templateName: string): Promise<void> {
-        // There should be at least one ckeditor, somewhere on the page, first.
-        // The actual element of the ckeditor has no direct correlation to the editorId, but if one exists then
-        // we can proceed with the next checks to find the actual editor we want
-        await expect(this.page.locator("div.ck.ck-editor").first()).toHaveCount(1);
+        await this.focusCKEditorById(editorId);
 
-        // Wait for the editor to be ready
-        await this.page.waitForFunction(
-            ([_editorId]) => {
-                if (window.sbProps === undefined || window.sbProps.editors === undefined) {
-                    return false;
-                }
-                if (window.sbProps.editors[_editorId] === undefined) {
-                    return false;
-                }
-                return true;
-            },
-            [editorId],
-        );
-
-        // Focus the editor, and clear all content
-        await this.page.evaluate(
-            ([_editorId]) => {
-                window.sbProps.editors[_editorId]!.focus();
-                window.sbProps.editors[_editorId]!.setData("");
-            },
-            [editorId],
-        );
+        // clear all existing editor content
+        await this.page.evaluate(([_editorId]) => window.sbProps.editors[_editorId]!.setData(""), [editorId]);
 
         // click the template icon in the ckeditor toolbar
         this.isGoingTo("click the template icon in the ckeditor toolbar and select a template");

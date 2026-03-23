@@ -20,6 +20,7 @@ export enum AiFeature {
     DIALOG_AGENT = "dialogagent",
     DIFFERENTIATION = "differentiation",
     LEARNING_ACTIVITY_CUSTOMISATION = "learningactivitycustomisation",
+    AI_MODERATION_AGENT = "aimoderationagent",
 }
 
 /**

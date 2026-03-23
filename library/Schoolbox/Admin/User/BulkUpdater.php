@@ -79,6 +79,15 @@ class BulkUpdater
      */
     private int $house;
 
+    /**
+     * @var array
+     */
+    private array $qualificationIds = [];
+
+    /**
+     * @var bool
+     */
+    private bool $removeFromAllQualifications;
 
     /**
      * @var int
@@ -139,6 +148,8 @@ class BulkUpdater
      * @param int            $role
      * @param int            $year
      * @param int            $house
+     * @param array          $qualificationIds
+     * @param bool           $removeFromAllQualifications
      * @param int            $eportfolioEnabled
      * @param int            $emailFromUsername
      * @param int            $externalMailClient
@@ -158,6 +169,8 @@ class BulkUpdater
         int $role,
         int $year,
         int $house,
+        array $qualificationIds,
+        bool $removeFromAllQualifications,
         int $eportfolioEnabled,
         int $emailFromUsername,
         int $externalMailClient,
@@ -195,6 +208,11 @@ class BulkUpdater
         $this->role               = $role;
         $this->year               = $year;
         $this->house              = $house;
+        /* Handle qualification assignments */
+        if (count($qualificationIds) > 0) {
+            $this->qualificationIds = array_map('intval', $qualificationIds);
+        }
+        $this->removeFromAllQualifications = $removeFromAllQualifications;
         $this->eportfolioEnabled  = $eportfolioEnabled;
         $this->emailFromUsername  = $emailFromUsername;
         $this->externalMailClient = $externalMailClient;
@@ -270,6 +288,23 @@ class BulkUpdater
             foreach ($statements['campus']['insert']['params'] as $campusParam) {
                 $messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) modified campus relations for {$lookup[$campusParam['userId']]} ({$campusParam['userId']})";
             }
+        }
+
+        /* Handle qualification updates */
+        if (\count($statements['qualifications']['delete']['params'])) {
+            /* Delete existing qualifications if removing from all or updating qualifications */
+            $statements['qualifications']['delete']['statement']->execute($statements['qualifications']['delete']['params']);
+            $updated = true;
+            /* Log the qualification removals */
+            foreach ($this->userIds as $userId) {
+                $messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) updated qualifications for {$lookup[$userId]} ({$userId})";
+            }
+        }
+
+        if (\count($statements['qualifications']['insert']['params'])) {
+            /* Insert new qualification assignments */
+            $statements['qualifications']['insert']['statement']->execute();
+            $updated = true;
         }
 
         if (\count($statements['token']['update']['params'])) {
@@ -403,6 +438,16 @@ class BulkUpdater
                     'params'    => [],
                 ],
             ],
+            'qualifications' => [
+                'delete' => [
+                    'statement' => null,
+                    'params'    => [],
+                ],
+                'insert' => [
+                    'statement' => null,
+                    'params'    => [],
+                ],
+            ],
             'user'   => [
                 'update' => [
                     'statement' => null,
@@ -457,6 +502,34 @@ class BulkUpdater
             $statements['campus']['insert']['statement'] = $this->userBulkMapper->getDatabase()->prepare(
                 "INSERT INTO userCampus (uid, campus) VALUES {$campusInsertPlaceholder}"
             );
+        }
+
+        /* Qualification Updater */
+        if (\count($this->qualificationIds) || $this->removeFromAllQualifications) {
+            $statements['qualifications']['delete']['statement'] = $this->userBulkMapper->getDatabase()->prepare(
+                "DELETE FROM user_qualification WHERE user_id IN ({$bindings->getPlaceholder()})"
+            );
+            $statements['qualifications']['delete']['params'] = $bindings->getParams();
+
+            /* Only insert new qualifications if not removing from all and we have qualifications */
+            if (!$this->removeFromAllQualifications && \count($this->qualificationIds)) {
+                $qualificationInsertPlaceholders = [];
+                foreach ($this->userIds as $userId) {
+                    foreach ($this->qualificationIds as $qualificationId) {
+                        $qualificationInsertPlaceholders[] = "({$userId}, {$qualificationId})";
+                        $statements['qualifications']['insert']['params'][] = [
+                            'userId' => $userId,
+                            'qualificationId' => $qualificationId,
+                        ];
+                    }
+                }
+
+                $qualificationInsertPlaceholder = implode(",\n", $qualificationInsertPlaceholders);
+
+                $statements['qualifications']['insert']['statement'] = $this->userBulkMapper->getDatabase()->prepare(
+                    "INSERT INTO user_qualification (user_id, qualification_id) VALUES {$qualificationInsertPlaceholder}"
+                );
+            }
         }
 
         /* Collate SET commands for each of the scalar params provided

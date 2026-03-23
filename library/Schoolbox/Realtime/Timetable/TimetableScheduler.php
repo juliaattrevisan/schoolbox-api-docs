@@ -37,13 +37,14 @@ class TimetableScheduler extends CronScheduler
 
 
     /**
-     * @param LoopInterface $loop
+     * @param LoopInterface             $loop
      * @param DispatchStrategyInterface $dispatchStrategy
-     * @param LoggerInterface $log
-     * @param Collection|Campus[] $campuses
-     * @param TriggerFactory $factory
-     * @param IConfigLoader $conf
-     * @param IClock $clock
+     * @param LoggerInterface           $log
+     * @param Collection                $campuses
+     * @param TriggerFactory            $factory
+     * @param IConfigLoader             $conf
+     * @param IClock                    $clock
+     * @param int|null                  $maxFutureTriggerTime
      */
     public function __construct(
         LoopInterface $loop,
@@ -52,9 +53,10 @@ class TimetableScheduler extends CronScheduler
         Collection $campuses,
         TriggerFactory $factory,
         IConfigLoader $conf,
-        IClock $clock
+        IClock $clock,
+        ?int $maxFutureTriggerTime = null,
     ) {
-        parent::__construct($loop, $dispatchStrategy, $log, $clock);
+        parent::__construct($loop, $dispatchStrategy, $log, $clock, $maxFutureTriggerTime);
 
         $this->factory  = $factory;
         $this->campuses = $campuses;

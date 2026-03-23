@@ -42,6 +42,10 @@ export default {
             type: Array,
             required: true,
         },
+        qualifications: {
+            type: Array,
+            required: true,
+        },
         eportfolioEnabled: {
             type: Boolean,
             required: true,
@@ -65,6 +69,8 @@ export default {
                 roleId: -1,
                 yearLevelId: -1,
                 houseId: -1,
+                qualificationIds: [],
+                removeFromAllQualifications: false,
                 ePortfolio: -1,
                 emailFromUserName: -1,
                 externalMailClient: -1,
@@ -234,11 +240,11 @@ export default {
                 </div>
                 <div>
                     <label>
-                        {{ locale.qualification.translate(false, true) }}
+                        Qualification
                         <span
                             data-tooltip
                             class="hint has-tip tip-top"
-                            :title="`One or more ${locale.qualification.translate(true, true)} can be selected for users to be involved in. Do not select anything if you don't want to update a user's ${locale.qualification.translate(true, true)}. Use the 'Remove from all' checkbox to remove users from all ${locale.qualification.translate(true, true)}.`"
+                            :title="`One or more qualifications can be selected for users to be involved in. Do not select anything if you don't want to update a user's qualifications. Use the 'Remove from all' checkbox to remove users from all qualifications.`"
                             >?</span
                         >
                     </label>

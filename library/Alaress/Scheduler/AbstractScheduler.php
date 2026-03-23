@@ -23,6 +23,7 @@ use Alaress\WorkerCrew\DispatcherInterface;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
+use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -31,7 +32,12 @@ use Schoolbox\External;
 
 abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHandlerInterface
 {
-    /** @var array */
+    /**
+     * A list of timers which have been scheduled for a trigger.
+     *
+     * @var array<string, array<string, array<string, TimerInterface>>> keyed by trigger's model class, then its label,
+     *                                                                  then its model's hash
+     */
     private array $timers;
 
     /**
@@ -64,12 +70,17 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param LoggerInterface           $log
      * @param IClock                    $clock
+     * @param int|null                  $maxFutureTriggerTime The max seconds in the future to trigger a notification in
+     *                                                        `scheduleNotification`:
+     *                                                        if the notification is further in the future than this: it
+     *                                                        is ignored, and will presumably be sent later.
      */
     public function __construct(
         private LoopInterface $loop,
         DispatchStrategyInterface $dispatchStrategy,
         protected LoggerInterface $log,
-        private IClock $clock
+        private IClock $clock,
+        private ?int $maxFutureTriggerTime = null,
     ) {
         parent::__construct($loop);
 
@@ -144,7 +155,8 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
             return;
         }
 
-        $interval = $trigger->getTimestamp() - $this->clock->time();
+        $time     = $this->clock->time();
+        $interval = $trigger->getTimestamp() - $time;
 
         if ($interval <= 0) {
             $this->log->info("[AbstractScheduler] Immediately dispatching trigger: {$trigger->getEventObjectId()} {$trigger->getLabel()}");
@@ -152,6 +164,25 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
             $this->log->debug($previousTriggerExisted ? 'Cleared previous trigger' : 'No previous trigger was set', ['char' => '-']);
 
             $this->dispatchTrigger($trigger);
+            $resolver?->acknowledge();
+            return;
+        }
+
+        // Don't schedule this trigger if it's more than a configured amount of
+        // time in advance.
+        if (isset($this->maxFutureTriggerTime) && $interval > $this->maxFutureTriggerTime) {
+            $this->log->info(
+                sprintf(
+                    "[AbstractScheduler] Trigger with timestamp too far in the future, not dispatching: %s %s (timestamp: %s, max time: %s)",
+                    $trigger->getEventObjectId(),
+                    $trigger->getLabel(),
+                    Alaress_Date_Format::newFromTimestamp($trigger->getTimestamp())->toRfc3339String(),
+                    Alaress_Date_Format::newFromTimestamp($time + $this->maxFutureTriggerTime)->toRfc3339String(),
+                )
+            );
+
+            // Need to still cache this trigger in Redis, even if it is not scheduled
+            $this->cacheTrigger($trigger);
             $resolver?->acknowledge();
             return;
         }
@@ -226,12 +257,10 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
             $this->unschedule($trigger);
         }
 
-        $model = $trigger->getEvent()->getObject();
-        $label = $trigger->getLabel();
-
         $interval = $interval ?: ($trigger->getTimestamp() - $this->clock->time());
         $timer    = $this->loop->addTimer($interval, $callable);
-        $this->putTimer($model, $label, $timer, $trigger);
+        $this->putTimer($trigger, $timer);
+        $this->cacheTrigger($trigger);
 
         $this->log->info(
             sprintf(
@@ -256,11 +285,8 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      */
     protected function unschedule(TriggerInterface $trigger): bool
     {
-        $model = $trigger->getEvent()->getObject();
-        $label = $trigger->getLabel();
-
-        if ($this->hasTimer($model, $label)) {
-            $timer = $this->getTimer($model, $label);
+        if ($this->hasTimer($trigger)) {
+            $timer = $this->getTimer($trigger);
             $this->log->info("[AbstractScheduler] Canceling existing timer for '{$trigger->getEventObjectId()} - {$trigger->getLabel()}'", ['char' => '-']);
 
             if ($timer instanceof TimerInterface) {
@@ -268,7 +294,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
             } else {
                 $this->log->debug("[AbstractScheduler] Timer is not set properly for '{$trigger->getEventObjectId()} - {$trigger->getLabel()}'", ['char' => '-']);
             }
-            $this->removeTimer($model, $label);
+            $this->removeTimer($trigger);
 
             return true;
         }
@@ -278,61 +304,85 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
 
 
     /**
-     * @param object $model
-     * @param string $label
+     * Get the timer for this trigger, if there is one.
+     *
+     * @param TriggerInterface $trigger
      * @return TimerInterface|null
      */
-    private function getTimer($model, $label)
+    private function getTimer(TriggerInterface $trigger): ?TimerInterface
     {
+        $model = $trigger->getEvent()->getObject();
+        $label = $trigger->getLabel();
         $class = get_class($model);
-        return $this->hasTimer($model, $label)
+        return $this->hasTimer($trigger)
             ? $this->timers[$class][$label][$this->hashObject($model)]
             : null;
     }
 
 
     /**
-     * @param object           $model
-     * @param string           $label
-     * @param TimerInterface   $timer
+     * Store the timer for this trigger, so it may be fetched by `getTrigger`.
+     *
      * @param TriggerInterface $trigger
+     * @param TimerInterface   $timer
+     * @return void
      */
-    public function putTimer(object $model, string $label, TimerInterface $timer, TriggerInterface $trigger): void
+    private function putTimer(TriggerInterface $trigger, TimerInterface $timer): void
     {
+        $model = $trigger->getEvent()->getObject();
         $class = get_class($model);
+        $label = $trigger->getLabel();
         $hash  = $this->hashObject($model);
-
         $this->timers[$class][$label][$hash] = $timer;
+    }
 
-        // Store scheduled trigger key, so that it can be referred when canceled
+    /**
+     * Store this object's trigger, so that it can be restored after the
+     * scheduler process restarts.
+     *
+     * @param TriggerInterface $trigger
+     * @return void
+     */
+    private function cacheTrigger(TriggerInterface $trigger): void
+    {
         if ($this->instanceId && $this->jit) {
+            $model = $trigger->getEvent()->getObject();
+            $class = get_class($model);
+            $label = $trigger->getLabel();
+            $hash  = $this->hashObject($model);
             [$storageKey,] = RedisQueue::getStorage($trigger, $this->instanceId);
             $this->redisKeys[$class][$label][$hash] = $storageKey;
             $this->jit->storeCache($trigger);
         }
     }
 
-
     /**
-     * @param object $model
-     * @param string $label
+     * Does `$trigger` have a timer?
+     *
+     * @param TriggerInterface $trigger
      * @return bool
      */
-    private function hasTimer($model, $label)
+    private function hasTimer(TriggerInterface $trigger): bool
     {
+        $model = $trigger->getEvent()->getObject();
         $class = get_class($model);
+        $label = $trigger->getLabel();
         $hash  = $this->hashObject($model);
         return isset($this->timers[$class][$label][$hash]);
     }
 
 
     /**
-     * @param object $model
-     * @param string $label
+     * Remove the trigger associated with `$trigger`, if any.
+     *
+     * @param TriggerInterface $trigger
+     * @return void
      */
-    public function removeTimer(object $model, string $label): void
+    private function removeTimer(TriggerInterface $trigger): void
     {
+        $model = $trigger->getEvent()->getObject();
         $class = get_class($model);
+        $label = $trigger->getLabel();
         $hash  = $this->hashObject($model);
         unset($this->timers[$class][$label][$hash]);
         // Removed scheduled trigger from RedisCache

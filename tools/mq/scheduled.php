@@ -63,7 +63,18 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $postman = new Postman($log, $subscriptionCache, $loop, $flags, INSTANCE_ID, $redis);
 
         $strat     = new DefaultDispatchStrategy($flags);
-        $scheduler = new Scheduler($loop, $strat, $log, new Clock(), $conf, $postman, INSTANCE_ID);
+        $scheduler = new Scheduler(
+            $loop,
+            $strat,
+            $log,
+            new Clock(),
+            $conf,
+            $postman,
+            INSTANCE_ID,
+            // Since future triggers are cached using the JIT cache, the max
+            // future trigger time must be <= the JIT's TTL.
+            min(Scheduler::DEFAULT_MAX_FUTURE_TRIGGER_TIME, RedisCache::EXPIRY_WINDOW),
+        );
 
         // restoring from redis cache
         $jit = new RedisCache($redis, $log, INSTANCE_ID);

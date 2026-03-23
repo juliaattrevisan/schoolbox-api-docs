@@ -12,8 +12,12 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <div class="ac-feed-alert" :class="`ac-feed-alert--${props.message.data.side}`">
-        <p class="alert-box l-mar--0 l-pad-s" :class="props.message.data.severity">
+    <div
+        class="ac-feed-alert"
+        :class="`ac-feed-alert--${props.message.data.side}`"
+        :data-test="`ac-feed-alert-list-item-${props.message.entryKey}`"
+    >
+        <p class="alert-box l-mar--0 l-pad-s" :class="props.message.data.severity" data-test="ac-feed-message-content">
             <template v-if="props.message.data.title">
                 <strong>{{ props.message.data.title }}</strong>
                 <br />

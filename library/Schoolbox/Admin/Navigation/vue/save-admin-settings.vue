@@ -118,7 +118,7 @@ function onFormDataChange() {
 <template>
     <div class="save-container" ref="saveContainer">
         <bottom-drawer :showDrawer="showSaveButton">
-            <input type="submit" value="Save" />
+            <input type="submit" value="Save" data-test="save-admin-settings-submit" />
         </bottom-drawer>
     </div>
 </template>

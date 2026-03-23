@@ -70,6 +70,13 @@ function onGenerateSelected(): void {
             >
                 View Linked Records
             </button>
+            <a
+                v-if="props.profile._routes?.customisations"
+                :href="props.profile._routes.customisations"
+                class="button icon-group f-no-margins"
+            >
+                View Customisations
+            </a>
             <button
                 v-if="sbProps.aiFeatures.differentiation?.enabled && headerStore.hasEnabledTextFields"
                 class="button icon-ai f-no-margins"
