@@ -8,7 +8,7 @@ import locale from "@js/terminology/rosettaStone";
 import LevelEditable from "./level-editable.vue";
 import CapabilityEditable from "./capability-editable.vue";
 import { MAX_CAPABILITY_LENGTH } from "./types";
-import type { RubricGrid, RubricGridCapability, RubricGridLevel } from "./types";
+import type { RubricGrid, RubricGridLevel } from "./types";
 
 interface Props {
     rubricGridPayload: RubricGrid;
@@ -20,11 +20,10 @@ const rubricGrid = window.Vue.ref(cloneDeep(props.rubricGridPayload)); // local 
 
 /**
  * Move a level left or right
- * @param level the level to move
+ * @param index the index of the level to move
  * @param direction the direction to move
  */
-function moveLevel(level: RubricGridLevel, direction: -1 | 1): void {
-    const index = rubricGrid.value.levels.findIndex((l) => l.id === level.id);
+function moveLevel(index: number, direction: -1 | 1): void {
     const newIndex = index + direction;
     if (newIndex < 0 || newIndex >= rubricGrid.value.levels.length) {
         return; // out of bounds
@@ -36,11 +35,10 @@ function moveLevel(level: RubricGridLevel, direction: -1 | 1): void {
 
 /**
  * Move a capability up or down
- * @param capability the capability to move
+ * @param index the index of the capability to move
  * @param direction the direction to move
  */
-function moveCapability(capability: RubricGridCapability, direction: -1 | 1): void {
-    const index = rubricGrid.value.capabilities.findIndex((c) => c.id === capability.id);
+function moveCapability(index: number, direction: -1 | 1): void {
     const newIndex = index + direction;
     if (newIndex < 0 || newIndex >= rubricGrid.value.capabilities.length) {
         return; // out of bounds
@@ -98,7 +96,7 @@ const totalColumns = window.Vue.computed(() => {
                         v-model:name="level.name"
                         :can-move-prev="index > 0"
                         :can-move-next="index < rubricGrid.levels.length - 1"
-                        @move="(direction) => moveLevel(level, direction)"
+                        @move="(direction) => moveLevel(index, direction)"
                     />
                     <th v-if="rubricGrid.levels.length < props.maxLevels">
                         <!-- Add a new level -->
@@ -113,13 +111,14 @@ const totalColumns = window.Vue.computed(() => {
                     v-for="(capability, index) in rubricGrid.capabilities"
                     :key="capability.id"
                     v-model:name="capability.name"
+                    v-model:indicators="capability.indicators"
                     :total-columns="totalColumns"
                     :levels="rubricGrid.levels"
                     :max-levels="props.maxLevels"
                     :capability="capability"
                     :can-move-prev="index > 0"
                     :can-move-next="index < rubricGrid.capabilities.length - 1"
-                    @move="(direction) => moveCapability(capability, direction)"
+                    @move="(direction) => moveCapability(index, direction)"
                 />
 
                 <tr class="rb-group-header rb-new-group">

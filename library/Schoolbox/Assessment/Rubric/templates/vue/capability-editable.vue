@@ -26,8 +26,24 @@ interface Props {
 const props = defineProps<Props>();
 
 const capabilityName = defineModel<RubricGridCapability["name"]>("name", { required: true });
+const indicators = defineModel<RubricGridCapability["indicators"]>("indicators", { required: true });
 
 const emit = defineEmits<{ move: [direction: -1 | 1] }>();
+
+/**
+ * Move an indicator up or down within the capability
+ * @param index the index of the indicator to move
+ * @param direction the direction to move
+ */
+function moveIndicator(index: number, direction: -1 | 1): void {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= indicators.value.length) {
+        return; // out of bounds
+    }
+
+    const arr = indicators.value;
+    [arr[index], arr[newIndex]] = [arr[newIndex], arr[index]];
+}
 
 window.Vue.onMounted(() => {
     if (document.readyState === "complete") {
@@ -84,7 +100,7 @@ window.Vue.onMounted(() => {
     </tr>
 
     <indicator-editable
-        v-for="(indicator, index) in props.capability.indicators"
+        v-for="(indicator, index) in indicators"
         :key="indicator.id"
         v-model:name="indicator.name"
         v-model:has-usage="indicator.hasUsage"
@@ -92,8 +108,8 @@ window.Vue.onMounted(() => {
         :levels="props.levels"
         :max-levels="props.maxLevels"
         :can-move-prev="index > 0"
-        :can-move-next="index < props.capability.indicators.length - 1"
-        @move="(direction) => console.warn('todo: move indicator')"
+        :can-move-next="index < indicators.length - 1"
+        @move="(direction) => moveIndicator(index, direction)"
     />
 
     <tr class="rb-new-criterion">
