@@ -72,7 +72,7 @@
         <iframe id="lti-frame{{ componentInstanceId }}"
                 style="height: {{ height }}px; display: none"
                 src="about:blank" frameborder="0"
-                allow="autoplay; encrypted-media; fullscreen; camera *; microphone *; geolocation *; midi *; clipboard-write *; display-capture *; local-network-access *">
+                allow="autoplay *; encrypted-media *; fullscreen *; camera *; microphone *; geolocation *; midi *; clipboard-write *; display-capture *; local-network-access *">
         </iframe>
         <section class="content" style="display: none" >
         <a id="lti-link{{ componentInstanceId }}"
@@ -128,7 +128,7 @@
                     {% endif %}
                     src="{{ src }}?context=componentInstance-{{ componentInstanceId }}"
                     frameborder="0"
-                    allow="autoplay; encrypted-media; fullscreen; camera *; microphone *; geolocation *; midi *; clipboard-write *; display-capture *; local-network-access *"
+                    allow="autoplay *; encrypted-media *; fullscreen *; camera *; microphone *; geolocation *; midi *; clipboard-write *; display-capture *; local-network-access *"
             ></iframe>
         {% elseif provider.isTargetWindow %}
             <section class="content">
