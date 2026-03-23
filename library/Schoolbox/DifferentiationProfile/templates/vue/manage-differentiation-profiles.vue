@@ -58,9 +58,12 @@ genAiStore.init(props.routes.genAi);
  */
 const minWidth = 700; // Minimum width where useMaxScrollableHeight is applied
 const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
-const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
-    document.getElementById("filter_panel"),
-]);
+const { maxScrollableHeight } = useMaxScrollableHeight(
+    scrollableEl,
+    minWidth,
+    [document.getElementById("filter_panel")],
+    500,
+);
 </script>
 
 <template>
@@ -134,12 +137,7 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
     <dummy-inline-editor />
 </template>
 
-<style scoped>
-/* Set minimum height to table to see a few students in small height screens */
-.scrollable {
-    min-height: 400px;
-}
-</style>
+<style scoped></style>
 
 <style>
 /* A few tweaks to adjust the filter panel to sit properly within the layout */

@@ -7,7 +7,7 @@ import { TabType } from "../js/types/pastoralReportTypes";
 import type { Tab, Config, Routes } from "../js/types/pastoralReportTypes";
 import PrList from "./pr-list.vue";
 import PrTable from "./table/pr-table.vue";
-import { useMaxScrollableHeight } from "./composable/useMaxScrollableHeight";
+import { useMaxScrollableHeight } from "@schoolboxVue/composables/content/useMaxScrollableHeight";
 
 const props = defineProps<{
     title: string;
@@ -35,7 +35,7 @@ window.Vue.provide("localePastoral", props.localePastoral);
  * Keep the container below the height of the viewport
  */
 const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
-const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth);
+const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [], 500);
 
 /**
  * Handle tab selection and update URL without adding to browser history
