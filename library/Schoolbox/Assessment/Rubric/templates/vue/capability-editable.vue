@@ -11,6 +11,7 @@
  */
 
 import locale from "@js/terminology/rosettaStone";
+import { shiftArrayItem } from "@js/util/arrayUtils";
 import IndicatorEditable from "./indicator-editable.vue";
 import { MAX_CAPABILITY_LENGTH, MAX_INDICATOR_LENGTH } from "./types";
 import type { RubricGridCapability, RubricGridLevel } from "./types";
@@ -29,21 +30,6 @@ const capabilityName = defineModel<RubricGridCapability["name"]>("name", { requi
 const indicators = defineModel<RubricGridCapability["indicators"]>("indicators", { required: true });
 
 const emit = defineEmits<{ move: [direction: -1 | 1] }>();
-
-/**
- * Move an indicator up or down within the capability
- * @param index the index of the indicator to move
- * @param direction the direction to move
- */
-function moveIndicator(index: number, direction: -1 | 1): void {
-    const newIndex = index + direction;
-    if (newIndex < 0 || newIndex >= indicators.value.length) {
-        return; // out of bounds
-    }
-
-    const arr = indicators.value;
-    [arr[index], arr[newIndex]] = [arr[newIndex], arr[index]];
-}
 
 window.Vue.onMounted(() => {
     if (document.readyState === "complete") {
@@ -109,7 +95,7 @@ window.Vue.onMounted(() => {
         :max-levels="props.maxLevels"
         :can-move-prev="index > 0"
         :can-move-next="index < indicators.length - 1"
-        @move="(direction) => moveIndicator(index, direction)"
+        @move="(dir) => shiftArrayItem(indicators, index, dir)"
     />
 
     <tr class="rb-new-criterion">

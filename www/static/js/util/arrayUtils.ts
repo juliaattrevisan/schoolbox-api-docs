@@ -29,6 +29,23 @@ export function moveArrayItem(array: unknown[], oldIndex: number, newIndex: numb
 }
 
 /**
+ * Shift an array item by a specified number of positions
+ * To keep Vue's reactivity, this mutates the original in-place
+ * @template T the type of the array items
+ * @param array array to shift item in
+ * @param index index of item to shift
+ * @param direction number of positions to shift (negative for left)
+ */
+export function shiftArrayItem<T>(array: T[], index: number, direction: number): void {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= array.length) {
+        return; // out of bounds, nothing to do
+    }
+
+    [array[index], array[newIndex]] = [array[newIndex], array[index]];
+}
+
+/**
  * To check if an array is made up of numbers
  * @param arr - array to check
  * @returns - true if all items in the array are numbers
