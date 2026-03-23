@@ -2,3 +2,10 @@
  * Filter tweaks
  * Scope: UI Uplift
  */
+
+body.sbx-body {
+    .filter-dropdown {
+        gap: var(--sbx-size-xs);
+        padding: var(--sbx-size-s);
+    }
+}
