@@ -1025,7 +1025,7 @@ class Controller extends Base
             );
         } else {
             $returnUrl = Redirect::decode($returnUrlEncoded);
-            if ($isCreateRequest && str_contains($returnUrl, 'calendar/')) {
+            if ($isCreateRequest && str_contains($returnUrl, '/calendar')) {
                 // Create custom toast message for main calendar page.
                 $toastMessage = $this->bookingResponseHelper->getCreateResponseMessage(
                     $addBookingsResults['nBookingsCreatedByStatusId'] ?? [],
