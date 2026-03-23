@@ -28,6 +28,7 @@ class Controller extends ConfigController
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
         CacheInterface $oidcCache,
+        private Environment $twig,
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
     }
@@ -141,11 +142,8 @@ class Controller extends ConfigController
     public function previewCss(): void
     {
         try {
-            $previewData = (new Helper($this->getConfigMapper(), $this->getConfigLoader()))->buildPreviewData($this->requestPost->get('configs') ?? []);
-
-            /** @var Environment $twig */
-            $twig = $this->getDi()->get('templateEngine');
-            $css = $twig->render('css/skin.twig', $previewData);
+            $previewData = (new \Schoolbox\Admin\SkinConfig\Helper($this->getConfigMapper(), $this->getConfigLoader()))->buildPreviewData($this->requestPost->get('configs') ?? []);
+            $css = $this->twig->render('css/skin.twig', $previewData);
             $cacheControl = 'no-store, no-cache, must-revalidate, max-age=0';
 
             $this->response = $this->responseFromContent($css, null, 'text/css')->withHeader('Cache-Control', $cacheControl);
