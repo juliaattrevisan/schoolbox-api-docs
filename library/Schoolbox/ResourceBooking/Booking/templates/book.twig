@@ -15,8 +15,8 @@ $(function() {
     // Have some sort of helper for creating remote validations.
     let getValidatorRemoteMethod = function(code, key) {
         return function(value, element) {
-            // Variable 'errors' will contain the server's response to the form submission (set in the ajaxFail() method).
-            // Variable 'errors' will be an object containing dates as keys, arrays as values.
+            // Variable 'errors' is set in the ajaxFail() method.  It is the server's response
+            // to the form submission - an object containing dates as keys, arrays as values.
             let errorsByDate = (errors[key || element.name] || {});
             let errorsArrays = Object.values(errorsByDate);
 
