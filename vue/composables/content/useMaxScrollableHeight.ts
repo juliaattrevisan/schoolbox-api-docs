@@ -10,7 +10,7 @@ import type { Ref } from "vue";
  * @param scrollableEl - Ref to the scrollable HTML element
  * @param minWidth - Optional width in px to disable max height on small screens
  * @param extraElements - Optional array of extra elements to observe to trigger height recalculation
- * @param minHeight - Optional minimum height in px for the scrollable area
+ * @param minHeight - Optional floor in px applied to the computed max height for the scrollable area
  * @returns maxScrollableHeight - reactive ref containing the calculated max height as a CSS string
  */
 export function useMaxScrollableHeight(
@@ -41,9 +41,8 @@ export function useMaxScrollableHeight(
             ? parseInt(window.getComputedStyle(mainSBContainerEl).paddingBottom, 10)
             : 0;
         const newHeight = window.innerHeight - scrollableTop - footerHeight - mainSBContainerPaddingBtm - 1;
-        const finalHeight = minHeight ? Math.max(newHeight, minHeight) : newHeight;
-
-        maxScrollableHeight.value = `${finalHeight}px`;
+        const constrainedHeight = minHeight && minHeight > 0 ? Math.max(newHeight, minHeight) : newHeight;
+        maxScrollableHeight.value = `${constrainedHeight}px`;
     }
 
     /**
