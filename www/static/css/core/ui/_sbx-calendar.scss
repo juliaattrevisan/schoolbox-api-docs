@@ -4,68 +4,62 @@
  */
 
 body.sbx-body {
-    .fc {
-        border: var(--border);
-        border-radius: var(--sbx-config-field-roundness);
+    // apply the usual spacing for button groups
+    .fc-button-group {
+        display: flex;
+        gap: var(--sbx-size-xs);
+    }
 
-        & .fc-button-group {
-            display: flex;
-            gap: 0.5rem;
+    // overrule the .fc-button-group styles that square the buttons depending on where they are placed
+    .fc-button {
+        border-radius: var(--sbx-config-field-roundness) !important;
+    }
 
-            & button {
-                border-radius: var(--sbx-config-field-roundness) !important;
-                padding-inline: 1rem;
+    // remove the active colour hover state, should behave just like other secondary buttons with the slight filter change on hover
+    .fc-button:hover:not(.fc-button-active) {
+        background: var(--sbx-color-foreground-primary) !important;
+    }
 
-                &.fc-customNext-button,
-                &.fc-customPrev-button {
-                    background-color: transparent;
-                    border: 1px solid var(--sbx-config-color-accent);
-                    border-radius: var(--sbx-config-field-roundness);
+    // remove the active colour, as it's used for the current calendar, not the calendar button
+    .adtp-btn {
+        background: var(--sbx-color-foreground-primary);
+    }
 
-                    & a {
-                        background-color: transparent !important;
-                    }
-                }
+    // add some spacing to the view-event-modal.vue bottom buttons
+    .component-action .rsvp,
+    .component-action .actions {
+        display: flex;
+        gap: var(--sbx-size-xs);
+    }
 
-                &.fc-customToday-button {
-                    background-color: var(--sbx-config-color-accent);
-                    color: var(--sbx-config-color-accent-text);
-                }
+    // add some spacing between the checkbox and label for the 'All day' checkbox in the date modal
+    .time-switch {
+        display: flex;
+        gap: var(--sbx-size-s);
+    }
 
-                &.fc-quickSwitchButton-button {
-                    background-color: transparent !important;
-                    border: 1px solid var(--sbx-config-color-accent);
+    // so the background colours used for event types in the filters modal don't butt up against the label
+    input[type="checkbox"]:not(.plain) + label[for^="eventType-"] {
+        padding-left: var(--sbx-size-s);
+    }
 
-                    & a {
-                        background-color: transparent !important;
-                    }
-                }
-            }
+    // add the new border colour to the calendar table cells
+    .fc-theme-standard .fc-dayGridMonth-view td {
+        border: 1px solid var(--sbx-color-border);
+    }
 
-            & .fc-button-active {
-                color: var(--sbx-color-text-primary) !important;
-                overflow: visible;
-                position: relative;
+    // add borders to the list view for better separation of events
+    .fc-list-table tr {
+        border-bottom: 1px solid var(--sbx-color-border);
+    }
 
-                &::before {
-                    background-color: var(--sbx-config-color-accent);
-                    bottom: -18px;
-                    content: "";
-                    height: 2px;
-                    left: 0;
-                    position: absolute;
-                    width: 100%;
-                }
-            }
-        }
+    // they're <a> tags so they have accent colour, but they have no href so they should just use the normal text colour
+    .fc-list-day-text {
+        color: var(--sbx-color-text-primary);
+    }
 
-        & .fc-daygrid-day-events {
-            margin-inline: 0.5rem;
-            width: calc(100% - 1rem);
-        }
-
-        & .fc-toolbar-title {
-            font-weight: 600;
-        }
+    // shrink from s so they fit in the event cells a bit better
+    .fc div {
+        font-size: var(--sbx-font-size-xs);
     }
 }

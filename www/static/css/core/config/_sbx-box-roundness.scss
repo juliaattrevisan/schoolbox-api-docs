@@ -39,7 +39,7 @@ body.sbx-body {
     }
 
     // Top-only rounded elements
-    .component-titlebar,
+    .component-titlebar:not(.meta),
     .accordion dd:first-of-type > a,
     .accordion .accordion-navigation:first-of-type > a,
     .v-card .card-class-image,
@@ -69,7 +69,6 @@ body.sbx-body {
 
     // tables need to be rounded uniquely
     table {
-        border-collapse: separate;
         border-spacing: 0;
         border-radius: var(--sbx-config-box-roundness);
     }

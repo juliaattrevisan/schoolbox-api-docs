@@ -65,6 +65,7 @@ body.sbx-body {
     table.rubric tr:nth-child(even),
     table.diagonal-headings-table tr:nth-child(even),
     table.VueTables__table tr:nth-child(even),
+    .fc-list-table tr:nth-child(even),
     .action-list > li:nth-child(even),
     .information-list > li:nth-child(even):not(:has(.information-list)) {
         background-color: var(--sbx-color-foreground-primary-alt);

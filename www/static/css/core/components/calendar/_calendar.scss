@@ -47,9 +47,9 @@
  * Skin Builder choices
  */
 .fc-toolbar {
-    border-bottom: 2px solid #ededed;
+    border-bottom: 2px solid var(--sbx-color-border, #ededed);
     margin: 0 !important;
-    padding: 1rem;
+    padding: var(--sbx-size-m, 1rem);
 
     .fc-button {
         @include button-dimensions();
@@ -59,7 +59,7 @@
         }
         &:hover,
         &.fc-button-active {
-            background-color: $content-ui-hover !important;
+            background-color: var(--sbx-config-color-active, $content-ui-hover) !important;
             color: var(--sbx-config-color-accent, $content-ui-foreground) !important;
         }
     }

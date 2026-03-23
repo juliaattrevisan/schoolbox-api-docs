@@ -1122,7 +1122,9 @@ export default {
                                     // linked events for EOTC bookings are always displayed on the calendar
                                 "
                             >
-                                <button @click.prevent="addEventToCalendar">Add Event to Calendar</button>
+                                <button class="button" @click.prevent="addEventToCalendar">
+                                    Add Event to Calendar
+                                </button>
                             </span>
                             <!-- If the modal represents a booking, and the linked event is visible on the calendar... -->
                             <span
