@@ -46,6 +46,9 @@ docker-taskd.env
 .aws/
 .docker-compose.env
 
+# instances.ini is created by provision process
+docker/schoolbox/config/instances.ini
+
 # Caddy config is created by the Docker provision process
 docker/caddy/config/Caddyfile
 
