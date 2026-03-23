@@ -63,10 +63,30 @@ const showCapabilityMaxValue = window.Vue.computed(() => {
 });
 
 /**
- * TODO: data-rubric-sum
+ * Calculate the current max available points for this capability
+ * based on the value of all indicators in the capability
  */
-const rubricSum = window.Vue.computed(() => {
-    return 0; // TODO
+const derivedMaxValue = window.Vue.computed(() => {
+    let capabilityMax = 0;
+    for (const indicator of indicators.value) {
+        if (!indicator.hasUsage) {
+            // Not checked? Don't count this indicator towards the total
+            continue;
+        }
+
+        // Find the highest valued descriptor for this indicator
+        let indicatorMax = 0;
+        for (const descriptor of indicator.descriptors) {
+            const value = descriptor.maxValue ?? 0;
+            if (value > indicatorMax) {
+                indicatorMax = value;
+            }
+        }
+
+        capabilityMax += indicatorMax;
+    }
+
+    return capabilityMax;
 });
 </script>
 
@@ -149,8 +169,15 @@ const rubricSum = window.Vue.computed(() => {
                 class="rb-value-input"
                 required
             />
-            <!-- todo: data-use-criterion-values -->
-            <a class="fieldAssign" href="#">Assign {{ rubricSum }} from {{ locale.rubricCriterion.plural() }} </a>
+            <!-- todo: data-customised -->
+            <a
+                v-if="capabilityMaxValue != derivedMaxValue"
+                class="fieldAssign"
+                href="#"
+                @click.prevent="capabilityMaxValue = derivedMaxValue"
+            >
+                Assign {{ derivedMaxValue }} from {{ locale.rubricCriterion.plural() }}
+            </a>
         </th>
     </tr>
 </template>
