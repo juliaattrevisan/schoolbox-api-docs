@@ -243,27 +243,6 @@ class Config
     }
 
     /**
-     * Mapper join alias compatibility accessor for skinConfigSubcategory.
-     *
-     * @return SkinConfig\Subcategory\Model|null
-     */
-    public function getSkinConfigSubcategory(): ?SkinConfig\Subcategory\Model
-    {
-        return $this->getSkinSubcategory();
-    }
-
-    /**
-     * Mapper join alias compatibility mutator for skinConfigSubcategory.
-     *
-     * @param SkinConfig\Subcategory\Model|null $skinConfigSubcategory
-     * @return $this
-     */
-    public function setSkinConfigSubcategory(?SkinConfig\Subcategory\Model $skinConfigSubcategory): self
-    {
-        return $this->setSkinSubcategory($skinConfigSubcategory);
-    }
-
-    /**
      * @return bool
      */
     public function getEditable(): ?bool
