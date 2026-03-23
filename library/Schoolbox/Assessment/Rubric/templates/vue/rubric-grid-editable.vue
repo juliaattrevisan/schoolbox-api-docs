@@ -102,7 +102,7 @@ const rubricSum = window.Vue.computed(() => {
 });
 
 /**
- * Assuming the assessment uses the "Total Mark" mark type,
+ * Assuming the assessment uses the "Total Mark" mark type (should always update even if not as the mark type could change),
  * Keep the max mark input in sync with the rubric grid's max value
  */
 window.Vue.watch(rubricSum, (newValue) => {
