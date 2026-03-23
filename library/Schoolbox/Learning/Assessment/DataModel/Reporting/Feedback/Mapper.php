@@ -195,7 +195,13 @@ class Mapper extends \Schoolbox\Mapper
             return true;
         }
 
-        return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getLearner(), $object->getReporting()->getAssessmentModel());
+        /* Turns out this isn't always hydrated, which is odd
+         */
+        $assessment = $object->getReporting()->getAssessmentModel() ?? $this->getJoinMapper('reporting')
+            ->findById($object->getReporting()->getId())
+            ->getAssessmentModel();
+
+        return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getLearner(), $assessment);
     }
 
 
