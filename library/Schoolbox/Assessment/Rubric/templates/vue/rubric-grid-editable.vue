@@ -4,14 +4,16 @@
  */
 
 import { cloneDeep } from "es-toolkit";
+import type { Ref } from "vue";
+import { apiRequest } from "@js/util/sbx/apiUtils";
+import { assertUnreachable } from "@js/util/errorUtils";
 import locale from "@js/terminology/rosettaStone";
 import { shiftArrayItem } from "@js/util/arrayUtils";
 import { MARK_TYPE_VALUE_NONE } from "@schoolboxAssessment/Types/MarkType";
 import LevelEditable from "./level-editable.vue";
 import CapabilityEditable from "./capability-editable.vue";
 import { MAX_CAPABILITY_LENGTH } from "./types";
-import type { RubricGrid, RubricGridLevel, RubricGridCapability } from "./types";
-import { apiRequest } from "@js/util/sbx/apiUtils";
+import type { RubricGrid, RubricGridLevel, RubricGridCapability, RubricGridIndicator } from "./types";
 
 interface Props {
     rubricGridPayload: RubricGrid;
@@ -60,28 +62,43 @@ function normaliseForComparison(string: string): string {
     return string.toString().replace(/\s+/g, " ").trim().toLowerCase();
 }
 
-const isAddingCapability = window.Vue.ref(false);
+const isCreating = window.Vue.ref(false); // whether we're currently creating a new capability/indicator
 const newCapabilityName = window.Vue.ref("");
 
+// async function onAddKeydown(event: KeyboardEvent, type: "group", capabilityId: null): Promise<void>;
+// async function onAddKeydown<TType extends "group" | "level" | "criterion">(
+//     event: KeyboardEvent,
+//     type: TType,
+//     capabilityId: TType extends "group" ? null : number,
+// ): Promise<void> {
+
 /**
- * When a key is pressed in the "add capability" textarea,
- * if it's a non-shift return (i.e. shift+return is ignored), add a new capability to the grid
+ * When a key is pressed in the "add capability" or "add indicator" textarea,
+ * if it's a non-shift return (i.e. shift+return is ignored), add a new capability/indicator to the grid
  * @param event the keydown event
+ * @param type the type of item to add, either capability or indicator
+ * @param capability if adding an indicator, the capability to add the new item to (will push to capability.indicators)
+ * @param nameRef a ref pointing to the name of the new item
  */
-async function onAddCapabilityKeydown(event: KeyboardEvent): Promise<void> {
+async function onAddKeydown<TType extends "capability" | "indicator">(
+    event: KeyboardEvent,
+    type: TType,
+    capability: TType extends "indicator" ? RubricGridCapability : null,
+    nameRef: Ref<string, string>,
+): Promise<void> {
     if (event.key !== "Enter" || event.shiftKey) {
         return;
     }
 
     event.preventDefault();
-    const name = newCapabilityName.value.trim();
 
-    if (name.length === 0 || isAddingCapability.value) {
+    const name = nameRef.value.trim();
+    if (name.length === 0 || isCreating.value) {
         return; // prevent blank and double-fire from keydown to blue
     }
 
-    isAddingCapability.value = true; // prevent mods & double-fire
-    newCapabilityName.value = "";
+    isCreating.value = true; // prevent mods & double-fire
+    nameRef.value = "";
 
     /**
      * Ensure user is not trying to add a duplicate group. The server-side validation will prevent
@@ -89,39 +106,60 @@ async function onAddCapabilityKeydown(event: KeyboardEvent): Promise<void> {
      * name is entered.
      */
     const normalisedName = normaliseForComparison(name);
+    const nameLocale = type === "capability" ? locale.rubricGroup : locale.rubricCriterion;
 
-    const toast = window.sbProps.toastActivate(`Creating ${locale.rubricGroup.singular()}...`);
+    const toast = window.sbProps.toastActivate(`Creating ${nameLocale.singular()}...`);
     if (rubricGrid.value.capabilities.some((c) => normaliseForComparison(c.name) === normalisedName)) {
         toast.timeout({
-            text: `${locale.rubricGroup.proper()} name already exists!`,
+            text: `${nameLocale.proper()} name already exists!`,
             isSuccess: false,
         });
         return;
     }
 
-    const response = await apiRequest<RubricGridCapability>({
+    const response = await apiRequest<TType extends "capability" ? RubricGridCapability : RubricGridIndicator>({
         url: props.routeRubricCreate,
         method: "POST",
         body: {
-            type: "group",
+            type: type === "capability" ? "group" : "criterion", // todo: swap for the new names in the backend?
             rubricId: rubricGrid.value.id,
-            groupId: null, // adding a new capability
+            groupId: type === "indicator" ? capability!.id : null,
             groupIndex: 0, // todo: don't need this anymore... it's only used to render the old twig stuff
             name,
             levelCount: rubricGrid.value.levels.length,
             folderId: props.folderId,
+            groupName: type === "indicator" ? capability!.name : null,
         },
     });
 
-    isAddingCapability.value = false;
+    isCreating.value = false;
     if (!response.success) {
         toast.timeout({ text: response.message, isSuccess: false });
         return;
     }
 
-    toast.timeout({ text: `${locale.rubricGroup.proper()} created!` });
-    // TODO: this assumes the API returns the new capability struct, that is definitely not the case right now
-    rubricGrid.value.capabilities.push(response.data);
+    toast.timeout({ text: `${nameLocale.proper()} created!` });
+
+    if (type === "capability") {
+        // TType is "capability", so response is RubricGridCapability
+        // TODO: this assumes the API returns the new capability struct, that is definitely not the case right now
+        rubricGrid.value.capabilities.push(response.data as RubricGridCapability);
+    } else if (type === "indicator") {
+        // TType is "indicator", so response is RubricGridIndicator
+        // TODO: this assumes the API returns the new indicator struct, that is definitely not the case right now
+        capability!.indicators.push(response.data as RubricGridIndicator);
+    } else {
+        assertUnreachable(type);
+    }
+}
+
+/**
+ * When the return key is pressed, add a new capability to the grid
+ * (this needs to exist as the ref can't be passed directly when inside <template>)
+ * @param event the keydown event
+ */
+async function onAddCapabilityKeydown(event: KeyboardEvent): Promise<void> {
+    await onAddKeydown(event, "capability", null, newCapabilityName);
 }
 
 /**
@@ -242,9 +280,11 @@ window.Vue.watch(rubricSum, (newValue) => {
                     :max-levels="props.maxLevels"
                     :capability="capability"
                     :capability-mark-type="capabilityMarkType"
+                    :is-creating="isCreating"
                     :can-move-prev="index > 0"
                     :can-move-next="index < rubricGrid.capabilities.length - 1"
                     @move="(dir) => shiftArrayItem(rubricGrid.capabilities, index, dir)"
+                    @add-indicator-keydown="(e, nameRef) => onAddKeydown(e, 'indicator', capability, nameRef)"
                 />
 
                 <tr class="rb-group-header rb-new-group">
@@ -255,8 +295,8 @@ window.Vue.watch(rubricSum, (newValue) => {
                             :v-model="newCapabilityName"
                             :placeholder="`+ Type to add new ${locale.rubricGroup.singular()}`"
                             :maxlength="MAX_CAPABILITY_LENGTH"
-                            :disabled="isAddingCapability"
-                            @keydown="onAddCapabilityKeydown"
+                            :disabled="isCreating"
+                            @keydown="(e) => onAddCapabilityKeydown(e)"
                         ></textarea>
                     </th>
                 </tr>

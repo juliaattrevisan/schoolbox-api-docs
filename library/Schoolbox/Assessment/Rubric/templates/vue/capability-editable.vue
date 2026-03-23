@@ -10,6 +10,7 @@
  * - A full width row for the maximum capability points, if the capability mark type is set
  */
 
+import type { Ref } from "vue";
 import locale from "@js/terminology/rosettaStone";
 import { shiftArrayItem } from "@js/util/arrayUtils";
 import { MARK_TYPE_VALUE_NONE } from "@schoolboxAssessment/Types/MarkType";
@@ -23,6 +24,7 @@ interface Props {
     capabilityMarkType: number;
     levels: RubricGridLevel[];
     maxLevels: number;
+    isCreating: boolean;
     canMovePrev: boolean;
     canMoveNext: boolean;
 }
@@ -41,7 +43,10 @@ const capabilityMaxValue = window.Vue.computed({
     },
 });
 
-const emit = defineEmits<{ move: [direction: -1 | 1] }>();
+const emit = defineEmits<{
+    move: [direction: -1 | 1];
+    addIndicatorKeydown: [event: KeyboardEvent, nameRef: Ref<string, string>];
+}>();
 
 const capabilityMarkMaxValueInputId = `rb-capability-mark-max-value-${window.Vue.useId()}`;
 
@@ -52,6 +57,17 @@ window.Vue.onMounted(() => {
         window.jQuery(document).foundation("tooltip", "reflow");
     }
 });
+
+const newIndicatorName = window.Vue.ref("");
+
+/**
+ * When the return key is pressed, add a new indicator to the capability
+ * (this needs to exist as the ref can't be passed directly when inside <template>)
+ * @param event the keydown event
+ */
+function onAddIndicatorKeydown(event: KeyboardEvent): void {
+    emit("addIndicatorKeydown", event, newIndicatorName);
+}
 
 /**
  * Only show the max value input if there are selected indicators in the group
@@ -169,9 +185,12 @@ window.Vue.onMounted(() => {
     <tr class="rb-new-criterion">
         <!-- Add a new indicator (criterion) -->
         <th :colspan="totalColumns - 1 /* subtract the capability column */">
+            <!-- TODO: previously some of these only added maxlength after the first change (data-group-grid-text in grid-editable.twig) -->
             <textarea
                 :placeholder="`+ Type to add new ${locale.rubricCriterion.singular()} ${capabilityName ? `to ${capabilityName}` : ''}`"
                 :maxlength="MAX_INDICATOR_LENGTH"
+                :disabled="isCreating"
+                @keydown="onAddIndicatorKeydown"
             ></textarea>
         </th>
     </tr>
