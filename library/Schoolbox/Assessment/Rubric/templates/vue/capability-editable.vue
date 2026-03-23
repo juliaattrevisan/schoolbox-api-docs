@@ -88,6 +88,24 @@ const derivedMaxValue = window.Vue.computed(() => {
 
     return capabilityMax;
 });
+
+/**
+ * Keep track of if the max value field has been customised or not in order to
+ * know whether to override it when the derived max value changes
+ */
+const isCustomised = window.Vue.ref(false);
+window.Vue.watch(derivedMaxValue, (newValue) => {
+    if (isCustomised.value) return; // don't sync if customised
+    capabilityMaxValue.value = newValue;
+});
+
+window.Vue.onMounted(() => {
+    // if the capability max value is initially set and differs from the derived max value,
+    // then the field should be considered customised on load
+    if (capabilityMaxValue.value !== null) {
+        isCustomised.value = capabilityMaxValue.value !== derivedMaxValue.value;
+    }
+});
 </script>
 
 <template>
@@ -168,13 +186,16 @@ const derivedMaxValue = window.Vue.computed(() => {
                 type="number"
                 class="rb-value-input"
                 required
+                @change.self="isCustomised = true"
             />
-            <!-- todo: data-customised -->
             <a
                 v-if="capabilityMaxValue != derivedMaxValue"
                 class="fieldAssign"
                 href="#"
-                @click.prevent="capabilityMaxValue = derivedMaxValue"
+                @click.prevent="
+                    capabilityMaxValue = derivedMaxValue;
+                    isCustomised = false;
+                "
             >
                 Assign {{ derivedMaxValue }} from {{ locale.rubricCriterion.plural() }}
             </a>
