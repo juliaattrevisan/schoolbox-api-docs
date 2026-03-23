@@ -719,3 +719,8 @@ $allow-sidebar-stash: $large-up;
 .search-is-active {
     z-index: calc((--sbx-depth-pop-over) + 1) !important;
 }
+
+#top-menu a > sbx-icon {
+    display: block;
+    margin: 0 auto var(--spacing-xs);
+}
