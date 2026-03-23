@@ -46,6 +46,7 @@ class Module extends BaseModule
                 new Rule\HasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL),
                 new Rule\HasServicePermission(UserAccess::SERVICE_TIMETABLE, UserAccess::ACCESS_FULL),
                 new Rule\HasServicePermission(UserAccess::SERVICE_DIFFERENTIATION, UserAccess::ACCESS_FULL),
+                new Rule\HasServicePermission(UserAccess::SERVICE_IB_COORDINATOR, UserAccess::ACCESS_FULL),
             )
         );
 
