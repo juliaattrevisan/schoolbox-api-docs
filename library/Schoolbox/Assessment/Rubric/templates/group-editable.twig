@@ -59,6 +59,8 @@
         {# This is a tel input rather than number because in Firefox and Chrome, scrolling while the number field is focused changes the value.
            We found this to be a significant UX issue, and disabling it is kinda gross: https://stackoverflow.com/questions/9712295/disable-scrolling-on-input-type-number
            Number inputs also do not consistently restrict entry to numeric values across browsers: https://bugzilla.mozilla.org/show_bug.cgi?id=1398528
+
+           Note: I can't replicate this anymore in chrome or firefox... it is possible browser behaviour for this has changed in the last 9 years
            #}
         <input type="tel"
                value="{{ rubricGrid.retrieveCapabilityUsage(group).maxValue ?? '' }}"

@@ -12,6 +12,7 @@
 
 import locale from "@js/terminology/rosettaStone";
 import { shiftArrayItem } from "@js/util/arrayUtils";
+import { MARK_TYPE_VALUE_NONE } from "@schoolboxAssessment/Types/MarkType";
 import IndicatorEditable from "./indicator-editable.vue";
 import { MAX_CAPABILITY_LENGTH, MAX_INDICATOR_LENGTH } from "./types";
 import type { RubricGridCapability, RubricGridLevel } from "./types";
@@ -19,6 +20,7 @@ import type { RubricGridCapability, RubricGridLevel } from "./types";
 interface Props {
     totalColumns: number;
     capability: RubricGridCapability;
+    capabilityMarkType: number;
     levels: RubricGridLevel[];
     maxLevels: number;
     canMovePrev: boolean;
@@ -27,9 +29,12 @@ interface Props {
 const props = defineProps<Props>();
 
 const capabilityName = defineModel<RubricGridCapability["name"]>("name", { required: true });
+const capabilityMaxValue = defineModel<RubricGridCapability["maxValue"] | null>("maxValue", { required: true });
 const indicators = defineModel<RubricGridCapability["indicators"]>("indicators", { required: true });
 
 const emit = defineEmits<{ move: [direction: -1 | 1] }>();
+
+const capabilityMarkMaxValueInputId = `rb-capability-mark-max-value-${window.Vue.useId()}`;
 
 window.Vue.onMounted(() => {
     if (document.readyState === "complete") {
@@ -37,6 +42,22 @@ window.Vue.onMounted(() => {
         // As vue loads the template after foundation has been initialised, we need to reinitialise the tooltips
         window.jQuery(document).foundation("tooltip", "reflow");
     }
+});
+
+/**
+ * Only show the max value input if there are selected indicators in the group
+ * and the 'Capability Mark Type' is set to something other than 'None'
+ */
+const showCapabilityMaxValue = window.Vue.computed(() => {
+    const hasSelectedIndicators = indicators.value.some((indicator) => indicator.hasUsage);
+    return hasSelectedIndicators && props.capabilityMarkType !== MARK_TYPE_VALUE_NONE;
+});
+
+/**
+ * TODO: data-rubric-sum
+ */
+const rubricSum = window.Vue.computed(() => {
+    return 0; // TODO
 });
 </script>
 
@@ -109,6 +130,19 @@ window.Vue.onMounted(() => {
     </tr>
 
     <!-- TODO: input for max value (data-group-max-value-row) -->
+    <tr v-if="showCapabilityMaxValue">
+        <th class="rb-group-summary" :colspan="totalColumns">
+            <label :for="capabilityMarkMaxValueInputId">Maximum points for {{ locale.rubricGroup.singular() }}</label>
+            <input
+                :id="capabilityMarkMaxValueInputId"
+                v-model.number="capabilityMaxValue"
+                type="number"
+                class="rb-value-input"
+            />
+            <!-- todo: data-use-criterion-values -->
+            <a class="fieldAssign">Assign {{ rubricSum }} from {{ locale.rubricCriterion.plural() }}</a>
+        </th>
+    </tr>
 </template>
 
 <style scoped>

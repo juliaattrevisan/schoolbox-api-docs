@@ -17,6 +17,7 @@ export type RubricGridCapability = {
      * excluding the current rubric grid's assessment?
      */
     inUseExcludingAssessment: boolean;
+    maxValue: number | null;
     indicators: RubricGridIndicator[];
 };
 

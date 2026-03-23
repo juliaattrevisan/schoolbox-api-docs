@@ -2079,6 +2079,7 @@ class Controller extends Assessment\Controller
                 'id' => $capability->getId(),
                 'name' => $capability->getName(),
                 'inUseExcludingAssessment' => $capability->isInUseExcluding($rubricGrid->getAssessment()),
+                'maxValue' => $rubricGrid->retrieveCapabilityUsage($capability)?->getMaxValue(),
                 'indicators' => [],
             ];
 
