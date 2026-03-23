@@ -246,6 +246,7 @@ function build_caddyfile() {
 
     # Export for envsubst
     export FRANKENPHP_UPSTREAMS=$(printf "%b" "$UPSTREAMS")
+    export PRIMARY_INSTANCE_HOSTNAME=${PRIMARY_INSTANCE_HOSTNAME}
 
     envsubst < ./docker/caddy/config/Caddyfile.template > ./docker/caddy/config/Caddyfile
 
