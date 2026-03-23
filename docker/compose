@@ -3,7 +3,7 @@
 declare SCHOOLBOX_CLI_IMAGE_BUILD_FROM_LOCAL
 declare TASKD_BUILD_FROM_LOCAL
 declare LTI_DEVKIT_ENABLE
-declare SECOND_INSTANCE_ENABLE
+declare SECONDARY_INSTANCE_ENABLE
 
 source "$(dirname "$0")/functions"
 
@@ -47,7 +47,7 @@ case "${LTI_DEVKIT_ENABLE}" in
         profiles="$profiles --profile lti"
         ;;
 esac
-case "${SECOND_INSTANCE_ENABLE}" in
+case "${SECONDARY_INSTANCE_ENABLE}" in
     1 | true | yes | on)
         profiles="$profiles --profile second-instance"
         ;;

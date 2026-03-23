@@ -34,7 +34,7 @@ declare SENTRY_TRACE_SAMPLE_RATE
 declare SENTRY_PROFILE_SAMPLE_RATE
 declare LTI_DEVKIT_PUBLISHED_PORT
 declare MAILCATCHER_UI_PUBLISHED_PORT
-declare SECOND_INSTANCE_ENABLE
+declare SECONDARY_INSTANCE_ENABLE
 declare SYNERGETIC_PASSWORD_ENCRYPTION_KEY
 declare SYNERGETIC_PASSWORD_ENCRYPTION_IV
 declare INSTANCE_REGISTRY_URL
@@ -346,7 +346,7 @@ function start_containers() {
 
     # Also rebuild cronjobs
     "$(dirname "$0")/compose" exec -it schoolbox-cli sudo cloud-rebuild-cronjobs --is-primary-host 1 --instance docker --add-path --shell /bin/bash
-    case "${SECOND_INSTANCE_ENABLE}" in
+    case "${SECONDARY_INSTANCE_ENABLE}" in
         1 | true | yes | on)
             "$(dirname "$0")/compose" exec -it schoolbox-cli sudo cloud-rebuild-cronjobs --is-primary-host 1 --instance docker2 --add-path --shell /bin/bash
             ;;
@@ -358,7 +358,7 @@ function start_containers() {
     "$(dirname "$0")/compose" exec -it rabbitmq rabbitmqctl add_vhost docker
     "$(dirname "$0")/compose" exec -it rabbitmq rabbitmqctl set_permissions -p docker guest ".*" ".*" ".*"
     "$(dirname "$0")/compose" restart schoolbox-scheduled schoolbox-mobiled
-    case "${SECOND_INSTANCE_ENABLE}" in
+    case "${SECONDARY_INSTANCE_ENABLE}" in
         1 | true | yes | on)
             "$(dirname "$0")/compose" exec -it rabbitmq rabbitmqctl add_vhost docker2
             "$(dirname "$0")/compose" exec -it rabbitmq rabbitmqctl set_permissions -p docker2 guest ".*" ".*" ".*"

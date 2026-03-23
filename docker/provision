@@ -2,7 +2,7 @@
 
 declare LTI_DEVKIT_ENABLE
 declare LTI_DEVKIT_PUBLISHED_PORT
-declare SECOND_INSTANCE_ENABLE
+declare SECONDARY_INSTANCE_ENABLE
 declare PROVISION_DEBUG_ENABLE
 
 source "$(dirname "$0")/functions"
@@ -51,7 +51,7 @@ esac
 
 # Is the second env in action?
 # If so, re-run the provision script for INSTANCE_ID=docker2
-case "${SECOND_INSTANCE_ENABLE}" in
+case "${SECONDARY_INSTANCE_ENABLE}" in
     1 | true | yes | on)
         "$(dirname "$0")/compose" exec -it -e INSTANCE_ID=docker2 $env_args -u root schoolbox-cli tools/docker-provision.sh --install-instance-only
         ;;
@@ -95,7 +95,7 @@ esac
 echo "Access the Schoolbox development instance via the following local URLs:"
 echo "This machine only:"
 echo "- https://docker.dev.schoolbox.cloud/"
-case "${SECOND_INSTANCE_ENABLE}" in
+case "${SECONDARY_INSTANCE_ENABLE}" in
     1 | true | yes | on)
         echo "- https://docker2.dev.schoolbox.cloud/ (separate instance)"
         echo "Other machines on this network (docker.dev.schoolbox.cloud only):"
