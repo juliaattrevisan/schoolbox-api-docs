@@ -154,6 +154,13 @@ class UserMapper extends Mapper
             'nationality',
         );
 
+        $this->joinsReverseMulti(
+            'user_id',
+            User\Language\Mapper::class,
+            'language',
+            'language',
+        );
+
         $this->hasJoin(
             'userAccess',
             array(
@@ -412,6 +419,9 @@ class UserMapper extends Mapper
         /** @var User\Nationality\Mapper $nationalityMapper */
         $nationalityMapper = $this->getJoinMapper('nationality');
 
+        /** @var User\Language\Mapper $languageMapper */
+        $languageMapper = $this->getJoinMapper('language');
+
         foreach ($statement as $row) {
             $userId = $row['id'];
 
@@ -461,15 +471,14 @@ class UserMapper extends Mapper
             $userIds          = array_keys($users);
             $campusesByUserId = $campusMapper->findForOtherMapper($this, 'userCampus', $userIds);
             $qualificationsByUserId = $qualificationMapper->findForOtherMapper($this, 'user_qualification', $userIds);
-            $nationalityPb = $nationalityMapper->getPredicateBuilder()->in('user_id', $userIds);
-            $nationalityByUserId = $nationalityMapper
-                ->findByPredicates($nationalityPb)
-                ->indexByCallback(fn (Schoolbox\User\Nationality\Model $nationality) => $nationality->getUser()->getId());
+            $nationalityByUserId = $nationalityMapper->findForOtherMapper($this, 'nationality', $userIds);
+            $languageByUserId = $languageMapper->findForOtherMapper($this, 'language', $userIds);
 
             foreach ($users as $userId => $user) {
                 $user->setCampusCollection($campusesByUserId[$userId] ?? $campusMapper->createCollection());
                 $user->setQualificationCollection($qualificationsByUserId[$userId] ?? $qualificationMapper->createCollection());
-                $user->setNationality($nationalityByUserId[$userId] ?? $nationalityMapper->createModel());
+                $user->setNationalityCollection($nationalityByUserId[$userId] ?? $nationalityMapper->createCollection());
+                $user->setLanguageCollection($languageByUserId[$userId] ?? $languageMapper->createCollection());
             }
 
             // Load linked users

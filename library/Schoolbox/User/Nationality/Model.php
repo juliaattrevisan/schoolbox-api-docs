@@ -2,7 +2,6 @@
 
 namespace Schoolbox\User\Nationality;
 
-use Schoolbox\IModel;
 use Schoolbox\Mapper\Traits\Model as ModelTraits;
 use Schoolbox\User;
 

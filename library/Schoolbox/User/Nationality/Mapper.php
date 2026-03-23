@@ -8,7 +8,6 @@
 namespace Schoolbox\User\Nationality;
 
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Mapper extends BaseMapper
@@ -27,7 +26,8 @@ class Mapper extends BaseMapper
             'id',
             null,
             null,
-            'user', 'user'
+            'user',
+            'user'
         );
         $this->uses('nationality', self::TYPE_STRING);
     }

@@ -31,6 +31,7 @@ use Schoolbox\IB\Qualification\Model as QualificationModel;
 use Schoolbox\User\Pronoun\Model;
 use SensitiveParameter;
 use Schoolbox\User\Nationality\Model as NationalityModel;
+use Schoolbox\User\Language\Model as LanguageModel;
 
 class User implements Serializable, Linkable, ISoftDeletable, IModel
 {
@@ -277,9 +278,11 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     private ?GenericCollection $qualificationCollection = null;
 
     /**
-     * @var NationalityModel|null
+     * @var GenericCollection
      */
-    private ?NationalityModel $nationality = null;
+    private GenericCollection $nationality;
+
+    private GenericCollection $languageCollection;
 
     public function __construct()
     {
@@ -295,9 +298,19 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         if ($this->campusCollection !== null) {
             $this->campusCollection = clone $this->campusCollection;
         }
+
         if ($this->qualificationCollection !== null) {
             $this->qualificationCollection = clone $this->qualificationCollection;
         }
+
+        if ($this->nationality !== null) {
+            $this->nationality = clone $this->nationality;
+        }
+
+        if ($this->languageCollection !== null) {
+            $this->languageCollection = clone $this->languageCollection;
+        }
+
         if ($this->accessList instanceof GenericCollection) {
             $this->accessList = clone $this->accessList;
         }
@@ -1503,21 +1516,41 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @param NationalityModel|null $nationality
+     * @param GenericCollection $nationality
      * @return self
      */
-    public function setNationality(?NationalityModel $nationality): self
+    public function setNationalityCollection(GenericCollection $nationality): self
     {
+        $nationality->assertCollectionOf(NationalityModel::class);
         $this->nationality = $nationality;
         return $this;
     }
 
     /**
-     * @return NationalityModel|null
+     * @return GenericCollection|null
      */
-    public function getNationality(): ?NationalityModel
+    public function getNationalityCollection(): ?GenericCollection
     {
         return $this->nationality;
+    }
+
+    /**
+     * @param GenericCollection $languageCollection
+     * @return self
+     */
+    public function setLanguageCollection(GenericCollection $languageCollection): self
+    {
+        $this->languageCollection->assertCollectionOf(LanguageModel::class);
+        $this->languageCollection = $languageCollection;
+        return $this;
+    }
+
+    /**
+     * @return GenericCollection
+     */
+    public function getLanguageCollection(): GenericCollection
+    {
+        return $this->languageCollection;
     }
 
     /**
