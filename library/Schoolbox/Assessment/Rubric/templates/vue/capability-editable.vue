@@ -29,8 +29,17 @@ interface Props {
 const props = defineProps<Props>();
 
 const capabilityName = defineModel<RubricGridCapability["name"]>("name", { required: true });
-const capabilityMaxValue = defineModel<RubricGridCapability["maxValue"] | null>("maxValue", { required: true });
 const indicators = defineModel<RubricGridCapability["indicators"]>("indicators", { required: true });
+
+const capabilityMaxValueModel = defineModel<RubricGridCapability["maxValue"] | null>("maxValue", { required: true });
+const capabilityMaxValue = window.Vue.computed({
+    get: () => capabilityMaxValueModel.value,
+    set: (value: string | number | null) => {
+        // clearing an input will attempt to set it to "", treat that as null instead
+        const isValid = typeof value === "number" && !Number.isNaN(value);
+        capabilityMaxValueModel.value = isValid ? value : null;
+    },
+});
 
 const emit = defineEmits<{ move: [direction: -1 | 1] }>();
 
@@ -138,9 +147,10 @@ const rubricSum = window.Vue.computed(() => {
                 v-model.number="capabilityMaxValue"
                 type="number"
                 class="rb-value-input"
+                required
             />
             <!-- todo: data-use-criterion-values -->
-            <a class="fieldAssign">Assign {{ rubricSum }} from {{ locale.rubricCriterion.plural() }}</a>
+            <a class="fieldAssign" href="#">Assign {{ rubricSum }} from {{ locale.rubricCriterion.plural() }} </a>
         </th>
     </tr>
 </template>

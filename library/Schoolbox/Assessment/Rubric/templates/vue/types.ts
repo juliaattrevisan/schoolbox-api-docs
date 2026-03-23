@@ -36,7 +36,7 @@ export type RubricGridIndicator = {
 export type RubricGridDescriptor = {
     id: number;
     description: string;
-    maxValue: number;
+    maxValue: number | null;
 };
 
 /**

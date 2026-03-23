@@ -14,7 +14,16 @@ const props = defineProps<Props>();
 
 const indicatorEnabled = defineModel<boolean>("indicatorEnabled", { required: true });
 const descriptorDescription = defineModel<RubricGridDescriptor["description"]>("description", { required: true });
-const descriptorMaxValue = defineModel<RubricGridDescriptor["maxValue"]>("maxValue", { required: true });
+
+const descriptorMaxValueModel = defineModel<RubricGridDescriptor["maxValue"] | null>("maxValue", { required: true });
+const descriptorMaxValue = window.Vue.computed({
+    get: () => descriptorMaxValueModel.value,
+    set: (value: string | number | null) => {
+        // clearing an input will attempt to set it to "", treat that as null instead
+        const isValid = typeof value === "number" && !Number.isNaN(value);
+        descriptorMaxValueModel.value = isValid ? value : null;
+    },
+});
 
 const textareaRef = window.Vue.useTemplateRef<HTMLTextAreaElement>("textareaRef");
 

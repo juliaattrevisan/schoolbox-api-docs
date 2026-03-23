@@ -2094,7 +2094,7 @@ class Controller extends Assessment\Controller
                         // fake negative ID to identify non existent descriptors in the frontend
                         'id' => $descriptor?->getId() ?? min(array_column($descriptors, 'id'), 0) - 1,
                         'description' => $descriptor?->getDescription() ?? '',
-                        'maxValue' => $descriptor?->getMaxValue() ?? 0,
+                        'maxValue' => $descriptor?->getMaxValue(),
                     ];
                 }
 
