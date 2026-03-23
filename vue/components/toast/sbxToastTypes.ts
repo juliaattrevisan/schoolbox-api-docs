@@ -34,7 +34,7 @@ export type Toast = {
  * The details passed when timing out a toast
  */
 export type ToastTimeoutDetail = {
-    text: string;
+    text?: string;
     isSuccess?: boolean;
     duration?: number; // Units: milliseconds.
     fadeDuration?: number; // Units: milliseconds.
