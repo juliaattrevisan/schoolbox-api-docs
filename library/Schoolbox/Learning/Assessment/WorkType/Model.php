@@ -249,11 +249,11 @@ class Model implements ISoftDeletable, Sequential
             throw new InsufficientHydrationException('Cannot determine visibility from NULL property');
         }
 
-        return match (($this->isVisibleToParents ? 1 : 0) . '-' . ($this->isVisibleToStudents ? 1 : 0)) {
-            '0-0' => Mapper::VISIBILITY_STAFF_ONLY,
-            '0-1' => Mapper::VISIBILITY_STAFF_STUDENTS,
-            '1-0' => Mapper::VISIBILITY_STAFF_PARENTS,
-            '1-1' => Mapper::VISIBILITY_STAFF_STUDENTS_PARENTS,
+        return match ([$this->isVisibleToParents, $this->isVisibleToStudents]) {
+            [false, false] => Mapper::VISIBILITY_STAFF_ONLY,
+            [false, true ] => Mapper::VISIBILITY_STAFF_STUDENTS,
+            [true , false] => Mapper::VISIBILITY_STAFF_PARENTS,
+            [true , true ] => Mapper::VISIBILITY_STAFF_STUDENTS_PARENTS,
         };
     }
 
