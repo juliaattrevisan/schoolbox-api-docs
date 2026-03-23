@@ -290,7 +290,13 @@ class Color
         $red   = filter_var($serialized['r'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
         $green = filter_var($serialized['g'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
         $blue  = filter_var($serialized['b'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
-        $alpha = filter_var($serialized['a'] ?? null, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
+        // filter_var with float seems to cast to string then float, which can
+        // result in lost resolution.
+        // If serialized value is actually a float, don't cast it.
+        $alpha = $serialized['a'] ?? null;
+        $alpha = is_float($alpha) || is_int($alpha)
+            ? floatval($alpha)
+            : filter_var($alpha, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
         if (!isset($red, $green, $blue, $alpha)) {
             trigger_error(
                 sprintf(
