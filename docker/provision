@@ -2,7 +2,9 @@
 
 declare LTI_DEVKIT_ENABLE
 declare LTI_DEVKIT_PUBLISHED_PORT
+declare PRIMARY_INSTANCE_HOSTNAME
 declare SECONDARY_INSTANCE_ENABLE
+declare SECONDARY_INSTANCE_HOSTNAME
 declare PROVISION_DEBUG_ENABLE
 
 source "$(dirname "$0")/functions"
@@ -94,11 +96,11 @@ esac
 # Output the URLs/IPs which this instance may be accessed from:
 echo "Access the Schoolbox development instance via the following local URLs:"
 echo "This machine only:"
-echo "- https://docker.dev.schoolbox.cloud/"
+echo "- https://${PRIMARY_INSTANCE_HOSTNAME}/"
 case "${SECONDARY_INSTANCE_ENABLE}" in
     1 | true | yes | on)
-        echo "- https://docker2.dev.schoolbox.cloud/ (separate instance)"
-        echo "Other machines on this network (docker.dev.schoolbox.cloud only):"
+        echo "- https://${SECONDARY_INSTANCE_HOSTNAME}/ (separate instance)"
+        echo "Other machines on this network (${PRIMARY_INSTANCE_HOSTNAME} only):"
         ;;
     * )
         echo "Other machines on this network:"
