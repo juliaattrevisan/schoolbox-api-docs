@@ -56,7 +56,8 @@ CREATE TABLE `reporting` (
 
 -- This is different to curriculum_node_for_assessment despite being the same schema.
 -- rcn means "filter the mega markbook to only show assessments that used descendents of this curriculum node(s)"
--- It does not mean "this reporting activity is associated with these curriculum nodes" which is what rcn means.
+-- It does not mean "this reporting activity is associated with these curriculum nodes" which is what cnfa
+-- (curriculum_node_for_assessment) means.
 --
 -- So, it's the same schema structure but has a different contextual usage.
 CREATE TABLE `reporting_curriculum_node` (
