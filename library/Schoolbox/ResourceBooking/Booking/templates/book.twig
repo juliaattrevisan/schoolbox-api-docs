@@ -166,11 +166,12 @@ $(function() {
                 } catch (e) {
                     // noop
                 }
-                window.location.href = (
-                    $('#resource-booking-back').attr('href') +
-                    dateQuery +
-                    (dateQuery === '' ? '?' : '&') + 'calendarToast=' + encodeURIComponent(data.message)
-                );
+
+                let redirectUrl = $('#resource-booking-back').attr('href') + dateQuery;
+                if (typeof data.message === 'string' && data.message.trim() !== '') {
+                    redirectUrl += (dateQuery === '' ? '?' : '&') + 'calendarToast=' + encodeURIComponent(data.message.trim());
+                }
+                window.location.href = redirectUrl;
             }
         };
         var ajaxFail = function (jqXHR) {
