@@ -83,6 +83,12 @@ export default {
         };
     },
 
+    computed: {
+        locale() {
+            return locale;
+        },
+    },
+
     mounted() {
         this.updateFieldsOriginal = Object.assign({}, this.updateFields); //to reset to original values
     },
