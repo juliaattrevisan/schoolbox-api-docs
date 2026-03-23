@@ -129,7 +129,7 @@ class Controller extends ConfigController
             $this->persistPostedConfigs($this->flattenPostedConfigs($this->requestPost->get('configs') ?? []));
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {
-            $status = Response::HTTP_BAD_REQUEST;
+            $status = Response::HTTP_INTERNAL_SERVER_ERROR;
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($status);
             $this->response = $this->responseAsJson($problem->asArray())->withStatus($status);
@@ -148,7 +148,7 @@ class Controller extends ConfigController
 
             $this->response = $this->responseFromContent($css, null, 'text/css')->withHeader('Cache-Control', $cacheControl);
         } catch (\Throwable $e) {
-            $status = Response::HTTP_BAD_REQUEST;
+            $status = Response::HTTP_INTERNAL_SERVER_ERROR;
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($status);
             $this->response = $this->responseAsJson($problem->asArray())->withStatus($status);
