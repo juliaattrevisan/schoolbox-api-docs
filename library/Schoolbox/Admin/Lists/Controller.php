@@ -29,7 +29,13 @@ use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Learning\Assessment\AssessmentType;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
+use Schoolbox\Learning\Assessment\Lti\Model as Lti;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Moment\Tag\Mapper as LearningMomentEvidenceTag;
@@ -1141,49 +1147,49 @@ class Controller extends Base
                         'default'   => '',
                     ],
                     'permittedProject' => [
-                        'caption'    => AssessmentType::stringToReadableName(AssessmentType::TYPE_PROJECT),
+                        'caption'    => Project::getDefaultTypeName(),
                         'checkbox'   => true,
                         'mandatory'  => true,
                         'default'    => false,
                         'popOutList' => 'permittedActivities',
                     ],
                     'permittedDueWork' => [
-                        'caption'    => AssessmentType::stringToReadableName(AssessmentType::TYPE_DUE_WORK),
+                        'caption'    => DueWork::getDefaultTypeName(),
                         'checkbox'   => true,
                         'mandatory'  => true,
                         'default'    => false,
                         'popOutList' => 'permittedActivities',
                     ],
                     'permittedTask' => [
-                        'caption'    => AssessmentType::stringToReadableName(AssessmentType::TYPE_TASK),
+                        'caption'    => Task::getDefaultTypeName(),
                         'checkbox'   => true,
                         'mandatory'  => true,
                         'default'    => false,
                         'popOutList' => 'permittedActivities',
                     ],
                     'permittedQuiz' => [
-                        'caption'    => AssessmentType::stringToReadableName(AssessmentType::TYPE_QUIZ),
+                        'caption'    => Quiz::getDefaultTypeName(),
                         'checkbox'   => true,
                         'mandatory'  => true,
                         'default'    => false,
                         'popOutList' => 'permittedActivities',
                     ],
                     'permittedLti' => [
-                        'caption'    => AssessmentType::stringToReadableName(AssessmentType::TYPE_LTI_ASSESSMENT),
+                        'caption'    => Lti::getDefaultTypeName(),
                         'checkbox'   => true,
                         'mandatory'  => true,
                         'default'    => false,
                         'popOutList' => 'permittedActivities',
                     ],
                     'permittedLessonPlan' => [
-                        'caption'    => AssessmentType::stringToReadableName(AssessmentType::TYPE_LESSON_PLAN),
+                        'caption'    => LessonPlan::getDefaultTypeName(),
                         'checkbox'   => true,
                         'mandatory'  => true,
                         'default'    => false,
                         'popOutList' => 'permittedActivities',
                     ],
                     'permittedDialogAgent' => [
-                        'caption'    => AssessmentType::stringToReadableName(AssessmentType::TYPE_DIALOG_AGENT),
+                        'caption'    => DialogAgent::getDefaultTypeName(),
                         'checkbox'   => true,
                         'mandatory'  => true,
                         'default'    => false,
