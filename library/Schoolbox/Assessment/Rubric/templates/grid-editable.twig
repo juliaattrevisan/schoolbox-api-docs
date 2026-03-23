@@ -2,6 +2,8 @@
     <rubric-grid-editable
         :rubric-grid-payload="{{ rubricGridPayload|json_encode }}"
         :max-levels="{{ config.rubric_max_levels }}"
+        :folder-id="{{ folderId }}"
+        :route-rubric-create="{{ routeLookup("rubric.create") }}"
     />
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricGridEditable.js?v={{ config.site_version }}"></script>

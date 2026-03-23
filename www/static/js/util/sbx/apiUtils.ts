@@ -274,9 +274,10 @@ function parseResponse<TResponseData>(
  * @param options - Options for the API request
  * @returns - A typed response from the server including a success state
  */
-export async function apiRequest<TResponseData, TBody extends ApiRequestBodyBase | undefined = undefined>(
-    options: ApiRequestOptions<TBody>,
-): Promise<ApiBaseResponse<TResponseData>> {
+export async function apiRequest<
+    TResponseData,
+    TBody extends ApiRequestBodyBase | undefined = ApiRequestBodyBase | undefined,
+>(options: ApiRequestOptions<TBody>): Promise<ApiBaseResponse<TResponseData>> {
     const request = buildRequest("application/json", options);
 
     let response: Response;

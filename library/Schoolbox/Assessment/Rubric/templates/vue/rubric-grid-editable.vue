@@ -10,11 +10,14 @@ import { MARK_TYPE_VALUE_NONE } from "@schoolboxAssessment/Types/MarkType";
 import LevelEditable from "./level-editable.vue";
 import CapabilityEditable from "./capability-editable.vue";
 import { MAX_CAPABILITY_LENGTH } from "./types";
-import type { RubricGrid, RubricGridLevel } from "./types";
+import type { RubricGrid, RubricGridLevel, RubricGridCapability } from "./types";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 
 interface Props {
     rubricGridPayload: RubricGrid;
     maxLevels: number;
+    folderId: number;
+    routeRubricCreate: string;
 }
 const props = defineProps<Props>();
 
@@ -44,6 +47,81 @@ function addLevel(): void {
     rubricGrid.value.levels.push(newLevel);
 
     // todo: handle adding new descriptors
+}
+
+/**
+ * Returns the normalised string for comparison to avoid duplicates.
+ * MUST use same logic as RubricMapper->normaliseForComparison()
+ * @param string the string to normalise
+ * @returns normalised string
+ */
+function normaliseForComparison(string: string): string {
+    // Ensure var really is a string before performing string operations
+    return string.toString().replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+const isAddingCapability = window.Vue.ref(false);
+const newCapabilityName = window.Vue.ref("");
+
+/**
+ * When a key is pressed in the "add capability" textarea,
+ * if it's a non-shift return (i.e. shift+return is ignored), add a new capability to the grid
+ * @param event the keydown event
+ */
+async function onAddCapabilityKeydown(event: KeyboardEvent): Promise<void> {
+    if (event.key !== "Enter" || event.shiftKey) {
+        return;
+    }
+
+    event.preventDefault();
+    const name = newCapabilityName.value.trim();
+
+    if (name.length === 0 || isAddingCapability.value) {
+        return; // prevent blank and double-fire from keydown to blue
+    }
+
+    isAddingCapability.value = true; // prevent mods & double-fire
+    newCapabilityName.value = "";
+
+    /**
+     * Ensure user is not trying to add a duplicate group. The server-side validation will prevent
+     * duplicate criterion, but cannot prevent duplicate groups as they are not persisted until a indicator
+     * name is entered.
+     */
+    const normalisedName = normaliseForComparison(name);
+
+    const toast = window.sbProps.toastActivate(`Creating ${locale.rubricGroup.singular()}...`);
+    if (rubricGrid.value.capabilities.some((c) => normaliseForComparison(c.name) === normalisedName)) {
+        toast.timeout({
+            text: `${locale.rubricGroup.proper()} name already exists!`,
+            isSuccess: false,
+        });
+        return;
+    }
+
+    const response = await apiRequest<RubricGridCapability>({
+        url: props.routeRubricCreate,
+        method: "POST",
+        body: {
+            type: "group",
+            rubricId: rubricGrid.value.id,
+            groupId: null, // adding a new capability
+            groupIndex: 0, // todo: don't need this anymore... it's only used to render the old twig stuff
+            name,
+            levelCount: rubricGrid.value.levels.length,
+            folderId: props.folderId,
+        },
+    });
+
+    isAddingCapability.value = false;
+    if (!response.success) {
+        toast.timeout({ text: response.message, isSuccess: false });
+        return;
+    }
+
+    toast.timeout({ text: `${locale.rubricGroup.proper()} created!` });
+    // TODO: this assumes the API returns the new capability struct, that is definitely not the case right now
+    rubricGrid.value.capabilities.push(response.data);
 }
 
 /**
@@ -172,10 +250,13 @@ window.Vue.watch(rubricSum, (newValue) => {
                 <tr class="rb-group-header rb-new-group">
                     <!-- Add a new group -->
                     <th :colspan="totalColumns">
-                        <!-- TODO: data-spawn="group" data-group-grid-text -->
+                        <!-- TODO: previously some of these only added maxlength after the first change (data-group-grid-text in grid-editable.twig) -->
                         <textarea
+                            :v-model="newCapabilityName"
                             :placeholder="`+ Type to add new ${locale.rubricGroup.singular()}`"
                             :maxlength="MAX_CAPABILITY_LENGTH"
+                            :disabled="isAddingCapability"
+                            @keydown="onAddCapabilityKeydown"
                         ></textarea>
                     </th>
                 </tr>
