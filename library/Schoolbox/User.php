@@ -30,6 +30,7 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\IB\Qualification\Model as QualificationModel;
 use Schoolbox\User\Pronoun\Model;
 use SensitiveParameter;
+use Schoolbox\User\Nationality\Model as NationalityModel;
 
 class User implements Serializable, Linkable, ISoftDeletable, IModel
 {
@@ -274,6 +275,11 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
     /** @var GenericCollection|null Collection of IB qualifications assigned to this user */
     private ?GenericCollection $qualificationCollection = null;
+
+    /**
+     * @var NationalityModel|null
+     */
+    private ?NationalityModel $nationality = null;
 
     public function __construct()
     {
@@ -1494,6 +1500,24 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function getPronoun(): ?Model
     {
         return $this->pronoun;
+    }
+
+    /**
+     * @param NationalityModel|null $nationality
+     * @return self
+     */
+    public function setNationality(?NationalityModel $nationality): self
+    {
+        $this->nationality = $nationality;
+        return $this;
+    }
+
+    /**
+     * @return NationalityModel|null
+     */
+    public function getNationality(): ?NationalityModel
+    {
+        return $this->nationality;
     }
 
     /**

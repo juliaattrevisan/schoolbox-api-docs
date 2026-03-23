@@ -138,6 +138,22 @@ class UserMapper extends Mapper
         $this->joinsVia('user_qualification', QualificationMapper::class, 'id', 'qualification_id', 'user_id', null, null, null, 'qualificationCollection');
         $this->uses('ib_candidate_number', self::TYPE_STRING);
 
+//        $this->joins(
+//            'user_qualification',
+//            IB\Qualification\Mapper::class,
+//            'id',
+//            null,
+//            null,
+//            'qualification',
+//        );
+
+        $this->joinsReverseMulti(
+            'user_id',
+            User\Nationality\Mapper::class,
+            'nationality',
+            'nationality',
+        );
+
         $this->hasJoin(
             'userAccess',
             array(
@@ -393,6 +409,9 @@ class UserMapper extends Mapper
         /** @var QualificationMapper $qualificationMapper */
         $qualificationMapper = $this->getJoinMapper('user_qualification');
 
+        /** @var User\Nationality\Mapper $nationalityMapper */
+        $nationalityMapper = $this->getJoinMapper('nationality');
+
         foreach ($statement as $row) {
             $userId = $row['id'];
 
@@ -438,13 +457,19 @@ class UserMapper extends Mapper
 
         // Load one-to-many relations in separate queries
         if (!empty($users)) {
-            // Load campuses and qualifications
-            $userIds                = array_keys($users);
-            $campusesByUserId       = $campusMapper->findForOtherMapper($this, 'userCampus', $userIds);
+            // Load campuses
+            $userIds          = array_keys($users);
+            $campusesByUserId = $campusMapper->findForOtherMapper($this, 'userCampus', $userIds);
             $qualificationsByUserId = $qualificationMapper->findForOtherMapper($this, 'user_qualification', $userIds);
+            $nationalityPb = $nationalityMapper->getPredicateBuilder()->in('user_id', $userIds);
+            $nationalityByUserId = $nationalityMapper
+                ->findByPredicates($nationalityPb)
+                ->indexByCallback(fn (Schoolbox\User\Nationality\Model $nationality) => $nationality->getUser()->getId());
+
             foreach ($users as $userId => $user) {
                 $user->setCampusCollection($campusesByUserId[$userId] ?? $campusMapper->createCollection());
                 $user->setQualificationCollection($qualificationsByUserId[$userId] ?? $qualificationMapper->createCollection());
+                $user->setNationality($nationalityByUserId[$userId] ?? $nationalityMapper->createModel());
             }
 
             // Load linked users
