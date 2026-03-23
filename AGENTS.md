@@ -5,9 +5,9 @@
 Schoolbox is a school management platform combining LMS and SIS functionality.
 It is deployed internally and not shipped in client packages.
 
-- **Backend:** PHP (version as per `composer.json`; expected to track an actively supported version — see [php.net/supported-versions](https://www.php.net/supported-versions.php))
+- **Backend:** PHP 8.4
 - **Frontend:** Vue 3 + TypeScript
-- **Data stores:** MySQL/MariaDB, Redis
+- **Data stores:** MariaDB 11.8, Redis 6.0
 - **Deployment:** two environments:
   - **client-hosted** — school's own infrastructure (cloud or physical servers); deployed as APT packages managed via Puppet
   - **cloud-saas** — Schoolbox-managed cloud infrastructure; hybrid: web requests served by container images built via GitHub Actions, background tasks and daemons run on a Puppet-managed server
@@ -110,12 +110,12 @@ docker/ssh
 
 ## Testing
 
-| Suite                    | Tool        | Config file                              |
-|--------------------------|-------------|------------------------------------------|
-| PHP unit                 | PHPUnit     | `phpunit.xml`                            |
-| Acceptance / integration | Codeception | `codeception.dist.yml`                   |
-| JS unit                  | Jest        | `jest.config.js` (happy-dom environment) |
-| E2E browser              | Playwright  | `playwright.config.ts`                   |
+| Suite       | Tool        | Config file            | Environment       | Test file location                           | Scope                                             |
+|-------------|-------------|------------------------|-------------------|----------------------------------------------|---------------------------------------------------|
+| PHP unit    | PHPUnit     | `phpunit.xml`          | CLI               | Alongside PHP code, in `Test` folders        | PHP code at class and function level              |
+| Smoke, API  | Codeception | `codeception.dist.yml` | PhpBrowser        | `test/codeception`                           | Browser requests (does not test user interaction) |
+| JS unit     | Jest        | `jest.config.js`       | happy-dom         | Alongside JS/TS/Vue code, in `tests` folders | JS code at class and function level               |
+| E2E browser | Playwright  | `playwright.config.ts` | headless Chromium | `test/playwright`                            | User interaction                                  |
 
 Run the relevant suite(s) for changed code before marking work done.
 
