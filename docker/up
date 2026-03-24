@@ -398,8 +398,8 @@ function start_containers() {
 function main() {
     verify_executables
     output_help "$@"
-    create_dirs
     load_config
+    create_dirs
     login_to_aws
     login_to_container_registry
     build_image_names
