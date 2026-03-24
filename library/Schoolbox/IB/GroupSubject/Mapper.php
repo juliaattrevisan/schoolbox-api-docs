@@ -72,7 +72,7 @@ class Mapper extends BaseMapper
         $statement = $this->getDatabase()->prepare($sql);
         $statement->bindValue(':groupId', $groupId, \PDO::PARAM_INT);
         $statement->execute();
-        
+
         return $statement->fetchAll(\PDO::FETCH_OBJ);
     }
 }

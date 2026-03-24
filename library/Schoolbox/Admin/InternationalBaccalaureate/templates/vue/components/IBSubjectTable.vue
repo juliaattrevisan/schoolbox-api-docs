@@ -99,9 +99,7 @@ window.Vue.onMounted(() => {
  */
 function openLanguageModal(rowId: string): void {
     currentEditingRow.value = rowId;
-    if (languageModal.value) {
-        languageModal.value.open();
-    }
+    languageModal.value?.open();
 }
 
 /**
@@ -232,7 +230,7 @@ function getCurrentRowLanguages(): string[] {
  * This would typically call an API to get actual student counts
  * @param rowId - The ID of the row to update student count for
  */
-async function updateStudentCount(rowId: string): Promise<void> {
+function updateStudentCount(rowId: string): void {
     const row = subjectRows.value.find((r) => r.id === rowId);
     if (!row) return;
 

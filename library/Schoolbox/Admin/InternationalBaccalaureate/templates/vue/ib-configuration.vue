@@ -7,10 +7,7 @@
 
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
-import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
-import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
-import IBGeneralConfig from "./components/IBGeneralConfig.vue";
-import IBSubjectTable from "./components/IBSubjectTable.vue";
+// Components will be imported when needed in the template
 import type { IBCategory, IBConfiguration } from "../js/types/ibConfigurationTypes";
 
 interface Props {
@@ -36,21 +33,7 @@ const isGeneralConfigTab = window.Vue.computed(
         currentCategory.value.name.toLowerCase().includes("config"),
 );
 
-// Computed property to get subjects for current category
-const currentSubjects = window.Vue.computed(() => {
-    return currentSubjectsFromAPI.value;
-});
-
-/**
- * Handles configuration changes for general tab
- * @param config - The configuration object that changed
- * @param newValue - The new value for the configuration
- */
-function onConfigChange(config: IBConfiguration, newValue: string): void {
-    // Handle configuration changes for general tab
-    // This can be extended if needed for form tracking
-    console.info("Config changed:", config.key, newValue);
-}
+// Removed unused computed property and function
 
 /**
  * Load subjects for the current category from the API.

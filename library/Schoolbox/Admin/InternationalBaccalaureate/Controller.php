@@ -128,7 +128,6 @@ class Controller extends BaseController
                 if (empty($configurations)) {
                     $configurations = [];
                 }
-
             } catch (Exception $e) {
                 // If there's an error loading from config, return empty array
                 $configurations = [];

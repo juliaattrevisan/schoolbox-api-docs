@@ -21,8 +21,8 @@ const currentValues = window.Vue.ref<{ [key: string]: string }>({});
 // Initialize form values
 window.Vue.watch(
     () => props.configurations,
-    (newConfigs) => {
-        newConfigs.forEach((config) => {
+    (newConfigs: IBConfiguration[]) => {
+        newConfigs.forEach((config: IBConfiguration) => {
             currentValues.value[config.key] = config.value || "";
         });
     },
@@ -49,7 +49,7 @@ async function saveGeneralConfig(): Promise<void> {
         isSaving.value = true;
 
         for (const config of props.configurations) {
-            const newValue = currentValues.value[config.key];
+            const newValue: string = currentValues.value[config.key];
 
             const response = await fetch(props.saveEndpoint, {
                 method: "POST",
