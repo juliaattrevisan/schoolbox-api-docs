@@ -348,7 +348,7 @@ class Mapper extends \Schoolbox\Mapper
             $newSelectionIds[] = $workType->getId();
         }
 
-        /* Load nodes that already exist in the db: we maybe need to remove some of these
+        /* Load work types that already exist in the db: we maybe need to remove some of these
          */
         $oldSelections = $this->database->executeQuery("
             SELECT work_type_id
