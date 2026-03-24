@@ -311,7 +311,7 @@ class Mapper extends \Schoolbox\Mapper
          * Make all the removal changes...or none of the removal changes - preventing a partial update where one query
          * succeeds but others fail (for whatever reason)
          */
-        $this->database->transact(function() use ($model, $diff) {
+        $this->database->transact(function () use ($model, $diff) {
             $placeholders = Builder::getArrayPlaceholders($diff, 'cnodeId');
             $params = Builder::getArrayParameters($diff, 'cnodeId');
 
@@ -378,7 +378,7 @@ class Mapper extends \Schoolbox\Mapper
          * Make all the removal changes...or none of the removal changes - preventing a partial update where one query
          * succeeds but others fail (for whatever reason)
          */
-        $this->database->transact(function() use ($model, $diff) {
+        $this->database->transact(function () use ($model, $diff) {
             $placeholders = Builder::getArrayPlaceholders($diff, 'worktypeId');
             $params = Builder::getArrayParameters($diff, 'worktypeId');
 
