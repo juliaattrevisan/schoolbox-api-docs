@@ -181,6 +181,7 @@ body.sbx-body {
         border-left: none;
         border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
         line-height: 1;
+        // this is the same as $small-only, which we can't currently import in this context
         @media only print, screen and (max-width: 40em) {
             border-left: var(--sbx-border-width-normal);
             border-radius: var(--sbx-config-field-roundness);

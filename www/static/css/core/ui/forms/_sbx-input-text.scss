@@ -4,7 +4,6 @@
  */
 
 @use "sbx-form";
-@use "../../base/settings";
 
 body.sbx-body {
     // Base
@@ -65,6 +64,7 @@ body.sbx-body {
     .input-group {
         input {
             border-radius: var(--sbx-config-field-roundness) 0 0 var(--sbx-config-field-roundness);
+            // this is the same as $small-only, which we can't currently import in this context
             @media only print, screen and (max-width: 40em) {
                 border-radius: var(--sbx-config-field-roundness);
             }
