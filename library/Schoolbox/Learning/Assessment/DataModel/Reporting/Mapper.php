@@ -247,40 +247,15 @@ class Mapper extends \Schoolbox\Mapper
      * for the maybe-rare circumstance that you want zero curric nodes and zero work types selected...not sure if those
      * scenarios actually occur at the moment.
      *
-     * TODO you could potentially do a diff, but it's probably going to be easier to just remove and reinsert
-     *
      * @param Model $model
      * @param Model|null $previous
      * @return void
+     * @throws \Throwable
      */
     public function clearRelations(Model $model, ?Model $previous = null): void
     {
         $this->updateSupportingDataCurriculumNodeRelations($model, $previous);
-
-//        die();
-//        /* This feels like a solved problem, but I can't find something similar across the mappers except for
-//         * persistFiles() but that doesn't use a join table.
-//         */
-//        $query = "
-//            DELETE FROM reporting_curriculum_node
-//            WHERE reporting_id = :id
-//        ";
-//
-//        $this->database->executeQuery($query, [
-//            'id' => $model->getId()
-//        ]);
-//
-//        /* This feels like a solved problem, but I can't find something similar across the mappers except for
-//         * persistFiles() but that doesn't use a join table.
-//         */
-//        $query = "
-//            DELETE FROM reporting_work_type
-//            WHERE reporting_id = :id
-//        ";
-//
-//        $this->database->executeQuery($query, [
-//            'id' => $model->getId()
-//        ]);
+        $this->updateSupportingDataWorkTypeRelations($model, $previous);
     }
 
 
@@ -346,6 +321,75 @@ class Mapper extends \Schoolbox\Mapper
                 DELETE FROM reporting_curriculum_node
                 WHERE reporting_id = :reportingId
                 AND curriculum_node_id IN {$placeholders}
+            ", array_merge([
+                'reportingId' => $model->getId(),
+            ], $params));
+        });
+    }
+
+
+    /**
+     * Updates supporting data's work types using a diff to avoid an exotic transaction issue: see SA-21417
+     *
+     * @param Model $model
+     * @param Model|null $previous
+     * @return void
+     * @throws \Throwable
+     */
+    private function updateSupportingDataWorkTypeRelations(Model $model, ?Model $previous = null): void
+    {
+        /* Set up a container for new curric node instances
+         */
+        $newSelections = new GenericCollection(\Schoolbox\Learning\Assessment\WorkType\Model::class);
+
+        /* Pile in selections that are supposed to exist after this mutation
+         * The null coalesce dodges around a swampy behaviour where a collection isn't instantiated in $model for the
+         * particular case where you removed all the work types via the ui (ie. you literally wanted to select nothing)
+         */
+        foreach ($model->getSupportingDataWorkTypes() ?? [] as $workType) {
+            $newSelections->add($workType);
+        }
+
+        $newSelectionIds = $newSelections->getPropertyValues('id');
+
+        /* Load nodes that already exist in the db: we maybe need to remove some of these
+         */
+        $oldSelections = $this->database->executeQuery("
+            SELECT work_type_id
+            FROM reporting_work_type
+            WHERE reporting_id = :reportingId
+        ", [
+            'reportingId' => $model->getId()
+        ]);
+
+        $oldSelectionIds = $oldSelections->fetchColumnArray('work_type_id');
+
+        /* Calculate the diff because we need to delete those that are no longer in $newSelections; since we're
+         * interrogating the join table, there's no exact mapper/model for it: we also don't really need to hydrate
+         * anything just to delete it, so we can fetch the ids by themselves first.
+         */
+        $diff = array_diff($oldSelectionIds, $newSelectionIds);
+
+        /* Old selections == new selections (you didn't change anything)
+         * Nothing to do: exit earlyish
+         */
+        if (!count($diff)) {
+            return;
+        }
+
+        /* If there's something to remove, do it
+         *
+         * Make all the removal changes...or none of the removal changes - preventing a partial update where one query
+         * succeeds but others fail (for whatever reason)
+         */
+        $this->database->transact(function() use ($model, $diff) {
+            $placeholders = Builder::getArrayPlaceholders($diff, 'worktypeId');
+            $params = Builder::getArrayParameters($diff, 'worktypeId');
+
+            $this->database->executeQuery("
+                DELETE FROM reporting_work_type
+                WHERE reporting_id = :reportingId
+                AND work_type_id IN {$placeholders}
             ", array_merge([
                 'reportingId' => $model->getId(),
             ], $params));
