@@ -299,10 +299,14 @@ class Mapper extends \Schoolbox\Mapper
         $newSelections = new GenericCollection(\Schoolbox\Curriculum\Node\Model::class);
 
         /* Pile in selections that are supposed to exist after this mutation
+         * The null coalesce dodges around a swampy behaviour where a collection isn't instantiated in $model for the
+         * particular case where you removed all the nodes via the ui (ie. you literally wanted to select nothing)
          */
-        foreach ($model->getSupportingDataCurriculumNodes() as $curriculumNode) {
+        foreach ($model->getSupportingDataCurriculumNodes() ?? [] as $curriculumNode) {
             $newSelections->add($curriculumNode);
         }
+
+        $newSelectionIds = $newSelections->getPropertyValues('id');
 
         /* Load nodes that already exist in the db: we maybe need to remove some of these
          */
@@ -314,20 +318,27 @@ class Mapper extends \Schoolbox\Mapper
             'reportingId' => $model->getId()
         ]);
 
+        $oldSelectionIds = $oldSelections->fetchColumnArray('curriculum_node_id');
+
         /* Calculate the diff because we need to delete those that are no longer in $newSelections; since we're
          * interrogating the join table, there's no exact mapper/model for it: we also don't really need to hydrate
          * anything just to delete it, so we can fetch the ids by themselves first.
          */
-        $oldSelectionIds = $oldSelections->fetchColumnArray('curriculum_node_id');
+        $diff = array_diff($oldSelectionIds, $newSelectionIds);
 
-        /* Make all the removal changes...or none of the removal changes - preventing a partial update where one query
+        /* Old selections == new selections (you didn't change anything)
+         * Nothing to do: exit earlyish
+         */
+        if (!count($diff)) {
+            return;
+        }
+
+        /* If there's something to remove, do it
+         *
+         * Make all the removal changes...or none of the removal changes - preventing a partial update where one query
          * succeeds but others fail (for whatever reason)
          */
-        $this->database->transact(function() use ($model, $newSelections, $oldSelectionIds) {
-            $newSelectionIds = $newSelections->getPropertyValues('id');
-
-            $diff = array_diff($oldSelectionIds, $newSelectionIds);
-
+        $this->database->transact(function() use ($model, $diff) {
             $placeholders = Builder::getArrayPlaceholders($diff, 'cnodeId');
             $params = Builder::getArrayParameters($diff, 'cnodeId');
 
