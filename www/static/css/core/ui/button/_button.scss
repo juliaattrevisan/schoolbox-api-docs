@@ -371,3 +371,23 @@ button.submit {
     display: inline-flex;
     gap: var(--spacing-s);
 }
+
+// a button with only SVG icons that displays inline with text
+.sbx-icon-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-s);
+    flex-wrap: nowrap;
+}
+.sbx-icon-actions .sbx-icon-only-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    flex: 0 0 auto;
+    margin: 0;
+}
+.sbx-icon-actions .sbx-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+}

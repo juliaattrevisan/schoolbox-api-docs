@@ -67,7 +67,9 @@
                                 <nav>
                                     {# Fudge some accessibility text here later, I guess #}
                                     {% if updateRoute %}
-                                        <a class="icon-modify" href="{{ updateRoute }}" title="Modify"></a>
+                                        <a class="sbx-icon-only-button" href="{{ updateRoute }}" title="Modify" aria-label="Modify">
+                                            <sbx-icon name="modify"></sbx-icon>
+                                        </a>
                                     {% endif %}
 
                                     {% if enableRoute or deleteRoute %}

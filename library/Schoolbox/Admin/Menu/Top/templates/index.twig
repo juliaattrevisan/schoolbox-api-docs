@@ -10,7 +10,7 @@
         {% if menu | length == 0 %}
         <div class="small-12 island">
             <div class="empty-state">
-                <i class="icon-month-view"></i>
+                <sbx-icon name="month-view" size="2rem"></sbx-icon>
                 <p>Your top menu is empty.</p>
                 <p><a href="{{ routeLookup('adminMenuTop.getCreate') }}" title="Post some news">Create first top menu item</a></p>
             </div>
@@ -18,7 +18,7 @@
         {% else %}
         <div class="small-12 hide" data-tabs-empty>
             <div class="empty-state">
-                <i class="icon-month-view"></i>
+                <sbx-icon name="month-view" size="2rem"></sbx-icon>
                 <p>Your top menu is empty.</p>
                 <p><a href="{{ routeLookup('adminMenuTop.getCreate') }}" title="Post some news">Create first top menu item</a></p>
             </div>
@@ -32,7 +32,9 @@
                     </div>
                 </div>
                 <nav>
-                    <a href="{{ routeLookup('adminMenuTop.getCreate') }}" class="icon-add" title="Add Menu Item"></a>
+                    <a href="{{ routeLookup('adminMenuTop.getCreate') }}" class="sbx-icon-only-button" title="Add Menu Item" aria-label="Add Menu Item">
+                        <sbx-icon name="add"></sbx-icon>
+                    </a>
                 </nav>
             </div>
 
@@ -44,16 +46,22 @@
                                 <div class="grip"></div>
                                 <div class="list-item">
                                     <div class="card small-12">
-                                        <a>
-                                            <div class="icon-{{ item.icon }} size-32"></div>
-                                            <h3>{{ item.text }}</h3>
-                                            <p class="meta">{{ item.title }}</p>
+                                        <a class="l-flex-row l-flex--no-wrap l-flex--align-start l-gap-m">
+                                            <sbx-icon name="{{ item.icon }}" size="1.5rem" color="var(--body-foreground)"></sbx-icon>
+                                            <div class="l-flex-col l-gap-xs">
+                                                <h3>{{ item.text }}</h3>
+                                                <p class="meta">{{ item.title }}</p>
+                                            </div>
                                         </a>
                                     </div>
                                 </div>
                                 <nav>
-                                    <a class="icon-modify" title="Edit menu item" href="{{ routeLookup('adminMenuTop.getModify', {id: item.id}) }}"></a>
-                                    <a class="icon-delete" data-delete="{{ item.id }}" title="Delete menu item"></a>
+                                    <a class="sbx-icon-only-button" title="Edit menu item" aria-label="Edit menu item" href="{{ routeLookup('adminMenuTop.getModify', {id: item.id}) }}">
+                                        <sbx-icon name="modify"></sbx-icon>
+                                    </a>
+                                    <a class="sbx-icon-only-button" data-delete="{{ item.id }}" title="Delete menu item" aria-label="Delete menu item">
+                                        <sbx-icon name="delete"></sbx-icon>
+                                    </a>
                                 </nav>
                             </div>
                         </li>

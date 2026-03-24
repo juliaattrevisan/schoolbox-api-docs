@@ -371,7 +371,7 @@ window.Vue.watch(modifySelected, (newSelected) => {
         <div class="small-12 island">
             <template v-if="clientList.length === 0">
                 <div id="listEmptyState" class="empty-state">
-                    <i class="icon-list"></i>
+                    <sbx-icon name="list" />
                     <p>
                         No oAuth clients have been configured.
                         <a href="#add-client" @click.prevent="showAddModal">Add an oAuth client</a>.
@@ -400,29 +400,29 @@ window.Vue.watch(modifySelected, (newSelected) => {
                                 }}</a>
                                 <em v-else>No user</em>
                             </td>
-                            <td class="actions-small-2">
-                                <nav>
-                                    <a
-                                        href="#modify"
-                                        class="icon-modify no-text"
+                            <td class="actions-small-3">
+                                <nav class="sbx-icon-actions">
+                                    <button
+                                        class="sbx-icon-only-button f-no-margins"
                                         title="Modify this client"
                                         aria-label="Modify this client"
-                                        @click.prevent="showModifyModal(row)"
-                                    ></a>
-                                    <a
-                                        href="#regenerate"
-                                        class="icon-refresh no-text"
-                                        title="Regenerate this client&rsquo;s secret"
-                                        aria-label="Regenerate this client&rsquo;s secret"
-                                        @click.prevent="showRegenerateModal(row)"
-                                    ></a>
-                                    <a
-                                        href="#delete"
-                                        class="icon-delete no-text"
+                                    >
+                                        <sbx-icon name="modify" />
+                                    </button>
+                                    <button
+                                        class="sbx-icon-only-button f-no-margins"
+                                        title="Regenerate this client’s secret"
+                                        aria-label="Regenerate this client’s secret"
+                                    >
+                                        <sbx-icon name="refresh" />
+                                    </button>
+                                    <button
+                                        class="sbx-icon-only-button f-no-margins"
                                         title="Delete this client"
                                         aria-label="Delete this client"
-                                        @click.prevent="showDeleteModal(row)"
-                                    ></a>
+                                    >
+                                        <sbx-icon name="delete" />
+                                    </button>
                                 </nav>
                             </td>
                         </tr>

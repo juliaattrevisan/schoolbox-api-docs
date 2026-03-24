@@ -319,9 +319,33 @@ export default {
             </template>
             <template #edit="props">
                 <nav class="edit">
-                    <a class="icon-eye" @click.prevent="onClickGetKey(props.row)" title="View DKIM TXT Record"></a>
-                    <a class="icon-modify" @click.prevent="onClickModifyDomain(props.row)" title="Modify domain"></a>
-                    <a class="icon-delete" @click.prevent="onClickDeleteDomain(props.row)" title="Delete domain"></a>
+                    <button
+                        type="button"
+                        class="sbx-icon-only-button f-no-margins"
+                        aria-label="View DKIM TXT Record"
+                        title="View DKIM TXT Record"
+                        @click.prevent="onClickGetKey(props.row)"
+                    >
+                        <sbx-icon name="open" />
+                    </button>
+                    <button
+                        type="button"
+                        class="sbx-icon-only-button f-no-margins"
+                        aria-label="Modify domain"
+                        title="Modify domain"
+                        @click.prevent="onClickModifyDomain(props.row)"
+                    >
+                        <sbx-icon name="modify" />
+                    </button>
+                    <button
+                        type="button"
+                        class="sbx-icon-only-button f-no-margins"
+                        aria-label="Delete domain"
+                        title="Delete domain"
+                        @click.prevent="onClickDeleteDomain(props.row)"
+                    >
+                        <sbx-icon name="delete" />
+                    </button>
                 </nav>
             </template>
         </v-client-table>
@@ -429,11 +453,9 @@ export default {
     width: 7rem;
 }
 
-.edit a {
+.edit .sbx-icon-only-button {
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
-    line-height: 2.5;
     opacity: 0.7;
-    padding-left: 8px; //move the pencil into the centre
 }
 
 .date-modified-td {
