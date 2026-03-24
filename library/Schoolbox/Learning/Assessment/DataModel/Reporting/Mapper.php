@@ -187,10 +187,6 @@ class Mapper extends \Schoolbox\Mapper
             }
         }
 
-        /* Hydrate Grade Groups with Grade Levels, if applicable
-         */
-        $stack = $this->hydrateGradeGroups($stack);
-
         /* Supporting Data nodes (sry, there isn't a shorter name...)
          */
         if ($this->getConfigLoader()->get('curriculum_tagging_enabled')) {
@@ -198,47 +194,6 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         return $this->hydrateSupportingDataWorkTypesIntoCollection($stack);
-    }
-
-
-    /**
-     * Hydrates Grade Groups with Grade Levels into $collection instances of Reporting Models
-     * I don't really know how Due Works did this, other than an ants-related comment, which is a bit mystical to me.
-     * Anyway, this gets all the mark types, grade groups and grade levels used by the $collection, and then assigns
-     * them accordingly.
-     *
-     * It relies on the mapper cache's behaviour; I wanted to ensure that each assessment got its own instance of
-     * Mark Types and Grade Groups, despite them being the same contents. This should prevent you modifying the settings
-     * in one Reporting instance and having it quietly affect another since objects pass by reference.
-     *
-     * @param GenericCollection $collection
-     * @return GenericCollection
-     * @throws Exception
-     * @throws Deleted
-     */
-    private function hydrateGradeGroups(GenericCollection $collection): GenericCollection
-    {
-        $instructorGradeGroupMapper = $this->getJoinMapper('instructorGradeGroup');
-        $gradeGroupMapper = $this->getJoinMapper('gradeGroup');
-
-        foreach ($collection as $reporting) {
-            /* Yes I know, Mark Types are in the SubmissionBox area, despite being used pretty much everywhere
-             * TODO Amri, we should refactor this into a common area along with the others currently in SubmissionBox
-             */
-            if (SubmissionBox\MarkType::SLUG_LETTER === $reporting->getInstructorMarkType()->getSlug()) {
-                $instructorGradeGroup = $instructorGradeGroupMapper->findById($reporting->getInstructorGradeGroup()->getId());
-
-                $reporting->setInstructorGradeGroup($instructorGradeGroup);
-            }
-
-            if (SubmissionBox\MarkType::SLUG_LETTER === $reporting->getMarkType()->getSlug()) {
-                $gradeGroup = $gradeGroupMapper->findById($reporting->getGradeGroup()->getId());
-
-                $reporting->setGradeGroup($gradeGroup);
-            }
-        }
-
-        return $collection;
     }
 
 
