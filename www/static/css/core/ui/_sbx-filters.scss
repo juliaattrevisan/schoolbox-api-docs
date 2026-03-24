@@ -13,4 +13,9 @@ body.sbx-body {
     .filter-interaction.content {
         padding: var(--sbx-size-s) 0;
     }
+
+    // remove the bottom and right borders
+    .filter-dropdown .filter-component {
+        border: none;
+    }
 }

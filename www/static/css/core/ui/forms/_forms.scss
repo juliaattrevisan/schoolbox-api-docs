@@ -920,7 +920,7 @@ input[type="checkbox"]:not(.plain) {
 }
 
 .filter-interaction {
-    border-bottom: 1px solid #ededed;
+    border-bottom: 1px solid var(--sbx-color-border, #ededed);
     .filter-summary {
         line-height: 2rem;
     }
