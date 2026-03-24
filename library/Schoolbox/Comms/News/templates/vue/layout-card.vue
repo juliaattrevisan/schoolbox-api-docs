@@ -154,9 +154,11 @@ export default {
                     <a
                         v-if="article._links.update.auth"
                         :href="article._links.update.href"
-                        class="icon-modify no-text"
+                        class="sbx-icon-only-button"
                         :title="'Modify this ' + localeNewsPlural"
-                    ></a>
+                        :aria-label="'Modify this ' + localeNewsPlural"
+                        ><sbx-icon name="modify"
+                    /></a>
                     <a
                         v-if="configSaveForLater"
                         @click="saveForLater(article)"

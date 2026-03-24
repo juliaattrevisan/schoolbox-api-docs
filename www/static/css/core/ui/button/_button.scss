@@ -391,3 +391,12 @@ button.submit {
     width: 0.875rem;
     height: 0.875rem;
 }
+.f-dropdown a.sbx-button--has-icon {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-m);
+}
+
+.f-dropdown a.sbx-button--has-icon sbx-icon {
+    line-height: 1;
+}
