@@ -4,26 +4,13 @@
 <div class="admin-container row">
     {{ renderAdminNavigation(pageCurrent) }}
     <div class="admin-content">
+        <div id="skin-config-container">
+            <skin-config
+                :routes="{{ { post: routeLookup('adminDesignSkinConfig.postConfig'), preview: routeLookup('adminDesignSkinConfig.previewCss') }|json_encode }}"
+                :configs="{{ configs|json_encode }}"
+            />
+        </div>
+        <script src="{{ CDN_PREFIX }}/js/bundle/colourPicker.js?v={{ config.site_version }}"></script>
+        <script src="{{ CDN_PREFIX }}/js/bundle/skinConfig.js?v={{ config.site_version }}"></script>
     </div>
 </div>
-
-<table>
-    <thead>
-    <tr>
-        <th>Name</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for config in configs %}
-        {% for category in config %}
-            <tr>
-                <td>
-                    {{ category.name }}
-                </td>
-            </tr>
-        {% endfor %}
-    {% endfor %}
-    </tbody>
-
-</table>

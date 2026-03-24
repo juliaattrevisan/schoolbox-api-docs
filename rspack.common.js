@@ -207,6 +207,7 @@ module.exports = {
         aiUsageLog: "./library/Schoolbox/Admin/OpenAI/Usage/templates/aiUsageLog.ts",
         adminDifferentiationProfiles:
             "./library/Schoolbox/Admin/DifferentiationProfiles/templates/vue/adminDifferentiationProfiles.ts",
+        skinConfig: "./library/Schoolbox/Admin/SkinConfig/templates/vue/skinConfig.ts",
 
         //Vue component to display data in a table
         dataTable: "./vue/components/dataTable/dataTable.ts",

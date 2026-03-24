@@ -27,7 +27,7 @@ class Module extends BaseModule
 
     protected function registerRoutes(): void
     {
-        /* Superusers only
+        /* Superusers or those with Design Full Access can access this module
          */
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
@@ -41,8 +41,8 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '', 'getConfig', $perms);
-        //TODO - add POST route for saving config changes, and implement the postConfig method in the controller
-//        $this->register('POST', '', 'postConfig', $perms);
+        $this->register('POST', '', 'postConfig', $perms);
+        $this->register('POST', '/preview', 'previewCss', $perms);
     }
 
     /**
@@ -55,6 +55,7 @@ class Module extends BaseModule
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
             $this->injector->get('oidc.cache'),
+            $this->injector->get('templateEngine'),
         );
     }
 
