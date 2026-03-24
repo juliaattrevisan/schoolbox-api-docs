@@ -141,14 +141,18 @@ function onMouseOut(event: MouseEvent): void {
         />
         <button
             for="search-field"
-            class="c-search-input__button icon-search no-text"
+            type="button"
+            class="c-search-input__button"
             title="Search"
+            aria-label="Search"
             data-test="search-input-button"
             data-header-search-button
             @mouseover="onMouseOver"
             @mouseout="onMouseOut"
             @click.prevent="onClicked"
-        ></button>
+        >
+            <sbx-icon name="search" size="1rem" color="currentColor" />
+        </button>
     </div>
 </template>
 
@@ -171,14 +175,23 @@ function onMouseOut(event: MouseEvent): void {
     &__button {
         align-items: center;
         background-color: var(--sbx-config-color-menu-background, var(--content-ui-submit-background));
+        color: var(--navigation-foreground);
         display: flex;
         height: var(--tabbar-height);
         justify-content: center;
         margin: 0;
         padding: 0;
-        &:before {
+        sbx-icon {
+            display: block;
             transition: all 0.2s ease-in;
             color: var(--sbx-config-color-menu-foreground, var(--navigation-foreground));
+        }
+        &:hover,
+        &:focus,
+        &:focus-visible,
+        &:active {
+            background-color: var(--navigation-background);
+            color: var(--navigation-foreground);
         }
     }
 }
