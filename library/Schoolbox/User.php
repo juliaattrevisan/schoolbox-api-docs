@@ -280,12 +280,12 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /**
      * @var GenericCollection|NationalityModel[]|null
      */
-    private GenericCollection|array|null $nationalityCollection = null;
+    private $nationalityCollection = null;
 
     /**
      * @var GenericCollection|LanguageModel[]|null
      */
-    private GenericCollection|array|null $languageCollection = null;
+    private $languageCollection = null;
 
     public function __construct()
     {
