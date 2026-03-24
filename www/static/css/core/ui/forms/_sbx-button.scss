@@ -151,10 +151,20 @@ body.sbx-body {
      * These need to be treated differently to standard buttons
      * as they have no text content and so need a border to define their shape
      */
-    .button[class*="icon-"],
+    .button[class*="icon-"]:empty,
+    a[class*="icon-"]:empty,
+    button[class^="icon-"]:empty,
     .dz-remove,
     .ab-upload .dz-remove {
         border: none;
+        &:hover,
+        &:active {
+            background-color: var(
+                --sbx-config-color-active
+            ); // ^foundation-fixes^ - remove the use of --content-ui-hover
+            color: var(--sbx-config-color-accent); // ^foundation-fixes^ - remove the change of text colour on hover
+            filter: brightness(1.05);
+        }
     }
 
     .button[class*="icon-"]:not(:empty) {
