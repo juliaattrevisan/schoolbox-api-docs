@@ -49,4 +49,10 @@ body.sbx-body {
     #applied_filters [data-filter-name] {
         font-weight: var(--sbx-font-weight-active);
     }
+
+    // add some spacing on the children block when there's parent/children checkbox groups
+    .filter-dropdown .option-list > .checklist {
+        padding-bottom: var(--sbx-size-s);
+        padding-top: var(--sbx-size-s);
+    }
 }
