@@ -55,4 +55,9 @@ body.sbx-body {
         padding-bottom: var(--sbx-size-s);
         padding-top: var(--sbx-size-s);
     }
+
+    // increase the max width to give more room
+    .filter-dropdown .f-dropdown {
+        max-width: 350px;
+    }
 }
