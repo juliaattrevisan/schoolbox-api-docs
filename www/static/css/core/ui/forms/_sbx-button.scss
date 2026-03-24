@@ -30,10 +30,8 @@ body.sbx-body {
         color: var(--sbx-config-color-accent-text);
         &:hover,
         &:active {
-            background: var(--sbx-config-color-accent); // ^foundation-fixes^ - remove the use of --content-ui-hover
-            color: var(
-                --sbx-config-color-accent-text
-            ); // ^foundation-fixes^ - remove the change of text colour on hover
+            background: var(--sbx-config-color-active); // ^foundation-fixes^ - remove the use of --content-ui-hover
+            color: var(--sbx-config-color-accent); // ^foundation-fixes^ - remove the change of text colour on hover
             filter: brightness(1.1);
         }
         &:focus {
@@ -78,10 +76,10 @@ body.sbx-body {
         &:hover,
         &:active {
             background-color: var(
-                --sbx-color-foreground-primary
+                --sbx-config-color-active
             ); // ^foundation-fixes^ - remove the use of --content-ui-hover
             color: var(--sbx-config-color-accent); // ^foundation-fixes^ - remove the change of text colour on hover
-            filter: brightness(1.1);
+            filter: brightness(1.05);
         }
         &:focus {
             @include sbx-form.form-input-focus;
