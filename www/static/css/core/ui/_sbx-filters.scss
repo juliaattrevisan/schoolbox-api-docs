@@ -18,4 +18,12 @@ body.sbx-body {
     .filter-dropdown .filter-component {
         border: none;
     }
+
+    #applied_filters .applied-filter-tab .selected-item {
+        font-size: var(--sbx-font-size-xs);
+    }
+
+    #applied_filters [data-filter-name] {
+        font-weight: var(--sbx-font-weight-active);
+    }
 }
