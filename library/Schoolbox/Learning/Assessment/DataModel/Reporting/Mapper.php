@@ -269,7 +269,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     private function updateSupportingDataCurriculumNodeRelations(Model $model, ?Model $previous = null): void
     {
-        /* Set up a container for new curric node instances
+        /* Set up a container for new curric node selections
          */
         $newSelectionIds = [];
 
@@ -336,7 +336,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     private function updateSupportingDataWorkTypeRelations(Model $model, ?Model $previous = null): void
     {
-        /* Set up a container for new curric node instances
+        /* Set up a container for new work type selections
          */
         $newSelectionIds = [];
 
