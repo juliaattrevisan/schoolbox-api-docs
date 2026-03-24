@@ -3,8 +3,10 @@
 declare LTI_DEVKIT_ENABLE
 declare LTI_DEVKIT_HOSTNAME
 declare LTI_DEVKIT_PUBLISHED_PORT
+declare PRIMARY_INSTANCE_ID
 declare PRIMARY_INSTANCE_HOSTNAME
 declare SECONDARY_INSTANCE_ENABLE
+declare SECONDARY_INSTANCE_ID
 declare SECONDARY_INSTANCE_HOSTNAME
 declare PROVISION_DEBUG_ENABLE
 
@@ -50,13 +52,13 @@ case "${PROVISION_DEBUG_ENABLE}" in
 esac
 
 # Run the provision script in the schoolbox-cli container
-"$(dirname "$0")/compose" exec -it $env_args -u root schoolbox-cli tools/docker-provision.sh $provision_args
+"$(dirname "$0")/compose" exec -it -e INSTANCE_ID=${PRIMARY_INSTANCE_ID} $env_args -u root schoolbox-cli tools/docker-provision.sh $provision_args
 
 # Is the second env in action?
-# If so, re-run the provision script for INSTANCE_ID=docker2
+# If so, re-run the provision script for the secondary hostname
 case "${SECONDARY_INSTANCE_ENABLE}" in
     1 | true | yes | on)
-        "$(dirname "$0")/compose" exec -it -e INSTANCE_ID=docker2 $env_args -u root schoolbox-cli tools/docker-provision.sh --install-instance-only
+        "$(dirname "$0")/compose" exec -it -e INSTANCE_ID=${SECONDARY_INSTANCE_ID} $env_args -u root schoolbox-cli tools/docker-provision.sh --install-instance-only
         ;;
 esac
 
