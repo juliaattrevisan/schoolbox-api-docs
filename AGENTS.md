@@ -56,6 +56,8 @@ It is deployed internally and not shipped in client packages.
 | `vendor/`       | Composer dependencies — do not edit                      |
 | `vue/`          | Shared Vue 3 components, composables, mixins             |
 | `www/`          | Web root; one subdirectory per module                    |
+| `sql/schoolbox/initial.sql` | Contains the current SQL schema of the system|
+
 
 ---
 
