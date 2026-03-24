@@ -127,6 +127,7 @@ async function onNameSelected(): Promise<void> {
 
 .button-name {
     background: none;
+    border-radius: var(--sbx-config-field-roundness, 0);
     font-size: 1rem;
     margin: 0;
     min-height: 42px;
@@ -136,7 +137,7 @@ async function onNameSelected(): Promise<void> {
     transition: background 0.2s;
     width: 100%;
     &:hover {
-        background: var(--content-ui-background);
+        background: var(--sbx-config-color-active, var(--content-ui-background));
     }
     &:disabled {
         opacity: 0.2;
