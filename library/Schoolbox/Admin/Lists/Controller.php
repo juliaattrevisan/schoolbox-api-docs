@@ -1139,7 +1139,7 @@ class Controller extends Base
                         'isPopOutList' => true,
                         'nullable'  => false,
                         'width'     => 3,
-                        'tooltip'   => 'Which activities are permitted?',
+                        'tooltip'   => 'Select the activity types that will be allowed to utilise this work type.',
                     ],
                     'externalResultType' => [
                         'caption'   => 'External SIS Type',
