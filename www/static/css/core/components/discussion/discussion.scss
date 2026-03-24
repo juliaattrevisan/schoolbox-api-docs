@@ -55,7 +55,8 @@
     // "Allow Comments" checkbox
     .checklist {
         display: flex;
-        flex-flow: row-reverse;
+        justify-content: flex-end;
+        gap: var(--spacing-xs);
     }
 }
 
