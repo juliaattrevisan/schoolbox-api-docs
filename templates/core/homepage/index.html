@@ -18,6 +18,20 @@
         --right-font-primary: {right_font_primary};
         --right-bg-primary:   {right_bg_primary};
     }
+
+    .homepage-lock-icon {
+        display: inline-flex;
+        padding: 0 0.25rem;
+    }
+
+    .homepage-tab-icon-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+
+    }
 </style>
 <!-- BEGIN google_script -->
 <!-- Google Identity Service see https://developers.google.com/identity/oauth2/web/guides/migration-to-gis#gis-and-gapi -->
@@ -136,15 +150,15 @@
             <span class="switch inline" id="component-lock-switch">
                 <input id="component-lock-toggle" type="checkbox" autocomplete="off" />
                 <label for="component-lock-toggle" data-test="homepage-component-lock-toggle">
-                    <span class="icon-unlocked">&nbsp;</span>
-                    <span class="icon-locked">&nbsp;</span>
+                    <span><sbx-icon class="homepage-lock-icon" name="unlocked" size="0.75rem"></sbx-icon></span>
+                    <span><sbx-icon class="homepage-lock-icon" name="locked" size="0.75rem"></sbx-icon></span>
                 </label>
             </span>
             <span class="tab-title" data-show-empty>
-                <a class="icon-add" href="#tabs-1" title="Add components" data-tab-activator id="add-component" data-test="homepage-tab-activator-addComponent"></a>
+                <a href="#tabs-1" class="homepage-tab-icon-button" title="Add components" aria-label="Add components" data-tab-activator id="add-component" data-test="homepage-tab-activator-addComponent"><sbx-icon name="add" size="0.875rem"></sbx-icon></a>
             </span>
             <span class="tab-title" data-hide-empty>
-                <a class="icon-components" href="#tabs-2" title="Edit columns" data-tab-activator id="edit-column"></a>
+                <a href="#tabs-2" class="homepage-tab-icon-button" title="Edit columns" aria-label="Edit columns" data-tab-activator id="edit-column"><sbx-icon name="components" size="0.875rem"></sbx-icon></a>
             </span>
         </span>
 
@@ -167,7 +181,7 @@
             <div class="small-12 columns">
                 <ul class="role-view">
                     <li class="separator">You are in Student View</li>
-                    <li><a href="?readonly=0"></a><sbx-icon name="teacher" size="0.875rem"></sbx-icon>Switch to Teacher View</a></li>
+                    <li><a href="?readonly=0" class="sbx-button--has-icon l-flex--align-start l-gap-m"><sbx-icon name="teacher" size="0.875rem"></sbx-icon>Switch to Teacher View</a></li>
                 </ul>
             </div>
         </div>
