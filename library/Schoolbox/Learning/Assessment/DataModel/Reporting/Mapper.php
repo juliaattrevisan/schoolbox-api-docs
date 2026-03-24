@@ -255,29 +255,90 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function clearRelations(Model $model, ?Model $previous = null): void
     {
-        /* This feels like a solved problem, but I can't find something similar across the mappers except for
-         * persistFiles() but that doesn't use a join table.
-         */
-        $query = "
-            DELETE FROM reporting_curriculum_node
-            WHERE reporting_id = :id
-        ";
+        $this->updateSupportingDataCurriculumNodeRelations($model, $previous);
 
-        $this->database->executeQuery($query, [
-            'id' => $model->getId()
+//        die();
+//        /* This feels like a solved problem, but I can't find something similar across the mappers except for
+//         * persistFiles() but that doesn't use a join table.
+//         */
+//        $query = "
+//            DELETE FROM reporting_curriculum_node
+//            WHERE reporting_id = :id
+//        ";
+//
+//        $this->database->executeQuery($query, [
+//            'id' => $model->getId()
+//        ]);
+//
+//        /* This feels like a solved problem, but I can't find something similar across the mappers except for
+//         * persistFiles() but that doesn't use a join table.
+//         */
+//        $query = "
+//            DELETE FROM reporting_work_type
+//            WHERE reporting_id = :id
+//        ";
+//
+//        $this->database->executeQuery($query, [
+//            'id' => $model->getId()
+//        ]);
+    }
+
+
+    /**
+     * Updates supporting data's curriculum nodes using a diff to avoid an exotic transaction issue: see SA-21417
+     *
+     * @param Model $model
+     * @param Model|null $previous
+     * @return void
+     * @throws \Throwable
+     */
+    private function updateSupportingDataCurriculumNodeRelations(Model $model, ?Model $previous = null): void
+    {
+        /* Set up a container for new curric node instances
+         */
+        $newSelections = new GenericCollection(\Schoolbox\Curriculum\Node\Model::class);
+
+        /* Pile in selections that are supposed to exist after this mutation
+         */
+        foreach ($model->getSupportingDataCurriculumNodes() as $curriculumNode) {
+            $newSelections->add($curriculumNode);
+        }
+
+        /* Load nodes that already exist in the db: we maybe need to remove some of these
+         */
+        $oldSelections = $this->database->executeQuery("
+            SELECT curriculum_node_id
+            FROM reporting_curriculum_node
+            WHERE reporting_id = :reportingId
+        ", [
+            'reportingId' => $model->getId()
         ]);
 
-        /* This feels like a solved problem, but I can't find something similar across the mappers except for
-         * persistFiles() but that doesn't use a join table.
+        /* Calculate the diff because we need to delete those that are no longer in $newSelections; since we're
+         * interrogating the join table, there's no exact mapper/model for it: we also don't really need to hydrate
+         * anything just to delete it, so we can fetch the ids by themselves first.
          */
-        $query = "
-            DELETE FROM reporting_work_type
-            WHERE reporting_id = :id
-        ";
+        $oldSelectionIds = $oldSelections->fetchColumnArray('curriculum_node_id');
 
-        $this->database->executeQuery($query, [
-            'id' => $model->getId()
-        ]);
+        /* Make all the removal changes...or none of the removal changes - preventing a partial update where one query
+         * succeeds but others fail (for whatever reason)
+         */
+        $this->database->transact(function() use ($model, $newSelections, $oldSelectionIds) {
+            $newSelectionIds = $newSelections->getPropertyValues('id');
+
+            $diff = array_diff($oldSelectionIds, $newSelectionIds);
+
+            $placeholders = Builder::getArrayPlaceholders($diff, 'cnodeId');
+            $params = Builder::getArrayParameters($diff, 'cnodeId');
+
+            $this->database->executeQuery("
+                DELETE FROM reporting_curriculum_node
+                WHERE reporting_id = :reportingId
+                AND curriculum_node_id IN {$placeholders}
+            ", array_merge([
+                'reportingId' => $model->getId(),
+            ], $params));
+        });
     }
 
 
