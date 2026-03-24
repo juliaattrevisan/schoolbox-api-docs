@@ -18,19 +18,44 @@
         <li class="separator">Profile Options</li>
     {% endif %}
 
-    <li><a class="icon-staff-students" href="/search/user/{{ user.current.id }}">Profile</a></li>
-    <li><a class="icon-settings" href="/settings/notifications">Notification Settings</a></li>
+    <li>
+        <a class="account-menu__link" href="/search/user/{{ user.current.id }}">
+            <sbx-icon name="staff-students" size="0.875rem" color="var(--sbx-color-text-primary)"></sbx-icon>
+            <span>Profile</span>
+        </a>
+    </li>
+    <li>
+        <a class="account-menu__link" href="/settings/notifications">
+            <sbx-icon name="settings" size="0.875rem" color="var(--sbx-color-text-primary)"></sbx-icon>
+            <span>Notification Settings</span>
+        </a>
+    </li>
     {% set adminHomeUrl = routeLookupIfAuthorized('adminHome.getIndex') %}
     {% if adminHomeUrl %}
-        <li><a class="icon-locked" href="{{ adminHomeUrl }}">Administration</a></li>
+        <li>
+            <a class="account-menu__link" href="{{ adminHomeUrl }}">
+                <sbx-icon name="locked" size="0.875rem" color="var(--sbx-color-text-primary)"></sbx-icon>
+                <span>Administration</span>
+            </a>
+        </li>
     {% endif %}
 
     {# Not Help? Show a link to Help #}
     {% if user.current.role.staff and config.show_schoolbox_help_link %}
-        <li><a class="icon-help" href="{{ routeLookup('helpSso.sendTokenToHelp') }}" target="_blank">Online Help</a></li>
+        <li>
+            <a class="account-menu__link" href="{{ routeLookup('helpSso.sendTokenToHelp') }}" target="_blank">
+                <sbx-icon name="help" size="0.875rem" color="var(--sbx-color-text-primary)"></sbx-icon>
+                <span>Online Help</span>
+            </a>
+        </li>
     {% endif %}
 
-    <li><a class="icon-logout" href="/logout.php">Logout</a></li>
+    <li>
+        <a class="account-menu__link" href="/logout.php">
+            <sbx-icon name="logout" size="0.875rem" color="var(--sbx-color-text-primary)"></sbx-icon>
+            <span>Logout</span>
+        </a>
+    </li>
 </ul>
 {% if user.current.linkedUsers is not empty or user.previous or user.initial %}
     <ul id="switch-user{{ mobileSuffix }}" class="switch-user{{ mobileSuffix }}">
