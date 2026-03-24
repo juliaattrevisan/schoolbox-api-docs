@@ -54,5 +54,4 @@ class Model
         $this->nationality = $nationality;
         return $this;
     }
-
 }

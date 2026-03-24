@@ -54,5 +54,4 @@ class Model
         $this->language = $language;
         return $this;
     }
-
 }
