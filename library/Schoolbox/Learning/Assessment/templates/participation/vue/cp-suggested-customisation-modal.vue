@@ -180,12 +180,12 @@ function onConfirm(): void {
 
 .slide-left-enter-from {
     opacity: 0;
-    transform: translateX(var(--sbx-size-s, 0.5rem));
+    transform: translateX(var(--sbx-size-xs, 0.5rem));
 }
 
 .slide-left-leave-to {
     opacity: 0;
-    transform: translateX(calc(-1 * var(--sbx-size-s, 0.5rem)));
+    transform: translateX(calc(-1 * var(--sbx-size-xs, 0.5rem)));
 }
 
 /* Slide right (backward progression) */
@@ -196,11 +196,11 @@ function onConfirm(): void {
 
 .slide-right-enter-from {
     opacity: 0;
-    transform: translateX(calc(-1 * var(--sbx-size-s, 0.5rem)));
+    transform: translateX(calc(-1 * var(--sbx-size-xs, 0.5rem)));
 }
 
 .slide-right-leave-to {
     opacity: 0;
-    transform: translateX(var(--sbx-size-s, 0.5rem));
+    transform: translateX(var(--sbx-size-xs, 0.5rem));
 }
 </style>

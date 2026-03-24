@@ -115,7 +115,7 @@ body.sbx-body {
     .sub-nav {
         display: flex;
         flex-wrap: wrap;
-        gap: var(--sbx-size-xs);
+        gap: var(--sbx-size-xxs);
     }
 
     /**
@@ -129,7 +129,7 @@ body.sbx-body {
      * An existing flex list of buttons, just add some gap
      */
     .flex-list.buttons {
-        gap: var(--sbx-size-xs);
+        gap: var(--sbx-size-xxs);
     }
 
     /**
@@ -137,8 +137,8 @@ body.sbx-body {
      */
     .component-action section {
         background: var(--sbx-color-foreground-primary);
-        padding: var(--sbx-size-s);
-        gap: var(--sbx-size-xs);
+        padding: var(--sbx-size-xs);
+        gap: var(--sbx-size-xxs);
         button,
         .button {
             font-weight: normal; // for better readability and consistency with other buttons
@@ -278,18 +278,18 @@ body.sbx-body {
      * Add some gap otherwise the checkbox and text within these buttons are too close together
      */
     .search-result {
-        gap: var(--sbx-size-s);
+        gap: var(--sbx-size-xs);
     }
 
     // add spacing to pagination buttons on pastoral class report
     .count-filter {
-        gap: var(--sbx-size-xs);
+        gap: var(--sbx-size-xxs);
     }
 
     // give some spacing to the buttons
     .context-switch,
     .avatar-switch {
         display: flex;
-        gap: var(--sbx-size-xs);
+        gap: var(--sbx-size-xxs);
     }
 }

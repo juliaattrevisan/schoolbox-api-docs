@@ -6,7 +6,7 @@
 body.sbx-body {
     .pagination {
         display: flex;
-        gap: var(--sbx-size-xs);
+        gap: var(--sbx-size-xxs);
         & li {
             &.active {
                 & a {

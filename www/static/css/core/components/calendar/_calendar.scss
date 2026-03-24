@@ -49,7 +49,7 @@
 .fc-toolbar {
     border-bottom: 2px solid var(--sbx-color-border, #ededed);
     margin: 0 !important;
-    padding: var(--sbx-size-s, 1rem);
+    padding: var(--sbx-size-xs, 1rem);
 
     .fc-button {
         @include button-dimensions();

@@ -6,7 +6,7 @@
 body.sbx-body {
     // add some spacing
     .filter-dropdown {
-        gap: var(--sbx-size-xs);
+        gap: var(--sbx-size-xxs);
         padding: var(--sbx-size-s);
     }
 
@@ -24,7 +24,7 @@ body.sbx-body {
     #panel-summary {
         display: flex;
         flex-direction: column;
-        gap: var(--sbx-size-s);
+        gap: var(--sbx-size-xs);
         .small-12.columns {
             padding: 0;
         }
@@ -32,7 +32,7 @@ body.sbx-body {
 
     // use gap instead of padding for spacing between active filters
     #applied_filters {
-        gap: var(--sbx-size-s);
+        gap: var(--sbx-size-xs);
         .applied-filter-tab {
             flex: 1 auto;
             padding: 0;
@@ -52,8 +52,8 @@ body.sbx-body {
 
     // add some spacing on the children block when there's parent/children checkbox groups
     .filter-dropdown .option-list > .checklist {
-        padding-bottom: var(--sbx-size-s);
-        padding-top: var(--sbx-size-s);
+        padding-bottom: var(--sbx-size-xs);
+        padding-top: var(--sbx-size-xs);
     }
 
     // stretch out the curriculum selector so it displays better
