@@ -56,27 +56,10 @@ body.sbx-body {
         padding-top: var(--sbx-size-s);
     }
 
-    // increase the max width to give more room
-    .filter-dropdown .f-dropdown {
-        max-width: 350px;
-    }
-
     // stretch out the curriculum selector so it displays better
-    .filter-dropdown .curriculum-selector {
-        width: 100%;
-        // Ensure the container is a flexbox layout
-        .input-group {
-            display: flex;
+    .filter-dropdown {
+        [data-cs-container] {
             width: 100%;
-        }
-        // Make the input take up all remaining space
-        .search-input {
-            flex: 1 1 auto;
-        }
-        // Make the button only as wide as its content
-        .button {
-            flex: 0 0 auto;
-            width: auto;
         }
     }
 }

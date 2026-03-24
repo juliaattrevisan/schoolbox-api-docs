@@ -208,4 +208,18 @@ const isActive = window.Vue.computed(() => {
         margin-bottom: 0;
     }
 }
+// make the input and button sit on the same line and stretch to fill the container, with the button only as wide as its content
+.input-group {
+    display: flex;
+    width: 100%;
+}
+// Make the input take up all remaining space
+.search-input {
+    flex: 1 1 auto;
+}
+// Make the button only as wide as its content
+.curriculum-selector .button {
+    flex: 0 0 auto;
+    width: auto;
+}
 </style>
