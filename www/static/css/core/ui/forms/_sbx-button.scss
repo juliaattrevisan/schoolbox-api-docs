@@ -140,7 +140,7 @@ body.sbx-body {
     .component-action section {
         background: var(--sbx-color-foreground-primary);
         padding: var(--sbx-size-s);
-        gap: var(--sbx-size-s);
+        gap: var(--sbx-size-xs);
         button,
         .button {
             font-weight: normal; // for better readability and consistency with other buttons
