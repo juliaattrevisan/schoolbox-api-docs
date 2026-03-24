@@ -36,7 +36,7 @@
 .lrn .lrn-author-ui .lrn-author-widget-sidebar button:hover,
 .lrn .lrn-author-ui .lrn-author-widget-sidebar button:focus,
 .lrn .lrn-author-ui .lrn-author-widget-sidebar button:active {
-    background: var(--content-ui-background);
+    background: var(--sbx-config-color-active, var(--content-ui-background));
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
 }
 
@@ -338,7 +338,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked span:hover,
 .lrn-qe .lrn-qe-ui.lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-checkbox-validate.checked span:hover {
-    background: var(--content-ui-background);
+    background: var(--sbx-config-color-active, var(--content-ui-background));
 }
 .lrn-qe .lrn-qe-modal-footer .lrn-qe-btn.lrn-qe-btn-default:focus,
 .lrn-qe .lrn-qe-ui .lrn-qe-btn-remove.lrn-qe-btn-default:focus,
