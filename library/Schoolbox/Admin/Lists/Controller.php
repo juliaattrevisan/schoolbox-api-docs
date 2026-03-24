@@ -1132,7 +1132,7 @@ class Controller extends Base
                         ],
                         'nullable'  => false,
                         'width'     => 2,
-                        'tooltip'   => 'Who may see this work type?',
+                        'tooltip'   => 'Select the role types that have access to view learning activities using this work type.  Access includes the assigning of the learning activity and the feedback that is made visible.',
                     ],
                     'permittedActivities' => [
                         'caption'   => 'Permitted Activities',
