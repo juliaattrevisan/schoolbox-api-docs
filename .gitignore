@@ -17,8 +17,6 @@ vendor/
 # Rspack bundle export directory
 www/static/js/bundle/
 node_modules/
-test/behavior/screenshots/*.png
-test/behavior/screenshots/*.html
 vagrantcache/
 tools/xdebug.ini
 vagrant.yaml

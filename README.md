@@ -192,6 +192,5 @@ For full information on the build process of making a APT package and deploying 
 * Testing:
   * [Acceptance Tests](./test/playwright/README.md)
   * [Smoke Tests](./test/codeception/Smoketests/README.md)
-  * [Behaviour Tests](./test/behavior/README.md)
   * [Unit Tests](./docs/unit-test.md)
   * [PHP Stan](./docs/php-stan.md)
