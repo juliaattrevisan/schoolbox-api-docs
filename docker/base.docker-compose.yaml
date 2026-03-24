@@ -114,13 +114,13 @@ services:
         condition: service_healthy
     environment:
       PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
+      INSTANCE_ID: ${PRIMARY_INSTANCE_ID}
     build:
       context: ./schoolbox-digestd
       args:
         BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
         BASE_BRANCH: ${BASE_BRANCH}
-    env_file: ./schoolbox/default-instance.env
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/${PRIMARY_INSTANCE_ID}/storage
@@ -149,13 +149,13 @@ services:
         condition: service_healthy
     environment:
       PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
+      INSTANCE_ID: ${PRIMARY_INSTANCE_ID}
     build:
       context: ./schoolbox-scheduled
       args:
         BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
         BASE_BRANCH: ${BASE_BRANCH}
-    env_file: ./schoolbox/default-instance.env
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/${PRIMARY_INSTANCE_ID}/storage
@@ -184,13 +184,13 @@ services:
         condition: service_healthy
     environment:
       PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
+      INSTANCE_ID: ${PRIMARY_INSTANCE_ID}
     build:
       context: ./schoolbox-mobiled
       args:
         BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
         BASE_BRANCH: ${BASE_BRANCH}
-    env_file: ./schoolbox/default-instance.env
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/${PRIMARY_INSTANCE_ID}/storage
@@ -221,12 +221,12 @@ services:
         condition: service_healthy
     environment:
       PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
+      INSTANCE_ID: ${SECONDARY_INSTANCE_ID}
     build:
       context: ./schoolbox-digestd
       args:
         BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
-    env_file: ./schoolbox/second-instance.env
     volumes:
       - code:/usr/share/schoolbox
       - storage2:/var/lib/schoolbox/${SECONDARY_INSTANCE_ID}/storage
@@ -257,12 +257,12 @@ services:
         condition: service_healthy
     environment:
       PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
+      INSTANCE_ID: ${SECONDARY_INSTANCE_ID}
     build:
       context: ./schoolbox-scheduled
       args:
         BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
-    env_file: ./schoolbox/second-instance.env
     volumes:
       - code:/usr/share/schoolbox
       - storage2:/var/lib/schoolbox/${SECONDARY_INSTANCE_ID}/storage
@@ -293,12 +293,12 @@ services:
         condition: service_healthy
     environment:
       PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
+      INSTANCE_ID: ${SECONDARY_INSTANCE_ID}
     build:
       context: ./schoolbox-mobiled
       args:
         BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
-    env_file: ./schoolbox/second-instance.env
     volumes:
       - code:/usr/share/schoolbox
       - storage2:/var/lib/schoolbox/${SECONDARY_INSTANCE_ID}/storage
@@ -329,13 +329,13 @@ services:
         condition: service_healthy
     environment:
       PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
+      INSTANCE_ID: ${PRIMARY_INSTANCE_ID}
     build:
       context: ./schoolbox-socketd
       args:
         BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
         BASE_BRANCH: ${BASE_BRANCH}
-    env_file: ./schoolbox/default-instance.env
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/${PRIMARY_INSTANCE_ID}/storage
