@@ -11,7 +11,7 @@ body.sbx-body {
 
     // side padding is on the parent .filter-dropdown now
     .filter-interaction.content {
-        padding: var(--sbx-size-s) 0;
+        padding: var(--sbx-size-s);
     }
 
     // remove the bottom and right borders
@@ -19,10 +19,20 @@ body.sbx-body {
         border: none;
     }
 
+    // use gap instead of padding for spacing between active filters
+    #applied_filters {
+        gap: var(--sbx-size-s);
+        .applied-filter-tab {
+            padding: 0;
+        }
+    }
+
+    // increase the size of the active filter
     #applied_filters .applied-filter-tab .selected-item {
         font-size: var(--sbx-font-size-xs);
     }
 
+    // bolden the filter name
     #applied_filters [data-filter-name] {
         font-weight: var(--sbx-font-weight-active);
     }
