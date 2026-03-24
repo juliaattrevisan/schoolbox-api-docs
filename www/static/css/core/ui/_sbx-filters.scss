@@ -19,11 +19,22 @@ body.sbx-body {
         border: none;
     }
 
+    #panel-summary {
+        display: flex;
+        flex-direction: column;
+        gap: var(--sbx-size-s);
+        .small-12.columns {
+            padding: 0;
+        }
+    }
+
     // use gap instead of padding for spacing between active filters
     #applied_filters {
         gap: var(--sbx-size-s);
         .applied-filter-tab {
+            flex: 0 0 calc(50% - (var(--sbx-size-s) / 2));
             padding: 0;
+            margin-top: 0;
         }
     }
 
