@@ -29,8 +29,8 @@ services:
     tty: true
     volumes:
       - code:/usr/share/schoolbox
-      - storage:/var/lib/schoolbox/docker/storage
-      - storage2:/var/lib/schoolbox/docker2/storage
+      - storage:/var/lib/schoolbox/${PRIMARY_INSTANCE_ID}/storage
+      - storage2:/var/lib/schoolbox/${SECONDARY_INSTANCE_ID}/storage
       - caddy-ssl:/etc/nginx/certs/
       - aws-config:/root/.aws
     # Add host.docker.internal as an alias back to the host machine, so that
@@ -39,13 +39,13 @@ services:
       - host.docker.internal:host-gateway
     # After building: create data dirs, start cron
     post_start:
-      - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker/
+      - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/${PRIMARY_INSTANCE_ID}/
         user: root
-      - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker2/
+      - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/${SECONDARY_INSTANCE_ID}/
         user: root
-      - command: /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/docker/ www-data
+      - command: /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/${PRIMARY_INSTANCE_ID}/ www-data
         user: root
-      - command: /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/docker2/ www-data
+      - command: /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/${SECONDARY_INSTANCE_ID}/ www-data
         user: root
     configs:
       - source: frankenphp-php
