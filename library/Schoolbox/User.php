@@ -280,8 +280,11 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /**
      * @var GenericCollection
      */
-    private GenericCollection $nationality;
+    private GenericCollection $nationalityCollection;
 
+    /**
+     * @var GenericCollection
+     */
     private GenericCollection $languageCollection;
 
     public function __construct()
@@ -303,8 +306,8 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
             $this->qualificationCollection = clone $this->qualificationCollection;
         }
 
-        if ($this->nationality !== null) {
-            $this->nationality = clone $this->nationality;
+        if ($this->nationalityCollection !== null) {
+            $this->nationalityCollection = clone $this->nationalityCollection;
         }
 
         if ($this->languageCollection !== null) {
@@ -1516,13 +1519,13 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @param GenericCollection $nationality
+     * @param GenericCollection $nationalityCollection
      * @return self
      */
-    public function setNationalityCollection(GenericCollection $nationality): self
+    public function setNationalityCollection(GenericCollection $nationalityCollection): self
     {
-        $nationality->assertCollectionOf(NationalityModel::class);
-        $this->nationality = $nationality;
+        $nationalityCollection->assertCollectionOf(NationalityModel::class);
+        $this->nationalityCollection = $nationalityCollection;
         return $this;
     }
 
@@ -1531,7 +1534,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     public function getNationalityCollection(): ?GenericCollection
     {
-        return $this->nationality;
+        return $this->nationalityCollection;
     }
 
     /**
@@ -1540,15 +1543,15 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     public function setLanguageCollection(GenericCollection $languageCollection): self
     {
-        $this->languageCollection->assertCollectionOf(LanguageModel::class);
+        $languageCollection->assertCollectionOf(LanguageModel::class);
         $this->languageCollection = $languageCollection;
         return $this;
     }
 
     /**
-     * @return GenericCollection
+     * @return GenericCollection|null
      */
-    public function getLanguageCollection(): GenericCollection
+    public function getLanguageCollection(): ?GenericCollection
     {
         return $this->languageCollection;
     }
