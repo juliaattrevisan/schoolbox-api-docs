@@ -46,10 +46,11 @@ CREATE TABLE `allowedFileTypes` (
   `iconFile` varchar(80) DEFAULT NULL,
   `enable` enum('true','false') DEFAULT NULL,
   `max_file_size` bigint(20) NOT NULL DEFAULT 0,
-  `deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `deleted_at` datetime DEFAULT NULL,
+  `_deleted` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`fileTypeID`),
   UNIQUE KEY `mime` (`mime`),
-  KEY `deleted` (`deleted`)
+  KEY `deleted_at` (`deleted_at`)
 ) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1124,7 +1125,7 @@ CREATE TABLE `config` (
   KEY `config_type_id` (`type_id`),
   CONSTRAINT `fk_config_field_id` FOREIGN KEY (`field_id`) REFERENCES `lu_config_field` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_config_type_id` FOREIGN KEY (`type_id`) REFERENCES `lu_config_type` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=753 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=759 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2281,7 +2282,7 @@ CREATE TABLE `eportfolio_component_filelist_item` (
   PRIMARY KEY (`id`),
   KEY `fk_eportfolio_component_filelist_page_id` (`page_id`),
   KEY `fk_eportfolio_component_filelist_file_id` (`file_id`),
-  CONSTRAINT `fk_eportfolio_component_filelist_file_id` FOREIGN KEY (`file_id`) REFERENCES `myFile` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_eportfolio_component_filelist_file_id` FOREIGN KEY (`file_id`) REFERENCES `my_file` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_eportfolio_component_filelist_page_id` FOREIGN KEY (`page_id`) REFERENCES `eportfolio_page` (`page_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2726,7 +2727,7 @@ CREATE TABLE `filter` (
   PRIMARY KEY (`id`),
   KEY `idx_filter_entity` (`entity`),
   KEY `idx_filter_class` (`class`)
-) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2779,7 +2780,7 @@ DROP TABLE IF EXISTS `filter_page`;
 CREATE TABLE `filter_page` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `filter_id` int(11) NOT NULL,
-  `page` enum('pending','grades','classMarkbook','analytics','dueWorkCal','courseMarkbook','rubricMarkbook','assessmentCal','badgeList','awardList','classPastoral','differentiationProfile') DEFAULT NULL,
+  `page` enum('pending','grades','classMarkbook','analytics','dueWorkCal','courseMarkbook','rubricMarkbook','assessmentCal','badgeList','awardList','classPastoral','differentiationProfile','customisationRecord') DEFAULT NULL,
   `enabled` tinyint(1) NOT NULL,
   `user_configurable` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
@@ -2800,7 +2801,7 @@ DROP TABLE IF EXISTS `filter_selection`;
 CREATE TABLE `filter_selection` (
   `filter_id` int(11) NOT NULL,
   `user_id` int(11) unsigned NOT NULL,
-  `page` enum('pending','grades','classMarkbook','analytics','dueWorkCal','courseMarkbook','rubricMarkbook','assessmentCal','badgeList','awardList','classPastoral','differentiationProfile') DEFAULT NULL,
+  `page` enum('pending','grades','classMarkbook','analytics','dueWorkCal','courseMarkbook','rubricMarkbook','assessmentCal','badgeList','awardList','classPastoral','differentiationProfile','customisationRecord') DEFAULT NULL,
   `key` varchar(127) NOT NULL,
   `selected` tinyint(1) DEFAULT NULL,
   UNIQUE KEY `unique_filter_selection_filter_id_user_id_page_key` (`filter_id`,`user_id`,`page`,`key`),
@@ -3641,7 +3642,7 @@ CREATE TABLE `lu_config_type` (
   `sequence` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `lu_config_type_type` (`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3818,6 +3819,28 @@ CREATE TABLE `lu_pastoral_type` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `lu_qualification`
+--
+
+DROP TABLE IF EXISTS `lu_qualification`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `lu_qualification` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `system_purpose` text DEFAULT NULL,
+  `sequence` int(11) NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_deleted_at` (`deleted_at`),
+  KEY `idx_sequence` (`sequence`),
+  KEY `idx_system_purpose` (`system_purpose`(1024))
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `lu_resource_booking_status`
 --
 
@@ -3857,7 +3880,38 @@ CREATE TABLE `lu_service` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `lu_skin_config_category`
+--
+
+DROP TABLE IF EXISTS `lu_skin_config_category`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `lu_skin_config_category` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `lu_skin_config_subcategory`
+--
+
+DROP TABLE IF EXISTS `lu_skin_config_subcategory`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `lu_skin_config_subcategory` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `category_id` int(11) NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_skin_config_category_category_id` (`category_id`),
+  CONSTRAINT `fk_skin_config_category_category` FOREIGN KEY (`category_id`) REFERENCES `lu_skin_config_category` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4356,16 +4410,18 @@ CREATE TABLE `mv_assessment_relation` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `myFile`
+-- Table structure for table `my_file`
 --
 
-DROP TABLE IF EXISTS `myFile`;
+DROP TABLE IF EXISTS `my_file`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `myFile` (
+CREATE TABLE `my_file` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `parent` int(11) NOT NULL DEFAULT 0,
-  `owner` int(11) NOT NULL DEFAULT 0,
+  `parent` int(11) DEFAULT NULL,
+  `_parent` int(11) NOT NULL DEFAULT 0,
+  `owner` int(10) unsigned DEFAULT NULL,
+  `_owner` int(11) NOT NULL DEFAULT 0,
   `realname` tinytext DEFAULT NULL,
   `submitted` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `description` longtext DEFAULT NULL,
@@ -4376,27 +4432,31 @@ CREATE TABLE `myFile` (
   KEY `parent` (`parent`),
   KEY `owner` (`owner`),
   KEY `hash` (`hash`),
-  CONSTRAINT `fk_myFile_storage_hash` FOREIGN KEY (`hash`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_myFile_storage_hash` FOREIGN KEY (`hash`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `myFile_myFolder_id_fk` FOREIGN KEY (`parent`) REFERENCES `my_folder` (`id`),
+  CONSTRAINT `myFile_user_id_fk` FOREIGN KEY (`owner`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `myFolder`
+-- Table structure for table `my_folder`
 --
 
-DROP TABLE IF EXISTS `myFolder`;
+DROP TABLE IF EXISTS `my_folder`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `myFolder` (
+CREATE TABLE `my_folder` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `owner` int(11) unsigned NOT NULL DEFAULT 0,
-  `parent` int(11) NOT NULL DEFAULT 0,
+  `parent` int(11) DEFAULT NULL,
+  `_parent` int(11) NOT NULL DEFAULT 0,
   `name` mediumtext DEFAULT NULL,
   `deleted_at` datetime DEFAULT NULL,
   UNIQUE KEY `id` (`id`),
   KEY `parent` (`parent`),
   KEY `owner` (`owner`),
-  CONSTRAINT `fk_myFolder_owner_id` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_myFolder_owner_id` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `myFolder_myFolder_id_fk` FOREIGN KEY (`parent`) REFERENCES `my_folder` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -5620,13 +5680,13 @@ CREATE TABLE `reportcard_comment` (
   `body` text DEFAULT NULL,
   `created` timestamp NOT NULL DEFAULT current_timestamp(),
   `modified` timestamp NULL DEFAULT NULL,
-  `deleted` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
   `student_visibility` tinyint(1) NOT NULL DEFAULT 1,
   `parent_visibility` tinyint(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
   KEY `category_id` (`category_id`,`student_id`),
   KEY `created` (`created`),
-  KEY `deleted` (`deleted`),
+  KEY `deleted` (`deleted_at`),
   KEY `student_id` (`student_id`),
   KEY `student_visibility` (`student_visibility`),
   KEY `parent_visibility` (`parent_visibility`),
@@ -6387,6 +6447,23 @@ CREATE TABLE `site_access` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `skin_config_category`
+--
+
+DROP TABLE IF EXISTS `skin_config_category`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `skin_config_category` (
+  `configID` int(10) unsigned DEFAULT NULL,
+  `subcategory_id` int(11) NOT NULL,
+  KEY `idx_skin_config_category_configID` (`configID`),
+  KEY `idx_skin_config_category_subcategoryId` (`subcategory_id`),
+  CONSTRAINT `fk_skin_config_category_config` FOREIGN KEY (`configID`) REFERENCES `config` (`configID`),
+  CONSTRAINT `fk_skin_config_category_subcategory` FOREIGN KEY (`subcategory_id`) REFERENCES `lu_skin_config_subcategory` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `socialstream_post`
 --
 
@@ -6933,7 +7010,7 @@ CREATE TABLE `storage` (
   `hash` varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci DEFAULT NULL,
   `filesize` bigint(20) NOT NULL DEFAULT 0,
   `uploaded_on` datetime NOT NULL,
-  `last_accessed` datetime DEFAULT NULL,
+  `_last_accessed` datetime DEFAULT NULL,
   `last_gc_at` datetime DEFAULT NULL,
   `public` tinyint(1) NOT NULL DEFAULT 0,
   `expired_at` datetime DEFAULT NULL,
@@ -7429,15 +7506,15 @@ CREATE TABLE `term_year_level` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `textBox`
+-- Table structure for table `textbox`
 --
 
-DROP TABLE IF EXISTS `textBox`;
+DROP TABLE IF EXISTS `textbox`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `textBox` (
-  `textBoxID` int(11) NOT NULL AUTO_INCREMENT,
-  `categoryID` int(11) unsigned DEFAULT NULL,
+CREATE TABLE `textbox` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `folder_id` int(11) unsigned DEFAULT NULL,
   `heading` varchar(100) DEFAULT NULL,
   `body` mediumtext DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
@@ -7446,15 +7523,15 @@ CREATE TABLE `textBox` (
   `updated_by` int(4) unsigned DEFAULT NULL,
   `deleted_at` datetime DEFAULT NULL,
   `deleted_by` int(4) unsigned DEFAULT NULL,
-  PRIMARY KEY (`textBoxID`),
-  KEY `categoryID` (`categoryID`),
+  PRIMARY KEY (`id`),
+  KEY `categoryID` (`folder_id`),
   KEY `deleted` (`deleted_at`),
   KEY `fk_textBox_created_by` (`created_by`),
   KEY `fk_textBox_updated_by` (`updated_by`),
   KEY `fk_textBox_deleted_by` (`deleted_by`),
   CONSTRAINT `fk_textBox_created_by` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`),
   CONSTRAINT `fk_textBox_deleted_by` FOREIGN KEY (`deleted_by`) REFERENCES `user` (`id`),
-  CONSTRAINT `fk_textBox_folder_id` FOREIGN KEY (`categoryID`) REFERENCES `folder` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_textBox_folder_id` FOREIGN KEY (`folder_id`) REFERENCES `folder` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_textBox_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=409 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -8215,6 +8292,25 @@ CREATE TABLE `user_password_reset_request` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `user_qualification`
+--
+
+DROP TABLE IF EXISTS `user_qualification`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user_qualification` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `qualification_id` int(11) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_user_qualification` (`user_id`,`qualification_id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_qualification_id` (`qualification_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Temporary table structure for view `v_assessment_feedback`
 --
 
@@ -8516,13 +8612,14 @@ CREATE TABLE `wiki` (
   `latestRevision` int(11) unsigned DEFAULT NULL COMMENT 'Nullable to enable insertion of wiki before first revision',
   `slug` varchar(255) DEFAULT NULL,
   `created` datetime DEFAULT NULL,
-  `deleted` enum('true','false') DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `_deleted` enum('true','false') DEFAULT NULL,
   `locked` enum('true','false') DEFAULT NULL,
   PRIMARY KEY (`wikiID`),
   KEY `category_slug` (`categoryID`,`slug`(191)),
   KEY `categoryID` (`categoryID`),
-  KEY `deleted` (`deleted`),
   KEY `fk_wiki_latestRevision_wikiRevision_revisionID` (`latestRevision`),
+  KEY `deleted_at` (`deleted_at`),
   CONSTRAINT `fk_wiki_folder_id` FOREIGN KEY (`categoryID`) REFERENCES `folder` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_wiki_latestRevision_wikiRevision_revisionID` FOREIGN KEY (`latestRevision`) REFERENCES `wikiRevision` (`revisionID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -8757,4 +8854,4 @@ CREATE TABLE `wikiRevision` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2026-03-24  5:00:56
+-- Dump completed on 2026-03-24  5:06:43
