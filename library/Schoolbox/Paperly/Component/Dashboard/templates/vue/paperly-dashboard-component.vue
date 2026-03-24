@@ -71,6 +71,15 @@ const upcoming = window.Vue.computed<UpcomingItem[]>(() => {
     // otherwise show all upcoming tasks
     return paperlyPayload.value.upcoming;
 });
+
+/**
+ * Convert a legacy icon class into an `sbx-icon` name
+ * @param iconClass - the legacy icon class
+ * @returns the icon name without the `icon-` prefix
+ */
+function getIconName(iconClass: string): string {
+    return iconClass.replace(/^icon-/, "");
+}
 </script>
 
 <template>
@@ -86,10 +95,11 @@ const upcoming = window.Vue.computed<UpcomingItem[]>(() => {
         <ul class="flex-list flex-wrap buttons l-pad-s">
             <li v-for="feature in paperlyPayload.features" :key="feature.url">
                 <a
-                    :class="feature.icon ?? ''"
+                    class="sbx-button--has-icon l-gap-s"
                     :href="feature.url ?? ''"
                     :target="props.openItemsInNewTab ? '_blank' : undefined"
                 >
+                    <sbx-icon v-if="feature.icon" :name="getIconName(feature.icon)" />
                     {{ feature.title ?? "" }}
                 </a>
             </li>
@@ -99,7 +109,7 @@ const upcoming = window.Vue.computed<UpcomingItem[]>(() => {
                 Upcoming Tasks (Action required)
             </h3>
             <div v-if="upcoming.length === 0" class="empty-state">
-                <i class="icon-paperly-forms"></i>
+                <sbx-icon name="paperly-forms" size="2rem" />
                 <p>There are currently no upcoming tasks that require action.</p>
             </div>
             <pdc-upcoming-item

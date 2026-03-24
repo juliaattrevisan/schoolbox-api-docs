@@ -112,11 +112,14 @@ export default {
                         <a
                             v-if="configSaveForLater"
                             @click="saveForLater(article)"
-                            :class="[
-                                savedArticleIds.indexOf(article.id) >= 0 ? 'icon-favourite' : 'icon-favourite-hollow',
-                            ]"
+                            class="sbx-icon-only-button"
                             title="Save for later"
-                        ></a>
+                            aria-label="Save for later"
+                        >
+                            <sbx-icon
+                                :name="savedArticleIds.indexOf(article.id) >= 0 ? 'favourite' : 'favourite-hollow'"
+                            />
+                        </a>
                     </nav>
                 </div>
 

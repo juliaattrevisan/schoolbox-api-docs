@@ -374,10 +374,12 @@ export default {
                             <button
                                 v-if="isEnrolled || isPrivate"
                                 title="Toggle Favourites"
-                                :class="['group-action', isFavourite ? 'icon-favourite' : 'icon-favourite-hollow']"
+                                class="group-action"
+                                aria-label="Toggle Favourites"
                                 :disabled="isProcessing"
                                 @click="toggleFavourites"
                             >
+                                <sbx-icon :name="isFavourite ? 'favourite' : 'favourite-hollow'" />
                                 Toggle Favourites
                             </button>
                             <button
@@ -481,12 +483,17 @@ export default {
     @include disabled-button;
     background: none;
     font-size: 0;
-    &:before {
-        //tweak the icon display
+    .sbx-icon {
         color: var(--accent-foreground);
-        font-size: 1.5rem;
-        padding: 0;
+        display: inline-flex;
     }
+
+    :deep(.sbx-icon__svg) {
+        height: 1.5rem;
+        padding: 0;
+        width: 1.5rem;
+    }
+
     &:hover {
         opacity: 0.8;
     }
