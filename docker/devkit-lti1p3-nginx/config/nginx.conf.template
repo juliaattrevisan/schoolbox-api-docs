@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name devkit_lti1p3.docker.localhost;
+    server_name ${LTI_DEVKIT_HOSTNAME};
     root /var/www/html/public;
 
     sendfile off;

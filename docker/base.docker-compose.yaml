@@ -364,11 +364,11 @@ services:
     volumes:
       - ../../devkit-lti1p3:/var/www/html
       - ./devkit-lti1p3-nginx/config/nginx.conf:/etc/nginx/conf.d/default.conf
-    # Make this host available across the network as devkit-lti1p3.localhost
+    # Make this host available across the network as LTI_DEVKIT_HOSTNAME
     networks:
       default:
         aliases:
-          - devkit-lti1p3.localhost
+          - ${LTI_DEVKIT_HOSTNAME}
     profiles:
       - lti
 

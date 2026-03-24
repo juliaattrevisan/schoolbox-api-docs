@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 declare LTI_DEVKIT_ENABLE
+declare LTI_DEVKIT_HOSTNAME
 declare LTI_DEVKIT_PUBLISHED_PORT
 declare PRIMARY_INSTANCE_HOSTNAME
 declare SECONDARY_INSTANCE_ENABLE
@@ -70,6 +71,7 @@ esac
 # extract the newly created LTI tool's deployment ID
 case "${LTI_DEVKIT_ENABLE}" in
     1 | true | yes | on)
+        export LTI_DEVKIT_HOSTNAME=${LTI_DEVKIT_HOSTNAME}
         export LTI_DEVKIT_PUBLISHED_PORT=${LTI_DEVKIT_PUBLISHED_PORT}
         export PRIMARY_INSTANCE_HOSTNAME=${PRIMARY_INSTANCE_HOSTNAME}
         export SCHOOLBOX_PLATFORM_PUBLIC_KEY=$("$(dirname "$0")/compose" exec -it $env_args schoolbox-cli tools/instance-mariadb.sh \
@@ -78,7 +80,7 @@ case "${LTI_DEVKIT_ENABLE}" in
             | sed -e 's/[[:space:]]*$//' )
         export SCHOOLBOX_PLATFORM_DEPLOYMENT_ID=$("$(dirname "$0")/compose" exec -it $env_args schoolbox-cli "tools/provision/create-devkit-lti-tool.php" \
             --key "$(cat ../devkit-lti1p3/config/keys/public.key)" \
-            --host "http://devkit-lti1p3.localhost:${LTI_DEVKIT_PUBLISHED_PORT}" \
+            --host "http://${LTI_DEVKIT_HOSTNAME}:${LTI_DEVKIT_PUBLISHED_PORT}" \
             | sed -e 's/[[:space:]]*$//' )
 
         envsubst < ./docker/devkit-lti1p3-phpfpm/env.template > ./docker/devkit-lti1p3-phpfpm/.env
