@@ -278,14 +278,14 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     private ?GenericCollection $qualificationCollection = null;
 
     /**
-     * @var GenericCollection
+     * @var GenericCollection|NationalityModel[]|null
      */
-    private GenericCollection $nationalityCollection;
+    private GenericCollection|array|null $nationalityCollection;
 
     /**
-     * @var GenericCollection
+     * @var GenericCollection|LanguageModel[]|null
      */
-    private GenericCollection $languageCollection;
+    private GenericCollection|array|null $languageCollection;
 
     public function __construct()
     {
@@ -1530,9 +1530,9 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @return GenericCollection|null
+     * @return GenericCollection|NationalityModel[]|null
      */
-    public function getNationalityCollection(): ?GenericCollection
+    public function getNationalityCollection(): null|array|GenericCollection
     {
         return $this->nationalityCollection;
     }
@@ -1549,9 +1549,9 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @return GenericCollection|null
+     * @return GenericCollection|LanguageModel[]|null
      */
-    public function getLanguageCollection(): ?GenericCollection
+    public function getLanguageCollection(): null|array|GenericCollection
     {
         return $this->languageCollection;
     }
