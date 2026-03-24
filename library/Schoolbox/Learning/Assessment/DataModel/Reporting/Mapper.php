@@ -271,17 +271,15 @@ class Mapper extends \Schoolbox\Mapper
     {
         /* Set up a container for new curric node instances
          */
-        $newSelections = new GenericCollection(\Schoolbox\Curriculum\Node\Model::class);
+        $newSelectionIds = [];
 
         /* Pile in selections that are supposed to exist after this mutation
          * The null coalesce dodges around a swampy behaviour where a collection isn't instantiated in $model for the
          * particular case where you removed all the nodes via the ui (ie. you literally wanted to select nothing)
          */
         foreach ($model->getSupportingDataCurriculumNodes() ?? [] as $curriculumNode) {
-            $newSelections->add($curriculumNode);
+            $newSelectionIds[] = $curriculumNode->getId();
         }
-
-        $newSelectionIds = $newSelections->getPropertyValues('id');
 
         /* Load nodes that already exist in the db: we maybe need to remove some of these
          */
@@ -340,17 +338,15 @@ class Mapper extends \Schoolbox\Mapper
     {
         /* Set up a container for new curric node instances
          */
-        $newSelections = new GenericCollection(\Schoolbox\Learning\Assessment\WorkType\Model::class);
+        $newSelectionIds = [];
 
         /* Pile in selections that are supposed to exist after this mutation
          * The null coalesce dodges around a swampy behaviour where a collection isn't instantiated in $model for the
          * particular case where you removed all the work types via the ui (ie. you literally wanted to select nothing)
          */
         foreach ($model->getSupportingDataWorkTypes() ?? [] as $workType) {
-            $newSelections->add($workType);
+            $newSelectionIds[] = $workType->getId();
         }
-
-        $newSelectionIds = $newSelections->getPropertyValues('id');
 
         /* Load nodes that already exist in the db: we maybe need to remove some of these
          */
