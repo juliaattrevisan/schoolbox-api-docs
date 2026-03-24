@@ -5,6 +5,7 @@ source "$(dirname "$0")/functions"
 # Always run within root folder
 cd "$(dirname "$0")/.." || exit 1
 
+declare PROJECT_NAME
 declare PHP_MAJOR_VERSION
 declare MARIADB_MAJOR_VERSION
 declare REDIS_MAJOR_VERSION
@@ -245,7 +246,7 @@ function build_configs_from_templates() {
     # "docker" in here may need to be substituted with the project name,
     # provided with the -p flag
     for i in $(seq 1 $FRANKENPHP_REPLICAS); do
-        UPSTREAMS="${UPSTREAMS}        to https://docker-schoolbox-frankenphp-${i}:443\n"
+        UPSTREAMS="${UPSTREAMS}        to https://${PROJECT_NAME}-schoolbox-frankenphp-${i}:443\n"
     done
 
     # Export for envsubst

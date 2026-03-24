@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+declare PROJECT_NAME
 declare SCHOOLBOX_CLI_IMAGE_BUILD_FROM_LOCAL
 declare TASKD_BUILD_FROM_LOCAL
 declare LTI_DEVKIT_ENABLE
@@ -55,6 +56,7 @@ esac
 
 # Run docker compose with whatever the appropriate profiles are.
 docker compose --progress plain \
+    -p "${PROJECT_NAME}" \
     -f "docker/base.docker-compose.yaml" \
     -f "${frankenphp_compose_file}" \
     -f "${schoolbox_cli_compose_file}" \
