@@ -102,7 +102,7 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Clear supporting data curric nodes and work types selections
          */
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'clearRelations']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateRelations']);
 
         /* Recursive Undeleter callbacks: deleting a dialog agent also deletes all students' responses and feedbacks
          */
@@ -252,7 +252,7 @@ class Mapper extends \Schoolbox\Mapper
      * @return void
      * @throws \Throwable
      */
-    public function clearRelations(Model $model, ?Model $previous = null): void
+    public function updateRelations(Model $model, ?Model $previous = null): void
     {
         $this->updateSupportingDataCurriculumNodeRelations($model, $previous);
         $this->updateSupportingDataWorkTypeRelations($model, $previous);
