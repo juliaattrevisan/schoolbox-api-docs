@@ -261,9 +261,7 @@ export default {
                                 v-model="updateFields.removeFromAllQualifications"
                                 type="checkbox"
                             />
-                            <label class="checkbox-label" for="remove_from_all_qualifications"
-                                >Remove from all qualifications</label
-                            >
+                            <label class="checkbox-label" for="remove_from_all_qualifications">Remove from all</label>
                         </li>
                     </ul>
                     <label for="apply_position_title">
