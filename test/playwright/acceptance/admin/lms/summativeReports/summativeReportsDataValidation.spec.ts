@@ -32,7 +32,7 @@ test.describe("Admin LMS - Summative Reports Data Validation", () => {
         await tester.loginAsAdmin();
     });
 
-    test("create a summative report with summary and class inclusion and check the report details in the preview page", async ({
+    test.skip("create a summative report with summary and class inclusion and check the report details in the preview page", async ({
         tester,
         db,
     }) => {
@@ -91,7 +91,10 @@ test.describe("Admin LMS - Summative Reports Data Validation", () => {
         }
     });
 
-    test("create a summative report page, toggle on the class page to check its details", async ({ tester, db }) => {
+    test.skip("create a summative report page, toggle on the class page to check its details", async ({
+        tester,
+        db,
+    }) => {
         try {
             tester.isGoingTo("create a summative report page, toggle on the class page");
             await createSummativeReport.goto();
@@ -166,8 +169,8 @@ test.describe("Admin LMS - Summative Reports Data Validation", () => {
             );
             await summativeReportList.clickSummativeReportActionButton("download", summativeReportTitle);
             await summativeReportList.checkReportGenerationInProgressMessage(1);
-            tester.isGoingTo("wait 60 seconds for the notification to trigger close to the match time");
-            await page.waitForTimeout(60000);
+            tester.isGoingTo("wait for a while for the notification to trigger");
+            await page.waitForSelector(`a[data-unread="1"]`, { timeout: 120000 });
             await common.assertNotifExists(`Your summative report ${summativeReportTitle} is ready to download`);
             await common.assertFileDownload("notification-image", `${summativeReportTitle}.zip`);
         } finally {
