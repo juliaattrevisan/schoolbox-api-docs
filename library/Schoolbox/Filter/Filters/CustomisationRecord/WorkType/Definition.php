@@ -58,16 +58,6 @@ class Definition extends AbstractDefinition
     }
 
     /**
-     * Returns a string by which to identify this filter
-     *
-     * @return string
-     */
-    public static function getSlug(): string
-    {
-        return 'work_type';
-    }
-
-    /**
      * This filter is available on the customisation record page.
      *
      * @param IConfigLoader $configLoader

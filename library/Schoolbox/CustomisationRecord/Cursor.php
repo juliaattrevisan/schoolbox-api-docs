@@ -116,7 +116,7 @@ class Cursor implements ICursor
         if ($this->orderBy === self::CURSOR_ORDER_BY_WORK_TYPE) {
             return $this->codec->encode([
                 self::CURSOR_ORDER_BY_WORK_TYPE_COLUMN => $lastRecord->getPlan()->getAssessment()->getWorkType()?->getName(),
-                self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getUser()->getId(),
+                self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getId(),
             ]);
         }
         /* Encode cursor for default ordering (by student name)
