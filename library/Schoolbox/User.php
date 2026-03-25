@@ -268,6 +268,12 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
     private ?Model $pronoun = null;
 
+    /** @var string|null IB candidate number (managed by IBIS write-back, not manually editable) */
+    private ?string $ibCandidateNumber = null;
+
+    /** @var GenericCollection|null Collection of IB qualifications assigned to this user */
+    private ?GenericCollection $qualificationCollection = null;
+
     public function __construct()
     {
         $this->role = new Role();
@@ -1520,5 +1526,41 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         }
 
         return true;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getIbCandidateNumber(): ?string
+    {
+        return $this->ibCandidateNumber;
+    }
+
+    /**
+     * @param string|null $ibCandidateNumber
+     * @return self
+     */
+    public function setIbCandidateNumber(?string $ibCandidateNumber): self
+    {
+        $this->ibCandidateNumber = $ibCandidateNumber;
+        return $this;
+    }
+
+    /**
+     * @return GenericCollection|null
+     */
+    public function getQualificationCollection(): ?GenericCollection
+    {
+        return $this->qualificationCollection;
+    }
+
+    /**
+     * @param GenericCollection $qualificationCollection
+     * @return self
+     */
+    public function setQualificationCollection(GenericCollection $qualificationCollection): self
+    {
+        $this->qualificationCollection = $qualificationCollection;
+        return $this;
     }
 }

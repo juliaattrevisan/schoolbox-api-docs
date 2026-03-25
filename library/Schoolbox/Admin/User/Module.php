@@ -27,6 +27,7 @@ use Schoolbox\User\Title\Mapper as UserTitleMapper;
 use Schoolbox\User\Pronoun;
 use Schoolbox\User\Log\Mapper as UserLogMapper;
 use Schoolbox\User\Token\Mapper as TokenMapper;
+use Schoolbox\IB\Qualification\Mapper as QualificationMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel;
 
@@ -132,6 +133,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(TokenMapper::class),
             $this->getMapperFactory()->get(YearLevel\Mapper::class),
             $this->getMapperFactory()->get(Pronoun\Mapper::class),
+            $this->getMapperFactory()->get(QualificationMapper::class),
         );
     }
 

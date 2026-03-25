@@ -23,6 +23,7 @@ use Schoolbox\Calendar\Util\ViewNameMapping;
 use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\IB\Qualification\Mapper as QualificationMapper;
 use Schoolbox\Resource\Storage;
 use UnexpectedValueException;
 
@@ -134,6 +135,8 @@ class UserMapper extends Mapper
         $this->joins('year_id', YearLevel\Mapper::class, 'id', null, null, 'year', 'year');
         $this->joinsVia('user_link', UserMapper::class, 'id', 'linked_user_id', 'user_id', null, null, null, 'linkedUsers');
         $this->joinsVia('userCampus', CampusMapper::class, 'id', 'campus', 'uid', 'id', null, null, 'campusCollection');
+        $this->joinsVia('userQualification', QualificationMapper::class, 'id', 'user_qualification', 'user_id', 'qualification_id', null, null, 'qualificationCollection');
+        $this->uses('ib_candidate_number', self::TYPE_STRING);
 
         $this->hasJoin(
             'userAccess',

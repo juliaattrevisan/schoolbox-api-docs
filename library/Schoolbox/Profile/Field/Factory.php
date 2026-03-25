@@ -478,6 +478,14 @@ class Factory
              * various controller-specific instances; use the callback to populate it
              */
             'differentiationProfile' => null,
+            'ibCandidateNumber' => $viewee->getIbCandidateNumber(),
+            'qualificationCollection' => implode(
+                ', ',
+                array_map(
+                    fn (\Schoolbox\IB\Qualification\Model $q) => $q->getName() ?? '',
+                    iterator_to_array($viewee->getQualificationCollection() ?? new \Schoolbox\GenericCollection())
+                )
+            ),
         ];
 
         $referenceFields = array_merge($externalUser, $referenceFields);

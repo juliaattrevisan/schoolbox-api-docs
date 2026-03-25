@@ -42,6 +42,8 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\User\Log\Mapper as UserLogMapper;
 use Schoolbox\User\Title\Mapper as UserTitleMapper;
+use Schoolbox\IB\Qualification\Mapper as QualificationMapper;
+use Schoolbox\IB\Qualification\Model as QualificationModel;
 use Schoolbox\YearLevel;
 
 /**
@@ -119,6 +121,8 @@ class Controller extends Base
     private User\Token\Mapper $tokenMapper;
 
     private User\Pronoun\Mapper $pronounMapper;
+
+    private QualificationMapper $qualificationMapper;
 
     /**
      * These identifier consts determine which dropdown to use when choosing the Service Identifier
@@ -303,6 +307,7 @@ class Controller extends Base
      * @param HouseMapper            $houseMapper
      * @param User\Token\Mapper      $tokenMapper
      * @param YearLevel\Mapper       $yearLevelMapper
+     * @param QualificationMapper    $qualificationMapper
      */
     public function __construct(
         CMSLogMapper $cmsLogMapper,
@@ -318,7 +323,8 @@ class Controller extends Base
         HouseMapper $houseMapper,
         User\Token\Mapper $tokenMapper,
         YearLevel\Mapper $yearLevelMapper,
-        User\Pronoun\Mapper $pronounMapper
+        User\Pronoun\Mapper $pronounMapper,
+        QualificationMapper $qualificationMapper
     ) {
         $this->cmsLogMapper = $cmsLogMapper;
         $this->userLogMapper = $userLogMapper;
@@ -334,6 +340,7 @@ class Controller extends Base
         $this->tokenMapper = $tokenMapper;
         $this->yearLevelMapper = $yearLevelMapper;
         $this->pronounMapper = $pronounMapper;
+        $this->qualificationMapper = $qualificationMapper;
     }
 
 
@@ -422,6 +429,7 @@ class Controller extends Base
                 'method' => 'Update',
                 'yearLevels' => $this->yearLevelMapper->findAll(),
                 'campuses' => $this->campusMapper->findAll(),
+                'qualifications' => $this->qualificationMapper->findAll(),
                 'roles' => $this->roleMapper->findAll(),
                 'externalDatabase' => $connectorName,
                 'residentialHouses' => $this->houseResidentialMapper->findAll(),
@@ -793,6 +801,14 @@ class Controller extends Base
                 $user->getCampusCollection()->add($campus);
             }
         }
+
+        $qualificationCollection = new GenericCollection(QualificationModel::class);
+        foreach ($post['qualification'] ?? [] as $qualificationId) {
+            $qualification = new QualificationModel();
+            $qualification->setId((int) $qualificationId);
+            $qualificationCollection->add($qualification);
+        }
+        $user->setQualificationCollection($qualificationCollection);
 
         /* Pronoun Logic
          *
