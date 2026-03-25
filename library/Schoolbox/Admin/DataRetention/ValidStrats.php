@@ -1,0 +1,87 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Schoolbox\Admin\DataRetention;
+
+/**
+ * Decide which strategy names from a csv string are valid for the data retention CLI.
+ *
+ * This is a thin, testable helper around simple csv parsing and whitelisting:
+ *  - Only names present in the provided valid strategy list are returned.
+ *  - Comparison is currently case-sensitive to preserve existing behaviour.
+ *  - Order is preserved and duplicates are removed.
+ */
+final class ValidStrats
+{
+    // retain learning moments and their associated data
+    public const string MOMENTS = 'moments';
+
+    // retain files uploaded by users in the My Files area
+    public const string MYFILES = 'myFiles';
+
+    /**
+     * These are valid as csv values in the arg
+     */
+    public const array STRATS_WHITELIST = [
+        self::MOMENTS,
+
+        self::MYFILES,
+    ];
+
+    /**
+     * After processing $csvArgs we remember what was valid
+     * because we'll probably reuse this a few times and
+     * we can save some cycles
+     *
+     * @var array
+     */
+    private array $filteredStrats;
+
+
+    /**
+     * @param string $csvArgs
+     */
+    public function __construct(string $csvArgs)
+    {
+        $this->filteredStrats = $this->filter($csvArgs);
+    }
+
+    /**
+     * Filter a csv of requested strategies against the known valid list.
+     *
+     * Examples (assuming ['moments', 'myFiles'] as valid strategies):
+     *  - "moments,myFiles" => ['moments', 'myFiles']
+     *  - "moments,unknown" => ['moments']
+     *  - "" or only commas/whitespace => []
+     *
+     * @param string $csvStrats raw csv string from CLI option
+     * @return string[] filtered, canonical strategy names
+     */
+    public function filter(string $csvStrats): array
+    {
+        // Split csv args into individual pieces
+        $parts = explode(',', $csvStrats);
+
+        // Cast all elements to strings
+        $parts = array_map('strval', $parts);
+
+        // Trim all the strings in the set
+        $parts = array_map('trim', $parts);
+
+        // Remove anything that doesn't also appear in $validStrats and ignore those
+        $filtered = array_intersect(self::STRATS_WHITELIST, $parts);
+
+        // Return only the valid strats chosen
+        return array_values($filtered);
+    }
+
+
+    /**
+     * get filtered strats
+     */
+    public function getFilteredStrats(): array
+    {
+        return $this->filteredStrats;
+    }
+}

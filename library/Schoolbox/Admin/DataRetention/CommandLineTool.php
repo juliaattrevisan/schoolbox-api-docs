@@ -12,7 +12,6 @@ namespace Schoolbox\Admin\DataRetention;
 
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
-use Schoolbox\GenericCollection;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -104,6 +103,12 @@ class CommandLineTool extends CliTool\App
     {
         $logger = $this->getLogger();
 
+        if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
+            // release this manually, so we don't trigger the notice in the shutdown function
+            $this->getHelp();
+            return;
+        }
+
         // Validate any retention period override early so we can fail fast before doing work.
         $retentionPeriod = $this->getOptAsInt(self::OPT_RETENTION_PERIOD);
         if (null !== $retentionPeriod) {
@@ -160,12 +165,12 @@ class CommandLineTool extends CliTool\App
         }
 
         // build the bus for all the data retention tasks
-        /** @var GenericCollection<IStrategy> $bus */
-        $bus = new GenericCollection(IStrategy::class);
+        /** @var IStrategy[] $bus */
+        $bus = [];
 
         // add bus for cmsLogExample // clear things from the cmsLog older than 1 year (possible options are 1 Day, 30 Days, 365 Days, <null>)
-//        $bus->add(new CmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig(), $endTime, $loopCount, $chunkSize));
-        $bus->add(new MomentsRetention(
+//        $bus[] = new CmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig(), $endTime, $loopCount, $chunkSize);
+        $bus[] = new MomentsRetention(
             $logger,
             $this->perform(),
             $this->getDatabaseInternal(),
@@ -174,44 +179,31 @@ class CommandLineTool extends CliTool\App
             $endTime,
             $loopCount,
             $chunkSize,
-        ));
-        $bus->add(new MyFilesRetention(
-            $logger,
-            $this->perform(),
-            $this->getDatabaseInternal(),
-            $lock,
-            $this->getConfig(),
-            $endTime,
-            $loopCount,
-            $chunkSize,
-        ));
-
-        // get strats to run, default all, and filter the bus to only those strats
-        $validStrats = array_map(
-            fn (IStrategy $strategy) => $strategy->getStrategyName(),
-            iterator_to_array($bus)
         );
-
-        if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
-            // release this manually, so we don't trigger the notice in the shutdown function
-            $lock->release();
-            $this->getHelp($validStrats);
-            return;
-        }
+        $bus[] = new MyFilesRetention(
+            $logger,
+            $this->perform(),
+            $this->getDatabaseInternal(),
+            $lock,
+            $this->getConfig(),
+            $endTime,
+            $loopCount,
+            $chunkSize,
+        );
 
         /**
          * get the strats to run, default all. This is a csv of strats, e.g. "cmslogexample,moments". If the result is an empty string, then we will run all strats.
          */
-        $selectedStrats = [];
+        $validStrats = [];
         $csvStrats = (string)$this->getOpt(self::OPT_LONG_STRATS);
         if ('' !== $csvStrats) {
-            $selectedStrats = $this->validateStrats($csvStrats, $validStrats);
+            $validStrats = new ValidStrats($csvStrats)->getFilteredStrats();
             // if no strats are valid, log and return
-            if (count($selectedStrats) === 0) {
+            if (count($validStrats) === 0) {
                 $logger->notice(sprintf("No valid strats found in '%s', exiting. Valid strats are: %s", $csvStrats, implode(', ', $validStrats)));
                 return;
             }
-            $logger->debug(sprintf("Selected strats from csv '%s': %s", $csvStrats, implode(', ', $selectedStrats)));
+            $logger->debug(sprintf("Selected strats from csv '%s': %s", $csvStrats, implode(', ', $validStrats)));
         }
 
         // log the settings we are running with
@@ -226,16 +218,19 @@ class CommandLineTool extends CliTool\App
 
         // filter buses to those we have requested
         // filter should only allow the strats we have requested, but if the result is an empty string, then we will run all strats
-        if (count($selectedStrats) > 0) {
-            $bus = $bus->filter(fn (IStrategy $strategy) => in_array($strategy->getStrategyName(), $selectedStrats, true));
-            $logger->notice(sprintf("Filtering to '%s' enable strats:", count($selectedStrats)));
-            $logger->notice(sprintf("    Enabled strats %s ", implode(', ', $selectedStrats)));
+        if (count($validStrats) > 0) {
+            $bus = array_values(array_filter(
+                $bus,
+                fn (IStrategy $strategy) => in_array($strategy->getStrategyName(), $validStrats, true),
+            ));
+            $logger->notice(sprintf("Filtering to '%s' enable strats:", count($validStrats)));
+            $logger->notice(sprintf("    Enabled strats %s ", implode(', ', $validStrats)));
         } else {
             $logger->notice("No strats specified, running all strats");
         }
 
         // if we have functions, run them
-        if ($bus->count() > 0) {
+        if (count($bus) > 0) {
             $logger->info('Running data retention strategies');
             /**
              * @var IStrategy $strategy
@@ -294,44 +289,12 @@ class CommandLineTool extends CliTool\App
     }
 
     /**
-     * Validate the strats provided in the csv against the valid strats, and return an array of the valid strats to run.
-     * This will ignore any invalid strats provided in the csv, and will return an empty array if no valid strats are found.
-     * @param string $csvStrats
-     * @param array  $validStrats
-     * @return array
-     */
-    private function validateStrats(string $csvStrats, array $validStrats): array
-    {
-        // Split csv args into individual pieces
-        $temp = explode(',', $csvStrats);
-
-        /* Cast all the elements in $values to strings
-         * because loosely typed data is poopy
-         */
-        $temp = array_map('strval', $temp);
-
-        /* Trim all the strings in the set
-         * because doing manual trimming is boring
-         */
-        $temp = array_map('trim', $temp);
-
-        /* Remove anything that doesn't also appear in $validStrats
-         * and ignore those
-         */
-        $temp = array_intersect($validStrats, $temp);
-
-        /* Store only the valid strats chosen
-         */
-        return array_values($temp);
-    }
-
-    /**
      * @param array $validStrats a list of valid strats to run, used for help text. If empty, will just show the option as is.
      * @return void
      */
-    private function getHelp(array $validStrats = []): void
+    private function getHelp(): void
     {
-        $csvStrats = implode(', ', $validStrats);
+        $csvStrats = implode(', ', ValidStrats::STRATS_WHITELIST);
         echo <<<HELP
 NAME
     ./tools/dataRetention/process.php - hard deletes data that matches specified data retention criteria and has already been soft deleted
