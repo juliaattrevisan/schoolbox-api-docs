@@ -1,8 +1,8 @@
 -- Seed new skin configuration settings and map them into existing skin categories/subcategories.
 
 -- Add new config type for Sonar Skin Configs
-# INSERT INTO lu_config_type (type, sequence)
-# VALUES ('Sonar Skin Configs', (SELECT COALESCE(MAX(sequence), 0) + 1 FROM lu_config_type));
+INSERT INTO lu_config_type (type, sequence)
+VALUES ('Sonar Skin Configs', (SELECT COALESCE(MAX(sequence), 0) + 1 FROM lu_config_type));
 
 -- New settings will be under Sonar Skin Configs config type
 SET @sonar_config_type_id = (SELECT id FROM lu_config_type WHERE type = 'Sonar Skin Configs' LIMIT 1);
