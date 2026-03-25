@@ -76,18 +76,6 @@ class LaravelTimestampAlaressDateRelativeTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testRelativeTimeDays1()
-    {
-        $this->markTestSkipped('Yesterday no longer shows as "yesterday"');
-        $input = date('U', strtotime('2011-08-30 13:12:01'));
-        $expected = 'Yesterday';
-
-        $relativeDate = self::buildDateObject($input, 'U');
-        $result = $relativeDate->getRelativeTime(new DateTime('2011-08-31 13:12:01'));
-
-        $this->assertEquals($expected, $result);
-    }
-
     public function testRelativeTimeDays2()
     {
         $input = date('U', strtotime('2011-08-26 13:12:01'));

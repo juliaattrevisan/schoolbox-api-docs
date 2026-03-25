@@ -31,12 +31,6 @@ parameters:
 			path: library/Alaress/Async/AMQP/AMQPConnector.php
 
 		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: library/Alaress/Async/AMQP/Bunny/BunnyControl.php
-
-		-
 			message: '#^Method Alaress\\Async\\Notification\\Cloud\\Google\\GCM\:\:propagate\(\) should return bool but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
@@ -229,18 +223,6 @@ parameters:
 			path: library/Alaress/Date/Interval.php
 
 		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 7
-			path: library/Alaress/Date/Test/LaravelDatetimeAlaressDateRelativeTest.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: library/Alaress/Date/Test/LaravelTimestampAlaressDateRelativeTest.php
-
-		-
 			message: '#^Dead catch \- Symfony\\Component\\Lock\\Exception\\LockReleasingException is never thrown in the try block\.$#'
 			identifier: catch.neverThrown
 			count: 1
@@ -249,12 +231,6 @@ parameters:
 		-
 			message: '#^Instanceof between null and Throwable will always evaluate to false\.$#'
 			identifier: instanceof.alwaysFalse
-			count: 1
-			path: library/Alaress/Jitter/Jitter.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
 			count: 1
 			path: library/Alaress/Jitter/Jitter.php
 
@@ -5299,12 +5275,6 @@ parameters:
 			path: library/Schoolbox/Resource/Browser/AbstractNode.php
 
 		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 3
-			path: library/Schoolbox/Resource/Browser/AbstractTreeBuilder.php
-
-		-
 			message: '#^Parameter \#1 \$nodeId \(string\) of method Schoolbox\\Resource\\Browser\\Office365\\Locator\:\:findByFolderId\(\) should be compatible with parameter \$nodeId \(int\) of method Schoolbox\\Resource\\File\\ILocator\:\:findByFolderId\(\)$#'
 			identifier: method.childParameterType
 			count: 1
@@ -5550,11 +5520,6 @@ parameters:
 			count: 1
 			path: library/Schoolbox/Sync/Grammar/Ruleset.php
 
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Test/UserRulesetTest.php
 
 		-
 			message: '#^Anonymous function has an unused use \$key\.$#'

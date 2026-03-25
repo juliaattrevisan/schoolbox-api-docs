@@ -122,8 +122,5 @@ class Jitter implements IJitter
                 $attempts++;
             }
         }
-
-        // Should never get here, but:
-        return null;
     }
 }
