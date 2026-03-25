@@ -419,8 +419,7 @@ class UserMapper extends Mapper
                 ->setResidentialHouse($residentialHouse)
                 ->setLinkedUsers($this->createCollection())
                 ->setPronoun($pronoun)
-                ->setCampusCollection($campusMapper->createCollection())
-                ->setQualificationCollection($qualificationMapper->createCollection());
+                ->setCampusCollection($campusMapper->createCollection());
 
             /* Portrait Image
              */
@@ -439,16 +438,12 @@ class UserMapper extends Mapper
 
         // Load one-to-many relations in separate queries
         if (!empty($users)) {
-            // Load campuses
-            $userIds          = array_keys($users);
-            $campusesByUserId = $campusMapper->findForOtherMapper($this, 'userCampus', $userIds);
-            foreach ($users as $userId => $user) {
-                $user->setCampusCollection($campusesByUserId[$userId] ?? $campusMapper->createCollection());
-            }
-
-            // Load qualifications
+            // Load campuses and qualifications
+            $userIds                = array_keys($users);
+            $campusesByUserId       = $campusMapper->findForOtherMapper($this, 'userCampus', $userIds);
             $qualificationsByUserId = $qualificationMapper->findForOtherMapper($this, 'user_qualification', $userIds);
             foreach ($users as $userId => $user) {
+                $user->setCampusCollection($campusesByUserId[$userId] ?? $campusMapper->createCollection());
                 $user->setQualificationCollection($qualificationsByUserId[$userId] ?? $qualificationMapper->createCollection());
             }
 

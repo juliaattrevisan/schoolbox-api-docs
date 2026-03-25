@@ -281,12 +281,15 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
-     * Clones shouldn't share campusCollection
+     * Clones shouldn't share campusCollection or qualificationCollection
      */
     public function __clone()
     {
         if ($this->campusCollection !== null) {
             $this->campusCollection = clone $this->campusCollection;
+        }
+        if ($this->qualificationCollection !== null) {
+            $this->qualificationCollection = clone $this->qualificationCollection;
         }
         if ($this->accessList instanceof GenericCollection) {
             $this->accessList = clone $this->accessList;
