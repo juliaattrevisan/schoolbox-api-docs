@@ -34,7 +34,9 @@ const isCoreCategory = window.Vue.computed(() => {
     return props.categoryName.toLowerCase() === "core";
 });
 
-// Initialize and update subject rows from IB subjects
+/**
+ * Initializes subject rows from the ibSubjects prop.
+ */
 function initializeSubjectRows(): void {
     if (isCoreCategory.value) {
         // For Core category, create two separate tables using subjects from database via API

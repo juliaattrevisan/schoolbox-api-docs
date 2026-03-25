@@ -16,7 +16,7 @@ const emit = defineEmits<{
 }>();
 
 const isSaving = window.Vue.ref<boolean>(false);
-const currentValues = window.Vue.ref<{ [key: string]: string }>({});
+const currentValues = window.Vue.ref<Record<string, string>>({}) as { value: Record<string, string> };
 
 // Initialize form values
 window.Vue.watch(
