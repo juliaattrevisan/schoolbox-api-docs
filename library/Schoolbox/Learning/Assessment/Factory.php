@@ -416,7 +416,7 @@ class Factory
 
         /* Assemble a GenericCollection of supporting data curriculum nodes
          */
-        $supportingCurriculumNodes = null;
+        $supportingCurriculumNodes = CurriculumNodeMapper::getInstance()->createCollection();
         $supportingCurriculumNodeIds = null;
 
         /* For some reason this curric node selector sends you back an empty string if you didn't select anything,
@@ -440,7 +440,7 @@ class Factory
 
         /* Assemble a GenericCollection of supporting data work types
          */
-        $supportingWorkTypes = null;
+        $supportingWorkTypes = WorkTypeMapper::getInstance()->createCollection();
         $supportingWorkTypeIds = $post['reporting']['supporting']['workTypes'] ?? null;
 
         if ($supportingWorkTypeIds && \count($supportingWorkTypeIds)) {

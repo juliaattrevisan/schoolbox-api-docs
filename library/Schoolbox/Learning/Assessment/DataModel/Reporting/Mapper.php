@@ -232,7 +232,7 @@ class Mapper extends \Schoolbox\Mapper
          * The null coalesce dodges around a swampy behaviour where a collection isn't instantiated in $model for the
          * particular case where you removed all the nodes via the ui (ie. you literally wanted to select nothing)
          */
-        foreach ($model->getSupportingDataCurriculumNodes() ?? [] as $curriculumNode) {
+        foreach ($model->getSupportingDataCurriculumNodes() as $curriculumNode) {
             $newSelectionIds[] = $curriculumNode->getId();
         }
 
@@ -299,7 +299,7 @@ class Mapper extends \Schoolbox\Mapper
          * The null coalesce dodges around a swampy behaviour where a collection isn't instantiated in $model for the
          * particular case where you removed all the work types via the ui (ie. you literally wanted to select nothing)
          */
-        foreach ($model->getSupportingDataWorkTypes() ?? [] as $workType) {
+        foreach ($model->getSupportingDataWorkTypes() as $workType) {
             $newSelectionIds[] = $workType->getId();
         }
 
