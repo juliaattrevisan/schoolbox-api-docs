@@ -1,63 +1,257 @@
 -- Seed new skin configuration settings and map them into existing skin categories/subcategories.
 
 -- Add new config type for Sonar Skin Configs
-INSERT INTO lu_config_type (type, sequence)
-VALUES ('Sonar Skin Configs', (SELECT COALESCE(MAX(sequence), 0) + 1 FROM lu_config_type));
+INSERT INTO
+    lu_config_type (type, sequence)
+VALUES (
+        'Sonar Skin Configs',
+        (
+            SELECT COALESCE(MAX(sequence), 0) + 1
+            FROM lu_config_type
+        )
+    );
 
 -- New settings will be under Sonar Skin Configs config type
-SET @sonar_config_type_id = (SELECT id FROM lu_config_type WHERE type = 'Sonar Skin Configs' LIMIT 1);
+SET
+    @sonar_config_type_id = (
+        SELECT id
+        FROM lu_config_type
+        WHERE
+            type = 'Sonar Skin Configs'
+        LIMIT 1
+    );
 
 -- Preset field types for new skin config settings
-SET @config_colour_field_id = (SELECT id FROM lu_config_field WHERE field = 'colour' LIMIT 1);
-SET @config_select_field_id = (SELECT id FROM lu_config_field WHERE field = 'select' LIMIT 1);
-SET @config_checkbox_field_id = (SELECT id FROM lu_config_field WHERE field = 'checkbox' LIMIT 1);
-SET @config_textarea_field_id = (SELECT id FROM lu_config_field WHERE field = 'textarea' LIMIT 1);
+SET
+    @config_colour_field_id = (
+        SELECT id
+        FROM lu_config_field
+        WHERE
+            field = 'colour'
+        LIMIT 1
+    );
+
+SET
+    @config_select_field_id = (
+        SELECT id
+        FROM lu_config_field
+        WHERE
+            field = 'select'
+        LIMIT 1
+    );
+
+SET
+    @config_checkbox_field_id = (
+        SELECT id
+        FROM lu_config_field
+        WHERE
+            field = 'checkbox'
+        LIMIT 1
+    );
+
+SET
+    @config_textarea_field_id = (
+        SELECT id
+        FROM lu_config_field
+        WHERE
+            field = 'textarea'
+        LIMIT 1
+    );
 
 -- Get category and subcategory ids for new skin config settings
-SET @category_colours = (SELECT id FROM lu_skin_config_category WHERE name = 'Colours');
-SET @category_css = (SELECT id FROM lu_skin_config_category WHERE name = 'Custom CSS');
-SET @category_roundness = (SELECT id FROM lu_skin_config_category WHERE name = 'Roundness');
-SET @category_drop_shadow = (SELECT id FROM lu_skin_config_category WHERE name = 'Drop shadow');
+SET
+    @category_colours = (
+        SELECT id
+        FROM lu_skin_config_category
+        WHERE
+            name = 'Colours'
+    );
 
-SET @subcategory_general = (SELECT id FROM lu_skin_config_subcategory WHERE category_id = @category_colours AND name = 'General');
-SET @subcategory_top_menu = (SELECT id FROM lu_skin_config_subcategory WHERE category_id = @category_colours AND name = 'Top Menu');
-SET @subcategory_component = (SELECT id FROM lu_skin_config_subcategory WHERE category_id = @category_colours AND name = 'Component');
-SET @subcategory_interactive = (SELECT id FROM lu_skin_config_subcategory WHERE category_id = @category_colours AND name = 'Interactive');
-SET @subcategory_form = (SELECT id FROM lu_skin_config_subcategory WHERE category_id = @category_colours AND name = 'Form');
-SET @subcategory_css = (SELECT id FROM lu_skin_config_subcategory WHERE category_id = @category_css AND name IS NULL);
-SET @subcategory_roundness = (SELECT id FROM lu_skin_config_subcategory WHERE category_id = @category_roundness AND name IS NULL);
-SET @subcategory_drop_shadow = (SELECT id FROM lu_skin_config_subcategory WHERE category_id = @category_drop_shadow AND name IS NULL);
+SET
+    @category_css = (
+        SELECT id
+        FROM lu_skin_config_category
+        WHERE
+            name = 'Custom CSS'
+    );
+
+SET
+    @category_roundness = (
+        SELECT id
+        FROM lu_skin_config_category
+        WHERE
+            name = 'Roundness'
+    );
+
+SET
+    @category_drop_shadow = (
+        SELECT id
+        FROM lu_skin_config_category
+        WHERE
+            name = 'Drop shadow'
+    );
+
+SET
+    @subcategory_general = (
+        SELECT id
+        FROM lu_skin_config_subcategory
+        WHERE
+            category_id = @category_colours
+            AND name = 'General'
+    );
+
+SET
+    @subcategory_menu = (
+        SELECT id
+        FROM lu_skin_config_subcategory
+        WHERE
+            category_id = @category_colours
+            AND name = 'Menu'
+    );
+
+SET
+    @subcategory_component = (
+        SELECT id
+        FROM lu_skin_config_subcategory
+        WHERE
+            category_id = @category_colours
+            AND name = 'Component'
+    );
+
+SET
+    @subcategory_css = (
+        SELECT id
+        FROM lu_skin_config_subcategory
+        WHERE
+            category_id = @category_css
+            AND name IS NULL
+    );
+
+SET
+    @subcategory_roundness = (
+        SELECT id
+        FROM lu_skin_config_subcategory
+        WHERE
+            category_id = @category_roundness
+            AND name IS NULL
+    );
+
+SET
+    @subcategory_drop_shadow = (
+        SELECT id
+        FROM lu_skin_config_subcategory
+        WHERE
+            category_id = @category_drop_shadow
+            AND name IS NULL
+    );
 
 -- Get current values for skin config settings to be updated, to ensure no loss of customisation for existing instances.
-SET @value_skin_colour_body_background = (SELECT `value` FROM config WHERE name = 'skin_colour_body_bg' LIMIT 1);
-SET @value_skin_colour_accent = (SELECT `value` FROM config WHERE name = 'skin_colour_form_input_border_color' LIMIT 1);
-SET @value_skin_colour_active = (SELECT `value` FROM config WHERE name = 'skin_colour_accent_background' LIMIT 1);
-SET @value_skin_colour_menu_primary = (SELECT `value` FROM config WHERE name = 'skin_colour_navigation_background' LIMIT 1);
-SET @value_skin_colour_menu_secondary = (SELECT `value` FROM config WHERE name = 'skin_colour_navigation_foreground' LIMIT 1);
-SET @value_skin_colour_menu_hover = (SELECT `value` FROM config WHERE name = 'skin_colour_navigation_hover' LIMIT 1);
-SET @value_skin_colour_homepage_heading_text = (SELECT `value` FROM config WHERE name = 'homepage_colour_head_font' LIMIT 1);
-SET @value_skin_colour_homepage_heading_background = (SELECT `value` FROM config WHERE name = 'homepage_colour_head_bg' LIMIT 1);
-SET @value_skin_sonar_custom_css = (SELECT `value` FROM config WHERE name = 'skin_custom_css' LIMIT 1);
+SET
+    @value_skin_colour_body_background = (
+        SELECT `value`
+        FROM config
+        WHERE
+            name = 'skin_colour_body_bg'
+        LIMIT 1
+    );
 
-SET @settings_sequence_start = (SELECT COALESCE(MAX(sequence), 0) FROM config WHERE module = 'settings');
+SET
+    @value_skin_colour_accent = (
+        SELECT `value`
+        FROM config
+        WHERE
+            name = 'skin_colour_form_input_border_color'
+        LIMIT 1
+    );
+
+SET
+    @value_skin_colour_active = (
+        SELECT `value`
+        FROM config
+        WHERE
+            name = 'skin_colour_accent_background'
+        LIMIT 1
+    );
+
+SET
+    @value_skin_colour_menu_primary = (
+        SELECT `value`
+        FROM config
+        WHERE
+            name = 'skin_colour_navigation_background'
+        LIMIT 1
+    );
+
+SET
+    @value_skin_colour_menu_secondary = (
+        SELECT `value`
+        FROM config
+        WHERE
+            name = 'skin_colour_navigation_foreground'
+        LIMIT 1
+    );
+
+SET
+    @value_skin_colour_menu_hover = (
+        SELECT `value`
+        FROM config
+        WHERE
+            name = 'skin_colour_navigation_hover'
+        LIMIT 1
+    );
+
+SET
+    @value_skin_colour_component_heading_text = (
+        SELECT `value`
+        FROM config
+        WHERE
+            name = 'homepage_colour_head_font'
+        LIMIT 1
+    );
+
+SET
+    @value_skin_colour_component_heading_background = (
+        SELECT `value`
+        FROM config
+        WHERE
+            name = 'homepage_colour_head_bg'
+        LIMIT 1
+    );
+
+SET
+    @value_skin_sonar_custom_css = (
+        SELECT `value`
+        FROM config
+        WHERE
+            name = 'skin_custom_css'
+        LIMIT 1
+    );
+
+SET
+    @settings_sequence_start = (
+        SELECT COALESCE(MAX(sequence), 0)
+        FROM config
+        WHERE
+            module = 'settings'
+    );
 
 -- Inserting the new skin config settings
-INSERT INTO config (
-    name,
-    value,
-    title,
-    description,
-    field_id,
-    type_id,
-    editable,
-    hidden,
-    required,
-    module,
-    sequence,
-    options
-)
-VALUES
-    (
+INSERT INTO
+    config (
+        name,
+        value,
+        title,
+        description,
+        field_id,
+        type_id,
+        editable,
+        hidden,
+        required,
+        module,
+        sequence,
+        options
+    )
+VALUES (
         'skin_colour_body_background',
         @value_skin_colour_body_background,
         'Body Background Colour',
@@ -156,8 +350,8 @@ VALUES
         '{"customProperty":"--sbx-config-color-menu-hover","contrast":"--sbx-config-color-menu-secondary"}'
     ),
     (
-        'skin_colour_homepage_heading_text',
-        @value_skin_colour_homepage_heading_text,
+        'skin_colour_component_heading_text',
+        @value_skin_colour_component_heading_text,
         'Component Heading Text Colour',
         'Sets the colour of the heading text on homepage components.',
         @config_colour_field_id,
@@ -167,11 +361,11 @@ VALUES
         'false',
         'settings',
         @settings_sequence_start + 8,
-        '{"customProperty":"--sbx-config-color-homepage-heading-text","contrast":"--sbx-config-color-homepage-heading-background"}'
+        '{"customProperty":"--sbx-config-color-component-heading-text","contrast":"--sbx-config-color-component-heading-background"}'
     ),
     (
-        'skin_colour_homepage_heading_background',
-        @value_skin_colour_homepage_heading_background,
+        'skin_colour_component_heading_background',
+        @value_skin_colour_component_heading_background,
         'Component Heading Background Colour',
         'Sets the colour of the heading background on homepage components.',
         @config_colour_field_id,
@@ -181,7 +375,7 @@ VALUES
         'false',
         'settings',
         @settings_sequence_start + 9,
-        '{"customProperty":"--sbx-config-color-homepage-heading-background","contrast":"--sbx-config-color-homepage-heading-text"}'
+        '{"customProperty":"--sbx-config-color-component-heading-background","contrast":"--sbx-config-color-component-heading-text"}'
     ),
     (
         'skin_field_roundness',
@@ -240,17 +434,122 @@ VALUES
         NULL
     );
 -- Append them to the relevant skin config categories/subcategories
-INSERT INTO skin_config_category (configID, subcategory_id)
-VALUES ((SELECT configID FROM config WHERE name = 'skin_colour_body_background'), @subcategory_general),
-       ((SELECT configID FROM config WHERE name = 'skin_colour_accent'), @subcategory_interactive),
-       ((SELECT configID FROM config WHERE name = 'skin_colour_accent_text'), @subcategory_interactive),
-       ((SELECT configID FROM config WHERE name = 'skin_colour_active'), @subcategory_interactive),
-       ((SELECT configID FROM config WHERE name = 'skin_colour_menu_primary'), @subcategory_top_menu),
-       ((SELECT configID FROM config WHERE name = 'skin_colour_menu_secondary'), @subcategory_top_menu),
-       ((SELECT configID FROM config WHERE name = 'skin_colour_menu_hover'), @subcategory_top_menu),
-       ((SELECT configID FROM config WHERE name = 'skin_colour_homepage_heading_text'), @subcategory_component),
-       ((SELECT configID FROM config WHERE name = 'skin_colour_homepage_heading_background'), @subcategory_component),
-       ((SELECT configID FROM config WHERE name = 'skin_field_roundness'), @subcategory_roundness),
-       ((SELECT configID FROM config WHERE name = 'skin_box_roundness'), @subcategory_roundness),
-       ((SELECT configID FROM config WHERE name = 'skin_box_drop_shadow'), @subcategory_drop_shadow),
-       ((SELECT configID FROM config WHERE name = 'skin_sonar_custom_css'), @subcategory_css);
+INSERT INTO
+    skin_config_category (configID, subcategory_id)
+VALUES (
+        (
+            SELECT configID
+            FROM config
+            WHERE
+                name = 'skin_colour_body_background'
+        ),
+        @subcategory_general
+    ),
+    (
+        (
+            SELECT configID
+            FROM config
+            WHERE
+                name = 'skin_colour_accent'
+        ),
+        @subcategory_general
+    ),
+    (
+        (
+            SELECT configID
+            FROM config
+            WHERE
+                name = 'skin_colour_accent_text'
+        ),
+        @subcategory_general
+    ),
+    (
+        (
+            SELECT configID
+            FROM config
+            WHERE
+                name = 'skin_colour_active'
+        ),
+        @subcategory_general
+    ),
+    (
+        (
+            SELECT configID
+            FROM config
+            WHERE
+                name = 'skin_colour_menu_primary'
+        ),
+        @subcategory_menu
+    ),
+    (
+        (
+            SELECT configID
+            FROM config
+            WHERE
+                name = 'skin_colour_menu_secondary'
+        ),
+        @subcategory_menu
+    ),
+    (
+        (
+            SELECT configID
+            FROM config
+            WHERE
+                name = 'skin_colour_menu_hover'
+        ),
+        @subcategory_menu
+    ),
+    (
+        (
+            SELECT configID
+            FROM config
+            WHERE
+                name = 'skin_colour_component_heading_text'
+        ),
+        @subcategory_component
+    ),
+    (
+        (
+            SELECT configID
+            FROM config
+            WHERE
+                name = 'skin_colour_component_heading_background'
+        ),
+        @subcategory_component
+    ),
+    (
+        (
+            SELECT configID
+            FROM config
+            WHERE
+                name = 'skin_field_roundness'
+        ),
+        @subcategory_roundness
+    ),
+    (
+        (
+            SELECT configID
+            FROM config
+            WHERE
+                name = 'skin_box_roundness'
+        ),
+        @subcategory_roundness
+    ),
+    (
+        (
+            SELECT configID
+            FROM config
+            WHERE
+                name = 'skin_box_drop_shadow'
+        ),
+        @subcategory_drop_shadow
+    ),
+    (
+        (
+            SELECT configID
+            FROM config
+            WHERE
+                name = 'skin_sonar_custom_css'
+        ),
+        @subcategory_css
+    );
