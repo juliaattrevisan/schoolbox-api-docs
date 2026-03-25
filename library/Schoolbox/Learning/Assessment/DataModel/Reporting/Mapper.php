@@ -100,9 +100,9 @@ class Mapper extends \Schoolbox\Mapper
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'deleterFields']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreDeleterFields']);
 
-        /* Clear supporting data curric nodes and work types selections
+        /* Update supporting data curric nodes and work types selections
          */
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateRelations']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateRelations']);
 
         /* Recursive Undeleter callbacks: deleting a dialog agent also deletes all students' responses and feedbacks
          */
