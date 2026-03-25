@@ -68,26 +68,6 @@ class Definition extends AbstractDefinition
     }
 
     /**
-     * Return the name of the filter to expose in the UI
-     *
-     * @return string
-     */
-    public static function getName(): string
-    {
-        return 'Work Type';
-    }
-
-    /**
-     * Returns the twig template to render this filter's panel component into
-     *
-     * @return string
-     */
-    public static function getPanelComponentTemplate(): string
-    {
-        return '@filterDefinitions/CustomisationRecord/WorkType/templates/component.twig';
-    }
-
-    /**
      * This filter is available on the customisation record page.
      *
      * @param IConfigLoader $configLoader
@@ -143,55 +123,6 @@ class Definition extends AbstractDefinition
             }
         }
         return $options;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getKey(): string
-    {
-        return 'work_type';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getTitle(): string
-    {
-        return 'Work Type';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getKeyConverterClass(): string
-    {
-        return KeyConverter::class;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getComponentClass(): string
-    {
-        return Component::class;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSequence(): int
-    {
-        return 100;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
-    {
-        // All work types should be unselected by default
-        return false;
     }
 
     /**
