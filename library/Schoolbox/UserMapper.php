@@ -135,7 +135,7 @@ class UserMapper extends Mapper
         $this->joins('year_id', YearLevel\Mapper::class, 'id', null, null, 'year', 'year');
         $this->joinsVia('user_link', UserMapper::class, 'id', 'linked_user_id', 'user_id', null, null, null, 'linkedUsers');
         $this->joinsVia('userCampus', CampusMapper::class, 'id', 'campus', 'uid', 'id', null, null, 'campusCollection');
-        $this->joinsVia('userQualification', QualificationMapper::class, 'id', 'user_qualification', 'user_id', 'qualification_id', null, null, 'qualificationCollection');
+        $this->joinsVia('user_qualification', QualificationMapper::class, 'id', 'qualification_id', 'user_id', null, null, null, 'qualificationCollection');
         $this->uses('ib_candidate_number', self::TYPE_STRING);
 
         $this->hasJoin(
@@ -390,6 +390,9 @@ class UserMapper extends Mapper
         /** @var CampusMapper $campusMapper */
         $campusMapper = $this->getJoinMapper('userCampus');
 
+        /** @var QualificationMapper $qualificationMapper */
+        $qualificationMapper = $this->getJoinMapper('user_qualification');
+
         foreach ($statement as $row) {
             $userId = $row['id'];
 
@@ -416,7 +419,8 @@ class UserMapper extends Mapper
                 ->setResidentialHouse($residentialHouse)
                 ->setLinkedUsers($this->createCollection())
                 ->setPronoun($pronoun)
-                ->setCampusCollection($campusMapper->createCollection());
+                ->setCampusCollection($campusMapper->createCollection())
+                ->setQualificationCollection($qualificationMapper->createCollection());
 
             /* Portrait Image
              */
@@ -440,6 +444,12 @@ class UserMapper extends Mapper
             $campusesByUserId = $campusMapper->findForOtherMapper($this, 'userCampus', $userIds);
             foreach ($users as $userId => $user) {
                 $user->setCampusCollection($campusesByUserId[$userId] ?? $campusMapper->createCollection());
+            }
+
+            // Load qualifications
+            $qualificationsByUserId = $qualificationMapper->findForOtherMapper($this, 'user_qualification', $userIds);
+            foreach ($users as $userId => $user) {
+                $user->setQualificationCollection($qualificationsByUserId[$userId] ?? $qualificationMapper->createCollection());
             }
 
             // Load linked users

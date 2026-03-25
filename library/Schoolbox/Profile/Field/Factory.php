@@ -483,7 +483,7 @@ class Factory
                 ', ',
                 array_map(
                     fn (\Schoolbox\IB\Qualification\Model $q) => $q->getName() ?? '',
-                    iterator_to_array($viewee->getQualificationCollection() ?? new \Schoolbox\GenericCollection())
+                    iterator_to_array($viewee->getQualificationCollection() ?? new \Schoolbox\GenericCollection(\Schoolbox\IB\Qualification\Model::class))
                 )
             ),
         ];
