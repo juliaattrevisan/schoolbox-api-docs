@@ -24,12 +24,19 @@ abstract class StrategyBase implements IStrategy
 
     public const int DEFAULT_CHUNK_SIZE = 1000; // how many things to delete at once
 
-    /* the config key to look up the retention period for this strategy, e.g. 'ConfigMapper::NAME_DATA_RETENTION_*'
+    /* This is how we work out how long to retain soft deleted data for. Or if we should hard delete it at all. This is configured config, and can be overridden by the command line tool option --retention-period=xx(days)
+     *
+     * the config key to look up the retention period for this strategy, e.g. 'ConfigMapper::NAME_DATA_RETENTION_*'
      * planned options 1;1 Day:30;30 Days:365;365 Days and <null> (null is do NOT hard delete this)
+     *
+     * @var string
      */
-    public string $retentionConfigKey = '';
+    protected string $retentionConfigKey = '';
 
     /**
+     * This is how we work out how long to retain soft deleted data for. Or if we should hard delete it at all.
+     * This is configured in config using $retentionConfigKey, and can be overridden by the command line tool option --retention-period=xx(days)
+     *
      * cache and store the retention period for this strategy,
      * so we don't have to keep looking it up from the config for every chunk,
      * and so we can override it with setRetentionPeriod if needed
@@ -151,6 +158,9 @@ abstract class StrategyBase implements IStrategy
      * Get the retention period for this strategy, in database format
      * e.g. '2024-01-01 00:00:00'
      * null if no retention period is set (i.e. do not hard delete this data)
+     *
+     * Either uses the cli option --retention-period=xx(days) if set,
+     * or looks up the retention period from config using $retentionConfigKey
      * @return string|null
      */
     protected function getRetentionPeriod()

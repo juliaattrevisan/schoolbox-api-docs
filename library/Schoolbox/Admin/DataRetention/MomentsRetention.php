@@ -17,7 +17,8 @@ use Schoolbox\Config\ConfigMapper;
 
 class MomentsRetention extends StrategyBase
 {
-    public string $retentionConfigKey = ConfigMapper::NAME_DATA_RETENTION_LEARNINGMOMENTS;
+    protected string $retentionConfigKey = ConfigMapper::NAME_DATA_RETENTION_LEARNINGMOMENTS;
+
     /**
      * @inheritDoc
      */
