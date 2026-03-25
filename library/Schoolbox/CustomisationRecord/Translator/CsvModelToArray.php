@@ -29,6 +29,7 @@ class CsvModelToArray
             'customised_activity' => $plan->getName() ?? $plan->getAssessment()->getTitle(),
             'original_activity' => $originalActivity->getTitle(),
             'type' => $plan->getCustomisationType(),
+            'work_type' => $plan->getAssessment()->getWorkType()?->getName() ?? 'None',
             'unit' => $context?->getTitle(),
             'class' => $context?->getFolder()?->getTitle()
         ];

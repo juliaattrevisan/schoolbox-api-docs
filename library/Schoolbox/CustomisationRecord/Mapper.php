@@ -94,6 +94,13 @@ class Mapper extends BaseMapper
                 continue;
             }
 
+            /* Hydrate work type
+             */
+            if ($row['wt.id']) {
+                $workTypeMapper = \Schoolbox\Learning\Assessment\WorkType\Mapper::getInstance();
+                $workType = $workTypeMapper->hydrate($row, 'wt');
+                $assessment->setWorkType($workType);
+            }
             /* Hydrating the unit implementation and course implementation for the assessment
              */
             /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $assessmentContext */
@@ -156,6 +163,7 @@ class Mapper extends BaseMapper
                    {$this->getJoinColumnString('user.userCampus', 'c')},
                    {$this->getJoinColumnString('plan.assessment', 'a')},
                    {$this->getJoinColumnString('plan.assessment', 'oa')},
+                   {$this->getJoinColumnString('plan.assessment.work_type', 'wt')},
                    {$this->getJoinColumnString('plan.assessment.assessment_course_unit_implementation', 'cui')},
                    {$this->getJoinMapper('plan.assessment.assessment_course_unit_implementation')->getJoinColumnString('course', 'ci')},
                    {$this->getJoinMapper('plan.assessment.assessment_course_unit_implementation')->getJoinColumnString('course.folder', 'f')},
@@ -190,6 +198,7 @@ class Mapper extends BaseMapper
             LEFT JOIN folder f ON ci.folder_id = f.id
             LEFT JOIN folder_code fc ON f.id = fc.folder_id AND fc.deleted_at IS NULL
             LEFT JOIN assessment oa ON a.original_assessment_id = oa.id
+            LEFT JOIN lu_work_type wt ON a.work_type_id = wt.id
             LEFT JOIN differentiation_profiles ON differentiation_profiles.student_id = u.id
             LEFT JOIN differentiation_profiles_adjustment_category ac ON FIND_IN_SET(ac.id, differentiation_profiles.adjustment_category)
             LEFT JOIN differentiation_profiles_adjustment_level al ON FIND_IN_SET(al.id, differentiation_profiles.adjustment_level)
@@ -204,6 +213,7 @@ class Mapper extends BaseMapper
         ?array $adjustmentCategories,
         ?array $adjustmentLevels,
         ?array $termIds,
+        ?array $workTypeIds = null,
         ?array $cursorParams = null,
         ?array $order = null,
         ?int $limit = null
@@ -239,6 +249,10 @@ class Mapper extends BaseMapper
                 'adjustment_levels_none_key' => CustomisationRecord\AdjustmentLevel\KeyConverter::NONE_KEY_VALUE,
                 ...Builder::getArrayParameters($adjustmentLevels, 'adjustmentLevel'),
             ]);
+        }
+
+        if (!empty($workTypeIds)) {
+            $pb = $pb->in('a.work_type_id', $workTypeIds);
         }
 
         if (!empty($cursorParams)) {

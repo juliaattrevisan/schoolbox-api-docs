@@ -18,12 +18,14 @@ class Cursor implements ICursor
     public const string CURSOR_ORDER_BY_CLASS_NAME = 'class';
     public const string CURSOR_ORDER_BY_UNIT_NAME = 'unit';
     public const string CURSOR_ORDER_BY_CUSTOMISATION_TYPE = 'type';
+    public const string CURSOR_ORDER_BY_WORK_TYPE = 'work_type';
 
     public const string CURSOR_ORDER_BY_STUDENT_ID_COLUMN = 'participant.id';
     public const string CURSOR_ORDER_BY_CREATED_AT_COLUMN = 'created_at';
     public const string CURSOR_ORDER_BY_CLASS_NAME_COLUMN = 'f.name';
     public const string CURSOR_ORDER_BY_UNIT_NAME_COLUMN = 'cui.title';
     public const string CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN = 'pp.is_dynamic';
+    public const string CURSOR_ORDER_BY_WORK_TYPE_COLUMN = 'wt.name';
 
     public function __construct(
         private Finder $finder,
@@ -105,6 +107,15 @@ class Cursor implements ICursor
         if ($this->orderBy === self::CURSOR_ORDER_BY_CUSTOMISATION_TYPE) {
             return $this->codec->encode([
                 self::CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN => $lastRecord->getPlan()->getIsDynamic(),
+                self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getId(),
+            ]);
+        }
+
+        /* Return customisation record cursor when ordered by work type
+         */
+        if ($this->orderBy === self::CURSOR_ORDER_BY_WORK_TYPE) {
+            return $this->codec->encode([
+                self::CURSOR_ORDER_BY_WORK_TYPE_COLUMN => $lastRecord->getPlan()->getAssessment()->getWorkType()?->getName(),
                 self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getId(),
             ]);
         }

@@ -98,6 +98,10 @@ class Controller extends Base
                 Cursor::CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN => $order,
                 'participant.id' => $order,
             ],
+            Cursor::CURSOR_ORDER_BY_WORK_TYPE => [
+                Cursor::CURSOR_ORDER_BY_WORK_TYPE_COLUMN => $order,
+                'participant.id' => $order,
+            ],
             /* Default to sorting by user's name
              */
             default => [
@@ -237,6 +241,10 @@ class Controller extends Base
                 Cursor::CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN => $order,
                 'participant.id' => $order,
             ],
+            Cursor::CURSOR_ORDER_BY_WORK_TYPE => [
+                Cursor::CURSOR_ORDER_BY_WORK_TYPE_COLUMN => $order,
+                'participant.id' => $order,
+            ],
             /* Default to sorting by user's name
              */
             default => [
@@ -320,6 +328,10 @@ class Controller extends Base
                 Cursor::CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN => $order,
                 'participant.id' => $order,
             ],
+            Cursor::CURSOR_ORDER_BY_WORK_TYPE => [
+                Cursor::CURSOR_ORDER_BY_WORK_TYPE_COLUMN => $order,
+                'participant.id' => $order,
+            ],
             /* Default to sorting by user's name
              */
             default => [
@@ -381,6 +393,12 @@ class Controller extends Base
             [
                 'key' => 'type',
                 'title' => 'Customisation Type',
+                'type' => 'Basic',
+                'isSortable' => true,
+            ],
+            [
+                'key' => 'work_type',
+                'title' => 'Work Type',
                 'type' => 'Basic',
                 'isSortable' => true,
             ],
