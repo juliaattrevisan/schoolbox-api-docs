@@ -36,7 +36,7 @@ class MyFilesRetention extends StrategyBase
      */
     public function getStrategyName(): string
     {
-        return 'myFiles';
+        return ValidStrats::MYFILES;
     }
 
     /**

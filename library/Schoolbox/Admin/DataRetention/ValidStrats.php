@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Justin Clarke <justin.clarke@schoolbox.education>
+ * @copyright Copyright 2026, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
+ */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\DataRetention;
@@ -12,8 +18,11 @@ namespace Schoolbox\Admin\DataRetention;
  *  - Comparison is currently case-sensitive to preserve existing behaviour.
  *  - Order is preserved and duplicates are removed.
  */
-final class ValidStrats
+class ValidStrats
 {
+    // retain Cms Log entries (This is an example of how to build a stat)
+    public const string CMSLOG = 'cmslog';
+
     // retain learning moments and their associated data
     public const string MOMENTS = 'moments';
 
@@ -24,8 +33,8 @@ final class ValidStrats
      * These are valid as csv values in the arg
      */
     public const array STRATS_WHITELIST = [
+//        self::CMSLOG,
         self::MOMENTS,
-
         self::MYFILES,
     ];
 

@@ -45,7 +45,7 @@ class CmsLogExample extends StrategyBase
 
     public function getStrategyName(): string
     {
-        return 'cmslog';
+        return ValidStrats::CMSLOG;
     }
 
     protected function hasDataToDelete(): bool

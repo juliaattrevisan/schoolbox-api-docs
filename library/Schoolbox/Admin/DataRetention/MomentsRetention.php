@@ -33,7 +33,7 @@ class MomentsRetention extends StrategyBase
 
     public function getStrategyName(): string
     {
-        return 'moments';
+        return ValidStrats::MOMENTS;
     }
 
     /**
