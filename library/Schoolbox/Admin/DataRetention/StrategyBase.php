@@ -78,6 +78,7 @@ abstract class StrategyBase implements IStrategy
         if (!$this->hasDataToDelete()) {
             // if there is no data to delete, log and return early to avoid unnecessary processing
             $this->log->notice('No entries to delete');
+            return;
         }
 
         // fetch ids to delete
