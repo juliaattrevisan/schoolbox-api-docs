@@ -98,8 +98,7 @@ class CommandLineTool extends CliTool\App
     {
         $logger = $this->getLogger();
 
-        // Hold process lock for max-time,
-        // plus a little longer to finish actually deleting files
+        // Determine script end time: run for at most max-time seconds from now.
         $maxTime = $this->getOptAsInt(self::OPT_LONG_MAX_TIME, self::DEFAULT_MAX_TIME);
         if ($maxTime <= 0) {
             $maxTime = self::DEFAULT_MAX_TIME;
