@@ -99,12 +99,12 @@ class Controller extends Base
     protected HouseMapper $houseMapper;
 
     /**
-     * @var UserLogMapper;
+     * @var UserLogMapper
      */
     protected UserLogMapper $userLogMapper;
 
     /**
-     * @var CMSLogMapper;
+     * @var CMSLogMapper
      */
     protected CMSLogMapper $cmsLogMapper;
 

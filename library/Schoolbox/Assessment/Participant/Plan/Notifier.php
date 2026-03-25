@@ -143,7 +143,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private $quizFeedbackMapper;
 
     /**
-     * @var WorkTypeMapper;
+     * @var WorkTypeMapper
      */
     private $workTypeMapper;
 

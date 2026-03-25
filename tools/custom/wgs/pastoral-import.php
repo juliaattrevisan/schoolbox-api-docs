@@ -76,7 +76,7 @@ $app = new class extends CliTool\App {
     /** @var \Schoolbox\Resource\Storage\Mapper */
     private $storageMapper;
 
-    /** @var Pastoral\Attachment\Mapper; */
+    /** @var Pastoral\Attachment\Mapper */
     private $pastoralAttachmentMapper;
 
     /** @var string $dirName */
