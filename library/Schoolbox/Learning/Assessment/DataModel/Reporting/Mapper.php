@@ -16,7 +16,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Mapper\Exception\Deleted;
 
 /**
  * @method Model createModel($idValue = null)
