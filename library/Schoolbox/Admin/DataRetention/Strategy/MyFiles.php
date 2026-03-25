@@ -148,11 +148,11 @@ class MyFiles extends Base
         $folderIds = array_column(array_filter($chunk, fn($item) => $item['table'] === self::TABLE_NAME_FOLDER), 'id');
 
         // debug log the ids we are deleting in this chunk
-        $this->log->debug(sprintf("Deleting my_file ids: %s", implode(', ', $fileIds)));
+        $this->log->debug(sprintf("Deleting %s ids: %s", self::TABLE_NAME_FILE, implode(', ', $fileIds)));
 
         // clean up the folders if any exist...
         if (!empty($folderIds)) {
-            $this->log->debug(sprintf("Deleting my_folder ids: %s", implode(', ', $folderIds)));
+            $this->log->debug(sprintf("Deleting %s ids: %s", self::TABLE_NAME_FOLDER, implode(', ', $folderIds)));
         }
 
         // Delete files and folders using the padded chunk approach to work with Builder placeholders
