@@ -20,9 +20,17 @@ export default class CreateSummativeReport {
 
     static readonly SUMMARY_OVERALL_GRADE = `label[for="report-summary-show-overall-grade"]`;
 
+    static readonly DATA_TEST_SUMMARY_WORK_TYPE_CHECKBOX = `report-summary-worktype-{workType}-{option}`;
+
     static readonly SUMMARY_CLASS_CODE = `label[for="report-summary-show-class-code"]`;
 
-    static readonly DATA_TEST_WORK_TYPE_CHECKBOX = `report-summary-worktype-{workType}-{option}`;
+    static readonly CLASS_OVERALL_GRADE = `label[for="report-class-show-overall-grade"]`;
+
+    static readonly CLASS_PAGE_CLASS_CODE = `label[for="report-class-show-class-code"]`;
+
+    static readonly CLASS_PAGE_SUBJECT_OVERVIEW = `label[for="report-class-show-subject-overview"]`;
+
+    static readonly DATA_TEST_CLASS_WORK_TYPE_CHECKBOX = `report-class-worktype-{workType}-{option}`;
 
     static readonly ENABLE_SUMMARY_CURRICULUM_PROGRESSION = `label[for="report-summary-enable-vic-progression"]`;
 
@@ -148,7 +156,7 @@ export default class CreateSummativeReport {
      * @param showOverallGrade - set true to click the show overall grade checkbox
      * @param showClassCode - set true to click the show class code checkbox
      */
-    async tickOverallGradeClassCodeCheckboxes(showOverallGrade: boolean, showClassCode: boolean): Promise<void> {
+    async tickSummaryOverallGradeClassCodeCheckboxes(showOverallGrade: boolean, showClassCode: boolean): Promise<void> {
         if (showOverallGrade) {
             await this.page.locator(CreateSummativeReport.SUMMARY_OVERALL_GRADE).click();
         }
@@ -158,13 +166,54 @@ export default class CreateSummativeReport {
     }
 
     /**
+     * click the show overall grade and/or class code checkbox in the class page section
+     * @param showOverallGrade - set true to click the show overall grade checkbox
+     * @param showClassCode - set true to click the show class code checkbox
+     */
+    async tickClassOverallGradeClassCodeCheckboxes(showOverallGrade: boolean, showClassCode: boolean): Promise<void> {
+        if (showOverallGrade) {
+            await this.page.locator(CreateSummativeReport.CLASS_OVERALL_GRADE).click();
+        }
+        if (showClassCode) {
+            await this.page.locator(CreateSummativeReport.CLASS_PAGE_CLASS_CODE).click();
+        }
+    }
+
+    /**
+     * click the show subject overview checkbox in the class page section and type in the title field
+     * @param showSubjectOverview - set true to click the show subject overview checkbox
+     * @param subjectOverviewTitle - fill in the subject overview title
+     */
+    async typeSubjectOverview(showSubjectOverview: boolean, subjectOverviewTitle: string): Promise<void> {
+        if (showSubjectOverview) {
+            await this.page.locator(CreateSummativeReport.CLASS_PAGE_SUBJECT_OVERVIEW).click();
+            await this.page.locator("#report-class-search-subject-overview").fill(subjectOverviewTitle);
+        }
+    }
+
+    /**
      * click the checkboxes for a work type in the summary section according to the options provided without using tickWorkTypeCheckbox method
      * @param workType - the work type to click: assessment, learningTask or behaviour
      * @param options - the options to click: showGrade, showComment, showRubric or showDistributionGraph
      */
-    async tickWorkTypeCheckboxes(workType: string, options: string[]): Promise<void> {
+    async tickSummaryWorkTypeCheckboxes(workType: string, options: string[]): Promise<void> {
         for (const option of options) {
-            const checkboxSelector = CreateSummativeReport.DATA_TEST_WORK_TYPE_CHECKBOX.replace(
+            const checkboxSelector = CreateSummativeReport.DATA_TEST_SUMMARY_WORK_TYPE_CHECKBOX.replace(
+                "{workType}",
+                workType,
+            ).replace("{option}", option);
+            await this.page.getByTestId(checkboxSelector).click();
+        }
+    }
+
+    /**
+     * click the checkboxes for a work type in the class section according to the options provided without using tickWorkTypeCheckbox method
+     * @param workType - the work type to click: assessment, learningTask or behaviour
+     * @param options - the options to click: showGrade, showComment, showRubric or showDistributionGraph
+     */
+    async tickClassWorkTypeCheckboxes(workType: string, options: string[]): Promise<void> {
+        for (const option of options) {
+            const checkboxSelector = CreateSummativeReport.DATA_TEST_CLASS_WORK_TYPE_CHECKBOX.replace(
                 "{workType}",
                 workType,
             ).replace("{option}", option);

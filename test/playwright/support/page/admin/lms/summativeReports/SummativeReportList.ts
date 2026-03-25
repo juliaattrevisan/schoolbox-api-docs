@@ -20,6 +20,10 @@ export default class SummativeReportList {
 
     static readonly DATA_TEST_PREVIEW_ICON = "summative-report-preview-{title}";
 
+    static readonly DATA_TEST_REPORT_COMPILING_MESSAGE = "report-generation-in-progress";
+
+    static readonly DATA_TEST_REPORT_COMPILING_MESSAGE_STUDENTS_COUNT = "report-generation-in-progress-students-count";
+
     private common: Common;
 
     constructor(tester: AcceptanceTester, page: Page) {
@@ -108,5 +112,17 @@ export default class SummativeReportList {
         await this.page.getByTestId(dataTestId).click();
         const previewPage = await popupPromise;
         return previewPage;
+    }
+
+    /**
+     * check the report generation in progress message is shown with correct students count
+     * @param expectedCount - The expected students count in the message
+     */
+    async checkReportGenerationInProgressMessage(expectedCount: number): Promise<void> {
+        await expect(this.page.getByTestId(SummativeReportList.DATA_TEST_REPORT_COMPILING_MESSAGE)).toBeVisible();
+        const expectedMessage = `We are currently working on collating your student reports for ${expectedCount} student${expectedCount > 1 ? "s" : ""} into a zip file.`;
+        await expect(
+            this.page.getByTestId(SummativeReportList.DATA_TEST_REPORT_COMPILING_MESSAGE_STUDENTS_COUNT),
+        ).toContainText(expectedMessage);
     }
 }

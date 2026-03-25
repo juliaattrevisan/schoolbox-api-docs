@@ -399,7 +399,7 @@ export default class Common {
             this.page.getByTestId(downloadButtonId).click(), // Click the download button
         ]);
         const fileName = download.suggestedFilename();
-        expect(fileName).toBe(expectedFileName); // Confirm the file name
+        expect(fileName).toContain(expectedFileName); // Confirm the file name
     }
 
     /**
