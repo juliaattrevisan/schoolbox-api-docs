@@ -177,6 +177,7 @@ class CommandLineTool extends CliTool\App
             // release this manually, so we don't trigger the notice in the shutdown function
             $lock->release();
             $this->getHelp($validStrats);
+            return;
         }
 
         /**
@@ -186,10 +187,10 @@ class CommandLineTool extends CliTool\App
         $csvStrats = (string)$this->getOpt(self::OPT_LONG_STRATS);
         if ('' !== $csvStrats) {
             $selectedStrats = $this->validateStrats($csvStrats, $validStrats);
-            // if no strats are valid, log and exit
+            // if no strats are valid, log and return
             if (count($selectedStrats) === 0) {
                 $logger->notice(sprintf("No valid strats found in '%s', exiting. Valid strats are: %s", $csvStrats, implode(', ', $validStrats)));
-                exit;
+                return;
             }
             $logger->debug(sprintf("Selected strats from csv '%s': %s", $csvStrats, implode(', ', $selectedStrats)));
         }
@@ -248,7 +249,7 @@ class CommandLineTool extends CliTool\App
                 // if we have passed the end time, stop for now and continue tomorrow
                 if (time() > $endTime) {
                     $logger->notice(sprintf("End time of '%s' reached, stopping for now", date('Y-m-d H:i:s', $endTime)));
-                    exit(CliKernelAbstract::EXIT_STATUS_OK);
+                    return;
                 }
 
                 // refresh lock, depending on the data retention queries this may have taken a while...
@@ -264,8 +265,6 @@ class CommandLineTool extends CliTool\App
         } else {
             $logger->notice('No data retention strategies to run');
         }
-
-        exit(CliKernelAbstract::EXIT_STATUS_OK);
     }
 
     /**
@@ -347,6 +346,5 @@ OPTIONS
     -v[v[v]]:                verbosity: how much activity will be logged
 
 HELP;
-        exit;
     }
 }
