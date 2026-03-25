@@ -75,29 +75,31 @@ class ConfigMapper extends Mapper
     public const int FIELD_JSON          = 21;
 
     // Type enum
-    public const int TYPE_SITE          =  1;
-    public const int TYPE_SECURITY      =  2;
-    public const int TYPE_PATHS         =  3;
-    public const int TYPE_RESOURCES     =  4;
-    public const int TYPE_POLICY        =  5;
-    public const int TYPE_LOCALISATION  =  6;
-    public const int TYPE_EXTERNAL      =  7;
-    public const int TYPE_EMAIL         =  8;
-    public const int TYPE_COLOURS       =  9;
-    public const int TYPE_3RD           = 10;
-    public const int TYPE_MODULES       = 11;
-    public const int TYPE_WELCOME       = 13;
-    public const int TYPE_DEBUGGING     = 14;
-    public const int TYPE_LMS_POLICY    = 15;
-    public const int TYPE_LDAP          = 16;
-    public const int TYPE_PROXY         = 17;
-    public const int TYPE_SKIN_CONFIG   = 18;
-    public const int TYPE_PASTORAL_CARE = 19;
-    public const int TYPE_DOC_MANAGE    = 20;
-    public const int TYPE_SAML          = 21;
-    public const int TYPE_AI            = 22;
-    public const int TYPE_CANVAS        = 23;
-    public const int TYPE_DATA_RETENTION = 25;
+    public const int TYPE_SITE              = 1;
+    public const int TYPE_SECURITY          = 2;
+    public const int TYPE_PATHS             = 3;
+    public const int TYPE_RESOURCES         = 4;
+    public const int TYPE_POLICY            = 5;
+    public const int TYPE_LOCALISATION      = 6;
+    public const int TYPE_EXTERNAL          = 7;
+    public const int TYPE_EMAIL             = 8;
+    public const int TYPE_COLOURS           = 9;
+    public const int TYPE_3RD               = 10;
+    public const int TYPE_MODULES           = 11;
+    public const int TYPE_WELCOME           = 13;
+    public const int TYPE_DEBUGGING         = 14;
+    public const int TYPE_LMS_POLICY        = 15;
+    public const int TYPE_LDAP              = 16;
+    public const int TYPE_PROXY             = 17;
+    public const int TYPE_SKIN_CONFIG       = 18;
+    public const int TYPE_PASTORAL_CARE     = 19;
+    public const int TYPE_DOC_MANAGE        = 20;
+    public const int TYPE_SAML              = 21;
+    public const int TYPE_AI                = 22;
+    public const int TYPE_CANVAS            = 23;
+    public const int TYPE_DATA_RETENTION    = 25;
+    public const int TYPE_ASSETS            = 26;
+    public const int TYPE_SONAR_SKIN_CONFIG = 27;
 
     // Technically these should be prefixed with 'NAME_', but it gets a bit verbose for little extra clarity
     public const string _GLOBAL_MODERATION              = 'global_moderation';

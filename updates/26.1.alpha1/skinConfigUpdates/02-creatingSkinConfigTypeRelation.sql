@@ -9,7 +9,9 @@ CREATE TABLE lu_skin_config_category
 
 INSERT INTO lu_skin_config_category (`name`)
 VALUES ('Colours'),
-       ('Custom CSS');
+       ('Custom CSS'),
+       ('Roundness'),
+       ('Drop Shadow');
 
 
 CREATE TABLE lu_skin_config_subcategory
@@ -28,6 +30,12 @@ SET @category_colours = (SELECT id
 SET @category_css = (SELECT id
                      FROM lu_skin_config_category
                      WHERE name = 'Custom CSS');
+SET @category_roundness = (SELECT id
+                           FROM lu_skin_config_category
+                           WHERE name = 'Roundness');
+SET @category_drop_shadow = (SELECT id
+                             FROM lu_skin_config_category
+                             WHERE name = 'Drop Shadow');
 
 INSERT INTO lu_skin_config_subcategory (category_id, name)
 VALUES (@category_colours, 'General'),
@@ -37,7 +45,9 @@ VALUES (@category_colours, 'General'),
        (@category_colours, 'Component'),
        (@category_colours, 'Interactive'),
        (@category_colours, 'Form'),
-       (@category_css, null);
+       (@category_css, null),
+       (@category_roundness, null),
+       (@category_drop_shadow, null);
 
 SET @subcategory_general = (SELECT id
                             FROM lu_skin_config_subcategory
@@ -64,6 +74,14 @@ SET @subcategory_css = (SELECT id
                         FROM lu_skin_config_subcategory
                         WHERE category_id = @category_css
                           AND name IS NULL);
+SET @subcategory_roundness = (SELECT id
+                              FROM lu_skin_config_subcategory
+                              WHERE category_id = @category_roundness
+                                AND name IS NULL);
+SET @subcategory_drop_shadow = (SELECT id
+                                FROM lu_skin_config_subcategory
+                                WHERE category_id = @category_drop_shadow
+                                  AND name IS NULL);
 
 CREATE TABLE skin_config_category
 (
