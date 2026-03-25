@@ -70,6 +70,7 @@ class Moments extends Base
 
         // if no entries exit early
         if (empty($toDelete['moments'])) {
+            $this->log->info("Found '0' moments to delete");
             return false;
         }
 

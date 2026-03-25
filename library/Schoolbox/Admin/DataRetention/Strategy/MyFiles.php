@@ -77,6 +77,7 @@ class MyFiles extends Base
 
         // if no entries exit early
         if (empty($folderToDelete['folders']) && empty($filesToDelete['files'])) {
+            $this->log->info("Found '0' MyFiles and MyFolders to delete");
             return false;
         }
 
