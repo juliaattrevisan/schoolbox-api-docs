@@ -75,31 +75,41 @@ function onPrintSelected(): void {
             >
         </li>
         <li>
-            <a href="#" class="icon-print" @click.prevent="onPrintSelected">Print Unit Planner</a>
+            <a href="#" class="sbx-button--has-icon" @click.prevent="onPrintSelected"
+                ><sbx-icon name="print" />Print Unit Planner</a
+            >
         </li>
         <li>
-            <a :href="`/homepage/${props.folderId}`" class="icon-home">View Homepage</a>
+            <a :href="`/homepage/${props.folderId}`" class="sbx-button--has-icon"
+                ><sbx-icon name="home" />View Homepage</a
+            >
         </li>
         <li class="separator">Reports</li>
         <li>
-            <a :href="`/learning/assessment/calendar?course=${props.course.id}`" class="icon-calendar"
-                >Assessment Calendar</a
+            <a :href="`/learning/assessment/calendar?course=${props.course.id}`" class="sbx-button--has-icon"
+                ><sbx-icon name="calendar" />Assessment Calendar</a
             >
         </li>
         <li v-if="routes.courseMarkbook">
-            <a :href="`${props.routes.courseMarkbook}`" class="icon-curriculum">Course Markbook</a>
+            <a :href="`${props.routes.courseMarkbook}`" class="sbx-button--has-icon"
+                ><sbx-icon name="curriculum" />Course Markbook</a
+            >
         </li>
         <li v-if="routes.curriculumCoverage">
-            <a :href="`${props.routes.curriculumCoverage}?courseId=${props.course.id}`" class="icon-report"
-                >Curriculum Coverage</a
+            <a :href="`${props.routes.curriculumCoverage}?courseId=${props.course.id}`" class="sbx-button--has-icon"
+                ><sbx-icon name="report" />Curriculum Coverage</a
             >
         </li>
         <li v-if="routes.learningAnalytics">
-            <a :href="`${props.routes.learningAnalytics}`" class="icon-poll">Learning Analytics</a>
+            <a :href="`${props.routes.learningAnalytics}`" class="sbx-button--has-icon"
+                ><sbx-icon name="poll" />Learning Analytics</a
+            >
         </li>
         <li v-if="routes.modifyCourse" class="separator">Manage</li>
         <li v-if="routes.modifyCourse">
-            <a :href="`${props.routes.modifyCourse}?${getReturnUrl()}`" class="icon-modify">Modify Course</a>
+            <a :href="`${props.routes.modifyCourse}?${getReturnUrl()}`" class="sbx-button--has-icon"
+                ><sbx-icon name="modify" />Modify Course</a
+            >
         </li>
     </ul>
 </template>

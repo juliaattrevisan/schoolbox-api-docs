@@ -92,7 +92,7 @@ Usage:
         </div>
     </div>
     <nav>
-        <a href="#" class="icon-down-arrow" data-collapser="{{ collapsePrefix }}-{{ courseSpec.id }}" data-test="course-list-arrow-{{ courseSpec.folder.name }}"></a>
+        <a href="#" class="sbx-icon-only-button" title="Toggle course details" aria-label="Toggle course details" data-collapser="{{ collapsePrefix }}-{{ courseSpec.id }}" data-test="course-list-arrow-{{ courseSpec.folder.name }}"><sbx-icon name="down-arrow"></sbx-icon></a>
         {% if hasTot %}
         <sbx-pop-out content-id="courseDropdown-{{ courseSpec.id }}" data-test="sbx-pop-out-courseDropdown-{{ courseSpec.id }}"></sbx-pop-out>
         {% endif %}
@@ -102,48 +102,48 @@ Usage:
     <ul class="f-dropdown" data-dropdown-content id="courseDropdown-{{ courseSpec.id }}">
         {% if importUrl %}
             <li>
-                <a href="{{ importUrl }}" class="icon-download" data-test="course-list-import-{{ courseSpec.folder.name }}">Import into {{ locale.class.properPlural }}</a>
+                <a href="{{ importUrl }}" class="sbx-button--has-icon" data-test="course-list-import-{{ courseSpec.folder.name }}"><sbx-icon name="download"></sbx-icon>Import into {{ locale.class.properPlural }}</a>
             </li>
         {% endif %}
         <li>
         {% if courseSpec.folder.hasHomepage %}
-            <a href="/homepage/{{ courseSpec.folder.id }}/" class="icon-home" data-test="course-list-homepage-{{ courseSpec.folder.name }}">Course Homepage</a>
+            <a href="/homepage/{{ courseSpec.folder.id }}/" class="sbx-button--has-icon" data-test="course-list-homepage-{{ courseSpec.folder.name }}"><sbx-icon name="home"></sbx-icon>Course Homepage</a>
         {% else %}
-            <a href="/resources/{{ courseSpec.folder.id }}/" class="icon-folder">Course Resources</a>
+            <a href="/resources/{{ courseSpec.folder.id }}/" class="sbx-button--has-icon"><sbx-icon name="folder"></sbx-icon>Course Resources</a>
         {% endif %}
         </li>
-        <li><a href="{{ routeLookup('rubricManager.getForm', { folderId: courseSpec.folder.id }) }}" class="icon-criteria" data-test="course-list-rubric-{{ courseSpec.folder.name }}">Manage Rubric {{ locale.rubricGroup.properPlural }}</a></li>
+        <li><a href="{{ routeLookup('rubricManager.getForm', { folderId: courseSpec.folder.id }) }}" class="sbx-button--has-icon" data-test="course-list-rubric-{{ courseSpec.folder.name }}"><sbx-icon name="criteria"></sbx-icon>Manage Rubric {{ locale.rubricGroup.properPlural }}</a></li>
 
         {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getMarkbook', {courseSpec: courseSpec, courseSpecId: courseSpec.id}) %}
-        {% if courseMarkbookRoute %}<li><a href="{{ courseMarkbookRoute }}" class="icon-curriculum" data-test="course-list-markbook-{{ courseSpec.folder.name }}">Course Markbook</a></li>{% endif %}
-        <li><a href="{{ routeLookup('learningAnalytics.course', {courseSpecId: courseSpec.id}) }}" class="icon-poll" data-test="course-list-analytics-{{ courseSpec.folder.name }}">Learning Analytics</a></li>
+        {% if courseMarkbookRoute %}<li><a href="{{ courseMarkbookRoute }}" class="sbx-button--has-icon" data-test="course-list-markbook-{{ courseSpec.folder.name }}"><sbx-icon name="curriculum"></sbx-icon>Course Markbook</a></li>{% endif %}
+        <li><a href="{{ routeLookup('learningAnalytics.course', {courseSpecId: courseSpec.id}) }}" class="sbx-button--has-icon" data-test="course-list-analytics-{{ courseSpec.folder.name }}"><sbx-icon name="poll"></sbx-icon>Learning Analytics</a></li>
 
         {% set assessmentCalendarUrl = routeLookupIfAuthorized('learningAssessmentCalendar.getReport') %}
         {% if assessmentCalendarUrl %}
             <li>
-                <a href="{{ assessmentCalendarUrl~'?course='~courseSpec.id }}" class="icon-calendar" data-test="course-list-calendar-{{ courseSpec.folder.name }}">{{ locale.assessment|capitalize }} Calendar</a>
+                <a href="{{ assessmentCalendarUrl~'?course='~courseSpec.id }}" class="sbx-button--has-icon" data-test="course-list-calendar-{{ courseSpec.folder.name }}"><sbx-icon name="calendar"></sbx-icon>{{ locale.assessment|capitalize }} Calendar</a>
             </li>
         {% endif %}
 
         {% if unitPlannerUrl %}
-            <li><a href="{{ unitPlannerUrl }}" class="icon-project" data-test="course-list-planner-{{ courseSpec.folder.name }}">Unit Planner</a></li>
+            <li><a href="{{ unitPlannerUrl }}" class="sbx-button--has-icon" data-test="course-list-planner-{{ courseSpec.folder.name }}"><sbx-icon name="project"></sbx-icon>Unit Planner</a></li>
         {% endif %}
         {% set curriculumCoverageUrl = routeLookupIfAuthorized('curriculumreports.getCoverage') %}
         {% if curriculumCoverageUrl %}
         <li>
-            <a href="/curriculum/reports/coverage?courseId={{ courseSpec.id }}" class="icon-report" data-test="course-list-report-{{ courseSpec.folder.name }}">Curriculum Coverage</a>
+            <a href="/curriculum/reports/coverage?courseId={{ courseSpec.id }}" class="sbx-button--has-icon" data-test="course-list-report-{{ courseSpec.folder.name }}"><sbx-icon name="report"></sbx-icon>Curriculum Coverage</a>
         </li>
         {% endif %}
         {% if folderAccess[courseSpec.folder.id] ?? false %}
             {% set modifyCourseUrl = routeLookupIfAuthorized('course.modifyCourse', {id: courseSpec.id, course: courseSpec }) %}
             {% if modifyCourseUrl %}
-                <li><a href="{{ modifyCourseUrl }}" class="icon-modify" data-test="course-list-modify-{{ courseSpec.folder.name }}">Modify</a></li>
+                <li><a href="{{ modifyCourseUrl }}" class="sbx-button--has-icon" data-test="course-list-modify-{{ courseSpec.folder.name }}"><sbx-icon name="modify"></sbx-icon>Modify</a></li>
             {% endif %}
         {% endif %}
 
         {# Course delete: standard folder delete -#}
         {% if USER.isSuperuser() %}
-        <li><a href="{{ routeLookup('course.deleteCourseSpecification', {id: courseSpec.id}) }}" class="icon-delete" data-course-delete-id="{{ courseSpec.id }}" data-action="course-delete" data-test="course-list-delete-{{ courseSpec.folder.name }}">Delete</a></li>
+        <li><a href="{{ routeLookup('course.deleteCourseSpecification', {id: courseSpec.id}) }}" class="sbx-button--has-icon" data-course-delete-id="{{ courseSpec.id }}" data-action="course-delete" data-test="course-list-delete-{{ courseSpec.folder.name }}"><sbx-icon name="delete"></sbx-icon>Delete</a></li>
         {% endif %}
     </ul>
     {% endif %}

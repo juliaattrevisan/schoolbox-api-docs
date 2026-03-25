@@ -175,11 +175,13 @@ window.Vue.onUnmounted(() => {
                     >
                 </li>
                 <li v-if="props.activity._links.modifyContent">
-                    <a :href="getReturnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Contents</a>
+                    <a :href="getReturnUrl(props.activity._links.modifyContent)" class="sbx-button--has-icon"
+                        ><sbx-icon name="modify" />Modify Contents</a
+                    >
                 </li>
                 <li v-if="props.activity._links.configureAgent">
-                    <a :href="getReturnUrl(props.activity._links.configureAgent)" class="icon-modify"
-                        >Configure Agent
+                    <a :href="getReturnUrl(props.activity._links.configureAgent)" class="sbx-button--has-icon"
+                        ><sbx-icon name="modify" />Configure Agent
                     </a>
                 </li>
                 <li v-if="props.activity._links.delete">

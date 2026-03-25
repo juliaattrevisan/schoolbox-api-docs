@@ -65,13 +65,14 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
         {% if new %}
             {# New criterion: show delete button, no are you sure #}
             {# Hide it until the item is actually in use, though #}
-            <a class="icon-delete hide"
+            <a class="sbx-icon-only-button no-text hide"
                data-template="rubric-criterion-delete"
                data-rubric-criterion-name=""
                data-rubric-criterion=""
                data-role="remove-criterion"
                title="Delete {{ locale.rubricCriterion.proper }}"
-               href="#"></a>
+               aria-label="Delete {{ locale.rubricCriterion.proper }}"
+               href="#"><sbx-icon name="delete"></sbx-icon></a>
         {% else %}
             {# Existing criteria: #}
             {# If in use: show usage #}

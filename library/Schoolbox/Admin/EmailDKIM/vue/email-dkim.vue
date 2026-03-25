@@ -288,7 +288,13 @@ export default {
             <h2 class="subheader">Domains</h2>
         </div>
         <nav>
-            <a @click.prevent="onClickAddDomain" class="icon-add" title="Add a domain"></a>
+            <a
+                @click.prevent="onClickAddDomain"
+                class="sbx-icon-only-button f-no-margins"
+                title="Add a domain"
+                aria-label="Add a domain"
+                ><sbx-icon name="add"
+            /></a>
         </nav>
     </div>
     <div>
