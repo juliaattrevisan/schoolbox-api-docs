@@ -1470,6 +1470,7 @@ class Mapper extends BaseMapper
             $assessmentId = $model->getId();
             if (isset($subModelList[$assessmentId])) {
                 $model->setSubObject($subModelList[$assessmentId]);
+                $subModelList[$assessmentId]->setAssessmentModel($model);
             }
         }
 
