@@ -427,9 +427,9 @@ class Subnav
                 'searchable' => false,
                 'children'   => [
                     '/adminv2/international-baccalaureate/configuration' => [
-                        'name'        => 'DP Subject Configuration',
+                        'name'        => 'Configuration',
                         'visible'     => true,
-                        'description' => 'Configure DP subject config.',
+                        'description' => 'Configure school and subject details for the International Baccalaureate program',
                     ],
                     '/adminv2/international-baccalaureate/registrations' => [
                         'name'        => 'Registration Reports',
