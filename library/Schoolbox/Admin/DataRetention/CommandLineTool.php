@@ -62,7 +62,13 @@ class CommandLineTool extends CliTool\App
     private const OPT_LONG_STRATS = 'strats::';
 
     /**
-     * Manually override the retention period for a strategy, for testing purposes (number of days (same format as the admin config value)
+     * Manually override the retention period for all strategies, for testing purposes.
+     * Value is a whole number of days in the same format as the admin config value:
+     *  - positive N: hard-delete data soft-deleted more than N days ago ("N days ago" cutoff)
+     *  - 0: treated as a safety guard; the tool will log a warning and exit without deleting anything
+     *  - negative: invalid; the tool will log a warning and exit without deleting anything
+     *
+     * Only whole numbers are accepted; non-integer values will be rejected.
      */
     private const OPT_RETENTION_PERIOD = 'retention-period:';
 
@@ -97,6 +103,20 @@ class CommandLineTool extends CliTool\App
     public function run(): void
     {
         $logger = $this->getLogger();
+
+        // Validate any retention period override early so we can fail fast before doing work.
+        $retentionPeriod = $this->getOptAsInt(self::OPT_RETENTION_PERIOD);
+        if (null !== $retentionPeriod) {
+            if ($retentionPeriod < 0) {
+                $logger->warning('Negative retention period override supplied; exiting without processing to avoid deleting everything.');
+                return;
+            }
+
+            if ($retentionPeriod === 0) {
+                $logger->warning('Retention period override of 0 days supplied; exiting without processing to avoid deleting all soft-deleted data.');
+                return;
+            }
+        }
 
         // Determine script end time: run for at most max-time seconds from now.
         $maxTime = $this->getOptAsInt(self::OPT_LONG_MAX_TIME, self::DEFAULT_MAX_TIME);
@@ -194,20 +214,12 @@ class CommandLineTool extends CliTool\App
             $logger->debug(sprintf("Selected strats from csv '%s': %s", $csvStrats, implode(', ', $selectedStrats)));
         }
 
-        // if set override the retention period for all strats, for testing purposes
-        $retentionPeriod = $this->getOptAsInt(self::OPT_RETENTION_PERIOD);
-
         // log the settings we are running with
         $logger->notice(sprintf("Running %s:", $this->perform() ? "with perform" : "in dry-run mode"));
         $logger->notice(sprintf("Script will end at or before '%s'", date('Y-m-d H:i:s', $endTime)));
         $logger->notice(sprintf("Chunk size: %s", $chunkSize));
         $logger->notice(sprintf("Loop count: %s", $loopCount));
         if (null !== $retentionPeriod) {
-            // if in the future for some reason, log and return null to avoid deleting everything
-            if ($retentionPeriod < 0) {
-                $logger->notice('Negative retention period, exiting');
-                return;
-            }
             $logger->notice(sprintf("Overriding retention period to '%s' days", $retentionPeriod));
         }
 
@@ -339,7 +351,11 @@ OPTIONS
     --chunk={chunk-size}:    process this many entries per chunk: defaults to 1000.
     --strats=                A csv of strats to hard delete.  Valid strats are {{$csvStrats}}. If not provided, will run all strats.
                              e.g. hard delete only learning moment stuff: ./tools/dataRetention/process.php --strats=moments
-    --retention-period=      Manually override the retention period for a strategy, for testing purposes (number of days, same format as the admin config value)
+    --retention-period=      Manually override the retention period for all strategies, for testing purposes (whole number of days, same format as the admin config value).
+                             Positive N: delete data soft-deleted more than N days ago ("N days ago" cutoff).
+                             0: safety guard – logs a warning and exits without deleting anything.
+                             Negative: invalid – logs a warning and exits without deleting anything.
+                             Only whole numbers are accepted; non-integer values will be rejected.
     -p, --perform:           perform: *without* this flag, this tool will only do a dry run, outputting what would be
                              deleted
     -v[v[v]]:                verbosity: how much activity will be logged
