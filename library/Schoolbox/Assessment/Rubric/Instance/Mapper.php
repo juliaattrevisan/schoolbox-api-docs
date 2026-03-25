@@ -13,6 +13,8 @@ namespace Schoolbox\Assessment\Rubric\Instance;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Class Mapper
@@ -58,7 +60,8 @@ class Mapper extends \Schoolbox\Mapper
             'mark_type_id',
             null,
             null,
-            'capabilityMarkType'
+            'capabilityMarkType',
+            'capabilityMarkType',
         );
 
         /* Grade Groups are currently living in SubmissionBox folder, despite being a shared concept across all the
@@ -70,7 +73,76 @@ class Mapper extends \Schoolbox\Mapper
             'id',
             null,
             null,
-            'capabilityGradeGroup'
+            'capabilityGradeGroup',
+            'capabilityGradeGroup',
         );
+    }
+
+
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    protected function getSelectString(): string
+    {
+        $selectString = "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('assessmentModel', 'assessmentModel')},
+                {$this->getJoinColumnString('capabilityMarkType', 'capabilityMarkType')},
+                {$this->getJoinColumnString('capabilityGradeGroup', 'capabilityGradeGroup')}
+            FROM {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('assessmentModel', '', 'assessmentModel', true)}
+            LEFT JOIN {$this->getJoinSql('capabilityMarkType', '', 'capabilityMarkType', true)}
+            LEFT JOIN {$this->getJoinSql('capabilityGradeGroup', '', 'capabilityGradeGroup', true)}
+        ";
+
+        return $selectString;
+    }
+
+
+    /**
+     * Hydrate joins added in `getSelectString`.
+     *
+     * @param \PDOStatement $statement
+     * @return GenericCollection|Model
+     * @throws Exception
+     * @throws DefinitionException
+     * @throws \UnexpectedValueException
+     */
+    protected function hydrateSelect(\PDOStatement $statement): Model|GenericCollection
+    {
+        $stack = $this->createCollection();
+
+        foreach ($statement as $row) {
+            $rubric = $this->hydrate($row);
+
+            /* Bolt on the IAssessable instance
+             */
+            /** @var \Schoolbox\Learning\Assessment\DataModel\Model $assessment */
+            $assessment = $this->hydrateJoin($row, 'assessmentModel', 'assessmentModel');
+            $rubric->setAssessmentModel($assessment);
+
+            /* Figure out the capability mark type which might be optional
+             */
+            $capabilityMarkType = $this->hydrateJoin($row, 'capabilityMarkType', 'capabilityMarkType');
+            $rubric->setCapabilityMarkType($capabilityMarkType);
+
+            /* If it was a Letter Grade, go find its levels
+             */
+            if (SubmissionBox\MarkType::SLUG_LETTER === $rubric->getCapabilityMarkType()->getSlug()) {
+                /** @var SubmissionBox\GradeLevel\Group\Model $capabilityGradeGroup */
+                $capabilityGradeGroup = $this->getJoinMapper('capabilityGradeGroup')->findByIdWithFallback($rubric->getCapabilityGradeGroup()->getId());
+
+                $rubric->setCapabilityGradeGroup($capabilityGradeGroup);
+            }
+
+            $stack->add($rubric);
+        }
+
+        return $stack;
     }
 }
