@@ -102,15 +102,7 @@ class MomentsRetention extends StrategyBase
                                 'old'   => $this->getRetentionPeriod(),
                             ]);
 
-        // collate ids to delete
-        $deleteIds = [];
-        while ($row = $statement->fetch()) {
-            $deleteIds[] = [
-                'id' => $row['id'],
-                'discussion_thread_id' => $row['discussion_thread_id'] // may exist, may be null, we need this to delete the discussion thread and comments if it exists
-            ];
-        }
-        return $deleteIds;
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
