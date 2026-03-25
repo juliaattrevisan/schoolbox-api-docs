@@ -56,7 +56,9 @@
                     </div>
                 </div>
                 <nav>
-                    <a href="{{ routeLookup('adminProfileButton.getCreate', {roleType: roleType}) }}" class="icon-add" title="Create a new profile button"></a>
+                    <a href="{{ routeLookup('adminProfileButton.getCreate', {roleType: roleType}) }}" class="sbx-icon-only-button" title="Create a new profile button" aria-label="Create a new profile button">
+                        <sbx-icon name="add"></sbx-icon>
+                    </a>
                 </nav>
             </div>
 
@@ -113,11 +115,15 @@
                                     </div>
                                 </div>
                                 <nav>
-                                    <a class="icon-modify" title="Edit this profile button" href="{{ routeLookup('adminProfileButton.getModify', {id: item.id}) }}"></a>
+                                    <a class="sbx-icon-only-button" title="Edit this profile button" aria-label="Edit this profile button" href="{{ routeLookup('adminProfileButton.getModify', {id: item.id}) }}">
+                                        <sbx-icon name="modify"></sbx-icon>
+                                    </a>
 
                                     {# Only custom buttons can be deleted #}
                                     {% if item.isCustom %}
-                                    <a class="icon-delete" data-delete="{{ item.id }}" title="Delete this profile button"></a>
+                                    <a class="sbx-icon-only-button" data-delete="{{ item.id }}" title="Delete this profile button" aria-label="Delete this profile button">
+                                        <sbx-icon name="delete"></sbx-icon>
+                                    </a>
                                     {% endif %}
                                 </nav>
                             </div>

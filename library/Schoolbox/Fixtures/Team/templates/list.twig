@@ -59,7 +59,9 @@
             }) %}
             {% if routeCreateTeam %}
             <nav>
-                <a href='{{ routeCreateTeam }}' class="icon-add" title="Add Team to {{ division.name }}"></a>
+                <a href='{{ routeCreateTeam }}' class="sbx-icon-only-button" title="Add Team to {{ division.name }}" aria-label="Add Team to {{ division.name }}">
+                    <sbx-icon name="add"></sbx-icon>
+                </a>
             </nav>
             {% endif %}
         </div>
@@ -89,7 +91,9 @@
                     {% if routeModifyTeam or routeDeleteTeam %}
                         <nav>
                             {% if routeModifyTeam %}
-                                <a href="{{ routeModifyTeam }}" class="icon-modify" title="Modify"></a>
+                                <a href="{{ routeModifyTeam }}" class="sbx-icon-only-button" title="Modify" aria-label="Modify">
+                                    <sbx-icon name="modify"></sbx-icon>
+                                </a>
                             {% endif %}
 
                             {% if routeDeleteTeam %}
@@ -98,7 +102,12 @@
                         </nav>
                         {% if routeDeleteTeam %}
                             <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-team-{{ currentTeam.getId() }}-actions">
-                                <li><a href="{{ routeDeleteTeam }}" class="icon-delete" title="Delete" data-delete="{{ currentTeam.id }}">Delete</a></li>
+                                <li>
+                                    <a href="{{ routeDeleteTeam }}" class="sbx-button--has-icon" title="Delete" data-delete="{{ currentTeam.id }}">
+                                        <sbx-icon name="delete"></sbx-icon>
+                                        Delete
+                                    </a>
+                                </li>
                             </ul>
                         {% endif %}
                     {% endif %}

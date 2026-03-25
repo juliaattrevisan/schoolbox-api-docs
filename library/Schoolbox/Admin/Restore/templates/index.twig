@@ -5,8 +5,9 @@
 
         $('[data-restore]').on('click', function(event) {
             event.preventDefault();
-            let object = $(event.target).attr('data-restore-type'),
-                href = $(event.target).attr('data-restore-href');
+            let $button = $(this),
+                object = $button.attr('data-restore-type'),
+                href = $button.attr('data-restore-href');
             $(this).confirmDialog({
                 text: 'Are you sure you want to recover this ' + object + '?',
                 confirmEvent: function() {
@@ -18,7 +19,7 @@
                         url: href,
                         dataType: 'json',
                         data: {
-                            id: $(event.target).attr('data-restore-id')
+                            id: $button.attr('data-restore-id')
                         }
                     })
                         .done(function() {
@@ -26,7 +27,7 @@
                                 text: object + ' recovered!',
                                 css: 'success'
                             });
-                            $(event.target).closest('tr').remove();
+                            $button.closest('tr').remove();
                         })
                         .fail(function(response) {
                             var temp = JSON.parse(response.responseText);
@@ -117,7 +118,11 @@
                         <tr>
                             <td>{{ folder.title }}{% if folder.codes is not empty %} ({% for code in folder.codes %}{{ code.code }}{% if not loop.last %},{% endif %}{% endfor %}){% endif %}</td>
                             <td>{{ folder.deletedAt.long }}</td>
-                            <td><a data-restore data-restore-id="{{ folder.id }}" data-restore-href="{{ routeLookup('restore.restoreFolder') }}" data-restore-type="Folder" href="#" class="icon-upload" title="Restore"></a></td>
+                            <td>
+                                <a data-restore data-restore-id="{{ folder.id }}" data-restore-href="{{ routeLookup('restore.restoreFolder') }}" data-restore-type="Folder" href="#" class="sbx-icon-only-button" title="Restore" aria-label="Restore">
+                                    <sbx-icon name="upload"></sbx-icon>
+                                </a>
+                            </td>
                         </tr>
                         {% endfor %}
                         </tbody>
@@ -159,7 +164,13 @@
                             </td>
                             <td>{{ assessment.assessmentContext.folder.nameWithCodes }}</td>
                             <td>{{ assessment.deletedAt.long }}</td>
-                            <td><span><a data-restore data-restore-id="{{ assessment.id }}" data-restore-href="{{ routeLookup('restore.restoreAssessment') }}" data-restore-type="Assessment" href="#" class="icon-upload" title="Restore"></a></span></td>
+                            <td>
+                                <span>
+                                    <a data-restore data-restore-id="{{ assessment.id }}" data-restore-href="{{ routeLookup('restore.restoreAssessment') }}" data-restore-type="Assessment" href="#" class="sbx-icon-only-button" title="Restore" aria-label="Restore">
+                                        <sbx-icon name="upload"></sbx-icon>
+                                    </a>
+                                </span>
+                            </td>
                         </tr>
                         {% endfor %}
                         </tbody>
@@ -183,7 +194,11 @@
                                 <td>{{ user.getRole.getName }}/{{ user.getRole.getType }}</td>
                                 <td>{% for campus in user.getCampusCollection %}{{ campus.name }}<br>{% endfor %}</td>
                                 <td>{{ user.deletedAt.long }}</td>
-                                <td><a data-restore data-restore-id="{{ user.id }}" data-restore-href="{{ routeLookup('restore.restoreUser') }}" data-restore-type="User" href="#" class="icon-upload" title="Restore"></a></td>
+                                <td>
+                                    <a data-restore data-restore-id="{{ user.id }}" data-restore-href="{{ routeLookup('restore.restoreUser') }}" data-restore-type="User" href="#" class="sbx-icon-only-button" title="Restore" aria-label="Restore">
+                                        <sbx-icon name="upload"></sbx-icon>
+                                    </a>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -205,7 +220,11 @@
                                 <td>{{ file.getBaseName }}</td>
                                 <td><a href="/resources/{{ file.getFolder.getId }}">{{ file.getFolder.getTitle }}</a></td>
                                 <td>{{ file.deletedAt.long }}</td>
-                                <td><a data-restore data-restore-id="{{ file.id }}" data-restore-href="{{ routeLookup('restore.restoreFile') }}" data-restore-type="File" href="#" class="icon-upload" title="Restore"></a></td>
+                                <td>
+                                    <a data-restore data-restore-id="{{ file.id }}" data-restore-href="{{ routeLookup('restore.restoreFile') }}" data-restore-type="File" href="#" class="sbx-icon-only-button" title="Restore" aria-label="Restore">
+                                        <sbx-icon name="upload"></sbx-icon>
+                                    </a>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -228,7 +247,11 @@
                                 <td>{{ course.getTitle }}</td>
                                 <td><a href="/resources/{{ course.getFolder.getId }}">{{ course.getFolder.getTitle }}</a></td>
                                 <td>{{ course.deletedAt.long }}</td>
-                                <td><a data-restore data-restore-id="{{ course.id }}" data-restore-href="{{ routeLookup('restore.restoreCourseSpec') }}" data-restore-type="Course" href="#" class="icon-upload" title="Restore"></a></td>
+                                <td>
+                                    <a data-restore data-restore-id="{{ course.id }}" data-restore-href="{{ routeLookup('restore.restoreCourseSpec') }}" data-restore-type="Course" href="#" class="sbx-icon-only-button" title="Restore" aria-label="Restore">
+                                        <sbx-icon name="upload"></sbx-icon>
+                                    </a>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -251,7 +274,11 @@
                                 <td>{{ unit.getTitle }}</td>
                                 <td><a href="{{ routeLookupIfAuthorized('course.modifyCourse', {courseSpec: unit.getCourse, id: unit.getCourse.getId})  }}">{{ unit.getCourse.getTitle }}</a></td>
                                 <td>{{ unit.deletedAt.long }}</td>
-                                <td><a data-restore data-restore-id="{{ unit.id }}" data-restore-href="{{ routeLookup('restore.restoreUnitSpec') }}" data-restore-type="Unit" href="#" class="icon-upload" title="Restore"></a></td>
+                                <td>
+                                    <a data-restore data-restore-id="{{ unit.id }}" data-restore-href="{{ routeLookup('restore.restoreUnitSpec') }}" data-restore-type="Unit" href="#" class="sbx-icon-only-button" title="Restore" aria-label="Restore">
+                                        <sbx-icon name="upload"></sbx-icon>
+                                    </a>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -279,7 +306,11 @@
                                 <td>{{ course.getSpecification.getTitle }}</td>
                                 <td><a href="/resources/{{ course.getFolder.getId }}">{{ course.getFolder.getTitle }}</a></td>
                                 <td>{{ course.deletedAt.long }}</td>
-                                <td><a data-restore data-restore-id="{{ course.id }}" data-restore-href="{{ routeLookup('restore.restoreCourseImpl') }}" data-restore-type="Course" href="#" class="icon-upload" title="Restore"></a></td>
+                                <td>
+                                    <a data-restore data-restore-id="{{ course.id }}" data-restore-href="{{ routeLookup('restore.restoreCourseImpl') }}" data-restore-type="Course" href="#" class="sbx-icon-only-button" title="Restore" aria-label="Restore">
+                                        <sbx-icon name="upload"></sbx-icon>
+                                    </a>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -302,7 +333,11 @@
                                 <td>{{ unit.getTitle }}</td>
                                 <td><a href="/resources/{{ unit.getFolder.getId }}">{{ unit.getFolder.getTitle }}</a></td>
                                 <td>{{ unit.deletedAt.long }}</td>
-                                <td><a data-restore data-restore-id="{{ unit.id }}" data-restore-href="{{ routeLookup('restore.restoreUnitImpl') }}" data-restore-type="Unit" href="#" class="icon-upload" title="Restore"></a></td>
+                                <td>
+                                    <a data-restore data-restore-id="{{ unit.id }}" data-restore-href="{{ routeLookup('restore.restoreUnitImpl') }}" data-restore-type="Unit" href="#" class="sbx-icon-only-button" title="Restore" aria-label="Restore">
+                                        <sbx-icon name="upload"></sbx-icon>
+                                    </a>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>

@@ -6,10 +6,17 @@
         </div>
     </div>
     <nav>
-        <a href="{{ routeLookup('sportsfixturesVenue.getModifyForm', {entityId: venue.id}) }}" class="icon-modify" title="Modify"></a>
+        <a href="{{ routeLookup('sportsfixturesVenue.getModifyForm', {entityId: venue.id}) }}" class="sbx-icon-only-button" title="Modify" aria-label="Modify">
+            <sbx-icon name="modify"></sbx-icon>
+        </a>
         <sbx-pop-out content-id="sportsfixtures-venue-{{ venue.getId() }}-actions"></sbx-pop-out>
     </nav>
     <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-venue-{{ venue.getId() }}-actions">
-        <li><a href="{{ routeLookup('sportsfixturesVenue.deleteEntity', {entityId: venue.id}) }}" class="icon-delete" title="Delete" data-delete="{{ venue.id }}">Delete</a></li>
+        <li>
+            <a href="{{ routeLookup('sportsfixturesVenue.deleteEntity', {entityId: venue.id}) }}" class="sbx-button--has-icon" title="Delete" data-delete="{{ venue.id }}">
+                <sbx-icon name="delete"></sbx-icon>
+                Delete
+            </a>
+        </li>
     </ul>
 </li>

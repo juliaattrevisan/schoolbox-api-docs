@@ -17,7 +17,9 @@
                 </div>
             </div>
             <nav>
-                <a href='{{ routeLookup('sportsfixturesPosition.getCreateForm', {contextId: sport.id}) }}' class="icon-add" title="Add position to {{ sport.name }}"></a>
+                <a href='{{ routeLookup('sportsfixturesPosition.getCreateForm', {contextId: sport.id}) }}' class="sbx-icon-only-button" title="Add position to {{ sport.name }}" aria-label="Add position to {{ sport.name }}">
+                    <sbx-icon name="add"></sbx-icon>
+                </a>
             </nav>
         </div>
         {% include '@sportsfixturesPosition/listContent.twig' with { positions: allPositions } %}

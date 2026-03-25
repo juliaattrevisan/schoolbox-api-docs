@@ -13,7 +13,9 @@
                     </div>
                 </div>
                 <nav>
-                    <a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: team.id}) }}" class="icon-modify" title="Modify Team"></a>
+                    <a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: team.id}) }}" class="sbx-icon-only-button" title="Modify Team" aria-label="Modify Team">
+                        <sbx-icon name="modify"></sbx-icon>
+                    </a>
                 </nav>
                 <div class="toast" data-alert data-team-indicator></div>
             </div>
