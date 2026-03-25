@@ -12,15 +12,25 @@ const emit = defineEmits<{
 
 const isOpen = window.Vue.ref<boolean>(false);
 
+/**
+ * Opens the language selection modal.
+ */
 function open(): void {
     isOpen.value = true;
 }
 
+/**
+ * Closes the language selection modal and emits the close event.
+ */
 function close(): void {
     isOpen.value = false;
     emit("close");
 }
 
+/**
+ * Confirms the language selection, emits the selected languages, and closes the modal.
+ * @param languages - The array of selected language codes
+ */
 function onConfirm(languages: string[]): void {
     emit("languagesSelected", languages);
     close();
