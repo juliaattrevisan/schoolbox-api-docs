@@ -31,12 +31,6 @@ parameters:
 			path: library/Alaress/Async/AMQP/AMQPConnector.php
 
 		-
-			message: '#^Method Alaress\\Async\\Notification\\Cloud\\Google\\GCM\:\:propagate\(\) should return bool but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: library/Alaress/Async/Notification/Cloud/Google/GCM.php
-
-		-
 			message: '#^Method Alaress\\Database\\Broker\\Base\:\:prepareQuery\(\) should return Alaress\\Database\\Statement\\Query\\IQuery but returns Alaress\\Database\\Statement\\Query\\Base\.$#'
 			identifier: return.type
 			count: 1
@@ -259,12 +253,6 @@ parameters:
 			path: library/Alaress/Lumberjack/TtyFormatter.php
 
 		-
-			message: '#^Method Alaress\\OAuth2\\Client\\Provider\\Office365\:\:createResourceOwner\(\) should return League\\OAuth2\\Client\\Provider\\ResourceOwnerInterface but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: library/Alaress/OAuth2/Client/Provider/Office365.php
-
-		-
 			message: '#^Method Alaress\\OAuth2\\Client\\Provider\\Office365\:\:urlUserDetails\(\) should return string but returns null\.$#'
 			identifier: return.type
 			count: 1
@@ -331,18 +319,6 @@ parameters:
 			path: library/Alaress/Scheduler/Trigger/CancelTrigger.php
 
 		-
-			message: '#^Method Alaress\\Session\\BaseSessionSegment\:\:clear\(\) should return null but return statement is missing\.$#'
-			identifier: return.missing
-			count: 2
-			path: library/Alaress/Session/BaseSessionSegment.php
-
-		-
-			message: '#^Method Alaress\\Session\\BaseSessionSegment\:\:load\(\) should return null but return statement is missing\.$#'
-			identifier: return.missing
-			count: 2
-			path: library/Alaress/Session/BaseSessionSegment.php
-
-		-
 			message: '#^Call to an undefined method Aura\\Session\\Phpfunc\:\:session_id\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -365,12 +341,6 @@ parameters:
 			identifier: method.alreadyNarrowedType
 			count: 2
 			path: library/Alaress/Test/RelativeUrlTest.php
-
-		-
-			message: '#^Method Alaress_Validator_Abstract\:\:setValue\(\) should return bool but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: library/Alaress/Validator/Abstract.php
 
 		-
 			message: '#^Property Alaress\\WorkerCrew\\Transaction\\AbstractTransaction\:\:\$timer \(React\\EventLoop\\TimerInterface\) does not accept null\.$#'
@@ -443,12 +413,6 @@ parameters:
 			identifier: method.notFound
 			count: 2
 			path: library/Assess/Import/Xml.php
-
-		-
-			message: '#^Method Calendar\:\:delete\(\) should return bool but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: library/Calendar.php
 
 		-
 			message: '#^Access to an undefined property Sabre\\VObject\\Component\\VEvent\:\:\$CATEGORIES\.$#'
@@ -5265,12 +5229,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method Schoolbox\\Resource\\File\\IFile\:\:getTitle\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Resource/Browser/AbstractNode.php
-
-		-
-			message: '#^Method Schoolbox\\Resource\\Browser\\AbstractNode\:\:setFolderLocator\(\) should return Schoolbox\\Resource\\Browser\\AbstractNode but return statement is missing\.$#'
-			identifier: return.missing
 			count: 1
 			path: library/Schoolbox/Resource/Browser/AbstractNode.php
 

@@ -38,6 +38,8 @@ class BaseSessionSegment extends BaseSession\Segment
         if (!isset($_SESSION)) {
             $_SESSION = array();
         }
+
+        return null;
     }
 
     /**
@@ -72,5 +74,7 @@ class BaseSessionSegment extends BaseSession\Segment
         if ($this->resumeSession()) {
             $_SESSION = array();
         }
+
+        return null;
     }
 }

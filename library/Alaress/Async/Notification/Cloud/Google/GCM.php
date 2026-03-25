@@ -152,5 +152,7 @@ class GCM extends AbstractService
             }
             // range exception not caught here
         }
+
+        return true;
     }
 }
