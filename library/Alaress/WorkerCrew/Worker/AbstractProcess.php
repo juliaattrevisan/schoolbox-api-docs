@@ -41,7 +41,7 @@ abstract class AbstractProcess implements WorkerInterface
     /**
      * Timer for ensuring a worker doesn't sit idle for too long
      *
-     * @var TimerInterface
+     * @var TimerInterface|null
      */
     protected $timeout;
 

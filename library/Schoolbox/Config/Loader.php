@@ -24,7 +24,7 @@ class Loader implements IConfigLoader
     /**
      * Cached config values.
      *
-     * @var array
+     * @var array|null
      */
     private static $allConfigs;
 

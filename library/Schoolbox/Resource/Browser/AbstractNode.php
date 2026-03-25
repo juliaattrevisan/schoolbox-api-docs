@@ -355,7 +355,6 @@ abstract class AbstractNode implements NodeInterface
         return $this;
     }
 
-
     /**
      * @return FolderLocatorInterface
      */

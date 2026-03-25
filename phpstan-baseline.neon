@@ -343,24 +343,6 @@ parameters:
 			path: library/Alaress/Test/RelativeUrlTest.php
 
 		-
-			message: '#^Property Alaress\\WorkerCrew\\Transaction\\AbstractTransaction\:\:\$timer \(React\\EventLoop\\TimerInterface\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 2
-			path: library/Alaress/WorkerCrew/Transaction/AbstractTransaction.php
-
-		-
-			message: '#^Property Alaress\\WorkerCrew\\Transaction\\AbstractTransaction\:\:\$timer \(React\\EventLoop\\TimerInterface\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 3
-			path: library/Alaress/WorkerCrew/Transaction/AbstractTransaction.php
-
-		-
-			message: '#^Property Alaress\\WorkerCrew\\Worker\\AbstractProcess\:\:\$timeout \(React\\EventLoop\\TimerInterface\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Alaress/WorkerCrew/Worker/AbstractProcess.php
-
-		-
 			message: '#^Call to function unset\(\) contains undefined variable \$e\.$#'
 			identifier: unset.variable
 			count: 3
@@ -741,12 +723,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method Schoolbox\\Resource\\File\\IFile\:\:getTitle\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: library/Component/Homepage/VideoController.php
-
-		-
-			message: '#^Property Component_Homepage_VideoController\:\:\$defaultVideo \(Schoolbox\\Video\\ResourceVideo\) does not accept null\.$#'
-			identifier: assign.propertyType
 			count: 1
 			path: library/Component/Homepage/VideoController.php
 
@@ -2398,18 +2374,6 @@ parameters:
 			message: '#^PHPDoc tag @param for parameter \$name with type mixed is not subtype of native type string\.$#'
 			identifier: parameter.phpDocType
 			count: 1
-			path: library/Schoolbox/Config/Loader.php
-
-		-
-			message: '#^Static property Schoolbox\\Config\\Loader\:\:\$allConfigs \(array\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Schoolbox/Config/Loader.php
-
-		-
-			message: '#^Static property Schoolbox\\Config\\Loader\:\:\$allConfigs \(array\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 3
 			path: library/Schoolbox/Config/Loader.php
 
 		-
@@ -4333,6 +4297,12 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Participant.php
 
 		-
+			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Learning\\Assessment\\Visibility is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
+			identifier: varTag.nativeType
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/Participant/Test/AssessmentListMutatorTest.php
+
+		-
 			message: '#^Property Schoolbox\\Learning\\Assessment\\ParticipantStatistics\:\:\$cacheCountAssessments \(int\) does not accept null\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -4443,12 +4413,6 @@ parameters:
 		-
 			message: '#^Method Schoolbox\\Learning\\Assessment\\Summator\\Average\:\:calculateTotalWeight\(\) should return int but returns null\.$#'
 			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Summator/Average.php
-
-		-
-			message: '#^Property Schoolbox\\Learning\\Assessment\\Summator\\Average\:\:\$sum \(float\) does not accept null\.$#'
-			identifier: assign.propertyType
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Summator/Average.php
 
@@ -4705,12 +4669,6 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Controller.php
 
 		-
-			message: '#^Property Schoolbox\\Learning\\Quiz\\Model\:\:\$attempts \(array\<Schoolbox\\Learning\\Quiz\\Attempt\\Model\>\|\(iterable\<Schoolbox\\Learning\\Quiz\\Attempt\\Model\>&Schoolbox\\GenericCollection\)\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Model.php
-
-		-
 			message: '#^Property Schoolbox\\Learning\\Quiz\\Model\:\:\$attempts \(array\<Schoolbox\\Learning\\Quiz\\Attempt\\Model\>\|\(iterable\<Schoolbox\\Learning\\Quiz\\Attempt\\Model\>&Schoolbox\\GenericCollection\)\) is never assigned array\<Schoolbox\\Learning\\Quiz\\Attempt\\Model\> so it can be removed from the property type\.$#'
 			identifier: property.unusedType
 			count: 1
@@ -4727,12 +4685,6 @@ parameters:
 			identifier: property.unusedType
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Section/Model.php
-
-		-
-			message: '#^Property Schoolbox\\Learning\\Quiz\\Section\\Question\\Solution\\Model\:\:\$question \(Schoolbox\\Learning\\Quiz\\Section\\Question\\Model\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Section/Question/Solution/Model.php
 
 		-
 			message: '#^Constant Schoolbox\\Learning\\Turnitin\\ValidFile\:\:MIN_TURNITIN_TEXT_LENGTH is unused\.$#'
@@ -5204,12 +5156,6 @@ parameters:
 
 		-
 			message: '#^Property Schoolbox\\Resource\\Attachment\\Zone\:\:\$mapper \(Schoolbox\\Resource\\Storage\\Mapper\) does not accept Schoolbox\\Mapper\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Zone.php
-
-		-
-			message: '#^Property Schoolbox\\Resource\\Attachment\\Zone\:\:\$mimeFilter \(string\) does not accept null\.$#'
 			identifier: assign.propertyType
 			count: 1
 			path: library/Schoolbox/Resource/Attachment/Zone.php

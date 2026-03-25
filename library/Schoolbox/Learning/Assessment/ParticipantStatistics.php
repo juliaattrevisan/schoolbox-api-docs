@@ -29,7 +29,7 @@ class ParticipantStatistics
      */
     private $assessmentAndDescendants;
 
-    /** @var int How many assessments is the participant participating in? */
+    /** @var int|null How many assessments is the participant participating in? */
     private $cacheCountAssessments;
 
     /** @var int How many assessments does the participant need to respond to? */

@@ -260,7 +260,7 @@ class Worker
 
 
     /**
-     * @return Task
+     * @return Task|null
      */
     public function getTask()
     {

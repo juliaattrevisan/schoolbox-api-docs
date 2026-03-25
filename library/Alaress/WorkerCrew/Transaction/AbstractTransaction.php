@@ -20,7 +20,7 @@ abstract class AbstractTransaction implements ITransaction
     /** @var int */
     private $cacheInterval;
 
-    /** @var TimerInterface */
+    /** @var TimerInterface|null */
     private $timer = null;
 
     /** @var int */

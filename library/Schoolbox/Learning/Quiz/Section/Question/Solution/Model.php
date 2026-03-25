@@ -23,7 +23,7 @@ class Model implements ISoftDeletable
     use DeletedAtDate;
 
     /**
-     * @var QuizQuestion
+     * @var QuizQuestion|null
      */
     private $question;
 
@@ -54,7 +54,7 @@ class Model implements ISoftDeletable
      */
 
     /**
-     * @return QuizQuestion
+     * @return QuizQuestion|null
      */
     public function getQuestion()
     {
