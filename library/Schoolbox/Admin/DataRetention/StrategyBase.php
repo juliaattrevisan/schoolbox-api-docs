@@ -20,9 +20,9 @@ use Symfony\Component\Lock\LockInterface;
 
 abstract class StrategyBase implements IStrategy
 {
-    public const DEFAULT_CHUNK_LOOPS = 3; // how many times do we loop through the data in chunks
+    public const int DEFAULT_CHUNK_LOOPS = 3; // how many times do we loop through the data in chunks
 
-    public const DEFAULT_CHUNK_SIZE = 1000; // how many things to delete at once
+    public const int DEFAULT_CHUNK_SIZE = 1000; // how many things to delete at once
 
     /* the config key to look up the retention period for this strategy, e.g. 'ConfigMapper::NAME_DATA_RETENTION_*'
      * planned options 1;1 Day:30;30 Days:365;365 Days and <null> (null is do NOT hard delete this)

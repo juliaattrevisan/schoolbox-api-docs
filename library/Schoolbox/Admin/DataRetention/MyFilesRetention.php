@@ -20,8 +20,8 @@ class MyFilesRetention extends StrategyBase
     public string $retentionConfigKey = ConfigMapper::NAME_DATA_RETENTION_MYFILES;
 
     // DB table names (updated to snake_case)
-    private const TABLE_NAME_FILE = 'my_file';
-    private const TABLE_NAME_FOLDER = 'my_folder';
+    private const string TABLE_NAME_FILE = 'my_file';
+    private const string TABLE_NAME_FOLDER = 'my_folder';
 
     /**
      * @inheritDoc
