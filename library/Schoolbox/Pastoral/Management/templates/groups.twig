@@ -25,7 +25,7 @@
         <nav>
             {# Pastoral moderators can manage pastoral groups #}
             {% if isRouteAuthorized('pastoralManagement.getGroupsModify') %}
-                <a href="{{ routeLookup('pastoralManagement.getGroupsModify') }}" class="icon-add" title="Add {{ locale.pastoral.proper }} Group"></a>
+                <a href="{{ routeLookup('pastoralManagement.getGroupsModify') }}" class="sbx-icon-only-button" title="Add {{ locale.pastoral.proper }} Group" aria-label="Add {{ locale.pastoral.proper }} Group"><sbx-icon name="add"></sbx-icon></a>
             {% endif %}
         </nav>
     </div>
@@ -62,11 +62,12 @@
                             </div>
                         </div>
                         <nav>
-                            <a class="icon-modify no-text"
+                            <a class="sbx-icon-only-button no-text"
                                 href="{{ routeLookup('pastoralManagement.getGroupsModify', {groupId: group.id}) }}"
-                                title="Edit Group"></a>
-                            <a href="#" data-delete="{{ group.id }}" class="icon-delete"
-                                title="Delete {{ locale.pastoral.proper }} Group"></a>
+                                title="Edit Group"
+                                aria-label="Edit Group"><sbx-icon name="modify"></sbx-icon></a>
+                            <a href="#" data-delete="{{ group.id }}" class="sbx-icon-only-button"
+                                title="Delete {{ locale.pastoral.proper }} Group" aria-label="Delete {{ locale.pastoral.proper }} Group"><sbx-icon name="delete"></sbx-icon></a>
                         </nav>
                     </li>
                 {% endfor %}

@@ -14,7 +14,9 @@
                 {% block createLink %}
                     {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
                     {% if createRoute %}
-                        <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
+                        <a href="{{ createRoute }}" class="sbx-icon-only-button" title="Create {{ locale.news }}" aria-label="Create {{ locale.news }}">
+                            <sbx-icon name="add"></sbx-icon>
+                        </a>
                     {% endif %}
                 {% endblock %}
 
@@ -23,7 +25,9 @@
 
                 {% set adminRoute = routeLookupIfAuthorized('commsNewsPolicy.getPolicies') %}
                 {% if adminRoute %}
-                    <a class="icon-settings" href="{{ adminRoute }}" title="{{ locale.news.proper }} Administration"></a>
+                    <a class="sbx-icon-only-button" href="{{ adminRoute }}" title="{{ locale.news.proper }} Administration" aria-label="{{ locale.news.proper }} Administration">
+                        <sbx-icon name="settings"></sbx-icon>
+                    </a>
                 {% endif %}
             </nav>
             {% endblock %}

@@ -21,7 +21,7 @@
         {% if user.role.isStaff %}
             {% set routeRecordInsert = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
 
-            {% if routeRecordInsert %}<a href="{{ routeRecordInsert }}" class="button icon-add" title="Create {{ locale.pastoral.proper }} Record">Create {{ locale.pastoral.proper }} Record</a>{% endif %}
+            {% if routeRecordInsert %}<a href="{{ routeRecordInsert }}" class="button sbx-button--has-icon" title="Create {{ locale.pastoral.proper }} Record"><sbx-icon name="add"></sbx-icon>Create {{ locale.pastoral.proper }} Record</a>{% endif %}
 
         {% endif %}
     </div>

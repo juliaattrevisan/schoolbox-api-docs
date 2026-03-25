@@ -424,32 +424,43 @@ export default {
                         </nav>
                         <ul data-dropdown-content class="f-dropdown" :id="`class-options${group.id}`">
                             <li v-if="group.isAccessWrite || group.isAccessAdmin">
-                                <a :href="group.modifyLink" class="icon-modify" title="Modify Folder">Modify Folder</a>
+                                <a :href="group.modifyLink" class="sbx-button--has-icon" title="Modify Folder"
+                                    ><sbx-icon name="modify" />Modify Folder</a
+                                >
                             </li>
                             <li v-if="group.isAccessWrite || group.isAccessAdmin">
                                 <a
                                     :href="`/statistics/homepage/${group.id}`"
-                                    class="icon-report"
+                                    class="sbx-button--has-icon"
                                     title="View Statistics"
-                                    >View Statistics</a
+                                    ><sbx-icon name="report" />View Statistics</a
                                 >
                             </li>
                             <li v-if="group.isAccessAdmin">
-                                <a :href="`/group/modify/${group.id}`" class="icon-group" title="Manage Group"
-                                    >Manage Group</a
+                                <a :href="`/group/modify/${group.id}`" class="sbx-button--has-icon" title="Manage Group"
+                                    ><sbx-icon name="group" />Manage Group</a
                                 >
                             </li>
                             <li v-if="isEnrolled">
-                                <a href="#" class="icon-logout" @click="leave" title="Leave Group">Leave</a>
+                                <a href="#" class="sbx-button--has-icon" @click="leave" title="Leave Group"
+                                    ><sbx-icon name="logout" />Leave</a
+                                >
                             </li>
                             <li v-else-if="isMembershipPending">
-                                <a href="#" class="icon-logout" @click="leave" title="Cancel membership request"
-                                    >Cancel membership request</a
+                                <a
+                                    href="#"
+                                    class="sbx-button--has-icon"
+                                    @click="leave"
+                                    title="Cancel membership request"
+                                    ><sbx-icon name="logout" />Cancel membership request</a
                                 >
                             </li>
                             <li v-if="group.cohortReportLink">
-                                <a :href="group.cohortReportLink" class="icon-share" title="Cohort Learning Moments"
-                                    >Cohort Learning Moments</a
+                                <a
+                                    :href="group.cohortReportLink"
+                                    class="sbx-button--has-icon"
+                                    title="Cohort Learning Moments"
+                                    ><sbx-icon name="share" />Cohort Learning Moments</a
                                 >
                             </li>
                         </ul>

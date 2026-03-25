@@ -80,7 +80,7 @@
                  #}
                 {% if button.type in ['emailstaff'] %}
                     <li>
-                        <a class="icon-email" id="email-all-staff" title="Includes all teachers, year coordinator, head of house, tutor and coach.">{{ text }}</a>
+                        <a class="sbx-button--has-icon" id="email-all-staff" title="Includes all teachers, year coordinator, head of house, tutor and coach."><sbx-icon name="email"></sbx-icon>{{ text }}</a>
                         <form id="email-all-form" action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" class="hide" method="post">
                             <input name="userIds" value="{{ allTeacherIds }}" type="hidden">
                             <input name="target" value="cc" type="hidden">
@@ -90,7 +90,7 @@
                     </li>
                 {% elseif button.type in ['emailparents'] %}
                     <li>
-                        <a class="icon-email" id="email-all-parents" title="Emails the parents that have email addresses and can be contacted">{{ text }}</a>
+                        <a class="sbx-button--has-icon" id="email-all-parents" title="Emails the parents that have email addresses and can be contacted"><sbx-icon name="email"></sbx-icon>{{ text }}</a>
                         <form action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" method="post" class="no-margin" id="email-contacts-form">
                             <input type="hidden" name="studentExternalIds" value="{{ user.externalId }}"/>
                             <input type="hidden" name="selectedGroups" value="parents_of"/>
@@ -119,7 +119,7 @@
 
                     {% if route %}
                         <li>
-                            <a href="{{ route }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ text }}</a>
+                            <a href="{{ route }}" title="{{ button.title }}" class="sbx-button--has-icon {{ button.css }}" target="{{ button.target }}"><sbx-icon name="{{ button.icon }}"></sbx-icon>{{ text }}</a>
                         </li>
                     {% endif %}
                 {% endif %}

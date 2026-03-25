@@ -51,7 +51,11 @@
                                     });
                                 });
                             </script>
-                            <nav><a href="{{ deleteRoute }}" class="icon-delete" data-delete></a></nav>
+                            <nav>
+                                <a href="{{ deleteRoute }}" class="sbx-icon-only-button" data-delete title="Delete" aria-label="Delete">
+                                    <sbx-icon name="delete"></sbx-icon>
+                                </a>
+                            </nav>
                         {% endif %}
                     </td>
                 </tr>

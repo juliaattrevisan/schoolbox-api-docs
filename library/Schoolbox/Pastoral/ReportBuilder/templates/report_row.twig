@@ -35,14 +35,16 @@
             <span class="icon-star alert"></span>
         </label>
         {% if canEdit %}
-            <a class="icon-modify no-text"
+                <a class="sbx-icon-only-button no-text"
                href="{{ routeLookup('pastoralReportBuilder.getReportUpdate', {reportId: report.id, report: report}) }}"
-               title="Modify Report"></a>
-            <a class="icon-delete no-text"
+                    title="Modify Report"
+                    aria-label="Modify Report"><sbx-icon name="modify"></sbx-icon></a>
+                <a class="sbx-icon-only-button no-text"
                data-delete="{{ report.id }}"
                href="{{ routeLookup('pastoralReportBuilder.postReportDelete', {reportId: report.id, report: report}) }}"
                title="Delete Report"
-            ></a>
+                    aria-label="Delete Report"
+                ><sbx-icon name="delete"></sbx-icon></a>
         {% endif %}
     </nav>
 </li>

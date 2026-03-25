@@ -379,7 +379,9 @@
                             </div>
                         </div>
                         <nav>
-                            <a href="#" data-reveal-id="legend-modal" class="icon-help" title="View Help"></a>
+                            <a href="#" data-reveal-id="legend-modal" class="sbx-icon-only-button" title="View Help" aria-label="View Help">
+                                <sbx-icon name="help"></sbx-icon>
+                            </a>
                         </nav>
                     </div>
 
@@ -407,7 +409,7 @@
                                 <ul id="feature-pop-out-{{ namespace.id }}" class="f-dropdown" data-dropdown-content>
                                     <li>
                                         <a
-                                            class="icon-export"
+                                            class="sbx-button--has-icon"
                                             href="#apply-default-settings"
                                             data-apply-default-button
                                             data-reveal-id="default-settings-modal"
@@ -415,6 +417,7 @@
                                             data-namespace="{{ locale.translateSentence(ns[namespace.id].slug) }}"
                                             data-namespace-formatted="{{ locale.translateSentence(ns[namespace.id].label) | capitalize }}"
                                         >
+                                            <sbx-icon name="export"></sbx-icon>
                                             Apply default settings to all {{ roletypeFormatted }}...
                                         </a>
                                     </li>

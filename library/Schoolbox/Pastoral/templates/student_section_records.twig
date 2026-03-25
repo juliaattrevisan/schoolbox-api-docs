@@ -92,7 +92,7 @@
 
                                     {% set routeRecordUpdate = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
                                     {% if routeRecordUpdate %}
-                                        <a class="icon-modify no-text" href="{{ routeRecordUpdate }}" title="Modify"></a>
+                                        <a class="sbx-icon-only-button no-text" href="{{ routeRecordUpdate }}" title="Modify" aria-label="Modify"><sbx-icon name="modify"></sbx-icon></a>
                                     {% endif %}
 
                                     {# Delete record #}
@@ -100,10 +100,11 @@
                                     {% if isRouteAuthorized('pastoral.postRecordDelete', {recordId: record.id}) %}
                                         <a data-delete
                                            id="{{ record.id }}"
-                                           class="icon-delete no-text"
+                                           class="sbx-icon-only-button no-text"
                                            href="{{ routeLookup('pastoral.postRecordDelete', {recordId: record.id}) }}"
                                            title="Delete"
-                                        ></a>
+                                           aria-label="Delete"
+                                        ><sbx-icon name="delete"></sbx-icon></a>
                                     {% endif %}
                                 </nav>
                             {% endif %}

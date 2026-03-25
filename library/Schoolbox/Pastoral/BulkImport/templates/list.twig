@@ -28,7 +28,7 @@
             </div>
             <nav>
                 {% if createRoute %}
-                    <a href="{{ createRoute }}?{{ returnQueryString }}" class="icon-add" title="Add a summative report"></a>
+                    <a href="{{ createRoute }}?{{ returnQueryString }}" class="sbx-icon-only-button" title="Add a summative report" aria-label="Add a summative report"><sbx-icon name="add"></sbx-icon></a>
                 {% endif %}
             </nav>
         </div>
@@ -103,19 +103,19 @@
                             {# Buttons: run, undo, modify, archive?, delete? #}
                             <nav>
                                 {% if getRoute and import.zip %}
-                                    <a class="icon-eye" href="{{ getRoute }}?{{ returnQueryString }}" title="{% if import.imported %}View import results{% else %}Preview import{% endif %}"></a>
+                                    <a class="sbx-icon-only-button" href="{{ getRoute }}?{{ returnQueryString }}" title="{% if import.imported %}View import results{% else %}Preview import{% endif %}" aria-label="{% if import.imported %}View import results{% else %}Preview import{% endif %}"><sbx-icon name="view"></sbx-icon></a>
                                 {% endif %}
 
                                 {% if runRoute and import.zip %}
-                                    <a class="icon-import" data-action="run" data-form-id="postRunImport-{{ import.id }}" title="Run import"></a>
+                                    <a class="sbx-icon-only-button" data-action="run" data-form-id="postRunImport-{{ import.id }}" title="Run import" aria-label="Run import"><sbx-icon name="import"></sbx-icon></a>
                                 {% endif %}
 
                                 {% if undoRoute and import.zip %}
-                                    <a class="icon-undo" data-action="undo" data-form-id="postUndoImport-{{ import.id }}" title="Undo import"></a>
+                                    <a class="sbx-icon-only-button" data-action="undo" data-form-id="postUndoImport-{{ import.id }}" title="Undo import" aria-label="Undo import"><sbx-icon name="undo"></sbx-icon></a>
                                 {% endif %}
 
                                 {% if deleteRoute %}
-                                    <a class="icon-delete" data-action="delete" data-form-id="postDeleteImport-{{ import.id }}" title="Delete import"></a>
+                                    <a class="sbx-icon-only-button" data-action="delete" data-form-id="postDeleteImport-{{ import.id }}" title="Delete import" aria-label="Delete import"><sbx-icon name="delete"></sbx-icon></a>
                                 {% endif %}
                             </nav>
                         </div>

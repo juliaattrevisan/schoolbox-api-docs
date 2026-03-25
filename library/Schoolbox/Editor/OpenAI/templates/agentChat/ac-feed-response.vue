@@ -143,7 +143,9 @@ function retryResponse(): void {
         <div v-else class="ac-feed-response-container">
             <div v-if="imageSrc" class="actions-small-1">
                 <nav>
-                    <a :href="imageSrc" class="icon-download" title="Download" download></a>
+                    <a :href="imageSrc" class="sbx-icon-only-button" title="Download" aria-label="Download" download
+                        ><sbx-icon name="download"></sbx-icon
+                    ></a>
                 </nav>
                 <img :src="imageSrc" @click="() => acStore.spawnLightbox(props.message.entryKey)" />
             </div>

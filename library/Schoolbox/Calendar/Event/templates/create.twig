@@ -73,7 +73,7 @@
             <sbx-pop-out content-id="overflow"></sbx-pop-out>
         </nav>
         <ul class="f-dropdown" data-dropdown-content id="overflow">
-            <li><a data-action="delete" href="{{ routeLookupIfAuthorized('calendarEvent.postDelete', {eventId: event.id}) }}?{{ returnUrl }}" class="icon-delete">Delete Event</a></li>
+            <li><a data-action="delete" href="{{ routeLookupIfAuthorized('calendarEvent.postDelete', {eventId: event.id}) }}?{{ returnUrl }}" class="sbx-button--has-icon"><sbx-icon name="delete"></sbx-icon>Delete Event</a></li>
         </ul>
     {% endif %}
 </div>

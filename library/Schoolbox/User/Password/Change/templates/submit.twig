@@ -10,11 +10,10 @@
             {% set formRoute = routeLookupIfAuthorized('example.getExample', {id: user.id}) %}
 
             {% if formRoute %}
-                <a href="{{ formRoute }}" class="button icon-previous">Back to {{ formRoute }}</a>
+                <a href="{{ formRoute }}" class="button sbx-button--has-icon"><sbx-icon name="previous"></sbx-icon>Back to {{ formRoute }}</a>
             {% else %}
                 Not authorised to POST
             {% endif %}
         </section>
     </div>
 </div>
-

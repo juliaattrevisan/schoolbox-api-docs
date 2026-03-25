@@ -477,7 +477,13 @@ export default {
             <div class="actions-small-1 row" v-if="canModify()">
                 <div class="list-item"></div>
                 <nav>
-                    <a :href="this.ENDPOINTS.modifyPath(this.event.id)" class="icon-modify" title="Modify Event"></a>
+                    <a
+                        :href="this.ENDPOINTS.modifyPath(this.event.id)"
+                        class="sbx-icon-only-button"
+                        title="Modify Event"
+                        aria-label="Modify Event"
+                        ><sbx-icon name="modify"></sbx-icon
+                    ></a>
                 </nav>
             </div>
         </div>

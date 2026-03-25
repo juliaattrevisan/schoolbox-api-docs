@@ -21,24 +21,24 @@
                         {% if user.enabled %}
                             <a
                                 href="{{ routeLookup('user.impersonate', {userId: user.id}) }}"
-                                class="icon-staff-students"
+                                class="sbx-button--has-icon"
                                 title="Login as user"
                                 data-test="admin-user-modify-impersonate"
-                            >Impersonate</a>
+                            ><sbx-icon name="staff-students"></sbx-icon>Impersonate</a>
                         {% else %}
-                            <a class="icon-staff-students menu_disabled" title="Account disabled">Impersonate</a>
+                            <a class="sbx-button--has-icon menu_disabled" title="Account disabled"><sbx-icon name="staff-students"></sbx-icon>Impersonate</a>
                         {% endif %}
                     </li>
-                    <li><a href="/search/user/{{ user.id }}" class="icon-eye">View Profile</a></li>
+                    <li><a href="/search/user/{{ user.id }}" class="sbx-button--has-icon"><sbx-icon name="view"></sbx-icon>View Profile</a></li>
                     <li>
                         {% if isSchoolboxAdmin %}
-                            <a class="icon-delete menu_disabled"
-                            title="This user may not be deleted">Delete User</a>
+                            <a class="sbx-button--has-icon menu_disabled"
+                            title="This user may not be deleted"><sbx-icon name="delete"></sbx-icon>Delete User</a>
                         {% else %}
-                            <a class="icon-delete"
+                            <a class="sbx-button--has-icon"
                             title="Delete User"
                             data-delete
-                            data-action="{{ routeLookup('adminUser.postDeleteUser', {userId: user.id}) }}">Delete User</a>
+                            data-action="{{ routeLookup('adminUser.postDeleteUser', {userId: user.id}) }}"><sbx-icon name="delete"></sbx-icon>Delete User</a>
                         {% endif %}
                     </li>
                 </ul>
@@ -428,7 +428,7 @@
                                         </div>
                                     </div>
                                     <nav>
-                                        <a href="#" data-delete-group="{{ folder.id }}" class="icon-delete" title="Remove"></a>
+                                        <a href="#" data-delete-group="{{ folder.id }}" class="sbx-icon-only-button" title="Remove" aria-label="Remove"><sbx-icon name="delete"></sbx-icon></a>
                                     </nav>
                                 </li>
                             {% endfor %}
@@ -518,7 +518,7 @@
                                             </div>
                                         </div>
                                         <nav>
-                                            <a href="#" data-delete-permission="{{ permission.serviceIdentifier }}" data-service="{{ permission.service}}" class="icon-delete" title="Remove"></a>
+                                            <a href="#" data-delete-permission="{{ permission.serviceIdentifier }}" data-service="{{ permission.service}}" class="sbx-icon-only-button" title="Remove" aria-label="Remove"><sbx-icon name="delete"></sbx-icon></a>
                                         </nav>
                                     </li>
                                 {% endif %}
@@ -597,7 +597,7 @@
                                         </div>
                                     </div>
                                     <nav>
-                                        <a href="#" data-delete-linked="{{ linkedUser.id }}" class="icon-delete" title="Remove"></a>
+                                        <a href="#" data-delete-linked="{{ linkedUser.id }}" class="sbx-icon-only-button" title="Remove" aria-label="Remove"><sbx-icon name="delete"></sbx-icon></a>
                                     </nav>
                                 </li>
                             {% endfor %}
@@ -650,7 +650,7 @@
                                         </div>
                                     </div>
                                     <nav>
-                                        <a href="#" data-delete-token="{{ token.jwtId }}" class="icon-delete" title="Remove"></a>
+                                        <a href="#" data-delete-token="{{ token.jwtId }}" class="sbx-icon-only-button" title="Remove" aria-label="Remove"><sbx-icon name="delete"></sbx-icon></a>
                                     </nav>
                                 </li>
                             {% endfor %}
@@ -678,7 +678,7 @@
                                     </div>
                                 </div>
                                 <nav>
-                                    <a class="icon-view" href="/adminv2/reports/login/user={{ user.username }}" title="See All"></a>
+                                    <a class="sbx-icon-only-button" href="/adminv2/reports/login/user={{ user.username }}" title="See All" aria-label="See All"><sbx-icon name="view"></sbx-icon></a>
                                 </nav>
                             </div>
                             <table>
@@ -721,7 +721,7 @@
                                     </div>
                                 </div>
                                 <nav>
-                                    <a class="icon-view" href="/adminv2/reports/activity/user={{ user.username }}" title="See All"></a>
+                                    <a class="sbx-icon-only-button" href="/adminv2/reports/activity/user={{ user.username }}" title="See All" aria-label="See All"><sbx-icon name="view"></sbx-icon></a>
                                 </nav>
                             </div>
                             <table>
@@ -1131,7 +1131,7 @@
                                 +
                                 '</div></div><nav><a href="#" data-delete-token="'
                                 + data.jwtId +
-                                '" class="icon-delete" title="Remove"></a></nav></li>';
+                                '" class="sbx-icon-only-button" title="Remove" aria-label="Remove"><sbx-icon name="delete"></sbx-icon></a></nav></li>';
                         $('[data-token-list]').html($('[data-token-list]').html() + html);
                         tokenDelete();
                     })

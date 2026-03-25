@@ -473,8 +473,13 @@
         <ul id="header-options" class="f-dropdown" data-dropdown-content>
 
             {% if deleteRoute %}
-                <li><a class="icon-delete" href="{{ deleteRoute }}{{ returnUrlQueryString ?? '' }}"
-                       data-delete="{{ article.title }}">Delete</a></li>
+                <li>
+                    <a class="sbx-button--has-icon" href="{{ deleteRoute }}{{ returnUrlQueryString ?? '' }}"
+                       data-delete="{{ article.title }}">
+                        <sbx-icon name="delete"></sbx-icon>
+                        Delete
+                    </a>
+                </li>
             {% endif %}
 
         </ul>

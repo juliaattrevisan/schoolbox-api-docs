@@ -53,8 +53,10 @@
                 <div class="small-12 island">
                     <div class="row actions-small-1">
                         <nav>
-                            <a class='icon-add' href="{{ routeLookup('adminRubricResultSet.getCreate') }}"
-                               title="Add new result set"></a>
+                            <a class='sbx-icon-only-button' href="{{ routeLookup('adminRubricResultSet.getCreate') }}"
+                               title="Add new result set" aria-label="Add new result set">
+                                <sbx-icon name="add"></sbx-icon>
+                            </a>
                         </nav>
                     </div>
                     <section>
@@ -70,10 +72,10 @@
                                     </div>
                                     <nav>
                                         <a href="{{ routeLookup('adminRubricResultSet.getUpdate', {resultSetId: resultSetId}) }}"
-                                           class="icon-modify" title="Modify"></a>
+                                           class="sbx-icon-only-button" title="Modify" aria-label="Modify"><sbx-icon name="modify"></sbx-icon></a>
                                         <a onclick="return deleteRowAfterConfirmation({{ resultSetId }})"
-                                           id="delete-row-button-{{ resultSetId }}" class="icon-delete"
-                                           title="Delete"></a>
+                                           id="delete-row-button-{{ resultSetId }}" class="sbx-icon-only-button"
+                                           title="Delete" aria-label="Delete"><sbx-icon name="delete"></sbx-icon></a>
                                     </nav>
                                 </li>
                             {% endfor %}

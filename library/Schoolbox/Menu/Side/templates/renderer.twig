@@ -50,7 +50,10 @@
             {% elseif section.section == 'groups' and section.visible %}
                 <li id="side-menu-mygroups" {% if groups | length == 0 %}class="hide"{% endif %}>
                     <h3 class="side-menu-heading-link">
-                        <a href="{{ routeLookup('groups.getNewGroups') }}#my-favourite-groups" class="icon-modify" title="Modify">{{ section.title }}</a>
+                        <a href="{{ routeLookup('groups.getNewGroups') }}#my-favourite-groups" class="sbx-button--has-icon" title="Modify">
+                            <sbx-icon name="modify"></sbx-icon>
+                            {{ section.title }}
+                        </a>
                     </h3>
                     <div class="nav-wrapper">
                         <ul class="off-canvas-list">
@@ -65,7 +68,12 @@
 
             {% elseif section.section == 'bookmarks' and section.visible %}
                 <li id="side-menu-mylinks">
-                    <h3 class="side-menu-heading-link"><a href="/cms/myLinks" class="icon-modify" title="Modify">{{ section.title }}</a></h3>
+                    <h3 class="side-menu-heading-link">
+                        <a href="/cms/myLinks" class="sbx-button--has-icon" title="Modify">
+                            <sbx-icon name="modify"></sbx-icon>
+                            {{ section.title }}
+                        </a>
+                    </h3>
                     <div class="nav-wrapper my-links">
                         <ul class="off-canvas-list">
                             {% for link in bookmarks %}

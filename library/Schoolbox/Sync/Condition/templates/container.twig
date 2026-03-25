@@ -3,6 +3,6 @@
 
     {% include allConditionStructures.fragments[currentCondition.id].subfragments.fragment.getFilename() %}
     <nav>
-        <a href="/adminv2/ups/condition/delete/{{ currentCondition.id }}" class="icon-delete" title="Delete" data-condition-delete="{{ currentCondition.id }}"></a>
+        <a href="/adminv2/ups/condition/delete/{{ currentCondition.id }}" class="sbx-icon-only-button" title="Delete" aria-label="Delete" data-condition-delete="{{ currentCondition.id }}"><sbx-icon name="delete"></sbx-icon></a>
     </nav>
 </li>

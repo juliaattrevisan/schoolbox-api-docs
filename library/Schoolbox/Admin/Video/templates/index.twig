@@ -115,10 +115,10 @@
                                     <td class="actions-small-3">
                                         <nav>
                                             {% if video.isFailed %}
-                                                <a class="icon-download no-text" href="/storage/fetch.php?hash={{ video.storage.hash }}" title="Download file"></a>
-                                                <a class="icon-search no-text" data-view="{{ video.id }}" href="#" title="View Transcode Results" data-reveal-id="ajax-load" data-reveal-ajax="/adminv2/video/{{ video.id }}"></a>
-                                                <a class="icon-refresh no-text" data-restart-processing="{{ video.id }}" href="#" title="Restart Processing"></a>
-                                                <a class="icon-delete no-text" data-delete="{{ video.id }}" href="#" title="Delete From Queue"></a>
+                                                <a class="sbx-icon-only-button no-text" href="/storage/fetch.php?hash={{ video.storage.hash }}" title="Download file" aria-label="Download file"><sbx-icon name="download"></sbx-icon></a>
+                                                <a class="sbx-icon-only-button no-text" data-view="{{ video.id }}" href="#" title="View Transcode Results" aria-label="View Transcode Results" data-reveal-id="ajax-load" data-reveal-ajax="/adminv2/video/{{ video.id }}"><sbx-icon name="search"></sbx-icon></a>
+                                                <a class="sbx-icon-only-button no-text" data-restart-processing="{{ video.id }}" href="#" title="Restart Processing" aria-label="Restart Processing"><sbx-icon name="refresh"></sbx-icon></a>
+                                                <a class="sbx-icon-only-button no-text" data-delete="{{ video.id }}" href="#" title="Delete From Queue" aria-label="Delete From Queue"><sbx-icon name="delete"></sbx-icon></a>
                                             {% endif %}
                                         </nav>
                                     </td>

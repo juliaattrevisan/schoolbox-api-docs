@@ -34,7 +34,7 @@
             </div>
             <nav>
                 {% if filterSummary %}
-                <a class="icon-filter" title="Clear Filter" href="{{ routeLookup('upsRuleset.log', { logId: id }) }}"></a>
+                <a class="sbx-icon-only-button" title="Clear Filter" aria-label="Clear Filter" href="{{ routeLookup('upsRuleset.log', { logId: id }) }}"><sbx-icon name="filter"></sbx-icon></a>
                 {% endif %}
             </nav>
         </div>

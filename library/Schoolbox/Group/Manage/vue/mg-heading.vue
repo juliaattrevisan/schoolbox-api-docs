@@ -80,33 +80,35 @@ function onDisbandSelected() {
             <li>
                 <a
                     href="#update-group-settings"
-                    class="icon-settings"
+                    class="sbx-button--has-icon"
                     id="updateGroupSettings"
                     @click.prevent="onUpdateSettingsSelected"
-                    >Update Group Settings</a
+                    ><sbx-icon name="settings" />Update Group Settings</a
                 >
             </li>
             <li v-if="store.emailEnabled && membersStore.hasGroupMembers">
                 <a
                     href="#email-group-members"
-                    class="icon-email"
+                    class="sbx-button--has-icon"
                     id="emailAllGroup"
                     @click.prevent="onEmailGroupSelected"
-                    >Email Group Members</a
+                    ><sbx-icon name="email" />Email Group Members</a
                 >
             </li>
             <li v-if="store.emailEnabled && membersStore.hasGroupMembers">
                 <a
                     href="#email-group-parents"
-                    class="icon-staff"
+                    class="sbx-button--has-icon"
                     id="emailAllParents"
                     title="Includes parents of students in the group, as well as parents directly in the group."
                     @click.prevent="onEmailGroupParentsSelected"
-                    >Email Group Parents</a
+                    ><sbx-icon name="staff" />Email Group Parents</a
                 >
             </li>
             <li>
-                <a href="#disband-group" class="icon-delete" @click.prevent="onDisbandSelected">Disband Group</a>
+                <a href="#disband-group" class="sbx-button--has-icon" @click.prevent="onDisbandSelected"
+                    ><sbx-icon name="delete" />Disband Group</a
+                >
             </li>
         </ul>
     </div>
