@@ -8,12 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\DataRetention;
-
-use Alaress\Database\Connector\IConnector;
-use Psr\Log\LoggerInterface;
-use Schoolbox\IConfigLoader;
-use Symfony\Component\Lock\LockInterface;
+namespace Schoolbox\Admin\DataRetention\Strategy;
 
 /**
  * Interface IStrategy

@@ -10,12 +10,13 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\DataRetention;
+namespace Schoolbox\Admin\DataRetention\Strategy;
 
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Admin\DataRetention\ValidStrats;
 use Schoolbox\Config\ConfigMapper;
 
-class MomentsRetention extends StrategyBase
+class Moments extends Base
 {
     protected string $retentionConfigKey = ConfigMapper::NAME_DATA_RETENTION_LEARNINGMOMENTS;
 

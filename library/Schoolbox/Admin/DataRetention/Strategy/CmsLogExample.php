@@ -10,11 +10,12 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\DataRetention;
+namespace Schoolbox\Admin\DataRetention\Strategy;
 
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Admin\DataRetention\ValidStrats;
 
-class CmsLogExample extends StrategyBase
+class CmsLogExample extends Base
 {
     private ?string $retentionPeriod = null;
 

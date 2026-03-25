@@ -10,15 +10,14 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\DataRetention;
+namespace Schoolbox\Admin\DataRetention\Strategy;
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Exception;
 use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
 use Symfony\Component\Lock\LockInterface;
 
-abstract class StrategyBase implements IStrategy
+abstract class Base implements IStrategy
 {
     public const int DEFAULT_CHUNK_LOOPS = 3; // how many times do we loop through the data in chunks
 

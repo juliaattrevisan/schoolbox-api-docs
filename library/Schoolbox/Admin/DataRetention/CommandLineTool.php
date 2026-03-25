@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\DataRetention;
 
-use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Symfony\Component\Lock\LockInterface;
 
@@ -51,7 +50,7 @@ class CommandLineTool extends CliTool\App
     private const string OPT_LONG_HELP  = 'help';
 
     /**
-     * -n: Count of loops to run for each strategy, default StrategyBase::DEFAULT_CHUNK_LOOPS
+     * -n: Count of loops to run for each strategy, default Strategy\Base::DEFAULT_CHUNK_LOOPS
      */
     private const string OPT_SHORT_LOOP_COUNT = 'n:';
 
@@ -153,24 +152,24 @@ class CommandLineTool extends CliTool\App
         register_shutdown_function(fn () => $this->releaseLock($lock));
 
         // get the number of loops to run for each strategy, default 3
-        $loopCount = $this->getOptAsInt(self::OPT_SHORT_LOOP_COUNT, StrategyBase::DEFAULT_CHUNK_LOOPS);
+        $loopCount = $this->getOptAsInt(self::OPT_SHORT_LOOP_COUNT, Strategy\Base::DEFAULT_CHUNK_LOOPS);
         if ($loopCount <= 0) {
-            $loopCount = StrategyBase::DEFAULT_CHUNK_LOOPS;
+            $loopCount = Strategy\Base::DEFAULT_CHUNK_LOOPS;
         }
 
         // get the chunk size, default 1000
-        $chunkSize = $this->getOptAsInt(self::OPT_LONG_CHUNK_SIZE, StrategyBase::DEFAULT_CHUNK_SIZE);
+        $chunkSize = $this->getOptAsInt(self::OPT_LONG_CHUNK_SIZE, Strategy\Base::DEFAULT_CHUNK_SIZE);
         if ($chunkSize <= 0) {
-            $chunkSize = StrategyBase::DEFAULT_CHUNK_SIZE;
+            $chunkSize = Strategy\Base::DEFAULT_CHUNK_SIZE;
         }
 
         // build the bus for all the data retention tasks
-        /** @var IStrategy[] $bus */
+        /** @var Strategy\IStrategy[] $bus */
         $bus = [];
 
         // add bus for cmsLogExample // clear things from the cmsLog older than 1 year (possible options are 1 Day, 30 Days, 365 Days, <null>)
-//        $bus[] = new CmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig(), $endTime, $loopCount, $chunkSize);
-        $bus[] = new MomentsRetention(
+//        $bus[] = new Strategy\CmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig(), $endTime, $loopCount, $chunkSize);
+        $bus[] = new Strategy\Moments(
             $logger,
             $this->perform(),
             $this->getDatabaseInternal(),
@@ -180,7 +179,7 @@ class CommandLineTool extends CliTool\App
             $loopCount,
             $chunkSize,
         );
-        $bus[] = new MyFilesRetention(
+        $bus[] = new Strategy\MyFiles(
             $logger,
             $this->perform(),
             $this->getDatabaseInternal(),
@@ -221,7 +220,7 @@ class CommandLineTool extends CliTool\App
         if (count($validStrats) > 0) {
             $bus = array_values(array_filter(
                 $bus,
-                fn (IStrategy $strategy) => in_array($strategy->getStrategyName(), $validStrats, true),
+                fn (Strategy\IStrategy $strategy) => in_array($strategy->getStrategyName(), $validStrats, true),
             ));
             $logger->notice(sprintf("Filtering to '%s' enable strats:", count($validStrats)));
             $logger->notice(sprintf("    Enabled strats %s ", implode(', ', $validStrats)));
@@ -233,7 +232,7 @@ class CommandLineTool extends CliTool\App
         if (count($bus) > 0) {
             $logger->info('Running data retention strategies');
             /**
-             * @var IStrategy $strategy
+             * @var Strategy\IStrategy $strategy
              */
             foreach ($bus as $busNumber => $strategy) {
                 // cache a timestamp to keep track of how long the strat runs for

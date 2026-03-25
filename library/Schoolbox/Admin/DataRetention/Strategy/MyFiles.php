@@ -10,12 +10,13 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\DataRetention;
+namespace Schoolbox\Admin\DataRetention\Strategy;
 
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Admin\DataRetention\ValidStrats;
 use Schoolbox\Config\ConfigMapper;
 
-class MyFilesRetention extends StrategyBase
+class MyFiles extends Base
 {
     protected string $retentionConfigKey = ConfigMapper::NAME_DATA_RETENTION_MYFILES;
 
@@ -163,7 +164,7 @@ class MyFilesRetention extends StrategyBase
         // Delete folders (iteratively deleting leaf folders to avoid parent FK violations)
         $foldersDeleted = $this->deleteFolders($folderIds);
 
-        // note: transaction commit/rollback is handled by StrategyBase::process(), do not commit here
+        // note: transaction commit/rollback is handled by Base::process(), do not commit here
 
         if ($this->perform) {
             $this->log->notice(
