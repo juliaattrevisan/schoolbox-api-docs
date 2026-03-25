@@ -4,7 +4,7 @@
  * example strategy, clear things from the cmsLog older than 2 years
  *
  * Justin Clarke <justin.clarke@schoolbox.education>
- * @copyright Copyright 2025, Schoolbox Pty Ltd
+ * @copyright Copyright 2026, Schoolbox Pty Ltd
  * @link      https://schoolbox.education/
  */
 
