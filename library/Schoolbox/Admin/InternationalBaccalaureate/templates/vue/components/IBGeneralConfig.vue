@@ -101,7 +101,7 @@ async function saveGeneralConfig(): Promise<void> {
                     <input
                         :id="`config-${config.key}`"
                         :type="config.type"
-                        :value="currentValues[config.key] || config.value"
+                        :value="currentValues.value[config.key] || config.value"
                         :data-test="`ib-configuration-input-${config.key}`"
                         class="form-control"
                         :disabled="isSaving"
