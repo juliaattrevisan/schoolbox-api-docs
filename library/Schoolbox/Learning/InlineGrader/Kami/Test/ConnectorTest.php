@@ -48,7 +48,7 @@ class ConnectorTest extends TestCase
 
     /**
      * @param null|string $apiKey
-     * @throws \PHPUnit_Framework_AssertionFailedError
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerDisabledConnector')]
     public function testDisabled(?string $apiKey): void
@@ -61,7 +61,7 @@ class ConnectorTest extends TestCase
 
     /**
      * @param null|string $apiKey
-     * @throws \PHPUnit_Framework_AssertionFailedError
+     * @throws \PHPUnit\Framework\AssertionFailedError
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerEnabledConnector')]
     public function testEnabled(?string $apiKey): void
@@ -93,7 +93,7 @@ class ConnectorTest extends TestCase
      *
      *
      * @param null|string $apiKey
-     * @throws \PHPUnit_Framework_AssertionFailedError
+     * @throws \PHPUnit\Framework\AssertionFailedError
      * @throws \Schoolbox\Learning\InlineGrader\Kami\Exception\ResponseDecodeException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerDisabledConnector')]

@@ -43,12 +43,6 @@ parameters:
 			path: library/Alaress/Async/Notification/Cloud/Google/GCM.php
 
 		-
-			message: '#^PHPDoc tag @throws with type PHPUnit_Framework_AssertionFailedError is not subtype of Throwable$#'
-			identifier: throws.notThrowable
-			count: 1
-			path: library/Alaress/Async/Test/Subscription.php
-
-		-
 			message: '#^Method Alaress\\Database\\Broker\\Base\:\:prepareQuery\(\) should return Alaress\\Database\\Statement\\Query\\IQuery but returns Alaress\\Database\\Statement\\Query\\Base\.$#'
 			identifier: return.type
 			count: 1
@@ -323,18 +317,6 @@ parameters:
 			identifier: method.childParameterType
 			count: 1
 			path: library/Alaress/Routing/ByUserRouter.php
-
-		-
-			message: '#^PHPDoc tag @throws with type InvalidArgumentException\|OutOfBoundsException\|PHPUnit_Framework_AssertionFailedError is not subtype of Throwable$#'
-			identifier: throws.notThrowable
-			count: 1
-			path: library/Alaress/Routing/Test/RouterTest.php
-
-		-
-			message: '#^PHPDoc tag @throws with type InvalidArgumentException\|PHPUnit_Framework_Exception is not subtype of Throwable$#'
-			identifier: throws.notThrowable
-			count: 1
-			path: library/Alaress/Routing/Test/RouterTest.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
@@ -4665,18 +4647,6 @@ parameters:
 		-
 			message: '#^Method Schoolbox\\Learning\\InlineGrader\\Kami\\Test\\ConnectorTest\:\:providerInvalidSiteSchoolCode\(\) should return array\<string\|null\> but returns array\<int, list\<string\|null\>\>\.$#'
 			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Learning/InlineGrader/Kami/Test/ConnectorTest.php
-
-		-
-			message: '#^PHPDoc tag @throws with type PHPUnit_Framework_AssertionFailedError is not subtype of Throwable$#'
-			identifier: throws.notThrowable
-			count: 2
-			path: library/Schoolbox/Learning/InlineGrader/Kami/Test/ConnectorTest.php
-
-		-
-			message: '#^PHPDoc tag @throws with type PHPUnit_Framework_AssertionFailedError\|Schoolbox\\Learning\\InlineGrader\\Kami\\Exception\\ResponseDecodeException is not subtype of Throwable$#'
-			identifier: throws.notThrowable
 			count: 1
 			path: library/Schoolbox/Learning/InlineGrader/Kami/Test/ConnectorTest.php
 
