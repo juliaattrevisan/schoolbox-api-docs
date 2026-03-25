@@ -423,6 +423,14 @@ class Factory
             $campusNames = implode(', ', $viewee->getCampusCollection()->indexBy('name')->keys());
         }
 
+        /* For convenience, collate the qualification names here
+         */
+        $qualificationNames = '';
+
+        if ($viewee->getQualificationCollection()) {
+            $qualificationNames = implode(', ', $viewee->getQualificationCollection()->indexBy('name')->keys());
+        }
+
         /* Collect Emergency Contacts from the sis, using the awfully-named nodes
          */
         $emergencyContacts = [];
@@ -479,13 +487,7 @@ class Factory
              */
             'differentiationProfile' => null,
             'ibCandidateNumber' => $viewee->getIbCandidateNumber(),
-            'qualificationCollection' => implode(
-                ', ',
-                array_map(
-                    fn (\Schoolbox\IB\Qualification\Model $q) => $q->getName() ?? '',
-                    iterator_to_array($viewee->getQualificationCollection() ?? new \Schoolbox\GenericCollection(\Schoolbox\IB\Qualification\Model::class))
-                )
-            ),
+            'qualificationCollection' => $qualificationNames,
         ];
 
         $referenceFields = array_merge($externalUser, $referenceFields);
