@@ -380,14 +380,16 @@ class External_Schoolbox_User implements External_UserInterface
         }
 
         //If the existing portrait has the same SHA1 hash as the one in sis_user_profile return it without updating the user
-        if ($existingPortrait
+        if (
+            $existingPortrait
             && $hash['portrait_hash'] === $existingPortrait->getHash()
         ) {
             return $existingPortrait;
         }
 
         //Return existing portrait if it is newer than SUDS profile
-        if ($existingPortrait
+        if (
+            $existingPortrait
             && $existingPortrait->getCreatedAt()->gt(Alaress_Date_Format::newDatabaseDate($hash['updated_at']))
         ) {
             return $existingPortrait;
