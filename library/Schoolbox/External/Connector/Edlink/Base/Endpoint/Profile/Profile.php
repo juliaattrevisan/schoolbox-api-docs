@@ -68,6 +68,14 @@ class Profile implements IStrategy
     private array $importedParents = [];
 
     /**
+     * Tracks emergency contact count per student external ID
+     * Used to fill slots 1-3 in order
+     *
+     * @var array<string, int>
+     */
+    private array $emergencyContactCount = [];
+
+    /**
      * Maps Edlink UUID → resolved external ID (SIS ID)
      * Used by importAgents() to look up the SIS ID for students/parents
      * that were already imported by importPeople()
@@ -246,6 +254,10 @@ class Profile implements IStrategy
         $demographics = $person['demographics'] ?? [];
         $gender = trim((string)($demographics['gender'] ?? ''));
         $birthday = $demographics['birthday'] ?? null;
+        $iep = !empty($demographics['iep']);
+        $disability = trim((string)($demographics['disability'] ?? ''));
+        $specialAccommodations = !empty($demographics['special_accommodations']);
+        $ell = !empty($demographics['english_language_learner']);
 
         /* Grade levels is an array — take the first meaningful value
          */
@@ -254,27 +266,9 @@ class Profile implements IStrategy
             $yearLevel = trim((string)$person['grade_levels'][0]);
         }
 
-        /* Graduation year
+        /* State ID from identifiers array for studies code
          */
-        $graduationYear = $person['graduation_year'] ?? null;
-
-        /* Campus — resolve from school_ids if available
-         * Use the first school's name from our preloaded schools
-         */
-        $campusName = '';
-        $schoolIds = $person['school_ids'] ?? [];
-        if (\count($schoolIds) && \count($this->schools)) {
-            $firstSchoolId = $schoolIds[0];
-            $campusName = $this->schools[$firstSchoolId] ?? '';
-        }
-
-        /* Username — Edlink doesn't provide a dedicated username field
-         * Use email as the most reliable identifier, fall back to external ID
-         */
-        $username = (new FirstMeaningfulValue())->find([
-            $email,
-            $externalId,
-        ]);
+        $stateId = $this->resolveIdentifierByType($person, 'state_id');
 
         $fullname = trim("{$firstname} {$lastname}");
 
@@ -312,12 +306,19 @@ class Profile implements IStrategy
         }
 
         $studentProfile
-            ->setUsername($username)
             ->setEmail($email)
             ->setMobile($phone)
             ->setGender($gender)
             ->setYearLevel($yearLevel)
-            ->setCampusName($campusName);
+            ->setIndividualLearningPlans($iep)
+            ->setSpecialNeeds($specialAccommodations)
+            ->setEsl($ell);
+
+        /* Medical alert from disability field
+         */
+        if ('' !== $disability) {
+            $studentProfile->setAlertMedical($disability);
+        }
 
         /* Date of birth from demographics.birthday
          */
@@ -332,19 +333,18 @@ class Profile implements IStrategy
             }
         }
 
-        /* Studies code from graduation year if available
+        /* Studies code from state_id identifier if available
          */
-        if (null !== $graduationYear) {
-            $studentProfile->setStudiesCode((string)$graduationYear);
+        if ('' !== $stateId) {
+            $studentProfile->setStudiesCode($stateId);
         }
 
         $this->log->info(sprintf(
-            'Adding student profile for %s (preferred: %s) (%s) year=%s campus=%s',
+            'Adding student profile for %s (preferred: %s) (%s) year=%s',
             $fullname,
             $firstnamePreferred,
             $externalId,
-            $yearLevel,
-            $campusName
+            $yearLevel
         ));
 
         if ($this->perform) {
@@ -458,49 +458,60 @@ class Profile implements IStrategy
 
             foreach ($response['$data'] as $agent) {
                 $relationship = trim((string)($agent['relationship'] ?? ''));
+                $flags = $agent['flags'] ?? [];
 
-                /* Only process parent/guardian relationships
-                 */
-                if ($relationship !== 'parent' && $relationship !== 'guardian') {
-                    continue;
-                }
-
-                $parentPerson = $agent['observer'] ?? null;
+                $observerPerson = $agent['observer'] ?? null;
                 $studentPerson = $agent['target'] ?? null;
 
-                if (!$parentPerson || !$studentPerson) {
+                if (!$observerPerson || !$studentPerson) {
                     continue;
                 }
 
-                $parentEdlinkId = trim((string)($parentPerson['id'] ?? ''));
+                $observerEdlinkId = trim((string)($observerPerson['id'] ?? ''));
                 $studentEdlinkId = trim((string)($studentPerson['id'] ?? ''));
 
-                if ('' === $parentEdlinkId || '' === $studentEdlinkId) {
+                if ('' === $observerEdlinkId || '' === $studentEdlinkId) {
                     continue;
                 }
 
                 /* Resolve external IDs: use cached mapping from importPeople() if available,
                  * otherwise resolve from the expanded person data
                  */
-                $parentExternalId = $this->edlinkIdToExternalId[$parentEdlinkId]
-                    ?? $this->resolveExternalId($parentPerson);
+                $observerExternalId = $this->edlinkIdToExternalId[$observerEdlinkId]
+                    ?? $this->resolveExternalId($observerPerson);
                 $studentExternalId = $this->edlinkIdToExternalId[$studentEdlinkId]
                     ?? $this->resolveExternalId($studentPerson);
 
-                if ('' === $parentExternalId || '' === $studentExternalId) {
+                if ('' === $observerExternalId || '' === $studentExternalId) {
                     continue;
                 }
 
-                /* Import the parent profile (only once per parent)
+                $isPrimaryContact = \in_array('primary_contact', $flags, true);
+                $isAlternateContact = \in_array('alternate_contact', $flags, true);
+                $isEmergencyContact = \in_array('emergency_contact', $flags, true);
+
+                /* Additional flags available but not yet used:
+                 * - has_custody: observer has legal custody of the student
+                 * - lives_with: student lives with the observer
+                 * - pickup_rights: observer is authorised to pick up the student
                  */
-                if (!isset($this->importedParents[$parentExternalId])) {
-                    $this->importParent($parentPerson, $parentExternalId);
-                    $this->importedParents[$parentExternalId] = true;
+
+                /* Import as parent if flagged as primary or alternate contact
+                 */
+                if ($isPrimaryContact || $isAlternateContact) {
+                    if (!isset($this->importedParents[$observerExternalId])) {
+                        $this->importParent($observerPerson, $observerExternalId);
+                        $this->importedParents[$observerExternalId] = true;
+                    }
+
+                    $this->createRelationship($observerExternalId, $studentExternalId, $relationship);
                 }
 
-                /* Create the relationship between parent and student
+                /* Import as emergency contact if flagged
                  */
-                $this->createRelationship($parentExternalId, $studentExternalId, $relationship);
+                if ($isEmergencyContact) {
+                    $this->importEmergencyContact($observerPerson, $studentExternalId);
+                }
             }
 
             $nextUrl = $response['$next'] ?? false;
@@ -610,6 +621,64 @@ class Profile implements IStrategy
     }
 
     /**
+     * Import an emergency contact onto a student profile
+     *
+     * Fills slots 1-3 in order. Contacts beyond 3 are skipped.
+     *
+     * @param array  $person            The emergency contact's person data
+     * @param string $studentExternalId The student's external ID
+     */
+    private function importEmergencyContact(array $person, string $studentExternalId): void
+    {
+        $slot = ($this->emergencyContactCount[$studentExternalId] ?? 0) + 1;
+
+        if ($slot > 3) {
+            return;
+        }
+
+        $this->emergencyContactCount[$studentExternalId] = $slot;
+
+        $name = trim(
+            trim((string)($person['first_name'] ?? ''))
+            . ' '
+            . trim((string)($person['last_name'] ?? ''))
+        );
+        $phone = trim((string)($person['phone'] ?? ''));
+
+        if ('' === $name && '' === $phone) {
+            return;
+        }
+
+        try {
+            $studentProfile = $this->studentProfileMapper->findByExternalId($studentExternalId);
+        } catch (Exception $e) {
+            $this->log->warning(sprintf(
+                'Could not find student profile for %s; skipping emergency contact',
+                $studentExternalId
+            ));
+            return;
+        }
+
+        $nameSetter = "setEmergencyContactName{$slot}";
+        $phoneSetter = "setEmergencyContactPhone{$slot}";
+
+        $studentProfile->$nameSetter($name);
+        $studentProfile->$phoneSetter($phone);
+
+        $this->log->info(sprintf(
+            'Adding emergency contact %d for %s: %s (%s)',
+            $slot,
+            $studentExternalId,
+            $name,
+            $phone
+        ));
+
+        if ($this->perform) {
+            $this->studentProfileMapper->save($studentProfile);
+        }
+    }
+
+    /**
      * Download a photo from a URL and attach it to the base profile
      *
      * @param UserProfile\Model $baseProfile
@@ -703,6 +772,37 @@ class Profile implements IStrategy
             $this->log->warning(sprintf('Could not parse Edlink date: %s', $dateString));
             return null;
         }
+    }
+
+    /**
+     * Resolve a single identifier value by type from the identifiers[] array
+     *
+     * @param array  $person
+     * @param string $type
+     * @return string
+     */
+    private function resolveIdentifierByType(array $person, string $type): string
+    {
+        $identifiers = $person['identifiers'] ?? [];
+
+        if (!\is_array($identifiers)) {
+            return '';
+        }
+
+        foreach ($identifiers as $identifier) {
+            if (!\is_array($identifier)) {
+                continue;
+            }
+
+            $idType = trim((string)($identifier['type'] ?? ''));
+            $value = trim((string)($identifier['value'] ?? ''));
+
+            if ($idType === $type && '' !== $value) {
+                return $value;
+            }
+        }
+
+        return '';
     }
 
     private function resolveExternalId(array $person): string

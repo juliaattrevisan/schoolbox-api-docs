@@ -71,6 +71,14 @@ class Classes implements IStrategy
     private array $courses = [];
 
     /**
+     * Maps Edlink UUID → resolved external ID (SIS ID) for people
+     * Used to resolve enrollment person_id to the same external ID used by the Profile importer
+     *
+     * @var array<string, string>
+     */
+    private array $edlinkIdToExternalId = [];
+
+    /**
      * Class lookup: Edlink class ID → class data
      * Needed to resolve enrollments back to classes
      *
@@ -119,6 +127,11 @@ class Classes implements IStrategy
          */
         $this->log->info('Importing classes.');
         $this->importClasses();
+
+        /* Preload people ID mapping so enrollments use SIS IDs, not Edlink UUIDs
+         */
+        $this->log->info('Preloading people ID mappings.');
+        $this->preloadPeopleIds();
 
         /* Import enrollments → sis_class_user
          */
@@ -420,29 +433,108 @@ class Classes implements IStrategy
          */
         $classEntryId = $classEntry->getId();
 
-        if (isset($this->classInvolvements[$classEntryId][$personId])) {
+        /* Resolve person_id (Edlink UUID) to the SIS external ID
+         * used by the Profile importer
+         */
+        $externalId = $this->edlinkIdToExternalId[$personId] ?? $personId;
+
+        if (isset($this->classInvolvements[$classEntryId][$externalId])) {
             return;
         }
 
-        /* The person_id from Edlink is their Edlink UUID
-         * This maps to external_id in Schoolbox's profile system
-         */
         $classInvolvement = $this->classInvolvementMapper->createModel()
             ->setClass($classEntry)
-            ->setExternalId($personId);
+            ->setExternalId($externalId);
 
         if ($this->perform) {
             $this->classInvolvementMapper->save($classInvolvement);
         }
 
-        $this->classInvolvements[$classEntryId][$personId] = true;
+        $this->classInvolvements[$classEntryId][$externalId] = true;
 
         $this->log->debug(sprintf(
             'Created enrollment for %s in %s (%s)',
-            $personId,
+            $externalId,
             $classData['name'],
             $classCode
         ));
+    }
+
+    /**
+     * Preload all people from the /people endpoint to build an Edlink UUID → SIS ID mapping
+     * This ensures enrollment external IDs match the IDs used by the Profile importer
+     */
+    private function preloadPeopleIds(): void
+    {
+        $nextUrl = sprintf('people?$first=%s', self::NUM_PER_PAGE);
+
+        for ($i = 0; ($nextUrl && $i < self::MAX_CALLS); $i++) {
+            $response = $this->api->retrieve('GET', $nextUrl);
+
+            if (!isset($response['$data']) || !\count($response['$data'])) {
+                break;
+            }
+
+            foreach ($response['$data'] as $person) {
+                $edlinkId = trim((string)($person['id'] ?? ''));
+
+                if ('' === $edlinkId) {
+                    continue;
+                }
+
+                $externalId = $this->resolveExternalId($person);
+
+                if ('' !== $externalId) {
+                    $this->edlinkIdToExternalId[$edlinkId] = $externalId;
+                }
+            }
+
+            $nextUrl = $response['$next'] ?? false;
+        }
+
+        $this->log->info(sprintf('Loaded %d people ID mappings.', \count($this->edlinkIdToExternalId)));
+    }
+
+    /**
+     * Resolve the best external ID for a person from Edlink data.
+     * Mirrors the logic in Profile\Profile::resolveExternalId()
+     *
+     * @param array $person
+     * @return string
+     */
+    private function resolveExternalId(array $person): string
+    {
+        $edlinkId = trim((string)($person['id'] ?? ''));
+        $identifiers = $person['identifiers'] ?? [];
+
+        if (\is_array($identifiers) && \count($identifiers)) {
+            $idLookup = [];
+
+            foreach ($identifiers as $identifier) {
+                if (!\is_array($identifier)) {
+                    continue;
+                }
+
+                $type = trim((string)($identifier['type'] ?? ''));
+                $value = trim((string)($identifier['value'] ?? ''));
+
+                if ('' !== $type && '' !== $value) {
+                    $idLookup[$type] = $value;
+                }
+            }
+
+            foreach (['sis_id', 'student_id', 'staff_id'] as $preferredType) {
+                if (isset($idLookup[$preferredType])) {
+                    return $idLookup[$preferredType];
+                }
+            }
+
+            if (\count($idLookup)) {
+                return $idLookup[array_key_first($idLookup)];
+            }
+        }
+
+        return $edlinkId;
     }
 
     /**
