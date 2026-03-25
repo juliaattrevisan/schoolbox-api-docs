@@ -229,8 +229,10 @@ class Mapper extends \Schoolbox\Mapper
         $newSelectionIds = [];
 
         /* Pile in selections that are supposed to exist after this mutation
-         * The null coalesce dodges around a swampy behaviour where a collection isn't instantiated in $model for the
-         * particular case where you removed all the nodes via the ui (ie. you literally wanted to select nothing)
+         *
+         * If a collection isn't instantiated in $model, you've got a missing hydration:
+         *     - check your decorator's initial conditions, esp. when you unselect all your ui options
+         *     - check your hydrateSelects and ensure empty collections are initialised there
          */
         foreach ($model->getSupportingDataCurriculumNodes() as $curriculumNode) {
             $newSelectionIds[] = $curriculumNode->getId();
@@ -296,8 +298,10 @@ class Mapper extends \Schoolbox\Mapper
         $newSelectionIds = [];
 
         /* Pile in selections that are supposed to exist after this mutation
-         * The null coalesce dodges around a swampy behaviour where a collection isn't instantiated in $model for the
-         * particular case where you removed all the work types via the ui (ie. you literally wanted to select nothing)
+         *
+         * If a collection isn't instantiated in $model, you've got a missing hydration:
+         *     - check your decorator's initial conditions, esp. when you unselect all your ui options
+         *     - check your hydrateSelects and ensure empty collections are initialised there
          */
         foreach ($model->getSupportingDataWorkTypes() as $workType) {
             $newSelectionIds[] = $workType->getId();
