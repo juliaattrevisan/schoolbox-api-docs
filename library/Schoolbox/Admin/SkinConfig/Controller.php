@@ -18,6 +18,8 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Field\Mapper as FieldMapper;
+use Schoolbox\GenericCollection;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
@@ -25,6 +27,7 @@ class Controller extends ConfigController
 {
     public function __construct(
         ConfigMapper $configMapper,
+        readonly private FieldMapper $fieldMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
         CacheInterface $oidcCache,
@@ -66,6 +69,8 @@ class Controller extends ConfigController
      */
     private function viewConfig(): array
     {
+        $fieldMap = $this->fieldMapper->findAll()->indexBy('id');
+
         $skinConfigs = $this
             ->getConfigMapper()
             ->findByColumnList(
@@ -88,7 +93,7 @@ class Controller extends ConfigController
 
         /* Converting to JSON format
          */
-        $data = $skinConfigs->reduce(function (array $carry, Config $config): array {
+        $data = $skinConfigs->reduce(function (array $carry, Config $config) use ($fieldMap): array {
             if ($config->getName() === ConfigMapper::NAME_SONAR_UI_TOGGLE) {
                 // Skip the toggle config as it's handled separately
                 $carry['toggle'] = [
@@ -114,7 +119,7 @@ class Controller extends ConfigController
                     'title'          => $config->getTitle(),
                     'description'    => $config->getDescription(),
                     'customProperty' => $this->getCustomProperty($config),
-                    'type'           => $this->getOptionType($config),
+                    'type'           => $this->getOptionType($config, $fieldMap),
                     'editable'       => $config->getEditable(),
                     'hidden'         => $config->getHidden(),
                 ];
@@ -172,14 +177,14 @@ class Controller extends ConfigController
 
     /**
      * Map the config field type to the frontend Skin Config input type.
+     *
+     * @param Config            $config
+     * @param GenericCollection $fieldMap
+     * @return string|null
      */
-    private function getOptionType(Config $config): string
+    private function getOptionType(Config $config, GenericCollection $fieldMap): ?string
     {
-        return match ($config->getFieldId()) {
-            ConfigMapper::FIELD_TEXT_AREA => 'textarea',
-            ConfigMapper::FIELD_COLOUR => 'colour',
-            default => 'colour',
-        };
+        return $fieldMap->offsetGet($config->getFieldId())?->getField();
     }
 
     /**
