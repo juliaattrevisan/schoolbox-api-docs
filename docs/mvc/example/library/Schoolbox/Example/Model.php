@@ -2,7 +2,7 @@
 
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2024, Schoolbox Pty Ltd
+ * @copyright   Copyright 2026, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 

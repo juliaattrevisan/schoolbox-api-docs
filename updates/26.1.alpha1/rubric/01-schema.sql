@@ -18,6 +18,18 @@ CREATE TABLE rubric_instance
         FOREIGN KEY (`assessment_id`)
             REFERENCES `assessment` (`id`)
             ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    INDEX `fk_ri_rcmti_idx` (`rubric_capability_mark_type_id` ASC),
+    CONSTRAINT `fk_ri_rcmti`
+        FOREIGN KEY (`rubric_capability_mark_type_id`)
+            REFERENCES `submission_mark_type` (`mark_type_id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    INDEX `fk_ri_rcggi_idx` (`rubric_capability_grade_group_id` ASC),
+    CONSTRAINT `fk_ri_rcggi`
+        FOREIGN KEY (`rubric_capability_grade_group_id`)
+            REFERENCES `submission_grade_group` (`id`)
+            ON DELETE NO ACTION
             ON UPDATE NO ACTION
 )
     DEFAULT CHARACTER SET = utf8mb4
