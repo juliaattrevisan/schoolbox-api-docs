@@ -27,7 +27,7 @@ class ValidStratsTest extends TestCase
     }
 
     /**
-     * @return array<string, array{0:string,1:array,2:array}>
+     * @return array<string, array{0:string,1:array}>
      */
     public static function providerValidStrats(): array
     {

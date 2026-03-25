@@ -17,7 +17,7 @@ use Schoolbox\Config\ConfigMapper;
 
 class MyFilesRetention extends StrategyBase
 {
-    protected  string $retentionConfigKey = ConfigMapper::NAME_DATA_RETENTION_MYFILES;
+    protected string $retentionConfigKey = ConfigMapper::NAME_DATA_RETENTION_MYFILES;
 
     // DB table names (updated to snake_case)
     private const string TABLE_NAME_FILE = 'my_file';

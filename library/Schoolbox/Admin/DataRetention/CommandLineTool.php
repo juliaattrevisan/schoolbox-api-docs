@@ -289,7 +289,6 @@ class CommandLineTool extends CliTool\App
     }
 
     /**
-     * @param array $validStrats a list of valid strats to run, used for help text. If empty, will just show the option as is.
      * @return void
      */
     private function getHelp(): void
