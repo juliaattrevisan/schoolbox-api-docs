@@ -61,6 +61,9 @@ under the premise that you didn't want rubrics there (even if it had rubric sett
 
 This tool is intended to be a one-use-only as part of an upgrade path and always runs in perform mode.
 
+WARNING
+This tool is NOT idempotent: running this multiple times manually will create multiple rows that you probably don't want.
+
 Usage: 02-replicate-settings.php [-vvv]
 
 
