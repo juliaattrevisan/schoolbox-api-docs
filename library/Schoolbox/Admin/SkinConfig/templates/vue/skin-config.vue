@@ -28,10 +28,31 @@ const { configs, hasUnsavedChanges, resetToSavedState, markCurrentAsSaved } = us
 );
 const { schedulePreviewRefresh } = useSkinPreview(configs, props.routes.preview);
 
+/**
+ * Reinitialise visible colour pickers after the rendered config set changes.
+ */
+async function reinitialiseColourPickers(): Promise<void> {
+    await window.Vue.nextTick();
+    document.querySelectorAll("[data-colour-picker]").forEach((element) => {
+        if (!(element instanceof HTMLInputElement) || element.id === "") {
+            return;
+        }
+        document.dispatchEvent(
+            new CustomEvent("colourPickerInitialise", {
+                detail: {
+                    el: `#${element.id}`,
+                    format: "rgb",
+                },
+            }),
+        );
+    });
+}
+
 window.Vue.watch(
     () => configs.value.toggle.enabled,
-    () => {
+    async () => {
         schedulePreviewRefresh();
+        await reinitialiseColourPickers();
     },
 );
 
