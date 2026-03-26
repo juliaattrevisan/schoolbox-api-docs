@@ -25,11 +25,11 @@ It is deployed internally and not shipped in client packages.
 
 ## Tech Stack
 
-| Layer | Technologies |
-|-------|-------------|
-| Backend | PHP 8.4, Aura (DI/Router/Session), Symfony (HttpFoundation/Cache/Mailer/Lock), Guzzle, Twig, Flysystem, PDO (MySQL), Predis (Redis) |
-| Frontend | Vue 3, TypeScript, Rspack, SCSS, CKEditor |
-| Integrations | OAuth2, LTI 1.3, Firebase, Canvas API, SAML, WebDAV (Sabre), IMAP, Gotenberg |
+| Layer        | Technologies                                                                                                                        |
+|--------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| Backend      | PHP 8.4, Aura (DI/Router/Session), Symfony (HttpFoundation/Cache/Mailer/Lock), Guzzle, Twig, Flysystem, PDO (MySQL), Predis (Redis) |
+| Frontend     | Vue 3, TypeScript, Rspack, SCSS, CKEditor                                                                                           |
+| Integrations | OAuth2, LTI 1.3, Firebase, Canvas API, SAML, WebDAV (Sabre), IMAP, Gotenberg                                                        |
 
 ---
 
@@ -123,6 +123,10 @@ Run the relevant suite(s) for changed code before marking work done.
 
 ## Code Standards
 
+When writing or reviewing code, take reasonable steps to ensure that these standards are met: if they are not, then a justification is required of why they cannot be met.
+
+For example: if written code contains a performance issue which cannot be addressed without significant architectural change, then this should be mentioned.
+
 ### PHP
 
 - Style: PSR-12 enforced via PHPCS (`phpcs.xml`)
@@ -134,6 +138,18 @@ Run the relevant suite(s) for changed code before marking work done.
 - Formatting: Prettier
 - Zero ESLint warnings allowed (`--max-warnings 0`)
 - No TypeScript `any` without explicit justification
+
+### Quality
+
+- When writing code, prioritise these attributes in order:
+  - simplicity: simpler code is easier to understand for developers and agents, and easier to maintain and refactor
+  - correctness: once common cases are correctly handled in a simple manner, edge cases can be addressed
+  - performance: once code is simple and correct, it can be optimised
+- Ensure that code written does not introduce security issues, for example:
+  - insufficient access control
+  - vulnerable dependencies
+  - injection of untrusted input (SQL injection, XSS)
+  - other risks as defined in OWASP
 
 ---
 
