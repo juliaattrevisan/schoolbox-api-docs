@@ -186,7 +186,16 @@ class Mapper extends \Schoolbox\Mapper
             }
         }
 
-        /* Supporting Data nodes (sry, there isn't a shorter name...)
+        /* Exit early when $stack is empty (ie. nothing matched whatever predicate clauses/sql conditions you chose)
+         * Nothing to append
+         */
+        if (!$stack->count()) {
+            return $stack;
+        }
+
+        /* Otherwise we have at least one reporting activity: populate its supporting data relationships
+         *
+         * Supporting Data nodes (sry, there isn't a shorter name...)
          */
         if ($this->getConfigLoader()->get('curriculum_tagging_enabled')) {
             $stack = $this->hydrateSupportingDataCurriculumNodesIntoCollection($stack);
