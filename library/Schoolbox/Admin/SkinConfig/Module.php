@@ -17,6 +17,7 @@ use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Config\Field\Mapper as FieldMapper;
 
 class Module extends BaseModule
 {
@@ -52,6 +53,7 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(ConfigMapper::class),
+            $this->getMapperFactory()->get(FieldMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
             $this->injector->get('oidc.cache'),

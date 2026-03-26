@@ -18,6 +18,8 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Field\Mapper as FieldMapper;
+use Schoolbox\GenericCollection;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
@@ -25,6 +27,7 @@ class Controller extends ConfigController
 {
     public function __construct(
         ConfigMapper $configMapper,
+        readonly private FieldMapper $fieldMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
         CacheInterface $oidcCache,
@@ -48,9 +51,9 @@ class Controller extends ConfigController
         $this->response = $this->responseFromTemplate(
             '@adminDesignSkinConfig/index.twig',
             [
-                'pageTitle' => 'Skin Config',
+                'pageTitle'      => 'Skin Config',
                 'pageCurrent'    => $pageCurrent,
-                'configs' => $configs,
+                'configs'        => $configs,
                 'allBreadcrumbs' => (new Subnav(
                     $this->getConfigLoader(),
                     $this->getUser()
@@ -66,22 +69,23 @@ class Controller extends ConfigController
      */
     private function viewConfig(): array
     {
+        $fieldMap = $this->fieldMapper->findAll()->indexBy('id');
+
         $skinConfigs = $this
             ->getConfigMapper()
             ->findByColumnList(
                 [
-                    'type_id' => [
+                    'type_id'  => [
                         ConfigMapper::TYPE_SKIN_CONFIG,
                         ConfigMapper::TYPE_SONAR_SKIN_CONFIG,
                     ],
-                    'hidden' => 'false',
                     'editable' => 'true',
                 ],
                 [
                     'order' => [
-                        'scc.id' => 'ASC',
-                        'scs.id' => 'ASC',
-                        'sequence' => 'ASC',
+                        'scc.id'             => 'ASC',
+                        'scs.id'             => 'ASC',
+                        'sequence'           => 'ASC',
                         ConfigMapper::COL_ID => 'ASC',
                     ],
                 ]
@@ -89,35 +93,48 @@ class Controller extends ConfigController
 
         /* Converting to JSON format
          */
-        $data = $skinConfigs->reduce(function (array $carry, Config $config): array {
-            $categoryName = $config->getSkinSubcategory()->getCategory()->getName();
-            $subcategoryId = $config->getSkinSubcategory()->getId();
-            $subcategoryName = $config->getSkinSubcategory()->getName();
+        $data = $skinConfigs->reduce(function (array $carry, Config $config) use ($fieldMap): array {
+            if ($config->getName() === ConfigMapper::NAME_SONAR_UI_TOGGLE) {
+                // Skip the toggle config as it's handled separately
+                $carry['toggle'] = [
+                    'enabled'     => (bool)$config->getValue(),
+                    'title'       => $config->getTitle(),
+                    'description' => $config->getDescription(),
+                ];
+            } else {
+                $categoryName  = strtolower($config->getSkinSubcategory()->getCategory()->getName()); // e.g. "Colours" -> "colours"
+                $subcategoryId = $config->getSkinSubcategory()->getId();
+                $type          = $config->getType()->getId() === ConfigMapper::TYPE_SONAR_SKIN_CONFIG ? 'sonar' : 'existing';
 
-            // Create subcategory bucket once
-            $carry[$categoryName][$subcategoryId] ??= [
-                'name' => $subcategoryName,
-                'options' => [],
-            ];
+                // Create subcategory bucket once
+                $carry[$type][$categoryName][$subcategoryId] ??= [
+                    'name'    => $config->getSkinSubcategory()->getName(),
+                    'options' => [],
+                ];
 
-            $carry[$categoryName][$subcategoryId]['options'][] = [
-                'id' => $config->getId(),
-                'name' => $config->getName(),
-                'value' => $config->getValue(),
-                'title' => $config->getTitle(),
-                'description' => $config->getDescription(),
-                'customProperty' => $this->getCustomProperty($config),
-                'type' => $this->getOptionType($config),
-                'editable' => $config->getEditable(),
-                'hidden' => $config->getHidden(),
-            ];
+                $carry[$type][$categoryName][$subcategoryId]['options'][] = [
+                    'id'             => $config->getId(),
+                    'name'           => $config->getName(),
+                    'value'          => $config->getValue(),
+                    'title'          => $config->getTitle(),
+                    'description'    => $config->getDescription(),
+                    'customProperty' => $this->getCustomProperty($config),
+                    'type'           => $this->getOptionType($config, $fieldMap),
+                    'editable'       => $config->getEditable(),
+                    'hidden'         => $config->getHidden(),
+                ];
+            }
 
             return $carry;
         }, []);
 
-        // Convert subcategory maps to indexed arrays for JSON output while preserving DB order.
-        foreach ($data as $category => $subcategoryMap) {
-            $data[$category] = array_values($subcategoryMap);
+        // Convert subcategory maps to indexed arrays for JSON output
+        foreach ($data as $type => $categories) {
+            foreach ($categories as $category => $subcategoryMap) {
+                if (is_array($subcategoryMap)) {
+                    $data[$type][$category] = array_values($subcategoryMap);
+                }
+            }
         }
 
         return $data;
@@ -132,7 +149,7 @@ class Controller extends ConfigController
             $this->persistPostedConfigs($this->flattenPostedConfigs($this->requestPost->get('configs') ?? []));
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {
-            $status = Response::HTTP_INTERNAL_SERVER_ERROR;
+            $status  = Response::HTTP_INTERNAL_SERVER_ERROR;
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($status);
             $this->response = $this->responseAsJson($problem->asArray())->withStatus($status);
@@ -145,13 +162,13 @@ class Controller extends ConfigController
     public function previewCss(): void
     {
         try {
-            $previewData = (new \Schoolbox\Admin\SkinConfig\Helper($this->getConfigMapper(), $this->getConfigLoader()))->buildPreviewData($this->requestPost->get('configs') ?? []);
-            $css = $this->twig->render('css/skin.twig', $previewData);
+            $previewData  = (new \Schoolbox\Admin\SkinConfig\Helper($this->getConfigMapper(), $this->getConfigLoader()))->buildPreviewData($this->requestPost->get('configs') ?? []);
+            $css          = $this->twig->render('css/skin.twig', $previewData);
             $cacheControl = 'no-store, no-cache, must-revalidate, max-age=0';
 
             $this->response = $this->responseFromContent($css, null, 'text/css')->withHeader('Cache-Control', $cacheControl);
         } catch (\Throwable $e) {
-            $status = Response::HTTP_INTERNAL_SERVER_ERROR;
+            $status  = Response::HTTP_INTERNAL_SERVER_ERROR;
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($status);
             $this->response = $this->responseAsJson($problem->asArray())->withStatus($status);
@@ -160,14 +177,14 @@ class Controller extends ConfigController
 
     /**
      * Map the config field type to the frontend Skin Config input type.
+     *
+     * @param Config            $config
+     * @param GenericCollection $fieldMap
+     * @return string|null
      */
-    private function getOptionType(Config $config): string
+    private function getOptionType(Config $config, GenericCollection $fieldMap): ?string
     {
-        return match ($config->getFieldId()) {
-            ConfigMapper::FIELD_TEXT_AREA => 'textarea',
-            ConfigMapper::FIELD_COLOUR => 'colour',
-            default => 'colour',
-        };
+        return $fieldMap->offsetGet($config->getFieldId())?->getField();
     }
 
     /**
@@ -193,10 +210,10 @@ class Controller extends ConfigController
     private function buildConfigPredicate(): Predicate\Builder
     {
         return $this->getConfigMapper()
-            ->getPredicateBuilder()
-            ->equals('type_id', ConfigMapper::TYPE_SKIN_CONFIG)
-            ->equals('hidden', 'false')
-            ->equals('editable', 'true');
+                    ->getPredicateBuilder()
+                    ->equals('type_id', ConfigMapper::TYPE_SKIN_CONFIG)
+                    ->equals('hidden', 'false')
+                    ->equals('editable', 'true');
     }
 
     /**
@@ -209,7 +226,7 @@ class Controller extends ConfigController
      */
     private function persistPostedConfigs(array $postedConfigs): void
     {
-        $database = $this->getConfigMapper()->getDatabase();
+        $database        = $this->getConfigMapper()->getDatabase();
         $existingConfigs = $this->getConfigMapper()->findByPredicates($this->buildConfigPredicate())->indexBy(ConfigMapper::COL_NAME);
 
         $database->beginTransaction();
@@ -220,9 +237,9 @@ class Controller extends ConfigController
                 }
 
                 /** @var Config $existingConfig */
-                $existingConfig = $existingConfigs[$name];
+                $existingConfig  = $existingConfigs[$name];
                 $valueSerializer = $this->getFieldStrategyFactory()->makeValueSerializer($existingConfig->getFieldId());
-                $newValue = $valueSerializer->serializeValue($value, $existingConfig);
+                $newValue        = $valueSerializer->serializeValue($value, $existingConfig);
 
                 if ($newValue === $existingConfig->getValue()) {
                     continue;
@@ -236,10 +253,10 @@ class Controller extends ConfigController
                         AND hidden = :hidden
                         AND editable = :editable',
                     [
-                        'value' => $newValue,
+                        'value'    => $newValue,
                         'configID' => $existingConfig->getId(),
-                        'typeId' => ConfigMapper::TYPE_SKIN_CONFIG,
-                        'hidden' => 'false',
+                        'typeId'   => ConfigMapper::TYPE_SKIN_CONFIG,
+                        'hidden'   => 'false',
                         'editable' => 'true',
                     ]
                 )->execute();
@@ -261,19 +278,24 @@ class Controller extends ConfigController
     private function flattenPostedConfigs(array $configs): array
     {
         $flattenedConfigs = [];
-        foreach ($configs as $subcategories) {
-            if (!is_array($subcategories)) {
+        foreach ($configs as $type => $categories) {
+            if (!is_array($categories)) {
                 continue;
             }
-            foreach ($subcategories as $subcategory) {
-                if (!is_array($subcategory) || !isset($subcategory['options']) || !is_array($subcategory['options'])) {
+            foreach ($categories as $subcategories) {
+                if (!is_array($subcategories)) {
                     continue;
                 }
-                foreach ($subcategory['options'] as $option) {
-                    if (!is_array($option) || !isset($option['name']) || !is_string($option['name'])) {
+                foreach ($subcategories as $subcategory) {
+                    if (!is_array($subcategory) || !isset($subcategory['options']) || !is_array($subcategory['options'])) {
                         continue;
                     }
-                    $flattenedConfigs[$option['name']] = isset($option['value']) && is_string($option['value']) ? $option['value'] : null;
+                    foreach ($subcategory['options'] as $option) {
+                        if (!is_array($option) || !isset($option['name']) || !is_string($option['name'])) {
+                            continue;
+                        }
+                        $flattenedConfigs[$option['name']] = isset($option['value']) && is_string($option['value']) ? $option['value'] : null;
+                    }
                 }
             }
         }

@@ -382,17 +382,24 @@ class ConfigMapper extends Mapper
     public const string NAME_ACCOUNTS_MENU_HOVER_COLOUR = 'accounts_menu_hover_colour';
     public const string NAME_EMAIL_BANNER_IMAGE = 'email_banner_image';
     public const string NAME_SKIN_FAVICON = 'skin_favicon';
+    public const string NAME_SONAR_UI_TOGGLE = 'advanced_ui_enabled';
 
     /* Skin Config Categories
      */
     public const string NAME_SKIN_CATEGORY_COLOURS = 'colours';
     public const string NAME_SKIN_CATEGORY_CSS = 'custom css';
+    public const string NAME_SKIN_CATEGORY_ROUNDNESS = 'roundness';
+    public const string NAME_SKIN_CATEGORY_DROP_SHADOW = 'drop shadow';
 
     /* Skin Config Sub-Categories
      */
     public const string NAME_SKIN_SUBCATEGORY_GENERAL = 'general';
     public const string NAME_SKIN_SUBCATEGORY_TOP_MENU = 'top menu';
     public const string NAME_SKIN_SUBCATEGORY_SIDE_MENU = 'side menu and notifications';
+    public const string NAME_SKIN_SUBCATEGORY_USER_ACCOUNT = 'user account';
+    public const string NAME_SKIN_SUBCATEGORY_COMPONENT = 'component';
+    public const string NAME_SKIN_SUBCATEGORY_INTERACTIVE = 'interactive';
+    public const string NAME_SKIN_SUBCATEGORY_FORM = 'form';
 
     /* Skin Config Junction table
      */
