@@ -68,7 +68,7 @@
                         <nav>
                             <a class="icon-view" href="#" title="Show Answers" data-show-answer-content="{QUESTION_BANK_ID}" ></a>
                             <!-- BEGIN show_delete -->
-                            <a class="icon-delete" href="/assess/questionbank/question/delete/{QUESTION_BANK_ID}?{RETURN_URL_NAME}={RETURN_URL}" title="Delete" data-delete-question ></a>
+                            <a href="/assess/questionbank/question/delete/{QUESTION_BANK_ID}?{RETURN_URL_NAME}={RETURN_URL}" title="Delete" data-delete-question><sbx-icon name="delete"></sbx-icon></a>
                             <!-- END show_delete -->
                             <a class="icon-modify" href="/assess/questionbank/question/modify/{QUESTION_BANK_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}?{RETURN_URL_NAME}={RETURN_URL}" title="Modify" ></a>
                         </nav>
@@ -190,7 +190,7 @@
                     </form>
                 </div>
 
-                <a href='/assess/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}' class="button icon-delete">Remove this category</a>
+                <a href='/assess/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}' class="button sbx-button--has-icon"><sbx-icon name="delete"></sbx-icon>Remove this category</a>
             </div>
         </section>
     </div>

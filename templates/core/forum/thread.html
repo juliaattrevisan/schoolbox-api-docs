@@ -33,7 +33,7 @@
         <!-- END reply -->
         <!-- BEGIN modify_thread -->
         <a class="icon-locked" href="/forum/modifyForm.php?toggleLock={THREAD_ID}" title="{LOCK_UNLOCK} Thread"></a>
-        <a class="icon-delete" href="/forum/modifyForm.php?deleteThread={THREAD_ID}" data-action="delete" data-relation="thread" title="Delete Thread"></a>
+        <a href="/forum/modifyForm.php?deleteThread={THREAD_ID}" data-action="delete" data-relation="thread" title="Delete Thread"><sbx-icon name="delete"></sbx-icon></a>
         <!-- END modify_thread -->
     </nav>
 </div>
@@ -69,7 +69,7 @@
                         <a class="icon-modify no-text" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}" title="Modify Post"></a>
                         <!-- END modify -->
                         <!-- BEGIN delete -->
-                        <a class="icon-delete no-text" href="/forum/modifyForm.php?deletePost={POST_ID}" data-action="delete" data-relation="post" title="Delete Post"></a>
+                        <a class="no-text" href="/forum/modifyForm.php?deletePost={POST_ID}" data-action="delete" data-relation="post" title="Delete Post"><sbx-icon name="delete"></sbx-icon></a>
                         <!-- END delete -->
 
                     </nav>

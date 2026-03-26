@@ -309,8 +309,9 @@ export default {
                 v-if="!hasError"
                 @click.prevent="onDeleteRecordingSelected"
                 data-test="videojs-record-delete-button"
-                class="button icon-delete delete-button"
+                class="button delete-button"
                 title="Delete recording"
+                ><sbx-icon name="delete"></sbx-icon
             ></a>
         </transition>
 
