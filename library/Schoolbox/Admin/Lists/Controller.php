@@ -1120,7 +1120,7 @@ class Controller extends Base
                         'tooltipPosition' => 'right',
                     ],
                     'visibility' => [
-                        'getter'    => 'getVisibility',
+                        'getter'    => 'getVisibility', // Note this function returns a value derived from isVisibleToParents and isVisibleToStudents.
                         'caption'   => 'Visibility',
                         'mandatory' => true,
                         'default'   => WorkTypeMapper::VISIBILITY_STAFF_ONLY,
@@ -1942,6 +1942,24 @@ class Controller extends Base
                             }
 
                             $records[$id][$prop->getName()] = $value;
+                        }
+                    }
+                }
+
+                // Handle fields with explicit getters that don't correspond to a model property.
+                // (e.g. Assessment\WorkType\Model->getVisibility() derives its return value from other properties.)
+
+                $id = $row->$idGetter();
+
+                foreach ($tables[$table]['fields'] as $fieldName => $fieldConfig) {
+                    if (isset($fieldConfig['getter']) && !isset($records[$id][$fieldName])) {
+                        $getter = $fieldConfig['getter'];
+                        if ($reflect->hasMethod($getter)) {
+                            if (!isset($records[$id])) {
+                                $records[$id] = [];
+                            }
+
+                            $records[$id][$fieldName] = $row->$getter();
                         }
                     }
                 }
