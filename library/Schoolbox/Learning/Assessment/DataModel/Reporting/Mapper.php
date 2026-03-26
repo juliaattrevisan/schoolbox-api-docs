@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DataModel\Reporting;
 
-use Alaress\Database\Predicate\Builder;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
@@ -99,9 +98,17 @@ class Mapper extends \Schoolbox\Mapper
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'deleterFields']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreDeleterFields']);
 
-        /* Update supporting data curric nodes and work types selections
+        /* Update supporting data curric nodes and work types selections.
+         * I've left this artifact here as a reminder you need to think about doing this: reporting activity uses m-m
+         * joinsVia, which saves all these relationships for you, and you don't need to micromanage it. However, your
+         * activity might have something like 1-m (one to many, vs many to many) such as a list of attached files, and
+         * I would expect you needed to micromanage those instead of relying on the base mapper to do magic for you.
+         * So, if you're using a regular joins, not a joinsVia, then you would have to do something like this.
+         *
+         * Plus, if you're making multiple database queries to fulfil your micromanagement requirement, you should put
+         * those into a transaction (see this commented-out implementation for syntax)
          */
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateRelations']);
+//        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateRelations']);
 
         /* Recursive Undeleter callbacks: deleting a dialog agent also deletes all students' responses and feedbacks
          */
@@ -205,159 +212,159 @@ class Mapper extends \Schoolbox\Mapper
     }
 
 
-    /**
-     * Clear out supporting data curric nodes and work types prior to saving a new set, allowing you to "clear the lists"
-     * for the maybe-rare circumstance that you want zero curric nodes and zero work types selected...not sure if those
-     * scenarios actually occur at the moment.
-     *
-     * @param Model $model
-     * @param Model|null $previous
-     * @return void
-     * @throws \Throwable
-     */
-    public function updateRelations(Model $model, ?Model $previous = null): void
-    {
-        $this->updateSupportingDataCurriculumNodeRelations($model, $previous);
-        $this->updateSupportingDataWorkTypeRelations($model, $previous);
-    }
-
-
-    /**
-     * Updates supporting data's curriculum nodes using a diff to avoid an exotic transaction issue: see SA-21417
-     *
-     * @param Model $model
-     * @param Model|null $previous
-     * @return void
-     * @throws \Throwable
-     */
-    private function updateSupportingDataCurriculumNodeRelations(Model $model, ?Model $previous = null): void
-    {
-        /* Set up a container for new curric node selections
-         */
-        $newSelectionIds = [];
-
-        /* Pile in selections that are supposed to exist after this mutation
-         *
-         * If a collection isn't instantiated in $model, you've got a missing hydration:
-         *     - check your decorator's initial conditions, esp. when you unselect all your ui options
-         *     - check your hydrateSelects and ensure empty collections are initialised there
-         */
-        foreach ($model->getSupportingDataCurriculumNodes() as $curriculumNode) {
-            $newSelectionIds[] = $curriculumNode->getId();
-        }
-
-        /* Load nodes that already exist in the db: we maybe need to remove some of these
-         */
-        $oldSelections = $this->database->executeQuery("
-            SELECT curriculum_node_id
-            FROM reporting_curriculum_node
-            WHERE reporting_id = :reportingId
-        ", [
-            'reportingId' => $model->getId()
-        ]);
-
-        $oldSelectionIds = $oldSelections->fetchColumnArray('curriculum_node_id');
-
-        /* Calculate the diff because we need to delete those that are no longer in $newSelections; since we're
-         * interrogating the join table, there's no exact mapper/model for it: we also don't really need to hydrate
-         * anything just to delete it, so we can fetch the ids by themselves first.
-         */
-        $diff = array_diff($oldSelectionIds, $newSelectionIds);
-
-        /* Old selections == new selections (you didn't change anything)
-         * Nothing to do: exit earlyish
-         */
-        if (!count($diff)) {
-            return;
-        }
-
-        /* If there's something to remove, do it
-         *
-         * Make all the removal changes...or none of the removal changes - preventing a partial update where one query
-         * succeeds but others fail (for whatever reason)
-         */
-        $this->database->transact(function () use ($model, $diff) {
-            $placeholders = Builder::getArrayPlaceholders($diff, 'cnodeId');
-            $params = Builder::getArrayParameters($diff, 'cnodeId');
-
-            $this->database->executeQuery("
-                DELETE FROM reporting_curriculum_node
-                WHERE reporting_id = :reportingId
-                AND curriculum_node_id IN {$placeholders}
-            ", array_merge([
-                'reportingId' => $model->getId(),
-            ], $params));
-        });
-    }
-
-
-    /**
-     * Updates supporting data's work types using a diff to avoid an exotic transaction issue: see SA-21417
-     *
-     * @param Model $model
-     * @param Model|null $previous
-     * @return void
-     * @throws \Throwable
-     */
-    private function updateSupportingDataWorkTypeRelations(Model $model, ?Model $previous = null): void
-    {
-        /* Set up a container for new work type selections
-         */
-        $newSelectionIds = [];
-
-        /* Pile in selections that are supposed to exist after this mutation
-         *
-         * If a collection isn't instantiated in $model, you've got a missing hydration:
-         *     - check your decorator's initial conditions, esp. when you unselect all your ui options
-         *     - check your hydrateSelects and ensure empty collections are initialised there
-         */
-        foreach ($model->getSupportingDataWorkTypes() as $workType) {
-            $newSelectionIds[] = $workType->getId();
-        }
-
-        /* Load work types that already exist in the db: we maybe need to remove some of these
-         */
-        $oldSelections = $this->database->executeQuery("
-            SELECT work_type_id
-            FROM reporting_work_type
-            WHERE reporting_id = :reportingId
-        ", [
-            'reportingId' => $model->getId()
-        ]);
-
-        $oldSelectionIds = $oldSelections->fetchColumnArray('work_type_id');
-
-        /* Calculate the diff because we need to delete those that are no longer in $newSelections; since we're
-         * interrogating the join table, there's no exact mapper/model for it: we also don't really need to hydrate
-         * anything just to delete it, so we can fetch the ids by themselves first.
-         */
-        $diff = array_diff($oldSelectionIds, $newSelectionIds);
-
-        /* Old selections == new selections (you didn't change anything)
-         * Nothing to do: exit earlyish
-         */
-        if (!count($diff)) {
-            return;
-        }
-
-        /* If there's something to remove, do it
-         *
-         * Make all the removal changes...or none of the removal changes - preventing a partial update where one query
-         * succeeds but others fail (for whatever reason)
-         */
-        $this->database->transact(function () use ($model, $diff) {
-            $placeholders = Builder::getArrayPlaceholders($diff, 'worktypeId');
-            $params = Builder::getArrayParameters($diff, 'worktypeId');
-
-            $this->database->executeQuery("
-                DELETE FROM reporting_work_type
-                WHERE reporting_id = :reportingId
-                AND work_type_id IN {$placeholders}
-            ", array_merge([
-                'reportingId' => $model->getId(),
-            ], $params));
-        });
-    }
+//    /**
+//     * Clear out supporting data curric nodes and work types prior to saving a new set, allowing you to "clear the lists"
+//     * for the maybe-rare circumstance that you want zero curric nodes and zero work types selected...not sure if those
+//     * scenarios actually occur at the moment.
+//     *
+//     * @param Model $model
+//     * @param Model|null $previous
+//     * @return void
+//     * @throws \Throwable
+//     */
+//    public function updateRelations(Model $model, ?Model $previous = null): void
+//    {
+//        $this->updateSupportingDataCurriculumNodeRelations($model, $previous);
+//        $this->updateSupportingDataWorkTypeRelations($model, $previous);
+//    }
+//
+//
+//    /**
+//     * Updates supporting data's curriculum nodes using a diff to avoid an exotic transaction issue: see SA-21417
+//     *
+//     * @param Model $model
+//     * @param Model|null $previous
+//     * @return void
+//     * @throws \Throwable
+//     */
+//    private function updateSupportingDataCurriculumNodeRelations(Model $model, ?Model $previous = null): void
+//    {
+//        /* Set up a container for new curric node selections
+//         */
+//        $newSelectionIds = [];
+//
+//        /* Pile in selections that are supposed to exist after this mutation
+//         *
+//         * If a collection isn't instantiated in $model, you've got a missing hydration:
+//         *     - check your decorator's initial conditions, esp. when you unselect all your ui options
+//         *     - check your hydrateSelects and ensure empty collections are initialised there
+//         */
+//        foreach ($model->getSupportingDataCurriculumNodes() as $curriculumNode) {
+//            $newSelectionIds[] = $curriculumNode->getId();
+//        }
+//
+//        /* Load nodes that already exist in the db: we maybe need to remove some of these
+//         */
+//        $oldSelections = $this->database->executeQuery("
+//            SELECT curriculum_node_id
+//            FROM reporting_curriculum_node
+//            WHERE reporting_id = :reportingId
+//        ", [
+//            'reportingId' => $model->getId()
+//        ]);
+//
+//        $oldSelectionIds = $oldSelections->fetchColumnArray('curriculum_node_id');
+//
+//        /* Calculate the diff because we need to delete those that are no longer in $newSelections; since we're
+//         * interrogating the join table, there's no exact mapper/model for it: we also don't really need to hydrate
+//         * anything just to delete it, so we can fetch the ids by themselves first.
+//         */
+//        $diff = array_diff($oldSelectionIds, $newSelectionIds);
+//
+//        /* Old selections == new selections (you didn't change anything)
+//         * Nothing to do: exit earlyish
+//         */
+//        if (!count($diff)) {
+//            return;
+//        }
+//
+//        /* If there's something to remove, do it
+//         *
+//         * Make all the removal changes...or none of the removal changes - preventing a partial update where one query
+//         * succeeds but others fail (for whatever reason)
+//         */
+//        $this->database->transact(function () use ($model, $diff) {
+//            $placeholders = Builder::getArrayPlaceholders($diff, 'cnodeId');
+//            $params = Builder::getArrayParameters($diff, 'cnodeId');
+//
+//            $this->database->executeQuery("
+//                DELETE FROM reporting_curriculum_node
+//                WHERE reporting_id = :reportingId
+//                AND curriculum_node_id IN {$placeholders}
+//            ", array_merge([
+//                'reportingId' => $model->getId(),
+//            ], $params));
+//        });
+//    }
+//
+//
+//    /**
+//     * Updates supporting data's work types using a diff to avoid an exotic transaction issue: see SA-21417
+//     *
+//     * @param Model $model
+//     * @param Model|null $previous
+//     * @return void
+//     * @throws \Throwable
+//     */
+//    private function updateSupportingDataWorkTypeRelations(Model $model, ?Model $previous = null): void
+//    {
+//        /* Set up a container for new work type selections
+//         */
+//        $newSelectionIds = [];
+//
+//        /* Pile in selections that are supposed to exist after this mutation
+//         *
+//         * If a collection isn't instantiated in $model, you've got a missing hydration:
+//         *     - check your decorator's initial conditions, esp. when you unselect all your ui options
+//         *     - check your hydrateSelects and ensure empty collections are initialised there
+//         */
+//        foreach ($model->getSupportingDataWorkTypes() as $workType) {
+//            $newSelectionIds[] = $workType->getId();
+//        }
+//
+//        /* Load work types that already exist in the db: we maybe need to remove some of these
+//         */
+//        $oldSelections = $this->database->executeQuery("
+//            SELECT work_type_id
+//            FROM reporting_work_type
+//            WHERE reporting_id = :reportingId
+//        ", [
+//            'reportingId' => $model->getId()
+//        ]);
+//
+//        $oldSelectionIds = $oldSelections->fetchColumnArray('work_type_id');
+//
+//        /* Calculate the diff because we need to delete those that are no longer in $newSelections; since we're
+//         * interrogating the join table, there's no exact mapper/model for it: we also don't really need to hydrate
+//         * anything just to delete it, so we can fetch the ids by themselves first.
+//         */
+//        $diff = array_diff($oldSelectionIds, $newSelectionIds);
+//
+//        /* Old selections == new selections (you didn't change anything)
+//         * Nothing to do: exit earlyish
+//         */
+//        if (!count($diff)) {
+//            return;
+//        }
+//
+//        /* If there's something to remove, do it
+//         *
+//         * Make all the removal changes...or none of the removal changes - preventing a partial update where one query
+//         * succeeds but others fail (for whatever reason)
+//         */
+//        $this->database->transact(function () use ($model, $diff) {
+//            $placeholders = Builder::getArrayPlaceholders($diff, 'worktypeId');
+//            $params = Builder::getArrayParameters($diff, 'worktypeId');
+//
+//            $this->database->executeQuery("
+//                DELETE FROM reporting_work_type
+//                WHERE reporting_id = :reportingId
+//                AND work_type_id IN {$placeholders}
+//            ", array_merge([
+//                'reportingId' => $model->getId(),
+//            ], $params));
+//        });
+//    }
 
 
     /**
