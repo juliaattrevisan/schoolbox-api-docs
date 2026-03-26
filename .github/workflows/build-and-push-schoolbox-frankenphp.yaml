@@ -208,4 +208,5 @@ jobs:
       run_url: ${{ format('{0}/{1}/actions/runs/{2}', github.server_url, github.repository, github.run_id) }}
       webhook_url: ${{ secrets.SLACK_OPERATIONS_WEBHOOK_URL }}
       channel: operations
+      message: '${ICON} Container build workflow *${WORKFLOW_NAME}* ${RESULT} on \`${REF_NAME}\`. <${RUN_URL}|View run>'
     secrets: inherit
