@@ -369,6 +369,13 @@ class Mapper extends \Schoolbox\Mapper
      */
     private function hydrateSupportingDataCurriculumNodesIntoCollection(GenericCollection $collection): GenericCollection
     {
+        /* If the set was empty, just return that: there's nothing to amend
+         * hydrateSelect() already does this earlier, but this is here as a precaution in case you reuse this method
+         */
+        if (!$collection->count()) {
+            return $collection;
+        }
+
         $reportingIds = $collection->keys();
 
         /* Reinsert the ones we chose. Surely there was a more elegant way of doing this, but I can't remember/find one
@@ -413,6 +420,13 @@ class Mapper extends \Schoolbox\Mapper
      */
     private function hydrateSupportingDataWorkTypesIntoCollection(GenericCollection $collection): GenericCollection
     {
+        /* If the set was empty, just return that: there's nothing to amend
+         * hydrateSelect() already does this earlier, but this is here as a precaution in case you reuse this method
+         */
+        if (!$collection->count()) {
+            return $collection;
+        }
+
         $reportingIds = $collection->keys();
 
         $pb = $this->getPredicateBuilder()->in('id', $reportingIds);
