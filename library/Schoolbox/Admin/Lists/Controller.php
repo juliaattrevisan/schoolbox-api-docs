@@ -1905,6 +1905,8 @@ class Controller extends Base
         $idGetter = $tables[$table]['fields']['id']['getter'] ?? 'getId';
 
         foreach ($rows as $row) {
+            $rowId = $row->$idGetter();
+
             // Go through every property available
 
             foreach ($properties as $prop) {
@@ -1923,10 +1925,8 @@ class Controller extends Base
                         }
 
                         if ($reflect->hasMethod($getter)) {
-                            $id = $row->$idGetter();
-
-                            if (!isset($records[$id])) {
-                                $records[$id] = [];
+                            if (!isset($records[$rowId])) {
+                                $records[$rowId] = [];
                             }
 
                             $value = $row->$getter();
@@ -1937,14 +1937,13 @@ class Controller extends Base
                                 $value = $value->getId();
                             }
 
-                            $records[$id][$prop->getName()] = $value;
+                            $records[$rowId][$prop->getName()] = $value;
                         }
                     }
                 }
 
                 // Handle fields with explicit getters that don't correspond to a model property (derived or computed fields).
                 // (e.g. Assessment\WorkType\Model->getVisibility() derives its return value from other properties.)
-                $rowId = $row->$idGetter();
                 foreach ($tables[$table]['fields'] as $fieldName => $fieldConfig) {
                     if (isset($fieldConfig['getter']) && !isset($records[$rowId][$fieldName])) {
                         $getter = $fieldConfig['getter'];
