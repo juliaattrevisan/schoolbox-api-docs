@@ -45,9 +45,9 @@
                                            data-affected-team="{{ currentTeam.team.id }}">Remove Player from {{ currentTeam.team.name }}</a>
                                     {% else %}
                                         <a href="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: currentTeam.team.id}) }}"
-                                           class="icon-add"
+                                           class="sbx-button--has-icon"
                                            data-add-team-player="{{ playerData.player.id }}"
-                                           data-affected-team="{{ currentTeam.team.id }}">Add Player to {{ currentTeam.team.name }}</a>
+                                           data-affected-team="{{ currentTeam.team.id }}"><sbx-icon name="add"></sbx-icon>Add Player to {{ currentTeam.team.name }}</a>
                                     {% endif %}
                                 </li>
                             {% endfor %}

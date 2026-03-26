@@ -13,7 +13,7 @@
     <nav>
         {# New item: only if I have the permission to do this #}
         {% if isRouteAuthorized('resourceCategory.add') %}
-         <a id="resourcecategory-create" rel="create-form" class="icon-add" href="{{ routeLookup('resourceCategory.add') }}" title="Add New"></a>
+         <a id="resourcecategory-create" rel="create-form" class="sbx-icon-only-button" href="{{ routeLookup('resourceCategory.add') }}" title="Add New"><sbx-icon name="add"></sbx-icon></a>
         {% endif %}
     </nav>
 </div>
@@ -21,5 +21,3 @@
 {% include '@resourceCategory/sub/list.twig' %}
 
 {% include 'sub/paginator.twig' with {paginator: paginator, currentPage: page, class:'admin-nav'} %}
-
-

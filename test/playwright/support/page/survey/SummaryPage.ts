@@ -57,7 +57,7 @@ export default class SummaryPage {
      */
     async clickNewQuestion(sectionId: number): Promise<void> {
         await this.page.click(`[data-test=sbx-pop-out-section${sectionId}-options]`);
-        await this.page.click(`#section${sectionId}-options a.icon-add`);
+        await this.page.click(`#section${sectionId}-options a.sbx-button--has-icon`);
         await expect(this.page.locator(`h2.subheader:has-text("Create Question")`)).toBeVisible();
     }
 }

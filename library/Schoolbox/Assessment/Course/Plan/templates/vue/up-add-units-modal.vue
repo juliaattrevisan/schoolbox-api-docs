@@ -82,11 +82,12 @@ window.Vue.onMounted(() => {
                 <div>
                     <button
                         v-if="addUnitsStore.newUnits.length < MAX_UNITS"
-                        class="button icon-add f-no-margins"
+                        class="button sbx-button--has-icon f-no-margins"
                         data-test="up-add-units-add"
                         type="button"
                         @click.prevent="addUnitsStore.add()"
                     >
+                        <sbx-icon name="add"></sbx-icon>
                         Add another
                     </button>
                 </div>

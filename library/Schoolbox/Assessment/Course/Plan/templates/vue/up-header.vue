@@ -36,10 +36,11 @@ function onPrintSelected(): void {
             <div class="l-flex-row l-gap-s">
                 <button
                     v-if="routes.newUnits"
-                    class="button icon-add"
+                    class="button sbx-button--has-icon"
                     data-test="unit-planner-create-units"
                     @click.prevent="addStore.prompt()"
                 >
+                    <sbx-icon name="add"></sbx-icon>
                     Create {{ locale.unit.translate(true, true) }}
                 </button>
                 <sbx-pop-out content-id="unit-dropdown"></sbx-pop-out>

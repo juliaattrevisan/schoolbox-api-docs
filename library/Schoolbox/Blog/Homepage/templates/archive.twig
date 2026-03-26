@@ -27,7 +27,7 @@
     </div>
     <nav>
         {% if isRouteAuthorized('blog.getInsert', {folder: folder}) %}
-        <a href="{{ routeLookup('blog.getInsert', {folderId: folder.getId}) }}" class="icon-add" title="Post Blog"></a>
+        <a href="{{ routeLookup('blog.getInsert', {folderId: folder.getId}) }}" class="sbx-icon-only-button" title="Post Blog"><sbx-icon name="add"></sbx-icon></a>
         {% endif %}
     </nav>
 </div>

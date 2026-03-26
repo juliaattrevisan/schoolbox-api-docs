@@ -34,10 +34,10 @@
         {% if isRouteAuthorized('resourceItem.add') %}
             <li class="separator">Admin Actions</li>
             <li>
-                <a id="resource-create" rel="create-form" class="icon-add" href="{{ routeLookup('resourceItem.add') }}" title="Add Resource">Add Resource</a>
+                <a id="resource-create" rel="create-form" class="sbx-button--has-icon" href="{{ routeLookup('resourceItem.add') }}" title="Add Resource"><sbx-icon name="add"></sbx-icon>Add Resource</a>
             </li>
             <li>
-                <a id="resource-create" rel="create-form" class="icon-add" href="{{ routeLookup('resourceCategory.add') }}" title="Add Category">Add Category</a>
+                <a id="resource-create" rel="create-form" class="sbx-button--has-icon" href="{{ routeLookup('resourceCategory.add') }}" title="Add Category"><sbx-icon name="add"></sbx-icon>Add Category</a>
             </li>
         {% endif %}
     </ul>
@@ -104,7 +104,7 @@
                         #}
 
                         {% if isRouteAuthorized('resourceBooking.book', {id: item.id, item: item}) %}
-                        <a class="icon-add resource-book-link" id="resource-book-{{item.id}}" title="Book" href="{{ routeLookup('resourceBooking.book', {id: item.id}) }}"></a>
+                        <a class="resource-book-link sbx-icon-only-button" id="resource-book-{{item.id}}" title="Book" href="{{ routeLookup('resourceBooking.book', {id: item.id}) }}"><sbx-icon name="add"></sbx-icon></a>
                         {% endif %}
 
                         {% if isRouteAuthorized('resourceItem.edit', {id: item.id, item: item}) %}

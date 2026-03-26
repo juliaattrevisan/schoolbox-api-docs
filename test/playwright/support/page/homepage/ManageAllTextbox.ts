@@ -23,8 +23,8 @@ export default class ManageAllTextbox {
      * click Create Text Box button
      */
     async clickCreateTextBox(): Promise<void> {
-        await this.page.waitForSelector("a.icon-add.button");
-        await this.page.click("a.icon-add.button");
+        await this.page.waitForSelector('a[data-action="addTextbox"].button.sbx-button--has-icon');
+        await this.page.click('a[data-action="addTextbox"].button.sbx-button--has-icon');
     }
 
     /**

@@ -61,6 +61,7 @@ function onUpdateToggleSelected(): void {
     >
         Update {{ props.title }}
     </button>
+    <!-- TODO(SA-22099): Replace this legacy add/close icon toggle with `sbx-icon` once the toggle states are rendered explicitly. -->
     <button
         :class="`button-action-option ${props.isAdding ? 'icon-close' : 'icon-add'}`"
         :title="`Add subsection to ${props.title}`"

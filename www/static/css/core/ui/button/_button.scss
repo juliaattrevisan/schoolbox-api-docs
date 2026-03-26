@@ -394,9 +394,19 @@ button.submit {
 .f-dropdown a.sbx-button--has-icon {
     display: flex;
     align-items: flex-start;
-    gap: var(--spacing-m);
+    gap: var(--spacing-s);
 }
 
 .f-dropdown a.sbx-button--has-icon sbx-icon {
+    line-height: 1;
+}
+.sbx-button--has-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-s);
+}
+
+.sbx-button--has-icon sbx-icon {
+    flex: 0 0 auto;
     line-height: 1;
 }

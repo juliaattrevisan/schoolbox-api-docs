@@ -9,7 +9,7 @@ export default class Badges {
 
     static readonly URL = "/learning/badge";
 
-    static readonly BUTTON_ADD = "a.icon-add.button";
+    static readonly BUTTON_ADD = 'a.button.sbx-button--has-icon[title="Create Badge"]';
 
     static readonly DROPDOWN_DELETE = "a.icon-delete";
 

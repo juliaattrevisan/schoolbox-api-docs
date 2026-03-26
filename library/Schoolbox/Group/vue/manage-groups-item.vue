@@ -357,17 +357,19 @@ export default {
                                 <button
                                     v-if="!isRequestToJoin && !(isPrivate || isAdmin)"
                                     title="Join"
-                                    class="group-action icon-add"
+                                    class="group-action"
                                     @click="join"
                                 >
+                                    <sbx-icon name="add"></sbx-icon>
                                     Join
                                 </button>
                                 <button
                                     v-else-if="!(isPrivate || isAdmin)"
                                     title="Request to join"
-                                    class="group-action icon-add"
+                                    class="group-action"
                                     @click="join"
                                 >
+                                    <sbx-icon name="add"></sbx-icon>
                                     Request to join
                                 </button>
                             </template>
