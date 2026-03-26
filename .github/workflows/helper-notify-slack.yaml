@@ -1,0 +1,88 @@
+name: "Notify Slack channel"
+
+on:
+  workflow_call:
+    inputs:
+      workflow_name:
+        description: Name of the workflow that just completed
+        required: true
+        type: string
+      status:
+        description: Final workflow status (success|failure)
+        required: true
+        type: string
+      ref_name:
+        description: Branch or tag name for the run
+        required: true
+        type: string
+      run_url:
+        description: URL of the GitHub Actions run
+        required: true
+        type: string
+      webhook_url:
+        description: Webhook URL to post the message to.
+        required: true
+        type: string
+      channel:
+        description: Channel to post the message to.
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      workflow_name:
+        description: Name of the workflow that just completed
+        required: true
+        type: string
+      status:
+        description: Final workflow status (success|failure)
+        required: true
+        type: choice
+        options:
+          - success
+          - failure
+      ref_name:
+        description: Branch or tag name for the run
+        required: true
+        type: string
+      run_url:
+        description: URL of the GitHub Actions run
+        required: true
+        type: string
+      webhook_url:
+        description: Webhook URL to post the message to.
+        required: true
+        type: string
+      channel:
+        description: Channel to post the message to.
+        required: true
+        type: string
+
+jobs:
+  notify:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Send Slack message"
+        env:
+          STATUS: ${{ inputs.status }}
+          WORKFLOW_NAME: ${{ inputs.workflow_name }}
+          REF_NAME: ${{ inputs.ref_name }}
+          RUN_URL: ${{ inputs.run_url }}
+          WEBHOOK_URL: ${{ inputs.webhook_url }}
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          if [ "${STATUS}" = "success" ]; then
+            ICON=":white_check_mark:"
+            RESULT="completed successfully"
+          else
+            ICON=":x:"
+            RESULT="failed"
+          fi
+
+          MESSAGE="${ICON} Container build workflow *${WORKFLOW_NAME}* ${RESULT} on \`${REF_NAME}\`. <${RUN_URL}|View run>"
+          PAYLOAD="$(jq -nc --arg channel "#${CHANNEL}" --arg text "${MESSAGE}" '{channel: $channel, text: $text}')"
+
+          curl --fail-with-body --request POST \
+            --header 'Content-type: application/json' \
+            --data "${PAYLOAD}" \
+            "${WEBHOOK_URL}"
