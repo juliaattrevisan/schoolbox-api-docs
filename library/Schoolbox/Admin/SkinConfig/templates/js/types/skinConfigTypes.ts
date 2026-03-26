@@ -16,7 +16,7 @@ export type SkinConfigOption = {
     title: string | null;
     description: string | null;
     customProperty: string | null;
-    type: "colour" | "textarea";
+    type: "checkbox" | "colour" | "select" | "textarea";
     editable: boolean;
     hidden: boolean;
 };
@@ -30,6 +30,24 @@ export type SkinConfigSubcategory = {
 };
 
 /**
+ * Config section groups keyed by display category.
+ */
+export type SkinConfigSection = Record<string, SkinConfigSubcategory[]>;
+
+/**
+ * Toggle metadata for enabling the advanced user interface.
+ */
+export type SkinConfigToggle = {
+    enabled: boolean;
+    title: string | null;
+    description: string | null;
+};
+
+/**
  * The expected payload for the Skin Config app
  */
-export type SkinConfigData = Record<string, SkinConfigSubcategory[]>;
+export type SkinConfigData = {
+    toggle: SkinConfigToggle;
+    existing: SkinConfigSection;
+    sonar: SkinConfigSection;
+};

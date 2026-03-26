@@ -74,7 +74,7 @@ async function onSaveSelected(): Promise<void> {
         </div>
         <form method="post" class="skin-config-form" @submit.prevent="onSaveSelected">
             <div
-                v-for="(subcategories, categoryKey) in configs"
+                v-for="(subcategories, categoryKey) in configs.existing"
                 :key="categoryKey"
                 class="small-12 island"
                 :data-test="`skin-config-category-${categoryKey}`"
