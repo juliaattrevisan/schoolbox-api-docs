@@ -55,9 +55,9 @@ SET
 
 INSERT INTO
     lu_skin_config_subcategory (category_id, name)
-VALUES (@category_colours, 'General'),
+VALUES (@category_colours, 'Menu'),
+    (@category_colours, 'General'),
     (@category_colours, 'Top Menu'),
-    (@category_colours, 'Menu'),
     (
         @category_colours,
         'Side Menu and Notification'
