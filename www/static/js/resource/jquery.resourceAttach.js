@@ -586,17 +586,17 @@
 
                     let fileName = list[i].name;
                     let errorMessage = list[i].errorMessage;
-                            let failedFileItem = document
-                                .createRange()
-                                .createContextualFragment(
-                                    '<li class="actions-small-1 dz-error"><div class="list-item"><div class="card small-12"><p class="filename" data-dz-name="" title="' +
-                                        errorMessage +
-                                        '">' +
-                                        fileName +
-                                        " failed: " +
-                                        errorMessage +
-                                        '</p></div></div><nav><a href="#" data-dz-remove="" title="Remove" class="sbx-button--has-icon"><sbx-icon name="close"></sbx-icon></a></nav></li>',
-                                );
+                    let failedFileItem = document
+                        .createRange()
+                        .createContextualFragment(
+                            '<li class="actions-small-1 dz-error"><div class="list-item"><div class="card small-12"><p class="filename" data-dz-name="" title="' +
+                                errorMessage +
+                                '">' +
+                                fileName +
+                                " failed: " +
+                                errorMessage +
+                                '</p></div></div><nav><a href="#" data-dz-remove="" title="Remove" class="sbx-button--has-icon"><sbx-icon name="close"></sbx-icon></a></nav></li>',
+                        );
                     this.element.querySelector(".az-error-list").appendChild(failedFileItem);
                 } else {
                     //only display those files that were succesfully uploaded from the modal window

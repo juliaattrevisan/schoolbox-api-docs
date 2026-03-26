@@ -263,10 +263,9 @@ export default {
                                                     >
                                                 </li>
                                                 <li>
-                                                    <a
-                                                        @click.prevent="openGoalWithdrawModal(award)"
-                                                        title="Remove goal"
-                                                    ><sbx-icon name="close"></sbx-icon>Remove goal</a>
+                                                    <a @click.prevent="openGoalWithdrawModal(award)" title="Remove goal"
+                                                        ><sbx-icon name="close"></sbx-icon>Remove goal</a
+                                                    >
                                                 </li>
                                             </template>
                                         </template>
