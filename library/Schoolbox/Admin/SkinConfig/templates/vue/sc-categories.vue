@@ -132,23 +132,82 @@ function onPreviewRefresh(): void {
                         </div>
                     </template>
                     <template v-else-if="subcategory.name === 'General'">
-                        <div class="small-12 medium-4 columns">
+                        <div class="small-12 medium-4 large-3 columns">
                             <label class="required" for="title">Title</label>
                             <input id="title" type="text" name="title" value="School Musical" maxlength="255" />
                         </div>
-                        <div class="small-12 medium-4 columns">
+                        <div class="small-12 medium-4 large-3 columns">
                             <div class="checklist l-flex-col l-gap-s">
                                 <label class="title">Filter</label>
                                 <ul class="option-list l-flex-row l-gap-s">
                                     <li data-v-40e5173a="">
-                                        <input type="checkbox" checked />
+                                        <input id="waiting-list" type="checkbox" checked />
                                         <label for="waiting-list">Waiting List</label>
                                     </li>
                                     <li data-v-40e5173a="">
-                                        <input type="checkbox" />
+                                        <input id="admin-access" type="checkbox" />
                                         <label for="admin-access">Group Admin</label>
                                     </li>
                                 </ul>
+                            </div>
+                        </div>
+                        <div class="small-12 medium-4 large-3 columns">
+                            <label for="useDualMarkTypes" class="inline-block">Use Dual Mark Types?</label>
+                            <div class="switch">
+                                <input id="useDualMarkTypes" name="useDualMarkTypes" type="checkbox" />
+                                <label for="useDualMarkTypes" data-test="assessment-form-checkbox-dualMarkTypes">
+                                    <span class="icon-approve"></span>
+                                    <span class="icon-cancel"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="small-12 medium-4 large-3 columns">
+                            <sbx-pop-out content-id="pop-out-1" button-text="Create Activity"></sbx-pop-out>
+                            <ul id="pop-out-1" class="f-dropdown" data-dropdown-content>
+                                <li>
+                                    <a class="icon-project" href="#">Project</a>
+                                </li>
+                                <li>
+                                    <a class="icon-due-work" href="#">Due Work</a>
+                                </li>
+                                <li>
+                                    <a class="icon-task" href="#">Task</a>
+                                </li>
+                                <li>
+                                    <a class="icon-quiz" href="#">Quiz</a>
+                                </li>
+                                <li>
+                                    <a class="icon-lti" href="#">3rd Party Assessment</a>
+                                </li>
+                                <li>
+                                    <a class="icon-lesson-plan" href="#">Lesson Plan</a>
+                                </li>
+                                <li>
+                                    <a class="icon-dialog-agent" href="#">Discussion</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="small-12 columns">
+                            <ul class="flex-list buttons">
+                                <li>
+                                    <a href="#"><sbx-icon name="previous"></sbx-icon>Cancel</a>
+                                </li>
+                                <li><a href="#" class="submit">Confirm</a></li>
+                            </ul>
+                        </div>
+                        <div class="small-12 medium-4 columns">
+                            <label>Filter(s) selected:</label>
+                            <div id="applied_filters">
+                                <div data-applied-filter-tab="22" class="applied-filter-tab">
+                                    <span class="label filter">
+                                        <span data-filter-name="">Category</span>
+                                        <a href="#" class="close" title="Remove filter">×</a>
+                                    </span>
+                                    <ul data-selected-list="" class="selected-list">
+                                        <li class="selected-item">Learning</li>
+                                        <li class="selected-item">Personal Development</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                         <div class="small-12 medium-4 columns">
@@ -165,37 +224,13 @@ function onPreviewRefresh(): void {
                                 </div>
                             </div>
                         </div>
-                        <div class="small-12 columns">
-                            <ul class="flex-list buttons">
-                                <li>
-                                    <a href="#"><sbx-icon name="previous"></sbx-icon>Cancel</a>
-                                </li>
-                                <li><a href="#" class="submit">Confirm</a></li>
-                            </ul>
-                        </div>
-                        <div class="small-12 columns">
-                            <label>Filter(s) selected:</label>
-                        </div>
-                        <div class="small-12 columns">
-                            <div id="applied_filters">
-                                <div data-applied-filter-tab="22" class="applied-filter-tab">
-                                    <span class="label filter">
-                                        <span data-filter-name="">Category</span>
-                                        <a href="#" class="close" title="Remove filter">×</a>
-                                    </span>
-                                    <ul data-selected-list="" class="selected-list">
-                                        <li class="selected-item">Learning</li>
-                                        <li class="selected-item">Personal Development</li>
-                                    </ul>
-                                </div>
-                                <div data-applied-filter-tab="26" class="applied-filter-tab">
-                                    <span class="label filter">
-                                        <span data-filter-name="">Year Level</span>
-                                        <a href="#" class="close" title="Remove filter">×</a>
-                                    </span>
-                                    <ul data-selected-list="" class="selected-list">
-                                        <li class="selected-item">12</li>
-                                    </ul>
+                        <div class="small-12 medium-4 columns">
+                            <label>Attachments</label>
+                            <div id="fileImage-zone" class="attachzone s64">
+                                <label></label>
+                                <ul data-dz-previews="" class="az-list"></ul>
+                                <div id="FileImageZone" class="dzone icon-attach">
+                                    <span>Click or drag here to attach files</span>
                                 </div>
                             </div>
                         </div>
