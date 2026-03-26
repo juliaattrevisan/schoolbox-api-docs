@@ -78,7 +78,7 @@ async function onSaveSelected(): Promise<void> {
 </script>
 
 <template>
-    <div data-test="skin-config-container">
+    <div data-test="skin-config-container" class="small-12 island">
         <div v-if="loadError" class="small-12 columns" data-test="custom-participation-load-error">
             <request-error :further-info="loadError" />
         </div>
@@ -113,12 +113,7 @@ async function onSaveSelected(): Promise<void> {
                     </div>
                 </fieldset>
             </section>
-            <div
-                v-for="(subcategories, categoryKey) in activeConfigs"
-                :key="categoryKey"
-                class="small-12 island"
-                :data-test="`skin-config-category-${categoryKey}`"
-            >
+            <template v-for="(subcategories, categoryKey) in activeConfigs" :key="categoryKey">
                 <div class="row">
                     <div class="list-item">
                         <div class="small-12 island">
@@ -182,7 +177,7 @@ async function onSaveSelected(): Promise<void> {
                         </div>
                     </fieldset>
                 </section>
-            </div>
+            </template>
             <div ref="saveContainer" class="save-drawer-anchor">
                 <bottom-drawer :show-drawer="showSaveDrawer">
                     <div class="l-flex l-flex--justify l-gap-xs">
