@@ -437,4 +437,25 @@ export default class MarkbookPage {
             await expect(selectedValue).toHaveValue(visibility.toString());
         }
     }
+
+    /**
+     * locates the cell for a given student and assessment
+     * check whether or not the progress-tick-form is visible or not
+     * @param studentId - The ID of the student
+     * @param assessmentId - The ID of the assessment
+     * @param shouldBeVisible - Whether the tick field should be visible or not: pass true to check it is visible and false to check it is not visible
+     */
+    async checkProgressTickVisibility(
+        studentId: string | number,
+        assessmentId: string | number,
+        shouldBeVisible: boolean,
+    ): Promise<void> {
+        const cell = this.getCell(studentId, assessmentId);
+        const progressTick = cell.locator("div.progress-tick-form");
+        if (shouldBeVisible) {
+            await expect(progressTick).toBeVisible();
+        } else {
+            await expect(progressTick).not.toBeVisible();
+        }
+    }
 }

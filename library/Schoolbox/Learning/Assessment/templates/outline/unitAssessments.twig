@@ -223,7 +223,7 @@
                                     </div>
                                 {% endif %}
                                 {% if canWrite %}
-                                    <p class="meta">
+                                    <p class="meta" data-test="course-outline-number-students-{{ customisedAssessment.title }}">
                                         {{ dueDate.forAssessment(customisedAssessment) }}&nbsp;{% if customisedAssessment is not lessonPlan %}|&nbsp;<span class="{{ urgency.marks(customisedAssessmentCompletionGradient ?? '') }}">{{ customisedAssessmentCompletionCount }}/{{ customisedAssessmentStudentCount }} students completed</span>{% endif %}
                                     </p>
                                 {% else %}

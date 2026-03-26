@@ -72,6 +72,61 @@ export default class CourseOutline {
     }
 
     /**
+     * Uses the course outline component to find an unit and click the expand/collapse arrow
+     * @param unitName - The name of the unit to find in the course outline
+     * @param arrowOption - The option to select when expanding/collapsing the unit: expanded, collapsed
+     */
+    async clickUnitExpandCollapse(unitName: string, arrowOption: "expanded" | "collapsed"): Promise<void> {
+        // Find the course outline and the unit we created inside it
+        this.tester.isGoingTo("find the unit in the course outline");
+        const courseOutline = this.homepage.locateComponentByName("Course Outline");
+        const courseOutlineUnit = courseOutline.locator("li[data-unit]").filter({ hasText: unitName });
+
+        this.tester.isGoingTo("click to expand/collapse the unit");
+        await courseOutlineUnit.getByTestId(`course-outline-expand-unit-${unitName}-${arrowOption}`).click();
+    }
+
+    /**
+     * Uses the course outline component to find an activity under a unit and click the expand/collapse arrow to view custom activities
+     * @param unitName - The name of the unit to find in the course outline
+     * @param activityName - The name of the activity to find in the unit
+     */
+    async clickActivityExpandCollapse(unitName: string, activityName: string): Promise<void> {
+        // Find the course outline and the unit we created inside it
+        this.tester.isGoingTo("find the unit in the course outline");
+        const courseOutline = this.homepage.locateComponentByName("Course Outline");
+        const courseOutlineUnit = courseOutline.locator("li[data-unit]").filter({ hasText: unitName });
+        const activities = courseOutlineUnit.locator("li[data-assessment]");
+        const activity = activities.filter({ hasText: activityName });
+
+        this.tester.isGoingTo("click to expand/collapse the activity to view custom activities");
+        await activity.getByTestId(`course-outline-expand-activity-${activityName}`).click();
+    }
+
+    /**
+     * Uses the course outline component to find an activity under a unit
+     * check the activity has customised activities under it with the correct title
+     * @param unitName - The name of the unit to find in the course outline
+     * @param activityName - The name of the activity to find in the unit
+     * @param customActivityTitle - The title of the custom activity to check is shown under the activity
+     */
+    async checkCustomActivityPresented(
+        unitName: string,
+        activityName: string,
+        customActivityTitle: string,
+    ): Promise<void> {
+        // Find the course outline and the unit we created inside it
+        this.tester.isGoingTo("find the unit in the course outline");
+        const courseOutline = this.homepage.locateComponentByName("Course Outline");
+        const courseOutlineUnit = courseOutline.locator("li[data-unit]").filter({ hasText: unitName });
+        const activities = courseOutlineUnit.locator("li[data-assessment]");
+        const activity = activities.filter({ hasText: activityName });
+
+        this.tester.isGoingTo("check the custom activity is shown in the course outline");
+        await expect(activity.locator(`li.child:has-text("${customActivityTitle}")`)).toBeVisible();
+    }
+
+    /**
      * finds the activity id by passing its name
      * @param courseOutlineHeader - The header of the course outline component
      * @param unitName - The name of the unit to find in the course outline
@@ -224,5 +279,24 @@ export default class CourseOutline {
     static async clickReadOnlyUsers(component: Locator, componentId: string): Promise<void> {
         await component.locator(`label[for="${componentId}-showComponentTitle"]`).isVisible();
         await component.locator(`label[for="${componentId}-showComponentTitle"]`).click();
+    }
+
+    /**
+     * given a list of activities name check whether the proper meta text is presented for the activity or not
+     * pass false to check the meta text is not presented and true is by default to check the meta text is presented
+     * @param activities - The list of activities with the meta text to check eg: [{activityName: "Persuasive Article", expectMetaText: "0/5 students completed", isMetaTextPresented: true}]
+     * isMetaTextPresented property can be true or false depending on whether you want to check the meta text is presented or not
+     */
+    async checkActivityMetaText(
+        activities: { activityName: string; expectMetaText: string; isMetaTextPresented?: boolean }[],
+    ): Promise<void> {
+        for (const activity of activities) {
+            const metaTextLocator = this.page.getByTestId(`course-outline-number-students-${activity.activityName}`);
+            if (activity.isMetaTextPresented === false) {
+                await expect(metaTextLocator).not.toContainText(activity.expectMetaText);
+            } else {
+                await expect(metaTextLocator).toContainText(activity.expectMetaText);
+            }
+        }
     }
 }

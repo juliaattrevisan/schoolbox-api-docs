@@ -13,7 +13,7 @@ export default class StudentParticipation {
 
     private page: Page;
 
-    static readonly URL_PARTICIPATION = "/learning/assessments/650/participation";
+    static readonly URL_PARTICIPATION = "/learning/assessments/{activityId}/participation";
 
     static readonly URL_CLASS_MARKBOOK = "/learning/markbook/class/83?1=&5=&8=&10=&11=&12=";
 
@@ -34,10 +34,70 @@ export default class StudentParticipation {
 
     /**
      * Navigate to the student participation page
+     * @param activityId - The ID of the activity to view participation for
      */
-    async goto(): Promise<void> {
+    async goto(activityId: string): Promise<void> {
         this.tester.isGoingTo("Navigate to student participation page");
-        await this.page.goto(StudentParticipation.URL_PARTICIPATION);
+        await this.page.goto(StudentParticipation.URL_PARTICIPATION.replace("{activityId}", activityId));
+    }
+    /**
+     * click the student participation 3-dot menu for a specific student
+     * @param userId - The user ID of the student
+     */
+    async clickStudentDotMenu(userId: string): Promise<void> {
+        this.tester.isGoingTo(`Click the Show Actions button for participant ${userId}`);
+        await this.page
+            .getByTestId(StudentParticipation.DATA_TEST_POP_OUT_PARTICIPANT_BUTTON.replace("{userId}", userId))
+            .click();
+    }
+
+    /**
+     * click one of the options under the 3-dot menu for a specific student
+     * @param button - The button to click for the specific student's action: modify, exclude, etc
+     * @param userId - The user ID of the student
+     */
+    async clickStudentActionButton(button: string, userId: string): Promise<void> {
+        this.tester.isGoingTo(`Click the ${button} under the 3-dot menu for participant ${userId}`);
+        await this.page.locator(`[id="participant-${userId}"]`).getByRole("button", { name: button }).click();
+    }
+
+    /**
+     * choose one of the activities to create for a specific student
+     * @param activityType - The type of activity to create: task, dueWork, quiz
+     */
+    async chooseActivityType(activityType: string): Promise<void> {
+        this.tester.isGoingTo(`Choose ${activityType} as the activity type to create`);
+        await this.page.locator(`label[for="${activityType}"]`).click();
+    }
+
+    /**
+     * check whether or not the custom activity is presented in the student participation table for the specific student
+     * @param studentName - The name of the student for verification
+     * @param activityTitle - The title of the activity to check in the table
+     * @param isPresented - Whether the activity is expected to be presented or not in the table
+     * default value is true for checking the activity is presented in the table
+     * set to false for checking the activity is not presented in the table
+     * the function will check the activity is presented when isPresented is true, and check the activity is not presented when isPresented is false
+     * this is to avoid code duplication for checking both presence and absence of the activity in the table
+     * example usage:
+     * checkCustomActivityInTable(studentName, activityTitle); // checks the activity is presented in the table
+     * checkCustomActivityInTable(studentName, activityTitle, false); // checks the activity is not presented in the table
+     * @returns void
+     */
+    async checkCustomActivityInTable(
+        studentName: string,
+        activityTitle: string,
+        isPresented: boolean = true,
+    ): Promise<void> {
+        this.tester.isGoingTo(
+            `Verify the activity '${activityTitle}' is ${isPresented ? "shown" : "not shown"} in the participation table for participant ${studentName}`,
+        );
+        const studentRow = this.page.locator("tr").filter({ hasText: studentName });
+        if (isPresented) {
+            await expect(studentRow).toContainText(activityTitle);
+        } else {
+            await expect(studentRow).not.toContainText(activityTitle);
+        }
     }
 
     /**
@@ -92,6 +152,29 @@ export default class StudentParticipation {
 
         this.tester.isGoingTo("Verify student's row no longer shows the modified customisation title");
         await expect(studentRow).not.toContainText(customisationTitle);
+    }
+
+    /**
+     * select a customisation in the Include customisation modal
+     * @param titleIndex - The index of the customisation to select
+     */
+    async selectCustomisationInModal(titleIndex: number): Promise<void> {
+        // When the Customisation select with the id activitySelect
+        const customisationSelect = this.page.locator("select#activitySelect");
+
+        // Select the option based on the provided index - the placeholder is index 0, so the first customisation option starts from index 1
+        await customisationSelect.selectOption({ index: titleIndex });
+
+        // In the modal select the button that includes the text 'Confirm'
+        await this.page.getByTestId("cp-include-in-existing-modal-confirm-button").click();
+    }
+
+    /**
+     * Clicks the Yes on the modal for including in existing customisation
+     */
+    async confirmIncludeCustomisation(): Promise<void> {
+        // In the please confirm modal select the button that includes the text 'Yes'
+        await this.page.getByTestId("cp-confirm-modify-modal-yes-button").click();
     }
 
     /**
