@@ -42,6 +42,9 @@ export default class CurriculumDescription {
             .locator(CurriculumDescription.ELEMENT_CURRICULUM_CODE_DROPDOWN)
             .selectOption(curriculumCode);
         await curriculumDescriptionComponent.locator(CurriculumDescription.ELEMENT_UPDATE_BUTTON).click();
+        await curriculumDescriptionComponent
+            .locator(CurriculumDescription.ELEMENT_UPDATE_BUTTON)
+            .waitFor({ state: "hidden" });
     }
 
     /**

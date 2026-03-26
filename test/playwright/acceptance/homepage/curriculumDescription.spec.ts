@@ -17,9 +17,7 @@ import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
  * 2. Execute npx playwright test curriculumDescription.spec.ts
  */
 
-test.describe("Curriculum Description Component Tests", () => {
-    test.describe.configure({ mode: "serial" });
-
+test.describe.serial("Curriculum Description Component Tests", () => {
     let homepage: Homepage;
     let curriculumDescription: CurriculumDescription;
     let curriculumDescriptionComponent: Locator;
@@ -82,6 +80,25 @@ test.describe("Curriculum Description Component Tests", () => {
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
         await Homepage.clickComponentSettings(curriculumDescriptionComponent);
         await CurriculumDescription.setCurriculumCode(curriculumDescriptionComponent, "All");
+        tester.isGoingTo("Verify all curriculum codes and descriptions are shown");
+        await CurriculumDescription.verifyCurriculumLinkCode(curriculumDescriptionComponent, CURRICULUM_ACELA1556.code);
+        await CurriculumDescription.verifyCurriculumDescriptionRow(
+            curriculumDescriptionComponent,
+            CURRICULUM_ACELA1556.code,
+            CURRICULUM_ACELA1556.description,
+        );
+        await CurriculumDescription.verifyCurriculumLinkCode(curriculumDescriptionComponent, CURRICULUM_ACELA1560.code);
+        await CurriculumDescription.verifyCurriculumDescriptionRow(
+            curriculumDescriptionComponent,
+            CURRICULUM_ACELA1560.code,
+            CURRICULUM_ACELA1560.description,
+        );
+        await CurriculumDescription.verifyCurriculumLinkCode(curriculumDescriptionComponent, CURRICULUM_ELBE1177.code);
+        await CurriculumDescription.verifyCurriculumDescriptionRow(
+            curriculumDescriptionComponent,
+            CURRICULUM_ELBE1177.code,
+            CURRICULUM_ELBE1177.description,
+        );
     });
 
     test("Click curriculum code links and verify redirect URLs", async ({ tester, page }) => {
@@ -105,36 +122,38 @@ test.describe("Curriculum Description Component Tests", () => {
         await expect(page).toHaveURL(CURRICULUM_ELBE1177.url);
     });
 
-    test("Disable curriculum node from the database", async ({ tester, db }) => {
-        tester.isGoingTo("Disable curriculum node ELBE1177");
-        await db.updateInDatabase("curriculum_node", { enabled: 0 }, { id: 154, code: "ELBE1177" });
-    });
+    test("Login as Jana Reed and verify student view for disabled curriculum node", async ({ tester, db }) => {
+        try {
+            tester.isGoingTo("Disable curriculum node ELBE1177");
+            await db.updateInDatabase("curriculum_node", { enabled: 0 }, { id: 154, code: "ELBE1177" });
 
-    test("Login as Jana Reed and verify student view for disabled curriculum node", async ({ tester }) => {
-        tester.isGoingTo("Impersonate Jana Reed and open homepage");
-        await tester.impersonate("Jana Reed");
-        await homepage.goto(87);
-        tester.isGoingTo(
-            "Login as student and verify the component title is visible and curriculum rows are shown as plain text only",
-        );
-        curriculumDescriptionComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
-        await homepage.seeInComponentHeading(COMPONENT_TITLE, Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
-        await expect(curriculumDescriptionComponent.locator('a[data-test^="curriculum-code-"]')).toHaveCount(0);
-        await expect(curriculumDescriptionComponent).toContainText(CURRICULUM_ACELA1556.code);
-        await expect(curriculumDescriptionComponent).toContainText(CURRICULUM_ACELA1556.description);
-        await expect(curriculumDescriptionComponent).toContainText(CURRICULUM_ACELA1560.code);
-        await expect(curriculumDescriptionComponent).toContainText(CURRICULUM_ACELA1560.description);
-        tester.isGoingTo("Verify ELBE1177 code and description are not visible to the student");
-        await expect(curriculumDescriptionComponent).not.toContainText(CURRICULUM_ELBE1177.code);
-        await expect(curriculumDescriptionComponent).not.toContainText(CURRICULUM_ELBE1177.description);
+            tester.isGoingTo("Impersonate Jana Reed and open homepage");
+            await tester.impersonate("Jana Reed");
+            await homepage.goto(87);
+            tester.isGoingTo(
+                "Login as student and verify the component title is visible and curriculum rows are shown as plain text only",
+            );
+            curriculumDescriptionComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
+            await homepage.seeInComponentHeading(COMPONENT_TITLE, Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
+            await expect(curriculumDescriptionComponent.locator('a[data-test^="curriculum-code-"]')).toHaveCount(0);
+            await expect(curriculumDescriptionComponent).toContainText(CURRICULUM_ACELA1556.code);
+            await expect(curriculumDescriptionComponent).toContainText(CURRICULUM_ACELA1556.description);
+            await expect(curriculumDescriptionComponent).toContainText(CURRICULUM_ACELA1560.code);
+            await expect(curriculumDescriptionComponent).toContainText(CURRICULUM_ACELA1560.description);
+            tester.isGoingTo("Verify ELBE1177 code and description are not visible to the student");
+            await expect(curriculumDescriptionComponent).not.toContainText(CURRICULUM_ELBE1177.code);
+            await expect(curriculumDescriptionComponent).not.toContainText(CURRICULUM_ELBE1177.description);
+        } finally {
+            tester.isGoingTo("Re-enable curriculum node ELBE1177");
+            await db.updateInDatabase("curriculum_node", { enabled: 1 }, { id: 154, code: "ELBE1177" });
+        }
     });
 
     /**
-     * Restores the curriculum node and removes the Curriculum Description component after the suite finishes.
+     * Removes the Curriculum Description component after the suite finishes.
      */
-    test.afterAll(async ({ baseTester, db, api }) => {
-        baseTester.isGoingTo("clean up: remove Curriculum Description component and restore curriculum node");
-        await db.updateInDatabase("curriculum_node", { enabled: 1 }, { id: 154, code: "ELBE1177" });
+    test.afterAll(async ({ baseTester, api }) => {
+        baseTester.isGoingTo("clean up: remove Curriculum Description component");
         await api.deleteHomepageComponent(87, curriculumDescriptionComponentId);
     });
 });
