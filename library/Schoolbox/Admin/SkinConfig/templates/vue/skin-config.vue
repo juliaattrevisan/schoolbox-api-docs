@@ -19,40 +19,17 @@ const props = defineProps<{
 const isProcessing = window.Vue.ref(false);
 const loadError = window.Vue.ref<string | null>(null);
 const saveText = window.Vue.computed(() => (isProcessing.value ? "Saving..." : "Save"));
-const { configs, hasUnsavedChanges, resetToSavedState, markCurrentAsSaved } = useSkinConfigState(
-    props.configs,
-    isProcessing,
-    () => {
+const { configs, hasUnsavedChanges, initialiseColourPickers, resetToSavedState, markCurrentAsSaved } =
+    useSkinConfigState(props.configs, isProcessing, () => {
         schedulePreviewRefresh();
-    },
-);
-const { schedulePreviewRefresh } = useSkinPreview(configs, props.routes.preview);
-
-/**
- * Reinitialise visible colour pickers after the rendered config set changes.
- */
-async function reinitialiseColourPickers(): Promise<void> {
-    await window.Vue.nextTick();
-    document.querySelectorAll("[data-colour-picker]").forEach((element) => {
-        if (!(element instanceof HTMLInputElement) || element.id === "") {
-            return;
-        }
-        document.dispatchEvent(
-            new CustomEvent("colourPickerInitialise", {
-                detail: {
-                    el: `#${element.id}`,
-                    format: "rgb",
-                },
-            }),
-        );
     });
-}
+const { schedulePreviewRefresh } = useSkinPreview(configs, props.routes.preview);
 
 window.Vue.watch(
     () => configs.value.toggle.enabled,
     async () => {
         schedulePreviewRefresh();
-        await reinitialiseColourPickers();
+        await initialiseColourPickers();
     },
 );
 
