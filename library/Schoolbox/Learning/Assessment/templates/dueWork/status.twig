@@ -64,8 +64,8 @@
         {% endif %}
         {% if not allReadonly %}
             <li class="separator">Bulk Actions</li>
-            <li><a class="icon-approve" data-mass="submit" data-reveal-id="manage-submissions">Manage submissions</a></li>
-            <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish grades & feedback</a></li>
+            <li><a class="icon-approve" data-mass="submit" data-reveal-id="manage-submissions"><sbx-icon name="approve"></sbx-icon>Manage submissions</a></li>
+            <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish"><sbx-icon name="approve"></sbx-icon>Publish grades & feedback</a></li>
 
             {% set rescoreRoute = routeLookupIfAuthorized('learningAssessment.getRescore', {assessment: assessment, assessmentId: assessment.id}) %}
             {% if rescoreRoute %}
