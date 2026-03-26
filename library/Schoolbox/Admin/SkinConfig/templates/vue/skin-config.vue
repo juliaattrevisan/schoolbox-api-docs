@@ -24,6 +24,16 @@ const { configs, saveContainer, hasUnsavedChanges, showSaveDrawer, resetToSavedS
         schedulePreviewRefresh();
     });
 const { schedulePreviewRefresh } = useSkinPreview(configs, props.routes.preview);
+const activeConfigs = window.Vue.computed(() =>
+    configs.value.toggle.enabled ? configs.value.sonar : configs.value.existing,
+);
+
+window.Vue.watch(
+    () => configs.value.toggle.enabled,
+    () => {
+        schedulePreviewRefresh();
+    },
+);
 
 /**
  * Restore the last saved config state.
@@ -73,8 +83,38 @@ async function onSaveSelected(): Promise<void> {
             <request-error :further-info="loadError" />
         </div>
         <form method="post" class="skin-config-form" @submit.prevent="onSaveSelected">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label id="skin-config-toggle" class="inline-block" for="skin-config-toggle-field">
+                            <span>{{ configs.toggle.title }}</span>
+                            <span
+                                v-if="configs.toggle.description"
+                                data-tooltip
+                                class="hint has-tip tip-bottom"
+                                :title="configs.toggle.description"
+                                >?</span
+                            >
+                        </label>
+                        <div class="switch f-no-margins">
+                            <input
+                                id="skin-config-toggle-field"
+                                v-model="configs.toggle.enabled"
+                                type="checkbox"
+                                name="advanced_ui_enabled"
+                                autocomplete="off"
+                                data-test="skin-config-toggle-input"
+                            />
+                            <label for="skin-config-toggle-field" data-test="skin-config-toggle">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+            </section>
             <div
-                v-for="(subcategories, categoryKey) in configs.existing"
+                v-for="(subcategories, categoryKey) in activeConfigs"
                 :key="categoryKey"
                 class="small-12 island"
                 :data-test="`skin-config-category-${categoryKey}`"
