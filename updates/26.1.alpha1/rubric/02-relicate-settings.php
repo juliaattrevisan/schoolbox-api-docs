@@ -170,6 +170,56 @@ HELP;
             $numInserted,
             number_format($end - $start, 2)
         ));
+
+        /* Detect if something is going awry somehow
+         */
+        $this->reportDivergence();
+    }
+
+
+    /**
+     * I can't stop thinking about what happens when a big chunk of stuff just didn't happen, such as Dialog Agents
+     * missing entire schema trees, prompting someone to blindly re-run an updates folder to "try again".
+     *
+     * This tool isn't idempotent and is going to dupe stuff out but that's technically not an illegal outcome in the
+     * grand design: only at the point of time when this tool executes.
+     *
+     * At this point there should only be one rubric_instance row per submission box, simply by virtue of the old
+     * assumption that one due work always has 0 or 1 rubric grids
+     *
+     * @return void
+     */
+    private function reportDivergence(): void
+    {
+        $result = $this->getDatabaseInternal()->executeQuery("
+            SELECT 
+                sb.id, 
+                sb.assessment_id,
+                sb.rubric_capability_mark_type_id AS submission_box_rubric_capability_mark_type_id,
+                ri.rubric_capability_mark_type_id AS rubric_instance_rubric_capability_mark_type_id,
+                sb.rubric_capability_grade_group_id AS submission_box_rubric_capability_grade_group_id,
+                ri.rubric_capability_grade_group_id AS rubric_instance_rubric_capability_grade_group_id,
+                sb.rubric_mark_range AS submission_box_rubric_mark_range,
+                ri.rubric_mark_range AS rubric_instance_rubric_mark_range
+            FROM submission_box sb
+            INNER JOIN assessment a ON sb.assessment_id = a.id
+            LEFT JOIN rubric_instance ri ON sb.assessment_id = ri.assessment_id 
+            WHERE a.deleted_at IS NULL AND
+            (
+                sb.rubric_capability_mark_type_id != ri.rubric_capability_mark_type_id
+                OR sb.rubric_capability_grade_group_id != ri.rubric_capability_grade_group_id
+                OR sb.rubric_mark_range != ri.rubric_mark_range
+            )
+        ")->fetchAll(\PDO::FETCH_ASSOC);
+
+        if (!count($result)) {
+            $this->getLogger()->info('No divergences detected.');
+            return;
+        }
+
+        $this->getLogger()->warning('Divergences detected.');
+
+        print_r($result);
     }
 
 
