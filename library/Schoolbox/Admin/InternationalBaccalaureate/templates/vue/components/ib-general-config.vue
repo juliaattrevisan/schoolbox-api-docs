@@ -35,7 +35,7 @@ async function saveGeneralConfig(): Promise<void> {
     const toast = window.sbProps.toastActivate("Saving...");
 
     for (const config of props.configurations) {
-        const response = await apiRequest<{ success: boolean }>({
+        const response = await apiRequest<{ success: boolean }, Record<string, unknown>>({
             url: props.saveEndpoint,
             method: "POST",
             body: {

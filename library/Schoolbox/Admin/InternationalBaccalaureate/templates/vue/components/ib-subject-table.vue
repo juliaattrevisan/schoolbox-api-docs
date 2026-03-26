@@ -315,10 +315,10 @@ async function saveSubjectConfiguration(): Promise<void> {
                 }),
         };
 
-        const response = await apiRequest<{ success: boolean }>({
+        const response = await apiRequest<{ success: boolean }, Record<string, unknown>>({
             url: props.saveEndpoint,
             method: "POST",
-            body: saveData,
+            body: saveData as Record<string, unknown>,
         });
 
         if (!response.success) {
