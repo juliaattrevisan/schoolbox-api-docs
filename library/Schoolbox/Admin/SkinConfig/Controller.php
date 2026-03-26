@@ -224,7 +224,10 @@ class Controller extends ConfigController
     {
         return $this->getConfigMapper()
                     ->getPredicateBuilder()
-                    ->equals('type_id', ConfigMapper::TYPE_SKIN_CONFIG)
+                    ->in('type_id', [
+                        ConfigMapper::TYPE_SKIN_CONFIG,
+                        ConfigMapper::TYPE_SONAR_SKIN_CONFIG,
+                    ])
                     ->equals('hidden', 'false')
                     ->equals('editable', 'true');
     }
@@ -299,7 +302,7 @@ class Controller extends ConfigController
                 [
                     'value'    => $newValue,
                     'configID' => $existingConfig->getId(),
-                    'typeId'   => ConfigMapper::TYPE_SKIN_CONFIG,
+                    'typeId'   => $existingConfig->getTypeId(),
                     'hidden'   => 'false',
                     'editable' => 'true',
                 ]
@@ -317,6 +320,10 @@ class Controller extends ConfigController
     {
         $flattenedConfigs = [];
         foreach ($configs as $type => $categories) {
+            if ($type === 'toggle') {
+                continue;
+            }
+
             if (!is_array($categories)) {
                 continue;
             }
