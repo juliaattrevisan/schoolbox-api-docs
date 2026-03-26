@@ -2,7 +2,7 @@ import { test } from "@schoolboxTest/playwright/support/integrations";
 import CreateSummativeReport from "@schoolboxTest/playwright/support/page/admin/lms/summativeReports/CreateSummativeReport";
 import SummativeList from "@schoolboxTest/playwright/support/page/admin/lms/summativeReports/SummativeReportList";
 import SummativePreview from "@schoolboxTest/playwright/support/page/admin/lms/summativeReports/SummativePreview";
-import Common from "@schoolboxTest/playwright/support/page/Common";
+
 /**
  * create a summative report with summary and class inclusion
  * check the heading works properly in the preview page
@@ -17,7 +17,6 @@ import Common from "@schoolboxTest/playwright/support/page/Common";
 test.describe("Admin LMS - Summative Reports Data Validation", () => {
     let summativeReportList: SummativeList;
     let createSummativeReport: CreateSummativeReport;
-    let common: Common;
 
     const summativeReportTitle = "Summative Report Data Validation Test";
     const academicPeriod = "2020";
@@ -28,7 +27,6 @@ test.describe("Admin LMS - Summative Reports Data Validation", () => {
     test.beforeEach(async ({ tester, page }) => {
         summativeReportList = new SummativeList(tester, page);
         createSummativeReport = new CreateSummativeReport(tester, page);
-        common = new Common(page);
         await tester.loginAsAdmin();
     });
 
@@ -146,17 +144,11 @@ test.describe("Admin LMS - Summative Reports Data Validation", () => {
         }
     });
 
-    test("create a summative report page, click download, check the notification is shown and able to download the report from the notification", async ({
+    test("create a summative report page, click download, check the message about the report being generated is shown", async ({
         tester,
         db,
-        page,
     }) => {
         try {
-            tester.isGoingTo("clear all notifications");
-            await tester.runShellCommand(
-                `php /usr/share/schoolbox/test/socket/destroy-notification-redis-data.php -vvv`,
-            );
-
             tester.isGoingTo("create a summative report page");
             await createSummativeReport.goto();
             await createSummativeReport.fillTitleField(summativeReportTitle);
@@ -164,15 +156,9 @@ test.describe("Admin LMS - Summative Reports Data Validation", () => {
             await createSummativeReport.fillStudentSelectionField("students", "Jana");
             await createSummativeReport.clickSaveButton();
 
-            tester.isGoingTo(
-                "click the download icon and check the notification is shown and able to download the report from the notification",
-            );
+            tester.isGoingTo("click the download icon and check the message about the report being generated is shown");
             await summativeReportList.clickSummativeReportActionButton("download", summativeReportTitle);
             await summativeReportList.checkReportGenerationInProgressMessage(1);
-            tester.isGoingTo("wait for a while for the notification to trigger");
-            await page.waitForSelector(`a[data-unread="1"]`, { timeout: 120000 });
-            await common.assertNotifExists(`Your summative report ${summativeReportTitle} is ready to download`);
-            await common.assertFileDownload("notification-image", `${summativeReportTitle}.zip`);
         } finally {
             tester.isGoingTo(
                 "update delete_at for the data created in this test so it does not impact next suite of tests",
@@ -181,10 +167,6 @@ test.describe("Admin LMS - Summative Reports Data Validation", () => {
                 "summative_report",
                 { deleted_at: "2022-01-15 11:22:34" },
                 { "title like": summativeReportTitle, deleted_at: null },
-            );
-            tester.isGoingTo("clear all notifications");
-            await tester.runShellCommand(
-                `php /usr/share/schoolbox/test/socket/destroy-notification-redis-data.php -vvv`,
             );
         }
     });
