@@ -148,6 +148,10 @@ HELP;
             ));
         }
 
+        /* Add a timer
+         */
+        $end = microtime(true);
+
         /* Compare how many we expected to find vs how many we actually manufactured as an assertion we did it all
          */
         $numInserted = $this->getDatabaseInternal()->executeQuery("
@@ -156,10 +160,6 @@ HELP;
             WHERE deleted_at IS NULL
             AND created_at = :createdAt
         ", ['createdAt' => $now])->fetch()['num'];
-
-        /* Add a timer
-         */
-        $end = microtime(true);
 
         $this->getLogger()->info(sprintf(
             'Replication of %s submission boxes into %s rubric_instance rows took %s seconds.',
