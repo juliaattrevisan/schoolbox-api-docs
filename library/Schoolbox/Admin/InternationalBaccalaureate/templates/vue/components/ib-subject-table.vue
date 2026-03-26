@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import LanguageSelectionModal from "./LanguageSelectionModal.vue";
+import { apiRequest } from "@js/util/sbx/apiUtils";
+import LanguageSelectionModal from "./language-selection-modal.vue";
 
 interface SubjectRow {
     id: string;
@@ -27,7 +28,7 @@ const isSaving = window.Vue.ref<boolean>(false);
 const saveError = window.Vue.ref<string | null>(null);
 const subjectRows = window.Vue.ref<SubjectRow[]>([]);
 const currentEditingRow = window.Vue.ref<string | null>(null);
-const languageModal = window.Vue.ref<InstanceType<typeof LanguageSelectionModal> | null>(null);
+const isLanguageModalOpen = window.Vue.ref<boolean>(false);
 
 // Check if this is a Core category (TOK, EE, CAS)
 const isCoreCategory = window.Vue.computed(() => {
@@ -101,7 +102,7 @@ window.Vue.onMounted(() => {
  */
 function openLanguageModal(rowId: string): void {
     currentEditingRow.value = rowId;
-    languageModal.value?.open();
+    isLanguageModalOpen.value = true;
 }
 
 /**
@@ -314,17 +315,14 @@ async function saveSubjectConfiguration(): Promise<void> {
                 }),
         };
 
-        const response = await fetch(props.saveEndpoint, {
+        const response = await apiRequest<{ success: boolean }>({
+            url: props.saveEndpoint,
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-            },
-            body: JSON.stringify(saveData),
+            body: saveData,
         });
 
-        if (!response.ok) {
-            throw new Error("Save failed");
+        if (!response.success) {
+            throw new Error(response.message || "Save failed");
         }
 
         const toast = window.sbProps.toastActivate(`${props.categoryTitle} configuration saved successfully`);
@@ -555,7 +553,7 @@ async function saveSubjectConfiguration(): Promise<void> {
         </div>
 
         <LanguageSelectionModal
-            ref="languageModal"
+            v-model:is-open="isLanguageModalOpen"
             :selected-languages="getCurrentRowLanguages()"
             @close="closeLanguageModal"
             @languages-selected="onLanguagesSelected"

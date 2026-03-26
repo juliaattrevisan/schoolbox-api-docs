@@ -33,7 +33,7 @@ class Controller extends BaseController
         // Add General Configuration tab manually
         $categories = [
             [
-                'id' => 1,
+                'id' => 0,
                 'name' => 'general',
                 'title' => 'General Configuration'
             ]

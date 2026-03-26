@@ -5,9 +5,9 @@
  * configuration options that are loaded dynamically.
  */
 
-import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
-import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
-// Components will be imported when needed in the template
+import { apiRequest } from "@js/util/sbx/apiUtils";
+import IBGeneralConfig from "./components/ib-general-config.vue";
+import IBSubjectTable from "./components/ib-subject-table.vue";
 import type { IBCategory, IBConfiguration } from "../js/types/ibConfigurationTypes";
 
 interface Props {
@@ -44,34 +44,16 @@ async function loadCategorySubjects(): Promise<void> {
         return;
     }
 
-    try {
-        const categoryId = currentCategory.value.id;
-        const url = props.subjectsEndpoint.replace("{groupId}", categoryId.toString());
+    const url = props.subjectsEndpoint.replace("{groupId}", currentCategory.value.id.toString());
+    const response = await apiRequest<Array<{ subject: string; level: string }>>({ url, method: "GET" });
 
-        const response = await fetch(url, {
-            headers: {
-                Accept: "application/json",
-            },
-        });
-
-        if (!response.ok) {
-            const errorMessage = await extractErrorMessage(response);
-            throw new Error(errorMessage);
-        }
-
-        const responseJson = (await response.json()) as Array<{ subject: string; level: string }>;
-        if (responseJson === null || !Array.isArray(responseJson)) {
-            throw new Error("Unexpected subjects response format");
-        }
-
-        currentSubjectsFromAPI.value = responseJson;
-    } catch (error) {
-        if (isAbortError(error)) {
-            return;
-        }
-        console.error("Failed to load subjects:", error);
+    if (!response.success || !Array.isArray(response.data)) {
+        console.error("Failed to load subjects:", response.success ? "Unexpected format" : response.message);
         currentSubjectsFromAPI.value = [];
+        return;
     }
+
+    currentSubjectsFromAPI.value = response.data;
 }
 
 /**
@@ -82,39 +64,25 @@ async function loadCategoryConfigurations(): Promise<void> {
         return;
     }
 
-    try {
-        isLoading.value = true;
-        loadError.value = null;
+    isLoading.value = true;
+    loadError.value = null;
 
-        const url = props.configurationEndpoint.replace("{categoryId}", currentCategory.value.id.toString());
-        const response = await fetch(url, {
-            headers: {
-                Accept: "application/json",
-            },
-        });
+    const url = props.configurationEndpoint.replace("{categoryId}", currentCategory.value.id.toString());
+    const response = await apiRequest<IBConfiguration[]>({ url, method: "GET" });
 
-        if (!response.ok) {
-            const errorMessage = await extractErrorMessage(response);
-            throw new Error(errorMessage);
-        }
+    isLoading.value = false;
 
-        const responseJson = (await response.json()) as IBConfiguration[];
-        if (responseJson === null || !Array.isArray(responseJson)) {
-            throw new Error("Unexpected response format");
-        }
-
-        currentConfigurations.value = responseJson;
-    } catch (error) {
-        if (isAbortError(error)) {
-            return;
-        }
-        if (error instanceof Error && hasErrorMessage(error)) {
-            loadError.value = error.message;
-        }
-        console.error(error);
-    } finally {
-        isLoading.value = false;
+    if (!response.success) {
+        loadError.value = response.message;
+        return;
     }
+
+    if (!Array.isArray(response.data)) {
+        loadError.value = "Unexpected response format";
+        return;
+    }
+
+    currentConfigurations.value = response.data;
 }
 
 /**
@@ -173,6 +141,28 @@ window.Vue.onMounted((): void => {
         <section class="content tabs-content">
             <div class="content active">
                 <h2>{{ currentCategory.title }}</h2>
+
+                <div v-if="isLoading" class="loading"><i class="fa fa-spinner fa-spin"></i> Loading...</div>
+                <div v-else-if="loadError" class="alert alert-box alert">
+                    <i class="fa fa-exclamation-triangle"></i>
+                    {{ loadError }}
+                </div>
+                <IBGeneralConfig
+                    v-else-if="isGeneralConfigTab"
+                    :configurations="currentConfigurations"
+                    :is-loading="isLoading"
+                    :save-error="loadError"
+                    :save-endpoint="saveEndpoint"
+                    :category-title="currentCategory.title"
+                />
+                <IBSubjectTable
+                    v-else
+                    :category-name="currentCategory.name"
+                    :category-title="currentCategory.title"
+                    :category-id="currentCategory.id"
+                    :save-endpoint="saveEndpoint"
+                    :ib-subjects="currentSubjectsFromAPI"
+                />
             </div>
         </section>
     </div>
