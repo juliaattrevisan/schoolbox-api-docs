@@ -138,26 +138,17 @@ class UserMapper extends Mapper
         $this->joinsVia('user_qualification', QualificationMapper::class, 'id', 'qualification_id', 'user_id', null, null, null, 'qualificationCollection');
         $this->uses('ib_candidate_number', self::TYPE_STRING);
 
-//        $this->joins(
-//            'user_qualification',
-//            IB\Qualification\Mapper::class,
-//            'id',
-//            null,
-//            null,
-//            'qualification',
-//        );
-
         $this->joinsReverseMulti(
             'user_id',
             User\Nationality\Mapper::class,
-            'nationality',
+            'nationalityCollection',
             'nationality',
         );
 
         $this->joinsReverseMulti(
             'user_id',
             User\Language\Mapper::class,
-            'language',
+            'languageCollection',
             'language',
         );
 
