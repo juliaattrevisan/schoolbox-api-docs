@@ -430,7 +430,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      */
     public function getAllInSeries(int $seriesId, bool $futureEventsOnly = false): GenericCollection
     {
-        $pb = new Builder($this->getDatabase()->getQuoter(), 'event')
+        $pb = new Builder($this->getDatabase()->getQuoter(), $this->table) // this mapper is overloaded, so we need to dynamically set the table name.
             ->equals('series_id', $seriesId);
 
         if ($futureEventsOnly) {
