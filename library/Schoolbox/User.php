@@ -27,6 +27,7 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Storage;
+use Schoolbox\IB\Qualification\Model as QualificationModel;
 use Schoolbox\User\Pronoun\Model;
 use SensitiveParameter;
 
@@ -268,6 +269,12 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
     private ?Model $pronoun = null;
 
+    /** @var string|null IB candidate number (managed by IBIS write-back, not manually editable) */
+    private ?string $ibCandidateNumber = null;
+
+    /** @var GenericCollection|null Collection of IB qualifications assigned to this user */
+    private ?GenericCollection $qualificationCollection = null;
+
     public function __construct()
     {
         $this->role = new Role();
@@ -275,12 +282,15 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
-     * Clones shouldn't share campusCollection
+     * Clones shouldn't share campusCollection or qualificationCollection
      */
     public function __clone()
     {
         if ($this->campusCollection !== null) {
             $this->campusCollection = clone $this->campusCollection;
+        }
+        if ($this->qualificationCollection !== null) {
+            $this->qualificationCollection = clone $this->qualificationCollection;
         }
         if ($this->accessList instanceof GenericCollection) {
             $this->accessList = clone $this->accessList;
@@ -1520,5 +1530,42 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         }
 
         return true;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getIbCandidateNumber(): ?string
+    {
+        return $this->ibCandidateNumber;
+    }
+
+    /**
+     * @param string|null $ibCandidateNumber
+     * @return self
+     */
+    public function setIbCandidateNumber(?string $ibCandidateNumber): self
+    {
+        $this->ibCandidateNumber = $ibCandidateNumber;
+        return $this;
+    }
+
+    /**
+     * @return GenericCollection|null
+     */
+    public function getQualificationCollection(): ?GenericCollection
+    {
+        return $this->qualificationCollection;
+    }
+
+    /**
+     * @param GenericCollection|QualificationModel[] $qualificationCollection
+     * @return self
+     */
+    public function setQualificationCollection(GenericCollection $qualificationCollection): self
+    {
+        $qualificationCollection->assertCollectionOf(QualificationModel::class);
+        $this->qualificationCollection = $qualificationCollection;
+        return $this;
     }
 }

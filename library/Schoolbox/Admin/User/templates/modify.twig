@@ -223,6 +223,13 @@
                                                 {% endfor %}
                                             </select>
                                         </div>
+
+                                        {% if user %}
+                                        <div>
+                                            <label for="ibCandidateNumber">IB Candidate Number</label>
+                                            <input id="ibCandidateNumber" type="text" disabled value="{{ user.ibCandidateNumber ?? '' }}" title="This field is updated automatically via the IBIS registration write-back workflow"/>
+                                        </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </fieldset>
@@ -247,6 +254,25 @@
                                     {% endfor %}
                                 </div>
                             </fieldset>
+
+                            <fieldset>
+                                <label class="content">{{ locale.translate('qualification', false, true) }} being undertaken</label>
+                                <div class="row content">
+                                    {% for qualification in qualifications ?? [] %}
+                                    <div class="small-12 medium-4 columns">
+                                        {% set qualChecked = false %}
+                                        {% for userQual in user.qualificationCollection ?? [] %}
+                                            {% if userQual.id == qualification.id %}
+                                                {% set qualChecked = true %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        <input id="qualification-{{ qualification.id }}" type="checkbox" name="qualification[]" value="{{ qualification.id }}" {% if qualChecked %}checked{% endif %}>
+                                        <label for="qualification-{{ qualification.id }}" class="checkbox-label">{{ qualification.name }}</label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </fieldset>
+
                             <fieldset>
                                 <label class="content">Options</label>
                                 <div class="row content">

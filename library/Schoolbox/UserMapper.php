@@ -23,6 +23,7 @@ use Schoolbox\Calendar\Util\ViewNameMapping;
 use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\IB\Qualification\Mapper as QualificationMapper;
 use Schoolbox\Resource\Storage;
 use UnexpectedValueException;
 
@@ -134,6 +135,8 @@ class UserMapper extends Mapper
         $this->joins('year_id', YearLevel\Mapper::class, 'id', null, null, 'year', 'year');
         $this->joinsVia('user_link', UserMapper::class, 'id', 'linked_user_id', 'user_id', null, null, null, 'linkedUsers');
         $this->joinsVia('userCampus', CampusMapper::class, 'id', 'campus', 'uid', 'id', null, null, 'campusCollection');
+        $this->joinsVia('user_qualification', QualificationMapper::class, 'id', 'qualification_id', 'user_id', null, null, null, 'qualificationCollection');
+        $this->uses('ib_candidate_number', self::TYPE_STRING);
 
         $this->hasJoin(
             'userAccess',
@@ -387,6 +390,9 @@ class UserMapper extends Mapper
         /** @var CampusMapper $campusMapper */
         $campusMapper = $this->getJoinMapper('userCampus');
 
+        /** @var QualificationMapper $qualificationMapper */
+        $qualificationMapper = $this->getJoinMapper('user_qualification');
+
         foreach ($statement as $row) {
             $userId = $row['id'];
 
@@ -432,11 +438,13 @@ class UserMapper extends Mapper
 
         // Load one-to-many relations in separate queries
         if (!empty($users)) {
-            // Load campuses
-            $userIds          = array_keys($users);
-            $campusesByUserId = $campusMapper->findForOtherMapper($this, 'userCampus', $userIds);
+            // Load campuses and qualifications
+            $userIds                = array_keys($users);
+            $campusesByUserId       = $campusMapper->findForOtherMapper($this, 'userCampus', $userIds);
+            $qualificationsByUserId = $qualificationMapper->findForOtherMapper($this, 'user_qualification', $userIds);
             foreach ($users as $userId => $user) {
                 $user->setCampusCollection($campusesByUserId[$userId] ?? $campusMapper->createCollection());
+                $user->setQualificationCollection($qualificationsByUserId[$userId] ?? $qualificationMapper->createCollection());
             }
 
             // Load linked users
