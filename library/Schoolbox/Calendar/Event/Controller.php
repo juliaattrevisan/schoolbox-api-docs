@@ -1638,6 +1638,12 @@ class Controller extends Base
         if ($event->getVariant() === Event::VARIANT_BOOKING) {
             $event->setVariant(Event::VARIANT_EVENT);
 
+            // Change the event title to match resource_booking.name.
+            // (Pick any linked resource_booking row.  Their names should be identical.)
+            $existingBookings = $this->bookingMapper->findByColumn('event_id', $event->getId());
+            $firstBooking = $existingBookings->first();
+            $event->setTitle($firstBooking->getName());
+
             try {
                 $this->eventMapper->save($event);
             } catch (MapperException) {
