@@ -1,3 +1,6 @@
+/**
+ * @see /library/Schoolbox/Assessment/Rubric/Grid/Translator/ModelToArray.php
+ */
 export type RubricGrid = {
     id: number; // currently the assessment ID, or 0 for new rubrics
     levels: RubricGridLevel[];

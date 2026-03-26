@@ -58,6 +58,7 @@ use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Result\Mapper as RubricResultSetMapper;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Level;
+use Schoolbox\Assessment\Rubric\Grid\Translator\ModelToArray as RubricGridTranslator;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Error;
@@ -2064,53 +2065,8 @@ class Controller extends Assessment\Controller
         }
         $data['rubricGrid'] = $rubricGrid;
 
-        // TODO: this is mainly temporary atm to test the new vue component
-        $rubricGridPayload = [
-            'id' => $rubricGrid->getId(),
-            'levels' => $rubricGrid->getLevels()->map(fn(Level $level) => [
-                'id' => $level->getId(),
-                'name' => $level->getName(),
-            ])->reindex(),
-            'capabilities' => [],
-        ];
-
-        foreach ($rubricGrid->iterateCapabilities() as $capability) {
-            $capabilityData = [
-                'id' => $capability->getId(),
-                'name' => $capability->getName(),
-                'inUseExcludingAssessment' => $capability->isInUseExcluding($rubricGrid->getAssessment()),
-                'maxValue' => $rubricGrid->retrieveCapabilityUsage($capability)?->getMaxValue(),
-                'indicators' => [],
-            ];
-
-            foreach ($rubricGrid->iterateIndicators($capability) as $indicator) {
-                $indicatorUsage = $rubricGrid->retrieveIndicatorUsage($indicator);
-
-                $descriptors = [];
-                foreach ($rubricGrid->getLevels() as $levelIndex => $level) {
-                    $descriptor = $indicatorUsage?->retrieveDescriptor($levelIndex);
-
-                    $descriptors[] = [
-                        // fake negative ID to identify non existent descriptors in the frontend
-                        'id' => $descriptor?->getId() ?? min(array_column($descriptors, 'id'), 0) - 1,
-                        'description' => $descriptor?->getDescription() ?? '',
-                        'maxValue' => $descriptor?->getMaxValue(),
-                    ];
-                }
-
-                $capabilityData['indicators'][] = [
-                    'id' => $indicator->getId(),
-                    'name' => $indicator->getName(),
-                    'inUseExcludingAssessment' => $indicator->isInUseExcluding($rubricGrid->getAssessment()),
-                    'hasUsage' => $indicatorUsage !== null,
-                    'descriptors' => $descriptors,
-                ];
-            }
-
-            $rubricGridPayload['capabilities'][] = $capabilityData;
-        }
-
-        $data['rubricGridPayload'] = $rubricGridPayload;
+        $rubricGridTranslator = new RubricGridTranslator();
+        $data['rubricGridPayload'] = $rubricGridTranslator($rubricGrid);
 
         return $data;
     }
