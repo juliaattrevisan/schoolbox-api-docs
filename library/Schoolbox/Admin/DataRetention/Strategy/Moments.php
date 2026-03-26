@@ -130,11 +130,6 @@ class Moments extends Base
             $this->log->debug(sprintf("Deleting discussion_thread ids: %s", implode(', ', $discussionThreadIds)));
         }
 
-        // some value which will never be an ID
-        $nonExistentId = -1;
-
-        // fill $chunkIds up to $this->chunkSize with $nonExistentId
-        $chunkIds  = array_merge($chunkIds, array_fill(0, $this->chunkSize - count($chunkIds), $nonExistentId));
 
         $delPlaceholders = Builder::getArrayPlaceholders($chunkIds, 'moment_id');
         $statementEvidence = $this->database->prepare($this->deleteStatement('moment_evidence') . " FROM moment_evidence WHERE moment_id IN {$delPlaceholders}");
@@ -144,7 +139,7 @@ class Moments extends Base
         $statementMoment = $this->database->prepare($this->deleteStatement('moment') . " FROM moment WHERE id IN {$delPlaceholders}");
 
         // build params
-        $delParams       = Builder::getArrayParameters($chunkIds, 'moment_id');
+        $delParams = Builder::getArrayParameters($chunkIds, 'moment_id');
 
         // unlink evidence // the Garbage Collector will take care of the actual files, we just need to remove the database records
         $statementEvidence->execute($delParams);
@@ -162,8 +157,6 @@ class Moments extends Base
         $statementMoment->execute($delParams);
 
         if (!empty($discussionThreadIds)) { // if there are discussion threads to delete, delete the threads and comments
-            // fill $discussionThreadIds up to $this->chunkSize with $nonExistentId
-            $discussionThreadIds  = array_merge($discussionThreadIds, array_fill(0, $this->chunkSize - count($discussionThreadIds), $nonExistentId));
             $discussionPlaceholders = Builder::getArrayPlaceholders($discussionThreadIds, 'moment_id');
 
             // delete the discussion thread comments // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads comments that were not... but they do match to the moment...
