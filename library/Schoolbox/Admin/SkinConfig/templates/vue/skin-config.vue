@@ -5,7 +5,6 @@
  */
 
 import { apiRequest } from "@js/util/sbx/apiUtils";
-import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import type { Routes, SkinConfigData } from "../js/types/skinConfigTypes";
 import { useSkinConfigState } from "./composable/useSkinConfigState";
@@ -19,13 +18,25 @@ const props = defineProps<{
 const isProcessing = window.Vue.ref(false);
 const loadError = window.Vue.ref<string | null>(null);
 const saveText = window.Vue.computed(() => (isProcessing.value ? "Saving..." : "Save"));
-const { configs, saveContainer, hasUnsavedChanges, showSaveDrawer, resetToSavedState, markCurrentAsSaved } =
-    useSkinConfigState(props.configs, isProcessing, () => {
+const { configs, hasUnsavedChanges, resetToSavedState, markCurrentAsSaved } = useSkinConfigState(
+    props.configs,
+    isProcessing,
+    () => {
         schedulePreviewRefresh();
-    });
+    },
+);
 const { schedulePreviewRefresh } = useSkinPreview(configs, props.routes.preview);
 const activeConfigs = window.Vue.computed(() =>
     configs.value.toggle.enabled ? configs.value.sonar : configs.value.existing,
+);
+
+// temporarily hide roundness and drop shadow as it's not done yet
+const visibleConfigs = window.Vue.computed(() =>
+    Object.fromEntries(
+        Object.entries(activeConfigs.value).filter(
+            ([categoryKey]) => categoryKey !== "roundness" && categoryKey !== "drop shadow",
+        ),
+    ),
 );
 
 window.Vue.watch(
@@ -113,7 +124,7 @@ async function onSaveSelected(): Promise<void> {
                     </div>
                 </fieldset>
             </section>
-            <template v-for="(subcategories, categoryKey) in activeConfigs" :key="categoryKey">
+            <template v-for="(subcategories, categoryKey) in visibleConfigs" :key="categoryKey">
                 <div class="row">
                     <div class="list-item">
                         <div class="small-12 island">
@@ -178,8 +189,8 @@ async function onSaveSelected(): Promise<void> {
                     </fieldset>
                 </section>
             </template>
-            <div ref="saveContainer" class="save-drawer-anchor">
-                <bottom-drawer :show-drawer="showSaveDrawer">
+            <div class="row">
+                <div class="small-12 column">
                     <div class="l-flex l-flex--justify l-gap-xs">
                         <button
                             v-if="hasUnsavedChanges"
@@ -190,25 +201,17 @@ async function onSaveSelected(): Promise<void> {
                             Undo Changes
                         </button>
                         <button
-                            name="btnSubmit"
+                            :value="saveText"
                             class="button submit l-flex__item--1"
                             data-test="skin-config-save-submit"
                         >
-                            {{ saveText }}
+                            Save
                         </button>
                     </div>
-                </bottom-drawer>
+                </div>
             </div>
         </form>
     </div>
 </template>
 
-<style scoped>
-.skin-config-form {
-    padding-bottom: 100px;
-}
-
-.save-drawer-anchor {
-    min-height: 30px;
-}
-</style>
+<style scoped></style>
