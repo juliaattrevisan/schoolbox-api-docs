@@ -467,7 +467,7 @@ class Mapper extends \Schoolbox\Mapper
         /* TODO Technical Uplift Candidate
          *  The traits are wrong and should have accepted a user instance rather than just an id
          *  All usages of the trait require you to ->getId() anyway, which means you have the user instance already.
-         *  WHy not just supply that instead?
+         *  Why not just supply that instead?
          */
         if (null === $subobject->getCreatedBy()) {
             $subobject->setCreatedBy($this->getSessionUser()->getId());
@@ -478,6 +478,11 @@ class Mapper extends \Schoolbox\Mapper
         }
     }
 
+
+    /* TODO Technical Uplift Candidate
+     *  I've struggled three times now to find a way to save the auditor fields without the dirty double-tap. There must
+     *  be a way to do it.
+     */
 
     /**
      * Prefill deleter fields (the Swamp shouldn't need to know about this)
