@@ -201,14 +201,6 @@ class MyFiles extends Base
             return 0;
         }
 
-        // some value which will never be an ID
-        $nonExistentId = -1;
-
-        // pad up to chunk size so Builder placeholders are consistent
-        if (count($fileIds) < $this->chunkSize) {
-            $fileIds = array_merge($fileIds, array_fill(0, $this->chunkSize - count($fileIds), $nonExistentId));
-        }
-
         $delPlaceholders = Builder::getArrayPlaceholders($fileIds, 'id');
         // Use JOIN-style delete with an alias so joins can be added safely if needed by FK changes
         $statement = $this->database->prepare($this->deleteStatement('f') . " FROM " . self::TABLE_NAME_FILE . " AS f WHERE f.id IN {$delPlaceholders}");
@@ -230,67 +222,12 @@ class MyFiles extends Base
             return 0;
         }
 
-        // some value which will never be an ID
-        $nonExistentId = -1;
+        $delPlaceholders = Builder::getArrayPlaceholders($folderIds, 'id');
+        $delStmt = $this->database->prepare($this->deleteStatement('fo') . " FROM " . self::TABLE_NAME_FOLDER . " AS fo WHERE fo.id IN {$delPlaceholders}");
 
-        $deletedTotal = 0;
+        $delStmt->execute(Builder::getArrayParameters($folderIds, 'id'));
 
-        // Work on a copy of the IDs so we can iteratively delete leaf folders (those with no children)
-        $remaining = array_values($folderIds);
-
-        while (!empty($remaining)) {
-            // pad up to chunk size so Builder placeholders are consistent
-            if (count($remaining) < $this->chunkSize) {
-                $padded = array_merge($remaining, array_fill(0, $this->chunkSize - count($remaining), $nonExistentId));
-            } else {
-                $padded = $remaining;
-            }
-
-            // Find leaf folders among the remaining set (folders that have no child folders)
-            $selectPlaceholders = Builder::getArrayPlaceholders($padded, 'id');
-            $selectStmt = $this->database->prepare(
-                "SELECT fo.id FROM " . self::TABLE_NAME_FOLDER . " AS fo LEFT JOIN " . self::TABLE_NAME_FOLDER . " AS ch ON ch.parent = fo.id WHERE ch.id IS NULL AND fo.id IN {$selectPlaceholders}"
-            );
-            $selectStmt->execute(Builder::getArrayParameters($padded, 'id'));
-
-            $idsToDelete = [];
-            while ($row = $selectStmt->fetch()) {
-                $idsToDelete[] = $row['id'];
-            }
-
-            // Nothing deletable this iteration -> break to avoid infinite loop
-            if (empty($idsToDelete)) {
-                break;
-            }
-
-            // pad idsToDelete to chunk size for consistent placeholders
-            if (count($idsToDelete) < $this->chunkSize) {
-                $idsToDelete = array_merge($idsToDelete, array_fill(0, $this->chunkSize - count($idsToDelete), $nonExistentId));
-            }
-
-            $delPlaceholders = Builder::getArrayPlaceholders($idsToDelete, 'id');
-            $delStmt = $this->database->prepare($this->deleteStatement('fo') . " FROM " . self::TABLE_NAME_FOLDER . " AS fo WHERE fo.id IN {$delPlaceholders}");
-
-            $delStmt->execute(Builder::getArrayParameters($idsToDelete, 'id'));
-
-            $deleted = $delStmt->rowCount();
-            $deletedTotal += $deleted;
-
-            // remove any truly deleted ids from the remaining set (ignore padded non-existent ids)
-            $remaining = array_values(array_diff($remaining, array_filter($idsToDelete, fn($id) => $id !== $nonExistentId)));
-        }
-
-        if (!empty($remaining)) {
-            $this->log->error(
-                sprintf(
-                    'Unable to delete %d folder(s); remaining IDs: %s',
-                    count($remaining),
-                    implode(',', $remaining)
-                )
-            );
-        }
-
-        return $deletedTotal;
+        return $delStmt->rowCount();
     }
 
     /**
@@ -303,14 +240,6 @@ class MyFiles extends Base
     {
         if (empty($fileIds)) {
             return 0;
-        }
-
-        // some value which will never be an ID
-        $nonExistentId = -1;
-
-        // pad up to chunk size so Builder placeholders are consistent
-        if (count($fileIds) < $this->chunkSize) {
-            $fileIds = array_merge($fileIds, array_fill(0, $this->chunkSize - count($fileIds), $nonExistentId));
         }
 
         $delPlaceholders = Builder::getArrayPlaceholders($fileIds, 'id');
