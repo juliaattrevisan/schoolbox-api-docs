@@ -102,7 +102,7 @@
                             {% if hasAssessmentRoutes %}
                                 <li class="separator">{{ locale.translate('activity', false, true) }}</li>
                                 {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" title="Modify this {{ locale.activity }}">Modify</a></li>{% endif %}
-                                {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.activity }}">Delete</a></li>{% endif %}
+                                {% if deleteRoute %}<li><a href="{{ deleteRoute }}" data-action="delete" title="Delete this {{ locale.activity }}"><sbx-icon name="delete"></sbx-icon>Delete</a></li>{% endif %}
                             {% endif %}
                             {% if hasCourseRoutes %}
                                 <li class="separator">Course</li>

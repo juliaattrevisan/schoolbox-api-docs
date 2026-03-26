@@ -455,14 +455,14 @@ window.Vue.watch(
                                 download
                             ></a>
                             <a
-                                class="icon-delete no-text"
+                                class="no-text"
                                 href="#"
                                 title="Delete Evidence"
                                 data-test="mf-evidence-delete"
                                 @click.prevent="
                                     deleteEvidence(mfStore.moment.evidence.findIndex((e) => e === evidence))
                                 "
-                            ></a>
+                            ><sbx-icon name="delete"></sbx-icon></a>
                         </nav>
                     </li>
                 </ul>

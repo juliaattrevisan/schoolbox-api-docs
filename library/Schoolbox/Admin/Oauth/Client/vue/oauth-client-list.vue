@@ -418,11 +418,11 @@ window.Vue.watch(modifySelected, (newSelected) => {
                                     ></a>
                                     <a
                                         href="#delete"
-                                        class="icon-delete no-text"
+                                        class="no-text"
                                         title="Delete this client"
                                         aria-label="Delete this client"
                                         @click.prevent="showDeleteModal(row)"
-                                    ></a>
+                                    ><sbx-icon name="delete"></sbx-icon></a>
                                 </nav>
                             </td>
                         </tr>

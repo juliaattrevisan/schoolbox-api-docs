@@ -73,7 +73,14 @@ $(function() {
                         </div>
                     </div>
                     <nav>
-                        <a href="/cms/myLinksForm.php?delete=1" data-delete="{MYLINK_ID}" class="icon-delete" data-interaction="delete" title="Delete this link"></a>
+                        <a href="/cms/myLinksForm.php?delete=1"
+                           data-delete="{MYLINK_ID}"
+                           class="sbx-icon-only-button no-text"
+                           data-interaction="delete"
+                           title="Delete this link"
+                           aria-label="Delete this link">
+                            <sbx-icon name="delete"></sbx-icon>
+                        </a>
                         <a href="#" data-reveal-id="modify-link-{MYLINK_ID}" class="icon-modify" data-interaction="show-open-form" title="Modify this link"></a>
                     </nav>
                     <div id="modify-link-{MYLINK_ID}" data-reveal class="reveal-modal" aria-labelledby="modify-link-label-{MYLINK_ID}" aria-hidden="true" role="dialog">

@@ -102,11 +102,16 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
             </li>
         {% endif %}
         <li>
-            <a class="icon-delete"
-               data-rubric-criterion="{{ criterionId }}"
-               data-rubric-criterion-name="{{ new ? '' : criterion.name }}"
-               data-role="remove-criterion"
-               href="#">Delete {{ locale.rubricCriterion.proper }}</a>
+                <a
+                    class="sbx-icon-only-button no-text"
+                    data-rubric-criterion="{{ criterionId }}"
+                    data-rubric-criterion-name="{{ new ? '' : criterion.name }}"
+                    data-role="remove-criterion"
+                    href="#"
+                    title="Delete {{ locale.rubricCriterion.proper }}"
+                    aria-label="Delete {{ locale.rubricCriterion.proper }}">
+                     <sbx-icon name="delete"></sbx-icon>
+                </a>
         </li>
     </ul>
 

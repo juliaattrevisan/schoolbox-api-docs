@@ -56,7 +56,7 @@
         <sbx-pop-out content-id="header-options"></sbx-pop-out>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
-        <li><a id="resourcecategory-delete" class="icon-delete" title="Delete" data-action="{{ routeLookup('resourceCategory.delete:post', {id: category.id}) }}">Delete</a></li>
+        <li><a id="resourcecategory-delete" title="Delete" data-action="{{ routeLookup('resourceCategory.delete:post', {id: category.id}) }}"><sbx-icon name="delete"></sbx-icon>Delete</a></li>
     </ul>
     {% endif %}
 </div>

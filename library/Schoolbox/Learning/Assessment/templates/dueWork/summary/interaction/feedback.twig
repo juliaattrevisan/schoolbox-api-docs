@@ -169,7 +169,12 @@ Data:
                 <a href="#" class="icon-{{ collapsed ? 'down' : 'up' }}-arrow" data-collapser="feedback-{{ responseId }}-{{ currentFeedback.id }}"></a>
             {% endif %}
             {% if deleteRoute and deleteIcon %}
-                <a class="icon-delete" data-delete="{{ deleteRoute }}"></a>
+                <a class="sbx-icon-only-button no-text"
+                   data-delete="{{ deleteRoute }}"
+                   title="Delete feedback"
+                   aria-label="Delete feedback">
+                    <sbx-icon name="delete"></sbx-icon>
+                </a>
             {% endif %}
         </nav>
 

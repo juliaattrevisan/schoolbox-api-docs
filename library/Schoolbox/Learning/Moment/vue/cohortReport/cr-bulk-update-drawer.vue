@@ -120,10 +120,11 @@ async function onAction(type: keyof typeof selectedResultActions.value): Promise
 
         <div class="l-flex-row l-flex--justify l-gap-xs">
             <button
-                class="button l-flex__item--1-auto icon-delete"
+                class="button l-flex__item--1-auto"
                 :disabled="selectedResultActions.delete.length === 0"
                 @click="onAction('delete')"
             >
+                <sbx-icon name="delete"></sbx-icon>
                 Delete
             </button>
             <button

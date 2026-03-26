@@ -31,7 +31,14 @@
             <li><a class="icon-document" data-action="open" href="{{ file.getHref() }}" target="_blank">Open</a></li>
             {% if access >= 2 %}
             <li><a class="icon-modify" data-action="modify" href="{{ modify ~ file.id }}">Modify</a></li>
-            <li><a class="icon-delete" data-action="delete" href="{{ delete ~ file.id }}">Delete</a></li>
+            <li><a class="sbx-icon-only-button no-text"
+                   data-action="delete"
+                   href="{{ delete ~ file.id }}"
+                   title="Delete file"
+                   aria-label="Delete file">
+                <sbx-icon name="delete"></sbx-icon>
+                Delete
+            </a></li>
             {% endif %}
         {% endset %}
 

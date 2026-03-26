@@ -53,7 +53,15 @@
                     {% else %}
                         <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForClass', {folder: unit.course.folder, folderId: unit.course.folder.id}) }}" class="icon-curriculum">Class Markbook</a></li>
                     {% endif %}
-                    <li><a href="{{ routeLookupIfAuthorized('course.deleteUnitImplementation', {id: unit.id}) }}" data-action="delete-unit" data-test="course-outline-unit-delete" class="icon-delete" title="Delete this {{ locale.unit }}">Delete</a></li>
+                    <li><a href="{{ routeLookupIfAuthorized('course.deleteUnitImplementation', {id: unit.id}) }}"
+                           data-action="delete-unit"
+                           data-test="course-outline-unit-delete"
+                           class="sbx-icon-only-button no-text"
+                           title="Delete this {{ locale.unit }}"
+                           aria-label="Delete this {{ locale.unit }}">
+                        <sbx-icon name="delete"></sbx-icon>
+                        Delete
+                    </a></li>
                 </ul>
                 {% endif %}
 

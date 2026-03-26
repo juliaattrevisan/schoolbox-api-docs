@@ -187,11 +187,11 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                     </div>
                     <nav>
                         <a
-                            class="delete-row-button icon-delete"
+                            class="delete-row-button"
                             :class="{ disabled: existingCourseTemplateCount === 1 && element.id >= 0 }"
                             title="Delete Template"
                             @click.prevent="onDeleteClicked(element)"
-                        ></a>
+                        ><sbx-icon name="delete"></sbx-icon></a>
                     </nav>
                 </div>
             </li>

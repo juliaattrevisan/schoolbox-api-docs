@@ -197,9 +197,9 @@ export default {
                                 <a
                                     @click.prevent="showDeleteModal(comment)"
                                     href="#delete-comment"
-                                    class="icon-delete no-text"
+                                    class="no-text"
                                     title="Delete comment"
-                                ></a>
+                                ><sbx-icon name="delete"></sbx-icon></a>
                             </nav>
                             <media-article :content="comment.body"></media-article>
                         </li>

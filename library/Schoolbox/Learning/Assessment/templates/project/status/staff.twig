@@ -216,7 +216,14 @@ Data:
                                             returnUrl: RETURN_URL.current,
                                         } only %}
 
-                                        {% if deleteRoute %}<li><a href="{{ deleteRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-delete" data-delete="{{ assessable.id }}" title="Delete this {{ locale.activity }}">Delete</a></li>{% endif %}
+                                        {% if deleteRoute %}<li><a href="{{ deleteRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}"
+                                                               class="sbx-icon-only-button no-text"
+                                                               data-delete="{{ assessable.id }}"
+                                                               title="Delete this {{ locale.activity }}"
+                                                               aria-label="Delete this {{ locale.activity }}">
+                                            <sbx-icon name="delete"></sbx-icon>
+                                            Delete
+                                        </a></li>{% endif %}
                                     </ul>
                                 {% endif %}
                             </div>

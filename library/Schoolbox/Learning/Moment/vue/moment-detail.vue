@@ -72,7 +72,8 @@ async function deleteMoment(): Promise<void> {
                 <a class="icon-modify" :href="getReturnUrl(props.moment._links.modifyForm)"> Modify </a>
             </li>
             <li v-if="props.moment._links.delete">
-                <a class="icon-delete" :href="props.moment._links.delete" @click.prevent="isDeleteModalOpen = true">
+                <a :href="props.moment._links.delete" @click.prevent="isDeleteModalOpen = true">
+                    <sbx-icon name="delete"></sbx-icon>
                     Delete
                 </a>
             </li>

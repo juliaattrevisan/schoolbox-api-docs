@@ -52,8 +52,8 @@
                             {% endfor %}
                             <li class="separator">Division Membership</li>
                             <li><a href="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.id}) }}"
-                                   class="icon-delete"
-                                   data-remove-player="{{ playerData.player.id }}">Remove Player From Division</a></li>
+                                class="sbx-button--has-icon"
+                                data-remove-player="{{ playerData.player.id }}"><sbx-icon name="delete"></sbx-icon>Remove Player From Division</a></li>
                         </ul>
                     </div>
                 </li>

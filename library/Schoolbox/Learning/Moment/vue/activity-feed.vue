@@ -759,11 +759,11 @@ window.Vue.onMounted(async () => {
                                             <li>
                                                 <a
                                                     v-if="item.object._links.delete"
-                                                    class="icon-delete"
                                                     title="Delete"
                                                     :data-test="`learning-moment-delete-${item.object.id}`"
                                                     @click.prevent="showDeleteModal(item)"
                                                 >
+                                                    <sbx-icon name="delete"></sbx-icon>
                                                     Delete
                                                 </a>
                                             </li>

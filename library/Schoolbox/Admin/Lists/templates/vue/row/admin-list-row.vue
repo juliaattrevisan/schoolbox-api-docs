@@ -137,7 +137,7 @@ export default {
             <nav v-if="canDelete">
                 <a
                     @click.prevent="onDeleteRowSelected"
-                    class="delete-row-button icon-delete"
+                    class="delete-row-button"
                     href="#delete-row"
                     title="Delete Row"
                     :data-test="`admin-list-row-delete-button-${row.id}`"

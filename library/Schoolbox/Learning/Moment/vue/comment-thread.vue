@@ -320,11 +320,10 @@ export default {
                             <nav>
                                 <a
                                     v-if="comment._links.delete.auth"
-                                    class="icon-delete"
                                     title="Delete comment"
                                     data-test="learning-moment-delete-comment"
                                     @click.prevent="showDeleteModal(index)"
-                                />
+                                ><sbx-icon name="delete"></sbx-icon></a>
                             </nav>
                             <media-article
                                 data-test="learning-moment-comment-thread-comment"

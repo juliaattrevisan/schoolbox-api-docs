@@ -485,10 +485,11 @@ function onClearAllSelected() {
         <div class="extra-actions-container">
             <button
                 v-if="isClassSelectorActive && hasSelectedClasses"
-                class="button icon-delete clear-all-button"
+                class="button clear-all-button"
                 aria-label="Clear all Classes"
                 @click.prevent="onClearAllSelected"
             >
+                <sbx-icon name="delete"></sbx-icon>
                 Clear all Classes
             </button>
         </div>

@@ -9,8 +9,7 @@
 
 {% for tab in tabs %}
     <li data-id="{{ tab.id }}"> {# data-id is used by JS to map between the top menu and side menu (overflow) version of these menu items #}
-        <a{% if tabCurrent | lower == tab.token | lower and tab.token is not empty %} class="navthis"{% endif %}
-           {# Should href tokens be url-encoded? #}
+        <a{% if tabCurrent | lower == tab.token | lower and tab.token is not empty %} class="navthis sbx-button--has-icon"{% else %} class="sbx-button--has-icon"{% endif %}
            href="{{ tab.url | ireplace(tokens) }}"
            title="{{ tab.title }}"
            {% if tab.target is not empty %}target="{{ tab.target }}"{% endif %}

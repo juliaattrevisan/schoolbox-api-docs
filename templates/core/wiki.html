@@ -59,7 +59,14 @@
 		<li><a href="/wiki/modifyForm.php?toggleLock={WIKI_ID}" class="icon-unlocked">Unlock</a></li>
 		<!-- END unlock_link -->
 		<!-- BEGIN delete_link -->
-		<li><a href="/wiki/modifyForm.php?delete={WIKI_ID}" class="icon-delete" data-delete-wiki>Delete</a></li>
+		<li><a href="/wiki/modifyForm.php?delete={WIKI_ID}"
+			   class="sbx-icon-only-button no-text"
+			   data-delete-wiki
+			   title="Delete wiki"
+			   aria-label="Delete wiki">
+				<sbx-icon name="delete"></sbx-icon>
+				Delete
+			</a></li>
 		<!-- END delete_link -->
 		<!-- BEGIN revert_link -->
 		<li><a href="/wiki/modifyForm.php?wikiID={WIKI_ID}&revert={CURRENT_REVISION}" class="icon-refresh" data-revert>Revert to this revision</a></li>

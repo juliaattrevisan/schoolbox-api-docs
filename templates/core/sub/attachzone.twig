@@ -40,7 +40,10 @@ $data = {
             {% if not attachzone.readonly %}
             <nav>
                 <a href="/storage/fetch.php?hash={{ attachment.hash|split(':')[1] }}&save=1" class="icon-download" title="Download"></a>
-                <a href="#" data-dz-remove title="Remove" class="icon-delete"></a>
+                <a href="#" data-dz-remove title="Remove" class="sbx-button--has-icon" aria-label="Remove">
+                    <sbx-icon name="delete"></sbx-icon>
+                    Remove
+                </a>
                 <input type="hidden" name="{{ attachzone.fileVar }}" value="{{ attachment.hash }}" data-az-attachment />
             </nav>
             {% endif %}
@@ -63,7 +66,10 @@ $data = {
                     </div>
                 </div>
                 <nav>
-                    <a href="#" data-dz-remove title="Remove" class="icon-delete"></a>
+                    <a href="#" data-dz-remove title="Remove" class="sbx-button--has-icon" aria-label="Remove">
+                        <sbx-icon name="delete"></sbx-icon>
+                        Remove
+                    </a>
                     <input type="hidden" data-az-attachment name="{{ attachzone.fileVar }}" value="" />
                 </nav>
                 <div class="progress"><span class="meter" style="width:0;" data-dz-uploadprogress></span></div>

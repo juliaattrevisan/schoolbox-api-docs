@@ -26,7 +26,14 @@
          -->
 
         <!-- BEGIN delete_survey -->
-        <li><a class="icon-delete" href="/survey/delete/{ASSESS_ASSESS_ID}{RETURN_URL}" data-delete>Delete</a></li>
+        <li><a class="sbx-icon-only-button no-text"
+               href="/survey/delete/{ASSESS_ASSESS_ID}{RETURN_URL}"
+               data-delete
+               title="Delete survey"
+               aria-label="Delete survey">
+            <sbx-icon name="delete"></sbx-icon>
+            Delete
+        </a></li>
         <!-- END delete_survey -->
 
         <!-- BEGIN delete_quiz -->
@@ -49,7 +56,14 @@
                 });
             });
         </script>
-        <li><a class="icon-delete" href="/learning/assessments/{ASSESSMENT_ID}/delete{RETURN_URL}" data-post-delete>Delete</a></li>
+        <li><a class="sbx-icon-only-button no-text"
+               href="/learning/assessments/{ASSESSMENT_ID}/delete{RETURN_URL}"
+               data-post-delete
+               title="Delete quiz"
+               aria-label="Delete quiz">
+            <sbx-icon name="delete"></sbx-icon>
+            Delete
+        </a></li>
         <!-- END delete_quiz -->
 
         <li><a class="icon-export" href="/{ASSESS_KIND_LC}/export/xml/{ASSESS_ASSESS_ID}">Export</a></li>

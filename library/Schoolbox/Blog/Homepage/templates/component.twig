@@ -110,7 +110,14 @@
 
                                 {% if isRouteAuthorized('blog.postCommentDelete', { comment: comment, folder: folder }) %}
                                 <nav>
-                                    <a data-interaction="deletecomment" class="icon-delete" data-blog-id="{{ blog.getId }}" data-comment-id="{{ comment.getId }}"></a>
+                                    <a data-interaction="deletecomment"
+                                       class="sbx-icon-only-button no-text"
+                                       data-blog-id="{{ blog.getId }}"
+                                       data-comment-id="{{ comment.getId }}"
+                                       title="Delete comment"
+                                       aria-label="Delete comment">
+                                        <sbx-icon name="delete"></sbx-icon>
+                                    </a>
                                 </nav>
                                 {% endif %}
 

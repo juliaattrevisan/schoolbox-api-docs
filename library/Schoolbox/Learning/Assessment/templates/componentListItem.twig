@@ -135,7 +135,7 @@
                     } only %}
                 {% endif %}
 
-                {% if deleteRoute %}<li><a class="icon-delete" href="{{ deleteRoute }}" data-action="delete" data-id="{{ assessable.id }}" data-test="component-assessment-actions-delete-{{ assessable.id }}">Delete</a></li>{% endif %}
+                {% if deleteRoute %}<li><a href="{{ deleteRoute }}" data-action="delete" data-id="{{ assessable.id }}" data-test="component-assessment-actions-delete-{{ assessable.id }}"><sbx-icon name="delete"></sbx-icon>Delete</a></li>{% endif %}
             {% endif %}
             {% if hasCourseRoutes %}
                 <li class="separator">Course</li>

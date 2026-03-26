@@ -8,6 +8,13 @@
         <li><a class="icon-download" data-action="download" href="#">Download</a></li>
     {% endif %}
     {% if access >= 2 or user.isSuperuser %}
-        <li><a class="icon-delete"   data-action="delete"   href="/cms/networkFolderForm.php?ajax=1&delete={{ folder.id }}">Delete</a></li>
+        <li><a class="sbx-icon-only-button no-text"
+               data-action="delete"
+               href="/cms/networkFolderForm.php?ajax=1&delete={{ folder.id }}"
+               title="Delete folder"
+               aria-label="Delete folder">
+            <sbx-icon name="delete"></sbx-icon>
+            Delete
+        </a></li>
     {% endif %}
 {% endif %}

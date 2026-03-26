@@ -68,10 +68,9 @@ function onDeleteUnit(): void {
                 <li v-if="props.unit._routes.delete">
                     <!-- we ignore this li as the formatting is adding whitespace -->
                     <button
-                        class="icon-delete"
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-delete-button`"
                         @click.prevent="onDeleteUnit"
-                    >Delete
+                    ><sbx-icon name="delete"></sbx-icon>Delete
                     </button>
                 </li>
             </ul>

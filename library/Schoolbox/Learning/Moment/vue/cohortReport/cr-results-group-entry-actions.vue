@@ -43,7 +43,8 @@ async function onApprove(): Promise<void> {
         <a class="icon-modify" :href="getReturnUrl(props.entry._links.modifyForm)"> Modify </a>
     </li>
     <li v-if="props.entry._links.delete">
-        <a class="icon-delete" @click.prevent="crmStore.openModal(props.entry, CohortReportModalType.CONFIRM_DELETE)">
+        <a @click.prevent="crmStore.openModal(props.entry, CohortReportModalType.CONFIRM_DELETE)">
+            <sbx-icon name="delete"></sbx-icon>
             Delete
         </a>
     </li>

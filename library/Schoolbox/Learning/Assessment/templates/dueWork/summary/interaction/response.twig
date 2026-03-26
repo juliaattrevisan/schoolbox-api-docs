@@ -74,7 +74,7 @@
                 <ul id="response-options-{{ currentInteraction.id }}" class="f-dropdown" data-dropdown-content>
                     {%  if url %} <li><a href="{{ url }}" class="icon-task" title="{{ tooltip }}" >{{ tooltip }}</a></li>
                     {% endif %}
-                    <li><a href="{{ viewRoute }}" class="icon-delete" title="Delete submission" data-delete="{{ deleteRoute }}">Delete</a></li>
+                    <li><a href="{{ viewRoute }}" title="Delete submission" data-delete="{{ deleteRoute }}"><sbx-icon name="delete"></sbx-icon>Delete</a></li>
                 </ul>
                 {% endif %}
             </li>

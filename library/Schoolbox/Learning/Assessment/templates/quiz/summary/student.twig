@@ -171,7 +171,7 @@
 
                                 {% set deleteRoute = routeLookupIfAuthorized('learningQuiz.postAttemptDelete', {assessmentId: assessment.id, assessment: assessment}) %}
                                 {% if deleteRoute %}
-                                    <a href="{{ deleteRoute }}" class="icon-delete" title="Delete Attempt" data-delete="{{ attempt.id }}"></a>
+                                    <a href="{{ deleteRoute }}" title="Delete Attempt" data-delete="{{ attempt.id }}"><sbx-icon name="delete"></sbx-icon></a>
                                 {% endif %}
                             </nav>
                         </td>

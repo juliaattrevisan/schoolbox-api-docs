@@ -65,14 +65,14 @@ window.Vue.onMounted(() => {
                             />
                             <button
                                 v-if="index > 0"
-                                class="button button--icon-only icon-delete f-no-margins"
+                                class="button button--icon-only f-no-margins"
                                 type="button"
                                 :disabled="addUnitsStore.newUnits.length === 1"
                                 title="Delete"
                                 aria-label="Delete"
                                 :data-test="`up-add-units-delete-${index}`"
                                 @click.prevent="addUnitsStore.remove(index)"
-                            ></button>
+                            ><sbx-icon name="delete"></sbx-icon></button>
                         </div>
                         <label v-if="addUnitsStore.validationErrors[index]" class="error"
                             >Please add a {{ locale.unit.translate(false, false) }} name</label

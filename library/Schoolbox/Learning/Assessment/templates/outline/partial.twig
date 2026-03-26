@@ -72,7 +72,15 @@
                 } only %}
             {% endif %}
 
-            {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" data-test="activity-delete-{{ assessment.id }}" title="Delete this {{ locale.assessment }}" >Delete</a></li>{% endif %}
+            {% if deleteRoute %}<li><a href="{{ deleteRoute }}"
+                                   class="sbx-icon-only-button no-text"
+                                   data-action="delete"
+                                   data-test="activity-delete-{{ assessment.id }}"
+                                   title="Delete this {{ locale.assessment }}"
+                                   aria-label="Delete this {{ locale.assessment }}">
+                <sbx-icon name="delete"></sbx-icon>
+                Delete
+            </a></li>{% endif %}
         {% endif %}
         {% if hasCourseRoutes %}
             <li class="separator">Course</li>

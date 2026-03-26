@@ -92,7 +92,14 @@
                         {% endif %}
 
                         {% if deleteRoute %}
-                            <li><a href="{{ viewRoute }}" class="icon-delete" title="Delete response" data-delete="{{ deleteRoute }}">Delete</a></li>
+                            <li><a href="{{ viewRoute }}"
+                                   class="sbx-icon-only-button no-text"
+                                   title="Delete response"
+                                   data-delete="{{ deleteRoute }}"
+                                   aria-label="Delete response">
+                                <sbx-icon name="delete"></sbx-icon>
+                                Delete
+                            </a></li>
                         {% endif %}
                     </ul>
                 {% endif %}

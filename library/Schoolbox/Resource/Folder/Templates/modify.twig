@@ -277,7 +277,13 @@
                 <li><a class="icon-group" href="{{ routeLookup('group.getModify', {folderId: folder.id, folder: folder}) }}" title="Manage individual user access to this folder">Manage Group</a></li>
             {% endif %}
 
-            <li><a class="icon-delete" data-interaction="delete">Delete Folder</a></li>
+            <li><a class="sbx-icon-only-button no-text"
+                   data-interaction="delete"
+                   title="Delete Folder"
+                   aria-label="Delete Folder">
+                <sbx-icon name="delete"></sbx-icon>
+                Delete Folder
+            </a></li>
             <li><a class="icon-refresh" data-reset-homepage-content>Reset Content</a>
         </ul>
     {% endif %}

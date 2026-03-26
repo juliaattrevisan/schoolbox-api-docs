@@ -88,7 +88,13 @@
 
                         {% if isRouteAuthorized('eportfolioBlog.postCommentDelete', {comment: comment, page: page }) %}
                             <nav>
-                                <a class="icon icon-delete" data-interaction="delete" data-comment-id="{{ comment.getId }}"></a>
+                                <a class="sbx-icon-only-button no-text"
+                                   data-interaction="delete"
+                                   data-comment-id="{{ comment.getId }}"
+                                   title="Delete comment"
+                                   aria-label="Delete comment">
+                                    <sbx-icon name="delete"></sbx-icon>
+                                </a>
                             </nav>
                         {% endif %}
 
