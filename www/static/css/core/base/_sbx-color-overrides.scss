@@ -184,11 +184,22 @@ body.sbx-body {
         border: none;
     }
 
+    // use the new config setting colours
     .component-titlebar {
         background-color: var(--sbx-config-color-component-heading-background);
         h2,
         nav a[class^="icon-"] {
             color: var(--sbx-config-color-component-heading-text);
+        }
+    }
+
+    // use the hover colour to indicate the active page
+    .hybrid-bar .top-menu li a.navthis {
+        background: var(--sbx-config-color-menu-hover);
+        border-radius: var(--sbx-config-field-roundness);
+        &:before,
+        span {
+            color: var(--sbx-config-color-menu-foreground);
         }
     }
 }

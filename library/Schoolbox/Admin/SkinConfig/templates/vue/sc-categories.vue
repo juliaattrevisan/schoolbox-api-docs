@@ -107,7 +107,10 @@ function onPreviewRefresh(): void {
                     </div>
                 </div>
                 <template v-if="configs.toggle.enabled">
-                    <div v-if="subcategory.name === 'Component'" class="small-12 columns">
+                    <div
+                        v-if="subcategory.name === 'General' || subcategory.name === 'Component'"
+                        class="small-12 columns"
+                    >
                         <h4>Preview</h4>
                     </div>
                     <template v-if="subcategory.name === 'Component'">
@@ -126,6 +129,49 @@ function onPreviewRefresh(): void {
                                     </nav>
                                 </div>
                             </div>
+                        </div>
+                    </template>
+                    <template v-else-if="subcategory.name === 'General'">
+                        <div class="small-12 medium-4 columns">
+                            <label class="required" for="title">Title</label>
+                            <input id="title" type="text" name="title" value="School Musical" maxlength="255" />
+                        </div>
+                        <div class="small-12 medium-4 columns">
+                            <div class="checklist l-flex-col l-gap-s">
+                                <label class="title">Filter</label>
+                                <ul class="option-list l-flex-row l-gap-s">
+                                    <li data-v-40e5173a="">
+                                        <input type="checkbox" checked />
+                                        <label for="waiting-list">Waiting List</label>
+                                    </li>
+                                    <li data-v-40e5173a="">
+                                        <input type="checkbox" />
+                                        <label for="admin-access">Group Admin</label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="small-12 medium-4 columns">
+                            <label for="news-topics-selectized">Topics</label>
+                            <div class="selectize-control multi plugin-remove_button">
+                                <div class="selectize-input items not-full has-options has-items">
+                                    <div class="item" data-value="1">
+                                        General Notices<a class="remove" title="Remove">×</a>
+                                    </div>
+                                    <div class="item" data-value="3">
+                                        Community<a class="remove" title="Remove">×</a>
+                                    </div>
+                                    <input type="text" autofill="no" tabindex="" style="width: 4px" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="small-12 columns">
+                            <ul class="flex-list buttons">
+                                <li>
+                                    <a href="#"><sbx-icon name="previous"></sbx-icon>Cancel</a>
+                                </li>
+                                <li><a href="#" class="submit">Confirm</a></li>
+                            </ul>
                         </div>
                     </template>
                 </template>
