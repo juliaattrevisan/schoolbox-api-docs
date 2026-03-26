@@ -459,12 +459,6 @@
 
             // Initiate
             processUseRubricClick($useRubricSwitch);
-
-            /**
-             * Catch a custom event that's fired on rubric csv import
-             * Use it to re-init the entire rubric grid
-             */
-            $('#rubric-attachable').on('rubric-grid-imported', initRubricGrid);
         }
 
         // Init the entire grid on document.ready

@@ -12,6 +12,7 @@ import { shiftArrayItem } from "@js/util/arrayUtils";
 import { MARK_TYPE_VALUE_NONE } from "@schoolboxAssessment/Types/MarkType";
 import LevelEditable from "./level-editable.vue";
 import CapabilityEditable from "./capability-editable.vue";
+import { RUBRIC_GRID_IMPORTED } from "./event";
 import { MAX_CAPABILITY_LENGTH } from "./types";
 import type { RubricGrid, RubricGridLevel, RubricGridCapability, RubricGridIndicator } from "./types";
 
@@ -71,13 +72,6 @@ function normaliseForComparison(string: string): string {
 
 const isCreating = window.Vue.ref(false); // whether we're currently creating a new capability/indicator
 const newCapabilityName = window.Vue.ref("");
-
-// async function onAddKeydown(event: KeyboardEvent, type: "group", capabilityId: null): Promise<void>;
-// async function onAddKeydown<TType extends "group" | "level" | "criterion">(
-//     event: KeyboardEvent,
-//     type: TType,
-//     capabilityId: TType extends "group" ? null : number,
-// ): Promise<void> {
 
 /**
  * When a key is pressed in the "add capability" or "add indicator" textarea,
@@ -241,6 +235,14 @@ window.Vue.watch(rubricSum, (newValue) => {
     if (instructorMaxMarkInput instanceof HTMLInputElement) {
         instructorMaxMarkInput.value = newValue.toString();
     }
+});
+
+/**
+ * Listen for a rubric grid import event
+ * TODO: this logic will need to change for multiple rubrics
+ */
+document.addEventListener(RUBRIC_GRID_IMPORTED, (event) => {
+    rubricGrid.value = event.detail.rubricGrid;
 });
 </script>
 

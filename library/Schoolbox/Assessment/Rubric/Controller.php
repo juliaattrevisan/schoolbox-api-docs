@@ -22,6 +22,7 @@ use Schoolbox\Assessment\Rubric\Grid\Exporter\ArrayExporter;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Level;
+use Schoolbox\Assessment\Rubric\Grid\Translator\ModelToArray as RubricGridTranslator;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -336,25 +337,22 @@ class Controller extends BaseController
             return;
         }
 
-        /* Obtain the grid html separately from the other rubric settings
+        /* Obtain the grid data separately from the other rubric settings
          *
          * Otherwise you have to infer the settings from what might have been visible in the grid
          */
-        $fragment = $this->responseFromTemplateUnthemed('@rubric/grid-editable.twig', $context = [
-            'formField'  => $post->get('formField', 'rb'),
-            'rubricGrid' => $assessment->getRubricGrid(),
-            'levelLimit' => $maxLevels,
-        ])->getBody()->getContents();
+        $rubricGridTranslator = new RubricGridTranslator();
+        $rubricGridPayload = $rubricGridTranslator($assessment->getRubricGrid());
 
         $payload = [
 
             /* Capability Mark Type value, if applicable
              */
-            'capabilityMarkType' => $assessment->getCapabilityMarkType() ? $assessment->getCapabilityMarkType()->getId() : null,
+            'capabilityMarkType' => $assessment->getCapabilityMarkType()?->getId(),
 
             /* Capability Grade Group value, if applicable
              */
-            'capabilityGradeGroup' => $assessment->getCapabilityGradeGroup() ? $assessment->getCapabilityGradeGroup()->getId() : null,
+            'capabilityGradeGroup' => $assessment->getCapabilityGradeGroup()?->getId(),
 
             /* Use Mark Range switch; grid-editable doesn't use this var
              * This compiled payload ends up in grid-csv.twig as result of async request
@@ -363,7 +361,7 @@ class Controller extends BaseController
 
             /* The rubric grid resulting from the csv import
              */
-            'fragment' => $fragment,
+            'rubricGrid' => $rubricGridPayload,
         ];
 
         $this->response = $this->responseAsJson($payload);

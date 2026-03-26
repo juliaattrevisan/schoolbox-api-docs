@@ -13,6 +13,7 @@ import type { ActivityStatusPageDocumentEventHandlerMap } from "@schoolboxLibrar
 import type { FiltersChangeEventHandlerMap } from "@schoolboxVue/components/grid/lazyGrid/event/LazyGridEvent";
 import type { SbxSearchSelectFiltersChangeEventHandlerMap } from "@schoolboxVue/components/searchSelect/event/SbxSearchSelectEvent";
 import type { FilterEventHandlerMap } from "@schoolboxLibrary/Filter/templates/ts/filterEvent";
+import type { RubricGridDocumentEventHandlerMap } from "@schoolboxAssessment/Rubric/templates/vue/event";
 
 /**
  * FOR EVENTS DISPATCHED TO THE DOCUMENT
@@ -28,7 +29,8 @@ export interface SbxGlobalDocumentEventHandlerMap
         ActivityStatusPageDocumentEventHandlerMap,
         FiltersChangeEventHandlerMap,
         SbxSearchSelectFiltersChangeEventHandlerMap,
-        FilterEventHandlerMap {}
+        FilterEventHandlerMap,
+        RubricGridDocumentEventHandlerMap {}
 
 /**
  * FOR EVENTS DISPATCHED TO ANY ELEMENT

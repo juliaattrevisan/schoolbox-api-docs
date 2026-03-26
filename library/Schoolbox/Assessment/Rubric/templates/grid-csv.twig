@@ -12,7 +12,6 @@
             }
 
             var wrap   = $(this),
-                target = wrap.find('[data-replaceable]'),
                 body   = $('body'),
                 assessmentIdInput,
                 folderIdInput,
@@ -74,24 +73,25 @@
             // get the new grid markup
             $.post(url, postdata).done(function (data) {
 
-                // dump in the new data
-                target.html(data.fragment).promise().done(function() {
-                    // Fire a custom event, this is used on dueWork/create.twig to update a field on import
-                    $('#rubric-attachable{{ idSuffix }}').trigger('rubric-grid-imported');
+                // dump in the new data (event used in rubric-grid-editable.vue)
+                document.dispatchEvent(new CustomEvent('RUBRIC_GRID_IMPORTED', {
+                    detail: {
+                        rubricGrid: data.rubricGrid,
+                    },
+                }));
 
-                    /* Set switches and dropdowns via payload values
-                     */
-                    body.find('#capability-markType').val(data.capabilityMarkType).trigger('change');
-                    if (data.capabilityGradeGroup) {
-                        body.find('#capability-gradingScheme').val(data.capabilityGradeGroup);
-                    }
+                /* Set switches and dropdowns via payload values
+                */
+                body.find('#capability-markType').val(data.capabilityMarkType).trigger('change');
+                if (data.capabilityGradeGroup) {
+                    body.find('#capability-gradingScheme').val(data.capabilityGradeGroup);
+                }
 
-                    if (data.useMarkRange) {
-                        body.find('#useMarkRange').prop('checked', true);
-                    } else {
-                        body.find('#useMarkRange').prop('checked', false);
-                    }
-                });
+                if (data.useMarkRange) {
+                    body.find('#useMarkRange').prop('checked', true);
+                } else {
+                    body.find('#useMarkRange').prop('checked', false);
+                }
 
             }).fail(function (data) {
 
@@ -137,9 +137,7 @@
 </script>
 <div id="rubric-attachable{{ idSuffix }}">
     <div data-hideable>
-        <div data-replaceable>
-            {% include '@rubric/grid-editable.twig' %}
-        </div>
+        {% include '@rubric/grid-editable.twig' %}
         <div>
             {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
         </div>
