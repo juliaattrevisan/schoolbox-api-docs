@@ -1948,15 +1948,15 @@ class Controller extends Base
 
                 // Handle fields with explicit getters that don't correspond to a model property (derived or computed fields).
                 // (e.g. Assessment\WorkType\Model->getVisibility() derives its return value from other properties.)
-                $id = $row->$idGetter();
+                $rowId = $row->$idGetter();
                 foreach ($tables[$table]['fields'] as $fieldName => $fieldConfig) {
-                    if (isset($fieldConfig['getter']) && !isset($records[$id][$fieldName])) {
+                    if (isset($fieldConfig['getter']) && !isset($records[$rowId][$fieldName])) {
                         $getter = $fieldConfig['getter'];
                         if ($reflect->hasMethod($getter)) {
-                            if (!isset($records[$id])) {
-                                $records[$id] = [];
+                            if (!isset($records[$rowId])) {
+                                $records[$rowId] = [];
                             }
-                            $records[$id][$fieldName] = $row->$getter();
+                            $records[$rowId][$fieldName] = $row->$getter();
                         }
                     }
                 }
