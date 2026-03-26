@@ -1902,6 +1902,8 @@ class Controller extends Base
             $rows     = $mapper->findAll(['order' => $orderArr]);
         }
 
+        $idGetter = $tables[$table]['fields']['id']['getter'] ?? 'getId';
+
         foreach ($rows as $row) {
             // Go through every property available
 
@@ -1921,12 +1923,6 @@ class Controller extends Base
                         }
 
                         if ($reflect->hasMethod($getter)) {
-                            if (isset($tables[$table]['fields']['id']['getter'])) {
-                                $idGetter = $tables[$table]['fields']['id']['getter'];
-                            } else {
-                                $idGetter = 'getId';
-                            }
-
                             $id = $row->$idGetter();
 
                             if (!isset($records[$id])) {
