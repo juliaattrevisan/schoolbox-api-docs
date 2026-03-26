@@ -38,11 +38,10 @@
                     entity:   team
                 }) %}
                 {% if routeRemovePlayers %}
-                <a href="{{ routeRemovePlayers }}"
-                   class="icon-close"
-                   title="Remove Player from {{ team.name }}"
-                   data-remove-team-player="{{ teamPlayer.id }}"
-                   data-affected-team="{{ team.id }}"></a>
+                     <a href="{{ routeRemovePlayers }}"
+                         title="Remove Player from {{ team.name }}"
+                         data-remove-team-player="{{ teamPlayer.id }}"
+                         data-affected-team="{{ team.id }}"><sbx-icon name="close"></sbx-icon></a>
                 {% endif %}
             </nav>
         </div>

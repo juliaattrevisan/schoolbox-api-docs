@@ -68,7 +68,10 @@
             href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
             data-series-id="{{ event.booking.event.seriesId }}"
             data-set-status="rejected"
-            class="icon-close"
-        >Reject{% if booking.clash %} Clash Booking{% endif %}</a>
+            class="sbx-button--has-icon"
+        >
+            <sbx-icon name="close"></sbx-icon>
+            Reject{% if booking.clash %} Clash Booking{% endif %}
+        </a>
     </li>
 </ul>

@@ -413,10 +413,12 @@ export default {
                                     <li v-if="badge.allowAsGoal">
                                         <a
                                             @click.prevent="openGoalWithdrawModal(badge)"
-                                            class="icon-close"
+                                            class="sbx-button--has-icon"
                                             title="Remove goal"
-                                            >Remove goal</a
                                         >
+                                            <sbx-icon name="close"></sbx-icon>
+                                            Remove goal
+                                        </a>
                                     </li>
                                     <li>
                                         <a :href="badge._links.update" class="icon-modify" title="Modify">Modify</a>
