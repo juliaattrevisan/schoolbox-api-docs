@@ -429,6 +429,7 @@ class Factory
 
         if ($viewee->getQualificationCollection()) {
             $qualificationNames = implode(', ', $viewee->getQualificationCollection()->indexBy('name')->keys());
+        }
 
         /* Concatenating all the nationalities together
          */
