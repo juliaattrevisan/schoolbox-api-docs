@@ -379,8 +379,11 @@ services:
     build:
       context: ./devkit-lti1p3-phpfpm
     env_file:
+      # env file is not required for docker/up:
+      # this file will be built on docker/provision, because it relies upon
+      # data which is created on provision.
       - path: ./devkit-lti1p3-phpfpm/.env
-#        required: true
+        required: false
     volumes:
       - ../../devkit-lti1p3:/var/www/html
     working_dir: /var/www/html
