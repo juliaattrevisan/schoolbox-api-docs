@@ -271,20 +271,20 @@ class Controller extends ConfigController
      * Uses the standard field serializers, but saves via constrained SQL updates instead of ConfigMapper::save()
      * so Skin Config join metadata is not re-persisted during save.
      *
-     * @param array<string, string|null> $postedConfigs
+     * @param array<int, string|null> $postedConfigs
      */
     private function persistPostedConfigs(array $postedConfigs): void
     {
         $database        = $this->getConfigMapper()->getDatabase();
-        $existingConfigs = $this->getConfigMapper()->findByPredicates($this->buildConfigPredicate())->indexBy(ConfigMapper::COL_NAME);
+        $existingConfigs = $this->getConfigMapper()->findByPredicates($this->buildConfigPredicate())->indexBy('id');
 
-        foreach ($postedConfigs as $name => $value) {
-            if (!$existingConfigs->keyExists($name)) {
+        foreach ($postedConfigs as $configId => $value) {
+            if (!$existingConfigs->keyExists($configId)) {
                 continue;
             }
 
             /** @var Config $existingConfig */
-            $existingConfig  = $existingConfigs[$name];
+            $existingConfig  = $existingConfigs[$configId];
             $valueSerializer = $this->getFieldStrategyFactory()->makeValueSerializer($existingConfig->getFieldId());
             $newValue        = $valueSerializer->serializeValue($value, $existingConfig);
 
@@ -295,16 +295,10 @@ class Controller extends ConfigController
             $database->prepareQuery(
                 'UPDATE config
                 SET value = :value
-                WHERE configID = :configID
-                    AND type_id = :typeId
-                    AND hidden = :hidden
-                    AND editable = :editable',
+                WHERE configID = :configID',
                 [
                     'value'    => $newValue,
                     'configID' => $existingConfig->getId(),
-                    'typeId'   => $existingConfig->getTypeId(),
-                    'hidden'   => 'false',
-                    'editable' => 'true',
                 ]
             )->execute();
         }
@@ -314,7 +308,7 @@ class Controller extends ConfigController
      * Flatten the posted nested Skin Config payload to a name/value map.
      *
      * @param array<array-key, mixed> $configs
-     * @return array<string, string|null>
+     * @return array<int, string|null>
      */
     private function flattenPostedConfigs(array $configs): array
     {
@@ -336,10 +330,16 @@ class Controller extends ConfigController
                         continue;
                     }
                     foreach ($subcategory['options'] as $option) {
-                        if (!is_array($option) || !isset($option['name']) || !is_string($option['name'])) {
+                        if (!is_array($option) || !isset($option['id'])) {
                             continue;
                         }
-                        $flattenedConfigs[$option['name']] = isset($option['value']) && is_string($option['value']) ? $option['value'] : null;
+
+                        $optionId = filter_var($option['id'], FILTER_VALIDATE_INT);
+                        if ($optionId === false) {
+                            continue;
+                        }
+
+                        $flattenedConfigs[$optionId] = isset($option['value']) && is_string($option['value']) ? $option['value'] : null;
                     }
                 }
             }
