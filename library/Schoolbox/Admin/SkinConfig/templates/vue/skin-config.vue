@@ -76,62 +76,45 @@ async function onSaveSelected(): Promise<void> {
 </script>
 
 <template>
-    <div data-test="skin-config-container" class="small-12 island">
-        <div v-if="loadError" class="small-12 columns" data-test="custom-participation-load-error">
+    <div data-test="skin-config-container" class="l-pad-m--horiz">
+        <div v-if="loadError" class="small-12 columns" data-test="skin-config-load-error">
             <request-error :further-info="loadError" />
         </div>
-        <form method="post" class="skin-config-form" @submit.prevent="onSaveSelected">
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label id="skin-config-toggle" class="inline-block" for="skin-config-toggle-field">
-                            <span>{{ configs.toggle.title }}</span>
-                            <span
-                                v-if="configs.toggle.description"
-                                data-tooltip
-                                class="hint has-tip tip-bottom"
-                                :title="configs.toggle.description"
-                                >?</span
-                            >
-                        </label>
-                        <div class="switch f-no-margins">
-                            <input
-                                id="skin-config-toggle-field"
-                                v-model="configs.toggle.enabled"
-                                type="checkbox"
-                                name="advanced_ui_enabled"
-                                autocomplete="off"
-                                data-test="skin-config-toggle-input"
-                            />
-                            <label for="skin-config-toggle-field" data-test="skin-config-toggle">
-                                <span>On</span>
-                                <span>Off</span>
-                            </label>
-                        </div>
-                    </div>
-                </fieldset>
-            </section>
-            <sc-categories :configs="configs" @preview-refresh="schedulePreviewRefresh" />
-            <div class="row">
-                <div class="small-12 column">
-                    <div class="l-flex l-flex--justify l-gap-xs">
-                        <button
-                            v-if="hasUnsavedChanges"
-                            type="button"
-                            class="button l-flex__item--1"
-                            @click="onUndoChanges"
-                        >
-                            Undo Changes
-                        </button>
-                        <button
-                            :value="saveText"
-                            class="button submit l-flex__item--1"
-                            data-test="skin-config-save-submit"
-                        >
-                            Save
-                        </button>
-                    </div>
+        <form method="post" class="l-flex-col l-gap-l skin-config-form" @submit.prevent="onSaveSelected">
+            <div class="c-island l-pad-m">
+                <label id="skin-config-toggle" class="inline-block" for="skin-config-toggle-field">
+                    <span>{{ configs.toggle.title }}</span>
+                    <span
+                        v-if="configs.toggle.description"
+                        data-tooltip
+                        class="hint has-tip tip-bottom"
+                        :title="configs.toggle.description"
+                        >?</span
+                    >
+                </label>
+                <div class="switch f-no-margins">
+                    <input
+                        id="skin-config-toggle-field"
+                        v-model="configs.toggle.enabled"
+                        type="checkbox"
+                        name="advanced_ui_enabled"
+                        autocomplete="off"
+                        data-test="skin-config-toggle-input"
+                    />
+                    <label for="skin-config-toggle-field" data-test="skin-config-toggle">
+                        <span>On</span>
+                        <span>Off</span>
+                    </label>
                 </div>
+            </div>
+            <sc-categories :configs="configs" @preview-refresh="schedulePreviewRefresh" />
+            <div class="l-flex l-flex--justify l-gap-xs">
+                <button v-if="hasUnsavedChanges" type="button" class="button l-flex__item--1" @click="onUndoChanges">
+                    Undo Changes
+                </button>
+                <button :value="saveText" class="button submit l-flex__item--1" data-test="skin-config-save-submit">
+                    Save
+                </button>
             </div>
         </form>
     </div>
