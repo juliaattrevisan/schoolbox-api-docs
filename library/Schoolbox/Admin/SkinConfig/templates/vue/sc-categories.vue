@@ -30,7 +30,7 @@ const activeConfigs = window.Vue.computed(() =>
 const visibleConfigs = window.Vue.computed(() =>
     Object.fromEntries(
         Object.entries(activeConfigs.value).filter(
-            ([categoryKey]) => categoryKey !== "roundness" && categoryKey !== "drop shadow",
+            ([categoryKey]) => categoryKey !== "Roundness" && categoryKey !== "Drop Shadow",
         ),
     ),
 );

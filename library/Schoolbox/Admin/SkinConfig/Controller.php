@@ -102,7 +102,7 @@ class Controller extends ConfigController
                     'description' => $config->getDescription(),
                 ];
             } else {
-                $categoryName  = strtolower($config->getSkinSubcategory()->getCategory()->getName()); // e.g. "Colours" -> "colours"
+                $categoryName  = $config->getSkinSubcategory()->getCategory()->getName(); // e.g. "Colours" -> "colours"
                 $subcategoryId = $config->getSkinSubcategory()->getId();
                 $type          = $config->getType()->getId() === ConfigMapper::TYPE_SONAR_SKIN_CONFIG ? 'sonar' : 'existing';
 
