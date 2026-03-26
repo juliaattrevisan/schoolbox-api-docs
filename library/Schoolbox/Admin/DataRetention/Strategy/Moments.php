@@ -23,10 +23,6 @@ class Moments extends Base
     /**
      * @inheritDoc
      */
-
-    /**
-     * @inheritDoc
-     */
     public function getRetentionLabel(): string
     {
         return 'Learning Moment Retention';
@@ -93,17 +89,17 @@ class Moments extends Base
     {
         $this->log->info('Deleting learning moments older than ' . $this->getRetentionPeriod());
         $query = "
-        SELECT
-            id,
-            discussion_thread_id
-        FROM moment
-        WHERE moment.deleted_at IS NOT NULL AND moment.deleted_at < :old
-    ";
+            SELECT
+                id,
+                discussion_thread_id
+            FROM moment
+            WHERE moment.deleted_at IS NOT NULL AND moment.deleted_at < :old
+        ";
 
         $statement = $this->database->prepare($query);
         $statement->execute([
-                                'old'   => $this->getRetentionPeriod(),
-                            ]);
+            'old'   => $this->getRetentionPeriod(),
+        ]);
 
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
@@ -129,7 +125,6 @@ class Moments extends Base
         if (!empty($discussionThreadIds)) {
             $this->log->debug(sprintf("Deleting discussion_thread ids: %s", implode(', ', $discussionThreadIds)));
         }
-
 
         $delPlaceholders = Builder::getArrayPlaceholders($chunkIds, 'moment_id');
         $statementEvidence = $this->database->prepare($this->deleteStatement('moment_evidence') . " FROM moment_evidence WHERE moment_id IN {$delPlaceholders}");

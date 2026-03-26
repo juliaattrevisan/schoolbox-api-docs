@@ -60,8 +60,8 @@ class CmsLogExample extends Base
 
         $statement = $this->database->prepare($query);
         $statement->execute([
-                                'old'   => $this->getRetentionPeriod(),
-                            ]);
+            'old'   => $this->getRetentionPeriod(),
+        ]);
 
         $count = $statement->fetchColumn();
         $this->log->info('Found ' . $count . ' logs to delete');
@@ -77,11 +77,11 @@ class CmsLogExample extends Base
     {
         $this->log->info('Deleting logs older than ' . $this->getRetentionPeriod());
         $query = "
-        SELECT
-            id
-        FROM cmsLog
-        WHERE time IS NOT NULL AND time < :old
-    ";
+            SELECT
+                id
+            FROM cmsLog
+            WHERE time IS NOT NULL AND time < :old
+        ";
 
         $statement = $this->database->prepare($query);
         $statement->execute([

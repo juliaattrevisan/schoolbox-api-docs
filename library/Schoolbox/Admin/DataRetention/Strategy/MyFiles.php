@@ -56,8 +56,8 @@ class MyFiles extends Base
 
         $statement = $this->database->prepare($query);
         $statement->execute([
-                                'old'   => $this->getRetentionPeriod(),
-                            ]);
+            'old'   => $this->getRetentionPeriod(),
+        ]);
 
         $filesToDelete = $statement->fetch();
 
@@ -70,8 +70,8 @@ class MyFiles extends Base
 
         $statement = $this->database->prepare($query);
         $statement->execute([
-                                'old'   => $this->getRetentionPeriod(),
-                            ]);
+            'old'   => $this->getRetentionPeriod(),
+        ]);
 
         $folderToDelete = $statement->fetch();
 
@@ -101,11 +101,11 @@ class MyFiles extends Base
 
         $statement = $this->database->prepare($query);
         $statement->execute([
-                                'old'   => $this->getRetentionPeriod(),
-                            ]);
+            'old'   => $this->getRetentionPeriod(),
+        ]);
 
         // collate ids to delete
-        $deleteIds = [];
+        $deleteIds = [  ];
         while ($row = $statement->fetch()) {
             $deleteIds[] = [
                 'id' => $row['id'],
@@ -123,8 +123,8 @@ class MyFiles extends Base
 
         $folderStatement = $this->database->prepare($folderQuery);
         $folderStatement->execute([
-                                'old'   => $this->getRetentionPeriod(),
-                            ]);
+            'old'   => $this->getRetentionPeriod(),
+        ]);
 
         // collate ids to delete
         while ($row = $folderStatement->fetch()) {

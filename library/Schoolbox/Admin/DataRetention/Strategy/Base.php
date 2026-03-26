@@ -90,7 +90,6 @@ abstract class Base implements IStrategy
         // fetch ids to delete
         $deleteIds = $this->getIdsToDelete();
 
-
         // log how many chunks we will delete
         $chunkCount = ceil(count($deleteIds) / $this->chunkSize);
         $this->log->notice(sprintf("Deleting '%s' entries broken into '%s' chunks", count($deleteIds), $chunkCount));
