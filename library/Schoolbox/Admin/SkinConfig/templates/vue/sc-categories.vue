@@ -173,6 +173,32 @@ function onPreviewRefresh(): void {
                                 <li><a href="#" class="submit">Confirm</a></li>
                             </ul>
                         </div>
+                        <div class="small-12 columns">
+                            <label>Filter(s) selected:</label>
+                        </div>
+                        <div class="small-12 columns">
+                            <div id="applied_filters">
+                                <div data-applied-filter-tab="22" class="applied-filter-tab">
+                                    <span class="label filter">
+                                        <span data-filter-name="">Category</span>
+                                        <a href="#" class="close" title="Remove filter">×</a>
+                                    </span>
+                                    <ul data-selected-list="" class="selected-list">
+                                        <li class="selected-item">Learning</li>
+                                        <li class="selected-item">Personal Development</li>
+                                    </ul>
+                                </div>
+                                <div data-applied-filter-tab="26" class="applied-filter-tab">
+                                    <span class="label filter">
+                                        <span data-filter-name="">Year Level</span>
+                                        <a href="#" class="close" title="Remove filter">×</a>
+                                    </span>
+                                    <ul data-selected-list="" class="selected-list">
+                                        <li class="selected-item">12</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </template>
                 </template>
             </fieldset>
