@@ -25,10 +25,11 @@ Usage:
                     data-moment-type="photo"
                     data-take-photo-button
                     href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=photo{% endif %}"
-                    class="icon-camera share-photo"
+                    class="share-photo sbx-button--has-icon"
                     data-test="learning-moment-evidence-share-photo"
                     title="Take a photo"
                 >
+                    <sbx-icon name="camera"></sbx-icon>
                     Take a photo
                 </a>
                 <a

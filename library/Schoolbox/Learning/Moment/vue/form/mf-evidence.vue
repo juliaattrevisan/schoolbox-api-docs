@@ -321,12 +321,13 @@ window.Vue.watch(
 <template>
     <div class="share-work-buttons l-grid l-gap-m l-mar-m--bottom">
         <a
-            class="icon-camera share-photo"
+            class="share-photo sbx-button--has-icon"
             data-test="learning-moment-evidence-share-photo"
             :title="canAddEvidence ? 'Take a photo' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="(MediaType.PHOTO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.PHOTO)"
         >
+            <sbx-icon name="camera"></sbx-icon>
             Take a photo
         </a>
         <a
