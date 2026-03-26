@@ -183,4 +183,12 @@ body.sbx-body {
     fieldset.no-pad {
         border: none;
     }
+
+    .component-titlebar {
+        background-color: var(--sbx-config-color-component-heading-background);
+        h2,
+        nav a[class^="icon-"] {
+            color: var(--sbx-config-color-component-heading-text);
+        }
+    }
 }

@@ -106,6 +106,65 @@ function onPreviewRefresh(): void {
                         />
                     </div>
                 </div>
+                <template v-if="configs.toggle.enabled">
+                    <div v-if="subcategory.name === 'Component'" class="small-12 columns">
+                        <h4>Preview</h4>
+                    </div>
+                    <template v-if="subcategory.name === 'Component'">
+                        <div class="small-12 columns">
+                            <div class="component-titlebar">
+                                <div data-component-titlebar-container="" data-action-count="3" class="actions-small-3">
+                                    <div class="list-item">
+                                        <h2 title="Class News">
+                                            <a
+                                                href="#"
+                                                class="icon-grip"
+                                                style="
+                                                    display: none;
+                                                    touch-action: none;
+                                                    cursor: grab;
+                                                    user-select: none;
+                                                "
+                                            ></a>
+                                            <span
+                                                id="component-title-3402"
+                                                data-test="homepage-component-titlebar-name"
+                                                data-test-component-instance-id="3402"
+                                                >Class News</span
+                                            >
+                                        </h2>
+                                    </div>
+                                    <nav>
+                                        <a
+                                            style="display: none"
+                                            data-component-settings=""
+                                            data-target="settings"
+                                            data-state="closed"
+                                            href="#"
+                                            class="icon-settings settings edit"
+                                            title="Settings"
+                                        ></a>
+                                        <a
+                                            data-collapser="true"
+                                            href="#"
+                                            class="icon-up-arrow collapse"
+                                            title="Expand/collapse content"
+                                        ></a>
+                                        <a
+                                            style="display: none"
+                                            data-component-settings=""
+                                            data-target="delete"
+                                            data-state="closed"
+                                            href="#"
+                                            class="icon-close"
+                                            title="Close"
+                                        ></a>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </template>
             </fieldset>
         </section>
     </template>

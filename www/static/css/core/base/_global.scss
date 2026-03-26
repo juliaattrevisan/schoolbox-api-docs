@@ -40,7 +40,7 @@ body {
 
 // Default body styles
 body {
-    background: var(--sbx-config-color-body-background, $body-bg);
+    background: $body-bg;
     color: var(--sbx-color-text-primary, $body-font-color);
     cursor: $cursor-auto-value;
     font-family: $body-font-family;
