@@ -228,6 +228,15 @@ SET
     );
 
 SET
+    @value_skin_colour_sonar_login_background = (
+        SELECT `value`
+        FROM config
+        WHERE
+            name = 'skin_colour_login_background'
+        LIMIT 1
+    );
+
+SET
     @value_skin_sonar_custom_css = (
         SELECT `value`
         FROM config
@@ -402,7 +411,7 @@ VALUES (
     ),
     (
         'skin_colour_sonar_login_foreground',
-        @value_skin_colour_sonar_login_foreground,
+        '#ffffff',
         'Login Foreground Colour',
         'The foreground colour of the login form on the login page.',
         @config_colour_field_id,
