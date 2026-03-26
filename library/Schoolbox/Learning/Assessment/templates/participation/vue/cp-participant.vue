@@ -173,7 +173,11 @@ function onOpenIncludeInExistingModal(): void {
                     <template v-if="hasCustomisation(props.participant)">
                         <li class="separator">Manage</li>
                         <li>
-                            <button class="icon-close" @click.prevent="onActionSelected('removeCustomisation')">
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="onActionSelected('removeCustomisation')"
+                            >
+                                <sbx-icon name="close"></sbx-icon>
                                 Remove Customisation
                             </button>
                         </li>

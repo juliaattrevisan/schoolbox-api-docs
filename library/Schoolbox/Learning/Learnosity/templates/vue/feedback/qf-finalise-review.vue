@@ -128,7 +128,9 @@ function onCancelSelected(): void {
                 </button>
             </li>
             <li>
-                <button class="button icon-close" @click.prevent="onCancelSelected">Cancel</button>
+                <button class="button sbx-button--has-icon" @click.prevent="onCancelSelected">
+                    <sbx-icon name="close"></sbx-icon>Cancel
+                </button>
             </li>
         </ul>
     </reveal-modal>
