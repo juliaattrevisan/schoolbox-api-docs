@@ -1948,9 +1948,7 @@ class Controller extends Base
 
                 // Handle fields with explicit getters that don't correspond to a model property.
                 // (e.g. Assessment\WorkType\Model->getVisibility() derives its return value from other properties.)
-
                 $id = $row->$idGetter();
-
                 foreach ($tables[$table]['fields'] as $fieldName => $fieldConfig) {
                     if (isset($fieldConfig['getter']) && !isset($records[$id][$fieldName])) {
                         $getter = $fieldConfig['getter'];
@@ -1958,7 +1956,6 @@ class Controller extends Base
                             if (!isset($records[$id])) {
                                 $records[$id] = [];
                             }
-
                             $records[$id][$fieldName] = $row->$getter();
                         }
                     }
@@ -1967,7 +1964,6 @@ class Controller extends Base
         }
 
         // Stick a name column in those with no fields defined
-
         foreach ($tables as $tableCurrent) {
             if (!isset($tableCurrent['fields'])) {
                 $tableCurrent['fields']         = [];
