@@ -145,10 +145,23 @@ class Controller extends ConfigController
      */
     public function postConfig(): void
     {
+        $postedConfigs = $this->requestPost->get('configs') ?? [];
+        $database = $this->getConfigMapper()->getDatabase();
+
         try {
-            $this->persistPostedConfigs($this->flattenPostedConfigs($this->requestPost->get('configs') ?? []));
+            $database->beginTransaction();
+
+            $toggleEnabled = $this->extractPostedToggleEnabled($postedConfigs);
+            if ($toggleEnabled !== null) {
+                $this->persistSonarToggleConfig($toggleEnabled);
+            }
+
+            $this->persistPostedConfigs($this->flattenPostedConfigs($postedConfigs));
+
+            $database->commit();
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {
+            $database->rollBack();
             $status  = Response::HTTP_INTERNAL_SERVER_ERROR;
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($status);
@@ -217,6 +230,39 @@ class Controller extends ConfigController
     }
 
     /**
+     * Extract the posted Sonar toggle value and normalise it to the persisted config string.
+     *
+     * @param array<array-key, mixed> $configs
+     */
+    private function extractPostedToggleEnabled(array $configs): ?string
+    {
+        $toggle = $configs['toggle'] ?? null;
+        if (!is_array($toggle) || !array_key_exists('enabled', $toggle)) {
+            return null;
+        }
+
+        $enabled = filter_var($toggle['enabled'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        if ($enabled === null) {
+            return null;
+        }
+
+        return $enabled ? '1' : '0';
+    }
+
+    /**
+     * Persist the Advanced UI feature toggle as a separate named config row.
+     */
+    private function persistSonarToggleConfig(string $enabled): void
+    {
+        $toggleConfig = $this->getConfigMapper()->findOneByColumn('name', ConfigMapper::NAME_SONAR_UI_TOGGLE);
+        if ($toggleConfig->getValue() === $enabled) {
+            return;
+        }
+
+        $this->getConfigMapper()->save($toggleConfig->setValue($enabled));
+    }
+
+    /**
      * Validate and persist the posted Skin Config name/value payload.
      *
      * Uses the standard field serializers, but saves via constrained SQL updates instead of ConfigMapper::save()
@@ -229,43 +275,35 @@ class Controller extends ConfigController
         $database        = $this->getConfigMapper()->getDatabase();
         $existingConfigs = $this->getConfigMapper()->findByPredicates($this->buildConfigPredicate())->indexBy(ConfigMapper::COL_NAME);
 
-        $database->beginTransaction();
-        try {
-            foreach ($postedConfigs as $name => $value) {
-                if (!$existingConfigs->keyExists($name)) {
-                    continue;
-                }
-
-                /** @var Config $existingConfig */
-                $existingConfig  = $existingConfigs[$name];
-                $valueSerializer = $this->getFieldStrategyFactory()->makeValueSerializer($existingConfig->getFieldId());
-                $newValue        = $valueSerializer->serializeValue($value, $existingConfig);
-
-                if ($newValue === $existingConfig->getValue()) {
-                    continue;
-                }
-
-                $database->prepareQuery(
-                    'UPDATE config
-                    SET value = :value
-                    WHERE configID = :configID
-                        AND type_id = :typeId
-                        AND hidden = :hidden
-                        AND editable = :editable',
-                    [
-                        'value'    => $newValue,
-                        'configID' => $existingConfig->getId(),
-                        'typeId'   => ConfigMapper::TYPE_SKIN_CONFIG,
-                        'hidden'   => 'false',
-                        'editable' => 'true',
-                    ]
-                )->execute();
+        foreach ($postedConfigs as $name => $value) {
+            if (!$existingConfigs->keyExists($name)) {
+                continue;
             }
 
-            $database->commit();
-        } catch (\Throwable $e) {
-            $database->rollBack();
-            throw $e;
+            /** @var Config $existingConfig */
+            $existingConfig  = $existingConfigs[$name];
+            $valueSerializer = $this->getFieldStrategyFactory()->makeValueSerializer($existingConfig->getFieldId());
+            $newValue        = $valueSerializer->serializeValue($value, $existingConfig);
+
+            if ($newValue === $existingConfig->getValue()) {
+                continue;
+            }
+
+            $database->prepareQuery(
+                'UPDATE config
+                SET value = :value
+                WHERE configID = :configID
+                    AND type_id = :typeId
+                    AND hidden = :hidden
+                    AND editable = :editable',
+                [
+                    'value'    => $newValue,
+                    'configID' => $existingConfig->getId(),
+                    'typeId'   => ConfigMapper::TYPE_SKIN_CONFIG,
+                    'hidden'   => 'false',
+                    'editable' => 'true',
+                ]
+            )->execute();
         }
     }
 
