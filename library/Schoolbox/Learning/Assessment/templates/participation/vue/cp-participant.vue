@@ -213,13 +213,13 @@ function onOpenIncludeInExistingModal(): void {
                         <li class="separator">Create</li>
                         <li v-if="props.routes.getAssessmentParticipationCopyActivity">
                             <button
-                                class="icon-copy"
                                 @click.prevent="
                                     onActionSelected(
                                         `${props.routes.getAssessmentParticipationCopyActivity}?student=${props.participant.user.id}&original=${props.assessmentId}&${getReturnUrl()}`,
                                     )
                                 "
                             >
+                                <sbx-icon name="copy"></sbx-icon>
                                 Create Copy of {{ locale.activity.translate(false, true) }}
                             </button>
                         </li>

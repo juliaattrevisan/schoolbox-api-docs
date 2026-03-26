@@ -99,7 +99,7 @@ function clearSelection(): void {
                 </button>
                 <button
                     v-if="props.routes.getAssessmentParticipationCopyActivity"
-                    class="icon-copy button l-flex__item--1-auto"
+                    class="button l-flex__item--1-auto"
                     data-test="custom-participation-copy-activity"
                     @click.prevent="
                         handleActionSelected(
@@ -108,6 +108,7 @@ function clearSelection(): void {
                         )
                     "
                 >
+                    <sbx-icon name="copy"></sbx-icon>
                     Create Copy of {{ locale.activity.translate(false, true) }}
                 </button>
                 <button

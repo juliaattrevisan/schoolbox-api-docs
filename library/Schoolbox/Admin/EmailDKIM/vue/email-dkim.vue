@@ -397,21 +397,25 @@ export default {
         <h3>TXT Record Name</h3>
         <div class="input-group">
             <input id="dkimName" readonly type="text" v-model="dkimName" />
-            <button class="icon-copy" @click.prevent="onCopySelected($event, 'dkimName')">Copy</button>
+            <button @click.prevent="onCopySelected($event, 'dkimName')"><sbx-icon name="copy"></sbx-icon>Copy</button>
         </div>
         <h3>TXT Record Value</h3>
         <div class="input-group">
             <input id="dkimValue" readonly type="text" v-model="dkimValue" />
-            <button class="icon-copy" @click.prevent="onCopySelected($event, 'dkimValue')">Copy</button>
+            <button @click.prevent="onCopySelected($event, 'dkimValue')"><sbx-icon name="copy"></sbx-icon>Copy</button>
         </div>
         <h3>TXT Record Value (split to 255 character parts)</h3>
         <div class="input-group">
             <input id="dkimValueSplit0" readonly type="text" v-model="dkimValueSplit0" />
-            <button class="icon-copy" @click.prevent="onCopySelected($event, 'dkimValueSplit0')">Copy</button>
+            <button @click.prevent="onCopySelected($event, 'dkimValueSplit0')">
+                <sbx-icon name="copy"></sbx-icon>Copy
+            </button>
         </div>
         <div class="input-group">
             <input id="dkimValueSplit1" readonly type="text" v-model="dkimValueSplit1" />
-            <button class="icon-copy" @click.prevent="onCopySelected($event, 'dkimValueSplit1')">Copy</button>
+            <button @click.prevent="onCopySelected($event, 'dkimValueSplit1')">
+                <sbx-icon name="copy"></sbx-icon>Copy
+            </button>
         </div>
     </reveal-modal>
     <reveal-modal ref="deleteModal">
