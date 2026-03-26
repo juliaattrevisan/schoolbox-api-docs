@@ -14,7 +14,7 @@ export default class CreateLessonPlanTemplate {
 
     static readonly BUTTON_SAVE = "#save-button";
 
-    static readonly BUTTON_DELETE = "a.button.icon-delete";
+    static readonly BUTTON_DELETE = "a.button[data-delete][title='Remove']";
 
     static readonly DATA_TEST_CONFIRM_YES = "confirm-dialog-confirm-button";
 

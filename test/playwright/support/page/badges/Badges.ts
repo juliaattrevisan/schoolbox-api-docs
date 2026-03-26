@@ -11,7 +11,7 @@ export default class Badges {
 
     static readonly BUTTON_ADD = 'a.button.sbx-button--has-icon[title="Create Badge"]';
 
-    static readonly DROPDOWN_DELETE = "a.icon-delete";
+    static readonly DROPDOWN_DELETE = "a[data-delete][title='Remove']";
 
     static readonly BUTTON_CONFIRM_DELETE = "a.button.submit";
 
