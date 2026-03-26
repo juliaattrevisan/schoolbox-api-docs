@@ -2,7 +2,7 @@ import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceT
 import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
-export default class SummativeReportList {
+export default class SummativePreview {
     private tester: AcceptanceTester;
 
     private page: Page;
@@ -53,27 +53,25 @@ export default class SummativeReportList {
         schoolLogo?: string;
     }): Promise<void> {
         if (details.title) {
-            await expect(this.page.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_TITLE)).toContainText(
-                details.title,
-            );
+            await expect(this.page.getByTestId(SummativePreview.DATA_TEST_PREVIEW_TITLE)).toContainText(details.title);
         }
         if (details.schoolName) {
-            await expect(this.page.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_SCHOOL_NAME)).toContainText(
+            await expect(this.page.getByTestId(SummativePreview.DATA_TEST_PREVIEW_SCHOOL_NAME)).toContainText(
                 details.schoolName,
             );
         }
         if (details.studentName) {
-            await expect(this.page.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_STUDENT_NAME)).toContainText(
+            await expect(this.page.getByTestId(SummativePreview.DATA_TEST_PREVIEW_STUDENT_NAME)).toContainText(
                 details.studentName,
             );
         }
         if (details.year) {
-            await expect(this.page.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_STUDENT_YEAR)).toContainText(
+            await expect(this.page.getByTestId(SummativePreview.DATA_TEST_PREVIEW_STUDENT_YEAR)).toContainText(
                 details.year,
             );
         }
         if (details.introduction) {
-            await expect(this.page.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_INTRODUCTION)).toContainText(
+            await expect(this.page.getByTestId(SummativePreview.DATA_TEST_PREVIEW_INTRODUCTION)).toContainText(
                 details.introduction,
             );
         }
@@ -88,7 +86,7 @@ export default class SummativeReportList {
      * @param heading - The summary heading to check
      */
     async checkSummaryHeading(heading: string): Promise<void> {
-        await expect(this.page.getByTestId(SummativeReportList.DATA_TEST_HEADING)).toContainText(heading);
+        await expect(this.page.getByTestId(SummativePreview.DATA_TEST_HEADING)).toContainText(heading);
     }
 
     /**
@@ -97,7 +95,7 @@ export default class SummativeReportList {
      */
     async checkSummaryFolder(folderName: string): Promise<void> {
         const folderTitleLocator = this.page.getByTestId(
-            SummativeReportList.DATA_TEST_SUMMARY_FOLDER_NAME.replace("{folderName}", folderName),
+            SummativePreview.DATA_TEST_SUMMARY_FOLDER_NAME.replace("{folderName}", folderName),
         );
         await expect(folderTitleLocator).toBeVisible();
         await expect(folderTitleLocator).toContainText(folderName);
@@ -107,9 +105,9 @@ export default class SummativeReportList {
      * check the class distribution title is presented in the preview page
      */
     async checkClassDistributionTitle(): Promise<void> {
-        await expect(
-            this.page.getByTestId(SummativeReportList.DATA_TEST_SUMMARY_CLASS_DISTRIBUTION_TITLE),
-        ).toContainText("class distribution");
+        await expect(this.page.getByTestId(SummativePreview.DATA_TEST_SUMMARY_CLASS_DISTRIBUTION_TITLE)).toContainText(
+            "class distribution",
+        );
     }
 
     /**
@@ -117,7 +115,7 @@ export default class SummativeReportList {
      */
     async checkDistributionGraphIsPresented(): Promise<void> {
         await expect(
-            this.page.getByTestId(SummativeReportList.DATA_TEST_SUMMARY_DISTRIBUTION_GRAPH_CONTAINER),
+            this.page.getByTestId(SummativePreview.DATA_TEST_SUMMARY_DISTRIBUTION_GRAPH_CONTAINER),
         ).toBeVisible();
     }
 
@@ -126,9 +124,7 @@ export default class SummativeReportList {
      * @param activityName - The activity name to check the distribution graph for
      */
     async checkDistributionGraphForActivityType(activityName: string): Promise<void> {
-        const graphContainer = this.page.getByTestId(
-            SummativeReportList.DATA_TEST_SUMMARY_DISTRIBUTION_GRAPH_CONTAINER,
-        );
+        const graphContainer = this.page.getByTestId(SummativePreview.DATA_TEST_SUMMARY_DISTRIBUTION_GRAPH_CONTAINER);
         await expect(graphContainer.locator(`text=${activityName}`)).toBeVisible();
     }
 
@@ -136,9 +132,7 @@ export default class SummativeReportList {
      * check the Results title is presented in the preview page
      */
     async checkResultsTitle(): Promise<void> {
-        await expect(this.page.getByTestId(SummativeReportList.DATA_TEST_SUMMARY_RESULTS_TITLE)).toContainText(
-            "Results",
-        );
+        await expect(this.page.getByTestId(SummativePreview.DATA_TEST_SUMMARY_RESULTS_TITLE)).toContainText("Results");
     }
 
     /**
@@ -149,7 +143,7 @@ export default class SummativeReportList {
         for (const assessmentName of assessmentNames) {
             await expect(
                 this.page.getByTestId(
-                    SummativeReportList.DATA_TEST_SUMMARY_RESULTS_CONTAINER.replace("{assessmentName}", assessmentName),
+                    SummativePreview.DATA_TEST_SUMMARY_RESULTS_CONTAINER.replace("{assessmentName}", assessmentName),
                 ),
             ).toBeVisible();
         }
@@ -168,7 +162,7 @@ export default class SummativeReportList {
         shouldContain: boolean,
     ): Promise<void> {
         const feedbackContainer = this.page.getByTestId(
-            SummativeReportList.DATA_TEST_SUMMARY_RESULTS_CONTAINER.replace("{assessmentName}", assessmentName),
+            SummativePreview.DATA_TEST_SUMMARY_RESULTS_CONTAINER.replace("{assessmentName}", assessmentName),
         );
         if (options.includes("grade")) {
             if (shouldContain) {

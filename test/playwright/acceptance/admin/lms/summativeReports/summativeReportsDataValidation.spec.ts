@@ -30,7 +30,7 @@ test.describe("Admin LMS - Summative Reports Data Validation", () => {
         await tester.loginAsAdmin();
     });
 
-    test.skip("create a summative report with summary and class inclusion and check the report details in the preview page", async ({
+    test("create a summative report with summary and class inclusion and check the report details in the preview page", async ({
         tester,
         db,
     }) => {
@@ -89,10 +89,7 @@ test.describe("Admin LMS - Summative Reports Data Validation", () => {
         }
     });
 
-    test.skip("create a summative report page, toggle on the class page to check its details", async ({
-        tester,
-        db,
-    }) => {
+    test("create a summative report page, toggle on the class page to check its details", async ({ tester, db }) => {
         try {
             tester.isGoingTo("create a summative report page, toggle on the class page");
             await createSummativeReport.goto();
