@@ -178,7 +178,7 @@ SET
         SELECT `value`
         FROM config
         WHERE
-            name = 'skin_colour_accent_background'
+            name = 'skin_colour_content_ui_selected'
         LIMIT 1
     );
 
