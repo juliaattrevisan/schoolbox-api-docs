@@ -1,3 +1,9 @@
+-- Update note:
+-- When you recreate these views, storm will inject the `schoolbox` database name for you, prepending it to every field.
+-- In prod, the database name won't always be `schoolbox` - it could be something else. These views need to be database
+-- agnostic in that regard. You'll need to remove the storm-suggested `schoolbox` prefix from everything here.
+
+
 -- Assessment Feedback
 
 create or replace view v_assessment_feedback as
