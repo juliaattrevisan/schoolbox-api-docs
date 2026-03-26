@@ -156,8 +156,9 @@ class MyFiles extends Base
         }
 
         // Delete files and folders using the padded chunk approach to work with Builder placeholders
-        // remove any eportfolio publish links that point to these myFile rows (remove the link, leave the component)
-        $eportfolioDeleted = $this->deleteEportfolioLinks($fileIds);
+
+        // remove any eportfolio file component links that point to these myFile rows (remove the link, leave the component)
+        $eportfolioDeleted = $this->deleteEportfolioFileJoin($fileIds);
 
         // Delete files before folders so folder deletions don't fail due to my_file rows referencing them
         $filesDeleted = $this->deleteFiles($fileIds);
@@ -170,7 +171,7 @@ class MyFiles extends Base
         if ($this->perform) {
             $this->log->notice(
                 sprintf(
-                    "Deleted '%s' MyFolders, '%s' MyFiles, '%s' eportfolio_links",
+                    "Deleted '%s' MyFolders, '%s' MyFiles, '%s' ePortfolioFile links",
                     $foldersDeleted,
                     $filesDeleted,
                     $eportfolioDeleted,
@@ -179,7 +180,7 @@ class MyFiles extends Base
         } else {
             $this->log->notice(
                 sprintf(
-                    "Would have deleted '%s' MyFolders, '%s' MyFiles, '%s' eportfolio_links",
+                    "Would have deleted '%s' MyFolders, '%s' MyFiles, '%s' ePortfolioFile links",
                     $foldersDeleted,
                     $filesDeleted,
                     $eportfolioDeleted,
@@ -293,12 +294,12 @@ class MyFiles extends Base
     }
 
     /**
-     * Delete eportfolio publish links that reference these myFile ids
+     * Delete eportfolio component file links for the given file ids, returns the number of rows deleted
      * This removes the link but leaves the component (empty) as requested.
      * @param array $fileIds
      * @return int
      */
-    private function deleteEportfolioLinks(array $fileIds): int
+    private function deleteEportfolioFileJoin(array $fileIds): int
     {
         if (empty($fileIds)) {
             return 0;
