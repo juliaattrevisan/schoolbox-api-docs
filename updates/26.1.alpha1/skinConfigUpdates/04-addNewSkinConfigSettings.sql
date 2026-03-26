@@ -347,7 +347,7 @@ VALUES (
     (
         'skin_colour_menu_hover',
         @value_skin_colour_menu_hover,
-        'Hover Menu Colour',
+        'Menu Hover Colour',
         'The background colour of the element when the mouse is hovering over a menu element.',
         @config_colour_field_id,
         @sonar_config_type_id,
@@ -357,20 +357,6 @@ VALUES (
         'settings',
         @settings_sequence_start + 7,
         '{"customProperty":"--sbx-config-color-menu-hover","contrast":"--sbx-config-color-menu-foreground"}'
-    ),
-    (
-        'skin_colour_component_heading_text',
-        @value_skin_colour_component_heading_text,
-        'Component Heading Text Colour',
-        'The colour of the heading text on homepage components.',
-        @config_colour_field_id,
-        @sonar_config_type_id,
-        'true',
-        'false',
-        'false',
-        'settings',
-        @settings_sequence_start + 8,
-        '{"customProperty":"--sbx-config-color-component-heading-text","contrast":"--sbx-config-color-component-heading-background"}'
     ),
     (
         'skin_colour_component_heading_background',
@@ -383,8 +369,22 @@ VALUES (
         'false',
         'false',
         'settings',
-        @settings_sequence_start + 9,
+        @settings_sequence_start + 8,
         '{"customProperty":"--sbx-config-color-component-heading-background","contrast":"--sbx-config-color-component-heading-text"}'
+    ),
+    (
+        'skin_colour_component_heading_text',
+        @value_skin_colour_component_heading_text,
+        'Component Heading Text Colour',
+        'The colour of the heading text on homepage components.',
+        @config_colour_field_id,
+        @sonar_config_type_id,
+        'true',
+        'false',
+        'false',
+        'settings',
+        @settings_sequence_start + 9,
+        '{"customProperty":"--sbx-config-color-component-heading-text","contrast":"--sbx-config-color-component-heading-background"}'
     ),
     (
         'skin_colour_sonar_login_background',
