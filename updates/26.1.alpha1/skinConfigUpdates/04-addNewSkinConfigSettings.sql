@@ -119,6 +119,15 @@ SET
     );
 
 SET
+    @subcategory_login = (
+        SELECT id
+        FROM lu_skin_config_subcategory
+        WHERE
+            category_id = @category_colours
+            AND name = 'Login'
+    );
+
+SET
     @subcategory_css = (
         SELECT id
         FROM lu_skin_config_subcategory
@@ -174,7 +183,7 @@ SET
     );
 
 SET
-    @value_skin_colour_menu_primary = (
+    @value_skin_colour_menu_background = (
         SELECT `value`
         FROM config
         WHERE
@@ -183,7 +192,7 @@ SET
     );
 
 SET
-    @value_skin_colour_menu_secondary = (
+    @value_skin_colour_menu_foreground = (
         SELECT `value`
         FROM config
         WHERE
@@ -269,7 +278,7 @@ VALUES (
         'skin_colour_accent',
         @value_skin_colour_accent,
         'Accent Colour',
-        'Used in interactive elements like check boxes and buttons.',
+        'The colour used in interactive elements like buttons, links and check boxes.',
         @config_colour_field_id,
         @sonar_config_type_id,
         'true',
@@ -283,7 +292,7 @@ VALUES (
         'skin_colour_accent_text',
         '#ffffff',
         'Accent Text Colour',
-        'For when text is displayed over the Accent Colour.',
+        'The text colour for when displayed over the Accent Colour.',
         @config_colour_field_id,
         @sonar_config_type_id,
         'true',
@@ -297,7 +306,7 @@ VALUES (
         'skin_colour_active',
         @value_skin_colour_active,
         'Active Colour',
-        '',
+        'The colour used to indicate active elements, like active filters, selected menu items and hover states.',
         @config_colour_field_id,
         @sonar_config_type_id,
         'true',
@@ -308,10 +317,10 @@ VALUES (
         '{"customProperty":"--sbx-config-color-active","contrast":"--sbx-config-color-accent"}'
     ),
     (
-        'skin_colour_menu_primary',
-        @value_skin_colour_menu_primary,
-        'Primary Menu Colour',
-        'The primary colour of the top, side and notifications menu.',
+        'skin_colour_menu_background',
+        @value_skin_colour_menu_background,
+        'Menu Background Colour',
+        'The background colour of the top menu.',
         @config_colour_field_id,
         @sonar_config_type_id,
         'true',
@@ -319,13 +328,13 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 5,
-        '{"customProperty":"--sbx-config-color-menu-primary","contrast":"--sbx-config-color-menu-secondary"}'
+        '{"customProperty":"--sbx-config-color-menu-background","contrast":"--sbx-config-color-menu-foreground"}'
     ),
     (
-        'skin_colour_menu_secondary',
-        @value_skin_colour_menu_secondary,
-        'Secondary Menu Colour',
-        'The secondary colour of the top, side and notifications menu.',
+        'skin_colour_menu_foreground',
+        @value_skin_colour_menu_foreground,
+        'Menu Foreground Colour',
+        'The foreground colour of the top menu.',
         @config_colour_field_id,
         @sonar_config_type_id,
         'true',
@@ -333,13 +342,13 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 6,
-        '{"customProperty":"--sbx-config-color-menu-secondary","contrast":"--sbx-config-color-menu-primary"}'
+        '{"customProperty":"--sbx-config-color-menu-foreground","contrast":"--sbx-config-color-menu-background"}'
     ),
     (
         'skin_colour_menu_hover',
         @value_skin_colour_menu_hover,
         'Hover Menu Colour',
-        'Used when the mouse is hovering over a menu element',
+        'The background colour of the element when the mouse is hovering over a menu element.',
         @config_colour_field_id,
         @sonar_config_type_id,
         'true',
@@ -347,13 +356,13 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 7,
-        '{"customProperty":"--sbx-config-color-menu-hover","contrast":"--sbx-config-color-menu-secondary"}'
+        '{"customProperty":"--sbx-config-color-menu-hover","contrast":"--sbx-config-color-menu-foreground"}'
     ),
     (
         'skin_colour_component_heading_text',
         @value_skin_colour_component_heading_text,
         'Component Heading Text Colour',
-        'Sets the colour of the heading text on homepage components.',
+        'The colour of the heading text on homepage components.',
         @config_colour_field_id,
         @sonar_config_type_id,
         'true',
@@ -367,7 +376,7 @@ VALUES (
         'skin_colour_component_heading_background',
         @value_skin_colour_component_heading_background,
         'Component Heading Background Colour',
-        'Sets the colour of the heading background on homepage components.',
+        'The colour of the heading background on homepage components.',
         @config_colour_field_id,
         @sonar_config_type_id,
         'true',
@@ -376,6 +385,34 @@ VALUES (
         'settings',
         @settings_sequence_start + 9,
         '{"customProperty":"--sbx-config-color-component-heading-background","contrast":"--sbx-config-color-component-heading-text"}'
+    ),
+    (
+        'skin_colour_sonar_login_background',
+        @value_skin_colour_sonar_login_background,
+        'Login Background Colour',
+        'The background colour of the login form on the login page.',
+        @config_colour_field_id,
+        @sonar_config_type_id,
+        'true',
+        'false',
+        'false',
+        'settings',
+        @settings_sequence_start + 10,
+        '{"customProperty":"--sbx-config-login-form-background","contrast":"--sbx-config-login-form-foreground"}'
+    ),
+    (
+        'skin_colour_sonar_login_foreground',
+        @value_skin_colour_sonar_login_foreground,
+        'Login Foreground Colour',
+        'The foreground colour of the login form on the login page.',
+        @config_colour_field_id,
+        @sonar_config_type_id,
+        'true',
+        'false',
+        'false',
+        'settings',
+        @settings_sequence_start + 11,
+        '{"customProperty":"--sbx-config-login-form-foreground","contrast":"--sbx-config-login-form-background"}'
     ),
     (
         'skin_field_roundness',
@@ -388,7 +425,7 @@ VALUES (
         'false',
         'false',
         'settings',
-        @settings_sequence_start + 10,
+        @settings_sequence_start + 12,
         '{"customProperty":"--sbx-config-field-roundness","select":"none:small:medium:large"}'
     ),
     (
@@ -402,7 +439,7 @@ VALUES (
         'false',
         'false',
         'settings',
-        @settings_sequence_start + 11,
+        @settings_sequence_start + 13,
         '{"customProperty":"--sbx-config-box-roundness","select":"none:small:medium:large"}'
     ),
     (
@@ -416,7 +453,7 @@ VALUES (
         'false',
         'false',
         'settings',
-        @settings_sequence_start + 12,
+        @settings_sequence_start + 14,
         NULL
     ),
     (
@@ -430,7 +467,7 @@ VALUES (
         'false',
         'false',
         'settings',
-        @settings_sequence_start + 13,
+        @settings_sequence_start + 15,
         NULL
     );
 -- Append them to the relevant skin config categories/subcategories
@@ -477,7 +514,7 @@ VALUES (
             SELECT configID
             FROM config
             WHERE
-                name = 'skin_colour_menu_primary'
+                name = 'skin_colour_menu_background'
         ),
         @subcategory_menu
     ),
@@ -486,7 +523,7 @@ VALUES (
             SELECT configID
             FROM config
             WHERE
-                name = 'skin_colour_menu_secondary'
+                name = 'skin_colour_menu_foreground'
         ),
         @subcategory_menu
     ),
@@ -516,6 +553,24 @@ VALUES (
                 name = 'skin_colour_component_heading_background'
         ),
         @subcategory_component
+    ),
+    (
+        (
+            SELECT configID
+            FROM config
+            WHERE
+                name = 'skin_colour_sonar_login_background'
+        ),
+        @subcategory_login
+    ),
+    (
+        (
+            SELECT configID
+            FROM config
+            WHERE
+                name = 'skin_colour_sonar_login_foreground'
+        ),
+        @subcategory_login
     ),
     (
         (
