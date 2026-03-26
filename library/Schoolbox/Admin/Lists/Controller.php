@@ -1946,7 +1946,7 @@ class Controller extends Base
                     }
                 }
 
-                // Handle fields with explicit getters that don't correspond to a model property.
+                // Handle fields with explicit getters that don't correspond to a model property (derived or computed fields).
                 // (e.g. Assessment\WorkType\Model->getVisibility() derives its return value from other properties.)
                 $id = $row->$idGetter();
                 foreach ($tables[$table]['fields'] as $fieldName => $fieldConfig) {
