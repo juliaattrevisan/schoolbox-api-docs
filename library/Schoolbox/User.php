@@ -27,6 +27,7 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Storage;
+use Schoolbox\IB\Qualification\Model as QualificationModel;
 use Schoolbox\User\Pronoun\Model;
 use SensitiveParameter;
 
@@ -1558,11 +1559,12 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @param GenericCollection $qualificationCollection
+     * @param GenericCollection|QualificationModel[] $qualificationCollection
      * @return self
      */
     public function setQualificationCollection(GenericCollection $qualificationCollection): self
     {
+        $qualificationCollection->assertCollectionOf(QualificationModel::class);
         $this->qualificationCollection = $qualificationCollection;
         return $this;
     }
