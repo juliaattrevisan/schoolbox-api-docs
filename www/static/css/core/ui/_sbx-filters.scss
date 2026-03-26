@@ -2,3 +2,64 @@
  * Filter tweaks
  * Scope: UI Uplift
  */
+
+body.sbx-body {
+    // add some spacing
+    .filter-dropdown {
+        gap: var(--sbx-size-xxs);
+        padding: var(--sbx-size-s);
+    }
+
+    // side padding is on the parent .filter-dropdown now
+    .filter-interaction.content {
+        padding: var(--sbx-size-s);
+    }
+
+    // remove the bottom and right borders
+    .filter-dropdown .filter-component {
+        border: none;
+    }
+
+    // update so the <label> and the #applied_filters below are aligned
+    #panel-summary {
+        display: flex;
+        flex-direction: column;
+        gap: var(--sbx-size-xs);
+        .small-12.columns {
+            padding: 0;
+        }
+    }
+
+    // use gap instead of padding for spacing between active filters
+    #applied_filters {
+        gap: var(--sbx-size-xs);
+        .applied-filter-tab {
+            flex: 1 auto;
+            padding: 0;
+            margin-top: 0;
+        }
+    }
+
+    // increase the size of the active filter
+    #applied_filters .applied-filter-tab .selected-item {
+        font-size: var(--sbx-font-size-xs);
+    }
+
+    // bolden the filter name
+    #applied_filters [data-filter-name] {
+        font-weight: var(--sbx-font-weight-active);
+    }
+
+    // add some spacing on the children block when there's parent/children checkbox groups
+    .filter-dropdown .option-list > .checklist {
+        padding-bottom: var(--sbx-size-xs);
+        padding-top: var(--sbx-size-xs);
+    }
+
+    // stretch out the curriculum selector so it displays better
+    .filter-dropdown {
+        [data-cs-container] {
+            width: 100%;
+        }
+    }
+}

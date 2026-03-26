@@ -1,6 +1,7 @@
 .button {
     align-items: center;
     background: none;
+    border-radius: var(--sbx-config-field-roundness, 0);
     display: flex;
     font-size: 1rem;
     justify-content: center;
@@ -9,7 +10,7 @@
     min-width: 40px;
     text-align: left;
     &:hover {
-        background: var(--content-ui-background);
+        background: var(--sbx-config-color-active, var(--content-ui-background));
     }
     &:disabled {
         opacity: 0.2;

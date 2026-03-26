@@ -30,10 +30,8 @@ body.sbx-body {
         color: var(--sbx-config-color-accent-text);
         &:hover,
         &:active {
-            background: var(--sbx-config-color-accent); // ^foundation-fixes^ - remove the use of --content-ui-hover
-            color: var(
-                --sbx-config-color-accent-text
-            ); // ^foundation-fixes^ - remove the change of text colour on hover
+            background: var(--sbx-config-color-active); // ^foundation-fixes^ - remove the use of --content-ui-hover
+            color: var(--sbx-config-color-accent); // ^foundation-fixes^ - remove the change of text colour on hover
             filter: brightness(1.1);
         }
         &:focus {
@@ -78,10 +76,10 @@ body.sbx-body {
         &:hover,
         &:active {
             background-color: var(
-                --sbx-color-foreground-primary
+                --sbx-config-color-active
             ); // ^foundation-fixes^ - remove the use of --content-ui-hover
             color: var(--sbx-config-color-accent); // ^foundation-fixes^ - remove the change of text colour on hover
-            filter: brightness(1.1);
+            filter: brightness(1.05);
         }
         &:focus {
             @include sbx-form.form-input-focus;
@@ -117,7 +115,7 @@ body.sbx-body {
     .sub-nav {
         display: flex;
         flex-wrap: wrap;
-        gap: var(--sbx-size-xs);
+        gap: var(--sbx-size-xxs);
     }
 
     /**
@@ -131,7 +129,7 @@ body.sbx-body {
      * An existing flex list of buttons, just add some gap
      */
     .flex-list.buttons {
-        gap: var(--sbx-size-xs);
+        gap: var(--sbx-size-xxs);
     }
 
     /**
@@ -139,8 +137,8 @@ body.sbx-body {
      */
     .component-action section {
         background: var(--sbx-color-foreground-primary);
-        padding: var(--sbx-size-s);
-        gap: var(--sbx-size-s);
+        padding: var(--sbx-size-xs);
+        gap: var(--sbx-size-xxs);
         button,
         .button {
             font-weight: normal; // for better readability and consistency with other buttons
@@ -153,10 +151,20 @@ body.sbx-body {
      * These need to be treated differently to standard buttons
      * as they have no text content and so need a border to define their shape
      */
-    .button[class*="icon-"],
+    .button[class*="icon-"]:empty,
+    a[class*="icon-"]:empty,
+    button[class^="icon-"]:empty,
     .dz-remove,
     .ab-upload .dz-remove {
         border: none;
+        &:hover,
+        &:active {
+            background-color: var(
+                --sbx-config-color-active
+            ); // ^foundation-fixes^ - remove the use of --content-ui-hover
+            color: var(--sbx-config-color-accent); // ^foundation-fixes^ - remove the change of text colour on hover
+            filter: brightness(1.05);
+        }
     }
 
     .button[class*="icon-"]:not(:empty) {
@@ -173,6 +181,11 @@ body.sbx-body {
         border-left: none;
         border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
         line-height: 1;
+        // this is the same as $small-only, which we can't currently import in this context
+        @media only print, screen and (max-width: 40em) {
+            border-left: var(--sbx-border-width-normal);
+            border-radius: var(--sbx-config-field-roundness);
+        }
     }
 
     /**
@@ -266,11 +279,18 @@ body.sbx-body {
      * Add some gap otherwise the checkbox and text within these buttons are too close together
      */
     .search-result {
-        gap: var(--sbx-size-s);
+        gap: var(--sbx-size-xs);
     }
 
     // add spacing to pagination buttons on pastoral class report
     .count-filter {
-        gap: var(--sbx-size-xs);
+        gap: var(--sbx-size-xxs);
+    }
+
+    // give some spacing to the buttons
+    .context-switch,
+    .avatar-switch {
+        display: flex;
+        gap: var(--sbx-size-xxs);
     }
 }

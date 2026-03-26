@@ -344,7 +344,7 @@ export default {
 
 <style lang="scss" scoped>
 .island .content {
-    padding: 2rem;
+    padding: 1rem;
     margin-bottom: 0;
 }
 

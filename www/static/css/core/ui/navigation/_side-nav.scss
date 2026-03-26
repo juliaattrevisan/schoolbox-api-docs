@@ -79,16 +79,18 @@ $side-nav-divider-color: scale-color(#fff, $lightness: 10%);
                 //ensure isn't applied on desktop
                 &:hover,
                 &:focus {
-                    background: $link-bg-hover;
-                    color: $link-color-hover;
+                    background: var(--sbx-config-color-active, $link-bg-hover);
+                    color: var(--sbx-config-color-accent, $link-color-hover);
+                    filter: brightness(1.05);
                 }
                 &:active {
-                    color: $link-color-active;
+                    color: var(--sbx-config-color-accent, $link-color-hover);
                 }
             }
         }
 
         &.active > a:first-child:not(.button) {
+            background: var(--sbx-config-color-active, inherit);
             color: $side-nav-link-color-active;
             font-family: $side-nav-font-family-active;
             font-weight: $side-nav-font-weight-active;

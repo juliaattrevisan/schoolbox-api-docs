@@ -11,7 +11,7 @@
     min-width: 40px;
     text-align: left;
     &:hover {
-        background: var(--content-ui-background);
+        background: var(--sbx-config-color-active, var(--content-ui-background));
     }
     &:disabled {
         opacity: 0.2;

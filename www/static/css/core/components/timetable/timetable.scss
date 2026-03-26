@@ -1,10 +1,8 @@
-$timetable-cell-border: $body-bg;
-
 .timetable,
 .timetable-small {
     td,
     th {
-        border: 1px solid $timetable-cell-border;
+        border: 1px solid var(--sbx-color-border, $body-bg);
     }
 
     /* Remove padding on cells containing classes

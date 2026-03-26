@@ -61,9 +61,23 @@ body.sbx-body {
     }
 
     // When a text input is immediately followed by a button or link, remove the border radius on the right side of the input to visually connect them
-    .input-group:has(> input + a) input,
-    .input-group:has(> input + button) input {
-        border-radius: var(--sbx-config-field-roundness) 0 0 var(--sbx-config-field-roundness);
+    .input-group {
+        input {
+            border-radius: var(--sbx-config-field-roundness) 0 0 var(--sbx-config-field-roundness);
+            // this is the same as $small-only, which we can't currently import in this context
+            @media only print, screen and (max-width: 40em) {
+                border-radius: var(--sbx-config-field-roundness);
+            }
+        }
+    }
+
+    // Additional styles for button in input group
+    .input-group button.button.icon-search {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        margin: 0;
+        padding: 0;
     }
 
     // States
@@ -84,13 +98,5 @@ body.sbx-body {
     // color picker input width fix
     input[type="text"].clr-color {
         width: calc(100% - 80px);
-    }
-    // Additional styles for button in input group
-    .input-group button.button.icon-search {
-        align-items: center;
-        display: flex;
-        justify-content: center;
-        margin: 0;
-        padding: 0;
     }
 }

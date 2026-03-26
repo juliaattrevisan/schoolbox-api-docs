@@ -144,7 +144,7 @@ function onNameSelected(): void {
     transition: background 0.2s;
     width: 100%;
     &:hover {
-        background: var(--content-ui-background);
+        background: var(--sbx-config-color-active, var(--content-ui-background));
     }
     &:disabled {
         opacity: 0.2;

@@ -2,31 +2,42 @@
  * Pagination Styles
  * Scope: UI Uplift
  */
-.sbx-body .pagination {
-    & li {
-        &:not(:last-child) {
-            margin-right: 8px;
-        }
 
-        &.active {
-            & a {
-                background-color: var(--sbx-config-color-accent) !important;
-                color: var(--sbx-config-color-accent-text) !important;
+body.sbx-body {
+    .pagination {
+        display: flex;
+        gap: var(--sbx-size-xxs);
+        & li {
+            &.active {
+                & a {
+                    background-color: var(--sbx-config-color-active);
+                    color: var(--sbx-config-color-accent);
+                }
             }
-        }
 
-        & a,
-        button {
-            background: var(--sbx-color-foreground-primary) !important;
-            border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
-            border-radius: var(--sbx-config-field-roundness) !important;
-            color: var(--sbx-config-color-accent);
-            padding-block: 0.4rem !important;
-            padding-inline: 0.8rem !important;
+            & a,
+            button {
+                background: var(--sbx-color-foreground-primary);
+                border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
+                border-radius: var(--sbx-config-field-roundness);
+                color: var(--sbx-config-color-accent);
+                padding-block: 0.4rem;
+                padding-inline: 0.8rem;
 
-            &:focus-visible {
-                outline: 1px solid var(--sbx-config-color-accent);
-                outline-offset: 1px;
+                &:focus-visible {
+                    outline: 1px solid var(--sbx-config-color-accent);
+                    outline-offset: 1px;
+                }
+                &:hover,
+                &:active {
+                    background-color: var(
+                        --sbx-config-color-active
+                    ); // ^foundation-fixes^ - remove the use of --content-ui-hover
+                    color: var(
+                        --sbx-config-color-accent
+                    ); // ^foundation-fixes^ - remove the change of text colour on hover
+                    filter: brightness(1.05);
+                }
             }
         }
     }

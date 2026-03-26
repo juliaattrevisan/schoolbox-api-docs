@@ -114,18 +114,18 @@ body.sbx-body {
     }
 
     // Add vertical spacing between checkboxes
-    .option-list:not([class*="l-flex"]) {
+    .option-list:not([class*="l-flex"]):not(:has(.option-list)) {
         display: flex;
         flex-direction: column;
-        gap: var(--sbx-size-s);
-        margin: 0 0 var(--sbx-size-s) 0; // add bottom margin to separate from next element
+        gap: var(--sbx-size-xs);
+        margin: 0 0 var(--sbx-size-xs) 0; // add bottom margin to separate from next element
     }
 
     // Layout fixes for checkboxes inside option lists
     .option-list li {
         align-items: flex-start;
         display: flex;
-        gap: var(--sbx-size-s);
+        gap: var(--sbx-size-xs);
     }
 
     .option-list input[type="checkbox"] {
@@ -142,7 +142,7 @@ body.sbx-body {
 
     // add some spacing between the checkbox and label in the participant group settings
     [data-participant-group] .checkbox-label {
-        margin-top: var(--sbx-size-s);
+        margin-top: var(--sbx-size-xs);
     }
 
     // Keep checkbox buttons hidden within rubrics, as the label is what's used to trigger the checkbox selection, and the checkbox itself is not needed visually

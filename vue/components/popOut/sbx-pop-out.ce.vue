@@ -136,7 +136,7 @@ window.Vue.onMounted(() => {
     align-self: start; /* https://moderncss.dev/css-button-styling-guide/#gotcha-child-of-flex-columns */
     background: none;
     border: none;
-    border-radius: 0;
+    border-radius: var(--sbx-config-field-roundness, 0);
     color: var(--sbx-config-color-accent, var(--content-ui-foreground));
     cursor: pointer;
     display: inline-flex;
@@ -154,12 +154,11 @@ window.Vue.onMounted(() => {
 .sbx-button:hover:not([disabled]),
 .sbx-button:active:not([disabled]) {
     background-color: var(--sbx-config-color-active, var(--content-ui-hover));
+    filter: brightness(1.05);
 }
 
 .sbx-button:focus:not([disabled]) {
-    background-color: var(
-        --content-ui-background
-    ); /* ^foundation-fixes^ - don't lighten on focus, just reduces contrast */
+    background-color: var(--sbx-config-color-active, var(--content-ui-background));
 }
 
 .sbx-button:disabled {

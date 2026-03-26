@@ -7,7 +7,7 @@ body.sbx-body {
     // apply the usual spacing for button groups
     .fc-button-group {
         display: flex;
-        gap: var(--sbx-size-xs);
+        gap: var(--sbx-size-xxs);
     }
 
     // overrule the .fc-button-group styles that square the buttons depending on where they are placed
@@ -29,18 +29,18 @@ body.sbx-body {
     .component-action .rsvp,
     .component-action .actions {
         display: flex;
-        gap: var(--sbx-size-xs);
+        gap: var(--sbx-size-xxs);
     }
 
     // add some spacing between the checkbox and label for the 'All day' checkbox in the date modal
     .time-switch {
         display: flex;
-        gap: var(--sbx-size-s);
+        gap: var(--sbx-size-xs);
     }
 
     // so the background colours used for event types in the filters modal don't butt up against the label
     input[type="checkbox"]:not(.plain) + label[for^="eventType-"] {
-        padding-left: var(--sbx-size-s);
+        padding-left: var(--sbx-size-xs);
     }
 
     // add the new border colour to the calendar table cells
