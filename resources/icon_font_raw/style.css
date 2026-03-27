@@ -522,6 +522,9 @@
 .icon-reply:before {
   content: "\e65b";
 }
+.icon-reporting:before {
+  content: "\e60e";
+}
 .icon-resource-booking:before {
   content: "\e65c";
 }
