@@ -25,13 +25,46 @@ const { configs, hasUnsavedChanges, initialiseColourPickers, resetToSavedState, 
     });
 const { schedulePreviewRefresh } = useSkinPreview(configs, props.routes.preview);
 
-window.Vue.watch(
-    () => configs.value.toggle.enabled,
-    async () => {
-        schedulePreviewRefresh();
+/**
+ * Persist the toggle state immediately, then reload the page so server-rendered assets are reapplied.
+ */
+async function onToggleChanged(): Promise<void> {
+    if (isProcessing.value) {
+        return;
+    }
+
+    const previousToggleEnabled = !configs.value.toggle.enabled;
+    const toast = window.sbProps.toastActivate("Saving...");
+
+    try {
+        isProcessing.value = true;
+        loadError.value = null;
+
+        const response = await apiRequest({
+            url: props.routes.post,
+            method: "POST",
+            body: {
+                configs: {
+                    toggle: configs.value.toggle,
+                },
+            },
+        });
+
+        if (!response.success) {
+            throw new Error(response.message || "Failed to save");
+        }
+
+        window.location.reload();
+    } catch (error) {
+        configs.value.toggle.enabled = previousToggleEnabled;
+        const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
+        loadError.value = errorMessage;
+        toast.timeout({ text: errorMessage, isSuccess: false });
         await initialiseColourPickers();
-    },
-);
+    } finally {
+        isProcessing.value = false;
+    }
+}
 
 /**
  * Restore the last saved config state.
@@ -100,6 +133,8 @@ async function onSaveSelected(): Promise<void> {
                         name="advanced_ui_enabled"
                         autocomplete="off"
                         data-test="skin-config-toggle-input"
+                        :disabled="isProcessing"
+                        @change="onToggleChanged"
                     />
                     <label for="skin-config-toggle-field" data-test="skin-config-toggle">
                         <span>On</span>
