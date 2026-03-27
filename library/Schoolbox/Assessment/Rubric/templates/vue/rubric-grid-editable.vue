@@ -122,14 +122,13 @@ async function onAddKeydown<TType extends "capability" | "indicator">(
         url: props.routeRubricCreate,
         method: "POST",
         body: {
-            type: type === "capability" ? "group" : "criterion", // todo: swap for the new names in the backend?
-            rubricId: rubricGrid.value.id,
-            groupId: type === "indicator" ? capability!.id : null,
-            groupIndex: 0, // todo: don't need this anymore... it's only used to render the old twig stuff
+            type,
             name,
-            levelCount: rubricGrid.value.levels.length,
             folderId: props.folderId,
-            groupName: type === "indicator" ? capability!.name : null,
+            rubricId: rubricGrid.value.id,
+            levelCount: rubricGrid.value.levels.length,
+            capabilityId: type === "indicator" ? capability!.id : null,
+            capabilityName: type === "indicator" ? capability!.name : null,
         },
     });
 

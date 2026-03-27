@@ -53,13 +53,13 @@ class Controller extends BaseController
     /**
      * @var Capability\Mapper
      */
-    private $groupMapper;
+    private $capabilityMapper;
 
 
     /**
      * @var Indicator\Mapper
      */
-    private $criterionMapper;
+    private $indicatorMapper;
 
 
     /**
@@ -86,8 +86,8 @@ class Controller extends BaseController
      * @param RubricDataSource     $mapper
      * @param AssessmentDataSource $assessmentDataSource
      * @param FolderMapper         $folderMapper
-     * @param Capability\Mapper    $groupMapper
-     * @param Indicator\Mapper     $criterionMapper
+     * @param Capability\Mapper    $capabilityMapper
+     * @param Indicator\Mapper     $indicatorMapper
      * @param RosettaStone         $rosettaStone
      * @param MarkTypeMapper       $markTypeMapper
      * @param Group\Mapper         $gradeGroupMapper
@@ -96,8 +96,8 @@ class Controller extends BaseController
         RubricDataSource $mapper,
         AssessmentDataSource $assessmentDataSource,
         FolderMapper $folderMapper,
-        Capability\Mapper $groupMapper,
-        Indicator\Mapper $criterionMapper,
+        Capability\Mapper $capabilityMapper,
+        Indicator\Mapper $indicatorMapper,
         RosettaStone $rosettaStone,
         MarkTypeMapper $markTypeMapper,
         Group\Mapper $gradeGroupMapper
@@ -105,8 +105,8 @@ class Controller extends BaseController
         $this->mapper               = $mapper;
         $this->assessmentDataSource = $assessmentDataSource;
         $this->folderMapper         = $folderMapper;
-        $this->groupMapper          = $groupMapper;
-        $this->criterionMapper      = $criterionMapper;
+        $this->capabilityMapper     = $capabilityMapper;
+        $this->indicatorMapper      = $indicatorMapper;
         $this->rosettaStone         = $rosettaStone;
         $this->markTypeMapper       = $markTypeMapper;
         $this->gradeGroupMapper     = $gradeGroupMapper;
@@ -114,7 +114,7 @@ class Controller extends BaseController
 
 
     /**
-     * AJAX method for creating a new group or criterion
+     * AJAX method for creating a new capability or indicator
      *
      * @api POST /rubric
      * @since 156
@@ -145,11 +145,11 @@ class Controller extends BaseController
 
         $rubricGridTranslator = new RubricGridTranslator();
 
-        if ($post->get('type') === 'criterion') {
-            $groupId    = $post->get('groupId');
-            $groupName  = $post->get('groupName');
+        if ($post->get('type') === 'indicator') {
+            $capabilityId    = $post->get('capabilityId');
+            $capabilityName  = $post->get('capabilityName');
             $critName   = $post->get('name');
-            if (!$groupName) {
+            if (!$capabilityName) {
                 $this->sendJSONError(
                     $this->rosettaStone->translateSentence(
                         'Must supply {:rubricGroup|indef} {:rubricGroup} for new {:rubricCriterion}'
@@ -159,13 +159,13 @@ class Controller extends BaseController
             }
 
 
-            // Only if adding a criterion to an existing group:
+            // Only if adding an indicator to an existing capability:
             // Find the capability model, so that the indicator may be saved
             // into the capability (and its folder)
-            if ($groupId) {
-                $groupModel = $this->groupMapper->findById($groupId);
+            if ($capabilityId) {
+                $capabilityModel = $this->capabilityMapper->findById($capabilityId);
                 // Surely this capability is in a folder?
-                if ($groupModel->getParentType() !== Capability\Model::PARENT_TYPE_CATEGORY) {
+                if ($capabilityModel->getParentType() !== Capability\Model::PARENT_TYPE_CATEGORY) {
                     $this->sendJSONError(
                         $this->rosettaStone->translateSentence(
                             'May only create folder-level {:rubricCriterion|p}'
@@ -173,16 +173,16 @@ class Controller extends BaseController
                     );
                     return;
                 }
-                $folderId = $groupModel->getParentId();
+                $folderId = $capabilityModel->getParentId();
             }
 
-            $criterionModels = $this->criterionMapper->findByColumn('rubric_capability_id', $groupId);
-            $proposedGroup   = Util::normalizeName($groupName);
-            $proposedName    = Util::normalizeName($critName);
-            foreach ($criterionModels as $criterionModel) {
-                $normGroup = Util::normalizeName($criterionModel->getCapability()->getName());
-                $normName  = Util::normalizeName($criterionModel->getName());
-                if ($normGroup === $proposedGroup && $normName === $proposedName) {
+            $indicatorModels = $this->indicatorMapper->findByColumn('rubric_capability_id', $capabilityId);
+            $proposedCapabilityName = Util::normalizeName($capabilityName);
+            $proposedName = Util::normalizeName($critName);
+            foreach ($indicatorModels as $indicatorModel) {
+                $normCapability = Util::normalizeName($indicatorModel->getCapability()->getName());
+                $normName = Util::normalizeName($indicatorModel->getName());
+                if ($normCapability === $proposedCapabilityName && $normName === $proposedName) {
                     $this->sendJSONError(
                         $this->rosettaStone->translateSentence(
                             '{:rubricCriterion|c} already exists in this {:rubricGroup}'
@@ -192,41 +192,37 @@ class Controller extends BaseController
                 }
             }
 
-            // This criterion needs to be created
-            $criterionModel = $this->criterionMapper->findOrCreateOneForFolderByKey(
+            // This indicator needs to be created
+            $indicatorModel = $this->indicatorMapper->findOrCreateOneForFolderByKey(
                 $folderId,
                 $critName,
-                isset($groupModel) ? $groupModel->getName() : $groupName
+                isset($capabilityModel) ? $capabilityModel->getName() : $capabilityName
             );
-
-            $group = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
-                ->setId($criterionModel->getCapability()->getId())
-                ->setName($groupName);
 
             // Don't have to save anything yet
             $indicator = (new \Schoolbox\Assessment\Rubric\RowSet\Indicator())
-                ->setId($criterionModel->getId())
+                ->setId($indicatorModel->getId())
                 ->setName($critName);
 
             $indicatorData = $rubricGridTranslator->translateIndicator($rubricGrid, $indicator);
             $this->response = $this->responseAsJson($indicatorData);
-        } elseif ($post->get('type') === 'group') {
-            // Does the list of crits/groups really need to be saved now?
-            // For some reason, groups aren't saved whilst criteria are?
-            // Probably because groups literally couldn't exist w/o criteria
-            $groupName = $post->get('name');
+        } elseif ($post->get('type') === 'capability') {
+            // Does the list of indicators/capabilities really need to be saved now?
+            // For some reason, capabilities aren't saved whilst criteria are?
+            // Probably because capabilities literally couldn't exist w/o criteria
+            $capabilityName = $post->get('name');
 
             // Next step: figure out what gets passed in
-            $group = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
+            $capability = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
 //                ->setId(rand(1, PHP_INT_MAX))
-                ->setName($groupName);
+                ->setName($capabilityName);
 
-            // Ensure the proposed Group name is not already in use.
-            $groupModels = $this->groupMapper->findForFolder($folderId);
-            $proposed    = Util::normalizeName($groupName);
-            foreach ($groupModels as $groupModel) {
-                $grouping = Util::normalizeName($groupModel->getName());
-                if ($proposed === $grouping) {
+            // Ensure the proposed Capability name is not already in use.
+            $capabilityModels = $this->capabilityMapper->findForFolder($folderId);
+            $proposedName = Util::normalizeName($capabilityName);
+            foreach ($capabilityModels as $capabilityModel) {
+                $normName = Util::normalizeName($capabilityModel->getName());
+                if ($proposedName === $normName) {
                     $this->sendJSONError(
                         $this->rosettaStone->translateSentence(
                             '{:rubricGroup|c} name already exists in this context'
@@ -236,7 +232,7 @@ class Controller extends BaseController
                 }
             }
 
-            $capabilityData = $rubricGridTranslator->translateCapability($rubricGrid, $group);
+            $capabilityData = $rubricGridTranslator->translateCapability($rubricGrid, $capability);
             $this->response = $this->responseAsJson($capabilityData);
         }
     }
