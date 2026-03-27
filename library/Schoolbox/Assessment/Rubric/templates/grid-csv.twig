@@ -1,5 +1,4 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/scrollTo/jquery.scrollTo.min.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.rubric-editable.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/assessment/jquery.sequencer.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function () {
@@ -137,7 +136,16 @@
 </script>
 <div id="rubric-attachable{{ idSuffix }}">
     <div data-hideable>
-        {% include '@rubric/grid-editable.twig' %}
+        <div id="rubric-grid-editable-container">
+            <rubric-grid-editable
+                :rubric-grid-payload="{{ rubricGridPayload|json_encode }}"
+                :max-levels="{{ config.rubric_max_levels }}"
+                :folder-id="{{ folderId }}"
+                route-rubric-create="{{ routeLookup("rubric.create") }}"
+            />
+        </div>
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricGridEditable.js?v={{ config.site_version }}"></script>
+
         <div>
             {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
         </div>
