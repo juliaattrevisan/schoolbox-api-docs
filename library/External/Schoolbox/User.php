@@ -363,6 +363,8 @@ class External_Schoolbox_User implements External_UserInterface
             return $user->getPortrait();
         }
 
+        $existingPortrait = $user->getPortrait();
+
         $hash = $this->internalDatabase->executeQuery(
             'SELECT portrait_hash, updated_at
                 FROM sis_user_profile
@@ -373,12 +375,24 @@ class External_Schoolbox_User implements External_UserInterface
             ]
         )->fetch();
 
+        if (!$hash) {
+            return $existingPortrait;
+        }
+
+        //If the existing portrait has the same SHA1 hash as the one in sis_user_profile return it without updating the user
         if (
-            !$hash
-            || ($user->getPortrait()
-                && $user->getPortrait()->getCreatedAt()->gt(Alaress_Date_Format::newDatabaseDate($hash['updated_at'])))
+            $existingPortrait
+            && $hash['portrait_hash'] === $existingPortrait->getHash()
         ) {
-            return $user->getPortrait();
+            return $existingPortrait;
+        }
+
+        //Return existing portrait if it is newer than SUDS profile
+        if (
+            $existingPortrait
+            && $existingPortrait->getCreatedAt()->gt(Alaress_Date_Format::newDatabaseDate($hash['updated_at']))
+        ) {
+            return $existingPortrait;
         }
 
         // using hash from sis_user_profile table
