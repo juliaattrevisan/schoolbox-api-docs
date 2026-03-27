@@ -167,7 +167,7 @@ For example: if written code contains a performance issue which cannot be addres
   - vulnerable dependencies
   - injection of untrusted input (SQL injection, XSS)
   - privacy concerns (leakage or unnecessary storage of PII)
-  - commit of 
+  - hard-coded API keys or other tokens
   - other risks as defined in OWASP
 
 ---
