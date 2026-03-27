@@ -231,9 +231,6 @@ class UserMapper extends Mapper
             }
         }
 
-        if (0 === $nationalityCollection->count()) {
-            return;
-        }
         $this->getJoinMapper('nationality')->save($nationalityCollection);
     }
 
@@ -258,9 +255,6 @@ class UserMapper extends Mapper
             }
         }
 
-        if (0 === $languageCollection->count()) {
-            return;
-        }
         $this->getJoinMapper('language')->save($languageCollection);
     }
 
