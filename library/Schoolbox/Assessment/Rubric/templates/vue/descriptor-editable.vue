@@ -9,8 +9,11 @@ import { MAX_DESCRIPTOR_LENGTH, type RubricGridDescriptor } from "./types";
 interface Props {
     levelName: string;
     indicatorName: string;
+    textareaHeight?: string;
 }
 const props = defineProps<Props>();
+
+const emit = defineEmits<{ descriptionKeyDown: [event: KeyboardEvent] }>();
 
 const indicatorEnabled = defineModel<boolean>("indicatorEnabled", { required: true });
 const descriptorDescription = defineModel<RubricGridDescriptor["description"]>("description", { required: true });
@@ -43,6 +46,8 @@ async function onCellClick(): Promise<void> {
     await window.Vue.nextTick();
     textareaRef.value?.focus();
 }
+
+defineExpose({ textareaRef });
 </script>
 
 <template>
@@ -56,7 +61,9 @@ async function onCellClick(): Promise<void> {
             rows="2"
             :maxlength="descriptionHasChanged ? MAX_DESCRIPTOR_LENGTH : undefined"
             :disabled="!indicatorEnabled"
+            :style="{ height: props.textareaHeight }"
             @change.once="descriptionHasChanged = true"
+            @keydown="emit('descriptionKeyDown', $event)"
         ></textarea>
 
         <!-- todo: data-descriptor-value data-descriptor-value-original data-descriptor-criterion data-descriptor-level-index data-descriptor-original -->

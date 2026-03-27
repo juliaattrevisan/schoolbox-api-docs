@@ -11,6 +11,7 @@
  * in the header if it exists
  */
 
+import { useTemplateRefsList } from "@vueuse/core";
 import locale from "@js/terminology/rosettaStone";
 import DescriptorEditable from "./descriptor-editable.vue";
 import { MAX_INDICATOR_LENGTH } from "./types";
@@ -41,6 +42,42 @@ window.Vue.onMounted(() => {
         // As vue loads the template after foundation has been initialised, we need to reinitialise the tooltips
         window.jQuery(document).foundation("tooltip", "reflow");
     }
+});
+
+const descriptorTextareaHeight = window.Vue.ref<string>("auto");
+
+const descriptorRefs = useTemplateRefsList<InstanceType<typeof DescriptorEditable>>();
+
+/**
+ * Update the height of the descriptor textareas to fit the content
+ * but also be consistent across all descriptors in the same row
+ */
+async function updateDescriptorHeight(): Promise<void> {
+    if (!descriptorRefs.value) {
+        return;
+    }
+
+    // reset to auto to allow shrinking when content is removed
+    descriptorTextareaHeight.value = "auto";
+    await window.Vue.nextTick();
+
+    let maxHeight = 0;
+
+    for (const descriptorRef of descriptorRefs.value) {
+        const textarea = descriptorRef.textareaRef;
+        if (!textarea) continue;
+
+        const { paddingTop, paddingBottom } = window.getComputedStyle(textarea);
+
+        const textareaHeight = textarea.scrollHeight - parseInt(paddingTop) - parseInt(paddingBottom);
+        maxHeight = Math.max(maxHeight, textareaHeight);
+    }
+
+    descriptorTextareaHeight.value = `${maxHeight}px`;
+}
+
+window.Vue.onMounted(() => {
+    setTimeout(() => void updateDescriptorHeight(), 0);
 });
 </script>
 
@@ -95,11 +132,14 @@ window.Vue.onMounted(() => {
         <descriptor-editable
             v-for="(descriptor, levelIndex) in props.indicator.descriptors"
             :key="descriptor.id"
+            :ref="descriptorRefs.set"
             v-model:indicator-enabled="hasUsage"
             v-model:description="descriptor.description"
             v-model:max-value="descriptor.maxValue"
             :level-name="props.levels[levelIndex].name"
             :indicator-name="props.indicator.name"
+            :textarea-height="descriptorTextareaHeight"
+            @description-key-down="updateDescriptorHeight"
         ></descriptor-editable>
 
         <td

@@ -31,32 +31,7 @@
         if (this.options.rubricId === null) {
             this.options.rubricId = this.element.id;
         }
-
-        this.listen();
     }
-
-    /**
-     * Clear and assign all relevant listeners
-     */
-    RubricEditable.prototype.listen = function () {
-        var rubricEditable = this;
-        var $rb = $(this.element);
-        var opt = this.options;
-
-        $rb.off("focus keyup paste", "textarea");
-        $rb.on("focus keyup paste", "textarea", function () {
-            // TODO: mimic in vue
-            // get mah row, and resize its inputs
-            rubricEditable.resizeDescriptorTextInputs($(this.closest("[data-group]")));
-        });
-
-        // effect these listeners
-        $rb.find("input[data-level]").trigger("change");
-        $rb.find("[data-group]").each(function () {
-            // TODO: mimic in vue
-            rubricEditable.resizeDescriptorTextInputs($(this));
-        });
-    };
 
     /**
      * Replace the existing levels and descriptors with the array given
@@ -91,28 +66,6 @@
         });
 
         this.options.afterApplyResultSet.call(this);
-    };
-
-    /**
-     * Resize all descriptor text inputs within the row.
-     *
-     * @param row
-     */
-    RubricEditable.prototype.resizeDescriptorTextInputs = function (row) {
-        // get mah inputs
-        var $areas = row.find("[data-descriptor-text]");
-
-        var h = 0;
-
-        $areas.each(function () {
-            this.style.height = "auto";
-            h = Math.max(
-                h,
-                this.scrollHeight - parseInt($(this).css("paddingTop")) - parseInt($(this).css("paddingBottom")),
-            );
-        });
-
-        $areas.height(h);
     };
 
     $.fn[pluginName] = function (options) {
