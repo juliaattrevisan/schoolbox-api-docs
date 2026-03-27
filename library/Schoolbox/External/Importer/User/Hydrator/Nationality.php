@@ -26,20 +26,13 @@ class Nationality implements HydratorInterface
     protected $fieldname;
 
     /**
-     * @var IMapper
-     */
-    protected $mapper;
-
-    /**
      * Constructor
      *
      * @param string $fieldname
-     * @param IMapper $mapper
      */
-    public function __construct($fieldname, $mapper)
+    public function __construct($fieldname)
     {
         $this->fieldname = $fieldname;
-        $this->mapper = $mapper;
     }
 
     /**
@@ -47,8 +40,10 @@ class Nationality implements HydratorInterface
      */
     public function hydrate(#[SensitiveParameter] array $row, UserModel $user): UserModel
     {
+
+        $nationalityMapper = UserModel\Nationality\Mapper::getInstance();
         if (isset($row[$this->fieldname])) {
-            $collection = $this->mapper->createCollection();
+            $collection = $nationalityMapper->createCollection();
             $values = explode(',', $row[$this->fieldname]);
             foreach ($values as $value) {
                 $value = trim($value);
@@ -56,7 +51,7 @@ class Nationality implements HydratorInterface
                     continue;
                 }
                 $collection->add(
-                    $this->mapper
+                    $nationalityMapper
                         ->createModel()
                         ->setNationality($value)
                         ->setUser($user)

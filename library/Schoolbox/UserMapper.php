@@ -219,14 +219,16 @@ class UserMapper extends Mapper
     private function updateNationality(User $user, ?User $previous = null): void
     {
         $nationalityCollection = $user->getNationalityCollection();
-        if (!$nationalityCollection?->diff($previous?->getNationalityCollection())->count()) {
-            /* No change in nationalities, so no need to save
-             */
-            return;
-        }
+        if (null !== $previous) {
+            if (!$nationalityCollection?->diff($previous?->getNationalityCollection())->count()) {
+                /* No change in nationalities, so no need to save
+                 */
+                return;
+            }
 
-        if ($previous->getNationalityCollection()->count()) {
-            $this->getJoinMapper('nationality')->delete($previous->getNationalityCollection());
+            if ($previous->getNationalityCollection()->count()) {
+                $this->getJoinMapper('nationality')->delete($previous->getNationalityCollection());
+            }
         }
 
         if (0 === $nationalityCollection->count()) {
@@ -244,14 +246,16 @@ class UserMapper extends Mapper
     private function updateLanguage(User $user, ?User $previous = null): void
     {
         $languageCollection = $user->getLanguageCollection();
-        if (!$languageCollection?->diff($previous?->getLanguageCollection())->count()) {
-            /* No change in languages, so no need to save
-             */
-            return;
-        }
+        if (null !== $previous) {
+            if (!$languageCollection?->diff($previous?->getLanguageCollection())->count()) {
+                /* No change in languages, so no need to save
+                 */
+                return;
+            }
 
-        if ($previous->getLanguageCollection()->count()) {
-            $this->getJoinMapper('language')->delete($previous->getLanguageCollection());
+            if ($previous->getLanguageCollection()->count()) {
+                $this->getJoinMapper('language')->delete($previous->getLanguageCollection());
+            }
         }
 
         if (0 === $languageCollection->count()) {

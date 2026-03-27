@@ -26,19 +26,13 @@ class Language implements HydratorInterface
     protected $fieldname;
 
     /**
-     * @var IMapper
-     */
-    protected $mapper;
-
-    /**
      * Constructor
      *
      * @param string $fieldname
      */
-    public function __construct($fieldname, $mapper)
+    public function __construct($fieldname)
     {
         $this->fieldname = $fieldname;
-        $this->mapper = $mapper;
     }
 
     /**
@@ -46,8 +40,9 @@ class Language implements HydratorInterface
      */
     public function hydrate(#[SensitiveParameter] array $row, UserModel $user): UserModel
     {
+        $languageMapper = UserModel\Language\Mapper::getInstance();
         if (isset($row[$this->fieldname])) {
-            $collection = $this->mapper->createCollection();
+            $collection = $languageMapper->createCollection();
             $values = explode(',', $row[$this->fieldname]);
             foreach ($values as $value) {
                 $value = trim($value);
@@ -55,7 +50,8 @@ class Language implements HydratorInterface
                     continue;
                 }
                 $collection->add(
-                    $this->mapper->createModel()
+                    $languageMapper
+                        ->createModel()
                         ->setLanguage($value)
                         ->setUser($user)
                 );
