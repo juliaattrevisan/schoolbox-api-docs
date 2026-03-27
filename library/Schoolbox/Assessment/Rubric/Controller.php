@@ -123,18 +123,6 @@ class Controller extends BaseController
     {
         $post = $this->requestPost;
 
-        $formField = $post->get('formField', 'rb');
-
-        $context = [
-            'formField' => $formField,
-            'rubric' => [
-                'id' => $post->get('rubricId'),
-                'levels' => $post->get('levelCount') ? array_fill(0, $post->get('levelCount'), ':)') : [],
-            ],
-            'markPerCapability' => $post->getBool('markPerCapability', false),
-            'useMarkRange'      => $post->getBool('useMarkRange', false),
-        ];
-
         // Don't use just folder ID
         $folderId = $post->get('folderId');
         if (!$folderId) {
@@ -154,12 +142,11 @@ class Controller extends BaseController
         for ($i = 0; $i < $levelCount; $i++) {
             $rubricGrid->getLevels()->add(new Level());
         }
-        $context['rubricGrid'] = $rubricGrid;
 
+        $rubricGridTranslator = new RubricGridTranslator();
 
         if ($post->get('type') === 'criterion') {
             $groupId    = $post->get('groupId');
-            $groupIndex = $post->get('groupIndex');
             $groupName  = $post->get('groupName');
             $critName   = $post->get('name');
             if (!$groupName) {
@@ -217,16 +204,12 @@ class Controller extends BaseController
                 ->setName($groupName);
 
             // Don't have to save anything yet
-            $criterion = (new \Schoolbox\Assessment\Rubric\RowSet\Indicator())
+            $indicator = (new \Schoolbox\Assessment\Rubric\RowSet\Indicator())
                 ->setId($criterionModel->getId())
                 ->setName($critName);
 
-            $context['rowspan']    = null;
-            $context['group']      = $group;
-            $context['crit']       = $criterion;
-            $context['groupIndex'] = $groupIndex;
-
-            $template = 'group-row-editable';
+            $indicatorData = $rubricGridTranslator->translateIndicator($rubricGrid, $indicator);
+            $this->response = $this->responseAsJson($indicatorData);
         } elseif ($post->get('type') === 'group') {
             // Does the list of crits/groups really need to be saved now?
             // For some reason, groups aren't saved whilst criteria are?
@@ -253,21 +236,9 @@ class Controller extends BaseController
                 }
             }
 
-            $context['rowspan']    = 1;
-            $context['group']      = $group;
-            $context['groupIndex'] = $post->get('groupIndex');
-
-            $template = 'group-editable';
-        } else {
-            return;
+            $capabilityData = $rubricGridTranslator->translateCapability($rubricGrid, $group);
+            $this->response = $this->responseAsJson($capabilityData);
         }
-
-
-        // TODO: json output instead
-        $this->response = $this->responseFromTemplateUnthemed(
-            "@rubric/$template.twig",
-            $context
-        );
     }
 
     /**

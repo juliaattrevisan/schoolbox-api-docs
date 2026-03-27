@@ -51,7 +51,7 @@ class ModelToArray
      * @param Capability $capability
      * @return array
      */
-    private function translateCapability(Grid $rubricGrid, Capability $capability): array
+    public function translateCapability(Grid $rubricGrid, Capability $capability): array
     {
         $indicators = [];
         foreach ($rubricGrid->iterateIndicators($capability) as $indicator) {
@@ -77,7 +77,7 @@ class ModelToArray
      * @param Indicator $indicator
      * @return array
      */
-    private function translateIndicator(Grid $rubricGrid, Indicator $indicator): array
+    public function translateIndicator(Grid $rubricGrid, Indicator $indicator): array
     {
         $indicatorUsage = $rubricGrid->retrieveIndicatorUsage($indicator);
 

@@ -187,9 +187,10 @@ window.Vue.onMounted(() => {
         <th :colspan="totalColumns - 1 /* subtract the capability column */">
             <!-- TODO: previously some of these only added maxlength after the first change (data-group-grid-text in grid-editable.twig) -->
             <textarea
+                v-model.trim="newIndicatorName"
                 :placeholder="`+ Type to add new ${locale.rubricCriterion.singular()} ${capabilityName ? `to ${capabilityName}` : ''}`"
                 :maxlength="MAX_INDICATOR_LENGTH"
-                :disabled="isCreating"
+                :disabled="isCreating || undefined"
                 @keydown="onAddIndicatorKeydown"
             ></textarea>
         </th>

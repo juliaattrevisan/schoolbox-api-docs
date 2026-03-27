@@ -98,9 +98,6 @@ async function onAddKeydown<TType extends "capability" | "indicator">(
         return; // prevent blank and double-fire from keydown to blue
     }
 
-    isCreating.value = true; // prevent mods & double-fire
-    nameRef.value = "";
-
     /**
      * Ensure user is not trying to add a duplicate group. The server-side validation will prevent
      * duplicate criterion, but cannot prevent duplicate groups as they are not persisted until a indicator
@@ -117,6 +114,9 @@ async function onAddKeydown<TType extends "capability" | "indicator">(
         });
         return;
     }
+
+    isCreating.value = true; // prevent mods & double-fire
+    nameRef.value = "";
 
     const response = await apiRequest<TType extends "capability" ? RubricGridCapability : RubricGridIndicator>({
         url: props.routeRubricCreate,
@@ -301,10 +301,10 @@ document.addEventListener(RUBRIC_GRID_IMPORTED, (event) => {
                     <th :colspan="totalColumns">
                         <!-- TODO: previously some of these only added maxlength after the first change (data-group-grid-text in grid-editable.twig) -->
                         <textarea
-                            :v-model="newCapabilityName"
+                            v-model.trim="newCapabilityName"
                             :placeholder="`+ Type to add new ${locale.rubricGroup.singular()}`"
                             :maxlength="MAX_CAPABILITY_LENGTH"
-                            :disabled="isCreating"
+                            :disabled="isCreating || undefined"
                             @keydown="(e) => onAddCapabilityKeydown(e)"
                         ></textarea>
                     </th>
