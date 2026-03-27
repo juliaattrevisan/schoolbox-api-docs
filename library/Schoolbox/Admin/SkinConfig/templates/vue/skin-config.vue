@@ -32,14 +32,11 @@ async function onToggleChanged(): Promise<void> {
     if (isProcessing.value) {
         return;
     }
-
     const previousToggleEnabled = !configs.value.toggle.enabled;
     const toast = window.sbProps.toastActivate("Saving...");
-
     try {
         isProcessing.value = true;
         loadError.value = null;
-
         const response = await apiRequest({
             url: props.routes.post,
             method: "POST",
@@ -49,11 +46,9 @@ async function onToggleChanged(): Promise<void> {
                 },
             },
         });
-
         if (!response.success) {
             throw new Error(response.message || "Failed to save");
         }
-
         window.location.reload();
     } catch (error) {
         configs.value.toggle.enabled = previousToggleEnabled;
@@ -147,8 +142,8 @@ async function onSaveSelected(): Promise<void> {
                 <button v-if="hasUnsavedChanges" type="button" class="button l-flex__item--1" @click="onUndoChanges">
                     Undo Changes
                 </button>
-                <button :value="saveText" class="button submit l-flex__item--1" data-test="skin-config-save-submit">
-                    Save
+                <button class="button submit l-flex__item--1" data-test="skin-config-save-submit">
+                    {{ saveText }}
                 </button>
             </div>
         </form>
