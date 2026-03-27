@@ -32,6 +32,9 @@ const checkboxId = `rb-indicator-${window.Vue.useId()}`;
 
 const emit = defineEmits<{ move: [direction: -1 | 1] }>();
 
+/* only add maxlength to fields that actually change. to then only validate those fields characters count */
+const indicatorNameHasChanged = window.Vue.ref(false);
+
 window.Vue.onMounted(() => {
     if (document.readyState === "complete") {
         // If the document isn't ready, we can't reflow tooltips yet
@@ -82,8 +85,9 @@ window.Vue.onMounted(() => {
             <label v-else class="checkbox-label rb-criterion rb-editable" :for="checkboxId">
                 <textarea
                     v-model.trim.lazy="indicatorName"
-                    :maxlength="MAX_INDICATOR_LENGTH"
+                    :maxlength="indicatorNameHasChanged ? MAX_INDICATOR_LENGTH : undefined"
                     :placeholder="`${locale.rubricCriterion.proper()} name`"
+                    @change.once="indicatorNameHasChanged = true"
                 ></textarea>
             </label>
         </th>

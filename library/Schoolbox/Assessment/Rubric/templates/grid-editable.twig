@@ -7,35 +7,3 @@
     />
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricGridEditable.js?v={{ config.site_version }}"></script>
-
-{% set maxCapabilityLength = 900 %}
-{# maxCapabilityLength is 900, due to the way browsers look at maxlength as character lenght, but mysql table looks at char byte lenght
-so if there are bullet points in the textbox they count as 3 characters, and will cause issues, so lets work on 900 as the limit, and we shouldn't hit the db max...#}
-
-{# js specific to the rubric we just injected to...wherever we injected it #}
-<script type="text/javascript">
-    $(function () {
-        /**
-         * only add maxlength to fields that actually change.
-         * to then only validate those fields characters count
-         */
-        {# maxCapabilityLength/maxIndicatorLength is 900, due to the way browsers look at maxlength as character lenght, but mysql table looks at char byte lenght
-        so if there are bullet points in the textbox they count as 3 characters, and will cause issues, so lets work on 900 as the limit, and we shouldn't hit the db max... ' #}
-        let maxCapabilityLength = 900, maxIndicatorLength = 900, maxDescriptorLength = 900;
-        $('[data-group-row-text]').on('change', (event) => {
-            event.target.setAttribute('maxlength', maxCapabilityLength);
-        });
-        $('[data-group-edit-text]').on('change', (event) => {
-            event.target.setAttribute('maxlength', maxCapabilityLength);
-        });
-        $('[data-group-grid-text]').on('change', (event) => {
-            event.target.setAttribute('maxlength', maxCapabilityLength);
-        });
-        $('[data-criterion-text]').on('change', (event) => {
-            event.target.setAttribute('maxlength', maxIndicatorLength);
-        });
-        $('[data-descriptor-text]').on('change', (event) => {
-            event.target.setAttribute('maxlength', maxDescriptorLength);
-        });
-    });
-</script>

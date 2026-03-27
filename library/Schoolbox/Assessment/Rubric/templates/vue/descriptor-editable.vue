@@ -27,6 +27,9 @@ const descriptorMaxValue = window.Vue.computed({
 
 const textareaRef = window.Vue.useTemplateRef<HTMLTextAreaElement>("textareaRef");
 
+/* only add maxlength to fields that actually change. to then only validate those fields characters count */
+const descriptionHasChanged = window.Vue.ref(false);
+
 /**
  * When the cell is clicked and the indicator this is part of is disabled,
  * enable the indicator and focus the textarea
@@ -51,8 +54,9 @@ async function onCellClick(): Promise<void> {
             v-model.trim="descriptorDescription"
             :placeholder="`Descriptor for ${props.levelName} ${props.indicatorName}`"
             rows="2"
-            :maxlength="MAX_DESCRIPTOR_LENGTH"
+            :maxlength="descriptionHasChanged ? MAX_DESCRIPTOR_LENGTH : undefined"
             :disabled="!indicatorEnabled"
+            @change.once="descriptionHasChanged = true"
         ></textarea>
 
         <!-- todo: data-descriptor-value data-descriptor-value-original data-descriptor-criterion data-descriptor-level-index data-descriptor-original -->

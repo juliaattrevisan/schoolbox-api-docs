@@ -50,6 +50,9 @@ window.Vue.onMounted(() => {
     }
 });
 
+/* only add maxlength to fields that actually change. to then only validate those fields characters count */
+const capabilityNameHasChanged = window.Vue.ref(false);
+
 const newIndicatorName = window.Vue.ref("");
 
 /**
@@ -164,8 +167,9 @@ window.Vue.onMounted(() => {
             <textarea
                 v-else
                 v-model.trim.lazy="capabilityName"
-                :maxlength="MAX_CAPABILITY_LENGTH"
+                :maxlength="capabilityNameHasChanged ? MAX_CAPABILITY_LENGTH : undefined"
                 :placeholder="`${locale.rubricGroup.proper()} name`"
+                @change.once="capabilityNameHasChanged = true"
             ></textarea>
         </th>
     </tr>
@@ -186,7 +190,6 @@ window.Vue.onMounted(() => {
     <tr class="rb-new-criterion">
         <!-- Add a new indicator (criterion) -->
         <th :colspan="totalColumns - 1 /* subtract the capability column */">
-            <!-- TODO: previously some of these only added maxlength after the first change (data-group-grid-text in grid-editable.twig) -->
             <textarea
                 v-model.trim="newIndicatorName"
                 :placeholder="`+ Type to add new ${locale.rubricCriterion.singular()} ${capabilityName ? `to ${capabilityName}` : ''}`"

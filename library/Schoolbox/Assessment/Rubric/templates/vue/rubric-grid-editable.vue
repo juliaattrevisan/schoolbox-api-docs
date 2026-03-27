@@ -321,7 +321,6 @@ document.addEventListener(RUBRIC_GRID_IMPORTED, (event) => {
                 <tr class="rb-group-header rb-new-group">
                     <!-- Add a new group -->
                     <th :colspan="totalColumns">
-                        <!-- TODO: previously some of these only added maxlength after the first change (data-group-grid-text in grid-editable.twig) -->
                         <textarea
                             v-model.trim="newCapabilityName"
                             :placeholder="`+ Type to add new ${locale.rubricGroup.singular()}`"
