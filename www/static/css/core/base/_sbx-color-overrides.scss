@@ -185,7 +185,10 @@ body.sbx-body {
     }
 
     // use the new config setting colours
-    .component-titlebar {
+    .component-titlebar,
+    #component-layout .column-top .component-titlebar,
+    #component-layout .column-left .component-titlebar,
+    #component-layout .column-right .component-titlebar {
         background-color: var(--sbx-config-color-component-heading-background);
         h2,
         nav a[class^="icon-"] {
