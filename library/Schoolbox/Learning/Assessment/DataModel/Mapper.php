@@ -1697,6 +1697,16 @@ class Mapper extends BaseMapper
             $assessmentId = $model->getId();
             if (isset($subModelList[$assessmentId])) {
                 $model->setSubObject($subModelList[$assessmentId]);
+
+                // Ensure sub-object has back-reference to its parent assessment model.
+                // Note augmentListWithDueWorks() uses this function for SubmissionBox sub-objects via hydrateDueWork().
+                // Without the back-reference to the parent assessment model added here, sub-objects hydrated by this
+                // method will hold a back-reference to a stub assessment model containing only an ID and default field
+                // values (e.g. weight: 0, no participants loaded).  When the Assessment\DataModel\Translator later
+                // creates a domain object from that stub, the domain object will have no participants, so
+                // getParticipantIfExtant() will return null in AbstractSummator->summate(), and the sub-assessment's
+                // mark will be silently excluded from project mark calculations.
+                $subModelList[$assessmentId]->setAssessmentModel($model);
             }
         }
 
