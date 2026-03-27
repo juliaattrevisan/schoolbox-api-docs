@@ -30,6 +30,7 @@ class Factory
      *                       still succeed even if saving it will not.
      * @return Grid
      * @throws \InvalidArgumentException
+     * @see /library/Schoolbox/Assessment/Rubric/templates/vue/payload.ts
      */
     public function buildFromPostData(Grid $grid, array $postData, bool $validate = true): Grid
     {

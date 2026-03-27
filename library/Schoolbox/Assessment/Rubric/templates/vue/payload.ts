@@ -1,0 +1,68 @@
+import type { RubricGrid } from "./types";
+
+/**
+ * The form data used when saving the editable rubric grid
+ * This is generally inside a .rb.[rubricId] property when sent
+ * @see /library/Schoolbox/Assessment/Rubric/Grid/Factory.php $rubricData
+ */
+type RubricGridFormPayload = {
+    level: { id: number; name: string }[];
+    group: { id: number | ""; name: string; maxValue: number | null }[];
+    criterion: Record<
+        number, // indicatorId
+        {
+            id: number;
+            groupId: number;
+            name: string;
+            on?: 1;
+        }
+    >;
+    descriptor: Record<
+        number, // indicatorId
+        {
+            id: number | "";
+            text?: string;
+            points?: string;
+        }[]
+    >;
+};
+
+/**
+ * Convert a RubricGrid into a RubricGridFormPayload
+ * @param grid - the RubricGrid to convert
+ * @returns the converted payload
+ */
+export function translateGridToFormPayload(grid: RubricGrid): RubricGridFormPayload {
+    const gridData: RubricGridFormPayload = {
+        level: grid.levels.map((level) => ({
+            id: level.id,
+            name: level.name,
+        })),
+        group: grid.capabilities.map((capability) => ({
+            id: capability.id >= 0 ? capability.id : "", // the backend expects empty IDs for new capabilities (I think)
+            name: capability.name,
+            maxValue: capability.maxValue,
+        })),
+        criterion: {},
+        descriptor: {},
+    };
+
+    for (const capability of grid.capabilities) {
+        for (const indicator of capability.indicators) {
+            gridData.criterion[indicator.id] = {
+                id: indicator.id,
+                groupId: capability.id,
+                name: indicator.name,
+                on: indicator.hasUsage ? 1 : undefined,
+            };
+
+            gridData.descriptor[indicator.id] = indicator.descriptors.map((descriptor) => ({
+                id: descriptor.id >= 0 ? descriptor.id : "", // the backend expects empty IDs for new descriptors (I think)
+                text: descriptor.description.trim(),
+                points: (descriptor.maxValue ?? "").toString(),
+            }));
+        }
+    }
+
+    return gridData;
+}

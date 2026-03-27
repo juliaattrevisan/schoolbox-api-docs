@@ -343,8 +343,15 @@ class Factory
         }
 
         // TODO what should this be?
-        if (isset($post['formField'], $post[$post['formField']])) {
-            $this->setRubricData($post[$post['formField']]);
+        if (isset($post['rubric'])) {
+            $rubrics = [];
+            foreach ($post['rubric'] as $rubricId => $rubricData) {
+                $rubrics[$rubricId] = json_decode($rubricData, true, 512, JSON_THROW_ON_ERROR);
+            }
+
+            if (\count($rubrics) > 0) {
+                $this->setRubricData($rubrics);
+            }
         }
 
         /* Check if any attached files existed in POST data

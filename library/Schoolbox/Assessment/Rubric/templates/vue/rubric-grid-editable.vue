@@ -13,6 +13,7 @@ import { MARK_TYPE_VALUE_NONE } from "@schoolboxAssessment/Types/MarkType";
 import LevelEditable from "./level-editable.vue";
 import CapabilityEditable from "./capability-editable.vue";
 import { RUBRIC_GRID_IMPORTED } from "./event";
+import { translateGridToFormPayload } from "./payload";
 import { MAX_CAPABILITY_LENGTH } from "./types";
 import type { RubricGrid, RubricGridLevel, RubricGridCapability, RubricGridIndicator } from "./types";
 
@@ -246,9 +247,14 @@ document.addEventListener(RUBRIC_GRID_IMPORTED, (event) => {
 </script>
 
 <template>
+    <input
+        type="hidden"
+        :name="`rubric[${rubricGrid.id}]`"
+        :value="JSON.stringify(translateGridToFormPayload(rubricGrid))"
+    />
+
     <h3 class="subheader show-for-medium-down">Levels</h3>
     <div class="scrollable">
-        <!-- TODO: :id="`rb-${rubricGrid.id}`" :data-rubric="rubricGrid.id" data-rb-grid -->
         <table class="rb stack-for-medium-down">
             <thead>
                 <tr>
