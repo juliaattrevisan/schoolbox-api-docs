@@ -87,7 +87,7 @@ class ModelToArray
 
             $descriptors[] = [
                 // fake negative ID to identify non existent descriptors in the frontend
-                'id' => $descriptor?->getId() ?? min(array_column($descriptors, 'id'), 0) - 1,
+                'id' => $descriptor?->getId() ?? min([0, ...array_column($descriptors, 'id')]) - 1,
                 'description' => $descriptor?->getDescription() ?? '',
                 'maxValue' => $descriptor?->getMaxValue(),
             ];
