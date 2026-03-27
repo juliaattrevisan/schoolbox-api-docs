@@ -64,6 +64,7 @@ defineExpose({ textareaRef });
             :maxlength="descriptionHasChanged ? MAX_DESCRIPTOR_LENGTH : undefined"
             :disabled="!indicatorEnabled || undefined"
             :style="{ height: props.textareaHeight }"
+            :name="`rb-descriptor-textarea-${componentId}` /* alaressValidate hates this and applies the rule for the below input to the textarea if this doesn't have a name??? */"
             @change.once="descriptionHasChanged = true"
             @input="emit('descriptionInput')"
         ></textarea>
