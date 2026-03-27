@@ -34,14 +34,6 @@ const capabilityName = defineModel<RubricGridCapability["name"]>("name", { requi
 const indicators = defineModel<RubricGridCapability["indicators"]>("indicators", { required: true });
 
 const capabilityMaxValueModel = defineModel<RubricGridCapability["maxValue"] | null>("maxValue", { required: true });
-const capabilityMaxValue = window.Vue.computed({
-    get: () => capabilityMaxValueModel.value,
-    set: (value: string | number | null) => {
-        // clearing an input will attempt to set it to "", treat that as null instead
-        const isValid = typeof value === "number" && !Number.isNaN(value);
-        capabilityMaxValueModel.value = isValid ? value : null;
-    },
-});
 
 const emit = defineEmits<{
     move: [direction: -1 | 1];
@@ -103,6 +95,15 @@ const derivedMaxValue = window.Vue.computed(() => {
     }
 
     return indicatorMaxSum;
+});
+
+const capabilityMaxValue = window.Vue.computed({
+    get: () => capabilityMaxValueModel.value ?? derivedMaxValue.value,
+    set: (value: string | number | null) => {
+        // clearing an input will attempt to set it to "", treat that as null instead
+        const isValid = typeof value === "number" && !Number.isNaN(value);
+        capabilityMaxValueModel.value = isValid ? value : null;
+    },
 });
 
 /**
