@@ -63,15 +63,6 @@ function addLevel(levelName: RubricGridLevel["name"], levelValue: RubricGridDesc
             });
         }
     }
-
-    // todo: (from old logic) scroll the newly created level into view (for mobile)
-    // ^ only for manually triggered creation, not via result set addition
-    // $rb.closest(".scrollable").scrollTo($rb.find('[data-spawn="level"]'), {
-    //     scrollX: true,
-    //     scrollY: false,
-    //     offsetLeft: 0,
-    //     duration: 0,
-    // });
 }
 
 /**
