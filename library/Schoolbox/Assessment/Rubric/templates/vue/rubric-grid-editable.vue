@@ -193,7 +193,15 @@ const totalColumns = window.Vue.computed(() => {
     return columns;
 });
 
+const useMarkRange = window.Vue.ref<boolean>(false);
 const capabilityMarkType = window.Vue.ref<number>(MARK_TYPE_VALUE_NONE);
+
+/**
+ * Keep the "Use mark range" checkbox in sync with the ref
+ */
+function onUseMarkRangeChange(this: HTMLInputElement): void {
+    useMarkRange.value = this.checked;
+}
 
 /**
  * Keep the capability mark type input (which is outside of vue's scope) in sync with the ref
@@ -204,6 +212,16 @@ function onCapabilityMarkTypeChange(this: HTMLSelectElement): void {
 }
 
 window.Vue.onMounted(() => {
+    // TODO: ideally deal with this fully inside of vue instead
+    const useMarkRangeInput = document.getElementById("useMarkRange");
+    if (!(useMarkRangeInput instanceof HTMLInputElement)) {
+        console.warn("Unable to find 'Use mark range' input");
+        return;
+    }
+
+    onUseMarkRangeChange.call(useMarkRangeInput);
+    useMarkRangeInput.addEventListener("change", onUseMarkRangeChange);
+
     // TODO: ideally deal with this fully inside of vue instead
     const markTypeInput = document.getElementById("capability-markType");
     if (!(markTypeInput instanceof HTMLSelectElement)) {
@@ -217,6 +235,9 @@ window.Vue.onMounted(() => {
 
 window.Vue.onUnmounted(() => {
     // clean up
+    const useMarkRangeInput = document.getElementById("useMarkRange");
+    useMarkRangeInput?.removeEventListener("change", onUseMarkRangeChange);
+
     const markTypeInput = document.getElementById("capability-markType");
     markTypeInput?.removeEventListener("change", onCapabilityMarkTypeChange);
 });
@@ -311,6 +332,7 @@ document.addEventListener(RUBRIC_GRID_IMPORTED, (event) => {
                     :max-levels="props.maxLevels"
                     :capability="capability"
                     :capability-mark-type="capabilityMarkType"
+                    :use-mark-range="useMarkRange"
                     :is-creating="isCreating"
                     :can-move-prev="index > 0"
                     :can-move-next="index < rubricGrid.capabilities.length - 1"

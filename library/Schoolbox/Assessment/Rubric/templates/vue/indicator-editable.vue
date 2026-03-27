@@ -21,6 +21,7 @@ interface Props {
     indicator: RubricGridIndicator;
     levels: RubricGridLevel[];
     maxLevels: number;
+    useMarkRange: boolean;
     canMovePrev: boolean;
     canMoveNext: boolean;
 }
@@ -138,6 +139,7 @@ window.Vue.onMounted(() => {
             v-model:max-value="descriptor.maxValue"
             :level-name="props.levels[levelIndex].name"
             :indicator-name="props.indicator.name"
+            :use-mark-range="props.useMarkRange"
             :textarea-height="descriptorTextareaHeight"
             @description-input="updateDescriptorHeight"
         ></descriptor-editable>

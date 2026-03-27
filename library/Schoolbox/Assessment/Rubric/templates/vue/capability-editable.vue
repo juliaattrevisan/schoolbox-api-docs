@@ -22,6 +22,7 @@ interface Props {
     totalColumns: number;
     capability: RubricGridCapability;
     capabilityMarkType: number;
+    useMarkRange: boolean;
     levels: RubricGridLevel[];
     maxLevels: number;
     isCreating: boolean;
@@ -182,6 +183,7 @@ window.Vue.onMounted(() => {
         :indicator="indicator"
         :levels="props.levels"
         :max-levels="props.maxLevels"
+        :use-mark-range="props.useMarkRange"
         :can-move-prev="index > 0"
         :can-move-next="index < indicators.length - 1"
         @move="(dir) => shiftArrayItem(indicators, index, dir)"

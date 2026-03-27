@@ -9,6 +9,7 @@ import { MAX_DESCRIPTOR_LENGTH, type RubricGridDescriptor } from "./types";
 interface Props {
     levelName: string;
     indicatorName: string;
+    useMarkRange: boolean;
     textareaHeight?: string;
 }
 const props = defineProps<Props>();
@@ -65,13 +66,12 @@ defineExpose({ textareaRef });
         ></textarea>
 
         <!-- todo: data-descriptor-value data-descriptor-value-original data-descriptor-criterion data-descriptor-level-index data-descriptor-original -->
-        <!-- todo: usingMarkRange -->
         <input
             v-model.number="descriptorMaxValue"
             class="rb-value rb-value-input"
             type="number"
             min="0"
-            placeholder="Points"
+            :placeholder="useMarkRange ? 'Maximum points' : 'Points'"
             :disabled="!indicatorEnabled"
         />
     </td>
