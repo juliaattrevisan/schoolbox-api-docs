@@ -113,7 +113,7 @@ body.sbx-body {
         display: none;
     }
 
-    // Add vertical spacing between checkboxes
+    // Add vertical spacing between checkboxes that aren't already using flex
     .option-list:not([class*="l-flex"]):not(:has(.option-list)) {
         display: flex;
         flex-direction: column;
