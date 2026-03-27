@@ -1,4 +1,18 @@
-import type { RubricGrid } from "./types";
+import type { RubricGrid, RubricGridCapability, RubricGridIndicator } from "./types";
+
+export type RubricGridCreateCapabilityResponse = RubricGridCapability & {
+    id: number | null; // since it's a new capability, it won't have an ID yet
+};
+
+export type RubricGridCreateIndicatorResponse = {
+    /**
+     * The ID of the capability this indicator belongs to.
+     * This becomes relevant if the capability was new, since the frontend wouldn't know of
+     * the real ID yet until it gets created when an indicator is created under it here.
+     */
+    capabilityId: number;
+    indicator: RubricGridIndicator;
+};
 
 /**
  * The form data used when saving the editable rubric grid

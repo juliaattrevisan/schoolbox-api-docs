@@ -205,7 +205,11 @@ class Controller extends BaseController
                 ->setName($critName);
 
             $indicatorData = $rubricGridTranslator->translateIndicator($rubricGrid, $indicator);
-            $this->response = $this->responseAsJson($indicatorData);
+            $this->response = $this->responseAsJson([
+                // this can differ to $capabilityId if we just had to create the capability to put the indicator in
+                'capabilityId' => $indicatorModel->getCapability()->getId(),
+                'indicator' => $indicatorData,
+            ]);
         } elseif ($post->get('type') === 'capability') {
             // Does the list of indicators/capabilities really need to be saved now?
             // For some reason, capabilities aren't saved whilst criteria are?

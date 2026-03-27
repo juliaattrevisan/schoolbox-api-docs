@@ -14,8 +14,9 @@ import LevelEditable from "./level-editable.vue";
 import CapabilityEditable from "./capability-editable.vue";
 import { RUBRIC_GRID_IMPORTED } from "./event";
 import { translateGridToFormPayload } from "./payload";
+import type { RubricGridCreateCapabilityResponse, RubricGridCreateIndicatorResponse } from "./payload";
 import { MAX_CAPABILITY_LENGTH } from "./types";
-import type { RubricGrid, RubricGridLevel, RubricGridCapability, RubricGridIndicator } from "./types";
+import type { RubricGrid, RubricGridLevel, RubricGridCapability } from "./types";
 
 interface Props {
     rubricGridPayload: RubricGrid;
@@ -119,7 +120,9 @@ async function onAddKeydown<TType extends "capability" | "indicator">(
     isCreating.value = true; // prevent mods & double-fire
     nameRef.value = "";
 
-    const response = await apiRequest<TType extends "capability" ? RubricGridCapability : RubricGridIndicator>({
+    const response = await apiRequest<
+        TType extends "capability" ? RubricGridCreateCapabilityResponse : RubricGridCreateIndicatorResponse
+    >({
         url: props.routeRubricCreate,
         method: "POST",
         body: {
@@ -128,7 +131,7 @@ async function onAddKeydown<TType extends "capability" | "indicator">(
             folderId: props.folderId,
             rubricId: rubricGrid.value.id,
             levelCount: rubricGrid.value.levels.length,
-            capabilityId: type === "indicator" ? capability!.id : null,
+            capabilityId: type === "indicator" && capability!.id >= 0 ? capability!.id : null,
             capabilityName: type === "indicator" ? capability!.name : null,
         },
     });
@@ -142,13 +145,27 @@ async function onAddKeydown<TType extends "capability" | "indicator">(
     toast.timeout({ text: `${nameLocale.proper()} created!` });
 
     if (type === "capability") {
-        // TType is "capability", so response is RubricGridCapability
-        // TODO: this assumes the API returns the new capability struct, that is definitely not the case right now
-        rubricGrid.value.capabilities.push(response.data as RubricGridCapability);
+        // TType is "capability", so response is RubricGridCreateCapabilityResponse
+        const newCapability = response.data as RubricGridCreateCapabilityResponse;
+        if (newCapability.id === null) {
+            // The API for adding capabilities may/will return `null` for the new ID
+            // however, we need a unique ID to use as a key in Vue
+            const lowestId = Math.min(...rubricGrid.value.capabilities.map((c) => c.id), 0);
+            newCapability.id = lowestId - 1; // negative IDs are unsaved
+        }
+
+        rubricGrid.value.capabilities.push(newCapability);
     } else if (type === "indicator") {
-        // TType is "indicator", so response is RubricGridIndicator
-        // TODO: this assumes the API returns the new indicator struct, that is definitely not the case right now
-        capability!.indicators.push(response.data as RubricGridIndicator);
+        // TType is "indicator", so response is RubricGridCreateIndicatorResponse
+        const { capabilityId, indicator } = response.data as RubricGridCreateIndicatorResponse;
+
+        // If the capability was new, then it would've been created and given an actual ID.
+        // need to update our knowledge of the new ID if so.
+        if (capability!.id < 0 && capabilityId !== null) {
+            capability!.id = capabilityId;
+        }
+
+        capability!.indicators.push(indicator);
     } else {
         assertUnreachable(type);
     }
