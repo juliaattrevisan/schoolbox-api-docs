@@ -220,7 +220,7 @@ class UserMapper extends Mapper
     {
         $nationalityCollection = $user->getNationalityCollection();
         if (null !== $previous) {
-            if (!$nationalityCollection?->diff($previous?->getNationalityCollection())->count()) {
+            if (!$nationalityCollection?->diff($previous->getNationalityCollection())->count()) {
                 /* No change in nationalities, so no need to save
                  */
                 return;
@@ -247,7 +247,7 @@ class UserMapper extends Mapper
     {
         $languageCollection = $user->getLanguageCollection();
         if (null !== $previous) {
-            if (!$languageCollection?->diff($previous?->getLanguageCollection())->count()) {
+            if (!$languageCollection?->diff($previous->getLanguageCollection())->count()) {
                 /* No change in languages, so no need to save
                  */
                 return;
