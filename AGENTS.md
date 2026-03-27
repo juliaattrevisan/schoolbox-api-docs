@@ -148,6 +148,7 @@ For example: if written code contains a performance issue which cannot be addres
 
 - Style: PSR-12 enforced via PHPCS (`phpcs.xml`)
 - Static analysis: PHPStan level 4 (`phpstan.neon`, `phpstan-baseline.neon`)
+- Covered by PHPUnit tests, and designed in a manner which allows individual methods/functions/classes to be tested in isolation
 
 ### JS / TS / Vue
 
