@@ -77,7 +77,8 @@ class Event extends Day\Event
      * name is the resource name.  So we don't need to repeat the resource name on every calendar item that
      * represents a booking of that resource.
      *
-     * Instead we show event.title (for events that are visible on the main calendar), or resource_booking.name.
+     * Instead, we show event.title (for bookings whose parent events are visible on the main calendar),
+     * or resource_booking.name (for bookings whose parent events are not visible on the main calendar).
      * Only if the preferred one of those is blank or null do we fall back on the default title.
      *
      * Notes:
