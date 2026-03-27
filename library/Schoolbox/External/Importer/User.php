@@ -108,7 +108,7 @@ class User extends AbstractImporter
     public static function getFormat()
     {
         $format = [
-            'Delete?'                      => 'Is this user to be deleted?',
+            'Delete?'                              => 'Is this user to be deleted?',
             'Schoolbox User ID'                    => 'The user\'s internal Schoolbox ID number',
             'Username'                             => 'The unique name the user uses to log in',
             'External ID'                          => 'The user\'s ID number in your external system',
@@ -125,6 +125,8 @@ class User extends AbstractImporter
             'Year'                                 => '',
             'House'                                => '',
             'Residential House'                    => '',
+            'Nationality'                          => '',
+            'Language'                             => '',
             'E-Portfolio?'                         => '',
             'Hide Contact Details?'                => '',
             'Hide Timetable?'                      => '',
@@ -214,7 +216,9 @@ class User extends AbstractImporter
         $this->userHydrators[] = new User\Hydrator\Field('Alt Email', 'setAltEmail', true);
         $this->userHydrators[] = new User\Hydrator\Lookup('House', 'setSchoolHouse', $this->houseList);
         $this->userHydrators[] = new User\Hydrator\Lookup('Residential House', 'setResidentialHouse', $this->residentialHouseList);
-        $this->userHydrators[] = new User\Hydrator\Lookup('Pronoun', 'setPronoun', $this->pronounList);
+        $this->userHydrators[] = new User\Hydrator\Lookup('Residential House', 'setResidentialHouse', $this->residentialHouseList);
+        $this->userHydrators[] = new User\Hydrator\Nationality('Nationality', UserModel\Nationality\Mapper::getInstance());
+        $this->userHydrators[] = new User\Hydrator\Language('Language', UserModel\Language\Mapper::getInstance());
     }
 
     /**

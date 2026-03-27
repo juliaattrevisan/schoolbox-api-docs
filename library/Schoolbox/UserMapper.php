@@ -181,6 +181,9 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'addUsernameToCache']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCommunityPortalPassword']);
 
+        $this->registerCallback(self::CALLBACK_POSTSAVE, $this->updateNationality(...));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, $this->updateLanguage(...));
+
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'blockAlaressUserDeletion']);
 
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeUsernameFromCache']);
@@ -207,6 +210,55 @@ class UserMapper extends Mapper
         $this->registerPersistSearchIndexCallbacks();
     }
 
+    /**
+     * @param User      $user
+     * @param User|null $previous
+     * @return void
+     * @throws Mapper\Exception
+     */
+    private function updateNationality(User $user, ?User $previous = null): void
+    {
+        $nationalityCollection = $user->getNationalityCollection();
+        if (!$nationalityCollection?->diff($previous?->getNationalityCollection())->count()) {
+            /* No change in nationalities, so no need to save
+             */
+            return;
+        }
+
+        if ($previous->getNationalityCollection()->count()) {
+            $this->getJoinMapper('nationality')->delete($previous->getNationalityCollection());
+        }
+
+        if (0 === $nationalityCollection->count()) {
+            return;
+        }
+        $this->getJoinMapper('nationality')->save($nationalityCollection);
+    }
+
+    /**
+     * @param User      $user
+     * @param User|null $previous
+     * @return void
+     * @throws Mapper\Exception
+     */
+    private function updateLanguage(User $user, ?User $previous = null): void
+    {
+        $languageCollection = $user->getLanguageCollection();
+        if (!$languageCollection?->diff($previous?->getLanguageCollection())->count()) {
+            /* No change in languages, so no need to save
+             */
+            return;
+        }
+
+        if ($previous->getLanguageCollection()->count()) {
+            $this->getJoinMapper('language')->delete($previous->getLanguageCollection());
+        }
+
+        if (0 === $languageCollection->count()) {
+            return;
+        }
+        $this->getJoinMapper('language')->save($languageCollection);
+    }
 
     /**
      * Pre-save callback to ensure the Alaress Admin superuser account is not broken
