@@ -476,7 +476,7 @@
 
             if ($("#useMarkRange").is(":checked")) {
                 var descriptorList = $.makeArray(
-                    $(indicatorCheckbox).closest("tr[data-group]").find("[data-descriptor-value]"),
+                    $(indicatorCheckbox).closest("tr[data-indicator-row]").find("[data-descriptor-value]"),
                 );
 
                 var hasDescValue = function (descriptor) {

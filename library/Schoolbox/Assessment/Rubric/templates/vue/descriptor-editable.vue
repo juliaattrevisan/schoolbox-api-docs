@@ -16,6 +16,8 @@ const props = defineProps<Props>();
 
 const emit = defineEmits(["descriptionInput"]);
 
+const componentId = window.Vue.useId();
+
 const indicatorEnabled = defineModel<boolean>("indicatorEnabled", { required: true });
 const descriptorDescription = defineModel<RubricGridDescriptor["description"]>("description", { required: true });
 
@@ -54,25 +56,27 @@ defineExpose({ textareaRef });
 <template>
     <td :class="!indicatorEnabled ? 'hide-v' : ''" @click="onCellClick">
         <textarea
+            :id="`rb-descriptor-textarea-${componentId}`"
             ref="textareaRef"
             v-model.trim="descriptorDescription"
             :placeholder="`Descriptor for ${props.levelName} ${props.indicatorName}`"
             rows="2"
             :maxlength="descriptionHasChanged ? MAX_DESCRIPTOR_LENGTH : undefined"
-            :disabled="!indicatorEnabled"
+            :disabled="!indicatorEnabled || undefined"
             :style="{ height: props.textareaHeight }"
             @change.once="descriptionHasChanged = true"
             @input="emit('descriptionInput')"
         ></textarea>
 
-        <!-- todo: data-descriptor-value data-descriptor-value-original -->
         <input
+            :id="`rb-descriptor-max-value-${componentId}`"
             v-model.number="descriptorMaxValue"
             class="rb-value rb-value-input"
             type="number"
             min="0"
             :placeholder="useMarkRange ? 'Maximum points' : 'Points'"
-            :disabled="!indicatorEnabled"
+            :disabled="!indicatorEnabled || undefined"
+            :data-descriptor-value="!indicatorEnabled || undefined"
         />
     </td>
 </template>

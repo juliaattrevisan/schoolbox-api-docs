@@ -30,7 +30,7 @@ const props = defineProps<Props>();
 const indicatorName = defineModel<RubricGridIndicator["name"]>("name", { required: true });
 const hasUsage = defineModel<boolean>("hasUsage", { required: true });
 
-const checkboxId = `rb-indicator-${window.Vue.useId()}`;
+const componentId = window.Vue.useId();
 
 const emit = defineEmits<{ move: [direction: -1 | 1] }>();
 
@@ -83,7 +83,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <tr>
+    <tr data-indicator-row>
         <th>
             <span class="sequencer">
                 <a
@@ -102,12 +102,18 @@ window.Vue.onMounted(() => {
                 ></a>
             </span>
 
-            <input :id="checkboxId" v-model="hasUsage" type="checkbox" value="1" />
+            <input
+                :id="`rb-indicator-${componentId}`"
+                v-model="hasUsage"
+                type="checkbox"
+                value="1"
+                data-criterion-name
+            />
 
             <label
                 v-if="props.indicator.inUseExcludingAssessment"
                 class="checkbox-label rb-criterion rb-readonly rb-indicator-name"
-                :for="checkboxId"
+                :for="`rb-indicator-${componentId}`"
             >
                 {{ indicatorName }}
                 <span
@@ -120,8 +126,9 @@ window.Vue.onMounted(() => {
                 </span>
             </label>
 
-            <label v-else class="checkbox-label rb-criterion rb-editable" :for="checkboxId">
+            <label v-else class="checkbox-label rb-criterion rb-editable" :for="`rb-indicator-${componentId}`">
                 <textarea
+                    :id="`rb-indicator-textarea-${componentId}`"
                     v-model.trim.lazy="indicatorName"
                     :maxlength="indicatorNameHasChanged ? MAX_INDICATOR_LENGTH : undefined"
                     :placeholder="`${locale.rubricCriterion.proper()} name`"

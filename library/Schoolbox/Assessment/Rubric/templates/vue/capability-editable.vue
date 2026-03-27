@@ -41,7 +41,7 @@ const emit = defineEmits<{
     addIndicatorKeydown: [event: KeyboardEvent, nameRef: Ref<string, string>];
 }>();
 
-const capabilityMarkMaxValueInputId = `rb-capability-mark-max-value-${window.Vue.useId()}`;
+const componentId = window.Vue.useId();
 
 window.Vue.onMounted(() => {
     if (document.readyState === "complete") {
@@ -165,6 +165,7 @@ window.Vue.onMounted(() => {
 
             <textarea
                 v-else
+                :id="`rb-capability-name-textarea-${componentId}`"
                 v-model.trim.lazy="capabilityName"
                 :maxlength="capabilityNameHasChanged ? MAX_CAPABILITY_LENGTH : undefined"
                 :placeholder="`${locale.rubricGroup.proper()} name`"
@@ -203,19 +204,23 @@ window.Vue.onMounted(() => {
     <tr v-if="showCapabilityMaxValue">
         <!-- input for max value -->
         <th class="rb-group-summary" :colspan="totalColumns">
-            <label :for="capabilityMarkMaxValueInputId">Maximum points for {{ locale.rubricGroup.singular() }}</label>
+            <label :for="`rb-capability-mark-max-value-${componentId}`">
+                Maximum points for {{ locale.rubricGroup.singular() }}
+            </label>
             <input
-                :id="capabilityMarkMaxValueInputId"
+                :id="`rb-capability-mark-max-value-${componentId}`"
                 v-model.number="capabilityMaxValue"
                 type="number"
                 class="rb-value-input"
                 required
+                data-group-max-value
                 @change.self="isCustomised = true"
             />
             <a
                 v-if="capabilityMaxValue != derivedMaxValue"
                 class="fieldAssign"
                 href="#"
+                data-use-criterion-values
                 @click.prevent="
                     capabilityMaxValue = derivedMaxValue;
                     isCustomised = false;

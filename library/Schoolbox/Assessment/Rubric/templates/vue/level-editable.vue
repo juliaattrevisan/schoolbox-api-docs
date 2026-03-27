@@ -15,11 +15,14 @@ const props = defineProps<Props>();
 const levelName = defineModel<RubricGridLevel["name"]>("name", { required: true });
 
 const emit = defineEmits<{ move: [direction: -1 | 1] }>();
+
+const componentId = window.Vue.useId();
 </script>
 
 <template>
     <th class="rb-level">
         <input
+            :id="`rb-level-name-${componentId}`"
             v-model.trim="levelName"
             type="text"
             :placeholder="`${locale.rubricLevel.proper()} name`"
