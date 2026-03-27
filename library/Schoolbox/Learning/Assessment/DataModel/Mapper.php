@@ -95,6 +95,7 @@ class Mapper extends BaseMapper
         // * LTI assessment
         // * Lesson Plan
         // * Dialog Agent
+        // * Reporting
         $this->joinsReverseSingle('assessment_id', TaskMapper::class, 'task', 'task');
         $this->joinsReverseSingle('assessment_id', SubmissionBoxMapper::class, 'duework', 'duework');
         $this->joinsReverseSingle('assessment_id', Quiz\Mapper::class, 'quiz', 'quiz');
@@ -102,6 +103,7 @@ class Mapper extends BaseMapper
         $this->joinsReverseSingle('assessment_id', LtiAssessment\Mapper::class, 'ltiAssessment', 'ltiAssessment');
         $this->joinsReverseSingle('assessment_id', LessonPlan\Mapper::class, 'lessonPlan', 'lessonPlan');
         $this->joinsReverseSingle('assessment_id', DialogAgent\Mapper::class, 'dialogAgent', 'dialogAgent');
+        $this->joinsReverseSingle('assessment_id', Reporting\Mapper::class, 'reporting', 'reporting');
 
         // Participation plan join
         $this->joinsReverseMulti('assessment_id', Plan\Mapper::class, 'plans', 'plans');
@@ -201,6 +203,7 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteLtiAssessment(...));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteLessonPlan(...));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteDialogAgent(...));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteReporting(...));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteCustomisation(...));
 
         $this->registerPersistSearchIndexCallbacks();
@@ -427,6 +430,24 @@ class Mapper extends BaseMapper
 
 
     /**
+     * Delete all of a Reporting's subobjects
+     *
+     * @param Model $assessment
+     * @return bool
+     */
+    public function softDeleteReporting(Model $assessment): bool
+    {
+        if ($assessment->getReporting() instanceof Reporting\Model) {
+            $reportingMapper = $this->getJoinMapper('reporting');
+            $reporting = $reportingMapper->findByColumn('assessment_id', $assessment->getId());
+            $reportingMapper->softDelete($reporting);
+        }
+
+        return true;
+    }
+
+
+    /**
      * Cascades soft-delete to any customisation of this assessment.
      *
      * @param Model $assessment
@@ -548,6 +569,8 @@ class Mapper extends BaseMapper
                 JOIN  {$this->getJoinSql('dialogAgent.responses', 'da', 'dr')} AND dr.learner_id = :userId
                 WHERE {$where}
 
+                -- Reporting activity doesn't have any responses
+                
                 ORDER BY id ASC
             ";
 
@@ -589,6 +612,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('ltiAssessment', 'l')},
                 {$this->getJoinColumnString('lessonPlan', 'lessonPlan')},
                 {$this->getJoinColumnString('dialogAgent', 'dialogAgent')},
+                {$this->getJoinColumnString('reporting', 'reporting')},
                 {$this->getJoinColumnString('project', 'p')},
                 {$this->getJoinColumnString('assessment_folder', 'f')},
                 {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
@@ -613,6 +637,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}
             LEFT JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
             LEFT JOIN {$this->getJoinSql('dialogAgent', '', 'dialogAgent', true)}
+            LEFT JOIN {$this->getJoinSql('reporting', '', 'reporting', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
@@ -704,6 +729,10 @@ class Mapper extends BaseMapper
                         $typeJoins[] = " LEFT JOIN {$this->getJoinSql('dialogAgent', '', 'dialogAgent', true)}";
                         $typesPb     = $typesPb->notNull('dialogAgent.id');
                         break;
+                    case AssessmentType::TYPE_REPORTING:
+                        $typeJoins[] = " LEFT JOIN {$this->getJoinSql('reporting', '', 'reporting', true)}";
+                        $typesPb     = $typesPb->notNull('reporting.id');
+                        break;
                     default:
                         break;
                 }
@@ -763,6 +792,7 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithLtiAssessments($modelList);
         $modelList = $this->augmentListWithLessonPlans($modelList);
         $modelList = $this->augmentListWithDialogAgents($modelList);
+        $modelList = $this->augmentListWithReporting($modelList);
         $modelList = $this->augmentListWithProjects($modelList);
 
         // Augmentations for one-to-many fields, copied from standard hydrate.
@@ -910,6 +940,7 @@ class Mapper extends BaseMapper
         if (0 === \count($ids)) {
             return $this->createCollection();
         }
+
         return $this->findByPredicates($builder->in('id', $ids), $options);
     }
 
@@ -1102,6 +1133,21 @@ class Mapper extends BaseMapper
                 $model->setDialogAgent(null);
             }
 
+            /* Reporting
+             */
+            if ($row['reporting.id']) {
+                $reporting = $this->hydrateJoin($row, 'reporting', 'reporting');
+
+                $model->setReporting($reporting);
+
+                /* We need this to add joined relationships to each Reporting activity in the set in a convenient manner
+                 * that doesn't result in millions of rows LEFT JOINed onto everything
+                 */
+                $reportingIds[] = $row['reporting.id'];
+            } else {
+                $model->setReporting(null);
+            }
+
             // Project?
             if ($row['p.id']) {
                 $projectIds[$row['p.id']] = true;
@@ -1173,9 +1219,16 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithLessonPlanFiles($modelList, $lessonPlanIds);
         $modelList = $this->augmentWithLessonPlanFields($modelList, $lessonPlanIds);
 
+        /* Augment with Reporting Activities and their Supporting Data
+         */
+        $modelList = $this->augmentListWithReporting($modelList);
+        $modelList = $this->augmentListWithReportingSupportingDataCurriculumNodes($modelList, $reportingIds ?? []);
+        $modelList = $this->augmentListWithReportingSupportingDataWorkTypes($modelList, $reportingIds ?? []);
+
         // Augment all contexts
         $modelList = $this->augmentListWithUnitSpecContexts($modelList, $unitSpecIds);
         $modelList = $this->augmentListWithUnitImplContexts($modelList, $unitImplIds);
+
         if ($hydrateProjectContext) {
             // Infinite-cycle breakout.
             $modelList = $this->augmentListWithProjectContexts($modelList, $contextProjectIds);
@@ -1185,7 +1238,7 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithFolderCodes($modelList);
         // Specification assessments
         $modelList = $this->augmentListWithSpecifications($modelList);
-        // Grade groups
+        // Grade groups (note this requires subobjects to be hydrated FIRST
         $modelList = $this->augmentListWithGradeGroups($modelList);
         // Curriculum Nodes
         $modelList = $this->augmentListWithCurriculumNodes($modelList);
@@ -1195,6 +1248,7 @@ class Mapper extends BaseMapper
         }
         // Lesson Plan Linked Assessments
         $modelList = $this->augmentWithLessonPlanAssessments($modelList, $lessonPlanIds);
+
         return $modelList;
     }
 
@@ -1405,6 +1459,179 @@ class Mapper extends BaseMapper
             ",
             fn ($row) => $mapper->hydrate($row),
         );
+    }
+
+
+    /**
+     * For any assessments in `$modelList`: fetch and add their corresponding
+     * Reporting, if there are any.
+     *
+     * @param GenericCollection<Model> $modelList
+     * @return GenericCollection<Model>
+     */
+    private function augmentListWithReporting(GenericCollection $modelList): GenericCollection
+    {
+        /** @var Reporting\Mapper $mapper */
+        $mapper = $this->getJoinMapper('reporting');
+
+        return $this->augmentListWithSubObjects(
+            $modelList,
+            $mapper,
+            "
+                SELECT {$mapper->getColumnString()}
+                FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
+            ",
+            fn ($row) => $mapper->hydrate($row),
+        );
+    }
+
+
+    /**
+     * Hydrates Curriculum Nodes for each reporting activity's Supporting Data
+     *
+     * @param GenericCollection $modelList
+     * @param array $reportingIds
+     * @return GenericCollection
+     * @throws Exception
+     */
+    private function augmentListWithReportingSupportingDataCurriculumNodes(GenericCollection $modelList, array $reportingIds): GenericCollection
+    {
+        /* No reporting activities? No trabajo
+         * Exit early
+         */
+        if (!count($reportingIds)) {
+            return $modelList;
+        }
+
+        /* Manually obtain supporting data curriculum nodes
+         */
+        $placeholders = Builder::getArrayPlaceholders($reportingIds, 'reportingIds');
+        $parameters = Builder::getArrayParameters($reportingIds, 'reportingIds');
+
+        /* $this->>getTable() is the assessment table
+         */
+        $query = "
+            SELECT 
+                rcn.reporting_id AS reporting_id,
+                cn.*
+            FROM reporting_curriculum_node rcn
+            INNER JOIN curriculum_node cn ON rcn.curriculum_node_id = cn.id
+            WHERE rcn.reporting_id IN {$placeholders}
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($parameters);
+
+        /* This is a bit awkward since supporting data curric nodes are using a relationship table that doesn't actually
+         * have a join name, nor does it have its own mapper, and it's not shared among all activities...which means I
+         * kind of have to do it like this, afaict
+         */
+        $curriculumNodeMapper = CurriculumNodeMapper::getInstance();
+
+        $curriculumNodes = [];
+
+        foreach ($statement as $row) {
+            $reportingId = $row['reporting_id'];
+
+            if (!isset($curriculumNodes[$reportingId])) {
+                $curriculumNodes[$reportingId] = $curriculumNodeMapper->createCollection();
+            }
+
+            $curriculumNodes[$reportingId]->add($curriculumNodeMapper->hydrate($row));
+        }
+
+        /* Assign them to each reporting subobject in the model list, replacing whatever was there before
+         * This is pretty unique: nothing really exists like this outside of Reporting.
+         */
+        /** @var \Schoolbox\Learning\Assessment\DataModel\Model $model */
+        foreach ($modelList as $model) {
+            /* $modelList might contain non-reporting items, such as for the Pending Assessments screen: we don't care
+             * about those ones and they won't return a meaningful value from getReporting() obviously
+             */
+            if (!$model->getSubObject() instanceof \Schoolbox\Learning\Assessment\DataModel\Reporting\Model) {
+                continue;
+            }
+
+            /* Assign new nodes or an empty collection if you tried to clear them all
+             */
+            $model->getReporting()->setSupportingDataCurriculumNodes($curriculumNodes[$model->getReporting()->getId()] ?? $curriculumNodeMapper->createCollection());
+        }
+
+        return $modelList;
+    }
+
+
+
+    /**
+     * Hydrates Work Types for each reporting activity's Supporting Data
+     *
+     * @param GenericCollection $modelList
+     * @param array $reportingIds
+     * @return GenericCollection
+     * @throws Exception
+     */
+    private function augmentListWithReportingSupportingDataWorkTypes(GenericCollection $modelList, array $reportingIds): GenericCollection
+    {
+        /* No reporting activities? No trabajo
+         * Exit early
+         */
+        if (!count($reportingIds)) {
+            return $modelList;
+        }
+
+        /* Manually obtain supporting data curriculum nodes
+         */
+        $placeholders = Builder::getArrayPlaceholders($reportingIds, 'reportingIds');
+        $parameters = Builder::getArrayParameters($reportingIds, 'reportingIds');
+
+        /* $this->>getTable() is the assessment table
+         */
+        $query = "
+            SELECT 
+                rwt.reporting_id AS reporting_id,
+                lwt.*
+            FROM reporting_work_type rwt
+            INNER JOIN lu_work_type lwt ON rwt.work_type_id = lwt.id
+            WHERE rwt.reporting_id IN {$placeholders}
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($parameters);
+
+        /* This is a bit awkward since supporting data work types are using a relationship table that doesn't actually
+         * have a join name, nor does it have its own mapper, and it's not shared among all activities...which means I
+         * kind of have to do it like this, afaict
+         */
+        $workTypeMapper = WorkTypeMapper::getInstance();
+
+        $workTypes = [];
+
+        foreach ($statement as $row) {
+            $reportingId = $row['reporting_id'];
+
+            if (!isset($workTypes[$reportingId])) {
+                $workTypes[$reportingId] = $workTypeMapper->createCollection();
+            }
+
+            $workTypes[$reportingId]->add($workTypeMapper->hydrate($row));
+        }
+
+        /* Assign them to each reporting subobject in the model list, replacing whatever was there before
+         * This is pretty unique: nothing really exists like this outside of Reporting.
+         */
+        /** @var \Schoolbox\Learning\Assessment\DataModel\Model $model */
+        foreach ($modelList as $model) {
+            /* $modelList might contain non-reporting items, such as for the Pending Assessments screen: we don't care
+             * about those ones and they won't return a meaningful value from getReporting() obviously
+             */
+            if (!$model->getSubObject() instanceof \Schoolbox\Learning\Assessment\DataModel\Reporting\Model) {
+                continue;
+            }
+
+            $model->getReporting()->setSupportingDataWorkTypes($workTypes[$model->getReporting()->getId()] ?? $workTypeMapper->createCollection());
+        }
+
+        return $modelList;
     }
 
 
@@ -1949,11 +2176,18 @@ class Mapper extends BaseMapper
     protected function augmentListWithGradeGroups(GenericCollection $modelList): GenericCollection
     {
         // Just load grade groups one by one - let the model cache do its thing
+        /* Note that despite this being a duework.grade_group join, the Reporting activity also uses it...
+         * TODO Amri one day we need to refactor the Grade Group and Mark Type stuff into a common area.
+         */
         /** @var SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper */
         $gradeGroupMapper = $this->getJoinMapper('duework.grade_group');
+
         foreach ($modelList as $model) {
             $submodel = $model->getSubObject();
-            if ($submodel instanceof SubmissionBox || $submodel instanceof Project\Model || $submodel instanceof Quiz\Model) {
+
+            /* Grade groups (note this requires subobjects to be hydrated FIRST because of THIS hideous instanceof check
+             */
+            if ($submodel instanceof SubmissionBox || $submodel instanceof Project\Model || $submodel instanceof Quiz\Model || $submodel instanceof Reporting\Model) {
                 if ($submodel->getGradeGroup() instanceof SubmissionBox\GradeLevel\Group\Model) {
                     $submodel->setGradeGroup(
                         $gradeGroupMapper->findByIdWithFallback($submodel->getGradeGroup()->getId())
@@ -1962,7 +2196,7 @@ class Mapper extends BaseMapper
             }
 
             // Instructor grade group only applies to submission boxes (DueWork instances)
-            if ($submodel instanceof SubmissionBox) {
+            if ($submodel instanceof SubmissionBox || $submodel instanceof Reporting\Model) {
                 if ($submodel->getInstructorGradeGroup() instanceof SubmissionBox\GradeLevel\Group\Model) {
                     $submodel->setInstructorGradeGroup(
                         $gradeGroupMapper->findByIdWithFallback($submodel->getInstructorGradeGroup()->getId())

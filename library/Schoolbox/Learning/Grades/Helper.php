@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Lti\Model as Lti;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Learning\Markbook\SortForMarkbook;
@@ -134,25 +135,49 @@ class Helper
     }
 
     /**
-     * Filter assessments with given work types
-     * @param User       $viewer
+     * Filter assessments with given work types and activity types.
+     *
+     * Note that this method is used in both the Grades page data set and Summative Report data set generation which is
+     * an unfortunate coupling. You can use $activityTypes contextually to decide which activity types (due work, quiz,
+     * reporting, etc) are allowed. If null, we'll use the default ones which basically exclude Tasks.
+     *
+     * @param User $viewer
      * @param Collection $assessments
      * @param Collection $workTypes
+     * @param null|array $activityTypes
      * @return Collection
      * @throws MapperException
      */
-    public function filterAssessments(User $viewer, Collection $assessments, Collection $workTypes)
+    public function filterAssessments(User $viewer, Collection $assessments, Collection $workTypes, ?array $activityTypes): Collection
     {
         $visibility                  = new Visibility($this->access);
         $workTypeAssessmentsByFolder = new Collection();
+
+        /* This obnoxious set is so annoying to micromanage, but it lets you choose which learning activities get
+         * included in the filtered set. This method is used to fulfil both the Grades page and Summative Reports, which
+         * is an action at a distance, if you wanted different outcomes in both areas.
+         */
+        $allowedActivities = $activityTypes ?? [
+            Project::class,
+            DueWork::class,
+            Quiz::class,
+            Lti::class,
+            DialogAgent::class,
+            Reporting::class
+        ];
 
         foreach ($assessments as $folderId => $folderAssessments) {
             $workTypeAssessments = new GenericCollection(IAssessable::class);
             foreach ($folderAssessments as $folderAssessment) {
                 if (
                     /* Filters swamp - only allow worktypes that show on the grades page (check Work Types in admin)
+                     *
+                     * filterAssessments() turns out to be deeply coupled between the Grades page and the Summative
+                     * Report, meaning that if you want Reporting to appear in Summative, you'll be inadvertently
+                     * making it appear on Grades page as well. Both places use this method (ugh) with this unholy
+                     * set of instanceof checks (double ugh)
                      */
-                    ($folderAssessment instanceof Project || $folderAssessment instanceof DueWork || $folderAssessment instanceof Quiz || $folderAssessment instanceof Lti || $folderAssessment instanceof DialogAgent) &&
+                    in_array(get_class($folderAssessment), $allowedActivities) &&
                     $folderAssessment->getWorkType() &&
                     \in_array($folderAssessment->getWorkType()->getId(), $workTypes->getPropertyValues('id'), true) &&
                     $visibility->isVisibleToUserOrChildOfUser($folderAssessment, $viewer, true, null, !$this->access->isInstructor($viewer, $folderAssessment->getBaseContext()->getFolder()))

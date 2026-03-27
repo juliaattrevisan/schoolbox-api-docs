@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\DialogAgent\ValidDialogAgentEnabled;
@@ -46,6 +47,7 @@ class AssessmentType implements IType
     public const TYPE_LTI_ASSESSMENT = 'lti';
     public const TYPE_LESSON_PLAN = 'lessonPlan';
     public const TYPE_DIALOG_AGENT = 'dialogAgent';
+    public const TYPE_REPORTING = 'reporting';
 
     public const ALL_TYPES = [
         self::TYPE_PROJECT,
@@ -54,7 +56,8 @@ class AssessmentType implements IType
         self::TYPE_QUIZ,
         self::TYPE_LTI_ASSESSMENT,
         self::TYPE_LESSON_PLAN,
-        self::TYPE_DIALOG_AGENT
+        self::TYPE_DIALOG_AGENT,
+        self::TYPE_REPORTING,
     ];
 
     /**
@@ -91,6 +94,10 @@ class AssessmentType implements IType
 
         if ($assessment instanceof DialogAgent) {
             return self::TYPE_DIALOG_AGENT;
+        }
+
+        if ($assessment instanceof Reporting) {
+            return self::TYPE_REPORTING;
         }
 
         throw new \UnexpectedValueException('Unknown IAssessable: ' . get_class($assessment));
@@ -140,6 +147,10 @@ class AssessmentType implements IType
             return (new DialogAgent())->setContext($context);
         }
 
+        if (self::TYPE_REPORTING === $stringVal) {
+            return (new Reporting())->setContext($context);
+        }
+
         throw new \UnexpectedValueException("Unknown Assessment: $stringVal");
     }
 
@@ -165,10 +176,13 @@ class AssessmentType implements IType
                 return LessonPlan::getDefaultTypeNameTranslated();
             case self::TYPE_DIALOG_AGENT:
                 return DialogAgent::getDefaultTypeNameTranslated();
+            case self::TYPE_REPORTING:
+                return Reporting::getDefaultTypeNameTranslated();
             default:
                 throw new InvalidArgumentException("Unknown assessment type: $stringVal");
         }
     }
+
 
     /* Getters/Setters
      */
@@ -181,6 +195,7 @@ class AssessmentType implements IType
     {
         return self::ALL_TYPES;
     }
+
 
     /**
      * Returns the list of all assessment (activity) types
@@ -199,6 +214,7 @@ class AssessmentType implements IType
         return $list;
     }
 
+
     /**
      * Returns the list of enabled assessment (activity) types
      * The mapped values are the readable type names, respecting terminology, in "Title Case"
@@ -214,8 +230,17 @@ class AssessmentType implements IType
         if (!$configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE)) {
             unset($list[self::TYPE_LTI_ASSESSMENT]);
         }
+
+        /* Remove Dialog Agent if it wasn't configured properly in admin
+         */
         if (!new ValidDialogAgentEnabled($configLoader)->isSatisfied()) {
             unset($list[self::TYPE_DIALOG_AGENT]);
+        }
+
+        /* Remove Reporting Activity if it was disabled in admin
+         */
+        if (!$configLoader->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE)) {
+            unset($list[self::TYPE_REPORTING]);
         }
 
         return $list;
@@ -237,6 +262,7 @@ class AssessmentType implements IType
             self::TYPE_LTI_ASSESSMENT => 'lti',
             self::TYPE_LESSON_PLAN => 'lesson-plan',
             self::TYPE_DIALOG_AGENT => 'dialog-agent',
+            self::TYPE_REPORTING => 'reporting',
             default => throw new InvalidArgumentException("Expected valid assessment type, received '$type'."),
         };
     }

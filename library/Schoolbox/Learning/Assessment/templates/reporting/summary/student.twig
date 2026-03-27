@@ -1,0 +1,57 @@
+{##
+ # Summary screen for Reporting Activities
+ #
+ # @param DialogAgent\Model $assessment   A Reporting Activity assessment instance
+ # @param \Schoolbox\User $student        The student who will be creating the response (none for Reporting, though)
+ # @param Participant $participant        A participant instance for $student, if extant
+ # @param Collection $breadcrumbs         A set of key-value tuples for breadcrumb rendering
+ # @param array $lastViews                A struct that tells you when people last viewed this screen
+ # @param string $returnUrl               A redirect destination
+ # @param string $returnUrlEncoded        An encoded redirect destination so you can go back there
+ # @param array $courseAssessments        A struct containing a set of assessments grouped by their units
+ # @param bool $isInstructor              Whether the currently logged in guy is an instructor
+ #}
+
+{# Nobody has any real use for the Summary screen for reporting activities.
+ # Staff get shunted across to the Status screen unceremoniously if they visit the Summary; everyone else gets 404.
+ # Some future implementation may unlock the Feedback History in this area, but for now, reporting activities only
+ # surface in the Summative Report.
+ #}
+
+{#{% import 'sub/breadcrumbs.twig' as bread %}#}
+{#{{ bread.crumbsArray(breadcrumbs) }}#}
+
+{#<div class="row actions-small-2">#}
+{#    <div class="small-12 columns">#}
+{#        <h1>{{ assessment.title }}</h1>#}
+
+{#        {% include '@learningAssessment/reporting/meta.twig' with {#}
+{#            assessment: assessment,#}
+{#            student: student,#}
+{#            icon: 'icon-reporting',#}
+{#            participant: null,#}
+{#            lastViews: lastViews#}
+{#        } only %}#}
+{#    </div>#}
+
+{#    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}#}
+
+{#    {% include '@learningAssessment/fragments/modifyTot.twig' with {#}
+{#         assessment: assessment,#}
+{#         gradeRoute: null,#}
+{#         viewRoute: null,#}
+{#         modifyRoute: modifyRoute,#}
+{#         canShowcase: false,#}
+{#         isShowcased: false,#}
+{#         externalRedirectUrl: null#}
+{#    } %}#}
+{#</div>#}
+
+{# Note: Reporting Activities don't come with a description #}
+
+{# Reporting History#}
+{# # This also includes the ability to declare an authoritative response#}
+{# #}
+{#{% include '@learningAssessment/reporting/history.twig' with {#}
+{#    timeline: timeline ?? null#}
+{#} %}#}

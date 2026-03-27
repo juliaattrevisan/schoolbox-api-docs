@@ -16,6 +16,7 @@
 {% set isQuiz = isQuiz ?? assessment is quiz %}
 {% set isDueWork = isDueWork ?? assessment is dueWork %}
 {% set isDialogAgent = isDialogAgent ?? assessment is dialogAgent %}
+{% set isReporting = isReporting ?? assessment is reporting %}
 
 <li data-participant="{{ participant.user.id }}">
     {% if isDialogAgent %}
@@ -24,13 +25,25 @@
          #}
         {% set response = participant.authoritativeResponse(true) %}
 
-        <a class="link-row" href="{{ assessmentResponse.localUrl(response) }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
+        <a class="link-row" href="{{ assessmentResponse.localUrl(response, response.assessable) }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
             <div class="compact card small-12">
                 <div>
                     {% include 'include/portrait.twig' with {user: participant.user, description: 'View submission'} only %}
                     <p>
                         {{ participant.user.fullName }}
                         <span class="pipe meta" title="{{ response.submittedAt.local }}">Submitted {{ response.submittedAt.relativeTime }}</span>
+                    </p>
+                </div>
+            </div>
+        </a>
+    {% elseif isReporting %}
+        {# TODO jezwords #}
+        <a class="link-row" href="{{ assessmentResponse.localUrl(null, assessment) }}" title="">
+            <div class="compact card small-12">
+                <div>
+                    {% include 'include/portrait.twig' with {user: participant.user, description: 'View submission'} only %}
+                    <p>
+                        {{ participant.user.fullName }}
                     </p>
                 </div>
             </div>
@@ -94,7 +107,7 @@
             {% endif %}
         {% else %}
             {# Due Work, etc. #}
-            <a class="link-row" href="{{ assessmentResponse.localUrl(response) }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
+            <a class="link-row" href="{{ assessmentResponse.localUrl(response, response.assessable) }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
                 <div class="compact card small-12">
                     <div>
                         {% include 'include/portrait.twig' with {user: participant.user, description: 'View submission'} only %}

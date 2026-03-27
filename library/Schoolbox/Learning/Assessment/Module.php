@@ -407,6 +407,7 @@ class Module extends BaseModule
             AssessmentType::TYPE_LTI_ASSESSMENT => Assessment\Lti\Controller::class,
             AssessmentType::TYPE_LESSON_PLAN    => Assessment\LessonPlan\Controller::class,
             AssessmentType::TYPE_DIALOG_AGENT   => Assessment\DialogAgent\Controller::class,
+            AssessmentType::TYPE_REPORTING      => Assessment\Reporting\Controller::class,
         ];
 
         // set the controller class for later
@@ -1012,6 +1013,40 @@ class Module extends BaseModule
                     )
                 );
 
+            case Assessment\Reporting\Controller::class:
+                return new Assessment\Reporting\Controller(
+                    $userMapper,
+                    $errorMapper,
+                    $assessmentDataSource,
+                    $workTypeMapper,
+                    $this->getAccess(),
+                    $transactor,
+                    $bakery,
+                    $termMapper,
+                    $participantDataSource,
+                    $courseSpecMapper,
+                    $unitSpecMapper,
+                    $this->injector->get('l10n'),
+                    $replicator,
+                    $viewLatestMapper,
+                    $projectResultCacheMapper,
+                    $lessonPlanTemplateMapper,
+                    $lessonPlanDataModelMapper,
+                    $dialogAgentDataModelMapper,
+                    $dialogAgentScenarioMapper,
+                    $filtersAssessmentIdFinder,
+                    $filtersFactoryFactory,
+                    $filterMapper,
+                    $filterSelectionMapper,
+                    $courseImplementationMapper,
+                    $unitImplementationMapper,
+                    editorTemplateHelper: new EditorTemplateHelper(
+                        $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                        EditorTemplatesCategoryModel::LEARNING_ACTIVITY,
+                        $this->injector->get('user')
+                    )
+                );
+
             default:
                 throw new InvalidArgumentException(
                     sprintf('Assessment controller for class "%s" not found', $className),
@@ -1060,6 +1095,10 @@ class Module extends BaseModule
 
             case AssessmentType::TYPE_DIALOG_AGENT:
                 $controller = $this->buildControllerForClass(Assessment\DialogAgent\Controller::class);
+                break;
+
+            case AssessmentType::TYPE_REPORTING:
+                $controller = $this->buildControllerForClass(Assessment\Reporting\Controller::class);
                 break;
 
             default:
@@ -1297,6 +1336,7 @@ class Module extends BaseModule
                 AssessmentType::TYPE_LTI_ASSESSMENT,
                 AssessmentType::TYPE_PROJECT,
                 AssessmentType::TYPE_DIALOG_AGENT,
+                AssessmentType::TYPE_REPORTING,
             ]),
             /* The status pages of specifications of quizzes need to be viewable because specifications of quizzes are
              * previewable while under development.

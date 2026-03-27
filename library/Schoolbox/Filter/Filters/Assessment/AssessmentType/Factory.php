@@ -57,6 +57,7 @@ class Factory extends Filter\AbstractFactory
             Definition::KEY_LTI_ASSESSMENT,
             Definition::KEY_LESSON_PLAN,
             Definition::KEY_DIALOG_AGENT,
+            Definition::KEY_REPORTING,
         ]);
     }
 }

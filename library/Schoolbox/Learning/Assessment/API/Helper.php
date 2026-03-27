@@ -245,7 +245,8 @@ class Helper
                     IF(submission_box.id, 'dueWork', NULL),
                     IF(project.id, 'project', NULL),
                     IF(lesson_plan.id, 'lessonPlan', NULL),
-                    IF(dialog_agent.id, 'dialogAgent', NULL)
+                    IF(dialog_agent.id, 'dialogAgent', NULL),
+                    IF(reporting.id, 'reporting', NULL)
                 ) AS `assessmentType`,
                 folder.name AS `folderName`,
                 (
@@ -280,6 +281,7 @@ class Helper
             LEFT JOIN project projectParent ON projectParent.id = mv_assessment_relation.project_assessment_id
             LEFT JOIN lesson_plan ON assessment.id = lesson_plan.assessment_id
             LEFT JOIN dialog_agent ON assessment.id = dialog_agent.assessment_id
+            LEFT JOIN reporting ON assessment.id = reporting.assessment_id
         ";
 
         $where = "
@@ -300,7 +302,8 @@ class Helper
                     IF(submission_box.id, 'dueWork', NULL),
                     IF(project.id, 'project', NULL),
                     IF(lesson_plan.id, 'lessonPlan', NULL),
-                    IF(dialog_agent.id, 'dialogAgent', NULL)
+                    IF(dialog_agent.id, 'dialogAgent', NULL),
+                    IF(reporting.id, 'reporting', NULL)
                 ) = :assessmentType 
             ";
 
@@ -615,7 +618,27 @@ class Helper
                 AND da.deleted_at IS NULL
                 AND dar.deleted_at IS NULL
                 AND daf.deleted_at IS NULL
-            DIALOGAGENT
+            DIALOGAGENT,
+            <<<REPORTING
+                SELECT
+                    r.assessment_id AS assessment_id,
+                    'reporting_feedback' AS feedback_table,
+                    rf.id AS feedback_id,
+                    rf.updated_at AS completion_date,
+                    rf.comment AS comment,
+                    rf.mark AS mark,
+                    rf.norm_mark AS norm_mark,
+                    $participantFields,
+                    $reviewerFields
+                FROM reporting r
+                INNER JOIN reporting_feedback rf ON r.id = rf.reporting_id
+                LEFT JOIN user participant ON rf.learner_id = participant.id
+                LEFT JOIN `user` `reviewer` ON `rf`.`instructor_id` = `reviewer`.`id`
+                WHERE r.assessment_id IN ({$bindings->getPlaceholder()})
+                AND r.deleted_at IS NULL
+                AND rf.deleted_at IS NULL
+            REPORTING
+
         ];
 
         $statement = $this->mapper->getDatabase()->query(

@@ -19,6 +19,9 @@ use Schoolbox\Filter\Codec;
 use Schoolbox\Filter;
 use Schoolbox\Filter\CompositeFactoryFactory;
 use Schoolbox\Filter\Filters\Assessment\IdFinder;
+use Schoolbox\Learning\Assessment\Reporting\Folder;
+use Schoolbox\Learning\Assessment\Reporting\Range;
+use Schoolbox\Learning\Assessment\Reporting\ValidModerateActivity;
 use Schoolbox\Learning\Assessment\Translator\ParticipationPlans;
 use Schoolbox\Learning\Assessment\Translator\Participations;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
@@ -283,10 +286,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         // Unfortunately each different type of assessment needs to be handled
         // uniquely in this method, because type is passed in the query string.
-        if (
-            AssessmentType::TYPE_LTI_ASSESSMENT === $type
-            && $assessment instanceof \Schoolbox\Learning\Assessment\Lti\Model
-        ) {
+        if (AssessmentType::TYPE_LTI_ASSESSMENT === $type && $assessment instanceof \Schoolbox\Learning\Assessment\Lti\Model) {
             // Use Learnosity's GUID generator for better or worse,
             // because it's used above.
             // Consider replacing with Ramsey UUID?
@@ -385,6 +385,29 @@ abstract class Controller extends ListController implements IAssessmentControlle
         if (AssessmentType::TYPE_DIALOG_AGENT === $type) {
             $data['dialogAgent']['instance'] = null;
             $data['dialogAgent']['scenarios'] = $this->dialogAgentScenarioMapper->findAll();
+        }
+
+        /* Reporting Activity specific settings/data are here
+         */
+        if (AssessmentType::TYPE_REPORTING === $type) {
+            /* You have to fulfil these preconditions to alter something about a reporting activity
+             * Normally we'd exit earlier, but this assessment controller is obese and needs refactoring: SA-21446
+             */
+            if (!(new ValidModerateActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
+                throw new \Schoolbox\Mapper\Exception\NotFound();
+            }
+
+            /* Reporting activities need to know about all the available Work Types that could be selected
+             */
+            $data['reporting']['workTypes'] = $this->workTypeMapper->findAll();
+
+            /* Reporting activities can constrain the mega markbook to certain kinds of folders
+             */
+            $data['reporting']['availableFolderOptions'] = Folder::lookup();
+
+            /* There are numerous date range options of which numerous could be enabled
+             */
+            $data['reporting']['availableRangeOptions'] = Range::lookup();
         }
 
         /* TODO lol why is this outside the AssessmentType check?
@@ -722,6 +745,29 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $data['dialogAgent']['scenario'] = $dialogAgentScenarioMapper->findById($assessment->getScenarioId());
         }
 
+        /* Reporting Activity specific settings/data are here
+         */
+        if ($assessment instanceof Reporting\Model) {
+            /* You have to fulfil these preconditions to alter something about a reporting activity
+             * Normally we'd exit earlier, but this assessment controller is obese and needs refactoring: SA-21446
+             */
+            if (!(new ValidModerateActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
+                throw new \Schoolbox\Mapper\Exception\NotFound();
+            }
+
+            /* Reporting activities need to know about all the available Work Types that could be selected
+             */
+            $data['reporting']['workTypes'] = $this->workTypeMapper->findAll();
+
+            /* Reporting activities can constrain the mega markbook to certain kinds of folders
+             */
+            $data['reporting']['availableFolderOptions'] = Folder::lookup();
+
+            /* There are numerous date range options of which numerous could be enabled
+             */
+            $data['reporting']['availableRangeOptions'] = Range::lookup();
+        }
+
         $data['courseManaged'] = [
             'isVisible' => $courseManagedFields->isVisible(),
             'isMutable' => $courseManagedFields->isMutable(),
@@ -806,6 +852,19 @@ abstract class Controller extends ListController implements IAssessmentControlle
          */
         if ($assessment instanceof DialogAgent\Model) {
             $assessment->setCloseAt($assessment->getDueAt());
+        }
+
+        /* Enforce Open Date = Publish Date for Reporting
+         */
+        if ($assessment instanceof Reporting\Model) {
+            /* You have to fulfil these preconditions to alter something about a reporting activity
+             * Normally we'd exit earlier, but this assessment controller is obese and needs refactoring: SA-21446
+             */
+            if (!(new ValidModerateActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
+                throw new \Schoolbox\Mapper\Exception\NotFound();
+            }
+
+            $assessment->setOpenAt($assessment->getPublishAt());
         }
 
         /* Regular update while you're creating the assessment, otherwise
@@ -925,6 +984,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function postDeleteAssessment(IAssessable $assessment): void
     {
+        if ($assessment instanceof Reporting\Model) {
+            /* You have to fulfil these preconditions to alter something about a reporting activity
+             * Normally we'd exit earlier, but this assessment controller is obese and needs refactoring: SA-21446
+             */
+            if (!(new ValidModerateActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
+                throw new \Schoolbox\Mapper\Exception\NotFound();
+            }
+        }
+
         /* Deleting assessments from inside a project always affects
          * its outcome; update the cache accordingly
          */

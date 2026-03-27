@@ -936,7 +936,7 @@ class Controller extends ConfigController
              * Summary and Class Pages
              */
             if ($summaryWorkTypes->count() > 0) {
-                $summaryAssessments = $gradeHelper->filterAssessments($viewer, $assessments, $summaryWorkTypes);
+                $summaryAssessments = $gradeHelper->filterAssessments($viewer, $assessments, $summaryWorkTypes, null);
             }
         }
 
@@ -953,7 +953,7 @@ class Controller extends ConfigController
              * Summary and Class Pages
              */
             if ($classWorkTypes->count() > 0) {
-                $classAssessments = $gradeHelper->filterAssessments($viewer, $assessments, $classWorkTypes);
+                $classAssessments = $gradeHelper->filterAssessments($viewer, $assessments, $classWorkTypes, null);
             }
         }
         /* If the config option lms_cohort_comparison is set,

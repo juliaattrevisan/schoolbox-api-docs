@@ -495,6 +495,9 @@ class ConfigMapper extends Mapper
     public const string NAME_DATA_RETENTION_CMS = 'dataRetention_CMS';
     public const string NAME_DATA_RETENTION_STUDENTSUBMISSIONS = 'dataRetention_StudentSubmissions';
 
+    /* Reporting Activity Feature Flag
+     */
+    public const string NAME_REPORTING_ACTIVITY_ENABLE = 'reporting_activity_enable';
 
     // Debug settings
     public const string NAME_DEBUG_MODE = 'debug_mode';

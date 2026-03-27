@@ -41,6 +41,7 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\AssessmentContext;
@@ -565,24 +566,38 @@ class ListController extends Web\Controller\Base
                 'id'    => 'due-work',
                 'value' => AssessmentType::TYPE_DUE_WORK,
                 'label' => $this->rosettaStone->translate('dueWork', false, true),
-                'icon'  => 'due-work',
+                'icon'  => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_DUE_WORK),
                 'title' => 'Create an assessable item for students that can accept submissions',
             ],
             [
                 'id'    => 'task',
                 'value' => AssessmentType::TYPE_TASK,
                 'label' => Task::getDefaultTypeName(),
-                'icon'  => 'task',
+                'icon'  => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_TASK),
                 'title' => 'A simple activity that will track student completion',
             ],
             [
                 'id'    => 'quiz',
                 'value' => AssessmentType::TYPE_QUIZ,
                 'label' => Quiz::getDefaultTypeName(),
-                'icon'  => 'quiz',
+                'icon'  => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_QUIZ),
                 'title' => 'Ask a series of questions with automatic marking',
             ],
         ];
+
+        /* Reporting Activities are hidden behind this feature flag which is on by default
+         */
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE)) {
+            $data['types'][] = [
+                'id'    => 'reporting',
+                'value' => AssessmentType::TYPE_REPORTING,
+                'label' => $this->rosettaStone->translate('reporting', false, true),
+                'icon'  => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_REPORTING),
+                /* TODO Jezwords
+                 */
+                'title' => 'Provide teacher discretionary marking',
+            ];
+        }
 
         // TODO: avoid this AI config copypasta to check if dialog agent is enabled
         $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
@@ -592,7 +607,7 @@ class ListController extends Web\Controller\Base
                 'id'    => 'dialog-agent',
                 'value' => AssessmentType::TYPE_DIALOG_AGENT,
                 'label' => $this->rosettaStone->translate('dialogAgent', false, true),
-                'icon'  => 'dialog-agent',
+                'icon'  => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_DIALOG_AGENT),
                 'title' => 'Create an activity for students to interact with AI about a topic',
             ];
         }
@@ -622,7 +637,7 @@ class ListController extends Web\Controller\Base
                     'id'    => 'lti',
                     'value' => AssessmentType::TYPE_LTI_ASSESSMENT,
                     'label' => LtiAssessment::getDefaultTypeName(),
-                    'icon'  => 'lti',
+                    'icon'  => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_LTI_ASSESSMENT),
                     'title' => 'Connect an assessment provided by an LTI tool',
                 ];
             }
@@ -633,7 +648,7 @@ class ListController extends Web\Controller\Base
                 'id'    => 'lesson-plan',
                 'value' => AssessmentType::TYPE_LESSON_PLAN,
                 'label' => $this->rosettaStone->translate('lessonPlan', false, true),
-                'icon'  => 'lesson-plan',
+                'icon'  => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_LESSON_PLAN),
                 'title' => 'A detailed guide that outlines a lesson\'s purpose and activities',
             ];
 
@@ -646,7 +661,7 @@ class ListController extends Web\Controller\Base
                     'id'    => 'project',
                     'value' => AssessmentType::TYPE_PROJECT,
                     'label' => $this->rosettaStone->translate('project', false, true),
-                    'icon'  => 'project',
+                    'icon'  => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_PROJECT),
                     'title' => 'Setup a container for multiple activities that are related',
                 ];
                 array_unshift($data['types'], $item);
@@ -655,7 +670,7 @@ class ListController extends Web\Controller\Base
 
         $data['contextType'] = AssessmentContextType::objectToString($context) . 's';
         $data['baseContextType'] = AssessmentContextType::objectToString($context->getBaseContext()) . 's';
-        $data['context']     = $context;
+        $data['context'] = $context;
         $data['breadcrumbs'] = $this->getBakery()->produceFromContext($context, null, $this->getUser());
 
         $this->response = $this->responseFromTemplate('@learningAssessment/create.twig', $data);
@@ -844,6 +859,13 @@ class ListController extends Web\Controller\Base
             /* Artificially enforce close = due for dialog agents
              */
             if ($assessment instanceof DialogAgent) {
+                $planData['close_date'] = $planData['due_date'];
+            }
+
+            /* Artificially enforce open = publish, and close = due, for reporting activities
+             */
+            if ($assessment instanceof Reporting) {
+                $planData['open_date'] = $planData['publish_date'];
                 $planData['close_date'] = $planData['due_date'];
             }
 

@@ -26,6 +26,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessment;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
+use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Task\Model as TaskAssessment;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
@@ -103,7 +104,7 @@ class ImportFactory
      * AssessmentImpls will have no id, but will have dates populated according to previous stage
      * All AssessmentImpls will link to an AssessmentSpec
      *
-     * @param UnitImplementation[]|GenericCollection $unitImpls      Each UnitImpl links to a UnitSpec to get Assessments for
+     * @param GenericCollection<UnitImplementation>  $unitImpls      Each UnitImpl links to a UnitSpec to get Assessments for
      * @param string|null                            $defaultDueTime Adjust due date time to this, if set in H:i format
      * @return DataTransferObject
      * @throws InvalidDataStateException If broken data encountered
@@ -158,7 +159,8 @@ class ImportFactory
                 spr.assessment_id             AS 'spr.id',
                 slt.assessment_id             AS 'slt.id',
                 specLessonPlan.assessment_id  AS 'specLessonPlan.id',
-                specDialogAgent.assessment_id AS 'specDialogAgent.id'
+                specDialogAgent.assessment_id AS 'specDialogAgent.id',
+                specReporting.assessment_id   AS 'specReporting.id'
             FROM course_unit_specification us
             LEFT JOIN folder usf ON usf.id = us.folder_id
             LEFT JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
@@ -171,6 +173,7 @@ class ImportFactory
             LEFT JOIN lti_assessment slt ON slt.assessment_id = sa.id
             LEFT JOIN lesson_plan specLessonPlan ON specLessonPlan.assessment_id = sa.id
             LEFT JOIN dialog_agent specDialogAgent ON specDialogAgent.assessment_id = sa.id
+            LEFT JOIN reporting specReporting ON specReporting.assessment_id = sa.id
         ";
 
         $pb = new Builder($this->database->getQuoter(), '');
@@ -221,7 +224,7 @@ class ImportFactory
      * UnitImpl IDs will be null if not yet imported from UnitSpec.
      * UnitImpls will link to extant UnitSpecs
      *
-     * @param UnitImplementation[]|GenericCollection $unitImpls
+     * @param GenericCollection<UnitImplementation>  $unitImpls
      * @param string|null                            $defaultDueTime Adjust due date time to this, if set in H:i format
      * @return DataTransferObject
      * @throws InvalidDataStateException If broken course data detected
@@ -239,7 +242,6 @@ class ImportFactory
          * Created inside the specified $unitImpls (not imported from Spec)
          */
         $assessmentImpls = new GenericCollection(GenericCollection::class);
-
 
         /**
          * Imported from a Spec to the specified $unitImpls
@@ -320,6 +322,7 @@ class ImportFactory
                 slt.assessment_id             AS 'slt.id',
                 specLessonPlan.assessment_id  AS 'specLessonPlan.id',
                 specDialogAgent.assessment_id AS 'specDialogAgent.id',
+                specReporting.assessment_id   AS 'specReporting.id',
                 ia.id                         AS 'ia.id',
                 ia.title                      AS 'ia.title',
                 ia.publish_date               AS 'ia.publish_date',
@@ -337,7 +340,8 @@ class ImportFactory
                 ipr.assessment_id             AS 'ipr.id',
                 ilt.assessment_id             AS 'ilt.id',
                 implLessonPlan.assessment_id  AS 'implLessonPlan.id',
-                implDialogAgent.assessment_id AS 'implDialogAgent.id'
+                implDialogAgent.assessment_id AS 'implDialogAgent.id',
+                implReporting.assessment_id   AS 'implReporting.id'
             FROM course_unit_specification us
             JOIN folder usf                               ON usf.id = us.folder_id
             JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
@@ -350,6 +354,7 @@ class ImportFactory
             LEFT JOIN lti_assessment slt                  ON slt.assessment_id = sa.id
             LEFT JOIN lesson_plan specLessonPlan          ON specLessonPlan.assessment_id = sa.id
             LEFT JOIN dialog_agent specDialogAgent        ON specDialogAgent.assessment_id = sa.id
+            LEFT JOIN reporting specReporting             ON specReporting.assessment_id = sa.id
             LEFT JOIN ($innerQuery1) `t1`                 ON `t1`.`sa.id` = sa.id
             LEFT JOIN assessment ia                       ON `t1`.`ia.id` = ia.id
             LEFT JOIN submission_box idw                  ON idw.assessment_id = ia.id
@@ -359,6 +364,7 @@ class ImportFactory
             LEFT JOIN lti_assessment ilt                  ON ilt.assessment_id = ia.id
             LEFT JOIN lesson_plan implLessonPlan          ON implLessonPlan.assessment_id = ia.id
             LEFT JOIN dialog_agent implDialogAgent        ON implDialogAgent.assessment_id = ia.id
+            LEFT JOIN reporting implReporting             ON implReporting.assessment_id = ia.id
         ";
         $pbOuter1 = new Builder($this->database->getQuoter(), '');
         $pbOuter1->in('us.id', array_keys($unitSpecCache));
@@ -389,6 +395,7 @@ class ImportFactory
                 null                          AS 'slt.id',
                 null                          AS 'specLessonPlan.id',
                 null                          AS 'specDialogAgent.id',
+                null                          AS 'specReporting.id',
                 ia.id                         AS 'ia.id',
                 ia.title                      AS 'ia.title',
                 ia.publish_date               AS 'ia.publish_date',
@@ -406,7 +413,8 @@ class ImportFactory
                 ipr.assessment_id             AS 'ipr.id',
                 ilt.assessment_id             AS 'ilt.id',
                 implLessonPlan.assessment_id  AS 'implLessonPlan.id',
-                implDialogAgent.assessment_id AS 'implDialogAgent.id'
+                implDialogAgent.assessment_id AS 'implDialogAgent.id',
+                implReporting.assessment_id   AS 'implReporting.id'
             FROM course_unit_implementation ui
             JOIN course_unit_specification us ON us.id = ui.course_unit_specification_id
             JOIN folder usf ON usf.id = us.folder_id
@@ -420,6 +428,7 @@ class ImportFactory
             LEFT JOIN lti_assessment ilt ON ilt.assessment_id = ia.id
             LEFT JOIN lesson_plan implLessonPlan ON implLessonPlan.assessment_id = ia.id
             LEFT JOIN dialog_agent implDialogAgent ON implDialogAgent.assessment_id = ia.id
+            LEFT JOIN reporting implReporting ON implReporting.assessment_id = ia.id
             LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
         ";
         $pbOuter2 = new Builder($this->database->getQuoter(), '');
@@ -489,7 +498,7 @@ class ImportFactory
      *
      * Normally we are un-interested in deleted specs. The exception is when we are adding as part of a pair.
      *
-     * @param GenericCollection|GenericCollection[] $assessmentSpecs - Sets of AssessmentSpecs, indexed by UnitSpec.id
+     * @param GenericCollection<GenericCollection>  $assessmentSpecs - Sets of AssessmentSpecs, indexed by UnitSpec.id
      * @param int[]                                 $assessmentImplToSpecMap
      * @return GenericCollection
      * @throws InvalidDataStateException If broken course data encountered
@@ -532,7 +541,8 @@ class ImportFactory
                 stk.assessment_id     AS 'stk.id',
                 slt.assessment_id     AS 'slt.id',
                 specLessonPlan.assessment_id AS 'specLessonPlan.id',
-                specDialogAgent.assessment_id AS 'specDialogAgent.id'
+                specDialogAgent.assessment_id AS 'specDialogAgent.id',
+                specReporting.assessment_id AS 'specReporting.id'
             FROM project p
             JOIN project_assessment pa   ON pa.project_id = p.id
             JOIN assessment sa           ON sa.id = pa.assessment_id
@@ -544,6 +554,7 @@ class ImportFactory
             LEFT JOIN lti_assessment slt ON slt.assessment_id = sa.id
             LEFT JOIN lesson_plan specLessonPlan ON specLessonPlan.assessment_id = sa.id
             LEFT JOIN dialog_agent specDialogAgent ON specDialogAgent.assessment_id = sa.id
+            LEFT JOIN reporting specReporting ON specReporting.assessment_id = sa.id
         ";
 
         $pb    = new Builder($this->database->getQuoter(), '');
@@ -623,7 +634,8 @@ class ImportFactory
                 itk.assessment_id     AS 'itk.id',
                 ilt.assessment_id     AS 'ilt.id',
                 implLessonPlan.assessment_id AS 'implLessonPlan.id',
-                implDialogAgent.assessment_id AS 'implDialogAgent.id'
+                implDialogAgent.assessment_id AS 'implDialogAgent.id',
+                implReporting.assessment_id AS 'implReporting.id'
             FROM project p
             JOIN project_assessment pa   ON pa.project_id = p.id
             JOIN assessment ia           ON ia.id = pa.assessment_id
@@ -635,6 +647,7 @@ class ImportFactory
             LEFT JOIN lti_assessment ilt ON ilt.assessment_id = ia.id
             LEFT JOIN lesson_plan implLessonPlan ON implLessonPlan.assessment_id = ia.id
             LEFT JOIN dialog_agent implDialogAgent ON implDialogAgent.assessment_id = ia.id
+            LEFT JOIN reporting implReporting ON implReporting.assessment_id = ia.id
         ";
 
         $pb    = new Builder($this->database->getQuoter(), '');
@@ -857,6 +870,8 @@ class ImportFactory
             $assessmentSpec = new LessonPlan();
         } elseif ($row['specDialogAgent.id']) {
             $assessmentSpec = new DialogAgent();
+        } elseif ($row['specReporting.id']) {
+            $assessmentSpec = new Reporting();
         } elseif ($row['spr.id']) {
             $assessmentSpec = new Project();
         } else {
@@ -921,6 +936,8 @@ class ImportFactory
             $assessmentImpl = new LessonPlan();
         } elseif ($row['implDialogAgent.id']) {
             $assessmentImpl = new DialogAgent();
+        } elseif ($row['implReporting.id']) {
+            $assessmentImpl = new Reporting();
         } elseif ($row['ipr.id']) { // Project needs to be checked at last, as this is not set for an assessment in a project
             $assessmentImpl = new Project();
         } else {

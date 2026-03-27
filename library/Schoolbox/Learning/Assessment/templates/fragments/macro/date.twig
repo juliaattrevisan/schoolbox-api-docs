@@ -1,7 +1,22 @@
-{%  macro dateField(dateTitle, dateProperty, hide, dateValue, syncStartDateProperty, syncEndDateProperty) %}
-<div class="row" id="{{ dateProperty }}" {% if hide %}style="display:none;"{% endif %}>
+{##
+ # Date fragment
+ #
+ # This macro allows you to render each of the date fields for a learning activity such as the publish date, open date,
+ # etc. with optional date-buddy definitions that works with the Nat Picker js.
+ #
+ # If specified, $divisor will let you pick a medium-up column definition, e.g. medium-6, so that you can have the dates
+ # displaying side by side instead of one giant stack. Whether this is good or bad for user experience I can't really
+ # tell, but it was...desirable, to do this.
+ #}
 
-    <div class="column small-12">
+{% macro dateField(dateTitle, dateProperty, hide, dateValue, syncStartDateProperty, syncEndDateProperty, divisor) %}
+    {% set viewports = '' %}
+
+    {% if divisor is defined and divisor is not null %}
+        {% set viewports = 'medium-' ~ divisor %}
+    {% endif %}
+
+    <div class="column small-12 {{ viewports }}" id="{{ dateProperty }}" {% if hide %}style="display:none;"{% endif %}>
         <label>
             {{ dateTitle }} Date
             <input
@@ -22,5 +37,4 @@
             />
         </label>
     </div>
-</div>
 {% endmacro %}

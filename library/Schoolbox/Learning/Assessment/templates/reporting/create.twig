@@ -1,0 +1,308 @@
+{##
+ # Create/update a Dialog Agent instance
+ #
+ # TODO fill in the rest of this mega set of params which are shared across all activities
+ #
+ # @param \Schoolbox\Resource\Folder\Model $context
+ # @param string $contextType                                            A string denoting the next closest context oft his assessment
+ # @param string $baseContextType                                        A string denoting the deepest context of this assessment
+ # @param Collection $breadcrumbs                                        A list of (name, url) tuples
+ # @param \Schoolbox\Learning\Assessment\Reporting\Model $assessment
+ # @param Collection $workTypes  A set of work types that could be selected for Supporting Data
+ # @param $assessmentType
+ # @param $markVisibility
+ # @param $availabeVisibilities
+ # @param allMarkTypes
+ # @param $allWorkTypes
+ # @param $capabilitymarkTypes
+ # @param $capabilityGradingSchemes
+ # @param $parentFolderId
+ # @param $participants
+ # @param $curriculumNodes
+ # @param $returnUrl
+ # @param $cuestom_assessment_participation
+ # @param $selfAssessmentEnabled
+ # @param $defaultGradeGroup
+ # @param $canRelocate
+ # @param $courseManaged
+ #}
+
+{% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
+
+<input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
+
+{# Basic Details #}
+<fieldset>
+    <label class="required" for="title">Title</label>
+    <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
+    <input type="text" name="title" id="title" data-test="assessment-form-input-title" value="{{ assessment.title }}" required maxlength="255"  />
+
+    <div class="row">
+        <div class="small-12 columns">
+            {# Work Type #}
+            {% include '@learningAssessment/fragments/workTypeSelectorWithLabel.twig'
+                with {
+                allWorkTypes: allWorkTypes,
+                assessment: assessment,
+                courseManaged: courseManaged
+            } only
+            %}
+        </div>
+    </div>
+
+    {# Curriculum Nodes for this Reporting Activity #}
+    {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+        curriculumNodes: curriculumNodes,
+        entityType: locale.reporting,
+        courseManagedReadonly: courseManaged.isReadonly,
+        excludeLegend: true,
+        hasTabs: true,
+        parentFolderId: parentFolderId ?? null,
+    } %}
+
+    {# Reporting activities don't have a description #}
+    <input type="hidden" name="description" value="" />
+
+    {# Assessment Location #}
+    {% if canRelocate %}
+        {% include '@learningAssessment/fragments/assessmentLocation.twig' %}
+    {% endif %}
+
+    {# Default Activity Duration #}
+    {% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
+</fieldset>
+
+{# The Four Dates of the Apocalypse
+ # This is a unique implementation which doesn't have a due date plus it's horizontally
+ # arranged, unlike the other activities
+#}
+{% if context.baseContext is not unitSpecification %}
+    {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
+
+    {# This ends up using the default settings for dates, which is to provide Publish and Due.
+     # You can specify more intricately inside dates.twig
+     #}
+    <fieldset>
+        <legend>Submission Dates</legend>
+        {% include '@learningAssessment/fragments/dates.twig' with {
+            assessment: assessment,
+        } %}
+    </fieldset>
+{% endif %}
+
+<fieldset>
+    <legend>Supporting Data</legend>
+
+    <div class="row">
+        <div class="small-12 columns">
+            <label>Enable Supporting Data</label>
+            <p class="meta">If on, shows academic grades from various sources to help staff provide feedback.</p>
+            <div class="switch">
+                <input type="hidden" name="reporting[supporting][enable]" value="0" />
+
+                {% set checked = '' %}
+
+                {% if assessment.supportingDataEnable %}
+                    {% set checked = 'checked="checked"' %}
+                {% endif %}
+
+                <input id="supporting-enable" name="reporting[supporting][enable]" type="checkbox" {{ checked }} />
+                <label for="supporting-enable">
+                    <span class="icon-approve"></span>
+                    <span class="icon-cancel"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 columns">
+            <label for="reporting-range">Date Range</label>
+            {# TODO Jezwords #}
+            <p class="meta">
+                Select how much data to obtain based on this relative time period.
+            </p>
+
+            <select name="reporting[supporting][range]" id="reporting-range">
+                {% for key, label in reporting.availableRangeOptions %}
+                    {% set selected = '' %}
+
+                    {% if key == assessment.supportingDataRange %}
+                        {% set selected = 'selected="selected"' %}
+                    {% endif %}
+
+                    <option value="{{ key }}" {{ selected }}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 columns">
+            {# Curriculum Nodes for Supporting Data #}
+            {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+                curriculumNodes: assessment.supportingDataCurriculumNodes,
+                entityType: locale.reporting.proper,
+                courseManagedReadonly: courseManaged.isReadonly,
+                excludeLegend: true,
+                hasTabs: true,
+                parentFolderId: parentFolderId ?? null,
+                tooltip:
+                    'Select branches of the curriculum to have supporting data appear to staff when entering feedback for this ' ~
+                    locale.reporting ~ '. This data can come from ' ~ locale.activity.plural ~ ' and rubrics that have been tagged
+                    with curriculum codes matching the selection below. It is possible to select both a branch of a curriculum or
+                    specific curriculum codes. If you select a branch, all nodes contained within will be applied.',
+                useMetaTooltip: true,
+                formValueName: 'reporting[supporting][curriculumNodes]',
+            } %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 columns">
+            <label for="supporting-folders">{{ locale.class.properPlural }}</label>
+            {# TODO Jezwords #}
+            <p class="meta">
+                The supporting data can come from a range of locations.<br />
+                Current class folder will show content from only the page that this activity is imported to.<br />
+                All current class folders will look at content across all pages that have a current class code and that a student has data for.<br />
+                Current & archived class folders will look at content across all current and historic pages that a student has data for.
+            </p>
+            <select id="supporting-folders" name="reporting[supporting][folders]">
+                {% for key, label in reporting.availableFolderOptions %}
+                    {% set selected = '' %}
+
+                    {% if key == assessment.supportingDataFolders %}
+                        {% set selected = 'selected="selected"' %}
+                    {% endif %}
+
+                    <option value="{{ key }}" {{ selected }}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 columns">
+            <label>Work Types</label>
+            <p class="meta">Select which work types will be presented as supporting data.</p>
+
+            {# TODO Snake Lord, the checkbox container in the pantry is broken;
+             # need to implement the one on the Advanced Search control panel instead
+             #}
+            <div class="checklist">
+                <ul class="option-list">
+                    {% for workType in reporting.workTypes %}
+                        {% set checked = '' %}
+
+                        {% if workType.id in assessment.supportingDataWorkTypes.propertyValues('id') ?? [] %}
+                            {% set checked = 'checked="checked"' %}
+                        {% endif %}
+                        <li>
+                            <input id="checkbox-worktype-{{ workType.id }}" name="reporting[supporting][workTypes][]" type="checkbox" value="{{ workType.id }}" {{ checked }}/>
+                            <label for="checkbox-worktype-{{ workType.id }}">{{ workType.name }}</label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 columns">
+            <label>{{ locale.activity.proper }} {{ locale.grades.properPlural }}</label>
+            <p class="meta">
+                {{ locale.activity.proper }} {{ locale.grades.plural }} shown are based upon the teacher input of data
+                within quizzes, {{ locale.dueWork.plural }}, {{ locale.project.plural }} and third party assessments.
+                These can be seen in the {{ locale.class }} and course markbooks.
+            </p>
+            <div class="switch">
+                <input type="hidden" name="reporting[supporting][markbook][enable]" value="0" />
+
+                {% set checked = '' %}
+
+                {% if assessment.supportingDataMarkbookEnable %}
+                    {% set checked = 'checked="checked"' %}
+                {% endif %}
+
+                <input id="supporting-megamarkbook" name="reporting[supporting][markbook][enable]" type="checkbox" {{ checked }}>
+                <label for="supporting-megamarkbook">
+                    <span class="icon-approve"></span>
+                    <span class="icon-cancel"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+</fieldset>
+
+{# Grading options #}
+<fieldset>
+    <legend>{{ locale.grading.proper }}</legend>
+
+    <div class="row">
+        <div class="small-12 columns">
+            {# TODO Jezwords #}
+            <label>Enable Feedback Comments</label>
+            <p class="meta">If on, a place for written feedback will be available to staff.</p>
+            <div class="switch">
+                <input type="hidden" name="reporting[comments][enable]" value="0" />
+                {% set checked = '' %}
+
+                {% if assessment.feedbackCommentsEnable %}
+                    {% set checked = 'checked="checked"' %}
+                {% endif %}
+
+                <input id="supporting-comments" name="reporting[comments][enable]" type="checkbox" {{ checked }} />
+                <label for="supporting-comments">
+                    <span class="icon-approve"></span>
+                    <span class="icon-cancel"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    {# Reporting activities were chosen to have zero weighting, always
+     # This avoids the scenario of statistically weighting and re-weighting outcomes, which might or might not be truthful
+     # in a mathematical sense. We also considered Reporting activities in a Reporting Project where you'd have the
+     # usual project summators at your disposal to make things even harder to understand, so we just turned this off
+     #}
+    {#    {% include '@learningAssessment/fragments/weight.twig' with {#}
+    {#        assessment: assessment,#}
+    {#        courseManagedReadonly: courseManaged.isReadonly#}
+    {#    } %}#}
+
+    {# Reporting activities always have mark visibility set to Staff (0)
+     # There'll be some future feature where one person can change this setting en masse to have a synchronous release
+     # of final marks. For now, feedbacks for reporting activities only appear in summative reports rather than the
+     # usual schoolbox app ui
+     #}
+    {#    {% import 'sub/visibility.twig' as visibility %}#}
+    {#    {{ visibility.dropdown(markVisibility, availableVisibilities) }}#}
+
+    {# Letter Grade enables Grading Scheme
+     # Total Mark enables Maximum Available Marks
+     #}
+    {% include '@learningAssessment/fragments/dualMarkTypes.twig' with {
+        assessment: assessment,
+        allMarkTypes: allMarkTypes,
+        allGradeSchemes: allGradeSchemes,
+        selectedMaxMark: assessment.instructorMaxMark ?? null,
+        selectedMarkType: assessment.instructorMarkType.id ?? null,
+        selectedGradeGroup: assessment.instructorGradeGroup.id ?? null,
+        defaultGradeGroup: defaultGradeGroup,
+        courseManagedReadonly: courseManaged.isReadonly
+    } %}
+</fieldset>
+
+{# Participation
+ # This is a reimplementation of SA-21908 and allows activities to turn up while doing a Custom activity for a person
+ # via Student Participation - saving the form should cause your activity customisation to turn up in the list.
+ #
+ # (Unit Implementations only)
+ #}
+{% if context.baseContext is unitImplementation and custom_assessment_participation %}
+    {% include '@learningAssessment/fragments/participation.twig' %}
+{% endif %}
+
+{# Submit #}
+{{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}

@@ -31,6 +31,7 @@ interface IAssessable extends ISoftDeletable
     public const MARK_VISIBILITY_PRIVATE        = SubmissionBox::MARK_VISIBILITY_STAFF_ONLY;
     public const MARK_VISIBILITY_STUDENT        = SubmissionBox::MARK_VISIBILITY_STAFF_AND_STUDENT;
     public const MARK_VISIBILITY_PARENT_STUDENT = SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT;
+    public const MARK_VISIBILITY_STAFF_PARENT   = 4;
 
 
     /**

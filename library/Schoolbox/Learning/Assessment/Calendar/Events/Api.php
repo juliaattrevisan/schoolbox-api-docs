@@ -20,9 +20,9 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
+use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
-use Schoolbox\IConfigLoader;
 use UnexpectedValueException;
 
 /**
@@ -120,6 +120,12 @@ class Api implements Calendar_Api_EventType_Interface
         $stack = new GenericCollection(EventInterface::class);
         foreach ($assessments as $assessment) {
             if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->user, true)) {
+                continue;
+            }
+
+            /* Reporting activities have no meaning for students who shouldn't see anything about staff-only activities.
+             */
+            if (!$this->viewer->getRole()->isStaff() && $assessment instanceof Reporting) {
                 continue;
             }
 

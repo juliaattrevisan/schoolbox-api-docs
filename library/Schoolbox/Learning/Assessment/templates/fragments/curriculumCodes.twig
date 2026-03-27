@@ -1,13 +1,18 @@
 {##
  # Curriculum Code Selectize
  #
- # @param bool $courseManagedReadonly
- # @param ?bool $excludeLegend - Whether the legend should be excluded (defaults to false)
- # @param ?bool $vueSlot - Whether this is being rendered as a vue slot, (defaults to false)
- #                         if so, the relevant createApp() must have CurriculumSelector included as an available component
- #                         Otherwise, this will render it as an independent vue app
- # @param bool $hasTabs - Whether the curriculum code selector should have tabs
- # @param int|null $parentFolderId - The folder ID to use for the current curriculum selector tab to display nodes linked to the relevant course/unit folder
+ # @param GenericCollection $curriculumNodes  A collection of curriculum nodes used to preselect the form element
+ # @param string $entityType                  A string that's used in a tooltip; contextual to the thing that receives curriculum nodes
+ # @param bool $courseManagedReadonly         A bool that decides whether settings are managed elsewhere
+ # @param ?bool $excludeLegend                Whether the legend should be excluded (defaults to false)
+ # @param ?bool $vueSlot                      Whether this is being rendered as a vue slot, (defaults to false)
+ #                                            if so, the relevant createApp() must have CurriculumSelector included as an available component
+ #                                            Otherwise, this will render it as an independent vue app
+ # @param bool $hasTabs                       Whether the curriculum code selector should have tabs
+ # @param int|null $parentFolderId            The folder ID to use for the current curriculum selector tab to display nodes linked to the relevant course/unit folder
+ # @param string|null $tooltip                If provided, use this exact text in the tooltip; otherwise reverts back to the default phrasing
+ # @param bool|null $useMetaTooltip           If true, puts the tooltip as a grey meta text underneath the label instead of a foundation tooltip.
+ # @param string|null $formValueName          If provided, becomes the element's name= attribute
  #}
 {% set entityType = entityType ?: 'Folder' %}
 {% set excludeLegend = excludeLegend ?? false %}
@@ -20,17 +25,29 @@
     {% endif %}
         <div class="row">
             <div class="small-12 columns">
+                {% if tooltip is not defined %}
+                    {% set tooltip = 'Link this ' ~ entityType ~ ' with a corresponding curriculum code; you can link multiple curriculum codes to this ' ~ entityType %}
+                {% endif %}
+
                 <label>Curriculum Codes
-                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Link this {{ entityType }} with a corresponding curriculum code, you can link multiple curriculum codes to this {{ entityType }}">?</span>
+                    {% if useMetaTooltip is not defined or not useMetaTooltip %}
+                        <span data-tooltip class="hint has-tip tip-top" data-width="200" title="{{ tooltip }}">?</span>
+                    {% endif %}
                 </label>
-                    {% include 'sub/curriculumCodeSelector.twig' with {
-                        'codeList': curriculumNodes,
-                        'renderButton': true,
-                        'vueSlot': vueSlot,
-                        courseManagedReadonly: courseManagedReadonly ?? false,
-                        hasTabs: hasTabs ?? false,
-                        parentFolderId: parentFolderId ?? null,
-                    } %}
+
+                {% if useMetaTooltip is defined and useMetaTooltip %}
+                    <p class="meta">{{ tooltip }}</p>
+                {% endif %}
+
+                {% include 'sub/curriculumCodeSelector.twig' with {
+                    'codeList': curriculumNodes,
+                    'renderButton': true,
+                    'vueSlot': vueSlot,
+                    courseManagedReadonly: courseManagedReadonly ?? false,
+                    hasTabs: hasTabs ?? false,
+                    parentFolderId: parentFolderId ?? null,
+                    formValueName: formValueName ?? null,
+                } %}
             </div>
         </div>
     {% if not excludeLegend ?? false %}

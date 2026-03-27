@@ -145,6 +145,12 @@
             {type: 'open',  label: 'Open',  date: assessmentImpl.openAt},
             {type: 'due',  label: 'Close',  date: assessmentImpl.dueAt},
         ] %}
+    {% elseif assessmentSpec is reporting %}
+        {# Reporting activities get special scary names #}
+        {% set dates = [
+            {type: 'publish', label: 'Start',    date: assessmentImpl.publishAt},
+            {type: 'due',     label: 'Deadline', date: assessmentImpl.dueAt},
+        ] %}
     {% else %}
         {% set dates = [
             {type: 'publish', label: 'Publish', date: assessmentImpl.publishAt},

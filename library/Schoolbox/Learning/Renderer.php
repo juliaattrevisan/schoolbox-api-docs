@@ -16,9 +16,10 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImpleme
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Lti\Model as Lti;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Twig\SimpleTest;
 use Twig\TwigTest;
@@ -56,21 +57,11 @@ class Renderer extends AbstractExtension
             new TwigTest('unitSpecification', function ($context) {
                 return $context instanceof UnitSpecification;
             }),
-            new TwigTest('project', function ($context) {
-                return $context instanceof Project;
-            }),
-
-            new TwigTest('quiz', function ($assessable) {
-                return $assessable instanceof Quiz;
-            }),
             new TwigTest('dialogAgent', function ($assessable) {
                 return $assessable instanceof DialogAgent;
             }),
             new TwigTest('dueWork', function ($assessable) {
                 return $assessable instanceof DueWork;
-            }),
-            new TwigTest('task', function ($assessable) {
-                return $assessable instanceof Task;
             }),
             new TwigTest('lti', function ($assessable) {
                 return $assessable instanceof Lti;
@@ -78,7 +69,18 @@ class Renderer extends AbstractExtension
             new TwigTest('lessonPlan', function ($assessable) {
                 return $assessable instanceof LessonPlan;
             }),
-
+            new TwigTest('project', function ($context) {
+                return $context instanceof Project;
+            }),
+            new TwigTest('quiz', function ($assessable) {
+                return $assessable instanceof Quiz;
+            }),
+            new TwigTest('reporting', function ($assessable) {
+                return $assessable instanceof Reporting;
+            }),
+            new TwigTest('task', function ($assessable) {
+                return $assessable instanceof Task;
+            }),
             new TwigTest('response', function ($interaction) {
                 return $interaction instanceof IResponse;
             }),

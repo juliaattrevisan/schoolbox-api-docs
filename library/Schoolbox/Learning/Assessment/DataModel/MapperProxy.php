@@ -27,11 +27,13 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\CourseManagedFields;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgentObject;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizObject;
+use Schoolbox\Learning\Assessment\Reporting\Model as ReportingObject;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -491,11 +493,34 @@ class MapperProxy
                 LEFT JOIN lti_assessment_score sc ON la.id = sc.lti_assessment_id AND pc.user_id = sc.student_id AND sc.deleted_at IS NULL AND sc.is_feedback = 1
            WHERE
                 la.assessment_id IN ({$assessmentIdBindings4['placeholders']})
+           
+           UNION 
+           
+           -- Reporting Activities
+           SELECT
+                'reporting' AS assessment_type,
+                reporting.assessment_id AS assessment_id,
+                a.weight AS weight,
+                reporting.mark_type AS mark_type,
+                reporting_feedback.learner_id AS user_id,
+                reporting_feedback.norm_mark AS mark,
+                reporting.max_mark AS max_mark,
+                reporting_feedback.published_at AS published_at
+           FROM reporting
+                JOIN participant_plan pp ON pp.assessment_id = reporting.assessment_id AND pp.deleted_at IS NULL
+                JOIN assessment a ON a.id = reporting.assessment_id
+                LEFT JOIN participant pc ON pp.id = pc.participant_plan_id AND pc.excluded_at IS NULL
+                LEFT JOIN reporting_feedback ON reporting.id = reporting_feedback.reporting_id 
+                    AND pc.user_id = reporting_feedback.learner_id 
+                    AND reporting_feedback.deleted_at IS NULL 
+           WHERE
+                reporting.mark_type IN ({$markTypeBindings['placeholders']})
+                AND reporting.assessment_id IN ({$assessmentIdBindings['placeholders']})
+                AND reporting_feedback.published_at IS NOT NULL
 
-        ORDER BY assessment_id, user_id, published_at DESC
+            ORDER BY assessment_id, user_id, published_at DESC
         "
         );
-
         $markQuery->setFetchMode(\PDO::FETCH_ASSOC);
         $markQuery->execute(
             array_merge(
@@ -1274,7 +1299,14 @@ class MapperProxy
         /* Artificially enforce close = due for dialog agents *specifically before* translation because something
          * else will persist $assessable specially, not just the $dataModel itself.
          */
-        if ($assessable instanceof \Schoolbox\Learning\Assessment\DialogAgent\Model) {
+        if ($assessable instanceof DialogAgentObject) {
+            $assessable->setCloseAt($assessable->getDueAt());
+        }
+
+        /* Artificially enforce open = publish, and close = due, for reporting activities
+         */
+        if ($assessable instanceof ReportingObject) {
+            $assessable->setOpenAt($assessable->getPublishAt());
             $assessable->setCloseAt($assessable->getDueAt());
         }
 
@@ -1392,6 +1424,8 @@ class MapperProxy
             }
         } elseif ($subObject instanceof DialogAgent\Model) {
             DialogAgent\Mapper::getInstance()->save($subObject);
+        } elseif ($subObject instanceof Reporting\Model) {
+            Reporting\Mapper::getInstance()->save($subObject);
         } elseif ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);
         }
@@ -1486,6 +1520,8 @@ class MapperProxy
                 $mapper = LessonPlan\Mapper::getInstance();
             } elseif ($subObject instanceof DialogAgent\Model) {
                 $mapper = DialogAgent\Mapper::getInstance();
+            } elseif ($subObject instanceof Reporting\Model) {
+                $mapper = Reporting\Mapper::getInstance();
             } else {
                 return null;
             }
@@ -1544,6 +1580,14 @@ class MapperProxy
             /* Deletes the \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model instance
              */
             DialogAgent\Mapper::getInstance()->delete($subModel);
+        } elseif ($subModel instanceof Reporting\Model) {
+            /* Deletes the \Schoolbox\Learning\Assessment\DataModel\Model instance
+             */
+            $this->baseMapper->delete($dataModel);
+
+            /* Deletes the \Schoolbox\Learning\Assessment\DataModel\Reporting\Model instance
+             */
+            Reporting\Mapper::getInstance()->delete($subModel);
         } else {
             $this->baseMapper->delete($dataModel);
         }
@@ -1594,6 +1638,10 @@ class MapperProxy
 
             if ($subModel instanceof DialogAgent\Model) {
                 DialogAgent\Mapper::getInstance()->restoreSoftDeleted($subModel);
+            }
+
+            if ($subModel instanceof Reporting\Model) {
+                Reporting\Mapper::getInstance()->restoreSoftDeleted($subModel);
             }
 
             $this->baseMapper->restoreSoftDeleted($dataModel);
@@ -1886,6 +1934,10 @@ class MapperProxy
 
                     case AssessmentType::TYPE_DIALOG_AGENT:
                         $filterBuilder->notNull('dialogAgent.id');
+                        break;
+
+                    case AssessmentType::TYPE_REPORTING:
+                        $filterBuilder->notNull('reporting.id');
                         break;
 
                     default:

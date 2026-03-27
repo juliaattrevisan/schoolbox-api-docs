@@ -213,7 +213,9 @@
     </div>
     {% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
     {% if context.baseContext is not unitSpecification %}
-        {% include '@learningAssessment/fragments/dates.twig' %}
+        {% include '@learningAssessment/fragments/dates.twig' with {
+            assessment: assessment
+        } %}
     {% endif %}
 
     {# Enforce Safe Exam Browser #}

@@ -16,6 +16,7 @@ use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Error;
+use Schoolbox\Error\Mapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Decorator\CourseManagedDecorator as DueWorkCourseManagedDecorator;
 use Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator as DueWorkDecorator;
@@ -30,6 +31,7 @@ use Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait;
 use Schoolbox\Learning\Assessment\Quiz\Decorator\Decorator as QuizDecorator;
 use Schoolbox\Learning\Assessment\Quiz\Decorator\QuizTrait;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Reporting\Decorator\ReportingTrait;
 use Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 use Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
 use Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait;
@@ -38,7 +40,6 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\User;
 use UnexpectedValueException;
@@ -62,6 +63,7 @@ class Factory
     use AttachedFilesTrait;
     use LtiTrait;
     use LessonPlanTrait;
+    use ReportingTrait;
 
     /**
      * Unique identifier
@@ -164,21 +166,11 @@ class Factory
 
 
     /**
-     * Dialog Agents have a scenario
+     * Idiosyncratic usage in Lesson Plans
+     * Used in Lesson Plans' AI generation to decide how much data the LLM should generate. Unfortunately shares a
+     * similar name, but not concept, with other duration fields here
      *
-     * @var int|null
-     */
-    private ?int $scenarioId = null;
-
-
-    /** @var Error\Mapper */
-    private Error\Mapper $errorMapper;
-
-
-    /**
-     * Used in Lesson Plans' AI generation to decide how much data
-     * the LLM should generate. Unfortunately shares a similar name,
-     * but not concept, with other duration fields here
+     * (Used by Lesson Plans, Quiz and Dialog Agents)
      *
      * @var string|null
      */
@@ -186,16 +178,31 @@ class Factory
 
 
     /**
-     * Factory constructor.
-     * @param User             $creator
-     * @param array            $post (an array of post vars from the create/update forms)
-     * @param string|null      $assessmentType
-     * @param IAssessable|null $original
-     * @throws MapperException
-     * @throws Deleted
+     * Dialog Agents have a scenario
+     *
+     * (Dialog Agent specific)
+     *
+     * @var int|null
      */
-    public function __construct(User $creator, $post, $assessmentType, ?IAssessable $original, $errorMapper)
-    {
+    private ?int $scenarioId = null;
+
+
+    /**
+     * Factory constructor.
+     * @param User $creator
+     * @param array|\Alaress\Web\Request\Values $post (an array of post vars from the create/update forms)
+     * @param string|null $assessmentType
+     * @param IAssessable|null $original
+     * @param Mapper $errorMapper
+     * @throws \Exception
+     */
+    public function __construct(
+        User $creator,
+        array|\Alaress\Web\Request\Values $post,
+        ?string $assessmentType,
+        ?IAssessable $original,
+        private \Schoolbox\Error\Mapper $errorMapper
+    ) {
         $this->setAssessmentType(trim($post['assessmentType'] ?? ''));
         $this->setContext($post['context'] ?? '');
         $this->setTitle(trim($post['title'] ?? ''));
@@ -211,7 +218,6 @@ class Factory
         $this->setOpenAt(trim($post['openDate'] ?? ''));
         $this->setDueAt(trim($post['dueDate'] ?? ''));
         $this->setCloseAt(trim($post['closeDate'] ?? ''));
-        $this->errorMapper = $errorMapper;
 
         if ($assessmentType === AssessmentType::TYPE_LESSON_PLAN) {
             // Work type should always be null for lesson plans.
@@ -230,15 +236,20 @@ class Factory
         $this->setSummator($post['summator'] ?? '');
         $this->setRequireAllActivities((bool)($post['requireAllActivities'] ?? false));
 
+        /* Due Work and Reporting have display vs. instructor marking
+         */
+        $markType = (int)trim($post['markType'] ?? '');
+        $this->setMarkType($markType);
+
+        $instructorMarkType = (int)trim($post['instructor-markType'] ?? '');
+        $this->setInstructorMarkType($instructorMarkType);
+
+        $this->setGradingScheme(empty($post['gradingScheme']) ? null : (int)trim($post['gradingScheme']));
+        $this->setInstructorGradingScheme(empty($post['instructor-gradingScheme']) ? null : (int)trim($post['instructor-gradingScheme']));
+
         /* Due Work needs this to instantiate correctly
          */
         $this->setAcceptOnline((int)trim($post['acceptOnline'] ?? ''));
-        $markType = (int)trim($post['markType'] ?? '');
-        $this->setMarkType($markType);
-        $instructorMarkType = (int)trim($post['instructor-markType'] ?? '');
-        $this->setInstructorMarkType($instructorMarkType);
-        $this->setGradingScheme(empty($post['gradingScheme']) ? null : (int)trim($post['gradingScheme']));
-        $this->setInstructorGradingScheme(empty($post['instructor-gradingScheme']) ? null : (int)trim($post['instructor-gradingScheme']));
         $this->setUseRubric((bool)($post['useRubric'] ?? ''));
         $this->setSimilarityCheckEnabled(trim($post['similarityCheckEnabled'] ?? '') === 'on');
 
@@ -282,7 +293,7 @@ class Factory
         $this->setUseMarkRange(trim($post['useMarkRange'] ?? '') === 'on');
 
         // Only due works have a max mark.
-        if ($assessmentType === AssessmentType::TYPE_DUE_WORK) {
+        if (in_array($assessmentType, [AssessmentType::TYPE_DUE_WORK, AssessmentType::TYPE_REPORTING])) {
             // MaxMark is the maximum available marks for the entire assessment.
             // It is permitted to be null for all mark types except Total Mark.
             // Unfortunately, the due work create form uses these deprecated values, not the new "slug" ones.
@@ -394,6 +405,54 @@ class Factory
          */
         $this->setScenarioId((int)($post['scenarioId'] ?? null));
 
+        /* Reporting Activities
+         * These are mostly settings for Supporting Data; some parts are shared with Due Work and other activities such
+         * as mark types, grade groups, etc. Reporting-specific stuff is namespaced in the ui, unsurprisingly, in a node
+         * called "reporting".
+         */
+        $this->setFeedbackCommentsEnable('on' === ($post['reporting']['comments']['enable'] ?? null));
+        $this->setSupportingDataEnable('on' === ($post['reporting']['supporting']['enable'] ?? null));
+        $this->setSupportingDataRange($post['reporting']['supporting']['range'] ?? null);
+
+        /* Assemble a GenericCollection of supporting data curriculum nodes
+         */
+        $supportingCurriculumNodes = CurriculumNodeMapper::getInstance()->createCollection();
+        $supportingCurriculumNodeIds = null;
+
+        /* For some reason this curric node selector sends you back an empty string if you didn't select anything,
+         * forcing you to specially handle this in all usages...but why? Might be something to do with [] in the curric
+         * selector's name= attribute, cos I've seen them come through as nodes[][] instead of nodes[].
+         *
+         * TODO find out why the curriculum selector is broken
+         */
+        $formCnodes = $post['reporting']['supporting']['curriculumNodes'][0] ?? null;
+
+        if ('' !== trim((string)$formCnodes)) {
+            $supportingCurriculumNodeIds = explode(',', $formCnodes);
+        }
+
+        if ($supportingCurriculumNodeIds && \count($supportingCurriculumNodeIds)) {
+            $supportingCurriculumNodes = CurriculumNodeMapper::getInstance()->findByColumn('id', $supportingCurriculumNodeIds);
+        }
+
+        $this->setSupportingDataCurriculumNodes($supportingCurriculumNodes);
+        $this->setSupportingDataFolders($post['reporting']['supporting']['folders'] ?? null);
+
+        /* Assemble a GenericCollection of supporting data work types
+         */
+        $supportingWorkTypes = WorkTypeMapper::getInstance()->createCollection();
+        $supportingWorkTypeIds = $post['reporting']['supporting']['workTypes'] ?? null;
+
+        if ($supportingWorkTypeIds && \count($supportingWorkTypeIds)) {
+            $supportingWorkTypes = WorkTypeMapper::getInstance()->findByColumn('id', $supportingWorkTypeIds);
+        }
+
+        $this->setSupportingDataWorkTypes($supportingWorkTypes);
+
+        $this->setSupportingDataMarkbookEnable('on' === ($post['reporting']['supporting']['markbook']['enable'] ?? null));
+
+        /* TODO Explain what this thing means: custom fields, line items, what it's supposed to be doing here
+         */
         // Ensure custom fields is an array if it's set
         $customFields = $post['customFields'] ?? null;
         if (isset($customFields)) {
@@ -468,7 +527,6 @@ class Factory
      * @throws UnexpectedValueException
      * @throws \RangeException
      * @throws MapperException
-     * @throws ResourceException
      */
     private function produceFromExistingAssessment(IAssessable $assessment): IAssessable
     {
@@ -588,6 +646,22 @@ class Factory
                 $this->getDurationHours(),
                 $this->getDurationMinutes(),
             );
+        } elseif ($assessment instanceof Reporting\Model) {
+            $decorator = new Reporting\Decorator\Decorator(
+                $this->getMarkType(),
+                $this->getInstructorMarkType(),
+                $this->getGradingScheme(),
+                $this->getInstructorGradingScheme(),
+                $this->getMaxMark(),
+                $this->getInstructorMaxMark(),
+                $this->getFeedbackCommentsEnable(),
+                $this->getSupportingDataEnable(),
+                $this->getSupportingDataRange(),
+                $this->getSupportingDataCurriculumNodes(),
+                $this->getSupportingDataFolders(),
+                $this->getSupportingDataWorkTypes(),
+                $this->getSupportingDataMarkbookEnable(),
+            );
         } else {
             throw new DomainException('Please select an assessment type');
         }
@@ -653,6 +727,15 @@ class Factory
         /* Dialog Agents have a special treatment of dates where Close Date = Due Date
          */
         if ($assessment instanceof DialogAgent\Model) {
+            $assessment->setCloseAt($assessment->getDueAt());
+        }
+
+        /* Reporting activities have a special treatment of dates where Open Date = Publish Date...also, probably
+         * Close Date = Due Date. There isn't really a "late date" for staff to give feedbacks; students never respond
+         * to Reporting activities.
+         */
+        if ($assessment instanceof Reporting\Model) {
+            $assessment->setOpenAt($assessment->getPublishAt());
             $assessment->setCloseAt($assessment->getDueAt());
         }
 
@@ -865,6 +948,9 @@ class Factory
         return $this->originalAssessmentId;
     }
 
+    /**
+     * @return IAssessable|null
+     */
     public function getOriginalAssessment(): ?IAssessable
     {
         return $this->originalAssessment;
@@ -1004,6 +1090,8 @@ class Factory
         return $this;
     }
 
+    /* Lesson Plan specific
+     */
 
     /**
      * @return string|null
@@ -1024,6 +1112,8 @@ class Factory
         return $this;
     }
 
+    /* Dialog Agent specific
+     */
 
     /**
      * @return int|null
@@ -1043,4 +1133,8 @@ class Factory
         $this->scenarioId = $scenarioId;
         return $this;
     }
+
+
+    /* Reporting activity specific: fulfilled by the trait
+     */
 }
