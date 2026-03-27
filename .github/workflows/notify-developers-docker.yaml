@@ -1,0 +1,45 @@
+name: Notify developers of Docker environment change
+
+# Notify developers of Docker environment change, whenever something which would
+# change it is merged.
+#
+# This includes:
+# * the Docker environment variable definition file `docker.default.env`
+# * any Docker Compose file
+# * any template file (as these may be used to build env vars for containers)
+# * the build file `docker/up`
+on:
+  push:
+   branches:
+     - master
+     - develop
+   paths:
+     - 'docker.default.env'
+     - 'docker/**/*docker-compose.yaml'
+     - 'docker/**/*.template'
+     - 'docker/up'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+# Apparently a reliable method for determining the base branch:
+# see https://stackoverflow.com/a/71158878.
+# Should work for both push to a branch, and workflow_dispatch.
+env:
+  BASE_BRANCH: ${{ github.head_ref || github.ref_name }}
+
+jobs:
+  notify-developers:
+    if: github.repository == 'alaress/schoolbox'
+    uses: ./.github/workflows/helper-notify-slack.yaml
+    with:
+      workflow_name: ${{ github.workflow }}
+      status: 'success'
+      ref_name: ${{ github.head_ref || github.ref_name }}
+      run_url: ${{ format('{0}/{1}/actions/runs/{2}', github.server_url, github.repository, github.run_id) }}
+      webhook_url: ${{ secrets.SLACK_OPERATIONS_WEBHOOK_URL }}
+      channel: developers
+      message: '${ICON} Docker environment has changed in `${REF_NAME}`: if working on that branch, please `gitsync` and `docker/up` at earliest convenience.'
+    secrets: inherit
