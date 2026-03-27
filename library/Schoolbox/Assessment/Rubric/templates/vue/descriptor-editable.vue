@@ -65,7 +65,7 @@ defineExpose({ textareaRef });
             @input="emit('descriptionInput')"
         ></textarea>
 
-        <!-- todo: data-descriptor-value data-descriptor-value-original data-descriptor-criterion data-descriptor-level-index data-descriptor-original -->
+        <!-- todo: data-descriptor-value data-descriptor-value-original -->
         <input
             v-model.number="descriptorMaxValue"
             class="rb-value rb-value-input"

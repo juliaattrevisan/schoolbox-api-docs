@@ -130,9 +130,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <!-- TODO: data-group data-sequencer-group data-groupname -->
     <tr class="rb-group-header">
-        <!-- TODO: no criteria specified... etc -->
         <th :rowspan="props.capability.indicators.length + 2 /* add 2 for the header + add new indicator row */">
             <!-- todo: can't sequence when no criteria, those should stay at the end... -->
             <span class="sequencer">
@@ -202,8 +200,8 @@ window.Vue.onMounted(() => {
         </th>
     </tr>
 
-    <!-- TODO: input for max value (data-group-max-value-row) -->
     <tr v-if="showCapabilityMaxValue">
+        <!-- input for max value -->
         <th class="rb-group-summary" :colspan="totalColumns">
             <label :for="capabilityMarkMaxValueInputId">Maximum points for {{ locale.rubricGroup.singular() }}</label>
             <input

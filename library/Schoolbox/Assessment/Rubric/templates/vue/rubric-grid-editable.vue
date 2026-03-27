@@ -36,7 +36,12 @@ const rubricGrid = window.Vue.ref(cloneDeep(props.rubricGridPayload)); // local 
 function moveLevel(index: number, direction: -1 | 1): void {
     shiftArrayItem(rubricGrid.value.levels, index, direction);
 
-    // todo: handle moving all the descriptors around
+    // move corresponding descriptors
+    for (const capability of rubricGrid.value.capabilities) {
+        for (const indicator of capability.indicators) {
+            shiftArrayItem(indicator.descriptors, index, direction);
+        }
+    }
 }
 
 /**
