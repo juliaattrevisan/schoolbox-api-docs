@@ -1640,9 +1640,12 @@ class Controller extends Base
 
             // Change the event title to match resource_booking.name.
             // (Pick any linked resource_booking row.  Their names should be identical.)
-            $existingBookings = $this->bookingMapper->findByColumn('event_id', $event->getId());
-            $firstBooking = $existingBookings->first();
-            if (trim($firstBooking->getName()) !== '') {
+            try {
+                $firstBooking = $this->bookingMapper->findOneByColumn('event_id', $event->getId());
+            } catch (MapperException) {
+                $firstBooking = null;
+            }
+            if ($firstBooking !== null && trim($firstBooking->getName()) !== '') {
                 $event->setTitle($firstBooking->getName());
             }
 
