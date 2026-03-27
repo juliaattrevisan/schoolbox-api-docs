@@ -16,7 +16,7 @@ import { RUBRIC_GRID_IMPORTED } from "./event";
 import { translateGridToFormPayload } from "./payload";
 import type { RubricGridCreateCapabilityResponse, RubricGridCreateIndicatorResponse } from "./payload";
 import { MAX_CAPABILITY_LENGTH } from "./types";
-import type { RubricGrid, RubricGridLevel, RubricGridCapability } from "./types";
+import type { RubricGrid, RubricGridLevel, RubricGridCapability, RubricGridDescriptor } from "./types";
 
 interface Props {
     rubricGridPayload: RubricGrid;
@@ -41,18 +41,31 @@ function moveLevel(index: number, direction: -1 | 1): void {
 
 /**
  * Adds a level to the grid, on the right-hand side
+ * @param levelName the name of the new level
+ * @param levelValue the default value to give to the new descriptors
  */
-function addLevel(): void {
+function addLevel(levelName: RubricGridLevel["name"], levelValue: RubricGridDescriptor["maxValue"]): void {
     const lowestId = Math.min(...rubricGrid.value.levels.map((l) => l.id), 0);
     const newLevel: RubricGridLevel = {
         id: lowestId - 1, // negative IDs are unsaved
-        name: "",
+        name: levelName,
     };
     rubricGrid.value.levels.push(newLevel);
 
-    // todo: handle adding new descriptors
+    // add corresponding descriptors
+    for (const capability of rubricGrid.value.capabilities) {
+        for (const indicator of capability.indicators) {
+            const lowestDescriptorId = Math.min(...indicator.descriptors.map((d) => d.id), 0);
+            indicator.descriptors.push({
+                id: lowestDescriptorId - 1, // negative IDs are unsaved
+                description: "",
+                maxValue: levelValue,
+            });
+        }
+    }
 
     // todo: (from old logic) scroll the newly created level into view (for mobile)
+    // ^ only for manually triggered creation, not via result set addition
     // $rb.closest(".scrollable").scrollTo($rb.find('[data-spawn="level"]'), {
     //     scrollX: true,
     //     scrollY: false,
