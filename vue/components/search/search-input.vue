@@ -170,7 +170,7 @@ function onMouseOut(event: MouseEvent): void {
 
     &__button {
         align-items: center;
-        background-color: var(--content-ui-submit-background);
+        background-color: var(--sbx-config-color-menu-background, var(--content-ui-submit-background));
         display: flex;
         height: var(--tabbar-height);
         justify-content: center;
@@ -178,15 +178,7 @@ function onMouseOut(event: MouseEvent): void {
         padding: 0;
         &:before {
             transition: all 0.2s ease-in;
-            color: var(--navigation-foreground);
-        }
-        &:hover {
-            background-color: rgba(
-                calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
-                calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
-                calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
-                var(--content-ui-submit-background-a)
-            );
+            color: var(--sbx-config-color-menu-foreground, var(--navigation-foreground));
         }
     }
 }
