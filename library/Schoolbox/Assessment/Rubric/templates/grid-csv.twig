@@ -117,9 +117,9 @@
             e.preventDefault();
 
             var frm = $('<form/>')
-                .attr('action', '/rubric/csv')
+                .attr('action', e.target.href)
                 .attr('method', 'post')
-                .append($('table[data-rubric]').clone())
+                .append($('#rubric-grid-editable-container').clone())
                 .append($('#capability-markType').clone())
                 .append($('#capability-gradingScheme').clone())
                 .append($('#useMarkRange').clone());

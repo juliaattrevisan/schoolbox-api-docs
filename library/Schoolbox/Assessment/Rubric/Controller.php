@@ -346,8 +346,12 @@ class Controller extends BaseController
      */
     public function download()
     {
-        $post         = $this->requestPost->get('rb');
-        $assessmentId = key($post);
+        $rubrics = [];
+        foreach ($this->requestPost->get('rubric') as $rubricId => $rubricData) {
+            $rubrics[$rubricId] = json_decode($rubricData, true, 512, JSON_THROW_ON_ERROR);
+        }
+
+        $assessmentId = key($rubrics); // TODO: change for multiple rubrics
         $assessment   = $this->assessmentDataSource->findById($assessmentId);
 
         if (!$assessment instanceof DueWork) {
@@ -389,7 +393,7 @@ class Controller extends BaseController
 
         $grid     = (new GridFactory())->buildFromPostData(
             $this->mapper->retrieveGrid($assessment, false),
-            $post,
+            $rubrics,
             false
         );
         $basename = (new Url($assessment->getTitle()))->getSlug();
