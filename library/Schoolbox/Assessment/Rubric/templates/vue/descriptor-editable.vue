@@ -13,7 +13,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const emit = defineEmits<{ descriptionKeyDown: [event: KeyboardEvent] }>();
+const emit = defineEmits(["descriptionInput"]);
 
 const indicatorEnabled = defineModel<boolean>("indicatorEnabled", { required: true });
 const descriptorDescription = defineModel<RubricGridDescriptor["description"]>("description", { required: true });
@@ -52,8 +52,6 @@ defineExpose({ textareaRef });
 
 <template>
     <td :class="!indicatorEnabled ? 'hide-v' : ''" @click="onCellClick">
-        <!-- todo: data-descriptor-text -->
-        <!-- todo: this textarea is meant to auto resize vertically to always fit the content -->
         <textarea
             ref="textareaRef"
             v-model.trim="descriptorDescription"
@@ -63,7 +61,7 @@ defineExpose({ textareaRef });
             :disabled="!indicatorEnabled"
             :style="{ height: props.textareaHeight }"
             @change.once="descriptionHasChanged = true"
-            @keydown="emit('descriptionKeyDown', $event)"
+            @input="emit('descriptionInput')"
         ></textarea>
 
         <!-- todo: data-descriptor-value data-descriptor-value-original data-descriptor-criterion data-descriptor-level-index data-descriptor-original -->

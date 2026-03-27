@@ -62,14 +62,14 @@ async function updateDescriptorHeight(): Promise<void> {
     await window.Vue.nextTick();
 
     let maxHeight = 0;
+    const textareas: HTMLTextAreaElement[] = descriptorRefs.value
+        .map((ref) => ref.textareaRef)
+        .filter((ref) => ref !== null);
 
-    for (const descriptorRef of descriptorRefs.value) {
-        const textarea = descriptorRef.textareaRef;
-        if (!textarea) continue;
+    for (const textarea of textareas) {
+        const { borderTopWidth, borderBottomWidth } = window.getComputedStyle(textarea);
 
-        const { paddingTop, paddingBottom } = window.getComputedStyle(textarea);
-
-        const textareaHeight = textarea.scrollHeight - parseInt(paddingTop) - parseInt(paddingBottom);
+        const textareaHeight = textarea.scrollHeight + parseFloat(borderTopWidth) + parseFloat(borderBottomWidth);
         maxHeight = Math.max(maxHeight, textareaHeight);
     }
 
@@ -139,7 +139,7 @@ window.Vue.onMounted(() => {
             :level-name="props.levels[levelIndex].name"
             :indicator-name="props.indicator.name"
             :textarea-height="descriptorTextareaHeight"
-            @description-key-down="updateDescriptorHeight"
+            @description-input="updateDescriptorHeight"
         ></descriptor-editable>
 
         <td
