@@ -30,7 +30,7 @@ class Mapper extends BaseMapper
 {
     /* 1000 is the limit in the database, but we choose 900 as our limit due to concern about special characters
      * (eg. bullet points) requiring more bytes than normal characters.
-     * @see expanded reason in www/static/js/submissions/jquery.rubric-editable.js.
+     * @see expanded reason in /library/Schoolbox/Assessment/Rubric/templates/vue/types.ts
      * @see also SA-13689.
      */
     public const CAPABILITY_NAME_MAX_CHARS_TO_STORE = 900;

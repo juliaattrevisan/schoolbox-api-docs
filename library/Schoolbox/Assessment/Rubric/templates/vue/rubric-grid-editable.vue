@@ -12,7 +12,7 @@ import { shiftArrayItem } from "@js/util/arrayUtils";
 import { MARK_TYPE_VALUE_NONE } from "@schoolboxAssessment/Types/MarkType";
 import LevelEditable from "./level-editable.vue";
 import CapabilityEditable from "./capability-editable.vue";
-import { RUBRIC_GRID_IMPORTED } from "./event";
+import { RUBRIC_GRID_APPLY_RESULT_SET, RUBRIC_GRID_IMPORTED } from "./event";
 import { translateGridToFormPayload } from "./payload";
 import type { RubricGridCreateCapabilityResponse, RubricGridCreateIndicatorResponse } from "./payload";
 import { MAX_CAPABILITY_LENGTH } from "./types";
@@ -72,6 +72,20 @@ function addLevel(levelName: RubricGridLevel["name"], levelValue: RubricGridDesc
     //     offsetLeft: 0,
     //     duration: 0,
     // });
+}
+
+/**
+ * Delete a level from the grid, removing all associated descriptors
+ * @param index the index of the level to delete
+ */
+function deleteLevel(index: number): void {
+    rubricGrid.value.levels.splice(index, 1);
+
+    for (const capability of rubricGrid.value.capabilities) {
+        for (const indicator of capability.indicators) {
+            indicator.descriptors.splice(index, 1);
+        }
+    }
 }
 
 /**
@@ -295,6 +309,69 @@ window.Vue.watch(rubricSum, (newValue) => {
 document.addEventListener(RUBRIC_GRID_IMPORTED, (event) => {
     rubricGrid.value = event.detail.rubricGrid;
 });
+
+// TODO:
+// /**
+//  * Gets an 2D array of original descriptor values, indexed by criterion.id, then level.index
+//  *
+//  * Applying a new result set may or may not change descriptor values. But by itself
+//  * it blows away the original value. This function enables us to re-apply original values
+//  * after apply a new result set to determine if marks should be invalidated.
+//  */
+// function getOriginalDescriptorValues(){
+//     var originalDescriptorValues = [];
+//     $rubric.find('[data-descriptor-value-original]').each(function(idx, elem){
+//         var $elem = $(elem);
+//         var criterion = $elem.data('descriptor-criterion');
+//         var level = $elem.data('descriptor-level-index');
+
+//         // first time we've hit this row ?
+//         if('undefined' == typeof originalDescriptorValues[criterion]){
+//             originalDescriptorValues[criterion] = [];
+//         }
+//         originalDescriptorValues[criterion][level] = $elem.data('descriptor-value-original');
+//     });
+//     return originalDescriptorValues;
+// }
+// /**
+//  * Re-applies original descriptor values after applying a new result set.
+//  *
+//  * This is because applying a new result set may or may not change descriptor values,
+//  * but because it inserts new DOM elements, we need to manually re-apply the original values.
+//  *
+//  * @param {array} originalDescriptorValues  Indexed by criterion.id, then level.index
+//  */
+// function applyOriginalDescriptorValues(originalDescriptorValues){
+
+//     $rubric.find('[data-descriptor-value-original]').each(function(idx, elem){
+//         var $elem     = $(elem);
+//         var criterion = $elem.data('descriptor-criterion');
+//         var level     = $elem.data('descriptor-level-index');
+
+//         $elem.attr('data-descriptor-value-original', originalDescriptorValues[criterion][level]);
+//     });
+// }
+
+/**
+ * Listen for a rubric grid apply result set event
+ * TODO: this logic will need to change for multiple rubrics and/or multiple result sets
+ */
+document.addEventListener(RUBRIC_GRID_APPLY_RESULT_SET, (event) => {
+    // this wipes all the existing levels/descriptors and replaces them with the ones from the results set
+    // the new descriptor values just count up from 0
+
+    // delete all existing levels
+    while (rubricGrid.value.levels.length) {
+        deleteLevel(rubricGrid.value.levels.length - 1);
+    }
+
+    // add each new level
+    for (const [levelIndex, levelName] of event.detail.options.entries()) {
+        addLevel(levelName, levelIndex);
+    }
+
+    // TODO: if rubric has marks, apply original descriptor values (applyOriginalDescriptorValues)
+});
 </script>
 
 <template>
@@ -327,7 +404,7 @@ document.addEventListener(RUBRIC_GRID_IMPORTED, (event) => {
                     />
                     <th v-if="rubricGrid.levels.length < props.maxLevels">
                         <!-- Add a new level -->
-                        <a href="#" data-test="rubric-spawn-level" @click.prevent="addLevel">
+                        <a href="#" data-test="rubric-spawn-level" @click.prevent="() => addLevel('', null)">
                             &plus; {{ locale.rubricLevel.proper() }}
                         </a>
                     </th>

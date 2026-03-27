@@ -43,27 +43,15 @@
     </div>
 
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-    <div data-overlay class="wait-overlay hide">
-        <p>
-            Working...
-            <span class="loader"></span>
-        </p>
-    </div>
 </div>
-
-<div class="toast" data-alert data-relation="create-response"></div>
 
 
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/attacher/attacher.hide-watch.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function() {
-        const capabilityMarkTypeNone = parseInt('{{ markTypeNone }}');
-
-
         // Rubric ResultSets Modal
         var $rsReveal     = $('#reveal-resultset');
         var $interactions = $rsReveal.find('input,a');
-        var $overlay      = $rsReveal.find('[data-overlay]');
 
         $rsReveal.on('closed.fndtn.reveal', function () {
             // un-check the selected radio
@@ -71,8 +59,6 @@
 
             // re-enable all inputs and links
             $interactions.prop('disabled', false);
-
-            $overlay.addClass('hide');
 
         });
 
@@ -84,166 +70,40 @@
         $rsReveal.on('click', 'a', function (e) {
             e.preventDefault();
 
-            var $button = $(this), rubricEditable, value, $input, $label, options ;
+            var $button = $(this), value, $input, $label, options ;
 
-            switch ($button.data('action')) {
-                case 'applyResultSet':
+            if ($button.data('action') !== 'applyResultSet') {
+                // only allow the apply button to do proceed, only other known option is 'close'
+                return;
+            }
 
-                    let $rubric = $('table[data-rubric]');
-                    rubricEditable = $rubric.data('plugin_rubricEditable');
+            $input = $rsReveal.find('input:checked');
+            if (!$input.length) {
+                return; // no option selected
+            }
+            value  = $input.val();
+            $label = $input.siblings('[for=' + $input.attr('id') + ']');
 
-                    if (rubricEditable) {
+            // ensure value
+            if (value > 0) {
+                // get the list of options we're going to populate
+                options = $label.text().split(',').map(function (v) { return v.trim(); });
 
-                        $input = $rsReveal.find('input:checked');
+                // prevent multi-submit
+                $interactions.prop('disabled', true);
 
-                        if ($input.length) {
-                            value  = $input.val();
-                            $label = $input.siblings('[for=' + $input.attr('id') + ']');
+                console.log('Applying result set', value, options);
 
-                            // ensure value
-                            if (value > 0) {
-                                // get the list of options we're going to populate
-                                options = $label.text().split(',').map(function (v) { return v.trim(); });
+                // tell the rubric to apply the result set
+                document.dispatchEvent(new CustomEvent('RUBRIC_GRID_APPLY_RESULT_SET', {
+                    detail: {
+                        options,
+                    },
+                }));
 
-                                // prevent multi-submit
-                                $interactions.prop('disabled', true);
-                                $overlay.removeClass('hide');
-
-                                // break this out of main execution
-                                setTimeout(function () {
-                                    {% if rubricHasMarks %}
-                                        var originalDescriptorValues = getOriginalDescriptorValues();
-                                    {% endif %}
-
-                                    // apply the set
-                                    rubricEditable.applyResultSet(options);
-                                    $rsReveal.foundation('reveal', 'close');
-
-                                    {% if rubricHasMarks %}
-                                        applyOriginalDescriptorValues(originalDescriptorValues);
-                                    {% endif %}
-                                    // checkRubricTotal();
-                                }, 100);
-                            }
-                        }
-                    }
-                    break;
-                default:
-                    // only other known option is 'close'
-                    $rsReveal.foundation('reveal', 'close');
-                    break;
+                $rsReveal.foundation('reveal', 'close');
             }
         });
-
-        {# No need to output this if the Rubric has no marks #}
-        {% if rubricHasMarks %}
-
-            /**
-             * Gets an 2D array of original descriptor values, indexed by criterion.id, then level.index
-             *
-             * Applying a new result set may or may not change descriptor values. But by itself
-             * it blows away the original value. This function enables us to re-apply original values
-             * after apply a new result set to determine if marks should be invalidated.
-             */
-            function getOriginalDescriptorValues(){
-                var originalDescriptorValues = [];
-                $rubric.find('[data-descriptor-value-original]').each(function(idx, elem){
-                   var $elem = $(elem);
-                   var criterion = $elem.data('descriptor-criterion');
-                   var level = $elem.data('descriptor-level-index');
-
-                    // first time we've hit this row ?
-                    if('undefined' == typeof originalDescriptorValues[criterion]){
-                        originalDescriptorValues[criterion] = [];
-                    }
-                    originalDescriptorValues[criterion][level] = $elem.data('descriptor-value-original');
-                });
-                return originalDescriptorValues;
-            }
-
-            /**
-             * Re-applies original descriptor values after applying a new result set.
-             *
-             * This is because applying a new result set may or may not change descriptor values,
-             * but because it inserts new DOM elements, we need to manually re-apply the original values.
-             *
-             * @param {array} originalDescriptorValues  Indexed by criterion.id, then level.index
-             */
-            function applyOriginalDescriptorValues(originalDescriptorValues){
-
-                $rubric.find('[data-descriptor-value-original]').each(function(idx, elem){
-                    var $elem     = $(elem);
-                    var criterion = $elem.data('descriptor-criterion');
-                    var level     = $elem.data('descriptor-level-index');
-
-                    $elem.attr('data-descriptor-value-original', originalDescriptorValues[criterion][level]);
-                });
-            }
-        {% endif %}
-
-
-        $("#useMarkRange").on('change', function() {
-            if ($("#useMarkRange").is(":checked")) {
-                $("td[data-descriptor] input").prop("placeholder", "Maximum points");
-            } else {
-                $("td[data-descriptor] input").prop("placeholder", "Points");
-            }
-        });
-
-
-        var toggleGroupMaxValues = function() {
-            var $groupMaxValueInputs = $('[data-group-max-value]'),
-                $groupMaxValueRows = $('[data-group-max-value-row]');
-
-            if (parseInt($('#capability-markType').val()) === capabilityMarkTypeNone) {
-                // Not using mark-per-group? Easy, hide all max value inputs
-                $groupMaxValueRows.addClass('hide');
-                $groupMaxValueInputs.addClass('hide').prop('disabled', true);
-
-            } else {
-                // Using mark-per-group? A little harder, show max value inputs for all in use
-                var $allCriterionRows = $('[data-group]');
-
-                // List of all groups, no duplicates
-                // TODO this is copypasted from elsewhere; figure out how to get it into a plugin!
-                var groupIdentifiers = new Set(
-                    $allCriterionRows
-                        .map(function() { return $(this).data('group'); })
-                        .toArray()
-                );
-
-                // Which groups are actually used?
-                var groupsInUse = {};
-                groupIdentifiers.forEach(function (groupIdentifier) {
-                    var $selectedCriteria = $allCriterionRows
-                        .filter('[data-group="'+groupIdentifier+'"]')
-                        .find('input[data-criterion-name]:checked');
-                    groupsInUse[groupIdentifier] = $selectedCriteria.length > 0;
-                });
-
-                // Switch on/off groups by whether they have a criterion in use
-                $groupMaxValueRows.each(function () {
-                    var $this = $(this),
-                        groupIdentifier = $this.data('group'),
-                        $thisGroupMaxValueRows = $groupMaxValueRows.filter('[data-group="'+groupIdentifier+'"]'),
-                        $thisGroupMaxValueInputs = $thisGroupMaxValueRows.find('[data-group-max-value]');
-                    if (groupIdentifier in groupsInUse && groupsInUse[groupIdentifier]) {
-                        $thisGroupMaxValueRows.removeClass('hide');
-                        $thisGroupMaxValueInputs.removeClass('hide').prop('disabled', false);
-                    } else {
-                        $thisGroupMaxValueRows.addClass('hide');
-                        $thisGroupMaxValueInputs.addClass('hide').prop('disabled', true);
-                    }
-                });
-            }
-        };
-
-
-        // Show/hide group marks based upon mark-per-group (NOT capability)
-        // Only show the group mark if at least one criterion is selected
-        // in the group
-        $("#capability-markType").on('change', toggleGroupMaxValues);
-        $('#rubric-attachable').on('change', 'input[data-criterion-name]', toggleGroupMaxValues);
     });
 </script>
 

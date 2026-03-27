@@ -430,7 +430,7 @@
             {
                 if ($element.is(':checked')) {
                     disableMaxMark();
-                    calculateGridTotal(); // todo: just needs to update both max mark inputs when you do this
+                    // calculateGridTotal(); // todo: just needs to update both max mark inputs when you do this
                 } else {
                     enableMaxMark();
 
@@ -444,17 +444,6 @@
              */
             $useRubricSwitch.on('click', function () {
                 processUseRubricClick($(this));
-            });
-
-            // configure callbacks into the grid
-            let $rubric = $('table[data-rubric]');
-            $rubric.rubricEditable({
-                url: '{{ routeLookup("rubric.create") }}',
-                rubricId: '{{ rubricGrid.id }}',
-                formField: '{{ formField ?? 'rb' }}',
-                levelLimit: {{ levelLimit ?? config.rubric_max_levels }},
-                localisedGroupName: '{{ locale.translate('rubricGroup', false, true) }}',
-                localisedCriterionName: '{{ locale.translate('rubricCriterion', false, true) }}',
             });
 
             // Initiate
