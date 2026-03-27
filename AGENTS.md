@@ -92,6 +92,15 @@ npm test                # Jest unit tests
 npm run watch-test      # Jest watch mode
 ```
 
+In order to ensure frontend code quality, these commands should be run with the list of files which have changed:
+```bash
+npm run build                    # verify that frontend code still compiles
+npx eslint --no-ignore [FILE]... # verify file still passes ESLint
+npx prettier --check [FILE]...   # verify that file still meets auto-format standards
+npx prettier --write [FILE]...   # auto-format file
+npm test                         # verify all unit tests still pass, not just those changed
+```
+
 ### Backend
 
 These commands should be run within the Docker environment's CLI:
@@ -104,6 +113,14 @@ docker/ssh
 ./vendor/bin/phpcbf     # auto-fix style issues
 ./vendor/bin/phpstan    # static analysis (level 4)
 ./vendor/bin/phpunit    # unit tests
+```
+
+In order to ensure backend code quality, these commands should be run with the list of files which have changed:
+```bash
+./vendor/bin/phpcs [FILE]...           # verify that one or more files meet PSR-12
+./vendor/bin/phpcbf [FILE]...          # auto-fix style issues in these files
+./vendor/bin/phpstan analyze [FILE]... # ensure that files pass static analysis
+./vendor/bin/phpunit                   # verify all unit tests still pass, not just those changed
 ```
 
 ---
