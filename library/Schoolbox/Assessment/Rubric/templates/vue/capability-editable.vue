@@ -179,6 +179,7 @@ window.Vue.onMounted(() => {
         :key="indicator.id"
         v-model:name="indicator.name"
         v-model:has-usage="indicator.hasUsage"
+        :capability-id="props.capability.id"
         :indicator="indicator"
         :levels="props.levels"
         :max-levels="props.maxLevels"

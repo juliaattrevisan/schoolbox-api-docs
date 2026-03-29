@@ -7,6 +7,7 @@
 import { MAX_DESCRIPTOR_LENGTH, type RubricGridDescriptor } from "./types";
 
 interface Props {
+    descriptorIndex: number;
     levelName: string;
     indicatorName: string;
     useMarkRange: boolean;
@@ -54,7 +55,11 @@ defineExpose({ textareaRef });
 </script>
 
 <template>
-    <td :class="!indicatorEnabled ? 'hide-v' : ''" @click="onCellClick">
+    <td
+        :class="!indicatorEnabled ? 'hide-v' : ''"
+        :data-test="`rubric-descriptor-cell-${props.descriptorIndex}`"
+        @click="onCellClick"
+    >
         <textarea
             :id="`rb-descriptor-textarea-${componentId}`"
             ref="textareaRef"
@@ -78,6 +83,7 @@ defineExpose({ textareaRef });
             :placeholder="useMarkRange ? 'Maximum points' : 'Points'"
             :disabled="!indicatorEnabled || undefined"
             :data-descriptor-value="!indicatorEnabled || undefined"
+            data-test="rubric-descriptor-max-value"
         />
     </td>
 </template>

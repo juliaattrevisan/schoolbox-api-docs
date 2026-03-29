@@ -54,6 +54,14 @@ export default class AssessmentForm {
 
     static readonly DATA_TEST_RUBRIC_SPAWN_LEVEL = "rubric-spawn-level";
 
+    static readonly DATA_TEST_RUBRIC_INDICATOR_ROW = "rubric-indicator-row-"; // Append "-[capabilityId]-[indicatorId]"
+
+    static readonly DATA_TEST_RUBRIC_INDICATOR_TOGGLE = "rubric-indicator-toggle";
+
+    static readonly DATA_TEST_RUBRIC_DESCRIPTOR_CELL = "rubric-descriptor-cell-"; // Append "-[descriptorIndex]"
+
+    static readonly DATA_TEST_RUBRIC_DESCRIPTOR_MAX_VALUE = "rubric-descriptor-max-value";
+
     static readonly SELECTOR_PARTICIPATION_BUTTON_SAVE = "participation-plan-form-button-save";
 
     static readonly SELECTOR_PARTICIPATION_LEGEND = "participation-plan-legend";
@@ -432,26 +440,30 @@ export default class AssessmentForm {
      * @param indicatorId - The indicator ID
      */
     async toggleRubricIndicator(capabilityId: number, indicatorId: number): Promise<void> {
-        const rubricIndicator = this.page.locator(`label[for="rb[${capabilityId}][criterion][${indicatorId}][on]"]`);
-        await rubricIndicator.click();
+        const indicatorToggle = this.page
+            .getByTestId(`${AssessmentForm.DATA_TEST_RUBRIC_INDICATOR_ROW}${capabilityId}-${indicatorId}`)
+            .getByTestId(AssessmentForm.DATA_TEST_RUBRIC_INDICATOR_TOGGLE);
+        await indicatorToggle.click();
     }
 
     /**
-     * Fill in points for a given criterion
+     * Fill in points for a given descriptor
      * @param capabilityId - The capability ID
      * @param indicatorId - The indicator ID
-     * @param criterionId - The criterion ID
+     * @param descriptorIndex - The index of the descriptor
      * @param value - The value to set
      */
     async fillRubricCriterionPoints(
         capabilityId: number,
         indicatorId: number,
-        criterionId: number,
+        descriptorIndex: number,
         value: string | number,
     ): Promise<void> {
-        const pointsInput = this.page.locator(
-            `input[name="rb[${capabilityId}][descriptor][${indicatorId}][${criterionId}][points]"]`,
-        );
+        const descriptor = this.page
+            .getByTestId(`${AssessmentForm.DATA_TEST_RUBRIC_INDICATOR_ROW}${capabilityId}-${indicatorId}`)
+            .getByTestId(`${AssessmentForm.DATA_TEST_RUBRIC_DESCRIPTOR_CELL}-${descriptorIndex}`);
+
+        const pointsInput = descriptor.getByTestId(AssessmentForm.DATA_TEST_RUBRIC_DESCRIPTOR_MAX_VALUE);
         await pointsInput.fill(value.toString());
     }
 }

@@ -15,9 +15,10 @@ import { useTemplateRefsList } from "@vueuse/core";
 import locale from "@js/terminology/rosettaStone";
 import DescriptorEditable from "./descriptor-editable.vue";
 import { MAX_INDICATOR_LENGTH } from "./types";
-import type { RubricGridIndicator, RubricGridLevel } from "./types";
+import type { RubricGridCapability, RubricGridIndicator, RubricGridLevel } from "./types";
 
 interface Props {
+    capabilityId: RubricGridCapability["id"];
     indicator: RubricGridIndicator;
     levels: RubricGridLevel[];
     maxLevels: number;
@@ -83,7 +84,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <tr data-indicator-row>
+    <tr data-indicator-row :data-test="`rubric-indicator-row-${props.capabilityId}-${props.indicator.id}`">
         <th>
             <span class="sequencer">
                 <a
@@ -114,6 +115,7 @@ window.Vue.onMounted(() => {
                 v-if="props.indicator.inUseExcludingAssessment"
                 class="checkbox-label rb-criterion rb-readonly rb-indicator-name"
                 :for="`rb-indicator-${componentId}`"
+                data-test="rubric-indicator-toggle"
             >
                 {{ indicatorName }}
                 <span
@@ -144,6 +146,7 @@ window.Vue.onMounted(() => {
             v-model:indicator-enabled="hasUsage"
             v-model:description="descriptor.description"
             v-model:max-value="descriptor.maxValue"
+            :descriptor-index="levelIndex"
             :level-name="props.levels[levelIndex].name"
             :indicator-name="props.indicator.name"
             :use-mark-range="props.useMarkRange"
