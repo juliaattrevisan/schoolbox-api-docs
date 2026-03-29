@@ -125,7 +125,6 @@ class AssessmentOnGroupCest
         $assessment_title     = 'Testing Create Assessment with Rubric On Group Page ID ' . $groupPage->getId() . ' at ' . $timestamp;
         $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_FOLDER, $groupPage->getId(), $groupPage->getId(), AssessmentType::TYPE_DUE_WORK);
         $newAssessmentRequest->setTitle($assessment_title);
-        $newAssessmentRequest->setFormParam('useRubric', 'on');
         $newAssessmentRequest->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
         $this->setDefaultRubric($i, $newAssessmentRequest, $groupPage->getId());
 
@@ -221,7 +220,6 @@ class AssessmentOnGroupCest
         $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_FOLDER, $groupPage->getId(), $groupPage->getId(), AssessmentType::TYPE_DUE_WORK);
         $assessment_title     = 'Testing Mark Assessment with rubric On Homepage ID ' . $groupPage->getId() . ' at ' . $timestamp;
         $newAssessmentRequest->setTitle($assessment_title);
-        $newAssessmentRequest->setFormParam('useRubric', 'on');
         $newAssessmentRequest->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
         $this->setDefaultRubric($i, $newAssessmentRequest, $groupPage->getId());
         $i->amGoingTo('Send request create asessment on Group Page #' . $groupPage->getId());

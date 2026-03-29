@@ -67,7 +67,6 @@ trait FormTrait
             $this->setFormParam('instructor-gradingScheme', 1);
         }
         $this->setFormParam('resultset', '');
-        $this->setFormParam('useRubric', 0);
         // 6 - none
         $this->setFormParam('capability-markType', 6);
         $this->setFormParam('capability-gradingScheme', 1);

@@ -107,26 +107,8 @@
     });
 </script>
 
-
-<div class="row">
-    <div class="small-12 columns">
-        <label for="useRubric" class="inline-block">Use Rubric?</label>
-
-        {# For when the checkbox itself is disabled, since that won't submit to backend
-         # under those circumstances, inadvertently unlocking this setting
-         #}
-        <input type="hidden" name="useRubric" value="0" />
-
-        <div class="switch">
-            <input name="useRubric" id="useRubric" data-test="assessment-form-use-rubric" type="checkbox" {% if assessment.useRubric %}checked="checked"{% endif %} {% if courseManagedReadonly %}disabled{% endif %} />
-            <label for="useRubric">
-                <span class="icon-approve"></span>
-                <span class="icon-cancel"></span>
-            </label>
-        </div>
-    </div>
-</div>
-<fieldset class="{% if not assessment.useRubric %}hide{% endif %}" data-hide-watch="#useRubric">
+{# TODO: old useRubric hide/show logic #}
+<fieldset class="{% if not assessment.useRubric %}hide{% endif %}">
     <legend>Rubric marking options</legend>
 
     {% include '@learningAssessment/fragments/markType.twig' with {
@@ -165,25 +147,14 @@
     </div>
 </fieldset>
 
-{# Sare away this entire rubric div off the viewport - there are too many interactable elements
- # to disable each of them reliably and sensibly, even though the grid itself doesn't perist.
- # Note that rubric grids can be insanely long and wide and distinguished
- #
- # ...so just boot it off your screen instead. I'm sure people will laugh, but whatevers
- # Show an informative instead
- #}
 {% if courseManagedReadonly %}
     <div class="row">
-        <div id="rubric-section" class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}">
+        <div class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}">
             <div class="small-12 columns no-pad">
-
+                {# TODO: deal with multiple readonly rubric grids #}
                 {% include '@rubric/grid.twig' with {
                     rubricGrid: rubricGrid,
-                    rubricGridPayload: rubricGridPayload,
                     folderId: assessment.context.folder.id,
-                    usingMarkPerCapability: assessment.isMarkPerCapability,
-                    usingMarkRange: assessment.useMarkRange,
-                    idSuffix: idSuffix ?? '',
                     showRubricTotal: true,
                     showGroupTotal: assessment.markPerCapability,
                     rubricMarkedGrid: false,
@@ -194,7 +165,7 @@
     </div>
 {% else %}
     <div class="row">
-        <div id="rubric-section" class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}" data-hide-watch="#useRubric">
+        <div class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}">
             <div class="small-12 columns no-pad">
                 <a href="#" id="apply-resultset" class="button">Apply Result Set</a>
             </div>
@@ -204,9 +175,6 @@
                     rubricGridPayload: rubricGridPayload,
                     attachzone: rubricAttachZone,
                     folderId: assessment.context.folder.id,
-                    usingMarkPerCapability: assessment.isMarkPerCapability,
-                    usingMarkRange: assessment.useMarkRange,
-                    idSuffix: idSuffix ?? '',
                 } only %}
             </div>
         </div>

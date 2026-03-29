@@ -5,6 +5,7 @@ var scriptValidationRules = $("script[src*=validationRules]");
  */
 var validateOptions = {
     rules: {
+        // TODO tweak useRubric logic
         useRubric: {
             require_from_group: {
                 param: [1, "[data-criterion-name]"],
@@ -54,6 +55,7 @@ var validateOptions = {
              */
             error.insertAfter($element.siblings("[data-use-criterion-values]"));
         } else if ($element.is("#useRubric")) {
+            // TODO tweak useRubric logic
             // For validating if at least one indicator is selected
             error.insertAfter($element.closest("div.switch"));
         } else if ($element.is("[data-type-group]")) {
@@ -75,6 +77,7 @@ var validateOptions = {
     messages: {
         weight: "The " + scriptValidationRules.attr("data-locale-grading-proper") + " weight should be zero or greater",
         useRubric: {
+            // TODO tweak useRubric logic
             require_from_group: "You must have at least one selected indicator if using a rubric",
         },
         "submissionOptions[]": {
@@ -98,6 +101,7 @@ $(document).ready(function () {
 
 function initDynamicValidationTriggers() {
     if ($("#useRubric").is(":checked")) {
+        // TODO tweak useRubric logic
         // on change of mark range setting
         $("#useMarkRange").on("change", function () {
             reValidate();
@@ -150,6 +154,7 @@ function initDynamicValidationTriggers() {
 function attachValidationRules() {
     // Don't attach rubric validation unless Use Rubric is on
     if ($("#useRubric").is(":checked")) {
+        // todo: tweak useRubric logic
         // Validate decimal places on each descriptor
         // Only validate digits (i.e. string contains only numbers, no decimal places) if mark range is on
         // Always validate it's numeric and positive
@@ -298,6 +303,7 @@ var beforeAttemptingSubmit = function () {
         // because the solution is a little different.
         var messageCallback = function () {
             if ($('input[name="useRubric"]').is(":checked")) {
+                // todo: tweak useRubric logic
                 return "If using Total Mark with rubrics, at least one descriptor must have a points value greater than zero.";
             }
             return "This field must be a number greater than zero.";
@@ -320,6 +326,7 @@ var beforeAttemptingSubmit = function () {
         // because the solution is a little different.
         var messageCallback = function () {
             if ($('input[name="useRubric"]').is(":checked")) {
+                // todo: tweak useRubric logic
                 return "If using Total Mark with rubrics, at least one descriptor must have a points value greater than zero.";
             }
             return "This field must be a number greater than zero.";

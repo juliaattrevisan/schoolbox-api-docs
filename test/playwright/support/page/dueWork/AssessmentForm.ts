@@ -50,8 +50,6 @@ export default class AssessmentForm {
 
     static readonly DATA_TEST_SUBMISSION_TYPE_LABEL = "assessment-form-submission-type"; // Append "-[submissionType]"
 
-    static readonly DATA_TEST_USE_RUBRIC = "assessment-form-use-rubric";
-
     static readonly DATA_TEST_RUBRIC_SPAWN_LEVEL = "rubric-spawn-level";
 
     static readonly DATA_TEST_RUBRIC_INDICATOR_ROW = "rubric-indicator-row-"; // Append "-[capabilityId]-[indicatorId]"
@@ -416,15 +414,6 @@ export default class AssessmentForm {
     async worksheetAttachment(db: DatabaseHelper, filePath: string): Promise<void> {
         const attachZone = this.page.locator(AssessmentForm.SELECTOR_WORKSHEET_ATTACHMENT_ZONE);
         await this.tester.dragAndDropFile(db, attachZone, filePath);
-    }
-
-    /**
-     * Toggles the use rubric option
-     */
-    async toggleUseRubric(): Promise<void> {
-        const useRubricInputId = await this.page.getByTestId(AssessmentForm.DATA_TEST_USE_RUBRIC).getAttribute("id");
-        const useRubricLabel = this.page.locator(`.switch label[for="${useRubricInputId}"]`);
-        await useRubricLabel.click();
     }
 
     /**
