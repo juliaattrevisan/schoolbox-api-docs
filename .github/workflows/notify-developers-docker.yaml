@@ -41,5 +41,8 @@ jobs:
       run_url: ${{ format('{0}/{1}/actions/runs/{2}', github.server_url, github.repository, github.run_id) }}
       webhook_url: ${{ secrets.SLACK_OPERATIONS_WEBHOOK_URL }}
       channel: developers
-      message: '${ICON} Docker environment has changed in `${REF_NAME}`: if working on that branch, please `gitsync` and `docker/up` at earliest convenience.'
+      message: |
+        The Docker environment has been updated in the `${{ env.BASE_BRANCH }}` branch.
+
+        If working on that branch, please `gitsync ${{ env.BASE_BRANCH }}` and `docker/up` at earliest convenience.
     secrets: inherit
