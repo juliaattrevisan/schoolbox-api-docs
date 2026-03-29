@@ -136,16 +136,15 @@
 </script>
 <div id="rubric-attachable{{ idSuffix }}">
     <div data-hideable>
-        <div id="rubric-grid-editable-container">
-            <rubric-grid-editable
+        <div id="rubric-builder-container">
+            <rubric-builder
                 :rubric-grid-payload="{{ rubricGridPayload|json_encode }}"
                 :max-levels="{{ config.rubric_max_levels }}"
                 :folder-id="{{ folderId }}"
                 route-rubric-create="{{ routeLookup("rubric.create") }}"
             />
         </div>
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricGridEditable.js?v={{ config.site_version }}"></script>
-
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricBuilder.js?v={{ config.site_version }}"></script>
         <div>
             {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
         </div>

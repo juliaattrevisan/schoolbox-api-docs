@@ -3,30 +3,28 @@
  * The editable rubric grid shown on the activity create/modify page (currently due work, soon to be more)
  */
 
-import { cloneDeep } from "es-toolkit";
 import type { Ref } from "vue";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import { assertUnreachable } from "@js/util/errorUtils";
 import locale from "@js/terminology/rosettaStone";
 import { shiftArrayItem } from "@js/util/arrayUtils";
-import { MARK_TYPE_VALUE_NONE } from "@schoolboxAssessment/Types/MarkType";
 import LevelEditable from "./level-editable.vue";
 import CapabilityEditable from "./capability-editable.vue";
-import { RUBRIC_GRID_APPLY_RESULT_SET, RUBRIC_GRID_IMPORTED } from "./event";
-import { translateGridToFormPayload } from "./payload";
+import { RUBRIC_GRID_APPLY_RESULT_SET } from "./event";
 import type { RubricGridCreateCapabilityResponse, RubricGridCreateIndicatorResponse } from "./payload";
 import { MAX_CAPABILITY_LENGTH } from "./types";
 import type { RubricGrid, RubricGridLevel, RubricGridCapability, RubricGridDescriptor } from "./types";
 
 interface Props {
-    rubricGridPayload: RubricGrid;
-    maxLevels: number;
     folderId: number;
+    maxLevels: number;
+    capabilityMarkType: number;
+    useMarkRange: boolean;
     routeRubricCreate: string;
 }
 const props = defineProps<Props>();
 
-const rubricGrid = window.Vue.ref(cloneDeep(props.rubricGridPayload)); // local mutable copy
+const rubricGrid = defineModel<RubricGrid>("rubricGrid", { required: true });
 
 /**
  * Move a level left or right
@@ -203,9 +201,7 @@ async function onAddCapabilityKeydown(event: KeyboardEvent): Promise<void> {
     await onAddKeydown(event, "capability", null, newCapabilityName);
 }
 
-/**
- * The total number of columns in the grid
- */
+/** The total number of columns in the grid */
 const totalColumns = window.Vue.computed(() => {
     let columns = rubricGrid.value.levels.length + 2; // levels + capability + criterion columns
 
@@ -214,96 +210,6 @@ const totalColumns = window.Vue.computed(() => {
     }
 
     return columns;
-});
-
-const useMarkRange = window.Vue.ref<boolean>(false);
-const capabilityMarkType = window.Vue.ref<number>(MARK_TYPE_VALUE_NONE);
-
-/**
- * Keep the "Use mark range" checkbox in sync with the ref
- */
-function onUseMarkRangeChange(this: HTMLInputElement): void {
-    useMarkRange.value = this.checked;
-}
-
-/**
- * Keep the capability mark type input (which is outside of vue's scope) in sync with the ref
- * TODO: ideally this would be fully handled in vue, but markType.twig is currently rendered via twig & jquery
- */
-function onCapabilityMarkTypeChange(this: HTMLSelectElement): void {
-    capabilityMarkType.value = parseInt(this.value, 10);
-}
-
-window.Vue.onMounted(() => {
-    // TODO: ideally deal with this fully inside of vue instead
-    const useMarkRangeInput = document.getElementById("useMarkRange");
-    if (!(useMarkRangeInput instanceof HTMLInputElement)) {
-        console.warn("Unable to find 'Use mark range' input");
-        return;
-    }
-
-    onUseMarkRangeChange.call(useMarkRangeInput);
-    useMarkRangeInput.addEventListener("change", onUseMarkRangeChange);
-
-    // TODO: ideally deal with this fully inside of vue instead
-    const markTypeInput = document.getElementById("capability-markType");
-    if (!(markTypeInput instanceof HTMLSelectElement)) {
-        console.warn("Unable to find capability mark type input");
-        return;
-    }
-
-    onCapabilityMarkTypeChange.call(markTypeInput);
-    markTypeInput.addEventListener("change", onCapabilityMarkTypeChange);
-});
-
-window.Vue.onUnmounted(() => {
-    // clean up
-    const useMarkRangeInput = document.getElementById("useMarkRange");
-    useMarkRangeInput?.removeEventListener("change", onUseMarkRangeChange);
-
-    const markTypeInput = document.getElementById("capability-markType");
-    markTypeInput?.removeEventListener("change", onCapabilityMarkTypeChange);
-});
-
-/**
- * Calculates the assessment's max available marks from the rubric grid
- * based on the max value for each capability, instead of the max descriptor value for each indicator.
- */
-const rubricSum = window.Vue.computed(() => {
-    let sum = 0;
-    for (const capability of rubricGrid.value.capabilities) {
-        if (capability.maxValue !== null) {
-            sum += capability.maxValue;
-        }
-    }
-    return parseFloat(sum.toFixed(2));
-});
-
-/**
- * Assuming the assessment uses the "Total Mark" mark type (should always update even if not as the mark type could change),
- * Keep the max mark input in sync with the rubric grid's max value
- */
-window.Vue.watch(rubricSum, (newValue) => {
-    // TODO: note this has consequences for multiple rubrics later on, it'll need to change slightly
-
-    // TODO: ideally deal with this fully inside of vue instead
-    const maxMarkInput = document.getElementById("maxMark");
-    if (maxMarkInput instanceof HTMLInputElement) {
-        maxMarkInput.value = newValue.toString();
-    }
-
-    const instructorMaxMarkInput = document.getElementById("instructor-maxMark");
-    if (instructorMaxMarkInput instanceof HTMLInputElement) {
-        instructorMaxMarkInput.value = newValue.toString();
-    }
-});
-
-/**
- * Listen for a rubric grid import event
- * TODO: this logic will need to change for multiple rubrics
- */
-document.addEventListener(RUBRIC_GRID_IMPORTED, (event) => {
-    rubricGrid.value = event.detail.rubricGrid;
 });
 
 // TODO:
@@ -371,12 +277,6 @@ document.addEventListener(RUBRIC_GRID_APPLY_RESULT_SET, (event) => {
 </script>
 
 <template>
-    <input
-        type="hidden"
-        :name="`rubric[${rubricGrid.id}]`"
-        :value="JSON.stringify(translateGridToFormPayload(rubricGrid))"
-    />
-
     <h3 class="subheader show-for-medium-down">Levels</h3>
     <div class="scrollable">
         <table class="rb stack-for-medium-down">
@@ -413,13 +313,13 @@ document.addEventListener(RUBRIC_GRID_APPLY_RESULT_SET, (event) => {
                     v-model:name="capability.name"
                     v-model:indicators="capability.indicators"
                     v-model:max-value="capability.maxValue"
-                    :total-columns="totalColumns"
-                    :levels="rubricGrid.levels"
-                    :max-levels="props.maxLevels"
                     :capability="capability"
-                    :capability-mark-type="capabilityMarkType"
-                    :use-mark-range="useMarkRange"
+                    :levels="rubricGrid.levels"
+                    :total-columns="totalColumns"
                     :is-creating="isCreating"
+                    :max-levels="props.maxLevels"
+                    :capability-mark-type="props.capabilityMarkType"
+                    :use-mark-range="props.useMarkRange"
                     :can-move-prev="index > 0"
                     :can-move-next="index < rubricGrid.capabilities.length - 1"
                     @move="(dir) => shiftArrayItem(rubricGrid.capabilities, index, dir)"

@@ -19,13 +19,13 @@ import { MAX_CAPABILITY_LENGTH, MAX_INDICATOR_LENGTH } from "./types";
 import type { RubricGridCapability, RubricGridLevel } from "./types";
 
 interface Props {
-    totalColumns: number;
     capability: RubricGridCapability;
+    levels: RubricGridLevel[];
+    totalColumns: number;
+    isCreating: boolean;
+    maxLevels: number;
     capabilityMarkType: number;
     useMarkRange: boolean;
-    levels: RubricGridLevel[];
-    maxLevels: number;
-    isCreating: boolean;
     canMovePrev: boolean;
     canMoveNext: boolean;
 }
