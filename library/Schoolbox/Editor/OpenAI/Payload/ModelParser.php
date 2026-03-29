@@ -116,10 +116,13 @@ class ModelParser
         }
 
         // GPT-4o and 4.1 family models:
-        // * don't support reasoning
+        // * don't support reasoning, and always support sampling params
+        //   (top_p, temperature)
         // * only support medium verbosity
+        $retainSamplingParams = false;
         if (in_array($version, ['4o', '4.1'])) {
             unset($payload['reasoning']);
+            $retainSamplingParams = true;
             if (isset($payload['text']['verbosity'])) {
                 $payload['text']['verbosity'] = 'medium';
             }
@@ -152,12 +155,12 @@ class ModelParser
             }
         }
 
-        // Set reasoning effort, and clear temperature and top_p if any effort
-        // other than null was set
+        // Set reasoning effort, and clear sampling params temperature and top_p
+        // if using a GPT-4 model, or any effort other than none was set
         if (isset($reasoningEffort)) {
             $payload['reasoning']['effort'] = $reasoningEffort;
         }
-        if ($reasoningEffort !== 'none') {
+        if (!($retainSamplingParams || $reasoningEffort === 'none')) {
             unset($payload['temperature'], $payload['top_p']);
         }
 
