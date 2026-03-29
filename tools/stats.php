@@ -473,7 +473,7 @@ $app = new class extends CliTool\App {
         }
         $queryList['openai_image_model_unknown'] = [
             sprintf(
-                "SELECT COUNT(*) FROM openai_log WHERE feature = 'image' AND JSON_VALUE(prompt, '$.tools[0].model') NOT IN (%s)",
+                "SELECT COUNT(*) FROM openai_log WHERE feature = 'image' AND COALESCE(JSON_VALUE(prompt, '$.tools[0].model'), '') NOT IN (%s)",
                 implode(',', array_fill(0, count(OpenAiConfig::AI_IMAGE_MODELS), '?')),
             ),
             OpenAiConfig::AI_IMAGE_MODELS,
