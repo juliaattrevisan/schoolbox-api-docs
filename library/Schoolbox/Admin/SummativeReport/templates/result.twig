@@ -70,7 +70,7 @@
         transform-box: fill-box;
         transform-origin: center;
     }
-    
+
     @keyframes waves {
         0% {
             transform: translateX(0);
@@ -188,7 +188,7 @@
         {% else %}
         <div class="small-12 island">
             <section class="content">
-                <div class="wait-content">
+                <div class="wait-content" data-test="report-generation-in-progress">
                     <h1>We're compiling your reports now</h1>
                     <div class="svg-container">
                         <svg width="390" height="288" viewBox="0 0 390 288" preserveAspectRatio="xMidYMin" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -487,7 +487,7 @@
                     </div>
                 </div><!-- .wait-content -->
                 <div class="report-count">
-                    <h3>We are currently working on collating your student reports for {{ reportCount }} student{{ reportCount > 1 ? 's' : '' }} into a zip file.
+                    <h3 data-test="report-generation-in-progress-students-count">We are currently working on collating your student reports for {{ reportCount }} student{{ reportCount > 1 ? 's' : '' }} into a zip file.
                        {# (number of reports * 5 seconds for each report) / 60 seconds for minutes, then round up to the closest minute - #}
                        {% set minutes = ((reportCount * 5) /60) |round (0, 'ceil') %}
                        We expect this to take approximately {{ ((reportCount * 5) /60) |round (0, 'ceil') }} minute{{ minutes > 1 ? 's' : '' }}.

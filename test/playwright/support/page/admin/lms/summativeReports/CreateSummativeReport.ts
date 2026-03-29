@@ -16,6 +16,22 @@ export default class CreateSummativeReport {
 
     static readonly CLASS_TOGGLE = `label[for="report-include-class"]`;
 
+    static readonly DATA_TEST_SUMMARY_HEADING = "report-summary-heading";
+
+    static readonly SUMMARY_OVERALL_GRADE = `label[for="report-summary-show-overall-grade"]`;
+
+    static readonly DATA_TEST_SUMMARY_WORK_TYPE_CHECKBOX = `report-summary-worktype-{workType}-{option}`;
+
+    static readonly SUMMARY_CLASS_CODE = `label[for="report-summary-show-class-code"]`;
+
+    static readonly CLASS_OVERALL_GRADE = `label[for="report-class-show-overall-grade"]`;
+
+    static readonly CLASS_PAGE_CLASS_CODE = `label[for="report-class-show-class-code"]`;
+
+    static readonly CLASS_PAGE_SUBJECT_OVERVIEW = `label[for="report-class-show-subject-overview"]`;
+
+    static readonly DATA_TEST_CLASS_WORK_TYPE_CHECKBOX = `report-class-worktype-{workType}-{option}`;
+
     static readonly ENABLE_SUMMARY_CURRICULUM_PROGRESSION = `label[for="report-summary-enable-vic-progression"]`;
 
     static readonly SUMMARY_CURRICULUM_PROGRESSION_TITLE = "input#report-summary-vic-progression-title";
@@ -117,28 +133,106 @@ export default class CreateSummativeReport {
      * toggle the summary inclusion
      */
     async toggleSummaryInclusion(): Promise<void> {
-        await this.page.click(CreateSummativeReport.SUMMARY_TOGGLE);
+        await this.page.locator(CreateSummativeReport.SUMMARY_TOGGLE).click();
     }
 
     /**
      * toggle the class inclusion
      */
     async toggleClassInclusion(): Promise<void> {
-        await this.page.click(CreateSummativeReport.CLASS_TOGGLE);
+        await this.page.locator(CreateSummativeReport.CLASS_TOGGLE).click();
+    }
+
+    /**
+     * fill in the summary heading field
+     * @param heading - The heading to fill in
+     */
+    async fillSummaryHeadingField(heading: string): Promise<void> {
+        await this.page.locator(`[data-test="${CreateSummativeReport.DATA_TEST_SUMMARY_HEADING}"]`).fill(heading);
+    }
+
+    /**
+     * click the show overall grade and/or class code checkbox in the summary section
+     * @param showOverallGrade - set true to click the show overall grade checkbox
+     * @param showClassCode - set true to click the show class code checkbox
+     */
+    async tickSummaryOverallGradeClassCodeCheckboxes(showOverallGrade: boolean, showClassCode: boolean): Promise<void> {
+        if (showOverallGrade) {
+            await this.page.locator(CreateSummativeReport.SUMMARY_OVERALL_GRADE).click();
+        }
+        if (showClassCode) {
+            await this.page.locator(CreateSummativeReport.SUMMARY_CLASS_CODE).click();
+        }
+    }
+
+    /**
+     * click the show overall grade and/or class code checkbox in the class page section
+     * @param showOverallGrade - set true to click the show overall grade checkbox
+     * @param showClassCode - set true to click the show class code checkbox
+     */
+    async tickClassOverallGradeClassCodeCheckboxes(showOverallGrade: boolean, showClassCode: boolean): Promise<void> {
+        if (showOverallGrade) {
+            await this.page.locator(CreateSummativeReport.CLASS_OVERALL_GRADE).click();
+        }
+        if (showClassCode) {
+            await this.page.locator(CreateSummativeReport.CLASS_PAGE_CLASS_CODE).click();
+        }
+    }
+
+    /**
+     * click the show subject overview checkbox in the class page section and type in the title field
+     * @param showSubjectOverview - set true to click the show subject overview checkbox
+     * @param subjectOverviewTitle - fill in the subject overview title
+     */
+    async typeSubjectOverview(showSubjectOverview: boolean, subjectOverviewTitle: string): Promise<void> {
+        if (showSubjectOverview) {
+            await this.page.locator(CreateSummativeReport.CLASS_PAGE_SUBJECT_OVERVIEW).click();
+            await this.page.locator("#report-class-search-subject-overview").fill(subjectOverviewTitle);
+        }
+    }
+
+    /**
+     * click the checkboxes for a work type in the summary section according to the options provided without using tickWorkTypeCheckbox method
+     * @param workType - the work type to click: assessment, learningTask or behaviour
+     * @param options - the options to click: showGrade, showComment, showRubric or showDistributionGraph
+     */
+    async tickSummaryWorkTypeCheckboxes(workType: string, options: string[]): Promise<void> {
+        for (const option of options) {
+            const checkboxSelector = CreateSummativeReport.DATA_TEST_SUMMARY_WORK_TYPE_CHECKBOX.replace(
+                "{workType}",
+                workType,
+            ).replace("{option}", option);
+            await this.page.getByTestId(checkboxSelector).click();
+        }
+    }
+
+    /**
+     * click the checkboxes for a work type in the class section according to the options provided without using tickWorkTypeCheckbox method
+     * @param workType - the work type to click: assessment, learningTask or behaviour
+     * @param options - the options to click: showGrade, showComment, showRubric or showDistributionGraph
+     */
+    async tickClassWorkTypeCheckboxes(workType: string, options: string[]): Promise<void> {
+        for (const option of options) {
+            const checkboxSelector = CreateSummativeReport.DATA_TEST_CLASS_WORK_TYPE_CHECKBOX.replace(
+                "{workType}",
+                workType,
+            ).replace("{option}", option);
+            await this.page.getByTestId(checkboxSelector).click();
+        }
     }
 
     /**
      * toggle the summary curriculum progression checkbox
      */
     async toggleSummaryCurriculumProgression(): Promise<void> {
-        await this.page.click(CreateSummativeReport.ENABLE_SUMMARY_CURRICULUM_PROGRESSION);
+        await this.page.locator(CreateSummativeReport.ENABLE_SUMMARY_CURRICULUM_PROGRESSION).click();
     }
 
     /**
      * toggle the class curriculum progression
      */
     async toggleClassCurriculumProgression(): Promise<void> {
-        await this.page.click(CreateSummativeReport.ENABLE_CLASS_CURRICULUM_PROGRESSION);
+        await this.page.locator(CreateSummativeReport.ENABLE_CLASS_CURRICULUM_PROGRESSION).click();
     }
 
     /**
@@ -146,7 +240,7 @@ export default class CreateSummativeReport {
      * @param title - The title to fill in
      */
     async fillSummaryCurriculumProgressionTitle(title: string): Promise<void> {
-        await this.page.fill(CreateSummativeReport.SUMMARY_CURRICULUM_PROGRESSION_TITLE, title);
+        await this.page.locator(CreateSummativeReport.SUMMARY_CURRICULUM_PROGRESSION_TITLE).fill(title);
     }
 
     /**
@@ -154,7 +248,7 @@ export default class CreateSummativeReport {
      * @param title - The title to fill in
      */
     async fillClassCurriculumProgressionTitle(title: string): Promise<void> {
-        await this.page.fill(CreateSummativeReport.CLASS_CURRICULUM_PROGRESSION_TITLE, title);
+        await this.page.locator(CreateSummativeReport.CLASS_CURRICULUM_PROGRESSION_TITLE).fill(title);
     }
 
     /**

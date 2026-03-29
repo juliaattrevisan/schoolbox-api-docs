@@ -540,7 +540,7 @@
     {% if showSummary %}
     <div class="summary summative-content">
         {% if summaryHeading|length %}
-            <h3>{{ summaryHeading }}</h3>
+            <h3 data-test="summative-preview-summary-heading">{{ summaryHeading }}</h3>
         {% endif %}
 
         {% for folder in folders %}
@@ -554,9 +554,9 @@
                     <div class="left">
                         {% block summaryFolderTitle %}
                             {% if summaryOptions.classCode is not defined or summaryOptions.classCode %}
-                                <h4>{{ folder.title }}</h4>
+                                <h4  data-test="summative-preview-summary-folder-title-{{ folder.title }}">{{ folder.title }}</h4>
                             {% else %}
-                                <h4>{{ folder.name }}</h4>
+                                <h4  data-test="summative-preview-summary-folder-title-{{ folder.name }}">{{ folder.name }}</h4>
                             {% endif %}
                         {% endblock %}
                     </div>
