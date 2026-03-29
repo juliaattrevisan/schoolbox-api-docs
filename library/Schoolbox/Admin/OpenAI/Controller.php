@@ -29,7 +29,7 @@ class Controller extends ConfigController
         $textVerbosityModelOptions   = [];
         foreach (array_keys($features) as $feature) {
             $reasoningEffortModelOptions[$feature] = $config->buildReasoningEffortModelOptions($feature);
-            $textVerbosityModelOptions[$feature]   = $config->buildTextVerbosityModelOptions($feature);
+            $textVerbosityModelOptions[$feature]   = Config::TEXT_VERBOSITY_MODEL_OPTIONS;
         }
 
         $this->response = $this->responseFromTemplate('@adminOpenAi/index.twig', [

@@ -214,10 +214,10 @@ class Config
     ];
 
     public const array TEXT_VERBOSITY_MODEL_OPTIONS = [
-        "gpt-4o"              => self::TEXT_VERBOSITY_OPTIONS,
-        "gpt-4o-mini"         => self::TEXT_VERBOSITY_OPTIONS,
-        "gpt-4.1"             => self::TEXT_VERBOSITY_OPTIONS,
-        "gpt-4.1-mini"        => self::TEXT_VERBOSITY_OPTIONS,
+        "gpt-4o"              => self::TEXT_VERBOSITY_OPTIONS_GPT4,
+        "gpt-4o-mini"         => self::TEXT_VERBOSITY_OPTIONS_GPT4,
+        "gpt-4.1"             => self::TEXT_VERBOSITY_OPTIONS_GPT4,
+        "gpt-4.1-mini"        => self::TEXT_VERBOSITY_OPTIONS_GPT4,
         "gpt-5"               => self::TEXT_VERBOSITY_OPTIONS,
         "gpt-5-mini"          => self::TEXT_VERBOSITY_OPTIONS,
         "gpt-5-nano"          => self::TEXT_VERBOSITY_OPTIONS,
@@ -658,28 +658,6 @@ class Config
         $options = self::REASONING_EFFORT_MODEL_OPTIONS;
         if ($feature === Helper::FEATURE_IMAGE) {
             $options = array_map(fn ($effortLevels) => array_values(array_diff($effortLevels, ['minimal'])), $options);
-        }
-        return $options;
-    }
-
-    /**
-     * Build available verbosity effort levels for this feature.
-     *
-     * This ensures that only the `medium` level is available for chat for
-     * GPT-4 models.
-     *
-     * @param string $feature
-     * @return array|array[]
-     */
-    public function buildTextVerbosityModelOptions(string $feature): array
-    {
-        $options = self::TEXT_VERBOSITY_MODEL_OPTIONS;
-        if ($feature === Helper::FEATURE_CHAT) {
-            foreach ($options as $key => $value) {
-                if (in_array($key, self::AI_MODELS_GPT4)) {
-                    $options[$key] = self::TEXT_VERBOSITY_OPTIONS_GPT4;
-                }
-            }
         }
         return $options;
     }
