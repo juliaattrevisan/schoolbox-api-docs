@@ -70,6 +70,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementatio
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Assessment\Rubric\Grid\Translator\ModelToArray as RubricGridTranslator;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Editor\OpenAI\Helper as OpenAIHelper;
 
@@ -616,7 +617,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
              * and only apply it when the rubric is being used in the original assessment
              */
             if ($assessment instanceof DueWork\Model && $assessment->getUseRubric()) {
-                $data['rubricGrid'] = $this->rubricDataSource->retrieveGrid($assessment, true, true);
+                $rubricGrid = $this->rubricDataSource->retrieveGrid($assessment, true, true);
+
+                $rubricGridTranslator = new RubricGridTranslator();
+                $$data['rubricGrid'] = $rubricGrid;
+                $data['rubricGridPayload'] = $rubricGridTranslator($rubricGrid);
             }
         }
 
