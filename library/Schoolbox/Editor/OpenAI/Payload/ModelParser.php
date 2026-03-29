@@ -162,7 +162,7 @@ class ModelParser
         }
 
         // GPT 5.2 and 5.4 pro variants supports no reasoning levels other than:
-        // `medium`, `high`, `x-high`
+        // `medium`, `high`, `xhigh`
         if (
             in_array($version, ['5.2', '5.4'])
             && isset($payload['reasoning']['effort'])
