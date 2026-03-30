@@ -176,10 +176,7 @@ class Model implements ISoftDeletable, Sequential
      */
     public function isStaffOrInstructorVisibleOnly(): bool
     {
-        if (null === $this->staffOrInstructorVisibleOnly) {
-            throw new InsufficientHydrationException('Cannot determine visibility from NULL property');
-        }
-        return $this->staffOrInstructorVisibleOnly;
+        return !$this->isVisibleToParents && !$this->isVisibleToStudents;
     }
 
 
@@ -188,7 +185,7 @@ class Model implements ISoftDeletable, Sequential
      */
     public function getStaffOrInstructorVisibleOnly(): ?bool
     {
-        return $this->staffOrInstructorVisibleOnly;
+        return $this->isStaffOrInstructorVisibleOnly();
     }
 
 
@@ -198,8 +195,26 @@ class Model implements ISoftDeletable, Sequential
      */
     public function setStaffOrInstructorVisibleOnly(bool $staffOrInstructorVisibleOnly): self
     {
-        $this->staffOrInstructorVisibleOnly = $staffOrInstructorVisibleOnly;
+        if ($staffOrInstructorVisibleOnly) {
+            $this->isVisibleToParents = false;
+            $this->isVisibleToStudents = false;
+        } else {
+            $this->isVisibleToParents = true;
+            $this->isVisibleToStudents = true;
+        }
         return $this;
+    }
+
+    /**
+     * Human friendly getter
+     * @return bool
+     */
+    public function isVisibleToParents(): bool
+    {
+        if (null === $this->isVisibleToParents) {
+            throw new InsufficientHydrationException('Cannot determine visibility from NULL property');
+        }
+        return $this->isVisibleToParents;
     }
 
     /**
@@ -218,6 +233,18 @@ class Model implements ISoftDeletable, Sequential
     {
         $this->isVisibleToParents = $isVisibleToParents;
         return $this;
+    }
+
+    /**
+     * Human friendly getter
+     * @return bool
+     */
+    public function isVisibleToStudents(): bool
+    {
+        if (null === $this->isVisibleToStudents) {
+            throw new InsufficientHydrationException('Cannot determine visibility from NULL property');
+        }
+        return $this->isVisibleToStudents;
     }
 
     /**
