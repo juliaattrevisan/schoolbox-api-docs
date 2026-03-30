@@ -25,11 +25,11 @@ It is deployed internally and not shipped in client packages.
 
 ## Tech Stack
 
-| Layer | Technologies |
-|-------|-------------|
-| Backend | PHP 8.4, Aura (DI/Router/Session), Symfony (HttpFoundation/Cache/Mailer/Lock), Guzzle, Twig, Flysystem, PDO (MySQL), Predis (Redis) |
-| Frontend | Vue 3, TypeScript, Rspack, SCSS, CKEditor |
-| Integrations | OAuth2, LTI 1.3, Firebase, Canvas API, SAML, WebDAV (Sabre), IMAP, Gotenberg |
+| Layer        | Technologies                                                                                                                        |
+|--------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| Backend      | PHP 8.4, Aura (DI/Router/Session), Symfony (HttpFoundation/Cache/Mailer/Lock), Guzzle, Twig, Flysystem, PDO (MySQL), Predis (Redis) |
+| Frontend     | Vue 3, TypeScript, Rspack, SCSS, CKEditor                                                                                           |
+| Integrations | OAuth2, LTI 1.3, Firebase, Canvas API, SAML, WebDAV (Sabre), IMAP, Gotenberg                                                        |
 
 ---
 
@@ -94,6 +94,15 @@ npm test                # Jest unit tests
 npm run watch-test      # Jest watch mode
 ```
 
+In order to ensure frontend code quality, these commands should be run with the list of files which have changed:
+```bash
+npm run build                  # verify that frontend code still compiles after files have changed
+npx eslint [FILE]...           # verify file still passes ESLint
+npx prettier --check [FILE]... # verify that file still meets auto-format standards
+npx prettier --write [FILE]... # auto-format file
+npm test                       # verify all unit tests still pass, not just those changed
+```
+
 ### Backend
 
 These commands should be run within the Docker environment's CLI:
@@ -106,6 +115,14 @@ docker/ssh
 ./vendor/bin/phpcbf     # auto-fix style issues
 ./vendor/bin/phpstan    # static analysis (level 4)
 ./vendor/bin/phpunit    # unit tests
+```
+
+In order to ensure backend code quality, these commands should be run with the list of files which have changed:
+```bash
+./vendor/bin/phpcs [FILE]...           # verify that one or more files meet PSR-12
+./vendor/bin/phpcbf [FILE]...          # auto-fix style issues in these files
+./vendor/bin/phpstan analyze [FILE]... # ensure that files pass static analysis
+./vendor/bin/phpunit                   # verify all unit tests still pass, not just those changed
 ```
 
 ---
@@ -125,10 +142,15 @@ Run the relevant suite(s) for changed code before marking work done.
 
 ## Code Standards
 
+When writing or reviewing code, take reasonable steps to ensure that these standards are met: if they are not, then a justification is required of why they cannot be met.
+
+For example: if written code contains a performance issue which cannot be addressed without significant architectural change, then this should be mentioned.
+
 ### PHP
 
 - Style: PSR-12 enforced via PHPCS (`phpcs.xml`)
 - Static analysis: PHPStan level 4 (`phpstan.neon`, `phpstan-baseline.neon`)
+- Covered by PHPUnit tests, and designed in a manner which allows individual methods/functions/classes to be tested in isolation
 
 ### JS / TS / Vue
 
@@ -136,6 +158,65 @@ Run the relevant suite(s) for changed code before marking work done.
 - Formatting: Prettier
 - Zero ESLint warnings allowed (`--max-warnings 0`)
 - No TypeScript `any` without explicit justification
+
+### Quality
+
+- When writing code, prioritise these attributes in order:
+  - simplicity: simpler code is easier to understand for developers and agents, and easier to maintain and refactor
+  - correctness: once common cases are correctly handled in a simple manner, edge cases can be addressed
+  - performance: once code is simple and correct, it can be optimised
+- Ensure that code written does not introduce security issues, for example:
+  - insufficient access control
+  - vulnerable dependencies
+  - injection of untrusted input (SQL injection, XSS)
+  - privacy concerns (leakage or unnecessary storage of PII)
+  - hard-coded API keys or other tokens
+  - other risks as defined in OWASP
+
+---
+
+## Version Numbering
+
+Schoolbox version numbers are numbered thus:
+```
+{yearOfMajorVersion}.{majorVersionNumberForYear}.{patchVersion}
+```
+
+where:
+- `{yearOfMajorVersion}` is the year in which this major version was or will be released:
+  - this does not always match the current year, as this major version could've been released in a previous year
+- `{majorVersionNumberForYear}` is the numbered major version for `{yearOfMajorVersion}`, starting from 0
+- `{patchVersion}` is the patch number for `{yearOfMajorVersion}.{majorVersionNumberForYear}`:
+  - for generally available releases, this is a number starting from 0
+  - for preview versions deployed to staging instances only, this is `beta{version}`, `{version}` starting from 1
+  - for pre-release versions, this is `alpha{version}`, `{version}` starting from 1
+
+### Examples
+
+- `26.0.1` is the 2nd patch for the 1st major version released in 2026
+  - remember, major and patch version counts start from 0
+- `25.1.0` is the 1st patch for the 2nd major version released in 2025
+- `26.1.alpha1` is the 1st pre-release alpha for the 2nd major version released in 2026
+  - remember, alpha and beta version counts start from 1
+- `26.1.beta2` is the 2nd preview version for the 2nd major version released in 2026
+
+---
+
+## Database Schema changes
+
+Schema change scripts belong in `updates/{versionNumber}`.
+
+`versionNumber` will match the next version number to be released, as per Version Numbering above:
+- for code in both `master` and `develop`, this will be a generally available release version such as `26.0.1`
+- for code in `develop` only, this will be a pre-release or preview version, such as `26.1.alpha1` or `26.1.beta2`
+
+The exact version number will be determined as part of the release process - confirm with the team if unsure.
+
+Within the `updates/{versionNumber}` folder, the update script itself:
+- should (but does not need to) belong in a sub-folder
+- must be a `.php` or `.sql` file: `.php` will be executed, `.sql` will be run against the Schoolbox instance's database
+
+Update scripts will be run in alpha-numeric order: thus, if a script needs to run before another it may be given a numeric prefix. For example, `00-prepare.sql` will run before `01-execute.sql`.
 
 ---
 
@@ -148,20 +229,6 @@ Run the relevant suite(s) for changed code before marking work done.
   - when a new major version is created:
     - a branch referencing the old major version is created from `master`
     - the old `master` branch is replaced with a new `master` branch created from `develop`
-
-### Version naming
-
-Schoolbox version numbers are numbered thus:
-```
-{yearOfMajorVersion}.{majorVersionNumberForYear}.{patchVersion}
-```
-
-#### Examples
-
-- `26.0.1` is the 2nd patch for the 1st major version released in 2026 (counting starts from 0)
-- `25.1.0` is the 1st patch for the 2nd major version released in 2025
-
-Note that `{yearOfMajorVersion}` does not always match the current year: the major version could've been released in a previous year.
 
 ### Branch naming
 
