@@ -16,14 +16,14 @@ import type { RubricGrid } from "./types";
 import RubricGridEditable from "./rubric-grid-editable.vue";
 
 interface Props {
-    rubricGridPayload: RubricGrid;
+    rubricGridsPayload: RubricGrid[];
     maxLevels: number;
     folderId: number;
     routeRubricCreate: string;
 }
 const props = defineProps<Props>();
 
-const rubricGrid = window.Vue.ref(cloneDeep(props.rubricGridPayload)); // local mutable copy
+const rubricGrids = window.Vue.ref(cloneDeep(props.rubricGridsPayload)); // local mutable copy
 
 const useMarkRange = window.Vue.ref<boolean>(false);
 const capabilityMarkType = window.Vue.ref<number>(MARK_TYPE_VALUE_NONE);
@@ -75,25 +75,34 @@ window.Vue.onUnmounted(() => {
 });
 
 /**
- * Calculates the assessment's max available marks from the rubric grid
+ * Calculates the assessment's max available marks from the rubric grid(s)
  * based on the max value for each capability, instead of the max descriptor value for each indicator.
  */
-const rubricSum = window.Vue.computed(() => {
-    let sum = 0;
-    for (const capability of rubricGrid.value.capabilities) {
-        if (capability.maxValue !== null) {
-            sum += capability.maxValue;
+const allRubricsSum = window.Vue.computed(() => {
+    let totalSum = 0;
+    for (const rubric of rubricGrids.value) {
+        let rubricSum = 0;
+        for (const capability of rubric.capabilities) {
+            if (capability.maxValue !== null) {
+                rubricSum += capability.maxValue;
+            }
         }
+
+        // TODO: weights
+        totalSum += parseFloat(rubricSum.toFixed(2));
     }
-    return parseFloat(sum.toFixed(2));
+
+    return totalSum;
 });
 
 /**
  * Assuming the assessment uses the "Total Mark" mark type (should always update even if not as the mark type could change),
  * Keep the max mark input in sync with the rubric grid's max value
  */
-window.Vue.watch(rubricSum, (newValue) => {
-    // TODO: note this has consequences for multiple rubrics later on, it'll need to change slightly
+window.Vue.watch(allRubricsSum, (newValue) => {
+    if (rubricGrids.value.length === 0) {
+        return; // if there are no rubrics, we shouldn't override the max mark field
+    }
 
     // TODO: ideally deal with this fully inside of vue instead
     const maxMarkInput = document.getElementById("maxMark");
@@ -112,24 +121,29 @@ window.Vue.watch(rubricSum, (newValue) => {
  * TODO: this logic will need to change for multiple rubrics
  */
 document.addEventListener(RUBRIC_GRID_IMPORTED, (event) => {
-    rubricGrid.value = event.detail.rubricGrid;
+    // TODO: for now this will just add a new rubric
+    rubricGrids.value.push(event.detail.rubricGrid);
 });
 </script>
 
 <template>
-    <rubric-grid-editable
-        v-model:rubric-grid="rubricGrid"
-        :folder-id="props.folderId"
-        :max-levels="props.maxLevels"
-        :capability-mark-type="capabilityMarkType"
-        :use-mark-range="useMarkRange"
-        :route-rubric-create="props.routeRubricCreate"
-    />
+    <template v-for="rubric in rubricGrids" :key="rubric.id">
+        <rubric-grid-editable
+            v-model:rubric-grid-levels="rubric.levels"
+            v-model:rubric-grid-capabilities="rubric.capabilities"
+            :rubric-id="rubric.id"
+            :folder-id="props.folderId"
+            :max-levels="props.maxLevels"
+            :capability-mark-type="capabilityMarkType"
+            :use-mark-range="useMarkRange"
+            :route-rubric-create="props.routeRubricCreate"
+        />
 
-    <!-- hidden input to submit the rubric grid as JSON -->
-    <input
-        type="hidden"
-        :name="`rubric[${rubricGrid.id}]`"
-        :value="JSON.stringify(translateGridToFormPayload(rubricGrid))"
-    />
+        <!-- hidden input to submit the rubric grid as JSON -->
+        <input
+            type="hidden"
+            :name="`rubric[${rubric.id}]`"
+            :value="JSON.stringify(translateGridToFormPayload(rubric))"
+        />
+    </template>
 </template>

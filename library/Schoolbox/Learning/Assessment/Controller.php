@@ -619,9 +619,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
             if ($assessment instanceof DueWork\Model && $assessment->getUseRubric()) {
                 $rubricGrid = $this->rubricDataSource->retrieveGrid($assessment, true, true);
 
+                /**
+                 * list of all rubric grids for this assessment
+                 * @see also in /library/Schoolbox/Learning/Assessment/DueWork/Controller.php::generateRubricTwigData
+                 */
+
+                // TODO: for now, just one grid support, in the format of multiple
                 $rubricGridTranslator = new RubricGridTranslator();
-                $$data['rubricGrid'] = $rubricGrid;
-                $data['rubricGridPayload'] = $rubricGridTranslator($rubricGrid);
+                $data['rubricGrids'] = [$rubricGrid];
+                $data['rubricGridsPayload'] = [$rubricGridTranslator($rubricGrid)];
             }
         }
 

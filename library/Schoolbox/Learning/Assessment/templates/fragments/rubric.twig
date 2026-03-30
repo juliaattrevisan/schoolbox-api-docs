@@ -152,6 +152,7 @@
         <div class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}">
             <div class="small-12 columns no-pad">
                 {# TODO: deal with multiple readonly rubric grids #}
+                {% for rubricGrid in rubricGrids %}
                 {% include '@rubric/grid.twig' with {
                     rubricGrid: rubricGrid,
                     folderId: assessment.context.folder.id,
@@ -160,6 +161,7 @@
                     rubricMarkedGrid: false,
                     showDescriptorValue: true
                 } only %}
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -171,10 +173,11 @@
             </div>
             <div class="small-12 columns no-pad">
                 {% include '@rubric/grid-csv.twig' with {
-                    rubricGrid: rubricGrid,
-                    rubricGridPayload: rubricGridPayload,
+                    rubricGridsPayload: rubricGridsPayload,
+                    rubricBlankGrid: rubricBlankGrid,
                     attachzone: rubricAttachZone,
                     folderId: assessment.context.folder.id,
+                    allowCsvDownload: assessment.id ? true : false
                 } only %}
             </div>
         </div>

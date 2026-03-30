@@ -112,7 +112,7 @@
             });
         });
 
-        {% if rubricGrid.assessment.id %}
+        {% if allowCsvDownload %}
         $('#dl-csv').on('click', function (e) {
             e.preventDefault();
 
@@ -138,7 +138,8 @@
     <div data-hideable>
         <div id="rubric-builder-container">
             <rubric-builder
-                :rubric-grid-payload="{{ rubricGridPayload|json_encode }}"
+                :rubric-grids-payload="{{ rubricGridsPayload|json_encode }}"
+                :rubric-blank-grid="{{ rubricBlankGrid|json_encode }}"
                 :max-levels="{{ config.rubric_max_levels }}"
                 :folder-id="{{ folderId }}"
                 route-rubric-create="{{ routeLookup("rubric.create") }}"
@@ -148,7 +149,7 @@
         <div>
             {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
         </div>
-        {% if rubricGrid.assessment.id %}
+        {% if allowCsvDownload %}
         <a href="{{ routeLookup('rubric.download') }}" class="button sbx-button--has-icon" id="dl-csv"><sbx-icon name="download"></sbx-icon>Download Rubric as CSV</a>
         {% endif %}
     </div>
