@@ -21,11 +21,6 @@ class IFrame extends Base
      */
     public function test(): ?array
     {
-        // if gdrive /folder link, ignore the iframe and move onto the next strategy, otherwise it will break the preview of gdrive folders
-        if (stripos($this->getUrl(), 'drive.google.com') !== false && stripos($this->getUrl(), '/folders/') !== false) {
-            return $this->testNext();
-        }
-
         foreach ($this->getAllowedURLs() as $allowedURL) {
             if (false !== stripos($this->getUrl(), trim($allowedURL))) {
                 return [
