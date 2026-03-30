@@ -39,10 +39,22 @@ class Component extends Filter\BaseComponent
     {
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
         $roleType = $this->getUser()->getRole()->getType();
+        $isUserConfigurable = $this->getPageFilter()->getUserConfigurable();
 
         foreach ($this->workTypes as $workType) {
             $key = (string)$workType->getId();
-            $isSelected = $abstractOptions[$key]->getDefaults()[$roleType]->isSelected();
+
+            if (!$abstractOptions->offsetExists($key)) {
+                continue;
+            }
+
+            $option = $abstractOptions[$key];
+
+            if ($isUserConfigurable && !$option->getAvailable()) {
+                continue;
+            }
+
+            $isSelected = $option->getDefaults()[$roleType]->isSelected();
             $availableSelections[$key] = $this->createSelection($key, $isSelected);
         }
 
