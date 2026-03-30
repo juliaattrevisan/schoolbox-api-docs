@@ -40,6 +40,7 @@ class ResponseHelper
      * @param array  $nBookingsModifiedByStatusId - The number of bookings updated, indexed by bookingStatusId.
      * @param string $responseType
      * @param int    $nCreatedEvents - The number of events created.
+     * @throws \UnexpectedValueException
      * @return string
      */
     private function getCreateOrUpdateResponseMessage(
