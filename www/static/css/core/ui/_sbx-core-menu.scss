@@ -79,6 +79,7 @@ body.sbx-body {
         .profile-options,
         .profile-options-mobile {
             a {
+                color: var(--sbx-config-color-accent);
                 border-radius: var(--sbx-config-field-roundness);
                 &:hover {
                     background: var(--sbx-config-color-active);
@@ -141,20 +142,24 @@ body.sbx-body {
         }
     }
 
-    #side-menu,
-    #side-menu-mygroups,
-    #side-menu-mysubjects,
-    #side-menu-mylinks {
-        & h3 {
-            border-bottom: 1px solid var(--sbx-color-foreground-secondary);
-            color: var(--sbx-config-color-accent) !important;
-            padding-inline: 0.5rem;
-
-            & a {
-                color: var(--sbx-config-color-accent) !important;
-                border-radius: 0px !important;
-                background-color: transparent !important;
-                padding-inline: 0.5rem;
+    // Left menu styles
+    #left-menu {
+        h3 {
+            color: var(--sbx-color-text-primary);
+            text-transform: none;
+        }
+        a {
+            color: var(--sbx-config-color-accent);
+            border-radius: var(--sbx-config-field-roundness);
+        }
+        /* Ensure the Back link has the icon content and font-family */
+        .back {
+            a {
+                text-transform: none;
+                &:before {
+                    content: "\e655"; /* The icon character */
+                    font-family: "sbx-icons" !important; /* Forces the icon font */
+                }
             }
         }
     }
@@ -166,21 +171,6 @@ body.sbx-body {
             box-shadow: var(--sbx-shadow-m);
             left: 1rem;
             top: 1rem;
-        }
-
-        & .left-submenu {
-            width: 17.25rem;
-
-            & .back {
-                & a {
-                    height: auto !important;
-                    line-height: 4;
-                }
-            }
-        }
-
-        & nav:has(.off-canvas-list) {
-            padding: 0.5rem;
         }
     }
 

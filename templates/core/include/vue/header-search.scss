@@ -22,7 +22,7 @@
             opacity: 1;
         }
         .c-search-input__button {
-            background-color: var(--navigation-hover);
+            background-color: var(--sbx-config-color-menu-hover, var(--navigation-hover));
         }
         ::placeholder {
             color: black;
@@ -37,12 +37,12 @@
             transition: opacity 0.2s ease-out;
         }
         &__button {
-            background-color: var(--navigation-background);
+            background-color: var(--sbx-config-color-menu-primary, var(--navigation-background));
         }
     }
 
     &__results {
-        border: 2px solid var(--navigation-hover);
+        border: 2px solid var(--sbx-config-color-menu-hover, var(--navigation-hover));
         border-top: 0;
         h3 {
             margin: 0; // clear .tab-bar h3 margins

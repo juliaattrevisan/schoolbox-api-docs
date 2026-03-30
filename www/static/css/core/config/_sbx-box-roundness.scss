@@ -34,7 +34,8 @@ body.sbx-body {
     .swiper-horizontal,
     .scrollable.show-for-medium-up,
     .Schoolbox_Tile_Component_DashboardTileController .tileList .tile,
-    .row:has(> #filter_panel) {
+    .row:has(> #filter_panel),
+    .c-header-search__results {
         border-radius: var(--sbx-config-box-roundness);
     }
 
