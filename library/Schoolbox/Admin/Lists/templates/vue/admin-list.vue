@@ -199,6 +199,7 @@ export default {
 
                         <input
                             type="submit"
+                            data-test="admin-list-save-button"
                             @click.prevent="saveRows_onSaveSelected"
                             :value="saveRows_saveStatus"
                             :disabled="saveRows_isProcessing"

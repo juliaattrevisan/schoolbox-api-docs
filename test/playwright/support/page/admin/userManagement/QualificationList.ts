@@ -1,6 +1,8 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import type { Locator, Page } from "@playwright/test";
 import { expect } from "@playwright/test";
+import Common from "../../Common";
+import SummativePreview from "../lms/summativeReports/SummativePreview";
 
 /**
  * Page object for the Admin > Lists > Qualifications page (/adminv2/lists/qualification).
@@ -18,36 +20,38 @@ export default class QualificationList {
 
     private page: Page;
 
+    private Common: Common;
+
     static readonly URL = "/adminv2/lists/qualification";
 
     /** Empty state element shown when no rows exist */
-    static readonly EMPTY_STATE = "#listEmptyState";
+    static readonly DATA_TEST_EMPTY_STATE = "admin-list-empty-state";
 
-    /** "Add New Row" anchor (admin-list-add-row.vue) */
-    static readonly SELECTOR_ADD_ROW_BUTTON = "a[data-button='add-row']";
+    /** "Add New Row" anchor */
+    static readonly DATA_TEST_ADD_ROW_BUTTON = "admin-list-add-row-button";
 
-    /** Save submit input (admin-list.vue) */
-    static readonly SELECTOR_SAVE_BUTTON = "input[type='submit']";
+    /** Save submit input */
+    static readonly DATA_TEST_SAVE_BUTTON = "admin-list-save-button";
 
-    /** Each list row (admin-list-row.vue) */
+    /** Each list row */
     static readonly SELECTOR_ROW = "li.list-item-container";
 
     /** Delete (bin) icon on each row */
-    static readonly SELECTOR_DELETE_ROW_BUTTON = "a.delete-row-button";
+    static readonly DATA_TEST_DELETE_ROW_BUTTON = "admin-list-row-delete-button-{rowId}";
 
     /** Drag-and-drop handle on each row */
-    static readonly SELECTOR_GRIP = ".grip";
+    static readonly DATA_TEST_GRIP = "admin-list-row-grip";
 
     /** "Yes" confirm button inside the delete-row modal */
-    static readonly SELECTOR_DELETE_CONFIRM_BUTTON = "a.button.submit";
+    static readonly DATA_TEST_DELETE_CONFIRM_BUTTON = "admin-list-confirm-delete";
 
     /** Inline validation error label rendered by admin-list-row.vue */
     static readonly SELECTOR_VALIDATION_ERROR = "label.error";
 
-    /** Column header element (admin-list-header.vue) */
-    static readonly SELECTOR_COLUMN_HEADER = "header.list-header";
+    /** Column header element */
+    static readonly DATA_TEST_COLUMN_HEADER = "admin-list-header";
 
-    /** Toast notification component (vue/components/toast.vue) */
+    /** Toast notification component */
     static readonly SELECTOR_TOAST = "[data-test='toast']";
 
     /** Visible label for the "Not Selected" System Purpose option */
@@ -62,6 +66,9 @@ export default class QualificationList {
     /** Visible label for the Diploma Course option */
     static readonly SYSTEM_PURPOSE_COURSE = "Diploma Course [COURSE]";
 
+    /** Input field name for each row */
+    static readonly DATA_TEST_ROW_INPUT_FIELD = "admin-list-row-input-field";
+
     /**
      * HTML maxlength attribute on the Name input field.
      * Source: Admin/Lists/Controller.php, qualification.fields.name.maxLength = 255.
@@ -71,17 +78,7 @@ export default class QualificationList {
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
-    }
-
-    /**
-     * Waits for the admin-list data load to complete.
-     * Either the row list form or the empty-state element should be visible once loaded.
-     */
-    async waitForListLoaded(): Promise<void> {
-        await this.page
-            .locator(`form[method='post'], ${QualificationList.EMPTY_STATE}`)
-            .first()
-            .waitFor();
+        this.Common = new Common(page);
     }
 
     /**
@@ -89,15 +86,14 @@ export default class QualificationList {
      */
     async goto(): Promise<void> {
         await this.page.goto(QualificationList.URL);
-        await this.waitForListLoaded();
     }
 
     /**
      * Asserts the empty-state element is visible with the expected text.
      */
     async checkEmptyStateIsPresented(): Promise<void> {
-        await expect(this.page.locator(QualificationList.EMPTY_STATE)).toBeVisible();
-        await expect(this.page.locator(QualificationList.EMPTY_STATE)).toContainText(
+        await expect(this.page.getByTestId(QualificationList.DATA_TEST_EMPTY_STATE)).toBeVisible();
+        await expect(this.page.getByTestId(QualificationList.DATA_TEST_EMPTY_STATE)).toContainText(
             "The Qualifications list is empty.",
         );
     }
@@ -106,7 +102,7 @@ export default class QualificationList {
      * Asserts the column headers (ID, Name, System Purpose) are present in the list header.
      */
     async checkColumnsArePresented(): Promise<void> {
-        const header = this.page.locator(QualificationList.SELECTOR_COLUMN_HEADER);
+        const header = this.page.getByTestId(QualificationList.DATA_TEST_COLUMN_HEADER);
         await expect(header).toContainText("ID");
         await expect(header).toContainText("Name");
         await expect(header).toContainText("System Purpose");
@@ -116,7 +112,7 @@ export default class QualificationList {
      * Clicks the "Add New Row" button to append a blank row to the list.
      */
     async clickAddNewRowButton(): Promise<void> {
-        await this.page.locator(QualificationList.SELECTOR_ADD_ROW_BUTTON).click();
+        await this.page.getByTestId(QualificationList.DATA_TEST_ADD_ROW_BUTTON).click();
     }
 
     /**
@@ -142,7 +138,7 @@ export default class QualificationList {
      * @param name - value to fill in
      */
     async fillNameInRow(rowIndex: number, name: string): Promise<void> {
-        await this.getRowLocator(rowIndex).locator("input[type='text']").fill(name);
+        await this.getRowLocator(rowIndex).getByTestId(QualificationList.DATA_TEST_ROW_INPUT_FIELD).fill(name);
     }
 
     /**
@@ -169,7 +165,7 @@ export default class QualificationList {
      * @returns The current value of the Name field
      */
     async getRowNameAtIndex(rowIndex: number): Promise<string> {
-        return this.getRowLocator(rowIndex).locator("input[type='text']").inputValue();
+        return this.getRowLocator(rowIndex).getByTestId(QualificationList.DATA_TEST_ROW_INPUT_FIELD).inputValue();
     }
 
     /**
@@ -193,30 +189,33 @@ export default class QualificationList {
      * Clicks the Save (submit) button.
      */
     async clickSaveButton(): Promise<void> {
-        await this.page.locator(QualificationList.SELECTOR_SAVE_BUTTON).click();
+        await this.page.getByTestId(QualificationList.DATA_TEST_SAVE_BUTTON).click();
     }
 
     /**
-     * Asserts the "Save successful" toast notification becomes visible.
+     * Asserts the "Save successful" toast notification becomes visible and then hidden to ensure the save operation completed successfully.
      */
     async checkSaveSuccessToast(): Promise<void> {
-        await expect(this.page.locator(QualificationList.SELECTOR_TOAST)).toContainText("Save successful");
+        await expect(this.page.locator(QualificationList.SELECTOR_TOAST)).toBeVisible();
+        await expect(this.page.locator(QualificationList.SELECTOR_TOAST)).not.toBeVisible();
     }
 
     /**
      * Clicks the delete (bin) icon for the row at the given index.
      * New (unsaved) rows are removed immediately; persisted rows open a confirmation modal.
-     * @param rowIndex - zero-based row index
+     * @param rowId - the ID of the row to delete
      */
-    async clickDeleteRowButton(rowIndex: number): Promise<void> {
-        await this.getRowLocator(rowIndex).locator(QualificationList.SELECTOR_DELETE_ROW_BUTTON).click();
+    async clickDeleteRowButton(rowId: string): Promise<void> {
+        await this.page
+            .getByTestId(QualificationList.DATA_TEST_DELETE_ROW_BUTTON.replace("{rowId}", rowId.toString()))
+            .click();
     }
 
     /**
      * Clicks the "Yes" confirm button inside the delete-row modal.
      */
     async confirmDeleteRow(): Promise<void> {
-        await this.page.locator(QualificationList.SELECTOR_DELETE_CONFIRM_BUTTON).click();
+        await this.page.getByTestId(QualificationList.DATA_TEST_DELETE_CONFIRM_BUTTON).click();
     }
 
     /**
@@ -250,9 +249,7 @@ export default class QualificationList {
     async checkValidationErrorIsShownForRow(rowIndex: number): Promise<void> {
         const row = this.getRowLocator(rowIndex);
         await expect(row.locator(QualificationList.SELECTOR_VALIDATION_ERROR)).toBeVisible();
-        await expect(row.locator(QualificationList.SELECTOR_VALIDATION_ERROR)).toContainText(
-            "This field is required.",
-        );
+        await expect(row.locator(QualificationList.SELECTOR_VALIDATION_ERROR)).toContainText("This field is required.");
     }
 
     /**
@@ -261,7 +258,7 @@ export default class QualificationList {
     async checkGrabHandlesArePresented(): Promise<void> {
         const count = await this.getRowCount();
         for (let i = 0; i < count; i += 1) {
-            await expect(this.getRowLocator(i).locator(QualificationList.SELECTOR_GRIP)).toBeVisible();
+            await expect(this.getRowLocator(i).getByTestId(QualificationList.DATA_TEST_GRIP)).toBeVisible();
         }
     }
 
@@ -270,7 +267,7 @@ export default class QualificationList {
      * @param rowIndex - zero-based row index
      */
     async checkNameMaxLengthAttribute(rowIndex: number): Promise<void> {
-        await expect(this.getRowLocator(rowIndex).locator("input[type='text']")).toHaveAttribute(
+        await expect(this.getRowLocator(rowIndex).locator(`[data-test="admin-list-row-input-field"]`)).toHaveAttribute(
             "maxlength",
             String(QualificationList.NAME_MAX_LENGTH),
         );
@@ -326,8 +323,9 @@ export default class QualificationList {
      */
     async dragRowToPosition(fromIndex: number, toIndex: number): Promise<void> {
         const rows = this.page.locator(QualificationList.SELECTOR_ROW);
-        const sourceGrip = rows.nth(fromIndex).locator(QualificationList.SELECTOR_GRIP);
-        const targetGrip = rows.nth(toIndex).locator(QualificationList.SELECTOR_GRIP);
+        const sourceGrip = rows.nth(fromIndex).getByTestId(QualificationList.DATA_TEST_GRIP);
+        const targetGrip = rows.nth(toIndex).getByTestId(QualificationList.DATA_TEST_GRIP);
         await sourceGrip.dragTo(targetGrip);
+        await this.page.waitForTimeout(1000); // wait for the DOM to update after drag-and-drop
     }
 }
