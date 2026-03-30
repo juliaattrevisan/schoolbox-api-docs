@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
+declare PROJECT_NAME
 declare SCHOOLBOX_CLI_IMAGE_BUILD_FROM_LOCAL
 declare TASKD_BUILD_FROM_LOCAL
 declare LTI_DEVKIT_ENABLE
-declare SECOND_INSTANCE_ENABLE
+declare SECONDARY_INSTANCE_ENABLE
 
 source "$(dirname "$0")/functions"
 
@@ -47,7 +48,7 @@ case "${LTI_DEVKIT_ENABLE}" in
         profiles="$profiles --profile lti"
         ;;
 esac
-case "${SECOND_INSTANCE_ENABLE}" in
+case "${SECONDARY_INSTANCE_ENABLE}" in
     1 | true | yes | on)
         profiles="$profiles --profile second-instance"
         ;;
@@ -55,6 +56,7 @@ esac
 
 # Run docker compose with whatever the appropriate profiles are.
 docker compose --progress plain \
+    -p "${PROJECT_NAME}" \
     -f "docker/base.docker-compose.yaml" \
     -f "${frankenphp_compose_file}" \
     -f "${schoolbox_cli_compose_file}" \

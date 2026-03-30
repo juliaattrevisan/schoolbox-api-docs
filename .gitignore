@@ -46,8 +46,14 @@ docker-taskd.env
 .aws/
 .docker-compose.env
 
+# instances.ini is created by provision process
+docker/schoolbox/config/instances.ini
+
 # Caddy config is created by the Docker provision process
 docker/caddy/config/Caddyfile
+
+# LTI nginx confi is created by provision
+docker/devkit-lti1p3-nginx/config/nginx.conf
 
 # IR configuration is created by the Docker provision process:
 # it should not be committed

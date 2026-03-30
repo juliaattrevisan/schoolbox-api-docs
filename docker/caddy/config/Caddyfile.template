@@ -1,5 +1,5 @@
 {
-    default_sni docker.dev.schoolbox.cloud
+    default_sni ${PRIMARY_INSTANCE_HOSTNAME}
 }
 http:// {
     handle_path /.well-known/acme-challenge/ping {

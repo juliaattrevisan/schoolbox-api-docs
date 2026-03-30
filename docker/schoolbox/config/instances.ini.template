@@ -1,5 +1,5 @@
-[docker]
-hostnames[]  = 'docker.dev.schoolbox.cloud'
+[${PRIMARY_INSTANCE_ID}]
+hostnames[]  = '${PRIMARY_INSTANCE_HOSTNAME}'
 hostnames[]  = 'localhost'
 db_host      = 'mariadb'
 db_host_read = 'mariadb'
@@ -15,8 +15,8 @@ db_pass      = 'abc123'
 # to this instance.
 fallback = true
 
-[docker2]
-hostnames[]  = 'docker2.dev.schoolbox.cloud'
+[${SECONDARY_INSTANCE_ID}]
+hostnames[]  = '${SECONDARY_INSTANCE_HOSTNAME}'
 hostnames[]  = 'localhost'
 db_host      = 'mariadb'
 db_host_read = 'mariadb'
