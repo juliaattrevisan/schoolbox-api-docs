@@ -41,7 +41,7 @@ $login-form-background: var(--sbx-config-login-form-background, var(--login-form
 
 $accounts-menu-foreground: var(--sbx-config-color-menu-primary, var(--accounts-menu-foreground)) !default;
 $accounts-menu-background: var(--sbx-config-color-menu-secondary, var(--accounts-menu-background)) !default;
-$accounts-menu-hover: var(--sbx-config-color-menu-hover, var(--accounts-menu-hover)) !default;
+$accounts-menu-hover: var(--sbx-config-color-active, var(--accounts-menu-hover)) !default;
 
 /*****************************
  Contrasts to skin color vars above

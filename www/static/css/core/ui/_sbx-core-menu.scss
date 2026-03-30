@@ -40,13 +40,14 @@ body.sbx-body {
 
             & #notification-toggle {
                 align-items: center;
+                background: var(--sbx-color-alert);
                 border-radius: var(--sbx-config-field-roundness);
                 display: flex;
                 height: 2rem;
                 width: 2rem;
 
                 &::before {
-                    color: var(--sbx-config-color-accent-text);
+                    color: var(--sbx-color-alert-text);
                     height: 100%;
                     line-height: 1.9;
                     width: 100%;
@@ -60,6 +61,83 @@ body.sbx-body {
                     top: -8px;
                 }
             }
+        }
+    }
+
+    // Account dropdown
+    #account-content {
+        border-radius: var(--sbx-config-box-roundness);
+
+        // separator between account options and switch user list
+        & .separator {
+            color: var(--sbx-color-text-primary);
+            font-size: var(--sbx-font-size-s);
+            font-weight: 600;
+            text-transform: none;
+        }
+
+        .profile-options,
+        .profile-options-mobile {
+            a {
+                border-radius: var(--sbx-config-field-roundness);
+                &:hover {
+                    background: var(--sbx-config-color-active);
+                }
+                // icons next to account options
+                & [class^="icon"] {
+                    color: var(--sbx-config-color-accent);
+                    font-size: var(--sbx-font-size-s);
+                    line-height: 1.2;
+                    li:has(&) {
+                        padding-block: var(--sbx-size-s);
+                    }
+                }
+            }
+        }
+
+        .switch-user {
+            // switch user list
+            li.user {
+                border-radius: var(--sbx-config-field-roundness);
+                padding-block: var(--sbx-size-s);
+                padding-inline: var(--sbx-size-s);
+                & img {
+                    border-radius: var(--sbx-config-field-roundness);
+                }
+                & p {
+                    color: var(--sbx-color-text-primary);
+                    &:not(.meta) {
+                        font-weight: var(--sbx-font-weight-active);
+                    }
+                }
+                &:hover {
+                    background: var(--sbx-config-color-active);
+                }
+            }
+        }
+    }
+
+    // mobile account menu, when it goes into the left side menu
+    .account-menu-mobile {
+        // keep similar to the .separator styles in the desktop account menu for consistency, but with some tweaks for mobile
+        .separator {
+            color: var(--sbx-color-text-primary);
+            font-size: var(--sbx-font-size-s);
+            font-weight: var(--sbx-font-weight-active);
+            text-transform: none;
+        }
+
+        // add a bit of padding for breathing space
+        .switch-user-mobile {
+            li.user {
+                padding-block: var(--sbx-size-xxs);
+                padding-inline: var(--sbx-size-xs);
+            }
+        }
+
+        // remove the derived color
+        .user .card .meta {
+            color: var(--sbx-color-text-secondary);
         }
     }
 
@@ -170,45 +248,6 @@ body.sbx-body {
                 color: var(--sbx-config-color-accent);
                 font-family: var(--ff-primary);
                 padding-block: 0.5rem;
-            }
-        }
-    }
-
-    // Account content styles
-    #account-content {
-        border-radius: var(--sbx-border-radius-normal);
-
-        & .separator {
-            background-color: #eee !important;
-            color: var(--sbx-config-color-accent);
-            font-weight: 600;
-        }
-
-        & [class^="icon"] {
-            color: var(--sbx-color-text-primary);
-            font-size: 14px;
-            font-weight: 500;
-            line-height: 1.2;
-
-            li:has(&) {
-                padding-block: 0.4rem;
-            }
-        }
-
-        & li.user {
-            padding-block: 0.8rem;
-            padding-inline: 0.8rem;
-
-            & img {
-                border-radius: var(--sbx-border-radius-normal);
-            }
-
-            & p {
-                color: var(--sbx-color-text-primary);
-
-                &:not(.meta) {
-                    font-weight: 800;
-                }
             }
         }
     }
