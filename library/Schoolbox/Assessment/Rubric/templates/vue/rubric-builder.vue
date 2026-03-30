@@ -10,6 +10,7 @@
 
 import { cloneDeep } from "es-toolkit";
 import { MARK_TYPE_VALUE_NONE } from "@schoolboxAssessment/Types/MarkType";
+import FieldsetCollapsible from "@schoolboxVue/components/fieldset-collapsible.vue";
 import { RUBRIC_GRID_IMPORTED } from "./event";
 import { translateGridToFormPayload } from "./payload";
 import type { RubricGrid } from "./types";
@@ -17,6 +18,7 @@ import RubricGridEditable from "./rubric-grid-editable.vue";
 
 interface Props {
     rubricGridsPayload: RubricGrid[];
+    rubricBlankGrid: RubricGrid;
     maxLevels: number;
     folderId: number;
     routeRubricCreate: string;
@@ -127,23 +129,32 @@ document.addEventListener(RUBRIC_GRID_IMPORTED, (event) => {
 </script>
 
 <template>
-    <template v-for="rubric in rubricGrids" :key="rubric.id">
-        <rubric-grid-editable
-            v-model:rubric-grid-levels="rubric.levels"
-            v-model:rubric-grid-capabilities="rubric.capabilities"
-            :rubric-id="rubric.id"
-            :folder-id="props.folderId"
-            :max-levels="props.maxLevels"
-            :capability-mark-type="capabilityMarkType"
-            :use-mark-range="useMarkRange"
-            :route-rubric-create="props.routeRubricCreate"
-        />
+    <!-- TODO: temp multiple grids... chaotically -->
+    <fieldset-collapsible
+        v-for="(rubric, index) in [rubricGrids[0], rubricGrids[0], rubricGrids[0], rubricGrids[0]]"
+        :key="rubric.id"
+        class="content collapsible"
+    >
+        <template #legend>Rubric {{ index + 1 }}</template>
 
-        <!-- hidden input to submit the rubric grid as JSON -->
-        <input
-            type="hidden"
-            :name="`rubric[${rubric.id}]`"
-            :value="JSON.stringify(translateGridToFormPayload(rubric))"
-        />
-    </template>
+        <template #content>
+            <rubric-grid-editable
+                v-model:rubric-grid-levels="rubric.levels"
+                v-model:rubric-grid-capabilities="rubric.capabilities"
+                :rubric-id="rubric.id"
+                :folder-id="props.folderId"
+                :max-levels="props.maxLevels"
+                :capability-mark-type="capabilityMarkType"
+                :use-mark-range="useMarkRange"
+                :route-rubric-create="props.routeRubricCreate"
+            />
+
+            <!-- hidden input to submit the rubric grid as JSON -->
+            <input
+                type="hidden"
+                :name="`rubric[${rubric.id}]`"
+                :value="JSON.stringify(translateGridToFormPayload(rubric))"
+            />
+        </template>
+    </fieldset-collapsible>
 </template>

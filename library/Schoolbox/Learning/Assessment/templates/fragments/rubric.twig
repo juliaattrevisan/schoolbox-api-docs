@@ -153,14 +153,14 @@
             <div class="small-12 columns no-pad">
                 {# TODO: deal with multiple readonly rubric grids #}
                 {% for rubricGrid in rubricGrids %}
-                {% include '@rubric/grid.twig' with {
-                    rubricGrid: rubricGrid,
-                    folderId: assessment.context.folder.id,
-                    showRubricTotal: true,
-                    showGroupTotal: assessment.markPerCapability,
-                    rubricMarkedGrid: false,
-                    showDescriptorValue: true
-                } only %}
+                    {% include '@rubric/grid.twig' with {
+                        rubricGrid: rubricGrid,
+                        folderId: assessment.context.folder.id,
+                        showRubricTotal: true,
+                        showGroupTotal: assessment.markPerCapability,
+                        rubricMarkedGrid: false,
+                        showDescriptorValue: true
+                    } only %}
                 {% endfor %}
             </div>
         </div>
