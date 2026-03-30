@@ -138,6 +138,20 @@ class UserMapper extends Mapper
         $this->joinsVia('user_qualification', QualificationMapper::class, 'id', 'qualification_id', 'user_id', null, null, null, 'qualificationCollection');
         $this->uses('ib_candidate_number', self::TYPE_STRING);
 
+        $this->joinsReverseMulti(
+            'user_id',
+            User\Nationality\Mapper::class,
+            'nationalityCollection',
+            'nationality',
+        );
+
+        $this->joinsReverseMulti(
+            'user_id',
+            User\Language\Mapper::class,
+            'languageCollection',
+            'language',
+        );
+
         $this->hasJoin(
             'userAccess',
             array(
@@ -393,6 +407,12 @@ class UserMapper extends Mapper
         /** @var QualificationMapper $qualificationMapper */
         $qualificationMapper = $this->getJoinMapper('user_qualification');
 
+        /** @var User\Nationality\Mapper $nationalityMapper */
+        $nationalityMapper = $this->getJoinMapper('nationality');
+
+        /** @var User\Language\Mapper $languageMapper */
+        $languageMapper = $this->getJoinMapper('language');
+
         foreach ($statement as $row) {
             $userId = $row['id'];
 
@@ -438,13 +458,22 @@ class UserMapper extends Mapper
 
         // Load one-to-many relations in separate queries
         if (!empty($users)) {
-            // Load campuses and qualifications
-            $userIds                = array_keys($users);
-            $campusesByUserId       = $campusMapper->findForOtherMapper($this, 'userCampus', $userIds);
+            // Load campuses
+            $userIds          = array_keys($users);
+            $campusesByUserId = $campusMapper->findForOtherMapper($this, 'userCampus', $userIds);
             $qualificationsByUserId = $qualificationMapper->findForOtherMapper($this, 'user_qualification', $userIds);
+            $nationalityByUserId = $nationalityMapper->findForOtherMapper($this, 'nationality', $userIds);
+            $languageByUserId = $languageMapper->findForOtherMapper($this, 'language', $userIds);
+
             foreach ($users as $userId => $user) {
                 $user->setCampusCollection($campusesByUserId[$userId] ?? $campusMapper->createCollection());
                 $user->setQualificationCollection($qualificationsByUserId[$userId] ?? $qualificationMapper->createCollection());
+                /* Understanding that this is only currently being used for the IBIS, but this might later being used for other features
+                 * and this will probably not be too heavy of a load, but if we did came across it to be affecting the performance, we can
+                 * then consider making it to load on demand or similar to the `augmentWithXXXXX` function in the Swamp.
+                 */
+                $user->setNationalityCollection($nationalityByUserId[$userId] ?? $nationalityMapper->createCollection());
+                $user->setLanguageCollection($languageByUserId[$userId] ?? $languageMapper->createCollection());
             }
 
             // Load linked users

@@ -431,6 +431,28 @@ class Factory
             $qualificationNames = implode(', ', $viewee->getQualificationCollection()->indexBy('name')->keys());
         }
 
+        /* Concatenating all the nationalities together
+         */
+        $nationality = '';
+
+        if ($viewee->getNationalityCollection()) {
+            $nationality = implode(
+                ', ',
+                $viewee->getNationalityCollection()->indexBy('nationality')->keys()
+            );
+        }
+
+        /* Concatenating all the languages together
+         */
+        $languages = '';
+
+        if ($viewee->getLanguageCollection()) {
+            $languages = implode(
+                ', ',
+                $viewee->getLanguageCollection()->indexBy('language')->keys()
+            );
+        }
+
         /* Collect Emergency Contacts from the sis, using the awfully-named nodes
          */
         $emergencyContacts = [];
@@ -488,6 +510,8 @@ class Factory
             'differentiationProfile' => null,
             'ibCandidateNumber' => $viewee->getIbCandidateNumber(),
             'qualificationCollection' => $qualificationNames,
+            'nationality' => $nationality,
+            'language' => $languages,
         ];
 
         $referenceFields = array_merge($externalUser, $referenceFields);

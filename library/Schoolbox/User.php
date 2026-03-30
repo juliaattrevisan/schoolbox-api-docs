@@ -30,6 +30,8 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\IB\Qualification\Model as QualificationModel;
 use Schoolbox\User\Pronoun\Model;
 use SensitiveParameter;
+use Schoolbox\User\Nationality\Model as NationalityModel;
+use Schoolbox\User\Language\Model as LanguageModel;
 
 class User implements Serializable, Linkable, ISoftDeletable, IModel
 {
@@ -275,6 +277,16 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /** @var GenericCollection|null Collection of IB qualifications assigned to this user */
     private ?GenericCollection $qualificationCollection = null;
 
+    /**
+     * @var GenericCollection|NationalityModel[]|null
+     */
+    private $nationalityCollection = null;
+
+    /**
+     * @var GenericCollection|LanguageModel[]|null
+     */
+    private $languageCollection = null;
+
     public function __construct()
     {
         $this->role = new Role();
@@ -282,16 +294,26 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
-     * Clones shouldn't share campusCollection or qualificationCollection
+     * Clones shouldn't share these lists/collections
      */
     public function __clone()
     {
         if ($this->campusCollection !== null) {
             $this->campusCollection = clone $this->campusCollection;
         }
+
         if ($this->qualificationCollection !== null) {
             $this->qualificationCollection = clone $this->qualificationCollection;
         }
+
+        if ($this->nationalityCollection !== null) {
+            $this->nationalityCollection = clone $this->nationalityCollection;
+        }
+
+        if ($this->languageCollection !== null) {
+            $this->languageCollection = clone $this->languageCollection;
+        }
+
         if ($this->accessList instanceof GenericCollection) {
             $this->accessList = clone $this->accessList;
         }
@@ -1494,6 +1516,44 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function getPronoun(): ?Model
     {
         return $this->pronoun;
+    }
+
+    /**
+     * @param GenericCollection $nationalityCollection
+     * @return self
+     */
+    public function setNationalityCollection(GenericCollection $nationalityCollection): self
+    {
+        $nationalityCollection->assertCollectionOf(NationalityModel::class);
+        $this->nationalityCollection = $nationalityCollection;
+        return $this;
+    }
+
+    /**
+     * @return GenericCollection|NationalityModel[]|null
+     */
+    public function getNationalityCollection(): null|array|GenericCollection
+    {
+        return $this->nationalityCollection;
+    }
+
+    /**
+     * @param GenericCollection $languageCollection
+     * @return self
+     */
+    public function setLanguageCollection(GenericCollection $languageCollection): self
+    {
+        $languageCollection->assertCollectionOf(LanguageModel::class);
+        $this->languageCollection = $languageCollection;
+        return $this;
+    }
+
+    /**
+     * @return GenericCollection|LanguageModel[]|null
+     */
+    public function getLanguageCollection(): null|array|GenericCollection
+    {
+        return $this->languageCollection;
     }
 
     /**
