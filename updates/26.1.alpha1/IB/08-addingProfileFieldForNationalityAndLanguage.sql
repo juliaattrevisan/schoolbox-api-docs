@@ -1,5 +1,5 @@
 SET
-    @field_sequence = (SELECT MAX(sequence)
+    @field_sequence = (SELECT COALESCE(MAX(sequence), 0)
                        FROM profile_field
                        WHERE roletype = 'student');
 
