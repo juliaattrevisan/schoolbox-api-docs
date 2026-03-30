@@ -239,6 +239,8 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
+     * Return the visibility of the work type as a string constant, derived from the visibility booleans.
+     * @throws InsufficientHydrationException
      * @return string
      */
     public function getVisibility(): string
@@ -258,6 +260,7 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
+     * Set the visibility booleans given a string constant.
      * @param string $visibility
      * @return self
      */
