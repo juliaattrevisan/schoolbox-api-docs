@@ -468,6 +468,10 @@ class UserMapper extends Mapper
             foreach ($users as $userId => $user) {
                 $user->setCampusCollection($campusesByUserId[$userId] ?? $campusMapper->createCollection());
                 $user->setQualificationCollection($qualificationsByUserId[$userId] ?? $qualificationMapper->createCollection());
+                /* Understanding that this is only currently being used for the IBIS, but this might later being used for other features
+                 * and this will probably not be too heavy of a load, but if we did came across it to be affecting the performance, we can
+                 * then consider making it to load on demand or similar to the `augmentWithXXXXX` function in the Swamp.
+                 */
                 $user->setNationalityCollection($nationalityByUserId[$userId] ?? $nationalityMapper->createCollection());
                 $user->setLanguageCollection($languageByUserId[$userId] ?? $languageMapper->createCollection());
             }

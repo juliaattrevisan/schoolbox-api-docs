@@ -294,7 +294,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
-     * Clones shouldn't share campusCollection or qualificationCollection
+     * Clones shouldn't share these lists/collections
      */
     public function __clone()
     {
