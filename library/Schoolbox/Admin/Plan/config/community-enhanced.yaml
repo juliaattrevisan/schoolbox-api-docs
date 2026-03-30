@@ -11,6 +11,7 @@ config:
   badges_enabled : {value: false, edit: false}
   fixtures_enabled: {edit: true}
   clipboard_enabled: {edit: true}
+  socs_enabled: {edit: true}
   pastoral_enabled : {value: false, edit: false}
   resource_booking_enabled: {edit: true}
   external_document_report_enabled : { edit : true }
