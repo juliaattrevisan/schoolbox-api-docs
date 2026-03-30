@@ -126,6 +126,19 @@ document.addEventListener(RUBRIC_GRID_IMPORTED, (event) => {
     // TODO: for now this will just add a new rubric
     rubricGrids.value.push(event.detail.rubricGrid);
 });
+
+const showRubricCreate = window.Vue.ref(false);
+
+/**
+ * Create a new blank rubric ("Create manually" button)
+ */
+function createRubric(): void {
+    // TODO: I assume this is meant to prefill with similar data to the original one.
+    // TODO: This might need to fetch a new blank grid since the capabilities/indicators possibly changed and that has implications for the new grid...
+    const newRubric = cloneDeep(props.rubricBlankGrid);
+    newRubric.id = 0; // apparently 0 is how rubrics define they are new
+    rubricGrids.value.push(newRubric);
+}
 </script>
 
 <template>
@@ -133,7 +146,6 @@ document.addEventListener(RUBRIC_GRID_IMPORTED, (event) => {
     <fieldset-collapsible
         v-for="(rubric, index) in [rubricGrids[0], rubricGrids[0], rubricGrids[0], rubricGrids[0]]"
         :key="rubric.id"
-        class="content collapsible"
         delay-content-render
     >
         <template #legend>Rubric {{ index + 1 }}</template>
@@ -158,4 +170,25 @@ document.addEventListener(RUBRIC_GRID_IMPORTED, (event) => {
             />
         </template>
     </fieldset-collapsible>
+
+    <fieldset-collapsible v-if="showRubricCreate" delay-content-render initially-expanded>
+        <template #legend>Rubric {{ rubricGrids.length + 1 }}</template>
+
+        <template #content>
+            <div class="l-flex-row l-flex--justify l-gap-xs">
+                <!-- TODO -->
+                <button class="button l-flex__item--1 icon-modify" type="button" @click="createRubric">
+                    Create manually
+                </button>
+                <button class="button l-flex__item--1 icon-copy" type="button">Copy from existing activity</button>
+                <button class="button l-flex__item--1 icon-upload" type="button">Upload a Schoolbox format file</button>
+            </div>
+        </template>
+    </fieldset-collapsible>
+
+    <div v-if="!showRubricCreate" class="row">
+        <div class="column small-12">
+            <button class="button" @click="showRubricCreate = true">Add a rubric</button>
+        </div>
+    </div>
 </template>

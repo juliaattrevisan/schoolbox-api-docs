@@ -4,6 +4,7 @@
  */
 
 interface Props {
+    initiallyExpanded?: boolean;
     /**
      * Depending on what is being rendered, you may wish to delay rendering the components inside the content slot
      * until the fieldset is expanded for the first time so that elements have the chance to calculate their
@@ -25,6 +26,12 @@ function toggleExpanded(): void {
         hasBeenExpanded.value = true;
     }
 }
+
+window.Vue.onMounted(() => {
+    if (props.initiallyExpanded && !isExpanded.value) {
+        toggleExpanded();
+    }
+});
 </script>
 
 <template>
