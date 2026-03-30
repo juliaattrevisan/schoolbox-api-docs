@@ -134,6 +134,7 @@ document.addEventListener(RUBRIC_GRID_IMPORTED, (event) => {
         v-for="(rubric, index) in [rubricGrids[0], rubricGrids[0], rubricGrids[0], rubricGrids[0]]"
         :key="rubric.id"
         class="content collapsible"
+        delay-content-render
     >
         <template #legend>Rubric {{ index + 1 }}</template>
 
