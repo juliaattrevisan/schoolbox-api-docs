@@ -1025,14 +1025,14 @@ class Controller extends Base
             );
         } else {
             $returnUrl = Redirect::decode($returnUrlEncoded);
-            if ($isCreateRequest && str_contains($returnUrl, '/calendar')) {
+            if ($isCreateRequest && str_starts_with(parse_url($returnUrl, PHP_URL_PATH) ?? '', '/calendar')) {
                 // Create custom toast message for main calendar page.
                 $toastMessage = $this->bookingResponseHelper->getCreateResponseMessage(
                     $addBookingsResults['nBookingsCreatedByStatusId'] ?? [],
                     $nUpdatedEvents,
                 );
 
-                $separator = str_contains($returnUrl, '?') ? '&' : '?';
+                $separator = parse_url($returnUrl, PHP_URL_QUERY) !== null ? '&' : '?';
                 $returnUrl .= "{$separator}calendarToast=" . urlencode($toastMessage);
             }
 
