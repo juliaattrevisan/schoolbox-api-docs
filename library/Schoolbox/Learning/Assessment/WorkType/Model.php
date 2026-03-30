@@ -52,9 +52,6 @@ class Model implements ISoftDeletable, Sequential
      */
     private $showOnGradesPage;
 
-    /** @var bool */
-    private $staffOrInstructorVisibleOnly;
-
     /** @var ?bool */
     private ?bool $isVisibleToParents = null;
 
@@ -298,22 +295,18 @@ class Model implements ISoftDeletable, Sequential
             case Mapper::VISIBILITY_STAFF_ONLY:
                 $this->isVisibleToStudents = false;
                 $this->isVisibleToParents = false;
-                $this->staffOrInstructorVisibleOnly = true; // Set this to keep this field working until it is removed in SA-21973.
                 break;
             case Mapper::VISIBILITY_STAFF_STUDENTS:
                 $this->isVisibleToStudents = true;
                 $this->isVisibleToParents = false;
-                $this->staffOrInstructorVisibleOnly = false; // Set this to keep this field working until it is removed in SA-21973.
                 break;
             case Mapper::VISIBILITY_STAFF_PARENTS:
                 $this->isVisibleToStudents = false;
                 $this->isVisibleToParents = true;
-                $this->staffOrInstructorVisibleOnly = false; // Set this to keep this field working until it is removed in SA-21973.
                 break;
             case Mapper::VISIBILITY_STAFF_STUDENTS_PARENTS:
                 $this->isVisibleToStudents = true;
                 $this->isVisibleToParents = true;
-                $this->staffOrInstructorVisibleOnly = false; // Set this to keep this field working until it is removed in SA-21973.
                 break;
             default:
                 throw new \UnexpectedValueException('Unknown visibility: ' . $visibility);
