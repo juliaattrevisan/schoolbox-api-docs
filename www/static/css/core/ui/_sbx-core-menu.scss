@@ -5,53 +5,61 @@
  */
 
 body.sbx-body {
+    // top menu
     #hybrid-bar {
         margin: var(--sbx-size-m) var(--sbx-size-m) 0 var(--sbx-size-m);
-    }
 
-    // Notifications styles
-    #notifications {
-        align-items: center;
-        display: flex;
-        overflow: hidden;
-        padding: 1rem;
-        padding-inline-end: 2rem;
-        right: 1rem;
-        top: 1rem;
-        width: auto;
+        // shift the hamburger menu down/across inline with the margin tweak
+        #left-off-canvas-toggle {
+            left: var(--sbx-size-m);
+            overflow: hidden;
+            top: var(--sbx-size-m);
+        }
 
-        & #notification-toggle {
-            align-items: center;
-            display: flex;
-            height: 2rem;
-            width: 2rem;
-
-            &::before {
-                color: var(--sbx-config-color-accent-text);
-                height: 100%;
-                line-height: 1.9;
-                width: 100%;
-            }
-
-            & span {
-                background-color: red;
-                font-size: 8px;
-                position: absolute;
-                right: -8px;
-                top: -8px;
+        #header-search-input {
+            & button {
+                border-radius: var(--sbx-config-field-roundness);
             }
         }
-    }
 
-    #left-off-canvas-toggle {
-        left: 1rem;
-        overflow: hidden;
-        top: 1rem;
-    }
+        // move the search results in so the right side is inline with the search input
+        .c-header-search__results {
+            margin-right: 72px;
+        }
 
-    #header-search-input {
-        & button {
-            background-color: transparent; // Removed button background for search input on header
+        // Notifications toggle, move it across with the margin tweak and add some padding to give it more room
+        #notifications {
+            align-items: center;
+            display: flex;
+            overflow: hidden;
+            padding: var(--sbx-size-m);
+            padding-inline-end: calc(var(--sbx-size-m) * 2);
+            right: var(--sbx-size-m);
+            top: var(--sbx-size-m);
+            width: auto;
+
+            & #notification-toggle {
+                align-items: center;
+                border-radius: var(--sbx-config-field-roundness);
+                display: flex;
+                height: 2rem;
+                width: 2rem;
+
+                &::before {
+                    color: var(--sbx-config-color-accent-text);
+                    height: 100%;
+                    line-height: 1.9;
+                    width: 100%;
+                }
+
+                & span {
+                    background-color: var(--sbx-color-alert);
+                    font-size: 8px;
+                    position: absolute;
+                    right: -8px;
+                    top: -8px;
+                }
+            }
         }
     }
 
@@ -217,9 +225,5 @@ body.sbx-body {
         & img {
             border-radius: var(--sbx-border-radius-normal);
         }
-    }
-
-    .c-header-search__results {
-        margin-right: 72px;
     }
 }
