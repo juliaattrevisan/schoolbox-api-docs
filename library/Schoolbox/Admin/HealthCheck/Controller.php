@@ -587,7 +587,7 @@ class Controller extends Base
         SELECT
             NAME as 'Work Type',
             IF(show_on_grades_page, 'Yes', 'No') as 'Display on Grades Page',
-            IF(is_visible_to_parents=0 AND is_visible_to_students=0, 'Yes', 'No') as 'Visible to Staff only'
+            IF(is_visible_to_parents = 0 AND is_visible_to_students = 0, 'Yes', 'No') as 'Visible to Staff only'
         FROM
             lu_work_type
         WHERE
