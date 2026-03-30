@@ -278,7 +278,7 @@ class Feed
             AND assess.start < NOW()
             AND assess.deleted_at IS NULL
             AND assess.availability = 'assess'
-            AND (lwt.staff_or_instructor_visible_only = 0 {$sivoClause})
+            AND ((lwt.is_visible_to_parents = 0 AND lwt.is_visible_to_students) {$sivoClause})
             ORDER BY assess.created_at DESC LIMIT 0, :limit
         ");
         $this->executeWithLimit($query, $params, $limit);
