@@ -54,4 +54,3 @@ class GoogleDriveRedirect extends Base
         return $this->testNext();
     }
 }
-
