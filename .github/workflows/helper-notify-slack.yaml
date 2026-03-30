@@ -1,0 +1,113 @@
+name: "Notify Slack channel"
+
+on:
+  workflow_call:
+    inputs:
+      workflow_name:
+        description: Name of the workflow that just completed
+        required: true
+        type: string
+      status:
+        description: Final workflow status (success|failure)
+        required: true
+        type: string
+      ref_name:
+        description: Branch or tag name for the run
+        required: true
+        type: string
+      run_url:
+        description: URL of the GitHub Actions run
+        required: true
+        type: string
+      webhook_url:
+        description: Webhook URL to post the message to.
+        required: true
+        type: string
+      channel:
+        description: Channel to post the message to.
+        required: true
+        type: string
+      message:
+        description: |
+          The message to post.
+
+          The following variables will be substituted:
+          - ICON: `:white_check_mark:` if `inputs.status` is successful, `:x:` if not
+          - REF_NAME: value of `inputs.ref_name`
+          - RESULT: `completed successfully` if `inputs.status` is successful, `failed` if not
+          - RUN_URL: value of `inputs.run_url`
+          - WORKFLOW_NAME: value of `inputs.workflow_name`
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      workflow_name:
+        description: Name of the workflow that just completed
+        required: true
+        type: string
+      status:
+        description: Final workflow status (success|failure)
+        required: true
+        type: choice
+        options:
+          - success
+          - failure
+      ref_name:
+        description: Branch or tag name for the run
+        required: true
+        type: string
+      run_url:
+        description: URL of the GitHub Actions run
+        required: true
+        type: string
+      webhook_url:
+        description: Webhook URL to post the message to.
+        required: true
+        type: string
+      channel:
+        description: Channel to post the message to.
+        required: true
+        type: string
+      message:
+        description: |
+          The message to post.
+
+          The following variables will be substituted:
+          - ICON: `:white_check_mark:` if `inputs.status` is successful, `:x:` if not
+          - REF_NAME: value of `inputs.ref_name`
+          - RESULT: `completed successfully` if `inputs.status` is successful, `failed` if not
+          - RUN_URL: value of `inputs.run_url`
+          - WORKFLOW_NAME: value of `inputs.workflow_name`
+        required: true
+        type: string
+
+jobs:
+  notify:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Send Slack message"
+        env:
+          STATUS: ${{ inputs.status }}
+          WORKFLOW_NAME: ${{ inputs.workflow_name }}
+          REF_NAME: ${{ inputs.ref_name }}
+          RUN_URL: ${{ inputs.run_url }}
+          WEBHOOK_URL: ${{ inputs.webhook_url }}
+          CHANNEL: ${{ inputs.channel }}
+          MESSAGE: ${{ inputs.message }}
+        run: |
+          if [ "${STATUS}" = "success" ]; then
+            ICON=":white_check_mark:"
+            RESULT="completed successfully"
+          else
+            ICON=":x:"
+            RESULT="failed"
+          fi
+
+          TEXT=$(echo "${MESSAGE}" | envsubst '$ICON $REF_NAME $RESULT $RUN_URL $WORKFLOW_NAME')
+          PAYLOAD="$(jq -nc --arg channel "#${CHANNEL}" --arg text "${TEXT}" '{channel: $channel, text: $text}')"
+
+          curl --fail-with-body --request POST \
+            --header 'Content-type: application/json' \
+            --data "${PAYLOAD}" \
+            "${WEBHOOK_URL}"
