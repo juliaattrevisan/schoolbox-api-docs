@@ -101,12 +101,14 @@ class Factory extends Filter\AbstractFactory
          */
         if (Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS === $pageFilter->getPage()) {
             /* Due Work calendar: never see a SIVO regardless if you're a staff or a student.
+             * SIVO means 'Staff/Instructor Visible Only' - so we only want assessments that are visible to either parents or students.
              */
             $workTypes = $this->workTypeMapper->findByPredicates(
-                $this->workTypeMapper->getPredicateBuilder()
-                    // The intended result of chaining the two predicates below is: 'is_visible_to_parents=0 AND is_visible_to_students=0'.
-                    ->equals('is_visible_to_parents', 0)
-                    ->equals('is_visible_to_students', 0)
+                $this->workTypeMapper->getPredicateBuilder()->any(
+                    $this->workTypeMapper->getPredicateBuilder()
+                        ->notEquals('is_visible_to_parents', 0)
+                        ->notEquals('is_visible_to_students', 0)
+                )
             );
         } elseif (Filter\Page\Model::PAGE_GRADES === $pageFilter->getPage()) {
             /* Grades page: role dependent
@@ -114,11 +116,15 @@ class Factory extends Filter\AbstractFactory
             if ($user->getRole()->isStaff()) {
                 $workTypes = $this->workTypeMapper->findAll();
             } else {
+                /* Grades page: never see a SIVO regardless if you're a staff or a student.
+                 * SIVO means 'Staff/Instructor Visible Only' - so we only want assessments that are visible to either parents or students.
+                 */
                 $workTypes = $this->workTypeMapper->findByPredicates(
-                    // The intended result of chaining the two predicates below is: 'is_visible_to_parents=0 AND is_visible_to_students=0'.
-                    $this->workTypeMapper->getPredicateBuilder()
-                        ->equals('is_visible_to_parents', 0)
-                        ->equals('is_visible_to_students', 0)
+                    $this->workTypeMapper->getPredicateBuilder()->any(
+                        $this->workTypeMapper->getPredicateBuilder()
+                            ->notEquals('is_visible_to_parents', 0)
+                            ->notEquals('is_visible_to_students', 0)
+                    )
                 );
             }
         } else {
