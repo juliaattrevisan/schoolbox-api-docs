@@ -262,6 +262,7 @@ class Model implements ISoftDeletable, Sequential
     /**
      * Set the visibility booleans given a string constant.
      * @param string $visibility
+     * @throws \UnexpectedValueException
      * @return self
      */
     public function setVisibility(string $visibility): self
