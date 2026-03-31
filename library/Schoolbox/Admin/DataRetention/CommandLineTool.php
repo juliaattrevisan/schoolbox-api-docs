@@ -307,7 +307,7 @@ OPTIONS
     -n                       Count of loops to run for each strategy, default 3, set to 1 to only loop once
     --max-time={max-time}:   process entries in chunks until the script has been running for this many seconds.
                              Defaults to 3600 (1 hours).
-    --chunk={chunk-size}:    process this many entries per chunk: defaults to 1000.
+    --chunk={chunk-size}:    process this many entries per chunk: defaults to 1000. (max 10000)
     --strats=                A csv of strats to hard delete.  Valid strats are {{$csvStrats}}. If not provided, will run all strats.
                              e.g. hard delete only learning moment stuff: ./tools/dataRetention/process.php --strats=moments
     --retention-period=      Manually override the retention period for all strategies, for testing purposes (whole number of days, same format as the admin config value).
