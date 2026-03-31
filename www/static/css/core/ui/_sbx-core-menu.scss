@@ -162,6 +162,10 @@ body.sbx-body {
             color: var(--sbx-color-text-primary);
             text-transform: none;
         }
+        // to help differentiate the heading links from the list below
+        .side-menu-heading-link {
+            font-weight: var(--sbx-font-weight-active);
+        }
         a {
             color: var(--sbx-config-color-accent);
             border-radius: var(--sbx-config-field-roundness);
@@ -178,7 +182,7 @@ body.sbx-body {
         }
     }
 
-    // Left menu styles when left menu is not open
+    // Left menu styles when menu is not open
     .off-canvas-wrap.move-right :not(.left-open) {
         & #left-menu {
             border-radius: var(--sbx-config-box-roundness);
@@ -188,42 +192,32 @@ body.sbx-body {
         }
     }
 
-    // Notifications menu styles when left menu is not open
-    .off-canvas-wrap.move-left :not(.left-open) {
+    // Notifications menu styles when menu is not open
+    .off-canvas-wrap.move-left :not(.right-open) {
         & #msgs {
             border-radius: var(--sbx-config-box-roundness);
             box-shadow: var(--sbx-shadow-m);
             right: 1rem;
             top: 1rem;
-
-            #right-menu-dock,
-            .settings-button {
-                color: var(--sbx-config-color-accent);
-            }
-
-            & #notification-toggle-full {
-                color: var(--sbx-config-color-accent);
-            }
         }
     }
 
-    // Message list styles
+    // Notifications menu styles
     #message-list {
-        & #notification-toggle-full {
-            background-color: transparent;
+        #right-menu-dock,
+        .settings-button {
+            border-radius: var(--sbx-config-field-roundness);
             color: var(--sbx-config-color-accent);
+            padding: var(--sbx-size-xs);
+            &:hover {
+                background: var(--sbx-config-color-active);
+            }
         }
 
-        & li:has(:is(#msg-bar, section, .button)) {
-            padding-inline: 0.6rem;
-        }
-
-        & li:has(section) {
-            padding-block: 1rem 0.6rem;
-        }
-
-        & :where(#right-menu-dock, #notification-toggle-full, .icon-settings) {
-            color: var(--sbx-config-color-accent);
+        #notification-toggle-full {
+            background-color: var(--sbx-color-foreground-primary);
+            color: var(--sbx-color-text-primary);
+            text-transform: none;
         }
     }
 
