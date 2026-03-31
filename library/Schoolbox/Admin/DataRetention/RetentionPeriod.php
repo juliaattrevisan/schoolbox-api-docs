@@ -61,7 +61,7 @@ class RetentionPeriod
 
         // Defensive: if resulting date is in the future, treat as invalid
         if ($natural->isFuture()) {
-            throw new SchoolboxException('Negative retention period override supplied. ignoring');
+            throw new SchoolboxException('Negative retention period supplied. ignoring');
         }
 
         // Use getDatabase() which returns database format used across the project
@@ -91,10 +91,10 @@ class RetentionPeriod
 
         // At this point $days is int
         if ($days < 0) {
-            throw new SchoolboxException('Negative retention period override supplied; Retention period must be a positive integer number of days.');
+            throw new SchoolboxException('Negative retention period supplied; Retention period must be a positive integer number of days.');
         }
         if ($days === 0) {
-            throw new SchoolboxException('Retention period override of 0 days supplied');
+            throw new SchoolboxException('Retention period of 0 days supplied');
         }
         return true;
     }

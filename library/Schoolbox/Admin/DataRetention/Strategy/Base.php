@@ -14,6 +14,8 @@ namespace Schoolbox\Admin\DataRetention\Strategy;
 
 use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Admin\DataRetention\RetentionPeriod;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\IConfigLoader;
 use Symfony\Component\Lock\LockInterface;
 
@@ -41,9 +43,9 @@ abstract class Base implements IStrategy
      * and so we can override it with setRetentionPeriod if needed
      *
      * This should be in database format, e.g. '2024-01-01 00:00:00'
-     * @var null|string
+     * @var null|RetentionPeriod
      */
-    private ?string $retentionPeriod = null;
+    private ?RetentionPeriod $retentionPeriod = null;
 
     /**
      * @param null|LoggerInterface $log        // log to STDERR
@@ -161,29 +163,23 @@ abstract class Base implements IStrategy
      * or looks up the retention period from config using $retentionConfigKey
      * @return string|null
      */
-    protected function getRetentionPeriod()
+    protected function getRetentionPeriod(): ?string
     {
         if (null === $this->retentionPeriod) {
-            $retentionPeriod = (string)$this->config->get($this->retentionConfigKey); // configured by admin with planned options 1 Day, 30 Days, 365 Days, <null> (null is do NOT hard delete this)
-            if ('' === $retentionPeriod) {
-                $this->log->notice('No retention period set, skipping');
+            try {
+                $this->retentionPeriod = new RetentionPeriod((string)$this->config->get($this->retentionConfigKey));
+            } catch (SchoolboxException $e) {
+                $this->log->warning(sprintf("Invalid retention period '%s': %s. Skipping.", $this->config->get($this->retentionConfigKey), $e->getMessage()));
                 return null;
             }
-            $retentionDate = \Alaress_Date_Format::newNaturalDate(sprintf("-%s days", $retentionPeriod));
-
-            // if in the future for some reason, log and return null to avoid deleting everything
-            if ($retentionDate->isFuture()) {
-                $this->log->notice('Negative retention period, skipping');
-                return null;
-            }
-            $this->retentionPeriod = $retentionDate->getDatabase();
         }
-        return $this->retentionPeriod;
+        return $this->retentionPeriod->getRetentionDatabase();
     }
 
-    public function setRetentionPeriod(?int $retentionPeriod): void
+    public function setRetentionPeriod(?RetentionPeriod $retentionPeriod): self
     {
-        $this->retentionPeriod = (\Alaress_Date_Format::newNaturalDate(sprintf("-%s days", $retentionPeriod)))->getDatabase();
+        $this->retentionPeriod = $retentionPeriod;
+        return $this;
     }
 
     /**

@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\DataRetention\Strategy;
 
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Admin\DataRetention\RetentionPeriod;
 use Schoolbox\Admin\DataRetention\ValidStrats;
 
 class CmsLogExample extends Base
@@ -23,17 +24,12 @@ class CmsLogExample extends Base
      * This is an example with no db config, so set this to 365 days as an example, but we should be using the config loader to get this value from the config key defined in $retentionConfigKey
      * @inheritDoc
      */
-    protected function getRetentionPeriod()
+    protected function getRetentionPeriod(): ?string
     {
         if (null === $this->retentionPeriod) {
             $this->retentionPeriod = (\Alaress_Date_Format::newNaturalDate("-365 days"))->getDatabase();
         }
         return $this->retentionPeriod;
-    }
-
-    public function setRetentionPeriod(?int $retentionPeriod): void
-    {
-        $this->retentionPeriod = (\Alaress_Date_Format::newNaturalDate(sprintf("-%s days", $retentionPeriod)))->getDatabase();
     }
 
     /**

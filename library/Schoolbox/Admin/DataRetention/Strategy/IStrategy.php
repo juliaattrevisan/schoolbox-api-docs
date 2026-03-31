@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\DataRetention\Strategy;
 
+use Schoolbox\Admin\DataRetention\RetentionPeriod;
+
 /**
  * Interface IStrategy
  *
@@ -38,8 +40,8 @@ interface IStrategy
 
     /**
      * Override the retention period for this strategy, do NOT use the date range from the config
-     * @param null|int $retentionPeriod
-     * @return void
+     * @param ?RetentionPeriod $retentionPeriod
+     * @return self
      */
-    public function setRetentionPeriod(?int $retentionPeriod): void;
+    public function setRetentionPeriod(?RetentionPeriod $retentionPeriod): self;
 }
