@@ -238,7 +238,9 @@ abstract class Base implements IStrategy
      */
     private function clearPreparedStatements(): void
     {
-        $this->log->debug('Clearing prepared statements cache');
+        $this->log->info(sprintf("Clearing '%d' prepared statements from the cache", count($this->preparedStatements)));
+
+        $this->log->debug(print_r(array_keys($this->preparedStatements), true));
         $this->preparedStatements = [];
     }
 
