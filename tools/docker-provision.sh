@@ -273,31 +273,32 @@ function download_artifact() {
 }
 
 function init_composer_dependencies() {
-  log "Installing vendor dependencies with composer";
-
-  local vendor_dir="$SITE_ROOT/vendor"
-  local vendor_file='vendor-php-dev.tar.gz'
-  local artifact_file;
-
-  # Only use last line of output from function:
-  # the rest may include logs
-  artifact_file=$(download_artifact "${vendor_file}" 'vendor' 'composer.lock' 'vendor/composer.lock.checksum' "$vendor_dir" | tail -n1)
-
-  if [ "$artifact_file" = "ignore" ]; then
-      log "Vendor artifact up to date: updating autoload and patches";
-  else
-      if [ -f "${CACHE_DIR}/${artifact_file}" ]; then
-          # Extract content
-          log "Extracting vendor cache file '${artifact_file}'";
-          rm -fR "${vendor_dir}" 2> /dev/null;
-          tar xzf "${CACHE_DIR}/${artifact_file}";
-          log "Updating autoload and patches";
-      else
-          # Still no luck, build from scratch with composer
-          log "No matching vendor cache found. Building with composer";
-      fi
-  fi
-  "$SITE_ROOT"/tools/composer.sh --ignore-platform-req=ext-gd
+  composer install --no-progress -o $*
+#  log "Installing vendor dependencies with composer";
+#
+#  local vendor_dir="$SITE_ROOT/vendor"
+#  local vendor_file='vendor-php-dev.tar.gz'
+#  local artifact_file;
+#
+#  # Only use last line of output from function:
+#  # the rest may include logs
+#  artifact_file=$(download_artifact "${vendor_file}" 'vendor' 'composer.lock' 'vendor/composer.lock.checksum' "$vendor_dir" | tail -n1)
+#
+#  if [ "$artifact_file" = "ignore" ]; then
+#      log "Vendor artifact up to date: updating autoload and patches";
+#  else
+#      if [ -f "${CACHE_DIR}/${artifact_file}" ]; then
+#          # Extract content
+#          log "Extracting vendor cache file '${artifact_file}'";
+#          rm -fR "${vendor_dir}" 2> /dev/null;
+#          tar xzf "${CACHE_DIR}/${artifact_file}";
+#          log "Updating autoload and patches";
+#      else
+#          # Still no luck, build from scratch with composer
+#          log "No matching vendor cache found. Building with composer";
+#      fi
+#  fi
+#  "$SITE_ROOT"/tools/composer.sh --ignore-platform-req=ext-gd
 }
 
 function init_npm_dependencies() {
@@ -307,34 +308,37 @@ function init_npm_dependencies() {
   # so the npm versions it installed are available
   source /opt/nvm/nvm.sh
 
-  local npm_dir="$SITE_ROOT/node_modules"
-  local npm_file='npm.tar.gz'
-  local artifact_file;
+  npm ci;
 
-  # Only use last line of output from function:
-  # the rest may include logs
-  artifact_file=$(download_artifact "${npm_file}" 'npm' 'npm-shrinkwrap.json' 'node_modules/npm.shrinkwrap.checksum' "$npm_dir" | tail -n1)
-
-  if [ "$artifact_file" = "ignore" ]; then
-      log "NPM artifact up to date";
-  else
-      if [ -f "${CACHE_DIR}/${artifact_file}" ]; then
-          # Extract content
-          log "Found matching NPM cache file: now extracting";
-          rm -fR "$SITE_ROOT"/node_modules 2>/dev/null;
-          rm -fR "${npm_dir}" 2> /dev/null;
-          tar xzf "${CACHE_DIR}/${artifact_file}";
-      else
-          # Still no luck, build from scratch
-          log "Cache content:";
-          cat "${CACHE_DIR}"/npm.cache;
-          log "No matching NPM cache found. Building with npm";
-          "$SITE_ROOT"/tools/pkg-build-npm.sh 2>&1;
-      fi
-  fi
+#  local npm_dir="$SITE_ROOT/node_modules"
+#  local npm_file='npm.tar.gz'
+#  local artifact_file;
+#
+#  # Only use last line of output from function:
+#  # the rest may include logs
+#  artifact_file=$(download_artifact "${npm_file}" 'npm' 'npm-shrinkwrap.json' 'node_modules/npm.shrinkwrap.checksum' "$npm_dir" | tail -n1)
+#
+#  if [ "$artifact_file" = "ignore" ]; then
+#      log "NPM artifact up to date";
+#  else
+#      if [ -f "${CACHE_DIR}/${artifact_file}" ]; then
+#          # Extract content
+#          log "Found matching NPM cache file: now extracting";
+#          rm -fR "$SITE_ROOT"/node_modules 2>/dev/null;
+#          rm -fR "${npm_dir}" 2> /dev/null;
+#          tar xzf "${CACHE_DIR}/${artifact_file}";
+#      else
+#          # Still no luck, build from scratch
+#          log "Cache content:";
+#          cat "${CACHE_DIR}"/npm.cache;
+#          log "No matching NPM cache found. Building with npm";
+#          "$SITE_ROOT"/tools/pkg-build-npm.sh 2>&1;
+#      fi
+#  fi
 
   log "Building JS/CSS files";
-  "$SITE_ROOT"/tools/pkg-build-css-js.sh
+  npm run build
+#  "$SITE_ROOT"/tools/pkg-build-css-js.sh
 }
 
 function add_rabbitmq_vhost() {
