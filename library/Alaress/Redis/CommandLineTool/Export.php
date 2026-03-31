@@ -5,40 +5,39 @@ declare(strict_types=1);
 namespace Alaress\Redis\CommandLineTool;
 
 use Alaress\Redis;
+use Aws\S3\S3Client;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 
 /**
- * Exports an instance's persistent Redis notification data into a MariaDB staging table
- * (_redis_migration).
+ * Exports an instance's persistent Redis notification data into a SQLite file and uploads it
+ * to S3 as redis-{instanceId}.sqlite, using the instance's configured OTFS S3 credentials.
  *
- * Run on the self-hosted instance before taking the database backup.
+ * Run on the self-hosted instance before migration to cloud.
  *
  */
 class Export extends CliTool\App
 {
-    private const OPT_SHORT_HELP     = 'h';
-    private const OPT_LONG_HELP      = 'help';
-    private const OPT_LONG_INSTANCE  = 'instance-id:';
-    private const OPT_LONG_DROP      = 'drop-existing';
-
-    private const STAGING_TABLE = '_redis_migration';
+    private const OPT_SHORT_HELP    = 'h';
+    private const OPT_LONG_HELP     = 'help';
+    private const OPT_LONG_INSTANCE = 'instance-id:';
 
     private const CREATE_TABLE_SQL = "
-        CREATE TABLE IF NOT EXISTS `" . self::STAGING_TABLE . "` (
-            `id`                 INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            `redis_key`          VARCHAR(512)  NOT NULL,
-            `redis_type`         ENUM('string','set') NOT NULL,
-            `redis_value`        LONGBLOB,
-            `redis_ttl_abs`      BIGINT UNSIGNED DEFAULT NULL,
-            `source_instance_id` VARCHAR(64)   NOT NULL,
-            `exported_at`        INT UNSIGNED  NOT NULL
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        CREATE TABLE IF NOT EXISTS migration (
+            id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+            redis_key          TEXT    NOT NULL,
+            redis_type         TEXT    NOT NULL,
+            redis_value        BLOB,
+            redis_ttl_abs      INTEGER DEFAULT NULL,
+            source_instance_id TEXT    NOT NULL,
+            exported_at        INTEGER NOT NULL
+        )
     ";
 
-    /** @var ClientInterface */
     private ClientInterface $redis;
+    private ?\PDO $sqlite = null;
 
     private int $rowsInserted = 0;
     private int $keysExported = 0;
@@ -56,7 +55,6 @@ class Export extends CliTool\App
         return [
             self::OPT_LONG_HELP,
             self::OPT_LONG_INSTANCE,
-            self::OPT_LONG_DROP,
         ];
     }
 
@@ -81,7 +79,12 @@ class Export extends CliTool\App
 
         $this->redis = $this->getDi()->get('redis.storage');
 
-        $this->prepareTable();
+        $sqlitePath = null;
+        if ($this->perform()) {
+            $sqlitePath = $this->initSqlite($instanceId);
+            $this->sqlite->beginTransaction();
+        }
+
         $this->scanAndExport($instanceId);
 
         $this->getLogger()->notice(
@@ -93,42 +96,70 @@ class Export extends CliTool\App
                 $this->keysSkipped,
             )
         );
+
+        if ($this->perform()) {
+            $this->sqlite->commit();
+            $s3Key = "redis-{$instanceId}.sqlite";
+            $this->uploadToS3($sqlitePath, $s3Key);
+            unlink($sqlitePath);
+        }
+    }
+
+    private function initSqlite(string $instanceId): string
+    {
+        $path = sys_get_temp_dir() . '/' . $instanceId . '_redis_migration.sqlite';
+        $this->sqlite = new \PDO('sqlite:' . $path);
+        $this->sqlite->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $this->sqlite->exec(self::CREATE_TABLE_SQL);
+        return $path;
+    }
+
+    private function uploadToS3(string $sqlitePath, string $s3Key): void
+    {
+        [$client, $bucket] = $this->buildS3Client();
+        $this->getLogger()->notice("Uploading to s3://{$bucket}/{$s3Key}");
+        $client->putObject([
+            'Bucket'     => $bucket,
+            'Key'        => $s3Key,
+            'SourceFile' => $sqlitePath,
+        ]);
+        $this->getLogger()->notice('S3 upload complete.');
     }
 
     /**
-     * Drop (if requested) and create the staging table.
+     * @return array{S3Client, string} [$client, $bucket]
      */
-    private function prepareTable(): void
+    private function buildS3Client(): array
     {
-        $tableExists = $this->stagingTableExists();
+        $cfg = [
+            'credentials' => [
+                'key'    => trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_CRED_KEY) ?? ''),
+                'secret' => trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_CRED_SECRET) ?? ''),
+            ],
+            'region'  => trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_REGION) ?? ''),
+            'version' => trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_VERSION) ?? ''),
+        ];
+        $altHost   = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_HOST) ?? '');
+        $altBucket = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_BUCKET) ?? '');
+        $bucket    = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_BUCKET) ?? '');
 
-        if ($tableExists && !$this->getOpt(self::OPT_LONG_DROP)) {
-            $this->getLogger()->error(
-                sprintf(
-                    'Table `%s` already exists. Use --drop-existing to replace it.',
-                    self::STAGING_TABLE,
-                )
-            );
-            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        if (!empty($altHost)) {
+            $cfg['endpoint']              = $altHost;
+            $cfg['credentials']['key']    = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_ACCESS_KEY) ?? '');
+            $cfg['credentials']['secret'] = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_SECRET_KEY) ?? '');
+            $cfg['region']                = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_REGION) ?? '');
+        }
+        if (!empty($altHost) && !empty($altBucket)) {
+            $bucket = $altBucket;
         }
 
-        if ($tableExists && $this->getOpt(self::OPT_LONG_DROP)) {
-            $this->getLogger()->notice(sprintf('Dropping existing `%s` table', self::STAGING_TABLE));
-            if ($this->perform()) {
-                $this->getDatabaseInternal()->execute('DROP TABLE IF EXISTS `' . self::STAGING_TABLE . '`');
-            }
-        }
-
-        $this->getLogger()->notice(sprintf('Creating `%s` table', self::STAGING_TABLE));
-        if ($this->perform()) {
-            $this->getDatabaseInternal()->execute(self::CREATE_TABLE_SQL);
-        }
+        return [new S3Client($cfg), $bucket];
     }
 
     private const PROGRESS_INTERVAL = 1000;
 
     /**
-     * Scan Redis and write matching keys to the staging table.
+     * Scan Redis and write matching keys to the SQLite file.
      */
     private function scanAndExport(string $instanceId): void
     {
@@ -149,7 +180,6 @@ class Export extends CliTool\App
                     if (!preg_match("/{$pattern}/", $key, $matches)) {
                         continue;
                     }
-                    // Skip keys belonging to a different instance
                     $keyInstanceId = $matches['instanceId'] ?? null;
                     if ($keyInstanceId !== $instanceId) {
                         continue;
@@ -171,13 +201,12 @@ class Export extends CliTool\App
     }
 
     /**
-     * Export a single Redis key into the staging table.
+     * Export a single Redis key into the SQLite file.
      */
     private function exportKey(string $key, string $instanceId): void
     {
         $ttl = $this->redis->ttl($key);
 
-        // Key has already expired — skip
         if ($ttl === -2) {
             $this->getLogger()->debug("Skipping expired key: {$key}");
             $this->keysSkipped++;
@@ -215,15 +244,6 @@ class Export extends CliTool\App
         }
     }
 
-    /**
-     * Insert one row into the staging table.
-     *
-     * @param string      $key        Redis key name
-     * @param string      $type       'string' or 'set'
-     * @param string|null $value      Raw value (binary-safe) or set member string
-     * @param int|null    $ttlAbs     Absolute Unix expiry timestamp, or null for no TTL
-     * @param string      $instanceId Source instance ID
-     */
     private function insertRow(
         string $key,
         string $type,
@@ -235,19 +255,18 @@ class Export extends CliTool\App
         if (!$this->perform()) {
             return;
         }
-        $this->getDatabaseInternal()->executeQuery(
-            'INSERT INTO `' . self::STAGING_TABLE . '`
-             (redis_key, redis_type, redis_value, redis_ttl_abs, source_instance_id, exported_at)
-             VALUES (:key, :type, :value, :ttlAbs, :instanceId, :exportedAt)',
-            [
-                'key'        => $key,
-                'type'       => $type,
-                'value'      => $value,
-                'ttlAbs'     => $ttlAbs,
-                'instanceId' => $instanceId,
-                'exportedAt' => time(),
-            ]
+        $stmt = $this->sqlite->prepare(
+            'INSERT INTO migration (redis_key, redis_type, redis_value, redis_ttl_abs, source_instance_id, exported_at)
+             VALUES (:key, :type, :value, :ttlAbs, :instanceId, :exportedAt)'
         );
+        $stmt->execute([
+            'key'        => $key,
+            'type'       => $type,
+            'value'      => $value,
+            'ttlAbs'     => $ttlAbs,
+            'instanceId' => $instanceId,
+            'exportedAt' => time(),
+        ]);
     }
 
     /**
@@ -268,39 +287,22 @@ class Export extends CliTool\App
         ));
     }
 
-    /**
-     * Check whether the staging table already exists in the database.
-     */
-    private function stagingTableExists(): bool
-    {
-        $result = $this->getDatabaseInternal()->executeQuery(
-            "SELECT COUNT(*) FROM information_schema.tables
-             WHERE table_schema = DATABASE()
-               AND table_name = :tableName",
-            ['tableName' => self::STAGING_TABLE]
-        )->fetchColumn();
-
-        return (int)$result > 0;
-    }
-
     private function printHelp(): void
     {
         $file = $this->getToolFilename();
         fwrite(STDOUT, <<<HELP
         Usage: {$file} [OPTION]...
-        Exports an instance's Redis notification data to the `_redis_migration` MariaDB staging
-        table, so it is included in the next mariadb-dump and can be migrated to cloud.
+        Exports an instance's Redis notification data to a SQLite file and uploads it to S3
+        as redis-{instanceId}.sqlite, using the instance's configured OTFS S3 credentials.
 
         Options:
           --instance-id [ID]   Source Schoolbox instance ID (required)
-          --drop-existing      Drop and recreate `_redis_migration` if it already exists
           -p, --perform        Apply changes (default: dry-run, no changes made)
           -h, --help           Print this message and exit
 
         Example:
-          {$file} --instance-id abc12345                   # dry-run
-          {$file} --instance-id abc12345 --perform         # export
-          {$file} --instance-id abc12345 --drop-existing --perform  # re-export
+          {$file} --instance-id abc12345           # dry-run
+          {$file} --instance-id abc12345 --perform  # export and upload to S3
 
         HELP);
     }
