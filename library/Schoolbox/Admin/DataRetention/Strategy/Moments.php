@@ -156,15 +156,10 @@ class Moments extends Base
 
             // delete the discussion thread comments // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads comments that were not... but they do match to the moment...
             $statementComment = $this->database->prepare($this->deleteStatement('discussion_thread_comment') . " FROM discussion_thread_comment WHERE discussion_thread_id IN {$discussionPlaceholders}");
-            // delete the discussion threads // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads that were not... but they do match to the moment...
             $statementThread = $this->database->prepare($this->deleteStatement('discussion_thread') . " FROM discussion_thread WHERE id IN {$discussionPlaceholders}");
+            $discussionParams = Builder::getArrayParameters($discussionThreadIds, 'moment_id');
 
-            $discussionParams       = Builder::getArrayParameters($discussionThreadIds, 'moment_id');
-
-            // delete the discussion thread comments // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads comments that were not... but they do match to the moment...
             $statementComment->execute($discussionParams);
-
-            // delete the discussion threads // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads that were not... but they do match to the moment...
             $statementThread->execute($discussionParams);
         } else { // if there are no discussion threads to delete, set the statement variables to null so we can log them as 0
             $statementComment = null;
