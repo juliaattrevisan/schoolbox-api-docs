@@ -273,32 +273,25 @@ function download_artifact() {
 }
 
 function init_composer_dependencies() {
-  time composer install --no-progress -o $*
-#  log "Installing vendor dependencies with composer";
-#
-#  local vendor_dir="$SITE_ROOT/vendor"
-#  local vendor_file='vendor-php-dev.tar.gz'
-#  local artifact_file;
-#
-#  # Only use last line of output from function:
-#  # the rest may include logs
-#  artifact_file=$(download_artifact "${vendor_file}" 'vendor' 'composer.lock' 'vendor/composer.lock.checksum' "$vendor_dir" | tail -n1)
-#
-#  if [ "$artifact_file" = "ignore" ]; then
-#      log "Vendor artifact up to date: updating autoload and patches";
-#  else
-#      if [ -f "${CACHE_DIR}/${artifact_file}" ]; then
-#          # Extract content
-#          log "Extracting vendor cache file '${artifact_file}'";
-#          rm -fR "${vendor_dir}" 2> /dev/null;
-#          tar xzf "${CACHE_DIR}/${artifact_file}";
-#          log "Updating autoload and patches";
-#      else
-#          # Still no luck, build from scratch with composer
-#          log "No matching vendor cache found. Building with composer";
-#      fi
-#  fi
-#  "$SITE_ROOT"/tools/composer.sh --ignore-platform-req=ext-gd
+  local vendor_dir="$SITE_ROOT/vendor"
+  local lock_checksum
+  lock_checksum=$(sha1sum "${SITE_ROOT}/composer.lock" 2>/dev/null | awk '{print $1}')
+
+  local cache_file="${CACHE_DIR}/vendor-php-${lock_checksum}.tar.gz"
+
+  if [ -n "$lock_checksum" ] && [ -f "$cache_file" ]; then
+    log "Composer cache hit ($lock_checksum): extracting vendor"
+    rm -rf "${vendor_dir}"
+    tar xzf "$cache_file" -C "${SITE_ROOT}"
+  else
+    log "Composer cache miss: running composer install"
+    time composer install --no-progress -o $*
+
+    if [ -n "$lock_checksum" ]; then
+      log "Caching vendor directory for composer.lock ($lock_checksum)"
+      tar czf "$cache_file" -C "${SITE_ROOT}" vendor
+    fi
+  fi
 }
 
 function init_npm_dependencies() {
