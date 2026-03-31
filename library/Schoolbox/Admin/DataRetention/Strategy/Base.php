@@ -49,6 +49,9 @@ abstract class Base implements IStrategy
      */
     private ?RetentionPeriod $retentionPeriod = null;
 
+    // a hash lookup of (query, prepared statement) tuples
+    protected array $preparedStatements = [];
+
     /**
      * @param null|LoggerInterface $log        // log to STDERR
      * @param bool                 $perform    // should we actually perform the deletion?
@@ -151,6 +154,8 @@ abstract class Base implements IStrategy
                 $chunkLoop++;
             }
         }
+
+        $this->clearPreparedStatements();
     }
 
     /**
@@ -225,5 +230,28 @@ abstract class Base implements IStrategy
             return sprintf('SELECT %s.*', $table);
         }
         return sprintf('DELETE %s ', $table);
+    }
+
+    /**
+     * reset the prepared statements cache, so we can re-use them
+     * @return void
+     */
+    private function clearPreparedStatements(): void
+    {
+        $this->log->debug('Clearing prepared statements cache');
+        $this->preparedStatements = [];
+    }
+
+    /**
+     * Get the cached prepared statement for a query, or create a new one if it doesn't exist
+     * @param string $query
+     * @return \PDOStatement
+     */
+    protected function getPreparedStatement(string $query): \PDOStatement
+    {
+        if (!isset($this->preparedStatements[$query])) {
+            $this->preparedStatements[$query] = $this->database->prepare($query);
+        }
+        return $this->preparedStatements[$query];
     }
 }

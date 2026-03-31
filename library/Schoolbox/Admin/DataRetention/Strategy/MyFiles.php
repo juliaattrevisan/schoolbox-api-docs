@@ -203,7 +203,7 @@ class MyFiles extends Base
 
         $delPlaceholders = Builder::getArrayPlaceholders($fileIds, 'id');
         // Use JOIN-style delete with an alias so joins can be added safely if needed by FK changes
-        $statement = $this->database->prepare($this->deleteStatement('f') . " FROM " . self::TABLE_NAME_FILE . " AS f WHERE f.id IN {$delPlaceholders}");
+        $statement = $this->getPreparedStatement($this->deleteStatement('f') . " FROM " . self::TABLE_NAME_FILE . " AS f WHERE f.id IN {$delPlaceholders}");
 
         $statement->execute(Builder::getArrayParameters($fileIds, 'id'));
 
@@ -223,7 +223,7 @@ class MyFiles extends Base
         }
 
         $delPlaceholders = Builder::getArrayPlaceholders($folderIds, 'id');
-        $delStmt = $this->database->prepare($this->deleteStatement('fo') . " FROM " . self::TABLE_NAME_FOLDER . " AS fo WHERE fo.id IN {$delPlaceholders}");
+        $delStmt = $this->getPreparedStatement($this->deleteStatement('fo') . " FROM " . self::TABLE_NAME_FOLDER . " AS fo WHERE fo.id IN {$delPlaceholders}");
 
         $delStmt->execute(Builder::getArrayParameters($folderIds, 'id'));
 
@@ -244,7 +244,7 @@ class MyFiles extends Base
         }
 
         $delPlaceholders = Builder::getArrayPlaceholders($fileIds, 'id');
-        $statement = $this->database->prepare($this->deleteStatement('eportfolio_component_filelist_item') . " FROM eportfolio_component_filelist_item WHERE file_id IN {$delPlaceholders}");
+        $statement = $this->getPreparedStatement($this->deleteStatement('eportfolio_component_filelist_item') . " FROM eportfolio_component_filelist_item WHERE file_id IN {$delPlaceholders}");
 
         $statement->execute(Builder::getArrayParameters($fileIds, 'id'));
 
