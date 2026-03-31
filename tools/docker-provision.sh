@@ -273,6 +273,8 @@ function download_artifact() {
 }
 
 function init_composer_dependencies() {
+  log "Installing Composer dependencies";
+
   local vendor_dir="$SITE_ROOT/vendor"
   local lock_checksum
   lock_checksum=$(sha1sum "${SITE_ROOT}/composer.lock" 2>/dev/null | awk '{print $1}')
