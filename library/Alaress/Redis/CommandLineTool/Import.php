@@ -4,28 +4,26 @@ declare(strict_types=1);
 
 namespace Alaress\Redis\CommandLineTool;
 
+use Aws\S3\S3Client;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 
 /**
- * Imports Redis notification data from the _redis_migration MariaDB staging table into the
- * cloud Redis storage instance, re-keying all keys from the source instance ID to the cloud
- * instance ID.
+ * Imports Redis notification data from a SQLite file stored in S3 into the cloud Redis storage
+ * instance, re-keying all keys from the source instance ID to the cloud instance ID.
  *
- * Run on the cloud instance after the SQL backup has been restored into RDS.
+ * Run on the cloud instance after the SQLite file has been uploaded by the export tool.
  *
  */
 class Import extends CliTool\App
 {
-    private const OPT_SHORT_HELP      = 'h';
-    private const OPT_LONG_HELP       = 'help';
-    private const OPT_LONG_TARGET     = 'target-instance-id:';
-    private const OPT_LONG_DROP_TABLE = 'drop-table';
+    private const OPT_SHORT_HELP   = 'h';
+    private const OPT_LONG_HELP    = 'help';
+    private const OPT_LONG_SOURCE  = 'source-instance-id:';
+    private const OPT_LONG_TARGET  = 'target-instance-id:';
 
-    private const STAGING_TABLE = '_redis_migration';
-
-    /** @var ClientInterface */
     private ClientInterface $redis;
 
     private int $keysRestored        = 0;
@@ -43,8 +41,8 @@ class Import extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_SOURCE,
             self::OPT_LONG_TARGET,
-            self::OPT_LONG_DROP_TABLE,
         ];
     }
 
@@ -54,6 +52,12 @@ class Import extends CliTool\App
         if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
             $this->printHelp();
             exit(CliKernelAbstract::EXIT_STATUS_OK);
+        }
+
+        $sourceInstanceId = $this->getOpt(self::OPT_LONG_SOURCE) ?: null;
+        if (!$sourceInstanceId) {
+            $this->getLogger()->error('--source-instance-id is required.');
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
         $targetInstanceId = $this->getOpt(self::OPT_LONG_TARGET) ?: (defined('INSTANCE_ID') ? INSTANCE_ID : null);
@@ -67,19 +71,14 @@ class Import extends CliTool\App
             $this->getLogger()->notice('Dry-run mode: use -p / --perform to make changes');
         }
 
-        if (!$this->stagingTableExists()) {
-            $this->getLogger()->error(
-                sprintf(
-                    'Staging table `%s` not found. Has the export been run and the SQL backup restored?',
-                    self::STAGING_TABLE,
-                )
-            );
-            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
-        }
+        $sqlitePath = $this->downloadFromS3($sourceInstanceId);
+
+        $pdo = new \PDO('sqlite:' . $sqlitePath);
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
         $this->redis = $this->getDi()->get('redis.storage');
 
-        $this->importKeys($targetInstanceId);
+        $this->importKeys($pdo, $targetInstanceId);
 
         $this->getLogger()->notice(
             sprintf(
@@ -91,51 +90,86 @@ class Import extends CliTool\App
             )
         );
 
-        if ($this->getOpt(self::OPT_LONG_DROP_TABLE)) {
-            $this->getLogger()->notice(sprintf('Dropping staging table `%s`', self::STAGING_TABLE));
-            if ($this->perform()) {
-                $this->getDatabaseInternal()->execute('DROP TABLE IF EXISTS `' . self::STAGING_TABLE . '`');
-            }
+        unlink($sqlitePath);
+    }
+
+    private function downloadFromS3(string $sourceInstanceId): string
+    {
+        [$client, $bucket] = $this->buildS3Client();
+        $s3Key      = "redis-{$sourceInstanceId}.sqlite";
+        $localPath  = sys_get_temp_dir() . '/' . $sourceInstanceId . '_redis_migration.sqlite';
+
+        $this->getLogger()->notice("Downloading s3://{$bucket}/{$s3Key}");
+        $client->getObject([
+            'Bucket' => $bucket,
+            'Key'    => $s3Key,
+            'SaveAs' => $localPath,
+        ]);
+        $this->getLogger()->notice('Download complete.');
+
+        return $localPath;
+    }
+
+    /**
+     * @return array{S3Client, string} [$client, $bucket]
+     */
+    private function buildS3Client(): array
+    {
+        $cfg = [
+            'credentials' => [
+                'key'    => trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_CRED_KEY) ?? ''),
+                'secret' => trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_CRED_SECRET) ?? ''),
+            ],
+            'region'  => trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_REGION) ?? ''),
+            'version' => trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_VERSION) ?? ''),
+        ];
+        $altHost   = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_HOST) ?? '');
+        $altBucket = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_BUCKET) ?? '');
+        $bucket    = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_BUCKET) ?? '');
+
+        if (!empty($altHost)) {
+            $cfg['endpoint']              = $altHost;
+            $cfg['credentials']['key']    = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_ACCESS_KEY) ?? '');
+            $cfg['credentials']['secret'] = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_SECRET_KEY) ?? '');
+            $cfg['region']                = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_REGION) ?? '');
         }
+        if (!empty($altHost) && !empty($altBucket)) {
+            $bucket = $altBucket;
+        }
+
+        return [new S3Client($cfg), $bucket];
     }
 
     private const PROGRESS_INTERVAL = 1000;
     private const SET_MEMBER_BATCH  = 50;
 
     /**
-     * Stream rows from the staging table and write to Redis one key at a time.
-     *
-     * Rows are fetched in small chunks via keyset pagination. Set keys are written
-     * incrementally — members are SADDed in batches of SET_MEMBER_BATCH as they arrive
-     * and EXPIREAT is applied once the key closes — so memory stays bounded regardless
-     * of how many members a single set contains.
+     * Stream rows from the SQLite file and write to Redis one key at a time.
      */
-    private function importKeys(string $targetInstanceId): void
+    private function importKeys(\PDO $pdo, string $targetInstanceId): void
     {
-        $totalKeys     = (int) $this->getDatabaseInternal()->executeQuery(
-            'SELECT COUNT(DISTINCT redis_key) FROM `' . self::STAGING_TABLE . '`'
-        )->fetchColumn();
+        $totalKeys     = (int) $pdo->query('SELECT COUNT(DISTINCT redis_key) FROM migration')->fetchColumn();
         $keysProcessed = 0;
         $lastId        = 0;
 
-        // Streaming state for the key whose rows are currently being consumed
         $streamKey      = null;
         $streamNewKey   = null;
         $streamType     = null;
         $streamTtlAbs   = null;
         $streamSourceId = null;
         $streamSkip     = false;
-        $streamMembers  = []; // buffered set members awaiting SADD
+        $streamMembers  = [];
 
         while (true) {
-            $fresh = $this->getDatabaseInternal()->executeQuery(
+            $stmt = $pdo->prepare(
                 'SELECT id, redis_key, redis_type, redis_value, redis_ttl_abs, source_instance_id
-                 FROM `' . self::STAGING_TABLE . '`
+                 FROM migration
                  WHERE id > :lastId
                  ORDER BY id
-                 LIMIT 500',
-                ['lastId' => $lastId]
-            )->fetchAll();
+                 LIMIT 500'
+            );
+            $stmt->execute(['lastId' => $lastId]);
+            $fresh = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
             $isLastPage = count($fresh) < 500;
 
@@ -143,7 +177,6 @@ class Import extends CliTool\App
                 $lastId = (int) $row['id'];
 
                 if ($row['redis_key'] !== $streamKey) {
-                    // Close the previous set key before moving on
                     if ($streamKey !== null && !$streamSkip && $streamType === 'set') {
                         $this->closeSetKey($streamNewKey, $streamMembers, $streamTtlAbs);
                         $this->keysRestored++;
@@ -194,7 +227,7 @@ class Import extends CliTool\App
                         }
                         $this->keysRestored++;
                         $this->logProgress(++$keysProcessed, $totalKeys);
-                        $streamSkip = true; // single-row type; no further rows expected
+                        $streamSkip = true;
                         break;
 
                     case 'set':
@@ -208,7 +241,6 @@ class Import extends CliTool\App
             }
 
             if ($isLastPage) {
-                // Finalize the last open set key
                 if ($streamKey !== null && !$streamSkip && $streamType === 'set') {
                     $this->closeSetKey($streamNewKey, $streamMembers, $streamTtlAbs);
                     $this->keysRestored++;
@@ -219,8 +251,6 @@ class Import extends CliTool\App
     }
 
     /**
-     * Flush any remaining buffered members and apply TTL to complete a set key write.
-     *
      * @param string[] $members
      */
     private function closeSetKey(string $newKey, array $members, ?int $ttlAbs): void
@@ -245,9 +275,6 @@ class Import extends CliTool\App
         }
     }
 
-    /**
-     * Write a string key to Redis with optional TTL.
-     */
     private function restoreStringKey(string $key, ?string $value, ?int $ttlAbs): void
     {
         $this->redis->set($key, (string)$value);
@@ -256,11 +283,6 @@ class Import extends CliTool\App
         }
     }
 
-    /**
-     * Replace the source instance ID with the target instance ID within a Redis key name
-     * or set member value.
-     *
-     */
     private function rekey(string $value, string $sourceId, string $targetId): string
     {
         if ($sourceId === $targetId) {
@@ -269,42 +291,25 @@ class Import extends CliTool\App
         return str_replace(':' . $sourceId . ':', ':' . $targetId . ':', $value);
     }
 
-    /**
-     * Check whether the staging table exists in the database.
-     */
-    private function stagingTableExists(): bool
-    {
-        $result = $this->getDatabaseInternal()->executeQuery(
-            'SELECT COUNT(*) FROM information_schema.tables
-             WHERE table_schema = DATABASE()
-               AND table_name = :tableName',
-            ['tableName' => self::STAGING_TABLE]
-        )->fetchColumn();
-
-        return (int)$result > 0;
-    }
-
     private function printHelp(): void
     {
         $file = $this->getToolFilename();
         fwrite(STDOUT, <<<HELP
         Usage: {$file} [OPTION]...
-        Reads Redis notification data from the `_redis_migration` MariaDB staging table and
-        writes it to the cloud Redis storage instance, re-keying from the source instance ID
-        to the target instance ID.
-
-        Run after the SQL backup (which includes `_redis_migration`) has been restored into RDS.
+        Downloads redis-{sourceInstanceId}.sqlite from S3 and writes the Redis notification data
+        to the cloud Redis storage instance, re-keying from the source instance ID to the
+        target instance ID.
 
         Options:
+          --source-instance-id [ID]   Self-hosted Schoolbox instance ID (required)
           --target-instance-id [ID]   Cloud Schoolbox instance ID (default: current INSTANCE_ID)
-          --drop-table                Drop `_redis_migration` from RDS after successful import
           -p, --perform               Apply changes (default: dry-run, no changes made)
           -h, --help                  Print this message and exit
 
         Example:
-          {$file} --target-instance-id newxyz99                         # dry-run
-          {$file} --target-instance-id newxyz99 --perform               # import
-          {$file} --target-instance-id newxyz99 --drop-table --perform  # import + cleanup
+          {$file} --source-instance-id oldinst                          # dry-run
+          {$file} --source-instance-id oldinst --perform                 # import
+          {$file} --source-instance-id oldinst --target-instance-id newxyz99 --perform
 
         HELP);
     }
