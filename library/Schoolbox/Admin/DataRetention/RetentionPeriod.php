@@ -21,6 +21,7 @@ class RetentionPeriod
      * Construct with an optional day-count. Use null to indicate "retain indefinitely".
      * Accepts integer, numeric string, or null.
      * @param int|string|null $days
+     * @throws SchoolboxException
      */
     public function __construct(int|string|null $days = null)
     {
@@ -30,6 +31,7 @@ class RetentionPeriod
     /**
      * Set the retention period. Accepts integer days, numeric string, or null to disable hard deletion.
      * @param int|string|null $days
+     * @throws SchoolboxException
      */
     public function setRetentionPeriod(int|string|null $days): void
     {

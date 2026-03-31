@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\DataRetention;
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -111,13 +112,10 @@ class CommandLineTool extends CliTool\App
         // Validate any retention period override early so we can fail fast before doing work.
         $retentionPeriod = $this->getOptAsInt(self::OPT_RETENTION_PERIOD);
         if (null !== $retentionPeriod) {
-            if ($retentionPeriod < 0) {
-                $logger->warning('Negative retention period override supplied; exiting without processing to avoid deleting everything.');
-                return;
-            }
-
-            if ($retentionPeriod === 0) {
-                $logger->warning('Retention period override of 0 days supplied; exiting without processing to avoid deleting all soft-deleted data.');
+            try {
+                $retentionPeriod = new RetentionPeriod($retentionPeriod);
+            } catch (SchoolboxException $e) {
+                $logger->warning(sprintf("Invalid retention period override '%s': %s. Exiting without deleting anything.", $this->getOpt(self::OPT_RETENTION_PERIOD), $e->getMessage()));
                 return;
             }
         }
