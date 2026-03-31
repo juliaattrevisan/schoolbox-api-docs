@@ -273,7 +273,7 @@ function download_artifact() {
 }
 
 function init_composer_dependencies() {
-  composer install --no-progress -o $*
+  time composer install --no-progress -o $*
 #  log "Installing vendor dependencies with composer";
 #
 #  local vendor_dir="$SITE_ROOT/vendor"
@@ -308,7 +308,7 @@ function init_npm_dependencies() {
   # so the npm versions it installed are available
   source /opt/nvm/nvm.sh
 
-  npm ci;
+  time npm ci;
 
 #  local npm_dir="$SITE_ROOT/node_modules"
 #  local npm_file='npm.tar.gz'
@@ -337,7 +337,7 @@ function init_npm_dependencies() {
 #  fi
 
   log "Building JS/CSS files";
-  npm run build
+  time npm run build
 #  "$SITE_ROOT"/tools/pkg-build-css-js.sh
 }
 
