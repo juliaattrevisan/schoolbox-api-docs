@@ -190,13 +190,18 @@ body.sbx-body {
             color: var(--sbx-color-text-primary);
             text-transform: none;
         }
-        // to help differentiate the heading links from the list below
-        .side-menu-heading-link {
-            font-weight: var(--sbx-font-weight-active);
-        }
         a {
             color: var(--sbx-config-color-accent);
             border-radius: var(--sbx-config-field-roundness);
+            font-size: var(--sbx-font-size-xs);
+        }
+        // to help differentiate the heading links from the list below
+        .side-menu-heading-link {
+            background: var(--sbx-color-foreground-secondary);
+            border-bottom: 1px solid var(--sbx-color-border);
+            border-radius: var(--sbx-config-field-roundness);
+            font-size: var(--sbx-font-size-s);
+            font-weight: var(--sbx-font-weight-active);
         }
         /* Ensure the Back link has the icon content and font-family */
         .back {
@@ -285,6 +290,7 @@ body.sbx-body {
         overflow: hidden;
         & li {
             & > a {
+                font-size: var(--sbx-font-size-xs);
                 padding-block: var(--sbx-config-box-roundness);
             }
         }
