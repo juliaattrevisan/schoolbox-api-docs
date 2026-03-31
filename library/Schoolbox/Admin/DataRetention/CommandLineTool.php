@@ -166,7 +166,7 @@ class CommandLineTool extends CliTool\App
         $bus = [];
 
         // add bus for cmsLogExample // clear things from the cmsLog older than 1 year (possible options are 1 Day, 30 Days, 365 Days, <null>)
-//        $bus[] = new Strategy\CmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig(), $endTime, $loopCount, $chunkSize);
+//        $bus[] = new Strategy\CmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig(), $endTime, $loopCount, $chunkSize)->setRetentionPeriod($retentionPeriod);
         $bus[] = new Strategy\Moments(
             $logger,
             $this->perform(),
@@ -176,7 +176,7 @@ class CommandLineTool extends CliTool\App
             $endTime,
             $loopCount,
             $chunkSize,
-        );
+        )->setRetentionPeriod($retentionPeriod);
         $bus[] = new Strategy\MyFiles(
             $logger,
             $this->perform(),
@@ -186,7 +186,7 @@ class CommandLineTool extends CliTool\App
             $endTime,
             $loopCount,
             $chunkSize,
-        );
+        )->setRetentionPeriod($retentionPeriod);
 
         /**
          * get the strats to run, default all. This is a csv of strats, e.g. "cmslogexample,moments". If the result is an empty string, then we will run all strats.
@@ -237,11 +237,6 @@ class CommandLineTool extends CliTool\App
                 $start = microtime(true);
                 // log a helpful counter to know where we are up to
                 $logger->notice(sprintf("[%s/%s] Running %s", $busNumber + 1, count($bus), $strategy->getRetentionLabel()));
-
-                // if retention period override is set, override the strategy's retention period for this run, for testing purposes
-                if (null !== $retentionPeriod) {
-                    $strategy->setRetentionPeriod($retentionPeriod);
-                }
 
                 $strategy->process();
 
