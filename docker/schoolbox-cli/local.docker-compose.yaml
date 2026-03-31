@@ -38,6 +38,8 @@ services:
       - storage2:/var/lib/schoolbox/${SECONDARY_INSTANCE_ID}/storage
       - caddy-ssl:/etc/nginx/certs/
       - aws-config:/root/.aws
+      - npm-cache:/root/.npm
+      - composer-cache:/root/.cache/composer
     # Add host.docker.internal as an alias back to the host machine, so that
     # the host can debug
     extra_hosts:
