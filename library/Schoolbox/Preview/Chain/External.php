@@ -13,6 +13,7 @@ use Schoolbox\Preview\Chain\Strategy\External\IFrame;
 use Schoolbox\Preview\Chain\Strategy\External\Image;
 use Schoolbox\Preview\Chain\Strategy\External\Embed;
 use Schoolbox\Preview\Chain\Strategy\External\Redirect;
+use Schoolbox\Preview\Chain\Strategy\External\GoogleDriveRedirect;
 
 /**
  * Class External
@@ -36,6 +37,7 @@ class External extends Base
         $this->start([
             new Image($decodedUrl, []),
             new Embed($decodedUrl, []),
+            new GoogleDriveRedirect($decodedUrl, []),
             new IFrame($decodedUrl, preg_split('/\R/', ConfigLoader::getInstance()->get('safe_iframe_source_list'))), // Explode on \R to include all types of newline chars.
             new Redirect($decodedUrl, []),
         ]);
