@@ -25,6 +25,8 @@ abstract class Base implements IStrategy
 
     public const int DEFAULT_CHUNK_SIZE = 1000; // how many things to delete at once
 
+    public const int MAX_CHUNK_SIZE = 10000; // sane limit of how many things to delete at once
+
     /* This is how we work out how long to retain soft deleted data for. Or if we should hard delete it at all. This is configured config, and can be overridden by the command line tool option --retention-period=xx(days)
      *
      * the config key to look up the retention period for this strategy, e.g. 'ConfigMapper::NAME_DATA_RETENTION_*'

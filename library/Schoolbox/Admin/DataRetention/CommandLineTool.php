@@ -157,8 +157,13 @@ class CommandLineTool extends CliTool\App
 
         // get the chunk size, default 1000
         $chunkSize = $this->getOptAsInt(self::OPT_LONG_CHUNK_SIZE, Strategy\Base::DEFAULT_CHUNK_SIZE);
+        // prevent negative chunks
         if ($chunkSize <= 0) {
             $chunkSize = Strategy\Base::DEFAULT_CHUNK_SIZE;
+        }
+        // prevent insane large chunks, reset to the max
+        if ($chunkSize > Strategy\Base::MAX_CHUNK_SIZE) {
+            $chunkSize = Strategy\Base::MAX_CHUNK_SIZE;
         }
 
         // build the bus for all the data retention tasks
