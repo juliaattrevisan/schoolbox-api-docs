@@ -279,14 +279,16 @@ function init_composer_dependencies() {
 
   local cache_file="${CACHE_DIR}/vendor-php-${lock_checksum}.tar.gz"
 
+  find "${CACHE_DIR}" -name 'vendor-php-*.tar.gz' -not -newerat '2 weeks ago' -delete
+
   if [ -n "$lock_checksum" ] && [ -f "$cache_file" ]; then
     log "Composer cache hit ($lock_checksum): extracting vendor"
     rm -rf "${vendor_dir}"
     tar xzf "$cache_file" -C "${SITE_ROOT}"
+    touch "$cache_file"
   else
     log "Composer cache miss: running composer install"
-    time composer install --no-progress -o $*
-
+    composer install --no-progress -o $*
     if [ -n "$lock_checksum" ]; then
       log "Caching vendor directory for composer.lock ($lock_checksum)"
       tar czf "$cache_file" -C "${SITE_ROOT}" vendor
