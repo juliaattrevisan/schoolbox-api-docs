@@ -144,6 +144,7 @@ function onMouseOut(event: MouseEvent): void {
             class="c-search-input__button icon-search no-text"
             title="Search"
             data-test="search-input-button"
+            data-header-search-button
             @mouseover="onMouseOver"
             @mouseout="onMouseOut"
             @click.prevent="onClicked"

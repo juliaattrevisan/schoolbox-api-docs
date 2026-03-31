@@ -9,6 +9,25 @@ body.sbx-body {
     #hybrid-bar {
         margin: var(--sbx-size-m) var(--sbx-size-m) 0 var(--sbx-size-m);
 
+        // make the width of the menu items dynamic to better allow for varying text lengths
+        .top-menu {
+            display: flex;
+            gap: var(--sbx-size-xs);
+            li {
+                width: auto;
+                a {
+                    padding-inline-start: var(--sbx-size-xs);
+                    padding-inline-end: var(--sbx-size-xs);
+                }
+            }
+            @media only print, screen and (max-width: 40em) {
+                display: inline;
+                li {
+                    width: 25%;
+                }
+            }
+        }
+
         // shift the hamburger menu down/across inline with the margin tweak
         #left-off-canvas-toggle {
             left: var(--sbx-size-m);
