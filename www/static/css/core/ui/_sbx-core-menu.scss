@@ -228,30 +228,12 @@ body.sbx-body {
         }
     }
 
+    // side nav used in admin, pastoral settings, news
     .side-nav {
-        border-radius: var(--sbx-border-radius-normal);
         overflow: hidden;
-
         & li {
-            &.active > a {
-                border-left-width: 4px;
-            }
-
-            &.active
-                > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
-                    button.submit
-                ):not(.show-ckeditor-button) {
-                color: var(--sbx-config-color-accent);
-                font-weight: 600;
-            }
-
-            &
-                > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
-                    button.submit
-                ):not(.show-ckeditor-button) {
-                color: var(--sbx-config-color-accent);
-                font-family: var(--ff-primary);
-                padding-block: 0.5rem;
+            & > a {
+                padding-block: var(--sbx-config-box-roundness);
             }
         }
     }
