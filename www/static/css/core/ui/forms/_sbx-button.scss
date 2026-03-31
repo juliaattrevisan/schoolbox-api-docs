@@ -234,7 +234,7 @@ body.sbx-body {
      */
     .f-dropdown,
     .f-dropdown li,
-    .f-dropdown button {
+    .f-dropdown li > button {
         background-color: var(--sbx-color-foreground-primary);
     }
 
