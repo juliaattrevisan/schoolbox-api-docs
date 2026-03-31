@@ -228,7 +228,7 @@ function init_npm_dependencies() {
   fi
 
   log "Building JS/CSS files";
-  time npm run build
+  npm run build
 }
 
 function add_rabbitmq_vhost() {
