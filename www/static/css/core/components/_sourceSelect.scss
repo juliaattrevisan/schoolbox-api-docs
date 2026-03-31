@@ -2,6 +2,7 @@
  */
 .source-select {
     @include form-element;
+    border-radius: var(--sbx-config-field-roundness);
     color: var(--sbx-config-color-accent, $content-ui-foreground);
     font-weight: normal;
     min-height: $global-button-input-height;
@@ -10,30 +11,21 @@
     white-space: nowrap;
     &:hover {
         background-color: $input-hover-bg-color;
-        //color: $input-hover-color;
-        //border-color: $input-border-color;
-        //text-decoration: none !important;
     }
-    //&:focus {
-    //    color: $input-focus-color;
-    //    background-color: $input-focus-bg-color;
-    //    border-color: $input-focus-border-color;
-    //    outline: none;
-    //}
 
     &.icon-folder {
-        color: #000;
+        color: var(--sbx-config-color-accent, #000);
 
         &:before {
-            color: #0066b0;
+            color: var(--sbx-config-color-accent, #0066b0);
             vertical-align: middle;
         }
     }
 
     &.placeholder {
-        color: $aluminum;
+        color: var(--sbx-config-color-accent, $aluminum);
         &.icon-folder:before {
-            color: $aluminum;
+            color: var(--sbx-config-color-accent, $aluminum);
         }
     }
 }
