@@ -17,15 +17,6 @@ const currentValues = window.Vue.ref<Record<string, string>>(
 );
 
 /**
- * Handles input changes for configuration fields
- * @param config - The configuration object that changed
- * @param newValue - The new value for the configuration
- */
-function onInputChange(config: IBConfiguration, newValue: string): void {
-    currentValues.value[config.key] = newValue;
-}
-
-/**
  * Saves the general configuration to the server
  */
 async function saveGeneralConfig(): Promise<void> {
@@ -77,10 +68,9 @@ async function saveGeneralConfig(): Promise<void> {
                     <input
                         :id="`config-${config.key}`"
                         :type="config.type"
-                        :value="currentValues[config.key]"
+                        v-model="currentValues[config.key]"
                         :data-test="`ib-configuration-input-${config.key}`"
                         :disabled="isSaving"
-                        @input="(event) => onInputChange(config, (event.target as HTMLInputElement).value)"
                     />
                 </div>
 
@@ -91,7 +81,7 @@ async function saveGeneralConfig(): Promise<void> {
 
                 <div class="small-12 columns">
                     <button type="submit" class="button submit" :disabled="isSaving">
-                        <i v-if="isSaving" class="fa fa-spinner fa-spin"></i>
+                        <div v-if="isSaving" class="loader"></div>
                         {{ isSaving ? "Saving..." : "Save General Configuration" }}
                     </button>
                 </div>

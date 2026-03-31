@@ -65,8 +65,8 @@ function onConfirm(): void {
                 <label :for="`lang-${lang.code}`">{{ lang.name }}</label>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
-                <button class="button submit l-flex__item--1" @click.prevent="onConfirm">Confirm</button>
                 <button class="button l-flex__item--1" @click.prevent="isOpen = false">Cancel</button>
+                <button class="button submit l-flex__item--1" @click.prevent="onConfirm">Confirm</button>
             </div>
         </div>
     </BasicModal>

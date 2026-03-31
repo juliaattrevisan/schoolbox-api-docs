@@ -1,6 +1,16 @@
--- Create IB configuration entries in the config table
--- This migration adds the school name and school code configuration entries for IB
+-- Add 'ib' to config module enum
+ALTER TABLE `config`
+MODIFY `module` ENUM('settings', 'comms', 'custom', 'oauth', 'schoolData', 'lti', 'report-export', 'feature-tours', 'ai-services', 'differentiation-profiles', 'ib')
+DEFAULT 'settings';
 
+-- Create IB config type
+INSERT INTO `lu_config_type` (`type`, `sequence`)
+VALUES (
+    'International Baccalaureate',
+    (SELECT MAX(sequence) + 1 FROM (SELECT sequence FROM lu_config_type) AS t)
+);
+
+-- Create IB configuration entries in the config table
 INSERT INTO `config` (
     `name`,
     `value`,
@@ -20,13 +30,13 @@ INSERT INTO `config` (
     '',
     'IB School Name',
     'Enter the school\'s name as registered with the International Baccalaureate.',
-    1, -- TEXT INPUT field type
+    (SELECT id FROM lu_config_field WHERE field = 'input'),
     NULL,
-    11, -- TYPE_MODULES
+    (SELECT id FROM lu_config_type WHERE type = 'International Baccalaureate'),
     'true',
     'true',
     'false',
-    'settings',
+    'ib',
     1
 ),
 (
@@ -34,12 +44,12 @@ INSERT INTO `config` (
     '',
     'IB School Code',
     'Enter the school\'s code as provided by the International Baccalaureate.',
-    1, -- TEXT INPUT field type
+    (SELECT id FROM lu_config_field WHERE field = 'input'),
     NULL,
-    11, -- TYPE_MODULES
+    (SELECT id FROM lu_config_type WHERE type = 'International Baccalaureate'),
     'true',
     'true',
     'false',
-    'settings',
+    'ib',
     2
 );

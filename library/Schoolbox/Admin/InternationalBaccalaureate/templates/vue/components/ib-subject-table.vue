@@ -519,8 +519,7 @@ async function saveSubjectConfiguration(): Promise<void> {
                                         v-if="row.isLanguageRow || row.languages.length <= 1"
                                         :value="row.studentCount"
                                         class="table-input"
-                                        type="number"
-                                        min="0"
+                                        type="text"
                                         :disabled="isSaving"
                                         @input="
                                             (event) =>

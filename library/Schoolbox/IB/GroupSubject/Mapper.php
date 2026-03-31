@@ -11,7 +11,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\IB\GroupSubject;
 
+use PDO;
+use PDOStatement;
 use Schoolbox\GenericCollection;
+use Schoolbox\IB\Subject\Mapper as SubjectMapper;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
@@ -35,6 +38,7 @@ class Mapper extends BaseMapper
         $this->uses('group_id', self::TYPE_INTEGER, null, 'groupId');
         $this->uses('subject_id', self::TYPE_INTEGER, null, 'subjectId');
         $this->uses('level', self::TYPE_STRING);
+        $this->joins('subject_id', SubjectMapper::class, 'id', null, null, 'subject', 'subject');
     }
 
     /**
@@ -50,29 +54,59 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Find group-subject relationships by group ID with subject details
-     * @param int $groupId
-     * @return array
+     * @inheritdoc
      */
-    public function findByGroupIdWithSubjects(int $groupId): array
+    protected function getSelectString(): string
     {
-        $sql = "
-            SELECT 
-                gs.id,
-                gs.group_id,
-                gs.subject_id,
-                gs.level,
-                s.name as subject_name
-            FROM ib_group_subjects gs
-            INNER JOIN lu_ib_subjects s ON gs.subject_id = s.id
-            WHERE gs.group_id = :groupId
-            ORDER BY s.name ASC, gs.level ASC
+        $subjectMapper = $this->getJoinMapper('subject');
+
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$subjectMapper->getColumnString('s')}
         ";
+    }
 
-        $statement = $this->getDatabase()->prepare($sql);
-        $statement->bindValue(':groupId', $groupId, \PDO::PARAM_INT);
-        $statement->execute();
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString(): string
+    {
+        return "
+            FROM `{$this->table}`
+            INNER JOIN {$this->getJoinSql('subject', '', 's', true)}
+        ";
+    }
 
-        return $statement->fetchAll(\PDO::FETCH_OBJ);
+    /**
+     * @inheritdoc
+     */
+    protected function hydrateSelect(PDOStatement $statement): GenericCollection
+    {
+        $subjectMapper = $this->getJoinMapper('subject');
+        $collection    = $this->createCollection();
+
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $groupSubject = $this->hydrate($row);
+            $groupSubject->setSubject($subjectMapper->hydrate($row, 's'));
+            $collection[$groupSubject->getId()] = $groupSubject;
+        }
+
+        return $collection;
+    }
+
+    /**
+     * Find group-subject relationships for a given group ID, with subjects hydrated.
+     *
+     * @param int $groupId
+     * @return GenericCollection|Model[]
+     */
+    public function findByGroupId(int $groupId): GenericCollection
+    {
+        $pb = $this->getPredicateBuilder()->equals('group_id', $groupId);
+
+        return $this->findByPredicates($pb, [
+            'order' => ['s.name' => 'ASC', 'level' => 'ASC'],
+        ]);
     }
 }

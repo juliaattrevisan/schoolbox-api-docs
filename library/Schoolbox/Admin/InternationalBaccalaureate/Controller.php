@@ -12,14 +12,15 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\InternationalBaccalaureate;
 
-use Alaress\Web\Controller\Base as BaseController;
+use Alaress\Database\Predicate;
+use Alaress\Web\Controller\ConfigController;
 use Exception;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\IB\GroupSubject\Mapper as IBGroupSubjectMapper;
 
-class Controller extends BaseController
+class Controller extends ConfigController
 {
     /**
      * DP Subject Configuration page
@@ -79,20 +80,13 @@ class Controller extends BaseController
      *
      * @api GET /adminv2/international-baccalaureate/configuration/api/{categoryId}
      */
-    public function getConfigurationData(): void
+    public function getConfigurationData(int $categoryId): void
     {
-        // Get categoryId from URL
-        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
-        $categoryId = 1; // Default
-        if (preg_match('/\/configuration\/api\/(\d+)/', $requestUri, $matches)) {
-            $categoryId = (int) $matches[1];
-        }
-
         $configurations = [];
 
         if ($categoryId === 0) { // General tab - load from config table
             try {
-                $configMapper = new ConfigMapper();
+                $configMapper = $this->getConfigMapper();
 
                 // Get IB config entries that should exist from migration
                 $schoolNameConfig = $configMapper->findOneByColumn(ConfigMapper::COL_NAME, 'ib_school_name');
@@ -148,25 +142,17 @@ class Controller extends BaseController
      *
      * @api GET /adminv2/international-baccalaureate/configuration/api/subjects/{groupId}
      */
-    public function getCategorySubjects(): void
+    public function getCategorySubjects(int $groupId): void
     {
-        // Get groupId from URL
-        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
-        $groupId = 1; // Default
-        if (preg_match('/\/subjects\/(\d+)/', $requestUri, $matches)) {
-            $groupId = (int) $matches[1];
-        }
-
         try {
-            // Fetch subjects for this group from database
             $groupSubjectMapper = new IBGroupSubjectMapper();
-            $groupSubjects = $groupSubjectMapper->findByGroupIdWithSubjects($groupId);
+            $groupSubjects = $groupSubjectMapper->findByGroupId($groupId);
 
             $subjects = [];
             foreach ($groupSubjects as $groupSubject) {
                 $subjects[] = [
-                    'subject' => $groupSubject->subject_name,
-                    'level' => $groupSubject->level ?: ''
+                    'subject' => $groupSubject->getSubject()->getName(),
+                    'level' => $groupSubject->getLevel() ?: ''
                 ];
             }
 
@@ -187,68 +173,29 @@ class Controller extends BaseController
      */
     public function saveConfiguration(): void
     {
-        try {
-            // Get POST data
-            $input = file_get_contents('php://input');
-            $data = json_decode($input, true);
+        $data = (array) $this->requestPost;
 
-            // Handle both single config and configurations array format
-            if (!$data) {
-                throw new Exception('Invalid request data');
-            }
-
-            $configMapper = new ConfigMapper();
-
-            // Check if it's a single config object or an array of configurations
-            if (isset($data['key']) && isset($data['value'])) {
-                // Single configuration format from Vue component
-                $configs = [$data];
-            } elseif (isset($data['configurations'])) {
-                // Array format (for future compatibility)
-                $configs = $data['configurations'];
-            } else {
-                throw new Exception('Invalid request data format');
-            }
-
-            foreach ($configs as $config) {
-                if (!isset($config['key']) || !isset($config['value'])) {
-                    continue;
-                }
-
-                $configKey = $config['key'];
-                $configValue = $config['value'];
-
-                // Only update existing config records (from migration)
-                try {
-                    $existingConfig = $configMapper->findOneByColumn(ConfigMapper::COL_NAME, $configKey);
-
-                    if ($existingConfig !== null) {
-                        // Update existing config value
-                        $existingConfig->setValue($configValue);
-                        $configMapper->save($existingConfig);
-                    } else {
-                        // Config record doesn't exist - migration may not have been run
-                        throw new Exception("Configuration '{$configKey}' not found. Please ensure the database migration has been run.");
-                    }
-                } catch (Exception $e) {
-                    throw new Exception("Failed to save config '{$configKey}': " . $e->getMessage());
-                }
-            }
-
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => true,
-                'message' => 'Configuration saved successfully'
-            ]);
-            exit;
-        } catch (Exception $e) {
-            header('Content-Type: application/json', true, 500);
-            echo json_encode([
-                'success' => false,
-                'message' => 'Failed to save configuration: ' . $e->getMessage()
-            ]);
+        if (!isset($data['key']) || !isset($data['value'])) {
+            header('Content-Type: application/json', true, 400);
+            echo json_encode(['success' => false, 'message' => 'Invalid request data']);
             exit;
         }
+
+        $this->updateConfig(
+            [$data['key'] => $data['value']],
+            $this->buildIbConfigPredicate()
+        );
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'message' => 'Configuration saved successfully']);
+        exit;
+    }
+
+    private function buildIbConfigPredicate(): Predicate\Builder
+    {
+        return $this->getConfigMapper()
+                    ->getPredicateBuilder()
+                    ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_IB);
     }
 
     /**

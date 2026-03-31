@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace Schoolbox\IB\GroupSubject;
 
 use JsonSerializable;
+use Schoolbox\IB\Subject\Model as SubjectModel;
+use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
  * Class Model
@@ -21,11 +23,7 @@ use JsonSerializable;
  */
 class Model implements JsonSerializable
 {
-    /**
-     * Junction ID
-     * @var int|null
-     */
-    private ?int $id = null;
+    use Id;
 
     /**
      * IB Group ID
@@ -46,22 +44,9 @@ class Model implements JsonSerializable
     private ?string $level = null;
 
     /**
-     * @return int|null
+     * @var SubjectModel|null
      */
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param int|null $id
-     * @return self
-     */
-    public function setId(?int $id): self
-    {
-        $this->id = $id;
-        return $this;
-    }
+    private ?SubjectModel $subject = null;
 
     /**
      * @return int|null
@@ -114,6 +99,24 @@ class Model implements JsonSerializable
     public function setLevel(?string $level): self
     {
         $this->level = $level;
+        return $this;
+    }
+
+    /**
+     * @return SubjectModel|null
+     */
+    public function getSubject(): ?SubjectModel
+    {
+        return $this->subject;
+    }
+
+    /**
+     * @param SubjectModel|null $subject
+     * @return self
+     */
+    public function setSubject(?SubjectModel $subject): self
+    {
+        $this->subject = $subject;
         return $this;
     }
 

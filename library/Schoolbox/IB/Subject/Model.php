@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Schoolbox\IB\Subject;
 
 use JsonSerializable;
+use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
  * Class Model
@@ -21,35 +22,13 @@ use JsonSerializable;
  */
 class Model implements JsonSerializable
 {
-    /**
-     * Subject ID
-     * @var int|null
-     */
-    private ?int $id = null;
+    use Id;
 
     /**
      * Subject Name
      * @var string|null
      */
     private ?string $name = null;
-
-    /**
-     * @return int|null
-     */
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param int|null $id
-     * @return self
-     */
-    public function setId(?int $id): self
-    {
-        $this->id = $id;
-        return $this;
-    }
 
     /**
      * @return string|null
