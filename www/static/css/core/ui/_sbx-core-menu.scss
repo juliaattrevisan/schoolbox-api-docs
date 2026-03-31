@@ -59,6 +59,9 @@ body.sbx-body {
                 display: flex;
                 height: 2rem;
                 width: 2rem;
+                &:hover {
+                    background: var(--sbx-config-color-menu-hover);
+                }
 
                 &::before {
                     color: var(--sbx-color-alert-text);
@@ -73,6 +76,12 @@ body.sbx-body {
                     position: absolute;
                     right: -8px;
                     top: -8px;
+                }
+            }
+            & #notification-toggle[data-unread="0"] {
+                background: var(--sbx-config-color-menu-primary);
+                &:hover {
+                    background: var(--sbx-config-color-menu-hover);
                 }
             }
         }
