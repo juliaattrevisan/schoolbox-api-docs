@@ -238,7 +238,8 @@ body.sbx-body {
 
         // the border is removed in www/static/css/core/ui/navigation/_offcanvas.scss
         a.install-button,
-        .enable-notif-button,
+        a.enable-notif-button,
+        a.mark-all-read,
         a[data-msgfooter-action] {
             border-bottom: 1px solid var(--sbx-config-color-accent) !important;
         }

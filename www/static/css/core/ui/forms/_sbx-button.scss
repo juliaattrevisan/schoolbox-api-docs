@@ -297,4 +297,9 @@ body.sbx-body {
         display: flex;
         gap: var(--sbx-size-xxs);
     }
+
+    // add some padding to the buttons at the bottom of the profile page now they are rounded
+    .profile-buttons {
+        padding: var(--sbx-size-s);
+    }
 }
