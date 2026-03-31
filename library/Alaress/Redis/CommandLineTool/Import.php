@@ -26,9 +26,9 @@ class Import extends CliTool\App
 
     private ClientInterface $redis;
 
-    private int $keysRestored        = 0;
-    private int $keysSkippedExpired  = 0;
-    private int $keysSkippedExisting = 0;
+    private int $keysRestored       = 0;
+    private int $keysSkippedExpired = 0;
+    private int $keysSkippedExisting = 0; // strings only
 
     /** @inheritdoc */
     public function getShortOpts(): array
@@ -177,7 +177,7 @@ class Import extends CliTool\App
                 $lastId = (int) $row['id'];
 
                 if ($row['redis_key'] !== $streamKey) {
-                    if ($streamKey !== null && !$streamSkip && $streamType === 'set') {
+                    if ($streamKey !== null && $streamType === 'set' && !$streamSkip) {
                         $this->closeSetKey($streamNewKey, $streamMembers, $streamTtlAbs);
                         $this->keysRestored++;
                         $this->logProgress(++$keysProcessed, $totalKeys);
@@ -199,8 +199,11 @@ class Import extends CliTool\App
                         continue;
                     }
 
-                    if ($this->redis->exists($streamNewKey)) {
-                        $this->getLogger()->warning("Key already exists in Redis, skipping: {$streamNewKey}");
+                    // For string keys, skip if the key already exists in Redis to avoid
+                    // overwriting live data. Set keys are handled by SADD (idempotent) with
+                    // the TTL extended to whichever expiry is later.
+                    if ($streamType === 'string' && $this->redis->exists($streamNewKey)) {
+                        $this->getLogger()->warning("String key already exists in Redis, skipping: {$streamNewKey}");
                         $this->keysSkippedExisting++;
                         $this->logProgress(++$keysProcessed, $totalKeys);
                         $streamSkip = true;
@@ -251,6 +254,12 @@ class Import extends CliTool\App
     }
 
     /**
+     * Flush any remaining buffered members and apply TTL to complete a set key write.
+     *
+     * If the key already exists in Redis, SADD is idempotent. The TTL is set to whichever
+     * expiry is later — the existing one or the one from the export — so we never shorten
+     * a live key's lifetime.
+     *
      * @param string[] $members
      */
     private function closeSetKey(string $newKey, array $members, ?int $ttlAbs): void
@@ -258,8 +267,21 @@ class Import extends CliTool\App
         if (!empty($members) && $this->perform()) {
             $this->redis->sadd($newKey, $members);
         }
-        if ($ttlAbs !== null && $this->perform()) {
-            $this->redis->expireat($newKey, $ttlAbs);
+
+        if (!$this->perform()) {
+            return;
+        }
+
+        $currentTtl    = $this->redis->ttl($newKey);
+        $currentTtlAbs = $currentTtl > 0 ? time() + $currentTtl : null;
+        $effectiveTtlAbs = match (true) {
+            $ttlAbs === null        => $currentTtlAbs,
+            $currentTtlAbs === null => $ttlAbs,
+            default                 => max($ttlAbs, $currentTtlAbs),
+        };
+
+        if ($effectiveTtlAbs !== null) {
+            $this->redis->expireat($newKey, $effectiveTtlAbs);
         }
     }
 
