@@ -303,37 +303,31 @@ function init_npm_dependencies() {
   # so the npm versions it installed are available
   source /opt/nvm/nvm.sh
 
-  time npm ci;
+  local node_modules_dir="$SITE_ROOT/node_modules"
+  local lock_checksum
+  lock_checksum=$(sha1sum "${SITE_ROOT}/npm-shrinkwrap.json" 2>/dev/null | awk '{print $1}')
 
-#  local npm_dir="$SITE_ROOT/node_modules"
-#  local npm_file='npm.tar.gz'
-#  local artifact_file;
-#
-#  # Only use last line of output from function:
-#  # the rest may include logs
-#  artifact_file=$(download_artifact "${npm_file}" 'npm' 'npm-shrinkwrap.json' 'node_modules/npm.shrinkwrap.checksum' "$npm_dir" | tail -n1)
-#
-#  if [ "$artifact_file" = "ignore" ]; then
-#      log "NPM artifact up to date";
-#  else
-#      if [ -f "${CACHE_DIR}/${artifact_file}" ]; then
-#          # Extract content
-#          log "Found matching NPM cache file: now extracting";
-#          rm -fR "$SITE_ROOT"/node_modules 2>/dev/null;
-#          rm -fR "${npm_dir}" 2> /dev/null;
-#          tar xzf "${CACHE_DIR}/${artifact_file}";
-#      else
-#          # Still no luck, build from scratch
-#          log "Cache content:";
-#          cat "${CACHE_DIR}"/npm.cache;
-#          log "No matching NPM cache found. Building with npm";
-#          "$SITE_ROOT"/tools/pkg-build-npm.sh 2>&1;
-#      fi
-#  fi
+  local cache_file="${CACHE_DIR}/node-modules-${lock_checksum}.tar.gz"
+
+  find "${CACHE_DIR}" -name 'node-modules-*.tar.gz' -not -newerat '2 weeks ago' -delete
+
+  if [ -n "$lock_checksum" ] && [ -f "$cache_file" ]; then
+    log "NPM cache hit ($lock_checksum): extracting node_modules"
+    rm -rf "${node_modules_dir}"
+    tar xzf "$cache_file" -C "${SITE_ROOT}"
+    touch "$cache_file"
+  else
+    log "NPM cache miss: running npm ci"
+    npm ci
+
+    if [ -n "$lock_checksum" ]; then
+      log "Caching node_modules for npm-shrinkwrap.json ($lock_checksum)"
+      tar czf "$cache_file" -C "${SITE_ROOT}" node_modules
+    fi
+  fi
 
   log "Building JS/CSS files";
   time npm run build
-#  "$SITE_ROOT"/tools/pkg-build-css-js.sh
 }
 
 function add_rabbitmq_vhost() {
