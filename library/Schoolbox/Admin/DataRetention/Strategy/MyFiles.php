@@ -157,7 +157,7 @@ class MyFiles extends Base
 
         // Delete files and folders using the padded chunk approach to work with Builder placeholders
 
-        // remove any eportfolio file component links that point to these myFile rows (remove the link, leave the component)
+        // remove any eportfolio file component links that point to these myFile rows (remove the link, leave the component (ePortfolio components using this table Image, MyFiles, Image Gallery))
         $eportfolioDeleted = $this->deleteEportfolioFileJoin($fileIds);
 
         // Delete files before folders so folder deletions don't fail due to my_file rows referencing them
@@ -233,6 +233,7 @@ class MyFiles extends Base
     /**
      * Delete eportfolio component file links for the given file ids, returns the number of rows deleted
      * This removes the link but leaves the component (empty) as requested.
+     * ePortfolio components using this table Image, MyFiles, Image Gallery
      * @param array $fileIds
      * @return int
      */
