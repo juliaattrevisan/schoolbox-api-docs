@@ -83,8 +83,8 @@ defineExpose({ hasVisibleContent });
         device.
     </p>
 
-    <a v-if="pwaPromptType.url" class="button" :href="pwaPromptType.url">Install</a>
-    <a v-else-if="pwaPromptType.id !== null" class="button" href="#" @click="onInstallPwa">Install</a>
+    <a v-if="pwaPromptType.url" class="button install-button" :href="pwaPromptType.url">Install</a>
+    <a v-else-if="pwaPromptType.id !== null" class="button install-button" href="#" @click="onInstallPwa">Install</a>
 
     <pwa-menu-install-modal-ios />
 </template>

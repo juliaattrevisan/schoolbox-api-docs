@@ -7,7 +7,7 @@
  */
 
 body.sbx-body {
-    .card img,
+    .card img:not([data-msgitem-thumb], [src*="/icon.php?"]),
     .card .card-feature-avatar,
     .tile,
     .banner img,
@@ -34,7 +34,7 @@ body.sbx-body {
 
     img[src*="/portrait.php?"][src*="size=square32"],
     img[src*="/portrait.php?"][src*="size=square48"],
-    .card.compact img:not(.mime),
+    .card.compact img:not(.mime, [data-msgitem-thumb]),
     .threaded .child .card img,
     .tiny.card img {
         // Small direct portrait images render as circles at or below 48px.

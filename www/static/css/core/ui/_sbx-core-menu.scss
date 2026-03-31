@@ -204,20 +204,50 @@ body.sbx-body {
 
     // Notifications menu styles
     #message-list {
+        padding: var(--sbx-size-xs);
         #right-menu-dock,
         .settings-button {
             border-radius: var(--sbx-config-field-roundness);
             color: var(--sbx-config-color-accent);
             padding: var(--sbx-size-xs);
+            top: var(--sbx-size-xs);
             &:hover {
                 background: var(--sbx-config-color-active);
             }
+        }
+        #right-menu-dock {
+            left: var(--sbx-size-xs);
+        }
+        .settings-button {
+            right: var(--sbx-size-xs);
         }
 
         #notification-toggle-full {
             background-color: var(--sbx-color-foreground-primary);
             color: var(--sbx-color-text-primary);
+            font-weight: var(--sbx-font-weight-active);
             text-transform: none;
+        }
+
+        // to distinguish the pwa setup from the other parts
+        .pwa-side-panel {
+            background: var(--sbx-color-foreground-secondary);
+            border-radius: var(--sbx-config-box-roundness);
+            margin-bottom: var(--sbx-size-s);
+        }
+
+        // the border is removed in www/static/css/core/ui/navigation/_offcanvas.scss
+        a.install-button,
+        .enable-notif-button,
+        a[data-msgfooter-action] {
+            border-bottom: 1px solid var(--sbx-config-color-accent) !important;
+        }
+
+        #msg-content {
+            margin-top: var(--sbx-size-s);
+            li {
+                padding: var(--sbx-size-xs);
+            }
         }
     }
 
