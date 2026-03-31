@@ -100,11 +100,18 @@ class Import extends CliTool\App
         $localPath  = sys_get_temp_dir() . '/' . $sourceInstanceId . '_redis_migration.sqlite';
 
         $this->getLogger()->notice("Downloading s3://{$bucket}/{$s3Key}");
-        $client->getObject([
-            'Bucket' => $bucket,
-            'Key'    => $s3Key,
-            'SaveAs' => $localPath,
-        ]);
+        try {
+            $client->getObject([
+                'Bucket' => $bucket,
+                'Key'    => $s3Key,
+                'SaveAs' => $localPath,
+            ]);
+        } catch (\Aws\S3\Exception\S3Exception $e) {
+            $this->getLogger()->error(
+                "s3://{$bucket}/{$s3Key} not found. Has the export been run for instance '{$sourceInstanceId}'?"
+            );
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
         $this->getLogger()->notice('Download complete.');
 
         return $localPath;
