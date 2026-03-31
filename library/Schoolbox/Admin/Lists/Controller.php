@@ -1976,7 +1976,7 @@ class Controller extends Base
             $rows     = $mapper->findAll(['order' => $orderArr]);
         }
 
-        $idGetter = $tables[$table]['fields']['id']['getter'] ?? 'getId';
+        $idGetter = $tables[$table]['fields']['id']['getter'] ?? $mapper->getGetIdentifierMethodName();
 
         foreach ($rows as $row) {
             $rowId = $row->$idGetter();
