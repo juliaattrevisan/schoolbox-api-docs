@@ -66,9 +66,9 @@ class Export extends CliTool\App
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
-        $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?: null;
+        $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?: (defined('INSTANCE_ID') ? INSTANCE_ID : null);
         if (!$instanceId) {
-            $this->getLogger()->error('--instance-id is required.');
+            $this->getLogger()->error('Unable to determine instance ID. Provide --instance-id.');
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
@@ -296,7 +296,7 @@ class Export extends CliTool\App
         as redis-{instanceId}.sqlite, using the instance's configured OTFS S3 credentials.
 
         Options:
-          --instance-id [ID]   Source Schoolbox instance ID (required)
+          --instance-id [ID]   Source Schoolbox instance ID (default: current INSTANCE_ID)
           -p, --perform        Apply changes (default: dry-run, no changes made)
           -h, --help           Print this message and exit
 
