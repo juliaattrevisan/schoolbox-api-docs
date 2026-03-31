@@ -4,7 +4,6 @@
  * Search field is used to filter the results, then the relevant
  * search result can be selected to move to the relevant page/setting
  */
-import { gsap } from "gsap/all";
 import ScrollFadeWrapper from "@schoolboxVue/components/scroll-fade-wrapper.vue";
 import AdminSettingsSearchResult from "./admin-settings-search-result.vue";
 
@@ -251,45 +250,6 @@ export default window.Vue.defineComponent({
         },
 
         /**
-         * how the element animates off
-         */
-        checkEachResultIndex() {
-            (this.$refs.searchResults as InstanceType<typeof AdminSettingsSearchResult>[]).forEach((searchResult) => {
-                searchResult.checkIndex();
-            });
-        },
-
-        /**
-         * animate settings to help context when filtering
-         * refer to https://vuejs.org/v2/guide/transitions.html#Staggering-List-Transitions
-         * what happens before shown
-         * @param element - the element that's animating
-         */
-        onBeforeOnEnter(element: Element) {
-            gsap.set(element, { opacity: 0, y: 10, height: 0 });
-        },
-
-        /**
-         * how it element animates on
-         * @param element - the element that's animating
-         * @param done - to be called once animation is complete
-         */
-        onEnter(element: Element, done: () => void) {
-            const elementIndex = element.getAttribute("index") ?? "0";
-            const delay = parseInt(elementIndex, 10) * 0.025;
-            gsap.to(element, { duration: 0.3, opacity: 1, y: 0, height: "auto", delay, onComplete: done });
-        },
-
-        /**
-         * how the element animates off
-         * @param element - the element that's animating
-         * @param done - to be called once animation is complete
-         */
-        onLeave(element: Element, done: () => void) {
-            gsap.to(element, { duration: 0.3, opacity: 0, y: 10, height: 0, onComplete: done });
-        },
-
-        /**
          * a result has been moused over via #admin-settings-search-result
          */
         onMouseOverResult() {
@@ -338,17 +298,7 @@ export default window.Vue.defineComponent({
             @input="query = ($event.target as HTMLInputElement).value /* Fix Android events SA-12170 */"
         />
         <scroll-fade-wrapper wrapper-tag="div" slotted-element-selector="ul">
-            <transition-group
-                name="staggered-fade"
-                tag="ul"
-                :css="false"
-                @before-enter="onBeforeOnEnter"
-                @enter="onEnter"
-                @enter-cancelled="checkEachResultIndex"
-                @leave="onLeave"
-                @after-leave="checkEachResultIndex"
-                @leave-cancelled="checkEachResultIndex"
-            >
+            <ul>
                 <li
                     v-for="(result, index) in resultsList"
                     :key="`${result.name}-${index}`"
@@ -364,7 +314,7 @@ export default window.Vue.defineComponent({
                         @on-selected-result="onSelectedResult"
                     />
                 </li>
-            </transition-group>
+            </ul>
         </scroll-fade-wrapper>
     </div>
 </template>
