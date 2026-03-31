@@ -98,6 +98,9 @@ abstract class Base implements IStrategy
 
         // chunk things into $this->chunkSize
         foreach (array_chunk($deleteIds, $this->chunkSize) as $chunkNum => $chunk) {
+            // refresh the lock to start the chunk with a fresh time period
+            $this->lock->refresh();
+
             // capture time, so we know how long a chunk took
             $start = microtime(true);
             // begin transaction for the chunk
@@ -144,7 +147,6 @@ abstract class Base implements IStrategy
                     return;
                 }
                 $chunkLoop++;
-                $this->lock->refresh();
             }
         }
     }
