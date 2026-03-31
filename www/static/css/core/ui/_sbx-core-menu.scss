@@ -34,10 +34,10 @@ body.sbx-body {
             width: 3rem;
             top: 50%;
             transform: translateY(-50%);
-            border-radius: var(--sbx-border-radius-normal);
+            border-radius: var(--sbx-config-field-roundness);
             overflow: hidden;
             & img {
-                border-radius: var(--sbx-border-radius-normal);
+                border-radius: var(--sbx-config-field-roundness);
             }
         }
 
@@ -181,7 +181,7 @@ body.sbx-body {
     // Left menu styles when left menu is not open
     .off-canvas-wrap.move-right :not(.left-open) {
         & #left-menu {
-            border-radius: var(--sbx-border-radius-normal);
+            border-radius: var(--sbx-config-box-roundness);
             box-shadow: var(--sbx-shadow-m);
             left: 1rem;
             top: 1rem;
@@ -191,7 +191,7 @@ body.sbx-body {
     // Notifications menu styles when left menu is not open
     .off-canvas-wrap.move-left :not(.left-open) {
         & #msgs {
-            border-radius: var(--sbx-border-radius-normal);
+            border-radius: var(--sbx-config-box-roundness);
             box-shadow: var(--sbx-shadow-m);
             right: 1rem;
             top: 1rem;
@@ -202,7 +202,6 @@ body.sbx-body {
             }
 
             & #notification-toggle-full {
-                background-color: var(--bg-primary) !important;
                 color: var(--sbx-config-color-accent);
             }
         }

@@ -37,7 +37,7 @@
         align-items: center;
         background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
         border: 1px solid var(--sbx-config-color-accent);
-        border-radius: var(--sbx-border-radius-normal);
+        border-radius: var(--sbx-config-field-roundness);
         box-sizing: content-box;
         display: inline-flex;
         height: calc(var(--diameter) + var(--offset) * 2);
@@ -49,7 +49,7 @@
             // the toggle
             background-color: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
             border: 1px solid var(--sbx-config-color-accent);
-            border-radius: 50%;
+            border-radius: var(--sbx-config-field-roundness);
             box-sizing: border-box;
             content: "";
             height: var(--diameter);
