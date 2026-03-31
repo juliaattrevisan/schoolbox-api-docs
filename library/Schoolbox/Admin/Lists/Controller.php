@@ -29,6 +29,13 @@ use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
+use Schoolbox\Learning\Assessment\Lti\Model as Lti;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Moment\Tag\Mapper as LearningMomentEvidenceTag;
@@ -565,7 +572,8 @@ class Controller extends Base
                     continue;
                 }
 
-                if ($model->$getter() !== $value[$currentIndex]) {
+                // If $model is a new record, or the value of $field has changed...
+                if ($oldModel === null || $model->$getter() !== $value[$currentIndex]) {
                     // Update values
                     $setter = $mapper->getSetMethodName($field);
                     if (!method_exists($model, $setter)) {
@@ -1096,6 +1104,13 @@ class Controller extends Base
                         'width'     => 1,
                         'readonly'  => true,
                     ],
+                    'name'          => [
+                        'caption'   => 'Name',
+                        'width'     => 3,
+                        'maxLength' => 40,
+                        'mandatory' => true,
+                        'default'   => '',
+                    ],
                     'showOnGradesPage' => [
                         'caption'   => 'Grades page',
                         'tooltip'   => 'If checked, assessments with this work type will appear on the grades summary page.',
@@ -1104,26 +1119,82 @@ class Controller extends Base
                         'default'   => false,
                         'tooltipPosition' => 'right',
                     ],
-                    'staffOrInstructorVisibleOnly' => [
-                        'caption'   => 'Visible to Staff & Instructors only',
-                        'tooltip'   => 'If checked, assessments with this work-type will only be visible to Staff or Instructors. Assessment marks will still be included in aggregate marks',
-                        'checkbox'  => true,
-                        'width'     => 2,
-                        'default'   => false,
-                        'tooltipPosition' => 'right',
-                    ],
-                    'name'          => [
-                        'caption'   => 'Name',
-                        'width'     => 6,
-                        'maxLength' => 40,
+                    'visibility' => [
+                        'getter'    => 'getVisibility', // Note this function returns a value derived from isVisibleToParents and isVisibleToStudents.
+                        'caption'   => 'Visibility',
                         'mandatory' => true,
-                        'default'   => '',
+                        'default'   => WorkTypeMapper::VISIBILITY_STAFF_ONLY,
+                        'lookup'    => [
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_ONLY, 'value' => 'Staff Only'],
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_STUDENTS, 'value' => 'Staff & Students'],
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_PARENTS, 'value' => 'Staff & Parents'],
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_STUDENTS_PARENTS, 'value' => 'Staff, Students & Parents'],
+                        ],
+                        'nullable'  => false,
+                        'width'     => 2,
+                        'tooltip'   => 'Select the role types that have access to view learning activities using this work type.  Access includes the assigning of the learning activity and the feedback that is made visible.',
+                    ],
+                    'permittedActivities' => [
+                        'caption'   => 'Permitted Activities',
+                        'isPopOutList' => true,
+                        'nullable'  => false,
+                        'width'     => 3,
+                        'tooltip'   => 'Select the activity types that will be allowed to utilise this work type.',
                     ],
                     'externalResultType' => [
                         'caption'   => 'External SIS Type',
                         'width'     => 2,
                         'default'   => '',
-                    ]
+                    ],
+                    'permittedProject' => [
+                        'caption'    => Project::getDefaultTypeName(),
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'permittedActivities',
+                    ],
+                    'permittedDueWork' => [
+                        'caption'    => DueWork::getDefaultTypeName(),
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'permittedActivities',
+                    ],
+                    'permittedTask' => [
+                        'caption'    => Task::getDefaultTypeName(),
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'permittedActivities',
+                    ],
+                    'permittedQuiz' => [
+                        'caption'    => Quiz::getDefaultTypeName(),
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'permittedActivities',
+                    ],
+                    'permittedLti' => [
+                        'caption'    => Lti::getDefaultTypeName(),
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'permittedActivities',
+                    ],
+                    'permittedLessonPlan' => [
+                        'caption'    => LessonPlan::getDefaultTypeName(),
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'permittedActivities',
+                    ],
+                    'permittedDialogAgent' => [
+                        'caption'    => DialogAgent::getDefaultTypeName(),
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'permittedActivities',
+                    ],
                 ]
             ],
             'submission-errors'     => [
@@ -1831,7 +1902,11 @@ class Controller extends Base
             $rows     = $mapper->findAll(['order' => $orderArr]);
         }
 
+        $idGetter = $tables[$table]['fields']['id']['getter'] ?? 'getId';
+
         foreach ($rows as $row) {
+            $rowId = $row->$idGetter();
+
             // Go through every property available
 
             foreach ($properties as $prop) {
@@ -1850,16 +1925,8 @@ class Controller extends Base
                         }
 
                         if ($reflect->hasMethod($getter)) {
-                            if (isset($tables[$table]['fields']['id']['getter'])) {
-                                $idGetter = $tables[$table]['fields']['id']['getter'];
-                            } else {
-                                $idGetter = 'getId';
-                            }
-
-                            $id = $row->$idGetter();
-
-                            if (!isset($records[$id])) {
-                                $records[$id] = [];
+                            if (!isset($records[$rowId])) {
+                                $records[$rowId] = [];
                             }
 
                             $value = $row->$getter();
@@ -1870,15 +1937,28 @@ class Controller extends Base
                                 $value = $value->getId();
                             }
 
-                            $records[$id][$prop->getName()] = $value;
+                            $records[$rowId][$prop->getName()] = $value;
                         }
+                    }
+                }
+            }
+
+            // Handle fields with explicit getters that don't correspond to a model property (derived or computed fields).
+            // (e.g. Assessment\WorkType\Model->getVisibility() derives its return value from other properties.)
+            foreach ($tables[$table]['fields'] as $fieldName => $fieldConfig) {
+                if (isset($fieldConfig['getter']) && !isset($records[$rowId][$fieldName])) {
+                    $getter = $fieldConfig['getter'];
+                    if ($reflect->hasMethod($getter)) {
+                        if (!isset($records[$rowId])) {
+                            $records[$rowId] = [];
+                        }
+                        $records[$rowId][$fieldName] = $row->$getter();
                     }
                 }
             }
         }
 
         // Stick a name column in those with no fields defined
-
         foreach ($tables as $tableCurrent) {
             if (!isset($tableCurrent['fields'])) {
                 $tableCurrent['fields']         = [];

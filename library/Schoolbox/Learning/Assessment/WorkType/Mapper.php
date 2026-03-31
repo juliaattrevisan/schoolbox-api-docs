@@ -19,6 +19,11 @@ use Schoolbox;
  */
 class Mapper extends Schoolbox\Mapper
 {
+    public const string VISIBILITY_STAFF_ONLY = 'staffOnly';
+    public const string VISIBILITY_STAFF_STUDENTS = 'staffAndStudents';
+    public const string VISIBILITY_STAFF_PARENTS = 'staffAndParents';
+    public const string VISIBILITY_STAFF_STUDENTS_PARENTS = 'staffAndStudentsAndParents';
+
     /**
      * @inheritdoc
      */
@@ -31,6 +36,15 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('external_result_type', self::TYPE_STRING);
         $this->uses('show_on_grades_page', self::TYPE_BOOLEAN);
         $this->uses('staff_or_instructor_visible_only', self::TYPE_BOOLEAN);
+        $this->uses('is_visible_to_parents', self::TYPE_BOOLEAN);
+        $this->uses('is_visible_to_students', self::TYPE_BOOLEAN);
+        $this->uses('permitted_project', self::TYPE_BOOLEAN);
+        $this->uses('permitted_due_work', self::TYPE_BOOLEAN);
+        $this->uses('permitted_task', self::TYPE_BOOLEAN);
+        $this->uses('permitted_quiz', self::TYPE_BOOLEAN);
+        $this->uses('permitted_lti', self::TYPE_BOOLEAN);
+        $this->uses('permitted_lesson_plan', self::TYPE_BOOLEAN);
+        $this->uses('permitted_dialog_agent', self::TYPE_BOOLEAN);
 
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('updated_by', self::TYPE_INTEGER);

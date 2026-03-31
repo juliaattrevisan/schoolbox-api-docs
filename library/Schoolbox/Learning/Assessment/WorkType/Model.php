@@ -55,6 +55,34 @@ class Model implements ISoftDeletable, Sequential
     /** @var bool */
     private $staffOrInstructorVisibleOnly;
 
+    /** @var ?bool */
+    private ?bool $isVisibleToParents = null;
+
+    /** @var ?bool */
+    private ?bool $isVisibleToStudents = null;
+
+    /** @var ?bool */
+    private ?bool $permittedProject = null;
+
+    /** @var ?bool */
+    private ?bool $permittedDueWork = null;
+
+    /** @var ?bool */
+    private ?bool $permittedTask = null;
+
+    /** @var ?bool */
+    private ?bool $permittedQuiz = null;
+
+    /** @var ?bool */
+    private ?bool $permittedLti = null;
+
+    /** @var ?bool */
+    private ?bool $permittedLessonPlan = null;
+
+    /** @var ?bool */
+    private ?bool $permittedDialogAgent = null;
+
+
     /**
      * @return bool
      */
@@ -156,9 +184,7 @@ class Model implements ISoftDeletable, Sequential
 
 
     /**
-     * Mapper-compatible getter.
-     *
-     * @return bool
+     * @return ?bool
      */
     public function getStaffOrInstructorVisibleOnly(): ?bool
     {
@@ -174,5 +200,216 @@ class Model implements ISoftDeletable, Sequential
     {
         $this->staffOrInstructorVisibleOnly = $staffOrInstructorVisibleOnly;
         return $this;
+    }
+
+    /**
+     * @return ?bool
+     */
+    public function getIsVisibleToParents(): ?bool
+    {
+        return $this->isVisibleToParents;
+    }
+
+    /**
+     * @param bool $isVisibleToParents
+     * @return self
+     */
+    public function setIsVisibleToParents(bool $isVisibleToParents): self
+    {
+        $this->isVisibleToParents = $isVisibleToParents;
+        return $this;
+    }
+
+    /**
+     * @return ?bool
+     */
+    public function getIsVisibleToStudents(): ?bool
+    {
+        return $this->isVisibleToStudents;
+    }
+
+    /**
+     * @param bool $isVisibleToStudents
+     * @return self
+     */
+    public function setIsVisibleToStudents(bool $isVisibleToStudents): self
+    {
+        $this->isVisibleToStudents = $isVisibleToStudents;
+        return $this;
+    }
+
+    /**
+     * Return the visibility of the work type as a string constant, derived from the visibility booleans.
+     * @throws InsufficientHydrationException
+     * @return string
+     */
+    public function getVisibility(): string
+    {
+        if ($this->isVisibleToParents === null || $this->isVisibleToStudents === null) {
+            // If not for this exception, this function would return a non-null value even when the underlying data
+            // items have not been hydrated.  Avoid misleading the caller by throwing an exception.
+            throw new InsufficientHydrationException('Cannot determine visibility from NULL property');
+        }
+
+        return match ([$this->isVisibleToParents, $this->isVisibleToStudents]) {
+            [false, false] => Mapper::VISIBILITY_STAFF_ONLY,
+            [false, true ] => Mapper::VISIBILITY_STAFF_STUDENTS,
+            [true , false] => Mapper::VISIBILITY_STAFF_PARENTS,
+            [true , true ] => Mapper::VISIBILITY_STAFF_STUDENTS_PARENTS,
+        };
+    }
+
+    /**
+     * Set the visibility booleans given a string constant.
+     * @param string $visibility
+     * @throws \UnexpectedValueException
+     * @return self
+     */
+    public function setVisibility(string $visibility): self
+    {
+        switch ($visibility) {
+            case Mapper::VISIBILITY_STAFF_ONLY:
+                $this->isVisibleToStudents = false;
+                $this->isVisibleToParents = false;
+                $this->staffOrInstructorVisibleOnly = true; // Set this to keep this field working until it is removed in SA-21973.
+                break;
+            case Mapper::VISIBILITY_STAFF_STUDENTS:
+                $this->isVisibleToStudents = true;
+                $this->isVisibleToParents = false;
+                $this->staffOrInstructorVisibleOnly = false; // Set this to keep this field working until it is removed in SA-21973.
+                break;
+            case Mapper::VISIBILITY_STAFF_PARENTS:
+                $this->isVisibleToStudents = false;
+                $this->isVisibleToParents = true;
+                $this->staffOrInstructorVisibleOnly = false; // Set this to keep this field working until it is removed in SA-21973.
+                break;
+            case Mapper::VISIBILITY_STAFF_STUDENTS_PARENTS:
+                $this->isVisibleToStudents = true;
+                $this->isVisibleToParents = true;
+                $this->staffOrInstructorVisibleOnly = false; // Set this to keep this field working until it is removed in SA-21973.
+                break;
+            default:
+                throw new \UnexpectedValueException('Unknown visibility: ' . $visibility);
+        }
+        return $this;
+    }
+
+    /**
+     * @return ?bool
+     */
+    public function getPermittedProject(): ?bool
+    {
+        return $this->permittedProject;
+    }
+
+    /**
+     * @param bool $permittedProject
+     * @return void
+     */
+    public function setPermittedProject(bool $permittedProject): void
+    {
+        $this->permittedProject = $permittedProject;
+    }
+
+    /**
+     * @return ?bool
+     */
+    public function getPermittedDueWork(): ?bool
+    {
+        return $this->permittedDueWork;
+    }
+
+    /**
+     * @param bool $permittedDueWork
+     * @return void
+     */
+    public function setPermittedDueWork(bool $permittedDueWork): void
+    {
+        $this->permittedDueWork = $permittedDueWork;
+    }
+
+    /**
+     * @return ?bool
+     */
+    public function getPermittedTask(): ?bool
+    {
+        return $this->permittedTask;
+    }
+
+    /**
+     * @param bool $permittedTask
+     * @return void
+     */
+    public function setPermittedTask(bool $permittedTask): void
+    {
+        $this->permittedTask = $permittedTask;
+    }
+
+    /**
+     * @return ?bool
+     */
+    public function getPermittedQuiz(): ?bool
+    {
+        return $this->permittedQuiz;
+    }
+
+    /**
+     * @param bool $permittedQuiz
+     * @return void
+     */
+    public function setPermittedQuiz(bool $permittedQuiz): void
+    {
+        $this->permittedQuiz = $permittedQuiz;
+    }
+
+    /**
+     * @return ?bool
+     */
+    public function getPermittedLti(): ?bool
+    {
+        return $this->permittedLti;
+    }
+
+    /**
+     * @param bool $permittedLti
+     * @return void
+     */
+    public function setPermittedLti(bool $permittedLti): void
+    {
+        $this->permittedLti = $permittedLti;
+    }
+
+    /**
+     * @return ?bool
+     */
+    public function getPermittedLessonPlan(): ?bool
+    {
+        return $this->permittedLessonPlan;
+    }
+
+    /**
+     * @param bool $permittedLessonPlan
+     * @return void
+     */
+    public function setPermittedLessonPlan(bool $permittedLessonPlan): void
+    {
+        $this->permittedLessonPlan = $permittedLessonPlan;
+    }
+
+    /**
+     * @return ?bool
+     */
+    public function getPermittedDialogAgent(): ?bool
+    {
+        return $this->permittedDialogAgent;
+    }
+
+    /**
+     * @param bool $permittedDialogAgent
+     * @return void
+     */
+    public function setPermittedDialogAgent(bool $permittedDialogAgent): void
+    {
+        $this->permittedDialogAgent = $permittedDialogAgent;
     }
 }

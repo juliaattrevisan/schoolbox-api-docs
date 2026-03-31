@@ -94,7 +94,7 @@ export default {
         },
 
         /**
-         * Pass through the array of options that fill out the pop out and dicate its display status
+         * Pass through the array of options that fill out the pop out and dictate its display status
          *
          * @param { Array }
          */
@@ -104,13 +104,13 @@ export default {
         },
 
         /**
-         * Pass through the array of options that fill out the pop out and dicate its display status
+         * Pass through the array of options that fill out the pop out and dictate its display status
          *
          * @param { Array }
          */
         checkIfDisabled(changePopOutOptions) {
             if (changePopOutOptions.length > 0) {
-                //if there's no options avaiable in the current changePopOut value, opening the pop out should be disabled
+                //if there's no options available in the current changePopOut value, opening the pop out should be disabled
                 this.isPopOutDisabled = false;
             } else {
                 this.isPopOutDisabled = true;
@@ -118,7 +118,7 @@ export default {
         },
 
         /**
-         * Pass through the array of options that fill out the pop out and dicate its display status
+         * Pass through the array of options that fill out the pop out and dictate its display status
          *
          * @param { Array }
          */
