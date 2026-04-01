@@ -60,7 +60,7 @@ class SentryWrapper implements CacheInterface
             'cache.get',
             'auto.cache',
             $this->generateData(key: $key),
-            fn (bool $result) => [
+            fn (mixed $result) => [
                 'cache.hit'       => $result !== $default,
                 'cache.item_size' => $this->calculateItemSize($result),
                 'cache.success'   => true,
