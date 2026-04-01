@@ -177,4 +177,28 @@ class Group
     {
         return $this->notificationDisabled;
     }
+
+    /**
+     * Transient: total active members for this group, populated by GroupMapper::findAllForApi().
+     * Not persisted to the database.
+     */
+    private int $memberCount = 0;
+
+    /**
+     * @return int
+     */
+    public function getMemberCount(): int
+    {
+        return $this->memberCount;
+    }
+
+    /**
+     * @param int $memberCount
+     * @return self
+     */
+    public function setMemberCount(int $memberCount): self
+    {
+        $this->memberCount = $memberCount;
+        return $this;
+    }
 }

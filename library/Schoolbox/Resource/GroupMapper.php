@@ -170,4 +170,83 @@ class GroupMapper extends Mapper
         }
         return $groupsArr;
     }
+
+    /**
+     * Return a paginated list of groups for the API, with optional name and type filters.
+     *
+     * @param string   $q      Partial name match. Empty string means no filter.
+     * @param int|null $type   Group::PRIVATE_GROUP, MODERATED_GROUP, or FREE_GROUP. Null means no filter.
+     * @param int      $limit  Maximum number of results to return.
+     * @param int|null $cursor Return only groups with folder id > this value. Null means start from beginning.
+     * @return array{results: \Schoolbox\GenericCollection, nextCursor: int|null}
+     */
+    public function findAllForApi(string $q, ?int $type, int $limit, ?int $cursor): array
+    {
+        /** @var FolderMapper $folderMapper */
+        $folderMapper = $this->getJoinMapper('folder');
+
+        $conditions = [];
+        $params     = [
+            'service'   => UserAccess::SERVICE_HOMEPAGE,
+            'minAccess' => UserAccess::ACCESS_READ, // >= ACCESS_READ excludes pending (ACCESS_AWAITING_AUTHORISATION=0) and denied (ACCESS_DENY=0) users
+            'limit'     => $limit,
+        ];
+
+        if ($q !== '') { // empty string = no name filter
+            $conditions[] = 'f.name LIKE :name';
+            $params['name'] = "%{$q}%";
+        }
+
+        if ($type !== null) {
+            $conditions[] = 'ug.type = :type';
+            $params['type'] = $type;
+        }
+
+        if ($cursor !== null) {
+            $conditions[] = 'f.id > :cursor';
+            $params['cursor'] = $cursor;
+        }
+
+        $where = $conditions ? 'WHERE ' . implode(' AND ', $conditions) : '';
+
+        $query = "
+            SELECT
+                {$this->getColumnString('ug')},
+                {$this->getJoinColumnString('folder', 'f')},
+                COALESCE(mc.cnt, 0) AS member_count
+            FROM `{$this->getTable()}` ug
+            INNER JOIN {$this->getJoinSql('folder', 'ug', 'f')}
+            LEFT JOIN (
+                SELECT sid, COUNT(*) AS cnt
+                FROM userAccess
+                WHERE service = :service
+                AND type >= :minAccess
+                GROUP BY sid
+            ) AS mc ON mc.sid = f.id
+            {$where}
+            ORDER BY f.id ASC
+            LIMIT :limit
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->bindValue('limit', $limit, PDO::PARAM_INT);
+        unset($params['limit']);
+        $statement->execute($params);
+
+        $groups = $this->createCollection();
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $group = $this->hydrate($row)
+                ->setFolder($folderMapper->hydrate($row, 'f'))
+                ->setMemberCount((int)$row['member_count']);
+            $groups[$group->getFolder()->getId()] = $group;
+        }
+
+        // When results exactly fill a page, we return a cursor pointing to the last result.
+        // The subsequent request will return an empty page with next=null, which is expected behaviour.
+        $nextCursor = $groups->count() === $limit
+            ? $groups->last()->getFolder()->getId()
+            : null;
+
+        return ['results' => $groups, 'nextCursor' => $nextCursor];
+    }
 }
