@@ -83,6 +83,7 @@ class ConfiguredDispatchStrategyBuilder
             $this->maxRequestsPerWorker,
             $this->workerWriteTimeout,
             $this->metricInterval,
+            $this->maxFutureTriggerTime,
         );
     }
 
