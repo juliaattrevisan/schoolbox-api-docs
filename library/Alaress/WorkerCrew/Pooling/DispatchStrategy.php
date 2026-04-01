@@ -53,20 +53,51 @@ class DispatchStrategy implements DispatchStrategyInterface
     protected $protocol;
 
 
-    /** @var string */
-    protected $flags;
+//    /** @var string */
+//    protected $flags;
 
 
     /**
+     * @param int    $minWorkers
+     * @param int    $maxWorkers
+     * @param int    $maxFlywheel
+     * @param int    $queueDelay
+     * @param int    $queueWarnSize
+     * @param int    $queueMaxSize
+     * @param int    $idleTimeout
+     * @param int    $workerTimeoutSoft
+     * @param int    $workerTimeoutHard
      * @param string $flags
+     * @param int    $maxRequestsPerWorker
+     * @param int    $maxFutureTriggerTime
      */
-    public function __construct($flags = '')
-    {
-        $this->flywheelSpins = self::MAX_FLYWHEEL;
+    public function __construct(
+        private $minWorkers = DispatchStrategy::MIN_WORKERS,
+        private $maxWorkers = DispatchStrategy::MAX_WORKERS,
+        private $maxFlywheel = DispatchStrategy::MAX_FLYWHEEL,
+        private $queueDelay = DispatchStrategy::QUEUE_DELAY,
+        private $queueWarnSize = DispatchStrategy::QUEUE_SIZE_WARN,
+        private $queueMaxSize = DispatchStrategy::QUEUE_SIZE_MAX,
+        private $idleTimeout = DispatchStrategy::IDLE_TIMEOUT,
+        private $workerTimeoutSoft = DispatchStrategy::WORKER_SOFT_TIMEOUT,
+        private $workerTimeoutHard = DispatchStrategy::WORKER_HARD_TIMEOUT,
+        private $flags = '',
+        private $maxRequestsPerWorker = DispatchStrategy::MAX_REQUESTS_PER_WORKER,
+        private $maxFutureTriggerTime = DispatchStrategy::MAX_FUTURE_TRIGGER_TIME,
+    ) {
+        $this->flywheelSpins = $maxFlywheel;
         $this->protocol      = new AlaressIPCProtocol();
-        $this->flags         = $flags;
     }
 
+//    /**
+//     * @param string $flags
+//     */
+//    public function __construct($flags = '')
+//    {
+//        $this->flywheelSpins = self::MAX_FLYWHEEL;
+//        $this->protocol      = new AlaressIPCProtocol();
+//        $this->flags         = $flags;
+//    }
 
     /**
      * Get the name of the strategy currently being used
