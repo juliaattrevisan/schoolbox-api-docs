@@ -174,7 +174,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
 
         // Don't schedule this trigger if it's more than a configured amount of
         // time in advance.
-        if (($this->maxFutureTriggerTime ?? 0) >= 0 && $interval > $this->maxFutureTriggerTime) {
+        if (($this->maxFutureTriggerTime ?? 0) > 0 && $interval > $this->maxFutureTriggerTime) {
             $this->log->info(
                 sprintf(
                     "[AbstractScheduler] Trigger with timestamp too far in the future, not dispatching: %s %s (timestamp: %s, max time: %s)",

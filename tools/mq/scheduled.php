@@ -65,9 +65,10 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $postman = new Postman($log, $subscriptionCache, $loop, $flags, INSTANCE_ID, $redis);
 
         // Relevant config options to scheduled:
-        $stratBuilder = new ConfiguredDispatchStrategyBuilder(new ConfigurationReader($configFile)->readConfig());
-        $strat        = $stratBuilder->build($flags);
-        $scheduler    = new Scheduler(
+        $stratBuilder         = new ConfiguredDispatchStrategyBuilder(new ConfigurationReader($configFile)->readConfig());
+        $strat                = $stratBuilder->build($flags);
+        $maxFutureTriggerTime = $strat->getMaxFutureTriggerTime();
+        $scheduler            = new Scheduler(
             $loop,
             $strat,
             $log,
@@ -77,7 +78,9 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
             INSTANCE_ID,
             // Since future triggers are cached using the JIT cache, the max
             // future trigger time must be <= the JIT's TTL.
-            min($strat->getMaxFutureTriggerTime(), RedisCache::EXPIRY_WINDOW),
+            $maxFutureTriggerTime > 0
+                ? min($strat->getMaxFutureTriggerTime(), RedisCache::EXPIRY_WINDOW)
+                : 0,
         );
 
         // Summarise strategy
