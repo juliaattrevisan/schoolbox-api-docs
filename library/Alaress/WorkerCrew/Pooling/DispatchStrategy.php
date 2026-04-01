@@ -20,7 +20,7 @@ use OutOfBoundsException;
 use PDOException;
 use Psr\Log\LoggerInterface;
 
-class DefaultDispatchStrategy implements DispatchStrategyInterface
+class DispatchStrategy implements DispatchStrategyInterface
 {
     const MIN_WORKERS  = 1;
     const MAX_WORKERS  = 6;

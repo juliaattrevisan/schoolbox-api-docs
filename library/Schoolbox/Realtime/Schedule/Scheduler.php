@@ -21,7 +21,7 @@ use Alaress\Redis\Async\Event\Message;
 use Alaress\Redis\Async\EventListener;
 use Alaress\Scheduler\AbstractScheduler;
 use Alaress\Scheduler\Trigger\TriggerInterface;
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\DispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use ErrorException;
 use InvalidArgumentException;
@@ -268,6 +268,6 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      */
     protected function getMethod()
     {
-        return DefaultDispatchStrategy::TASK_PUBLISH;
+        return DispatchStrategy::TASK_PUBLISH;
     }
 }

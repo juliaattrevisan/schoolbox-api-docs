@@ -14,7 +14,7 @@ use Alaress\WorkerCrew\Worker\Worker;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
 use OutOfBoundsException;
 
-class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
+class ConfiguredDispatchStrategy extends DispatchStrategy
 {
     protected $flywheelSpins;
 
@@ -49,20 +49,20 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
      * @param int    $maxFutureTriggerTime
      */
     public function __construct(
-        $minWorkers = DefaultDispatchStrategy::MIN_WORKERS,
-        $maxWorkers = DefaultDispatchStrategy::MAX_WORKERS,
-        $maxFlywheel = DefaultDispatchStrategy::MAX_FLYWHEEL,
-        $queueDelay = DefaultDispatchStrategy::QUEUE_DELAY,
-        $queueWarnSize = DefaultDispatchStrategy::QUEUE_SIZE_WARN,
-        $queueMaxSize = DefaultDispatchStrategy::QUEUE_SIZE_MAX,
-        $idleTimeout = DefaultDispatchStrategy::IDLE_TIMEOUT,
-        $workerTimeoutSoft = DefaultDispatchStrategy::WORKER_SOFT_TIMEOUT,
-        $workerTimeoutHard = DefaultDispatchStrategy::WORKER_HARD_TIMEOUT,
+        $minWorkers = DispatchStrategy::MIN_WORKERS,
+        $maxWorkers = DispatchStrategy::MAX_WORKERS,
+        $maxFlywheel = DispatchStrategy::MAX_FLYWHEEL,
+        $queueDelay = DispatchStrategy::QUEUE_DELAY,
+        $queueWarnSize = DispatchStrategy::QUEUE_SIZE_WARN,
+        $queueMaxSize = DispatchStrategy::QUEUE_SIZE_MAX,
+        $idleTimeout = DispatchStrategy::IDLE_TIMEOUT,
+        $workerTimeoutSoft = DispatchStrategy::WORKER_SOFT_TIMEOUT,
+        $workerTimeoutHard = DispatchStrategy::WORKER_HARD_TIMEOUT,
         $flags = '',
-        $maxRequestsPerWorker = DefaultDispatchStrategy::MAX_REQUESTS_PER_WORKER,
+        $maxRequestsPerWorker = DispatchStrategy::MAX_REQUESTS_PER_WORKER,
         $workerWriteTimeout = DefaultDispatchStrategy::WORKER_WRITE_TIMEOUT,
         $metricInterval = DefaultDispatchStrategy::METRIC_INTERVAL,
-        $maxFutureTriggerTime = DefaultDispatchStrategy::MAX_FUTURE_TRIGGER_TIME,
+        $maxFutureTriggerTime = DispatchStrategy::MAX_FUTURE_TRIGGER_TIME,
     ) {
         parent::__construct($flags);
         $this->flywheelSpins        = $maxFlywheel;

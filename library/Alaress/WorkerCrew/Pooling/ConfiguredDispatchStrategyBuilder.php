@@ -12,34 +12,34 @@ namespace Alaress\WorkerCrew\Pooling;
 class ConfiguredDispatchStrategyBuilder
 {
     /** @var int */
-    protected $minWorkers = DefaultDispatchStrategy::MIN_WORKERS;
+    protected $minWorkers = DispatchStrategy::MIN_WORKERS;
 
     /** @var int */
-    protected $maxWorkers = DefaultDispatchStrategy::MAX_WORKERS;
+    protected $maxWorkers = DispatchStrategy::MAX_WORKERS;
 
     /** @var int */
-    protected $queueDelay = DefaultDispatchStrategy::QUEUE_DELAY;
+    protected $queueDelay = DispatchStrategy::QUEUE_DELAY;
 
     /** @var int */
-    protected $maxFlywheel = DefaultDispatchStrategy::MAX_FLYWHEEL;
+    protected $maxFlywheel = DispatchStrategy::MAX_FLYWHEEL;
 
     /** @var int */
-    protected $idleTimeout = DefaultDispatchStrategy::IDLE_TIMEOUT;
+    protected $idleTimeout = DispatchStrategy::IDLE_TIMEOUT;
 
     /** @var int */
-    protected $queueWarnSize = DefaultDispatchStrategy::QUEUE_SIZE_WARN;
+    protected $queueWarnSize = DispatchStrategy::QUEUE_SIZE_WARN;
 
     /** @var int */
-    protected $queueMaxSize = DefaultDispatchStrategy::QUEUE_SIZE_MAX;
+    protected $queueMaxSize = DispatchStrategy::QUEUE_SIZE_MAX;
 
     /** @var int */
-    protected $workerTimeoutSoft = DefaultDispatchStrategy::WORKER_SOFT_TIMEOUT;
+    protected $workerTimeoutSoft = DispatchStrategy::WORKER_SOFT_TIMEOUT;
 
     /** @var int */
-    protected $workerTimeoutHard = DefaultDispatchStrategy::WORKER_HARD_TIMEOUT;
+    protected $workerTimeoutHard = DispatchStrategy::WORKER_HARD_TIMEOUT;
 
     /** @var int */
-    protected $maxRequestsPerWorker = DefaultDispatchStrategy::MAX_REQUESTS_PER_WORKER;
+    protected $maxRequestsPerWorker = DispatchStrategy::MAX_REQUESTS_PER_WORKER;
 
     /** @var int */
     protected $workerWriteTimeout = DefaultDispatchStrategy::WORKER_WRITE_TIMEOUT;
@@ -48,7 +48,7 @@ class ConfiguredDispatchStrategyBuilder
     protected $metricInterval = DefaultDispatchStrategy::METRIC_INTERVAL;
 
     /** @var int */
-    protected $maxFutureTriggerTime = DefaultDispatchStrategy::MAX_FUTURE_TRIGGER_TIME;
+    protected $maxFutureTriggerTime = DispatchStrategy::MAX_FUTURE_TRIGGER_TIME;
 
     /**
      * @param array $conf

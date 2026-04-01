@@ -20,7 +20,7 @@ use Alaress\Scheduler\Trigger\CancelTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Dispatcher;
 use Alaress\WorkerCrew\DispatcherInterface;
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\DispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Alaress_Date_Format;
@@ -432,7 +432,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
 
         // If this is handling ExternalException from a worker, most likely that this is caused by
         // SIS connector outage. Hence, rescheduling it.
-        if ($identifier instanceof TriggerInterface && $command === DefaultDispatchStrategy::TASK_PUBLISH) {
+        if ($identifier instanceof TriggerInterface && $command === DispatchStrategy::TASK_PUBLISH) {
             $this->log->warning("[AbstractScheduler] Rescheduling '{$identifier->getEventObjectId()} - {$identifier->getLabel()}' in " . self::RETRY_TIME, ['char' => '-']);
             $this->schedule($identifier, $this->timerCallback($identifier), true, self::RETRY_TIME);
         }

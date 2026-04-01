@@ -9,9 +9,9 @@
 
 namespace Schoolbox\Realtime\Routing;
 
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\DispatchStrategy;
 
-class DispatchStrategy extends DefaultDispatchStrategy
+class DispatchStrategy extends DispatchStrategy
 {
     const TASK_ROUTE = 'route';
 

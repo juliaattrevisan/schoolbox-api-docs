@@ -60,7 +60,7 @@ class Postman
                 $loop,
                 new Routing\DispatchResponder($log),
                 $log,
-                new Routing\DispatchStrategy($flags)
+                new Routing\DispatchStrategy(flags: $flags)
             ),
             Routing\DispatchStrategy::TASK_ROUTE
         );
