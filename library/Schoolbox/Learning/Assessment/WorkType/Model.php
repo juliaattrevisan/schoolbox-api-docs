@@ -276,10 +276,10 @@ class Model implements ISoftDeletable, Sequential
         }
 
         return match ([$this->isVisibleToParents, $this->isVisibleToStudents]) {
-            [false, false] => Mapper::VISIBILITY_STAFF_ONLY,
-            [false, true ] => Mapper::VISIBILITY_STAFF_STUDENTS,
-            [true , false] => Mapper::VISIBILITY_STAFF_PARENTS,
-            [true , true ] => Mapper::VISIBILITY_STAFF_STUDENTS_PARENTS,
+            [false, false] => Mapper::VISIBILITY_STAFF_INSTRUCTORS,
+            [false, true ] => Mapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS,
+            [true , false] => Mapper::VISIBILITY_STAFF_INSTRUCTORS_PARENTS,
+            [true , true ] => Mapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS_PARENTS,
         };
     }
 
@@ -292,19 +292,19 @@ class Model implements ISoftDeletable, Sequential
     public function setVisibility(string $visibility): self
     {
         switch ($visibility) {
-            case Mapper::VISIBILITY_STAFF_ONLY:
+            case Mapper::VISIBILITY_STAFF_INSTRUCTORS:
                 $this->isVisibleToStudents = false;
                 $this->isVisibleToParents = false;
                 break;
-            case Mapper::VISIBILITY_STAFF_STUDENTS:
+            case Mapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS:
                 $this->isVisibleToStudents = true;
                 $this->isVisibleToParents = false;
                 break;
-            case Mapper::VISIBILITY_STAFF_PARENTS:
+            case Mapper::VISIBILITY_STAFF_INSTRUCTORS_PARENTS:
                 $this->isVisibleToStudents = false;
                 $this->isVisibleToParents = true;
                 break;
-            case Mapper::VISIBILITY_STAFF_STUDENTS_PARENTS:
+            case Mapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS_PARENTS:
                 $this->isVisibleToStudents = true;
                 $this->isVisibleToParents = true;
                 break;

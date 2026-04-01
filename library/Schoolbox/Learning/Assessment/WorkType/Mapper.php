@@ -19,10 +19,42 @@ use Schoolbox;
  */
 class Mapper extends Schoolbox\Mapper
 {
-    public const string VISIBILITY_STAFF_ONLY = 'staffOnly';
-    public const string VISIBILITY_STAFF_STUDENTS = 'staffAndStudents';
-    public const string VISIBILITY_STAFF_PARENTS = 'staffAndParents';
-    public const string VISIBILITY_STAFF_STUDENTS_PARENTS = 'staffAndStudentsAndParents';
+    /**
+     * Staff and instructors only
+     *  - instructors - always included
+     *  - learners - always excluded
+     *  - parents of learners - included only if instructors
+     *  - users of role type ‘staff’ - always included
+     *  - other users of any role type - included only if instructors
+     */
+    public const string VISIBILITY_STAFF_INSTRUCTORS = 'staffAndInstructorsOnly';
+    /**
+     * Staff and instructors and learners
+     *  - instructors - always included
+     *  - learners - always included
+     *  - parents of learners - included only if instructors or learners
+     *  - users of role type ‘staff’ - always included
+     *  - other users of any role type - included only if instructors or learners
+     */
+    public const string VISIBILITY_STAFF_INSTRUCTORS_LEARNERS = 'staffAndInstructorsAndLearners';
+    /**
+     * Staff and instructors and parents
+     *  - Instructors - always included
+     *  - learners - always excluded
+     *  - parents of learners - included unless they are learners
+     *  - users of role type ‘staff’ - included unless they are learners
+     *  - other users of any role type - included only if instructors
+     */
+    public const string VISIBILITY_STAFF_INSTRUCTORS_PARENTS = 'staffAndInstructorsAndParents';
+    /**
+     * Staff and instructors and learners and parents
+     *  - instructors - always included
+     *  - learners - always included
+     *  - parents of learners - always included
+     *  - users of role type ‘staff’ - always included
+     *  - other users of any role type - included only if instructors or learners
+     */
+    public const string VISIBILITY_STAFF_INSTRUCTORS_LEARNERS_PARENTS = 'staffAndInstructorsAndLearnersAndParents';
 
     /**
      * @inheritdoc

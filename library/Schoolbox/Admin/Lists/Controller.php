@@ -1141,12 +1141,12 @@ class Controller extends Base
                         'getter'    => 'getVisibility', // Note this function returns a value derived from isVisibleToParents and isVisibleToStudents.
                         'caption'   => 'Visibility',
                         'mandatory' => true,
-                        'default'   => WorkTypeMapper::VISIBILITY_STAFF_ONLY,
+                        'default'   => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS,
                         'lookup'    => [
-                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_ONLY, 'value' => 'Staff Only'],
-                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_STUDENTS, 'value' => 'Staff & Students'],
-                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_PARENTS, 'value' => 'Staff & Parents'],
-                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_STUDENTS_PARENTS, 'value' => 'Staff, Students & Parents'],
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS, 'value' => 'Staff Only'],
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS, 'value' => 'Staff & Students'],
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS_PARENTS, 'value' => 'Staff & Parents'],
+                            ['key' => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS_PARENTS, 'value' => 'Staff, Students & Parents'],
                         ],
                         'nullable'  => false,
                         'width'     => 2,
