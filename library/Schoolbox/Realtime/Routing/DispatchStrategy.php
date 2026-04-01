@@ -15,7 +15,7 @@ use Alaress\WorkerCrew\Pooling\DispatchStrategy as BaseDispatchStrategy;
 
 class DispatchStrategy extends BaseDispatchStrategy
 {
-   public const string TASK_ROUTE = 'route';
+    public const string TASK_ROUTE = 'route';
 
     /**
      * @return string
