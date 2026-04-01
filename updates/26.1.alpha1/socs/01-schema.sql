@@ -59,7 +59,7 @@ VALUES (
            'socs_endpoint_token',
            'SOCS Endpoint Token',
            'The authentication token granted by the SOCS app that allows SOCS events to be imported into Fixtures.',
-           (SELECT id FROM lu_config_field WHERE field = 'input'),
+           (SELECT id FROM lu_config_field WHERE field = 'password'),
            (SELECT id FROM lu_config_type WHERE type = '3rd Party Services'),
            'true',
            'false',
