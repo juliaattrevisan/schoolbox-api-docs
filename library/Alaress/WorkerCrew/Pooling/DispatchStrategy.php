@@ -89,16 +89,6 @@ class DispatchStrategy implements DispatchStrategyInterface
         $this->protocol      = new AlaressIPCProtocol();
     }
 
-    /**
-     * Get the name of the strategy currently being used
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return 'Default';
-    }
-
 
     /**
      * Returns the IPC protocol that this strategy employs

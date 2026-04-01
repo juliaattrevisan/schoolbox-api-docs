@@ -27,14 +27,6 @@ interface DispatchStrategyInterface
 
 
     /**
-     * Get the name of the strategy currently being used
-     *
-     * @return string
-     */
-    public function getName();
-
-
-    /**
      * Returns the IPC protocol that this strategy employs
      *
      * @return ProtocolInterface
