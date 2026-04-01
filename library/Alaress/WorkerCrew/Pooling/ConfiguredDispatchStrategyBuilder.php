@@ -7,39 +7,72 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Alaress\WorkerCrew\Pooling;
 
+/**
+ * Builder for dispatch strategies, as configured by an array read from a
+ * config file.
+ */
 class ConfiguredDispatchStrategyBuilder
 {
-    /** @var int */
-    protected $minWorkers = DispatchStrategy::MIN_WORKERS;
+    /**
+     * Minimum workers which may be alive at any one time.
+     *
+     * @see DispatchStrategyInterface::getAvailableWorker()
+     */
+    protected int $minWorkers = DispatchStrategy::MIN_WORKERS;
 
-    /** @var int */
-    protected $maxWorkers = DispatchStrategy::MAX_WORKERS;
+    /**
+     * Maximum workers which may be alive at any one time.
+     *
+     * @see DispatchStrategyInterface::getAvailableWorker()
+     */
+    protected int $maxWorkers = DispatchStrategy::MAX_WORKERS;
 
-    /** @var int */
-    protected $queueDelay = DispatchStrategy::QUEUE_DELAY;
+    /**
+     * @see DispatchStrategyInterface::getQueueDelay()
+     */
+    protected int $queueDelay = DispatchStrategy::QUEUE_DELAY;
 
-    /** @var int */
-    protected $maxFlywheel = DispatchStrategy::MAX_FLYWHEEL;
+    /**
+     * How many times may the dispatcher run with an empty queue, before being
+     * spun down (and restarted once the queue is no longer empty)?
+     *
+     * @see DispatchStrategyInterface::canDispatcherFlywheel()
+     */
+    protected int $maxFlywheel = DispatchStrategy::MAX_FLYWHEEL;
 
-    /** @var int */
-    protected $idleTimeout = DispatchStrategy::IDLE_TIMEOUT;
+    /**
+     * @see DispatchStrategyInterface::getWorkerIdleTimeout()
+     */
+    protected int $idleTimeout = DispatchStrategy::IDLE_TIMEOUT;
 
-    /** @var int */
-    protected $queueWarnSize = DispatchStrategy::QUEUE_SIZE_WARN;
+    /**
+     * @see DispatchStrategyInterface::getWarningQueueLength()
+     */
+    protected int $queueWarnSize = DispatchStrategy::QUEUE_SIZE_WARN;
 
-    /** @var int */
-    protected $queueMaxSize = DispatchStrategy::QUEUE_SIZE_MAX;
+    /**
+     * @see DispatchStrategyInterface::getMaxQueueLength()
+     */
+    protected int $queueMaxSize = DispatchStrategy::QUEUE_SIZE_MAX;
 
-    /** @var int */
-    protected $workerTimeoutSoft = DispatchStrategy::WORKER_SOFT_TIMEOUT;
+    /**
+     * @see DispatchStrategyInterface::getWorkerExecutionTimeout(hard: false)
+     */
+    protected int $workerTimeoutSoft = DispatchStrategy::WORKER_SOFT_TIMEOUT;
 
-    /** @var int */
-    protected $workerTimeoutHard = DispatchStrategy::WORKER_HARD_TIMEOUT;
+    /**
+     * @see DispatchStrategyInterface::getWorkerExecutionTimeout(hard: true)
+     */
+    protected int $workerTimeoutHard = DispatchStrategy::WORKER_HARD_TIMEOUT;
 
-    /** @var int */
-    protected $maxRequestsPerWorker = DispatchStrategy::MAX_REQUESTS_PER_WORKER;
+    /**
+     * @see DispatchStrategyInterface::getMaxRequestsPerWorker()
+     */
+    protected int $maxRequestsPerWorker = DispatchStrategy::MAX_REQUESTS_PER_WORKER;
 
     /** @var int */
     protected $workerWriteTimeout = DefaultDispatchStrategy::WORKER_WRITE_TIMEOUT;
@@ -47,17 +80,24 @@ class ConfiguredDispatchStrategyBuilder
     /** @var int */
     protected $metricInterval = DefaultDispatchStrategy::METRIC_INTERVAL;
 
-    /** @var int */
-    protected $maxFutureTriggerTime = DispatchStrategy::MAX_FUTURE_TRIGGER_TIME;
+    /**
+     * @see DispatchStrategyInterface::getMaxFutureTriggerTime()
+     */
+    protected int $maxFutureTriggerTime = DispatchStrategy::MAX_FUTURE_TRIGGER_TIME;
 
     /**
-     * @param array $conf
+     * Constructor
+     *
+     * @param array<string, int|numeric-string> $conf Any properties which may be set in the dispatch strategy.
+     *
+     * @see ConfigurationReader for the format of `$conf`
      */
-    public function __construct(array $conf = array())
+    public function __construct(array $conf = [])
     {
         foreach ($conf as $k => $v) {
             if (property_exists($this, $k)) {
-                $this->$k = $v;
+                // It just so happens that all properties are ints
+                $this->$k = intval($v);
             }
         }
     }
