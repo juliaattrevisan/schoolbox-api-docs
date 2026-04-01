@@ -40,7 +40,6 @@ class ValidManageActivityTest extends TestCase
     }
 
 
-
     /**
      * Data provider for testValidManageActivity
      *
@@ -87,7 +86,6 @@ class ValidManageActivityTest extends TestCase
                 (new \Schoolbox\User())->setAccessList((new GenericCollection(UserAccess::class))->add($lmsWriteModerator)),
                 true
             ],
-
             /* Superusers + LMS Moderators are allowed
              */
             'Valid 3a' => [
