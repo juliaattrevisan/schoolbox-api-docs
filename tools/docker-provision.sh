@@ -189,7 +189,7 @@ function init_composer_dependencies() {
     touch "$cache_file"
   else
     log "Composer cache miss: running composer install"
-    composer install --no-progress -o $*
+    XDEBUG_MODE=off composer install --no-progress -o
     if [ -n "$lock_checksum" ]; then
       log "Caching vendor directory for composer.lock ($lock_checksum)"
       tar czf "$cache_file" -C "${SITE_ROOT}" vendor
