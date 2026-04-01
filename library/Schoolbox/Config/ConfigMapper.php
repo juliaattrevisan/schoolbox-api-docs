@@ -499,6 +499,19 @@ class ConfigMapper extends Mapper
      */
     public const string NAME_REPORTING_ACTIVITY_ENABLE = 'reporting_activity_enable';
 
+
+    /* Clipboard consts
+     */
+    public const string NAME_CLIPBOARD_ENABLED = 'clipboard_enabled';
+    public const string NAME_CLIPBOARD_ENDPOINT_HOST = 'clipboard_endpoint_host';
+    public const string NAME_CLIPBOARD_ENDPOINT_TOKEN = 'clipboard_endpoint_token';
+
+    /* SOCS consts
+     */
+    public const string NAME_SOCS_ENABLED = 'socs_enabled';
+    public const string NAME_SOCS_ENDPOINT_HOST = 'socs_endpoint_host';
+    public const string NAME_SOCS_ENDPOINT_TOKEN = 'socs_endpoint_token';
+
     // Debug settings
     public const string NAME_DEBUG_MODE = 'debug_mode';
 
