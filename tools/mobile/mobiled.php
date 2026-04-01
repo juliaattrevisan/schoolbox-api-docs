@@ -14,7 +14,8 @@ use Alaress\Date\Clock;
 use Alaress\Jitter\Jitter;
 use Alaress\Random\FloatGenerator;
 use Alaress\Redis\Async;
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\ConfigurationReader;
+use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategyBuilder;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Predis\ClientInterface;
 use Psr\Container\ContainerInterface;
@@ -74,6 +75,7 @@ DESCRIPTION:
 
 OPTIONS:
   -h, --help                    Display this help message
+  -c                            Config file to use: defaults to `mobiled.conf` in this folder.
   --retry-max-attempts          If the service manager detects that a delivery mechanism has been rate limited:
                                 retry the delivery this many times. (Defaults to 15 retries.)
   --retry-base-timeout          If the service manager detects that a delivery mechanism has been rate limited, this
@@ -153,8 +155,10 @@ HELP;
             $config,
         );
 
-        $strat     = new DefaultDispatchStrategy($flags);
-        $scheduler = new Scheduler(
+        $configFile   = $opts['c'] ?? (SITE_root . '/tools/mobile/mobiled.conf');
+        $stratBuilder = new ConfiguredDispatchStrategyBuilder(new ConfigurationReader($configFile)->readConfig());
+        $strat        = $stratBuilder->build($flags);
+        $scheduler    = new Scheduler(
             $loop,
             $strat,
             $log,
@@ -163,6 +167,10 @@ HELP;
             $jitter,
             $config,
         );
+
+        // Summarise strategy
+        $delim = \array_key_exists(Daemon\Kernel::OPT_LONG_PORCELAIN, $opts) ? ' ' : "\n    ";
+        $log->info(implode($delim, ['Using strategy:'] + $stratBuilder->summarise()), ['char' => '+']);
 
         // This daemon does not need to restore its messages from the Redis
         // cache, like scheduled does.
