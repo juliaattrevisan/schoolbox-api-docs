@@ -178,7 +178,7 @@ if (is_numeric($_REQUEST['cid'])) {
             foreach ($configDefinitionCollection as $confD) {
                 $key = $confD->getKey();
                 if (isset($config[$key])) {
-                    $configItem = Component_Config_Factory::build($key, null, $config);
+                    $configItem = Component_Config_Factory::build($page->getDi()->get('session')->get('user'), $key, null, $config);
                     $value      = $configItem->dehydrate($config[$key], $controller);
                     // if src is the current folder id, reset the value to empty string
                     if ($key === 'src' && (int)$value === $folder->getId()) {

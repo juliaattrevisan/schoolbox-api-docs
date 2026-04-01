@@ -15,12 +15,13 @@ abstract class Component_Config_Factory
 
     /**
      * @static
+     * @param \Schoolbox\User                      $user  The currently-logged-in user
      * @param string                               $key
      * @param Folder|Eportfolio_Page_Instance|null $context
      * @param array                                $fields
      * @return Component_Config_Abstract|bool
      */
-    public static function build($key, $context, array $fields)
+    public static function build(\Schoolbox\User $user, $key, $context, array $fields)
     {
         if (in_array(strtolower($key), self::$invalid)) {
             return false;
@@ -32,7 +33,7 @@ abstract class Component_Config_Factory
 
         if (class_exists($classname)) {
             // echo "Found $classname - will need template $key.html<br/>\n";
-            return new $classname($context, $fields);
+            return new $classname($user, $context, $fields);
         } else {
             // echo "Problem: couldn't find $classname ($key.html won't be rendered)<br/>\n";
             return false;

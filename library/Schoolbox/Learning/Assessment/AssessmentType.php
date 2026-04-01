@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
+use Schoolbox\Learning\Assessment\Reporting\ValidManageActivity;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\DialogAgent\ValidDialogAgentEnabled;
@@ -242,6 +243,12 @@ class AssessmentType implements IType
         /* Remove Reporting Activity if it was disabled in admin
          */
         if (!$configLoader->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE)) {
+            unset($list[self::TYPE_REPORTING]);
+        }
+
+        /* Only LMS Moderator with write+ access can create/modify/delete reporting activities
+         */
+        if (!(new ValidManageActivity())->isSatisfiedBy($configLoader->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $user)) {
             unset($list[self::TYPE_REPORTING]);
         }
 

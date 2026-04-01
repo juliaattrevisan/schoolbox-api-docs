@@ -20,9 +20,7 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
         $di = $page->getDi();
         $configLoader = $di->get('config');
 
-        /* TODO Inject a $user instance all the way through components!1111111
-         */
-        $assessmentTypeOptions = Assessment\AssessmentType::getEnabledOptions($configLoader);
+        $assessmentTypeOptions = Assessment\AssessmentType::getEnabledOptions($configLoader, $this->user);
 
         // if config doesn't exist, then default to all options...
         $setConfig = $assessmentTypeOptions;
