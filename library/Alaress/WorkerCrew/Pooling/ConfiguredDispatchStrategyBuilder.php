@@ -65,11 +65,11 @@ class ConfiguredDispatchStrategyBuilder
 
     /**
      * @param string $flags
-     * @return ConfiguredDispatchStrategy
+     * @return DispatchStrategy
      */
     public function build($flags = '')
     {
-        return new ConfiguredDispatchStrategy(
+        return new DispatchStrategy(
             $this->minWorkers,
             $this->maxWorkers,
             $this->maxFlywheel,
