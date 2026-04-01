@@ -22,40 +22,36 @@ use Psr\Log\LoggerInterface;
 
 class DispatchStrategy implements DispatchStrategyInterface
 {
-    const MIN_WORKERS  = 1;
-    const MAX_WORKERS  = 6;
-    const MAX_FLYWHEEL = 0;
+    public const int MIN_WORKERS  = 1;
+    public const int MAX_WORKERS  = 6;
+    public const int MAX_FLYWHEEL = 0;
 
-    const QUEUE_DELAY     = 1;
-    const QUEUE_SIZE_WARN = PHP_INT_MAX;
-    const QUEUE_SIZE_MAX  = PHP_INT_MAX;
+    public const int QUEUE_DELAY     = 1;
+    public const int QUEUE_SIZE_WARN = PHP_INT_MAX;
+    public const int QUEUE_SIZE_MAX  = PHP_INT_MAX;
 
-    const IDLE_TIMEOUT = 60000; // 1 minute
+    public const int IDLE_TIMEOUT = 60000; // 1 minute
 
-    const MAX_REQUESTS_PER_WORKER = 0; // 0 = unlimited
+    public const int MAX_REQUESTS_PER_WORKER = 0; // 0 = unlimited
 
-    const WORKER_SOFT_TIMEOUT  = 300000; // 5 minutes
-    const WORKER_HARD_TIMEOUT  = 1200000; // 20 minutes
-    const WORKER_WRITE_TIMEOUT = 5000; // 5 seconds
+    public const int MAX_FUTURE_TRIGGER_TIME = 0; // 0 = unlimited
 
-    const TASK_FETCH     = 'fetch';
-    const TASK_PUBLISH   = 'publish';
-    const TASK_DIGEST    = 'digest';
-    const TASK_TIMETABLE = 'timetable';
-    const TASK_MOBILE    = 'mobile';
+    public const int WORKER_SOFT_TIMEOUT = 300000; // 5 minutes
+    public const int WORKER_HARD_TIMEOUT = 1200000; // 20 minutes
 
-    const METRIC_INTERVAL = 60000;
+    public const string TASK_FETCH     = 'fetch';
+    public const string TASK_PUBLISH   = 'publish';
+    public const string TASK_DIGEST    = 'digest';
+    public const string TASK_TIMETABLE = 'timetable';
+    public const string TASK_MOBILE    = 'mobile';
 
-    protected $flywheelSpins;
+    protected int $flywheelSpins;
 
-
-    /** @var AlaressIPCProtocol */
-    protected $protocol;
-
-
-//    /** @var string */
-//    protected $flags;
-
+    /**
+     * The protocol used for communication between the worker pool process,
+     * and its workers.
+     */
+    protected AlaressIPCProtocol $protocol;
 
     /**
      * @param int    $minWorkers
@@ -72,18 +68,18 @@ class DispatchStrategy implements DispatchStrategyInterface
      * @param int    $maxFutureTriggerTime
      */
     public function __construct(
-        private $minWorkers = DispatchStrategy::MIN_WORKERS,
-        private $maxWorkers = DispatchStrategy::MAX_WORKERS,
-        private $maxFlywheel = DispatchStrategy::MAX_FLYWHEEL,
-        private $queueDelay = DispatchStrategy::QUEUE_DELAY,
-        private $queueWarnSize = DispatchStrategy::QUEUE_SIZE_WARN,
-        private $queueMaxSize = DispatchStrategy::QUEUE_SIZE_MAX,
-        private $idleTimeout = DispatchStrategy::IDLE_TIMEOUT,
-        private $workerTimeoutSoft = DispatchStrategy::WORKER_SOFT_TIMEOUT,
-        private $workerTimeoutHard = DispatchStrategy::WORKER_HARD_TIMEOUT,
-        private $flags = '',
-        private $maxRequestsPerWorker = DispatchStrategy::MAX_REQUESTS_PER_WORKER,
-        private $maxFutureTriggerTime = DispatchStrategy::MAX_FUTURE_TRIGGER_TIME,
+        private int $minWorkers = DispatchStrategy::MIN_WORKERS,
+        private int $maxWorkers = DispatchStrategy::MAX_WORKERS,
+        private int $maxFlywheel = DispatchStrategy::MAX_FLYWHEEL,
+        private int $queueDelay = DispatchStrategy::QUEUE_DELAY,
+        private int $queueWarnSize = DispatchStrategy::QUEUE_SIZE_WARN,
+        private int $queueMaxSize = DispatchStrategy::QUEUE_SIZE_MAX,
+        private int $idleTimeout = DispatchStrategy::IDLE_TIMEOUT,
+        private int $workerTimeoutSoft = DispatchStrategy::WORKER_SOFT_TIMEOUT,
+        private int $workerTimeoutHard = DispatchStrategy::WORKER_HARD_TIMEOUT,
+        private string $flags = '',
+        private int $maxRequestsPerWorker = DispatchStrategy::MAX_REQUESTS_PER_WORKER,
+        private int $maxFutureTriggerTime = DispatchStrategy::MAX_FUTURE_TRIGGER_TIME,
     ) {
         $this->flywheelSpins = $maxFlywheel;
         $this->protocol      = new AlaressIPCProtocol();
