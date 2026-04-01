@@ -19,9 +19,8 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Daemon\Kernel("Worker", [Daemon\Kernel::OPTION_ERRORS => E_ALL]);
 
 $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts): void {
-
     // use the default strat
-    $strat = new \Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy();
+    $strat = new \Alaress\WorkerCrew\Pooling\DispatchStrategy();
 
     // we open stream(3) as our data output stream
     $writer = new \Alaress\WorkerCrew\Worker\PipeWriter($strat, $log, fopen('php://fd/3', 'wb'));
