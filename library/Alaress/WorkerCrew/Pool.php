@@ -105,7 +105,7 @@ class Pool extends EventEmitter implements PoolInterface
      */
     public function healthCheck()
     {
-        $this->log->notice("Checking health of " . $this->strat->getName() . " pool", array('char' => '?'));
+        $this->log->notice("Checking health of worker pool", array('char' => '?'));
 
         foreach (array_keys($this->streams) as $pid) {
             try {
