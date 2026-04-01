@@ -89,16 +89,6 @@ class DispatchStrategy implements DispatchStrategyInterface
         $this->protocol      = new AlaressIPCProtocol();
     }
 
-//    /**
-//     * @param string $flags
-//     */
-//    public function __construct($flags = '')
-//    {
-//        $this->flywheelSpins = self::MAX_FLYWHEEL;
-//        $this->protocol      = new AlaressIPCProtocol();
-//        $this->flags         = $flags;
-//    }
-
     /**
      * Get the name of the strategy currently being used
      *
@@ -157,20 +147,19 @@ class DispatchStrategy implements DispatchStrategyInterface
     public function getAvailableWorker($workers, $remainingTaskCount)
     {
         // if we haven't got the min number of workers, favour starting a new one
-        if ($workers->countWhere(~(Worker::ENDED & Worker::ERROR)) < self::MIN_WORKERS) {
+        if ($workers->count() < $this->minWorkers) {
             return 0;
         }
 
         // if a worker is free, yes we can accept
         try {
-            $free = $workers->getPidWhere(Worker::READY);
-            return $free;
+            return $workers->getPidWhere(Worker::READY);
         } catch (OutOfBoundsException $e) {
             // ok, so there's none of those
         }
 
         // if number of workers THAT ARE NOT ENDED OR ERRORED is below the cap, spawn a new one
-        if ($workers->countWhere(~(Worker::ENDED & Worker::ERROR)) < self::MAX_WORKERS) {
+        if ($workers->countWhere(~(Worker::ENDED & Worker::ERROR)) < $this->maxWorkers) {
             return 0;
         }
 
@@ -294,7 +283,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      */
     public function getQueueDelay()
     {
-        return self::QUEUE_DELAY;
+        return $this->queueDelay;
     }
 
 
@@ -305,7 +294,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      */
     public function getWarningQueueLength()
     {
-        return self::QUEUE_SIZE_WARN;
+        return $this->queueWarnSize;
     }
 
 
@@ -316,7 +305,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      */
     public function getMaxQueueLength()
     {
-        return self::QUEUE_SIZE_MAX;
+        return $this->queueMaxSize;
     }
 
 
@@ -331,7 +320,7 @@ class DispatchStrategy implements DispatchStrategyInterface
         if ($this->flywheelSpins-- > 0) {
             return true;
         }
-        $this->flywheelSpins = self::MAX_FLYWHEEL;
+        $this->flywheelSpins = $this->maxFlywheel;
         return false;
     }
 
@@ -343,7 +332,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      */
     public function getWorkerIdleTimeout()
     {
-        return self::IDLE_TIMEOUT;
+        return $this->idleTimeout;
     }
 
 
@@ -395,7 +384,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      */
     public function getWorkerExecutionTimeout($hard = true)
     {
-        return $hard ? self::WORKER_HARD_TIMEOUT : self::WORKER_SOFT_TIMEOUT;
+        return $hard ? $this->workerTimeoutHard : $this->workerTimeoutSoft;
     }
 
 
@@ -406,7 +395,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      */
     public function getMaxRequestsPerWorker(): int
     {
-        return static::MAX_REQUESTS_PER_WORKER;
+        return $this->maxRequestsPerWorker;
     }
 
 
@@ -415,6 +404,6 @@ class DispatchStrategy implements DispatchStrategyInterface
      */
     public function getMaxFutureTriggerTime(): int
     {
-        return static::MAX_FUTURE_TRIGGER_TIME;
+        return $this->maxFutureTriggerTime;
     }
 }
