@@ -68,7 +68,7 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('external_result_type', self::TYPE_STRING);
         $this->uses('show_on_grades_page', self::TYPE_BOOLEAN);
         $this->uses('is_visible_to_parents', self::TYPE_BOOLEAN);
-        $this->uses('is_visible_to_students', self::TYPE_BOOLEAN);
+        $this->uses('is_visible_to_learners', self::TYPE_BOOLEAN);
         $this->uses('permitted_project', self::TYPE_BOOLEAN);
         $this->uses('permitted_due_work', self::TYPE_BOOLEAN);
         $this->uses('permitted_task', self::TYPE_BOOLEAN);
