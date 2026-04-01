@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ValidModerateActivityTest
+ * ValidManageActivityTest
  *
  * See SD-10 for usages
  *
@@ -18,23 +18,23 @@ namespace Schoolbox\Learning\Assessment\Reporting\Test;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\Reporting\ValidModerateActivity;
+use Schoolbox\Learning\Assessment\Reporting\ValidManageActivity;
 use Schoolbox\Permission\Access\UserAccess;
 
 /**
- * ValidModerateActivity test
+ * ValidManageActivity test
  */
-class ValidModerateActivityTest extends TestCase
+class ValidManageActivityTest extends TestCase
 {
     /**
      * @param bool $configOption
      * @param \Schoolbox\User $user
      * @param bool $expected
      */
-    #[DataProvider('providerValidModerateActivity')]
-    public function testValidModerateActivity($configOption, $user, $expected)
+    #[DataProvider('providerValidManageActivity')]
+    public function testValidManageActivity($configOption, $user, $expected)
     {
-        $outcome = (new ValidModerateActivity())->isSatisfiedBy($configOption, $user);
+        $outcome = (new ValidManageActivity())->isSatisfiedBy($configOption, $user);
 
         $this->assertEquals($expected, $outcome);
     }
@@ -42,11 +42,11 @@ class ValidModerateActivityTest extends TestCase
 
 
     /**
-     * Data provider for testValidModerateActivity
+     * Data provider for testValidManageActivity
      *
      * @return array
      */
-    public static function providerValidModerateActivity(): array
+    public static function providerValidManageActivity(): array
     {
         $lmsModerator = (new UserAccess())
             ->setService(UserAccess::SERVICE_LMS)

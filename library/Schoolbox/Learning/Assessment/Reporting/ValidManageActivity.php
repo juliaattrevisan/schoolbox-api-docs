@@ -13,7 +13,7 @@ namespace Schoolbox\Learning\Assessment\Reporting;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
-class ValidModerateActivity
+class ValidManageActivity
 {
     /**
      * In order to manage reporting activities:

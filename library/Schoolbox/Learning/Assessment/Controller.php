@@ -21,7 +21,7 @@ use Schoolbox\Filter\CompositeFactoryFactory;
 use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\Learning\Assessment\Reporting\Folder;
 use Schoolbox\Learning\Assessment\Reporting\Range;
-use Schoolbox\Learning\Assessment\Reporting\ValidModerateActivity;
+use Schoolbox\Learning\Assessment\Reporting\ValidManageActivity;
 use Schoolbox\Learning\Assessment\Translator\ParticipationPlans;
 use Schoolbox\Learning\Assessment\Translator\Participations;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
@@ -393,7 +393,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             /* You have to fulfil these preconditions to alter something about a reporting activity
              * Normally we'd exit earlier, but this assessment controller is obese and needs refactoring: SA-21446
              */
-            if (!(new ValidModerateActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
+            if (!(new ValidManageActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
                 throw new \Schoolbox\Mapper\Exception\NotFound();
             }
 
@@ -751,7 +751,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             /* You have to fulfil these preconditions to alter something about a reporting activity
              * Normally we'd exit earlier, but this assessment controller is obese and needs refactoring: SA-21446
              */
-            if (!(new ValidModerateActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
+            if (!(new ValidManageActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
                 throw new \Schoolbox\Mapper\Exception\NotFound();
             }
 
@@ -860,7 +860,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             /* You have to fulfil these preconditions to alter something about a reporting activity
              * Normally we'd exit earlier, but this assessment controller is obese and needs refactoring: SA-21446
              */
-            if (!(new ValidModerateActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
+            if (!(new ValidManageActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
                 throw new \Schoolbox\Mapper\Exception\NotFound();
             }
 
@@ -988,7 +988,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             /* You have to fulfil these preconditions to alter something about a reporting activity
              * Normally we'd exit earlier, but this assessment controller is obese and needs refactoring: SA-21446
              */
-            if (!(new ValidModerateActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
+            if (!(new ValidManageActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
                 throw new \Schoolbox\Mapper\Exception\NotFound();
             }
         }
