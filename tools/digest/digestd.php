@@ -11,7 +11,8 @@
 
 use Alaress\Date\Clock;
 use Alaress\Redis\Async;
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\ConfigurationReader;
+use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategyBuilder;
 use Predis\ClientInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -47,23 +48,22 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     /** @var ClientInterface $redis */
     $redis = $di->get('redis.storage');
 
-    $clock = new Clock();
-
-    $roleMapper = $di->get('mapperFactory')->get(RoleMapper::class);
-    $userMapper = $di->get('mapperFactory')->get(UserMapper::class);
-
-    /** @var Async\Client $asyncRedis */
-    $asyncRedis = $di->get('redis.signalQueue.sub');
-    $strat      = new DefaultDispatchStrategy($flags);
+    $configFile   = $opts['c'] ?? (SITE_root . '/tools/mobile/mobiled.conf');
+    $stratBuilder = new ConfiguredDispatchStrategyBuilder(new ConfigurationReader($configFile)->readConfig());
+    $strat        = $stratBuilder->build($flags);
 
     /** @var \Schoolbox\Mail\EmailFactory $emailFactory */
     $emailFactory = $di->get('mail.emailFactory');
+    $userMapper   = $di->get('mapperFactory')->get(UserMapper::class);
+    $notifier     = new MailNotifier(new ListFactory(INSTANCE_ID, $redis), $userMapper, $emailFactory, $conf, $log);
 
-    $notifier   = new MailNotifier(new ListFactory(INSTANCE_ID, $redis), $userMapper, $emailFactory, $conf, $log);
+    $clock      = new Clock();
+    $roleMapper = $di->get('mapperFactory')->get(RoleMapper::class);
     $factory    = new DigestTriggerFactory($notifier, $clock, $debugInterval);
-
     $scheduler  = new DigestScheduler($loop, $strat, $log, $clock, $roleMapper, $conf, $factory);
 
+    /** @var Async\Client $asyncRedis */
+    $asyncRedis = $di->get('redis.signalQueue.sub');
     $asyncRedis->psubscribe($topic, $scheduler);
 
     $log->info("Listening on redis://$topic");
