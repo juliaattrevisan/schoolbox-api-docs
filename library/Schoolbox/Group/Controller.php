@@ -283,6 +283,7 @@ class Controller extends BaseController
 
         // Validate and resolve limit
         if ($limitRaw !== null) {
+            // ctype_digit rejects empty string, negative signs, and non-integer values; the > 0 check is for clarity
             if (!ctype_digit((string)$limitRaw) || (int)$limitRaw <= 0) {
                 $this->sendJsonError('Invalid limit value', 400);
                 return;
@@ -306,7 +307,11 @@ class Controller extends BaseController
 
         // Decode cursor
         if ($cursor !== null && $cursor !== '') {
-            $decoded  = json_decode(base64_decode($cursor, true), true);
+            $decoded = base64_decode($cursor, true);
+            if ($decoded === false || !is_array($decoded = json_decode($decoded, true))) {
+                $this->sendJsonError('Invalid cursor value', 400);
+                return;
+            }
             $cursorId = isset($decoded['id']) ? (int)$decoded['id'] : null;
         } else {
             $cursorId = null;
@@ -320,7 +325,7 @@ class Controller extends BaseController
         foreach ($groups as $group) {
             $folder = $group->getFolder();
             $codes  = [];
-            foreach ($folder->getCodes() as $code) {
+            foreach ($folder->getCodes() ?? [] as $code) {
                 if ($code->isDeleted()) {
                     continue;
                 }
@@ -331,14 +336,14 @@ class Controller extends BaseController
                 'name'        => $folder->getName(),
                 'codes'       => $codes,
                 'type'        => $group->getTypeString(),
-                'url'         => sprintf('/groups/%d', $folder->getId()),
+                'url'         => sprintf('/groups/%d', $folder->getId()), // TODO: use routeGenerator->generate() once the named route for /groups/{id} is confirmed
                 'memberCount' => $group->getMemberCount(),
             ];
         }
 
         // Encode next cursor
         $next = $nextCursor !== null
-            ? base64_encode(json_encode(['id' => $nextCursor], JSON_THROW_ON_ERROR))
+            ? base64_encode(json_encode(['id' => $nextCursor], JSON_THROW_ON_ERROR)) // $nextCursor is always int; json_encode cannot fail
             : null;
 
         $this->response = $this->responseAsJson(['results' => $results, 'next' => $next]);
