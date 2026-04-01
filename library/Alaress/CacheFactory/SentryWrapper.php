@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Alaress\Cache;
+namespace Alaress\CacheFactory;
 
 use Alaress\Sentry\Tracing\Tracer;
 use DateInterval;
@@ -36,12 +36,15 @@ class SentryWrapper implements CacheInterface
     /**
      * Constructor
      *
-     * @param CacheInterface $cache  The cache object to wrap around.
-     * @param Tracer|null    $tracer The tracer object to use to record spans:
-     *                               if not set, use the default tracer.
+     * @param CacheInterface $cache     The cache object to wrap around.
+     * @param string         $namespace The cache's namespace, will be prefixed to keys in the description.
+     * @param Tracer|null    $tracer    The tracer object to use to record spans: if not set, use the default tracer.
      */
-    public function __construct(private CacheInterface $cache, ?Tracer $tracer = null)
-    {
+    public function __construct(
+        private CacheInterface $cache,
+        private string $namespace,
+        ?Tracer $tracer = null,
+    ) {
         $this->tracer    = $tracer ?? Tracer::getDefaultTrace();
         $this->floatSize = strlen(pack('d', 0));
     }
@@ -55,11 +58,11 @@ class SentryWrapper implements CacheInterface
             fn () => $this->cache->get($key, $default),
             $key,
             'cache.get',
-            'auto.cache.get',
+            'auto.cache',
             $this->generateData(key: $key),
             fn (bool $result) => [
                 'cache.hit'       => $result !== $default,
-                'cache.item_size' => strlen($result),
+                'cache.item_size' => $this->calculateItemSize($result),
                 'cache.success'   => true,
             ],
             fn (Throwable $e) => [
@@ -77,7 +80,7 @@ class SentryWrapper implements CacheInterface
             fn () => $this->cache->set($key, $value, $ttl),
             $key,
             'cache.put',
-            'auto.cache.put',
+            'auto.cache',
             $this->generateData($key, $value, $ttl),
             fn (bool $result) => [
                 'cache.write'   => $result,
@@ -99,7 +102,7 @@ class SentryWrapper implements CacheInterface
             fn () => $this->cache->delete($key),
             $key,
             'cache.remove',
-            'auto.cache.remove',
+            'auto.cache',
             $this->generateData(key: $key),
             fn (bool $result) => [
                 'cache.success' => true,
@@ -119,7 +122,7 @@ class SentryWrapper implements CacheInterface
             fn () => $this->cache->clear(),
             '',
             'cache.flush',
-            'auto.cache.flush',
+            'auto.cache',
             $this->generateData(),
             fn (bool $result) => [
                 'cache.success' => true,
@@ -139,7 +142,7 @@ class SentryWrapper implements CacheInterface
             fn () => $this->cache->getMultiple($keys, $default),
             '',
             'cache.getMultiple',
-            'auto.cache.getMultiple',
+            'auto.cache',
             $this->generateData(),
         );
     }
@@ -153,7 +156,7 @@ class SentryWrapper implements CacheInterface
             fn () => $this->cache->setMultiple($values, $ttl),
             '',
             'cache.putMultiple',
-            'auto.cache.putMultiple',
+            'auto.cache',
             $this->generateData(),
         );
     }
@@ -167,7 +170,7 @@ class SentryWrapper implements CacheInterface
             fn () => $this->cache->deleteMultiple($keys),
             '',
             'cache.removeMultiple',
-            'auto.cache.removeMultiple',
+            'auto.cache',
             $this->generateData(),
         );
     }
@@ -181,7 +184,7 @@ class SentryWrapper implements CacheInterface
             fn () => $this->cache->has($key),
             $key,
             'cache.has',
-            'auto.cache.has',
+            'auto.cache',
             $this->generateData(key: $key),
             fn (bool $result) => [
                 'cache.hit'       => $result,
@@ -208,16 +211,7 @@ class SentryWrapper implements CacheInterface
             $data['cache.key'] = $key;
         }
         if (isset($value)) {
-            if (is_string($value)) {
-                $data['cache.item_size'] = strlen($value);
-            } elseif (is_int($value)) {
-                $data['cache.item_size'] = PHP_INT_SIZE;
-            } elseif (is_float($value)) {
-                $data['cache.item_size'] = $this->floatSize;
-            } elseif (is_bool($value)) {
-                $data['cache.item_size'] = 1;
-            }
-            // If this is an object or array: can't feasibly calculate size
+            $data['cache.item_size'] = $this->calculateItemSize($value);
         }
         $dataTtl = $ttl;
         if ($dataTtl instanceof DateInterval) {
@@ -254,5 +248,26 @@ class SentryWrapper implements CacheInterface
             $seconds += ($interval->s);
         }
         return $seconds;
+    }
+
+    /**
+     * Calculate the size of `$value`, as fetched/stored in the cache.
+     *
+     * @param mixed $value
+     * @return int|null The size of `$value`, or `null` if it's an object or
+     *                  array and thus can't be realistically calculated.
+     */
+    private function calculateItemSize(mixed $value): ?int
+    {
+        if (is_string($value)) {
+            return strlen($value);
+        } elseif (is_int($value)) {
+            return PHP_INT_SIZE;
+        } elseif (is_float($value)) {
+            return $this->floatSize;
+        } elseif (is_bool($value)) {
+            return 1;
+        }
+        return null;
     }
 }
