@@ -205,10 +205,12 @@ function init_npm_dependencies() {
   source /opt/nvm/nvm.sh
 
   local node_modules_dir="$SITE_ROOT/node_modules"
-  local lock_checksum
+  local lock_checksum node_version node_arch
   lock_checksum=$(sha1sum "${SITE_ROOT}/npm-shrinkwrap.json" 2>/dev/null | awk '{print $1}')
+  node_version=$(node --version 2>/dev/null | tr -d '[:space:]')
+  node_arch=$(node -p "process.arch" 2>/dev/null | tr -d '[:space:]')
 
-  local cache_file="${CACHE_DIR}/node-modules-${lock_checksum}.tar.gz"
+  local cache_file="${CACHE_DIR}/node-modules-${lock_checksum}-${node_version}-${node_arch}.tar.gz"
 
   find "${CACHE_DIR}" -name 'node-modules-*.tar.gz' -not -newerat '2 weeks ago' -delete
 
