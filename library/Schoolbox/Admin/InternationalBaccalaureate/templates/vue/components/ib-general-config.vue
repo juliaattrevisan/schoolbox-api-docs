@@ -67,8 +67,8 @@ async function saveGeneralConfig(): Promise<void> {
                     </label>
                     <input
                         :id="`config-${config.key}`"
-                        :type="config.type"
                         v-model="currentValues[config.key]"
+                        :type="config.type"
                         :data-test="`ib-configuration-input-${config.key}`"
                         :disabled="isSaving"
                     />
