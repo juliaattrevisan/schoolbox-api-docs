@@ -1852,12 +1852,8 @@ abstract class Kernel
             'httpClient.internalCache',
             $di->lazy(
                 function () use ($di) {
-                    return new Psr16Cache(
-                        new RedisAdapter(
-                            $di->get('redis.cache'),
-                            'httpClient.' . INSTANCE_ID,
-                        )
-                    );
+                    return new \Alaress\CacheFactory\Factory($di->get('redis.cache'))
+                        ->build('httpClient');
                 }
             ),
         );
@@ -2282,12 +2278,8 @@ abstract class Kernel
             'oidc.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new Psr16Cache(
-                        new RedisAdapter(
-                            $di->get('redis.cache'),
-                            CacheHelper::BASE_CLIENT_KEY . '.' . INSTANCE_ID,
-                        )
-                    );
+                    return new \Alaress\CacheFactory\Factory($di->get('redis.cache'))
+                        ->build(CacheHelper::BASE_CLIENT_KEY);
                 }
             )
         );
@@ -2297,12 +2289,8 @@ abstract class Kernel
             'component.homepage.clickview.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new Psr16Cache(
-                        new RedisAdapter(
-                            $di->get('redis.cache'),
-                            'component.homepage.clickview.' . INSTANCE_ID,
-                        )
-                    );
+                    return new \Alaress\CacheFactory\Factory($di->get('redis.cache'))
+                        ->build('component.homepage.clickview');
                 }
             )
         );
@@ -2311,12 +2299,8 @@ abstract class Kernel
             'paperly.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new Psr16Cache(
-                        new RedisAdapter(
-                            $di->get('redis.cache'),
-                            'paperly.' . INSTANCE_ID,
-                        )
-                    );
+                    return new \Alaress\CacheFactory\Factory($di->get('redis.cache'))
+                        ->build('paperly');
                 }
             )
         );
@@ -2326,12 +2310,8 @@ abstract class Kernel
             'ai.response.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new Psr16Cache(
-                        new RedisAdapter(
-                            $di->get('redis.cache'),
-                            'differentiationProfiles.' . INSTANCE_ID,
-                        )
-                    );
+                    return new \Alaress\CacheFactory\Factory($di->get('redis.cache'))
+                        ->build('differentiationProfiles');
                 }
             )
         );

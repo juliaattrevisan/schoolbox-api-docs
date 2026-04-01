@@ -27,7 +27,7 @@ class Factory
     {
         return new SentryWrapper(
             new Psr16Cache(new RedisAdapter($this->redis, $namespace . '.' . INSTANCE_ID)),
-            $namespace,
+            $namespace . '.' . INSTANCE_ID,
         );
     }
 }
