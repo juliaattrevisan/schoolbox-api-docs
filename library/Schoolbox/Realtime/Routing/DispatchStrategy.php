@@ -7,29 +7,20 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Realtime\Routing;
 
-use Alaress\WorkerCrew\Pooling\DispatchStrategy;
+use Alaress\WorkerCrew\Pooling\DispatchStrategy as BaseDispatchStrategy;
 
-class DispatchStrategy extends DispatchStrategy
+class DispatchStrategy extends BaseDispatchStrategy
 {
-    const TASK_ROUTE = 'route';
-
-    /**
-     * Get the name of the strategy currently being used
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return 'Route';
-    }
-
+   public const string TASK_ROUTE = 'route';
 
     /**
      * @return string
      */
-    public function getCommand()
+    public function getCommand(): string
     {
         return SITE_root . "/tools/notif/route/worker.php";
     }
@@ -38,7 +29,7 @@ class DispatchStrategy extends DispatchStrategy
     /**
      * @return array
      */
-    public function getSupportedActions()
+    public function getSupportedActions(): array
     {
         return [ self::TASK_ROUTE ];
     }

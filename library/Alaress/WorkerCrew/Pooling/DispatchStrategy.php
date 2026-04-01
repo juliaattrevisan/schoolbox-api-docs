@@ -7,6 +7,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Alaress\WorkerCrew\Pooling;
 
 use Alaress\WorkerCrew\IPC\AlaressIPCProtocol;
@@ -14,11 +16,11 @@ use Alaress\WorkerCrew\IPC\ProtocolInterface;
 use Alaress\WorkerCrew\Worker\Worker;
 use Alaress\WorkerCrew\Worker\WorkerArray;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
-use Exception;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use PDOException;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 class DispatchStrategy implements DispatchStrategyInterface
 {
@@ -91,7 +93,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      *
      * @return ProtocolInterface
      */
-    public function getProtocol()
+    public function getProtocol(): ProtocolInterface
     {
         return $this->protocol;
     }
@@ -102,7 +104,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      *
      * @return string
      */
-    public function getCommand()
+    public function getCommand(): string
     {
         return SITE_root . "/tools/socket/worker.php";
     }
@@ -114,7 +116,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      * @param WorkerBundleInterface $workers
      * @return bool
      */
-    public function canAccept($workers)
+    public function canAccept(WorkerBundleInterface $workers): bool
     {
         return $this->getAvailableWorker($workers, 0) != -1;
     }
@@ -130,7 +132,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      * @param int                   $remainingTaskCount
      * @return int
      */
-    public function getAvailableWorker($workers, $remainingTaskCount)
+    public function getAvailableWorker(WorkerBundleInterface $workers, int $remainingTaskCount): int
     {
         // if we haven't got the min number of workers, favour starting a new one
         if ($workers->count() < $this->minWorkers) {
@@ -158,9 +160,9 @@ class DispatchStrategy implements DispatchStrategyInterface
      *
      * @return array
      */
-    public function getSupportedActions()
+    public function getSupportedActions(): array
     {
-        return array(self::TASK_FETCH, self::TASK_PUBLISH, self::TASK_DIGEST, self::TASK_TIMETABLE);
+        return [self::TASK_FETCH, self::TASK_PUBLISH, self::TASK_DIGEST, self::TASK_TIMETABLE];
     }
 
 
@@ -169,7 +171,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      *
      * @return string
      */
-    public function getFlags()
+    public function getFlags(): string
     {
         return $this->flags;
     }
@@ -181,7 +183,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      * @param string $data
      * @return int
      */
-    public function checkState($data)
+    public function checkState(string $data): int
     {
         // no data: this pipe is closed
         if (strlen($data) == 0) {
@@ -215,7 +217,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      * @param mixed  $arguments
      * @return string
      */
-    public function composeTaskString($command, $arguments)
+    public function composeTaskString(string $command, mixed $arguments): string
     {
         return $this->protocol->prepareCommand($command, $arguments);
     }
@@ -225,10 +227,10 @@ class DispatchStrategy implements DispatchStrategyInterface
      * Separate the given parameter into an array of two elements: command and args.
      *
      * @param string $taskString
-     * @throws InvalidArgumentException
      * @return array
+     *@throws InvalidArgumentException
      */
-    public function decomposeTaskString($taskString)
+    public function decomposeTaskString(string $taskString): array
     {
         $xpl = $this->protocol->rebuild($taskString);
         if (count($xpl) != 2) {
@@ -244,7 +246,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      * @param mixed $data
      * @return string
      */
-    public function encodeRecord($data)
+    public function encodeRecord(mixed $data): string
     {
         return $this->protocol->flatten($data);
     }
@@ -256,7 +258,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      * @param string $data
      * @return array
      */
-    public function decodeRecords($data)
+    public function decodeRecords(string $data): array
     {
         return $this->protocol->rebuild($data);
     }
@@ -267,7 +269,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      *
      * @return int
      */
-    public function getQueueDelay()
+    public function getQueueDelay(): int
     {
         return $this->queueDelay;
     }
@@ -278,7 +280,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      *
      * @return int
      */
-    public function getWarningQueueLength()
+    public function getWarningQueueLength(): int
     {
         return $this->queueWarnSize;
     }
@@ -289,7 +291,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      *
      * @return int
      */
-    public function getMaxQueueLength()
+    public function getMaxQueueLength(): int
     {
         return $this->queueMaxSize;
     }
@@ -301,7 +303,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      *
      * @return bool
      */
-    public function canDispatcherFlywheel()
+    public function canDispatcherFlywheel(): bool
     {
         if ($this->flywheelSpins-- > 0) {
             return true;
@@ -316,7 +318,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      *
      * @return int
      */
-    public function getWorkerIdleTimeout()
+    public function getWorkerIdleTimeout(): int
     {
         return $this->idleTimeout;
     }
@@ -327,7 +329,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      *
      * @return WorkerBundleInterface
      */
-    public function newWorkerBundle()
+    public function newWorkerBundle(): WorkerBundleInterface
     {
         return new WorkerArray($this->protocol);
     }
@@ -339,19 +341,19 @@ class DispatchStrategy implements DispatchStrategyInterface
      * @param WorkerBundleInterface $workers
      * @return void
      */
-    public function cleanup($workers)
+    public function cleanup(WorkerBundleInterface $workers): void
     {
         $workers->detachWhere(Worker::ENDED);
     }
 
 
     /**
-     * @param Exception       $exception
+     * @param Throwable      $exception
      * @param LoggerInterface $log
-     * @throws PDOException
      * @return void
+     * @throws PDOException
      */
-    public function handleException($exception, $log)
+    public function handleException(Throwable $exception, LoggerInterface $log): void
     {
         $log->critical(sprintf("Exception during dispatch - %s: %s", get_class($exception), $exception->getMessage()), ['exception' => $exception]);
 
@@ -368,7 +370,7 @@ class DispatchStrategy implements DispatchStrategyInterface
      * @param bool $hard
      * @return int
      */
-    public function getWorkerExecutionTimeout($hard = true)
+    public function getWorkerExecutionTimeout(bool $hard = true): int
     {
         return $hard ? $this->workerTimeoutHard : $this->workerTimeoutSoft;
     }
