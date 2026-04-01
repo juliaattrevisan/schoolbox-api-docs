@@ -48,7 +48,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     /** @var ClientInterface $redis */
     $redis = $di->get('redis.storage');
 
-    $configFile   = $opts['c'] ?? (SITE_root . '/tools/mobile/mobiled.conf');
+    $configFile   = $opts['c'] ?? (SITE_root . '/tools/digest/digestd.conf');
     $stratBuilder = new ConfiguredDispatchStrategyBuilder(new ConfigurationReader($configFile)->readConfig());
     $strat        = $stratBuilder->build($flags);
 
