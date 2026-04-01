@@ -21,6 +21,7 @@ use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\DialogAgent\ValidDialogAgentEnabled;
+use Schoolbox\User;
 
 /**
  * Encapsulates the mapping between Assessment Types and:
@@ -220,9 +221,10 @@ class AssessmentType implements IType
      * The mapped values are the readable type names, respecting terminology, in "Title Case"
      *
      * @param IConfigLoader $configLoader
+     * @param User $user
      * @return array<string, string>
      */
-    public static function getEnabledOptions(IConfigLoader $configLoader): array
+    public static function getEnabledOptions(IConfigLoader $configLoader, \Schoolbox\User $user): array
     {
         $list = self::getOptions();
 
