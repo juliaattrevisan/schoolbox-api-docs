@@ -17,17 +17,26 @@ use Throwable;
 /**
  * Wrapper around a PSR-16 cache object, which creates Sentry traces for cache
  * hits and misses.
+ *
+ * @see https://develop.sentry.dev/sdk/telemetry/traces/modules/caches/
  */
 class SentryWrapper implements CacheInterface
 {
     /**
+     * The tracer object to use to record spans.
+     */
+    private Tracer $tracer;
+
+    /**
      * Constructor
      *
-     * @param CacheInterface $cache The cache object to wrap around.
+     * @param CacheInterface $cache  The cache object to wrap around.
+     * @param Tracer|null    $tracer The tracer object to use to record spans:
+     *                               if not set, use the default tracer.
      */
-    public function __construct(private CacheInterface $cache, private ?Tracer $tracer = null)
+    public function __construct(private CacheInterface $cache, ?Tracer $tracer = null)
     {
-        $this->tracer ??= Tracer::getDefaultTrace();
+        $this->tracer = $tracer ?? Tracer::getDefaultTrace();
     }
 
     /**
@@ -177,15 +186,19 @@ class SentryWrapper implements CacheInterface
     /**
      * Generates data for the span.
      *
-     * @param string                $key
+     * @param string|null           $key
      * @param mixed                 $value
      * @param DateInterval|int|null $ttl
      * @return array
      */
-    private function generateData(string $key, mixed $value, DateInterval|int|null $ttl): array
+    private function generateData(?string $key = null, mixed $value = null, DateInterval|int|null $ttl = null): array
     {
-        $data = ['cache.key' => $key];
+        $data = [];
+        if (isset($key)) {
+            $data['cache.key'] = $key;
+        }
         if (isset($value)) {
+            // Item size can only be determined if the value was a string
             $data['cache.item_size'] = strlen($value);
         }
         $dataTtl = $ttl;
@@ -199,7 +212,8 @@ class SentryWrapper implements CacheInterface
     }
 
     /**
-     * Makes a best effort to convert a DateInterval to an int.
+     * Makes a best effort to convert a DateInterval to an int, for recording as
+     * data for the cache's span.
      *
      * @param DateInterval $interval
      * @return int|null
@@ -208,16 +222,10 @@ class SentryWrapper implements CacheInterface
     {
         // Need to assume that if days, months, years or invert are set then
         // a TTL can't be assumed
+        if ($interval->y || $interval->m || $interval->d || $interval->invert) {
+            return null;
+        }
         $seconds = 0;
-        if ($interval->y) {
-            return null;
-        }
-        if ($interval->m) {
-            return null;
-        }
-        if ($interval->d) {
-            return null;
-        }
         if ($interval->h) {
             $seconds += ($interval->h * 60 * 60);
         }
@@ -227,10 +235,6 @@ class SentryWrapper implements CacheInterface
         if ($interval->s) {
             $seconds += ($interval->s);
         }
-        if ($interval->invert) {
-            return null;
-        }
         return $seconds;
     }
-
 }
