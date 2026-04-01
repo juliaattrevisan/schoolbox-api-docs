@@ -34,7 +34,7 @@ class AssessmentTypes implements IDataGenerator
     {
         $options = [];
 
-        foreach (AssessmentType::getEnabledOptions($this->configLoader, $this->user) as $key => $name) {
+        foreach (AssessmentType::getPermittedOptions($this->configLoader, $this->user) as $key => $name) {
             $options[$key] = [
                 'name' => $name,
                 'icon' => AssessmentType::getIconClassSuffixForType($key),

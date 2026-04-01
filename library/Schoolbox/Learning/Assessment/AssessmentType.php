@@ -246,6 +246,33 @@ class AssessmentType implements IType
             unset($list[self::TYPE_REPORTING]);
         }
 
+        return $list;
+    }
+
+
+    /**
+     * Intended to be used in conjunction with getEnabledOptions which decides which learning activities were enabled
+     * based on the feature flag settings they had.
+     *
+     * getPermittedOptions decides whether the currently logged in user has enough service permissions to actually do
+     * things with the learning activities that were enabled by the system.
+     *
+     * getEnabledOptions() used to be shared in pretty much every contextual usage, but this behaviour isn't always
+     * correct or desired; reporting activities are only available to SOME people for management (create/modify/delete)
+     * but should be accessible to the staff roletype when changing the course outline filter settings: you can't change
+     * the contents of the reporting activity but you CAN change the way it's interpreted by other features.
+     *
+     * This creates a two-class system where reporting activities should appear in SOME places but NOT others, depending
+     * solely on the currently logged in user, NOT the system settings.
+     *
+     * @param IConfigLoader $configLoader
+     * @param User $user
+     * @return array
+     */
+    public static function getPermittedOptions(IConfigLoader $configLoader, \Schoolbox\User $user): array
+    {
+        $list = self::getEnabledOptions($configLoader, $user);
+
         /* Only LMS Moderator with write+ access can create/modify/delete reporting activities
          */
         if (!(new ValidManageActivity())->isSatisfiedBy($configLoader->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $user)) {
