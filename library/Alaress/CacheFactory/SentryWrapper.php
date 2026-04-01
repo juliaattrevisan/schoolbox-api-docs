@@ -56,7 +56,7 @@ class SentryWrapper implements CacheInterface
     {
         return $this->tracer->runWithinSpan(
             fn () => $this->cache->get($key, $default),
-            $key,
+            $this->generateDescription($key),
             'cache.get',
             'auto.cache',
             $this->generateData(key: $key),
@@ -78,7 +78,7 @@ class SentryWrapper implements CacheInterface
     {
         return $this->tracer->runWithinSpan(
             fn () => $this->cache->set($key, $value, $ttl),
-            $key,
+            $this->generateDescription($key),
             'cache.put',
             'auto.cache',
             $this->generateData($key, $value, $ttl),
@@ -100,7 +100,7 @@ class SentryWrapper implements CacheInterface
     {
         return $this->tracer->runWithinSpan(
             fn () => $this->cache->delete($key),
-            $key,
+            $this->generateDescription($key),
             'cache.remove',
             'auto.cache',
             $this->generateData(key: $key),
@@ -182,7 +182,7 @@ class SentryWrapper implements CacheInterface
     {
         return $this->tracer->runWithinSpan(
             fn () => $this->cache->has($key),
-            $key,
+            $this->generateDescription($key),
             'cache.has',
             'auto.cache',
             $this->generateData(key: $key),
@@ -208,7 +208,7 @@ class SentryWrapper implements CacheInterface
     {
         $data = [];
         if (isset($key)) {
-            $data['cache.key'] = $key;
+            $data['cache.key'] = $this->generateDescription($key);
         }
         if (isset($value)) {
             $data['cache.item_size'] = $this->calculateItemSize($value);
@@ -248,6 +248,17 @@ class SentryWrapper implements CacheInterface
             $seconds += ($interval->s);
         }
         return $seconds;
+    }
+
+    /**
+     * Generate a description from the cache's namespace, and the requested key.
+     *
+     * @param string $key
+     * @return string
+     */
+    private function generateDescription(string $key): string
+    {
+        return sprintf('%s:%s', $this->namespace, $key);
     }
 
     /**
