@@ -235,8 +235,9 @@ class Feed
      * Get a list of online assessments (aka 'quizzes') that were created.
      *
      * @param string|array $folderIds
-     * @param int $limit
+     * @param int          $limit
      * @return array
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function getOnlineAssessments($folderIds, $limit): array
     {
@@ -278,7 +279,13 @@ class Feed
             AND assess.start < NOW()
             AND assess.deleted_at IS NULL
             AND assess.availability = 'assess'
-            AND ((lwt.is_visible_to_parents <> 0 OR lwt.is_visible_to_students <> 0) {$sivoClause})
+            AND (
+                (
+                    (" . ($this->user->getRole()->isParent() ? 'TRUE' : 'FALSE') . " AND lwt.is_visible_to_parents <> 0) OR
+                    (" . ($this->user->getRole()->isStudent() ? 'TRUE' : 'FALSE') . " AND lwt.is_visible_to_students <> 0)
+                )
+                {$sivoClause}
+            )
             ORDER BY assess.created_at DESC LIMIT 0, :limit
         ");
         $this->executeWithLimit($query, $params, $limit);
