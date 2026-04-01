@@ -240,7 +240,10 @@ abstract class Base implements IStrategy
     {
         $this->log->info(sprintf("Clearing '%d' prepared statements from the cache", count($this->preparedStatements)));
 
-        $this->log->debug(print_r(array_keys($this->preparedStatements), true));
+        foreach ($this->preparedStatements as $sql => $prepare) {
+            $this->log->debug(sprintf("Used times: '%d', sql: '%s'", $prepare['count'], $sql));
+
+        }
         $this->preparedStatements = [];
     }
 
@@ -252,8 +255,13 @@ abstract class Base implements IStrategy
     protected function getPreparedStatement(string $query): \PDOStatement
     {
         if (!isset($this->preparedStatements[$query])) {
-            $this->preparedStatements[$query] = $this->database->prepare($query);
+            $this->preparedStatements[$query] = [
+                'statement' => $this->database->prepare($query),
+                'count' => 0
+            ];
         }
-        return $this->preparedStatements[$query];
+        // log that fetched the prepared statement
+        $this->preparedStatements[$query]['count']++;
+        return $this->preparedStatements[$query]['statement'];
     }
 }
