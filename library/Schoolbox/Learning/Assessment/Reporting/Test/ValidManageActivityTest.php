@@ -50,6 +50,10 @@ class ValidManageActivityTest extends TestCase
     {
         $lmsModerator = (new UserAccess())
             ->setService(UserAccess::SERVICE_LMS)
+            ->setAccessLevel(UserAccess::ACCESS_FULL);
+
+        $lmsWriteModerator = (new UserAccess())
+            ->setService(UserAccess::SERVICE_LMS)
             ->setAccessLevel(UserAccess::ACCESS_WRITE);
 
         $lmsRead = (new UserAccess())
@@ -68,32 +72,54 @@ class ValidManageActivityTest extends TestCase
                 (new \Schoolbox\User())->setSuperuser(true),
                 true
             ],
-            /* LMS Moderators are allowed
+            /* LMS Moderators with FULL access are allowed
              */
-            'Valid 2' => [
+            'Valid 2a' => [
                 true,
                 (new \Schoolbox\User())->setAccessList((new GenericCollection(UserAccess::class))->add($lmsModerator)),
                 true
             ],
+            /* LMS Moderators with WRITE access are allowed
+             * (I don't know the human word for this setup - what do you call these people?)
+             */
+            'Valid 2b' => [
+                true,
+                (new \Schoolbox\User())->setAccessList((new GenericCollection(UserAccess::class))->add($lmsWriteModerator)),
+                true
+            ],
+
             /* Superusers + LMS Moderators are allowed
              */
-            'Valid 3' => [
+            'Valid 3a' => [
                 true,
                 (new \Schoolbox\User())
                     ->setSuperuser(true)
                     ->setAccessList((new GenericCollection(UserAccess::class))->add($lmsModerator)),
                 true
             ],
+            'Valid 3b' => [
+                true,
+                (new \Schoolbox\User())
+                    ->setSuperuser(true)
+                    ->setAccessList((new GenericCollection(UserAccess::class))->add($lmsWriteModerator)),
+                true
+            ],
             /* User with multiple access perms, one of which is an LMS moderator
              */
-            'Valid 4' => [
+            'Valid 4a' => [
                 true,
                 (new \Schoolbox\User())
                     ->setSuperuser(true)
                     ->setAccessList((new GenericCollection(UserAccess::class))->add($newsModerator)->add($lmsRead)->add($newsModerator)->add($lmsModerator)->add($lmsRead)),
                 true
             ],
-
+            'Valid 4b' => [
+                true,
+                (new \Schoolbox\User())
+                    ->setSuperuser(true)
+                    ->setAccessList((new GenericCollection(UserAccess::class))->add($newsModerator)->add($lmsRead)->add($newsModerator)->add($lmsWriteModerator)->add($lmsRead)),
+                true
+            ],
             /* Feature flag is disabled: superusers are not allowed
              */
             'Feature disabled, super' => [
@@ -108,6 +134,11 @@ class ValidManageActivityTest extends TestCase
                 (new \Schoolbox\User())->setAccessList((new GenericCollection(UserAccess::class))->add($lmsModerator)),
                 false
             ],
+            'Feature disabled, LMS moderator with write access' => [
+                false,
+                (new \Schoolbox\User())->setAccessList((new GenericCollection(UserAccess::class))->add($lmsWriteModerator)),
+                false
+            ],
             /* Feature flag is disabled: Superusers + LMS Moderators are not allowed
              */
             'Feature disabled, super + LMS moderator' => [
@@ -115,6 +146,13 @@ class ValidManageActivityTest extends TestCase
                 (new \Schoolbox\User())
                     ->setSuperuser(true)
                     ->setAccessList((new GenericCollection(UserAccess::class))->add($lmsModerator)),
+                false
+            ],
+            'Feature disabled, super + LMS moderator with write access' => [
+                false,
+                (new \Schoolbox\User())
+                    ->setSuperuser(true)
+                    ->setAccessList((new GenericCollection(UserAccess::class))->add($lmsWriteModerator)),
                 false
             ],
             /* Insufficient service level: must have WRITE+ to get in
