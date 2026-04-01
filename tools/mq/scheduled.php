@@ -78,8 +78,9 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
             INSTANCE_ID,
             // Since future triggers are cached using the JIT cache, the max
             // future trigger time must be <= the JIT's TTL.
+            // maxFutureTriggerTime is configured in ms but the Scheduler expects seconds.
             $maxFutureTriggerTime > 0
-                ? min($strat->getMaxFutureTriggerTime(), RedisCache::EXPIRY_WINDOW)
+                ? min(intdiv($maxFutureTriggerTime, 1000), RedisCache::EXPIRY_WINDOW)
                 : 0,
         );
 
