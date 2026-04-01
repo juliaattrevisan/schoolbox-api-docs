@@ -20,7 +20,7 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
         $di = $page->getDi();
         $configLoader = $di->get('config');
 
-        $assessmentTypeOptions = Assessment\AssessmentType::getEnabledOptions($configLoader, $this->user);
+        $assessmentTypeOptions = Assessment\AssessmentType::getEnabledOptions($configLoader);
 
         // if config doesn't exist, then default to all options...
         $setConfig = $assessmentTypeOptions;

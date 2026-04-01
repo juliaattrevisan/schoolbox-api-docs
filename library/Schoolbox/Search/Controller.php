@@ -141,7 +141,7 @@ class Controller extends Base
         $configLoader = $this->getConfigLoader();
 
         if ($configLoader->get(ConfigMapper::NAME_LMS_ENABLED)) {
-            $assessmentTypes = AssessmentType::getEnabledOptions($configLoader, $this->getUser());
+            $assessmentTypes = AssessmentType::getEnabledOptions($configLoader);
 
             $subTypes = [];
             foreach ($assessmentTypes as $typeKey => $title) {

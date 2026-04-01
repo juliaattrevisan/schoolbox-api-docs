@@ -222,10 +222,9 @@ class AssessmentType implements IType
      * The mapped values are the readable type names, respecting terminology, in "Title Case"
      *
      * @param IConfigLoader $configLoader
-     * @param User $user
      * @return array<string, string>
      */
-    public static function getEnabledOptions(IConfigLoader $configLoader, \Schoolbox\User $user): array
+    public static function getEnabledOptions(IConfigLoader $configLoader): array
     {
         $list = self::getOptions();
 
@@ -271,7 +270,7 @@ class AssessmentType implements IType
      */
     public static function getPermittedOptions(IConfigLoader $configLoader, \Schoolbox\User $user): array
     {
-        $list = self::getEnabledOptions($configLoader, $user);
+        $list = self::getEnabledOptions($configLoader);
 
         /* Only LMS Moderator with write+ access can create/modify/delete reporting activities
          */

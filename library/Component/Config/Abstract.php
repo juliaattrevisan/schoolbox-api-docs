@@ -32,11 +32,10 @@ abstract class Component_Config_Abstract
     protected $is_shown_on_template = true;
 
     /**
-     * @param \Schoolbox\User $user  The currently logged in user
      * @param Folder|Eportfolio_Page_Instance|null $context
      * @param array|null $fields
      */
-    public function __construct(protected \Schoolbox\User $user, $context, $fields = null)
+    public function __construct($context, $fields = null)
     {
         $this->context = $context;
 
