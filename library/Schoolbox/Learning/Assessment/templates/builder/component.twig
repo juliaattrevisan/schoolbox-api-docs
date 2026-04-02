@@ -54,7 +54,7 @@ $data = [
 {% else %}
     <div class="empty-state">
         <i class="icon-course"></i>
-        <p><a href="{{ activityUrl }}?{{ returnUrlName }}={{ encodedReturnUrl }}">Create a new {{ locale.activity }}</a> for this {{ locale.unit }} that you can import into classes and reuse again.</p>
+        <p><a href="{{ activityUrl }}?{{ returnUrlName }}={{ encodedReturnUrl }}" data-test="course-builder-create-new-activity">Create a new {{ locale.activity }}</a> for this {{ locale.unit }} that you can import into classes and reuse again.</p>
     </div>
 {% endif %}
 
