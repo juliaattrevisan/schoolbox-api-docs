@@ -589,7 +589,7 @@ class Cursor implements ICursor
                     assessment.work_type_id IS NULL OR
                     assessment.work_type_id IN (
                         SELECT `id` FROM `lu_work_type`
-                        WHERE (`is_visible_to_parents` <> 0 OR `is_visible_to_students` <> 0)
+                        WHERE (`is_visible_to_parents` <> 0 OR `is_visible_to_learners` <> 0)
                         AND `deleted_at` IS NULL
                     )
                 )

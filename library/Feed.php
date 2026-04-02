@@ -282,7 +282,7 @@ class Feed
             AND (
                 (
                     (" . ($this->user->getRole()->isParent() ? 'TRUE' : 'FALSE') . " AND lwt.is_visible_to_parents <> 0) OR
-                    (" . ($this->user->getRole()->isStudent() ? 'TRUE' : 'FALSE') . " AND lwt.is_visible_to_students <> 0)
+                    (" . ($this->user->getRole()->isStudent() ? 'TRUE' : 'FALSE') . " AND lwt.is_visible_to_learners <> 0)
                 )
                 {$sivoClause}
             )

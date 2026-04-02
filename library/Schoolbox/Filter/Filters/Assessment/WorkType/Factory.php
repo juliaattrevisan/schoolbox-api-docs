@@ -107,7 +107,7 @@ class Factory extends Filter\AbstractFactory
                 $this->workTypeMapper->getPredicateBuilder()->any(
                     $this->workTypeMapper->getPredicateBuilder()
                         ->notEquals('is_visible_to_parents', 0)
-                        ->notEquals('is_visible_to_students', 0)
+                        ->notEquals('is_visible_to_learners', 0)
                 )
             );
         } elseif (Filter\Page\Model::PAGE_GRADES === $pageFilter->getPage()) {
@@ -123,7 +123,7 @@ class Factory extends Filter\AbstractFactory
                     $this->workTypeMapper->getPredicateBuilder()->any(
                         $this->workTypeMapper->getPredicateBuilder()
                             ->notEquals('is_visible_to_parents', 0)
-                            ->notEquals('is_visible_to_students', 0)
+                            ->notEquals('is_visible_to_learners', 0)
                     )
                 );
             }

@@ -583,11 +583,13 @@ class Controller extends Base
     public function workTypes()
     {
         $database = FolderMapper::getInstance()->getDatabase();
+        // Note the text output for the 'Visible' column deliberately matches the text used in the options on the
+        // 'Visibility' selector on the 'Admin > LMS > Work Types' page (defined in Admin\Lists\Controller).
         $statement = $database->prepare("
         SELECT
             NAME as 'Work Type',
             IF(show_on_grades_page, 'Yes', 'No') as 'Display on Grades Page',
-            CASE CONCAT(IF(is_visible_to_students, 1, 0), '-', IF(is_visible_to_parents, 1, 0))
+            CASE CONCAT(IF(is_visible_to_learners, 1, 0), '-', IF(is_visible_to_parents, 1, 0))
                 WHEN '0-0' THEN 'staffOnly'
                 WHEN '0-1' THEN 'staffAndParents'
                 WHEN '1-0' THEN 'staffAndStudents'
