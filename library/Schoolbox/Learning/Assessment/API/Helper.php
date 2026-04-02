@@ -168,7 +168,11 @@ class Helper
                     'participants'     => (
                         // Participants is not applicable to 'lessonPlan'.
                         (AssessmentType::TYPE_LESSON_PLAN === $row['assessmentType']) ? null : []
-                    )
+                    ),
+                    'specificationAssessmentId' => $row['specificationAssessmentId'] !== null ? (int)$row['specificationAssessmentId'] : null,
+                    'markVisibility'            => $row['markVisibility'] !== null ? (int)$row['markVisibility'] : null,
+                    'markType'                  => $row['markType'] ?? null,
+                    'description'               => $row['description'] ?? null,
                 ];
             }
         }
@@ -263,7 +267,10 @@ class Helper
                     LEFT JOIN folder_year_level ON folder_year_level.year_level_id = lu_year_level.id
                     WHERE folder_year_level.folder_id = mv_assessment_relation.folder_id
                 ) AS `yearLevelId`,
-                markTypeTable.hr_name AS markType,
+                assessment.description,
+                asi.specification_assessment_id AS specificationAssessmentId,
+                COALESCE(submission_box.mark_visibility, assess.mark_visibility, project.mark_visibility, lti_assessment.mark_visibility) AS markVisibility,
+                COALESCE(markTypeTable.slug, quizMarkType.slug, projectMarkType.slug) AS markType,
                 projectParent.assessment_id AS `project`
         ";
 
@@ -278,6 +285,9 @@ class Helper
             LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
             LEFT JOIN folder ON mv_assessment_relation.folder_id = folder.id
             LEFT JOIN submission_mark_type AS markTypeTable ON submission_box.mark_type = markTypeTable.mark_type_id
+            LEFT JOIN assessment_specification_implementation AS asi ON asi.implementation_assessment_id = assessment.id
+            LEFT JOIN submission_mark_type AS quizMarkType ON assess.mark_type_id = quizMarkType.mark_type_id
+            LEFT JOIN submission_mark_type AS projectMarkType ON project.mark_type_id = projectMarkType.mark_type_id
             LEFT JOIN project projectParent ON projectParent.id = mv_assessment_relation.project_assessment_id
             LEFT JOIN lesson_plan ON assessment.id = lesson_plan.assessment_id
             LEFT JOIN dialog_agent ON assessment.id = dialog_agent.assessment_id
