@@ -86,7 +86,7 @@ HELP;
     }
     private function choiceInstall()
     {
-        $allPackages  = $this->packageMapper->findAll();
+        $allPackages  = $this->packageMapper->findAll()->indexBy('id');
         $listPackages = [];
         /**
          * list all available packages
@@ -109,14 +109,7 @@ HELP;
             exit;
         }
         $this->getLogger()->info("Selected Id: {$packageId}");
-        // Find the package with the matching database ID
-        $package = null;
-        foreach ($allPackages as $pkg) {
-            if ($pkg->getId() === $packageId) {
-                $package = $pkg;
-                break;
-            }
-        }
+        $package = $allPackages[$packageId] ?? null;
         if ($package === null) {
             $this->getLogger()->error("Package with ID {$packageId} not found");
             $this->choiceInstall();
