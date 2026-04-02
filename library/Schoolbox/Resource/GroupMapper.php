@@ -189,7 +189,6 @@ class GroupMapper extends Mapper
         $params     = [
             'service'   => UserAccess::SERVICE_HOMEPAGE,
             'minAccess' => UserAccess::ACCESS_READ, // >= ACCESS_READ excludes pending (ACCESS_AWAITING_AUTHORISATION=0) and denied (ACCESS_DENY=0) users
-            'limit'     => $limit,
         ];
 
         if ($q !== '') { // empty string = no name filter
@@ -230,8 +229,10 @@ class GroupMapper extends Mapper
 
         $statement = $this->database->prepare($query);
         $statement->bindValue('limit', $limit, PDO::PARAM_INT);
-        unset($params['limit']);
-        $statement->execute($params);
+        foreach ($params as $key => $value) {
+            $statement->bindValue($key, $value);
+        }
+        $statement->execute();
 
         $groups = $this->createCollection();
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
