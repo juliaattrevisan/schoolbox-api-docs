@@ -92,32 +92,30 @@ class MyFiles extends Base
     protected function getIdsToDelete(): array
     {
         $this->log->info('Deleting MyFiles older than ' . $this->getRetentionDBDate());
-        $query = "
+        $filesTable = self::TABLE_NAME_FILE;
+        $filesQuery = "
             SELECT
-                id
-            FROM " . self::TABLE_NAME_FILE . "
+                id,
+                \"{$filesTable}\" AS `table`
+            FROM {$filesTable}
             WHERE deleted_at IS NOT NULL AND deleted_at < :old
         ";
 
-        $statement = $this->database->prepare($query);
+        $statement = $this->database->prepare($filesQuery);
         $statement->execute([
             'old'   => $this->getRetentionDBDate(),
         ]);
 
         // collate ids to delete
-        $deleteIds = [  ];
-        while ($row = $statement->fetch()) {
-            $deleteIds[] = [
-                'id' => $row['id'],
-                'table' => self::TABLE_NAME_FILE,
-            ];
-        }
+        $fileDeleteIds = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
         // now do the same for folders
+        $foldersTable = self::TABLE_NAME_FOLDER;
         $folderQuery = "
             SELECT
-                id
-            FROM " . self::TABLE_NAME_FOLDER . "
+                id,
+                \"{$foldersTable}\" AS `table`
+            FROM {$foldersTable}
             WHERE deleted_at IS NOT NULL AND deleted_at < :old
         ";
 
@@ -127,14 +125,9 @@ class MyFiles extends Base
         ]);
 
         // collate ids to delete
-        while ($row = $folderStatement->fetch()) {
-            $deleteIds[] = [
-                'id' => $row['id'],
-                'table' => self::TABLE_NAME_FOLDER,
-            ];
-        }
+        $folderDeleteIds = $folderStatement->fetchAll(\PDO::FETCH_ASSOC);
 
-        return $deleteIds;
+        return array_merge($fileDeleteIds, $folderDeleteIds);
     }
 
     /**
