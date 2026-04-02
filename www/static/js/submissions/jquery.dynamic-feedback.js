@@ -304,7 +304,7 @@
 
                     // Update this participant's status:
                     // need to be able to differentiate between reviewed and resubmit required somehow
-                    reloadStatus($participant, resubmissionRequired);
+                    reloadStatus($actionBar);
 
                     // Ensure the 'display reviewed' filter is ON
                     $(config.filters).find('[data-status="reviewed"]').prop("checked", true);
@@ -324,14 +324,27 @@
 
 
         /**
-         * Update the status chiclet for each participant
+         * Finds the state of the Resubmission Required checkbox based on a participant's dom element
          *
          * @param $participant
-         * @param resubmissionRequired whether the Resubmission Required checkbox was ticked
+         * @returns {*}
          */
-        function reloadStatus($participant, resubmissionRequired) {
+        function findResubmissionRequired($participant) {
+            return $participant.find('[data-feedback-form]').find('[name="resubmissionRequired"]').prop("checked");
+        }
+
+
+        /**
+         * Update the status chiclet for each participant
+         *
+         * @param $actionBar
+         */
+        function reloadStatus($actionBar) {
+            let $participant = findParticipantElement($actionBar);
+            let resubmissionRequired = findResubmissionRequired($participant);
             let status = resubmissionRequired ? config.statusResubmissionRequired : config.statusReviewed;
             let title = resubmissionRequired ? config.resubmissionRequiredText : config.reviewedText;
+
             $participant.attr("data-status", status);
 
             // Update the icon

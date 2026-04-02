@@ -435,10 +435,7 @@
 
                                                 /* Update the status
                                                  */
-                                                let participant = $actionBar.closest("[data-participant]");
-                                                let resubmissionRequired = participant.find('[data-feedback-form]').find('[name="resubmissionRequired"]').prop("checked");
-
-                                                dynamicFeedback.reloadStatus(participant, resubmissionRequired);
+                                                dynamicFeedback.reloadStatus($actionBar);
                                             }
                                         }
                                     }
