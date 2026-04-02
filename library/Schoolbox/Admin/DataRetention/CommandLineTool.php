@@ -116,7 +116,6 @@ class CommandLineTool extends CliTool\App
                 $logger->warning(sprintf("Invalid retention period override '%s'. Exiting without deleting anything.", $this->getOpt(self::OPT_RETENTION_PERIOD)));
                 return;
             }
-
             $retentionPeriod = new RetentionPeriod($this->getOptAsInt(self::OPT_RETENTION_PERIOD));
         } catch (SchoolboxException $e) {
             $logger->warning(sprintf("Invalid retention period override '%s': %s. Exiting without deleting anything.", $this->getOpt(self::OPT_RETENTION_PERIOD), $e->getMessage()));
@@ -223,7 +222,7 @@ class CommandLineTool extends CliTool\App
         $logger->notice(sprintf("Script will end at or before '%s'", date('Y-m-d H:i:s', $endTime)));
         $logger->notice(sprintf("Chunk size: %s", $chunkSize));
         $logger->notice(sprintf("Loop count: %s", $loopCount));
-        if (null !== $retentionPeriod) {
+        if ($retentionPeriod->getRetentionDays() !== 0 ) {
             $logger->notice(sprintf("Overriding retention period to '%s' days", $retentionPeriod->getRetentionDays()));
         }
 
