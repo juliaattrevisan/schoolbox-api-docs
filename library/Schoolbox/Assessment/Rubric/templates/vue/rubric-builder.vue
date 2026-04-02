@@ -136,55 +136,82 @@ function createRubric(): void {
     // TODO: I assume this is meant to prefill with similar data to the original one.
     // TODO: This might need to fetch a new blank grid since the capabilities/indicators possibly changed and that has implications for the new grid...
     const newRubric = cloneDeep(props.rubricBlankGrid);
-    newRubric.id = 0; // apparently 0 is how rubrics define they are new
+
+    // TODO: backend handling of negative IDs, it previously used "0" to some extent I think?
+    const lowestId = Math.min(...rubricGrids.value.map((grid) => grid.id), 0);
+    newRubric.id = lowestId - 1; // negative ID represents a new rubric that hasn't been persisted yet
+
     rubricGrids.value.push(newRubric);
+    showRubricCreate.value = false;
 }
+
+const rubricRows = window.Vue.computed(() => {
+    // all the actual rubrics
+    const rows: (RubricGrid | { id: "create" })[] = [...rubricGrids.value];
+
+    // plus a blank one used when creating a new rubric that doesn't have a grid yet
+    // (it needs an ID to be able to be used in the v-for)
+    if (showRubricCreate.value) {
+        rows.push({ id: "create" });
+    }
+
+    return rows;
+});
+
+// TODO: temp multiple grids... chaotically
+createRubric();
 </script>
 
 <template>
-    <!-- TODO: temp multiple grids... chaotically -->
-    <fieldset-collapsible
-        v-for="(rubric, index) in [rubricGrids[0], rubricGrids[0], rubricGrids[0], rubricGrids[0]]"
-        :key="rubric.id"
-        delay-content-render
-    >
-        <template #legend>Rubric {{ index + 1 }}</template>
+    <div v-for="(rubric, index) in rubricRows" :key="rubric.id" class="actions-small-1 rubric-builder-row">
+        <fieldset-collapsible delay-content-render :initially-expanded="rubric.id === 'create' || rubric.id < 0">
+            <template #legend>Rubric {{ index + 1 }}</template>
 
-        <template #content>
-            <rubric-grid-editable
-                v-model:rubric-grid-levels="rubric.levels"
-                v-model:rubric-grid-capabilities="rubric.capabilities"
-                :rubric-id="rubric.id"
-                :folder-id="props.folderId"
-                :max-levels="props.maxLevels"
-                :capability-mark-type="capabilityMarkType"
-                :use-mark-range="useMarkRange"
-                :route-rubric-create="props.routeRubricCreate"
-            />
+            <!-- existing rubric content -->
+            <template v-if="rubric.id !== 'create'" #content>
+                <rubric-grid-editable
+                    v-model:rubric-grid-levels="rubric.levels"
+                    v-model:rubric-grid-capabilities="rubric.capabilities"
+                    :rubric-id="rubric.id"
+                    :folder-id="props.folderId"
+                    :max-levels="props.maxLevels"
+                    :capability-mark-type="capabilityMarkType"
+                    :use-mark-range="useMarkRange"
+                    :route-rubric-create="props.routeRubricCreate"
+                />
 
-            <!-- hidden input to submit the rubric grid as JSON -->
-            <input
-                type="hidden"
-                :name="`rubric[${rubric.id}]`"
-                :value="JSON.stringify(translateGridToFormPayload(rubric))"
-            />
-        </template>
-    </fieldset-collapsible>
+                <!-- hidden input to submit the rubric grid as JSON -->
+                <input
+                    type="hidden"
+                    :name="`rubric[${rubric.id}]`"
+                    :value="JSON.stringify(translateGridToFormPayload(rubric))"
+                />
+            </template>
 
-    <fieldset-collapsible v-if="showRubricCreate" delay-content-render initially-expanded>
-        <template #legend>Rubric {{ rubricGrids.length + 1 }}</template>
+            <!-- create a new rubric -->
+            <template v-else #content>
+                <div class="l-flex-row l-flex--justify l-gap-xs">
+                    <!-- TODO -->
+                    <button class="button l-flex__item--1 icon-modify" type="button" @click="createRubric">
+                        Create manually
+                    </button>
+                    <button class="button l-flex__item--1 icon-copy" type="button">Copy from existing activity</button>
+                    <button class="button l-flex__item--1 icon-upload" type="button">
+                        Upload a Schoolbox format file
+                    </button>
+                </div>
+            </template>
+        </fieldset-collapsible>
 
-        <template #content>
-            <div class="l-flex-row l-flex--justify l-gap-xs">
-                <!-- TODO -->
-                <button class="button l-flex__item--1 icon-modify" type="button" @click="createRubric">
-                    Create manually
-                </button>
-                <button class="button l-flex__item--1 icon-copy" type="button">Copy from existing activity</button>
-                <button class="button l-flex__item--1 icon-upload" type="button">Upload a Schoolbox format file</button>
-            </div>
-        </template>
-    </fieldset-collapsible>
+        <nav>
+            <sbx-pop-out :content-id="`rubric-${rubric.id}-dropdown`"></sbx-pop-out>
+        </nav>
+        <ul :id="`rubric-${rubric.id}-dropdown`" class="f-dropdown" data-dropdown-content>
+            <!-- TODO: implement & add other options -->
+            <li><button class="icon-download" type="button">Download</button></li>
+            <li><button class="icon-delete" type="button">Delete</button></li>
+        </ul>
+    </div>
 
     <div v-if="!showRubricCreate" class="row">
         <div class="column small-12">
@@ -192,3 +219,15 @@ function createRubric(): void {
         </div>
     </div>
 </template>
+
+<style scoped>
+/**
+ * <fieldset>'s in a mage form have essentially a <hr> added by a top border.
+ * To add an inline 3-dot menu, it should be aligned with that line, and
+ * a background color is needed to cover up the line which is otherwise be visible behind it.
+ */
+.rubric-builder-row nav {
+    background: var(--sbx-color-foreground-primary, white);
+    top: -0.5rem;
+}
+</style>
