@@ -330,7 +330,7 @@
                         }
                     {% endif %}
 
-                    $.fn.dynamicFeedback({
+                    var dynamicFeedback = $.fn.dynamicFeedback({
                         statusIncomplete: '{{ statusIncomplete }}',
                         statusFailed: '{{ statusFailed }}',
                         statusPending: '{{ statusPending }}',
@@ -436,25 +436,9 @@
                                                 /* Update the status
                                                  */
                                                 let participant = $actionBar.closest("[data-participant]");
-
                                                 let resubmissionRequired = participant.find('[data-feedback-form]').find('[name="resubmissionRequired"]').prop("checked");
-                                                let status = resubmissionRequired ? 'failed' : '{{ statusReviewed }}';
-                                                let title = resubmissionRequired ? 'Resubmission Required' : 'Reviewed';
 
-                                                participant.attr("data-status", status);
-
-                                                // Update the icon
-                                                participant
-                                                    .find("[data-status]")
-                                                    .removeClass('{{ statusPending }}')
-                                                    .removeClass('{{ statusIncomplete }}')
-                                                    .removeClass('{{ statusReviewed }}')
-                                                    .removeClass('failed')
-                                                    .addClass(status)
-                                                    .attr("title", title);
-
-                                                // Update the text
-                                                participant.find("[data-status-label]").html(title);
+                                                dynamicFeedback.reloadStatus(participant, resubmissionRequired);
                                             }
                                         }
                                     }
