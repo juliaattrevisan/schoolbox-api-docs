@@ -219,6 +219,11 @@ class UserMapper extends Mapper
     private function updateNationality(User $user, ?User $previous = null): void
     {
         $nationalityCollection = $user->getNationalityCollection();
+        if (null === $nationalityCollection) {
+            // Null means relation was not loaded/changed; avoid saving a null model.
+            return;
+        }
+
         if (null !== $previous) {
             if (!$nationalityCollection?->diff($previous->getNationalityCollection())->count()) {
                 /* No change in nationalities, so no need to save
@@ -243,6 +248,11 @@ class UserMapper extends Mapper
     private function updateLanguage(User $user, ?User $previous = null): void
     {
         $languageCollection = $user->getLanguageCollection();
+        if (null === $languageCollection) {
+            // Null means relation was not loaded/changed; avoid saving a null model.
+            return;
+        }
+
         if (null !== $previous) {
             if (!$languageCollection?->diff($previous->getLanguageCollection())->count()) {
                 /* No change in languages, so no need to save
