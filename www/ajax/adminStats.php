@@ -531,7 +531,7 @@ switch ($_POST['module']) {
                 ];
             };
             try {
-                $cacheData = $cache->get('data');
+                $cacheData = $getCacheData();
                 $cache->set('cluster_info', $cacheData, 86400);
             } catch (Exception $e) {
                 $cacheData['cluster_name'] = 'Unknown';
@@ -540,14 +540,6 @@ switch ($_POST['module']) {
         }
         $output['cluster_info_status'] = $cacheData['cluster_name'];
         $output['cluster_info_light'] = $cacheData['light'];
-        try {
-            $cacheData = $cache->get('data');
-            $output['cluster_info_status'] = $cacheData['cluster_name'];
-            $output['cluster_info_light'] = $cacheData['light'];
-        } catch (Exception $e) {
-            $output['cluster_info_status'] = 'Unknown';
-            $output['cluster_info_light'] = 'warning';
-        }
         break;
     default:
         break;
