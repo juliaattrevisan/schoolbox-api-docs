@@ -58,4 +58,61 @@ class ValidStratsTest extends TestCase
             ],
         ];
     }
+
+
+    /**
+     * @param string $strat
+     * @param string $cliArgs
+     * @param bool   $expected
+     * @throws ExpectationFailedException
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerStratEnabled')]
+    public function testStratEnabled(string $strat, string $cliArgs, bool $expected): void
+    {
+        $validStrats = new ValidStrats($cliArgs);
+
+        $this->assertSame($expected, $validStrats->isStratEnabled($strat));
+    }
+
+
+    /**
+     * Data provider for testStratEnabled
+     *
+     * @return array<string, array{0:string,1:string,2:bool}>
+     */
+    public static function providerStratEnabled(): array
+    {
+        return [
+            // Special case: when no strats provided we treat all as enabled
+            'special case moments' => [
+                'moments',
+                '',
+                true,
+            ],
+
+            'moments enabled' => [
+                'moments',
+                'moments',
+                true,
+            ],
+
+            'myFiles enabled' => [
+                'myFiles',
+                'myFiles',
+                true,
+            ],
+
+            'moments not enabled when only myFiles' => [
+                'moments',
+                'myFiles',
+                false,
+            ],
+
+            'unknown strat not enabled when moments present' => [
+                'unknown',
+                'moments',
+                false,
+            ],
+        ];
+    }
 }

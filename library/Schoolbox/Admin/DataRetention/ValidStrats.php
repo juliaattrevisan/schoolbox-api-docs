@@ -85,12 +85,26 @@ class ValidStrats
         return array_values($filtered);
     }
 
-
     /**
      * get filtered strats
      */
     public function getFilteredStrats(): array
     {
         return $this->filteredStrats;
+    }
+
+    /**
+     * A convenience method that checks if a particular strat is in the result set
+     *
+     * @param string $strat
+     * @return bool
+     */
+    public function isStratEnabled(string $strat): bool
+    {
+        if (!\count($this->filteredStrats)) {
+            return true;
+        }
+
+        return \in_array($strat, $this->filteredStrats, true);
     }
 }

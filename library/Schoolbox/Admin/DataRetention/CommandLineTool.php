@@ -166,46 +166,51 @@ class CommandLineTool extends CliTool\App
             $chunkSize = Strategy\Base::MAX_CHUNK_SIZE;
         }
 
+        /**
+         * get the strats to run, default all. This is a csv of strats, e.g. "cmslogexample,moments". If the result is an empty string, then we will run all strats.
+         */
+        $csvStrats = (string)$this->getOpt(self::OPT_LONG_STRATS);
+        $validStrats = new ValidStrats($csvStrats);
+        // if no strats are valid, log and return
+        if (count($validStrats->getFilteredStrats()) !== 0) {
+            $logger->notice(sprintf("Filtering to '%s' enable strats:", count($validStrats->getFilteredStrats())));
+            $logger->notice(sprintf("    Enabled strats %s ", implode(', ', $validStrats->getFilteredStrats())));
+        } else {
+            $logger->notice("No strats specified, running all strats");
+        }
+
+
         // build the bus for all the data retention tasks
         /** @var Strategy\IStrategy[] $bus */
         $bus = [];
 
         // add bus for cmsLogExample // clear things from the cmsLog older than 1 year (possible options are 1 Day, 30 Days, 365 Days, <null>)
-//        $bus[] = new Strategy\CmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig(), $endTime, $loopCount, $chunkSize)->setRetentionPeriod($retentionPeriod);
-        $bus[] = new Strategy\Moments(
-            $logger,
-            $this->perform(),
-            $this->getDatabaseInternal(),
-            $lock,
-            $this->getConfig(),
-            $endTime,
-            $loopCount,
-            $chunkSize,
-        )->setRetentionPeriod($retentionPeriod);
-        $bus[] = new Strategy\MyFiles(
-            $logger,
-            $this->perform(),
-            $this->getDatabaseInternal(),
-            $lock,
-            $this->getConfig(),
-            $endTime,
-            $loopCount,
-            $chunkSize,
-        )->setRetentionPeriod($retentionPeriod);
-
-        /**
-         * get the strats to run, default all. This is a csv of strats, e.g. "cmslogexample,moments". If the result is an empty string, then we will run all strats.
-         */
-        $validStrats = [];
-        $csvStrats = (string)$this->getOpt(self::OPT_LONG_STRATS);
-        if ('' !== $csvStrats) {
-            $validStrats = new ValidStrats($csvStrats)->getFilteredStrats();
-            // if no strats are valid, log and return
-            if (count($validStrats) === 0) {
-                $logger->notice(sprintf("No valid strats found in '%s', exiting. Valid strats are: %s", $csvStrats, implode(', ', $validStrats)));
-                return;
-            }
-            $logger->debug(sprintf("Selected strats from csv '%s': %s", $csvStrats, implode(', ', $validStrats)));
+        if ($validStrats->isStratEnabled(ValidStrats::CMSLOG)) {
+//            $bus[] = new Strategy\CmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig(), $endTime, $loopCount, $chunkSize)->setRetentionPeriod($retentionPeriod);
+        }
+        if ($validStrats->isStratEnabled(ValidStrats::MOMENTS)) {
+            $bus[] = new Strategy\Moments(
+                $logger,
+                $this->perform(),
+                $this->getDatabaseInternal(),
+                $lock,
+                $this->getConfig(),
+                $endTime,
+                $loopCount,
+                $chunkSize,
+            )->setRetentionPeriod($retentionPeriod);
+        }
+        if ($validStrats->isStratEnabled(ValidStrats::MYFILES)) {
+            $bus[] = new Strategy\MyFiles(
+                $logger,
+                $this->perform(),
+                $this->getDatabaseInternal(),
+                $lock,
+                $this->getConfig(),
+                $endTime,
+                $loopCount,
+                $chunkSize,
+            )->setRetentionPeriod($retentionPeriod);
         }
 
         // log the settings we are running with
@@ -215,20 +220,6 @@ class CommandLineTool extends CliTool\App
         $logger->notice(sprintf("Loop count: %s", $loopCount));
         if (null !== $retentionPeriod) {
             $logger->notice(sprintf("Overriding retention period to '%s' days", $retentionPeriod->getRetentionDays()));
-        }
-
-
-        // filter buses to those we have requested
-        // filter should only allow the strats we have requested, but if the result is an empty string, then we will run all strats
-        if (count($validStrats) > 0) {
-            $bus = array_values(array_filter(
-                $bus,
-                fn (Strategy\IStrategy $strategy) => in_array($strategy->getStrategyName(), $validStrats, true),
-            ));
-            $logger->notice(sprintf("Filtering to '%s' enable strats:", count($validStrats)));
-            $logger->notice(sprintf("    Enabled strats %s ", implode(', ', $validStrats)));
-        } else {
-            $logger->notice("No strats specified, running all strats");
         }
 
         // if we have functions, run them
