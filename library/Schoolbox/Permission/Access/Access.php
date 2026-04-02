@@ -240,6 +240,40 @@ class Access
 
 
     /**
+     * Is the specified user a parent of a learner in the specified folder?
+     *
+     * A user is considered a parent of a learner if they have at least one child
+     * who has READ access to the folder.
+     *
+     * Requires that either:
+     * - The user is the current session user (children loaded during session creation), or
+     * - {@see User::setChildren()} has been called on the user beforehand.
+     *
+     * @param User         $user
+     * @param Folder\Model $folder
+     * @return bool
+     * @throws Mapper\Exception         If folder does not exist.
+     * @throws InvalidArgumentException Due to getFolderAccess() call.
+ */
+    public function isParentOfLearner(User $user, Folder\Model $folder): bool
+    {
+        $children = $user->getChildren();
+
+        if (null === $children) {
+            return false;
+        }
+
+        foreach ($children as $child) {
+            if ($this->getFolderAccess($child, $folder->getId()) === UserAccess::ACCESS_READ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
      * Returns the minimum access level across the collection of specified folders. Checks perms from:
      * 1. User.SU status
      * 2. Group membership via `userAccess` table
@@ -414,7 +448,6 @@ class Access
      * @throws InvalidArgumentException TODO implement better annotation/handling for impossible logic exceptions
      * @throws Mapper\Exception         If folder does not exist.
      * @throws LogicException           If unable to build an ExternalUser instance
-     * @throws UnexpectedValueException If cannot add item to folder collection (TODO SA-9670)
      */
     public function getFolderAccess(User $user, int $folderId, $cache = true): int
     {
