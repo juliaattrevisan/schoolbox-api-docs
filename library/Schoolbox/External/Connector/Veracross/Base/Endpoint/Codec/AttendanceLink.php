@@ -57,7 +57,14 @@ class AttendanceLink implements IAttendanceLink
             return '';
         }
 
-        return (string)(new Reader())->getAttendanceLink($event->getMetadata());
+        $url = (string)(new Reader())->getAttendanceLink($event->getMetadata());
+
+        if ($url !== '' && $user->hasEmail()) {
+            $separator = str_contains($url, '?') ? '&' : '?';
+            $url .= $separator . http_build_query(['login_hint' => $user->getEmail()]);
+        }
+
+        return $url;
     }
 
 
