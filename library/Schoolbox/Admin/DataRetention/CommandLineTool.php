@@ -110,14 +110,17 @@ class CommandLineTool extends CliTool\App
         }
 
         // Validate any retention period override early so we can fail fast before doing work.
-        $retentionPeriod = $this->getOptAsInt(self::OPT_RETENTION_PERIOD);
-        if (null !== $retentionPeriod) {
-            try {
-                $retentionPeriod = new RetentionPeriod($retentionPeriod);
-            } catch (SchoolboxException $e) {
-                $logger->warning(sprintf("Invalid retention period override '%s': %s. Exiting without deleting anything.", $this->getOpt(self::OPT_RETENTION_PERIOD), $e->getMessage()));
+        try {
+            $retentionOverride = $this->getOpt(self::OPT_RETENTION_PERIOD);
+            if ((null !== $retentionOverride) && !new ValidRetentionPeriod()->isSatisfiedBy($retentionOverride)) {
+                $logger->warning(sprintf("Invalid retention period override '%s'. Exiting without deleting anything.", $this->getOpt(self::OPT_RETENTION_PERIOD)));
                 return;
             }
+
+            $retentionPeriod = new RetentionPeriod($this->getOptAsInt(self::OPT_RETENTION_PERIOD));
+        } catch (SchoolboxException $e) {
+            $logger->warning(sprintf("Invalid retention period override '%s': %s. Exiting without deleting anything.", $this->getOpt(self::OPT_RETENTION_PERIOD), $e->getMessage()));
+            return;
         }
 
         // Determine script end time: run for at most max-time seconds from now.
@@ -186,7 +189,7 @@ class CommandLineTool extends CliTool\App
 
         // add bus for cmsLogExample // clear things from the cmsLog older than 1 year (possible options are 1 Day, 30 Days, 365 Days, <null>)
         if ($validStrats->isStratEnabled(ValidStrats::CMSLOG)) {
-//            $bus[] = new Strategy\CmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig(), $endTime, $loopCount, $chunkSize)->setRetentionPeriod($retentionPeriod);
+            $bus[] = new Strategy\CmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig(), $endTime, $retentionPeriod, $loopCount, $chunkSize);
         }
         if ($validStrats->isStratEnabled(ValidStrats::MOMENTS)) {
             $bus[] = new Strategy\Moments(
@@ -196,9 +199,10 @@ class CommandLineTool extends CliTool\App
                 $lock,
                 $this->getConfig(),
                 $endTime,
+                $retentionPeriod,
                 $loopCount,
                 $chunkSize,
-            )->setRetentionPeriod($retentionPeriod);
+            );
         }
         if ($validStrats->isStratEnabled(ValidStrats::MYFILES)) {
             $bus[] = new Strategy\MyFiles(
@@ -208,9 +212,10 @@ class CommandLineTool extends CliTool\App
                 $lock,
                 $this->getConfig(),
                 $endTime,
+                $retentionPeriod,
                 $loopCount,
                 $chunkSize,
-            )->setRetentionPeriod($retentionPeriod);
+            );
         }
 
         // log the settings we are running with

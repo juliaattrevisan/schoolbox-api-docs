@@ -45,9 +45,7 @@ abstract class Base implements IStrategy
      * and so we can override it with setRetentionPeriod if needed
      *
      * This should be in database format, e.g. '2024-01-01 00:00:00'
-     * @var null|RetentionPeriod
      */
-    private ?RetentionPeriod $retentionPeriod = null;
 
     // a hash lookup of (query, prepared statement) tuples
     protected array $preparedStatements = [];
@@ -69,6 +67,7 @@ abstract class Base implements IStrategy
         protected LockInterface $lock,
         protected IConfigLoader $config,
         protected int $endTime,
+        protected RetentionPeriod $retentionPeriod,
         protected int $chunkLoops = self::DEFAULT_CHUNK_LOOPS,
         protected int $chunkSize = self::DEFAULT_CHUNK_SIZE,
     ) {
@@ -79,7 +78,7 @@ abstract class Base implements IStrategy
      */
     public function process(): void
     {
-        $deleteOlderThan = $this->getRetentionPeriod();
+        $deleteOlderThan = $this->getRetentionDBDate();
         if ($deleteOlderThan === null) {
             return;
         }
@@ -172,17 +171,14 @@ abstract class Base implements IStrategy
      * or looks up the retention period from config using $retentionConfigKey
      * @return string|null
      */
-    protected function getRetentionPeriod(): ?string
+    protected function getRetentionDBDate(): ?string
     {
-        if (null === $this->retentionPeriod) {
-            try {
-                $this->retentionPeriod = new RetentionPeriod((string)$this->config->get($this->retentionConfigKey));
-            } catch (SchoolboxException $e) {
-                $this->log->warning(sprintf("Invalid retention period '%s': %s. Skipping.", $this->config->get($this->retentionConfigKey), $e->getMessage()));
-                return null;
-            }
+        try {
+            return $this->retentionPeriod->calculateDate((int)$this->config->get($this->retentionConfigKey));
+        } catch (SchoolboxException $e) {
+            $this->log->warning(sprintf("Invalid retention period '%s': %s. Skipping.", $this->config->get($this->retentionConfigKey), $e->getMessage()));
+            return null;
         }
-        return $this->retentionPeriod->getRetentionDatabase();
     }
 
     public function setRetentionPeriod(?RetentionPeriod $retentionPeriod): self

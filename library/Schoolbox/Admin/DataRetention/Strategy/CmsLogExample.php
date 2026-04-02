@@ -13,23 +13,23 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\DataRetention\Strategy;
 
 use Alaress\Database\Predicate\Builder;
-use Schoolbox\Admin\DataRetention\RetentionPeriod;
 use Schoolbox\Admin\DataRetention\ValidStrats;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class CmsLogExample extends Base
 {
-    private ?string $retentionPeriod = null;
-
     /**
      * This is an example with no db config, so set this to 365 days as an example, but we should be using the config loader to get this value from the config key defined in $retentionConfigKey
      * @inheritDoc
      */
-    protected function getRetentionPeriod(): ?string
+    protected function getRetentionDBDate(): ?string
     {
-        if (null === $this->retentionPeriod) {
-            $this->retentionPeriod = (\Alaress_Date_Format::newNaturalDate("-365 days"))->getDatabase();
+        try {
+            return $this->retentionPeriod->calculateDate(365);
+        } catch (SchoolboxException $e) {
+            $this->log->warning(sprintf("Invalid retention period '%s': %s. Skipping.", $this->config->get($this->retentionConfigKey), $e->getMessage()));
+            return null;
         }
-        return $this->retentionPeriod;
     }
 
     /**
@@ -56,7 +56,7 @@ class CmsLogExample extends Base
 
         $statement = $this->database->prepare($query);
         $statement->execute([
-            'old'   => $this->getRetentionPeriod(),
+            'old'   => $this->getRetentionDBDate(),
         ]);
 
         $count = $statement->fetchColumn();
@@ -71,7 +71,7 @@ class CmsLogExample extends Base
      */
     protected function getIdsToDelete(): array
     {
-        $this->log->info('Deleting logs older than ' . $this->getRetentionPeriod());
+        $this->log->info('Deleting logs older than ' . $this->getRetentionDBDate());
         $query = "
             SELECT
                 id
@@ -81,7 +81,7 @@ class CmsLogExample extends Base
 
         $statement = $this->database->prepare($query);
         $statement->execute([
-            'old'   => $this->getRetentionPeriod(),
+            'old'   => $this->getRetentionDBDate(),
         ]);
 
         // collate ids to delete

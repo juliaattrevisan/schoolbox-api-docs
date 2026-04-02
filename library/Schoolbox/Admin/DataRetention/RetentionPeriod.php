@@ -14,98 +14,57 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class RetentionPeriod
 {
-    private ?int $days = null;
-    private ?string $databaseDate = null; // database format e.g. '2024-01-01 00:00:00'
+    private ?\Alaress_Date_Format $date = null; // database format e.g. '2024-01-01 00:00:00'
 
     /**
      * Construct with an optional day-count. Use null to indicate "retain indefinitely".
      * Accepts integer, numeric string, or null.
-     * @param int|string|null $days
+     * @param int|null $days
      * @throws SchoolboxException
      */
-    public function __construct(int|string|null $days = null)
+    public function __construct(private int|null $days = null)
     {
-        $this->setRetentionPeriod($days);
+        if (null !== $days) {
+            // Compute database date using the project's date helper
+            $this->date = \Alaress_Date_Format::newNaturalDate(sprintf("-%d days", $this->days));
+        }
     }
 
     /**
      * Set the retention period. Accepts integer days, numeric string, or null to disable hard deletion.
-     * @param int|string|null $days
+     * @param int $days
      * @throws SchoolboxException
      */
-    public function setRetentionPeriod(int|string|null $days): void
+    public function setRetentionPeriod(int $days): void
     {
-        if (null === $days || '' === $days) {
-            $this->days = null;
-            $this->databaseDate = null;
-            return;
-        }
-
-        // Normalize numeric string to int
-        if (is_string($days)) {
-            if (!ctype_digit($days)) {
-                throw new SchoolboxException('Retention period string must contain only digits when provided as a string.');
-            }
-            $days = (int) $days;
-        }
-
-        // At this point $days is int
-        if (!$this->validate($days)) {
-            throw new SchoolboxException('Retention period must be a positive integer number of days.');
-        }
-
         $this->days = $days;
-
-        // Compute database date using the project's date helper
-        $natural = \Alaress_Date_Format::newNaturalDate(sprintf("-%d days", $this->days));
-
-        // Defensive: if resulting date is in the future, treat as invalid
-        if ($natural->isFuture()) {
-            throw new SchoolboxException('Negative retention period supplied. ignoring');
-        }
-
-        // Use getDatabase() which returns database format used across the project
-        $this->databaseDate = $natural->getDatabase();
-    }
-
-    /**
-     * Validate a retention period value (must be integer > 0)
-     * retention period should be in days, whole number, and greater than 0
-     * @param string|int|null $days
-     * @return bool
-     * @throws SchoolboxException
-     */
-    public function validate(null|string|int $days): bool
-    {
-        if (null === $days || '' === $days) {
-            return false;
-        }
-
-        // Normalise numeric string to int
-        if (is_string($days)) {
-            if (!ctype_digit($days)) {
-                throw new SchoolboxException('Retention period string must contain only digits when provided as a string.');
-            }
-            $days = (int) $days;
-        }
-
-        // At this point $days is int
-        if ($days < 0) {
-            throw new SchoolboxException('Negative retention period supplied; Retention period must be a positive integer number of days.');
-        }
-        if ($days === 0) {
-            throw new SchoolboxException('Retention period of 0 days supplied');
-        }
-        return true;
     }
 
     /**
      * Get the retention period cutoff in database format, or empty string if not set
+     * @param int $days
      * @return string
+     * @throws SchoolboxException
      */
+    public function calculateDate(int $days): string
+    {
+        if ($this->date) {
+            // just return what we calculated before
+            return $this->date->getDatabaseDate();
+        }
+        if (!new ValidRetentionPeriod()->isSatisfiedBy($days)) {
+            // we stored an illegal value but tried to continue: die loudly as a safety precaution
+            throw new SchoolboxException('Invalid retention period value stored; cannot calculate date cutoff.');
+        }
+
+        $this->days = $days;
+        $this->date = \Alaress_Date_Format::newNaturalDate(sprintf("-%d days", $this->days));
+        return $this->date->getDatabaseDate();
+    }
+
     public function getRetentionDatabase(): string
     {
-        return $this->databaseDate ?? '';
+        return '';
     }
 
     /**
