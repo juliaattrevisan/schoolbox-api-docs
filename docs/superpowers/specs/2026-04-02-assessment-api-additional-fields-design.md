@@ -9,7 +9,7 @@ Add 4 new fields to both the GET (`/api/assessment/{id}`) and LIST (`/api/assess
 | Field | Source | Applicable Types | Null when |
 |---|---|---|---|
 | `specificationAssessmentId` | `assessment_specification_implementation.specification_assessment_id` | All | No specification link exists |
-| `markVisibility` | `submission_box.mark_visibility` / `assess.mark_visibility` / `project.mark_visibility` | dueWork, quiz, project | lessonPlan, task, LTI, dialogAgent |
+| `markVisibility` | `submission_box.mark_visibility` / `assess.mark_visibility` / `project.mark_visibility` / `lti_assessment.mark_visibility` | dueWork, quiz, project, LTI | lessonPlan, task, dialogAgent |
 | `markType` | `submission_mark_type.slug` (via dueWork/quiz/project joins) | dueWork, quiz, project | lessonPlan, task, LTI, dialogAgent |
 | `description` | `assessment.description` | All | No description set |
 
@@ -30,7 +30,7 @@ LEFT JOIN submission_mark_type AS projectMarkType ON project.mark_type_id = proj
 ```sql
 assessment.description,
 asi.specification_assessment_id AS specificationAssessmentId,
-COALESCE(submission_box.mark_visibility, assess.mark_visibility, project.mark_visibility) AS markVisibility,
+COALESCE(submission_box.mark_visibility, assess.mark_visibility, project.mark_visibility, lti_assessment.mark_visibility) AS markVisibility,
 COALESCE(markTypeTable.slug, quizMarkType.slug, projectMarkType.slug) AS markType
 ```
 
@@ -56,7 +56,7 @@ Add 4 new properties to the schema:
 - `1`: Staff & Student
 - `2`: Staff, Student & Parent
 
-Applicable to dueWork, quiz, project. Null for other types.
+Applicable to dueWork, quiz, project, LTI. Null for other types.
 
 **`markType`** — string, nullable, enum `[percent, letter, raw, free, rubric, none, completion]`. The type of mark used. Applicable to dueWork, quiz, project. Null for other types.
 
