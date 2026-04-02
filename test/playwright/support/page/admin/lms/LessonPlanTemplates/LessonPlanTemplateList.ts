@@ -8,7 +8,7 @@ export default class LessonPlanTemplateList {
 
     static readonly URL = "/adminv2/lesson-plan/template";
 
-    static readonly ICON_ADD = "a.icon-add";
+    static readonly ICON_ADD = "a sbx-icon[name='add']";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;

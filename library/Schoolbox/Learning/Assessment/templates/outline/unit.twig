@@ -49,9 +49,9 @@
                     <li class="separator">Manage</li>
                     {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getRedirect', {courseSpec: unit.specification.course, courseSpecId: unit.specification.course.id, unitSpec: unit.specification, unitSpecId: unit.specification.id, folder: unit.course.folder, folderId: unit.course.folder.id}) %}
                     {% if courseMarkbookRoute %}
-                        <li><a href="{{ courseMarkbookRoute }}" class="icon-curriculum" data-test="course-outline-menu-course-markbook">Course Markbook</a></li>
+                        <li><a href="{{ courseMarkbookRoute }}" data-test="course-outline-menu-course-markbook"><sbx-icon name="curriculum"></sbx-icon>Course Markbook</a></li>
                     {% else %}
-                        <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForClass', {folder: unit.course.folder, folderId: unit.course.folder.id}) }}" class="icon-curriculum">Class Markbook</a></li>
+                        <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForClass', {folder: unit.course.folder, folderId: unit.course.folder.id}) }}"><sbx-icon name="curriculum"></sbx-icon>Class Markbook</a></li>
                     {% endif %}
                     <li><a href="{{ routeLookupIfAuthorized('course.deleteUnitImplementation', {id: unit.id}) }}"
                            data-action="delete-unit"

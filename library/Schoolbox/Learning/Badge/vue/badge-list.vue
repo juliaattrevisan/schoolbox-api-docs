@@ -392,23 +392,26 @@ export default {
                                     <li>
                                         <a
                                             @click.prevent="openAwardAsAchievementModal(badge)"
-                                            class="icon-achievement"
                                             title="Award achievement"
-                                            >Award achievement</a
                                         >
+                                            <sbx-icon name="achievement"></sbx-icon>
+                                            Award achievement
+                                        </a>
                                     </li>
                                     <li v-if="badge.allowAsGoal">
-                                        <a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set goal"
-                                            >Set goal</a
-                                        >
+                                        <a @click.prevent="openSetAsGoalModal(badge)" title="Set goal">
+                                            <sbx-icon name="goal"></sbx-icon>
+                                            Set goal
+                                        </a>
                                     </li>
                                     <li>
                                         <a
                                             @click.prevent="openAchievementWithdrawModal(badge)"
-                                            class="icon-withdraw-achievement"
                                             title="Withdraw achievement"
-                                            >Withdraw achievement</a
                                         >
+                                            <sbx-icon name="withdraw-achievement"></sbx-icon>
+                                            Withdraw achievement
+                                        </a>
                                     </li>
                                     <li v-if="badge.allowAsGoal">
                                         <a
@@ -421,7 +424,10 @@ export default {
                                         </a>
                                     </li>
                                     <li>
-                                        <a :href="badge._links.update" class="icon-modify" title="Modify">Modify</a>
+                                        <a :href="badge._links.update" title="Modify">
+                                            <sbx-icon name="modify"></sbx-icon>
+                                            Modify
+                                        </a>
                                     </li>
                                     <li>
                                         <a @click.prevent="openDeleteModal(badge)"

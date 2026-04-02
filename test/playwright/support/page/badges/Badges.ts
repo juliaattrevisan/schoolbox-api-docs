@@ -11,7 +11,7 @@ export default class Badges {
 
     static readonly BUTTON_ADD = 'a.button.sbx-button--has-icon[title="Create Badge"]';
 
-    static readonly DROPDOWN_DELETE = "a[data-delete][title='Remove']";
+    static readonly DROPDOWN_DELETE = "a sbx-icon[name='delete']";
 
     static readonly BUTTON_CONFIRM_DELETE = "a.button.submit";
 
@@ -71,7 +71,7 @@ export default class Badges {
      * @param dropdownOption - The dropdown option
      */
     async clickDropdownOptionLastElement(dropdownOption: string): Promise<void> {
-        await this.page.click(`a.icon-${dropdownOption}`);
+        await this.page.click(`a sbx-icon[name='${dropdownOption}']`);
     }
 
     /**
@@ -81,7 +81,7 @@ export default class Badges {
      * @param dropdownOption - The dropdown option
      */
     async clickDropdownOptionFirstElement(badgeId: number, dropdownOption: string): Promise<void> {
-        await this.page.click(`#badge-${badgeId}-dropdown a.icon-${dropdownOption}`);
+        await this.page.click(`#badge-${badgeId}-dropdown a sbx-icon[name='${dropdownOption}']`);
     }
 
     /**

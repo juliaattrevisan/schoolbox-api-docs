@@ -19,9 +19,9 @@ export default class ProfilePage {
 
     static readonly DATA_TEST_SHARE_LEARNING_MOMENT_BUTTON = "learning-moment-evidence-share";
 
-    static readonly DATA_TEST_SET_GOALS_BUTTON = "a.goals.icon-goal";
+    static readonly DATA_TEST_SET_GOALS_BUTTON = "a sbx-icon[name='goal']";
 
-    static readonly SELECTOR_AWARD_ACHIEVEMENTS_BUTTON = "a.icon-achievement";
+    static readonly SELECTOR_AWARD_ACHIEVEMENTS_BUTTON = "a sbx-icon[name='achievement']";
 
     static readonly SELECTOR_LEARNING_MOMENTS_FILTER = 'label[for="filter-learningMoments"]';
 
