@@ -238,7 +238,6 @@ abstract class Base implements IStrategy
 
         foreach ($this->preparedStatements as $sql => $prepare) {
             $this->log->debug(sprintf("Used times: '%d', sql: '%s'", $prepare['count'], $sql));
-
         }
         $this->preparedStatements = [];
     }
