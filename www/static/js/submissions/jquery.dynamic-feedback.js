@@ -322,7 +322,6 @@
                 });
         }
 
-
         /**
          * Finds the state of the Resubmission Required checkbox based on a participant's dom element
          *
@@ -330,9 +329,8 @@
          * @returns {*}
          */
         function findResubmissionRequired($participant) {
-            return $participant.find('[data-feedback-form]').find('[name="resubmissionRequired"]').prop("checked");
+            return $participant.find("[data-feedback-form]").find('[name="resubmissionRequired"]').prop("checked");
         }
-
 
         /**
          * Update the status chiclet for each participant
@@ -600,6 +598,6 @@
 
         return {
             reloadStatus: reloadStatus,
-        }
+        };
     };
 })(jQuery);
