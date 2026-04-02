@@ -285,7 +285,16 @@ class CommandLineTool extends CliTool\App
      */
     private function getHelp(): void
     {
-        $csvStrats = implode(', ', ValidStrats::STRATS_WHITELIST);
+        // Build a multi-line, human-readable representation of the available
+        // strategies. STRATS_WHITELIST can be very long (30+ items), so we
+        // chunk it into lines of up to 10 items to avoid a single very long
+        // help line which is hard to read in terminals.
+        $chunks = array_chunk(ValidStrats::STRATS_WHITELIST, 10);
+        $lines = [];
+        foreach ($chunks as $chunk) {
+            $lines[] = '        ' . implode(', ', $chunk);
+        }
+        $stratsHelp = implode("\n", $lines);
         echo <<<HELP
 NAME
     ./tools/dataRetention/process.php - hard deletes data that matches specified data retention criteria and has already been soft deleted
@@ -303,7 +312,9 @@ OPTIONS
     --max-time={max-time}:   process entries in chunks until the script has been running for this many seconds.
                              Defaults to 3600 (1 hours).
     --chunk={chunk-size}:    process this many entries per chunk: defaults to 1000. (max 10000)
-    --strats=                A csv of strats to hard delete.  Valid strats are {{$csvStrats}}. If not provided, will run all strats.
+    --strats=                A csv of strats to hard delete. If not provided, will run all strats.
+                             Available strats (chunked for readability):
+{$stratsHelp}
                              e.g. hard delete only learning moment stuff: ./tools/dataRetention/process.php --strats=moments
     --retention-period=      Manually override the retention period for all strategies, for testing purposes (whole number of days, same format as the admin config value).
                              Positive N: delete data soft-deleted more than N days ago ("N days ago" cutoff).
