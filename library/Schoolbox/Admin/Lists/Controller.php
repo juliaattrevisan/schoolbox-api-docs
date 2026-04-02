@@ -1143,6 +1143,7 @@ class Controller extends Base
                         'mandatory' => true,
                         'default'   => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS,
                         'lookup'    => [
+                            // Note we intentionally do not use 'instructor'/'learner' terminology here, since users are not familiar with those terms.
                             ['key' => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS, 'value' => 'Staff Only'],
                             ['key' => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS, 'value' => 'Staff & Students'],
                             ['key' => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS_PARENTS, 'value' => 'Staff & Parents'],

@@ -56,7 +56,7 @@ class Model implements ISoftDeletable, Sequential
     private ?bool $isVisibleToParents = null;
 
     /** @var ?bool */
-    private ?bool $isVisibleToStudents = null;
+    private ?bool $isVisibleToLearners = null;
 
     /** @var ?bool */
     private ?bool $permittedProject = null;
@@ -173,7 +173,7 @@ class Model implements ISoftDeletable, Sequential
      */
     public function isStaffOrInstructorVisibleOnly(): bool
     {
-        return !$this->isVisibleToParents && !$this->isVisibleToStudents;
+        return !$this->isVisibleToParents && !$this->isVisibleToLearners;
     }
 
 
@@ -194,10 +194,10 @@ class Model implements ISoftDeletable, Sequential
     {
         if ($staffOrInstructorVisibleOnly) {
             $this->isVisibleToParents = false;
-            $this->isVisibleToStudents = false;
+            $this->isVisibleToLearners = false;
         } else {
             $this->isVisibleToParents = true;
-            $this->isVisibleToStudents = true;
+            $this->isVisibleToLearners = true;
         }
         return $this;
     }
@@ -236,29 +236,29 @@ class Model implements ISoftDeletable, Sequential
      * Human friendly getter
      * @return bool
      */
-    public function isVisibleToStudents(): bool
+    public function isVisibleToLearners(): bool
     {
-        if (null === $this->isVisibleToStudents) {
+        if (null === $this->isVisibleToLearners) {
             throw new InsufficientHydrationException('Cannot determine student visibility from NULL property');
         }
-        return $this->isVisibleToStudents;
+        return $this->isVisibleToLearners;
     }
 
     /**
      * @return ?bool
      */
-    public function getIsVisibleToStudents(): ?bool
+    public function getIsVisibleToLearners(): ?bool
     {
-        return $this->isVisibleToStudents;
+        return $this->isVisibleToLearners;
     }
 
     /**
-     * @param bool $isVisibleToStudents
+     * @param bool $isVisibleToLearners
      * @return self
      */
-    public function setIsVisibleToStudents(bool $isVisibleToStudents): self
+    public function setIsVisibleToLearners(bool $isVisibleToLearners): self
     {
-        $this->isVisibleToStudents = $isVisibleToStudents;
+        $this->isVisibleToLearners = $isVisibleToLearners;
         return $this;
     }
 
@@ -269,13 +269,13 @@ class Model implements ISoftDeletable, Sequential
      */
     public function getVisibility(): string
     {
-        if ($this->isVisibleToParents === null || $this->isVisibleToStudents === null) {
+        if ($this->isVisibleToParents === null || $this->isVisibleToLearners === null) {
             // If not for this exception, this function would return a non-null value even when the underlying data
             // items have not been hydrated.  Avoid misleading the caller by throwing an exception.
             throw new InsufficientHydrationException('Cannot determine visibility from NULL property');
         }
 
-        return match ([$this->isVisibleToParents, $this->isVisibleToStudents]) {
+        return match ([$this->isVisibleToParents, $this->isVisibleToLearners]) {
             [false, false] => Mapper::VISIBILITY_STAFF_INSTRUCTORS,
             [false, true ] => Mapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS,
             [true , false] => Mapper::VISIBILITY_STAFF_INSTRUCTORS_PARENTS,
@@ -293,19 +293,19 @@ class Model implements ISoftDeletable, Sequential
     {
         switch ($visibility) {
             case Mapper::VISIBILITY_STAFF_INSTRUCTORS:
-                $this->isVisibleToStudents = false;
+                $this->isVisibleToLearners = false;
                 $this->isVisibleToParents = false;
                 break;
             case Mapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS:
-                $this->isVisibleToStudents = true;
+                $this->isVisibleToLearners = true;
                 $this->isVisibleToParents = false;
                 break;
             case Mapper::VISIBILITY_STAFF_INSTRUCTORS_PARENTS:
-                $this->isVisibleToStudents = false;
+                $this->isVisibleToLearners = false;
                 $this->isVisibleToParents = true;
                 break;
             case Mapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS_PARENTS:
-                $this->isVisibleToStudents = true;
+                $this->isVisibleToLearners = true;
                 $this->isVisibleToParents = true;
                 break;
             default:
