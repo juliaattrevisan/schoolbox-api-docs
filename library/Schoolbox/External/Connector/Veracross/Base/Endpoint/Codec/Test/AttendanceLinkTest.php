@@ -54,6 +54,23 @@ class AttendanceLinkTest extends TestCase
 
 
     /**
+     * Build a staff User with an alt email address.
+     */
+    private function makeStaffUserWithAltEmail(string $altEmail): User
+    {
+        $role = new Role();
+        $role->setType(Role::STAFF);
+
+        $user = new User();
+        $user->setRole($role);
+        $user->setLocalEmail(false);
+        $user->setAltEmail($altEmail);
+
+        return $user;
+    }
+
+
+    /**
      * Build a valid Veracross event with an attendance URL embedded in its metadata.
      */
     private function makeEvent(string $attendanceUrl): EventModel
@@ -141,12 +158,8 @@ class AttendanceLinkTest extends TestCase
     {
         $codec = new AttendanceLink(true, 7);
         $user  = $this->makeStaffUser('teacher.name', 'school.edu');
-
-        $event = new EventModel();
+        $event = $this->makeEvent('https://portals.veracross.com/school/attendance');
         $event->setSource('some_other_connector');
-        $event->setCode('MATHCLASS');
-        $event->setStartAt(new \Alaress_Date_Format());
-        $event->setMetadata(['links' => ['attendance' => 'https://portals.veracross.com/school/attendance']]);
 
         $result = $codec->generate($event, $user);
 
@@ -171,5 +184,23 @@ class AttendanceLinkTest extends TestCase
         $result = $codec->generate($event, $user);
 
         $this->assertSame('', $result);
+    }
+
+
+    /**
+     * login_hint is appended with user's alt email when localEmail is false.
+     */
+    public function testLoginHintAppendedForUserWithAltEmail(): void
+    {
+        $codec = new AttendanceLink(true, 7);
+        $user  = $this->makeStaffUserWithAltEmail('alt.teacher@otherdomain.com');
+        $event = $this->makeEvent('https://portals.veracross.com/school/attendance');
+
+        $result = $codec->generate($event, $user);
+
+        $this->assertSame(
+            'https://portals.veracross.com/school/attendance?login_hint=alt.teacher%40otherdomain.com',
+            $result
+        );
     }
 }
