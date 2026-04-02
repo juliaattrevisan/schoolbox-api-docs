@@ -150,6 +150,13 @@ class Module extends BaseModule
         );
 
         $this->register(
+            self::METHOD_GET,
+            "/list/export/csv",
+            'exportDifferentiationProfilesToCsv',
+            $getPerms,
+        );
+
+        $this->register(
             self::METHOD_POST,
             $studentPath,
             'createDifferentiationProfileData',
