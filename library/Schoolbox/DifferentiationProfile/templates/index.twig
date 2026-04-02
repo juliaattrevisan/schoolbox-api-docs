@@ -25,13 +25,26 @@
     <div class="l-flex-col l-gap-m">
         <div class="l-flex-row l-flex--justify-space f-no-margins">
             <h1>Manage {{ locale.differentiationProfile.properPlural }}</h1>
-            {% set viewRecordsRoute = routeLookupIfAuthorized('customisationRecord.viewRecords') %}
-            {% if viewRecordsRoute %}
-                <a href="{{ viewRecordsRoute }}" class="button l-flex l-gap-s" title="View Customisation Records">
-                    <sbx-icon name="group"></sbx-icon>
-                    View Customisation Records
-                </a>
-            {% endif %}
+            <div class="l-flex-row l-flex--align-center">
+                {% set viewRecordsRoute = routeLookupIfAuthorized('customisationRecord.viewRecords') %}
+                {% if viewRecordsRoute %}
+                    <a href="{{ viewRecordsRoute }}" class="button l-flex l-gap-s" title="View Customisation Records">
+                        <sbx-icon name="group"></sbx-icon>
+                        View Customisation Records
+                    </a>
+                {% endif %}
+                <nav>
+                    <sbx-pop-out content-id="header-options"</sbx-pop-out>
+                </nav>
+                <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
+                    <li>
+                        <a href="" title="Export to CSV">
+                            <sbx-icon name="export"></sbx-icon>
+                            Export to CSV
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
         <div>
             {% include '@filters/panel.twig' with {
