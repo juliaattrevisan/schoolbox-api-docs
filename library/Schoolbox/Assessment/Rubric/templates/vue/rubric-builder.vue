@@ -9,8 +9,10 @@
  */
 
 import { cloneDeep } from "es-toolkit";
+import locale from "@js/terminology/rosettaStone";
 import { MARK_TYPE_VALUE_NONE } from "@schoolboxAssessment/Types/MarkType";
 import FieldsetCollapsible from "@schoolboxVue/components/fieldset-collapsible.vue";
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import { RUBRIC_GRID_IMPORTED } from "./event";
 import { translateGridToFormPayload } from "./payload";
 import type { RubricGrid } from "./types";
@@ -145,6 +147,36 @@ function createRubric(): void {
     showRubricCreate.value = false;
 }
 
+const deleteConfirmationId = window.Vue.ref<RubricGrid["id"] | null>(null);
+const showDeleteConfirmation = window.Vue.computed({
+    get: () => deleteConfirmationId.value !== null,
+    set: (value: boolean) => {
+        if (!value) {
+            deleteConfirmationId.value = null;
+        }
+    },
+});
+
+/**
+ * Delete a rubric
+ * @param rubricId - the ID of the rubric to delete
+ * @param confirm - whether to show a confirmation modal before deletion
+ */
+function deleteRubric(rubricId: number | "create", confirm: boolean = true): void {
+    deleteConfirmationId.value = null;
+    if (rubricId === "create") {
+        showRubricCreate.value = false;
+        return;
+    }
+
+    if (confirm) {
+        deleteConfirmationId.value = rubricId;
+        return;
+    }
+
+    rubricGrids.value = rubricGrids.value.filter((rubric) => rubric.id !== rubricId);
+}
+
 const rubricRows = window.Vue.computed(() => {
     // all the actual rubrics
     const rows: (RubricGrid | { id: "create" })[] = [...rubricGrids.value];
@@ -191,7 +223,6 @@ createRubric();
             <!-- create a new rubric -->
             <template v-else #content>
                 <div class="l-flex-row l-flex--justify l-gap-xs">
-                    <!-- TODO -->
                     <button class="button l-flex__item--1 icon-modify" type="button" @click="createRubric">
                         Create manually
                     </button>
@@ -208,16 +239,37 @@ createRubric();
         </nav>
         <ul :id="`rubric-${rubric.id}-dropdown`" class="f-dropdown" data-dropdown-content>
             <!-- TODO: implement & add other options -->
-            <li><button class="icon-download" type="button">Download</button></li>
-            <li><button class="icon-delete" type="button">Delete</button></li>
+            <li>
+                <button class="icon-download" type="button" :disabled="rubric.id === 'create' || undefined">
+                    Download
+                </button>
+            </li>
+            <li><button class="icon-delete" type="button" @click="() => deleteRubric(rubric.id)">Delete</button></li>
         </ul>
     </div>
 
     <div v-if="!showRubricCreate" class="row">
         <div class="column small-12">
-            <button class="button" @click="showRubricCreate = true">Add a rubric</button>
+            <button class="button" type="button" @click="showRubricCreate = true">Add a rubric</button>
         </div>
     </div>
+
+    <basic-modal v-model:is-open="showDeleteConfirmation">
+        <h2>Please Confirm</h2>
+        <p>Are you sure you wish to delete this rubric from the {{ locale.activity.singular() }}?</p>
+        <ul class="flex-list buttons">
+            <li v-if="deleteConfirmationId">
+                <button
+                    class="button submit icon-delete"
+                    type="button"
+                    @click="deleteRubric(deleteConfirmationId, false)"
+                >
+                    Delete
+                </button>
+            </li>
+            <li><button class="button" type="button" @click="showDeleteConfirmation = false">Cancel</button></li>
+        </ul>
+    </basic-modal>
 </template>
 
 <style scoped>
