@@ -83,6 +83,18 @@ window.Vue.onUnmounted(() => {
 });
 
 /**
+ * Calculates the assessment's total weight from the rubric grids
+ */
+const totalRubricWeight = window.Vue.computed(() => {
+    let totalWeight = 0;
+    for (const rubric of rubricGrids.value) {
+        totalWeight += rubric.weight ?? 0; // rubrics without a weight are equivalent to 0 weight
+    }
+
+    return totalWeight;
+});
+
+/**
  * Calculates the assessment's max available marks from the rubric grid(s)
  * based on the max value for each capability, instead of the max descriptor value for each indicator.
  */
@@ -96,8 +108,13 @@ const allRubricsSum = window.Vue.computed(() => {
             }
         }
 
-        // TODO: weights
-        totalSum += parseFloat(rubricSum.toFixed(2));
+        let weightMultiplier = 1;
+        if (totalRubricWeight.value > 0) {
+            // rubrics with no weights don't contribute to the total if weighted rubrics are present
+            weightMultiplier = (rubric.weight ?? 0) / totalRubricWeight.value;
+        }
+
+        totalSum += parseFloat((rubricSum * weightMultiplier).toFixed(2));
     }
 
     return totalSum;
