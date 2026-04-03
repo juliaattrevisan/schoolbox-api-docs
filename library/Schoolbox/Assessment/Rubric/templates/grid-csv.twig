@@ -111,27 +111,6 @@
                 submits.prop('disabled', false);
             });
         });
-
-        {% if allowCsvDownload %}
-        $('#dl-csv').on('click', function (e) {
-            e.preventDefault();
-
-            var frm = $('<form/>')
-                .attr('action', e.target.href)
-                .attr('method', 'post')
-                .append($('#rubric-grid-editable-container').clone())
-                .append($('#capability-markType').clone())
-                .append($('#capability-gradingScheme').clone())
-                .append($('#useMarkRange').clone());
-
-            frm.on('submit', function () {
-                // “This is what the beginning of the end of the world will look like” ― Guillermo del Toro, The Strain
-                setTimeout(function(){frm.detach();},0);
-            });
-
-            frm.appendTo($('body')).trigger('submit');
-        });
-        {% endif %}
     });
 </script>
 <div id="rubric-attachable">
@@ -143,15 +122,16 @@
                 :max-levels="{{ config.rubric_max_levels }}"
                 :folder-id="{{ folderId }}"
                 route-rubric-create="{{ routeLookup("rubric.create") }}"
+                :assessment-id="{{ assessmentId ? assessmentId : 'null' }}"
+                {% if assessmentId %}
+                    route-rubric-download="{{ routeLookup('rubric.download') }}"
+                {% endif %}
             />
         </div>
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricBuilder.js?v={{ config.site_version }}"></script>
         <div>
             {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
         </div>
-        {% if allowCsvDownload %}
-        <a href="{{ routeLookup('rubric.download') }}" class="button sbx-button--has-icon" id="dl-csv"><sbx-icon name="download"></sbx-icon>Download Rubric as CSV</a>
-        {% endif %}
     </div>
     <div data-waiting-msg class="hide">
         <h2>

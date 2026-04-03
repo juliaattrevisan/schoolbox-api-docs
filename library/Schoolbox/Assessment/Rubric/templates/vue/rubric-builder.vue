@@ -17,13 +17,16 @@ import { RUBRIC_GRID_IMPORTED } from "./event";
 import { translateGridToFormPayload } from "./payload";
 import type { RubricGrid } from "./types";
 import RubricGridEditable from "./rubric-grid-editable.vue";
+import RbRubricDownload from "./rb-rubric-download.vue";
 
 interface Props {
     rubricGridsPayload: RubricGrid[];
     rubricBlankGrid: RubricGrid;
     maxLevels: number;
     folderId: number;
+    assessmentId: number | null;
     routeRubricCreate: string;
+    routeRubricDownload?: string | null;
 }
 const props = defineProps<Props>();
 
@@ -226,7 +229,8 @@ createRubric();
                     <button class="button l-flex__item--1 icon-modify" type="button" @click="createRubric">
                         Create manually
                     </button>
-                    <button class="button l-flex__item--1 icon-copy" type="button">Copy from existing activity</button>
+                    <!-- TODO -->
+                    <!-- <button class="button l-flex__item--1 icon-copy" type="button">Copy from existing activity</button> -->
                     <button class="button l-flex__item--1 icon-upload" type="button">
                         Upload a Schoolbox format file
                     </button>
@@ -235,16 +239,19 @@ createRubric();
         </fieldset-collapsible>
 
         <nav>
-            <sbx-pop-out :content-id="`rubric-${rubric.id}-dropdown`"></sbx-pop-out>
+            <sbx-pop-out :content-id="`rubric-${rubric.id}-dropdown`" is-close-on-content-click></sbx-pop-out>
         </nav>
         <ul :id="`rubric-${rubric.id}-dropdown`" class="f-dropdown" data-dropdown-content>
-            <!-- TODO: implement & add other options -->
             <li>
-                <button class="icon-download" type="button" :disabled="rubric.id === 'create' || undefined">
-                    Download
-                </button>
+                <rb-rubric-download
+                    :rubric-grid="rubric.id !== 'create' ? rubric : null"
+                    :assessment-id="props.assessmentId"
+                    :route-rubric-download="props.routeRubricDownload"
+                />
             </li>
-            <li><button class="icon-delete" type="button" @click="() => deleteRubric(rubric.id)">Delete</button></li>
+            <li>
+                <button class="button icon-delete" type="button" @click="() => deleteRubric(rubric.id)">Delete</button>
+            </li>
         </ul>
     </div>
 
@@ -254,7 +261,7 @@ createRubric();
         </div>
     </div>
 
-    <basic-modal v-model:is-open="showDeleteConfirmation">
+    <basic-modal v-model:is-open="showDeleteConfirmation" has-background-click>
         <h2>Please Confirm</h2>
         <p>Are you sure you wish to delete this rubric from the {{ locale.activity.singular() }}?</p>
         <ul class="flex-list buttons">

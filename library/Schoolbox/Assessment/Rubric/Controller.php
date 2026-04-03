@@ -346,14 +346,12 @@ class Controller extends BaseController
      */
     public function download()
     {
-        $rubrics = [];
-        foreach ($this->requestPost->get('rubric') as $rubricId => $rubricData) {
-            $rubrics[$rubricId] = json_decode($rubricData, true, 512, JSON_THROW_ON_ERROR);
-        }
+        // TODO: there's no permission check against here...
+        // TODO: ideally remove the need to provide an assessment at all if we can
+        $rubric = $this->requestPost->get('rubricGrid');
+        $assessmentId = $this->requestPost->getInt('assessmentId');
 
-        $assessmentId = key($rubrics); // TODO: change for multiple rubrics
         $assessment   = $this->assessmentDataSource->findById($assessmentId);
-
         if (!$assessment instanceof DueWork) {
             // This is an error. How do I generate one?
             // Note: I can't download rubrics for due works that don't exist yet
@@ -365,9 +363,9 @@ class Controller extends BaseController
          */
         $markType = null;
 
-        if ($this->requestPost['capability-markType']) {
+        if ($rubric['capabilityMarkType']) {
             try {
-                $markType = MarkTypeMapper::getInstance()->findById($this->requestPost['capability-markType']);
+                $markType = MarkTypeMapper::getInstance()->findById($rubric['capabilityMarkType']);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $this->sendError('Unknown capability mark type selected');
                 return;
@@ -378,9 +376,9 @@ class Controller extends BaseController
          */
         $gradeGroup = null;
 
-        if ($this->requestPost['capability-gradingScheme'] !== null) {
+        if ($rubric['capabilityGradeGroup'] !== null) {
             try {
-                $gradeGroup = Group\Mapper::getInstance()->findById($this->requestPost['capability-gradingScheme']);
+                $gradeGroup = Group\Mapper::getInstance()->findById($rubric['capabilityGradeGroup']);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $this->sendError('Unknown capability grade group selected');
                 return;
@@ -389,11 +387,11 @@ class Controller extends BaseController
 
         $assessment->setCapabilityMarkType($markType)
                    ->setCapabilityGradeGroup($gradeGroup);
-        $assessment->setUseMarkRange($this->requestPost->getBool('useMarkRange') ?? false);
+        $assessment->setUseMarkRange($rubric['useMarkRange'] ?? false);
 
         $grid     = (new GridFactory())->buildFromPostData(
             $this->mapper->retrieveGrid($assessment, false),
-            $rubrics,
+            [ $assessmentId => $rubric['rubricGrid'] ], // TODO this will probably change as we further implement multi-grid support
             false
         );
         $basename = (new Url($assessment->getTitle()))->getSlug();
