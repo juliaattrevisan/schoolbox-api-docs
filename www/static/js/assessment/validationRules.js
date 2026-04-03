@@ -103,7 +103,7 @@ function initDynamicValidationTriggers() {
     if ($("#useRubric").is(":checked")) {
         // TODO tweak useRubric logic
         // on change of mark range setting
-        $("#useMarkRange").on("change", function () {
+        $("[data-rubric-use-mark-range-toggle]").on("change", function () {
             reValidate();
         });
 
@@ -166,7 +166,8 @@ function attachValidationRules() {
                 min: 0,
                 digits: {
                     depends: function () {
-                        return $("#useMarkRange").is(":checked");
+                        const rubricBuilderRow = $(this).closest("[data-rubric-builder-row]");
+                        return rubricBuilderRow.find("[data-rubric-use-mark-range-toggle]").is(":checked");
                     },
                 },
                 messages: {

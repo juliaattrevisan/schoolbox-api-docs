@@ -42,11 +42,10 @@ class Factory
         $capabilities  = $rubricData['group']      ?? [];
         $indicators    = $rubricData['criterion']  ?? [];
         $descriptors   = $rubricData['descriptor'] ?? [];
-        $usesMarkRange = false;
+        $usesMarkRange = $rubricData['useMarkRange'] ?? false;
         $markPerCap    = false;
 
         if ($assessment instanceof DueWork) {
-            $usesMarkRange = $assessment->getUseMarkRange();
             $markPerCap    = $assessment->isMarkPerCapability();
         }
 

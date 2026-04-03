@@ -36,7 +36,7 @@
         {{- descriptor.description | markdown -}}
     </span>
 
-    {% set descriptorHasMarkRange = rubricGrid.assessment.useMarkRange and descriptor.hasRange %}
+    {% set descriptorHasMarkRange = rubricGrid.useMarkRange and descriptor.hasRange %}
 
     {# Just show a text value if the descriptor is not selected #}
     {% if descriptor.hasValue and showDescriptorValue %}

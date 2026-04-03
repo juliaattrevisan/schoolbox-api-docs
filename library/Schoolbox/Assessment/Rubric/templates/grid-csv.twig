@@ -85,13 +85,6 @@
                 if (data.capabilityGradeGroup) {
                     body.find('#capability-gradingScheme').val(data.capabilityGradeGroup);
                 }
-
-                if (data.useMarkRange) {
-                    body.find('#useMarkRange').prop('checked', true);
-                } else {
-                    body.find('#useMarkRange').prop('checked', false);
-                }
-
             }).fail(function (data) {
 
                 var elem = $(e.target);

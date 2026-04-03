@@ -5,12 +5,12 @@ export type RubricGrid = {
     id: number; // currently the assessment ID, or 0 for new rubrics
     title: string;
     weight: number | null;
+    useMarkRange: boolean;
     levels: RubricGridLevel[];
     capabilities: RubricGridCapability[];
 
     // todo: capabilityMarkType
     // todo: capabilityGradingScheme
-    // todo: useMarkRange
 };
 
 export type RubricGridLevel = {

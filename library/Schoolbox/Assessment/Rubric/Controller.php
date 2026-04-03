@@ -325,11 +325,6 @@ class Controller extends BaseController
              */
             'capabilityGradeGroup' => $assessment->getCapabilityGradeGroup()?->getId(),
 
-            /* Use Mark Range switch; grid-editable doesn't use this var
-             * This compiled payload ends up in grid-csv.twig as result of async request
-             */
-            'useMarkRange' => $assessment->getUseMarkRange(),
-
             /* The rubric grid resulting from the csv import
              */
             'rubricGrid' => $rubricGridPayload,
@@ -387,7 +382,7 @@ class Controller extends BaseController
 
         $assessment->setCapabilityMarkType($markType)
                    ->setCapabilityGradeGroup($gradeGroup);
-        $assessment->setUseMarkRange($rubric['useMarkRange'] ?? false);
+        $assessment->setUseMarkRange($rubric['useMarkRange'] ?? false); // TODO: useMarkRange should be against a rubric
 
         $grid     = (new GridFactory())->buildFromPostData(
             $this->mapper->retrieveGrid($assessment, false),
@@ -415,7 +410,7 @@ class Controller extends BaseController
      */
     public function determineMarkInvalidation(): void
     {
-        $post         = $this->requestPost->get('rb');
+        $post         = $this->requestPost->get('rubric');
         $assessmentId = key($post);
 
 
@@ -442,7 +437,7 @@ class Controller extends BaseController
         // the current assessment state is the same as the proposed state.
         $proposedAssessment = (clone $currentAssessment)
             ->setCapabilityMarkType($this->markTypeMapper->createModel()->setId((int)($this->requestPost['capability-markType'] ?? '')))
-            ->setUseMarkRange($this->requestPost->getBool('useMarkRange', false));
+            ->setUseMarkRange($this->requestPost->getBool('useMarkRange', false)); // TODO: useMarkRange should be against a rubric
         $proposedGrid = (new GridFactory())->buildFromPostData(
             $this->mapper->retrieveGrid($proposedAssessment, false),
             $post,

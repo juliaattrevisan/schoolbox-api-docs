@@ -45,13 +45,12 @@ class ArrayExporter
         // TODO markPerCapability should be localized, as should the input
         $capabilityMarkType   = null;
         $capabilityGradeGroup = null;
-        $usingMarkRange       = false;
+        $usingMarkRange       = $grid->isUseMarkRange();
         $assessment           = $grid->getAssessment();
 
         if ($assessment instanceof DueWork) {
             $capabilityMarkType   = $assessment->isMarkPerCapability() ? $assessment->getCapabilityMarkType()->getSlug() : MarkType::SLUG_NONE;
             $capabilityGradeGroup = $assessment->getCapabilityGradeGroup() ? $assessment->getCapabilityGradeGroup()->getId() : null;
-            $usingMarkRange       = $assessment->getUseMarkRange();
         }
 
         if ($capabilityMarkType === MarkType::SLUG_LETTER && isset($capabilityGradeGroup)) {

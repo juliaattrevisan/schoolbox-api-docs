@@ -13,6 +13,7 @@ const props = defineProps<Props>();
 
 const rubricTitle = defineModel<RubricGrid["title"]>("rubricTitle", { required: true });
 const rubricWeightModel = defineModel<RubricGrid["weight"]>("rubricWeight", { required: true });
+const rubricUseMarkRange = defineModel<RubricGrid["useMarkRange"]>("rubricUseMarkRange", { required: true });
 
 const rubricWeight = window.Vue.computed({
     get: () => rubricWeightModel.value ?? "",
@@ -31,6 +32,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
+    <!-- TODO: show all of these when courseManagedReadonly -->
     <div class="row">
         <div class="small-12 columns">
             <label>
@@ -60,6 +62,29 @@ window.Vue.onMounted(() => {
                 </span>
                 <input v-model.number.lazy="rubricWeight" type="number" :name="`rubric-${props.rubricId}-weight`" />
             </label>
+        </div>
+    </div>
+
+    <!-- TODO: capability mark type -->
+
+    <div class="row">
+        <div class="small-12 columns">
+            <div id="useMarkRangePanel">
+                <label :for="`rubric-${props.rubricId}-useMarkRange`" class="inline-block">Use Mark Range</label>
+                <div class="switch">
+                    <input
+                        :id="`rubric-${props.rubricId}-useMarkRange`"
+                        v-model="rubricUseMarkRange"
+                        :name="`rubric-${props.rubricId}-useMarkRange`"
+                        type="checkbox"
+                        data-rubric-use-mark-range-toggle
+                    />
+                    <label :for="`rubric-${props.rubricId}-useMarkRange`">
+                        <span class="icon-approve"></span>
+                        <span class="icon-cancel"></span>
+                    </label>
+                </div>
+            </div>
         </div>
     </div>
 </template>

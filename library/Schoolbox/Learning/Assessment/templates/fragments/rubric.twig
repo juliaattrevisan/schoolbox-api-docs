@@ -125,26 +125,6 @@
         courseManagedReadonly: courseManagedReadonly
     } %}
 
-    <div class="row">
-        <div class="small-12 columns">
-            <div id="useMarkRangePanel">
-                <label for="useMarkRange" class="inline-block">Use Mark Range</label>
-
-                {# For when the checkbox itself is disabled, since that won't submit to backend
-                 # under those circumstances, inadvertently unlocking this setting
-                 #}
-                <input type="hidden" name="useMarkRange" value="0" />
-
-                <div class="switch">
-                    <input name="useMarkRange" id="useMarkRange" type="checkbox" {% if assessment.useMarkRange %}checked="checked"{% endif %} {% if courseManagedReadonly %}disabled{% endif %} />
-                    <label for="useMarkRange">
-                        <span class="icon-approve"></span>
-                        <span class="icon-cancel"></span>
-                    </label>
-                </div>
-            </div>
-        </div>
-    </div>
 </fieldset>
 
 {% if courseManagedReadonly %}

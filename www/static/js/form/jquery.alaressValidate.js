@@ -474,7 +474,9 @@
         function (value, indicatorCheckbox) {
             var valid = true;
 
-            if ($("#useMarkRange").is(":checked")) {
+            const rubricBuilderRow = $(indicatorCheckbox).closest("[data-rubric-builder-row]");
+
+            if (rubricBuilderRow.find("[data-rubric-use-mark-range-toggle]").is(":checked")) {
                 var descriptorList = $.makeArray(
                     $(indicatorCheckbox).closest("tr[data-indicator-row]").find("[data-descriptor-value]"),
                 );

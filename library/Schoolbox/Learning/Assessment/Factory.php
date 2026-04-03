@@ -289,7 +289,6 @@ class Factory
 
         $this->setCapabilityMarkType((int)trim($post['capability-markType'] ?? ''));
         $this->setCapabilityGradeGroup((int)trim($post['capability-gradingScheme'] ?? ''));
-        $this->setUseMarkRange(trim($post['useMarkRange'] ?? '') === 'on');
 
         // Only due works have a max mark.
         if (in_array($assessmentType, [AssessmentType::TYPE_DUE_WORK, AssessmentType::TYPE_REPORTING])) {
@@ -347,6 +346,7 @@ class Factory
          */
         // TODO what should this be?
         $this->setUseRubric(false);
+        $this->setUseMarkRange(false); // TODO TEMP: useMarkRange should be against the rubric
         if (isset($post['rubric'])) {
             $rubrics = [];
             foreach ($post['rubric'] as $rubricId => $rubricData) {
@@ -357,6 +357,9 @@ class Factory
                 // TODO Will this have a side effect of turning on rubrics for existing assessments if you re-save one that had a rubric but turned off...?
                 $this->setUseRubric(true);
                 $this->setRubricData($rubrics);
+
+                // TODO TEMP: useMarkRange should be against the rubric
+                $this->setUseMarkRange($rubrics[array_key_first($rubrics)]['useMarkRange'] ?? false);
             }
         }
 

@@ -33,15 +33,7 @@ const props = defineProps<Props>();
 
 const rubricGrids = window.Vue.ref(cloneDeep(props.rubricGridsPayload)); // local mutable copy
 
-const useMarkRange = window.Vue.ref<boolean>(false);
 const capabilityMarkType = window.Vue.ref<number>(MARK_TYPE_VALUE_NONE);
-
-/**
- * Keep the "Use mark range" checkbox in sync with the ref
- */
-function onUseMarkRangeChange(this: HTMLInputElement): void {
-    useMarkRange.value = this.checked;
-}
 
 /**
  * Keep the capability mark type input (which is outside of vue's scope) in sync with the ref
@@ -52,16 +44,6 @@ function onCapabilityMarkTypeChange(this: HTMLSelectElement): void {
 }
 
 window.Vue.onMounted(() => {
-    // TODO: ideally deal with this fully inside of vue instead
-    const useMarkRangeInput = document.getElementById("useMarkRange");
-    if (!(useMarkRangeInput instanceof HTMLInputElement)) {
-        console.warn("Unable to find 'Use mark range' input");
-        return;
-    }
-
-    onUseMarkRangeChange.call(useMarkRangeInput);
-    useMarkRangeInput.addEventListener("change", onUseMarkRangeChange);
-
     // TODO: ideally deal with this fully inside of vue instead
     const markTypeInput = document.getElementById("capability-markType");
     if (!(markTypeInput instanceof HTMLSelectElement)) {
@@ -75,9 +57,6 @@ window.Vue.onMounted(() => {
 
 window.Vue.onUnmounted(() => {
     // clean up
-    const useMarkRangeInput = document.getElementById("useMarkRange");
-    useMarkRangeInput?.removeEventListener("change", onUseMarkRangeChange);
-
     const markTypeInput = document.getElementById("capability-markType");
     markTypeInput?.removeEventListener("change", onCapabilityMarkTypeChange);
 });
@@ -217,13 +196,15 @@ const rubricRows = window.Vue.computed(() => {
 
     return rows;
 });
-
-// TODO: temp multiple grids... chaotically
-createRubric();
 </script>
 
 <template>
-    <div v-for="(rubric, index) in rubricRows" :key="rubric.id" class="actions-small-1 rubric-builder-row">
+    <div
+        v-for="(rubric, index) in rubricRows"
+        :key="rubric.id"
+        class="actions-small-1 rubric-builder-row"
+        data-rubric-builder-row
+    >
         <fieldset-collapsible delay-content-render :initially-expanded="rubric.id === 'create' || rubric.id < 0">
             <template #legend>Rubric {{ index + 1 }}</template>
 
@@ -232,6 +213,7 @@ createRubric();
                 <rb-rubric-fields
                     v-model:rubric-title="rubric.title"
                     v-model:rubric-weight="rubric.weight"
+                    v-model:rubric-use-mark-range="rubric.useMarkRange"
                     :rubric-id="rubric.id"
                 />
 
@@ -239,10 +221,10 @@ createRubric();
                     v-model:rubric-grid-levels="rubric.levels"
                     v-model:rubric-grid-capabilities="rubric.capabilities"
                     :rubric-id="rubric.id"
+                    :use-mark-range="rubric.useMarkRange"
                     :folder-id="props.folderId"
                     :max-levels="props.maxLevels"
                     :capability-mark-type="capabilityMarkType"
-                    :use-mark-range="useMarkRange"
                     :route-rubric-create="props.routeRubricCreate"
                 />
 
