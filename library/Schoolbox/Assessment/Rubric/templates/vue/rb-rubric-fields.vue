@@ -60,7 +60,12 @@ window.Vue.onMounted(() => {
                 >
                     ?
                 </span>
-                <input v-model.number.lazy="rubricWeight" type="number" :name="`rubric-${props.rubricId}-weight`" />
+                <input
+                    v-model.number.lazy="rubricWeight"
+                    type="number"
+                    min="0"
+                    :name="`rubric-${props.rubricId}-weight`"
+                />
             </label>
         </div>
     </div>

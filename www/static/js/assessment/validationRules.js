@@ -5,15 +5,6 @@ var scriptValidationRules = $("script[src*=validationRules]");
  */
 var validateOptions = {
     rules: {
-        // TODO tweak useRubric logic
-        useRubric: {
-            require_from_group: {
-                param: [1, "[data-criterion-name]"],
-                depends: function (element) {
-                    return element.checked;
-                },
-            },
-        },
         title: { required: true },
         weight: {
             required: true,
@@ -76,10 +67,6 @@ var validateOptions = {
     },
     messages: {
         weight: "The " + scriptValidationRules.attr("data-locale-grading-proper") + " weight should be zero or greater",
-        useRubric: {
-            // TODO tweak useRubric logic
-            require_from_group: "You must have at least one selected indicator if using a rubric",
-        },
         "submissionOptions[]": {
             require_from_group: "Please select at least one option",
         },
@@ -90,18 +77,18 @@ var validateOptions = {
 $(document).ready(function () {
     // Initialise validator - have to do this here, as the only other place it happens is in the mage on submit
     $("#assessmentForm").alaressValidate();
-
-    // Attach on-load rules -
-    // we can't pass these as options to alaressValidate because we need to loop through elements applying rules
-    attachValidationRules();
-
-    // Attach MutationObservers and on-change listeners
-    initDynamicValidationTriggers();
 });
 
 function initDynamicValidationTriggers() {
-    if ($("#useRubric").is(":checked")) {
-        // TODO tweak useRubric logic
+    const moConfig = { attributes: false, childList: true, characterData: false };
+
+    // watch for new added builder rows
+    var builderRowObserver = new MutationObserver(attachValidationRules);
+    $("#rubric-builder-container").each(function () {
+        builderRowObserver.observe(this, moConfig);
+    });
+
+    if ($("[data-rubric-builder-row]").length) {
         // on change of mark range setting
         $("[data-rubric-use-mark-range-toggle]").on("change", function () {
             reValidate();
@@ -117,11 +104,9 @@ function initDynamicValidationTriggers() {
             $closestDescRow.valid();
         });
 
-        var moConfig = { attributes: false, childList: true, characterData: false };
-
         // on change of number of levels
         var levelObserver = new MutationObserver(attachValidationRules);
-        $("tr[data-group]").each(function () {
+        $("[data-rubric-grid-level]").each(function () {
             levelObserver.observe(this, moConfig);
         });
 
@@ -153,8 +138,12 @@ function initDynamicValidationTriggers() {
 
 function attachValidationRules() {
     // Don't attach rubric validation unless Use Rubric is on
-    if ($("#useRubric").is(":checked")) {
-        // todo: tweak useRubric logic
+    if ($("[data-rubric-builder-row]").length) {
+        // Each rubric must have at least 1 indicator (criterion) selected
+        $("[data-rubric-builder-row] [data-rubric-form-input]").each(function () {
+            $(this).rules("add", { rubricHasIndicator: true });
+        });
+
         // Validate decimal places on each descriptor
         // Only validate digits (i.e. string contains only numbers, no decimal places) if mark range is on
         // Always validate it's numeric and positive

@@ -467,6 +467,22 @@
     );
 
     /**
+     * Used in rubric to ensure a given rubric has at least one indicator
+     */
+    $.validator.addMethod(
+        "rubricHasIndicator",
+        function (value, element) {
+            const rubricBuilderRow = $(element).closest("[data-rubric-builder-row]");
+            return (
+                rubricBuilderRow.find("[data-criterion-name]").filter(function () {
+                    return $(this).is(":checked");
+                }).length > 0
+            );
+        },
+        "You must have at least one selected indicator if using a rubric",
+    );
+
+    /**
      * Used in rubric to ensure descriptors's values sequentially ascend, or descend, per indicator
      */
     $.validator.addMethod(

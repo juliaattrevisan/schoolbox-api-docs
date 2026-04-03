@@ -20,7 +20,7 @@ const componentId = window.Vue.useId();
 </script>
 
 <template>
-    <th class="rb-level">
+    <th class="rb-level" data-rubric-grid-level>
         <input
             :id="`rb-level-name-${componentId}`"
             v-model.trim="levelName"

@@ -107,7 +107,7 @@
     });
 </script>
 
-{# TODO: old useRubric hide/show logic #}
+{# TODO: move this into the assessment #}
 <fieldset class="{% if not assessment.useRubric %}hide{% endif %}">
     <legend>Rubric marking options</legend>
 
@@ -147,7 +147,7 @@
     </div>
 {% else %}
     <div class="row">
-        <div class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}">
+        <div class="small-12 columns">
             <div class="small-12 columns no-pad">
                 <a href="#" id="apply-resultset" class="button">Apply Result Set</a>
             </div>

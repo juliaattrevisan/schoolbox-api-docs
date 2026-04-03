@@ -14,7 +14,6 @@ import { MARK_TYPE_VALUE_NONE } from "@schoolboxAssessment/Types/MarkType";
 import FieldsetCollapsible from "@schoolboxVue/components/fieldset-collapsible.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import { RUBRIC_GRID_IMPORTED } from "./event";
-import { translateGridToFormPayload } from "./payload";
 import type { RubricGrid } from "./types";
 import RbRubricFields from "./rb-rubric-fields.vue";
 import RbRubricGrid from "./rb-rubric-grid.vue";
@@ -220,19 +219,11 @@ const rubricRows = window.Vue.computed(() => {
                 <rb-rubric-grid
                     v-model:rubric-grid-levels="rubric.levels"
                     v-model:rubric-grid-capabilities="rubric.capabilities"
-                    :rubric-id="rubric.id"
-                    :use-mark-range="rubric.useMarkRange"
+                    :rubric="rubric"
                     :folder-id="props.folderId"
                     :max-levels="props.maxLevels"
                     :capability-mark-type="capabilityMarkType"
                     :route-rubric-create="props.routeRubricCreate"
-                />
-
-                <!-- hidden input to submit the rubric grid as JSON -->
-                <input
-                    type="hidden"
-                    :name="`rubric[${rubric.id}]`"
-                    :value="JSON.stringify(translateGridToFormPayload(rubric))"
                 />
             </template>
 

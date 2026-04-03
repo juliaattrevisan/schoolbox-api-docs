@@ -11,22 +11,24 @@ import { shiftArrayItem } from "@js/util/arrayUtils";
 import RbGridLevel from "./rb-grid-level.vue";
 import RbGridCapability from "./rb-grid-capability.vue";
 import { RUBRIC_GRID_APPLY_RESULT_SET } from "./event";
+import { translateGridToFormPayload } from "./payload";
 import type { RubricGridCreateCapabilityResponse, RubricGridCreateIndicatorResponse } from "./payload";
 import { MAX_CAPABILITY_LENGTH } from "./types";
 import type { RubricGrid, RubricGridLevel, RubricGridCapability, RubricGridDescriptor } from "./types";
 
 interface Props {
-    rubricId: RubricGrid["id"];
+    rubric: RubricGrid;
     folderId: number;
     maxLevels: number;
     capabilityMarkType: number;
-    useMarkRange: boolean;
     routeRubricCreate: string;
 }
 const props = defineProps<Props>();
 
 const rubricGridLevels = defineModel<RubricGrid["levels"]>("rubricGridLevels", { required: true });
 const rubricGridCapabilities = defineModel<RubricGrid["capabilities"]>("rubricGridCapabilities", { required: true });
+
+const formValueRef = window.Vue.useTemplateRef<HTMLInputElement>("formValueRef");
 
 /**
  * Move a level left or right
@@ -152,7 +154,7 @@ async function onAddKeydown<TType extends "capability" | "indicator">(
             type,
             name,
             folderId: props.folderId,
-            rubricId: props.rubricId,
+            rubricId: props.rubric.id,
             levelCount: rubricGridLevels.value.length,
             capabilityId: type === "indicator" && capability!.id >= 0 ? capability!.id : null,
             capabilityName: type === "indicator" ? capability!.name : null,
@@ -276,12 +278,29 @@ document.addEventListener(RUBRIC_GRID_APPLY_RESULT_SET, (event) => {
 
     // TODO: if rubric has marks, apply original descriptor values (applyOriginalDescriptorValues)
 });
+
+/** Emit a change event so jquery.alaressValidate can pick it up for grid-based rules */
+const formValue = window.Vue.computed(() => JSON.stringify(translateGridToFormPayload(props.rubric)));
+window.Vue.watch(formValue, () => {
+    if (formValueRef.value) {
+        window.jQuery(formValueRef.value).valid();
+    }
+});
 </script>
 
 <template>
+    <!-- hidden input to submit the rubric grid as JSON -->
+    <input
+        ref="formValueRef"
+        type="hidden"
+        :name="`rubric[${rubric.id}]`"
+        :value="JSON.stringify(translateGridToFormPayload(rubric))"
+        data-rubric-form-input
+    />
+
     <h3 class="subheader show-for-medium-down">Levels</h3>
     <div class="scrollable">
-        <table class="rb stack-for-medium-down">
+        <table class="rb stack-for-medium-down" data-rubric>
             <thead>
                 <tr>
                     <th class="rb-no-cell">
@@ -321,7 +340,7 @@ document.addEventListener(RUBRIC_GRID_APPLY_RESULT_SET, (event) => {
                     :is-creating="isCreating"
                     :max-levels="props.maxLevels"
                     :capability-mark-type="props.capabilityMarkType"
-                    :use-mark-range="props.useMarkRange"
+                    :use-mark-range="props.rubric.useMarkRange"
                     :can-move-prev="index > 0"
                     :can-move-next="index < rubricGridCapabilities.length - 1"
                     @move="(dir) => shiftArrayItem(rubricGridCapabilities, index, dir)"
