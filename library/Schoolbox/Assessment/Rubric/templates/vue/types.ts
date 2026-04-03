@@ -3,10 +3,10 @@
  */
 export type RubricGrid = {
     id: number; // currently the assessment ID, or 0 for new rubrics
+    title: string;
     levels: RubricGridLevel[];
     capabilities: RubricGridCapability[];
 
-    // todo: title
     // todo: weight
     // todo: capabilityMarkType
     // todo: capabilityGradingScheme

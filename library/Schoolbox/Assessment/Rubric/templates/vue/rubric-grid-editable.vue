@@ -27,6 +27,7 @@ const props = defineProps<Props>();
 
 const rubricGridLevels = defineModel<RubricGrid["levels"]>("rubricGridLevels", { required: true });
 const rubricGridCapabilities = defineModel<RubricGrid["capabilities"]>("rubricGridCapabilities", { required: true });
+const rubricTitle = defineModel<RubricGrid["title"]>("rubricTitle", { required: true });
 
 /**
  * Move a level left or right
@@ -276,9 +277,33 @@ document.addEventListener(RUBRIC_GRID_APPLY_RESULT_SET, (event) => {
 
     // TODO: if rubric has marks, apply original descriptor values (applyOriginalDescriptorValues)
 });
+
+window.Vue.onMounted(() => {
+    if (document.readyState === "complete") {
+        // If the document isn't ready, we can't reflow tooltips yet
+        // As vue loads the template after foundation has been initialised, we need to reinitialise the tooltips
+        window.jQuery(document).foundation("tooltip", "reflow");
+    }
+});
 </script>
 
 <template>
+    <div class="row">
+        <div class="small-12 columns">
+            <label>
+                <span class="required-with-tip">Rubric Title</span>
+                <span
+                    data-tooltip
+                    class="hint has-tip tip-top"
+                    :title="`Add a title so that users can identify this rubric when reusing rubrics and viewing the ${locale.activity.singular()}.`"
+                >
+                    ?
+                </span>
+                <input v-model.lazy="rubricTitle" type="text" :name="`rubric-${rubricId}-title`" required />
+            </label>
+        </div>
+    </div>
+
     <h3 class="subheader show-for-medium-down">Levels</h3>
     <div class="scrollable">
         <table class="rb stack-for-medium-down">
