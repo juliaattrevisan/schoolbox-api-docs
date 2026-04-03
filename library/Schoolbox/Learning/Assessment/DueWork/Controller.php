@@ -2032,16 +2032,22 @@ class Controller extends Assessment\Controller
 
         $resultSets = $this->resultSetMapper->findAll();
 
-        $rs = new Collection();
-
+        $rs = [];
         foreach ($resultSets as $result) {
-            if (!$rs[$result->getResultSetId()] instanceof ICollection) {
-                $rs[$result->getResultSetId()] = $this->resultSetMapper->createCollection();
+            if (!isset($rs[$result->getResultSetId()])) {
+                $rs[$result->getResultSetId()] = [
+                    'id' => $result->getResultSetId(),
+                    'results' => [],
+                ];
             }
-            $rs[$result->getResultSetId()][$result->getValue()] = $result;
+
+            $rs[$result->getResultSetId()]['results'][] = [
+                'value' => $result->getValue(),
+                'label' => $result->getLabel(),
+            ];
         }
 
-        $data['rubricResultSets'] = $rs;
+        $data['rubricResultSets'] = array_values($rs);
 
         // Do any students have marks for this rubric?
         $levelIds      = RubricLevelMapper::getInstance()->findIdsByColumn('b.assessment_id', $dueWork->getId());

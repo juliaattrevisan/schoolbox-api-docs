@@ -71,20 +71,12 @@
 
             // get the new grid markup
             $.post(url, postdata).done(function (data) {
-
                 // dump in the new data (event used in rubric-builder.vue)
                 document.dispatchEvent(new CustomEvent('RUBRIC_GRID_IMPORTED', {
                     detail: {
                         rubricGrid: data.rubricGrid,
                     },
                 }));
-
-                /* Set switches and dropdowns via payload values
-                */
-                body.find('#capability-markType').val(data.capabilityMarkType).trigger('change');
-                if (data.capabilityGradeGroup) {
-                    body.find('#capability-gradingScheme').val(data.capabilityGradeGroup);
-                }
             }).fail(function (data) {
 
                 var elem = $(e.target);
@@ -112,6 +104,7 @@
             <rubric-builder
                 :rubric-grids-payload="{{ rubricGridsPayload|json_encode }}"
                 :rubric-blank-grid="{{ rubricBlankGrid|json_encode }}"
+                :result-sets="{{ resultSets|json_encode }}"
                 :capability-mark-types="{{ capabilityMarkTypes|json_encode }}"
                 :capability-grading-schemes="{{ capabilityGradingSchemes|json_encode }}"
                 :default-grade-group="{{ defaultGradeGroup }}"

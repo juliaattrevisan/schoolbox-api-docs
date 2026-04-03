@@ -1,3 +1,5 @@
+import type { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
+
 /**
  * @see /library/Schoolbox/Assessment/Rubric/Grid/Translator/ModelToArray.php
  */
@@ -8,7 +10,7 @@ export type RubricGrid = {
     useMarkRange: boolean;
     levels: RubricGridLevel[];
     capabilities: RubricGridCapability[];
-    capabilityMarkType: number | null;
+    capabilityMarkType: MarkTypeSlug | null;
     capabilityGradeGroup: number | null;
 };
 
@@ -45,6 +47,11 @@ export type RubricGridDescriptor = {
     id: number;
     description: string;
     maxValue: number | null;
+};
+
+export type ResultSet = {
+    id: number;
+    results: { value: number; label: string }[];
 };
 
 /**

@@ -16,96 +16,6 @@
  # @param int markTypeNone                  The id of the mark type "None" (usually int 6)
  # @param bool $courseManagedReadonly       A bool to decide if this is readonly or not
  #}
-<div class="reveal-modal" data-reveal id="reveal-resultset">
-    <h2>Apply Result Set</h2>
-    <p>Choose a standard result set to apply to this {{ locale.translate('rubricCriterion') }} grid.</p>
-    <div class="alert-box warning">
-        <strong>Warning:</strong> this is a destructive action. Any existing level and descriptor data will be replaced with the chosen result set.
-    </div>
-    <h3>Available Result Sets</h3>
-    <div class="small-12 columns no-pad">
-        <ul class="option-list">
-        {% for resultSetId, resultSet in resultSets %}
-            <li>
-                <input id="rs-{{ resultSetId }}" type="radio" name="resultset" value="{{ resultSetId }}"{% if loop.first %} checked="checked"{% endif %}/>
-                <label for="rs-{{ resultSetId }}" class="radio-label">
-                    {%- for result in resultSet -%}
-                        {{ result.label }}{% if resultSet|length > 1 and not loop.last %}, {% endif %}
-                    {%- endfor -%}
-                </label>
-            </li>
-        {% endfor %}
-        </ul>
-        <ul class="flex-list buttons">
-            <li><a href="#" data-action="applyResultSet" class="submit button">Apply</a></li>
-            <li><a href="#" data-action="close" class="button">Cancel</a></li>
-        </ul>
-    </div>
-
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-
-
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/attacher/attacher.hide-watch.js?v={{ config.site_version }}"></script>
-<script type="text/javascript">
-    $(function() {
-        // Rubric ResultSets Modal
-        var $rsReveal     = $('#reveal-resultset');
-        var $interactions = $rsReveal.find('input,a');
-
-        $rsReveal.on('closed.fndtn.reveal', function () {
-            // un-check the selected radio
-            $rsReveal.find('[type=radio]').prop('checked', false);
-
-            // re-enable all inputs and links
-            $interactions.prop('disabled', false);
-
-        });
-
-        $('#apply-resultset').on('click', function (e) {
-            e.preventDefault();
-            $rsReveal.foundation('reveal', 'open');
-        });
-
-        $rsReveal.on('click', 'a', function (e) {
-            e.preventDefault();
-
-            var $button = $(this), value, $input, $label, options ;
-
-            if ($button.data('action') !== 'applyResultSet') {
-                // only allow the apply button to do proceed, only other known option is 'close'
-                return;
-            }
-
-            $input = $rsReveal.find('input:checked');
-            if (!$input.length) {
-                return; // no option selected
-            }
-            value  = $input.val();
-            $label = $input.siblings('[for=' + $input.attr('id') + ']');
-
-            // ensure value
-            if (value > 0) {
-                // get the list of options we're going to populate
-                options = $label.text().split(',').map(function (v) { return v.trim(); });
-
-                // prevent multi-submit
-                $interactions.prop('disabled', true);
-
-                console.log('Applying result set', value, options);
-
-                // tell the rubric to apply the result set
-                document.dispatchEvent(new CustomEvent('RUBRIC_GRID_APPLY_RESULT_SET', {
-                    detail: {
-                        options,
-                    },
-                }));
-
-                $rsReveal.foundation('reveal', 'close');
-            }
-        });
-    });
-</script>
 
 {% if courseManagedReadonly %}
     <div class="row">
@@ -129,12 +39,10 @@
     <div class="row">
         <div class="small-12 columns">
             <div class="small-12 columns no-pad">
-                <a href="#" id="apply-resultset" class="button">Apply Result Set</a>
-            </div>
-            <div class="small-12 columns no-pad">
                 {% include '@rubric/grid-csv.twig' with {
                     rubricGridsPayload: rubricGridsPayload,
                     rubricBlankGrid: rubricBlankGrid,
+                    resultSets: resultSets,
                     attachzone: rubricAttachZone,
                     folderId: assessment.context.folder.id,
                     assessmentId: assessment.id ? assessment.id : null,

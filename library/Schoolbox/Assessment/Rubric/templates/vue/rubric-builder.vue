@@ -16,7 +16,7 @@ import FieldsetCollapsible from "@schoolboxVue/components/fieldset-collapsible.v
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import type { GradeScheme } from "@schoolboxLibrary/Learning/Assessment/templates/fragments/vue/mark-type.vue";
 import { RUBRIC_GRID_IMPORTED } from "./event";
-import type { RubricGrid } from "./types";
+import type { RubricGrid, ResultSet } from "./types";
 import RbRubricFields from "./rb-rubric-fields.vue";
 import RbRubricGrid from "./rb-rubric-grid.vue";
 import RbRubricDownload from "./rb-rubric-download.vue";
@@ -24,6 +24,7 @@ import RbRubricDownload from "./rb-rubric-download.vue";
 interface Props {
     rubricGridsPayload: RubricGrid[];
     rubricBlankGrid: RubricGrid;
+    resultSets: ResultSet[];
     capabilityMarkTypes: MarkType[];
     capabilityGradingSchemes: GradeScheme[];
     defaultGradeGroup: number;
@@ -202,6 +203,7 @@ const rubricRows = window.Vue.computed(() => {
                     v-model:rubric-grid-levels="rubric.levels"
                     v-model:rubric-grid-capabilities="rubric.capabilities"
                     :rubric="rubric"
+                    :result-sets="props.resultSets"
                     :folder-id="props.folderId"
                     :max-levels="props.maxLevels"
                     :capability-mark-type="rubric.capabilityMarkType ?? MarkTypeSlug.NONE"

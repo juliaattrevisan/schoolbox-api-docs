@@ -11,11 +11,11 @@ import { shiftArrayItem } from "@js/util/arrayUtils";
 import type { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import RbGridLevel from "./rb-grid-level.vue";
 import RbGridCapability from "./rb-grid-capability.vue";
-import { RUBRIC_GRID_APPLY_RESULT_SET } from "./event";
+import RbApplyResultSet from "./rb-apply-result-set.vue";
 import { translateGridToFormPayload } from "./payload";
 import type { RubricGridCreateCapabilityResponse, RubricGridCreateIndicatorResponse } from "./payload";
 import { MAX_CAPABILITY_LENGTH } from "./types";
-import type { RubricGrid, RubricGridLevel, RubricGridCapability, RubricGridDescriptor } from "./types";
+import type { RubricGrid, RubricGridLevel, RubricGridCapability, RubricGridDescriptor, ResultSet } from "./types";
 
 interface Props {
     rubric: RubricGrid;
@@ -23,6 +23,7 @@ interface Props {
     maxLevels: number;
     capabilityMarkType: MarkTypeSlug;
     routeRubricCreate: string;
+    resultSets: ResultSet[];
 }
 const props = defineProps<Props>();
 
@@ -260,10 +261,11 @@ const totalColumns = window.Vue.computed(() => {
 // }
 
 /**
- * Listen for a rubric grid apply result set event
- * TODO: this logic will need to change for multiple rubrics and/or multiple result sets
+ * Applies a result set to the rubric grid,
+ * replacing all levels and descriptors with the values from the result set
+ * @param resultSet the result set to apply
  */
-document.addEventListener(RUBRIC_GRID_APPLY_RESULT_SET, (event) => {
+function applyResultSet(resultSet: ResultSet): void {
     // this wipes all the existing levels/descriptors and replaces them with the ones from the results set
     // the new descriptor values just count up from 0
 
@@ -273,12 +275,12 @@ document.addEventListener(RUBRIC_GRID_APPLY_RESULT_SET, (event) => {
     }
 
     // add each new level
-    for (const [levelIndex, levelName] of event.detail.options.entries()) {
-        addLevel(levelName, levelIndex);
+    for (const result of resultSet.results) {
+        addLevel(result.label, result.value);
     }
 
     // TODO: if rubric has marks, apply original descriptor values (applyOriginalDescriptorValues)
-});
+}
 
 /** Emit a change event so jquery.alaressValidate can pick it up for grid-based rules */
 const formValue = window.Vue.computed(() => JSON.stringify(translateGridToFormPayload(props.rubric)));
@@ -290,6 +292,12 @@ window.Vue.watch(formValue, () => {
 </script>
 
 <template>
+    <rb-apply-result-set
+        v-if="props.resultSets.length"
+        :result-sets="props.resultSets"
+        @apply-result-set="applyResultSet"
+    />
+
     <!-- hidden input to submit the rubric grid as JSON -->
     <input
         ref="formValueRef"
