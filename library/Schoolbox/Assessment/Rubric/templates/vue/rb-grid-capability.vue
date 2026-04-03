@@ -14,7 +14,7 @@ import type { Ref } from "vue";
 import locale from "@js/terminology/rosettaStone";
 import { shiftArrayItem } from "@js/util/arrayUtils";
 import { MARK_TYPE_VALUE_NONE } from "@schoolboxAssessment/Types/MarkType";
-import IndicatorEditable from "./indicator-editable.vue";
+import RbGridIndicator from "./rb-grid-indicator.vue";
 import { MAX_CAPABILITY_LENGTH, MAX_INDICATOR_LENGTH } from "./types";
 import type { RubricGridCapability, RubricGridLevel } from "./types";
 
@@ -174,7 +174,7 @@ window.Vue.onMounted(() => {
         </th>
     </tr>
 
-    <indicator-editable
+    <rb-grid-indicator
         v-for="(indicator, index) in indicators"
         :key="indicator.id"
         v-model:name="indicator.name"

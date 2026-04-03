@@ -16,8 +16,8 @@ import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import { RUBRIC_GRID_IMPORTED } from "./event";
 import { translateGridToFormPayload } from "./payload";
 import type { RubricGrid } from "./types";
-import RubricGridEditable from "./rubric-grid-editable.vue";
 import RbRubricFields from "./rb-rubric-fields.vue";
+import RbRubricGrid from "./rb-rubric-grid.vue";
 import RbRubricDownload from "./rb-rubric-download.vue";
 
 interface Props {
@@ -211,7 +211,7 @@ createRubric();
                     :rubric-id="rubric.id"
                 />
 
-                <rubric-grid-editable
+                <rb-rubric-grid
                     v-model:rubric-grid-levels="rubric.levels"
                     v-model:rubric-grid-capabilities="rubric.capabilities"
                     :rubric-id="rubric.id"

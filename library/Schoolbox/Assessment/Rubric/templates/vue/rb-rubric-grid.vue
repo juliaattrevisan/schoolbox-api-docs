@@ -8,8 +8,8 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import { assertUnreachable } from "@js/util/errorUtils";
 import locale from "@js/terminology/rosettaStone";
 import { shiftArrayItem } from "@js/util/arrayUtils";
-import LevelEditable from "./level-editable.vue";
-import CapabilityEditable from "./capability-editable.vue";
+import RbGridLevel from "./rb-grid-level.vue";
+import RbGridCapability from "./rb-grid-capability.vue";
 import { RUBRIC_GRID_APPLY_RESULT_SET } from "./event";
 import type { RubricGridCreateCapabilityResponse, RubricGridCreateIndicatorResponse } from "./payload";
 import { MAX_CAPABILITY_LENGTH } from "./types";
@@ -292,7 +292,7 @@ document.addEventListener(RUBRIC_GRID_APPLY_RESULT_SET, (event) => {
                         <!-- indicators -->
                         {{ locale.rubricCriterion.properPlural() }}
                     </th>
-                    <level-editable
+                    <rb-grid-level
                         v-for="(level, index) in rubricGridLevels"
                         :key="level.id"
                         v-model:name="level.name"
@@ -309,7 +309,7 @@ document.addEventListener(RUBRIC_GRID_APPLY_RESULT_SET, (event) => {
                 </tr>
             </thead>
             <tbody>
-                <capability-editable
+                <rb-grid-capability
                     v-for="(capability, index) in rubricGridCapabilities"
                     :key="capability.id"
                     v-model:name="capability.name"

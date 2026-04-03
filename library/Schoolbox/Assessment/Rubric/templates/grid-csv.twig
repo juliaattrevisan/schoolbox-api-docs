@@ -72,7 +72,7 @@
             // get the new grid markup
             $.post(url, postdata).done(function (data) {
 
-                // dump in the new data (event used in rubric-grid-editable.vue)
+                // dump in the new data (event used in rubric-builder.vue)
                 document.dispatchEvent(new CustomEvent('RUBRIC_GRID_IMPORTED', {
                     detail: {
                         rubricGrid: data.rubricGrid,

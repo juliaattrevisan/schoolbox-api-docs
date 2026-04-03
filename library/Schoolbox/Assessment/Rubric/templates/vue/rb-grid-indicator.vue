@@ -13,7 +13,7 @@
 
 import { useTemplateRefsList } from "@vueuse/core";
 import locale from "@js/terminology/rosettaStone";
-import DescriptorEditable from "./descriptor-editable.vue";
+import RbGridDescriptor from "./rb-grid-descriptor.vue";
 import { MAX_INDICATOR_LENGTH } from "./types";
 import type { RubricGridCapability, RubricGridIndicator, RubricGridLevel } from "./types";
 
@@ -48,7 +48,7 @@ window.Vue.onMounted(() => {
 
 const descriptorTextareaHeight = window.Vue.ref<string>("auto");
 
-const descriptorRefs = useTemplateRefsList<InstanceType<typeof DescriptorEditable>>();
+const descriptorRefs = useTemplateRefsList<InstanceType<typeof RbGridDescriptor>>();
 
 /**
  * Update the height of the descriptor textareas to fit the content
@@ -139,7 +139,7 @@ window.Vue.onMounted(() => {
             </label>
         </th>
 
-        <descriptor-editable
+        <rb-grid-descriptor
             v-for="(descriptor, levelIndex) in props.indicator.descriptors"
             :key="descriptor.id"
             :ref="descriptorRefs.set"
@@ -152,7 +152,7 @@ window.Vue.onMounted(() => {
             :use-mark-range="props.useMarkRange"
             :textarea-height="descriptorTextareaHeight"
             @description-input="updateDescriptorHeight"
-        ></descriptor-editable>
+        />
 
         <td
             v-if="props.levels.length < props.maxLevels"
