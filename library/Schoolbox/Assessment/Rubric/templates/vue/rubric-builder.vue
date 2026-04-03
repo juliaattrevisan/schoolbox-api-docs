@@ -124,22 +124,29 @@ const allRubricsSum = window.Vue.computed(() => {
  * Assuming the assessment uses the "Total Mark" mark type (should always update even if not as the mark type could change),
  * Keep the max mark input in sync with the rubric grid's max value
  */
-window.Vue.watch(allRubricsSum, (newValue) => {
-    if (rubricGrids.value.length === 0) {
-        return; // if there are no rubrics, we shouldn't override the max mark field
-    }
+window.Vue.watch(
+    () => [allRubricsSum, rubricGrids.value.length],
+    () => {
+        // TODO: ignore when {% if not courseManaged.isReadonly %} if needed (the old one did)
 
-    // TODO: ideally deal with this fully inside of vue instead
-    const maxMarkInput = document.getElementById("maxMark");
-    if (maxMarkInput instanceof HTMLInputElement) {
-        maxMarkInput.value = newValue.toString();
-    }
+        // TODO: ideally deal with this fully inside of vue instead
+        const maxMarkInputs: HTMLInputElement[] = [
+            document.getElementById("maxMark"),
+            document.getElementById("instructor-maxMark"),
+        ].filter((el) => el instanceof HTMLInputElement);
 
-    const instructorMaxMarkInput = document.getElementById("instructor-maxMark");
-    if (instructorMaxMarkInput instanceof HTMLInputElement) {
-        instructorMaxMarkInput.value = newValue.toString();
-    }
-});
+        const shouldOverrideMaxMark = rubricGrids.value.length > 0;
+        maxMarkInputs.forEach((input) => {
+            if (shouldOverrideMaxMark) {
+                input.setAttribute("readonly", "1");
+                input.value = allRubricsSum.value.toString();
+            } else {
+                input.removeAttribute("readonly");
+            }
+        });
+    },
+    { immediate: true },
+);
 
 /**
  * Listen for a rubric grid import event
