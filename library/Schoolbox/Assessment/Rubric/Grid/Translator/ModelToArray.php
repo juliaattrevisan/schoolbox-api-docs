@@ -37,6 +37,7 @@ class ModelToArray
         return [
             'id' => $rubricGrid->getId(),
             'title' => '(backend unimplemented)', // TODO: rubric title, string (not null)
+            'weight' => null, // TODO: rubric weight, number|null
             'levels' => $rubricGrid->getLevels()->map(fn(Level $level) => [
                 'id' => $level->getId(),
                 'name' => $level->getName(),

@@ -208,6 +208,7 @@ createRubric();
                     v-model:rubric-grid-levels="rubric.levels"
                     v-model:rubric-grid-capabilities="rubric.capabilities"
                     v-model:rubric-title="rubric.title"
+                    v-model:rubric-weight="rubric.weight"
                     :rubric-id="rubric.id"
                     :folder-id="props.folderId"
                     :max-levels="props.maxLevels"

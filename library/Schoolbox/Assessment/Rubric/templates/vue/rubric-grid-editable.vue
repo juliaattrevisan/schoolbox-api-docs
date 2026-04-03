@@ -28,6 +28,14 @@ const props = defineProps<Props>();
 const rubricGridLevels = defineModel<RubricGrid["levels"]>("rubricGridLevels", { required: true });
 const rubricGridCapabilities = defineModel<RubricGrid["capabilities"]>("rubricGridCapabilities", { required: true });
 const rubricTitle = defineModel<RubricGrid["title"]>("rubricTitle", { required: true });
+const rubricWeightModel = defineModel<RubricGrid["weight"]>("rubricWeight", { required: true });
+
+const rubricWeight = window.Vue.computed({
+    get: () => rubricWeightModel.value ?? "",
+    set: (val: number | "") => {
+        rubricWeightModel.value = val === "" ? null : val;
+    },
+});
 
 /**
  * Move a level left or right
@@ -300,6 +308,20 @@ window.Vue.onMounted(() => {
                     ?
                 </span>
                 <input v-model.lazy="rubricTitle" type="text" :name="`rubric-${rubricId}-title`" required />
+            </label>
+        </div>
+
+        <div class="small-12 columns">
+            <label>
+                Rubric Weighting
+                <span
+                    data-tooltip
+                    class="hint has-tip tip-top"
+                    :title="`This value indicates how much this rubric's scoring contributes to the ${locale.grades.singular()} for the ${locale.activity.singular()} - a value of 0 indicates this rubric has no impact on the ${locale.grades.singular()}. Generally, this is a number between0 and 100. To contribute to the student weighted average ${locale.grades.singular()} for the ${locale.class.singular()}, a value must be applied to the ${locale.activity.singular()} weighting.`"
+                >
+                    ?
+                </span>
+                <input v-model.number.lazy="rubricWeight" type="number" :name="`rubric-${rubricId}-weight`" />
             </label>
         </div>
     </div>
