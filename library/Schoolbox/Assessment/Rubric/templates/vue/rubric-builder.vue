@@ -17,6 +17,7 @@ import { RUBRIC_GRID_IMPORTED } from "./event";
 import { translateGridToFormPayload } from "./payload";
 import type { RubricGrid } from "./types";
 import RubricGridEditable from "./rubric-grid-editable.vue";
+import RbRubricFields from "./rb-rubric-fields.vue";
 import RbRubricDownload from "./rb-rubric-download.vue";
 
 interface Props {
@@ -204,11 +205,15 @@ createRubric();
 
             <!-- existing rubric content -->
             <template v-if="rubric.id !== 'create'" #content>
+                <rb-rubric-fields
+                    v-model:rubric-title="rubric.title"
+                    v-model:rubric-weight="rubric.weight"
+                    :rubric-id="rubric.id"
+                />
+
                 <rubric-grid-editable
                     v-model:rubric-grid-levels="rubric.levels"
                     v-model:rubric-grid-capabilities="rubric.capabilities"
-                    v-model:rubric-title="rubric.title"
-                    v-model:rubric-weight="rubric.weight"
                     :rubric-id="rubric.id"
                     :folder-id="props.folderId"
                     :max-levels="props.maxLevels"
