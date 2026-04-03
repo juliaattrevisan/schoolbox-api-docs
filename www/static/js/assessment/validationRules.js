@@ -80,13 +80,13 @@ $(document).ready(function () {
 });
 
 function initDynamicValidationTriggers() {
-    const moConfig = { attributes: false, childList: true, characterData: false };
+    // const moConfig = { attributes: false, childList: true, characterData: false };
 
     // watch for new added builder rows
-    var builderRowObserver = new MutationObserver(attachValidationRules);
-    $("#rubric-builder-container").each(function () {
-        builderRowObserver.observe(this, moConfig);
-    });
+    // var builderRowObserver = new MutationObserver(attachValidationRules);
+    // $("#rubric-builder-container").each(function () {
+    //     builderRowObserver.observe(this, moConfig);
+    // });
 
     if ($("[data-rubric-builder-row]").length) {
         // on change of mark range setting
@@ -105,16 +105,16 @@ function initDynamicValidationTriggers() {
         });
 
         // on change of number of levels
-        var levelObserver = new MutationObserver(attachValidationRules);
-        $("[data-rubric-grid-level]").each(function () {
-            levelObserver.observe(this, moConfig);
-        });
+        // var levelObserver = new MutationObserver(attachValidationRules);
+        // $("[data-rubric-grid-level]").each(function () {
+        //     levelObserver.observe(this, moConfig);
+        // });
 
-        // on change of number of indicators/capabilities
-        var indicatorObserver = new MutationObserver(attachValidationRules);
-        $("table[data-rubric] tbody").each(function () {
-            indicatorObserver.observe(this, moConfig);
-        });
+        // // on change of number of indicators/capabilities
+        // var indicatorObserver = new MutationObserver(attachValidationRules);
+        // $("table[data-rubric] tbody").each(function () {
+        //     indicatorObserver.observe(this, moConfig);
+        // });
 
         // on change of checked indicators
         $("[data-criterion-name]").on("change", function () {
