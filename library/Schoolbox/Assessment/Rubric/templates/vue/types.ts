@@ -8,9 +8,8 @@ export type RubricGrid = {
     useMarkRange: boolean;
     levels: RubricGridLevel[];
     capabilities: RubricGridCapability[];
-
-    // todo: capabilityMarkType
-    // todo: capabilityGradingScheme
+    capabilityMarkType: number | null;
+    capabilityGradeGroup: number | null;
 };
 
 export type RubricGridLevel = {

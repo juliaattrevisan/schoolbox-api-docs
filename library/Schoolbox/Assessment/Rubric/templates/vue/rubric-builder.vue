@@ -10,9 +10,11 @@
 
 import { cloneDeep } from "es-toolkit";
 import locale from "@js/terminology/rosettaStone";
-import { MARK_TYPE_VALUE_NONE } from "@schoolboxAssessment/Types/MarkType";
+import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
+import type { MarkType } from "@schoolboxAssessment/Types/MarkType";
 import FieldsetCollapsible from "@schoolboxVue/components/fieldset-collapsible.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
+import type { GradeScheme } from "@schoolboxLibrary/Learning/Assessment/templates/fragments/vue/mark-type.vue";
 import { RUBRIC_GRID_IMPORTED } from "./event";
 import type { RubricGrid } from "./types";
 import RbRubricFields from "./rb-rubric-fields.vue";
@@ -22,6 +24,9 @@ import RbRubricDownload from "./rb-rubric-download.vue";
 interface Props {
     rubricGridsPayload: RubricGrid[];
     rubricBlankGrid: RubricGrid;
+    capabilityMarkTypes: MarkType[];
+    capabilityGradingSchemes: GradeScheme[];
+    defaultGradeGroup: number;
     maxLevels: number;
     folderId: number;
     assessmentId: number | null;
@@ -31,34 +36,6 @@ interface Props {
 const props = defineProps<Props>();
 
 const rubricGrids = window.Vue.ref(cloneDeep(props.rubricGridsPayload)); // local mutable copy
-
-const capabilityMarkType = window.Vue.ref<number>(MARK_TYPE_VALUE_NONE);
-
-/**
- * Keep the capability mark type input (which is outside of vue's scope) in sync with the ref
- * TODO: ideally this would be fully handled in vue, but markType.twig is currently rendered via twig & jquery
- */
-function onCapabilityMarkTypeChange(this: HTMLSelectElement): void {
-    capabilityMarkType.value = parseInt(this.value, 10);
-}
-
-window.Vue.onMounted(() => {
-    // TODO: ideally deal with this fully inside of vue instead
-    const markTypeInput = document.getElementById("capability-markType");
-    if (!(markTypeInput instanceof HTMLSelectElement)) {
-        console.warn("Unable to find capability mark type input");
-        return;
-    }
-
-    onCapabilityMarkTypeChange.call(markTypeInput);
-    markTypeInput.addEventListener("change", onCapabilityMarkTypeChange);
-});
-
-window.Vue.onUnmounted(() => {
-    // clean up
-    const markTypeInput = document.getElementById("capability-markType");
-    markTypeInput?.removeEventListener("change", onCapabilityMarkTypeChange);
-});
 
 /**
  * Calculates the assessment's total weight from the rubric grids
@@ -213,6 +190,11 @@ const rubricRows = window.Vue.computed(() => {
                     v-model:rubric-title="rubric.title"
                     v-model:rubric-weight="rubric.weight"
                     v-model:rubric-use-mark-range="rubric.useMarkRange"
+                    v-model:rubric-capability-mark-type="rubric.capabilityMarkType"
+                    v-model:rubric-capability-grade-group="rubric.capabilityGradeGroup"
+                    :capability-mark-types="props.capabilityMarkTypes"
+                    :capability-grading-schemes="props.capabilityGradingSchemes"
+                    :default-grade-group="props.defaultGradeGroup"
                     :rubric-id="rubric.id"
                 />
 
@@ -222,7 +204,7 @@ const rubricRows = window.Vue.computed(() => {
                     :rubric="rubric"
                     :folder-id="props.folderId"
                     :max-levels="props.maxLevels"
-                    :capability-mark-type="capabilityMarkType"
+                    :capability-mark-type="rubric.capabilityMarkType ?? MarkTypeSlug.NONE"
                     :route-rubric-create="props.routeRubricCreate"
                 />
             </template>

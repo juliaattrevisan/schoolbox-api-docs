@@ -12,7 +12,7 @@ import { getLetterGrade } from "@js/util/sbx/markUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
 import type { LetterGradeItem } from "@schoolboxAssessment/Types/LetterGradeItem";
-import { MARK_TYPE_PERCENTAGE, MARK_TYPE_LETTER_GRADE } from "@schoolboxAssessment/Types/MarkType";
+import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import { getAttemptScore, getAttemptMaxScore } from "@schoolboxLearnosity/js/util/markingUtils";
 
 interface Props {
@@ -182,7 +182,7 @@ const currentScore = window.Vue.computed(() => {
  * @returns {string} - the current mark
  */
 const actualMark = window.Vue.computed(() => {
-    if (props.markData.type.slug === MARK_TYPE_PERCENTAGE) {
+    if (props.markData.type.slug === MarkTypeSlug.PERCENT) {
         const percentage = getPercentage(currentScore.value, props.student.attemptResponse.maxMarks as number);
         // percentage is returned from the back end with a space between the value and the %
         // so we need to set this up to match the format to compare the values for showAssignButton
@@ -190,7 +190,7 @@ const actualMark = window.Vue.computed(() => {
             percentage !== undefined ? `${percentage.substring(0, percentage.length - 1)} %` : "";
         return percentageWithSpace;
     }
-    if (props.markData.type.slug === MARK_TYPE_LETTER_GRADE) {
+    if (props.markData.type.slug === MarkTypeSlug.LETTER) {
         return getLetterGrade(
             currentScore.value,
             props.student.attemptResponse.maxMarks as number,

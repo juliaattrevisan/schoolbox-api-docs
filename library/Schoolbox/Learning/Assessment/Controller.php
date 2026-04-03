@@ -33,6 +33,8 @@ use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevel;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\File\MimetypeMapper;
@@ -627,7 +629,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 // TODO: for now, just one grid support, in the format of multiple
                 $rubricGridTranslator = new RubricGridTranslator();
                 $data['rubricGrids'] = [$rubricGrid];
-                $data['rubricGridsPayload'] = [$rubricGridTranslator($rubricGrid)];
+                $data['rubricGridsPayload'] = [$rubricGridTranslator($rubricGrid, $assessment)];
             }
         }
 
@@ -1111,6 +1113,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $parentFolderId = null;
         }
 
+        $markTypes = [];
+        foreach ($this->getAllMarkTypes($assessment) as $markTypeId => $markTypeName) {
+            $markTypes[] = [
+                'name' => $markTypeName,
+                'slug' => MarkType::idToSlug($markTypeId),
+            ];
+        }
+
         /* The usual info everything requires
          */
         $data = [
@@ -1126,10 +1136,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'allWorkTypes'             => $this->workTypeMapper->findAll(['order' => ['sequence' => 'asc']]),
 
             /* Capabilities happen to have the same mark types as its DueWork IAssessable container,
-             * so we don't need a different method than the existing getAllMarkTypes
-             */
-            'capabilityMarkTypes'      => $this->getAllMarkTypes($assessment),
-            'capabilityGradingSchemes' => $this->getAllGradeSchemes(),
+            * so we don't need a different method than the existing getAllMarkTypes
+            */
+            'capabilityMarkTypes'      => $markTypes,
+            'capabilityGradingSchemes' => $this->getAllGradeSchemes()->map(fn(GradeScheme $scheme) => [
+                'id' => $scheme->getId(),
+                'name' => $scheme->getName(),
+                'gradeLevels' => $scheme->getGradeLevels()->map(fn(GradeLevel $level) => [
+                    'lowerBound' => $level->getLowerBound(),
+                    'caption' => $level->getCaption(),
+                ])->reindex(),
+            ])->reindex(),
             'parentFolderId'           => $parentFolderId,
         ];
 

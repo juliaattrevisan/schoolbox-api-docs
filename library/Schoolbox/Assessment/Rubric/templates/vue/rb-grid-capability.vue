@@ -13,7 +13,7 @@
 import type { Ref } from "vue";
 import locale from "@js/terminology/rosettaStone";
 import { shiftArrayItem } from "@js/util/arrayUtils";
-import { MARK_TYPE_VALUE_NONE } from "@schoolboxAssessment/Types/MarkType";
+import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import RbGridIndicator from "./rb-grid-indicator.vue";
 import { MAX_CAPABILITY_LENGTH, MAX_INDICATOR_LENGTH } from "./types";
 import type { RubricGridCapability, RubricGridLevel } from "./types";
@@ -24,7 +24,7 @@ interface Props {
     totalColumns: number;
     isCreating: boolean;
     maxLevels: number;
-    capabilityMarkType: number;
+    capabilityMarkType: MarkTypeSlug;
     useMarkRange: boolean;
     canMovePrev: boolean;
     canMoveNext: boolean;
@@ -71,7 +71,7 @@ function onAddIndicatorKeydown(event: KeyboardEvent): void {
  */
 const showCapabilityMaxValue = window.Vue.computed(() => {
     const hasSelectedIndicators = indicators.value.some((indicator) => indicator.hasUsage);
-    return hasSelectedIndicators && props.capabilityMarkType !== MARK_TYPE_VALUE_NONE;
+    return hasSelectedIndicators && props.capabilityMarkType !== MarkTypeSlug.NONE;
 });
 
 /**

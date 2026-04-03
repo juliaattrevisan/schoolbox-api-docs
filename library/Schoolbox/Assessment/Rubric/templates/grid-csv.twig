@@ -112,6 +112,9 @@
             <rubric-builder
                 :rubric-grids-payload="{{ rubricGridsPayload|json_encode }}"
                 :rubric-blank-grid="{{ rubricBlankGrid|json_encode }}"
+                :capability-mark-types="{{ capabilityMarkTypes|json_encode }}"
+                :capability-grading-schemes="{{ capabilityGradingSchemes|json_encode }}"
+                :default-grade-group="{{ defaultGradeGroup }}"
                 :max-levels="{{ config.rubric_max_levels }}"
                 :folder-id="{{ folderId }}"
                 route-rubric-create="{{ routeLookup("rubric.create") }}"

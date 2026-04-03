@@ -107,26 +107,6 @@
     });
 </script>
 
-{# TODO: move this into the assessment #}
-<fieldset class="{% if not assessment.useRubric %}hide{% endif %}">
-    <legend>Rubric marking options</legend>
-
-    {% include '@learningAssessment/fragments/markType.twig' with {
-        context: 'capability',
-        assessment: assessment,
-        allMarkTypes: capabilityMarkTypes,
-        allGradeSchemes: capabilityGradingSchemes,
-        selectedMaxMark: assessment.maxMark ?? null,
-        selectedMarkType: assessment.capabilityMarkType.id ?? null,
-        selectedGradeGroup: assessment.capabilityGradeGroup.id ?? null,
-        defaultGradeGroup: defaultGradeGroup,
-        renderMaxMark: false,
-        markTypeLabel: locale.rubricGroup.proper ~ ' Mark Type',
-        courseManagedReadonly: courseManagedReadonly
-    } %}
-
-</fieldset>
-
 {% if courseManagedReadonly %}
     <div class="row">
         <div class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}">
@@ -157,7 +137,10 @@
                     rubricBlankGrid: rubricBlankGrid,
                     attachzone: rubricAttachZone,
                     folderId: assessment.context.folder.id,
-                    assessmentId: assessment.id ? assessment.id : null
+                    assessmentId: assessment.id ? assessment.id : null,
+                    capabilityMarkTypes: capabilityMarkTypes,
+                    capabilityGradingSchemes: capabilityGradingSchemes,
+                    defaultGradeGroup: defaultGradeGroup,
                 } only %}
             </div>
         </div>

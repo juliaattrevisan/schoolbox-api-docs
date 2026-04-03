@@ -4,7 +4,7 @@
 
 import { defineStore } from "pinia";
 import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
-import { MARK_TYPE_NONE } from "@schoolboxAssessment/Types/MarkType";
+import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 
 export const useStore = defineStore("quizFeedback", () => {
     const isReadOnly = window.Vue.ref<boolean>(false); // whether is in feedback mode, where the teacher can provide feedback to the student
@@ -14,7 +14,7 @@ export const useStore = defineStore("quizFeedback", () => {
     const hasMarkVisibility = window.Vue.ref<boolean>(false); // whether marks and feedback are visible to the user
     const statusPage = window.Vue.ref<string>(""); // the link to the status page
     const markData = window.Vue.ref<AssessmentMarkData>({
-        type: { name: "", slug: MARK_TYPE_NONE },
+        type: { name: "", slug: MarkTypeSlug.NONE },
         submissionStates: [],
     }); // the mark type data linked to the assessment
 

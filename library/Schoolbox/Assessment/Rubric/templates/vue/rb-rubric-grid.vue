@@ -8,6 +8,7 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import { assertUnreachable } from "@js/util/errorUtils";
 import locale from "@js/terminology/rosettaStone";
 import { shiftArrayItem } from "@js/util/arrayUtils";
+import type { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import RbGridLevel from "./rb-grid-level.vue";
 import RbGridCapability from "./rb-grid-capability.vue";
 import { RUBRIC_GRID_APPLY_RESULT_SET } from "./event";
@@ -20,7 +21,7 @@ interface Props {
     rubric: RubricGrid;
     folderId: number;
     maxLevels: number;
-    capabilityMarkType: number;
+    capabilityMarkType: MarkTypeSlug;
     routeRubricCreate: string;
 }
 const props = defineProps<Props>();

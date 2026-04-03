@@ -8,11 +8,7 @@ import { getPercentage } from "@js/util/mathUtils";
 import { getLetterGrade, getLowerBound } from "@js/util/sbx/markUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
-import {
-    MARK_TYPE_TOTAL_MARK,
-    MARK_TYPE_PERCENTAGE,
-    MARK_TYPE_LETTER_GRADE,
-} from "@schoolboxAssessment/Types/MarkType";
+import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import type { LetterGradeItem } from "@schoolboxAssessment/Types/LetterGradeItem";
 import { StudentItemMarkTypes } from "@schoolboxLearnosity/js/types/StudentItemMarkTypes";
 import { getAttemptScore, getAttemptMaxScore } from "@schoolboxLearnosity/js/util/markingUtils";
@@ -91,23 +87,23 @@ const mark = window.Vue.computed(() => {
         return props.student.attemptResponse.mark;
     }
     // If the mark override is a percentage, we want to show the percentage
-    if (hasMarkOverride.value && props.markData.type.slug === MARK_TYPE_PERCENTAGE) {
+    if (hasMarkOverride.value && props.markData.type.slug === MarkTypeSlug.PERCENT) {
         return props.student.attemptResponse.mark?.includes("%")
             ? props.student.attemptResponse.mark
             : `${props.student.attemptResponse.mark}%`;
     }
     // If the mark override is a total mark or letter, we want to just show the mark
     if (
-        (hasMarkOverride.value && props.markData.type.slug === MARK_TYPE_TOTAL_MARK) ||
-        (hasMarkOverride.value && props.markData.type.slug === MARK_TYPE_LETTER_GRADE)
+        (hasMarkOverride.value && props.markData.type.slug === MarkTypeSlug.TOTAL) ||
+        (hasMarkOverride.value && props.markData.type.slug === MarkTypeSlug.LETTER)
     ) {
         return props.student.attemptResponse.mark;
     }
     const score = `${totalScore.value}/${maxScore.value}`;
-    if (props.markData.type.slug === MARK_TYPE_PERCENTAGE) {
+    if (props.markData.type.slug === MarkTypeSlug.PERCENT) {
         return `${getPercentage(totalScore.value, maxScore.value)} (${score})`;
     }
-    if (props.markData.type.slug === MARK_TYPE_LETTER_GRADE) {
+    if (props.markData.type.slug === MarkTypeSlug.LETTER) {
         return `${getLetterGrade(totalScore.value, maxScore.value, props.markData.levels as LetterGradeItem[])} (${score})`;
     }
     return score;
@@ -123,12 +119,12 @@ const statusStyles = window.Vue.computed(() => {
         return `${getGradient(normaliseAs.value, 100)}-bg`;
     }
     // ensure the background colour reflects the overridden percentage mark
-    if (hasMarkOverride.value && props.markData.type.slug === MARK_TYPE_PERCENTAGE) {
+    if (hasMarkOverride.value && props.markData.type.slug === MarkTypeSlug.PERCENT) {
         const markAsNum = Number(props.student.attemptResponse.mark?.replace("%", ""));
         return `${getGradient(markAsNum, 100)}-bg`;
     }
     // ensure the background colour reflects the overridden letter grade mark
-    if (hasMarkOverride.value && props.markData.type.slug === MARK_TYPE_LETTER_GRADE) {
+    if (hasMarkOverride.value && props.markData.type.slug === MarkTypeSlug.LETTER) {
         const lowerBound = getLowerBound(
             props.student.attemptResponse.mark as string,
             props.markData.levels as LetterGradeItem[],

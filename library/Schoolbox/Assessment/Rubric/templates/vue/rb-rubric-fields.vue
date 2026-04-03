@@ -4,16 +4,28 @@
  */
 
 import locale from "@js/terminology/rosettaStone";
+import MarkTypeInput from "@schoolboxLibrary/Learning/Assessment/templates/fragments/vue/mark-type.vue";
+import type { GradeScheme } from "@schoolboxLibrary/Learning/Assessment/templates/fragments/vue/mark-type.vue";
+import type { MarkType, MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import type { RubricGrid } from "./types";
 
 interface Props {
     rubricId: RubricGrid["id"];
+    capabilityMarkTypes: MarkType[];
+    capabilityGradingSchemes: GradeScheme[];
+    defaultGradeGroup: number;
 }
 const props = defineProps<Props>();
 
 const rubricTitle = defineModel<RubricGrid["title"]>("rubricTitle", { required: true });
 const rubricWeightModel = defineModel<RubricGrid["weight"]>("rubricWeight", { required: true });
 const rubricUseMarkRange = defineModel<RubricGrid["useMarkRange"]>("rubricUseMarkRange", { required: true });
+const rubricCapabilityMarkType = defineModel<MarkTypeSlug | null>("rubricCapabilityMarkType", {
+    required: true,
+});
+const rubricCapabilityGradeGroup = defineModel<RubricGrid["capabilityGradeGroup"]>("rubricCapabilityGradeGroup", {
+    required: true,
+});
 
 const rubricWeight = window.Vue.computed({
     get: () => rubricWeightModel.value ?? "",
@@ -70,7 +82,17 @@ window.Vue.onMounted(() => {
         </div>
     </div>
 
-    <!-- TODO: capability mark type -->
+    <mark-type-input
+        v-model:selected-mark-type="rubricCapabilityMarkType"
+        v-model:selected-grade-group="rubricCapabilityGradeGroup"
+        :context="`rubric-${props.rubricId}-capability`"
+        :all-mark-types="props.capabilityMarkTypes"
+        :all-grade-schemes="props.capabilityGradingSchemes"
+        :default-grade-group="props.defaultGradeGroup"
+        :render-max-mark="false"
+        :course-managed-readonly="/* TODO */ false"
+        :mark-type-label="`${locale.rubricGroup.proper()} Mark Type`"
+    />
 
     <div class="row">
         <div class="small-12 columns">

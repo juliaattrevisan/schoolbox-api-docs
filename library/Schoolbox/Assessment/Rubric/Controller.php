@@ -313,7 +313,7 @@ class Controller extends BaseController
          * Otherwise you have to infer the settings from what might have been visible in the grid
          */
         $rubricGridTranslator = new RubricGridTranslator();
-        $rubricGridPayload = $rubricGridTranslator($assessment->getRubricGrid());
+        $rubricGridPayload = $rubricGridTranslator($assessment->getRubricGrid(), $assessment);
 
         $payload = [
 

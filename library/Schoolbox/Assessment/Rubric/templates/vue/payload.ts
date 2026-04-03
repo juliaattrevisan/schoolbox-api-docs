@@ -39,10 +39,7 @@ type RubricGridFormPayload = {
             points?: string;
         }[]
     >;
-    title: RubricGrid["title"];
-    weight: RubricGrid["weight"];
-    useMarkRange: RubricGrid["useMarkRange"];
-};
+} & Pick<RubricGrid, "title" | "weight" | "useMarkRange" | "capabilityMarkType" | "capabilityGradeGroup">;
 
 /**
  * Convert a RubricGrid into a RubricGridFormPayload
@@ -65,6 +62,8 @@ export function translateGridToFormPayload(grid: RubricGrid): RubricGridFormPayl
         title: grid.title,
         weight: grid.weight,
         useMarkRange: grid.useMarkRange,
+        capabilityMarkType: grid.capabilityMarkType,
+        capabilityGradeGroup: grid.capabilityGradeGroup,
     };
 
     for (const capability of grid.capabilities) {
