@@ -138,9 +138,10 @@ class SentryWrapper implements CacheInterface
      */
     public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
+        $keysList = iterator_to_array($keys);
         return $this->tracer->runWithinSpan(
-            fn () => $this->cache->getMultiple($keys, $default),
-            '',
+            fn () => $this->cache->getMultiple($keysList, $default),
+            $this->generateDescriptionForKeys($keysList),
             'cache.getMultiple',
             'auto.cache',
             $this->generateData(),
@@ -152,9 +153,10 @@ class SentryWrapper implements CacheInterface
      */
     public function setMultiple(iterable $values, DateInterval|int|null $ttl = null): bool
     {
+        $valuesList = iterator_to_array($values);
         return $this->tracer->runWithinSpan(
-            fn () => $this->cache->setMultiple($values, $ttl),
-            '',
+            fn () => $this->cache->setMultiple($valuesList, $ttl),
+            $this->generateDescriptionForKeys(array_keys($valuesList)),
             'cache.putMultiple',
             'auto.cache',
             $this->generateData(),
@@ -166,9 +168,10 @@ class SentryWrapper implements CacheInterface
      */
     public function deleteMultiple(iterable $keys): bool
     {
+        $keysList = iterator_to_array($keys);
         return $this->tracer->runWithinSpan(
             fn () => $this->cache->deleteMultiple($keys),
-            '',
+            $this->generateDescriptionForKeys($keysList),
             'cache.removeMultiple',
             'auto.cache',
             $this->generateData(),
@@ -233,7 +236,11 @@ class SentryWrapper implements CacheInterface
     private function convertDateIntervalToSeconds(DateInterval $interval): ?int
     {
         // Need to assume that if days, months, years or invert are set then
-        // a TTL can't be assumed
+        // a TTL can't be assumed:
+        // this is because the number of days in a month can only be guessed,
+        // as can the number of hours in a day (due to DST switchover).
+        // It'll be up to `$this->cache` to determine the actual TTL of the
+        // cache item.
         if ($interval->y || $interval->m || $interval->d || $interval->invert) {
             return null;
         }
@@ -259,6 +266,24 @@ class SentryWrapper implements CacheInterface
     private function generateDescription(string $key): string
     {
         return sprintf('%s:%s', $this->namespace, $key);
+    }
+
+    /**
+     * Generate a description from the cache's namespace, and a list of
+     * requested keys.
+     *
+     * @param array $keys
+     * @return string
+     */
+    private function generateDescriptionForKeys(array $keys): string
+    {
+        return implode(
+            ',',
+            array_map(
+                $this->generateDescription(...),
+                array_map(strval(...), $keys),
+            ),
+        );
     }
 
     /**
