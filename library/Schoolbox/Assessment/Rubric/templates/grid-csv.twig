@@ -144,7 +144,7 @@
             {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
         </div>
         {% if rubricGrid.assessment.id %}
-        <a href="{{ routeLookup('rubric.download') }}" class="icon-download button" id="dl-csv">Download Rubric as CSV</a>
+        <a href="{{ routeLookup('rubric.download') }}" class="button" id="dl-csv"><sbx-icon name="download"></sbx-icon>Download Rubric as CSV</a>
         {% endif %}
     </div>
     <div data-waiting-msg class="hide">

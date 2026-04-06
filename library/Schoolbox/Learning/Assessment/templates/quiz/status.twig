@@ -70,7 +70,7 @@
             <a class="icon-class-list" href="{{ routeLookup('learnosity.getHorizontalMarking', { assessmentId: assessment.id }) }}">Review horizontally</a>
         </li>
         <li>
-            <a class="icon-download" data-download="attempts" href="{{ routeLookup('learnosity.getExportAttempts', { assessmentId: assessment.id }) }}">Download All</a>
+            <a data-download="attempts" href="{{ routeLookup('learnosity.getExportAttempts', { assessmentId: assessment.id }) }}"><sbx-icon name="download"></sbx-icon>Download All</a>
         </li>
         <li class="separator">Bulk Actions</li>
         <li>

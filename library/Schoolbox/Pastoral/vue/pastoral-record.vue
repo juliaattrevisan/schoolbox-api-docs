@@ -121,12 +121,8 @@ window.Vue.onMounted((): void => {
                             </div>
                         </div>
                         <nav>
-                            <a
-                                :href="attachment.route"
-                                download
-                                rel="download"
-                                title="Download"
-                                class="icon-download"
+                            <a :href="attachment.route" download rel="download" title="Download"
+                                ><sbx-icon name="download"></sbx-icon
                             ></a>
                         </nav>
                     </li>

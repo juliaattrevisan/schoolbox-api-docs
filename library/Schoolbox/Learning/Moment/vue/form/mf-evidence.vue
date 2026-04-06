@@ -449,10 +449,11 @@ window.Vue.watch(
                         <nav>
                             <a
                                 v-if="evidence.storage._links.fetch"
-                                class="icon-download no-text"
+                                class="no-text"
                                 :href="evidence.storage._links.fetch"
                                 title="Download"
                                 download
+                                ><sbx-icon name="download"></sbx-icon
                             ></a>
                             <a
                                 class="no-text"

@@ -60,7 +60,9 @@ async function onFileClick(file: FileWithName, event: MouseEvent): Promise<void>
                 </div>
             </div>
             <nav>
-                <a :href="`${file.storage._links.fetch}&save=1`" title="Download" class="icon-download"></a>
+                <a :href="`${file.storage._links.fetch}&save=1`" title="Download"
+                    ><sbx-icon name="download"></sbx-icon
+                ></a>
             </nav>
         </li>
     </ul>

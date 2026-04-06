@@ -48,7 +48,7 @@
         {% endif %}
 
         {% if download %}
-            <li><a class="icon-download" data-mass="publish" data-reveal-id="mass-download">Download All</a></li>
+            <li><a data-mass="publish" data-reveal-id="mass-download"><sbx-icon name="download"></sbx-icon>Download All</a></li>
         {% endif %}
 
         {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessment.id, assessment: assessment}) %}

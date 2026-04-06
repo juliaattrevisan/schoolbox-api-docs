@@ -171,7 +171,7 @@
             {% if assessment is quiz %}
                 {% set exportRoute = routeLookupIfAuthorized('learnosity.getExportToJson', {assessment: assessment, assessmentId: assessment.id}) %}
                 <li>
-                    <a href="{{ exportRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}" class="icon-download" title="Download a file to reuse this quiz elsewhere">Export quiz as file</a>
+                    <a href="{{ exportRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}" title="Download a file to reuse this quiz elsewhere"><sbx-icon name="download"></sbx-icon>Export quiz as file</a>
                 </li>
             {% endif %}
             {% if viewCustomParticipationRoute %}

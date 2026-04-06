@@ -239,9 +239,9 @@ Data:
                                 : null
                             %}
                             {% if kamiExportRoute %}
-                                <a href="{{ kamiExportRoute }}" data-kami-export class="icon-download" title="Download annotated document"></a>
+                                <a href="{{ kamiExportRoute }}" data-kami-export title="Download annotated document"><sbx-icon name="download"></sbx-icon></a>
                             {% else %}
-                                <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1" class="icon-download" title="Download"></a>
+                                <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1" title="Download"><sbx-icon name="download"></sbx-icon></a>
                             {% endif %}
                         </nav>
                     </li>

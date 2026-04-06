@@ -23,10 +23,10 @@
     <li>
         <a href='{{ routeLookup('rubricMarkbook.getMarkbookExport', {folder: folder, folderId: folder.id} ) }}?{{ queryArgs }}'
             data-download-spreadsheet
-            class='icon-download'>Download Rubric Points</a>
+            ><sbx-icon name="download"></sbx-icon>Download Rubric Points</a>
     <li><a href='{{ routeLookup('rubricMarkbook.getMarkbookExport', {folder: folder, folderId: folder.id} ) }}?{{ queryArgs }}&descriptorsOnly=true'
             data-download-spreadsheet
-            class='icon-download'>Download Rubric Descriptors</a>
+            ><sbx-icon name="download"></sbx-icon>Download Rubric Descriptors</a>
 </ul>
 
 <div class="row">
