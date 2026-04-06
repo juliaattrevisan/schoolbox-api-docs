@@ -13,6 +13,7 @@ use Alaress\Redis;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Psr16Cache;
@@ -40,7 +41,23 @@ class CacheFunctionCallTest extends TestCase
 
             protected function buildCache(string $baseKey): CacheInterface
             {
-                $this->caches[$baseKey] ??= new Psr16Cache(new ArrayAdapter());
+                $this->caches[$baseKey] ??= new class (
+                    new ArrayAdapter(),
+                    $this->mustHit,
+                ) extends Psr16Cache {
+                    public function __construct(CacheItemPoolInterface $pool, private bool $mustHit)
+                    {
+                        parent::__construct($pool);
+                    }
+
+                    public function get($key, $default = null): mixed
+                    {
+                        if ($this->mustHit && !$this->has($key)) {
+                            throw new \OutOfBoundsException(sprintf('Key "%s" does not exist', $key));
+                        }
+                        return parent::get($key, $default);
+                    }
+                };
                 return $this->caches[$baseKey];
             }
 
