@@ -276,13 +276,13 @@ class Feed
                     //  - instructors - always included
                     //  - learners - always excluded
                     //  - parents of learners - included only if instructors
-                    //  - users of role type ‘staff’ - always included
+                    //  - users of role type 'staff' - included unless they are learners
                     //  - other users of any role type - included only if instructors
-                    if (
-                        !$access->isInstructor($this->user, $folder) &&
-                        !$this->user->getRole()->isStaff()
-                    ) {
-                        if ($access->isLearner($this->user, $row[''])) {
+                    if (!$access->isInstructor($this->user, $folder)) {
+                        if ($access->isLearner($this->user, $folder)) {
+                            continue (2); // Skip row.
+                        }
+                        if (!$this->user->getRole()->isStaff()) {
                             continue (2); // Skip row.
                         }
                     }
@@ -292,7 +292,7 @@ class Feed
                     //  - instructors - always included
                     //  - learners - always included
                     //  - parents of learners - included only if instructors or learners
-                    //  - users of role type ‘staff’ - always included
+                    //  - users of role type 'staff' - always included
                     //  - other users of any role type - included only if instructors or learners
                     if (
                         !$access->isInstructor($this->user, $folder) &&
@@ -307,7 +307,7 @@ class Feed
                     //  - Instructors - always included
                     //  - learners - always excluded
                     //  - parents of learners - included unless they are learners
-                    //  - users of role type ‘staff’ - included unless they are learners
+                    //  - users of role type 'staff' - included unless they are learners
                     //  - other users of any role type - included only if instructors
                     if (!$access->isInstructor($this->user, $folder)) {
                         if ($access->isLearner($this->user, $folder)) {
@@ -326,7 +326,7 @@ class Feed
                     //  - instructors - always included
                     //  - learners - always included
                     //  - parents of learners - always included
-                    //  - users of role type ‘staff’ - always included
+                    //  - users of role type 'staff' - always included
                     //  - other users of any role type - included only if instructors or learners
                     if (
                         !$access->isInstructor($this->user, $folder) &&

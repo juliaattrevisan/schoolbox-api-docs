@@ -24,7 +24,7 @@ class Mapper extends Schoolbox\Mapper
      *  - instructors - always included
      *  - learners - always excluded
      *  - parents of learners - included only if instructors
-     *  - users of role type ‘staff’ - always included
+     *  - users of role type 'staff' - included unless they are learners
      *  - other users of any role type - included only if instructors
      */
     public const string VISIBILITY_STAFF_INSTRUCTORS = 'staffAndInstructorsOnly';
@@ -33,7 +33,7 @@ class Mapper extends Schoolbox\Mapper
      *  - instructors - always included
      *  - learners - always included
      *  - parents of learners - included only if instructors or learners
-     *  - users of role type ‘staff’ - always included
+     *  - users of role type 'staff' - always included
      *  - other users of any role type - included only if instructors or learners
      */
     public const string VISIBILITY_STAFF_INSTRUCTORS_LEARNERS = 'staffAndInstructorsAndLearners';
@@ -42,7 +42,7 @@ class Mapper extends Schoolbox\Mapper
      *  - Instructors - always included
      *  - learners - always excluded
      *  - parents of learners - included unless they are learners
-     *  - users of role type ‘staff’ - included unless they are learners
+     *  - users of role type 'staff' - included unless they are learners
      *  - other users of any role type - included only if instructors
      */
     public const string VISIBILITY_STAFF_INSTRUCTORS_PARENTS = 'staffAndInstructorsAndParents';
@@ -51,7 +51,7 @@ class Mapper extends Schoolbox\Mapper
      *  - instructors - always included
      *  - learners - always included
      *  - parents of learners - always included
-     *  - users of role type ‘staff’ - always included
+     *  - users of role type 'staff' - always included
      *  - other users of any role type - included only if instructors or learners
      */
     public const string VISIBILITY_STAFF_INSTRUCTORS_LEARNERS_PARENTS = 'staffAndInstructorsAndLearnersAndParents';
