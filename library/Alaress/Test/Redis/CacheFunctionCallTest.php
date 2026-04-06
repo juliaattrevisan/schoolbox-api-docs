@@ -13,6 +13,9 @@ use Alaress\Redis;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 
 #[CoversMethod(Redis::class, 'cacheFunctionCall')]
 class CacheFunctionCallTest extends TestCase
@@ -28,11 +31,19 @@ class CacheFunctionCallTest extends TestCase
             $cachedValue,
             $uncompressedValue,
         ) extends Redis {
+            private array $caches = [];
             private array $cachedValues = [];
             private bool $mustHit = false;
             public function __construct(private ?string $cachedValue, private mixed $uncompressedValue)
             {
             }
+
+            protected function buildCache(string $baseKey): CacheInterface
+            {
+                $this->caches[$baseKey] ??= new Psr16Cache(new ArrayAdapter());
+                return $this->caches[$baseKey];
+            }
+
             protected function uncompressValue(string $value): string|false
             {
                 return $this->uncompressedValue ?? parent::uncompressValue($value);
