@@ -11,12 +11,9 @@
 namespace Alaress;
 
 use Alaress\CacheFactory\Factory;
-use Alaress\CacheFactory\SentryWrapper;
 use Alaress\Redis\AutoRefreshClient;
 use Predis;
 use Psr\SimpleCache\CacheInterface;
-use Symfony\Component\Cache\Adapter\RedisAdapter;
-use Symfony\Component\Cache\Psr16Cache;
 
 class Redis
 {
@@ -278,7 +275,6 @@ class Redis
         $cache        = $this->buildCache($base_key);
         $key          = $this->getKey($params);
         $cachedValue  = $cache->get($key);
-//        $cachedValue  = $this->fetchCachedValue($key);
 
         // Was a result returned? If so decode it
         if (!isset($cachedValue)) {
@@ -299,7 +295,6 @@ class Redis
         if ($requiresRecalculation || $requiresRecache) {
             $cachedValue = $this->encodeCalculatedValue($returnValue);
             $cache->set($key, $cachedValue, $timeout);
-//            $this->storeCachedValue($key, $cachedValue, $timeout);
         }
 
         return $returnValue;
@@ -314,21 +309,13 @@ class Redis
      * @param mixed    $params   A parameter to pass to $callback. This is also
      *                           used to generate the cache key.
      *
-     * @return int (The number of keys that were removed)
+     * @return int (The number of keys that were removed, will be 1 or 0)
      */
     public function dropKeyCache(string $base_key, mixed $params): int
     {
-//        $redis = $this->client;
         $cache = $this->buildCache($base_key);
         $key   = $this->getKey($params);
         return $cache->delete($key) ? 1 : 0;
-
-//        try {
-//            return $redis->del($key);
-//        } catch (Predis\PredisException $e) {
-//            trigger_error(sprintf('Redis exception: "%s"', $e->getMessage()), E_USER_WARNING);
-//        }
-//        return 0;
     }
 
     /**
@@ -341,28 +328,6 @@ class Redis
     private function getKey(mixed $params): string
     {
         return hash('sha256', serialize($params));
-    }
-
-    /**
-     * Build a common redis key for inserting and returning cached data
-     * If updating, will also have to update the format at:
-     * tools/redis/setExternalTTL.php::getLikeCacheKey
-     *
-     * @param string   $base_key The base of the key to store the result in.
-     * @param mixed    $params   A parameter to pass to $callback. This is also
-     *                           used to generate the cache key.
-     *
-     * @return string The redis key to either extract or insert data into redis
-     */
-    private function getRedisKey(string $base_key, mixed $params): string
-    {
-        return sprintf(
-            '%s:%s:%s:%s',
-            self::FUNCTION_CALL_CACHE_PREFIX,
-            $this->instanceId,
-            $base_key,
-            hash('sha256', serialize($params)),
-        );
     }
 
     /**
