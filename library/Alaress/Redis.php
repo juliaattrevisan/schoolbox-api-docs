@@ -14,6 +14,7 @@ use Alaress\CacheFactory\Factory;
 use Alaress\CacheFactory\SentryWrapper;
 use Alaress\Redis\AutoRefreshClient;
 use Predis;
+use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Psr16Cache;
 
@@ -274,9 +275,8 @@ class Redis
             return call_user_func($callback, $params);
         }
 
-        $cacheFactory = new Factory($this->client);
-        $cache        = $cacheFactory->build($base_key);
-        $key          = $this->getRedisKey($base_key, $params);
+        $cache        = $this->buildCache($base_key);
+        $key          = $this->getKey($params);
         $cachedValue  = $cache->get($key);
 //        $cachedValue  = $this->fetchCachedValue($key);
 
@@ -318,15 +318,29 @@ class Redis
      */
     public function dropKeyCache(string $base_key, mixed $params): int
     {
-        $redis = $this->client;
-        $key   = $this->getRedisKey($base_key, $params);
+//        $redis = $this->client;
+        $cache = $this->buildCache($base_key);
+        $key   = $this->getKey($params);
+        return $cache->delete($key) ? 1 : 0;
 
-        try {
-            return $redis->del($key);
-        } catch (Predis\PredisException $e) {
-            trigger_error(sprintf('Redis exception: "%s"', $e->getMessage()), E_USER_WARNING);
-        }
-        return 0;
+//        try {
+//            return $redis->del($key);
+//        } catch (Predis\PredisException $e) {
+//            trigger_error(sprintf('Redis exception: "%s"', $e->getMessage()), E_USER_WARNING);
+//        }
+//        return 0;
+    }
+
+    /**
+     * Build the cache key for inserting and returning cached data.
+     *
+     * @param mixed $params A parameter to pass to $callback. This is also used
+     *                      to generate the cache key.
+     * @return string
+     */
+    private function getKey(mixed $params): string
+    {
+        return hash('sha256', serialize($params));
     }
 
     /**
@@ -422,6 +436,18 @@ class Redis
             $cachedValue = self::COMPRESSED_PAYLOAD_PREFIX . $cachedValue;
         }
         return $cachedValue;
+    }
+
+    /**
+     * Build a cache for the given key.
+     *
+     * @param string $baseKey
+     * @return CacheInterface
+     */
+    protected function buildCache(string $baseKey): CacheInterface
+    {
+        $cacheFactory = new Factory($this->client);
+        return $cacheFactory->build($baseKey);
     }
 
     /**
