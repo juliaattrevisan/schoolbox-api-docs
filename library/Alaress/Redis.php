@@ -10,8 +10,12 @@
 
 namespace Alaress;
 
+use Alaress\CacheFactory\Factory;
+use Alaress\CacheFactory\SentryWrapper;
 use Alaress\Redis\AutoRefreshClient;
 use Predis;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 
 class Redis
 {
@@ -270,8 +274,11 @@ class Redis
             return call_user_func($callback, $params);
         }
 
-        $key         = $this->getRedisKey($base_key, $params);
-        $cachedValue = $this->fetchCachedValue($key);
+        $cacheFactory = new Factory($this->client);
+        $cache        = $cacheFactory->build($base_key);
+        $key          = $this->getRedisKey($base_key, $params);
+        $cachedValue  = $cache->get($key);
+//        $cachedValue  = $this->fetchCachedValue($key);
 
         // Was a result returned? If so decode it
         if (!isset($cachedValue)) {
@@ -291,7 +298,8 @@ class Redis
         // fetched result was not compressed
         if ($requiresRecalculation || $requiresRecache) {
             $cachedValue = $this->encodeCalculatedValue($returnValue);
-            $this->storeCachedValue($key, $cachedValue, $timeout);
+            $cache->set($key, $cachedValue, $timeout);
+//            $this->storeCachedValue($key, $cachedValue, $timeout);
         }
 
         return $returnValue;
