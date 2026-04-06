@@ -214,7 +214,12 @@ const rubricRows = window.Vue.computed(() => {
             <!-- create a new rubric -->
             <template v-else #content>
                 <div class="l-flex-row l-flex--justify l-gap-xs">
-                    <button class="button l-flex__item--1 icon-modify" type="button" @click="createRubric">
+                    <button
+                        class="button l-flex__item--1 icon-modify"
+                        type="button"
+                        data-test="rubric-create-manually"
+                        @click="createRubric"
+                    >
                         Create manually
                     </button>
                     <!-- TODO -->
@@ -245,7 +250,9 @@ const rubricRows = window.Vue.computed(() => {
 
     <div v-if="!showRubricCreate" class="row">
         <div class="column small-12">
-            <button class="button" type="button" @click="showRubricCreate = true">Add a rubric</button>
+            <button class="button" type="button" data-test="rubric-create" @click="showRubricCreate = true">
+                Add a rubric
+            </button>
         </div>
     </div>
 
