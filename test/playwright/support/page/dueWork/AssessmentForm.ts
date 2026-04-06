@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import Common from "@schoolboxTest/playwright/support/page/Common";
 import type DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelper";
@@ -53,6 +53,8 @@ export default class AssessmentForm {
     static readonly DATA_TEST_RUBRIC_CREATE = "rubric-create";
 
     static readonly DATA_TEST_RUBRIC_CREATE_MANUALLY = "rubric-create-manually";
+
+    static readonly DATA_TEST_RUBRIC_GRID = "rubric-grid"; // Append "-[rubricId]"
 
     static readonly DATA_TEST_RUBRIC_SPAWN_LEVEL = "rubric-spawn-level";
 
@@ -432,6 +434,15 @@ export default class AssessmentForm {
      */
     async clickCreateRubricManually(): Promise<void> {
         await this.page.getByTestId(AssessmentForm.DATA_TEST_RUBRIC_CREATE_MANUALLY).click();
+    }
+
+    /**
+     * Locate a specific rubric grid by its ID
+     * @param rubricId - The rubric ID to locate, new unsaved rubrics will have negative IDs starting from -1
+     * @returns the locator for the grid which can be used for further narrowing
+     */
+    locateGrid(rubricId: number): Locator {
+        return this.page.getByTestId(`${AssessmentForm.DATA_TEST_RUBRIC_GRID}-${rubricId}`);
     }
 
     /**

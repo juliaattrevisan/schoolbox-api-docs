@@ -309,7 +309,7 @@ window.Vue.watch(formValue, () => {
 
     <h3 class="subheader show-for-medium-down">Levels</h3>
     <div class="scrollable">
-        <table class="rb stack-for-medium-down" data-rubric>
+        <table class="rb stack-for-medium-down" data-rubric :data-test="`rubric-grid-${rubric.id}`">
             <thead>
                 <tr>
                     <th class="rb-no-cell">
