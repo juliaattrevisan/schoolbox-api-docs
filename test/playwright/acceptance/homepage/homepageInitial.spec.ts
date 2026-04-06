@@ -73,7 +73,7 @@ test.describe("Homepage Initial Tests", () => {
 
         tester.isGoingTo("navigate to the resources page and check the new homepage folder is presented");
         await createFolder.gotoResources();
-        await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`)).toBeVisible();
+        await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`).first()).toBeVisible();
     });
 
     /**
@@ -87,7 +87,7 @@ test.describe("Homepage Initial Tests", () => {
         const homepage = new Homepage(tester, page);
         tester.isGoingTo("navigate to the Test Homepage via resources browser");
         await createFolder.gotoResources();
-        await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`)).toBeVisible();
+        await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`).first()).toBeVisible();
         await resources.clickFolderName(folderName);
         await resources.clickMenuItem("home");
         await page.waitForTimeout(2000);
@@ -121,7 +121,7 @@ test.describe("Homepage Initial Tests", () => {
         const textbox = new TextboxForm(tester, page);
         tester.isGoingTo("Navigate to the Test Homepage via resources browser");
         await createFolder.gotoResources();
-        await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`)).toBeVisible();
+        await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`).first()).toBeVisible();
         await resources.clickFolderName(folderName);
         await resources.clickMenuItem("home");
         await page.waitForTimeout(2000);
@@ -190,7 +190,7 @@ test.describe("Homepage Initial Tests", () => {
         tester.isGoingTo("Navigate to the Test Homepage via resources browser");
         await tester.impersonateViaUserProfilePage(student);
         await createFolder.gotoResources();
-        await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`)).toBeVisible();
+        await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`).first()).toBeVisible();
         await resources.clickFolderName(folderName);
         await resources.clickMenuItem("home");
         await page.waitForTimeout(2000);
@@ -217,7 +217,7 @@ test.describe("Homepage Initial Tests", () => {
         const homepage = new Homepage(tester, page);
         tester.isGoingTo("Navigate to the Test Homepage via resources browser");
         await createFolder.gotoResources();
-        await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`)).toBeVisible();
+        await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`).first()).toBeVisible();
         await resources.clickFolderName(folderName);
         await resources.clickMenuItem("home");
         await page.waitForTimeout(2000);
@@ -256,13 +256,13 @@ test.describe("Homepage Initial Tests", () => {
             "Navigate to the Test Homepage via resources browser, click delete homepage but not confirm it",
         );
         await createFolder.gotoResources();
-        await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`)).toBeVisible();
+        await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`).first()).toBeVisible();
         await resources.clickFolderName(folderName);
         await resources.clickMenuItem("delete");
         await resources.clickModalCancelButton();
         await page.waitForTimeout(2000);
         await page.reload();
-        await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`)).toBeVisible();
+        await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`).first()).toBeVisible();
     });
 
     /**
@@ -275,13 +275,13 @@ test.describe("Homepage Initial Tests", () => {
         const resources = new Resources(page);
         tester.isGoingTo("Navigate to the Test Homepage via resources browser and delete the homepage");
         await createFolder.gotoResources();
-        await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`)).toBeVisible();
+        await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`).first()).toBeVisible();
         await resources.clickFolderName(folderName);
         await resources.clickMenuItem("delete");
         await resources.clickModalDeleteButton();
         await page.waitForTimeout(2000);
         await page.reload();
-        await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`)).not.toBeVisible();
+        await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`).first()).not.toBeVisible();
     });
 
     /**

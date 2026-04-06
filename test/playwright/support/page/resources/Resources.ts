@@ -52,6 +52,7 @@ export default class Resources {
         await this.page
             .locator(`${Resources.RESOURCE_BROWSER} a.jstree-anchor`)
             .filter({ hasText: folderName })
+            .first()
             .click();
         await expect(this.page.locator(`${Resources.RESOURCE_BROWSER} .meta-preview h3`)).toContainText(folderName);
     }
@@ -62,7 +63,7 @@ export default class Resources {
      * @param menuItem - The menu item to click
      */
     async clickMenuItem(menuItem: string): Promise<void> {
-        await this.page.locator(`${Resources.RESOURCE_BROWSER} #meta a.icon-${menuItem}`).click();
+        await this.page.locator(`${Resources.RESOURCE_BROWSER} #meta a:has(sbx-icon[name='${menuItem}'])`).click();
     }
 
     /**
