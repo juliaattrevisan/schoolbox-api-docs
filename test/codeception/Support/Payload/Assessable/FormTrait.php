@@ -67,13 +67,6 @@ trait FormTrait
             $this->setFormParam('instructor-gradingScheme', 1);
         }
         $this->setFormParam('resultset', '');
-        // 6 - none
-        $this->setFormParam('capability-markType', 6);
-        $this->setFormParam('capability-gradingScheme', 1);
-
-        foreach ([0, 1] as $index) {
-            $this->setRubricLevel($index, null, '');
-        }
 
         $this->setFormParam('curriculumCodes', '');
     }
@@ -95,7 +88,25 @@ trait FormTrait
             return json_decode($value, true, 512, JSON_THROW_ON_ERROR);
         }
 
-        return null;
+        // no rubric yet, add one and populate it with defaults
+        // TODO: this will change again when testing multiple rubrics
+        $this->setRubricFormParam([
+            'level' => [],
+            'group' => [],
+            'criterion' => [],
+            'descriptor' => [],
+            'title' => '',
+            'weight' => null,
+            'useMarkRange' => false,
+            'capabilityMarkType' => 6,
+            'capabilityGradeGroup' => 1,
+        ]);
+
+        foreach ([0, 1] as $index) {
+            $this->setRubricLevel($index, null, '');
+        }
+
+        return $this->getRubricFormParam();
     }
 
     private function setRubricFormParam(array $rubricData): void
@@ -106,19 +117,46 @@ trait FormTrait
 
     public function setRubricCapability(int $index, ?int $id, string $name, ?int $maxMark): void
     {
-        $rubricData = $this->getRubricFormParam() ?? [];
+        $rubricData = $this->getRubricFormParam();
 
         $rubricData['group'][$index]['maxValue'] = $maxMark === null ? '' : (string)$maxMark;
         $rubricData['group'][$index]['id'] = $id === null ? '' : (string)$id;
         $rubricData['group'][$index]['name'] = $name;
 
         $this->setRubricFormParam($rubricData);
+    }
 
+    public function setRubricTitle(string $title): void
+    {
+        $rubricData = $this->getRubricFormParam();
+        $rubricData['title'] = $title;
+        $this->setRubricFormParam($rubricData);
+    }
+
+    public function setRubricWeight(?float $weight): void
+    {
+        $rubricData = $this->getRubricFormParam();
+        $rubricData['weight'] = $weight;
+        $this->setRubricFormParam($rubricData);
+    }
+
+    public function setRubricCapabilityMarkType(?int $markTypeId): void
+    {
+        $rubricData = $this->getRubricFormParam();
+        $rubricData['capabilityMarkType'] = $markTypeId;
+        $this->setRubricFormParam($rubricData);
+    }
+
+    public function setRubricCapabilityGradeGroup(?int $gradeGroupId): void
+    {
+        $rubricData = $this->getRubricFormParam();
+        $rubricData['capabilityGradeGroup'] = $gradeGroupId;
+        $this->setRubricFormParam($rubricData);
     }
 
     public function setRubricIndicator(int $indicatorId, int $capabilityId, string $name, bool $enabled): void
     {
-        $rubricData = $this->getRubricFormParam() ?? [];
+        $rubricData = $this->getRubricFormParam();
 
         $rubricData['criterion'][$indicatorId]['id'] = $indicatorId;
         $rubricData['criterion'][$indicatorId]['groupId'] = $capabilityId;
@@ -135,7 +173,7 @@ trait FormTrait
 
     public function setRubricLevel(int $index, ?int $id, string $name): void
     {
-        $rubricData = $this->getRubricFormParam() ?? [];
+        $rubricData = $this->getRubricFormParam();
 
         $rubricData['level'][$index]['id'] = $id === null ? '' : (string)$id;
         $rubricData['level'][$index]['name'] = $name;
@@ -150,7 +188,7 @@ trait FormTrait
         string $descriptorText,
         ?float $descriptorPoints
     ): void {
-        $rubricData = $this->getRubricFormParam() ?? [];
+        $rubricData = $this->getRubricFormParam();
 
         $rubricData['descriptor'][$indicatorId][$levelIndex]['id'] = $descriptorId === null ? '' : (string)$descriptorId;
         $rubricData['descriptor'][$indicatorId][$levelIndex]['text'] = $descriptorText;

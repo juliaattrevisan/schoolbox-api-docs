@@ -825,11 +825,6 @@ HELP;
              */
             $weight = '';
 
-            /* Rubric capability mark settings
-             */
-            $capabilityMarkType = (string)MarkType::TYPE_NONE;
-            $capabilityGradingScheme = '1'; // "Standard"
-
             /* Enforce feedbacks at midnight (no times specified)
              */
             $modified = sprintf('%s  00:00:00', trim($row[12]));
@@ -923,11 +918,6 @@ HELP;
                         'gradingScheme' => $gradingScheme,
                         'instructor-gradingScheme' => $gradingScheme,
                         'visibility' => SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT,
-                        /* Get past rubric foreign key shenanigans
-                         */
-                        'useRubric' => false,
-                        'capability-markType' => $capabilityMarkType,
-                        'capability-gradingScheme' => $capabilityGradingScheme
                     ];
 
                     /* Make it then save it

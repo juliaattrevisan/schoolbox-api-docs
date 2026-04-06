@@ -13,6 +13,7 @@ use Alaress\Json\Decorator\LinkDecorator;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use UnexpectedValueException;
 use Schoolbox\Assessment\Rubric\DataModel\Capability;
@@ -411,6 +412,18 @@ class Controller extends BaseController
     public function determineMarkInvalidation(): void
     {
         $post         = $this->requestPost->get('rubric');
+        $response = [
+            'compatible'    => true,
+            'affectedUsers' => [],
+        ];
+
+        // TODO: no rubric data? always compatible?
+        if (null === $post) {
+            $this->response = $this->responseAsJson($response)->withStatus(200);
+            return;
+        }
+
+        // TODO: multi-rubrics support
         $assessmentId = key($post);
 
 
@@ -435,9 +448,15 @@ class Controller extends BaseController
         // Need to load them separately due to object references: if I use the
         // same assessment in both retrieveGrid calls the current grid thinks
         // the current assessment state is the same as the proposed state.
-        $proposedAssessment = (clone $currentAssessment)
-            ->setCapabilityMarkType($this->markTypeMapper->createModel()->setId((int)($this->requestPost['capability-markType'] ?? '')))
-            ->setUseMarkRange($this->requestPost->getBool('useMarkRange', false)); // TODO: useMarkRange should be against a rubric
+        $proposedAssessment = (clone $currentAssessment);
+
+        // TODO: capabilityMarkType & useMarkRange come from the rubric data itself now, they shouldn't be against the assessment anymore
+        $capabilityMarkTypeId = (int)($post[$assessmentId]['capabilityMarkType'] ?? MarkType::TYPE_NONE);
+        $useMarkRange = $post[$assessmentId]['useMarkRange'] ?? false;
+
+        $proposedAssessment->setCapabilityMarkType($this->markTypeMapper->createModel()->setId($capabilityMarkTypeId));
+        $proposedAssessment->setUseMarkRange($useMarkRange);
+
         $proposedGrid = (new GridFactory())->buildFromPostData(
             $this->mapper->retrieveGrid($proposedAssessment, false),
             $post,
@@ -447,10 +466,6 @@ class Controller extends BaseController
 
         // Is the proposed grid itself not valid?
         // Doesn't matter for the purpose of this exercise
-        $response = [
-            'compatible'    => true,
-            'affectedUsers' => [],
-        ];
         if (!$proposedGrid->isCompatibleWith($currentGrid)) {
             $response['compatible'] = false;
             $jsonDecorator = new PropertyDecorator();

@@ -22,18 +22,14 @@ class CreateCapability extends Request
     /**
      * @param int    $folderId
      * @param int    $assessmentId
-     * @param int    $capabilityIndex
      * @param string $capabilityName
      * @param int    $levelCount
-     * @param bool   $markPerCap
      */
     public function __construct(
         int $folderId,
         int $assessmentId,
-        int $capabilityIndex,
         string $capabilityName,
-        int $levelCount,
-        bool $markPerCap
+        int $levelCount
     ) {
         $this->setReferer(
             $assessmentId
@@ -41,14 +37,13 @@ class CreateCapability extends Request
                 : "/learning/folders/{$folderId}/assessments/new?type=dueWork"
         );
 
-        $this->setFormParam('type', 'group');
-        $this->setFormParam('rubricId', $assessmentId);
-        $this->setFormParam('groupId', '');
-        $this->setFormParam('groupIndex', $capabilityIndex);
+        $this->setFormParam('type', 'capability');
         $this->setFormParam('name', $capabilityName);
-        $this->setFormParam('levelCount', $levelCount);
         $this->setFormParam('folderId', $folderId);
-        $this->setFormParam('markPerCapability', $markPerCap);
+        $this->setFormParam('rubricId', $assessmentId);
+        $this->setFormParam('levelCount', $levelCount);
+        $this->setFormParam('capabilityId', null);
+        $this->setFormParam('capabilityName', null);
     }
 
     /** @inheritDoc */

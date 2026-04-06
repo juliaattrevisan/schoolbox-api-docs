@@ -634,8 +634,8 @@ class AssessmentOnGroupCest
         $indicatorNameSuffixes            = ['1', '2', '3'];
         $levelNameSuffixes                = ['A', 'B', 'C'];
 
-        $assessmentPayload->setFormParam('capability-markType', '1');
-        $assessmentPayload->setFormParam('capability-gradingScheme', '1');
+        $assessmentPayload->setRubricCapabilityMarkType(1);
+        $assessmentPayload->setRubricCapabilityGradeGroup(1);
         $assessmentPayload->setFormParam('maxMark', '12');
 
         // Set rubric levels
@@ -649,10 +649,8 @@ class AssessmentOnGroupCest
             $createCapabilityRequest = new CreateCapability(
                 $folder_id,
                 $assessmentId,
-                $capIndex + 1,
                 $capabilityName,
-                count($levelNameSuffixes),
-                false
+                \count($levelNameSuffixes)
             );
             $i->amGoingTo("send request to create capability, '$capabilityName'");
             $i->sendRequest($createCapabilityRequest);
@@ -667,20 +665,17 @@ class AssessmentOnGroupCest
                     $folder_id,
                     $assessmentId,
                     null,
-                    $capIndex + 1,
                     $indicatorName,
-                    count($levelNameSuffixes),
-                    false,
+                    \count($levelNameSuffixes),
                     $capabilityName
                 );
                 $i->amGoingTo("send request to create a indicator, '$indicatorName' in capability, '$capabilityName'");
                 $i->sendRequest($createIndicatorRequest);
                 $i->seeResponseCodeIs(200);
 
-                preg_match($patternCapabilityAndIndicatorIds, $i->grabResponse(), $matches);
-                $capabilityId = (int)$matches[2];
-                $indicatorId = (int)$matches[1];
-                unset($matches);
+                $indicatorResponse = json_decode($i->grabResponse(), true);
+                $capabilityId = $indicatorResponse['capabilityId'];
+                $indicatorId = $indicatorResponse['indicator']['id'];
 
                 $assessmentPayload->setRubricCapability($capIndex, $capabilityId, $capabilityName, 4);
                 $assessmentPayload->setRubricIndicator($indicatorId, $capabilityId, $indicatorName, true);

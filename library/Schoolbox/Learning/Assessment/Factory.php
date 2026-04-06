@@ -287,9 +287,6 @@ class Factory
 
         $this->setEnablePolicy(trim($post['enablePolicy'] ?? '') === 'on');
 
-        $this->setCapabilityMarkType((int)trim($post['capability-markType'] ?? ''));
-        $this->setCapabilityGradeGroup((int)trim($post['capability-gradingScheme'] ?? ''));
-
         // Only due works have a max mark.
         if (in_array($assessmentType, [AssessmentType::TYPE_DUE_WORK, AssessmentType::TYPE_REPORTING])) {
             // MaxMark is the maximum available marks for the entire assessment.
@@ -346,7 +343,10 @@ class Factory
          */
         // TODO what should this be?
         $this->setUseRubric(false);
-        $this->setUseMarkRange(false); // TODO TEMP: useMarkRange should be against the rubric
+        // TODO TEMP: useMarkRange/capabilityMarkType/capabilityGradingScheme should be against the rubric, but need defaults
+        $this->setUseMarkRange(false);
+        $this->setCapabilityMarkType(MarkType::TYPE_NONE);
+        $this->setCapabilityGradeGroup(null);
         if (isset($post['rubric'])) {
             $rubrics = [];
             foreach ($post['rubric'] as $rubricId => $rubricData) {
@@ -358,8 +358,11 @@ class Factory
                 $this->setUseRubric(true);
                 $this->setRubricData($rubrics);
 
-                // TODO TEMP: useMarkRange should be against the rubric
-                $this->setUseMarkRange($rubrics[array_key_first($rubrics)]['useMarkRange'] ?? false);
+                // TODO TEMP: useMarkRange/capabilityMarkType/capabilityGradingscheme should be against the rubric
+                $firstRubricData = $rubrics[array_key_first($rubrics)];
+                $this->setUseMarkRange($firstRubricData['useMarkRange']);
+                $this->setCapabilityMarkType($firstRubricData['capabilityMarkType']);
+                $this->setCapabilityGradeGroup($firstRubricData['capabilityGradingScheme']);
             }
         }
 
