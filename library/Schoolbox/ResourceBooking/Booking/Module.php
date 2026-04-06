@@ -26,6 +26,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
+use Schoolbox\ResourceBooking\Booking\Util\ResponseHelper as BookingResponseHelper;
 
 class Module extends BaseModule
 {
@@ -172,7 +173,7 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return (new Controller())
+        return (new Controller(new BookingResponseHelper()))
             ->setEventMapper($this->getMapperFactory()->get(Calendar\EventMapper::class))
             ->setEventRecurrenceMapper(new Calendar\EventRecurrenceMapper($this->getMapperFactory()->get(Calendar\EventMapper::class)))
             ->setBookingMapper($this->getMapperFactory()->get(Mapper::class))

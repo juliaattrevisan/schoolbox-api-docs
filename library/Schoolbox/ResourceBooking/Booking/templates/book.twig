@@ -2,20 +2,6 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/jquery-validation/dist/additional-methods.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
-/**
- * Convert a data structure returned by ResourceBooking/Booking/Validation->validateBookingFromPostData() into a string.
- * TODO: Improve this so the returned string is more understandable by humans.
- */
-function convertErrorsDataStructureToString(errorsByDateByKey) {
-    let allErrorStrings = [];
-    for (const [key, errorsByDate] of Object.entries(errorsByDateByKey)) {
-        for (const [date, errors] of Object.entries(errorsByDate)) {
-            allErrorStrings = allErrorStrings.concat(errors);
-        }
-    }
-    return allErrorStrings.join(', ');
-}
-
 $(function() {
     // A global variable
     let dayjsFormat = dateDisplayFormats.dayjs;
@@ -29,7 +15,9 @@ $(function() {
     // Have some sort of helper for creating remote validations.
     let getValidatorRemoteMethod = function(code, key) {
         return function(value, element) {
-            let errorsByDate = (errors[key || element.name] || {}); // This will be an object containing dates as keys, arrays as values.
+            // Variable 'errors' is set in the ajaxFail() method.  It is the server's response
+            // to the form submission - an object containing dates as keys, arrays as values.
+            let errorsByDate = (errors[key || element.name] || {});
             let errorsArrays = Object.values(errorsByDate);
 
             // Search for code in all the errorStrings arrays.
@@ -171,25 +159,29 @@ $(function() {
                 }
             } else {
                 // Get the time of the first booking, direct to that date
-                var dateQuery = '';
+                let dateQuery = '';
                 try {
                     var date = dayjs(data.item[0].event.start);
                     dateQuery += '?date='+date.format('DD-MM-YYYY');
                 } catch (e) {
                     // noop
                 }
-                window.location.href = $('#resource-booking-back').attr('href')+dateQuery;
+
+                let redirectUrl = $('#resource-booking-back').attr('href') + dateQuery;
+                if (typeof data.message === 'string' && data.message.trim() !== '') {
+                    redirectUrl += (dateQuery === '' ? '?' : '&') + 'calendarToast=' + encodeURIComponent(data.message.trim());
+                }
+                window.location.href = redirectUrl;
             }
         };
         var ajaxFail = function (jqXHR) {
             const toast = window.sbProps.toastActivate();
-            let errorMsg = null;
             if (jqXHR?.responseJSON?.errors) {
-                errorMsg = convertErrorsDataStructureToString(jqXHR?.responseJSON?.errors);
-            } else if (jqXHR?.responseJSON?.message) {
-                errorMsg = jqXHR?.responseJSON?.message;
+                errors = jqXHR?.responseJSON?.errors; // IMPORTANT: This variable is used by the jQuery validate code above.  See getValidatorRemoteMethod().
+            } else {
+                errors = {}; // Reset errors since no errors were found in responseJSON.
             }
-            toast.timeout({ text: errorMsg || "Unable to update booking", isSuccess: false });
+            toast.timeout({ text: "Unable to update booking", isSuccess: false });
             form.valid()
         };
 

@@ -81,7 +81,7 @@ class CalendarCest
 
         #THEN
         $i->seeResponseCodeIs(302);
-        $location = '/calendar';
+        $location = '/calendar?calendarToast=Created+one+event+with+no+bookings';
         $i->seeHttpHeader('location', $location);
     }
 
@@ -110,7 +110,7 @@ class CalendarCest
 
         #THEN
         $i->seeResponseCodeIs(302);
-        $location = '/calendar';
+        $location = '/calendar?calendarToast=Created+one+event+with+no+bookings';
         $i->seeHttpHeader('location', $location);
     }
 
@@ -142,7 +142,7 @@ class CalendarCest
 
         #THEN
         $i->seeResponseCodeIs(302);
-        $location = '/calendar';
+        $location = '/calendar?calendarToast=Created+one+event+with+no+bookings';
         $i->seeHttpHeader('location', $location);
     }
 

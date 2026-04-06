@@ -2,7 +2,6 @@
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
-import type { Toast } from "@schoolboxVue/components/toast/sbxToastTypes";
 import type { Booking, Resource } from "./resourceBookingTypes";
 import { EFFICACY_SELF, EFFICACY_SERIES } from "./eventTypes";
 
@@ -24,9 +23,8 @@ const props = defineProps<Props>();
  * This defines the server response to an ENDPOINTS.addBookings request.
  */
 type AddBookingsToEventResponse = {
-    nBookingsCreatedPending: number;
-    nBookingsCreatedApproved: number;
-    nBookingsCreatedRejected: number;
+    message: string;
+    isSuccess: boolean;
 };
 
 const isModalOpen = window.Vue.ref<boolean>(false);
@@ -73,42 +71,6 @@ defineExpose({
 });
 
 /**
- * @param toast The toast to update
- * @param responseData The server's response to an 'addBookings' request.
- */
-function updateToastAndRefreshPage(toast: Toast, responseData: AddBookingsToEventResponse): void {
-    const nBookingsCreated =
-        responseData.nBookingsCreatedPending +
-        responseData.nBookingsCreatedApproved +
-        responseData.nBookingsCreatedRejected;
-
-    let msg;
-    let isSuccess;
-
-    if (nBookingsCreated === 0) {
-        isSuccess = false;
-        msg = `Could not create any bookings because of clashes`;
-    } else {
-        isSuccess = true;
-        msg = `Created ${nBookingsCreated} booking${nBookingsCreated > 1 ? "s" : ""} - `;
-        msg += `${responseData.nBookingsCreatedPending} pending, `;
-        msg += `${responseData.nBookingsCreatedApproved} approved, `;
-        msg += `${responseData.nBookingsCreatedRejected} rejected.`;
-    }
-
-    toast.timeout({
-        text: msg,
-        isSuccess,
-        duration: 2000,
-        fadeDuration: 1000,
-        timeoutCallback: () => {
-            // Reload the page after the timeout expires.
-            window.location.reload();
-        },
-    });
-}
-
-/**
  * Post the booking creation form.
  */
 async function createNewBooking(): Promise<void> {
@@ -129,8 +91,16 @@ async function createNewBooking(): Promise<void> {
         });
         const responseData = (await response.json()) as AddBookingsToEventResponse;
         if (response.ok) {
-            updateToastAndRefreshPage(toast, responseData);
-            isModalOpen.value = false; // Close the modal only on success.
+            if (responseData.isSuccess) {
+                isModalOpen.value = false; // Close the modal only on success.
+                // Note no toast is shown here because on success the page refreshes, and
+                // the added resources will appear with their statuses on the refreshed page.
+                window.location.reload();
+            } else {
+                // This will happen if no errors occurred but no bookings were created.
+                // This is possible because any resources already booked are skipped.
+                toast.timeout({ text: responseData.message, isSuccess: responseData.isSuccess });
+            }
         } else {
             toast.timeout({ text: "Unable to create booking(s)", isSuccess: false });
         }

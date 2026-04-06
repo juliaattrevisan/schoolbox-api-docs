@@ -34,6 +34,7 @@ use Schoolbox\ResourceBooking\Booking\Status\Mapper as BookingStatusMapper;
 use Schoolbox\ResourceBooking\Item\Mapper as BookingItemMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
+use Schoolbox\ResourceBooking\Booking\Util\ResponseHelper as BookingResponseHelper;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
@@ -146,6 +147,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(TermMapper::class),
             $this->getMapperFactory()->get(ExternalEventMapper::class),
             $this->injector->get('externalTimetable'),
+            new BookingResponseHelper(),
         );
     }
 

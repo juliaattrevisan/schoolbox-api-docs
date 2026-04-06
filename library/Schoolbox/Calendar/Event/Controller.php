@@ -39,6 +39,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Item\Mapper as BookingItemMapper;
@@ -46,6 +47,7 @@ use Schoolbox\ResourceBooking\Item\Model as BookingItemModel;
 use Schoolbox\ResourceBooking\Booking\Model as BookingModel;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as BookingStatusMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatusModel;
+use Schoolbox\ResourceBooking\Booking\Util\ResponseHelper as BookingResponseHelper;
 use Schoolbox\ResourceBooking\Booking\Validation as BookingValidation;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderLinkOnlyTranslator;
@@ -100,6 +102,7 @@ class Controller extends Base
      * @param TermMapper                  $termMapper
      * @param ExternalEventMapper         $externalEventMapper
      * @param External_Timetable          $externalTimetable
+     * @param BookingResponseHelper       $bookingResponseHelper
      */
     public function __construct(
         private Error\Mapper $errorMapper,
@@ -119,6 +122,7 @@ class Controller extends Base
         private TermMapper $termMapper,
         private ExternalEventMapper $externalEventMapper,
         private External_Timetable $externalTimetable,
+        private BookingResponseHelper $bookingResponseHelper,
     ) {
     }
 
@@ -630,7 +634,7 @@ class Controller extends Base
         $event->setOwner($this->userMapper->createModel()->setId($userId));
         $event->setAuthor($this->userMapper->createModel()->setId($authorId));
 
-        $this->postModify($event);
+        $this->postModify($event, true);
     }
 
 
@@ -667,15 +671,16 @@ class Controller extends Base
      * Partial updates are supported, so the $_POST data may contain a subset of fields from the 'Create/Event Form'.
      *
      * @param Event $event
+     * @param ?bool  $isCreateRequest
      * @throws MapperException
-     * @throws InvalidArgumentException
-     * @throws LogicException
-     * @throws UnexpectedValueException
-     * @throws \Schoolbox\Application\Exception\Exception
-     * @throws \Exception
+     * @throws Deleted
      */
-    public function postModify(Event $event): void
+    public function postModify(Event $event, ?bool $isCreateRequest = false): void
     {
+        // Parameter $isCreateRequest allows null because when WebRequest\Kernel->outputAuraContent() invokes the
+        // controller, any parameters not supplied in the request are given null values.  Fix so value is boolean.
+        $isCreateRequest = $isCreateRequest ?? false;
+
         // This will throw a SchoolboxException with a helpful message if the request is invalid,
         // and return a possibly modified request with compatible strings converted to ints or bools for example.
         // The $validRequestPost does not contain all possible fields, but all fields contained in the validRequestPost
@@ -744,7 +749,7 @@ class Controller extends Base
 
         /* Redirects
          */
-        $returnUrl = $this->requestQuery->get('returnUrl') ?? Redirect::encode('/calendar');
+        $returnUrlEncoded = $this->requestQuery->get('returnUrl') ?? Redirect::encode('/calendar');
 
         /* Check whether you have permissions to mutate $event into the vars provided
          */
@@ -903,7 +908,16 @@ class Controller extends Base
 
         /* Save this event and any recurring incidents too
          */
-        (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
+        $nUpdatedEvents = (new EventRecurrenceMapper($this->eventMapper))->save(
+            $event,
+            $efficacy,
+            $repeat,
+            $untilDate,
+            $startDate,
+            $endDate,
+            $accessLevel,
+            $eventRelations
+        );
 
         // Save changes to the linked resource bookings in a separate step, after the event has been saved.
         // TODO: Consider adding a database transaction encompassing all database
@@ -954,9 +968,10 @@ class Controller extends Base
         }
 
         // Add bookings if necessary.
+        $addBookingsResults = [];
         if (count($resourceIdsToAdd) > 0) {
             try {
-                $this->addBookingsSlave($event, $resourceIdsToAdd, $efficacy);
+                $addBookingsResults = $this->addBookingsSlave($event, $resourceIdsToAdd, $efficacy);
             } catch (NotFound | Forbidden $e) {
                 $bookingErrorsAdd[] = $e->getMessage();
             }
@@ -1009,9 +1024,21 @@ class Controller extends Base
                 ]
             );
         } else {
+            $returnUrl = Redirect::decode($returnUrlEncoded);
+            if ($isCreateRequest && str_starts_with(parse_url($returnUrl, PHP_URL_PATH) ?? '', '/calendar')) {
+                // Create custom toast message for main calendar page.
+                $toastMessage = $this->bookingResponseHelper->getCreateResponseMessage(
+                    $addBookingsResults['nBookingsCreatedByStatusId'] ?? [],
+                    $nUpdatedEvents,
+                );
+
+                $separator = parse_url($returnUrl, PHP_URL_QUERY) !== null ? '&' : '?';
+                $returnUrl .= "{$separator}calendarToast=" . urlencode($toastMessage);
+            }
+
             /* Apply redirect - go back to the place from whence you came
              */
-            $this->response = $this->redirectFound(Redirect::decode($returnUrl));
+            $this->response = $this->redirectFound($returnUrl);
         }
     }
 
@@ -1174,9 +1201,11 @@ class Controller extends Base
         $this->response = $this->responseAsJson(
             // This data structure must match type 'AddBookingsToEventResponse' defined in add-resource-bookings-modal.vue.
             [
-                'nBookingsCreatedPending' => $results['nBookingsCreatedPending'],
-                'nBookingsCreatedApproved' => $results['nBookingsCreatedApproved'],
-                'nBookingsCreatedRejected' => $results['nBookingsCreatedRejected'],
+                'message' => $this->bookingResponseHelper->getCreateResponseMessage(
+                    $results['nBookingsCreatedByStatusId'],
+                    0
+                ),
+                'isSuccess' => array_sum(array_values($results['nBookingsCreatedByStatusId'])) > 0,
             ]
         )->withStatus($results['httpStatusCode']);
     }
@@ -1306,9 +1335,7 @@ class Controller extends Base
         }
 
         return [
-            'nBookingsCreatedPending' => $nBookingsCreatedByStatusId[BookingStatusModel::STATUS_PENDING],
-            'nBookingsCreatedApproved' => $nBookingsCreatedByStatusId[BookingStatusModel::STATUS_APPROVED],
-            'nBookingsCreatedRejected' => $nBookingsCreatedByStatusId[BookingStatusModel::STATUS_REJECTED],
+            'nBookingsCreatedByStatusId' => $nBookingsCreatedByStatusId,
             'httpStatusCode' => $httpStatusCode,
         ];
     }

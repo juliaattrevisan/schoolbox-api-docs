@@ -17,6 +17,7 @@ use EOTC\EventMetadata;
 use Schoolbox;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Traversable;
 
@@ -114,14 +115,16 @@ class EventRecurrenceMapper
     /**
      * Totally custom save method
      *
-     * @param Event               $event
+     * @param Event                    $event
      * @param string|null              $efficacy
      * @param string|null              $repeatSetting
      * @param Alaress_Date_Format|null $until
-     * @param Alaress_Date_Format $startDate
-     * @param Alaress_Date_Format $endDate
+     * @param Alaress_Date_Format      $startDate
+     * @param Alaress_Date_Format      $endDate
      * @param int|null                 $access
-     * @param EventRelations      $eventRelations
+     * @param EventRelations           $eventRelations
+     * @return int
+     * @throws Deleted
      * @throws MapperException
      */
     public function save(
@@ -133,7 +136,7 @@ class EventRecurrenceMapper
         Alaress_Date_Format $endDate,
         ?int $access,
         EventRelations $eventRelations
-    ) {
+    ): int {
 
         /* Set up recurrences, if appropriate
          * This is mandatory as events are saved via EventRecurrence
@@ -149,6 +152,8 @@ class EventRecurrenceMapper
         // silence!! but srsly, in this context, the event mapper needs to not raise notifications
         $eventPropagator = $this->eventMapper->getEventPropagator();
         $this->eventMapper->setEventPropagator(new MockPropagator());
+
+        $nEventsPersisted = 0;
 
         if (is_numeric($event->getId())) {
             // pre-existing event
@@ -170,9 +175,10 @@ class EventRecurrenceMapper
             }
 
             if ($efficacy == self::EFFICACY_SERIES) {
-                $this->persistSeries($event, $eventRelations, $access, $startDate, $endDate);
+                $nEventsPersisted = $this->persistSeries($event, $eventRelations, $access, $startDate, $endDate);
             } elseif ($efficacy == self::EFFICACY_SELF) {
                 $this->persistSingle($event, $eventRelations, $access, $eventRecurrence, (bool)$previous->getSeriesId());
+                $nEventsPersisted = 1;
             }
         } else {
             // this is a new object
@@ -181,7 +187,7 @@ class EventRecurrenceMapper
             /* Create N recurring events which are wholly new. When you save a model through a mapper, it gives that model's instance the affectedId (that is,
              * the id it will have in the db). To save clones of event with different dates, need to set the primary key to null explicitly
              */
-            $this->persist(
+            $nEventsPersisted = $this->persist(
                 $event,
                 $eventRecurrence->getDateCollection(),
                 $eventRecurrence->getSeriesId(),
@@ -199,6 +205,8 @@ class EventRecurrenceMapper
         // generate the notification on behalf of the EventMapper that was suppressed
         $this->eventMapper->setEventPropagator($eventPropagator);
         $this->raiseNotification($event, $action, $previous);
+
+        return $nEventsPersisted;
     }
 
     /**
@@ -209,7 +217,9 @@ class EventRecurrenceMapper
      * @param int                 $access
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
+     * @return int
      * @throws MapperException
+     * @throws Deleted
      */
     protected function persistSeries(
         Event $event,
@@ -217,7 +227,7 @@ class EventRecurrenceMapper
         $access,
         Alaress_Date_Format $startDate,
         Alaress_Date_Format $endDate
-    ) {
+    ): int {
         // Clone metadata IMMEDIATELY otherwise it will be clobbered by refetch
         // of $event in getAllInSeries below. (╯°□°）╯︵ ┻━┻
         $seriesEventMetadata = $event->getMetadata();
@@ -235,7 +245,7 @@ class EventRecurrenceMapper
 
         if ($series->count() == 0) {
             // there's no point continuing if there's nothing to work with
-            return;
+            return 0;
         }
 
         $event->setAccess($access);
@@ -282,6 +292,8 @@ class EventRecurrenceMapper
              */
             $eventRelations->resetRelations($seriesEvent);
         }
+
+        return count($series);
     }
 
     /**
@@ -406,12 +418,13 @@ class EventRecurrenceMapper
     /**
      * @param Event          $event
      * @param Traversable    $dates
-     * @param EventRelations $eventRelations
      * @param int            $sid
+     * @param EventRelations $eventRelations
      * @param int            $access
+     * @return int
      * @throws MapperException
      */
-    protected function persist(Event $event, Traversable $dates, $sid, EventRelations $eventRelations, $access)
+    protected function persist(Event $event, Traversable $dates, $sid, EventRelations $eventRelations, $access): int
     {
         // Save event state to avoid mutating object.
         // Note that just saving the date object will do no good, because that object is modified in the loop.
@@ -420,6 +433,8 @@ class EventRecurrenceMapper
         $origSeriesId = $event->getSeriesId();
 
         $event->setSeriesId($sid)->setAccess($access);
+
+        $nEventsPersisted = 0;
 
         foreach ($dates as $currentDate) {
             $event->setStartDate($currentDate['start'])->setEndDate($currentDate['end']);
@@ -435,12 +450,16 @@ class EventRecurrenceMapper
 
             // Assign relations
             $eventRelations->resetRelations($event);
+
+            ++$nEventsPersisted;
         }
 
         // Restore event to previous state.
         $event->setStartDateTime(new Alaress_date_format($origStartDateTimeDb, Alaress_Date_Format::DATABASE_FORMAT));
         $event->setEndDateTime(new Alaress_date_format($origEndDateTimeDb, Alaress_Date_Format::DATABASE_FORMAT));
         $event->setSeriesId($origSeriesId);
+
+        return $nEventsPersisted;
     }
 
     /**
