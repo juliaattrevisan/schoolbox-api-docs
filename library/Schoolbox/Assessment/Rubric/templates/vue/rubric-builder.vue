@@ -269,7 +269,6 @@ const rubricRows = window.Vue.computed(() => {
         data-rubric-builder-row
     >
         <fieldset-collapsible
-            delay-content-render
             :initially-expanded="rubric.id === 'create' || rubric.id < 0 || !initialGridIds.includes(rubric.id)"
         >
             <template #legend>
@@ -278,7 +277,7 @@ const rubricRows = window.Vue.computed(() => {
             </template>
 
             <!-- existing rubric content -->
-            <template v-if="rubric.id !== 'create'" #content>
+            <template v-if="rubric.id !== 'create'" #content="{ hasBeenExpanded }">
                 <rb-rubric-fields
                     v-model:rubric-title="rubric.title"
                     v-model:rubric-weight="rubric.weight"
@@ -300,6 +299,7 @@ const rubricRows = window.Vue.computed(() => {
                     :max-levels="props.maxLevels"
                     :capability-mark-type="rubric.capabilityMarkType ?? MarkTypeSlug.NONE"
                     :route-rubric-create="props.routeRubricCreate"
+                    :has-been-expanded="hasBeenExpanded"
                 />
             </template>
 

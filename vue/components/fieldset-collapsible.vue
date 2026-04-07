@@ -42,7 +42,12 @@ window.Vue.onMounted(() => {
 
         <div class="l-grid" :style="{ 'grid-template-rows': isExpanded ? '1fr' : '0fr' }">
             <div class="collapsible-inner">
-                <slot v-if="!props.delayContentRender || hasBeenExpanded" name="content"></slot>
+                <slot
+                    v-if="!props.delayContentRender || hasBeenExpanded"
+                    name="content"
+                    :is-expanded="isExpanded"
+                    :has-been-expanded="hasBeenExpanded"
+                ></slot>
             </div>
         </div>
     </fieldset>

@@ -24,6 +24,7 @@ interface Props {
     capabilityMarkType: MarkTypeSlug;
     routeRubricCreate: string;
     resultSets: ResultSet[];
+    hasBeenExpanded: boolean;
 }
 const props = defineProps<Props>();
 
@@ -304,11 +305,13 @@ window.Vue.watch(formValue, () => {
         type="hidden"
         :name="`rubric[${rubric.id}]`"
         :value="JSON.stringify(translateGridToFormPayload(rubric))"
-        data-rubric-form-input
+        :data-rubric-form-input="
+            hasBeenExpanded || undefined /* delay this until the actual content exists so validate can see it */
+        "
     />
 
     <h3 class="subheader show-for-medium-down">Levels</h3>
-    <div class="scrollable">
+    <div v-if="hasBeenExpanded" class="scrollable">
         <table class="rb stack-for-medium-down" data-rubric :data-test="`rubric-grid-${rubric.id}`">
             <thead>
                 <tr>
