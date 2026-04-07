@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\DifferentiationProfile;
 
 use InvalidArgumentException;
+use Schoolbox\Admin\DifferentiationProfiles\Mapper as DpMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\DifferentiationProfile\AdjustmentCategories\Mapper as AdjustmentCategoryMapper;
 use Schoolbox\DifferentiationProfile\AdjustmentLevels\Mapper as AdjustmentLevelMapper;
@@ -53,7 +54,8 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getOptionMapper(),
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper(),
-                    $this->getMapperFactory()->get(AdjustmentLevelMapper::class)
+                    $this->getMapperFactory()->get(AdjustmentLevelMapper::class),
+                    $this->getMapperFactory()->get(DpMapper::class),
                 );
             case Campus\Definition::class:
                 return new Campus\Factory(
