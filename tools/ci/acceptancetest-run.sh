@@ -63,8 +63,7 @@ mkdir -vp $initialdir/built-artifacts;
 echo "Creating artifact";
 artifactsDir="/usr/share/schoolbox/test/playwright/_output"
 if [ -d "$artifactsDir/artifacts" ]; then
-    cd $artifactsDir;
-    tar czf "$initialdir/built-artifacts/$branch-acceptancetest.tar.gz" artifacts;
+    cp -a "$artifactsDir/artifacts" "$initialdir/built-artifacts/";
 else
     echo "No playwright artifacts found";
 fi
