@@ -27,6 +27,14 @@ use Schoolbox\User;
  */
 class Factory extends Filter\AbstractFactory
 {
+    /**
+     * @param Filter\Page\Option\Mapper          $optionMapper
+     * @param Filter\Page\Option\Defaults\Mapper $defaultMapper
+     * @param Filter\Selection\Mapper            $selectionMapper
+     * @param WorkType\Mapper                    $workTypeMapper
+     * @param Access                             $access
+     * @param FolderMapper                       $folderMapper
+     */
     public function __construct(
         Filter\Page\Option\Mapper $optionMapper,
         Filter\Page\Option\Defaults\Mapper $defaultMapper,
@@ -37,7 +45,6 @@ class Factory extends Filter\AbstractFactory
     ) {
         parent::__construct($optionMapper, $defaultMapper, $selectionMapper);
     }
-
 
     /**
      * @inheritdoc
@@ -54,7 +61,6 @@ class Factory extends Filter\AbstractFactory
         );
     }
 
-
     /**
      * @inheritdoc
      * @param Filter\Model $filter
@@ -65,7 +71,17 @@ class Factory extends Filter\AbstractFactory
         return new KeyConverter($filter, new Collection($this->workTypeMapper->findAllIds()));
     }
 
-
+    /**
+     * @inheritdoc
+     * @param IDefinition      $definition
+     * @param User             $user
+     * @param Model            $pageFilter
+     * @param GenericCollection|null $selections
+     * @param User|null        $viewee
+     * @param array            $routeArgs
+     * @param GenericCollection $overrides
+     * @return Component|IComponent
+     */
     public function buildComponent(
         IDefinition $definition,
         User $user,
