@@ -133,7 +133,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
             } catch (Mapper\Exception $e) {
                 return;
             }
-            if ($workType->isStaffOrInstructorVisibleOnly()) {
+            if (!$workType->isVisibleToLearners() && !$workType->isVisibleToParents()) {
                 return;
             }
         }

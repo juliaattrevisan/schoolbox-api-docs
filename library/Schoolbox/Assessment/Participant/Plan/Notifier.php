@@ -300,7 +300,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $isCurrentHidden = false;
         try {
             $isCurrentHidden = $assessment->getWorkType() === null ? false :
-                $this->workTypeMapper->findById($assessment->getWorkType()->getId())->isStaffOrInstructorVisibleOnly();
+                !$this->workTypeMapper->findById($assessment->getWorkType()->getId())->isVisibleToLearners();
         } catch (BaseMapper\Exception $e) {
             // noop;
         }
@@ -324,7 +324,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         ) {
             try {
                 $isPreviousHidden = $diff['assessment']['workType'][1] === null ? false :
-                    $this->workTypeMapper->findById($diff['assessment']['workType'][1])->isStaffOrInstructorVisibleOnly();
+                    !$this->workTypeMapper->findById($diff['assessment']['workType'][1])->isVisibleToLearners();
                 if ($isPreviousHidden && $isCurrentHidden) {
                     // no notification
                     return;
@@ -1406,7 +1406,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         // If the assessment is visible to staff only, do not trigger notification at all even to staff,
         // since notifications for staff here are to notify them participation status of students.
-        if ($assessment->isStaffOrInstructorVisibleOnly()) {
+        if (!($assessment->getWorkType()?->isVisibleToLearners() ?? true)) {
             return false;
         }
 
