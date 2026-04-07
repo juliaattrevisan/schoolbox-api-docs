@@ -323,11 +323,11 @@ export default {
                 </button>
                 <button
                     @click.prevent="onPrintSelected()"
-                    class="button submit icon-print options-list__option"
+                    class="button submit options-list__option"
                     title="Print codes"
                     :disabled="!hasGeneratedCodes"
                 >
-                    Print codes
+                    <sbx-icon name="print"></sbx-icon>Print codes
                 </button>
             </div>
         </bottom-drawer>
