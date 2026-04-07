@@ -162,10 +162,11 @@ class Visibility
 
 
     /**
-     * Is the assessable visible to a non-instructor with DENY access (non-learner)?
+     * Is the assessable visible to a non-instructor?
      *
-     * The learner exclusion check (READ access + work type hides learners) is handled upstream in isVisibleToUser().
-     * This method handles only DENY-access users, plus learners whose work type allows learner visibility.
+     * Called for DENY-access (non-learner) users, and for READ-access (learner) users whose work type allows learner
+     * visibility. The learner exclusion check (READ access + work type hides learners) is handled upstream in
+     * isVisibleToUser() and will never reach this method.
      *
      * @param IAssessable         $assessable
      * @param User                $nonInstructor
