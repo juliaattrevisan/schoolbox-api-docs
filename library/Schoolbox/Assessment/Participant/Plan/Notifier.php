@@ -713,7 +713,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     ->setSeverity(Logger::NOTICE);
         $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                     ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}");
-        $envelope->targetToUser($participant->getUser(), $bob->build());
+        if ($this->isLearnerNotifiable($assessment)) {
+            $envelope->targetToUser($participant->getUser(), $bob->build());
+        }
     }
 
 
@@ -764,7 +766,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                         ->setTitle(self::PATTERN_UPCOMING_STUDENT_TITLE)
                         ->setParam('when', new Param($when));
-            $envelope->targetToUser($participant->getUser(), $bob->build());
+            if ($this->isLearnerNotifiable($assessment)) {
+                $envelope->targetToUser($participant->getUser(), $bob->build());
+            }
 
             // build for parent, only if they're allowed
             if (!$this->isParentNotifiable($assessment)) {
@@ -828,7 +832,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                         ->setTitle(self::PATTERN_OVERDUE_STUDENT_TITLE)
                         ->setParam('overdue', new SimpleParam($overdue))
                         ->unsetParam('submit');
-            $envelope->targetToUser($participant->getUser(), $bob->build());
+            if ($this->isLearnerNotifiable($assessment)) {
+                $envelope->targetToUser($participant->getUser(), $bob->build());
+            }
 
             // build for parent, only if they're allowed
             if (!$this->isParentNotifiable($assessment)) {
@@ -903,7 +909,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 // build for student
                 $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                             ->setTitle(":assessment in :cat has closed");
-                $envelope->targetToUser($participant->getUser(), $bob->build());
+                if ($this->isLearnerNotifiable($assessment)) {
+                    $envelope->targetToUser($participant->getUser(), $bob->build());
+                }
 
                 // build for parent, only if they're allowed
                 if (!$this->isParentNotifiable($assessment)) {
@@ -1052,7 +1060,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                                ->setParam('oldname', new Param($oldName))
                                ->setParam('boxType', new SimpleParam($boxType))
                                ->setTopics(["$topicStub.$suffix"]);
-                $envelope->targetToUser($participant->getUser(), $bob->build());
+                if ($this->isLearnerNotifiable($assessment)) {
+                    $envelope->targetToUser($participant->getUser(), $bob->build());
+                }
 
                 // Parents
                 if ($this->isParentNotifiable($assessment)) {
@@ -1104,7 +1114,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                                    ->setParam('boxType', new Param($boxType))
                                    ->setParam('verb', new Param($verb, null, Param::STACKING_APPEND))
                                    ->setTopics(["$topicStub.$suffix"]);
-                    $envelope->targetToUser($participant->getUser(), $bob->build());
+                    if ($this->isLearnerNotifiable($assessment)) {
+                        $envelope->targetToUser($participant->getUser(), $bob->build());
+                    }
 
                     // Parents
                     if ($this->isParentNotifiable($assessment)) {
@@ -1131,7 +1143,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                             ->setTitle($m)
                             ->setTopics(["$topicStub.updated"]);
-                $envelope->targetToUser($participant->getUser(), $bob->build());
+                if ($this->isLearnerNotifiable($assessment)) {
+                    $envelope->targetToUser($participant->getUser(), $bob->build());
+                }
 
                 // Parents
                 if ($this->isParentNotifiable($assessment)) {
@@ -1154,7 +1168,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                             ->setTitle(self::PATTERN_UPDATE_STUDENT_TITLE)
                             ->setParam('boxType', new Param($boxType))
                             ->setTopics(["$topicStub.updated"]);
-                $envelope->targetToUser($participant->getUser(), $bob->build());
+                if ($this->isLearnerNotifiable($assessment)) {
+                    $envelope->targetToUser($participant->getUser(), $bob->build());
+                }
 
                 // Parents
                 if ($this->isParentNotifiable($assessment)) {
@@ -1408,9 +1424,13 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     private function isNotifiableAtAll(IAssessable $assessment, string $label): bool
     {
-        // If the assessment is visible to staff only, do not trigger notification at all even to staff,
-        // since notifications for staff here are to notify them participation status of students.
-        if (!($assessment->getWorkType()?->isVisibleToLearners() ?? true)) {
+        // If the assessment is visible to staff only (hidden from both learners and parents), do not trigger
+        // notification at all even to staff, since notifications for staff here are to notify them of participation
+        // status of students.
+        if (
+            !($assessment->getWorkType()?->isVisibleToLearners() ?? true) &&
+            !($assessment->getWorkType()?->isVisibleToParents() ?? true)
+        ) {
             return false;
         }
 
@@ -1474,6 +1494,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private function isParentTargetable(): bool
     {
         return !($this->conf->get('restrict_student_submissions') || $this->conf->get('restrict_parent_duework_access'));
+    }
+
+
+    private function isLearnerNotifiable(IAssessable $assessment): bool
+    {
+        return $assessment->getWorkType()?->isVisibleToLearners() ?? true;
     }
 
 
