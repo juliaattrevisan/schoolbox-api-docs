@@ -31,6 +31,7 @@ use Symfony\Component\Lock\LockInterface;
 class ImporterTool extends CliTool\App
 {
     private const SOCS_IMPORTER_LOCK_NAME = 'socs_importer';
+    public const LOCK_NAME = self::SOCS_IMPORTER_LOCK_NAME;
     private const OPT_LONG_HELP = 'help';
     private const OPT_LONG_INSTANCE = 'instance:';
     private const LOCK_TTL = 120;
