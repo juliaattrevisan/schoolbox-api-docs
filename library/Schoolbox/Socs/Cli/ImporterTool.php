@@ -117,8 +117,8 @@ HELP;
         $season = $this->recallSeason($seasonMapper, $logger);
 
         $now = \Alaress_Date_Format::now();
-        $startDate = $now->subDays(30)->format('j M Y');
-        $endDate = $now->addDays(100)->format('j M Y');
+        $startDate = (clone $now)->addDays(-30)->getUsingFormat('j M Y');
+        $endDate = (clone $now)->addDays(100)->getUsingFormat('j M Y');
 
         $logger->info(sprintf('Downloading SOCS fixtures from %s to %s', $startDate, $endDate));
 
