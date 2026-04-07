@@ -763,21 +763,20 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             $when = $participant->getDueDate()->getRelativeTime(Alaress_Date_Format::now()->addMinutes(-5), true);
 
             // build for student
-            $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
-                        ->setTitle(self::PATTERN_UPCOMING_STUDENT_TITLE)
-                        ->setParam('when', new Param($when));
             if ($this->isLearnerNotifiable($assessment)) {
+                $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
+                           ->setTitle(self::PATTERN_UPCOMING_STUDENT_TITLE)
+                           ->setParam('when', new Param($when));
                 $envelope->targetToUser($participant->getUser(), $bob->build());
             }
 
             // build for parent, only if they're allowed
-            if (!$this->isParentNotifiable($assessment)) {
-                continue;
+            if ($this->isParentNotifiable($assessment)) {
+                $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
+                           ->setTitle(self::PATTERN_UPCOMING_PARENT_TITLE)
+                           ->setParam('when', new Param($when));
+                $envelope->targetToParent($participant->getUser(), $bob->build());
             }
-            $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                        ->setTitle(self::PATTERN_UPCOMING_PARENT_TITLE)
-                        ->setParam('when', new Param($when));
-            $envelope->targetToParent($participant->getUser(), $bob->build());
         }
 
         return $envelope;
