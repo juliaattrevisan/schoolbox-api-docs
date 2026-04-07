@@ -82,7 +82,7 @@
             {% apply spaceless %}
             {% if hasAssessmentRoutes %}
                 <li class="separator">{{ locale.translate('activity', false, true) }}</li>
-                {% if statusRoute %}<li><a class="icon-progress" href="{{ statusRoute }}" data-test="component-assessment-actions-viewStatus-{{ assessable.id }}">View Status</a></li>{% endif %}
+                {% if statusRoute %}<li><a href="{{ statusRoute }}" data-test="component-assessment-actions-viewStatus-{{ assessable.id }}"><sbx-icon name="progress"></sbx-icon>View Status</a></li>{% endif %}
                 {% if assessable is dueWork %}
                     {% set viewGradeRoute = routeLookupIfAuthorized('learningDueWorkResponse.getFirstParticipantResponse', {
                         assessmentId: assessable.id,

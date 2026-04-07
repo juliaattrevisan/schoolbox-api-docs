@@ -19,7 +19,7 @@
     <ul data-dropdown-content class="f-dropdown" id="component{{ componentInstance.id }}-options-task{{ assessment.id }}">
         {% if hasAssessmentRoutes %}
             <li class="separator">{{ locale.translate('activity', false, true) }}</li>
-            {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress" data-test="course-outline-view-status-{{ assessment.id }}">View Status</a></li>{% endif %}
+            {% if statusRoute %}<li><a href="{{ statusRoute }}" data-test="course-outline-view-status-{{ assessment.id }}"><sbx-icon name="progress"></sbx-icon>View Status</a></li>{% endif %}
             {% if assessment is dueWork %}
                 {% set viewGradeRoute = routeLookupIfAuthorized('learningDueWorkResponse.getFirstParticipantResponse', {
                     assessmentId: assessment.id,

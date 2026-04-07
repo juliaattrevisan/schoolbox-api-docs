@@ -28,7 +28,7 @@
         {# if we are on course level, we should hide the status page
          #}
         {% if assessment.isImplementation and  viewRoute %}
-            <li><a class="icon-progress" href="{{ viewRoute }}">View Status</a></li>
+            <li><a href="{{ viewRoute }}"><sbx-icon name="progress"></sbx-icon>View Status</a></li>
         {% endif %}
 
         {# Students must have ePortfolio enabled, otherwise they can't do this

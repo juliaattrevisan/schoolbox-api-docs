@@ -209,7 +209,7 @@ export default class CourseOutline {
         const courseOutlineId = await courseOutline.getAttribute("id");
         await activity.getByTestId(`sbx-pop-out-${courseOutlineId}-options-task${activityId}-button`).click();
 
-        await activity.locator("[data-dropdown-content] a.icon-progress").click();
+        await activity.locator('[data-dropdown-content] a:has(sbx-icon[name="progress"])').click();
     }
 
     /**

@@ -37,7 +37,7 @@ const viewStudentParticipationLink = window.Vue.computed(() => {
         <a :href="getReturnUrl(props.activity._links.summary)" class="icon-view">View</a>
     </li>
     <li v-if="viewStatusLink" :data-test="`markbook-assessment-dropdown-${props.activity.id}-view-status`">
-        <a :href="viewStatusLink" class="icon-progress">View Status</a>
+        <a :href="viewStatusLink"><sbx-icon name="progress"></sbx-icon>View Status</a>
     </li>
     <li
         v-if="viewStudentParticipationLink"

@@ -14,7 +14,7 @@ export default class AssessmentPage {
 
     static readonly SELECTOR_LINK_MODIFY = '#header-options a:has(sbx-icon[name="modify"])';
 
-    static readonly SELECTOR_LINK_STATUS = "#header-options a.icon-progress";
+    static readonly SELECTOR_LINK_STATUS = '#header-options a:has(sbx-icon[name="progress"])';
 
     static readonly DATA_TEST_ASSESSMENT_SUMMARY_CREATE_BUTTON = "assessment-summary-create-button";
 

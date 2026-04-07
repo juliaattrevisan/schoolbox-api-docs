@@ -169,7 +169,7 @@ Data:
                                         <sbx-pop-out content-id="project-options{{ assessable.id }}"></sbx-pop-out>
                                     </nav>
                                     <ul data-dropdown-content class="f-dropdown" id="project-options{{ assessable.id }}">
-                                        {% if statusRoute and assessable.isImplementation %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
+                                        {% if statusRoute and assessable.isImplementation %}<li><a href="{{ statusRoute }}"><sbx-icon name="progress"></sbx-icon>View Status</a></li>{% endif %}
                                         {% if assessable is dueWork %}
                                             {% set viewGradeRoute = routeLookupIfAuthorized('learningDueWorkResponse.getFirstParticipantResponse', {
                                                 assessmentId: assessable.id,

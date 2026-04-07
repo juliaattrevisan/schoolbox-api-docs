@@ -29,7 +29,7 @@
     </div>
     <nav>
         <!-- BEGIN reply -->
-        <a class="icon-reply" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}" title="Post Reply"></a>
+            <a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}" title="Post Reply"><sbx-icon name="reply"></sbx-icon></a>
         <!-- END reply -->
         <!-- BEGIN modify_thread -->
         <a class="icon-locked" href="/forum/modifyForm.php?toggleLock={THREAD_ID}" title="{LOCK_UNLOCK} Thread"></a>
@@ -63,7 +63,7 @@
                     </div>
                     <nav>
                         <!-- BEGIN reply_post -->
-                        <a class="icon-reply no-text" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}"title="Reply" ></a>
+                            <a class="no-text" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}"title="Reply" ><sbx-icon name="reply"></sbx-icon></a>
                         <!-- END reply_post -->
                         <!-- BEGIN modify -->
                         <a class="no-text" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}" title="Modify Post"><sbx-icon name="modify"></sbx-icon></a>
