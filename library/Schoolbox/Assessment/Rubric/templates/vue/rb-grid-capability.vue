@@ -150,7 +150,6 @@ window.Vue.onMounted(() => {
                 ></a>
             </span>
 
-            <!-- todo: how on earth can groupName be null? I doubt it can be... see group-editable.twig -->
             <label v-if="props.capability.inUseExcludingAssessment" class="rb-capability-name">
                 {{ capabilityName }}
                 <span
