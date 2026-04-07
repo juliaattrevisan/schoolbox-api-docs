@@ -137,8 +137,6 @@ class SubmissionNotifier extends AbstractModuleNotifier
         $studentId = (int)$submission->getOwner()->getId();
         $boxId     = $submission->getSubmissionBox()->getId();
 
-        $mapper = $this->getMapper();
-
         switch ($method) {
             case Mapper::METHOD_CREATE:
                 // is this in draft mode? if so, do nothing
