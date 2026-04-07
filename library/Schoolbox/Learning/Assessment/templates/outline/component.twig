@@ -59,7 +59,7 @@
 <section>
 {% if filterList and not readOnly%}
     <p class="component-titlebar meta">
-        <a class="icon-filter" title="View / Edit filter" data-action="filtered">This is being filtered</a>
+            <a title="View / Edit filter" data-action="filtered"><sbx-icon name="filter"></sbx-icon>This is being filtered</a>
     </p>
 {% endif %}
     {% if (courseImplementation.units ?? [])|length %}
