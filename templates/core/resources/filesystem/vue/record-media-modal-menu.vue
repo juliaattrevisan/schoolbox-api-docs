@@ -186,7 +186,7 @@ export default {
     <div v-if="hasChecked" class="pseudo-video" ref="pseudoVideo">
         <button v-if="isAudioSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)">
             <div>
-                <div class="icon-mic"></div>
+                <sbx-icon name="mic"></sbx-icon>
                 <span>Audio</span>
                 <aside>Say something with an audio only recording.</aside>
             </div>

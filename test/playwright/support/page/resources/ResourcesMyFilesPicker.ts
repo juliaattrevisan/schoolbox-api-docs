@@ -84,7 +84,7 @@ export default class ResourcesMyFilesPicker {
      * Clicks the Audio option
      */
     async clickAudio(): Promise<void> {
-        const audioIcon = this.page.locator('div[class="icon-mic"]');
+        const audioIcon = this.page.locator('button:has(sbx-icon[name="mic"])');
         await audioIcon.click();
     }
 
