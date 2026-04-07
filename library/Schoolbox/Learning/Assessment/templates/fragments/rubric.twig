@@ -4,16 +4,13 @@
  # This is the assessment creational/updational section concerning the rubric grid.
  # It appears on the assessment modify screen at the bottom.
  #
- # @param Grid $rubricGrid                  An instance of Grid
+ # @param Grid $rubricGrids                 Instances of Grid for each rubric grid attached to this assessment
  # @param array $rubricAttachZone           An attachzone, for uploading rubric csvs
  # @param array $resultSets                 A Result Set chosen on the assessment modify screen to prepopulate rubric grid levels
- # @param bool $rubricHasMarks              Whether students have a feedback using this rubric grid
  # @param IAssessable $assessment           An assessment instance
- # @param int $markTypeTotalMark            The id of the Total Mark instance
- # @param array $capabilityMarkTypes        Tuples for (id, name) Mark Types available for rubric capabilities
- # @param array $capabilityGradingSchemes   Tuples for (id, name) Grading Schemes available for rubric capabilities
+ # @param array $capabilityMarkTypes        Mark Types available for rubric capabilities, matches /library/Schoolbox/Assessment/Types/MarkType.ts::MarkType
+ # @param array $capabilityGradingSchemes   Grading Schemes available for rubric capabilities, matches /library/Schoolbox/Learning/Assessment/templates/fragments/vue/mark-type.vue::GradeScheme
  # @param int defaultGradeGroup             Set in admin via default_grade_group config var
- # @param int markTypeNone                  The id of the mark type "None" (usually int 6)
  # @param bool $courseManagedReadonly       A bool to decide if this is readonly or not
  #}
 
@@ -39,17 +36,31 @@
     <div class="row">
         <div class="small-12 columns">
             <div class="small-12 columns no-pad">
-                {% include '@rubric/grid-csv.twig' with {
-                    rubricGridsPayload: rubricGridsPayload,
-                    rubricBlankGrid: rubricBlankGrid,
-                    resultSets: resultSets,
-                    attachzone: rubricAttachZone,
-                    folderId: assessment.context.folder.id,
-                    assessmentId: assessment.id ? assessment.id : null,
-                    capabilityMarkTypes: capabilityMarkTypes,
-                    capabilityGradingSchemes: capabilityGradingSchemes,
-                    defaultGradeGroup: defaultGradeGroup,
-                } only %}
+                {% set assessmentId = assessment.id ? assessment.id : null %}
+                <div id="rubric-builder-container">
+                    <rubric-builder
+                        :rubric-grids-payload="{{ rubricGridsPayload|json_encode }}"
+                        :rubric-blank-grid="{{ rubricBlankGrid|json_encode }}"
+                        :result-sets="{{ resultSets|json_encode }}"
+                        :capability-mark-types="{{ capabilityMarkTypes|json_encode }}"
+                        :capability-grading-schemes="{{ capabilityGradingSchemes|json_encode }}"
+                        :default-grade-group="{{ defaultGradeGroup }}"
+                        :max-levels="{{ config.rubric_max_levels }}"
+                        :folder-id="{{ assessment.context.folder.id }}"
+                        route-rubric-create="{{ routeLookup("rubric.create") }}"
+                        route-rubric-import="{{ routeLookup("rubric.import") }}"
+                        :assessment-id="{{ assessmentId ? assessmentId : 'null' }}"
+                        {% if assessmentId %}
+                            route-rubric-download="{{ routeLookup('rubric.download') }}"
+                        {% endif %}
+                    />
+                </div>
+                <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricBuilder.js?v={{ config.site_version }}"></script>
+
+                {# TODO: bring this into Vue land one day, attachzone can't do that yet so just hide it here and click from within Vue instead #}
+                <div id="rubric-builder-import-attachzone" class="hide">
+                    {% include 'sub/attachzone.twig' with { attachzone: rubricAttachZone } %}
+                </div>
             </div>
         </div>
     </div>

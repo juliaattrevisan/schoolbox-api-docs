@@ -2059,8 +2059,6 @@ class Controller extends Assessment\Controller
             ]
         );
 
-        $data['rubricHasMarks'] = $countMarkIds > 0;
-
         // The rubric grid can be used as is without Twig-wrangling
         $rubricGrid = $this->rubricMapper->retrieveGrid($dueWork, true);
         if (count($rubricGrid->getLevels()) === 0) {
