@@ -13,7 +13,7 @@ export default class CreateLessonPlan {
 
     static readonly DATA_TEST_LINK_ACTIVITY_BUTTON = "lesson-plan-link-activities-link";
 
-    static readonly LINK_ACTIVITY_BUTTON = "a.button.expand.icon-link";
+    static readonly LINK_ACTIVITY_BUTTON = 'a.button.expand:has(sbx-icon[name="link"])';
 
     static readonly URL_CREATE_LESSON_PLAN =
         "/learning/unitspecs/{unitSpecificationId}/assessments/new?lpt={lessonPlanTemplateId}&type=lessonPlan";
