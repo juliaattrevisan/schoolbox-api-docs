@@ -1,3 +1,4 @@
+import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import type { RubricGrid, RubricGridCapability, RubricGridIndicator } from "./types";
 
 export type RubricGridCreateCapabilityResponse = RubricGridCapability & {
@@ -39,7 +40,12 @@ type RubricGridFormPayload = {
             points?: string;
         }[]
     >;
-} & Pick<RubricGrid, "title" | "weight" | "useMarkRange" | "capabilityMarkType" | "capabilityGradeGroup">;
+    title: string;
+    weight: number | null;
+    useMarkRange: boolean;
+    capabilityMarkType: MarkTypeSlug;
+    capabilityGradeGroup: number | null;
+};
 
 /**
  * Convert a RubricGrid into a RubricGridFormPayload
@@ -62,7 +68,7 @@ export function translateGridToFormPayload(grid: RubricGrid): RubricGridFormPayl
         title: grid.title,
         weight: grid.weight,
         useMarkRange: grid.useMarkRange,
-        capabilityMarkType: grid.capabilityMarkType,
+        capabilityMarkType: grid.capabilityMarkType ?? MarkTypeSlug.NONE,
         capabilityGradeGroup: grid.capabilityGradeGroup,
     };
 

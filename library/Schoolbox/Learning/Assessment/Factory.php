@@ -343,7 +343,7 @@ class Factory
          */
         // TODO what should this be?
         $this->setUseRubric(false);
-        // TODO TEMP: useMarkRange/capabilityMarkType/capabilityGradingScheme should be against the rubric, but need defaults
+        // TODO TEMP: useMarkRange/capabilityMarkType/capabilityGradeGroup should be against the rubric, but need defaults
         $this->setUseMarkRange(false);
         $this->setCapabilityMarkType(MarkType::TYPE_NONE);
         $this->setCapabilityGradeGroup(null);
@@ -358,11 +358,11 @@ class Factory
                 $this->setUseRubric(true);
                 $this->setRubricData($rubrics);
 
-                // TODO TEMP: useMarkRange/capabilityMarkType/capabilityGradingscheme should be against the rubric
+                // TODO TEMP: useMarkRange/capabilityMarkType/capabilityGradeGroup should be against the rubric
                 $firstRubricData = $rubrics[array_key_first($rubrics)];
                 $this->setUseMarkRange($firstRubricData['useMarkRange']);
                 $this->setCapabilityMarkType(MarkType::slugToId($firstRubricData['capabilityMarkType']));
-                $this->setCapabilityGradeGroup($firstRubricData['capabilityGradingScheme']);
+                $this->setCapabilityGradeGroup($firstRubricData['capabilityGradeGroup']);
             }
         }
 

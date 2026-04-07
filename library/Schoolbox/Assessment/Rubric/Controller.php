@@ -441,7 +441,7 @@ class Controller extends BaseController
         $capabilityMarkTypeSlug = $post[$assessmentId]['capabilityMarkType'] ?? MarkType::SLUG_NONE;
         $capabilityMarkType = $this->markTypeMapper->createModel()
             ->setSlug($capabilityMarkTypeSlug)
-            ->setId(MarkType::idToSlug($capabilityMarkTypeSlug));
+            ->setId(MarkType::slugToId($capabilityMarkTypeSlug));
         $useMarkRange = $post[$assessmentId]['useMarkRange'] ?? false;
 
         $proposedAssessment->setCapabilityMarkType($capabilityMarkType);
