@@ -33,8 +33,6 @@ class CacheFunctionCallTest extends TestCase
             $uncompressedValue,
         ) extends Redis {
             private array $caches = [];
-            private array $cachedValues = [];
-            private bool $mustHit = false;
             public function __construct(private ?string $cachedValue, private mixed $uncompressedValue)
             {
             }
@@ -43,19 +41,28 @@ class CacheFunctionCallTest extends TestCase
             {
                 $this->caches[$baseKey] ??= new class (
                     new ArrayAdapter(),
-                    $this->mustHit,
+                    $this->cachedValue,
                 ) extends Psr16Cache {
-                    public function __construct(CacheItemPoolInterface $pool, private bool $mustHit)
+                    private bool $mustHit = false;
+                    public function __construct(CacheItemPoolInterface $pool, private ?string $cachedValue)
                     {
                         parent::__construct($pool);
                     }
 
                     public function get($key, $default = null): mixed
                     {
-                        if ($this->mustHit && !$this->has($key)) {
+                        if ($this->mustHit && !isset($this->cachedValue) && !$this->has($key)) {
                             throw new \OutOfBoundsException(sprintf('Key "%s" does not exist', $key));
                         }
-                        return parent::get($key, $default);
+                        // Need to call get before returning cachedValue, due to internals of Psr16Cache
+                        $result = parent::get($key, $default);
+                        return $this->cachedValue ?? $result;
+                    }
+
+                    public function setMustHit(bool $mustHit): self
+                    {
+                        $this->mustHit = $mustHit;
+                        return $this;
                     }
                 };
                 return $this->caches[$baseKey];
@@ -65,26 +72,11 @@ class CacheFunctionCallTest extends TestCase
             {
                 return $this->uncompressedValue ?? parent::uncompressValue($value);
             }
-            protected function fetchCachedValue(string $key): ?string
-            {
-                if (!array_key_exists($key, $this->cachedValues)) {
-                    if ($this->mustHit) {
-                        throw new \OutOfBoundsException(sprintf('Key "%s" does not exist', $key));
-                    }
-                    if (isset($this->cachedValue)) {
-                        $this->storeCachedValue($key, $this->cachedValue, null);
-                    }
-                    return $this->cachedValue;
-                }
-                return $this->cachedValues[$key];
-            }
-            protected function storeCachedValue(string $key, string $value, ?int $timeout): void
-            {
-                $this->cachedValues[$key] = $value;
-            }
             public function setMustHit(bool $mustHit): self
             {
-                $this->mustHit = $mustHit;
+                foreach ($this->caches as $cache) {
+                    $cache->setMustHit($mustHit);
+                }
                 return $this;
             }
         };
