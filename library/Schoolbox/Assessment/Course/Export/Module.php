@@ -8,6 +8,7 @@
 namespace Schoolbox\Assessment\Course\Export;
 
 use Alaress\Authorizer\Failure\InvalidPath;
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
 use Closure;
@@ -22,12 +23,14 @@ use Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator as LessonPlan
 use Schoolbox\Learning\Assessment\Overwriter;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
+use Schoolbox\Learning\Authorizer\Rule\IsManageReportingActivity;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\User;
 
 /**
  * Module for exporting assessments into courses.
@@ -51,6 +54,21 @@ class Module extends \Alaress\Module\Module
         // * User must be an instructor of the assessment the folder is within
         $permissions = new Rule\All(
             new Rule\IsLoggedIn(),
+            /* Reporting activities never have the ability to go back into the Course: that activity is purely
+             * bureaucratically driven (top-down) so staff shouldn't be make changes like this
+             */
+            new Rule\Callback(function (array $params, ?User $user) {
+                /* Reporting Activities need further evaluation to decide if a feature/action/ability is available.
+                 * This is because of the idiosyncratic nature where some staff have service permissions that allow access
+                 *
+                 * (Non-reporting activities don't need further checks.)
+                 */
+                if (!$params['assessment'] instanceof \Schoolbox\Learning\Assessment\Reporting\Model) {
+                    return;
+                }
+
+                throw new Unauthorized('User cannot save to course for reporting activities');
+            }),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\All(
