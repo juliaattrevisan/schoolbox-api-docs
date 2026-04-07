@@ -1138,7 +1138,7 @@ class Controller extends Base
                         'tooltipPosition' => 'right',
                     ],
                     'visibility' => [
-                        'getter'    => 'getVisibility', // Note this function returns a value derived from isVisibleToParents and isVisibleToStudents.
+                        'getter'    => 'getVisibility', // Note this function returns a value derived from isVisibleToParents and isVisibleToLearners.
                         'caption'   => 'Visibility',
                         'mandatory' => true,
                         'default'   => WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS,
