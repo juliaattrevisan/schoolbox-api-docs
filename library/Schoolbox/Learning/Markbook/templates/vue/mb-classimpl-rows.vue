@@ -5,6 +5,7 @@ import MbClassStatisticRow from "./mb-class-statistic-row.vue";
 import MbClassimplRowStudent from "./mb-classimpl-row-student.vue";
 import type { Props as MbClassStatisticRowProps } from "./mb-class-statistic-row.vue";
 import type { MarkbookClassImplActivity } from "./types/payload";
+import { ACTIVITY_TYPE_REPORTING, ACTIVITY_TYPE_TASK } from "@schoolboxAssessment/Types/assessmentTypes";
 
 interface Props {
     type: "course" | "class";
@@ -28,6 +29,8 @@ const classStatisticRows: Omit<MbClassStatisticRowProps, "classImpl">[] = [
         input: {
             key: "weight",
             allowCourseManaged: false,
+            hideForTypes: [ACTIVITY_TYPE_TASK],
+            readonlyForTypes: [ACTIVITY_TYPE_REPORTING],
             fetch: (aImpl: MarkbookClassImplActivity) => ({
                 url: `/learning/assessments/weight/${aImpl.id}`,
                 data: { assessmentId: aImpl.id, weight: aImpl.weight },
@@ -40,6 +43,8 @@ const classStatisticRows: Omit<MbClassStatisticRowProps, "classImpl">[] = [
         input: {
             key: "weight",
             allowCourseManaged: false,
+            hideForTypes: [ACTIVITY_TYPE_TASK],
+            readonlyForTypes: [ACTIVITY_TYPE_REPORTING],
             fetch: (aImpl: MarkbookClassImplActivity) => ({
                 url: `/learning/assessments/weight/${aImpl.id}`,
                 data: { assessmentId: aImpl.id, weight: aImpl.weight },

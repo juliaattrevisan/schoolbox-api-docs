@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ACTIVITY_TYPE_TASK } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useMarkbookStore } from "./store/markbookStore";
-import type { MarkbookClassImplActivity, MarkbookClassImpl } from "./types/payload";
+import type { MarkbookClassImplActivity, MarkbookClassImpl, MarkbookActivity } from "./types/payload";
 
 export interface Props {
     label: string;
@@ -23,6 +22,10 @@ export interface Props {
             url: string;
             data: Record<string, unknown>;
         };
+        /** Exclude specific assessment types from being able to change this (show as readonly) */
+        readonlyForTypes?: MarkbookActivity["assessmentType"][];
+        /** Hide specific assessment types from this row */
+        hideForTypes?: MarkbookActivity["assessmentType"][];
     };
     round?: number;
     classImpl: MarkbookClassImpl;
@@ -124,8 +127,14 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
             :data-assessment="assessment.id"
         >
             <template v-if="stat === null || aImpl === null"></template>
-            <template v-else-if="props.input && (props.input.allowCourseManaged || !aImpl.courseManaged)">
-                <template v-if="assessment.assessmentType === ACTIVITY_TYPE_TASK"></template>
+            <template
+                v-else-if="
+                    props.input &&
+                    (props.input.allowCourseManaged || !aImpl.courseManaged) &&
+                    !props.input.readonlyForTypes?.includes(assessment.assessmentType)
+                "
+            >
+                <template v-if="props.input.hideForTypes?.includes(assessment.assessmentType)"></template>
                 <span
                     v-else-if="props.input?.selectOptions && !aImpl.writable && getReadonlyIcon(aImpl) !== null"
                     :class="getReadonlyIcon(aImpl)"
