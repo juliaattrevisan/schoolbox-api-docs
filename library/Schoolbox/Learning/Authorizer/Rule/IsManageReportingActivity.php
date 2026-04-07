@@ -26,7 +26,7 @@ class IsManageReportingActivity implements IAuthorizationRule
      *
      * @param IConfigLoader $configLoader
      */
-    public function __construct(private IConfigLoader $configLoader)
+    public function __construct(private IConfigLoader $configLoader, private bool $allowDiffProfileServicePermission = false)
     {
     }
 
@@ -53,6 +53,13 @@ class IsManageReportingActivity implements IAuthorizationRule
          */
         if ((new Reporting\ValidManageActivity())->isSatisfiedBy($this->configLoader->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $user)) {
             return;
+        }
+
+        /* TODO MAYBE diff profile service perms let you through
+         */
+        if ($this->allowDiffProfileServicePermission) {
+            // check whether $user has diff profile service permission;
+            // if so, return;
         }
 
         throw new Unauthorized('User cannot modify custom participation for reporting activities');
