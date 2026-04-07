@@ -16,7 +16,7 @@
 {% if gradeRoute or viewRoute or modifyRoute or (canShowcase is defined and canShowcase and assessment.getCountInteractions) or (externalRedirectUrl is defined and externalRedirectUrl) or (hasStudentView is defined and hasStudentView) %}
     <nav>
         {% if externalRedirectUrl is defined and externalRedirectUrl %}
-            <a href="{{ externalRedirectUrl.url }}" class="icon-view alert" title="{{ externalRedirectUrl.name }}"></a>
+            <a href="{{ externalRedirectUrl.url }}" class="alert" title="{{ externalRedirectUrl.name }}"><sbx-icon name="view"></sbx-icon></a>
         {% endif %}
         <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
     </nav>
@@ -105,7 +105,7 @@
         {% if assessment is lessonPlan and hasStudentView is defined and hasStudentView %}
             {% if assessment.visibility == 'student' %}
                 <li class="separator" data-has-student-view-separator>You are in Teacher View</li>
-                <li><a class="icon-view" data-has-student-view="staff">Switch to Student View</a></li>
+                <li><a data-has-student-view="staff"><sbx-icon name="view"></sbx-icon>Switch to Student View</a></li>
 
                 <script>
                     $(function() {

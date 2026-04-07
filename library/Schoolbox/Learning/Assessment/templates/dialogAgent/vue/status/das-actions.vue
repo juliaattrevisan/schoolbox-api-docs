@@ -187,7 +187,8 @@ async function onResolve(): Promise<void> {
 
 <template>
     <li v-if="props.showView && props.response?._routes.view">
-        <a :href="props.response._routes.view" class="icon-view" data-test="das-actions-view">
+        <a :href="props.response._routes.view" data-test="das-actions-view">
+            <sbx-icon name="view"></sbx-icon>
             {{ `View ${locale.dialogAgent.proper()}` }}
         </a>
     </li>

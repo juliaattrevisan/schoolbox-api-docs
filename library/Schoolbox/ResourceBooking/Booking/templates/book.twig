@@ -553,7 +553,7 @@ $(function() {
 
                                 </div>
                                 <nav>
-                                    <a href="{{ routeLookup('resourceItem.read', {id: relatedItem.id}) }}" class="icon-view" id="resource-read-{{relatedItem.id}}" title="View Bookings"></a>
+                                    <a href="{{ routeLookup('resourceItem.read', {id: relatedItem.id}) }}" id="resource-read-{{relatedItem.id}}" title="View Bookings"><sbx-icon name="view"></sbx-icon></a>
                                 </nav>
                             </li>
                             {% endfor %}

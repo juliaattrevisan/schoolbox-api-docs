@@ -159,7 +159,7 @@
                                     {% else %}
                                         {% set reviewRoute = routeLookupIfAuthorized('learnosity.getReview', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) %}
                                         {% if reviewRoute %}
-                                            <a href="{{ reviewRoute }}" class="icon-view" title="Review"></a>
+                                            <a href="{{ reviewRoute }}" title="Review"><sbx-icon name="view"></sbx-icon></a>
                                         {% endif %}
 
                                         {% set feedbackRoute = routeLookupIfAuthorized('learnosity.getFeedback', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) %}
