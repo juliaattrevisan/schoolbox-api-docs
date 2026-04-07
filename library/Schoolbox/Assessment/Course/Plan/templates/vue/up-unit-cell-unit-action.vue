@@ -50,10 +50,9 @@ function onDeleteUnit(): void {
                 </li>
                 <li v-if="props.unit._routes.importIntoClasses">
                     <a
-                        class="icon-import"
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-import-link`"
                         :href="getReturnUrl(props.unit._routes.importIntoClasses!)"
-                        >Import into {{ locale.class.translate(true, true) }}
+                        ><sbx-icon name="import"></sbx-icon>Import into {{ locale.class.translate(true, true) }}
                     </a>
                 </li>
                 <li v-if="props.unit._routes.modify">

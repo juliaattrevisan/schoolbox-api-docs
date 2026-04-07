@@ -69,10 +69,9 @@ function onPrintSelected(): void {
         <li class="separator">Actions</li>
         <li v-if="props.routes.importIntoClasses">
             <a
-                class="icon-import"
                 :data-test="`up-header-${props.course.id}-import-link`"
                 :href="getReturnUrl(props.routes.importIntoClasses!)"
-                >Import into {{ locale.class.translate(true, true) }}</a
+                ><sbx-icon name="import"></sbx-icon>Import into {{ locale.class.translate(true, true) }}</a
             >
         </li>
         <li>

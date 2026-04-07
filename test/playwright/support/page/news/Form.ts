@@ -159,7 +159,7 @@ export default class Form {
      * @param audienceBrick - The audience brick
      */
     async selectAudienceOption(audienceBrick: string): Promise<void> {
-        await this.page.locator("button.button.icon-drag-drop").click();
+        await this.page.locator("button.button:has(sbx-icon[name='drag-drop'])").click();
         await expect(this.page.locator('div[class="reveal-modal no-pad open"]')).toBeVisible();
         await this.page.locator(`button.button-block:has-text("${audienceBrick}")`).click();
         // await expect(this.page.locator('label[for="audience-list-input-IjEi"]')).toBeVisible();
@@ -241,7 +241,7 @@ export default class Form {
         dropdown2: string,
         audienceType2: string[],
     ): Promise<void> {
-        await this.page.locator("button.button.icon-drag-drop").click();
+        await this.page.locator("button.button:has(sbx-icon[name='drag-drop'])").click();
         await expect(this.page.locator('div[class="reveal-modal no-pad open"]')).toBeVisible();
         await this.page.locator("a:has-text('Create Composite Audience')").click();
         // await this.page.waitForTimeout(2000);

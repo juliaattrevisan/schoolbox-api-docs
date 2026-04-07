@@ -210,7 +210,8 @@ async function onResolve(): Promise<void> {
         </button>
     </li>
     <li v-if="props.response?._routes.reopen">
-        <button class="icon-undo" data-test="das-actions-reopen" @click="onReopen">
+        <button data-test="das-actions-reopen" @click="onReopen">
+            <sbx-icon name="undo"></sbx-icon>
             {{ `Reopen ${locale.dialogAgent.proper()}` }}
         </button>
     </li>

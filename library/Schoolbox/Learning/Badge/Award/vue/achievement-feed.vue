@@ -247,9 +247,9 @@ export default {
                                                 <li>
                                                     <a
                                                         @click.prevent="openAchievementWithdrawModal(award)"
-                                                        class="icon-withdraw-achievement"
                                                         title="Withdraw achievement"
-                                                        >Withdraw achievement</a
+                                                        ><sbx-icon name="withdraw-achievement"></sbx-icon>Withdraw
+                                                        achievement</a
                                                     >
                                                 </li>
                                             </template>

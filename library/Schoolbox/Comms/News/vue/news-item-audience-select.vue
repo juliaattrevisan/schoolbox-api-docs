@@ -756,7 +756,8 @@ export default {
                     :placeholder="audiencePlaceholder"
                     required
                 />
-                <button type="button" class="button icon-drag-drop" @click.prevent="openBrowseModal">
+                <button type="button" class="button" @click.prevent="openBrowseModal">
+                    <sbx-icon name="drag-drop"></sbx-icon>
                     Browse&hellip;
                 </button>
             </div>
