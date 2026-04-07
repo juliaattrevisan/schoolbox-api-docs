@@ -138,13 +138,18 @@ class Mapper extends BaseMapper
                 ->groupByCallback(fn (Access\Model $model) => $model->getPastoralBulkImport()->getId());
 
             // Load tag models, keyed by import ID
-            $pb       = $this->getPredicateBuilder()->in('id', $ids);
+            $pb       = $this->getPredicateBuilder();
+            /* getJoinSql does a LEFT JOIN on the lu_pastoral_tag table, hence it will still show up even though
+             * the tag has been soft-deleted, it will still show up because of the LEFT JOIN, so we just replace it
+             * with the INNER JOIN to make sure that deleted tags are not returned
+             */
             $tagQuery = $this->getDatabase()->prepareQuery("
                 SELECT
                     {$this->getColumnString()},
                     {$this->getJoinColumnString('pastoral_bulk_import_tags', 'tag')}
                 FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-                INNER JOIN {$this->getJoinSql('pastoral_bulk_import_tags', '', 'tag')}
+                INNER JOIN `pastoral_bulk_import_tags` AS `v_tag` ON `pastoral_bulk_import`.`id` = `v_tag`.`pastoral_bulk_import_id`
+                INNER JOIN `lu_pastoral_tag` AS `tag` ON `tag`.`id` = `v_tag`.`tag_id` AND `tag`.`deleted_at` IS NULL
                 WHERE {$pb->in('id', $ids)->getWhereIntersect()}
             ");
             $tagModels = [];
