@@ -105,11 +105,8 @@ function onRemoveMembersSelected() {
         <ul class="flex-list">
             <mg-select-access />
             <li v-if="store.emailEnabled">
-                <button
-                    @click.prevent="onEmailMembersSelected"
-                    class="button submit icon-email"
-                    :disabled="store.isProcessing"
-                >
+                <button @click.prevent="onEmailMembersSelected" class="button submit" :disabled="store.isProcessing">
+                    <sbx-icon name="email"></sbx-icon>
                     Email {{ membersStore.selectedMembersPlural }}
                 </button>
             </li>

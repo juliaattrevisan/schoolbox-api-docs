@@ -640,8 +640,8 @@ export default {
                     <li v-if="mailEnabled && currentUserCanEmail">
                         <a
                             @click.prevent="openMailDialog"
-                            :class="{ disabled: selectedStudentExternalIds.length === 0, 'icon-email': true }"
-                            >Compose Email</a
+                            :class="{ disabled: selectedStudentExternalIds.length === 0 }"
+                            ><sbx-icon name="email"></sbx-icon>Compose Email</a
                         >
                     </li>
                 </ul>
@@ -759,6 +759,7 @@ export default {
                                         <slot name="student-menu-items" v-bind:student="student">
                                             <li v-for="(element, index) in student.routes" :key="index">
                                                 <a :href="element.href" :class="element.class" :title="element.title">
+                                                    <sbx-icon v-if="element.icon" :name="element.icon"></sbx-icon>
                                                     {{ element.label }}
                                                 </a>
                                             </li>
