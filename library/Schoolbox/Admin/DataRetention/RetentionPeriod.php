@@ -62,11 +62,6 @@ class RetentionPeriod
         return $this->date->getDatabaseDate();
     }
 
-    public function getRetentionDatabase(): string
-    {
-        return '';
-    }
-
     /**
      * Get the retention period in days, or 0 if not set
      * @return int

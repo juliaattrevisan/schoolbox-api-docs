@@ -34,10 +34,6 @@ class RetentionPeriodTest extends TestCase
 
         // By convention getRetentionDays() returns 0 when no value is set.
         $this->assertSame(0, $rp->getRetentionDays());
-
-        // Current implementation returns an empty string for the database cutoff
-        // when retention is disabled; assert that behaviour explicitly.
-        $this->assertSame('', $rp->getRetentionDatabase());
     }
 
     /**
@@ -122,11 +118,6 @@ class RetentionPeriodTest extends TestCase
 
         // The stored days value should reflect the constructor argument (or 0).
         $this->assertSame($expectedDays, $rp->getRetentionDays());
-
-        // Note: the current implementation does not compute or expose a
-        // database date string via the constructor path; it returns an empty
-        // string. We assert that behaviour explicitly so the test documents it.
-        $this->assertSame('', $rp->getRetentionDatabase());
     }
 
     public static function providerConstructorValidValues(): array
