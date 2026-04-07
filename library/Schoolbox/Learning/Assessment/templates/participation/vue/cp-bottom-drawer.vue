@@ -92,9 +92,10 @@ function clearSelection(): void {
                 </button>
                 <button
                     v-if="props.customisations.length > 0"
-                    class="icon-list button l-flex__item--1-auto"
+                    class="button l-flex__item--1-auto"
                     @click.prevent="handleOpenIncludeInExistingModal"
                 >
+                    <sbx-icon name="list"></sbx-icon>
                     Include in Existing Customisation
                 </button>
                 <button

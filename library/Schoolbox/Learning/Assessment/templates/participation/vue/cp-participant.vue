@@ -202,11 +202,8 @@ function onOpenIncludeInExistingModal(): void {
                             </button>
                         </li>
                         <li>
-                            <button
-                                v-if="customisations.length > 0"
-                                class="icon-list"
-                                @click.prevent="onOpenIncludeInExistingModal"
-                            >
+                            <button v-if="customisations.length > 0" @click.prevent="onOpenIncludeInExistingModal">
+                                <sbx-icon name="list"></sbx-icon>
                                 Include in Existing Customisation
                             </button>
                         </li>

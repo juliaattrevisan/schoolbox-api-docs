@@ -18,7 +18,7 @@
         </li>
         {% if isRouteAuthorized('resourceCategory.browse') %}
             <li>
-                <a class="icon-list" href="{{  routeLookup('resourceCategory.browse') }}" title="Resource Categories">Resource Categories</a>
+                <a href="{{  routeLookup('resourceCategory.browse') }}" title="Resource Categories"><sbx-icon name="list"></sbx-icon>Resource Categories</a>
             </li>
         {% endif %}
         {% if isRouteAuthorized('resourceBookingReport.index') %}
