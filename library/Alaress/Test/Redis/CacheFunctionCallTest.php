@@ -27,38 +27,78 @@ class CacheFunctionCallTest extends TestCase
         ?string $cachedValue,
         mixed $uncompressedValue,
     ): void {
-        // Mock Redis client
-        $redis = new class (
-            $cachedValue,
-            $uncompressedValue,
-        ) extends Redis {
+        /**
+         * Mock Redis client, which contains optional overrides for the
+         * * already-cached value
+         * * value to which the cached value uncompresses
+         */
+        $redis = new class ($cachedValue, $uncompressedValue) extends Redis
+        {
+            /**
+             * @var array<string, CacheInterface>
+             */
             private array $caches = [];
-            public function __construct(private ?string $cachedValue, private mixed $uncompressedValue)
-            {
+
+            /**
+             * Constructor
+             *
+             * @param string|null $cachedValueOverride       Optional override for cached value
+             * @param mixed       $uncompressedValueOverride Optional override for uncompressed value
+             */
+            public function __construct(
+                private ?string $cachedValueOverride,
+                private mixed $uncompressedValueOverride,
+            ) {
             }
 
+            /**
+             * Build a temporary cache, overriding the cached value if it's set.
+             *
+             * @param string $baseKey
+             * @return CacheInterface
+             */
             protected function buildCache(string $baseKey): CacheInterface
             {
                 $this->caches[$baseKey] ??= new class (
                     new ArrayAdapter(),
-                    $this->cachedValue,
+                    $this->cachedValueOverride,
                 ) extends Psr16Cache {
+                    /**
+                     * If true, this will raise an error if `get` misses.
+                     */
                     private bool $mustHit = false;
-                    public function __construct(CacheItemPoolInterface $pool, private ?string $cachedValue)
+
+                    /**
+                     * Constructor
+                     *
+                     * @param CacheItemPoolInterface $pool                Internal PSR-6 cache
+                     * @param string|null            $cachedValueOverride Optional ovverride for cached value
+                     */
+                    public function __construct(CacheItemPoolInterface $pool, private ?string $cachedValueOverride)
                     {
                         parent::__construct($pool);
                     }
 
+                    /**
+                     * @inheritdoc
+                     */
                     public function get($key, $default = null): mixed
                     {
-                        if ($this->mustHit && !isset($this->cachedValue) && !$this->has($key)) {
+                        if ($this->mustHit && !isset($this->cachedValueOverride) && !$this->has($key)) {
                             throw new \OutOfBoundsException(sprintf('Key "%s" does not exist', $key));
                         }
                         // Need to call get before returning cachedValue, due to internals of Psr16Cache
                         $result = parent::get($key, $default);
-                        return $this->cachedValue ?? $result;
+                        return $this->cachedValueOverride ?? $result;
                     }
 
+                    /**
+                     * Mark this cache as needing to hit on subsequent fetches:
+                     * if it does not, it will raise an error.
+                     *
+                     * @param bool $mustHit
+                     * @return $this
+                     */
                     public function setMustHit(bool $mustHit): self
                     {
                         $this->mustHit = $mustHit;
@@ -68,10 +108,25 @@ class CacheFunctionCallTest extends TestCase
                 return $this->caches[$baseKey];
             }
 
+            /**
+             * Return the overridden uncompressed value if set, or the
+             * calculated uncompressed value if not.
+             *
+             * @param string $value
+             * @return string|false
+             */
             protected function uncompressValue(string $value): string|false
             {
-                return $this->uncompressedValue ?? parent::uncompressValue($value);
+                return $this->uncompressedValueOverride ?? parent::uncompressValue($value);
             }
+
+            /**
+             * Mark the internal cache as needing to hit on subsequent fetches:
+             * if it does not, it will raise an error.
+             *
+             * @param bool $mustHit
+             * @return $this
+             */
             public function setMustHit(bool $mustHit): self
             {
                 foreach ($this->caches as $cache) {
