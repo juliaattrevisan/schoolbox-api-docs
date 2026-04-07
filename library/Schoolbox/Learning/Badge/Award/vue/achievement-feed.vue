@@ -257,9 +257,8 @@ export default {
                                                 <li>
                                                     <a
                                                         @click.prevent="awardAchievement(award)"
-                                                        class="icon-showcase"
                                                         title="Award achievement"
-                                                        >Award achievement</a
+                                                        ><sbx-icon name="showcase"></sbx-icon>Award achievement</a
                                                     >
                                                 </li>
                                                 <li>

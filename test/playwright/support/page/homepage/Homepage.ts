@@ -57,7 +57,7 @@ export default class Homepage {
 
     static readonly ELEMENT_LOCK_TOGGLE = "#component-lock-switch";
 
-    static readonly ELEMENT_COMPONENT_SETTINGS = "a.icon-settings.settings.edit";
+    static readonly ELEMENT_COMPONENT_SETTINGS = 'a.settings.edit:has(sbx-icon[name="settings"])';
 
     static readonly ELEMENT_REMOVE_ICON = "a.icon-close";
 

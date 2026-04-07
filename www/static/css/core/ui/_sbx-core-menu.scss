@@ -286,8 +286,91 @@ body.sbx-body {
                 right: var(--sbx-size-xs);
             }
 
-            #notification-toggle-full {
-                background-color: var(--sbx-color-foreground-primary);
+            & #notification-toggle-full {
+                background-color: var(--bg-primary) !important;
+                color: var(--sbx-config-color-accent);
+            }
+        }
+    }
+
+    // Message list styles
+    #message-list {
+        & #notification-toggle-full {
+            background-color: transparent;
+            color: var(--sbx-config-color-accent);
+        }
+
+        & li:has(:is(#msg-bar, section, .button)) {
+            padding-inline: 0.6rem;
+        }
+
+        & li:has(section) {
+            padding-block: 1rem 0.6rem;
+        }
+
+        & :where(#right-menu-dock, #notification-toggle-full, .settings-button) {
+            color: var(--sbx-config-color-accent);
+        }
+    }
+
+    .side-nav {
+        border-radius: var(--sbx-border-radius-normal);
+        overflow: hidden;
+
+        & li {
+            &.active > a {
+                border-left-width: 4px;
+            }
+
+            &.active
+                > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
+                    button.submit
+                ):not(.show-ckeditor-button) {
+                color: var(--sbx-config-color-accent);
+                font-weight: 600;
+            }
+
+            &
+                > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
+                    button.submit
+                ):not(.show-ckeditor-button) {
+                color: var(--sbx-config-color-accent);
+                font-family: var(--ff-primary);
+                padding-block: 0.5rem;
+            }
+        }
+    }
+
+    // Account content styles
+    #account-content {
+        border-radius: var(--sbx-border-radius-normal);
+
+        & .separator {
+            background-color: #eee !important;
+            color: var(--sbx-config-color-accent);
+            font-weight: 600;
+        }
+
+        & [class^="icon"] {
+            color: var(--sbx-color-text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.2;
+
+            li:has(&) {
+                padding-block: 0.4rem;
+            }
+        }
+
+        & li.user {
+            padding-block: 0.8rem;
+            padding-inline: 0.8rem;
+
+            & img {
+                border-radius: var(--sbx-border-radius-normal);
+            }
+
+            & p {
                 color: var(--sbx-color-text-primary);
                 font-weight: var(--sbx-font-weight-active);
                 text-transform: none;

@@ -151,11 +151,12 @@ const isSaving = window.Vue.computed(() => {
             <nav>
                 <a
                     ref="editBtn"
-                    class="icon-settings"
+                    class="settings"
                     title="Settings"
                     :data-test="`${peFieldsStore.getFieldIdentifier(props.field)}-settings`"
                     @click="isEditPanelOpen = !isEditPanelOpen"
-                />
+                    ><sbx-icon name="settings"></sbx-icon
+                ></a>
                 <a
                     ref="removeBtn"
                     title="Remove"

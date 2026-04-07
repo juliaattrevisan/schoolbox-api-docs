@@ -546,10 +546,11 @@ window.Vue.onMounted(async () => {
                             v-if="props.routes.getCreateEvidenceForm"
                             href="#"
                             title="Share Learning"
-                            class="learning icon-share"
+                            class="learning"
                             data-reveal-id="shareLearningMoment"
                             data-test="learning-moment-evidence-share"
                         >
+                            <sbx-icon name="share"></sbx-icon>
                             <span>Share Learning</span>
                         </a>
                         <a

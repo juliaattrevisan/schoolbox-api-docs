@@ -41,9 +41,9 @@
                  #}
                 {% if isShowcased %}
                     {% if USER.id == student.id %}
-                        <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='0' title="Remove from ePortfolio">Remove from ePortfolio</a>
+                        <a data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='0' title="Remove from ePortfolio"><sbx-icon name="showcase"></sbx-icon>Remove from ePortfolio</a>
                     {% else %}
-                        <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='0' title="Remove from {{ student.givenName }}'s ePortfolio">Remove from {{ student.givenName }}'s ePortfolio</a>
+                        <a data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='0' title="Remove from {{ student.givenName }}'s ePortfolio"><sbx-icon name="showcase"></sbx-icon>Remove from {{ student.givenName }}'s ePortfolio</a>
                     {% endif %}
                 {# Allow publish only if the assessment has responses or feedback
                  #}
@@ -52,9 +52,9 @@
                      # or if you're publishing on behalf of a student to *their* eportfolio
                      #}
                     {% if USER.id == student.id %}
-                        <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='1' title="Publish to ePortfolio">Publish to ePortfolio</a>
+                        <a data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='1' title="Publish to ePortfolio"><sbx-icon name="showcase"></sbx-icon>Publish to ePortfolio</a>
                     {% else %}
-                        <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='1' title="Publish to {{ student.givenName }}'s ePortfolio">Publish to {{ student.givenName }}'s ePortfolio</a>
+                        <a data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='1' title="Publish to {{ student.givenName }}'s ePortfolio"><sbx-icon name="showcase"></sbx-icon>Publish to {{ student.givenName }}'s ePortfolio</a>
                     {% endif %}
                 {% endif %}
             </li>

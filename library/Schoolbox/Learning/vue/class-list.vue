@@ -611,9 +611,8 @@ export default {
                             @click.prevent="openShareLearningMomentDialog"
                             :class="{
                                 disabled: selectedStudentLearningMomentsEnabledIds.length === 0,
-                                'icon-share': true,
                             }"
-                            >Share Learning Moment</a
+                            ><sbx-icon name="share"></sbx-icon>Share Learning Moment</a
                         >
                     </li>
                     <li v-if="badgesEnabled">
