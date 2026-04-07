@@ -114,7 +114,7 @@ class Factory extends Filter\AbstractFactory
         }
 
         // Case 2: viewer is a parent of the viewee
-        foreach ($user->getChildren() as $child) {
+        foreach ($user->getChildren() ?? [] as $child) {
             if ($child->getId() === $viewee->getId()) {
                 return $this->workTypeMapper->findByPredicates(
                     $this->workTypeMapper->getPredicateBuilder()->notEquals('is_visible_to_parents', 0)

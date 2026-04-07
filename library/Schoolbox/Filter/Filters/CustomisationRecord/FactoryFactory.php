@@ -22,6 +22,8 @@ use Schoolbox\Filter\IFactory;
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\MapperFactory;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -106,7 +108,9 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getOptionMapper(),
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper(),
-                    $this->getMapperFactory()->get(WorkTypeMapper::class)
+                    $this->getMapperFactory()->get(WorkTypeMapper::class),
+                    $this->getMapperFactory()->get(Access::class),
+                    $this->getMapperFactory()->get(FolderMapper::class)
                 );
         }
         throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);

@@ -125,7 +125,9 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getOptionMapper(),
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper(),
-                    $this->getWorkTypeMapper()
+                    $this->getWorkTypeMapper(),
+                    $this->getAccess(),
+                    $this->getFolderMapper()
                 );
             case WeightingType\Definition::class:
                 return new WeightingType\Factory(
