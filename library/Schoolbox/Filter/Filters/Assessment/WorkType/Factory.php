@@ -77,7 +77,10 @@ class Factory extends Filter\AbstractFactory
      * @param User             $user
      * @param Model            $pageFilter
      * @param GenericCollection|null $selections
-     * @param User|null        $viewee
+     * @param User|null $viewee
+     *  - The user whose assessments are being viewed.
+     *    Note this only makes sense for pages showing one user's assessments.
+     *    That is why this parameter is ignored depending on $pageFilter->getPage() (see code).
      * @param array            $routeArgs
      * @param GenericCollection $overrides
      * @return Component|IComponent
