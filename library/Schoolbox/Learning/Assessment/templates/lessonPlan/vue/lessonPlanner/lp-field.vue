@@ -104,9 +104,10 @@ window.Vue.onMounted(async () => {
             </textarea>
             <a
                 v-if="sbProps.aiFeatures.lessonplan?.enabled"
-                class="icon-ai lp-field-regenerate"
+                class="lp-field-regenerate"
                 @click="() => lpStore.openModal(props.fieldId)"
             >
+                <sbx-icon name="ai"></sbx-icon>
                 {{ fieldWasGenerated ? "Regenerate" : "Generate" }} with AI
             </a>
         </div>

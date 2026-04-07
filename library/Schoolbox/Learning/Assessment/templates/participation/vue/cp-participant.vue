@@ -138,10 +138,11 @@ function onOpenIncludeInExistingModal(): void {
         <td v-if="canSuggestCustomisation">
             <button
                 v-if="props.participant._links.differentiationProfile"
-                class="button icon-ai f-no-margins"
+                class="button f-no-margins"
                 type="button"
                 @click.prevent="onViewSuggestedCustomisation"
             >
+                <sbx-icon name="ai"></sbx-icon>
                 {{ props.participant.cachedSuggestedCustomisation ? "View" : "Generate" }} Suggested Customisation
             </button>
         </td>

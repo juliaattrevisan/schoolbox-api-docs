@@ -41,9 +41,10 @@ window.Vue.onMounted(() => {
                 <button
                     v-if="sbProps.aiFeatures.lessonplan?.enabled"
                     type="button"
-                    class="button expand icon-ai"
+                    class="button expand"
                     @click="() => lpStore.openModal()"
                 >
+                    <sbx-icon name="ai"></sbx-icon>
                     {{ lpStore.hasLessonContent ? "Regenerate" : "Generate" }}
                     {{ locale.lessonPlan.singular() }}
                     with AI

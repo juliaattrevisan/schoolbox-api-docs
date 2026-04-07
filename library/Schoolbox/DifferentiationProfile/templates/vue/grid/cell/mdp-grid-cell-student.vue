@@ -79,9 +79,10 @@ function onGenerateSelected(): void {
             </a>
             <button
                 v-if="sbProps.aiFeatures.differentiation?.enabled && headerStore.hasEnabledTextFields"
-                class="button icon-ai f-no-margins"
+                class="button f-no-margins"
                 @click="onGenerateSelected"
             >
+                <sbx-icon name="ai"></sbx-icon>
                 Extract with AI
             </button>
         </template>

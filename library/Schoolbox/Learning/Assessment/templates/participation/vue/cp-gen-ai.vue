@@ -113,7 +113,10 @@ window.Vue.onMounted(() => {
                 Suggested Customisation
                 {{ props.participant?.user.fullName ? ` for ${props.participant.user.fullName}` : "" }}
             </h2>
-            <button v-if="aiResponse" class="button icon-ai" @click.prevent="onRegenerate">Regenerate</button>
+            <button v-if="aiResponse" class="button" @click.prevent="onRegenerate">
+                <sbx-icon name="ai"></sbx-icon>
+                Regenerate
+            </button>
         </div>
         <request-error v-if="loadError" :further-info="loadError" />
         <div v-else-if="isProcessing">

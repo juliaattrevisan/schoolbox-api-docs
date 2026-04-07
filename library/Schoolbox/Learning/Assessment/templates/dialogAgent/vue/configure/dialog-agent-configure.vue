@@ -142,7 +142,7 @@ window.Vue.onMounted(async () => {
                 <a :href="modifyRoute"><sbx-icon name="modify"></sbx-icon> Modify Settings </a>
             </li>
             <li>
-                <button class="icon-ai" @click="isPromptModalOpen = true">View Agent Prompt</button>
+                <button @click="isPromptModalOpen = true"><sbx-icon name="ai"></sbx-icon>View Agent Prompt</button>
             </li>
         </ul>
     </div>

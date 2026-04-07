@@ -16,7 +16,7 @@ export default class Index {
 
     static readonly LINK_ADD_NEWS = ".icon-add";
 
-    static readonly LINK_ARCHIVE = ".icon-archive";
+    static readonly LINK_ARCHIVE = '.tabs a:has-text("Archive")';
 
     static readonly LINK_RSS = ".icon-rss";
 

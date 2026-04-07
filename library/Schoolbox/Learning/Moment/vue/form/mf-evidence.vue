@@ -340,12 +340,13 @@ window.Vue.watch(
             Record a video
         </a>
         <a
-            class="icon-audio share-audio"
+            class="share-audio"
             data-test="learning-moment-evidence-share-audio"
             :title="canAddEvidence ? 'Record audio' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="(MediaType.AUDIO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.AUDIO)"
         >
+            <sbx-icon name="audio"></sbx-icon>
             Record audio
         </a>
         <a

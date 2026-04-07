@@ -48,10 +48,11 @@ Usage:
                     data-moment-type="audio"
                     data-record-audio-button
                     href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=audio{% endif %}"
-                    class="icon-audio share-audio"
+                    class="share-audio"
                     data-test="learning-moment-evidence-share-audio"
                     title="Record audio"
                 >
+                    <sbx-icon name="audio"></sbx-icon>
                     Record audio
                 </a>
                 <a

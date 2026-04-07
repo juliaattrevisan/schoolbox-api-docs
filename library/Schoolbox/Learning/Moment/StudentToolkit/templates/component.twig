@@ -21,7 +21,7 @@
                 <a class="button icon-goal"
                    href="{{ routeLookupIfAuthorized('learningBadgeAward.getSetAsGoalForSelfForm') }}?{{ RETURN_URL.name }}={{ returnUrl ?? RETURN_URL.current }}">Set My Goals</a>
             {% endif %}
-            <a class="button icon-advanced-list" href="/search/user/{{ user.id }}#activity">My Activity</a>
+            <a class="button" href="/search/user/{{ user.id }}#activity"><sbx-icon name="advanced-list"></sbx-icon>My Activity</a>
             {% if config.badges_enabled %}
                 <a class="button icon-trophy" href="/search/user/{{ user.id }}#achievements">My Achievements</a>
             {% endif %}

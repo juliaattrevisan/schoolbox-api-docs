@@ -95,7 +95,8 @@ window.Vue.onMounted(() => {
         {{ lpStore.generateError }}
     </div>
 
-    <button type="button" class="button submit expand icon-ai" :disabled="!allowGeneration" @click="lpStore.generate">
+    <button type="button" class="button submit expand" :disabled="!allowGeneration" @click="lpStore.generate">
+        <sbx-icon name="ai"></sbx-icon>
         <template v-if="lpStore.generateForField === null">
             {{ lpStore.hasLessonContent ? "Regenerate" : "Generate" }}
             {{ locale.lessonPlan.singular() }}
