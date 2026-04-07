@@ -295,12 +295,14 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         /**
-         * Newly created assessment is hidden from learners or closed
+         * Newly created assessment is hidden from learners and parents, or closed
          */
         $isCurrentHidden = false;
         try {
-            $isCurrentHidden = $assessment->getWorkType() === null ? false :
-                !$this->workTypeMapper->findById($assessment->getWorkType()->getId())->isVisibleToLearners();
+            if ($assessment->getWorkType() !== null) {
+                $workType = $this->workTypeMapper->findById($assessment->getWorkType()->getId());
+                $isCurrentHidden = !$workType->isVisibleToLearners() && !$workType->isVisibleToParents();
+            }
         } catch (BaseMapper\Exception $e) {
             // noop;
         }
@@ -314,7 +316,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         /**
-         * Changed to hidden from learners
+         * Changed to hidden from learners and parents
          */
         $isPreviousHidden = false;
         if (
@@ -323,8 +325,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             && array_key_exists('workType', $diff['assessment'])
         ) {
             try {
-                $isPreviousHidden = $diff['assessment']['workType'][1] === null ? false :
-                    !$this->workTypeMapper->findById($diff['assessment']['workType'][1])->isVisibleToLearners();
+                if ($diff['assessment']['workType'][1] !== null) {
+                    $previousWorkType = $this->workTypeMapper->findById($diff['assessment']['workType'][1]);
+                    $isPreviousHidden = !$previousWorkType->isVisibleToLearners() && !$previousWorkType->isVisibleToParents();
+                }
                 if ($isPreviousHidden && $isCurrentHidden) {
                     // no notification
                     return;
