@@ -148,7 +148,7 @@
                             <!-- BEGIN show_delete -->
                             <a href="/survey/questionbank/question/delete/{QUESTION_BANK_ID}" title="Delete" data-delete-question><sbx-icon name="delete"></sbx-icon></a>
                             <!-- END show_delete -->
-                            <a class="icon-modify" href="/survey/questionbank/question/modify/{QUESTION_BANK_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}" title="Modify"></a>
+                            <a href="/survey/questionbank/question/modify/{QUESTION_BANK_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}" title="Modify"><sbx-icon name="modify"></sbx-icon></a>
                         </nav>
                         <article>{QUESTION}</article>
                         <div class="small-12 columns">
@@ -229,7 +229,7 @@
             </div>
             <div class="content">
                 <!-- BEGIN has_edit_category -->
-                <a class="button icon-modify" href="#" data-reveal-id="edit-category-modal">Edit Category</a>
+                <a class="button" href="#" data-reveal-id="edit-category-modal"><sbx-icon name="modify"></sbx-icon>Edit Category</a>
 
                 <div id="edit-category-modal" class='reveal-modal' data-reveal>
                     <form action='/survey/questionbank/modify.php' class="top" method='post'>

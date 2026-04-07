@@ -38,7 +38,7 @@ export default class Index {
 
     static readonly LINK_NEWS_ITEM_VIEW = ".card > a";
 
-    static readonly LINK_NEWS_ITEM_MODIFY = "a.icon-modify";
+    static readonly LINK_NEWS_ITEM_MODIFY = 'a:has(sbx-icon[name="modify"])';
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;

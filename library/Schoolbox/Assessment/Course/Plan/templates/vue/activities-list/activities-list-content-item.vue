@@ -163,8 +163,8 @@ window.Vue.onUnmounted(() => {
                 <li v-if="props.activity._links.modify">
                     <a
                         :href="getReturnUrl(props.activity._links.modify)"
-                        class="icon-modify"
                         :data-test="`unit-planner-modify-activity-${props.activity.id}`"
+                        ><sbx-icon name="modify"></sbx-icon
                         >{{
                             props.activity.assessmentType === ACTIVITY_TYPE_QUIZ ||
                             props.activity.assessmentType === ACTIVITY_TYPE_DIALOG_AGENT

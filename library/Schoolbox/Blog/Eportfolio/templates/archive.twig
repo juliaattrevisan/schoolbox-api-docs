@@ -87,7 +87,7 @@
                         </div>
                         {% if isRouteAuthorized('eportfolioBlog.getModify', {page: page, blog: blog }) %}
                         <nav>
-                            <a class="icon-modify" title="Modify" href="{{ routeLookup('eportfolioBlog.getModify', {pageId: page.getPageId, id: blog.getId }) }}"></a>
+                            <a title="Modify" href="{{ routeLookup('eportfolioBlog.getModify', {pageId: page.getPageId, id: blog.getId }) }}"><sbx-icon name="modify"></sbx-icon></a>
                         </nav>
                         {% endif %}
 

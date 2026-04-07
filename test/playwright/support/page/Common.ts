@@ -105,7 +105,7 @@ export default class Common {
     /**
      * modify button on pages like news feed, pastoral record
      */
-    static readonly ICON_MODIFY_PAGES = "a.icon-modify.no-text";
+    static readonly ICON_MODIFY_PAGES = 'a.no-text:has(sbx-icon[name="modify"])';
 
     /**
      * any modal dialog, open or closed

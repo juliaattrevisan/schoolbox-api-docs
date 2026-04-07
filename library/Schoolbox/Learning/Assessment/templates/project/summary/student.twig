@@ -79,7 +79,7 @@
         </nav>
         <ul data-dropdown-content class="f-dropdown" id="project-options{{ assessment.id }}">
             {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
-            {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>{% endif %}
+            {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}"><sbx-icon name="modify"></sbx-icon>Modify</a></li>{% endif %}
         </ul>
     {% endif %}
 </div>

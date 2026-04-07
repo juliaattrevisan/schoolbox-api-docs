@@ -545,7 +545,7 @@ export default {
                             >
                                 {{ getVisibilityAction(props.row) }}
                             </button>
-                            <a class="icon-modify" :href="props.row.editUrl" title="Modify File"></a>
+                            <a :href="props.row.editUrl" title="Modify File"><sbx-icon name="modify"></sbx-icon></a>
                         </nav>
                     </template>
                     <template #afterTable>

@@ -46,24 +46,31 @@ const viewStudentParticipationLink = window.Vue.computed(() => {
         <a :href="viewStudentParticipationLink" class="icon-group">Student Participation</a>
     </li>
     <li v-if="props.activity._links?.modify" :data-test="`markbook-assessment-dropdown-${props.activity.id}-modify`">
-        <a :href="getReturnUrl(props.activity._links.modify)" class="icon-modify">{{
-            props.activity.assessmentType === ACTIVITY_TYPE_QUIZ ||
-            props.activity.assessmentType === ACTIVITY_TYPE_DIALOG_AGENT
-                ? "Modify Settings"
-                : "Modify"
-        }}</a>
+        <a :href="getReturnUrl(props.activity._links.modify)"
+            ><sbx-icon name="modify"></sbx-icon
+            >{{
+                props.activity.assessmentType === ACTIVITY_TYPE_QUIZ ||
+                props.activity.assessmentType === ACTIVITY_TYPE_DIALOG_AGENT
+                    ? "Modify Settings"
+                    : "Modify"
+            }}</a
+        >
     </li>
     <li
         v-if="props.activity._links?.modifyContent"
         :data-test="`markbook-assessment-dropdown-${props.activity.id}-modify-content`"
     >
-        <a :href="getReturnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Content</a>
+        <a :href="getReturnUrl(props.activity._links.modifyContent)"
+            ><sbx-icon name="modify"></sbx-icon>Modify Content</a
+        >
     </li>
     <li
         v-if="props.activity._links?.configureAgent"
         :data-test="`markbook-assessment-dropdown-${props.activity.id}-configure-agent`"
     >
-        <a :href="getReturnUrl(props.activity._links.configureAgent)" class="icon-modify">Configure Agent</a>
+        <a :href="getReturnUrl(props.activity._links.configureAgent)"
+            ><sbx-icon name="modify"></sbx-icon>Configure Agent</a
+        >
     </li>
     <li
         v-if="props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK && viewStatusLink"

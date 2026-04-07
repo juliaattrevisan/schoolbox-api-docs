@@ -40,7 +40,7 @@
     </div>
     {% if isRouteAuthorized('blog.getModify', { blog: record, folder: record.getFolder }) %}
     <nav>
-        <a class="icon icon-modify" href="{{ routeLookup('blog.getModify', { id: record.getId }) }}" title="Modify"></a>
+        <a class="icon" href="{{ routeLookup('blog.getModify', { id: record.getId }) }}" title="Modify"><sbx-icon name="modify"></sbx-icon></a>
     </nav>
     {% endif %}
 </div>

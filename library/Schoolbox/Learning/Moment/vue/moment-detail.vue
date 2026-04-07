@@ -69,7 +69,7 @@ async function deleteMoment(): Promise<void> {
         </nav>
         <ul id="mf-pop-out" class="f-dropdown" data-dropdown-content>
             <li v-if="props.moment._links.modifyForm">
-                <a class="icon-modify" :href="getReturnUrl(props.moment._links.modifyForm)"> Modify </a>
+                <a :href="getReturnUrl(props.moment._links.modifyForm)"><sbx-icon name="modify"></sbx-icon> Modify </a>
             </li>
             <li v-if="props.moment._links.delete">
                 <a :href="props.moment._links.delete" @click.prevent="isDeleteModalOpen = true">

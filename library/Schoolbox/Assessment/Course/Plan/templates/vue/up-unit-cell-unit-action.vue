@@ -58,10 +58,9 @@ function onDeleteUnit(): void {
                 </li>
                 <li v-if="props.unit._routes.modify">
                     <a
-                        class="icon-modify"
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-modify-link`"
                         :href="getReturnUrl(props.unit._routes.modify!)"
-                        >Modify</a
+                        ><sbx-icon name="modify"></sbx-icon>Modify</a
                     >
                 </li>
                 <!-- prettier-ignore -->

@@ -186,13 +186,13 @@ function onOpenIncludeInExistingModal(): void {
                         <li class="separator">Manage</li>
                         <li>
                             <button
-                                class="icon-modify"
                                 @click.prevent="
                                     onActionSelected(
                                         `${props.routes.getLearningPlanNewUrl}?student=${props.participant.user.id}&${getReturnUrl()}`,
                                     )
                                 "
                             >
+                                <sbx-icon name="modify"></sbx-icon>
                                 Modify Existing {{ locale.activity.translate(false, true) }}
                             </button>
                         </li>

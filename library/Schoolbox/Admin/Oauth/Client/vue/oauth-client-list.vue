@@ -404,10 +404,11 @@ window.Vue.watch(modifySelected, (newSelected) => {
                                 <nav>
                                     <a
                                         href="#modify"
-                                        class="icon-modify no-text"
+                                        class="no-text"
                                         title="Modify this client"
                                         aria-label="Modify this client"
                                         @click.prevent="showModifyModal(row)"
+                                        ><sbx-icon name="modify"></sbx-icon
                                     ></a>
                                     <a
                                         href="#regenerate"

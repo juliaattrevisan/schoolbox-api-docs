@@ -749,11 +749,10 @@ window.Vue.onMounted(async () => {
                                                 <a
                                                     v-if="item.object._links.modifyForm"
                                                     :href="getReturnUrl(item.object._links.modifyForm)"
-                                                    class="icon-modify"
                                                     title="Modify"
                                                     :data-test="`learning-moment-popout-option-modify-${item.object.id}`"
                                                 >
-                                                    Modify
+                                                    <sbx-icon name="modify"></sbx-icon>Modify
                                                 </a>
                                             </li>
                                             <li>

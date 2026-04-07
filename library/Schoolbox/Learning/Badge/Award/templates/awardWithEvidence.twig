@@ -46,7 +46,7 @@
             </div>
             {% if modifyRoute or postRoute %}
             <nav>
-                {% if modifyRoute %}<a href="{{ modifyRoute ~ '?returnUrl=' ~ returnUrl }}" class="icon-modify" title="Modify"></a>{% endif %}
+                {% if modifyRoute %}<a href="{{ modifyRoute ~ '?returnUrl=' ~ returnUrl }}" title="Modify"><sbx-icon name="modify"></sbx-icon></a>{% endif %}
                 {% if postRoute and award.reason is not empty %}<a title="Delete" data-delete-evidence><sbx-icon name="delete"></sbx-icon></a>{% endif %}
             </nav>
             {% endif %}

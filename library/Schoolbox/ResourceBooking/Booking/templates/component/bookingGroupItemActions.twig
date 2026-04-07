@@ -17,8 +17,7 @@
             <li>
                 <a
                     href="{{ modifyRoute }}?returnUrl={{ returnUrl }}"
-                    class="icon-modify"
-                >Modify Approved Booking</a>
+                ><sbx-icon name="modify"></sbx-icon>Modify Approved Booking</a>
             </li>
         {% endif %}
     {% endif %}
@@ -28,8 +27,7 @@
         <li>
             <a
                 href="{{ modifyRoute }}?returnUrl={{ returnUrl }}"
-                class="icon-modify"
-            >Modify{% if booking.clash %} Clash{% endif %} Booking</a>
+            ><sbx-icon name="modify"></sbx-icon>Modify{% if booking.clash %} Clash{% endif %} Booking</a>
         </li>
     {% endif %}
 
@@ -37,8 +35,7 @@
         <li>
             <a
                 href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}"
-                class="icon-modify"
-            >Manage Clashes on Calendar</a>
+            ><sbx-icon name="modify"></sbx-icon>Manage Clashes on Calendar</a>
         </li>
     {% endif %}
 

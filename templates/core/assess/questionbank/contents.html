@@ -70,7 +70,7 @@
                             <!-- BEGIN show_delete -->
                             <a href="/assess/questionbank/question/delete/{QUESTION_BANK_ID}?{RETURN_URL_NAME}={RETURN_URL}" title="Delete" data-delete-question><sbx-icon name="delete"></sbx-icon></a>
                             <!-- END show_delete -->
-                            <a class="icon-modify" href="/assess/questionbank/question/modify/{QUESTION_BANK_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}?{RETURN_URL_NAME}={RETURN_URL}" title="Modify" ></a>
+                            <a href="/assess/questionbank/question/modify/{QUESTION_BANK_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}?{RETURN_URL_NAME}={RETURN_URL}" title="Modify" ><sbx-icon name="modify"></sbx-icon></a>
                         </nav>
                         <div class="small-12 columns">
                             <div class="alert-box hide" data-answer-content="{QUESTION_BANK_ID}">
@@ -149,7 +149,7 @@
             </div>
             <div class="content">
                 <!-- BEGIN has_edit_category -->
-                <a class="button icon-modify" href="#" data-reveal-id="edit-category-modal">Edit Category</a>
+                <a class="button" href="#" data-reveal-id="edit-category-modal"><sbx-icon name="modify"></sbx-icon>Edit Category</a>
 
                 <div id="edit-category-modal" class='reveal-modal' data-reveal>
                     <form action='/assess/questionbank/modify.php' class='top' method='post'>

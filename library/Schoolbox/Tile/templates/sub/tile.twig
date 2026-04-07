@@ -77,8 +77,8 @@ $(function () {
               data-role="delete"
               title="Delete"><sbx-icon name="delete"></sbx-icon>Delete</a>
         <a href="{{ routeLookup('tile.edit', {id: tile.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}"
-           class="button icon-modify right"
-           title="Modify"></a>
+              class="button right"
+              title="Modify"><sbx-icon name="modify"></sbx-icon></a>
     </div>
     {% endif %}
 </li>

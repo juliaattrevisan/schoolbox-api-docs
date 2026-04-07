@@ -74,7 +74,7 @@ function clearSelection(): void {
             </template>
             <template v-else>
                 <button
-                    class="icon-modify button l-flex__item--1-auto"
+                    class="button l-flex__item--1-auto"
                     @click.prevent="
                         handleActionSelected(
                             selectedList,
@@ -82,6 +82,7 @@ function clearSelection(): void {
                         )
                     "
                 >
+                    <sbx-icon name="modify"></sbx-icon>
                     Modify Existing {{ locale.activity.translate(false, true) }}
                 </button>
                 <button

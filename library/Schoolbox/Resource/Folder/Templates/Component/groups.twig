@@ -32,7 +32,7 @@
                 </nav>
                 <ul data-dropdown-content class="f-dropdown" id="class-options{{ group.id }}">
                     {% if isAccessWrite or isAccessAdmin %}
-                        <li><a href="{{ routeLookup('folder.getFolderModify', {id: group.id}) }}" class="icon-modify">Modify Folder</a></li>
+                        <li><a href="{{ routeLookup('folder.getFolderModify', {id: group.id}) }}"><sbx-icon name="modify"></sbx-icon>Modify Folder</a></li>
                         <li><a href="/statistics/homepage/{{ group.id }} " class="icon-report">View Statistics</a></li>
                     {% endif %}
                     {% if isAccessAdmin %}
