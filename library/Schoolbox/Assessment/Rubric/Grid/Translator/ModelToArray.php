@@ -41,7 +41,7 @@ class ModelToArray
             'title' => '(backend unimplemented)', // TODO: rubric title, string (not null)
             'weight' => null, // TODO: rubric weight, number|null
             'useMarkRange' => $rubricGrid->isUseMarkRange(),
-            'capabilityMarkType' => $assessment->getCapabilityMarkType()?->getId(),
+            'capabilityMarkType' => $assessment->getCapabilityMarkType()?->getSlug(),
             'capabilityGradeGroup' => $assessment->getCapabilityGradeGroup()?->getId(),
             'levels' => $rubricGrid->getLevels()->map(fn(Level $level) => [
                 'id' => $level->getId(),

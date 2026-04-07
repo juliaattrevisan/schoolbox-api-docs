@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { apiRequest } from "@js/util/sbx/apiUtils";
+import { downloadApiRequest } from "@js/util/sbx/apiUtils";
 import type { RubricGrid } from "./types";
+import { translateGridToFormPayload } from "./payload";
 
 interface Props {
     rubricGrid: RubricGrid | null;
@@ -33,10 +34,15 @@ async function download(): Promise<void> {
     }
 
     const toast = window.sbProps.toastActivate("Downloading rubric...");
-    const response = await apiRequest({
+    const response = await downloadApiRequest({
         method: "POST",
         url: parsedProps.value.routeRubricDownload,
-        body: parsedProps.value.rubricGrid,
+        body: {
+            rubricGrid: translateGridToFormPayload(parsedProps.value.rubricGrid),
+            assessmentId: parsedProps.value.assessmentId,
+        },
+        filenameFallback: "rubric.csv",
+        accept: ["text/csv"],
     });
 
     if (!response.success) {

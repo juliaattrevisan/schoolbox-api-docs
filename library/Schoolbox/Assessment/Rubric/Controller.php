@@ -316,22 +316,9 @@ class Controller extends BaseController
         $rubricGridTranslator = new RubricGridTranslator();
         $rubricGridPayload = $rubricGridTranslator($assessment->getRubricGrid(), $assessment);
 
-        $payload = [
-
-            /* Capability Mark Type value, if applicable
-             */
-            'capabilityMarkType' => $assessment->getCapabilityMarkType()?->getId(),
-
-            /* Capability Grade Group value, if applicable
-             */
-            'capabilityGradeGroup' => $assessment->getCapabilityGradeGroup()?->getId(),
-
-            /* The rubric grid resulting from the csv import
-             */
+        $this->response = $this->responseAsJson([
             'rubricGrid' => $rubricGridPayload,
-        ];
-
-        $this->response = $this->responseAsJson($payload);
+        ]);
     }
 
     /**
@@ -361,7 +348,7 @@ class Controller extends BaseController
 
         if ($rubric['capabilityMarkType']) {
             try {
-                $markType = MarkTypeMapper::getInstance()->findById($rubric['capabilityMarkType']);
+                $markType = MarkTypeMapper::getInstance()->findOneByColumn('slug', $rubric['capabilityMarkType']);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $this->sendError('Unknown capability mark type selected');
                 return;
@@ -387,7 +374,7 @@ class Controller extends BaseController
 
         $grid     = (new GridFactory())->buildFromPostData(
             $this->mapper->retrieveGrid($assessment, false),
-            [ $assessmentId => $rubric['rubricGrid'] ], // TODO this will probably change as we further implement multi-grid support
+            [ $assessmentId => $rubric ], // TODO this will probably change as we further implement multi-grid support
             false
         );
         $basename = (new Url($assessment->getTitle()))->getSlug();
@@ -451,10 +438,13 @@ class Controller extends BaseController
         $proposedAssessment = (clone $currentAssessment);
 
         // TODO: capabilityMarkType & useMarkRange come from the rubric data itself now, they shouldn't be against the assessment anymore
-        $capabilityMarkTypeId = (int)($post[$assessmentId]['capabilityMarkType'] ?? MarkType::TYPE_NONE);
+        $capabilityMarkTypeSlug = $post[$assessmentId]['capabilityMarkType'] ?? MarkType::SLUG_NONE;
+        $capabilityMarkType = $this->markTypeMapper->createModel()
+            ->setSlug($capabilityMarkTypeSlug)
+            ->setId(MarkType::idToSlug($capabilityMarkTypeSlug));
         $useMarkRange = $post[$assessmentId]['useMarkRange'] ?? false;
 
-        $proposedAssessment->setCapabilityMarkType($this->markTypeMapper->createModel()->setId($capabilityMarkTypeId));
+        $proposedAssessment->setCapabilityMarkType($capabilityMarkType);
         $proposedAssessment->setUseMarkRange($useMarkRange);
 
         $proposedGrid = (new GridFactory())->buildFromPostData(

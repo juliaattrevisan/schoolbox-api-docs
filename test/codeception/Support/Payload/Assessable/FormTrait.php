@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Tests\Support\Payload\Assessable;
 
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Learning\Assessment\AssessmentType;
 
 /**
@@ -98,7 +99,7 @@ trait FormTrait
             'title' => '',
             'weight' => null,
             'useMarkRange' => false,
-            'capabilityMarkType' => 6,
+            'capabilityMarkType' => MarkType::SLUG_NONE,
             'capabilityGradeGroup' => 1,
         ]);
 
@@ -140,10 +141,10 @@ trait FormTrait
         $this->setRubricFormParam($rubricData);
     }
 
-    public function setRubricCapabilityMarkType(?int $markTypeId): void
+    public function setRubricCapabilityMarkType(?string $markTypeSlug): void
     {
         $rubricData = $this->getRubricFormParam();
-        $rubricData['capabilityMarkType'] = $markTypeId;
+        $rubricData['capabilityMarkType'] = $markTypeSlug;
         $this->setRubricFormParam($rubricData);
     }
 

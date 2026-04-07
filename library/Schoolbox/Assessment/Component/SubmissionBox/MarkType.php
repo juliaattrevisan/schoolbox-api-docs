@@ -202,4 +202,25 @@ class MarkType
 
         return $map[$id] ?? self::SLUG_NONE;
     }
+
+    /**
+     * Convert from a mark type slug to ID
+     *
+     * @param string $slug
+     * @return int id
+     */
+    public static function slugToId(string $slug): int
+    {
+        $map = [
+            self::SLUG_PERCENT => self::TYPE_PERCENT,
+            self::SLUG_LETTER => self::TYPE_LETTER,
+            self::SLUG_TOTAL => self::TYPE_TOTAL,
+            self::SLUG_FREE => self::TYPE_FREE,
+            self::SLUG_RUBRIC => self::TYPE_RUBRIC,
+            self::SLUG_NONE => self::TYPE_NONE,
+            self::SLUG_COMPLETION => self::TYPE_COMPLETION,
+        ];
+
+        return $map[$slug] ?? self::TYPE_NONE;
+    }
 }

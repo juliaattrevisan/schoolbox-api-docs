@@ -361,7 +361,7 @@ class Factory
                 // TODO TEMP: useMarkRange/capabilityMarkType/capabilityGradingscheme should be against the rubric
                 $firstRubricData = $rubrics[array_key_first($rubrics)];
                 $this->setUseMarkRange($firstRubricData['useMarkRange']);
-                $this->setCapabilityMarkType($firstRubricData['capabilityMarkType']);
+                $this->setCapabilityMarkType(MarkType::slugToId($firstRubricData['capabilityMarkType']));
                 $this->setCapabilityGradeGroup($firstRubricData['capabilityGradingScheme']);
             }
         }

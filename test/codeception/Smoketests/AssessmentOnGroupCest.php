@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Tests\Smoketests;
 
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Tests\Support\IntegrationTester;
 use Tests\Support\Page\Duework\AssessmentForm;
 use Tests\Support\Payload;
@@ -634,7 +635,7 @@ class AssessmentOnGroupCest
         $indicatorNameSuffixes            = ['1', '2', '3'];
         $levelNameSuffixes                = ['A', 'B', 'C'];
 
-        $assessmentPayload->setRubricCapabilityMarkType(1);
+        $assessmentPayload->setRubricCapabilityMarkType(MarkType::SLUG_PERCENT);
         $assessmentPayload->setRubricCapabilityGradeGroup(1);
         $assessmentPayload->setFormParam('maxMark', '12');
 
