@@ -437,19 +437,21 @@ class Controller extends BaseController
         // the current assessment state is the same as the proposed state.
         $proposedAssessment = (clone $currentAssessment);
 
+        $rubricData = json_decode($post[$assessmentId], true);
+
         // TODO: capabilityMarkType & useMarkRange come from the rubric data itself now, they shouldn't be against the assessment anymore
-        $capabilityMarkTypeSlug = $post[$assessmentId]['capabilityMarkType'] ?? MarkType::SLUG_NONE;
+        $capabilityMarkTypeSlug = $rubricData['capabilityMarkType'] ?? MarkType::SLUG_NONE;
         $capabilityMarkType = $this->markTypeMapper->createModel()
             ->setSlug($capabilityMarkTypeSlug)
             ->setId(MarkType::slugToId($capabilityMarkTypeSlug));
-        $useMarkRange = $post[$assessmentId]['useMarkRange'] ?? false;
+        $useMarkRange = $rubricData['useMarkRange'] ?? false;
 
         $proposedAssessment->setCapabilityMarkType($capabilityMarkType);
         $proposedAssessment->setUseMarkRange($useMarkRange);
 
         $proposedGrid = (new GridFactory())->buildFromPostData(
             $this->mapper->retrieveGrid($proposedAssessment, false),
-            $post,
+            [ $assessmentId => $rubricData ],
             false
         );
 
