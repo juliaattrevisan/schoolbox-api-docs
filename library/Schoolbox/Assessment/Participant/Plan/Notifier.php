@@ -295,7 +295,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         /**
-         * Newly created assessment is isStaffOrInstructorVisibleOnly or closed
+         * Newly created assessment is hidden from learners or closed
          */
         $isCurrentHidden = false;
         try {
@@ -314,7 +314,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         /**
-         * Changed to isStaffOrInstructorVisibleOnly
+         * Changed to hidden from learners
          */
         $isPreviousHidden = false;
         if (
@@ -385,7 +385,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
          */
         if (!$isCurrentClosed && ($method === Mapper::METHOD_CREATE || ($isPreviousHidden && !$isCurrentHidden))) {
             /**
-             * New or just switched from is isStaffOrInstructorVisibleOnly to visible status
+             * New or just switched from hidden-from-learners to visible status
              */
             $bundle->attach(self::TRIGGER_OPEN, $triggerOpenTime);
             $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
