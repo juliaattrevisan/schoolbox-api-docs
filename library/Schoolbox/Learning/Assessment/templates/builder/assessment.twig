@@ -34,7 +34,7 @@ Usage:
         <div class="grip compact"></div>
         <div class="list-item">
             <div class="card small-12 compact wrap-down">
-                {% if textLinkRoute %}<a data-test="course-builder-assessment-title-{{ assessment.title }}" href="{{ textLinkRoute }}?{{ returnUrlName }}={{ returnUrl }}">{% endif %}
+                {% if textLinkRoute %}<a data-test="course-builder-assessment-title-{{ assessment.title }}" data-test-activity-id="{{ assessment.id }}" href="{{ textLinkRoute }}?{{ returnUrlName }}={{ returnUrl }}">{% endif %}
                     <span class="{{ icon.renderClass(assessment) }}"></span>
                     <p>{{ assessment.title }}</p>
                 {% if textLinkRoute %}</a>{% endif %}
@@ -44,7 +44,7 @@ Usage:
             <sbx-pop-out content-id="dropdown-{{ assessment.id }}"></sbx-pop-out>
         </nav>
         <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ assessment.id }}">
-            <li><a href="{{ routeLookup('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" class="icon-export" title="Copy this task into classes">Export to Classes</a></li>
+            <li><a href="{{ routeLookup('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" class="icon-export" title="Copy this task into classes" data-test="builder-export-activity-{{ assessment.id }}">Export to Classes</a></li>
 
             {% include '@learningAssessment/fragments/modifyLinks.twig' with {
                 assessment: assessment,
@@ -53,7 +53,7 @@ Usage:
                 returnUrl: RETURN_URL.current,
             } only %}
 
-            <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" data-action="delete-assessment" class="icon-delete">Delete</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" data-action="delete-assessment" class="icon-delete" data-test="builder-delete-activity-{{ assessment.id }}">Delete</a></li>
         </ul>
         <div data-reveal class="reveal-modal" id="export-modal-{{ assessment.id }}"></div>
     </div>

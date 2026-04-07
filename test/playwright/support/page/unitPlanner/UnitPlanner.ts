@@ -146,6 +146,20 @@ export default class UnitPlanner {
     }
 
     /**
+     * Get the current order of activities
+     * @returns - The order of activity IDs
+     */
+    async getActivityOrder(): Promise<string[]> {
+        const allActivityRowSelector = /^unit-planner-activity-title-/;
+        const pageOrder = await this.page
+            .getByTestId(allActivityRowSelector)
+            .evaluateAll((activityRows) =>
+                activityRows.map((activityRow) => activityRow.getAttribute("data-test-activity-id")),
+            );
+        return pageOrder.filter((id) => id !== null);
+    }
+
+    /**
      * Check whether create activity button is presented in the unit or not
      * pass true to check it is visible and false to check it is not visible
      * @param unitId - The ID of the unit

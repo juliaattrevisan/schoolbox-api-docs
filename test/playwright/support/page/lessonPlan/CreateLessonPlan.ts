@@ -15,6 +15,9 @@ export default class CreateLessonPlan {
 
     static readonly LINK_ACTIVITY_BUTTON = "a.button.expand.icon-link";
 
+    static readonly URL_CREATE_LESSON_PLAN =
+        "/learning/unitspecs/{unitSpecificationId}/assessments/new?lpt={lessonPlanTemplateId}&type=lessonPlan";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -72,5 +75,34 @@ export default class CreateLessonPlan {
      */
     async clickLinkActivityButton(): Promise<void> {
         await this.page.locator(CreateLessonPlan.LINK_ACTIVITY_BUTTON).click();
+    }
+
+    /**
+     * Go to create url to create a lesson plan under a unit by passing the unit specification id and the lesson plan template id
+     * @param unitSpecificationId - The unit specification id to create the lesson plan under
+     * @param lessonPlanTemplateId - The lesson plan template id to use for creating the lesson plan
+     */
+    async gotoCreateLessonPlanUrl(unitSpecificationId: number, lessonPlanTemplateId: number): Promise<void> {
+        const url = CreateLessonPlan.URL_CREATE_LESSON_PLAN.replace(
+            "{unitSpecificationId}",
+            String(unitSpecificationId),
+        ).replace("{lessonPlanTemplateId}", String(lessonPlanTemplateId));
+        await this.page.goto(url);
+    }
+
+    /**
+     * Creates a lesson plan by filling in the name and clicking the create button
+     * @param unitSpecificationId - The unit specification id to create the lesson plan under
+     * @param lessonPlanTemplateId - The lesson plan template id to use for creating the lesson plan
+     * @param lessonPlanName - the name of the lesson plan to create
+     */
+    async createLessonPlan(
+        unitSpecificationId: number,
+        lessonPlanTemplateId: number,
+        lessonPlanName: string,
+    ): Promise<void> {
+        await this.gotoCreateLessonPlanUrl(unitSpecificationId, lessonPlanTemplateId);
+        await this.typeName(lessonPlanName);
+        await this.clickCreateButton();
     }
 }
