@@ -145,6 +145,11 @@ HELP;
         }
 
         $body = (string)$response->getBody();
+        $logger->debug(sprintf(
+            'SOCS fixtures raw response: Content-Type %s; length %d',
+            $response->getHeaderLine('Content-Type') ?: 'unknown',
+            strlen($body)
+        ));
         if ('' === $body) {
             $logger->info('SOCS fixtures feed returned an empty payload');
             return;
@@ -152,7 +157,10 @@ HELP;
 
         $xml = @simplexml_load_string($body);
         if (false === $xml) {
-            $logger->warning('Unable to parse SOCS XML payload; aborting');
+            $logger->warning(sprintf(
+                'Unable to parse SOCS XML payload; aborting. First 200 chars: %s',
+                substr($body, 0, 200)
+            ));
             return;
         }
 
