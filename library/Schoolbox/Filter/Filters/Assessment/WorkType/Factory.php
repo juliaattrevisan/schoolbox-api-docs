@@ -92,8 +92,8 @@ class Factory extends Filter\AbstractFactory
         GenericCollection $overrides
     ): IComponent {
         if (
-            Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS === $pageFilter->getPage()
-            || Filter\Page\Model::PAGE_GRADES === $pageFilter->getPage()
+            $pageFilter->getPage() === Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS ||
+            $pageFilter->getPage() === Filter\Page\Model::PAGE_GRADES
         ) {
             $workTypes = $this->classifyViewerWorkTypes($user, $viewee);
         } else {
