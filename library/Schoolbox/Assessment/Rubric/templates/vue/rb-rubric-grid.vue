@@ -219,48 +219,6 @@ const totalColumns = window.Vue.computed(() => {
     return columns;
 });
 
-// TODO:
-// /**
-//  * Gets an 2D array of original descriptor values, indexed by criterion.id, then level.index
-//  *
-//  * Applying a new result set may or may not change descriptor values. But by itself
-//  * it blows away the original value. This function enables us to re-apply original values
-//  * after apply a new result set to determine if marks should be invalidated.
-//  */
-// function getOriginalDescriptorValues(){
-//     var originalDescriptorValues = [];
-//     $rubric.find('[data-descriptor-value-original]').each(function(idx, elem){
-//         var $elem = $(elem);
-//         var criterion = $elem.data('descriptor-criterion');
-//         var level = $elem.data('descriptor-level-index');
-
-//         // first time we've hit this row ?
-//         if('undefined' == typeof originalDescriptorValues[criterion]){
-//             originalDescriptorValues[criterion] = [];
-//         }
-//         originalDescriptorValues[criterion][level] = $elem.data('descriptor-value-original');
-//     });
-//     return originalDescriptorValues;
-// }
-// /**
-//  * Re-applies original descriptor values after applying a new result set.
-//  *
-//  * This is because applying a new result set may or may not change descriptor values,
-//  * but because it inserts new DOM elements, we need to manually re-apply the original values.
-//  *
-//  * @param {array} originalDescriptorValues  Indexed by criterion.id, then level.index
-//  */
-// function applyOriginalDescriptorValues(originalDescriptorValues){
-
-//     $rubric.find('[data-descriptor-value-original]').each(function(idx, elem){
-//         var $elem     = $(elem);
-//         var criterion = $elem.data('descriptor-criterion');
-//         var level     = $elem.data('descriptor-level-index');
-
-//         $elem.attr('data-descriptor-value-original', originalDescriptorValues[criterion][level]);
-//     });
-// }
-
 /**
  * Applies a result set to the rubric grid,
  * replacing all levels and descriptors with the values from the result set
@@ -279,8 +237,6 @@ function applyResultSet(resultSet: ResultSet): void {
     for (const result of resultSet.results) {
         addLevel(result.label, result.value);
     }
-
-    // TODO: if rubric has marks, apply original descriptor values (applyOriginalDescriptorValues)
 }
 
 /** Emit a change event so jquery.alaressValidate can pick it up for grid-based rules */
