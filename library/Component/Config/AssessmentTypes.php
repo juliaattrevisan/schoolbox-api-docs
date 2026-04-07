@@ -1,8 +1,6 @@
 <?php
 
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment;
-use Schoolbox\Learning\DialogAgent\ValidDialogAgentEnabled;
 
 class Component_Config_AssessmentTypes extends Component_Config_Abstract
 {

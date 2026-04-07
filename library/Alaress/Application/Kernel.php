@@ -955,7 +955,7 @@ abstract class Kernel
                         ),
                         'aiFeatures' => new \Schoolbox\Admin\OpenAI\DataGenerator($mapperFactory->get(ConfigMapper::class)),
                         'scripts' => new Output\DataGenerator\Scripts($config, $_SERVER),
-                        'assessmentTypes' => new Output\DataGenerator\AssessmentTypes($config),
+                        'assessmentTypes' => new Output\DataGenerator\AssessmentTypes($config, $session->getAuthUser()),
                     ];
 
                     if ($config->get('debug_mode')) {

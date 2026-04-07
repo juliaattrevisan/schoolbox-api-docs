@@ -13,12 +13,12 @@ namespace Schoolbox\Learning\Assessment\Reporting;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
-class ValidModerateActivity
+class ValidManageActivity
 {
     /**
      * In order to manage reporting activities:
      *     - Enable Reporting Activity must be enabled in admin
-     *     - the $user provided must be an LMS Moderator or a superuser
+     *     - the $user provided must be an LMS Moderator with write+ access, or a superuser
      *
      * @param bool $featureFlag
      * @param User $user

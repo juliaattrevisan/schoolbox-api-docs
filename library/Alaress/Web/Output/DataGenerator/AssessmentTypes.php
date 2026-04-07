@@ -9,10 +9,9 @@ declare(strict_types=1);
 
 namespace Alaress\Web\Output\DataGenerator;
 
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\AssessmentType;
-use Schoolbox\Learning\DialogAgent\ValidDialogAgentEnabled;
+use Schoolbox\User;
 
 /**
  * Generate data for rendering a list of enabled assessment types.
@@ -21,8 +20,9 @@ class AssessmentTypes implements IDataGenerator
 {
     /**
      * @param IConfigLoader $configLoader
+     * @param User $user
      */
-    public function __construct(private IConfigLoader $configLoader)
+    public function __construct(private IConfigLoader $configLoader, private \Schoolbox\User $user)
     {
     }
 
@@ -34,7 +34,7 @@ class AssessmentTypes implements IDataGenerator
     {
         $options = [];
 
-        foreach (AssessmentType::getEnabledOptions($this->configLoader) as $key => $name) {
+        foreach (AssessmentType::getPermittedOptions($this->configLoader, $this->user) as $key => $name) {
             $options[$key] = [
                 'name' => $name,
                 'icon' => AssessmentType::getIconClassSuffixForType($key),
