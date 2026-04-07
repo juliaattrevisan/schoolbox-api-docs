@@ -41,6 +41,10 @@ for shardDir in "$initialdir"/$shardFolderPrefix*; do
     echo "Merging shard artifacts from shard $shardNumber:"
 
     for artifact in "$shardDir/artifacts/"*; do
+        if [ ! -e "$artifact" ]; then
+            continue
+        fi
+
         artifactName="$(basename "$artifact")"
         newArtifactName="shard-$shardNumber-$artifactName"
         cp -a "$artifact" "$mergedArtifactsDir/$newArtifactName"
