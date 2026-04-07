@@ -565,6 +565,10 @@ class ListController extends Web\Controller\Base
 
         /* There are a few places that index AssessmentTypes as a single point of control:
          * This one is uniquely separate from all of those and needs special micromanagement.
+         *
+         * TODO Technical Uplift Candidate SA-22208
+         *  Combine with AssessmentType::getPermittedOptions() and build around THAT instead of uniquely crafting this
+         *  list every time
          */
         $data['types'] = [
             [
