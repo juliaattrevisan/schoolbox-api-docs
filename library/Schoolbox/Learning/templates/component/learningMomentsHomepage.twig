@@ -58,11 +58,11 @@ Usage:
                     data-action="shareLearningMoment"
                     data-moment-type="upload"
                     href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=upload{% endif %}"
-                    class="icon-upload share-file"
+                    class="share-file"
                     data-test="learning-moment-evidence-share-file"
                     title="Upload file"
                 >
-                    Upload file
+                    <sbx-icon name="upload"></sbx-icon>Upload file
                 </a>
                 <a
                     data-action="shareLearningMoment"

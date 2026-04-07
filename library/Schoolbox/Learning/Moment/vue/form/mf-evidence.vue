@@ -349,13 +349,13 @@ window.Vue.watch(
             Record audio
         </a>
         <a
-            class="icon-upload share-file"
+            class="share-file"
             data-test="learning-moment-evidence-share-file"
             :title="canAddEvidence ? 'Upload file' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="MediaType.UPLOAD === mediaType || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.UPLOAD)"
         >
-            Upload file
+            <sbx-icon name="upload"></sbx-icon>Upload file
         </a>
         <a
             v-if="!(showDescriptionEditor || MediaType.TEXT === mediaType)"

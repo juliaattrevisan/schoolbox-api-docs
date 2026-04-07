@@ -76,7 +76,7 @@ const viewStudentParticipationLink = window.Vue.computed(() => {
         v-if="props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK && viewStatusLink"
         :data-test="`markbook-assessment-dropdown-${props.activity.id}-import-feedback`"
     >
-        <a :href="`${viewStatusLink}&importFeedback`" class="icon-upload">Import Feedback</a>
+        <a :href="`${viewStatusLink}&importFeedback`"><sbx-icon name="upload"></sbx-icon>Import Feedback</a>
     </li>
 
     <!-- Additional check for whether all impls are writable before opening the bulk publish -->
