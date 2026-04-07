@@ -124,7 +124,7 @@
                     {% set preferredReturnUrl = returnUrl ?? RETURN_URL.current %}
 
                     {% if assessable is quiz %}
-                        <li><a class="icon-class-list" href="{{ routeLookup('learnosity.getHorizontalMarking', {assessment: assessable, assessmentId: assessable.id}) }}">Review horizontally</a></li>
+                        <li><a href="{{ routeLookup('learnosity.getHorizontalMarking', {assessment: assessable, assessmentId: assessable.id}) }}"><sbx-icon name="class-list"></sbx-icon>Review horizontally</a></li>
                     {% endif %}
 
                     {% include '@learningAssessment/fragments/modifyLinks.twig' with {

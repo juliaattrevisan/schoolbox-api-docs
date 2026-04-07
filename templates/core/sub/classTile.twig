@@ -32,7 +32,7 @@
                 <sbx-pop-out content-id="class-options{{ class.id }}"></sbx-pop-out>
             </nav>
             <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
-                <li><a href="{{ routeLookup('learning.getClassListPage', {folderId: class.id, folder: class}) }}" class="icon-class-list">Class List</a></li>
+                <li><a href="{{ routeLookup('learning.getClassListPage', {folderId: class.id, folder: class}) }}"><sbx-icon name="class-list"></sbx-icon>Class List</a></li>
                 {% set classMarkbookRoute = routeLookupIfAuthorized(
                     'learningMarkbook.getMarkbookForClassAndTerm',
                     {folder: class, folderId: class.id, term: term, termCode: term.code})

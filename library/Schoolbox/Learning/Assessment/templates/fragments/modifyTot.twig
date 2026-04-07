@@ -105,7 +105,7 @@
         {% if assessment is lessonPlan and hasStudentView is defined and hasStudentView %}
             {% if assessment.visibility == 'student' %}
                 <li class="separator" data-has-student-view-separator>You are in Teacher View</li>
-                <li><a data-has-student-view="staff"><sbx-icon name="view"></sbx-icon>Switch to Student View</a></li>
+                <li><a data-has-student-view="staff"><sbx-icon data-has-student-view-icon name="staff-students"></sbx-icon><span data-has-student-view-label>Switch to Student View</span></a></li>
 
                 <script>
                     $(function() {
@@ -113,16 +113,16 @@
                          * Enable student view of a Lesson Plan
                          */
                         function lessonPlanStudentView(elem) {
+                            const $elem = $(elem);
+
                             $('[data-has-student-view-separator]').text('You are in Student View');
                             $('[data-has-student-view-meta]').text('Student view')
                                 .removeClass()
                                 .addClass('icon-staff-students');
 
-                            $(elem)
-                                .text('Switch to Teacher View')
-                                .removeClass()
-                                .addClass('icon-teacher')
-                                .attr('data-has-student-view', 'student');
+                            $elem.find('[data-has-student-view-label]').text('Switch to Teacher View');
+                            $elem.find('[data-has-student-view-icon]').attr('name', 'teacher');
+                            $elem.attr('data-has-student-view', 'student');
 
                             $('#lessonPlan-staff').hide();
                             $('#lessonPlan-student').show();
@@ -134,16 +134,16 @@
                          * Enable staff view of a Lesson Plan
                          */
                         function lessonPlanStaffView(elem) {
+                            const $elem = $(elem);
+
                             $('[data-has-student-view-separator]').text('You are in Teacher View');
                             $('[data-has-student-view-meta]').text('Teacher view')
                                 .removeClass()
                                 .addClass('icon-teacher');
 
-                            $(elem)
-                                .text('Switch to Student View')
-                                .removeClass()
-                                .addClass('icon-staff-students')
-                                .attr('data-has-student-view', 'staff');
+                            $elem.find('[data-has-student-view-label]').text('Switch to Student View');
+                            $elem.find('[data-has-student-view-icon]').attr('name', 'staff-students');
+                            $elem.attr('data-has-student-view', 'staff');
 
                             $('#lessonPlan-staff').show();
                             $('#lessonPlan-student').hide();

@@ -217,12 +217,15 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
         element.wrap($('<div class="input-group" />'));
 
-        var $datebtn = $('<a class="adtp-btn icon-calendar" data-adtp-btn />');
+        var $datebtn = $('<a class="adtp-btn sbx-button--has-icon" data-adtp-btn />');
+        $datebtn.append($('<sbx-icon name="calendar"></sbx-icon>'));
 
         if (options.buttonText) {
-            $datebtn.text(options.buttonText);
+            $datebtn.append(document.createTextNode(options.buttonText));
         } else {
             $datebtn.addClass("no-text");
+            $datebtn.attr("aria-label", "Select Date");
+            $datebtn.attr("title", "Select Date");
         }
         element.data("dateButton", $datebtn).after($datebtn);
     }

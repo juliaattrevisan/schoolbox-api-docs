@@ -67,7 +67,7 @@
 {% block headerOptions %}
     {% if not isSpecification %}
         <li>
-            <a class="icon-class-list" href="{{ routeLookup('learnosity.getHorizontalMarking', { assessmentId: assessment.id }) }}">Review horizontally</a>
+            <a href="{{ routeLookup('learnosity.getHorizontalMarking', { assessmentId: assessment.id }) }}"><sbx-icon name="class-list"></sbx-icon>Review horizontally</a>
         </li>
         <li>
             <a data-download="attempts" href="{{ routeLookup('learnosity.getExportAttempts', { assessmentId: assessment.id }) }}"><sbx-icon name="download"></sbx-icon>Download All</a>

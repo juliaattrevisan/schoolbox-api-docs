@@ -8,12 +8,14 @@
  #}
 
 <li class="separator" data-has-student-view-separator>You are viewing instructor grades</li>
-<li><a data-has-student-view="staff"><sbx-icon name="view"></sbx-icon>View Student Grades</a></li>
+<li><a data-has-student-view="staff"><sbx-icon data-has-student-view-icon name="staff-students"></sbx-icon><span data-has-student-view-label>View Student Grades</span></a></li>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const viewSwitcher = document.querySelector('[data-has-student-view]');
         const viewSwitcherMeta = document.querySelector('[data-has-student-view-meta]');
         const viewSwitcherSeparator = document.querySelector('[data-has-student-view-separator]');
+        const viewSwitcherIcon = viewSwitcher.querySelector('[data-has-student-view-icon]');
+        const viewSwitcherLabel = viewSwitcher.querySelector('[data-has-student-view-label]');
 
         const iconTeacher = 'icon-teacher';
         const iconStaffStudents = 'icon-staff-students';
@@ -27,9 +29,8 @@
             viewSwitcherMeta.classList.remove(iconTeacher);
             viewSwitcherMeta.classList.add(iconStaffStudents);
 
-            viewSwitcher.textContent = 'View Instructor Grades';
-            viewSwitcher.classList.remove(iconStaffStudents);
-            viewSwitcher.classList.add(iconTeacher);
+            viewSwitcherLabel.textContent = 'View Instructor Grades';
+            viewSwitcherIcon.setAttribute('name', 'teacher');
             viewSwitcher.setAttribute('data-has-student-view', 'student');
 
             const marks = document.querySelectorAll('[data-learner-mark], [data-instructor-mark]');
@@ -46,9 +47,8 @@
             viewSwitcherMeta.classList.remove(iconStaffStudents);
             viewSwitcherMeta.classList.add(iconTeacher);
 
-            viewSwitcher.textContent = 'View Student Grades';
-            viewSwitcher.classList.remove(iconTeacher);
-            viewSwitcher.classList.add(iconStaffStudents);
+            viewSwitcherLabel.textContent = 'View Student Grades';
+            viewSwitcherIcon.setAttribute('name', 'staff-students');
             viewSwitcher.setAttribute('data-has-student-view', 'staff');
 
             const marks = document.querySelectorAll('[data-learner-mark], [data-instructor-mark]');

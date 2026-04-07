@@ -28,7 +28,7 @@
         {% endif %}
         {% if categoryId %}
         <li>
-            <a class="icon-calendar" href="{{  routeLookup('resourceCategory.read', {id: categoryId}) }}" title="Availability Calendar">Availability Calendar</a>
+            <a href="{{  routeLookup('resourceCategory.read', {id: categoryId}) }}" title="Availability Calendar"><sbx-icon name="calendar"></sbx-icon>Availability Calendar</a>
         </li>
         {% endif %}
         {% if isRouteAuthorized('resourceItem.add') %}

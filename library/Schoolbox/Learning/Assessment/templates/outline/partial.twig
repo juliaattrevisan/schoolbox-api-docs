@@ -60,7 +60,7 @@
 
             {% if modifyRoute %}
                 {% if assessment is quiz %}
-                    <li><a class="icon-class-list" data-test="course-outline-horizontal-{{ assessment.id }}" href="{{ routeLookup('learnosity.getHorizontalMarking', { assessmentId: assessment.id }) }}">Review horizontally</a></li>
+                    <li><a data-test="course-outline-horizontal-{{ assessment.id }}" href="{{ routeLookup('learnosity.getHorizontalMarking', { assessmentId: assessment.id }) }}"><sbx-icon name="class-list"></sbx-icon>Review horizontally</a></li>
                 {% endif %}
 
                 {% include '@learningAssessment/fragments/modifyLinks.twig' with {
