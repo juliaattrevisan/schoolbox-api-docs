@@ -412,10 +412,11 @@ window.Vue.watch(modifySelected, (newSelected) => {
                                     ></a>
                                     <a
                                         href="#regenerate"
-                                        class="icon-refresh no-text"
+                                        class="no-text"
                                         title="Regenerate this client&rsquo;s secret"
                                         aria-label="Regenerate this client&rsquo;s secret"
                                         @click.prevent="showRegenerateModal(row)"
+                                        ><sbx-icon name="refresh"></sbx-icon
                                     ></a>
                                     <a
                                         href="#delete"

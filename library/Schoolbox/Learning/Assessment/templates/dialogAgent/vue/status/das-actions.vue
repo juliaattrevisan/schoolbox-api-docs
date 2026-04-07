@@ -203,7 +203,8 @@ async function onResolve(): Promise<void> {
         </button>
     </li>
     <li v-if="props.response?._routes.reset">
-        <button class="icon-refresh" data-test="das-actions-reset" @click="onReset">
+        <button data-test="das-actions-reset" @click="onReset">
+            <sbx-icon name="refresh"></sbx-icon>
             {{ `Reset ${locale.dialogAgent.proper()}` }}
         </button>
     </li>
