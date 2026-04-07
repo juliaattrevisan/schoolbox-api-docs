@@ -134,13 +134,15 @@ function onMouseOut(event: MouseEvent): void {
             />
             <button
                 for="search-field"
-                class="c-filter-search-term__button icon-search no-text"
+                class="c-filter-search-term__button no-text"
                 title="Search"
                 data-test="sp-submit-button"
                 @mouseover="onMouseOver"
                 @mouseout="onMouseOut"
                 @click.prevent="onClicked"
-            ></button>
+            >
+                <sbx-icon name="search"></sbx-icon>
+            </button>
         </div>
     </div>
 </template>

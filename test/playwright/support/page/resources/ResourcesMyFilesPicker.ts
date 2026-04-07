@@ -108,7 +108,7 @@ export default class ResourcesMyFilesPicker {
      * Clicks the Screen Capture option
      */
     async clickScreen(): Promise<void> {
-        const screenIcon = this.page.locator('div[class="icon-screen-capture"]');
+        const screenIcon = this.page.locator('sbx-icon[name="screen-capture"]');
         await screenIcon.click();
     }
 

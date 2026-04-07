@@ -207,7 +207,7 @@ export default {
         </button>
         <button v-if="!hasDeviceCapture" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.SCREEN)">
             <div>
-                <div class="icon-screen-capture"></div>
+                <sbx-icon name="screen-capture"></sbx-icon>
                 <span>Screen</span>
                 <aside>Create a computer screen recording.</aside>
             </div>

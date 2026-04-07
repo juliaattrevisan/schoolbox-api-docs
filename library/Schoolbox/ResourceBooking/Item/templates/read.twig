@@ -29,7 +29,7 @@
         </div>
     </div>
     <nav>
-        <a class="icon-search" data-reveal-id="search-modal" title="Search Resources"></a>
+        <a data-reveal-id="search-modal" title="Search Resources"><sbx-icon name="search"></sbx-icon></a>
         {% if isRouteAuthorized('resourceItem.edit', {id: item.id, item: item}) %}
             <a class="resource-name resource-edit-link" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}"><sbx-icon name="modify"></sbx-icon></a>
         {% endif %}

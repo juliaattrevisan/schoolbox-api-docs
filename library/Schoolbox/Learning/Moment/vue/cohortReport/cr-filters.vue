@@ -137,10 +137,11 @@ async function applyFilters(): Promise<void> {
                             Clear filters
                         </button>
                         <button
-                            class="button submit l-flex__item--1 icon-search f-no-margins"
+                            class="button submit l-flex__item--1 f-no-margins"
                             data-test="cr-filter-apply-button"
                             @click.prevent="applyFilters"
                         >
+                            <sbx-icon name="search"></sbx-icon>
                             Apply filters
                         </button>
                     </div>
