@@ -8,6 +8,7 @@ export const ACTIVITY_TYPE_TASK = "task";
 export const ACTIVITY_TYPE_QUIZ = "quiz";
 export const ACTIVITY_TYPE_LTI_ASSESSMENT = "lti";
 export const ACTIVITY_TYPE_LESSON_PLAN = "lessonPlan";
+export const ACTIVITY_TYPE_REPORTING = "reporting";
 export type ActivityType =
     | typeof ACTIVITY_TYPE_PROJECT
     | typeof ACTIVITY_TYPE_DIALOG_AGENT
@@ -15,7 +16,8 @@ export type ActivityType =
     | typeof ACTIVITY_TYPE_TASK
     | typeof ACTIVITY_TYPE_QUIZ
     | typeof ACTIVITY_TYPE_LTI_ASSESSMENT
-    | typeof ACTIVITY_TYPE_LESSON_PLAN;
+    | typeof ACTIVITY_TYPE_LESSON_PLAN
+    | typeof ACTIVITY_TYPE_REPORTING;
 
 export type Activity = {
     id: number;
