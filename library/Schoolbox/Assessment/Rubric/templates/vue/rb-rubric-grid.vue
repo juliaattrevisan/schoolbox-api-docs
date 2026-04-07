@@ -182,7 +182,10 @@ async function onAddKeydown<TType extends "capability" | "indicator">(
             newCapability.id = lowestId - 1; // negative IDs are unsaved
         }
 
-        rubricGridCapabilities.value.push(newCapability);
+        rubricGridCapabilities.value.push({
+            ...newCapability,
+            id: newCapability.id,
+        });
     } else if (type === "indicator") {
         // TType is "indicator", so response is RubricGridCreateIndicatorResponse
         const { capabilityId, indicator } = response.data as RubricGridCreateIndicatorResponse;
