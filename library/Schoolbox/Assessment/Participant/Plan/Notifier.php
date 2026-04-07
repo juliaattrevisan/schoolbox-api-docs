@@ -697,23 +697,24 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         // Get assessment and build
         $assessment = $participant->getAssessable();
-        $boxType    = $assessment->getTypeName();
-        if ($assessment instanceof DueWork) {
-            $topicSuffix = "open";
-        } elseif ($assessment instanceof Quiz) {
-            $topicSuffix = "upcoming";
-        } else {
-            return;
-        }
 
-        $bob = $this->buildGenericBuilder($assessment)
-                    ->setTitle(self::PATTERN_OPEN_STUDENT_TITLE)
-                    ->setParam('boxType', new SimpleParam($boxType))
-                    ->addTopic("$topicStub.$topicSuffix")
-                    ->setSeverity(Logger::NOTICE);
-        $bob = $this->targetBuilderToLearner($bob, $assessment, $participant)
-                    ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}");
         if ($this->isLearnerNotifiable($assessment)) {
+            $boxType = $assessment->getTypeName();
+            if ($assessment instanceof DueWork) {
+                $topicSuffix = "open";
+            } elseif ($assessment instanceof Quiz) {
+                $topicSuffix = "upcoming";
+            } else {
+                return;
+            }
+
+            $bob = $this->buildGenericBuilder($assessment)
+                        ->setTitle(self::PATTERN_OPEN_STUDENT_TITLE)
+                        ->setParam('boxType', new SimpleParam($boxType))
+                        ->addTopic("$topicStub.$topicSuffix")
+                        ->setSeverity(Logger::NOTICE);
+            $bob = $this->targetBuilderToLearner($bob, $assessment, $participant)
+                        ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}");
             $envelope->targetToUser($participant->getUser(), $bob->build());
         }
     }
@@ -773,8 +774,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             // build for parent, only if they're allowed
             if ($this->isParentNotifiable($assessment)) {
                 $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                           ->setTitle(self::PATTERN_UPCOMING_PARENT_TITLE)
-                           ->setParam('when', new Param($when));
+                            ->setTitle(self::PATTERN_UPCOMING_PARENT_TITLE)
+                            ->setParam('when', new Param($when));
                 $envelope->targetToParent($participant->getUser(), $bob->build());
             }
         }
@@ -826,24 +827,23 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 continue;
             }
 
-            // build for student
-            $bob = $this->targetBuilderToLearner($bob, $assessment, $participant)
-                        ->setTitle(self::PATTERN_OVERDUE_STUDENT_TITLE)
-                        ->setParam('overdue', new SimpleParam($overdue))
-                        ->unsetParam('submit');
+            // build for student, only if they're allowed
             if ($this->isLearnerNotifiable($assessment)) {
+                $bob = $this->targetBuilderToLearner($bob, $assessment, $participant)
+                            ->setTitle(self::PATTERN_OVERDUE_STUDENT_TITLE)
+                            ->setParam('overdue', new SimpleParam($overdue))
+                            ->unsetParam('submit');
                 $envelope->targetToUser($participant->getUser(), $bob->build());
             }
 
             // build for parent, only if they're allowed
-            if (!$this->isParentNotifiable($assessment)) {
-                continue;
+            if ($this->isParentNotifiable($assessment)) {
+                $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
+                            ->setTitle(self::PATTERN_OVERDUE_PARENT_TITLE)
+                            ->setParam('submit', new SimpleParam($submit))
+                            ->unsetParam('overdue');
+                $envelope->targetToParent($participant->getUser(), $bob->build());
             }
-            $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                        ->setTitle(self::PATTERN_OVERDUE_PARENT_TITLE)
-                        ->setParam('submit', new SimpleParam($submit))
-                        ->unsetParam('overdue');
-            $envelope->targetToParent($participant->getUser(), $bob->build());
         }
 
         return $envelope;
@@ -905,20 +905,19 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
             // Feed only
             if ($forFeed) {
-                // build for student
-                $bob = $this->targetBuilderToLearner($bob, $assessment, $participant)
-                            ->setTitle(":assessment in :cat has closed");
+                // build for student, only if they're allowed
                 if ($this->isLearnerNotifiable($assessment)) {
+                    $bob = $this->targetBuilderToLearner($bob, $assessment, $participant)
+                                ->setTitle(":assessment in :cat has closed");
                     $envelope->targetToUser($participant->getUser(), $bob->build());
                 }
 
                 // build for parent, only if they're allowed
-                if (!$this->isParentNotifiable($assessment)) {
-                    continue;
+                if ($this->isParentNotifiable($assessment)) {
+                    $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
+                                ->setTitle(":assessment in :cat has closed for :child");
+                    $envelope->targetToParent($participant->getUser(), $bob->build());
                 }
-                $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                            ->setTitle(":assessment in :cat has closed for :child");
-                $envelope->targetToParent($participant->getUser(), $bob->build());
             }
         }
 
@@ -1051,15 +1050,15 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             if (!empty($assessmentDiff['title'])) {
                 [, $oldName] = $assessmentDiff['title'];
 
-                // Leaners
+                // Learners
                 // Topic depends on type of assessment
-                $suffix = $assessment instanceof Quiz ? 'updated' : 'renamed';
-                $bob    = $this->targetBuilderToLearner($bob, $assessment, $participant)
-                               ->setTitle(self::PATTERN_RENAMED_STUDENT_TITLE)
-                               ->setParam('oldname', new Param($oldName))
-                               ->setParam('boxType', new SimpleParam($boxType))
-                               ->setTopics(["$topicStub.$suffix"]);
                 if ($this->isLearnerNotifiable($assessment)) {
+                    $suffix = $assessment instanceof Quiz ? 'updated' : 'renamed';
+                    $bob    = $this->targetBuilderToLearner($bob, $assessment, $participant)
+                                   ->setTitle(self::PATTERN_RENAMED_STUDENT_TITLE)
+                                   ->setParam('oldname', new Param($oldName))
+                                   ->setParam('boxType', new SimpleParam($boxType))
+                                   ->setTopics(["$topicStub.$suffix"]);
                     $envelope->targetToUser($participant->getUser(), $bob->build());
                 }
 
@@ -1106,14 +1105,14 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
                     // Learners
                     // Topic depends on type of assessment
-                    $suffix = $assessment instanceof Quiz ? 'updated' : 'datechanged';
-                    $bob    = $this->targetBuilderToLearner($bob, $assessment, $participant)
-                                   ->setTitle(self::PATTERN_DATE_CHANGED_STUDENT_TITLE)
-                                   ->setParam('date', new Param($dateformat))
-                                   ->setParam('boxType', new Param($boxType))
-                                   ->setParam('verb', new Param($verb, null, Param::STACKING_APPEND))
-                                   ->setTopics(["$topicStub.$suffix"]);
                     if ($this->isLearnerNotifiable($assessment)) {
+                        $suffix = $assessment instanceof Quiz ? 'updated' : 'datechanged';
+                        $bob    = $this->targetBuilderToLearner($bob, $assessment, $participant)
+                                       ->setTitle(self::PATTERN_DATE_CHANGED_STUDENT_TITLE)
+                                       ->setParam('date', new Param($dateformat))
+                                       ->setParam('boxType', new Param($boxType))
+                                       ->setParam('verb', new Param($verb, null, Param::STACKING_APPEND))
+                                       ->setTopics(["$topicStub.$suffix"]);
                         $envelope->targetToUser($participant->getUser(), $bob->build());
                     }
 
@@ -1136,19 +1135,19 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             // accept online
             if ($assessment instanceof DueWork && !empty($assessmentDiff['acceptOnline'])) {
                 // Learners
-                $m = $assessment->isAcceptNone()
-                    ? self::PATTERN_NO_SUBMIT_STUDENT_TITLE
-                    : self::PATTERN_ACCEPT_ONLINE_STUDENT_TITLE;
-                $bob = $this->targetBuilderToLearner($bob, $assessment, $participant)
-                            ->setTitle($m)
-                            ->setTopics(["$topicStub.updated"]);
                 if ($this->isLearnerNotifiable($assessment)) {
+                    $m = $assessment->isAcceptNone()
+                        ? self::PATTERN_NO_SUBMIT_STUDENT_TITLE
+                        : self::PATTERN_ACCEPT_ONLINE_STUDENT_TITLE;
+                    $bob = $this->targetBuilderToLearner($bob, $assessment, $participant)
+                                ->setTitle($m)
+                                ->setTopics(["$topicStub.updated"]);
                     $envelope->targetToUser($participant->getUser(), $bob->build());
                 }
 
                 // Parents
                 if ($this->isParentNotifiable($assessment)) {
-                    $m   = $assessment->isAcceptNone()
+                    $m = $assessment->isAcceptNone()
                         ? self::PATTERN_NO_SUBMIT_PARENT_TITLE
                         : self::PATTERN_ACCEPT_ONLINE_PARENT_TITLE;
                     $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
@@ -1163,11 +1162,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             // Not sure if there's any point to this notif, but raise it anyway
             if (array_intersect(array_keys($assessmentDiff), ['type', 'weight', 'workType'])) {
                 // Learners
-                $bob = $this->targetBuilderToLearner($bob, $assessment, $participant)
-                            ->setTitle(self::PATTERN_UPDATE_STUDENT_TITLE)
-                            ->setParam('boxType', new Param($boxType))
-                            ->setTopics(["$topicStub.updated"]);
                 if ($this->isLearnerNotifiable($assessment)) {
+                    $bob = $this->targetBuilderToLearner($bob, $assessment, $participant)
+                                ->setTitle(self::PATTERN_UPDATE_STUDENT_TITLE)
+                                ->setParam('boxType', new Param($boxType))
+                                ->setTopics(["$topicStub.updated"]);
                     $envelope->targetToUser($participant->getUser(), $bob->build());
                 }
 
