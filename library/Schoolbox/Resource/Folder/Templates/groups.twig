@@ -60,7 +60,7 @@
                                     <li><a href="{{ routeLookup('group.getModify', {folderId: group.id, folder: group}) }}" class="icon-group">Manage Group</a></li>
                                 {% endif %}
                                 {% if ((not isPrivate) and (isAccessWrite or isAccessRead)) %}
-                                    <li><a href="/group/joinForm.php?leave={{ group.id }}&return=true" data-confirm-leave class="icon-logout">Leave Group</a></li>
+                                    <li><a href="/group/joinForm.php?leave={{ group.id }}&return=true" data-confirm-leave><sbx-icon name="logout"></sbx-icon>Leave Group</a></li>
                                 {% endif %}
                             </ul>
                         {% endif %}
