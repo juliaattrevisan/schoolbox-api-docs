@@ -91,9 +91,9 @@ function deleteLevel(index: number): void {
 
 /**
  * Returns the normalised string for comparison to avoid duplicates.
- * MUST use same logic as RubricMapper->normaliseForComparison()
  * @param string the string to normalise
  * @returns normalised string
+ * @see /library/Schoolbox/Assessment/Rubric/Util.php::normalizeName (must use the same logic)
  */
 function normaliseForComparison(string: string): string {
     // Ensure var really is a string before performing string operations
