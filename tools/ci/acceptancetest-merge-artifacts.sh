@@ -40,11 +40,8 @@ for shardDir in "$initialdir"/$shardFolderPrefix*; do
 
     echo "Merging shard artifacts from shard $shardNumber:"
 
+    shopt -s dotglob nullglob # include hidden files
     for artifact in "$shardDir/artifacts/"*; do
-        if [ ! -e "$artifact" ]; then
-            continue
-        fi
-
         artifactName="$(basename "$artifact")"
         newArtifactName="shard-$shardNumber-$artifactName"
         cp -a "$artifact" "$mergedArtifactsDir/$newArtifactName"
@@ -52,6 +49,7 @@ for shardDir in "$initialdir"/$shardFolderPrefix*; do
 
         mergedAny=1
     done
+    shopt -u dotglob nullglob
 done
 
 if [ "$mergedAny" -eq 0 ]; then
