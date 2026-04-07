@@ -117,7 +117,7 @@ class Factory extends Filter\AbstractFactory
      *
      * @param User      $user   The viewer
      * @param User|null $viewee The user whose assessments are being viewed
-     * @return GenericCollection|WorkType\Model[]
+     * @return GenericCollection<WorkType\Model>
      * @throws InvalidColumnException
      */
     private function classifyViewerWorkTypes(User $user, ?User $viewee): GenericCollection
