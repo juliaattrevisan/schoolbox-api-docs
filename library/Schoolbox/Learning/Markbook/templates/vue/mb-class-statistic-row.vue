@@ -5,6 +5,8 @@ import type { MarkbookClassImplActivity, MarkbookClassImpl, MarkbookActivity } f
 export interface Props {
     label: string;
     statsKey: keyof MarkbookClassImplActivity["stats"];
+    /** Hide specific assessment types from this row */
+    hideForTypes?: MarkbookActivity["assessmentType"][];
     input?: {
         allowCourseManaged?: boolean;
         key: keyof MarkbookClassImplActivity;
@@ -24,8 +26,6 @@ export interface Props {
         };
         /** Exclude specific assessment types from being able to change this (show as readonly) */
         readonlyForTypes?: MarkbookActivity["assessmentType"][];
-        /** Hide specific assessment types from this row */
-        hideForTypes?: MarkbookActivity["assessmentType"][];
     };
     round?: number;
     classImpl: MarkbookClassImpl;
@@ -38,32 +38,22 @@ const activities = window.Vue.computed(() =>
     mbStore.orderedActivities.map((assessment) => {
         const aImpl = props.classImpl.assessments[assessment.id] ?? null;
 
+        if (aImpl === null || props.hideForTypes?.includes(assessment.assessmentType)) {
+            return { assessment, aImpl: null, stat: null, readonly: true };
+        }
+
+        const inputOptions = props.input;
+        const selectOption = inputOptions?.selectOptions?.find((opt) => opt.value === aImpl[inputOptions.key]);
+
         return {
             assessment,
             aImpl,
-            stat: aImpl?.stats[props.statsKey] ?? null,
+            stat: aImpl.stats[props.statsKey] ?? null,
+            readonly: !aImpl.writable || inputOptions?.readonlyForTypes?.includes(assessment.assessmentType),
+            selectOption,
         };
     }),
 );
-
-/**
- * Find the readonly icon for a given aImpl's select value, if it exists
- * @param aImpl The relevant activity implementation
- * @returns The icon name, or null if none exists
- */
-function getReadonlyIcon(aImpl: MarkbookClassImplActivity): string | null {
-    if (props.input === undefined || props.input.selectOptions === undefined) {
-        return null;
-    }
-
-    const { key } = props.input;
-    const option = props.input.selectOptions.find((opt) => opt.value === aImpl[key]);
-    if (option === undefined) {
-        return null;
-    }
-
-    return option.readonlyIcon ?? null;
-}
 
 /**
  * Persist a change to an activity
@@ -121,23 +111,17 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
         <th class="fixed-left">&nbsp;</th>
         <td v-if="mbStore.data.rank !== null"></td>
         <td
-            v-for="{ assessment, aImpl, stat } in activities"
+            v-for="{ assessment, aImpl, stat, readonly, selectOption } in activities"
             :key="assessment.id"
             class="student-grade-cell"
             :data-assessment="assessment.id"
         >
             <template v-if="stat === null || aImpl === null"></template>
-            <template
-                v-else-if="
-                    props.input &&
-                    (props.input.allowCourseManaged || !aImpl.courseManaged) &&
-                    !props.input.readonlyForTypes?.includes(assessment.assessmentType)
-                "
-            >
-                <template v-if="props.input.hideForTypes?.includes(assessment.assessmentType)"></template>
+            <template v-else-if="props.input && (props.input.allowCourseManaged || !aImpl.courseManaged)">
                 <span
-                    v-else-if="props.input?.selectOptions && !aImpl.writable && getReadonlyIcon(aImpl) !== null"
-                    :class="getReadonlyIcon(aImpl)"
+                    v-if="props.input?.selectOptions && readonly && selectOption"
+                    :class="selectOption.readonlyIcon"
+                    :title="selectOption.label"
                 >
                     <!-- This field is a select and not writable, but has a readonlyIcon available to use - so use it -->
                 </span>
@@ -157,7 +141,7 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
                     ></option>
                     <!-- eslint-enable vue/no-v-html -->
                 </select>
-                <span v-else-if="!aImpl.writable">
+                <span v-else-if="readonly">
                     <!-- This field is an input and not writable, only show the value -->
                     {{ aImpl[props.input.key] }}
                 </span>
