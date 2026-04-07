@@ -37,6 +37,9 @@ class ImporterTool extends CliTool\App
     private const LOCK_TTL = 120;
     private const DEFAULT_TIMEOUT = 3600;
 
+    /** @var array<string,int> */
+    private array $urlUsage = [];
+
     public function getLongOpts(): array
     {
         return [
@@ -71,6 +74,7 @@ class ImporterTool extends CliTool\App
         try {
             $this->importFixtures($logger, $lock);
         } finally {
+            $this->logUrlUsage($logger);
             $lock->release();
         }
     }
@@ -123,12 +127,16 @@ HELP;
 
         $logger->info(sprintf('Downloading SOCS fixtures from %s to %s', $startDate, $endDate));
 
+        $query = [
+            'startdate' => $startDate,
+            'enddate' => $endDate,
+        ];
+
+        $this->noteUrlUsed($host, $query);
+
         try {
             $response = $client->request('GET', '', [
-                'query' => [
-                    'startdate' => $startDate,
-                    'enddate' => $endDate,
-                ],
+                'query' => $query,
             ]);
         } catch (GuzzleException $e) {
             $logger->warning(sprintf('Failed to contact SOCS endpoint: %s', $e->getMessage()));
@@ -240,6 +248,25 @@ HELP;
         } else {
             $logger->info(sprintf('SOCS fixtures planning complete; would process %d fixtures', $imported));
         }
+    }
+
+    private function logUrlUsage(LoggerInterface $logger): void
+    {
+        foreach ($this->urlUsage as $url => $count) {
+            $logger->info(sprintf('SOCS URL used %d time(s): %s', $count, $url));
+        }
+    }
+
+    private function noteUrlUsed(string $baseUrl, array $query): void
+    {
+        $separator = false === strpos($baseUrl, '?') ? '?' : '&';
+        $url = $baseUrl . $separator . http_build_query($query);
+
+        if (!isset($this->urlUsage[$url])) {
+            $this->urlUsage[$url] = 0;
+        }
+
+        $this->urlUsage[$url]++;
     }
 
     private function recallSeason(SeasonMapper $seasonMapper, LoggerInterface $logger): SeasonModel
