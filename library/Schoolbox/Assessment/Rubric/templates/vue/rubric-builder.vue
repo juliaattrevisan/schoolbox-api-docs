@@ -20,6 +20,7 @@ import type { RubricGrid, ResultSet } from "./types";
 import RbRubricFields from "./rb-rubric-fields.vue";
 import RbRubricGrid from "./rb-rubric-grid.vue";
 import RbRubricDownload from "./rb-rubric-download.vue";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 
 interface Props {
     rubricGridsPayload: RubricGrid[];
@@ -32,11 +33,13 @@ interface Props {
     folderId: number;
     assessmentId: number | null;
     routeRubricCreate: string;
+    routeRubricImport: string; // replace {storageTuple}
     routeRubricDownload?: string | null;
 }
 const props = defineProps<Props>();
 
 const rubricGrids = window.Vue.ref(cloneDeep(props.rubricGridsPayload)); // local mutable copy
+const initialGridIds = props.rubricGridsPayload.map((grid) => grid.id); // so that imported rubrics can expand by default
 
 /**
  * Calculates the assessment's total weight from the rubric grids
@@ -104,15 +107,6 @@ window.Vue.watch(
     { immediate: true },
 );
 
-/**
- * Listen for a rubric grid import event
- * TODO: this logic will need to change for multiple rubrics
- */
-document.addEventListener(RUBRIC_GRID_IMPORTED, (event) => {
-    // TODO: for now this will just add a new rubric
-    rubricGrids.value.push(event.detail.rubricGrid);
-});
-
 const showRubricCreate = window.Vue.ref(false);
 
 /**
@@ -129,6 +123,99 @@ function createRubric(): void {
 
     rubricGrids.value.push(newRubric);
     showRubricCreate.value = false;
+}
+
+/**
+ * Import a rubric from a file
+ * @param data - data from success.attachZone event
+ */
+async function importRubric(data: unknown): Promise<void> {
+    if (typeof data !== "object" || data === null || !("hash" in data) || typeof data.hash !== "string") {
+        // not the event we're looking for, skip
+        return;
+    }
+
+    const url = props.routeRubricImport.replace("{storageTuple}", data.hash);
+
+    const referenceData =
+        props.assessmentId && props.assessmentId > 0
+            ? { assessmentId: props.assessmentId }
+            : { folderId: props.folderId };
+
+    const markTypeInput = document.querySelector<HTMLSelectElement>('[name="markType"]');
+    const instructorMarkTypeInput = document.querySelector<HTMLSelectElement>('[name="instructor-markType"]');
+    const gradeGroupInput = document.querySelector<HTMLSelectElement>('[name="gradingScheme"]');
+    const instructorGradeGroupInput = document.querySelector<HTMLSelectElement>('[name="instructor-gradingScheme"]');
+
+    if (!markTypeInput || !instructorMarkTypeInput || !gradeGroupInput || !instructorGradeGroupInput) {
+        throw new Error("Missing required mark type/grade group inputs for rubric import");
+    }
+
+    // prevent departure or premature submission
+    const submits = document.querySelectorAll("[type=submit]:not(:disabled)");
+    submits.forEach((submit) => {
+        submit.setAttribute("disabled", "true");
+    });
+
+    const toast = window.sbProps.toastActivate("Importing rubric...");
+    const response = await apiRequest<{ rubricGrid: RubricGrid }>({
+        method: "POST",
+        url,
+        body: {
+            ...referenceData,
+            markTypeId: markTypeInput.value,
+            instructorMarkTypeId: instructorMarkTypeInput.value,
+            gradeGroupId: gradeGroupInput.value,
+            instructorGradeGroupId: instructorGradeGroupInput.value,
+        },
+    });
+
+    // you're free to leave now
+    submits.forEach((submit) => {
+        submit.removeAttribute("disabled");
+    });
+
+    // TODO: detach file from attachzone?
+
+    if (!response.success) {
+        toast.timeout({
+            text: typeof response.data === "string" ? response.data : response.message,
+            isSuccess: false,
+        });
+        return;
+    }
+
+    toast.timeout({ text: "Rubric imported", isSuccess: true });
+
+    // TODO: for now this will just add a new rubric, it possibly needs to do more...
+    // TODO: temp override the ID, currently it will conflict with the assessment ID if a rubric already exists
+    rubricGrids.value.push({
+        ...response.data.rubricGrid,
+        id: Math.min(...rubricGrids.value.map((grid) => grid.id), 0) - 1, // negative ID represents a new rubric that hasn't been persisted yet
+    });
+    showRubricCreate.value = false;
+}
+
+/**
+ * Listen for the attachzone to indicate a file was added and trigger an import
+ */
+window.Vue.onMounted(() => {
+    $(function () {
+        // there's a hidden attachzone on the page, use that. We can't use attachzone in vue directly yet
+        const azElement = window.jQuery("#rubric-builder-import-attachzone .attachzone");
+        window.jQuery(azElement).on("success.attachzone", (e, data: unknown) => {
+            void importRubric(data);
+        });
+    });
+});
+
+/**
+ * Open the hidden attachzone to select a file for import
+ */
+function openImportAttachzone(): void {
+    const azElement = window.jQuery("#rubric-builder-import-attachzone .attachzone");
+    const attachzone = azElement.data("plugin_resourceAttach");
+    attachzone.open();
 }
 
 const deleteConfirmationId = window.Vue.ref<RubricGrid["id"] | null>(null);
@@ -182,8 +269,14 @@ const rubricRows = window.Vue.computed(() => {
         class="actions-small-1 rubric-builder-row"
         data-rubric-builder-row
     >
-        <fieldset-collapsible delay-content-render :initially-expanded="rubric.id === 'create' || rubric.id < 0">
-            <template #legend>Rubric {{ index + 1 }}</template>
+        <fieldset-collapsible
+            delay-content-render
+            :initially-expanded="rubric.id === 'create' || rubric.id < 0 || !initialGridIds.includes(rubric.id)"
+        >
+            <template #legend>
+                Rubric {{ index + 1 }}
+                <span v-if="rubric.id !== 'create' && rubric.title.length"> ({{ rubric.title }}) </span>
+            </template>
 
             <!-- existing rubric content -->
             <template v-if="rubric.id !== 'create'" #content>
@@ -224,7 +317,7 @@ const rubricRows = window.Vue.computed(() => {
                     </button>
                     <!-- TODO -->
                     <!-- <button class="button l-flex__item--1 icon-copy" type="button">Copy from existing activity</button> -->
-                    <button class="button l-flex__item--1 icon-upload" type="button">
+                    <button class="button l-flex__item--1 icon-upload" type="button" @click="openImportAttachzone">
                         Upload a Schoolbox format file
                     </button>
                 </div>

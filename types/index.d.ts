@@ -167,6 +167,7 @@ declare global {
          */
         data(key: "plugin_resourceAttach"): {
             dropzone: Dropzone;
+            open: () => void;
         };
         /**
          * Reflow will make Foundation check the DOM for any elements and re-apply any listeners to them.

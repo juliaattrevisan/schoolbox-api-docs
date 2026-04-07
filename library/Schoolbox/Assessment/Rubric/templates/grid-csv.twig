@@ -1,131 +1,24 @@
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/scrollTo/jquery.scrollTo.min.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/assessment/jquery.sequencer.js?v={{ config.site_version }}"></script>
-<script type="text/javascript">
-    $(function () {
-        // listen for the attachzone doing its thing
-        $('#rubric-attachable').on('success.attachzone', function (e, data) {
+<div id="rubric-builder-container">
+    <rubric-builder
+        :rubric-grids-payload="{{ rubricGridsPayload|json_encode }}"
+        :rubric-blank-grid="{{ rubricBlankGrid|json_encode }}"
+        :result-sets="{{ resultSets|json_encode }}"
+        :capability-mark-types="{{ capabilityMarkTypes|json_encode }}"
+        :capability-grading-schemes="{{ capabilityGradingSchemes|json_encode }}"
+        :default-grade-group="{{ defaultGradeGroup }}"
+        :max-levels="{{ config.rubric_max_levels }}"
+        :folder-id="{{ folderId }}"
+        route-rubric-create="{{ routeLookup("rubric.create") }}"
+        route-rubric-import="{{ routeLookup("rubric.import") }}"
+        :assessment-id="{{ assessmentId ? assessmentId : 'null' }}"
+        {% if assessmentId %}
+            route-rubric-download="{{ routeLookup('rubric.download') }}"
+        {% endif %}
+    />
+</div>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricBuilder.js?v={{ config.site_version }}"></script>
 
-            // do nothing
-            if (typeof data.hash === 'undefined') {
-                return;
-            }
-
-            var wrap   = $(this),
-                body   = $('body'),
-                assessmentIdInput,
-                folderIdInput,
-                isTaskInput,
-                postdata;
-
-
-            // perform an ajax-replace of the target via the hash we've been given
-            var url = '{{ routeLookup('rubric.import', { storageTuple: '' }) }}' + data.hash;
-
-            // detect our lookup reference
-            assessmentIdInput = body.find('input[name="id"]');
-
-            if (assessmentIdInput.length == 1 && assessmentIdInput.val() > 0) {
-                postdata = {
-                    assessmentId: assessmentIdInput.val()
-                };
-
-            } else {
-                folderIdInput = body.find('input[name="folderId"]');
-
-                if (folderIdInput.length == 1 && folderIdInput.val() > 0) {
-                    postdata = {
-                        folderId: folderIdInput.val()
-                    };
-
-                } else {
-
-                    // nothing available: bug out
-                    // TODO detach the file
-                    return;
-                }
-            }
-
-            // Pass in task value (if used), grade group and mark type values
-
-            isTaskInput   = body.find('input[name="is_task"]');
-
-            if (isTaskInput.length == 1 && isTaskInput.val() > 0) {
-                postdata.task = 1;
-            }
-
-            postdata.markTypeId   = body.find(':input[name="markType"]').val();
-            postdata.instructorMarkTypeId   = body.find(':input[name="instructor-markType"]').val();
-            postdata.gradeGroupId = body.find(':input[name="gradingScheme"]').val();
-            postdata.instructorGradeGroupId = body.find(':input[name="instructor-gradingScheme"]').val();
-
-            // show/hide appropriate things
-            wrap.find('[data-hideable]').addClass('hide');
-            wrap.find('[data-waiting-msg]').removeClass('hide');
-
-            // scroll to where you can see that something is going on
-            window.scrollTo(0, $('[data-waiting-msg]').offset()['top']);
-
-            // prevent departure or premature submission
-            var submits = body.find('[type=submit]:not(:disabled)');
-            submits.prop('disabled', true);
-
-            // get the new grid markup
-            $.post(url, postdata).done(function (data) {
-                // dump in the new data (event used in rubric-builder.vue)
-                document.dispatchEvent(new CustomEvent('RUBRIC_GRID_IMPORTED', {
-                    detail: {
-                        rubricGrid: data.rubricGrid,
-                    },
-                }));
-            }).fail(function (data) {
-
-                var elem = $(e.target);
-                var az   = elem.data('plugin_resourceAttach');
-                var dz   = az.dropzone;
-                var file = dz.files[0];
-
-                // explain that something broke
-                az.rejectFile(file, data.responseText);
-
-            }).always(function () {
-                // restore the grid
-                wrap.find('[data-hideable]').removeClass('hide');
-                wrap.find('[data-waiting-msg]').addClass('hide');
-
-                // you're free to leave now
-                submits.prop('disabled', false);
-            });
-        });
-    });
-</script>
-<div id="rubric-attachable">
-    <div data-hideable>
-        <div id="rubric-builder-container">
-            <rubric-builder
-                :rubric-grids-payload="{{ rubricGridsPayload|json_encode }}"
-                :rubric-blank-grid="{{ rubricBlankGrid|json_encode }}"
-                :result-sets="{{ resultSets|json_encode }}"
-                :capability-mark-types="{{ capabilityMarkTypes|json_encode }}"
-                :capability-grading-schemes="{{ capabilityGradingSchemes|json_encode }}"
-                :default-grade-group="{{ defaultGradeGroup }}"
-                :max-levels="{{ config.rubric_max_levels }}"
-                :folder-id="{{ folderId }}"
-                route-rubric-create="{{ routeLookup("rubric.create") }}"
-                :assessment-id="{{ assessmentId ? assessmentId : 'null' }}"
-                {% if assessmentId %}
-                    route-rubric-download="{{ routeLookup('rubric.download') }}"
-                {% endif %}
-            />
-        </div>
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricBuilder.js?v={{ config.site_version }}"></script>
-        <div>
-            {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
-        </div>
-    </div>
-    <div data-waiting-msg class="hide">
-        <h2>
-            Importing Rubric Data...
-            <span class="loader"></span>
-        </h2>
-    </div>
+{# TODO: bring this into Vue land one day, attachzone can't do that yet so just hide it here and click from within Vue instead #}
+<div id="rubric-builder-import-attachzone" class="hide">
+    {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
 </div>
