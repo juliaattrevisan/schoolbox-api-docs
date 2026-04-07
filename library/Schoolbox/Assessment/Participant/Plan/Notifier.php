@@ -389,7 +389,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
          */
         if (!$isCurrentClosed && ($method === Mapper::METHOD_CREATE || ($isPreviousHidden && !$isCurrentHidden))) {
             /**
-             * New or just switched from hidden-from-learners to visible status
+             * New or just switched from hidden to visible status
              */
             $bundle->attach(self::TRIGGER_OPEN, $triggerOpenTime);
             $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
