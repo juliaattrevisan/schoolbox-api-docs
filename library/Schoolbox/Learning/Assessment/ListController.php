@@ -32,6 +32,7 @@ use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
 use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Participant\ParticipationHelper;
 use Schoolbox\Learning\Assessment\Project\ResultCache\ValidCache;
+use Schoolbox\Learning\Assessment\Reporting\ValidManageActivity;
 use Schoolbox\Learning\Assessment\Seb\Payload;
 use Schoolbox\Learning\Assessment\Seb\Payload as SebPayload;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
@@ -561,6 +562,10 @@ class ListController extends Web\Controller\Base
         }
 
         // show the generic first-half of the form
+
+        /* There are a few places that index AssessmentTypes as a single point of control:
+         * This one is uniquely separate from all of those and needs special micromanagement.
+         */
         $data['types'] = [
             [
                 'id'    => 'due-work',
@@ -586,17 +591,20 @@ class ListController extends Web\Controller\Base
         ];
 
         /* Reporting Activities are hidden behind this feature flag which is on by default
+         * You must have LMS Moderator WRITE+ access to create them
          */
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE)) {
-            $data['types'][] = [
-                'id'    => 'reporting',
-                'value' => AssessmentType::TYPE_REPORTING,
-                'label' => $this->rosettaStone->translate('reporting', false, true),
-                'icon'  => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_REPORTING),
-                /* TODO Jezwords
-                 */
-                'title' => 'Provide teacher discretionary marking',
-            ];
+            if ((new ValidManageActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
+                $data['types'][] = [
+                    'id'    => 'reporting',
+                    'value' => AssessmentType::TYPE_REPORTING,
+                    'label' => $this->rosettaStone->translate('reporting', false, true),
+                    'icon'  => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_REPORTING),
+                    /* TODO Jezwords
+                     */
+                    'title' => 'Provide teacher discretionary marking',
+                ];
+            }
         }
 
         // TODO: avoid this AI config copypasta to check if dialog agent is enabled
