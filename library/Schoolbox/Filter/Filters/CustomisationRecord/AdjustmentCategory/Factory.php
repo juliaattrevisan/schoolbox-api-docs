@@ -12,7 +12,6 @@ namespace Schoolbox\Filter\Filters\CustomisationRecord\AdjustmentCategory;
 use Schoolbox\Admin\DifferentiationProfiles\Mapper as DpMapper;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\Filters\DifferentiationProfile\AdjustmentLevel\Component;
 use Schoolbox\Filter\IComponent;
 use Schoolbox\Filter\IDefinition;
 use Schoolbox\Filter\Page;
