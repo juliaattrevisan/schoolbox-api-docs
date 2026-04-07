@@ -318,7 +318,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
         }
 
         $worktype = $box->getAssessmentModel()->getWorkType();
-        if ($worktype && !$worktype->isVisibleToLearners() && !$worktype->isVisibleToParents()) {
+        if ($worktype && !$worktype->isVisibleToLearners()) {
             return $envelope;
         }
 
