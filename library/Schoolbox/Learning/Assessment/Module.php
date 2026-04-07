@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -143,11 +144,34 @@ class Module extends BaseModule
         $canViewSimilarityReport  = $this->buildAuthRuleCanViewSimilarityReport();
         $canAckSubmission         = $this->buildAuthRuleCanAcknowledgeSubmission();
 
+        /* This fulfils the same idea as ValidManageActivity for reporting activities
+         */
+        $canManageReportingActivity = new Rule\Callback(function ($params, ?User $user) {
+            /* Reporting Activities need further evaluation to decide if a feature/action/ability is available.
+             * This is because of the idiosyncratic nature where some staff have service permissions that allow access
+             *
+             * (Non-reporting activities don't need further checks.)
+             */
+            if (!$params['assessment'] instanceof Reporting\Model) {
+                return;
+            }
+
+            /* $user must have the ability to manage reporting activities as per their LMS Moderator write+
+             * service permission
+             */
+            if ((new Assessment\Reporting\ValidManageActivity())->isSatisfiedBy($this->injector->get('config')->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $user)) {
+                return;
+            }
+
+            throw new Unauthorized('User cannot modify custom participation for reporting activities');
+        });
+
         $canDelete = new Rule\Any(
             $isSuper,
             new Rule\All(
                 $canWrite,
-                new IsDeletionUnLocked(new LockedChecker($this->getTermMapper()))
+                new IsDeletionUnLocked(new LockedChecker($this->getTermMapper())),
+                $canManageReportingActivity
             )
         );
 
@@ -156,7 +180,8 @@ class Module extends BaseModule
             new Rule\All(
                 $canWrite,
                 new AssessmentNotDeleted(),
-                new IsModifyUnLocked(new LockedChecker($this->getTermMapper()))
+                new IsModifyUnLocked(new LockedChecker($this->getTermMapper())),
+                $canManageReportingActivity
             )
         );
 
@@ -194,6 +219,7 @@ class Module extends BaseModule
                     $canWrite,
                     new AssessmentNotDeleted(),
                     new IsModifyUnLocked(new LockedChecker($this->getTermMapper())),
+                    $canManageReportingActivity
                 )
             )
         );
