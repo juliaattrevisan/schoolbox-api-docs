@@ -83,7 +83,7 @@ const allRubricsSum = window.Vue.computed(() => {
  * Keep the max mark input in sync with the rubric grid's max value
  */
 window.Vue.watch(
-    () => [allRubricsSum, rubricGrids.value.length],
+    () => [allRubricsSum.value, rubricGrids.value.length],
     () => {
         // TODO: ignore when {% if not courseManaged.isReadonly %} if needed (the old one did)
 

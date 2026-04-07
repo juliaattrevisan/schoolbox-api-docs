@@ -59,6 +59,7 @@ defineExpose({ textareaRef });
     <td
         :class="!indicatorEnabled ? 'hide-v' : ''"
         :data-test="`rubric-descriptor-cell-${props.descriptorIndex}`"
+        data-descriptor
         @click="onCellClick"
     >
         <textarea
@@ -83,7 +84,7 @@ defineExpose({ textareaRef });
             min="0"
             :placeholder="useMarkRange ? 'Maximum points' : 'Points'"
             :disabled="!indicatorEnabled || undefined"
-            :data-descriptor-value="!indicatorEnabled || undefined"
+            :data-descriptor-value="indicatorEnabled || undefined"
             data-test="rubric-descriptor-max-value"
         />
     </td>

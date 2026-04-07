@@ -115,7 +115,6 @@ window.Vue.onMounted(() => {
                 v-if="props.indicator.inUseExcludingAssessment"
                 class="checkbox-label rb-criterion rb-readonly rb-indicator-name"
                 :for="`rb-indicator-${componentId}`"
-                data-test="rubric-indicator-toggle"
             >
                 {{ indicatorName }}
                 <span
@@ -128,7 +127,12 @@ window.Vue.onMounted(() => {
                 </span>
             </label>
 
-            <label v-else class="checkbox-label rb-criterion rb-editable" :for="`rb-indicator-${componentId}`">
+            <label
+                v-else
+                class="checkbox-label rb-criterion rb-editable"
+                :for="`rb-indicator-${componentId}`"
+                data-test="rubric-indicator-toggle"
+            >
                 <textarea
                     :id="`rb-indicator-textarea-${componentId}`"
                     v-model.trim.lazy="indicatorName"

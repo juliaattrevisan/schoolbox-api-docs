@@ -97,10 +97,7 @@ function initDynamicValidationTriggers() {
         // Attach listener to run monotonicity validation on a descriptor row every time one of the contained descriptor values change
         $("[data-descriptor-value]").on("change", function () {
             var $changedDescriptor = $(this);
-            var $closestDescRow = $changedDescriptor
-                .closest("[data-descriptor]")
-                .prevAll("th")
-                .find("[data-criterion-name]");
+            var $closestDescRow = $changedDescriptor.closest("tr[data-indicator-row]").find("[data-criterion-name]");
             $closestDescRow.valid();
         });
 
