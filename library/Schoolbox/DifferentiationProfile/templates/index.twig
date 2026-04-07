@@ -38,15 +38,7 @@
                             </a>
                         </li>
                     {% endif %}
-                    {% set exportCSVRoute = routeLookupIfAuthorized('differentiationProfiles.exportDifferentiationProfilesToCsv') %}
-                    {% if exportCSVRoute %}
-                    <li>
-                        <a href="{{ exportCSVRoute }}" class="l-flex l-gap-s" title="Export to CSV">
-                            <sbx-icon name="export"></sbx-icon>
-                            Export to CSV
-                        </a>
-                    </li>
-                    {% endif %}
+                    <li id="download-csv-container"></li>
                 </ul>
         </div>
         <div>

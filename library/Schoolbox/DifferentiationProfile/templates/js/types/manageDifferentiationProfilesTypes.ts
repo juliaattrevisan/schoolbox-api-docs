@@ -9,6 +9,7 @@ import type { Nested } from "@js/util/queryUtils";
 export type Routes = {
     getData: string;
     genAi: string;
+    exportCsv: string;
 };
 
 /**
