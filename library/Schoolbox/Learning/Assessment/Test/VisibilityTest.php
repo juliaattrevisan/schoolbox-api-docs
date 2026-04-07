@@ -101,12 +101,13 @@ class VisibilityTest extends TestCase
         [$studentRole, $staffRole] = self::buildRoles();
 
         // isInstructor dimension
-        [$nonInstructor, $isInstructor] = self::buildUsers();
+        [$nonInstructor, $isInstructor, $isLearner] = self::buildUsers();
 
         // workType dimension
-        $workTypeNone   = null;
-        $workTypeNormal = (new WorkType\Model())->setStaffOrInstructorVisibleOnly(false);
-        $workTypeSivo   = (new WorkType\Model())->setStaffOrInstructorVisibleOnly(true);
+        $workTypeNone        = null;
+        $workTypeNormal      = (new WorkType\Model())->setStaffOrInstructorVisibleOnly(false);
+        $workTypeSivo        = (new WorkType\Model())->setStaffOrInstructorVisibleOnly(true);
+        $workTypeParentsOnly = (new WorkType\Model())->setIsVisibleToParents(true)->setIsVisibleToLearners(false);
 
         // Assessment temporal state
         $now = new Alaress_Date_Format(self::NOW_DATABASE, Alaress_Date_Format::DATABASE_FORMAT);
@@ -429,6 +430,43 @@ class VisibilityTest extends TestCase
             [$notParticipant, $staffRole, $isInstructor, $workTypeSivo, $overdue, $hideClosed, $now, true],
             [$notParticipant, $staffRole, $isInstructor, $workTypeSivo, $closed, $showClosed, $now, true],
             [$notParticipant, $staffRole, $isInstructor, $workTypeSivo, $closed, $hideClosed, $now, false],
+
+            // Learner (READ-access) student, SIVO (0,0): always excluded
+            [$isParticipant,  $studentRole, $isLearner, $workTypeSivo,        $upcoming, $showClosed, $now, false],
+            [$isParticipant,  $studentRole, $isLearner, $workTypeSivo,        $open,     $showClosed, $now, false],
+            [$notParticipant, $studentRole, $isLearner, $workTypeSivo,        $upcoming, $showClosed, $now, false],
+
+            // Learner (READ-access) student, parents-only (0,1): learner excluded
+            [$isParticipant,  $studentRole, $isLearner, $workTypeParentsOnly, $upcoming, $showClosed, $now, false],
+            [$isParticipant,  $studentRole, $isLearner, $workTypeParentsOnly, $open,     $showClosed, $now, false],
+            [$notParticipant, $studentRole, $isLearner, $workTypeParentsOnly, $upcoming, $showClosed, $now, false],
+
+            // Learner (READ-access) student, learners-visible (1,1): same as non-learner student
+            [$isParticipant,  $studentRole, $isLearner, $workTypeNormal,      $unpublished, $showClosed, $now, false],
+            [$isParticipant,  $studentRole, $isLearner, $workTypeNormal,      $upcoming,    $showClosed, $now, true],
+            [$isParticipant,  $studentRole, $isLearner, $workTypeNormal,      $upcoming,    $hideClosed, $now, true],
+            [$isParticipant,  $studentRole, $isLearner, $workTypeNormal,      $closed,      $showClosed, $now, true],
+            [$isParticipant,  $studentRole, $isLearner, $workTypeNormal,      $closed,      $hideClosed, $now, false],
+            [$notParticipant, $studentRole, $isLearner, $workTypeNormal,      $upcoming,    $showClosed, $now, false],
+            [$isParticipant,  $studentRole, $isLearner, $workTypeNone,        $upcoming,    $showClosed, $now, true],
+            [$notParticipant, $studentRole, $isLearner, $workTypeNone,        $upcoming,    $showClosed, $now, false],
+
+            // Learner (READ-access) STAFF, SIVO (0,0): EXCLUDED despite staff role — critical new rule
+            [$isParticipant,  $staffRole,   $isLearner, $workTypeSivo,        $upcoming, $showClosed, $now, false],
+            [$isParticipant,  $staffRole,   $isLearner, $workTypeSivo,        $open,     $showClosed, $now, false],
+            [$notParticipant, $staffRole,   $isLearner, $workTypeSivo,        $upcoming, $showClosed, $now, false],
+            [$notParticipant, $staffRole,   $isLearner, $workTypeSivo,        $closed,   $showClosed, $now, false],
+
+            // Learner (READ-access) STAFF, parents-only (0,1): EXCLUDED despite staff role
+            [$isParticipant,  $staffRole,   $isLearner, $workTypeParentsOnly, $upcoming, $showClosed, $now, false],
+            [$notParticipant, $staffRole,   $isLearner, $workTypeParentsOnly, $upcoming, $showClosed, $now, false],
+
+            // Learner (READ-access) STAFF, learners-visible (1,1): visible, subject to timing
+            [$isParticipant,  $staffRole,   $isLearner, $workTypeNormal,      $upcoming, $showClosed, $now, true],
+            [$isParticipant,  $staffRole,   $isLearner, $workTypeNormal,      $closed,   $hideClosed, $now, false],
+            [$notParticipant, $staffRole,   $isLearner, $workTypeNormal,      $upcoming, $showClosed, $now, true],
+            [$isParticipant,  $staffRole,   $isLearner, $workTypeNone,        $upcoming, $showClosed, $now, true],
+            [$notParticipant, $staffRole,   $isLearner, $workTypeNone,        $upcoming, $showClosed, $now, true],
         ];
     }
 
@@ -458,6 +496,7 @@ class VisibilityTest extends TestCase
         return [
             (new User())->setId(1)->setFirstname('Andy - non-instructor'),
             (new User())->setId(2)->setFirstname('Bart - is-instructor'),
+            (new User())->setId(3)->setFirstname('Cath - is-learner'),
         ];
     }
 
@@ -543,13 +582,12 @@ class VisibilityTest extends TestCase
             ->expects($this->any())
             ->method('getFolderAccess')
             ->willReturnCallback(function (User $user) {
-                switch ($user->getId()) {
-                    case 1:
-                        return UserAccess::ACCESS_DENY;
-                    case 2:
-                        return UserAccess::ACCESS_WRITE;
-                }
-                throw new \InvalidArgumentException("No access level defined for user '{$user->getId()}'");
+                return match ($user->getId()) {
+                    1 => UserAccess::ACCESS_DENY,
+                    2 => UserAccess::ACCESS_WRITE,
+                    3 => UserAccess::ACCESS_READ,
+                    default => throw new \InvalidArgumentException("No access level defined for user '{$user->getId()}'"),
+                };
             });
         return $mockAccess;
     }
