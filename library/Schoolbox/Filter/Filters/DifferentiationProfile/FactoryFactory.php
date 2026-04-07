@@ -47,7 +47,8 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getOptionMapper(),
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper(),
-                    $this->getMapperFactory()->get(AdjustmentCategoryMapper::class)
+                    $this->getMapperFactory()->get(AdjustmentCategoryMapper::class),
+                    $this->getMapperFactory()->get(DpMapper::class),
                 );
             case AdjustmentLevel\Definition::class:
                 return new AdjustmentLevel\Factory(

@@ -56,7 +56,9 @@ class Component extends BaseComponent
             /** @var DpModel $adjustmentLevelObj */
             $adjustmentLevelObj = $this->differentiationProfileMapper
                 ->findOneByColumn('name', 'adjustment_level');
-            $context['terminology'] = ('' === (string)$adjustmentLevelObj->getTerminology()) ?: $adjustmentLevelObj->getTitle();
+            $context['terminology'] =
+                ((string)$adjustmentLevelObj->getTerminology()) ?:
+                    $adjustmentLevelObj->getTitle();
         } catch (\Exception $e) {
             /* For any reasons that it fails to retrieve the config
              */
