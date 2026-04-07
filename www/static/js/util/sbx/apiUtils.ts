@@ -96,9 +96,9 @@ interface DownloadApiRequestOptions<
      */
     accept: string[];
     /**
-     * Fallback filename to use if the response does not provide one
+     * Filename to use for the download
      */
-    filenameFallback?: string;
+    filename: string;
 }
 
 export type SseMessageEvent<TEventType extends string = string, TMessageData = unknown> = {
@@ -353,7 +353,7 @@ export async function downloadApiRequest<TBody extends ApiRequestBodyBase | unde
         return parseResponse<null>(responseBody, response.status, contentType);
     }
 
-    const blob = await downloadResponse(response, options.filenameFallback);
+    const blob = await downloadResponse(response, options.filename);
     return {
         success: true,
         data: blob,

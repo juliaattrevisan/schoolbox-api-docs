@@ -33,6 +33,13 @@ async function download(): Promise<void> {
         return; // shouldn't be possible to click the button in this state, but just in case
     }
 
+    const filenameParts = [
+        document.querySelector<HTMLInputElement>("#title")?.value,
+        parsedProps.value.rubricGrid.title,
+        "rubric",
+    ];
+    const filename = filenameParts.filter(Boolean).join("-");
+
     const toast = window.sbProps.toastActivate("Downloading rubric...");
     const response = await downloadApiRequest({
         method: "POST",
@@ -41,7 +48,7 @@ async function download(): Promise<void> {
             rubricGrid: translateGridToFormPayload(parsedProps.value.rubricGrid),
             assessmentId: parsedProps.value.assessmentId,
         },
-        filenameFallback: "rubric.csv",
+        filename: `${encodeURIComponent(filename)}.csv`,
         accept: ["text/csv"],
     });
 

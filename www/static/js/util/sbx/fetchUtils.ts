@@ -50,19 +50,11 @@ export function parseSseEvent(rawEvent: string): { eventType: string | undefined
 /**
  * Trigger a browser download for the provided response body
  * @param response - The response containing the file to download
- * @param fallbackFilename - The filename to use if the response does not provide one
+ * @param filename - The filename to use for the download
  * @returns The downloaded Blob
  */
-export async function downloadResponse(response: Response, fallbackFilename?: string): Promise<Blob> {
-    // Attempt to extract a filename if provided
-    let filename = fallbackFilename || "download";
-    const contentDisposition = response.headers.get("content-disposition");
-    if (contentDisposition) {
-        const [, extractedFilename] = contentDisposition.match(/filename="?([^"]+)"?/) || [];
-        if (extractedFilename) {
-            filename = extractedFilename;
-        }
-    }
+export async function downloadResponse(response: Response, filename: string): Promise<Blob> {
+    // TODO: probably try extract the filename from content-disposition, it appears doing that properly for a lot of cases needs some investigation first
 
     // Trigger the download
     const blob = await response.blob();
