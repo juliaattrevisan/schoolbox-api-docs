@@ -201,9 +201,11 @@ class RetentionPeriodTest extends TestCase
     {
         return [
             [1.5],              // float
-            [new \stdClass()], // object
+            [new \stdClass()],  // object
             [[]],               // array
             [STDOUT],           // resource
+            ['3.14'],           // non-integer numeric string
+            ['abc'],            // non-numeric string
         ];
     }
 }

@@ -33,8 +33,8 @@ class ValidStratsTest extends TestCase
     {
         return [
             'empty string' => [
-                '',
-                [],
+                '',     // cli args
+                [],     // expected
             ],
             'only commas / whitespace' => [
                 '  , , , , , , ,, , ,,,,     ,, , ,,       ,           ',
@@ -85,9 +85,9 @@ class ValidStratsTest extends TestCase
         return [
             // Special case: when no strats provided we treat all as enabled
             'special case moments' => [
-                'moments',
-                '',
-                true,
+                'moments', // valid strat
+                '',        // cli args
+                true,      // expected
             ],
 
             'moments enabled' => [

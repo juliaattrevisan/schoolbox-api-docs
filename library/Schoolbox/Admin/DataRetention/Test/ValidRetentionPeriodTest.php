@@ -49,6 +49,7 @@ class ValidRetentionPeriodTest extends TestCase
             'int 30' => [30],
             'string 1' => ['1'],
             'string 365' => ['365'],
+            'string 2556' => ['2556'], // 7 years (days)
         ];
     }
 
