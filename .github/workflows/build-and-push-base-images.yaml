@@ -349,9 +349,13 @@ jobs:
       status: ${{ (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')) && 'failure' || 'success' }}
       ref_name: ${{ github.ref_name }}
       run_url: ${{ format('{0}/{1}/actions/runs/{2}', github.server_url, github.repository, github.run_id) }}
-      webhook_url: ${{ secrets.SLACK_DEVELOPERS_WEBHOOK_URL }}
+      # In order to generate a new webhook URL:
+      # * visit https://api.slack.com/apps/, create a new app (default permissions should be fine)
+      # * in Features > Incoming Webhooks, activate webhooks and create a new webhook for the relevant channel
       channel: developers
       message: |
         A new `${{ vars.FRANKENPHP_IMAGE_NAME }}` base image has been created for the `${{ github.ref_name }}` branch.
 
         If working on that branch, please `gitsync ${{ github.ref_name }}` and `docker/up` at earliest convenience.
+    secrets:
+      webhook_url: ${{ secrets.SLACK_DEVELOPERS_WEBHOOK_URL }}
