@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use SensitiveParameter;
 
 /**
  * Lightweight HTTP client for SOCS APIs with URL usage tracking.
@@ -18,18 +19,17 @@ class HttpClient
 
     private string $baseUrl;
 
-    private string $schoolId;
-
-    private string $token;
-
     /** @var array<string,int> */
     private array $urlUsage = [];
 
-    public function __construct(string $host, string $schoolId = '', string $token = '')
+    /**
+     * @param string $host Base URL of the SOCS API, without trailing slash.
+     * @param string $schoolId School ID
+     * @param string $token Schoolbox API token
+     */
+    public function __construct(string $host, private string $schoolId = '', #[SensitiveParameter] private string $token = '')
     {
         $this->baseUrl = rtrim($host, '/');
-        $this->schoolId = $schoolId;
-        $this->token = $token;
         $this->client = new Client([
             'timeout' => 300,
             'http_errors' => false,
@@ -79,8 +79,7 @@ class HttpClient
         if ($safeQuery === []) {
             $url = $baseUrl;
         } else {
-            $separator = str_contains($baseUrl, '?') ? '&' : '?';
-            $url = $baseUrl . $separator . http_build_query($safeQuery);
+            $url = sprintf("%s %s", $path, http_build_query($safeQuery));
         }
 
         if (!isset($this->urlUsage[$url])) {

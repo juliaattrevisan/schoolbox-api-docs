@@ -35,6 +35,8 @@ class ImporterTool extends CliTool\App
     private const SOCS_IMPORTER_LOCK_NAME = 'socs_importer';
     public const LOCK_NAME = self::SOCS_IMPORTER_LOCK_NAME;
     private const SOCS_SCHOOL_ID = '2460';
+
+    private const FIXTURES_PATH = 'fixturecalendar.ashx';
     private const MSO_SPORT_PATH = 'mso-sport.ashx';
     private const RESULTS_PATH = 'results.ashx';
     private const OPT_LONG_HELP = 'help';
@@ -104,6 +106,21 @@ class ImporterTool extends CliTool\App
         }
 
         try {
+            // spawn the http client in the background so that it can be used
+            $host = (string)$this->getConfig()->get('socs_endpoint_host');
+
+            if ('' === $host) {
+                $logger->warning('Missing SOCS endpoint host; exiting results import');
+                return;
+            }
+
+            $token = (string)$this->getConfig()->get('socs_endpoint_token');
+            if ('' === $token) {
+                $logger->warning('Missing SOCS endpoint token; exiting results import');
+                return;
+            }
+
+            $this->httpClient = new httpClient($host, self::SOCS_SCHOOL_ID, $token);
             if ($runFixtures) {
                 $this->importFixtures($logger, $lock);
             }
@@ -157,23 +174,6 @@ HELP;
      */
     private function importFixtures(LoggerInterface $logger, LockInterface $lock): void
     {
-        $host = (string)$this->getConfig()->get('socs_endpoint_host');
-
-        if ('' === $host) {
-            $logger->warning('Missing SOCS endpoint host; exiting');
-            return;
-        }
-
-        $logger->info('SOCS to Schoolbox Fixtures synchronisation starting');
-
-        $token = (string)$this->getConfig()->get('socs_endpoint_token');
-        if ('' === $token) {
-            $logger->warning('Missing SOCS endpoint token; exiting');
-            return;
-        }
-
-        $httpClient = $this->getHttpClient($host);
-
         $seasonMapper = SeasonMapper::getInstance();
         $sportMapper = SportMapper::getInstance();
         $divisionMapper = DivisionMapper::getInstance();
@@ -191,14 +191,12 @@ HELP;
         $logger->info(sprintf('Downloading SOCS fixtures from %s to %s', $startDate, $endDate));
 
         $query = [
-            'ID'        => self::SOCS_SCHOOL_ID,
-            'key'       => $token,
             'startdate' => $startDate,
             'enddate'   => $endDate,
         ];
 
         try {
-            $response = $httpClient->get('fixturecalendar.ashx', $query, $logger);
+            $response = $this->httpClient->get(self::FIXTURES_PATH, $query, $logger);
         } catch (GuzzleException $e) {
             $logger->warning(sprintf('Failed to contact SOCS endpoint: %s', $e->getMessage()));
             return;
@@ -325,21 +323,6 @@ HELP;
      */
     private function importResults(LoggerInterface $logger): void
     {
-        $host = (string)$this->getConfig()->get('socs_endpoint_host');
-
-        if ('' === $host) {
-            $logger->warning('Missing SOCS endpoint host; exiting results import');
-            return;
-        }
-
-        $token = (string)$this->getConfig()->get('socs_endpoint_token');
-        if ('' === $token) {
-            $logger->warning('Missing SOCS endpoint token; exiting results import');
-            return;
-        }
-
-        $httpClient = $this->getHttpClient($host);
-
         $now = \Alaress_Date_Format::now();
         $startDate = (clone $now)->addDays(-30)->getUsingFormat('j M Y');
         $endDate = (clone $now)->addDays(100)->getUsingFormat('j M Y');
@@ -347,14 +330,12 @@ HELP;
         $logger->info(sprintf('Downloading SOCS results from %s to %s', $startDate, $endDate));
 
         $query = [
-            'ID'        => self::SOCS_SCHOOL_ID,
-            'key'       => $token,
             'startdate' => $startDate,
             'enddate'   => $endDate,
         ];
 
         try {
-            $response = $httpClient->get(self::RESULTS_PATH, $query, $logger);
+            $response = $this->httpClient->get(self::RESULTS_PATH, $query, $logger);
         } catch (GuzzleException $e) {
             $logger->warning(sprintf('Failed to contact SOCS results endpoint: %s', $e->getMessage()));
             return;
@@ -460,21 +441,6 @@ HELP;
      */
     private function importTeams(LoggerInterface $logger): void
     {
-        $host = (string)$this->getConfig()->get('socs_endpoint_host');
-
-        if ('' === $host) {
-            $logger->warning('Missing SOCS endpoint host; exiting teams import');
-            return;
-        }
-
-        $token = (string)$this->getConfig()->get('socs_endpoint_token');
-        if ('' === $token) {
-            $logger->warning('Missing SOCS endpoint token; exiting teams import');
-            return;
-        }
-
-        $httpClient = $this->getHttpClient($host);
-
         $seasonMapper = SeasonMapper::getInstance();
         $sportMapper = SportMapper::getInstance();
         $divisionMapper = DivisionMapper::getInstance();
@@ -484,13 +450,10 @@ HELP;
 
         $logger->info('Downloading SOCS teams from mso-sport feed');
 
-        $query = [
-            'ID'  => self::SOCS_SCHOOL_ID,
-            'key' => $token,
-        ];
+        $query = [];
 
         try {
-            $response = $httpClient->get(self::MSO_SPORT_PATH, $query, $logger);
+            $response = $this->httpClient->get(self::MSO_SPORT_PATH, $query, $logger);
         } catch (GuzzleException $e) {
             $logger->warning(sprintf('Failed to contact SOCS teams endpoint: %s', $e->getMessage()));
             return;
@@ -824,10 +787,10 @@ HELP;
      *
      * @param string $host Base SOCS host URL from configuration
      */
-    private function getHttpClient(string $host): HttpClient
+    private function getHttpClient(string $host, string $schoolId = '', #[SensitiveParameter] string $token = ''): HttpClient
     {
         if (!$this->httpClient instanceof HttpClient) {
-            $this->httpClient = new HttpClient($host);
+            $this->httpClient = new HttpClient($host, $schoolId, $token);
         }
 
         return $this->httpClient;
