@@ -47,6 +47,7 @@ class Import implements IStrategy
         $response = $this->httpClient->get(self::MSO_SPORT_PATH, $query, $this->log);
 
         if (null === $response) {
+            $this->log->info('SOCS teams no response; skipping');
             return;
         }
 

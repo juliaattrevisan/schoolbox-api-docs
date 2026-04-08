@@ -47,6 +47,7 @@ class Import implements IStrategy
         $response = $this->httpClient->get(self::RESULTS_PATH, $query, $this->log);
 
         if (null === $response) {
+            $this->log->info('SOCS results no response; skipping');
             return;
         }
 

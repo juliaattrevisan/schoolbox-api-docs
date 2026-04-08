@@ -60,6 +60,7 @@ class Import implements IStrategy
         $response = $this->httpClient->get(self::FIXTURES_PATH, $query, $this->log);
 
         if (null === $response) {
+            $this->log->info('SOCS fixtures no response; skipping');
             return;
         }
 
