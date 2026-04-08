@@ -43,7 +43,7 @@
                 {% set cohortReportRoute = routeLookupIfAuthorized('learningMomentEvidence.getCohortReport', {folder: class, folderId: class.id}) %}
                 {% if cohortReportRoute %}<li><a href="{{ cohortReportRoute }}"><sbx-icon name="share"></sbx-icon>Cohort Learning Moments</a></li>{% endif %}
                 {% set badgeAwardRoute = routeLookupIfAuthorized('learningBadgeAward.getListPage', {folder: class, folderId: class.id}) %}
-                {% if badgeAwardRoute %}<li><a href="{{ badgeAwardRoute }}" class="icon-achievement">Badge Report</a></li>{% endif %}
+                {% if badgeAwardRoute %}<li><a href="{{ badgeAwardRoute }}"><sbx-icon name="achievement"></sbx-icon>Badge Report</a></li>{% endif %}
                 {% set classPastoralRoute = routeLookupIfAuthorized('pastoralClassReportModule.getReport', {folder: class, folderId: class.id}) %}
                 {% if classPastoralRoute %}<li><a href="{{ classPastoralRoute }}"><sbx-icon name="pastoral"></sbx-icon>{{ locale.pastoralCare.proper }} Report</a></li>{% endif %}
                 <li><a href="{{ routeLookup('folder.getFolderModify', {id: class.id}) }}"><sbx-icon name="modify"></sbx-icon>Modify</a></li>
@@ -62,7 +62,7 @@
                 {% if routes or intellischoolRoute %}
                     <li class="separator">Analytics</li>
                     {% for route in routes %}
-                        <li><a href="{{ route.url }}" class="icon-poll">{{ route.title }}</a></li>
+                        <li><a href="{{ route.url }}"><sbx-icon name="poll"></sbx-icon>{{ route.title }}</a></li>
                     {% endfor %}
                     {% if intellischoolRoute %}
                         <li><a href="{{ intellischoolRoute }}"><sbx-icon name="intellischool"></sbx-icon>Intellischool Analytics</a></li>

@@ -272,8 +272,8 @@ export default {
                 <a
                     :href="getUrl('achievement')"
                     title="Award achievement"
-                    class="button icon-achievement l-flex__item--1"
-                    >Award achievement</a
+                    class="button sbx-button--has-icon l-flex__item--1"
+                    ><sbx-icon name="achievement"></sbx-icon>Award achievement</a
                 >
             </div>
         </bottom-drawer>

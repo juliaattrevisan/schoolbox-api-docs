@@ -621,17 +621,13 @@ export default {
                         >
                     </li>
                     <li v-if="badgesEnabled">
-                        <a
-                            :href="buildAwardAchievementUrl()"
-                            :class="{ disabled: selectedStudentIds.length === 0, 'icon-achievement': true }"
-                            >Award Achievements</a
+                        <a :href="buildAwardAchievementUrl()" :class="{ disabled: selectedStudentIds.length === 0 }"
+                            ><sbx-icon name="achievement"></sbx-icon>Award Achievements</a
                         >
                     </li>
                     <li v-if="pastoralEnabled">
-                        <a
-                            @click.prevent="addPastoralRecord"
-                            :class="{ disabled: selectedStudentIds.length === 0, 'icon-user': true }"
-                            >Add {{ pastoralCareLabel }} Record</a
+                        <a @click.prevent="addPastoralRecord" :class="{ disabled: selectedStudentIds.length === 0 }"
+                            ><sbx-icon name="user"></sbx-icon>Add {{ pastoralCareLabel }} Record</a
                         >
                     </li>
                     <li v-if="mailEnabled && currentUserCanEmail">

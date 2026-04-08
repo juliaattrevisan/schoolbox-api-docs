@@ -33,7 +33,7 @@
                 <ul data-dropdown-content class="f-dropdown" id="class-options{{ group.id }}">
                     {% if isAccessWrite or isAccessAdmin %}
                         <li><a href="{{ routeLookup('folder.getFolderModify', {id: group.id}) }}"><sbx-icon name="modify"></sbx-icon>Modify Folder</a></li>
-                        <li><a href="/statistics/homepage/{{ group.id }} " class="icon-report">View Statistics</a></li>
+                        <li><a href="/statistics/homepage/{{ group.id }} "><sbx-icon name="report"></sbx-icon>View Statistics</a></li>
                     {% endif %}
                     {% if isAccessAdmin %}
                         <li><a href="{{ routeLookup('group.getModify', {folderId: group.id, folder: group}) }}"><sbx-icon name="group"></sbx-icon>Manage Group</a></li>

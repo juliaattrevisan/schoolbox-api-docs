@@ -193,7 +193,8 @@ async function onResolve(): Promise<void> {
         </a>
     </li>
     <li v-if="props.summaryRoute">
-        <a :href="props.summaryRoute" class="icon-history" data-test="das-actions-summary">
+        <a :href="props.summaryRoute" data-test="das-actions-summary">
+            <sbx-icon name="history"></sbx-icon>
             {{ `${locale.dialogAgent.proper()} History` }}
         </a>
     </li>

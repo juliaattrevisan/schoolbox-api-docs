@@ -45,8 +45,10 @@ const buttonCount = window.Vue.computed(() => {
             <a
                 v-if="props.routeCurriculumCoverage"
                 :href="props.routeCurriculumCoverage"
-                class="icon-report"
+                class="sbx-icon-only-button no-text"
                 title="View Curriculum Coverage Report"
+                aria-label="View Curriculum Coverage Report"
+                ><sbx-icon name="report"></sbx-icon
             ></a>
             <a
                 v-if="!store.isReadOnly"

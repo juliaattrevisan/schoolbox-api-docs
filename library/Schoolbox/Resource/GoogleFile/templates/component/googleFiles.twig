@@ -38,9 +38,9 @@
                         <sbx-pop-out content-id="google-file-{{ loop.index }}"></sbx-pop-out>
                     </nav>
                     <ul id="google-file-{{ loop.index }}" class="f-dropdown" data-dropdown-content>
-                        <li><a class="icon-bin" data-action="delete"
+                           <li><a data-action="delete"
                                href="{{ routeLookupIfAuthorized('googleFile.deleteGoogleFile', {googleFileId: googleFile.id, googleFile: googleFile}) }}"
-                               title="Remove">Remove</a>
+                               title="Remove"><sbx-icon name="delete"></sbx-icon>Remove</a>
                         </li>
                         <li><a data-action="permission"
                                data-id="{{ googleFile.googleId }}" data-edit-level="{{ googleFile.editLevel }}"
