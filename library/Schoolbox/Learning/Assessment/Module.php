@@ -75,6 +75,7 @@ use Schoolbox\LTI\Provider\Mapper as LtiToolMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Role;
@@ -197,7 +198,22 @@ class Module extends BaseModule
                     $canWrite,
                     new AssessmentNotDeleted(),
                     new IsModifyUnLocked(new LockedChecker($this->getTermMapper())),
-                    new IsManageReportingActivity($this->getConfig())
+                    new Rule\Any(
+                        new IsManageReportingActivity($this->getConfig()),
+                        new Rule\All(
+                            /* Differentiation Profile guys have access to Student Participation for reporting under a
+                             * very particular set of circumstances: this depends on IsManageReportingActivity returning
+                             * truthy for non-reporting-activities already.
+                             *
+                             *   - Feature flag must be on
+                             *   - Assessment must be a Reporting Activity
+                             *   - User must have diff profile moderate service perms
+                             */
+                            new Rule\IsConfigOn(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE, $this->getConfig()),
+                            new ValidAssessmentType([AssessmentType::TYPE_REPORTING]),
+                            new Rule\HasServicePermission(UserAccess::SERVICE_DIFFERENTIATION, UserAccess::ACCESS_FULL),
+                        )
+                    )
                 )
             )
         );
