@@ -12,11 +12,11 @@ use Symfony\Component\Lock\LockInterface;
 /**
  * SOCS fixtures prepare step.
  *
- * Marks previously-imported SOCS matchups for potential removal by setting
- * their updated_at timestamps to a sentinel value. Matchups that are seen and
- * saved again during the current import will have their timestamps refreshed,
- * allowing the cleanup step to soft-delete only those that did not appear in
- * the latest SOCS feed.
+ * Marks previously-imported fixtures and sports for potential removal by
+ * setting their updated_at timestamps to a sentinel value. Records that are
+ * seen and saved again during the current import will have their timestamps
+ * refreshed, allowing the cleanup step to soft-delete only those that did not
+ * appear in the latest SOCS feed.
  */
 class Prepare implements IStrategy
 {
@@ -46,6 +46,9 @@ class Prepare implements IStrategy
             // Mark existing SOCS matchups as "stale" until they are
             // re-saved by the current import run.
             $db->query("UPDATE {$table} SET updated_at = '0000-00-00 00:00:00'");
+            // Mark existing sports as "stale" until they are re-saved by the
+            // current import run.
+            $db->query("UPDATE sportsfixtures_sport SET updated_at = '0000-00-00 00:00:00'");
         }
 
         $this->log->info('Preparing previously-imported SOCS matchups for create/update.');

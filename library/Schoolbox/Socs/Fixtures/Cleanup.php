@@ -12,9 +12,10 @@ use Symfony\Component\Lock\LockInterface;
 /**
  * SOCS fixtures cleanup step.
  *
- * Soft-deletes SOCS-owned matchups that were marked as stale in the prepare
+ * Soft-deletes fixtures and sports that were marked as stale in the prepare
  * step and not refreshed during the current import run. This mirrors the
- * Clipboard Sessions cleanup behaviour but is scoped to SOCS fixtures only.
+ * Clipboard Sessions cleanup behaviour but is scoped to SOCS-driven data
+ * only.
  */
 class Cleanup implements IStrategy
 {
@@ -45,6 +46,8 @@ class Cleanup implements IStrategy
             // import run. Their related results are removed via mapper
             // callbacks when the matchup is soft-deleted.
             $db->query("UPDATE {$table} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            // Soft-delete sports that were not touched during this import run.
+            $db->query("UPDATE sportsfixtures_sport SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
         }
 
         $this->log->info('Soft-deleting SOCS matchups that did not appear in the import.');
