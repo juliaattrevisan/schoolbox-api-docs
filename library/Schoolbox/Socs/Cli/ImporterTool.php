@@ -39,6 +39,9 @@ class ImporterTool extends CliTool\App
     private const RESULTS_PATH = 'results.ashx';
     private const OPT_LONG_HELP = 'help';
     private const OPT_LONG_INSTANCE = 'instance:';
+    private const OPT_LONG_FIXTURES = 'fixtures';
+    private const OPT_LONG_RESULTS = 'results';
+    private const OPT_LONG_TEAMS = 'teams';
     private const LOCK_TTL = 120;
     private const DEFAULT_TIMEOUT = 3600;
 
@@ -49,6 +52,9 @@ class ImporterTool extends CliTool\App
         return [
             self::OPT_LONG_HELP,
             self::OPT_LONG_INSTANCE,
+            self::OPT_LONG_FIXTURES,
+            self::OPT_LONG_RESULTS,
+            self::OPT_LONG_TEAMS,
         ];
     }
 
@@ -75,10 +81,26 @@ class ImporterTool extends CliTool\App
 
         $this->setMaxExecutionTime(self::DEFAULT_TIMEOUT);
 
+        $runFixtures = (bool)$this->getOpt(self::OPT_LONG_FIXTURES);
+        $runResults = (bool)$this->getOpt(self::OPT_LONG_RESULTS);
+        $runTeams = (bool)$this->getOpt(self::OPT_LONG_TEAMS);
+
+        if (!$runFixtures && !$runResults && !$runTeams) {
+            $runFixtures = $runResults = $runTeams = true;
+        }
+
         try {
-            $this->importFixtures($logger, $lock);
-            $this->importResults($logger);
-            $this->importTeams($logger);
+            if ($runFixtures) {
+                $this->importFixtures($logger, $lock);
+            }
+
+            if ($runResults) {
+                $this->importResults($logger);
+            }
+
+            if ($runTeams) {
+                $this->importTeams($logger);
+            }
         } finally {
             if ($this->httpClient instanceof HttpClient) {
                 $this->httpClient->logUrlUsage($logger);
@@ -95,10 +117,14 @@ Import SOCS sport fixtures into the Schoolbox Fixtures module using the
 SOCS XML fixtures feed, synchronise SOCS results via the results feed,
 and synchronise SOCS teams via the mso-sport feed.
 
-Usage: php importer.php [--perform]
+Usage: php importer.php [--perform] [--fixtures] [--results] [--teams]
 
 When --perform is omitted, the importer will run in planning mode and
 log what would happen without persisting any changes.
+
+When none of --fixtures, --results or --teams are provided, all
+synchronisations will run. When one or more are provided, only the
+selected synchronisations will run.
 
 HELP;
     }
