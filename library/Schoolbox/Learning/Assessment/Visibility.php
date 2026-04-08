@@ -122,8 +122,7 @@ class Visibility
         User $instructor,
         bool $showClosed,
         Alaress_Date_Format $now
-    ): bool
-    {
+    ): bool {
         if ($showClosed) {
             return true;
         }
@@ -150,8 +149,7 @@ class Visibility
         bool $showClosed,
         Alaress_Date_Format $now,
         bool $respectWorkTypeVisibility
-    ): bool
-    {
+    ): bool {
         $workType = $assessable->getWorkType();
         if ($respectWorkTypeVisibility && $workType !== null && !$workType->isVisibleToLearners()) {
             return false;
@@ -176,8 +174,7 @@ class Visibility
         bool $showClosed,
         Alaress_Date_Format $now,
         bool $respectWorkTypeVisibility
-    ): bool
-    {
+    ): bool {
         if ($nonInstructorNonLearner->getRole()->isStaff()) {
             if ($showClosed) {
                 return true;
