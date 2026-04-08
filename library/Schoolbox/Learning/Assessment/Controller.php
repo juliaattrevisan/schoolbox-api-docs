@@ -1457,10 +1457,21 @@ abstract class Controller extends ListController implements IAssessmentControlle
         );
 
         $data['allParticipants'] = $assessment->getAllParticipants()->map($participationModelToArray)->reindex();
-        $data['learningPlanNew'] = $this->getRouteIfAuthorized('learningAssessment.getAssessmentParticipationLearningPlan', [
-            'assessment' => $assessment,
-            'assessmentId' => $assessment->getId(),
-        ]);
+
+        /* The module permissions for getAssessmentParticipationLearningPlan are actually shared among other routes,
+         * such as Exclude Student, etc. which (for the majority of learning activities) which makes it a bit hard to
+         * apply for particular activities in particular contexts in a convenient manner. We don't have branching
+         * if/else in authentication rules.
+         */
+        if ($assessment instanceof Reporting\Model) {
+            $data['learningPlanNew'] = null;
+        } else {
+            $data['learningPlanNew'] = $this->getRouteIfAuthorized('learningAssessment.getAssessmentParticipationLearningPlan', [
+                'assessment' => $assessment,
+                'assessmentId' => $assessment->getId(),
+            ]);
+        }
+
         $data['assessment'] = $assessment;
 
         $context = $assessment->getContext();

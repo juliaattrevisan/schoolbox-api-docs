@@ -185,6 +185,13 @@ class Module extends BaseModule
             new IsSafeExamBrowserRequired(),
         );
 
+        /* This auth pattern is used for mosto f the Student Participation area, servicing multiple endpoints such as
+         * creating new participation learning plans, exclusion, inclusion, etc. for all learning activities.
+         *
+         * Reporting activities have a special set of checks that cause this rule to permit or deny access to their
+         * respective routes, because reporting activities are unlike other LMS activities: it's bureaucratically-driven
+         * rather than learning-driven.
+         */
         $canModifyCustomParticipation = new Rule\All(
             /* Should only be accessible if the custom participation config is enabled
              */

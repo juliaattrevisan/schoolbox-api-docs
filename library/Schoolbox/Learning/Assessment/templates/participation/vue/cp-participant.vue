@@ -186,7 +186,7 @@ function onOpenIncludeInExistingModal(): void {
                     </template>
                     <template v-else>
                         <li class="separator">Manage</li>
-                        <li>
+                        <li v-if="props.routes.getLearningPlanNewUrl">
                             <button
                                 class="sbx-button--has-icon"
                                 @click.prevent="
