@@ -55,6 +55,7 @@ class Import implements IStrategy
         $query = [
             'startdate' => $startDate,
             'enddate'   => $endDate,
+            'TS'        => 1,
         ];
 
         $response = $this->httpClient->get(self::FIXTURES_PATH, $query, $this->log);
