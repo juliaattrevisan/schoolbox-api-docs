@@ -330,7 +330,7 @@
                         }
                     {% endif %}
 
-                    $.fn.dynamicFeedback({
+                    var dynamicFeedback = $.fn.dynamicFeedback({
                         statusIncomplete: '{{ statusIncomplete }}',
                         statusFailed: '{{ statusFailed }}',
                         statusPending: '{{ statusPending }}',
@@ -432,6 +432,10 @@
 
                                             if (isPublishSuccess) {
                                                 draftPublishSuccess($actionBar, $publishButton);
+
+                                                /* Update the status
+                                                 */
+                                                dynamicFeedback.reloadStatus($actionBar);
                                             }
                                         }
                                     }

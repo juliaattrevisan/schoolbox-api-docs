@@ -304,22 +304,7 @@
 
                     // Update this participant's status:
                     // need to be able to differentiate between reviewed and resubmit required somehow
-                    var status = resubmissionRequired ? config.statusResubmissionRequired : config.statusReviewed,
-                        title = resubmissionRequired ? config.resubmissionRequiredText : config.reviewedText;
-                    $participant.attr("data-status", status);
-
-                    // Update the icon
-                    $participant
-                        .find("[data-status]")
-                        .removeClass(config.statusPending)
-                        .removeClass(config.statusIncomplete)
-                        .removeClass(config.statusReviewed)
-                        .removeClass(config.statusResubmissionRequired)
-                        .addClass(status)
-                        .attr("title", title);
-
-                    // Update the text
-                    $participant.find("[data-status-label]").html(title);
+                    reloadStatus($actionBar);
 
                     // Ensure the 'display reviewed' filter is ON
                     $(config.filters).find('[data-status="reviewed"]').prop("checked", true);
@@ -335,6 +320,43 @@
                     toast.call($participant, xhr.responseText, false, false);
                     $btnPublish.removeAttr("disabled").text(config.publishText);
                 });
+        }
+
+        /**
+         * Finds the state of the Resubmission Required checkbox based on a participant's dom element
+         *
+         * @param $participant
+         * @returns {*}
+         */
+        function findResubmissionRequired($participant) {
+            return $participant.find("[data-feedback-form]").find('[name="resubmissionRequired"]').prop("checked");
+        }
+
+        /**
+         * Update the status chiclet for each participant
+         *
+         * @param $actionBar
+         */
+        function reloadStatus($actionBar) {
+            let $participant = findParticipantElement($actionBar);
+            let resubmissionRequired = findResubmissionRequired($participant);
+            let status = resubmissionRequired ? config.statusResubmissionRequired : config.statusReviewed;
+            let title = resubmissionRequired ? config.resubmissionRequiredText : config.reviewedText;
+
+            $participant.attr("data-status", status);
+
+            // Update the icon
+            $participant
+                .find("[data-status]")
+                .removeClass(config.statusPending)
+                .removeClass(config.statusIncomplete)
+                .removeClass(config.statusReviewed)
+                .removeClass(config.statusResubmissionRequired)
+                .addClass(status)
+                .attr("title", title);
+
+            // Update the text
+            $participant.find("[data-status-label]").html(title);
         }
 
         /**
@@ -573,5 +595,9 @@
             let participantId = input.attr("data-for-participant");
             return $('[data-participant="' + String(participantId) + '"]');
         }
+
+        return {
+            reloadStatus: reloadStatus,
+        };
     };
 })(jQuery);
