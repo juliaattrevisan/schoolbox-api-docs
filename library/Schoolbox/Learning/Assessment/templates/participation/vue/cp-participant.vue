@@ -207,7 +207,7 @@ function onOpenIncludeInExistingModal(): void {
                         </li>
                         <li>
                             <button
-                                v-if="customisations.length > 0"
+                                v-if="customisations.length > 0 && props.routes.includeInExistingCustomisation"
                                 class="sbx-button--has-icon"
                                 @click.prevent="onOpenIncludeInExistingModal"
                             >

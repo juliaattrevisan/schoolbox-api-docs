@@ -94,7 +94,7 @@ function clearSelection(): void {
                     Exclude {{ selectedList.length === 1 ? "Student" : "Students" }}
                 </button>
                 <button
-                    v-if="props.customisations.length > 0"
+                    v-if="props.customisations.length > 0 && props.routes.includeInExistingCustomisation"
                     class="button l-flex__item--1-auto sbx-button--has-icon"
                     @click.prevent="handleOpenIncludeInExistingModal"
                 >

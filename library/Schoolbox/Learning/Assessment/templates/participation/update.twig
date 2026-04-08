@@ -15,6 +15,7 @@
      # this particular means (Student Participation screen) which is annoyingly nuanced.
      #}
     {% set getAssessmentParticipationNewActivityRoute = null %}
+    {% set postExistingCustomisationIncludeRoute = null %}
 
     {% if assessment is not reporting %}
         {% set getAssessmentParticipationNewActivityRoute = routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {
@@ -22,6 +23,12 @@
             contextId: assessment.context.id,
             context: assessment.context
         }) %}
+
+        {% set postExistingCustomisationIncludeRoute = routeLookupIfAuthorized('learningAssessment.postExistingCustomisationInclude', {
+            assessmentId: assessment.id,
+            assessment: assessment,
+            })
+        %}
     {% endif %}
 
     <custom-participation
@@ -36,10 +43,7 @@
             assessmentId: assessment.id,
             assessment: assessment,
         }),
-        includeInExistingCustomisation: routeLookupIfAuthorized('learningAssessment.postExistingCustomisationInclude', {
-            assessmentId: assessment.id,
-            assessment: assessment,
-        }),
+        includeInExistingCustomisation: postExistingCustomisationIncludeRoute,
         genAI: routeLookupIfAuthorized('openai.postLearningActivityCustomisation'),
     } | json_encode }}"
     :assessment-id="{{ assessment.id }}"
