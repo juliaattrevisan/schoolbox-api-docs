@@ -197,7 +197,7 @@ Data:
                                         {% endif %}
                                         {% if assessable is dueWork and assessable.enableWorksheet and assessable.kamiWorksheetTemplate and worksheetClassView %}
                                             <li>
-                                                <a id="kamiWorksheet" class="icon-surveys" href="{{ worksheetClassView }}">Class View</a>
+                                                <a id="kamiWorksheet" href="{{ worksheetClassView }}"><sbx-icon name="surveys"></sbx-icon>Class View</a>
                                             </li>
                                         {% endif %}
                                         {% if similarityReportRoute %}<li><a class="icon-due-work" href="{{ similarityReportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Similarity Report</a></li>{% endif %}

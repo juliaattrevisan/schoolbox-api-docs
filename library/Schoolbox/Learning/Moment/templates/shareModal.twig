@@ -32,10 +32,10 @@
     {% endif %}
     <div class="share-work-buttons">
         <a data-action="shareLearningMoment" data-test="learning-moment-evidence-share-photo" class="share-photo sbx-button--has-icon" data-take-photo-button href="{{ baseUrl }}?momentType=photo&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" title="Take a photo"><sbx-icon name="camera"></sbx-icon>Take a photo</a>
-        <a data-action="shareLearningMoment" data-test="learning-moment-evidence-share-video" class="icon-video share-video" data-record-video-button href="{{ baseUrl }}?momentType=video&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" title="Record a video">Record a video</a>
+        <a data-action="shareLearningMoment" data-test="learning-moment-evidence-share-video" class="share-video" data-record-video-button href="{{ baseUrl }}?momentType=video&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" title="Record a video"><sbx-icon name="video"></sbx-icon>Record a video</a>
         <a data-action="shareLearningMoment" data-test="learning-moment-evidence-share-audio" class="share-audio" data-record-audio-button href="{{ baseUrl }}?momentType=audio&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" title="Record audio"><sbx-icon name="audio"></sbx-icon>Record audio</a>
         <a data-action="shareLearningMoment" data-test="learning-moment-evidence-share-file" class="share-file" href="{{ baseUrl }}?momentType=upload&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" title="Upload file"><sbx-icon name="upload"></sbx-icon>Upload file</a>
-        <a data-action="shareLearningMoment" data-test="learning-moment-evidence-share-text" class="icon-textbox share-text" href="{{ baseUrl }}?momentType=text&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" title="Write something">Write something</a>
+        <a data-action="shareLearningMoment" data-test="learning-moment-evidence-share-text" class="share-text" href="{{ baseUrl }}?momentType=text&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" title="Write something"><sbx-icon name="textbox"></sbx-icon>Write something</a>
     </div>
     <!-- Check that the device supports recording audio/video, and if not hide the buttons that aren't supported -->
     <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/checkShareWorkButtons.js?v={{ config.site_version }}"></script>

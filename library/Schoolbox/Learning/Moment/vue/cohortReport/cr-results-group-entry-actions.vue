@@ -35,9 +35,9 @@ async function onApprove(): Promise<void> {
         <a @click.prevent="onApprove"><sbx-icon name="approve"></sbx-icon> {{ props.entry._labels.publish }}</a>
     </li>
     <li v-if="props.entry._links.reject">
-        <a class="icon-surveys" @click.prevent="crmStore.openModal(props.entry, CohortReportModalType.CONFIRM_REJECT)">
-            Request Update
-        </a>
+        <a @click.prevent="crmStore.openModal(props.entry, CohortReportModalType.CONFIRM_REJECT)"
+            ><sbx-icon name="surveys"></sbx-icon>Request Update</a
+        >
     </li>
     <li v-if="props.entry._links.modifyForm">
         <a :href="getReturnUrl(props.entry._links.modifyForm)"><sbx-icon name="modify"></sbx-icon> Modify </a>

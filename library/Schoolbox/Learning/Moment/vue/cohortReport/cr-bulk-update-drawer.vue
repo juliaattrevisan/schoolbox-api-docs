@@ -128,10 +128,11 @@ async function onAction(type: keyof typeof selectedResultActions.value): Promise
                 Delete
             </button>
             <button
-                class="button l-flex__item--1-auto icon-surveys"
+                class="button l-flex__item--1-auto"
                 :disabled="selectedResultActions.reject.length === 0"
                 @click="onAction('reject')"
             >
+                <sbx-icon name="surveys"></sbx-icon>
                 Request Update
             </button>
         </div>

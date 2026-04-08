@@ -223,13 +223,13 @@ function onOpenIncludeInExistingModal(): void {
                         </li>
                         <li>
                             <button
-                                class="icon-submissions"
                                 @click.prevent="
                                     onActionSelected(
                                         `${props.routes.getAssessmentParticipationNewActivity}?student=${props.participant.user.id}&original=${props.assessmentId}&${getReturnUrl()}`,
                                     )
                                 "
                             >
+                                <sbx-icon name="submissions"></sbx-icon>
                                 Create New {{ locale.activity.translate(false, true) }}
                             </button>
                         </li>

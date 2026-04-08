@@ -31,7 +31,7 @@
     {% if assessment.isImplementation %}
         <li>
             {# Launch link depends on whether the tool opens in an iframe or not #}
-            <a class="icon-lti"
+            <a
                {% if assessment.ltiTool.isTargetWindow %}target="_blank"{% endif %}
                href="{{ routeLookupIfAuthorized(
                    'learningAssessment.getLtiStatusLaunch',
@@ -39,7 +39,7 @@
                        assessment:   assessment,
                        assessmentId: assessment.id,
                    }
-               ) }}">View in LTI Tool</a>
+               ) }}"><sbx-icon name="lti"></sbx-icon>View in LTI Tool</a>
         </li>
     {% endif %}
 {% endblock %}

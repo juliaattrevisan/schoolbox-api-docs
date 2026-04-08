@@ -200,7 +200,7 @@ export default {
         </button>
         <button v-if="isVideoSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.CAMERA)">
             <div>
-                <div class="icon-video"></div>
+                <sbx-icon name="video" size="3rem"></sbx-icon>
                 <span>Video</span>
                 <aside>Use a computer camera to create a video recording.</aside>
             </div>
@@ -278,6 +278,10 @@ $font-family-icon: "schoolbox";
     &:before {
         content: "\e674";
     }
+}
+
+.menu-item .sbx-icon {
+    color: var(--sbx-config-color-accent, $content-ui-foreground);
 }
 
 .icon-screen-capture {

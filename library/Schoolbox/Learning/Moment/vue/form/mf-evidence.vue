@@ -331,13 +331,13 @@ window.Vue.watch(
             Take a photo
         </a>
         <a
-            class="icon-video share-video"
+            class="share-video"
             data-test="learning-moment-evidence-share-video"
             :title="canAddEvidence ? 'Record a video' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="(MediaType.VIDEO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.VIDEO)"
         >
-            Record a video
+            <sbx-icon name="video"></sbx-icon>Record a video
         </a>
         <a
             class="share-audio"
@@ -360,12 +360,12 @@ window.Vue.watch(
         </a>
         <a
             v-if="!(showDescriptionEditor || MediaType.TEXT === mediaType)"
-            class="icon-textbox share-text"
+            class="share-text"
             data-test="learning-moment-evidence-share-text"
             title="Write something"
             @click.prevent="changeMediaType(MediaType.TEXT, true)"
         >
-            Write something
+            <sbx-icon name="textbox"></sbx-icon>Write something
         </a>
     </div>
 

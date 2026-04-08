@@ -37,11 +37,11 @@ Usage:
                     data-moment-type="video"
                     data-record-video-button
                     href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=video{% endif %}"
-                    class="icon-video share-video"
+                    class="share-video"
                     data-test="learning-moment-evidence-share-video"
                     title="Record a video"
                 >
-                    Record a video
+                    <sbx-icon name="video"></sbx-icon>Record a video
                 </a>
                 <a
                     data-action="shareLearningMoment"
@@ -69,11 +69,11 @@ Usage:
                     data-action="shareLearningMoment"
                     data-moment-type="text"
                     href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=text{% endif %}"
-                    class="icon-textbox share-text"
+                    class="share-text"
                     data-test="learning-moment-evidence-share-text"
                     title="Write something"
                 >
-                    Write something
+                    <sbx-icon name="textbox"></sbx-icon>Write something
                 </a>
             </div>
         {% endif %}

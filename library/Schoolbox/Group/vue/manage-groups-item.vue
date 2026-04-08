@@ -387,24 +387,21 @@ export default {
                             <button
                                 v-if="!group.isForceFollow && !group.isMsgDisabled && (isEnrolled || isPrivate)"
                                 title="Toggle Notifications"
-                                :class="[
-                                    'group-action',
-                                    isNotificationsOn ? 'icon-notifications' : 'icon-notifications-hollow',
-                                ]"
+                                class="group-action"
                                 :disabled="isProcessing"
                                 @click="toggleNotifications"
                             >
+                                <sbx-icon :name="isNotificationsOn ? 'notifications' : 'notifications-hollow'" />
                                 Toggle Notifications
                             </button>
                             <button
                                 v-if="(group.isForceFollow || group.isMsgDisabled) && (isEnrolled || isPrivate)"
                                 title="Disabled force follow button"
-                                :class="[
-                                    'group-action',
-                                    group.isForceFollow ? 'icon-notifications' : 'icon-notifications-hollow',
-                                ]"
+                                class="group-action"
                                 :disabled="true"
-                            ></button>
+                            >
+                                <sbx-icon :name="group.isForceFollow ? 'notifications' : 'notifications-hollow'" />
+                            </button>
                         </div>
                     </transition>
                 </div>

@@ -47,7 +47,7 @@
             {% endif %}
             {% if assessment is dueWork and assessment.enableWorksheet and kamiWorksheetRoute %}
                 <li>
-                    <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">Class View</a>
+                    <a id="kamiWorksheet" href="{{ kamiWorksheetRoute }}"><sbx-icon name="surveys"></sbx-icon>Class View</a>
                 </li>
             {% endif %}
             {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" title="View Similarity Report" data-test="course-outline-similarity-report-{{ assessment.id }}">Similarity Report</a></li>{% endif %}

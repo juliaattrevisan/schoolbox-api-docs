@@ -114,7 +114,7 @@ function clearSelection(): void {
                     Create Copy of {{ locale.activity.translate(false, true) }}
                 </button>
                 <button
-                    class="icon-submissions button l-flex__item--1-auto"
+                    class="button l-flex__item--1-auto"
                     @click.prevent="
                         handleActionSelected(
                             selectedList,
@@ -122,6 +122,7 @@ function clearSelection(): void {
                         )
                     "
                 >
+                    <sbx-icon name="submissions"></sbx-icon>
                     Create New {{ locale.activity.translate(false, true) }}
                 </button>
             </template>

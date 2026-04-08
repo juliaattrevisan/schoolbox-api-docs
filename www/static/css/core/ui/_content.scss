@@ -374,455 +374,456 @@ nav {
         background-color: var(--sbx-color-foreground-secondary, $aluminum);
     }
     span {
-          a span,
-          a sbx-icon {
-        display: block;
-        white-space: nowrap;
-        font-size: 1rem;
-        line-height: 2rem;
+        a span,
+        a sbx-icon {
+            display: block;
+            white-space: nowrap;
+            font-size: 1rem;
+            line-height: 2rem;
+        }
+        a:hover {
+            background-color: transparent;
+        }
+        .meta {
+            text-transform: lowercase;
+            font-variant: small-caps;
+        }
     }
-    a:hover {
-        background-color: transparent;
-    }
-    .meta {
-        text-transform: lowercase;
-        font-variant: small-caps;
-    }
-}
 
-// Grades that sit along side of other elements
-.flex-grade {
-    display: flex;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-    .sibling {
-        flex: 1;
-    }
-    .txt {
-        flex: 0 auto;
-        padding: 0 1rem;
-        p {
-            margin-bottom: 0;
-        }
-    }
-    .assess-status {
-        flex: 1 0 auto;
-        padding: 0.5rem 0.75rem;
-    }
-    .gradient-none-bg {
-        background-color: var(--sbx-color-foreground-secondary, $aluminum);
-    }
-    .grade {
-        align-items: center;
+    // Grades that sit along side of other elements
+    .flex-grade {
         display: flex;
-        flex: 0 0 auto;
-        justify-content: center;
-        margin-left: 0.75rem;
-        span {
-            color: var(--sbx-color-foreground-primary, $white);
-            line-height: inherit;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        .sibling {
+            flex: 1;
         }
-        &.review {
+        .txt {
+            flex: 0 auto;
+            padding: 0 1rem;
+            p {
+                margin-bottom: 0;
+            }
+        }
+        .assess-status {
+            flex: 1 0 auto;
+            padding: 0.5rem 0.75rem;
+        }
+        .gradient-none-bg {
+            background-color: var(--sbx-color-foreground-secondary, $aluminum);
+        }
+        .grade {
+            align-items: center;
+            display: flex;
+            flex: 0 0 auto;
+            justify-content: center;
+            margin-left: 0.75rem;
+            span {
+                color: var(--sbx-color-foreground-primary, $white);
+                line-height: inherit;
+            }
+            &.review {
+                background-color: var(--sbx-color-warning, $warning-color);
+            }
+            &.in-progress {
+                background-color: var(--sbx-color-foreground-secondary, $base);
+            }
+        }
+        @media not print {
+            @media #{$medium-down} {
+                flex-wrap: wrap;
+                justify-content: center;
+                .txt p {
+                    margin-bottom: 0.5rem;
+                }
+                .grade {
+                    flex: 1 100%;
+                    margin-left: 0;
+                }
+            }
+            ~ blockquote {
+                margin-bottom: 0;
+            }
+        }
+        @media print {
+            .grade {
+                flex: 0 0 auto;
+                flex-wrap: nowrap;
+            }
+        }
+    }
+
+    // generic counter
+    [data-show-count]:before {
+        content: attr(data-show-count);
+    }
+    [data-show-count="0"]:before {
+        content: "none";
+    }
+
+    // Schoolbox Loader: https://vagrant.dev.schoolbox.cloud/pantry
+    .loader {
+        background-color: var(--sbx-config-color-accent, $accent-foreground);
+        border-radius: 0.5rem;
+        margin: 2rem auto;
+        width: 3rem;
+        height: 3rem;
+        animation: sb-loader 1.2s infinite ease-in-out;
+    }
+
+    // spin in 3d vertically then horizontally
+    @keyframes sb-loader {
+        0% {
+            transform: perspective(7.5rem) rotateX(0deg) rotateY(0deg);
+        }
+        50% {
+            transform: perspective(7.5rem) rotateX(-180.1deg) rotateY(0deg);
+        }
+        100% {
+            transform: perspective(7.5rem) rotateX(-180deg) rotateY(-179.9deg);
+        }
+    }
+
+    // for loaders inside headings, use span.
+    span.loader {
+        border-radius: 0.2rem;
+        display: inline-block;
+        margin: 0 0.5rem;
+        width: 1rem;
+        height: 1rem;
+    }
+
+    // Full page loader, show above all other content
+    .loader-overlay {
+        background-color: rgba(0, 0, 0, 0.8);
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: 0;
+        position: fixed;
+        z-index: var(--sbx-depth-modal);
+
+        .loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    .progress-tick-form {
+        transition: all 240ms cubic-bezier(0.15, 1.4, 0.7, 1.35);
+        &[disabled] {
+            transform: scale(0.75);
+            opacity: 0.75;
+        }
+        margin: -0.5rem;
+
+        a.progress-tick:hover {
+            opacity: 0.7;
+        }
+    }
+
+    $progress-tick-size-regular: rem-calc($base-font-size * 2);
+    $progress-tick-size-small: rem-calc($base-font-size * 1.25);
+    $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
+
+    @mixin progress-tick($progress-tick-size) {
+        width: $progress-tick-size;
+        height: $progress-tick-size;
+        min-width: $progress-tick-size;
+        min-height: $progress-tick-size;
+        &:before {
+            font-size: calc($progress-tick-size / 2);
+            line-height: $progress-tick-size;
+        }
+        &.pending,
+        &.in-progress,
+        &.requires-assistance {
+            border-radius: calc($progress-tick-size / 4);
+        }
+    }
+
+    .progress-tick,
+    .action-list nav a.progress-tick {
+        @include progress-tick($progress-tick-size-regular);
+        display: block;
+        background-color: var(--sbx-color-highlight, $base);
+        margin: 0.25rem;
+        transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
+        @extend .no-text;
+        @extend .icon-approve;
+        &:before {
+            color: var(--sbx-color-text-primary, $white);
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            visibility: hidden;
+        }
+        &:not(.readonly):hover {
+            &:before {
+                visibility: visible;
+            }
+        }
+        &.small {
+            @include progress-tick($progress-tick-size-small);
+        }
+        &.tiny {
+            @include progress-tick($progress-tick-size-tiny);
+            display: inline-block;
+            margin: 0.5rem 0.25rem -1px 0.25rem;
+            &:before {
+                content: none;
+                display: none;
+            }
+        }
+
+        /**
+     * Progress Tick States
+     * See /library/Schoolbox/Assessment/Types/progressTick.ts for usage and associated enum
+     */
+        &.pending {
+            @extend .icon-approve;
             background-color: var(--sbx-color-warning, $warning-color);
+            transform: rotate(135deg);
+            &:before {
+                color: var(--sbx-color-warning-text, $white);
+                visibility: visible;
+                // counter-rotation
+                transform: rotate(-135deg);
+            }
+        }
+        &.reviewed,
+        &.submitted {
+            @extend .icon-approve;
+            background-color: var(--sbx-color-success, $success-color);
+            border-radius: $progress-tick-size-regular;
+            transform: rotate(360deg);
+            &:before {
+                color: var(--sbx-color-success-text, $white);
+                visibility: visible;
+            }
+        }
+        &.failed {
+            background-color: var(--sbx-color-alert, $alert-color);
+            &:before {
+                color: var(--sbx-color-alert-text, $white);
+                visibility: visible;
+                content: "\0021";
+                font-weight: $font-weight-bold;
+                font-size: 1.5rem;
+                line-height: 1.2;
+            }
+            &.small:before {
+                font-size: 1.25rem;
+                line-height: 0.85;
+            }
         }
         &.in-progress {
-            background-color: var(--sbx-color-foreground-secondary, $base);
-        }
-    }
-    @media not print {
-        @media #{$medium-down} {
-            flex-wrap: wrap;
-            justify-content: center;
-            .txt p {
-                margin-bottom: 0.5rem;
-            }
-            .grade {
-                flex: 1 100%;
-                margin-left: 0;
+            @extend .icon-time-value;
+            background-color: var(--sbx-color-in-progress, #0c78cf);
+            transform: rotate(-135deg);
+            &:before {
+                color: var(--sbx-color-in-progress-text, #fff);
+                visibility: visible;
+                // counter-rotation
+                transform: rotate(135deg);
             }
         }
-        ~ blockquote {
-            margin-bottom: 0;
+        &.requires-assistance {
+            @extend .icon-alert;
+            background-color: var(--sbx-color-warning, $warning-color);
+            transform: rotate(135deg);
+            &:before {
+                color: var(--sbx-color-warning-text, $white);
+                visibility: visible;
+                // counter-rotation
+                transform: rotate(-135deg);
+            }
         }
     }
-    @media print {
-        .grade {
-            flex: 0 0 auto;
-            flex-wrap: nowrap;
+
+    .countdown {
+        font-weight: 100;
+        font-size: $h1-font-size;
+    }
+
+    // gradient 1-10
+    @include rotate-color-list;
+
+    //a visual display to help indicate progress, see progress bars at: https://vagrant.dev.schoolbox.cloud/pantry
+    .progress {
+        transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
+        position: relative;
+        span {
+            transition: inherit;
+        }
+        .meter {
+            &.slow {
+                transition: width 1s;
+            }
+        }
+        .pipe-meter {
+            width: 0.5rem;
+            height: 2rem;
+            // DONE use CSS darken
+            background-color: css-darken($accent-foreground, 5%);
+            position: absolute;
+            top: -9px;
+            &.slow {
+                transition: left 1s;
+            }
         }
     }
-}
 
-// generic counter
-[data-show-count]:before {
-    content: attr(data-show-count);
-}
-[data-show-count="0"]:before {
-    content: "none";
-}
+    //To show visual progress through multi-step forms: https://vagrant.dev.schoolbox.cloud/pantry/form-progressive
+    $train-line-segment-maxlength: 15rem;
+    $train-line-stop-size: 2rem;
+    $train-line-segment-width: 0.25rem;
+    $train-line-visited-color: var(--sbx-config-color-accent, $content-ui-foreground);
+    $train-line-visited-glow-blur: 0.5rem;
+    $train-line-unvisited-color: $content-ui-background;
+    .train-line {
+        display: flex;
+        justify-content: center;
+        flex-flow: row wrap;
+        list-style: none;
+        padding: 0;
+        margin: $train-line-stop-size 0 0;
+        li {
+            padding: 0;
+            margin: 0;
+            flex: 1;
+            position: relative;
+            text-align: center;
+            max-width: $train-line-segment-maxlength;
+            min-width: 3 * $train-line-stop-size;
+            &:before,
+            &:after {
+                content: "";
+                display: block;
+                height: $train-line-segment-width;
+                flex: 1;
+                width: 50%;
+                position: absolute;
+                top: 0;
+                background: var(--sbx-config-color-accent, $content-ui-foreground);
+            }
+            &:before {
+                left: 0;
+            }
+            &:after {
+                right: 0;
+            }
+            &:first-child:before,
+            &:last-child:after {
+                content: none;
+            }
+            &.current-stop {
+                &:after {
+                    background: var(--sbx-config-color-active, $content-ui-background);
+                }
+                ~ li {
+                    &:before,
+                    &:after {
+                        background: var(--sbx-config-color-active, $content-ui-background);
+                    }
+                    a span {
+                        background: var(--sbx-config-color-active, $content-ui-background);
+                    }
+                }
+                a span {
+                    box-shadow: 0 0 $train-line-visited-glow-blur var(--sbx-config-color-accent, $content-ui-foreground);
+                    color: var(--sbx-config-color-accent-text, $content-ui-foreground-contrast);
+                }
+            }
+            a {
+                display: block;
+                margin: $train-line-stop-size 0.5rem;
+                // Smaller stops that have no icons (Nub)
+                // The 0.4 multiplier and offset is empirical - I don't know what the math is
+                // to derive it from the stop size or segment width
+                span {
+                    background: var(--sbx-config-color-accent, $content-ui-foreground);
+                    border-radius: calc($train-line-stop-size / 2);
+                    // DONE use contrasting color
+                    color: var(--sbx-color-text-primary, $content-ui-foreground-contrast);
+                    height: 0.5 * $train-line-stop-size;
+                    left: calc(50% - (#{calc($train-line-stop-size / 2)}) + 0.4rem);
+                    padding: calc(($train-line-stop-size - (rem-calc($base-font-size) * 1.5)) / 2)
+                        calc(($train-line-stop-size - rem-calc($base-font-size)) / 2);
+                    position: absolute;
+                    top: -0.4 * (calc(($train-line-stop-size - $train-line-segment-width) / 2));
+                    width: 0.5 * $train-line-stop-size;
+                    z-index: var(--sbx-depth-default);
+                    transition: all 200ms ease-out;
+                }
 
-// Schoolbox Loader: https://vagrant.dev.schoolbox.cloud/pantry
-.loader {
-    background-color: var(--sbx-config-color-accent, $accent-foreground);
-    border-radius: 0.5rem;
-    margin: 2rem auto;
-    width: 3rem;
-    height: 3rem;
-    animation: sb-loader 1.2s infinite ease-in-out;
-}
-
-// spin in 3d vertically then horizontally
-@keyframes sb-loader {
-    0% {
-        transform: perspective(7.5rem) rotateX(0deg) rotateY(0deg);
-    }
-    50% {
-        transform: perspective(7.5rem) rotateX(-180.1deg) rotateY(0deg);
-    }
-    100% {
-        transform: perspective(7.5rem) rotateX(-180deg) rotateY(-179.9deg);
-    }
-}
-
-// for loaders inside headings, use span.
-span.loader {
-    border-radius: 0.2rem;
-    display: inline-block;
-    margin: 0 0.5rem;
-    width: 1rem;
-    height: 1rem;
-}
-
-// Full page loader, show above all other content
-.loader-overlay {
-    background-color: rgba(0, 0, 0, 0.8);
-    bottom: 0;
-    left: 0;
-    right: 0;
-    top: 0;
-    position: fixed;
-    z-index: var(--sbx-depth-modal);
-
-    .loader {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
-}
-
-.progress-tick-form {
-    transition: all 240ms cubic-bezier(0.15, 1.4, 0.7, 1.35);
-    &[disabled] {
-        transform: scale(0.75);
-        opacity: 0.75;
-    }
-    margin: -0.5rem;
-
-    a.progress-tick:hover {
-        opacity: 0.7;
-    }
-}
-
-$progress-tick-size-regular: rem-calc($base-font-size * 2);
-$progress-tick-size-small: rem-calc($base-font-size * 1.25);
-$progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
-
-@mixin progress-tick($progress-tick-size) {
-    width: $progress-tick-size;
-    height: $progress-tick-size;
-    min-width: $progress-tick-size;
-    min-height: $progress-tick-size;
-    &:before {
-        font-size: calc($progress-tick-size / 2);
-        line-height: $progress-tick-size;
-    }
-    &.pending,
-    &.in-progress,
-    &.requires-assistance {
-        border-radius: calc($progress-tick-size / 4);
-    }
-}
-
-.progress-tick,
-.action-list nav a.progress-tick {
-    @include progress-tick($progress-tick-size-regular);
-    display: block;
-    background-color: var(--sbx-color-highlight, $base);
-    margin: 0.25rem;
-    transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
-    @extend .no-text;
-    @extend .icon-approve;
-    &:before {
-        color: var(--sbx-color-text-primary, $white);
-        text-align: center;
-        width: 100%;
-        height: 100%;
-        visibility: hidden;
-    }
-    &:not(.readonly):hover {
-        &:before {
-            visibility: visible;
+                // You specified an icon for this stop (Knurl)
+                a span[class^="icon-"],
+                a sbx-icon {
+                    height: $train-line-stop-size;
+                    left: calc(50% - (#{calc($train-line-stop-size / 2)}));
+                    top: -1 * (calc(($train-line-stop-size - $train-line-segment-width) / 2));
+                    width: $train-line-stop-size;
+                }
+            }
         }
     }
-    &.small {
-        @include progress-tick($progress-tick-size-small);
-    }
-    &.tiny {
-        @include progress-tick($progress-tick-size-tiny);
-        display: inline-block;
-        margin: 0.5rem 0.25rem -1px 0.25rem;
-        &:before {
-            content: none;
-            display: none;
+
+    article {
+        @extend .clearfix;
+        font-size: rem-calc(($base-font-size - 3));
+        // Scroll WYSIWYG content areas when wide tables exist.
+        overflow-x: auto;
+        overflow-y: hidden;
+        // Enforce right text alignment for right-aligned blocks within user-generated
+        // content.
+        // Otherwise: most do, but some don't (notably: discussion threads)
+        [dir="rtl"] {
+            text-align: right;
         }
     }
 
     /**
-     * Progress Tick States
-     * See /library/Schoolbox/Assessment/Types/progressTick.ts for usage and associated enum
-     */
-    &.pending {
-        @extend .icon-approve;
-        background-color: var(--sbx-color-warning, $warning-color);
-        transform: rotate(135deg);
-        &:before {
-            color: var(--sbx-color-warning-text, $white);
-            visibility: visible;
-            // counter-rotation
-            transform: rotate(-135deg);
-        }
-    }
-    &.reviewed,
-    &.submitted {
-        @extend .icon-approve;
-        background-color: var(--sbx-color-success, $success-color);
-        border-radius: $progress-tick-size-regular;
-        transform: rotate(360deg);
-        &:before {
-            color: var(--sbx-color-success-text, $white);
-            visibility: visible;
-        }
-    }
-    &.failed {
-        background-color: var(--sbx-color-alert, $alert-color);
-        &:before {
-            color: var(--sbx-color-alert-text, $white);
-            visibility: visible;
-            content: "\0021";
-            font-weight: $font-weight-bold;
-            font-size: 1.5rem;
-            line-height: 1.2;
-        }
-        &.small:before {
-            font-size: 1.25rem;
-            line-height: 0.85;
-        }
-    }
-    &.in-progress {
-        @extend .icon-time-value;
-        background-color: var(--sbx-color-in-progress, #0c78cf);
-        transform: rotate(-135deg);
-        &:before {
-            color: var(--sbx-color-in-progress-text, #fff);
-            visibility: visible;
-            // counter-rotation
-            transform: rotate(135deg);
-        }
-    }
-    &.requires-assistance {
-        @extend .icon-alert;
-        background-color: var(--sbx-color-warning, $warning-color);
-        transform: rotate(135deg);
-        &:before {
-            color: var(--sbx-color-warning-text, $white);
-            visibility: visible;
-            // counter-rotation
-            transform: rotate(-135deg);
-        }
-    }
-}
-
-.countdown {
-    font-weight: 100;
-    font-size: $h1-font-size;
-}
-
-// gradient 1-10
-@include rotate-color-list;
-
-//a visual display to help indicate progress, see progress bars at: https://vagrant.dev.schoolbox.cloud/pantry
-.progress {
-    transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
-    position: relative;
-    span {
-        transition: inherit;
-    }
-    .meter {
-        &.slow {
-            transition: width 1s;
-        }
-    }
-    .pipe-meter {
-        width: 0.5rem;
-        height: 2rem;
-        // DONE use CSS darken
-        background-color: css-darken($accent-foreground, 5%);
-        position: absolute;
-        top: -9px;
-        &.slow {
-            transition: left 1s;
-        }
-    }
-}
-
-//To show visual progress through multi-step forms: https://vagrant.dev.schoolbox.cloud/pantry/form-progressive
-$train-line-segment-maxlength: 15rem;
-$train-line-stop-size: 2rem;
-$train-line-segment-width: 0.25rem;
-$train-line-visited-color: var(--sbx-config-color-accent, $content-ui-foreground);
-$train-line-visited-glow-blur: 0.5rem;
-$train-line-unvisited-color: $content-ui-background;
-.train-line {
-    display: flex;
-    justify-content: center;
-    flex-flow: row wrap;
-    list-style: none;
-    padding: 0;
-    margin: $train-line-stop-size 0 0;
-    li {
-        padding: 0;
-        margin: 0;
-        flex: 1;
-        position: relative;
-        text-align: center;
-        max-width: $train-line-segment-maxlength;
-        min-width: 3 * $train-line-stop-size;
-        &:before,
-        &:after {
-            content: "";
-            display: block;
-            height: $train-line-segment-width;
-            flex: 1;
-            width: 50%;
-            position: absolute;
-            top: 0;
-            background: var(--sbx-config-color-accent, $content-ui-foreground);
-        }
-        &:before {
-            left: 0;
-        }
-        &:after {
-            right: 0;
-        }
-        &:first-child:before,
-        &:last-child:after {
-            content: none;
-        }
-        &.current-stop {
-            &:after {
-                background: var(--sbx-config-color-active, $content-ui-background);
-            }
-            ~ li {
-                &:before,
-                &:after {
-                    background: var(--sbx-config-color-active, $content-ui-background);
-                }
-                a span {
-                    background: var(--sbx-config-color-active, $content-ui-background);
-                }
-            }
-            a span {
-                box-shadow: 0 0 $train-line-visited-glow-blur var(--sbx-config-color-accent, $content-ui-foreground);
-                color: var(--sbx-config-color-accent-text, $content-ui-foreground-contrast);
-            }
-        }
-        a {
-            display: block;
-            margin: $train-line-stop-size 0.5rem;
-            // Smaller stops that have no icons (Nub)
-            // The 0.4 multiplier and offset is empirical - I don't know what the math is
-            // to derive it from the stop size or segment width
-            span {
-                background: var(--sbx-config-color-accent, $content-ui-foreground);
-                border-radius: calc($train-line-stop-size / 2);
-                // DONE use contrasting color
-                color: var(--sbx-color-text-primary, $content-ui-foreground-contrast);
-                height: 0.5 * $train-line-stop-size;
-                left: calc(50% - (#{calc($train-line-stop-size / 2)}) + 0.4rem);
-                padding: calc(($train-line-stop-size - (rem-calc($base-font-size) * 1.5)) / 2)
-                    calc(($train-line-stop-size - rem-calc($base-font-size)) / 2);
-                position: absolute;
-                top: -0.4 * (calc(($train-line-stop-size - $train-line-segment-width) / 2));
-                width: 0.5 * $train-line-stop-size;
-                z-index: var(--sbx-depth-default);
-                transition: all 200ms ease-out;
-            }
-
-            // You specified an icon for this stop (Knurl)
-            a span[class^="icon-"],
-            a sbx-icon {
-                height: $train-line-stop-size;
-                left: calc(50% - (#{calc($train-line-stop-size / 2)}));
-                top: -1 * (calc(($train-line-stop-size - $train-line-segment-width) / 2));
-                width: $train-line-stop-size;
-            }
-        }
-    }
-}
-
-article {
-    @extend .clearfix;
-    font-size: rem-calc(($base-font-size - 3));
-    // Scroll WYSIWYG content areas when wide tables exist.
-    overflow-x: auto;
-    overflow-y: hidden;
-    // Enforce right text alignment for right-aligned blocks within user-generated
-    // content.
-    // Otherwise: most do, but some don't (notably: discussion threads)
-    [dir="rtl"] {
-        text-align: right;
-    }
-}
-
-/**
  * Foundation kills margins on lists inside lists (ul li ul)
  * We have cases where an article lives in a <li>, which then has ul's (e.g. forum)
  * Remove the foundation margin kills in that situation
  */
-li article ul,
-li article ol {
-    margin-#{$default-float}: $list-side-margin;
-    margin-bottom: $list-margin-bottom;
-}
+    li article ul,
+    li article ol {
+        margin-#{$default-float}: $list-side-margin;
+        margin-bottom: $list-margin-bottom;
+    }
 
-// Fix list item cut off inside feed items
-li.feed-item article ul,
-li.feed-item article ol {
-    list-style-position: inside;
-}
-// an overlay that is displayed while something is processing
-.wait-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.6);
-    > * {
-        display: table;
+    // Fix list item cut off inside feed items
+    li.feed-item article ul,
+    li.feed-item article ol {
+        list-style-position: inside;
+    }
+    // an overlay that is displayed while something is processing
+    .wait-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
+        background-color: rgba(255, 255, 255, 0.6);
         > * {
-            text-align: center;
-            vertical-align: middle;
-            display: table-cell;
+            display: table;
+            width: 100%;
+            height: 100%;
+            > * {
+                text-align: center;
+                vertical-align: middle;
+                display: table-cell;
+            }
         }
     }
-}
 
-//this highlights the selected section
-.highlight-selection {
-    background-color: var(--sbx-color-highlight, #ffa);
-    color: var(--sbx-color-highlight-text, #000);
+    //this highlights the selected section
+    .highlight-selection {
+        background-color: var(--sbx-color-highlight, #ffa);
+        color: var(--sbx-color-highlight-text, #000);
+    }
 }
