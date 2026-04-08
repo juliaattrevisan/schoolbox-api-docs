@@ -45,9 +45,7 @@ class Import implements IStrategy
 
         $this->log->info('Downloading SOCS teams from mso-sport feed');
 
-        $query = [
-            'TS'    => 1,
-        ];
+        $query = [];
 
         $response = $this->httpClient->get(self::MSO_SPORT_PATH, $query, $this->log);
 
