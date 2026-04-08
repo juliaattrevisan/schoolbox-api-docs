@@ -872,24 +872,11 @@ input[type="checkbox"].plain {
             &:after,
             &:before {
                 margin: 0.5rem 0 0.5rem 0.5rem;
-                background-color: transparent;
             }
 
             &:hover {
                 cursor: pointer;
                 background: $content-ui-background;
-
-                &:after,
-                &:before {
-                    background-color: transparent;
-                }
-            }
-        }
-
-        &:focus {
-            &:after,
-            &:before {
-                background-color: transparent;
             }
         }
     }
