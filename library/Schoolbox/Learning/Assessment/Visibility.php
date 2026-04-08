@@ -207,7 +207,7 @@ class Visibility
             $participant = $assessable->getParticipantIfExtant($childLearner);
             $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
             $isPublished = $now->gte($participant->getPublishDate());
-            return $isPublished && ($showClosed || $now->lte($closeDate));
+            return $isPublished && ($showClosed || $now->lt($closeDate));
         }
 
         // Handle the case where the user is a staff member.
@@ -244,6 +244,6 @@ class Visibility
 
         $closeDate   = $participant->getCloseDate();
         $isPublished = $now->gte($participant->getPublishDate());
-        return $isPublished && ($showClosed || $now->lte($closeDate));
+        return $isPublished && ($showClosed || $now->lt($closeDate));
     }
 }
