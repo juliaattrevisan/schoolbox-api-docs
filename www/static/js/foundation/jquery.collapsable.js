@@ -30,6 +30,7 @@
                 container: "[data-component]",
                 iconCollapsed: DEFAULT_ICON_COLLAPSED,
                 iconExpanded: DEFAULT_ICON_EXPANDED,
+                preventDefault: true, // whether event.preventDefault() should be called on the toggle's click event
             };
 
             return $.extend(defaults, options);
@@ -41,7 +42,9 @@
         function setupCollapsable() {
             var self = this;
             $(self.config.element).on("click.collapsable", function (event) {
-                event.preventDefault();
+                if (self.config?.preventDefault !== false) {
+                    event.preventDefault();
+                }
 
                 var component,
                     target = $(this).data("collapser"),
