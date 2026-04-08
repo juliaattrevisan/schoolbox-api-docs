@@ -51,6 +51,22 @@ class ImporterTool extends CliTool\App
 
     private ?HttpClient $httpClient = null;
 
+    private ?SeasonMapper $seasonMapper = null;
+
+    private ?SportMapper $sportMapper = null;
+
+    private ?DivisionMapper $divisionMapper = null;
+
+    private ?TeamMapper $teamMapper = null;
+
+    private ?VenueMapper $venueMapper = null;
+
+    private ?SchoolMapper $schoolMapper = null;
+
+    private ?MatchupMapper $matchupMapper = null;
+
+    private ?ResultMapper $resultMapper = null;
+
     /**
      * Declare long CLI options accepted by the SOCS importer.
      *
@@ -176,15 +192,13 @@ HELP;
      */
     private function importFixtures(LoggerInterface $logger, LockInterface $lock): void
     {
-        $seasonMapper = SeasonMapper::getInstance();
-        $sportMapper = SportMapper::getInstance();
-        $divisionMapper = DivisionMapper::getInstance();
-        $teamMapper = TeamMapper::getInstance();
-        $venueMapper = VenueMapper::getInstance();
-        $schoolMapper = SchoolMapper::getInstance();
-        $matchupMapper = MatchupMapper::getInstance();
-
-        $season = $this->recallSeason($seasonMapper, $logger);
+        $season = $this->recallSeason($this->getSeasonMapper(), $logger);
+        $sportMapper = $this->getSportMapper();
+        $divisionMapper = $this->getDivisionMapper();
+        $teamMapper = $this->getTeamMapper();
+        $venueMapper = $this->getVenueMapper();
+        $schoolMapper = $this->getSchoolMapper();
+        $matchupMapper = $this->getMatchupMapper();
 
         $now = \Alaress_Date_Format::now();
         $startDate = (clone $now)->addDays(-30)->getUsingFormat('j M Y');
@@ -320,6 +334,9 @@ HELP;
      */
     private function importResults(LoggerInterface $logger, LockInterface $lock): void
     {
+        $matchupMapper = $this->getMatchupMapper();
+        $resultMapper = $this->getResultMapper();
+
         $now = \Alaress_Date_Format::now();
         $startDate = (clone $now)->addDays(-30)->getUsingFormat('j M Y');
         $endDate = (clone $now)->addDays(100)->getUsingFormat('j M Y');
@@ -365,9 +382,6 @@ HELP;
             ));
             return;
         }
-
-        $matchupMapper = MatchupMapper::getInstance();
-        $resultMapper = ResultMapper::getInstance();
 
         $imported = 0;
 
@@ -434,12 +448,10 @@ HELP;
      */
     private function importTeams(LoggerInterface $logger, LockInterface $lock): void
     {
-        $seasonMapper = SeasonMapper::getInstance();
-        $sportMapper = SportMapper::getInstance();
-        $divisionMapper = DivisionMapper::getInstance();
-        $teamMapper = TeamMapper::getInstance();
-
-        $season = $this->recallSeason($seasonMapper, $logger);
+        $season = $this->recallSeason($this->getSeasonMapper(), $logger);
+        $sportMapper = $this->getSportMapper();
+        $divisionMapper = $this->getDivisionMapper();
+        $teamMapper = $this->getTeamMapper();
 
         $logger->info('Downloading SOCS teams from mso-sport feed');
 
@@ -806,5 +818,101 @@ HELP;
     public function runAsRoot(): ?bool
     {
         return parent::runAsRoot();
+    }
+
+    /**
+     * Lazily obtain the SeasonMapper used by SOCS imports.
+     */
+    private function getSeasonMapper(): SeasonMapper
+    {
+        if (null === $this->seasonMapper) {
+            $this->seasonMapper = SeasonMapper::getInstance();
+        }
+
+        return $this->seasonMapper;
+    }
+
+    /**
+     * Lazily obtain the SportMapper used by SOCS imports.
+     */
+    private function getSportMapper(): SportMapper
+    {
+        if (null === $this->sportMapper) {
+            $this->sportMapper = SportMapper::getInstance();
+        }
+
+        return $this->sportMapper;
+    }
+
+    /**
+     * Lazily obtain the DivisionMapper used by SOCS imports.
+     */
+    private function getDivisionMapper(): DivisionMapper
+    {
+        if (null === $this->divisionMapper) {
+            $this->divisionMapper = DivisionMapper::getInstance();
+        }
+
+        return $this->divisionMapper;
+    }
+
+    /**
+     * Lazily obtain the TeamMapper used by SOCS imports.
+     */
+    private function getTeamMapper(): TeamMapper
+    {
+        if (null === $this->teamMapper) {
+            $this->teamMapper = TeamMapper::getInstance();
+        }
+
+        return $this->teamMapper;
+    }
+
+    /**
+     * Lazily obtain the VenueMapper used by SOCS imports.
+     */
+    private function getVenueMapper(): VenueMapper
+    {
+        if (null === $this->venueMapper) {
+            $this->venueMapper = VenueMapper::getInstance();
+        }
+
+        return $this->venueMapper;
+    }
+
+    /**
+     * Lazily obtain the SchoolMapper used by SOCS imports.
+     */
+    private function getSchoolMapper(): SchoolMapper
+    {
+        if (null === $this->schoolMapper) {
+            $this->schoolMapper = SchoolMapper::getInstance();
+        }
+
+        return $this->schoolMapper;
+    }
+
+    /**
+     * Lazily obtain the MatchupMapper used by SOCS imports.
+     */
+    private function getMatchupMapper(): MatchupMapper
+    {
+        if (null === $this->matchupMapper) {
+            $this->matchupMapper = MatchupMapper::getInstance();
+        }
+
+        return $this->matchupMapper;
+    }
+
+    /**
+     * Lazily obtain the ResultMapper used by SOCS imports.
+     */
+    private function getResultMapper(): ResultMapper
+    {
+        if (null === $this->resultMapper) {
+            $this->resultMapper = ResultMapper::getInstance();
+        }
+
+        return $this->resultMapper;
     }
 }
