@@ -106,12 +106,24 @@ class Factory
         }
 
         if ($results) {
-            $bus->add(new Results\Import(
+            $bus->add(new Results\Prepare(
+                $this->log,
+                $this->perform,
+                $this->lock,
+                $resultMapper
+            ))
+            ->add(new Results\Import(
                 $this->log,
                 $this->perform,
                 $this->lock,
                 $this->httpClient,
                 $matchupMapper,
+                $resultMapper
+            ))
+            ->add(new Results\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->lock,
                 $resultMapper
             ));
         }
