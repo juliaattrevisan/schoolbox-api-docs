@@ -539,7 +539,6 @@ HELP;
         $imported = 0;
 
         foreach ($teams as $teamNode) {
-            $teamId = trim((string)$teamNode->teamid);
             $sportName = trim((string)$teamNode->sport);
             $teamName = trim((string)$teamNode->teamname);
 
