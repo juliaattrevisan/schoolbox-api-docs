@@ -27,13 +27,14 @@ function onViewDP(): void {
 <template>
     <dt class="full-width">
         <div
-            class="alert-box highlight icon-learning-support u-cursor-pointer"
+            class="alert-box highlight u-cursor-pointer"
             role="button"
             tabindex="0"
             @click="onViewDP"
             @keydown.enter="onViewDP"
             @keydown.space.prevent="onViewDP"
         >
+            <sbx-icon name="learning-support"></sbx-icon>
             View {{ locale.differentiationProfile.translate(false, true) }}
         </div>
     </dt>

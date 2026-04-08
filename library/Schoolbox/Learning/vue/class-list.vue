@@ -767,11 +767,12 @@ export default {
                             <td class="show-for-medium-up" v-if="differentiationEnabled">
                                 <button
                                     v-if="student._links.differentiationProfile"
-                                    class="button icon-learning-support"
+                                    class="button sbx-button--has-icon"
                                     type="button"
                                     :data-test="`class-list-${student.id}-view-differentiation-profile`"
                                     @click.prevent="onDPSelected(student)"
                                 >
+                                    <sbx-icon name="learning-support"></sbx-icon>
                                     View {{ locale.differentiationProfile.translate(false, true) }}
                                 </button>
                             </td>

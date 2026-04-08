@@ -216,7 +216,8 @@ async function onResolve(): Promise<void> {
         </button>
     </li>
     <li v-if="props.response?._routes.assistanceResolve">
-        <button class="icon-medical" data-test="das-actions-assistanceResolve" @click="onResolve">
+        <button class="sbx-button--has-icon" data-test="das-actions-assistanceResolve" @click="onResolve">
+            <sbx-icon name="medical"></sbx-icon>
             {{ `Resolve Assistance Request` }}
         </button>
     </li>

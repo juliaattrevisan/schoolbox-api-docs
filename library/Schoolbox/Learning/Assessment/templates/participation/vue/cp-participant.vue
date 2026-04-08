@@ -127,11 +127,12 @@ function onOpenIncludeInExistingModal(): void {
         <td v-if="props.differentiationEnabled">
             <button
                 v-if="props.participant._links.differentiationProfile"
-                class="button icon-learning-support f-no-margins"
+                class="button sbx-button--has-icon f-no-margins"
                 type="button"
                 :data-test="`cp-participant-${props.participant.user.id}-view-differentiation-profile`"
                 @click.prevent="onViewDP"
             >
+                <sbx-icon name="learning-support"></sbx-icon>
                 View {{ locale.differentiationProfile.translate(false, true) }}
             </button>
         </td>
