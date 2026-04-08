@@ -5,37 +5,54 @@ declare(strict_types=1);
 namespace Schoolbox\Socs\Teams;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 use Schoolbox\Socs\IStrategy;
 use Symfony\Component\Lock\LockInterface;
 
 /**
  * SOCS teams cleanup step.
  *
- * Currently only refreshes the lock and logs completion of the teams import,
- * existing primarily to mirror the Clipboard importer structure and keep the
- * pipeline extensible.
+ * Removes teams attached to the SOCS Fixtures season that were marked as
+ * stale in the prepare step and not refreshed during the current import run.
+ * This mirrors the Clipboard prepare/cleanup behaviour but is scoped to
+ * SOCS-managed teams only.
  */
 class Cleanup implements IStrategy
 {
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
-        private LockInterface $lock
+        private LockInterface $lock,
+        private DivisionMapper $divisionMapper,
+        private TeamMapper $teamMapper
     ) {
     }
 
     /**
-     * Finalise the SOCS teams import stage.
+     * Remove SOCS-managed teams that did not appear in the latest import.
      *
      * @throws \Symfony\Component\Lock\Exception\LockAcquiringException
      * @throws \Symfony\Component\Lock\Exception\LockConflictedException
+     * @throws \PDOException When the underlying database query fails
      */
     public function import(): void
     {
         if ($this->perform) {
             $this->lock->refresh();
+
+            $db = $this->teamMapper->getDatabase();
+            $teamTable = $this->teamMapper->getTable();
+            $divisionTable = $this->divisionMapper->getTable();
+
+            // Delete teams that were not touched during this import run by
+            // removing those which still have the sentinel updated_at value.
+            $sql = "DELETE t FROM {$teamTable} t
+                INNER JOIN {$divisionTable} d ON t.division_id = d.id
+                WHERE t.updated_at = '0000-00-00 00:00:00'";
+            $db->query($sql);
         }
 
-        $this->log->info('SOCS teams cleanup complete.');
+        $this->log->info('Deleted SOCS-managed teams that did not appear in the import.');
     }
 }

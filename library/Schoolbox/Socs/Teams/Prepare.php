@@ -14,8 +14,11 @@ use Symfony\Component\Lock\LockInterface;
 /**
  * SOCS teams prepare step.
  *
- * Removes existing teams attached to the SOCS Fixtures season so that the
- * teams import can recreate the current set from the SOCS mso-sport feed.
+ * Marks existing teams attached to the SOCS Fixtures season as stale by
+ * setting their updated_at timestamps to a sentinel value. Teams that are
+ * re-saved during the current import will have their timestamps refreshed,
+ * allowing the cleanup step to remove only those that did not appear in the
+ * latest SOCS teams feed.
  */
 class Prepare implements IStrategy
 {
@@ -30,7 +33,7 @@ class Prepare implements IStrategy
     }
 
     /**
-     * Delete teams for the SOCS Fixtures season before re-importing.
+     * Mark teams for the SOCS Fixtures season as stale before re-importing.
      *
      * @throws \Symfony\Component\Lock\Exception\LockAcquiringException
      * @throws \Symfony\Component\Lock\Exception\LockConflictedException
@@ -39,7 +42,7 @@ class Prepare implements IStrategy
     public function import(): void
     {
         if (!$this->perform) {
-            $this->log->info('Planning SOCS teams prepare; no data will be deleted.');
+            $this->log->info('Planning SOCS teams prepare; no data will be modified.');
             return;
         }
 
@@ -57,10 +60,14 @@ class Prepare implements IStrategy
         $teamTable = $this->teamMapper->getTable();
         $divisionTable = $this->divisionMapper->getTable();
 
-        // Delete teams whose divisions belong to the SOCS Fixtures season.
-        $sql = "DELETE t FROM {$teamTable} t INNER JOIN {$divisionTable} d ON t.division_id = d.id WHERE d.season_id = {$seasonId}";
+        // Mark teams whose divisions belong to the SOCS Fixtures season as
+        // "stale" until they are re-saved by the current import run.
+        $sql = "UPDATE {$teamTable} t
+            INNER JOIN {$divisionTable} d ON t.division_id = d.id
+            SET t.updated_at = '0000-00-00 00:00:00'
+            WHERE d.season_id = {$seasonId}";
         $db->query($sql);
 
-        $this->log->info('Deleted existing SOCS teams attached to the SOCS Fixtures season.');
+        $this->log->info('Marked existing SOCS teams attached to the SOCS Fixtures season as stale.');
     }
 }

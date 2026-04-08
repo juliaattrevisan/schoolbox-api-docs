@@ -150,7 +150,9 @@ class Factory
             ->add(new Teams\Cleanup(
                 $this->log,
                 $this->perform,
-                $this->lock
+                $this->lock,
+                $divisionMapper,
+                $teamMapper
             ));
         }
 
