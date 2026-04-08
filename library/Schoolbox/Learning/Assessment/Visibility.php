@@ -189,6 +189,19 @@ class Visibility
         Alaress_Date_Format $now,
         bool $respectWorkTypeVisibility
     ): bool {
+        // Handle the case where the user is a staff member.
+        // Deliberately handle this case before the 'parent of learner' case, because if a user is both a staff member
+        // and a parent of a learner, they should be treated as a staff member.
+        if ($nonInstructorNonLearner->getRole()->isStaff()) {
+            if ($showClosed) {
+                return true;
+            }
+            // If staff member is also a participant, respect their custom close date.
+            $participant = $assessable->getParticipantIfExtant($nonInstructorNonLearner);
+            $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
+            return $now->lt($closeDate);
+        }
+
         $workType = $assessable->getWorkType();
 
         try {
@@ -222,17 +235,6 @@ class Visibility
                 $isPublished = $assessable->isPublished($childLearner);
             }
             return $isPublished && ($showClosed || $now->lt($closeDate));
-        }
-
-        // Handle the case where the user is a staff member.
-        if ($nonInstructorNonLearner->getRole()->isStaff()) {
-            if ($showClosed) {
-                return true;
-            }
-            // If staff member is also a participant, respect their custom close date.
-            $participant = $assessable->getParticipantIfExtant($nonInstructorNonLearner);
-            $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
-            return $now->lt($closeDate);
         }
 
         if (
