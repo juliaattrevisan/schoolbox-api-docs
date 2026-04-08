@@ -164,7 +164,7 @@ class Factory extends Filter\AbstractFactory
             return $this->workTypeMapper->findAll();
         }
 
-        // No relevant relationship — empty collection
+        // No relevant relationship — empty collection.
         return new GenericCollection(WorkType\Model::class);
     }
 
