@@ -487,6 +487,11 @@ volumes:
   # Volume for ClamAV signatures
   clamav-data:
 
+  # Volumes for NPM and Composer caches
+  npm-cache:
+
+  composer-cache:
+
 # Configs may be folders, but if they are they will override existing contents:
 # thus, PHP configs must be single files.
 # Config files are read from the argument to `--with-config-file-scan-dir`,

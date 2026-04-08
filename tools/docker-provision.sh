@@ -171,133 +171,30 @@ function init_database() {
   mariadb -h mariadb -u root < "${SITE_ROOT}/docker/schoolbox/sql/setup.sql"
 }
 
-function download_artifact() {
-  # Name of the artifact to download
-  local artifact_name=$1
-
-  # Name of the cache
-  local cache_name=$2
-
-  # Location of the lock file to check
-  local lock_file=$3
-
-  # Location of the checksum
-  local checksum_file=$4
-
-  # Location to extract to
-  local extract_dir=$5
-
-  local lock_checksum;
-#  echo "sha1sum \"${SITE_ROOT}/${lock_file}\" 2>/dev/null | awk '{print \$1}'"
-  lock_checksum=`sha1sum "${SITE_ROOT}/${lock_file}" 2>/dev/null | awk '{print $1}'`;
-
-  local artifact_file='';
-  local current_checksum;
-  if [ -f "$SITE_ROOT/${checksum_file}" ]; then
-#      echo "awk '{print \$1}' \"${SITE_ROOT}/${checksum_file}\""
-      current_checksum=`awk '{print $1}' "${SITE_ROOT}/${checksum_file}"`;
-      if [ "$lock_checksum" == "$current_checksum" ]; then
-          log "Artifact $artifact_name up to date, nothing to change";
-          artifact_file='ignore';
-      fi
-  fi
-
-  local cache_file;
-  local etag_file;
-  cache_file="${CACHE_DIR}/${cache_name}.cache"
-  etag_file="${CACHE_DIR}/${cache_name}.etag.cache"
-
-  if [ "$artifact_file" != 'ignore' ]; then
-      log "Artifact $artifact_name not up to date: checking for newer version";
-      # download files
-      local check;
-      check=`grep "$lock_checksum" "$cache_file" 2>/dev/null | wc -l`;
-      if [ $check -gt 0 ]; then
-          # We've located a matching cached file
-          artifact_file=`grep "$lock_checksum" "$cache_file" 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
-      else
-          # No cached files match: check to see if there are new versions
-          log "No matching cached artifact file found: downloading";
-
-          for branch in develop master;
-          do
-              # Check if we've already found a matching file
-              if [ "$artifact_file" == '' ];
-              then
-                  local etag;
-                  etag=$(curl -I "${ARTIFACT_SOURCE}/$branch-${artifact_name}" 2>/dev/null | grep ETag | cut -d'"' -f2);
-                  if [ $? -eq 0 ];
-                  then
-                      local check_etag;
-                      check_etag=`grep $etag $etag_file 2>/dev/null | wc -l`;
-                      if [ $check_etag -eq 0 ];
-                      then
-                          # New/updated version available - download it
-                          local version_artifact_name;
-                          version_artifact_name="${branch}-${artifact_name}"
-                          log "Downloading latest artifact: ${version_artifact_name}";
-                          wget --no-verbose "${ARTIFACT_SOURCE}/${version_artifact_name}" -O "${CACHE_DIR}/${version_artifact_name}" 2>&1;
-                          if [ $? -eq 0 ]; then
-                              # This is a new file, so remove old references
-                              sed -i "/${version_artifact_name}/d" "$etag_file" 2>/dev/null;
-                              sed -i "/${version_artifact_name}/d" "$cache_file" 2>/dev/null;
-                              # Add new file to etag cache
-                              echo "$etag ${version_artifact_name}" >> "$etag_file";
-
-                              # Cleanup for purity?
-                              rm -fR "${CACHE_DIR}/${extract_dir:?}" 2> /dev/null;
-
-                              # Extract checksum
-                              tar xzf "${CACHE_DIR}/${version_artifact_name}" "${checksum_file}";
-                              local version_artifact_checksum
-                              version_artifact_checksum=`awk '{print $1}' "${extract_dir}/${checksum_file}"`;
-
-                              # Cleanup again
-                              rm -fR "${CACHE_DIR}/${extract_dir:?}" 2> /dev/null;
-
-                              # Add new file to vendor cache
-                              echo "$version_artifact_checksum ${version_artifact_name}" >> "$cache_file";
-                              # Check if this is file we need
-                              if [ "$version_artifact_checksum" == "$lock_checksum" ]; then
-                                  artifact_file="${version_artifact_name}";
-                              fi
-                          fi
-                      fi
-                  fi
-              fi
-          done
-      fi
-  fi
-
-  echo "$artifact_file"
-}
-
 function init_composer_dependencies() {
-  log "Installing vendor dependencies with composer";
+  log "Installing Composer dependencies";
 
   local vendor_dir="$SITE_ROOT/vendor"
-  local vendor_file='vendor-php-dev.tar.gz'
-  local artifact_file;
+  local lock_checksum
+  lock_checksum=$(sha1sum "${SITE_ROOT}/composer.lock" 2>/dev/null | awk '{print $1}')
 
-  # Only use last line of output from function:
-  # the rest may include logs
-  artifact_file=$(download_artifact "${vendor_file}" 'vendor' 'composer.lock' 'vendor/composer.lock.checksum' "$vendor_dir" | tail -n1)
+  local cache_file="${CACHE_DIR}/vendor-php-${lock_checksum}.tar.gz"
 
-  if [ "$artifact_file" = "ignore" ]; then
-      log "Vendor artifact up to date: updating autoload and patches";
+  find "${CACHE_DIR}" -name 'vendor-php-*.tar.gz' -not -newerat '2 weeks ago' -delete
+
+  if [ -n "$lock_checksum" ] && [ -f "$cache_file" ]; then
+    log "Composer cache hit ($lock_checksum): extracting vendor"
+    rm -rf "${vendor_dir}"
+    tar xzf "$cache_file" -C "${SITE_ROOT}"
+    touch "$cache_file"
   else
-      if [ -f "${CACHE_DIR}/${artifact_file}" ]; then
-          # Extract content
-          log "Extracting vendor cache file '${artifact_file}'";
-          rm -fR "${vendor_dir}" 2> /dev/null;
-          tar xzf "${CACHE_DIR}/${artifact_file}";
-          log "Updating autoload and patches";
-      else
-          # Still no luck, build from scratch with composer
-          log "No matching vendor cache found. Building with composer";
-      fi
+    log "Composer cache miss: running composer install"
+    XDEBUG_MODE=off composer install --no-progress -o
+    if [ -n "$lock_checksum" ]; then
+      log "Caching vendor directory for composer.lock ($lock_checksum)"
+      tar czf "$cache_file" -C "${SITE_ROOT}" vendor
+    fi
   fi
-  "$SITE_ROOT"/tools/composer.sh --ignore-platform-req=ext-gd
 }
 
 function init_npm_dependencies() {
@@ -307,34 +204,33 @@ function init_npm_dependencies() {
   # so the npm versions it installed are available
   source /opt/nvm/nvm.sh
 
-  local npm_dir="$SITE_ROOT/node_modules"
-  local npm_file='npm.tar.gz'
-  local artifact_file;
+  local node_modules_dir="$SITE_ROOT/node_modules"
+  local lock_checksum node_version node_arch
+  lock_checksum=$(sha1sum "${SITE_ROOT}/npm-shrinkwrap.json" 2>/dev/null | awk '{print $1}')
+  node_version=$(node --version 2>/dev/null | tr -d '[:space:]')
+  node_arch=$(node -p "process.arch" 2>/dev/null | tr -d '[:space:]')
 
-  # Only use last line of output from function:
-  # the rest may include logs
-  artifact_file=$(download_artifact "${npm_file}" 'npm' 'npm-shrinkwrap.json' 'node_modules/npm.shrinkwrap.checksum' "$npm_dir" | tail -n1)
+  local cache_file="${CACHE_DIR}/node-modules-${lock_checksum}-${node_version}-${node_arch}.tar.gz"
 
-  if [ "$artifact_file" = "ignore" ]; then
-      log "NPM artifact up to date";
+  find "${CACHE_DIR}" -name 'node-modules-*.tar.gz' -not -newerat '2 weeks ago' -delete
+
+  if [ -n "$lock_checksum" ] && [ -f "$cache_file" ]; then
+    log "NPM cache hit ($lock_checksum): extracting node_modules"
+    rm -rf "${node_modules_dir}"
+    tar xzf "$cache_file" -C "${SITE_ROOT}"
+    touch "$cache_file"
   else
-      if [ -f "${CACHE_DIR}/${artifact_file}" ]; then
-          # Extract content
-          log "Found matching NPM cache file: now extracting";
-          rm -fR "$SITE_ROOT"/node_modules 2>/dev/null;
-          rm -fR "${npm_dir}" 2> /dev/null;
-          tar xzf "${CACHE_DIR}/${artifact_file}";
-      else
-          # Still no luck, build from scratch
-          log "Cache content:";
-          cat "${CACHE_DIR}"/npm.cache;
-          log "No matching NPM cache found. Building with npm";
-          "$SITE_ROOT"/tools/pkg-build-npm.sh 2>&1;
-      fi
+    log "NPM cache miss: running npm ci"
+    npm ci
+
+    if [ -n "$lock_checksum" ]; then
+      log "Caching node_modules for npm-shrinkwrap.json ($lock_checksum)"
+      tar czf "$cache_file" -C "${SITE_ROOT}" node_modules
+    fi
   fi
 
   log "Building JS/CSS files";
-  "$SITE_ROOT"/tools/pkg-build-css-js.sh
+  npm run build
 }
 
 function add_rabbitmq_vhost() {
