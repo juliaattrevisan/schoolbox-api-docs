@@ -140,47 +140,51 @@ $(function () {
      * Show/hide top nav items based on space available
      */
     function updateTopNavItems() {
-        const searchEl = document.getElementById("search");
-        if (searchEl === null) {
-            // don't need to continue if the search bar doesn't exist
+        var $searchButton = $("[data-header-search-button]").first();
+        if ($searchButton.length === 0) {
+            // don't need to continue if the search button doesn't exist
             return;
         }
-        // Determine how much space is required for the icons on the right of the top nav
-        // The search bar is always visible and furthest to the left, so we can use it to determine the width
-        // Other icons such as the profile menu and notifications can be revealed and hidden based on other conditions, so we can't use them
-        const searchStyle = window.getComputedStyle(searchEl);
-
-        const extraWidth = parseInt(searchStyle.right) + parseInt(searchStyle.width);
 
         // A separator used to break up the menu items from the profile menu that appears above it in mobile.
         const sideNavSeparator = document.querySelector("li[data-sidenav-separator]");
         let secondNavHasItems = false;
+        let hideRemainingItems = false;
 
-        var topMenuItemWidth = $("#top-menu > li").width();
+        // Reset the nav before measuring positions, otherwise hidden items report no geometry.
+        $("#top-menu > li").each(function () {
+            toggleTopNavItem(true, $(this));
+        });
 
-        // Store the width left in top nav after subtracting
-        var spaceLeft = $("#top-menu").width() - extraWidth;
+        var $topMenuItems = $("#top-menu > li");
+        var topMenuWidth = $("#top-menu").width();
+        var firstMenuItemWidth = $topMenuItems.first().outerWidth();
+        var keepFirstFourVisible =
+            topMenuWidth > 0 &&
+            firstMenuItemWidth !== undefined &&
+            Math.abs(firstMenuItemWidth - topMenuWidth / 4) <= 1;
 
-        $("#top-menu > li").each(function (index) {
-            // Always show the first 4 on the top nav
-            if (index < 4) {
+        var searchButtonLeft = $searchButton.get(0).getBoundingClientRect().left;
+
+        $topMenuItems.each(function (index) {
+            var itemRight = $(this).get(0).getBoundingClientRect().right;
+
+            // Keep the first 4 visible when the mobile 25% layout is active.
+            if (keepFirstFourVisible && index < 4) {
                 toggleTopNavItem(true, $(this));
-
-                // Remove the space used from the 'spaceLeft' var
-                spaceLeft -= topMenuItemWidth;
 
                 return;
             }
 
-            if (spaceLeft > topMenuItemWidth) {
-                // if there's space
-                toggleTopNavItem(true, $(this));
+            if (!hideRemainingItems && searchButtonLeft <= itemRight) {
+                hideRemainingItems = true;
+            }
 
-                // Remove the space used from the 'spaceLeft' var
-                spaceLeft -= topMenuItemWidth;
-            } else {
+            if (hideRemainingItems) {
                 toggleTopNavItem(false, $(this));
                 secondNavHasItems = true;
+            } else {
+                toggleTopNavItem(true, $(this));
             }
         });
 

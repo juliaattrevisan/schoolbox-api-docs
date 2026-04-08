@@ -118,7 +118,7 @@ defineExpose({ hasVisibleContent });
     <div v-else-if="prompt === PromptType.ENABLE_NOTIF_PROMPT" class="l-flex-col l-gap-s f-no-margins">
         <p>Enable notifications on your device:</p>
         <a
-            class="button"
+            class="button enable-notif-button"
             href="#"
             :disabled="pwaStore.hasPromptedForNotif || undefined"
             @click="pwaStore.onEnableNotifications"

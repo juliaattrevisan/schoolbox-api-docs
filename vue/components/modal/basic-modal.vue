@@ -128,6 +128,7 @@ function onBackgroundClick(): void {
     }
     &__container {
         background: var(--sbx-color-foreground-primary, #fff);
+        border-radius: var(--sbx-config-box-roundness, 0);
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
         margin: 0 auto;
         position: relative;
