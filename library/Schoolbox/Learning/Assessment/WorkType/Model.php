@@ -166,7 +166,7 @@ class Model implements ISoftDeletable, Sequential
 
 
     /**
-     * Human friendly getter
+     * Human-friendly getter
      * @return bool
      */
     public function isVisibleToParents(): bool
@@ -196,7 +196,7 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
-     * Human friendly getter
+     * Human-friendly getter
      * @return bool
      */
     public function isVisibleToLearners(): bool
