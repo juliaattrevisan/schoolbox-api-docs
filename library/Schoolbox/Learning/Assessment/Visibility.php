@@ -52,8 +52,13 @@ class Visibility
      * @param bool                     $respectWorkTypeVisibility
      * @return bool
      */
-    public function isVisibleToUser(IAssessable $assessment, User $viewer, bool $showClosed, ?Alaress_Date_Format $now = null, bool $respectWorkTypeVisibility = true): bool
-    {
+    public function isVisibleToUser(
+        IAssessable $assessment,
+        User $viewer,
+        bool $showClosed,
+        ?Alaress_Date_Format $now = null,
+        bool $respectWorkTypeVisibility = true
+    ): bool {
         $now = $now ?? Alaress_Date_Format::now();
         $folder = $assessment->getBaseContext()->getFolder();
 
@@ -90,8 +95,13 @@ class Visibility
      * @param bool                     $respectWorkTypeVisibility
      * @return bool
      */
-    public function isVisibleToUserOrChildOfUser(IAssessable $assessment, User $viewer, bool $showClosed, ?Alaress_Date_Format $now = null, bool $respectWorkTypeVisibility = true): bool
-    {
+    public function isVisibleToUserOrChildOfUser(
+        IAssessable $assessment,
+        User $viewer,
+        bool $showClosed,
+        ?Alaress_Date_Format $now = null,
+        bool $respectWorkTypeVisibility = true
+    ): bool {
         $now = $now ?? Alaress_Date_Format::now();
 
         if ($this->isVisibleToUser($assessment, $viewer, $showClosed, $now, $respectWorkTypeVisibility)) {
