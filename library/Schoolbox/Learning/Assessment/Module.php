@@ -211,7 +211,7 @@ class Module extends BaseModule
                              */
                             new Rule\IsConfigOn(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE, $this->getConfig()),
                             new ValidAssessmentType([AssessmentType::TYPE_REPORTING]),
-                            new Rule\HasServicePermission(UserAccess::SERVICE_DIFFERENTIATION, UserAccess::ACCESS_FULL),
+                            new Rule\HasServicePermission(UserAccess::SERVICE_DIFFERENTIATION, UserAccess::ACCESS_WRITE),
                         )
                     )
                 )
