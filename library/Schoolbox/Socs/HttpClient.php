@@ -79,7 +79,7 @@ class HttpClient
         if ($safeQuery === []) {
             $url = $baseUrl;
         } else {
-            $url = sprintf("%s %s", $path, http_build_query($safeQuery));
+            $url = $baseUrl . '?' . http_build_query($safeQuery);
         }
 
         if (!isset($this->urlUsage[$url])) {
