@@ -49,7 +49,8 @@ class Import implements IStrategy
         private UserMapper $userMapper,
         private TeamPlayerMapper $teamPlayerMapper,
         private TeamCoachMapper $teamCoachMapper,
-        private CoachMapper $coachMapper
+        private CoachMapper $coachMapper,
+        private bool $importHumans,
     ) {
         $this->perform = $perform;
     }
@@ -70,8 +71,13 @@ class Import implements IStrategy
         $query = [
             'startdate' => $startDate,
             'enddate'   => $endDate,
-            'TS'        => 1,
         ];
+
+        // if we are importing humans, we only get 7 days of data, so it needs to be intentional
+        if (!$this->importHumans) {
+            $this->log->info('SOCS fixtures is importing humans attached to fixtures; limiting to 7 days');
+            $query['TS'] = 1;
+        }
 
         $response = $this->httpClient->get(self::FIXTURES_PATH, $query, $this->log);
 

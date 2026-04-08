@@ -107,7 +107,26 @@ class Factory
                 $userMapper,
                 $teamPlayerMapper,
                 $teamCoachMapper,
-                $coachMapper
+                $coachMapper,
+                false
+            ))
+            ->add(new Fixtures\Import( // import again, this time with humans attached to the fixtures
+                $this->log,
+                $this->perform,
+                $this->lock,
+                $this->httpClient,
+                $seasonMapper,
+                $sportMapper,
+                $divisionMapper,
+                $teamMapper,
+                $venueMapper,
+                $schoolMapper,
+                $matchupMapper,
+                $userMapper,
+                $teamPlayerMapper,
+                $teamCoachMapper,
+                $coachMapper,
+                true
             ))
             ->add(new Fixtures\Cleanup(
                 $this->log,
