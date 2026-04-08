@@ -477,7 +477,15 @@ HELP;
         $raw = sprintf('%s %s', $date, $time);
 
         try {
-            return new \Alaress_Date_Format($raw, ['j M Y H:i', 'j M Y H:i:s', 'Y-m-d H:i:s', 'Y-m-d']);
+            return new \Alaress_Date_Format($raw, [
+                'j M Y H:i',
+                'j M Y H:i:s',
+                'd/m/Y H:i',
+                'd/m/Y H:i:s',
+                'd/m/Y',
+                'Y-m-d H:i:s',
+                'Y-m-d',
+            ]);
         } catch (\Exception $e) {
             $logger->debug(sprintf('Unable to parse SOCS date/time "%s": %s', $raw, $e->getMessage()));
             return null;
