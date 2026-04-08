@@ -33,6 +33,7 @@ class ImporterTool extends CliTool\App
     private const SOCS_IMPORTER_LOCK_NAME = 'socs_importer';
     public const LOCK_NAME = self::SOCS_IMPORTER_LOCK_NAME;
     private const SOCS_SCHOOL_ID = '2460';
+    private const MSO_SPORT_PATH = 'mso-sport.ashx';
     private const OPT_LONG_HELP = 'help';
     private const OPT_LONG_INSTANCE = 'instance:';
     private const LOCK_TTL = 120;
@@ -74,6 +75,7 @@ class ImporterTool extends CliTool\App
 
         try {
             $this->importFixtures($logger, $lock);
+            $this->importTeams($logger);
         } finally {
             $this->logUrlUsage($logger);
             $lock->release();
@@ -85,7 +87,7 @@ class ImporterTool extends CliTool\App
         echo <<<HELP
 
 Import SOCS sport fixtures into the Schoolbox Fixtures module using the
-SOCS XML fixtures feed.
+SOCS XML fixtures feed, and synchronise SOCS teams via the mso-sport feed.
 
 Usage: php importer.php [--perform]
 
@@ -258,6 +260,119 @@ HELP;
             $logger->info(sprintf('SOCS fixtures import complete; processed %d fixtures', $imported));
         } else {
             $logger->info(sprintf('SOCS fixtures planning complete; would process %d fixtures', $imported));
+        }
+    }
+
+    private function importTeams(LoggerInterface $logger): void
+    {
+        $host = (string)$this->getConfig()->get('socs_endpoint_host');
+
+        if ('' === $host) {
+            $logger->warning('Missing SOCS endpoint host; exiting teams import');
+            return;
+        }
+
+        $token = (string)$this->getConfig()->get('socs_endpoint_token');
+        if ('' === $token) {
+            $logger->warning('Missing SOCS endpoint token; exiting teams import');
+            return;
+        }
+
+        $baseUrl = rtrim($host, '/');
+        $teamsUrl = $baseUrl . '/' . self::MSO_SPORT_PATH;
+
+        $client = new Client([
+            'timeout' => 300,
+            'http_errors' => false,
+        ]);
+
+        $seasonMapper = SeasonMapper::getInstance();
+        $sportMapper = SportMapper::getInstance();
+        $divisionMapper = DivisionMapper::getInstance();
+        $teamMapper = TeamMapper::getInstance();
+
+        $season = $this->recallSeason($seasonMapper, $logger);
+
+        $logger->info('Downloading SOCS teams from mso-sport feed');
+
+        $query = [
+            'ID'  => self::SOCS_SCHOOL_ID,
+            'key' => $token,
+        ];
+
+        $this->noteUrlUsed($teamsUrl, $query);
+
+        try {
+            $response = $client->request('GET', $teamsUrl, [
+                'query' => $query,
+            ]);
+        } catch (GuzzleException $e) {
+            $logger->warning(sprintf('Failed to contact SOCS teams endpoint: %s', $e->getMessage()));
+            return;
+        }
+
+        if ($response->getStatusCode() !== 200) {
+            $logger->warning(sprintf(
+                'Bad SOCS teams response: %s %s',
+                $response->getStatusCode(),
+                $response->getReasonPhrase()
+            ));
+            return;
+        }
+
+        $body = (string)$response->getBody();
+        $logger->debug(sprintf(
+            'SOCS teams raw response: Content-Type %s; length %d',
+            $response->getHeaderLine('Content-Type') ?: 'unknown',
+            strlen($body)
+        ));
+        if ('' === $body) {
+            $logger->info('SOCS teams feed returned an empty payload');
+            return;
+        }
+
+        $xml = @simplexml_load_string($body);
+        if (false === $xml) {
+            $logger->warning(sprintf(
+                'Unable to parse SOCS teams XML payload; aborting. First 200 chars: %s',
+                substr($body, 0, 200)
+            ));
+            return;
+        }
+
+        /** @var \SimpleXMLElement[]|false $teams */
+        $teams = $xml->xpath('//team');
+        if (false === $teams || [] === $teams) {
+            $logger->info('SOCS teams feed contained no team records');
+            return;
+        }
+
+        $imported = 0;
+
+        foreach ($teams as $teamNode) {
+            $teamId = trim((string)$teamNode->teamid);
+            $sportName = trim((string)$teamNode->sport);
+            $teamName = trim((string)$teamNode->teamname);
+
+            if ('' === $sportName || '' === $teamName) {
+                $logger->debug('Skipping SOCS team with missing mandatory fields');
+                continue;
+            }
+
+            $sport = $this->recallSport($sportMapper, $logger, $sportName);
+
+            $divisionName = $teamName;
+            $division = $this->recallDivision($divisionMapper, $logger, $divisionName, $sport, $season);
+
+            $this->recallTeam($teamMapper, $logger, $teamName, $division);
+
+            $imported++;
+        }
+
+        if ($this->perform()) {
+            $logger->info(sprintf('SOCS teams import complete; processed %d teams', $imported));
+        } else {
+            $logger->info(sprintf('SOCS teams planning complete; would process %d teams', $imported));
         }
     }
 
