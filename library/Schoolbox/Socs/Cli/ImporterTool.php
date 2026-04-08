@@ -784,20 +784,6 @@ HELP;
     }
 
     /**
-     * Lazily create and cache the SOCS HttpClient for the current importer run.
-     *
-     * @param string $host Base SOCS host URL from configuration
-     */
-    private function getHttpClient(string $host, string $schoolId = '', #[SensitiveParameter] string $token = ''): HttpClient
-    {
-        if (!$this->httpClient instanceof HttpClient) {
-            $this->httpClient = new HttpClient($host, $schoolId, $token);
-        }
-
-        return $this->httpClient;
-    }
-
-    /**
      * Indicate whether this CLI tool is permitted to run as root.
      *
      * Delegates to the parent implementation, which emits a warning when
