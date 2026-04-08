@@ -48,6 +48,9 @@ class HttpClient
         }
     }
 
+    /**
+     * Log how many times each fully-qualified SOCS URL was requested.
+     */
     public function logUrlUsage(LoggerInterface $logger): void
     {
         foreach ($this->urlUsage as $url => $count) {
@@ -74,6 +77,9 @@ class HttpClient
         $this->urlUsage[$url]++;
     }
 
+    /**
+     * Build an absolute URL for a SOCS endpoint path relative to the configured host.
+     */
     private function buildBaseUrl(string $path): string
     {
         if ($path === '') {

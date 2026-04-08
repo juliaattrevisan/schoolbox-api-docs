@@ -289,6 +289,14 @@ HELP;
         }
     }
 
+    /**
+     * Import SOCS results from the standard results feed and attach them to existing fixtures.
+     *
+     * Looks up Matchups by their SOCS external_id and stores a single Result for the home team.
+     *
+     * @throws \Schoolbox\Mapper\Exception When database lookups or saves fail
+     * @throws \PDOException                 When the underlying database connection fails
+     */
     private function importResults(LoggerInterface $logger): void
     {
         $host = (string)$this->getConfig()->get('socs_endpoint_host');
@@ -735,6 +743,11 @@ HELP;
         }
     }
 
+    /**
+     * Lazily create and cache the SOCS HttpClient for the current importer run.
+     *
+     * @param string $host Base SOCS host URL from configuration
+     */
     private function getHttpClient(string $host): HttpClient
     {
         if (!$this->httpClient instanceof HttpClient) {
