@@ -110,7 +110,7 @@ export default class UnitPlanner {
         const pageOrder = await this.page
             .getByTestId(allUnitRowSelector)
             .evaluateAll((unitRows) => unitRows.map((unitRow) => unitRow.getAttribute("data-test-unit-id")));
-        return pageOrder.filter((id) => id !== null);
+        return pageOrder.filter((id): id is string => id !== null);
     }
 
     /**
@@ -156,7 +156,7 @@ export default class UnitPlanner {
             .evaluateAll((activityRows) =>
                 activityRows.map((activityRow) => activityRow.getAttribute("data-test-activity-id")),
             );
-        return pageOrder.filter((id) => id !== null);
+        return pageOrder.filter((id): id is string => id !== null);
     }
 
     /**

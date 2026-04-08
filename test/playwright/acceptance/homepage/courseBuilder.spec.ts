@@ -2,7 +2,6 @@ import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import CourseBuilder from "@schoolboxTest/playwright/support/page/homepage/CourseBuilder";
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
-import CreateLessonPlanTemplate from "@schoolboxTest/playwright/support/page/admin/lms/LessonPlanTemplates/CreateLessonPlanTemplate";
 import CreateLessonPlan from "@schoolboxTest/playwright/support/page/lessonPlan/CreateLessonPlan";
 import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
 
@@ -24,7 +23,6 @@ test.describe.serial("Homepage - Course Builder Component", () => {
     let courseBuilder: CourseBuilder;
     let homepage: Homepage;
     let assessmentForm: AssessmentForm;
-    let createLessonPlanTemplate: CreateLessonPlanTemplate;
     let createLessonPlan: CreateLessonPlan;
     let unitPlanner: UnitPlanner;
     const COMPONENT_NAME = "Course Builder";
@@ -32,12 +30,12 @@ test.describe.serial("Homepage - Course Builder Component", () => {
     const MATH_UNIT_SPECIFICATION_ID = 31;
     const ROMEO_AND_JULIET_HOMEPAGE_ID = 88;
     const LESSON_PLAN_TITLE = "Course Builder Lesson Plan";
+    const LESSON_PLAN_TEMPLATE_ID = 3;
 
     test.beforeEach(async ({ tester, page }) => {
         courseBuilder = new CourseBuilder(tester, page);
         homepage = new Homepage(tester, page);
         assessmentForm = new AssessmentForm(tester, page);
-        createLessonPlanTemplate = new CreateLessonPlanTemplate(page, tester);
         createLessonPlan = new CreateLessonPlan(tester, page);
         unitPlanner = new UnitPlanner(tester, page);
         await tester.loginAsAdmin();
@@ -87,9 +85,11 @@ test.describe.serial("Homepage - Course Builder Component", () => {
     }) => {
         try {
             tester.isGoingTo("create a lesson plan to be used in the tests");
-            await createLessonPlanTemplate.goto();
-            await createLessonPlanTemplate.createLessonPlanTemplate(LESSON_PLAN_TITLE);
-            await createLessonPlan.createLessonPlan(MATH_UNIT_SPECIFICATION_ID, 3, LESSON_PLAN_TITLE);
+            await createLessonPlan.createLessonPlan(
+                MATH_UNIT_SPECIFICATION_ID,
+                LESSON_PLAN_TEMPLATE_ID,
+                LESSON_PLAN_TITLE,
+            );
             tester.isGoingTo(
                 "check the 3-dot menu options are presented for a quiz, task, due work, lesson and project and check the course builder breadcrumb",
             );
@@ -164,12 +164,12 @@ test.describe.serial("Homepage - Course Builder Component", () => {
         }
     });
 
-    test("check the student cannot see the course builder component", async ({ tester, page }) => {
+    test("check the student cannot see the course builder component", async ({ tester}) => {
         tester.isGoingTo("login as a student and navigate to the homepage");
         await tester.impersonate("Jana Reed");
         await homepage.goto(ROMEO_AND_JULIET_HOMEPAGE_ID);
         tester.isGoingTo("check the course builder component is not visible for the student");
-        await expect(page.getByTestId("course-builder-component")).not.toBeVisible();
+        await expect(homepage.locateComponentByName("Course Builder")).toHaveCount(0);
     });
 
     test("check that by clicking export and modify redirects to the proper page", async ({ tester, page }) => {
@@ -178,13 +178,19 @@ test.describe.serial("Homepage - Course Builder Component", () => {
             "navigate to homepage, click modify for an activity and check it redirects to the activity modify page",
         );
         await homepage.goto(ROMEO_AND_JULIET_HOMEPAGE_ID);
-        await courseBuilder.modifyActivity(activityId);
-        expect(page.url()).toContain(`/learning/assessments/${activityId}/modify`);
+        await Promise.all([
+            page.waitForURL(`**/learning/assessments/${activityId}/modify**`),
+            courseBuilder.modifyActivity(activityId),
+        ]);
+        await expect(page).toHaveURL(new RegExp(`/learning/assessments/${activityId}/modify`));
         tester.isGoingTo(
             "navigate to homepage, click export for an activity and check it redirects to the activity export page",
         );
         await homepage.goto(ROMEO_AND_JULIET_HOMEPAGE_ID);
-        await courseBuilder.exportActivity(activityId);
-        expect(page.url()).toContain(`/learning/export/assessment/${activityId}`);
+        await Promise.all([
+            page.waitForURL(`**/learning/export/assessment/${activityId}**`),
+            courseBuilder.exportActivity(activityId),
+        ]);
+        await expect(page).toHaveURL(new RegExp(`/learning/export/assessment/${activityId}`));
     });
 });

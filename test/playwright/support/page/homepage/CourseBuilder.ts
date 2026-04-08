@@ -38,8 +38,12 @@ export default class CourseBuilder {
      */
     async clickCreateActivityButton(unitSpecificationId: number): Promise<void> {
         const component = this.homepage.locateComponentByName("Course Builder");
-        await component.getByTestId(CourseBuilder.DATA_TEST_CREATE_NEW_ACTIVITY).click();
-        expect(this.page.url()).toContain(`/learning/unitspecs/${unitSpecificationId}/assessments/new`);
+        const expectedUrl = `**/learning/unitspecs/${unitSpecificationId}/assessments/new**`;
+        await Promise.all([
+            this.page.waitForURL(expectedUrl),
+            component.getByTestId(CourseBuilder.DATA_TEST_CREATE_NEW_ACTIVITY).click(),
+        ]);
+        await expect(this.page).toHaveURL(new RegExp(`/learning/unitspecs/${unitSpecificationId}/assessments/new`));
     }
 
     /**
@@ -113,7 +117,7 @@ export default class CourseBuilder {
             .evaluateAll((activityRows) =>
                 activityRows.map((activityRow) => activityRow.getAttribute("data-test-activity-id")),
             );
-        return pageOrder.filter((id) => id !== null);
+        return pageOrder.filter((id): id is string => id !== null);
     }
 
     /**
