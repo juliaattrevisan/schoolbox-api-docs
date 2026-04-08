@@ -1463,14 +1463,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
          * apply for particular activities in particular contexts in a convenient manner. We don't have branching
          * if/else in authentication rules.
          */
-        if ($assessment instanceof Reporting\Model) {
-            $data['learningPlanNew'] = null;
-        } else {
-            $data['learningPlanNew'] = $this->getRouteIfAuthorized('learningAssessment.getAssessmentParticipationLearningPlan', [
-                'assessment' => $assessment,
-                'assessmentId' => $assessment->getId(),
-            ]);
-        }
+        $data['learningPlanNew'] = $this->getRouteIfAuthorized('learningAssessment.getAssessmentParticipationLearningPlan', [
+            'assessment' => $assessment,
+            'assessmentId' => $assessment->getId(),
+        ]);
 
         $data['assessment'] = $assessment;
 

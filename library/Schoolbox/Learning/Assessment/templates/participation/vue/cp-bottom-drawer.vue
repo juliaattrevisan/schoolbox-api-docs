@@ -74,6 +74,7 @@ function clearSelection(): void {
             </template>
             <template v-else>
                 <button
+                    v-if="props.routes.getLearningPlanNewUrl"
                     class="button l-flex__item--1-auto sbx-button--has-icon"
                     @click.prevent="
                         handleActionSelected(

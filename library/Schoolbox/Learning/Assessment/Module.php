@@ -185,12 +185,16 @@ class Module extends BaseModule
             new IsSafeExamBrowserRequired(),
         );
 
-        /* This auth pattern is used for mosto f the Student Participation area, servicing multiple endpoints such as
+        /* This auth pattern is used for most of the Student Participation area, servicing multiple endpoints such as
          * creating new participation learning plans, exclusion, inclusion, etc. for all learning activities.
+         * The premise was that if you can get to the Student Participation screen you can do all the actions presented
+         * there: but this isn't the case for reporting activities which allow you to get to Student Participation BUT
+         * not have the ability to do some of the actions there.
          *
          * Reporting activities have a special set of checks that cause this rule to permit or deny access to their
          * respective routes, because reporting activities are unlike other LMS activities: it's bureaucratically-driven
-         * rather than learning-driven.
+         * rather than learning-driven so things like creating/copying a reporting activity, modifying it, etc is
+         * actually precluded by nature of what that learning activity does.
          */
         $canModifyCustomParticipation = new Rule\All(
             /* Should only be accessible if the custom participation config is enabled
@@ -242,6 +246,45 @@ class Module extends BaseModule
             )
         );
 
+        /* This auth pattern is used for most of the Student Participation area, specifically for the Modify Existing
+         * Activity endpoint. For reporting activities, this url has no meaning and denies access for reporting activities.
+         *
+         * There's no real elegant way to succinctly phrase the endpoints that this auth rule services, so its var name
+         * is unfortunately a bit multifaceted: $canModifyExistingActivityCustomParticipation also services multiple
+         * endpoints where reporting activities are excluded from otherwise-common functionality.
+         */
+        $canModifyExistingActivityCustomParticipation = new Rule\All(
+            /* Should only be accessible if the custom participation config is enabled
+             */
+            new Rule\IsConfigOn(ConfigMapper::NAME_CUSTOM_ASSESSMENT_PARTICIPATION, $this->getConfig()),
+            /* Check if the custom participation is available
+             */
+            new IsCustomParticipationModifiable(),
+            new Rule\Any(
+                $isSuper,
+                new Rule\All(
+                    $canWrite,
+                    new AssessmentNotDeleted(),
+                    new IsModifyUnLocked(new LockedChecker($this->getTermMapper())),
+                    /* Anything EXCEPT reporting activities have access to Modify Existing Activity
+                     *
+                     * Yes, I know this is a bit gruesome.
+                     * This is a trap for the Swamp where new activity types need to be added to this list.
+                     */
+                    new ValidAssessmentType([
+                        AssessmentType::TYPE_PROJECT,
+                        AssessmentType::TYPE_DUE_WORK,
+                        AssessmentType::TYPE_TASK,
+                        AssessmentType::TYPE_QUIZ,
+                        AssessmentType::TYPE_LTI_ASSESSMENT,
+                        AssessmentType::TYPE_LESSON_PLAN,
+                        AssessmentType::TYPE_DIALOG_AGENT,
+                    ]),
+                )
+            )
+        );
+
+
         $canCopyAssessmentCustomParticipation = new Rule\All(
             $canModifyCustomParticipation,
             new IsCustomParticipationCopyable(),
@@ -286,7 +329,7 @@ class Module extends BaseModule
         /* Custom Participation
          */
         $this->register('GET', "$assRoute/participation", 'getAssessmentParticipationForm', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
-        $this->register('GET', "$assRoute/participation/new", 'getAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
+        $this->register('GET', "$assRoute/participation/new", 'getAssessmentParticipationLearningPlan', $canModifyExistingActivityCustomParticipation, $preloadAssessmentForParticipant);
         $this->register('POST', "$assRoute/participation/new", 'postCreateAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
         $this->register('GET', "$assRoute/participation/{planId:\d+}/modify", 'getUpdateAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
         $this->register('POST', "$assRoute/participation/{planId:\d+}/modify", 'postUpdateAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
