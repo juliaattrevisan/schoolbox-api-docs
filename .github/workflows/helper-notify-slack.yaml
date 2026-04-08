@@ -19,10 +19,6 @@ on:
         description: URL of the GitHub Actions run
         required: true
         type: string
-      webhook_url:
-        description: Webhook URL to post the message to.
-        required: true
-        type: string
       channel:
         description: Channel to post the message to.
         required: true
@@ -39,6 +35,10 @@ on:
           - WORKFLOW_NAME: value of `inputs.workflow_name`
         required: true
         type: string
+    secrets:
+      webhook_url:
+        description: Webhook URL to post the message to.
+        required: true
   workflow_dispatch:
     inputs:
       workflow_name:
@@ -61,8 +61,8 @@ on:
         required: true
         type: string
       webhook_url:
-        description: Webhook URL to post the message to.
-        required: true
+        description: Webhook URL to post the message to. Only needed when testing via manual dispatch; workflow_call uses the webhook_url secret instead.
+        required: false
         type: string
       channel:
         description: Channel to post the message to.
@@ -92,7 +92,7 @@ jobs:
           WORKFLOW_NAME: ${{ inputs.workflow_name }}
           REF_NAME: ${{ inputs.ref_name }}
           RUN_URL: ${{ inputs.run_url }}
-          WEBHOOK_URL: ${{ inputs.webhook_url }}
+          WEBHOOK_URL: ${{ inputs.webhook_url || secrets.webhook_url }}
           CHANNEL: ${{ inputs.channel }}
           MESSAGE: ${{ inputs.message }}
         run: |
