@@ -21,8 +21,10 @@ use Schoolbox\Socs\Factory as SocsFactory;
  */
 class ImporterTool extends CliTool\App
 {
-    private const SOCS_IMPORTER_LOCK_NAME = 'socs_importer';
-    public const LOCK_NAME = self::SOCS_IMPORTER_LOCK_NAME;
+    public const LOCK_NAME = 'socs_importer';
+
+    // this may be unique to each school, but we don't know yet... so hard coding it here for now...
+    private const SOCS_SCHOOL_ID = '2460';
 
     private const OPT_LONG_HELP = 'help';
     private const OPT_LONG_INSTANCE = 'instance:';
@@ -66,7 +68,7 @@ class ImporterTool extends CliTool\App
         }
 
         try {
-            $lock = $this->acquireLock(self::SOCS_IMPORTER_LOCK_NAME, self::LOCK_TTL);
+            $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TTL);
         } catch (\RuntimeException $e) {
             $logger->warning('Cannot acquire SOCS importer lock. Likely previous execution still in progress. Exiting');
             return;
@@ -78,13 +80,14 @@ class ImporterTool extends CliTool\App
         $runResults = (bool)$this->getOpt(self::OPT_LONG_RESULTS);
         $runTeams = (bool)$this->getOpt(self::OPT_LONG_TEAMS);
 
+        // if nothing is set, run them all
         if (!$runFixtures && !$runResults && !$runTeams) {
             $runFixtures = $runResults = $runTeams = true;
         }
 
         $host = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_HOST);
         $token = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN);
-        $schoolId = "2460";
+        $schoolId = self::SOCS_SCHOOL_ID; // this is currently hardcoded, but may change later...
 
         try {
             $composites = (new SocsFactory(
@@ -149,13 +152,5 @@ synchronisations will run. When one or more are provided, only the
 selected synchronisations will run.
 
 HELP;
-    }
-
-    /**
-     * Indicate whether this CLI tool is permitted to run as root.
-     */
-    public function runAsRoot(): ?bool
-    {
-        return parent::runAsRoot();
     }
 }
