@@ -11,6 +11,8 @@ namespace Schoolbox\Socs\Cli;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Socs\Factory as SocsFactory;
+use Schoolbox\Socs\Log\Guid as SocsLogGuid;
+use Schoolbox\Socs\Log\Mapper as SocsLogMapper;
 
 /**
  * CLI wrapper for the SOCS importer.
@@ -89,6 +91,22 @@ class ImporterTool extends CliTool\App
         $token = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN);
         $schoolId = self::SOCS_SCHOOL_ID; // this is currently hardcoded, but may change later...
 
+        $runId = (new SocsLogGuid())->generate();
+        $importLogMapper = SocsLogMapper::getInstance();
+        $importLog = null;
+
+        $scriptParts = [];
+        if ($runFixtures) {
+            $scriptParts[] = 'fixtures';
+        }
+        if ($runResults) {
+            $scriptParts[] = 'results';
+        }
+        if ($runTeams) {
+            $scriptParts[] = 'teams';
+        }
+        $scriptName = sprintf('socs:%s', implode('+', $scriptParts));
+
         try {
             $composites = (new SocsFactory(
                 $logger,
@@ -103,10 +121,20 @@ class ImporterTool extends CliTool\App
                 $runTeams
             );
         } catch (\DomainException $e) {
+            if ($this->perform()) {
+                $importLog = $importLogMapper->start($runId, $scriptName);
+                $importLogMapper->error($importLog, $e->getMessage());
+                $importLogMapper->prune();
+            }
+
             $logger->warning($e->getMessage());
             $lock->release();
 
             return;
+        }
+
+        if ($this->perform()) {
+            $importLog = $importLogMapper->start($runId, $scriptName);
         }
 
         try {
@@ -125,8 +153,18 @@ class ImporterTool extends CliTool\App
                 $logger->info('SOCS importer planning finished.');
             }
         } catch (\Exception $e) {
+            if ($this->perform() && $importLog !== null) {
+                $importLogMapper->error($importLog, $e->getMessage());
+                $importLogMapper->prune();
+            }
+
             $logger->warning($e->getMessage());
         } finally {
+            if ($this->perform() && $importLog !== null && !$importLog->isError()) {
+                $importLogMapper->finish($importLog);
+                $importLogMapper->prune();
+            }
+
             $lock->release();
         }
     }
