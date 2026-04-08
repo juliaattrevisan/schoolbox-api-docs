@@ -31,6 +31,7 @@
                 iconCollapsed: DEFAULT_ICON_COLLAPSED,
                 iconExpanded: DEFAULT_ICON_EXPANDED,
                 preventDefault: true, // whether event.preventDefault() should be called on the toggle's click event
+                event: "click",
             };
 
             return $.extend(defaults, options);
@@ -41,7 +42,7 @@
          */
         function setupCollapsable() {
             var self = this;
-            $(self.config.element).on("click.collapsable", function (event) {
+            $(self.config.element).on(`${self.config.event}.collapsable`, function (event) {
                 if (self.config.preventDefault === true) {
                     event.preventDefault();
                 }

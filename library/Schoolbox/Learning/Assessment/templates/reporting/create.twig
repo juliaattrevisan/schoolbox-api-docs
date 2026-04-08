@@ -94,7 +94,7 @@
     <legend>Supporting Data</legend>
 
     {% set supportingDataEnable = assessment.supportingDataEnable %}
-    {% set supportingDataCollapseState = supportingDataEnable ? 'expanded' : 'collapsed' %}
+    {% set supportingDataCollapseState = supportingDataEnable ? 'uncollapsed' : 'collapsed' %}
     {% set supportingDataHideClass = supportingDataEnable ? '' : ' hide' %}
 
     <div class="row">
@@ -108,9 +108,10 @@
                     id="supporting-enable"
                     name="reporting[supporting][enable]"
                     type="checkbox"
+                    data-collapser="supporting-data"
                     {% if supportingDataEnable %}checked="checked"{% endif %}
                 />
-                <label for="supporting-enable" data-collapser="supporting-data">
+                <label for="supporting-enable">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>
                 </label>
@@ -321,10 +322,11 @@
             checkboxes: "[data-checkbox-work-type]"
         });
 
-        $('[data-collapser]').collapsable({
+        $('[data-collapser=supporting-data]').collapsable({
             iconCollapsed: "",
             iconExpanded: "",
             preventDefault: false,
+            event: "change",
         });
     });
 </script>
