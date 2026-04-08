@@ -40,7 +40,6 @@ class Cleanup implements IStrategy
             $this->lock->refresh();
 
             $db = $this->resultMapper->getDatabase();
-            $table = $this->resultMapper->getTable();
 
             // Soft-delete results that were not touched during this import
             // run. Any results that were re-imported will have an updated

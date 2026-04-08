@@ -41,7 +41,6 @@ class Prepare implements IStrategy
             $this->lock->refresh();
 
             $db = $this->matchupMapper->getDatabase();
-            $table = $this->matchupMapper->getTable();
 
             // Mark existing SOCS matchups as "stale" until they are
             // re-saved by the current import run.

@@ -40,7 +40,6 @@ class Prepare implements IStrategy
             $this->lock->refresh();
 
             $db = $this->resultMapper->getDatabase();
-            $table = $this->resultMapper->getTable();
 
             // Mark all existing results as "stale" until they are re-saved
             // by the current import run.

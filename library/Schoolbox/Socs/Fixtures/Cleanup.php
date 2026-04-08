@@ -40,7 +40,6 @@ class Cleanup implements IStrategy
             $this->lock->refresh();
 
             $db = $this->matchupMapper->getDatabase();
-            $table = $this->matchupMapper->getTable();
 
             // Soft-delete SOCS matchups that were not touched during this
             // import run. Their related results are removed via mapper
