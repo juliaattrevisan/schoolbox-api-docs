@@ -201,7 +201,7 @@ class Visibility
         }
 
         // Handle the case where the user is a parent of a learner.
-        if ($respectWorkTypeVisibility && $childLearner !== null) {
+        if ($respectWorkTypeVisibility && $childLearner !== null && $workType->isVisibleToParents()) {
             if ($showClosed) {
                 return true;
             }
