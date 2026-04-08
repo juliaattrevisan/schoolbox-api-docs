@@ -150,18 +150,18 @@ class VisibilityTest extends TestCase
             [$isParticipant, $studentRole, $nonInstructor, $workTypeSILP, $closed, $showClosed, $now, true],
             [$isParticipant, $studentRole, $nonInstructor, $workTypeSILP, $closed, $hideClosed, $now, false],
 
-//            // Participating student non-instructor, work type: Staff-Instructors-Parents.
-//            // TODO: Figure out how to handle this case.  Student is not a learner and not an instructor.
-//            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $unpublished, $showClosed, $now, ],
-//            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $unpublished, $hideClosed, $now, ],
-//            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $upcoming, $showClosed, $now, ],
-//            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $upcoming, $hideClosed, $now, ],
-//            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $open, $showClosed, $now, ],
-//            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $open, $hideClosed, $now, ],
-//            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $overdue, $showClosed, $now, ],
-//            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $overdue, $hideClosed, $now, ],
-//            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $closed, $showClosed, $now, ],
-//            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $closed, $hideClosed, $now, ],
+            // Participating student non-instructor, work type: Staff-Instructors-Parents.
+            // I see if it's published, unless it's closed and hideClosed is on
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $unpublished, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $unpublished, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $upcoming, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $upcoming, $hideClosed, $now, true],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $open, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $open, $hideClosed, $now, true],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $overdue, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $overdue, $hideClosed, $now, true],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $closed, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $closed, $hideClosed, $now, false],
 
             // Participating student non-instructor, work type: Staff-Instructors-Learners.
             // I see if it's published, unless it's closed and hideClosed is on
