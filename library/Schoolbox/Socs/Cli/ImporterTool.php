@@ -32,6 +32,7 @@ class ImporterTool extends CliTool\App
 {
     private const SOCS_IMPORTER_LOCK_NAME = 'socs_importer';
     public const LOCK_NAME = self::SOCS_IMPORTER_LOCK_NAME;
+    private const SOCS_SCHOOL_ID = '2460';
     private const OPT_LONG_HELP = 'help';
     private const OPT_LONG_INSTANCE = 'instance:';
     private const LOCK_TTL = 120;
@@ -105,8 +106,16 @@ HELP;
 
         $logger->info('SOCS to Schoolbox Fixtures synchronisation starting');
 
+        $token = (string)$this->getConfig()->get('socs_endpoint_token');
+        if ('' === $token) {
+            $logger->warning('Missing SOCS endpoint token; exiting');
+            return;
+        }
+
+        $baseUrl = rtrim($host, '/');
+        $fixturesUrl = $baseUrl . '/fixturecalendar.ashx';
+
         $client = new Client([
-            'base_uri' => $host,
             'timeout' => 300,
             'http_errors' => false,
         ]);
@@ -128,14 +137,16 @@ HELP;
         $logger->info(sprintf('Downloading SOCS fixtures from %s to %s', $startDate, $endDate));
 
         $query = [
+            'ID'        => self::SOCS_SCHOOL_ID,
+            'key'       => $token,
             'startdate' => $startDate,
-            'enddate' => $endDate,
+            'enddate'   => $endDate,
         ];
 
-        $this->noteUrlUsed($host, $query);
+        $this->noteUrlUsed($fixturesUrl, $query);
 
         try {
-            $response = $client->request('GET', '', [
+            $response = $client->request('GET', $fixturesUrl, [
                 'query' => $query,
             ]);
         } catch (GuzzleException $e) {
