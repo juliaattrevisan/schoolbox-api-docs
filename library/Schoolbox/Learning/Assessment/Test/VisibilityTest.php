@@ -34,7 +34,7 @@ use Schoolbox\Resource\Folder;
  * 1. isParticipant: [true, false]
  * 2. isStaff:       [true, false]
  * 3. isInstructor:  [DENY, WRITE]
- * 4. workType:      [none, non-SIVO, SIVO]
+ * 4. workType:      [none, staff-instructors-learners-parents, staff-instructors-parents, staff-instructors-learners, staff-instructors]
  * 5. showClosed:    [true, false]
  * 6. state:         [unpublished, upcoming, open, overdue, closed]
  *
@@ -104,10 +104,13 @@ class VisibilityTest extends TestCase
         [$nonInstructor, $isInstructor, $isLearner] = self::buildUsers();
 
         // workType dimension
-        $workTypeNone        = null;
-        $workTypeNormal      = (new WorkType\Model())->setIsVisibleToParents(true)->setIsVisibleToLearners(true);
-        $workTypeSivo        = (new WorkType\Model())->setIsVisibleToParents(false)->setIsVisibleToLearners(false);
-        $workTypeParentsOnly = (new WorkType\Model())->setIsVisibleToParents(true)->setIsVisibleToLearners(false);
+        // The four visibility types are defined in WorkType\Mapper.
+        // They are all possible combinations of two booleans (is_visible_to_parents, is_visible_to_learners).
+        $workTypeNone = null;
+        $workTypeSI   = (new WorkType\Model())->setIsVisibleToParents(false)->setIsVisibleToLearners(false);
+        $workTypeSIP  = (new WorkType\Model())->setIsVisibleToParents(true)->setIsVisibleToLearners(false);
+        $workTypeSIL  = (new WorkType\Model())->setIsVisibleToParents(false)->setIsVisibleToLearners(true);
+        $workTypeSILP = (new WorkType\Model())->setIsVisibleToParents(true)->setIsVisibleToLearners(true);
 
         // Assessment temporal state
         $now = new Alaress_Date_Format(self::NOW_DATABASE, Alaress_Date_Format::DATABASE_FORMAT);
@@ -119,7 +122,9 @@ class VisibilityTest extends TestCase
 
         // Exhaustive combination test.
         return [
-            // Participating student non-instructor, no work type:
+            // --- Participating student non-instructor ---
+
+            // Participating student non-instructor, work type: None.
             // I see if it's published, unless it's closed and hideClosed is on
             [$isParticipant, $studentRole, $nonInstructor, $workTypeNone, $unpublished, $showClosed, $now, false],
             [$isParticipant, $studentRole, $nonInstructor, $workTypeNone, $unpublished, $hideClosed, $now, false],
@@ -132,33 +137,59 @@ class VisibilityTest extends TestCase
             [$isParticipant, $studentRole, $nonInstructor, $workTypeNone, $closed, $showClosed, $now, true],
             [$isParticipant, $studentRole, $nonInstructor, $workTypeNone, $closed, $hideClosed, $now, false],
 
-            // Participating student non-instructor, non-SIVO work type:
+            // Participating student non-instructor, work type: Staff-Instructors-Learners-Parents.
             // I see if it's published, unless it's closed and hideClosed is on
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeNormal, $unpublished, $showClosed, $now, false],
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeNormal, $unpublished, $hideClosed, $now, false],
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeNormal, $upcoming, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeNormal, $upcoming, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeNormal, $open, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeNormal, $open, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeNormal, $overdue, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeNormal, $overdue, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeNormal, $closed, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeNormal, $closed, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSILP, $unpublished, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSILP, $unpublished, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSILP, $upcoming, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSILP, $upcoming, $hideClosed, $now, true],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSILP, $open, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSILP, $open, $hideClosed, $now, true],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSILP, $overdue, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSILP, $overdue, $hideClosed, $now, true],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSILP, $closed, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSILP, $closed, $hideClosed, $now, false],
 
-            // Participating student non-instructor, SIVO work type:
+            // Participating student non-instructor, work type: Staff-Instructors-Parents.
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $unpublished, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $unpublished, $hideClosed, $now, ],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $upcoming, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $upcoming, $hideClosed, $now, ],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $open, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $open, $hideClosed, $now, ],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $overdue, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $overdue, $hideClosed, $now, ],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $closed, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIP, $closed, $hideClosed, $now, ],
+
+            // Participating student non-instructor, work type: Staff-Instructors-Learners.
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIL, $unpublished, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIL, $unpublished, $hideClosed, $now, ],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIL, $upcoming, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIL, $upcoming, $hideClosed, $now, ],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIL, $open, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIL, $open, $hideClosed, $now, ],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIL, $overdue, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIL, $overdue, $hideClosed, $now, ],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIL, $closed, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSIL, $closed, $hideClosed, $now, ],
+
+            // Participating student non-instructor, work type: Staff-Instructors.
             // I never see it
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeSivo, $unpublished, $showClosed, $now, false],
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeSivo, $unpublished, $hideClosed, $now, false],
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeSivo, $upcoming, $showClosed, $now, false],
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeSivo, $upcoming, $hideClosed, $now, false],
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeSivo, $open, $showClosed, $now, false],
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeSivo, $open, $hideClosed, $now, false],
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeSivo, $overdue, $showClosed, $now, false],
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeSivo, $overdue, $hideClosed, $now, false],
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeSivo, $closed, $showClosed, $now, false],
-            [$isParticipant, $studentRole, $nonInstructor, $workTypeSivo, $closed, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSI, $unpublished, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSI, $unpublished, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSI, $upcoming, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSI, $upcoming, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSI, $open, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSI, $open, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSI, $overdue, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSI, $overdue, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSI, $closed, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructor, $workTypeSI, $closed, $hideClosed, $now, false],
 
-            // Participating student instructor, no work type:
+            // --- Participating student instructor ---
+
+            // Participating student instructor, work type: None.
             // I see it unless it's closed and hideClosed is on
             [$isParticipant, $studentRole, $isInstructor, $workTypeNone, $unpublished, $showClosed, $now, true],
             [$isParticipant, $studentRole, $isInstructor, $workTypeNone, $unpublished, $hideClosed, $now, true],
@@ -171,33 +202,59 @@ class VisibilityTest extends TestCase
             [$isParticipant, $studentRole, $isInstructor, $workTypeNone, $closed, $showClosed, $now, true],
             [$isParticipant, $studentRole, $isInstructor, $workTypeNone, $closed, $hideClosed, $now, false],
 
-            // Participating student instructor, non-SIVO work type:
+            // Participating student instructor, work type: Staff-Instructors-Learners-Parents.
             // I see it unless it's closed and hideClosed is on
-            [$isParticipant, $studentRole, $isInstructor, $workTypeNormal, $unpublished, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $isInstructor, $workTypeNormal, $unpublished, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $isInstructor, $workTypeNormal, $upcoming, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $isInstructor, $workTypeNormal, $upcoming, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $isInstructor, $workTypeNormal, $open, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $isInstructor, $workTypeNormal, $open, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $isInstructor, $workTypeNormal, $overdue, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $isInstructor, $workTypeNormal, $overdue, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $isInstructor, $workTypeNormal, $closed, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $isInstructor, $workTypeNormal, $closed, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSILP, $unpublished, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSILP, $unpublished, $hideClosed, $now, true],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSILP, $upcoming, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSILP, $upcoming, $hideClosed, $now, true],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSILP, $open, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSILP, $open, $hideClosed, $now, true],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSILP, $overdue, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSILP, $overdue, $hideClosed, $now, true],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSILP, $closed, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSILP, $closed, $hideClosed, $now, false],
 
-            // Participating student instructor, SIVO work type:
+            // Participating student instructor, work type: Staff-Instructors-Parents.
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIP, $unpublished, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIP, $unpublished, $hideClosed, $now, ],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIP, $upcoming, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIP, $upcoming, $hideClosed, $now, ],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIP, $open, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIP, $open, $hideClosed, $now, ],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIP, $overdue, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIP, $overdue, $hideClosed, $now, ],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIP, $closed, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIP, $closed, $hideClosed, $now, ],
+
+            // Participating student instructor, work type: Staff-Instructors-Learners.
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIL, $unpublished, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIL, $unpublished, $hideClosed, $now, ],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIL, $upcoming, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIL, $upcoming, $hideClosed, $now, ],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIL, $open, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIL, $open, $hideClosed, $now, ],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIL, $overdue, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIL, $overdue, $hideClosed, $now, ],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIL, $closed, $showClosed, $now, ],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSIL, $closed, $hideClosed, $now, ],
+
+            // Participating student instructor, SIVO work type: Staff-Instructors.
             // I see it unless it's closed and hideClosed is on
-            [$isParticipant, $studentRole, $isInstructor, $workTypeSivo, $unpublished, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $isInstructor, $workTypeSivo, $unpublished, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $isInstructor, $workTypeSivo, $upcoming, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $isInstructor, $workTypeSivo, $upcoming, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $isInstructor, $workTypeSivo, $open, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $isInstructor, $workTypeSivo, $open, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $isInstructor, $workTypeSivo, $overdue, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $isInstructor, $workTypeSivo, $overdue, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $isInstructor, $workTypeSivo, $closed, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $isInstructor, $workTypeSivo, $closed, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSI, $unpublished, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSI, $unpublished, $hideClosed, $now, true],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSI, $upcoming, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSI, $upcoming, $hideClosed, $now, true],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSI, $open, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSI, $open, $hideClosed, $now, true],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSI, $overdue, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSI, $overdue, $hideClosed, $now, true],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSI, $closed, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $isInstructor, $workTypeSI, $closed, $hideClosed, $now, false],
 
-            // Participating staff non-instructor, no work type:
+            // --- Participating staff non-instructor ---
+
+            // Participating staff non-instructor, work type: None.
             // I see it unless it's closed and hideClosed is on
             [$isParticipant, $staffRole, $nonInstructor, $workTypeNone, $unpublished, $showClosed, $now, true],
             [$isParticipant, $staffRole, $nonInstructor, $workTypeNone, $unpublished, $hideClosed, $now, true],
@@ -210,33 +267,59 @@ class VisibilityTest extends TestCase
             [$isParticipant, $staffRole, $nonInstructor, $workTypeNone, $closed, $showClosed, $now, true],
             [$isParticipant, $staffRole, $nonInstructor, $workTypeNone, $closed, $hideClosed, $now, false],
 
-            // Participating staff non-instructor, non-SIVO work type:
+            // Participating staff non-instructor, work type: Staff-Instructors-Learners-Parents.
             // I see it unless it's closed and hideClosed is on
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeNormal, $unpublished, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeNormal, $unpublished, $hideClosed, $now, true],
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeNormal, $upcoming, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeNormal, $upcoming, $hideClosed, $now, true],
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeNormal, $open, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeNormal, $open, $hideClosed, $now, true],
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeNormal, $overdue, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeNormal, $overdue, $hideClosed, $now, true],
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeNormal, $closed, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeNormal, $closed, $hideClosed, $now, false],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSILP, $unpublished, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSILP, $unpublished, $hideClosed, $now, true],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSILP, $upcoming, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSILP, $upcoming, $hideClosed, $now, true],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSILP, $open, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSILP, $open, $hideClosed, $now, true],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSILP, $overdue, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSILP, $overdue, $hideClosed, $now, true],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSILP, $closed, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSILP, $closed, $hideClosed, $now, false],
 
-            // Participating staff non-instructor, SIVO work type:
+            // Participating staff non-instructor, work type: Staff-Instructors-Parents.
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIP, $unpublished, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIP, $unpublished, $hideClosed, $now, ],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIP, $upcoming, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIP, $upcoming, $hideClosed, $now, ],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIP, $open, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIP, $open, $hideClosed, $now, ],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIP, $overdue, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIP, $overdue, $hideClosed, $now, ],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIP, $closed, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIP, $closed, $hideClosed, $now, ],
+
+            // Participating staff non-instructor, work type: Staff-Instructors-Learners.
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIL, $unpublished, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIL, $unpublished, $hideClosed, $now, ],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIL, $upcoming, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIL, $upcoming, $hideClosed, $now, ],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIL, $open, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIL, $open, $hideClosed, $now, ],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIL, $overdue, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIL, $overdue, $hideClosed, $now, ],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIL, $closed, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSIL, $closed, $hideClosed, $now, ],
+
+            // Participating staff non-instructor, work type: Staff-Instructors.
             // I see it unless it's closed and hideClosed is on
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeSivo, $unpublished, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeSivo, $unpublished, $hideClosed, $now, true],
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeSivo, $upcoming, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeSivo, $upcoming, $hideClosed, $now, true],
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeSivo, $open, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeSivo, $open, $hideClosed, $now, true],
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeSivo, $overdue, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeSivo, $overdue, $hideClosed, $now, true],
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeSivo, $closed, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $nonInstructor, $workTypeSivo, $closed, $hideClosed, $now, false],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSI, $unpublished, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSI, $unpublished, $hideClosed, $now, true],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSI, $upcoming, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSI, $upcoming, $hideClosed, $now, true],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSI, $open, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSI, $open, $hideClosed, $now, true],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSI, $overdue, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSI, $overdue, $hideClosed, $now, true],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSI, $closed, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $nonInstructor, $workTypeSI, $closed, $hideClosed, $now, false],
 
-            // Participating staff instructor, no work type:
+            // --- Participating staff instructor ---
+
+            // Participating staff instructor, work type: None.
             // I see it unless it's closed and hideClosed is on
             [$isParticipant, $staffRole, $isInstructor, $workTypeNone, $unpublished, $showClosed, $now, true],
             [$isParticipant, $staffRole, $isInstructor, $workTypeNone, $unpublished, $hideClosed, $now, true],
@@ -249,33 +332,59 @@ class VisibilityTest extends TestCase
             [$isParticipant, $staffRole, $isInstructor, $workTypeNone, $closed, $showClosed, $now, true],
             [$isParticipant, $staffRole, $isInstructor, $workTypeNone, $closed, $hideClosed, $now, false],
 
-            // Participating staff instructor, non-SIVO work type:
+            // Participating staff instructor, work type: Staff-Instructors-Learners-Parents.
             // I see it unless it's closed and hideClosed is on
-            [$isParticipant, $staffRole, $isInstructor, $workTypeNormal, $unpublished, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $isInstructor, $workTypeNormal, $unpublished, $hideClosed, $now, true],
-            [$isParticipant, $staffRole, $isInstructor, $workTypeNormal, $upcoming, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $isInstructor, $workTypeNormal, $upcoming, $hideClosed, $now, true],
-            [$isParticipant, $staffRole, $isInstructor, $workTypeNormal, $open, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $isInstructor, $workTypeNormal, $open, $hideClosed, $now, true],
-            [$isParticipant, $staffRole, $isInstructor, $workTypeNormal, $overdue, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $isInstructor, $workTypeNormal, $overdue, $hideClosed, $now, true],
-            [$isParticipant, $staffRole, $isInstructor, $workTypeNormal, $closed, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $isInstructor, $workTypeNormal, $closed, $hideClosed, $now, false],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSILP, $unpublished, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSILP, $unpublished, $hideClosed, $now, true],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSILP, $upcoming, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSILP, $upcoming, $hideClosed, $now, true],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSILP, $open, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSILP, $open, $hideClosed, $now, true],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSILP, $overdue, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSILP, $overdue, $hideClosed, $now, true],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSILP, $closed, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSILP, $closed, $hideClosed, $now, false],
 
-            // Participating staff instructor, SIVO work type:
+            // Participating staff instructor, work type: Staff-Instructors-Parents.
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIP, $unpublished, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIP, $unpublished, $hideClosed, $now, ],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIP, $upcoming, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIP, $upcoming, $hideClosed, $now, ],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIP, $open, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIP, $open, $hideClosed, $now, ],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIP, $overdue, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIP, $overdue, $hideClosed, $now, ],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIP, $closed, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIP, $closed, $hideClosed, $now, ],
+
+            // Participating staff instructor, work type: Staff-Instructors-Learners.
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIL, $unpublished, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIL, $unpublished, $hideClosed, $now, ],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIL, $upcoming, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIL, $upcoming, $hideClosed, $now, ],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIL, $open, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIL, $open, $hideClosed, $now, ],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIL, $overdue, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIL, $overdue, $hideClosed, $now, ],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIL, $closed, $showClosed, $now, ],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSIL, $closed, $hideClosed, $now, ],
+
+            // Participating staff instructor, work type: Staff-Instructors.
             // I see it unless it's closed and hideClosed is on
-            [$isParticipant, $staffRole, $isInstructor, $workTypeSivo, $unpublished, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $isInstructor, $workTypeSivo, $unpublished, $hideClosed, $now, true],
-            [$isParticipant, $staffRole, $isInstructor, $workTypeSivo, $upcoming, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $isInstructor, $workTypeSivo, $upcoming, $hideClosed, $now, true],
-            [$isParticipant, $staffRole, $isInstructor, $workTypeSivo, $open, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $isInstructor, $workTypeSivo, $open, $hideClosed, $now, true],
-            [$isParticipant, $staffRole, $isInstructor, $workTypeSivo, $overdue, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $isInstructor, $workTypeSivo, $overdue, $hideClosed, $now, true],
-            [$isParticipant, $staffRole, $isInstructor, $workTypeSivo, $closed, $showClosed, $now, true],
-            [$isParticipant, $staffRole, $isInstructor, $workTypeSivo, $closed, $hideClosed, $now, false],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSI, $unpublished, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSI, $unpublished, $hideClosed, $now, true],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSI, $upcoming, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSI, $upcoming, $hideClosed, $now, true],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSI, $open, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSI, $open, $hideClosed, $now, true],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSI, $overdue, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSI, $overdue, $hideClosed, $now, true],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSI, $closed, $showClosed, $now, true],
+            [$isParticipant, $staffRole, $isInstructor, $workTypeSI, $closed, $hideClosed, $now, false],
 
-            // Non-participating student non-instructor, no work type:
+            // --- Non-participating student non-instructor ---
+
+            // Non-participating student non-instructor, work type: None.
             // I never see it
             [$notParticipant, $studentRole, $nonInstructor, $workTypeNone, $unpublished, $showClosed, $now, false],
             [$notParticipant, $studentRole, $nonInstructor, $workTypeNone, $unpublished, $hideClosed, $now, false],
@@ -288,33 +397,59 @@ class VisibilityTest extends TestCase
             [$notParticipant, $studentRole, $nonInstructor, $workTypeNone, $closed, $showClosed, $now, false],
             [$notParticipant, $studentRole, $nonInstructor, $workTypeNone, $closed, $hideClosed, $now, false],
 
-            // Non-participating student non-instructor, non-SIVO work type:
+            // Non-participating student non-instructor, work type: Staff-Instructors-Learners-Parents.
             // I never see it
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeNormal, $unpublished, $showClosed, $now, false],
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeNormal, $unpublished, $hideClosed, $now, false],
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeNormal, $upcoming, $showClosed, $now, false],
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeNormal, $upcoming, $hideClosed, $now, false],
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeNormal, $open, $showClosed, $now, false],
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeNormal, $open, $hideClosed, $now, false],
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeNormal, $overdue, $showClosed, $now, false],
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeNormal, $overdue, $hideClosed, $now, false],
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeNormal, $closed, $showClosed, $now, false],
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeNormal, $closed, $hideClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSILP, $unpublished, $showClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSILP, $unpublished, $hideClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSILP, $upcoming, $showClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSILP, $upcoming, $hideClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSILP, $open, $showClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSILP, $open, $hideClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSILP, $overdue, $showClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSILP, $overdue, $hideClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSILP, $closed, $showClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSILP, $closed, $hideClosed, $now, false],
 
-            // Non-participating student non-instructor, SIVO work type:
+            // Non-participating student non-instructor, work type: Staff-Instructors-Parents.
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIP, $unpublished, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIP, $unpublished, $hideClosed, $now, ],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIP, $upcoming, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIP, $upcoming, $hideClosed, $now, ],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIP, $open, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIP, $open, $hideClosed, $now, ],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIP, $overdue, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIP, $overdue, $hideClosed, $now, ],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIP, $closed, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIP, $closed, $hideClosed, $now, ],
+
+            // Non-participating student non-instructor, work type: Staff-Instructors-Learners.
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIL, $unpublished, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIL, $unpublished, $hideClosed, $now, ],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIL, $upcoming, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIL, $upcoming, $hideClosed, $now, ],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIL, $open, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIL, $open, $hideClosed, $now, ],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIL, $overdue, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIL, $overdue, $hideClosed, $now, ],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIL, $closed, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSIL, $closed, $hideClosed, $now, ],
+
+            // Non-participating student non-instructor, work type: Staff-Instructors.
             // I never see it
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeSivo, $unpublished, $showClosed, $now, false],
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeSivo, $unpublished, $hideClosed, $now, false],
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeSivo, $upcoming, $showClosed, $now, false],
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeSivo, $upcoming, $hideClosed, $now, false],
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeSivo, $open, $showClosed, $now, false],
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeSivo, $open, $hideClosed, $now, false],
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeSivo, $overdue, $showClosed, $now, false],
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeSivo, $overdue, $hideClosed, $now, false],
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeSivo, $closed, $showClosed, $now, false],
-            [$notParticipant, $studentRole, $nonInstructor, $workTypeSivo, $closed, $hideClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSI, $unpublished, $showClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSI, $unpublished, $hideClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSI, $upcoming, $showClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSI, $upcoming, $hideClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSI, $open, $showClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSI, $open, $hideClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSI, $overdue, $showClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSI, $overdue, $hideClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSI, $closed, $showClosed, $now, false],
+            [$notParticipant, $studentRole, $nonInstructor, $workTypeSI, $closed, $hideClosed, $now, false],
 
-            // Non-participating student instructor, no work type:
+            // --- Non-participating student instructor ---
+
+            // Non-participating student instructor, work type: None.
             // I see it unless it's closed and hideClosed is on
             [$notParticipant, $studentRole, $isInstructor, $workTypeNone, $unpublished, $showClosed, $now, true],
             [$notParticipant, $studentRole, $isInstructor, $workTypeNone, $unpublished, $hideClosed, $now, true],
@@ -327,33 +462,59 @@ class VisibilityTest extends TestCase
             [$notParticipant, $studentRole, $isInstructor, $workTypeNone, $closed, $showClosed, $now, true],
             [$notParticipant, $studentRole, $isInstructor, $workTypeNone, $closed, $hideClosed, $now, false],
 
-            // Non-participating student instructor, non-SIVO work type:
+            // Non-participating student instructor, work type: Staff-Instructors-Learners-Parents.
             // I see it unless it's closed and hideClosed is on
-            [$notParticipant, $studentRole, $isInstructor, $workTypeNormal, $unpublished, $showClosed, $now, true],
-            [$notParticipant, $studentRole, $isInstructor, $workTypeNormal, $unpublished, $hideClosed, $now, true],
-            [$notParticipant, $studentRole, $isInstructor, $workTypeNormal, $upcoming, $showClosed, $now, true],
-            [$notParticipant, $studentRole, $isInstructor, $workTypeNormal, $upcoming, $hideClosed, $now, true],
-            [$notParticipant, $studentRole, $isInstructor, $workTypeNormal, $open, $showClosed, $now, true],
-            [$notParticipant, $studentRole, $isInstructor, $workTypeNormal, $open, $hideClosed, $now, true],
-            [$notParticipant, $studentRole, $isInstructor, $workTypeNormal, $overdue, $showClosed, $now, true],
-            [$notParticipant, $studentRole, $isInstructor, $workTypeNormal, $overdue, $hideClosed, $now, true],
-            [$notParticipant, $studentRole, $isInstructor, $workTypeNormal, $closed, $showClosed, $now, true],
-            [$notParticipant, $studentRole, $isInstructor, $workTypeNormal, $closed, $hideClosed, $now, false],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSILP, $unpublished, $showClosed, $now, true],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSILP, $unpublished, $hideClosed, $now, true],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSILP, $upcoming, $showClosed, $now, true],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSILP, $upcoming, $hideClosed, $now, true],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSILP, $open, $showClosed, $now, true],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSILP, $open, $hideClosed, $now, true],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSILP, $overdue, $showClosed, $now, true],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSILP, $overdue, $hideClosed, $now, true],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSILP, $closed, $showClosed, $now, true],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSILP, $closed, $hideClosed, $now, false],
 
-            // Non-participating student instructor, SIVO work type:
+            // Non-participating student instructor, work type: Staff-Instructors-Parents.
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIP, $unpublished, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIP, $unpublished, $hideClosed, $now, ],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIP, $upcoming, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIP, $upcoming, $hideClosed, $now, ],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIP, $open, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIP, $open, $hideClosed, $now, ],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIP, $overdue, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIP, $overdue, $hideClosed, $now, ],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIP, $closed, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIP, $closed, $hideClosed, $now, ],
+
+            // Non-participating student instructor, work type: Staff-Instructors-Learners.
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIL, $unpublished, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIL, $unpublished, $hideClosed, $now, ],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIL, $upcoming, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIL, $upcoming, $hideClosed, $now, ],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIL, $open, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIL, $open, $hideClosed, $now, ],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIL, $overdue, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIL, $overdue, $hideClosed, $now, ],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIL, $closed, $showClosed, $now, ],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSIL, $closed, $hideClosed, $now, ],
+
+            // Non-participating student instructor, work type: Staff-Instructors.
             // I see it unless it's closed and hideClosed is on
-            [$notParticipant, $studentRole, $isInstructor, $workTypeSivo, $unpublished, $showClosed, $now, true],
-            [$notParticipant, $studentRole, $isInstructor, $workTypeSivo, $unpublished, $hideClosed, $now, true],
-            [$notParticipant, $studentRole, $isInstructor, $workTypeSivo, $upcoming, $showClosed, $now, true],
-            [$notParticipant, $studentRole, $isInstructor, $workTypeSivo, $upcoming, $hideClosed, $now, true],
-            [$notParticipant, $studentRole, $isInstructor, $workTypeSivo, $open, $showClosed, $now, true],
-            [$notParticipant, $studentRole, $isInstructor, $workTypeSivo, $open, $hideClosed, $now, true],
-            [$notParticipant, $studentRole, $isInstructor, $workTypeSivo, $overdue, $showClosed, $now, true],
-            [$notParticipant, $studentRole, $isInstructor, $workTypeSivo, $overdue, $hideClosed, $now, true],
-            [$notParticipant, $studentRole, $isInstructor, $workTypeSivo, $closed, $showClosed, $now, true],
-            [$notParticipant, $studentRole, $isInstructor, $workTypeSivo, $closed, $hideClosed, $now, false],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSI, $unpublished, $showClosed, $now, true],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSI, $unpublished, $hideClosed, $now, true],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSI, $upcoming, $showClosed, $now, true],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSI, $upcoming, $hideClosed, $now, true],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSI, $open, $showClosed, $now, true],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSI, $open, $hideClosed, $now, true],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSI, $overdue, $showClosed, $now, true],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSI, $overdue, $hideClosed, $now, true],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSI, $closed, $showClosed, $now, true],
+            [$notParticipant, $studentRole, $isInstructor, $workTypeSI, $closed, $hideClosed, $now, false],
 
-            // Non-participating staff non-instructor, no work type:
+            // --- Non-participating staff non-instructor ---
+
+            // Non-participating staff non-instructor, work type: None.
             // I see it unless it's closed and hideClosed is on
             [$notParticipant, $staffRole, $nonInstructor, $workTypeNone, $unpublished, $showClosed, $now, true],
             [$notParticipant, $staffRole, $nonInstructor, $workTypeNone, $unpublished, $hideClosed, $now, true],
@@ -366,33 +527,59 @@ class VisibilityTest extends TestCase
             [$notParticipant, $staffRole, $nonInstructor, $workTypeNone, $closed, $showClosed, $now, true],
             [$notParticipant, $staffRole, $nonInstructor, $workTypeNone, $closed, $hideClosed, $now, false],
 
-            // Non-participating staff non-instructor, non-SIVO work type:
+            // Non-participating staff non-instructor, work type: Staff-Instructors-Learners-Parents.
             // I see it unless it's closed and hideClosed is on
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeNormal, $unpublished, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeNormal, $unpublished, $hideClosed, $now, true],
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeNormal, $upcoming, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeNormal, $upcoming, $hideClosed, $now, true],
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeNormal, $open, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeNormal, $open, $hideClosed, $now, true],
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeNormal, $overdue, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeNormal, $overdue, $hideClosed, $now, true],
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeNormal, $closed, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeNormal, $closed, $hideClosed, $now, false],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSILP, $unpublished, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSILP, $unpublished, $hideClosed, $now, true],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSILP, $upcoming, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSILP, $upcoming, $hideClosed, $now, true],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSILP, $open, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSILP, $open, $hideClosed, $now, true],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSILP, $overdue, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSILP, $overdue, $hideClosed, $now, true],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSILP, $closed, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSILP, $closed, $hideClosed, $now, false],
 
-            // Non-participating staff non-instructor, SIVO work type:
+            // Non-participating staff non-instructor, work type: Staff-Instructors-Parents.
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIP, $unpublished, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIP, $unpublished, $hideClosed, $now, ],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIP, $upcoming, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIP, $upcoming, $hideClosed, $now, ],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIP, $open, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIP, $open, $hideClosed, $now, ],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIP, $overdue, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIP, $overdue, $hideClosed, $now, ],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIP, $closed, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIP, $closed, $hideClosed, $now, ],
+
+            // Non-participating staff non-instructor, work type: Staff-Instructors-Learners.
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIL, $unpublished, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIL, $unpublished, $hideClosed, $now, ],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIL, $upcoming, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIL, $upcoming, $hideClosed, $now, ],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIL, $open, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIL, $open, $hideClosed, $now, ],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIL, $overdue, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIL, $overdue, $hideClosed, $now, ],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIL, $closed, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSIL, $closed, $hideClosed, $now, ],
+
+            // Non-participating staff non-instructor, work type: Staff-Instructors.
             // I see it unless it's closed and hideClosed is on
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeSivo, $unpublished, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeSivo, $unpublished, $hideClosed, $now, true],
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeSivo, $upcoming, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeSivo, $upcoming, $hideClosed, $now, true],
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeSivo, $open, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeSivo, $open, $hideClosed, $now, true],
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeSivo, $overdue, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeSivo, $overdue, $hideClosed, $now, true],
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeSivo, $closed, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $nonInstructor, $workTypeSivo, $closed, $hideClosed, $now, false],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSI, $unpublished, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSI, $unpublished, $hideClosed, $now, true],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSI, $upcoming, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSI, $upcoming, $hideClosed, $now, true],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSI, $open, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSI, $open, $hideClosed, $now, true],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSI, $overdue, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSI, $overdue, $hideClosed, $now, true],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSI, $closed, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $nonInstructor, $workTypeSI, $closed, $hideClosed, $now, false],
 
-            // Non-participating staff instructor, no work type:
+            // --- Non-participating staff instructor ---
+
+            // Non-participating staff instructor, work type: None.
             // I see it unless it's closed and hideClosed is on
             [$notParticipant, $staffRole, $isInstructor, $workTypeNone, $unpublished, $showClosed, $now, true],
             [$notParticipant, $staffRole, $isInstructor, $workTypeNone, $unpublished, $hideClosed, $now, true],
@@ -405,68 +592,55 @@ class VisibilityTest extends TestCase
             [$notParticipant, $staffRole, $isInstructor, $workTypeNone, $closed, $showClosed, $now, true],
             [$notParticipant, $staffRole, $isInstructor, $workTypeNone, $closed, $hideClosed, $now, false],
 
-            // Non-participating staff instructor, non-SIVO work type:
+            // Non-participating staff instructor, work type: Staff-Instructors-Learners-Parents.
             // I see it unless it's closed and hideClosed is on
-            [$notParticipant, $staffRole, $isInstructor, $workTypeNormal, $unpublished, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $isInstructor, $workTypeNormal, $unpublished, $hideClosed, $now, true],
-            [$notParticipant, $staffRole, $isInstructor, $workTypeNormal, $upcoming, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $isInstructor, $workTypeNormal, $upcoming, $hideClosed, $now, true],
-            [$notParticipant, $staffRole, $isInstructor, $workTypeNormal, $open, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $isInstructor, $workTypeNormal, $open, $hideClosed, $now, true],
-            [$notParticipant, $staffRole, $isInstructor, $workTypeNormal, $overdue, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $isInstructor, $workTypeNormal, $overdue, $hideClosed, $now, true],
-            [$notParticipant, $staffRole, $isInstructor, $workTypeNormal, $closed, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $isInstructor, $workTypeNormal, $closed, $hideClosed, $now, false],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSILP, $unpublished, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSILP, $unpublished, $hideClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSILP, $upcoming, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSILP, $upcoming, $hideClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSILP, $open, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSILP, $open, $hideClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSILP, $overdue, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSILP, $overdue, $hideClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSILP, $closed, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSILP, $closed, $hideClosed, $now, false],
 
-            // Non-participating staff instructor, SIVO work type:
+            // Non-participating staff instructor, work type: Staff-Instructors-Parents.
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIP, $unpublished, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIP, $unpublished, $hideClosed, $now, ],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIP, $upcoming, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIP, $upcoming, $hideClosed, $now, ],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIP, $open, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIP, $open, $hideClosed, $now, ],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIP, $overdue, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIP, $overdue, $hideClosed, $now, ],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIP, $closed, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIP, $closed, $hideClosed, $now, ],
+
+            // Non-participating staff instructor, work type: Staff-Instructors-Learners.
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIL, $unpublished, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIL, $unpublished, $hideClosed, $now, ],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIL, $upcoming, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIL, $upcoming, $hideClosed, $now, ],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIL, $open, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIL, $open, $hideClosed, $now, ],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIL, $overdue, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIL, $overdue, $hideClosed, $now, ],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIL, $closed, $showClosed, $now, ],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSIL, $closed, $hideClosed, $now, ],
+
+            // Non-participating staff instructor, work type: Staff-Instructors.
             // I see it unless it's closed and hideClosed is on
-            [$notParticipant, $staffRole, $isInstructor, $workTypeSivo, $unpublished, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $isInstructor, $workTypeSivo, $unpublished, $hideClosed, $now, true],
-            [$notParticipant, $staffRole, $isInstructor, $workTypeSivo, $upcoming, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $isInstructor, $workTypeSivo, $upcoming, $hideClosed, $now, true],
-            [$notParticipant, $staffRole, $isInstructor, $workTypeSivo, $open, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $isInstructor, $workTypeSivo, $open, $hideClosed, $now, true],
-            [$notParticipant, $staffRole, $isInstructor, $workTypeSivo, $overdue, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $isInstructor, $workTypeSivo, $overdue, $hideClosed, $now, true],
-            [$notParticipant, $staffRole, $isInstructor, $workTypeSivo, $closed, $showClosed, $now, true],
-            [$notParticipant, $staffRole, $isInstructor, $workTypeSivo, $closed, $hideClosed, $now, false],
-
-            // Learner (READ-access) student, SIVO (0,0): always excluded
-            [$isParticipant,  $studentRole, $isLearner, $workTypeSivo,        $upcoming, $showClosed, $now, false],
-            [$isParticipant,  $studentRole, $isLearner, $workTypeSivo,        $open,     $showClosed, $now, false],
-            [$notParticipant, $studentRole, $isLearner, $workTypeSivo,        $upcoming, $showClosed, $now, false],
-
-            // Learner (READ-access) student, parents-only (0,1): learner excluded
-            [$isParticipant,  $studentRole, $isLearner, $workTypeParentsOnly, $upcoming, $showClosed, $now, false],
-            [$isParticipant,  $studentRole, $isLearner, $workTypeParentsOnly, $open,     $showClosed, $now, false],
-            [$notParticipant, $studentRole, $isLearner, $workTypeParentsOnly, $upcoming, $showClosed, $now, false],
-
-            // Learner (READ-access) student, learners-visible (1,1): same as non-learner student
-            [$isParticipant,  $studentRole, $isLearner, $workTypeNormal,      $unpublished, $showClosed, $now, false],
-            [$isParticipant,  $studentRole, $isLearner, $workTypeNormal,      $upcoming,    $showClosed, $now, true],
-            [$isParticipant,  $studentRole, $isLearner, $workTypeNormal,      $upcoming,    $hideClosed, $now, true],
-            [$isParticipant,  $studentRole, $isLearner, $workTypeNormal,      $closed,      $showClosed, $now, true],
-            [$isParticipant,  $studentRole, $isLearner, $workTypeNormal,      $closed,      $hideClosed, $now, false],
-            [$notParticipant, $studentRole, $isLearner, $workTypeNormal,      $upcoming,    $showClosed, $now, false],
-            [$isParticipant,  $studentRole, $isLearner, $workTypeNone,        $upcoming,    $showClosed, $now, true],
-            [$notParticipant, $studentRole, $isLearner, $workTypeNone,        $upcoming,    $showClosed, $now, false],
-
-            // Learner (READ-access) STAFF, SIVO (0,0): EXCLUDED despite staff role — critical new rule
-            [$isParticipant,  $staffRole,   $isLearner, $workTypeSivo,        $upcoming, $showClosed, $now, false],
-            [$isParticipant,  $staffRole,   $isLearner, $workTypeSivo,        $open,     $showClosed, $now, false],
-            [$notParticipant, $staffRole,   $isLearner, $workTypeSivo,        $upcoming, $showClosed, $now, false],
-            [$notParticipant, $staffRole,   $isLearner, $workTypeSivo,        $closed,   $showClosed, $now, false],
-
-            // Learner (READ-access) STAFF, parents-only (0,1): EXCLUDED despite staff role
-            [$isParticipant,  $staffRole,   $isLearner, $workTypeParentsOnly, $upcoming, $showClosed, $now, false],
-            [$notParticipant, $staffRole,   $isLearner, $workTypeParentsOnly, $upcoming, $showClosed, $now, false],
-
-            // Learner (READ-access) STAFF, learners-visible (1,1): visible, subject to timing
-            [$isParticipant,  $staffRole,   $isLearner, $workTypeNormal,      $upcoming, $showClosed, $now, true],
-            [$isParticipant,  $staffRole,   $isLearner, $workTypeNormal,      $closed,   $hideClosed, $now, false],
-            [$notParticipant, $staffRole,   $isLearner, $workTypeNormal,      $upcoming, $showClosed, $now, true],
-            [$isParticipant,  $staffRole,   $isLearner, $workTypeNone,        $upcoming, $showClosed, $now, true],
-            [$notParticipant, $staffRole,   $isLearner, $workTypeNone,        $upcoming, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSI, $unpublished, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSI, $unpublished, $hideClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSI, $upcoming, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSI, $upcoming, $hideClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSI, $open, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSI, $open, $hideClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSI, $overdue, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSI, $overdue, $hideClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSI, $closed, $showClosed, $now, true],
+            [$notParticipant, $staffRole, $isInstructor, $workTypeSI, $closed, $hideClosed, $now, false],
         ];
     }
 
