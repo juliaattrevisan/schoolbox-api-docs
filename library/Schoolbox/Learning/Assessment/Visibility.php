@@ -64,14 +64,18 @@ class Visibility
 
         try {
             $viewerIsInstructor = $this->access->isInstructor($viewer, $folder);
-            $viewerIsLearner = $this->access->isLearner($viewer, $folder);
         } catch (MapperException) {
             $viewerIsInstructor = false; // In case of mapper error, assume non-instructor.
-            $viewerIsLearner = false; // In case of mapper error, assume non-learner.
         }
 
         if ($viewerIsInstructor) {
             return $this->isVisibleToInstructor($assessment, $viewer, $showClosed, $now);
+        }
+
+        try {
+            $viewerIsLearner = $this->access->isLearner($viewer, $folder);
+        } catch (MapperException) {
+            $viewerIsLearner = false; // In case of mapper error, assume non-learner.
         }
 
         if ($viewerIsLearner) {
@@ -185,17 +189,30 @@ class Visibility
         Alaress_Date_Format $now,
         bool $respectWorkTypeVisibility
     ): bool {
-        if ($nonInstructorNonLearner->getRole()->isStaff()) {
+        $workType = $assessable->getWorkType();
+
+        $showToParent = false;
+        if ($respectWorkTypeVisibility && $workType !== null && $workType->isVisibleToParents()) {
+            try {
+                $showToParent = $this->access->isParentOfLearner(
+                    $nonInstructorNonLearner,
+                    $assessable->getBaseContext()->getFolder()
+                );
+            } catch (MapperException) {
+                // Do nothing - leave $showToParent as false.
+            }
+        }
+
+        if ($showToParent || $nonInstructorNonLearner->getRole()->isStaff()) {
             if ($showClosed) {
                 return true;
             }
-            // If staff member is also a participant, respect their custom close date.
+            // If user is also a participant, respect their custom close date.
             $participant = $assessable->getParticipantIfExtant($nonInstructorNonLearner);
             $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
             return $now->lt($closeDate);
         }
 
-        $workType = $assessable->getWorkType();
         if ($respectWorkTypeVisibility && $workType !== null) {
             if (!$workType->isVisibleToLearners() && !$workType->isVisibleToParents()) {
                 // Only staff/instructors may see; non-staff non-learner excluded.
