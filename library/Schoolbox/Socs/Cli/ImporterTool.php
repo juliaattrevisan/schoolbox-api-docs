@@ -8,10 +8,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Socs\Cli;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Socs\HttpClient;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Division\Model as DivisionModel;
 use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
@@ -39,8 +39,7 @@ class ImporterTool extends CliTool\App
     private const LOCK_TTL = 120;
     private const DEFAULT_TIMEOUT = 3600;
 
-    /** @var array<string,int> */
-    private array $urlUsage = [];
+    private ?HttpClient $httpClient = null;
 
     public function getLongOpts(): array
     {
@@ -77,7 +76,9 @@ class ImporterTool extends CliTool\App
             $this->importFixtures($logger, $lock);
             $this->importTeams($logger);
         } finally {
-            $this->logUrlUsage($logger);
+            if ($this->httpClient instanceof HttpClient) {
+                $this->httpClient->logUrlUsage($logger);
+            }
             $lock->release();
         }
     }
@@ -114,13 +115,7 @@ HELP;
             return;
         }
 
-        $baseUrl = rtrim($host, '/');
-        $fixturesUrl = $baseUrl . '/fixturecalendar.ashx';
-
-        $client = new Client([
-            'timeout' => 300,
-            'http_errors' => false,
-        ]);
+        $httpClient = $this->getHttpClient($host);
 
         $seasonMapper = SeasonMapper::getInstance();
         $sportMapper = SportMapper::getInstance();
@@ -145,14 +140,14 @@ HELP;
             'enddate'   => $endDate,
         ];
 
-        $this->noteUrlUsed($fixturesUrl, $query);
-
         try {
-            $response = $client->request('GET', $fixturesUrl, [
-                'query' => $query,
-            ]);
+            $response = $httpClient->get('fixturecalendar.ashx', $query, $logger);
         } catch (GuzzleException $e) {
             $logger->warning(sprintf('Failed to contact SOCS endpoint: %s', $e->getMessage()));
+            return;
+        }
+
+        if (null === $response) {
             return;
         }
 
@@ -278,13 +273,7 @@ HELP;
             return;
         }
 
-        $baseUrl = rtrim($host, '/');
-        $teamsUrl = $baseUrl . '/' . self::MSO_SPORT_PATH;
-
-        $client = new Client([
-            'timeout' => 300,
-            'http_errors' => false,
-        ]);
+        $httpClient = $this->getHttpClient($host);
 
         $seasonMapper = SeasonMapper::getInstance();
         $sportMapper = SportMapper::getInstance();
@@ -300,14 +289,14 @@ HELP;
             'key' => $token,
         ];
 
-        $this->noteUrlUsed($teamsUrl, $query);
-
         try {
-            $response = $client->request('GET', $teamsUrl, [
-                'query' => $query,
-            ]);
+            $response = $httpClient->get(self::MSO_SPORT_PATH, $query, $logger);
         } catch (GuzzleException $e) {
             $logger->warning(sprintf('Failed to contact SOCS teams endpoint: %s', $e->getMessage()));
+            return;
+        }
+
+        if (null === $response) {
             return;
         }
 
@@ -376,24 +365,6 @@ HELP;
         }
     }
 
-    private function logUrlUsage(LoggerInterface $logger): void
-    {
-        foreach ($this->urlUsage as $url => $count) {
-            $logger->info(sprintf('SOCS URL used %d time(s): %s', $count, $url));
-        }
-    }
-
-    private function noteUrlUsed(string $baseUrl, array $query): void
-    {
-        $separator = false === strpos($baseUrl, '?') ? '?' : '&';
-        $url = $baseUrl . $separator . http_build_query($query);
-
-        if (!isset($this->urlUsage[$url])) {
-            $this->urlUsage[$url] = 0;
-        }
-
-        $this->urlUsage[$url]++;
-    }
 
     private function recallSeason(SeasonMapper $seasonMapper, LoggerInterface $logger): SeasonModel
     {
@@ -605,6 +576,15 @@ HELP;
             $logger->debug(sprintf('Unable to parse SOCS date/time "%s": %s', $raw, $e->getMessage()));
             return null;
         }
+    }
+
+    private function getHttpClient(string $host): HttpClient
+    {
+        if (!$this->httpClient instanceof HttpClient) {
+            $this->httpClient = new HttpClient($host);
+        }
+
+        return $this->httpClient;
     }
 
     public function runAsRoot(): ?bool
