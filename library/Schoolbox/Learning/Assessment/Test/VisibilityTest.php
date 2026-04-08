@@ -1036,17 +1036,6 @@ class VisibilityTest extends TestCase
         $mockAccess = $this->createMock(Access::class);
         $mockAccess
             ->expects($this->any())
-            ->method('getFolderAccess')
-            ->willReturnCallback(function (User $user) {
-                return match ($user->getId()) {
-                    1 => UserAccess::ACCESS_DENY,
-                    2 => UserAccess::ACCESS_WRITE,
-                    3 => UserAccess::ACCESS_READ,
-                    default => throw new \InvalidArgumentException("No access level defined for user '{$user->getId()}'"),
-                };
-            });
-        $mockAccess
-            ->expects($this->any())
             ->method('isInstructor')
             ->willReturnCallback(function (User $user) {
                 return match ($user->getId()) {
