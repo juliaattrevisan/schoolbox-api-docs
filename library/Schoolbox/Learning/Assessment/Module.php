@@ -288,6 +288,23 @@ class Module extends BaseModule
         $canCopyAssessmentCustomParticipation = new Rule\All(
             $canModifyCustomParticipation,
             new IsCustomParticipationCopyable(),
+            new Rule\Any(
+                /* Anything EXCEPT reporting activities have access to Modify Existing Activity
+                 *
+                 * Yes, I know this is a bit gruesome.
+                 * This is a trap for the Swamp where new activity types need to be added to this list.
+                 */
+                new ValidAssessmentType([
+                    AssessmentType::TYPE_PROJECT,
+                    AssessmentType::TYPE_DUE_WORK,
+                    AssessmentType::TYPE_TASK,
+                    AssessmentType::TYPE_QUIZ,
+                    AssessmentType::TYPE_LTI_ASSESSMENT,
+                    AssessmentType::TYPE_LESSON_PLAN,
+                    AssessmentType::TYPE_DIALOG_AGENT,
+                ]),
+                new IsManageReportingActivity($this->getConfig()),
+            )
         );
 
         // pluralise for REST
