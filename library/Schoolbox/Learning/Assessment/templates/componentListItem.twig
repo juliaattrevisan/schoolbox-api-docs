@@ -106,7 +106,7 @@
                     assessment: assessable
                 }) %}
                 {% if viewCustomParticipationRoute %}
-                    <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
+                    <li><a href="{{ viewCustomParticipationRoute }}"><sbx-icon name="group"></sbx-icon>Student Participation</a></li>
                 {% endif %}
                 {% if assessable is dueWork and assessable.enableWorksheet and assessable.kamiWorksheetTemplate and worksheetClassView %}
                     <li>

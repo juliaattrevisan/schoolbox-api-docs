@@ -79,10 +79,11 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
             {# If not readonly: show delete #}
             {% if readonly %}
                 {# if readonly, show button for showing assessments which use this criterion #}
-                <a class="icon-info"
+                     <a class="sbx-icon-only-button no-text"
                    data-reveal-id="criterion-{{ criterion.id }}"
                    href="#"
-                   title="Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}"></a>
+                         title="Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}"
+                         aria-label="Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}"><sbx-icon name="info"></sbx-icon></a>
             {% else %}
                 {# show tot #}
                 {# delete button, with "are you sure" if it has been saved already #}
@@ -96,9 +97,9 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
     <ul id="dropdown-i{{ criterionId }}" class="f-dropdown" data-dropdown-content="">
         {% if criterionUsageCount > 0 %}
             <li>
-                <a class="icon-info"
+                <a
                    data-reveal-id="criterion-{{ criterion.id }}"
-                   href="#">Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}</a>
+                   href="#"><sbx-icon name="info"></sbx-icon>Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}</a>
             </li>
         {% endif %}
         <li>

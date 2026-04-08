@@ -43,7 +43,7 @@
                 assessment: assessment
             }) %}
             {% if viewCustomParticipationRoute %}
-                <li><a class="icon-group" data-test="course-outline-custom-participation-{{ assessment.id }}" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
+                <li><a data-test="course-outline-custom-participation-{{ assessment.id }}" href="{{ viewCustomParticipationRoute }}"><sbx-icon name="group"></sbx-icon>Student Participation</a></li>
             {% endif %}
             {% if assessment is dueWork and assessment.enableWorksheet and kamiWorksheetRoute %}
                 <li>

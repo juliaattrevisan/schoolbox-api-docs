@@ -42,10 +42,10 @@
                                href="{{ routeLookupIfAuthorized('googleFile.deleteGoogleFile', {googleFileId: googleFile.id, googleFile: googleFile}) }}"
                                title="Remove">Remove</a>
                         </li>
-                        <li><a class="icon-group" data-action="permission"
+                        <li><a data-action="permission"
                                data-id="{{ googleFile.googleId }}" data-edit-level="{{ googleFile.editLevel }}"
                                data-comment-level="{{ googleFile.commentLevel }}"
-                               title="Change permissions">Change permissions</a></li>
+                               title="Change permissions"><sbx-icon name="group"></sbx-icon>Change permissions</a></li>
                     </ul>
                 {% endif %}
             </li>
