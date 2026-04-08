@@ -35,6 +35,8 @@ class ImporterTool extends CliTool\App
     private const SOCS_IMPORTER_LOCK_NAME = 'socs_importer';
     public const LOCK_NAME = self::SOCS_IMPORTER_LOCK_NAME;
 
+    // this may be unique to each school, but we don't know yet... so hard coding it here for now...
+    private const SOCS_SCHOOL_ID = '2460';
 
     private const FIXTURES_PATH = 'fixturecalendar.ashx';
     private const MSO_SPORT_PATH = 'mso-sport.ashx';
@@ -120,13 +122,7 @@ class ImporterTool extends CliTool\App
                 return;
             }
 
-            $schoolId = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_SCHOOL_ID);
-            if ('' === $schoolId) {
-                $logger->warning('Missing SOCS school identifier; exiting SOCS importer');
-                return;
-            }
-
-            $this->httpClient = new HttpClient($host, $schoolId, $token);
+            $this->httpClient = new HttpClient($host, self::SOCS_SCHOOL_ID, $token);
             if ($runFixtures) {
                 $this->importFixtures($logger, $lock);
             }
