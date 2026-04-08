@@ -1045,6 +1045,28 @@ class VisibilityTest extends TestCase
                     default => throw new \InvalidArgumentException("No access level defined for user '{$user->getId()}'"),
                 };
             });
+        $mockAccess
+            ->expects($this->any())
+            ->method('isInstructor')
+            ->willReturnCallback(function (User $user) {
+                return match ($user->getId()) {
+                    1 => false,
+                    2 => true,
+                    3 => false,
+                    default => throw new \InvalidArgumentException("No access level defined for user '{$user->getId()}'"),
+                };
+            });
+        $mockAccess
+            ->expects($this->any())
+            ->method('isLearner')
+            ->willReturnCallback(function (User $user) {
+                return match ($user->getId()) {
+                    1 => false,
+                    2 => false,
+                    3 => true,
+                    default => throw new \InvalidArgumentException("No access level defined for user '{$user->getId()}'"),
+                };
+            });
         return $mockAccess;
     }
 }

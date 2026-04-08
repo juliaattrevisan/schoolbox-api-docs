@@ -11,7 +11,6 @@ namespace Schoolbox\Learning\Assessment;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Alaress_Date_Format;
 
 class Visibility
@@ -56,35 +55,25 @@ class Visibility
     public function isVisibleToUser(IAssessable $assessment, User $viewer, bool $showClosed, ?Alaress_Date_Format $now = null, bool $respectWorkTypeVisibility = true): bool
     {
         $now = $now ?? Alaress_Date_Format::now();
+        $folder = $assessment->getBaseContext()->getFolder();
 
         try {
-            $folderAccess = $this->access->getFolderAccess($viewer, $assessment->getBaseContext()->getFolder()->getId());
-        } catch (MapperException $e) {
-            return false;
+            $viewerIsInstructor = $this->access->isInstructor($viewer, $folder);
+            $viewerIsLearner = $this->access->isLearner($viewer, $folder);
+        } catch (MapperException) {
+            $viewerIsInstructor = false; // In case of mapper error, assume non-instructor.
+            $viewerIsLearner = false; // In case of mapper error, assume non-learner.
         }
 
-        // Instructor (WRITE+ access): always visible, subject only to timing
-        if ($folderAccess >= UserAccess::ACCESS_WRITE) {
+        if ($viewerIsInstructor) {
             return $this->isVisibleToInstructor($assessment, $viewer, $showClosed, $now);
         }
 
-        // Learner (READ access): excluded if work type hides learners, even if viewer is staff
-        if ($folderAccess === UserAccess::ACCESS_READ) {
-            $workType = $assessment->getWorkType();
-            if ($respectWorkTypeVisibility && $workType !== null && !$workType->isVisibleToLearners()) {
-                return false;
-            }
-            if ($viewer->getRole()->isStaff()) {
-                return $this->isVisibleToStaff($assessment, $viewer, $showClosed, $now);
-            }
-            return $this->isVisibleToNonInstructor($assessment, $viewer, $showClosed, $now, $respectWorkTypeVisibility);
+        if ($viewerIsLearner) {
+            return $this->isVisibleToLearner($assessment, $viewer, $showClosed, $now, $respectWorkTypeVisibility);
         }
 
-        // DENY access (non-learner, non-instructor): staff sees freely; others depend on participation
-        if ($viewer->getRole()->isStaff()) {
-            return $this->isVisibleToStaff($assessment, $viewer, $showClosed, $now);
-        }
-        return $this->isVisibleToNonInstructor($assessment, $viewer, $showClosed, $now, $respectWorkTypeVisibility);
+        return $this->isVisibleToNonInstructorNonLearner($assessment, $viewer, $showClosed, $now, $respectWorkTypeVisibility);
     }
 
 
@@ -128,7 +117,12 @@ class Visibility
      * @param Alaress_Date_Format $now
      * @return bool
      */
-    private function isVisibleToInstructor(IAssessable $assessable, User $instructor, bool $showClosed, Alaress_Date_Format $now): bool
+    private function isVisibleToInstructor(
+        IAssessable $assessable,
+        User $instructor,
+        bool $showClosed,
+        Alaress_Date_Format $now
+    ): bool
     {
         if ($showClosed) {
             return true;
@@ -141,50 +135,67 @@ class Visibility
 
 
     /**
-     * Is the assessable visible to a staff member? (Assumes the user has a staff role type)
+     * Is the assessable visible to the Learner? (Assumes the user is a learner)
      *
      * @param IAssessable         $assessable
-     * @param User                $staff
-     * @param bool                $showClosed Should we show assessments after their closed date?
-     * @param Alaress_Date_Format $now
-     * @return bool
-     */
-    private function isVisibleToStaff(IAssessable $assessable, User $staff, bool $showClosed, Alaress_Date_Format $now): bool
-    {
-        if ($showClosed) {
-            return true;
-        }
-        // If staff member is also a participant, respect their custom close date.
-        $participant = $assessable->getParticipantIfExtant($staff);
-        $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
-        return $now->lt($closeDate);
-    }
-
-
-    /**
-     * Is the assessable visible to a non-instructor?
-     *
-     * Called for DENY-access (non-learner) users, and for READ-access (learner) users whose work type allows learner
-     * visibility. The learner exclusion check (READ access + work type hides learners) is handled upstream in
-     * isVisibleToUser() and will never reach this method.
-     *
-     * @param IAssessable         $assessable
-     * @param User                $nonInstructor
+     * @param User                $learner
      * @param bool                $showClosed Should we show assessments after their closed date?
      * @param Alaress_Date_Format $now
      * @param bool                $respectWorkTypeVisibility
      * @return bool
      */
-    private function isVisibleToNonInstructor(IAssessable $assessable, User $nonInstructor, bool $showClosed, Alaress_Date_Format $now, bool $respectWorkTypeVisibility): bool
+    private function isVisibleToLearner(
+        IAssessable $assessable,
+        User $learner,
+        bool $showClosed,
+        Alaress_Date_Format $now,
+        bool $respectWorkTypeVisibility
+    ): bool
     {
+        $workType = $assessable->getWorkType();
+        if ($respectWorkTypeVisibility && $workType !== null && !$workType->isVisibleToLearners()) {
+            return false;
+        }
+        return $this->isVisibleToNonInstructorNonLearner($assessable, $learner, $showClosed, $now, $respectWorkTypeVisibility);
+    }
+
+
+    /**
+     * Is the assessable visible to a non-instructor non-learner? (Assumes the user is neither instructor nor learner)
+     *
+     * @param IAssessable         $assessable
+     * @param User                $nonInstructorNonLearner
+     * @param bool                $showClosed Should we show assessments after their closed date?
+     * @param Alaress_Date_Format $now
+     * @param bool                $respectWorkTypeVisibility
+     * @return bool
+     */
+    private function isVisibleToNonInstructorNonLearner(
+        IAssessable $assessable,
+        User $nonInstructorNonLearner,
+        bool $showClosed,
+        Alaress_Date_Format $now,
+        bool $respectWorkTypeVisibility
+    ): bool
+    {
+        if ($nonInstructorNonLearner->getRole()->isStaff()) {
+            if ($showClosed) {
+                return true;
+            }
+            // If staff member is also a participant, respect their custom close date.
+            $participant = $assessable->getParticipantIfExtant($nonInstructorNonLearner);
+            $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
+            return $now->lt($closeDate);
+        }
+
         $workType = $assessable->getWorkType();
         if ($respectWorkTypeVisibility && $workType !== null) {
             if (!$workType->isVisibleToLearners() && !$workType->isVisibleToParents()) {
-                // Pure SIVO (0,0): only staff/instructors may see; non-staff non-learner excluded
+                // Only staff/instructors may see; non-staff non-learner excluded.
                 return false;
             }
         }
-        $participant = $assessable->getParticipantIfExtant($nonInstructor);
+        $participant = $assessable->getParticipantIfExtant($nonInstructorNonLearner);
         if (!$participant) {
             return false;
         }
@@ -202,7 +213,5 @@ class Visibility
         $closeDate   = $participant->getCloseDate();
         $isPublished = $now->gte($participant->getPublishDate());
         return $isPublished && ($showClosed || $now->lte($closeDate));
-
-
     }
 }
