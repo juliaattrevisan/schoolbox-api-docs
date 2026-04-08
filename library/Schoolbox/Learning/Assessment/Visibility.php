@@ -11,7 +11,6 @@ namespace Schoolbox\Learning\Assessment;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Alaress_Date_Format;
 
 class Visibility
