@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Assessment;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Alaress_Date_Format;
 
 class Visibility
@@ -55,23 +56,20 @@ class Visibility
     public function isVisibleToUser(IAssessable $assessment, User $viewer, bool $showClosed, ?Alaress_Date_Format $now = null, bool $respectWorkTypeVisibility = true): bool
     {
         $now = $now ?? Alaress_Date_Format::now();
-        $folder = $assessment->getBaseContext()->getFolder();
 
         try {
-            $viewerIsInstructor = $this->access->isInstructor($viewer, $folder);
-            $viewerIsLearner = $this->access->isLearner($viewer, $folder);
-        } catch (MapperException) {
-            $viewerIsInstructor = false; // In case of mapper error, assume non-instructor.
-            $viewerIsLearner = false; // In case of mapper error, assume non-learner.
+            $folderAccess = $this->access->getFolderAccess($viewer, $assessment->getBaseContext()->getFolder()->getId());
+        } catch (MapperException $e) {
+            return false;
         }
 
-        // Instructor: assessment is always visible, subject only to timing.
-        if ($viewerIsInstructor) {
+        // Instructor (WRITE+ access): always visible, subject only to timing
+        if ($folderAccess >= UserAccess::ACCESS_WRITE) {
             return $this->isVisibleToInstructor($assessment, $viewer, $showClosed, $now);
         }
 
-        // Learner: assessment is visible unless work type excludes learners.
-        if ($viewerIsLearner) {
+        // Learner (READ access): excluded if work type hides learners, even if viewer is staff
+        if ($folderAccess === UserAccess::ACCESS_READ) {
             $workType = $assessment->getWorkType();
             if ($respectWorkTypeVisibility && $workType !== null && !$workType->isVisibleToLearners()) {
                 return false;
@@ -204,5 +202,7 @@ class Visibility
         $closeDate   = $participant->getCloseDate();
         $isPublished = $now->gte($participant->getPublishDate());
         return $isPublished && ($showClosed || $now->lte($closeDate));
+
+
     }
 }
