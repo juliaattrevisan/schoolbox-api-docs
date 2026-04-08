@@ -44,7 +44,7 @@ class Prepare implements IStrategy
 
             // Mark all existing results as "stale" until they are re-saved
             // by the current import run.
-            $db->query("UPDATE {$table} SET updated_at = '0000-00-00 00:00:00'");
+            $db->query("UPDATE sportsfixtures_result SET updated_at = '0000-00-00 00:00:00'");
         }
 
         $this->log->info('Preparing previously-imported fixtures results for SOCS results import.');
