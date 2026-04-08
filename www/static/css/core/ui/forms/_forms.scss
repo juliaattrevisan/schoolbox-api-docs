@@ -850,6 +850,7 @@ input[type="checkbox"].plain {
     padding: 0;
     max-height: 13rem;
     border: $fieldset-border-width $fieldset-border-style var(--sbx-config-color-accent, $input-border-color);
+    overflow-y: auto;
 
     input[type="checkbox"]:not(.plain):not(:disabled) {
         border: none;
