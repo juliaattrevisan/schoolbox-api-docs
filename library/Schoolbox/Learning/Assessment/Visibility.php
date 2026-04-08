@@ -205,6 +205,12 @@ class Visibility
             $respectWorkTypeVisibility && $workType !== null
             && $childLearner !== null && $workType->isVisibleToParents()
         ) {
+            // Apply special lesson plan visibility logic.
+            // (If lesson plan is hidden from students, it should be hidden from parents also).
+            if ($assessable instanceof LessonPlan\Model && \Schoolbox\Role::STUDENT !== $assessable->getVisibility()) {
+                return false;
+            }
+
             // If learner (child of parent of learner) is also a participant, respect their custom close date.
             // Also, parents should only see published assessments - similar to learners and non-learner participants.
             $childLearnerParticipant = $assessable->getParticipantIfExtant($childLearner);
