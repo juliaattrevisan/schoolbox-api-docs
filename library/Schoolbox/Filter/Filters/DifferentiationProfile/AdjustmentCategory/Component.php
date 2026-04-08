@@ -18,7 +18,7 @@ use Schoolbox\Admin\DifferentiationProfiles\Mapper as DpMapper;
 use Schoolbox\Admin\DifferentiationProfiles\Model as DpModel;
 
 /**
- * Component for rendering the name filter panel.
+ * Component for rendering the adjustment category filter panel.
  */
 class Component extends BaseComponent
 {
