@@ -35,6 +35,8 @@ class ImporterTool extends CliTool\App
 {
     private const SOCS_IMPORTER_LOCK_NAME = 'socs_importer';
     public const LOCK_NAME = self::SOCS_IMPORTER_LOCK_NAME;
+
+    // this may be unique to each school, but we don't know yet... so hard coding it here for now...
     private const SOCS_SCHOOL_ID = '2460';
 
     private const FIXTURES_PATH = 'fixturecalendar.ashx';
