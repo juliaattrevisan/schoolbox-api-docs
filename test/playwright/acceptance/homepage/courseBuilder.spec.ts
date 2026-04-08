@@ -164,7 +164,7 @@ test.describe.serial("Homepage - Course Builder Component", () => {
         }
     });
 
-    test("check the student cannot see the course builder component", async ({ tester}) => {
+    test("check the student cannot see the course builder component", async ({ tester }) => {
         tester.isGoingTo("login as a student and navigate to the homepage");
         await tester.impersonate("Jana Reed");
         await homepage.goto(ROMEO_AND_JULIET_HOMEPAGE_ID);
