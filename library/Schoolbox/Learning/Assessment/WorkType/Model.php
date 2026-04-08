@@ -167,43 +167,6 @@ class Model implements ISoftDeletable, Sequential
 
     /**
      * Human friendly getter
-     *
-     * @return bool
-     * @throws InsufficientHydrationException
-     */
-    public function isStaffOrInstructorVisibleOnly(): bool
-    {
-        return !$this->isVisibleToParents && !$this->isVisibleToLearners;
-    }
-
-
-    /**
-     * @return ?bool
-     */
-    public function getStaffOrInstructorVisibleOnly(): ?bool
-    {
-        return $this->isStaffOrInstructorVisibleOnly();
-    }
-
-
-    /**
-     * @param bool $staffOrInstructorVisibleOnly
-     * @return $this
-     */
-    public function setStaffOrInstructorVisibleOnly(bool $staffOrInstructorVisibleOnly): self
-    {
-        if ($staffOrInstructorVisibleOnly) {
-            $this->isVisibleToParents = false;
-            $this->isVisibleToLearners = false;
-        } else {
-            $this->isVisibleToParents = true;
-            $this->isVisibleToLearners = true;
-        }
-        return $this;
-    }
-
-    /**
-     * Human friendly getter
      * @return bool
      */
     public function isVisibleToParents(): bool

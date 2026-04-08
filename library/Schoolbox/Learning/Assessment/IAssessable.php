@@ -549,13 +549,6 @@ interface IAssessable extends ISoftDeletable
     public function getCountInteractions(bool $includeDrafts = false): int;
 
 
-    /**
-     * Returns whether this assessment should only visible to staff and instructors
-     *
-     * @return bool
-     */
-    public function isStaffOrInstructorVisibleOnly(): bool;
-
     /* Getters/Setters
      */
 

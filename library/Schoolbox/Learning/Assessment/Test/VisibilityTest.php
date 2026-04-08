@@ -105,8 +105,8 @@ class VisibilityTest extends TestCase
 
         // workType dimension
         $workTypeNone        = null;
-        $workTypeNormal      = (new WorkType\Model())->setStaffOrInstructorVisibleOnly(false);
-        $workTypeSivo        = (new WorkType\Model())->setStaffOrInstructorVisibleOnly(true);
+        $workTypeNormal      = (new WorkType\Model())->setIsVisibleToParents(true)->setIsVisibleToLearners(true);
+        $workTypeSivo        = (new WorkType\Model())->setIsVisibleToParents(false)->setIsVisibleToLearners(false);
         $workTypeParentsOnly = (new WorkType\Model())->setIsVisibleToParents(true)->setIsVisibleToLearners(false);
 
         // Assessment temporal state
