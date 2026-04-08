@@ -37,12 +37,11 @@ jobs:
     with:
       workflow_name: ${{ github.workflow }}
       status: 'success'
-      ref_name: ${{ github.head_ref || github.ref_name }}
+      ref_name: ${{ github.ref_name }}
       run_url: ${{ format('{0}/{1}/actions/runs/{2}', github.server_url, github.repository, github.run_id) }}
       webhook_url: ${{ secrets.SLACK_DEVELOPERS_WEBHOOK_URL }}
       channel: developers
       message: |
-        The Docker environment has been updated in the `${{ env.BASE_BRANCH }}` branch.
+        The Docker environment has been updated in the `${{ github.ref_name }}` branch.
 
-        If working on that branch, please `gitsync ${{ env.BASE_BRANCH }}` and `docker/up` at earliest convenience.
-    secrets: inherit
+        If working on that branch, please `gitsync ${{ github.ref_name }}` and `docker/up` at earliest convenience.
