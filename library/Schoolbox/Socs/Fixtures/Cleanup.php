@@ -45,9 +45,14 @@ class Cleanup implements IStrategy
             // Soft-delete SOCS matchups that were not touched during this
             // import run. Their related results are removed via mapper
             // callbacks when the matchup is soft-deleted.
-            $db->query("UPDATE {$table} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $db->query("UPDATE sportsfixtures_match SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
             // Soft-delete sports that were not touched during this import run.
             $db->query("UPDATE sportsfixtures_sport SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $db->query("UPDATE sportsfixtures_season SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $db->query("UPDATE sportsfixtures_division SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $db->query("UPDATE sportsfixtures_team SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $db->query("UPDATE sportsfixtures_venue SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $db->query("UPDATE sportsfixtures_school SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
         }
 
         $this->log->info('Soft-deleting SOCS matchups that did not appear in the import.');

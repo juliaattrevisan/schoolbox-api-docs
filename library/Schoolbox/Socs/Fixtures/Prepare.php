@@ -45,10 +45,17 @@ class Prepare implements IStrategy
 
             // Mark existing SOCS matchups as "stale" until they are
             // re-saved by the current import run.
-            $db->query("UPDATE {$table} SET updated_at = '0000-00-00 00:00:00'");
+            $db->query("UPDATE sportsfixtures_match SET updated_at = '0000-00-00 00:00:00'");
             // Mark existing sports as "stale" until they are re-saved by the
             // current import run.
+            // Mark existing hierarchy records as "stale" until they are
+            // re-saved by the current import run.
             $db->query("UPDATE sportsfixtures_sport SET updated_at = '0000-00-00 00:00:00'");
+            $db->query("UPDATE sportsfixtures_season SET updated_at = '0000-00-00 00:00:00'");
+            $db->query("UPDATE sportsfixtures_division SET updated_at = '0000-00-00 00:00:00'");
+            $db->query("UPDATE sportsfixtures_team SET updated_at = '0000-00-00 00:00:00'");
+            $db->query("UPDATE sportsfixtures_venue SET updated_at = '0000-00-00 00:00:00'");
+            $db->query("UPDATE sportsfixtures_school SET updated_at = '0000-00-00 00:00:00'");
         }
 
         $this->log->info('Preparing previously-imported SOCS matchups for create/update.');
