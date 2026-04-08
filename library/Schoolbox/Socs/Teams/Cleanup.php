@@ -45,14 +45,15 @@ class Cleanup implements IStrategy
             $teamTable = $this->teamMapper->getTable();
             $divisionTable = $this->divisionMapper->getTable();
 
-            // Delete teams that were not touched during this import run by
-            // removing those which still have the sentinel updated_at value.
-            $sql = "DELETE t FROM {$teamTable} t
+            // Soft-delete teams that were not touched during this import run by
+            // marking those which still have the sentinel updated_at value.
+            $sql = "UPDATE {$teamTable} t
                 INNER JOIN {$divisionTable} d ON t.division_id = d.id
+                SET t.deleted_at = NOW()
                 WHERE t.updated_at = '0000-00-00 00:00:00'";
             $db->query($sql);
         }
 
-        $this->log->info('Deleted SOCS-managed teams that did not appear in the import.');
+        $this->log->info('Soft-deleted SOCS-managed teams that did not appear in the import.');
     }
 }
