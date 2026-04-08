@@ -127,14 +127,15 @@ class Factory extends Filter\AbstractFactory
      */
     private function getWorkTypesVisibleToUser(User $user, User $viewee): GenericCollection
     {
-        // Case 1: viewer is looking at their own page — treat as learner
-        if ($user->getId() === $viewee->getId()) {
+        // If viewer is not staff and is looking at their own page, treat as learner.
+        // Show all work types visible to learners.
+        if (!$user->getRole()->isStaff() && $user->getId() === $viewee->getId()) {
             return $this->workTypeMapper->findByPredicates(
                 $this->workTypeMapper->getPredicateBuilder()->notEquals('is_visible_to_learners', 0)
             );
         }
 
-        // Case 2: viewer is a parent of the viewee
+        // If viewer is a parent of the viewee, show all work types visible to parents.
         foreach ($user->getChildren() ?? [] as $child) {
             if ($child->getId() === $viewee->getId()) {
                 return $this->workTypeMapper->findByPredicates(
@@ -143,23 +144,23 @@ class Factory extends Filter\AbstractFactory
             }
         }
 
-        // Case 3: determine viewer's folder relationship to the viewee
+        // Determine viewer's folder relationship to the viewee.
         $maxAccess = $this->getMaxViewerAccessToVieweeFolders($user, $viewee);
 
         if ($maxAccess >= UserAccess::ACCESS_WRITE) {
-            // Viewer is an instructor in one of the viewee's folders
+            // Viewer is an instructor in one of the viewee's folders.
             return $this->workTypeMapper->findAll();
         }
 
         if ($maxAccess === UserAccess::ACCESS_READ) {
-            // Viewer is also a learner in one of the viewee's folders
+            // Viewer is also a learner in one of the viewee's folders.
             return $this->workTypeMapper->findByPredicates(
                 $this->workTypeMapper->getPredicateBuilder()->notEquals('is_visible_to_learners', 0)
             );
         }
 
         if ($user->getRole()->isStaff()) {
-            // Staff with no folder relationship to the viewee — still gets all work types
+            // Staff with no folder relationship to the viewee — still gets all work types.
             return $this->workTypeMapper->findAll();
         }
 
