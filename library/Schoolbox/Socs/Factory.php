@@ -129,7 +129,15 @@ class Factory
         }
 
         if ($teams) {
-            $bus->add(new Teams\Import(
+            $bus->add(new Teams\Prepare(
+                $this->log,
+                $this->perform,
+                $this->lock,
+                $seasonMapper,
+                $divisionMapper,
+                $teamMapper
+            ))
+            ->add(new Teams\Import(
                 $this->log,
                 $this->perform,
                 $this->lock,
@@ -138,6 +146,11 @@ class Factory
                 $sportMapper,
                 $divisionMapper,
                 $teamMapper
+            ))
+            ->add(new Teams\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->lock
             ));
         }
 
