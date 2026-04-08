@@ -207,9 +207,14 @@ class Visibility
         ) {
             // If learner (child of parent of learner) is also a participant, respect their custom close date.
             // Also, parents should only see published assessments - similar to learners and non-learner participants.
-            $participant = $assessable->getParticipantIfExtant($childLearner);
-            $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
-            $isPublished = $now->gte($participant->getPublishDate());
+            $childLearnerParticipant = $assessable->getParticipantIfExtant($childLearner);
+            if ($childLearnerParticipant) {
+                $closeDate   = $childLearnerParticipant->getCloseDate();
+                $isPublished = $now->gte($childLearnerParticipant->getPublishDate());
+            } else {
+                $closeDate   = $assessable->getCloseAt();
+                $isPublished = $assessable->isPublished($childLearner);
+            }
             return $isPublished && ($showClosed || $now->lt($closeDate));
         }
 
