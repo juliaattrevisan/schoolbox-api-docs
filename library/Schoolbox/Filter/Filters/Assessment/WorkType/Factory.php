@@ -199,9 +199,6 @@ class Factory extends Filter\AbstractFactory
             if ($access > $maxAccess) {
                 $maxAccess = $access;
             }
-            if ($maxAccess >= UserAccess::ACCESS_WRITE) {
-                break; // Instructor access is the highest we care about.
-            }
         }
         return $maxAccess;
     }
