@@ -254,7 +254,7 @@ class Access
      * @return bool
      * @throws Mapper\Exception         If folder does not exist.
      * @throws InvalidArgumentException Due to getFolderAccess() call.
- */
+     */
     public function isParentOfLearner(User $user, Folder\Model $folder): bool
     {
         $children = $user->getChildren();
