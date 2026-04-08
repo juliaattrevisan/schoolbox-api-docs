@@ -28,6 +28,9 @@ trait RecallSupport
      */
     protected bool $perform = false;
 
+    /**
+     * Find or create the shared "SOCS Fixtures" season spanning the current year and next.
+     */
     protected function recallSeason(SeasonMapper $seasonMapper, LoggerInterface $logger): SeasonModel
     {
         $seasonName = 'SOCS Fixtures';
@@ -75,6 +78,9 @@ trait RecallSupport
         return $season;
     }
 
+    /**
+     * Find or create a SOCS sport by name.
+     */
     protected function recallSport(SportMapper $sportMapper, LoggerInterface $logger, string $sportName): SportModel
     {
         $needsSave = false;
@@ -104,6 +110,9 @@ trait RecallSupport
         return $sport;
     }
 
+    /**
+     * Find or create a SOCS division for the given sport, season and name.
+     */
     protected function recallDivision(
         DivisionMapper $divisionMapper,
         LoggerInterface $logger,
@@ -144,6 +153,9 @@ trait RecallSupport
         return $division;
     }
 
+    /**
+     * Find or create a SOCS team within the given division.
+     */
     protected function recallTeam(TeamMapper $teamMapper, LoggerInterface $logger, string $teamName, DivisionModel $division): TeamModel
     {
         $needsSave = false;
@@ -177,6 +189,9 @@ trait RecallSupport
         return $team;
     }
 
+    /**
+     * Find or create a SOCS venue by name.
+     */
     protected function recallVenue(VenueMapper $venueMapper, LoggerInterface $logger, string $venueName): VenueModel
     {
         $needsSave = false;
@@ -206,6 +221,9 @@ trait RecallSupport
         return $venue;
     }
 
+    /**
+     * Find or create a SOCS opposition school by name.
+     */
     protected function recallSchool(SchoolMapper $schoolMapper, LoggerInterface $logger, string $schoolName): SchoolModel
     {
         $needsSave = false;
@@ -235,6 +253,9 @@ trait RecallSupport
         return $school;
     }
 
+    /**
+     * Parse a SOCS date and time string into an Alaress_Date_Format instance.
+     */
     protected function makeDateTime(string $date, string $time, LoggerInterface $logger): ?\Alaress_Date_Format
     {
         if ('' === $date) {

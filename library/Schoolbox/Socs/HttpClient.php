@@ -37,7 +37,11 @@ class HttpClient
     }
 
     /**
+     * Perform a GET request to a SOCS endpoint, adding school ID and token.
+     *
      * @param array<string,string> $query Non-secret query parameters; ID and key are added automatically.
+     *
+     * @return ResponseInterface|null The HTTP response, or null if the request failed.
      */
     public function get(string $path, array $query, LoggerInterface $logger): ?ResponseInterface
     {
@@ -67,6 +71,8 @@ class HttpClient
     }
 
     /**
+     * Record a redacted SOCS URL usage entry for later logging.
+     *
      * @param array<string,string> $query Non-secret query parameters to include in logs.
      */
     private function noteUrlUsed(string $path, array $query): void

@@ -31,6 +31,9 @@ class Import implements IStrategy
     ) {
     }
 
+    /**
+     * Import SOCS results within a moving date window and attach them to fixtures.
+     */
     public function import(): void
     {
         $now = \Alaress_Date_Format::now();

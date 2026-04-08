@@ -36,6 +36,9 @@ class Import implements IStrategy
         $this->perform = $perform;
     }
 
+    /**
+     * Import SOCS teams from the mso-sport feed and ensure they exist in the hierarchy.
+     */
     public function import(): void
     {
         $season = $this->recallSeason($this->seasonMapper, $this->log);

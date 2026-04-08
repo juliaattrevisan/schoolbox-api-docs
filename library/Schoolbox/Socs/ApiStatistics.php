@@ -15,6 +15,9 @@ class ApiStatistics implements IStrategy
     {
     }
 
+    /**
+     * Log the number of times each SOCS URL was called during this run.
+     */
     public function import(): void
     {
         $this->httpClient->logUrlUsage($this->log);

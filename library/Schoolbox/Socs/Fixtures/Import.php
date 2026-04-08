@@ -54,6 +54,9 @@ class Import implements IStrategy
         $this->perform = $perform;
     }
 
+    /**
+     * Import SOCS fixtures into Schoolbox matchups and synchronise team memberships.
+     */
     public function import(): void
     {
         $season = $this->recallSeason($this->seasonMapper, $this->log);
@@ -186,6 +189,9 @@ class Import implements IStrategy
         }
     }
 
+    /**
+     * Lazily populate the external-id to user-id lookup cache.
+     */
     private function ensureUserLookupLoaded(): void
     {
         if ([] !== $this->userExternalIdLookup) {
@@ -196,6 +202,9 @@ class Import implements IStrategy
         $this->userExternalIdLookup = $lookup->generate();
     }
 
+    /**
+     * Attach pupils and staff referenced in a SOCS fixture to the given team.
+     */
     private function syncParticipantsWithTeam(\SimpleXMLElement $fixture, \Schoolbox\Fixtures\Team\Model $team): void
     {
         $this->ensureUserLookupLoaded();
@@ -216,6 +225,9 @@ class Import implements IStrategy
         }
     }
 
+    /**
+     * Ensure each pupil external ID from SOCS is linked as a team player.
+     */
     private function syncPupilsWithTeam(string $pupils, \Schoolbox\Fixtures\Team\Model $team): void
     {
         $externalIds = array_filter(array_map('trim', explode(',', $pupils)), 'strlen');
@@ -267,6 +279,9 @@ class Import implements IStrategy
         }
     }
 
+    /**
+     * Ensure each staff external ID from SOCS is linked as a coach for the team.
+     */
     private function syncStaffWithTeam(string $staff, \Schoolbox\Fixtures\Team\Model $team): void
     {
         $externalIds = array_filter(array_map('trim', explode(',', $staff)), 'strlen');
