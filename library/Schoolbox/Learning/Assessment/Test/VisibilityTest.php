@@ -100,7 +100,7 @@ class VisibilityTest extends TestCase
         [$studentRole, $staffRole] = self::buildRoles();
 
         // Instructor/Learner dimension
-        [$nonInstructorNonLearner, $isInstructor, $isLearner] = self::buildUsers();
+        [$nonInstructorNonLearner, $isInstructor, $isLearner, $isParentOfLearner] = self::buildUsers();
 
         // WorkType dimension
         // The four visibility types are defined in WorkType\Mapper.
@@ -953,6 +953,7 @@ class VisibilityTest extends TestCase
             (new User())->setId(1)->setFirstname('Andy - non-instructor-non-learner'),
             (new User())->setId(2)->setFirstname('Bart - is-instructor'),
             (new User())->setId(3)->setFirstname('Cath - is-learner'),
+            (new User())->setId(4)->setFirstname('Demi - is-parent-of-learner'),
         ];
     }
 
@@ -1041,6 +1042,7 @@ class VisibilityTest extends TestCase
                     1 => false,
                     2 => true,
                     3 => false,
+                    4 => false,
                     default => throw new \InvalidArgumentException("No access level defined for user '{$user->getId()}'"),
                 };
             });
@@ -1052,6 +1054,19 @@ class VisibilityTest extends TestCase
                     1 => false,
                     2 => false,
                     3 => true,
+                    4 => false,
+                    default => throw new \InvalidArgumentException("No access level defined for user '{$user->getId()}'"),
+                };
+            });
+        $mockAccess
+            ->expects($this->any())
+            ->method('isParentOfLearner')
+            ->willReturnCallback(function (User $user) {
+                return match ($user->getId()) {
+                    1 => false,
+                    2 => false,
+                    3 => false,
+                    4 => true,
                     default => throw new \InvalidArgumentException("No access level defined for user '{$user->getId()}'"),
                 };
             });
