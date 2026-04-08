@@ -25,8 +25,8 @@
         {# no criteria specified, meaning this was an empty group (and the above iteration didn't run) #}
         <th rowspan="2">
             <span class="sequencer hide" data-sequencer-v="{{ rubricId }}-groups">
-                <a class="icon-up-arrow" data-sequencer-up title="Move up"></a>
-                <a class="icon-down-arrow" data-sequencer-down title="Move down"></a>
+                <a class="sbx-icon-only-button no-text" data-sequencer-up title="Move up" aria-label="Move up"><sbx-icon name="up-arrow"></sbx-icon></a>
+                <a class="sbx-icon-only-button no-text" data-sequencer-down title="Move down" aria-label="Move down"><sbx-icon name="down-arrow"></sbx-icon></a>
             </span>
             <input type="hidden" name="{{ groupInput }}[id]" value="{{ group.id }}" data-group-id />
             {% if group.name %}

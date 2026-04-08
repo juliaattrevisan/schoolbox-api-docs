@@ -155,7 +155,7 @@
                             <nav>
                                 {% if attempt.learnosityReference %}
                                     {% if not finished and canAttempt %}
-                                        <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id}) }}" class="icon-next" title="Resume"></a>
+                                        <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id}) }}" class="sbx-icon-only-button no-text" title="Resume" aria-label="Resume"><sbx-icon name="next"></sbx-icon></a>
                                     {% else %}
                                         {% set reviewRoute = routeLookupIfAuthorized('learnosity.getReview', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) %}
                                         {% if reviewRoute %}

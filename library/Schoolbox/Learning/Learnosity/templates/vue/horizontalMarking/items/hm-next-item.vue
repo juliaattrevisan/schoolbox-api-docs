@@ -27,11 +27,12 @@ function onSelected(): void {
 <template>
     <button
         v-if="!itemsStore.isAttemptComment"
-        class="button full-width icon-next"
+        class="button full-width sbx-button--has-icon"
         :style="`${itemsStore.isNextFinalReview ? 'font-weight: bold' : ''}`"
         :disabled="!store.isLoaded || store.isProcessing || !itemsStore.hasNextItem"
         @click.prevent="onSelected"
     >
+        <sbx-icon name="next"></sbx-icon>
         {{ buttonTitle }}
     </button>
 </template>
