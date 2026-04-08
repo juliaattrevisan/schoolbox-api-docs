@@ -374,6 +374,8 @@ nav {
         background-color: var(--sbx-color-foreground-secondary, $aluminum);
     }
     span {
+          a span,
+          a sbx-icon {
         display: block;
         white-space: nowrap;
         font-size: 1rem;
@@ -755,14 +757,15 @@ $train-line-unvisited-color: $content-ui-background;
                 width: 0.5 * $train-line-stop-size;
                 z-index: var(--sbx-depth-default);
                 transition: all 200ms ease-out;
+            }
 
-                // You specified an icon for this stop (Knurl)
-                &[class^="icon-"] {
-                    height: $train-line-stop-size;
-                    left: calc(50% - (#{calc($train-line-stop-size / 2)}));
-                    top: -1 * (calc(($train-line-stop-size - $train-line-segment-width) / 2));
-                    width: $train-line-stop-size;
-                }
+            // You specified an icon for this stop (Knurl)
+            a span[class^="icon-"],
+            a sbx-icon {
+                height: $train-line-stop-size;
+                left: calc(50% - (#{calc($train-line-stop-size / 2)}));
+                top: -1 * (calc(($train-line-stop-size - $train-line-segment-width) / 2));
+                width: $train-line-stop-size;
             }
         }
     }

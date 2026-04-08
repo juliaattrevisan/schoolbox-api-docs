@@ -28,7 +28,7 @@
     </div>
     <div class="small-12 column">
         {% set fileActionList %}
-            <li><a class="icon-document" data-action="open" href="{{ file.getHref() }}" target="_blank">Open</a></li>
+            <li><a data-action="open" href="{{ file.getHref() }}" target="_blank"><sbx-icon name="document"></sbx-icon>Open</a></li>
             {% if access >= 2 %}
             <li><a data-action="modify" href="{{ modify ~ file.id }}"><sbx-icon name="modify"></sbx-icon>Modify</a></li>
             <li><a class="sbx-icon-only-button no-text"

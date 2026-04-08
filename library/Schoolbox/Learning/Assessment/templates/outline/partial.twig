@@ -54,7 +54,7 @@
             {%  if assessment is dueWork and assessment.useRubric %}
                 <li>
                     <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessment.id }) }}"
-                       class="icon-criteria" data-test="course-outline-rubric-report-{{ assessment.id }}">Rubric Report</a>
+                       data-test="course-outline-rubric-report-{{ assessment.id }}"><sbx-icon name="criteria"></sbx-icon>Rubric Report</a>
                 </li>
             {% endif %}
 

@@ -59,7 +59,7 @@
         {% if assessment.useRubric %}
             <li>
                 <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessment.id }) }}"
-                   class="icon-criteria">Rubric Report</a>
+                ><sbx-icon name="criteria"></sbx-icon>Rubric Report</a>
             </li>
         {% endif %}
         {% if not allReadonly %}
