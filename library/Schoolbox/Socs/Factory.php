@@ -81,7 +81,8 @@ class Factory
             $bus->add(new Fixtures\Prepare(
                 $this->log,
                 $this->perform,
-                $this->lock
+                $this->lock,
+                $matchupMapper
             ))
             ->add(new Fixtures\Import(
                 $this->log,
@@ -99,7 +100,8 @@ class Factory
             ->add(new Fixtures\Cleanup(
                 $this->log,
                 $this->perform,
-                $this->lock
+                $this->lock,
+                $matchupMapper
             ));
         }
 

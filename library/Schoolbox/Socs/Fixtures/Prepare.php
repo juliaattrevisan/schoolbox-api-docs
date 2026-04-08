@@ -5,31 +5,49 @@ declare(strict_types=1);
 namespace Schoolbox\Socs\Fixtures;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
 use Schoolbox\Socs\IStrategy;
 use Symfony\Component\Lock\LockInterface;
 
 /**
  * SOCS fixtures prepare step.
  *
- * Currently a no-op that exists to mirror the Clipboard importer structure
- * and keep the pipeline extensible for future soft-delete or mark-and-sweep
- * behaviour.
+ * Marks previously-imported SOCS matchups for potential removal by setting
+ * their updated_at timestamps to a sentinel value. Matchups that are seen and
+ * saved again during the current import will have their timestamps refreshed,
+ * allowing the cleanup step to soft-delete only those that did not appear in
+ * the latest SOCS feed.
  */
 class Prepare implements IStrategy
 {
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
-        private LockInterface $lock
+        private LockInterface $lock,
+        private MatchupMapper $matchupMapper
     ) {
     }
 
+    /**
+     * Soft-delete preparation for SOCS fixtures.
+     *
+     * @throws \Symfony\Component\Lock\Exception\LockAcquiringException
+     * @throws \Symfony\Component\Lock\Exception\LockConflictedException
+     * @throws \PDOException When the underlying database query fails
+     */
     public function import(): void
     {
         if ($this->perform) {
             $this->lock->refresh();
+
+            $db = $this->matchupMapper->getDatabase();
+            $table = $this->matchupMapper->getTable();
+
+            // Mark existing SOCS matchups as "stale" until they are
+            // re-saved by the current import run.
+            $db->query("UPDATE {$table} SET updated_at = '0000-00-00 00:00:00' WHERE external_id LIKE 'socs:%'");
         }
 
-        $this->log->info('Preparing SOCS fixtures import (no-op).');
+        $this->log->info('Preparing previously-imported SOCS matchups for create/update.');
     }
 }
