@@ -47,6 +47,14 @@ class ImporterTool extends CliTool\App
 
     private ?HttpClient $httpClient = null;
 
+    /**
+     * Declare long CLI options accepted by the SOCS importer.
+     *
+     * These values are consumed by the generic CLI option parser to
+     * determine which flags this tool understands.
+     *
+     * @return string[] List of long option definitions for getopt
+     */
     public function getLongOpts(): array
     {
         return [
@@ -58,6 +66,12 @@ class ImporterTool extends CliTool\App
         ];
     }
 
+    /**
+     * Entry point for the SOCS importer CLI.
+     *
+     * Acquires the importer lock, determines which imports to run, and
+     * executes fixtures, results and/or teams synchronisations.
+     */
     public function run(): void
     {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
@@ -109,6 +123,9 @@ class ImporterTool extends CliTool\App
         }
     }
 
+    /**
+     * Print usage information for the SOCS importer CLI.
+     */
     private function printHelp(): void
     {
         echo <<<HELP
@@ -129,6 +146,15 @@ selected synchronisations will run.
 HELP;
     }
 
+    /**
+     * Import fixtures from the SOCS standard fixtures feed into Schoolbox Matchups.
+     *
+     * Creates or updates sports, divisions, teams, venues and fixtures within the
+     * dedicated SOCS season.
+     *
+     * @throws \Schoolbox\Mapper\Exception When database lookups or saves fail
+     * @throws \PDOException                 When the underlying database connection fails
+     */
     private function importFixtures(LoggerInterface $logger, LockInterface $lock): void
     {
         $host = (string)$this->getConfig()->get('socs_endpoint_host');
@@ -423,6 +449,15 @@ HELP;
         }
     }
 
+    /**
+     * Import SOCS teams from the detailed mso-sport feed.
+     *
+     * Ensures that sports, divisions and teams referenced by SOCS exist in the
+     * dedicated SOCS season, without creating any fixtures.
+     *
+     * @throws \Schoolbox\Mapper\Exception When database lookups or saves fail
+     * @throws \PDOException                 When the underlying database connection fails
+     */
     private function importTeams(LoggerInterface $logger): void
     {
         $host = (string)$this->getConfig()->get('socs_endpoint_host');
@@ -531,6 +566,12 @@ HELP;
     }
 
 
+    /**
+     * Find or create the SOCS Fixtures season covering the current year window.
+     *
+     * @throws \Schoolbox\Mapper\Exception When saving the Season fails
+     * @throws \PDOException                 When the underlying database connection fails
+     */
     private function recallSeason(SeasonMapper $seasonMapper, LoggerInterface $logger): SeasonModel
     {
         $seasonName = 'SOCS Fixtures';
@@ -574,6 +615,12 @@ HELP;
         return $season;
     }
 
+    /**
+     * Find, resurrect or create a Sport by name for SOCS imports.
+      *
+      * @throws \Schoolbox\Mapper\Exception When saving the Sport fails
+      * @throws \PDOException                 When the underlying database connection fails
+     */
     private function recallSport(SportMapper $sportMapper, LoggerInterface $logger, string $sportName): SportModel
     {
         try {
@@ -599,6 +646,12 @@ HELP;
         return $sport;
     }
 
+    /**
+     * Find, resurrect or create a Division for a given sport/season combination.
+      *
+      * @throws \Schoolbox\Mapper\Exception When saving the Division fails
+      * @throws \PDOException                 When the underlying database connection fails
+     */
     private function recallDivision(
         DivisionMapper $divisionMapper,
         LoggerInterface $logger,
@@ -635,6 +688,12 @@ HELP;
         return $division;
     }
 
+    /**
+     * Find, resurrect or create a Team within the given Division.
+      *
+      * @throws \Schoolbox\Mapper\Exception When saving the Team fails
+      * @throws \PDOException                 When the underlying database connection fails
+     */
     private function recallTeam(TeamMapper $teamMapper, LoggerInterface $logger, string $teamName, DivisionModel $division): TeamModel
     {
         try {
@@ -664,6 +723,12 @@ HELP;
         return $team;
     }
 
+    /**
+     * Find, resurrect or create a Venue by name.
+      *
+      * @throws \Schoolbox\Mapper\Exception When saving the Venue fails
+      * @throws \PDOException                 When the underlying database connection fails
+     */
     private function recallVenue(VenueMapper $venueMapper, LoggerInterface $logger, string $venueName): VenueModel
     {
         try {
@@ -689,6 +754,12 @@ HELP;
         return $venue;
     }
 
+    /**
+     * Find, resurrect or create a School by name for opposition teams.
+      *
+      * @throws \Schoolbox\Mapper\Exception When saving the School fails
+      * @throws \PDOException                 When the underlying database connection fails
+     */
     private function recallSchool(SchoolMapper $schoolMapper, LoggerInterface $logger, string $schoolName): SchoolModel
     {
         try {
@@ -714,6 +785,12 @@ HELP;
         return $school;
     }
 
+    /**
+     * Parse SOCS date and time strings into an Alaress_Date_Format instance.
+     *
+     * Accepts multiple supported input formats and normalises common "tbc" time
+     * markers; returns null and logs when parsing fails.
+     */
     private function makeDateTime(string $date, string $time, LoggerInterface $logger): ?\Alaress_Date_Format
     {
         if ('' === $date) {
@@ -757,6 +834,14 @@ HELP;
         return $this->httpClient;
     }
 
+    /**
+     * Indicate whether this CLI tool is permitted to run as root.
+     *
+     * Delegates to the parent implementation, which emits a warning when
+     * executed as root but does not prevent execution outright.
+     *
+     * @return bool|null True to allow, false to block, null for default behaviour
+     */
     public function runAsRoot(): ?bool
     {
         return parent::runAsRoot();
