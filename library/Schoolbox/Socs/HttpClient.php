@@ -18,12 +18,18 @@ class HttpClient
 
     private string $baseUrl;
 
+    private string $schoolId;
+
+    private string $token;
+
     /** @var array<string,int> */
     private array $urlUsage = [];
 
-    public function __construct(string $host)
+    public function __construct(string $host, string $schoolId = '', string $token = '')
     {
         $this->baseUrl = rtrim($host, '/');
+        $this->schoolId = $schoolId;
+        $this->token = $token;
         $this->client = new Client([
             'timeout' => 300,
             'http_errors' => false,
@@ -31,16 +37,18 @@ class HttpClient
     }
 
     /**
-     * @param array<string,string> $query
+     * @param array<string,string> $query Non-secret query parameters; ID and key are added automatically.
      */
     public function get(string $path, array $query, LoggerInterface $logger): ?ResponseInterface
     {
         $url = $this->buildBaseUrl($path);
-        $this->noteUrlUsed($url, $query);
+        $this->noteUrlUsed($path, $query);
+
+        $fullQuery = ['ID' => $this->schoolId, 'key' => $this->token] + $query;
 
         try {
             return $this->client->request('GET', $url, [
-                'query' => $query,
+                'query' => $fullQuery,
             ]);
         } catch (GuzzleException $e) {
             $logger->warning(sprintf('Failed to contact SOCS endpoint %s: %s', $url, $e->getMessage()));
@@ -59,15 +67,20 @@ class HttpClient
     }
 
     /**
-     * @param array<string,string> $query
+     * @param array<string,string> $query Non-secret query parameters to include in logs.
      */
-    private function noteUrlUsed(string $baseUrl, array $query): void
+    private function noteUrlUsed(string $path, array $query): void
     {
-        if ($query === []) {
+        $baseUrl = $this->buildBaseUrl($path);
+
+        $safeQuery = $query;
+        unset($safeQuery['ID'], $safeQuery['key']);
+
+        if ($safeQuery === []) {
             $url = $baseUrl;
         } else {
             $separator = str_contains($baseUrl, '?') ? '&' : '?';
-            $url = $baseUrl . $separator . http_build_query($query);
+            $url = $baseUrl . $separator . http_build_query($safeQuery);
         }
 
         if (!isset($this->urlUsage[$url])) {
