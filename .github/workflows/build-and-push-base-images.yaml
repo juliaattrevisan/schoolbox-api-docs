@@ -354,4 +354,3 @@ jobs:
         A new `${{ vars.FRANKENPHP_IMAGE_NAME }}` base image has been created for the `${{ env.BASE_BRANCH }}` branch.
 
         If working on that branch, please `gitsync ${{ env.BASE_BRANCH }}` and `docker/up` at earliest convenience.
-    secrets: inherit

@@ -45,4 +45,3 @@ jobs:
         The Docker environment has been updated in the `${{ env.BASE_BRANCH }}` branch.
 
         If working on that branch, please `gitsync ${{ env.BASE_BRANCH }}` and `docker/up` at earliest convenience.
-    secrets: inherit
