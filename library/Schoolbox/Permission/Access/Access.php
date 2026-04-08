@@ -274,6 +274,31 @@ class Access
 
 
     /**
+     * @param User         $parent
+     * @param Folder\Model $folder
+     * @return ?User
+     * @throws MapperException
+     * @see isParentOfLearner()
+     */
+    public function getChildLearnerOfParent(User $parent, Folder\Model $folder): ?User
+    {
+        $children = $parent->getChildren();
+
+        if (null === $children) {
+            return null;
+        }
+
+        foreach ($children as $child) {
+            if ($this->getFolderAccess($child, $folder->getId()) === UserAccess::ACCESS_READ) {
+                return $child;
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
      * Returns the minimum access level across the collection of specified folders. Checks perms from:
      * 1. User.SU status
      * 2. Group membership via `userAccess` table

@@ -191,23 +191,31 @@ class Visibility
     ): bool {
         $workType = $assessable->getWorkType();
 
-        $showToParent = false;
-        if ($respectWorkTypeVisibility && $workType !== null && $workType->isVisibleToParents()) {
-            try {
-                $showToParent = $this->access->isParentOfLearner(
-                    $nonInstructorNonLearner,
-                    $assessable->getBaseContext()->getFolder()
-                );
-            } catch (MapperException) {
-                // Do nothing - leave $showToParent as false.
-            }
+        try {
+            $childLearner = $this->access->getChildLearnerOfParent(
+                $nonInstructorNonLearner,
+                $assessable->getBaseContext()->getFolder()
+            );
+        } catch (MapperException) {
+            $childLearner = null; // In case of mapper error, assume no child learner exists.
         }
 
-        if ($showToParent || $nonInstructorNonLearner->getRole()->isStaff()) {
+        // Handle the case where the user is a parent of a learner.
+        if ($respectWorkTypeVisibility && $childLearner !== null) {
             if ($showClosed) {
                 return true;
             }
-            // If user is also a participant, respect their custom close date.
+            // If learner (child of parent of learner) is also a participant, respect their custom close date.
+            $participant = $assessable->getParticipantIfExtant($childLearner);
+            $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
+            return $now->lt($closeDate);
+        }
+
+        if ($nonInstructorNonLearner->getRole()->isStaff()) {
+            if ($showClosed) {
+                return true;
+            }
+            // If staff member is also a participant, respect their custom close date.
             $participant = $assessable->getParticipantIfExtant($nonInstructorNonLearner);
             $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
             return $now->lt($closeDate);
