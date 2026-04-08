@@ -202,15 +202,15 @@ class Visibility
 
         // Handle the case where the user is a parent of a learner.
         if ($respectWorkTypeVisibility && $childLearner !== null && $workType->isVisibleToParents()) {
-            if ($showClosed) {
-                return true;
-            }
             // If learner (child of parent of learner) is also a participant, respect their custom close date.
+            // Also, parents should only see published assessments - similar to learners and non-learner participants.
             $participant = $assessable->getParticipantIfExtant($childLearner);
             $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
-            return $now->lt($closeDate);
+            $isPublished = $now->gte($participant->getPublishDate());
+            return $isPublished && ($showClosed || $now->lte($closeDate));
         }
 
+        // Handle the case where the user is a staff member.
         if ($nonInstructorNonLearner->getRole()->isStaff()) {
             if ($showClosed) {
                 return true;
