@@ -245,7 +245,7 @@ class Feed
 
         $query = $this->db->prepare("
             SELECT
-                assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start, assess.categoryId as folderId,
+                assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start, assess.category_id as folderId,
                 u.title, u.firstname, u.preferred_name, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
                 c.name as cat_name, c.id as cat_id,
                 lwt.is_visible_to_parents, lwt.is_visible_to_learners
