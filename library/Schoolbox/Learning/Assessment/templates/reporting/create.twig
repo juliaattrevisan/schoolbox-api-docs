@@ -187,23 +187,18 @@
             <label>Work Types</label>
             <p class="meta">Select which work types will be presented as supporting data.</p>
 
-            {# TODO Snake Lord, the checkbox container in the pantry is broken;
-             # need to implement the one on the Advanced Search control panel instead
-             #}
-            <div class="checklist">
-                <ul class="option-list">
-                    {% for workType in reporting.workTypes %}
+            <div class="checklist checklist-container">
+                {% for workType in reporting.workTypes %}
+                    <div class="checklist-wrapper">
                         {% set checked = '' %}
 
                         {% if workType.id in assessment.supportingDataWorkTypes.propertyValues('id') ?? [] %}
                             {% set checked = 'checked="checked"' %}
                         {% endif %}
-                        <li>
-                            <input id="checkbox-worktype-{{ workType.id }}" name="reporting[supporting][workTypes][]" type="checkbox" value="{{ workType.id }}" {{ checked }}/>
-                            <label for="checkbox-worktype-{{ workType.id }}">{{ workType.name }}</label>
-                        </li>
-                    {% endfor %}
-                </ul>
+                        <input id="checkbox-worktype-{{ workType.id }}" name="reporting[supporting][workTypes][]" type="checkbox" value="{{ workType.id }}" {{ checked }}/>
+                        <label for="checkbox-worktype-{{ workType.id }}">{{ workType.name }}</label>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
