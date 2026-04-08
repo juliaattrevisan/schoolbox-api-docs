@@ -201,7 +201,10 @@ class Visibility
         }
 
         // Handle the case where the user is a parent of a learner.
-        if ($respectWorkTypeVisibility && $childLearner !== null && $workType->isVisibleToParents()) {
+        if (
+            $respectWorkTypeVisibility && $workType !== null
+            && $childLearner !== null && $workType->isVisibleToParents()
+        ) {
             // If learner (child of parent of learner) is also a participant, respect their custom close date.
             // Also, parents should only see published assessments - similar to learners and non-learner participants.
             $participant = $assessable->getParticipantIfExtant($childLearner);
@@ -221,12 +224,15 @@ class Visibility
             return $now->lt($closeDate);
         }
 
-        if ($respectWorkTypeVisibility && $workType !== null) {
-            if (!$workType->isVisibleToLearners() && !$workType->isVisibleToParents()) {
-                // Only staff/instructors may see; non-staff non-learner excluded.
-                return false;
-            }
+        if (
+            $respectWorkTypeVisibility && $workType !== null
+            && !$workType->isVisibleToLearners() && !$workType->isVisibleToParents()
+        ) {
+            // This work type is visible only to staff and instructors.  Since the user is a non-instructor and not
+            // staff (since the staff case was handled above), the assessment should not be visible to the user.
+            return false;
         }
+
         $participant = $assessable->getParticipantIfExtant($nonInstructorNonLearner);
         if (!$participant) {
             return false;
