@@ -557,16 +557,18 @@ window.Vue.onMounted(async () => {
                             v-if="props.routes.getSetAsGoalForm"
                             :href="getReturnUrl(props.routes.getSetAsGoalForm)"
                             title="Set goals"
-                            class="goals icon-goal"
+                            class="goals"
                         >
+                            <sbx-icon name="goal"></sbx-icon>
                             <span>Set Goals</span>
                         </a>
                         <a
                             v-if="props.routes.getSetAsGoalForSelfForm"
                             :href="getReturnUrl(props.routes.getSetAsGoalForSelfForm)"
                             title="Set goals"
-                            class="goals icon-goal"
+                            class="goals"
                         >
+                            <sbx-icon name="goal"></sbx-icon>
                             <span>Set My Goals</span>
                         </a>
                         <a

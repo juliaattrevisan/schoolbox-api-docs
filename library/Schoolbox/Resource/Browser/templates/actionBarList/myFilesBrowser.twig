@@ -1,10 +1,10 @@
 {% if folder.id == 0 %}
-    <li><a class="icon-folder"   data-action="folder"   href="/cms/myFolder/new/{{ folder.id }}">Add Folder</a></li>
+    <li><a data-action="folder"   href="/cms/myFolder/new/{{ folder.id }}"><sbx-icon name="folder"></sbx-icon>Add Folder</a></li>
 {% else %}
     {% if access >= 2 or user.isSuperuser %}
         <li><a data-action="modify" href="/cms/myFolder/{{ folder.id }}"><sbx-icon name="modify"></sbx-icon>Modify</a></li>
         <li><a data-action="file"     href="/cms/myFile/new/{{ user.getId() }}/{{ folder.id }}"><sbx-icon name="drop-box"></sbx-icon>Post File</a></li>
-        <li><a class="icon-folder"   data-action="folder"   href="/cms/myFolder/new/{{ folder.id }}">Add Folder</a></li>
+        <li><a data-action="folder"   href="/cms/myFolder/new/{{ folder.id }}"><sbx-icon name="folder"></sbx-icon>Add Folder</a></li>
     {% endif %}
     {% if access >= 2 or user.isSuperuser %}
         <li><a class="sbx-icon-only-button no-text"

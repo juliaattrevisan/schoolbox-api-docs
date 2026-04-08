@@ -616,10 +616,8 @@ export default {
                         >
                     </li>
                     <li v-if="badgesEnabled">
-                        <a
-                            :href="buildSetGoalUrl()"
-                            :class="{ disabled: selectedStudentIds.length === 0, 'icon-goal': true }"
-                            >Set Goals</a
+                        <a :href="buildSetGoalUrl()" :class="{ disabled: selectedStudentIds.length === 0 }"
+                            ><sbx-icon name="goal"></sbx-icon>Set Goals</a
                         >
                     </li>
                     <li v-if="badgesEnabled">
