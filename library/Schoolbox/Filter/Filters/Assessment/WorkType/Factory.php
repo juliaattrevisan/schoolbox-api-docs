@@ -95,10 +95,12 @@ class Factory extends Filter\AbstractFactory
         GenericCollection $overrides
     ): IComponent {
         if (
-            $pageFilter->getPage() === Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS ||
-            $pageFilter->getPage() === Filter\Page\Model::PAGE_GRADES
+            $viewee !== null && (
+                $pageFilter->getPage() === Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS ||
+                $pageFilter->getPage() === Filter\Page\Model::PAGE_GRADES
+            )
         ) {
-            $workTypes = $this->classifyViewerWorkTypes($user, $viewee);
+            $workTypes = $this->getWorkTypesVisibleToUser($user, $viewee);
         } else {
             /* Everything else is a staff-only page */
             $workTypes = $this->workTypeMapper->findAll();
@@ -118,15 +120,15 @@ class Factory extends Filter\AbstractFactory
     /**
      * Classifies the viewer's relationship to the viewee and returns the appropriate set of visible work types.
      *
-     * @param User      $user   The viewer
-     * @param User|null $viewee The user whose assessments are being viewed
+     * @param User $user   The viewer
+     * @param User $viewee The user whose assessments are being viewed
      * @return GenericCollection<WorkType\Model>
      * @throws InvalidColumnException
      */
-    private function classifyViewerWorkTypes(User $user, ?User $viewee): GenericCollection
+    private function getWorkTypesVisibleToUser(User $user, User $viewee): GenericCollection
     {
         // Case 1: viewer is looking at their own page — treat as learner
-        if ($viewee === null || $user->getId() === $viewee->getId()) {
+        if ($user->getId() === $viewee->getId()) {
             return $this->workTypeMapper->findByPredicates(
                 $this->workTypeMapper->getPredicateBuilder()->notEquals('is_visible_to_learners', 0)
             );
