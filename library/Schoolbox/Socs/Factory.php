@@ -14,8 +14,12 @@ use Schoolbox\Fixtures\School\Mapper as SchoolMapper;
 use Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
 use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
+use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
+use Schoolbox\Fixtures\Team\Coach\Mapper as TeamCoachMapper;
+use Schoolbox\Fixtures\Coach\Mapper as CoachMapper;
 use Schoolbox\Fixtures\Venue\Mapper as VenueMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\UserMapper;
 use SensitiveParameter;
 use Symfony\Component\Lock\LockInterface;
 
@@ -70,10 +74,14 @@ class Factory
         $sportMapper = SportMapper::getInstance();
         $divisionMapper = DivisionMapper::getInstance();
         $teamMapper = TeamMapper::getInstance();
+        $teamPlayerMapper = TeamPlayerMapper::getInstance();
+        $teamCoachMapper = TeamCoachMapper::getInstance();
+        $coachMapper = CoachMapper::getInstance();
         $venueMapper = VenueMapper::getInstance();
         $schoolMapper = SchoolMapper::getInstance();
         $matchupMapper = MatchupMapper::getInstance();
         $resultMapper = ResultMapper::getInstance();
+        $userMapper = UserMapper::getInstance();
 
         $bus = new GenericCollection(IStrategy::class);
 
@@ -95,7 +103,11 @@ class Factory
                 $teamMapper,
                 $venueMapper,
                 $schoolMapper,
-                $matchupMapper
+                $matchupMapper,
+                $userMapper,
+                $teamPlayerMapper,
+                $teamCoachMapper,
+                $coachMapper
             ))
             ->add(new Fixtures\Cleanup(
                 $this->log,
