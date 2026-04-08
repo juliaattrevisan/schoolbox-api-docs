@@ -11,6 +11,7 @@ namespace Schoolbox\Socs\Cli;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Socs\HttpClient;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Result\Mapper as ResultMapper;
@@ -83,7 +84,7 @@ class ImporterTool extends CliTool\App
 
         $logger = $this->getLogger();
 
-        if (!$this->getConfig()->get('socs_enabled')) {
+        if (!$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENABLED)) {
             $logger->info('SOCS integration is not enabled; exiting');
             return;
         }
@@ -107,14 +108,14 @@ class ImporterTool extends CliTool\App
 
         try {
             // spawn the http client in the background so that it can be used
-            $host = (string)$this->getConfig()->get('socs_endpoint_host');
+            $host = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_HOST);
 
             if ('' === $host) {
                 $logger->warning('Missing SOCS endpoint host; exiting results import');
                 return;
             }
 
-            $token = (string)$this->getConfig()->get('socs_endpoint_token');
+            $token = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN);
             if ('' === $token) {
                 $logger->warning('Missing SOCS endpoint token; exiting results import');
                 return;
