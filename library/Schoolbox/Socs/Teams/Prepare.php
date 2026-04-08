@@ -27,7 +27,6 @@ class Prepare implements IStrategy
         private bool $perform,
         private LockInterface $lock,
         private SeasonMapper $seasonMapper,
-        private DivisionMapper $divisionMapper,
         private TeamMapper $teamMapper
     ) {
     }
@@ -57,13 +56,11 @@ class Prepare implements IStrategy
 
         $seasonId = (int)$season->getId();
         $db = $this->teamMapper->getDatabase();
-        $teamTable = $this->teamMapper->getTable();
-        $divisionTable = $this->divisionMapper->getTable();
 
         // Mark teams whose divisions belong to the SOCS Fixtures season as
         // "stale" until they are re-saved by the current import run.
-        $sql = "UPDATE {$teamTable} t
-            INNER JOIN {$divisionTable} d ON t.division_id = d.id
+        $sql = "UPDATE sportsfixtures_team t
+            INNER JOIN sportsfixtures_division d ON t.division_id = d.id
             SET t.updated_at = '0000-00-00 00:00:00'
             WHERE d.season_id = {$seasonId}";
         $db->query($sql);

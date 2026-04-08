@@ -134,7 +134,6 @@ class Factory
                 $this->perform,
                 $this->lock,
                 $seasonMapper,
-                $divisionMapper,
                 $teamMapper
             ))
             ->add(new Teams\Import(
@@ -151,7 +150,6 @@ class Factory
                 $this->log,
                 $this->perform,
                 $this->lock,
-                $divisionMapper,
                 $teamMapper
             ));
         }

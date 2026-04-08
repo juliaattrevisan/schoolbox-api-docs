@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Schoolbox\Socs\Teams;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 use Schoolbox\Socs\IStrategy;
 use Symfony\Component\Lock\LockInterface;
@@ -24,7 +23,6 @@ class Cleanup implements IStrategy
         private LoggerInterface $log,
         private bool $perform,
         private LockInterface $lock,
-        private DivisionMapper $divisionMapper,
         private TeamMapper $teamMapper
     ) {
     }
@@ -42,13 +40,11 @@ class Cleanup implements IStrategy
             $this->lock->refresh();
 
             $db = $this->teamMapper->getDatabase();
-            $teamTable = $this->teamMapper->getTable();
-            $divisionTable = $this->divisionMapper->getTable();
 
             // Soft-delete teams that were not touched during this import run by
             // marking those which still have the sentinel updated_at value.
-            $sql = "UPDATE {$teamTable} t
-                INNER JOIN {$divisionTable} d ON t.division_id = d.id
+            $sql = "UPDATE sportsfixtures_team t
+                INNER JOIN sportsfixtures_division d ON t.division_id = d.id
                 SET t.deleted_at = NOW()
                 WHERE t.updated_at = '0000-00-00 00:00:00'";
             $db->query($sql);
