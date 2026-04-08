@@ -637,6 +637,29 @@ abstract class Controller extends ListController implements IAssessmentControlle
             }
         }
 
+        /* Reporting Activity specific settings/data are here
+         */
+        if ($assessment instanceof Reporting\Model) {
+            /* You have to fulfil these preconditions to alter something about a reporting activity
+             * Normally we'd exit earlier, but this assessment controller is obese and needs refactoring: SA-21446
+             */
+            if (!(new ValidManageActivity())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_REPORTING_ACTIVITY_ENABLE), $this->getUser())) {
+                throw new \Schoolbox\Mapper\Exception\NotFound();
+            }
+
+            /* Reporting activities need to know about all the available Work Types that could be selected
+             */
+            $data['reporting']['workTypes'] = $this->workTypeMapper->findAll();
+
+            /* Reporting activities can constrain the mega markbook to certain kinds of folders
+             */
+            $data['reporting']['availableFolderOptions'] = Folder::lookup();
+
+            /* There are numerous date range options of which numerous could be enabled
+             */
+            $data['reporting']['availableRangeOptions'] = Range::lookup();
+        }
+
         $student = explode(',', $this->requestQuery->get('student', ''));
         $data['participants'] = $assessment->getAllParticipants()
             ->filter(fn(Participant $participant) => in_array($participant->getUser()->getId(), $student))
