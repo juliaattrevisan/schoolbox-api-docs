@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Socs\Cli;
 
-use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
@@ -36,8 +35,6 @@ class ImporterTool extends CliTool\App
     private const SOCS_IMPORTER_LOCK_NAME = 'socs_importer';
     public const LOCK_NAME = self::SOCS_IMPORTER_LOCK_NAME;
 
-    // this may be unique to each school, but we don't know yet... so hard coding it here for now...
-    private const SOCS_SCHOOL_ID = '2460';
 
     private const FIXTURES_PATH = 'fixturecalendar.ashx';
     private const MSO_SPORT_PATH = 'mso-sport.ashx';
@@ -113,27 +110,33 @@ class ImporterTool extends CliTool\App
             $host = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_HOST);
 
             if ('' === $host) {
-                $logger->warning('Missing SOCS endpoint host; exiting results import');
+                $logger->warning('Missing SOCS endpoint host; exiting SOCS importer');
                 return;
             }
 
             $token = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN);
             if ('' === $token) {
-                $logger->warning('Missing SOCS endpoint token; exiting results import');
+                $logger->warning('Missing SOCS endpoint token; exiting SOCS importer');
                 return;
             }
 
-            $this->httpClient = new httpClient($host, self::SOCS_SCHOOL_ID, $token);
+            $schoolId = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_SCHOOL_ID);
+            if ('' === $schoolId) {
+                $logger->warning('Missing SOCS school identifier; exiting SOCS importer');
+                return;
+            }
+
+            $this->httpClient = new HttpClient($host, $schoolId, $token);
             if ($runFixtures) {
                 $this->importFixtures($logger, $lock);
             }
 
             if ($runResults) {
-                $this->importResults($logger);
+                $this->importResults($logger, $lock);
             }
 
             if ($runTeams) {
-                $this->importTeams($logger);
+                $this->importTeams($logger, $lock);
             }
         } finally {
             if ($this->httpClient instanceof HttpClient) {
@@ -198,12 +201,7 @@ HELP;
             'enddate'   => $endDate,
         ];
 
-        try {
-            $response = $this->httpClient->get(self::FIXTURES_PATH, $query, $logger);
-        } catch (GuzzleException $e) {
-            $logger->warning(sprintf('Failed to contact SOCS endpoint: %s', $e->getMessage()));
-            return;
-        }
+        $response = $this->httpClient->get(self::FIXTURES_PATH, $query, $logger);
 
         if (null === $response) {
             return;
@@ -324,7 +322,7 @@ HELP;
      * @throws \Schoolbox\Mapper\Exception When database lookups or saves fail
      * @throws \PDOException                 When the underlying database connection fails
      */
-    private function importResults(LoggerInterface $logger): void
+    private function importResults(LoggerInterface $logger, LockInterface $lock): void
     {
         $now = \Alaress_Date_Format::now();
         $startDate = (clone $now)->addDays(-30)->getUsingFormat('j M Y');
@@ -337,12 +335,7 @@ HELP;
             'enddate'   => $endDate,
         ];
 
-        try {
-            $response = $this->httpClient->get(self::RESULTS_PATH, $query, $logger);
-        } catch (GuzzleException $e) {
-            $logger->warning(sprintf('Failed to contact SOCS results endpoint: %s', $e->getMessage()));
-            return;
-        }
+        $response = $this->httpClient->get(self::RESULTS_PATH, $query, $logger);
 
         if (null === $response) {
             return;
@@ -383,6 +376,7 @@ HELP;
         $imported = 0;
 
         foreach ($xml->children() as $resultNode) {
+            $lock->refresh();
             $eventId = trim((string)$resultNode->eventid);
             $resultText = trim((string)$resultNode->result);
 
@@ -442,7 +436,7 @@ HELP;
      * @throws \Schoolbox\Mapper\Exception When database lookups or saves fail
      * @throws \PDOException                 When the underlying database connection fails
      */
-    private function importTeams(LoggerInterface $logger): void
+    private function importTeams(LoggerInterface $logger, LockInterface $lock): void
     {
         $seasonMapper = SeasonMapper::getInstance();
         $sportMapper = SportMapper::getInstance();
@@ -455,12 +449,7 @@ HELP;
 
         $query = [];
 
-        try {
-            $response = $this->httpClient->get(self::MSO_SPORT_PATH, $query, $logger);
-        } catch (GuzzleException $e) {
-            $logger->warning(sprintf('Failed to contact SOCS teams endpoint: %s', $e->getMessage()));
-            return;
-        }
+        $response = $this->httpClient->get(self::MSO_SPORT_PATH, $query, $logger);
 
         if (null === $response) {
             return;
@@ -505,6 +494,7 @@ HELP;
         $imported = 0;
 
         foreach ($teams as $teamNode) {
+            $lock->refresh();
             $sportName = trim((string)$teamNode->sport);
             $teamName = trim((string)$teamNode->teamname);
 
@@ -544,6 +534,8 @@ HELP;
         $start = \Alaress_Date_Format::now()->startOfYear()->startOfDay();
         $end = \Alaress_Date_Format::now()->startOfYear()->startOfDay()->addYears(2);
 
+        $needsSave = false;
+
         try {
             /** @var SeasonModel $season */
             $season = $seasonMapper->findOneByColumn('name', $seasonName);
@@ -558,6 +550,7 @@ HELP;
             $season = $e->getDeletedObject();
             $season->setDeletedAt(null);
             $logger->debug(sprintf('Resurrecting previously-deleted SOCS season %s', $season->getName()));
+            $needsSave = true;
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var SeasonModel $season */
             $season = $seasonMapper->createModel()
@@ -571,9 +564,10 @@ HELP;
                 $season->getStart()->getDatabase(),
                 $season->getEnd()->getDatabase()
             ));
+            $needsSave = true;
         }
 
-        if ($this->perform()) {
+        if ($this->perform() && $needsSave) {
             $seasonMapper->save($season);
         }
 
@@ -588,6 +582,8 @@ HELP;
      */
     private function recallSport(SportMapper $sportMapper, LoggerInterface $logger, string $sportName): SportModel
     {
+        $needsSave = false;
+
         try {
             /** @var SportModel $sport */
             $sport = $sportMapper->findOneByColumn('name', $sportName);
@@ -597,14 +593,16 @@ HELP;
             $sport = $e->getDeletedObject();
             $sport->setDeletedAt(null);
             $logger->debug(sprintf('Resurrecting previously-deleted SOCS sport %s', $sport->getName()));
+            $needsSave = true;
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var SportModel $sport */
             $sport = $sportMapper->createModel()
                 ->setName($sportName);
             $logger->debug(sprintf('Creating new SOCS sport %s', $sport->getName()));
+            $needsSave = true;
         }
 
-        if ($this->perform()) {
+        if ($this->perform() && $needsSave) {
             $sportMapper->save($sport);
         }
 
@@ -624,6 +622,8 @@ HELP;
         SportModel $sport,
         SeasonModel $season
     ): DivisionModel {
+        $needsSave = false;
+
         try {
             /** @var DivisionModel $division */
             $division = $divisionMapper->findOneByColumnList([
@@ -637,6 +637,7 @@ HELP;
             $division = $e->getDeletedObject();
             $division->setDeletedAt(null);
             $logger->debug(sprintf('Resurrecting previously-deleted SOCS division %s', $division->getName()));
+            $needsSave = true;
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var DivisionModel $division */
             $division = $divisionMapper->createModel()
@@ -644,9 +645,10 @@ HELP;
                 ->setSport($sport)
                 ->setSeason($season);
             $logger->debug(sprintf('Creating new SOCS division %s', $division->getName()));
+            $needsSave = true;
         }
 
-        if ($this->perform()) {
+        if ($this->perform() && $needsSave) {
             $divisionMapper->save($division);
         }
 
@@ -661,6 +663,8 @@ HELP;
      */
     private function recallTeam(TeamMapper $teamMapper, LoggerInterface $logger, string $teamName, DivisionModel $division): TeamModel
     {
+        $needsSave = false;
+
         try {
             /** @var TeamModel $team */
             $team = $teamMapper->findOneByColumnList([
@@ -673,15 +677,17 @@ HELP;
             $team = $e->getDeletedObject();
             $team->setDeletedAt(null);
             $logger->debug(sprintf('Resurrecting previously-deleted SOCS team %s', $team->getName()));
+            $needsSave = true;
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var TeamModel $team */
             $team = $teamMapper->createModel()
                 ->setName($teamName)
                 ->setDivision($division);
             $logger->debug(sprintf('Creating new SOCS team %s', $team->getName()));
+            $needsSave = true;
         }
 
-        if ($this->perform()) {
+        if ($this->perform() && $needsSave) {
             $teamMapper->save($team);
         }
 
@@ -696,6 +702,8 @@ HELP;
      */
     private function recallVenue(VenueMapper $venueMapper, LoggerInterface $logger, string $venueName): VenueModel
     {
+        $needsSave = false;
+
         try {
             /** @var VenueModel $venue */
             $venue = $venueMapper->findOneByColumn('name', $venueName);
@@ -705,14 +713,16 @@ HELP;
             $venue = $e->getDeletedObject();
             $venue->setDeletedAt(null);
             $logger->debug(sprintf('Resurrecting previously-deleted SOCS venue %s', $venue->getName()));
+            $needsSave = true;
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var VenueModel $venue */
             $venue = $venueMapper->createModel()
                 ->setName($venueName);
             $logger->debug(sprintf('Creating new SOCS venue %s', $venue->getName()));
+            $needsSave = true;
         }
 
-        if ($this->perform()) {
+        if ($this->perform() && $needsSave) {
             $venueMapper->save($venue);
         }
 
@@ -727,6 +737,8 @@ HELP;
      */
     private function recallSchool(SchoolMapper $schoolMapper, LoggerInterface $logger, string $schoolName): SchoolModel
     {
+        $needsSave = false;
+
         try {
             /** @var SchoolModel $school */
             $school = $schoolMapper->findOneByColumn('name', $schoolName);
@@ -736,14 +748,16 @@ HELP;
             $school = $e->getDeletedObject();
             $school->setDeletedAt(null);
             $logger->debug(sprintf('Resurrecting previously-deleted SOCS school %s', $school->getName()));
+            $needsSave = true;
         } catch (\Schoolbox\Mapper\Exception $e) {
             /** @var SchoolModel $school */
             $school = $schoolMapper->createModel()
                 ->setName($schoolName);
             $logger->debug(sprintf('Creating new SOCS school %s', $school->getName()));
+            $needsSave = true;
         }
 
-        if ($this->perform()) {
+        if ($this->perform() && $needsSave) {
             $schoolMapper->save($school);
         }
 
