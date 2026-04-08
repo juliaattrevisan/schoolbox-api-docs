@@ -198,7 +198,8 @@ function onOpenIncludeInExistingModal(): void {
                             </button>
                         </li>
                         <li>
-                            <button class="icon-staff-students" @click.prevent="onActionSelected('exclude')">
+                            <button @click.prevent="onActionSelected('exclude')">
+                                <sbx-icon name="staff-students"></sbx-icon>
                                 Exclude Student
                             </button>
                         </li>

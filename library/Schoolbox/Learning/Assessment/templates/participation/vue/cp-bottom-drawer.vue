@@ -86,9 +86,10 @@ function clearSelection(): void {
                     Modify Existing {{ locale.activity.translate(false, true) }}
                 </button>
                 <button
-                    class="icon-staff-students button l-flex__item--1-auto"
+                    class="button l-flex__item--1-auto"
                     @click.prevent="handleActionSelected(selectedList, 'exclude')"
                 >
+                    <sbx-icon name="staff-students"></sbx-icon>
                     Exclude {{ selectedList.length === 1 ? "Student" : "Students" }}
                 </button>
                 <button
