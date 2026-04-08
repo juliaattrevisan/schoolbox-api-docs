@@ -22,7 +22,7 @@
     </nav>
     <ul data-dropdown-content id="header-options" class="f-dropdown">
         {% if gradeRoute %}
-        <li><a class="icon-task" href="{{ gradeRoute }}">View and {{ locale.grades }} submission</a></li>
+        <li><a href="{{ gradeRoute }}"><sbx-icon name="task"></sbx-icon>View and {{ locale.grades }} submission</a></li>
         {% endif %}
 
         {# if we are on course level, we should hide the status page

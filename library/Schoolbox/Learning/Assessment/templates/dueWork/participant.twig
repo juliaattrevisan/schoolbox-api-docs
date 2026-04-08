@@ -59,13 +59,13 @@
                 <ul id="feedback-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
                     {%- apply spaceless %}
                         {% if pActionResponses %}
-                            <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.givenName }}" data-inline-grader data-test="assessment-status-feedback-viewSubmission-{{ participant.user.id }}">View {% if fbUrl %}and {{ locale.grades }} {% endif %}submission</a></li>
+                            <li><a href="{{ pActionResponses }}" title="View submission for {{ participant.user.givenName }}" data-inline-grader data-test="assessment-status-feedback-viewSubmission-{{ participant.user.id }}"><sbx-icon name="task"></sbx-icon>View {% if fbUrl %}and {{ locale.grades }} {% endif %}submission</a></li>
                         {% endif %}
                         {% if pActionSummary %}
                             <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.givenName }}'s history" data-test="assessment-status-feedback-responseHistory-{{ participant.user.id }}">{{ responseHistory }}</a></li>
                         {% endif %}
                         {% if pActionSobo %}
-                            <li><a class="icon-due-work" href="{{ pActionSobo }}" title="Submit on behalf of {{ participant.user.givenName }}">Submit on behalf of {{ participant.user.givenName }}</a></li>
+                            <li><a href="{{ pActionSobo }}" title="Submit on behalf of {{ participant.user.givenName }}"><sbx-icon name="due-work"></sbx-icon>Submit on behalf of {{ participant.user.givenName }}</a></li>
                         {% endif %}
                     {% endapply -%}
                 </ul>

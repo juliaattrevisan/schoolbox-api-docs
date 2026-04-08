@@ -27,7 +27,7 @@
 {% block headerOptionsMiddle %}
     {% set rescoreRoute = routeLookupIfAuthorized('learnosity.postRescoreAttempts', {assessment: assessment, assessmentId: assessment.id}) %}
     {% if rescoreRoute and not isSpecification %}
-        <li><a class="icon-quiz" href="{{ rescoreRoute }}" data-rescore>Rescore all attempts</a></li>
+        <li><a href="{{ rescoreRoute }}" data-rescore><sbx-icon name="quiz"></sbx-icon>Rescore all attempts</a></li>
 
         <script>
             $(function() {

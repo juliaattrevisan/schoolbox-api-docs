@@ -37,9 +37,9 @@
                     'learningMarkbook.getMarkbookForClassAndTerm',
                     {folder: class, folderId: class.id, term: term, termCode: term.code})
                 %}
-                {% if classMarkbookRoute %}<li><a href="{{ classMarkbookRoute }}" class="icon-curriculum">Class Markbook</a></li>{% endif %}
+                {% if classMarkbookRoute %}<li><a href="{{ classMarkbookRoute }}"><sbx-icon name="curriculum"></sbx-icon>Class Markbook</a></li>{% endif %}
                 {% set rubricMarkbookRoute = routeLookupIfAuthorized('rubricMarkbook.getMarkbook', {folder: class, folderId: class.id}) %}
-                {% if rubricMarkbookRoute %}<li><a href="{{ rubricMarkbookRoute }}" class="icon-curriculum">Rubric Markbook</a></li>{% endif %}
+                {% if rubricMarkbookRoute %}<li><a href="{{ rubricMarkbookRoute }}"><sbx-icon name="curriculum"></sbx-icon>Rubric Markbook</a></li>{% endif %}
                 {% set cohortReportRoute = routeLookupIfAuthorized('learningMomentEvidence.getCohortReport', {folder: class, folderId: class.id}) %}
                 {% if cohortReportRoute %}<li><a href="{{ cohortReportRoute }}"><sbx-icon name="share"></sbx-icon>Cohort Learning Moments</a></li>{% endif %}
                 {% set badgeAwardRoute = routeLookupIfAuthorized('learningBadgeAward.getListPage', {folder: class, folderId: class.id}) %}

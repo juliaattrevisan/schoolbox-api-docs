@@ -94,7 +94,7 @@
                                                 <sbx-pop-out content-id="unit-options{{ unit.id }}"></sbx-pop-out>
                                             </nav>
                                             <ul data-dropdown-content class="f-dropdown" id="unit-options{{ unit.id }}">
-                                                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lessonPlan&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lesson-plan">Create {{ locale.lessonPlan.proper }}</a></li>
+                                                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lessonPlan&{{ returnUrlName }}={{ encodedReturnUrl }}"><sbx-icon name="lesson-plan"></sbx-icon>Create {{ locale.lessonPlan.proper }}</a></li>
                                             </ul>
                                         {% endif %}
                                     </div>

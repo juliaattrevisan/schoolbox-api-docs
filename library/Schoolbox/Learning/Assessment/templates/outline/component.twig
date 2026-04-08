@@ -65,7 +65,7 @@
     {% if (courseImplementation.units ?? [])|length %}
         <p class="component-titlebar meta">
             {% if courseSpecification.folder.id in accessibleFolderIds %}
-                <a class="icon-course" href="{{ '/homepage/' ~ courseSpecification.folder.id }}" title="Visit course page">{{ courseSpecification.title }}</a>
+                <a href="{{ '/homepage/' ~ courseSpecification.folder.id }}" title="Visit course page"><sbx-icon name="course"></sbx-icon>{{ courseSpecification.title }}</a>
             {% else %}
                 <a class="icon-course">{{ courseSpecification.title }}</a>
             {% endif %}

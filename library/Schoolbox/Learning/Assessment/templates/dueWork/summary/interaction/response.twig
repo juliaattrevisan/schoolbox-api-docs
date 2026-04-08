@@ -72,7 +72,7 @@
                     <sbx-pop-out content-id="response-options-{{ currentInteraction.id }}"></sbx-pop-out>
                 </nav>
                 <ul id="response-options-{{ currentInteraction.id }}" class="f-dropdown" data-dropdown-content>
-                    {%  if url %} <li><a href="{{ url }}" class="icon-task" title="{{ tooltip }}" >{{ tooltip }}</a></li>
+                    {%  if url %} <li><a href="{{ url }}" title="{{ tooltip }}"><sbx-icon name="task"></sbx-icon>{{ tooltip }}</a></li>
                     {% endif %}
                     <li><a href="{{ viewRoute }}" title="Delete submission" data-delete="{{ deleteRoute }}"><sbx-icon name="delete"></sbx-icon>Delete</a></li>
                 </ul>

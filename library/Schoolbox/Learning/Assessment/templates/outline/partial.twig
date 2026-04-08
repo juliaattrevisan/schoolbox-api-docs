@@ -26,7 +26,7 @@
                     assessment: assessment,
                 }) %}
                 {% if viewGradeRoute %}
-                    <li><a class="icon-task" data-test="course-outline-view-grade-submissions-{{ assessment.id }}" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submissions</a></li>
+                    <li><a data-test="course-outline-view-grade-submissions-{{ assessment.id }}" href="{{ viewGradeRoute }}"><sbx-icon name="task"></sbx-icon>View and {{ locale.grades }} submissions</a></li>
                 {% endif %}
             {% endif %}
             {% if assessment is dialogAgent %}
@@ -35,7 +35,7 @@
                     assessment: assessment,
                 }) %}
                 {% if viewResponseRoute %}
-                    <li><a class="icon-task" href="{{ viewResponseRoute }}">View Responses</a></li>
+                    <li><a href="{{ viewResponseRoute }}"><sbx-icon name="task"></sbx-icon>View Responses</a></li>
                 {% endif %}
             {% endif %}
             {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
@@ -50,7 +50,7 @@
                     <a id="kamiWorksheet" href="{{ kamiWorksheetRoute }}"><sbx-icon name="surveys"></sbx-icon>Class View</a>
                 </li>
             {% endif %}
-            {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" title="View Similarity Report" data-test="course-outline-similarity-report-{{ assessment.id }}">Similarity Report</a></li>{% endif %}
+            {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="View Similarity Report" data-test="course-outline-similarity-report-{{ assessment.id }}"><sbx-icon name="due-work"></sbx-icon>Similarity Report</a></li>{% endif %}
             {%  if assessment is dueWork and assessment.useRubric %}
                 <li>
                     <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessment.id }) }}"

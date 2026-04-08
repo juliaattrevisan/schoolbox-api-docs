@@ -19,6 +19,6 @@
     %}
 
     {% if currentFile.turnitin.isComplete and reportRoute %}
-        <a href="{{ reportRoute }}" class="icon-due-work" title="Similarity Report"></a>
+        <a href="{{ reportRoute }}" class="sbx-icon-only-button no-text" title="Similarity Report" aria-label="Similarity Report"><sbx-icon name="due-work"></sbx-icon></a>
     {% endif %}
 {% endif %}

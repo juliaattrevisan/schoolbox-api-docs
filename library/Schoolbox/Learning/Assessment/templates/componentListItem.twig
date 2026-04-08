@@ -89,7 +89,7 @@
                         assessment: assessable,
                     }) %}
                     {% if viewGradeRoute %}
-                        <li><a class="icon-task" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submissions</a></li>
+                        <li><a href="{{ viewGradeRoute }}"><sbx-icon name="task"></sbx-icon>View and {{ locale.grades }} submissions</a></li>
                     {% endif %}
                 {% endif %}
                 {% if assessable is dialogAgent %}
@@ -98,7 +98,7 @@
                         assessment: assessable,
                     }) %}
                     {% if viewResponseRoute %}
-                        <li><a class="icon-task" href="{{ viewResponseRoute }}">View Responses</a></li>
+                        <li><a href="{{ viewResponseRoute }}"><sbx-icon name="task"></sbx-icon>View Responses</a></li>
                     {% endif %}
                 {% endif %}
                 {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
@@ -113,7 +113,7 @@
                         <a id="kamiWorksheet" href="{{ worksheetClassView }}"><sbx-icon name="surveys"></sbx-icon>Class View</a>
                     </li>
                 {% endif %}
-                {% if similarityReportRoute %}<li><a class="icon-due-work" href="{{ similarityReportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Similarity Report</a></li>{% endif %}
+                {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}"><sbx-icon name="due-work"></sbx-icon>Similarity Report</a></li>{% endif %}
 
                 {% if modifyRoute %}
                     {# configForm.php will use itself as RETURN_URL.current since it parses twig as part of

@@ -176,7 +176,7 @@ Data:
                                                 assessment: assessable,
                                             }) %}
                                             {% if viewGradeRoute and assessable.isImplementation %}
-                                                <li><a class="icon-task" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submissions</a></li>
+                                                <li><a href="{{ viewGradeRoute }}"><sbx-icon name="task"></sbx-icon>View and {{ locale.grades }} submissions</a></li>
                                             {% endif %}
                                         {% endif %}
                                         {% if assessable is dialogAgent %}
@@ -185,7 +185,7 @@ Data:
                                                 assessment: assessable,
                                             }) %}
                                             {% if viewResponseRoute %}
-                                                <li><a class="icon-task" href="{{ viewResponseRoute }}">View Responses</a></li>
+                                                <li><a href="{{ viewResponseRoute }}"><sbx-icon name="task"></sbx-icon>View Responses</a></li>
                                             {% endif %}
                                         {% endif %}
                                         {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
@@ -200,7 +200,7 @@ Data:
                                                 <a id="kamiWorksheet" href="{{ worksheetClassView }}"><sbx-icon name="surveys"></sbx-icon>Class View</a>
                                             </li>
                                         {% endif %}
-                                        {% if similarityReportRoute %}<li><a class="icon-due-work" href="{{ similarityReportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Similarity Report</a></li>{% endif %}
+                                        {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}"><sbx-icon name="due-work"></sbx-icon>Similarity Report</a></li>{% endif %}
                                         {% if exportRoute %}<li><a href="{{ exportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}"><sbx-icon name="export"></sbx-icon>Export to Classes</a></li>{% endif %}
 
                                         {% if assessable is quiz %}

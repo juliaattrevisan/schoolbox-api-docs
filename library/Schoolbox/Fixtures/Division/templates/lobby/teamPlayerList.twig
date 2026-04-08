@@ -25,14 +25,15 @@
             <nav>
                 <a href="#"
                    data-reveal-id="editPlayerPositions"
-                   class="icon-position"
+                   class="sbx-icon-only-button no-text"
                    title="Change Player Positions"
+                   aria-label="Change Player Positions"
                    data-player-positions-name="{{ teamPlayer.fullName }}"
                    data-player-positions-team-name="{{ team.name }}"
                    data-player-positions-user="{{ teamPlayer.id }}"
                    data-player-positions-team="{{ team.id }}"
                    data-player-positions="{% for teamPosition in positions[teamPlayer.id] ?? [] %}{{ teamPosition.position.id }}{% if not loop.last %},{% endif %}{% endfor %}"
-                ></a>
+                ><sbx-icon name="position"></sbx-icon></a>
                 {% set routeRemovePlayers = routeLookupIfAuthorized('sportsfixturesTeam.postRemovePlayers', {
                     entityId: team.id,
                     entity:   team
