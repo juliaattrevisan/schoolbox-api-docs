@@ -42,7 +42,7 @@
         function setupCollapsable() {
             var self = this;
             $(self.config.element).on("click.collapsable", function (event) {
-                if (self.config?.preventDefault !== false) {
+                if (self.config.preventDefault === true) {
                     event.preventDefault();
                 }
 
