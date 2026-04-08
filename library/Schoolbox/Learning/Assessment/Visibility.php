@@ -37,14 +37,14 @@ class Visibility
      * Does not consider whether a parent can see the assessment because one of their children can. This is to ensure the caller
      * can distinguish the case where a parent can view the assessment themselves, vs seeing it due to their child's visibility.
      *
-     * * Instructor               - can see anytime (so long as not past close and we are hiding closed)
-     * * Learner (READ access)    - excluded if the work type hides learners; otherwise same as staff/participant rules
-     * * Staff (non-learner)      - can see anytime (so long as not past close and we are hiding closed)
-     * * NonStaff + NonInstructor - can only see if a participant, and after publish date, and not pure SIVO
+     *  - Instructor               - can see anytime (so long as not past close and we are hiding closed)
+     *  - Learner                  - excluded if the work type hides learners; otherwise same as staff/participant rules
+     *  - Staff (non-learner)      - can see anytime (so long as not past close and we are hiding closed)
+     *  - NonStaff + NonInstructor - can only see if a participant, and after publish date, and not pure SIVO
      *
-     * Staff      - is considered any user with role-type of 'staff'
-     * Instructor - is considered any user with WRITE+ perm to folder
-     * Learner    - is considered any user with READ perm to folder (overrides staff when work type hides learners)
+     * Staff      - is any user with role-type of 'staff'
+     * Instructor - is any user with WRITE+ perm to folder
+     * Learner    - is any user with READ perm to folder (overrides staff when work type hides learners)
      *
      * @param IAssessable              $assessment Must have plans and participants loaded if viewer is a participant
      * @param User                     $viewer
@@ -56,20 +56,23 @@ class Visibility
     public function isVisibleToUser(IAssessable $assessment, User $viewer, bool $showClosed, ?Alaress_Date_Format $now = null, bool $respectWorkTypeVisibility = true): bool
     {
         $now = $now ?? Alaress_Date_Format::now();
+        $folder = $assessment->getBaseContext()->getFolder();
 
         try {
-            $folderAccess = $this->access->getFolderAccess($viewer, $assessment->getBaseContext()->getFolder()->getId());
-        } catch (MapperException $e) {
-            return false;
+            $viewerIsInstructor = $this->access->isInstructor($viewer, $folder);
+            $viewerIsLearner = $this->access->isLearner($viewer, $folder);
+        } catch (MapperException) {
+            $viewerIsInstructor = false; // In case of mapper error, assume non-instructor.
+            $viewerIsLearner = false; // In case of mapper error, assume non-learner.
         }
 
-        // Instructor (WRITE+ access): always visible, subject only to timing
-        if ($folderAccess >= UserAccess::ACCESS_WRITE) {
+        // Instructor: assessment is always visible, subject only to timing.
+        if ($viewerIsInstructor) {
             return $this->isVisibleToInstructor($assessment, $viewer, $showClosed, $now);
         }
 
-        // Learner (READ access): excluded if work type hides learners, even if viewer is staff
-        if ($folderAccess === UserAccess::ACCESS_READ) {
+        // Learner: assessment is visible unless work type excludes learners.
+        if ($viewerIsLearner) {
             $workType = $assessment->getWorkType();
             if ($respectWorkTypeVisibility && $workType !== null && !$workType->isVisibleToLearners()) {
                 return false;
