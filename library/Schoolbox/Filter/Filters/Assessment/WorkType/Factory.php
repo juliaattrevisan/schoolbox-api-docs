@@ -17,6 +17,7 @@ use Schoolbox\Filter\IDefinition;
 use Schoolbox\Filter\Page\Model;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -179,9 +180,9 @@ class Factory extends Filter\AbstractFactory
     {
         $vieweeFolderIds = $this->folderMapper->findFolderIdsForUser(
             $viewee,
-            true,                      // include subjects
-            UserAccess::ACCESS_READ,   // only folders where viewee is a learner
-            true                       // exactAccess: exclude WRITE/FULL folders (those make viewee an instructor, not learner)
+            true,                    // Include subject folders.
+            UserAccess::ACCESS_READ, // Only return folders where viewee is a learner (see Access::isLearner()).
+            true                     // Only return matches that match access_level exactly.
         );
 
         if (empty($vieweeFolderIds)) {
@@ -190,12 +191,16 @@ class Factory extends Filter\AbstractFactory
 
         $maxAccess = UserAccess::ACCESS_DENY;
         foreach ($vieweeFolderIds as $folderId) {
-            $access = $this->access->getFolderAccess($viewer, $folderId);
+            try {
+                $access = $this->access->getFolderAccess($viewer, $folderId);
+            } catch (Exception) {
+                $access = UserAccess::ACCESS_DENY; // Assume no access in case of exception.
+            }
             if ($access > $maxAccess) {
                 $maxAccess = $access;
             }
             if ($maxAccess >= UserAccess::ACCESS_WRITE) {
-                break; // Instructor access is the highest we care about
+                break; // Instructor access is the highest we care about.
             }
         }
         return $maxAccess;
