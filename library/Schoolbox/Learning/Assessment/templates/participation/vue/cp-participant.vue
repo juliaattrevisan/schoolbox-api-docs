@@ -231,6 +231,7 @@ function onOpenIncludeInExistingModal(): void {
                         </li>
                         <li>
                             <button
+                                v-if="props.routes.getAssessmentParticipationNewActivity"
                                 class="sbx-button--has-icon"
                                 @click.prevent="
                                     onActionSelected(

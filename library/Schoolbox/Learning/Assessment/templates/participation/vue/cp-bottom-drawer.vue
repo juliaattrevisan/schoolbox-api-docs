@@ -116,6 +116,7 @@ function clearSelection(): void {
                     Create Copy of {{ locale.activity.translate(false, true) }}
                 </button>
                 <button
+                    v-if="props.routes.getAssessmentParticipationNewActivity"
                     class="button l-flex__item--1-auto sbx-button--has-icon"
                     @click.prevent="
                         handleActionSelected(
