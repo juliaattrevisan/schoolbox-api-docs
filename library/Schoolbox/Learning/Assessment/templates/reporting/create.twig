@@ -187,9 +187,9 @@
             <label>Work Types</label>
             <p class="meta">Select which work types will be presented as supporting data.</p>
 
-            <div class="checklist checklist-container">
+            <ul class="option-list checklist checklist-container">
                 {% for workType in reporting.workTypes %}
-                    <div class="checklist-wrapper">
+                    <li class="checklist-wrapper">
                         {% set checked = '' %}
 
                         {% if workType.id in assessment.supportingDataWorkTypes.propertyValues('id') ?? [] %}
@@ -197,9 +197,9 @@
                         {% endif %}
                         <input id="checkbox-worktype-{{ workType.id }}" name="reporting[supporting][workTypes][]" type="checkbox" value="{{ workType.id }}" {{ checked }}/>
                         <label for="checkbox-worktype-{{ workType.id }}">{{ workType.name }}</label>
-                    </div>
+                    </li>
                 {% endfor %}
-            </div>
+            </ul>
         </div>
     </div>
 
