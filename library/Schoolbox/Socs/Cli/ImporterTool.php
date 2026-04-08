@@ -13,6 +13,8 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Socs\HttpClient;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\Fixtures\Result\Mapper as ResultMapper;
+use Schoolbox\Fixtures\Result\Model as ResultModel;
 use Schoolbox\Fixtures\Division\Model as DivisionModel;
 use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
 use Schoolbox\Fixtures\Matchup\Model as MatchupModel;
@@ -34,6 +36,7 @@ class ImporterTool extends CliTool\App
     public const LOCK_NAME = self::SOCS_IMPORTER_LOCK_NAME;
     private const SOCS_SCHOOL_ID = '2460';
     private const MSO_SPORT_PATH = 'mso-sport.ashx';
+    private const RESULTS_PATH = 'results.ashx';
     private const OPT_LONG_HELP = 'help';
     private const OPT_LONG_INSTANCE = 'instance:';
     private const LOCK_TTL = 120;
@@ -74,6 +77,7 @@ class ImporterTool extends CliTool\App
 
         try {
             $this->importFixtures($logger, $lock);
+            $this->importResults($logger);
             $this->importTeams($logger);
         } finally {
             if ($this->httpClient instanceof HttpClient) {
@@ -88,7 +92,8 @@ class ImporterTool extends CliTool\App
         echo <<<HELP
 
 Import SOCS sport fixtures into the Schoolbox Fixtures module using the
-SOCS XML fixtures feed, and synchronise SOCS teams via the mso-sport feed.
+SOCS XML fixtures feed, synchronise SOCS results via the results feed,
+and synchronise SOCS teams via the mso-sport feed.
 
 Usage: php importer.php [--perform]
 
@@ -255,6 +260,132 @@ HELP;
             $logger->info(sprintf('SOCS fixtures import complete; processed %d fixtures', $imported));
         } else {
             $logger->info(sprintf('SOCS fixtures planning complete; would process %d fixtures', $imported));
+        }
+    }
+
+    private function importResults(LoggerInterface $logger): void
+    {
+        $host = (string)$this->getConfig()->get('socs_endpoint_host');
+
+        if ('' === $host) {
+            $logger->warning('Missing SOCS endpoint host; exiting results import');
+            return;
+        }
+
+        $token = (string)$this->getConfig()->get('socs_endpoint_token');
+        if ('' === $token) {
+            $logger->warning('Missing SOCS endpoint token; exiting results import');
+            return;
+        }
+
+        $httpClient = $this->getHttpClient($host);
+
+        $now = \Alaress_Date_Format::now();
+        $startDate = (clone $now)->addDays(-30)->getUsingFormat('j M Y');
+        $endDate = (clone $now)->addDays(100)->getUsingFormat('j M Y');
+
+        $logger->info(sprintf('Downloading SOCS results from %s to %s', $startDate, $endDate));
+
+        $query = [
+            'ID'        => self::SOCS_SCHOOL_ID,
+            'key'       => $token,
+            'startdate' => $startDate,
+            'enddate'   => $endDate,
+        ];
+
+        try {
+            $response = $httpClient->get(self::RESULTS_PATH, $query, $logger);
+        } catch (GuzzleException $e) {
+            $logger->warning(sprintf('Failed to contact SOCS results endpoint: %s', $e->getMessage()));
+            return;
+        }
+
+        if (null === $response) {
+            return;
+        }
+
+        if ($response->getStatusCode() !== 200) {
+            $logger->warning(sprintf(
+                'Bad SOCS results response: %s %s',
+                $response->getStatusCode(),
+                $response->getReasonPhrase()
+            ));
+            return;
+        }
+
+        $body = (string)$response->getBody();
+        $logger->debug(sprintf(
+            'SOCS results raw response: Content-Type %s; length %d',
+            $response->getHeaderLine('Content-Type') ?: 'unknown',
+            strlen($body)
+        ));
+        if ('' === $body) {
+            $logger->info('SOCS results feed returned an empty payload');
+            return;
+        }
+
+        $xml = @simplexml_load_string($body);
+        if (false === $xml) {
+            $logger->warning(sprintf(
+                'Unable to parse SOCS results XML payload; aborting. First 200 chars: %s',
+                substr($body, 0, 200)
+            ));
+            return;
+        }
+
+        $matchupMapper = MatchupMapper::getInstance();
+        $resultMapper = ResultMapper::getInstance();
+
+        $imported = 0;
+
+        foreach ($xml->children() as $resultNode) {
+            $eventId = trim((string)$resultNode->eventid);
+            $resultText = trim((string)$resultNode->result);
+
+            if ('' === $eventId || '' === $resultText) {
+                $logger->debug('Skipping SOCS result with missing mandatory fields');
+                continue;
+            }
+
+            $externalId = 'socs:' . $eventId;
+
+            try {
+                /** @var MatchupModel $matchup */
+                $matchup = $matchupMapper->findOneByColumn('external_id', $externalId);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $logger->debug(sprintf('Skipping SOCS result %s; no matching SOCS fixture found', $externalId));
+                continue;
+            }
+
+            $homeTeam = $matchup->getHomeTeam();
+            if (!$homeTeam instanceof TeamModel || !$homeTeam->getId()) {
+                $logger->debug(sprintf('Skipping SOCS result %s; matchup has no home team', $externalId));
+                continue;
+            }
+
+            if ($this->perform()) {
+                $existingResults = $resultMapper->findByColumn('match_id', $matchup->getId());
+                foreach ($existingResults as $existingResult) {
+                    $resultMapper->delete($existingResult);
+                }
+
+                /** @var ResultModel $result */
+                $result = $resultMapper->createModel();
+                $result
+                    ->setMatchup($matchup)
+                    ->setTeam($homeTeam)
+                    ->setDescription($resultText);
+
+                $resultMapper->save($result);
+            }
+
+            $imported++;
+        }
+
+        if ($this->perform()) {
+            $logger->info(sprintf('SOCS results import complete; processed %d results', $imported));
+        } else {
+            $logger->info(sprintf('SOCS results planning complete; would process %d results', $imported));
         }
     }
 
