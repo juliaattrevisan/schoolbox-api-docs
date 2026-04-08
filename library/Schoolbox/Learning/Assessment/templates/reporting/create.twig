@@ -187,20 +187,39 @@
             <label>Work Types</label>
             <p class="meta">Select which work types will be presented as supporting data.</p>
 
-            <ul class="option-list checklist checklist-container">
+            <ul class="option-list checklist checklist-container" data-supporting-work-types>
+                <li>
+                    <input id="checkbox-work-type-all" type="checkbox">
+                    <label for="checkbox-work-type-all">Select All</label>
+                </li>
                 {% for workType in reporting.workTypes %}
                     <li class="checklist-wrapper">
-                        {% set checked = '' %}
-
-                        {% if workType.id in assessment.supportingDataWorkTypes.propertyValues('id') ?? [] %}
-                            {% set checked = 'checked="checked"' %}
-                        {% endif %}
-                        <input id="checkbox-worktype-{{ workType.id }}" name="reporting[supporting][workTypes][]" type="checkbox" value="{{ workType.id }}" {{ checked }}/>
+                        <input
+                            id="checkbox-worktype-{{ workType.id }}"
+                            name="reporting[supporting][workTypes][]"
+                            type="checkbox"
+                            value="{{ workType.id }}"
+                            {% if workType.id in assessment.supportingDataWorkTypes.propertyValues('id') ?? [] %}
+                                checked="checked"
+                            {% endif %}
+                            data-checkbox-work-type
+                        />
                         <label for="checkbox-worktype-{{ workType.id }}">{{ workType.name }}</label>
                     </li>
                 {% endfor %}
             </ul>
         </div>
+
+        <script src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.js?v={{ config.site_version }}"></script>
+        <script>
+            $(function() {
+                $("[data-supporting-work-types]").selectAll({
+                    selector: "#checkbox-work-type-all",
+                    checkboxes: "[data-checkbox-work-type]"
+                });
+            });
+
+        </script>
     </div>
 
     <div class="row">
