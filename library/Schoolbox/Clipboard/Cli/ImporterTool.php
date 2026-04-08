@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Clipboard\Cli;
 
+use Ramsey\Uuid\Uuid;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Clipboard;
 
@@ -178,7 +179,7 @@ HELP;
 
         /* Each Clipboard Import gets its own run id
          */
-        $runId = (new Clipboard\Log\Guid())->generate();
+        $runId = Uuid::uuid4()->toString();
 
         if ($this->getOpt(self::OPT_LONG_PARTIAL)) {
             $scriptName = Clipboard\Log\Model::PARTIAL_SCRIPT_NAME;
