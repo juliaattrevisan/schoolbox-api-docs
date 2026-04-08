@@ -525,8 +525,10 @@ test.describe("Course import tests", () => {
         tester.isGoingTo("check the filters are working correctly for the teacher and the title is showing for them");
         await tester.impersonate("Jack Coles");
         await page.goto(`/homepage/${folderId}`);
-        await expect(componentCourseOutline.locator("a.icon-filter")).toContainText("This is being filtered");
-        await expect(componentCourseOutline.locator("a.icon-course")).toContainText("Year 9 English");
+        await expect(componentCourseOutline.locator('a:has(sbx-icon[name="filter"])')).toContainText(
+            "This is being filtered",
+        );
+        await expect(componentCourseOutline.locator('a:has(sbx-icon[name="course"])')).toContainText("Year 9 English");
         await expect(componentCourseOutline.getByTestId(`homepage-component-titlebar-name`)).toContainText(
             `Due Work and Tasks Only`,
         );
@@ -662,8 +664,8 @@ test.describe("Course import tests", () => {
         await expect(componentCourseOutline.getByTestId("homepage-component-titlebar-name")).toContainText(
             "Due Work and Tasks Only",
         );
-        await expect(componentCourseOutline.locator("a.icon-filter")).not.toBeVisible();
-        await expect(componentCourseOutline.locator("a.icon-course")).toContainText("Year 9 English");
+        await expect(componentCourseOutline.locator('a:has(sbx-icon[name="filter"])')).not.toBeVisible();
+        await expect(componentCourseOutline.locator('a:has(sbx-icon[name="course"])')).toContainText("Year 9 English");
         await expect(componentCourseOutline.getByTestId(`homepage-component-titlebar-name`)).toContainText(
             `Due Work and Tasks Only`,
         );

@@ -95,8 +95,9 @@ export default class StatusPage {
      * @param option - The option to click: modify, feedback, task, download
      */
     async clickJellyTotOption(option: string): Promise<void> {
-        await expect(this.page.locator(`#header-options a.icon-${option}`)).toBeVisible();
-        await this.page.locator(`#header-options a.icon-${option}`).click();
+        const optionLink = this.page.locator(`#header-options a:has(sbx-icon[name="${option}"])`);
+        await expect(optionLink).toBeVisible();
+        await optionLink.click();
         await this.tester.common.waitForPageLoad();
     }
 
