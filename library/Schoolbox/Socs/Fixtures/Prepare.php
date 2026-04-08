@@ -6,6 +6,8 @@ namespace Schoolbox\Socs\Fixtures;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
+use Schoolbox\Fixtures\Team\Coach\Mapper as TeamCoachMapper;
+use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\Socs\IStrategy;
 use Symfony\Component\Lock\LockInterface;
 
@@ -51,6 +53,12 @@ class Prepare implements IStrategy
             $db->query("UPDATE sportsfixtures_team SET updated_at = '0000-00-00 00:00:00'");
             $db->query("UPDATE sportsfixtures_venue SET updated_at = '0000-00-00 00:00:00'");
             $db->query("UPDATE sportsfixtures_school SET updated_at = '0000-00-00 00:00:00'");
+
+            /* Hard deletions for relationships that do not use updated_at. */
+            $teamCoachMapper = TeamCoachMapper::getInstance();
+            $teamPlayerMapper = TeamPlayerMapper::getInstance();
+            $db->query("DELETE FROM {$teamCoachMapper->getTable()}");
+            $db->query("DELETE FROM {$teamPlayerMapper->getTable()}");
         }
 
         $this->log->info('Preparing previously-imported SOCS matchups for create/update.');
