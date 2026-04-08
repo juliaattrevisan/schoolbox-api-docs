@@ -61,8 +61,8 @@ on:
         required: true
         type: string
       webhook_url:
-        description: Webhook URL to post the message to.
-        required: true
+        description: Webhook URL to post the message to. Only needed when testing via manual dispatch; workflow_call uses the webhook_url secret instead.
+        required: false
         type: string
       channel:
         description: Channel to post the message to.
