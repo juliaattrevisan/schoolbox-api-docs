@@ -35,6 +35,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
 use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\LTI\Provider\Model as ToolModel;
+use Schoolbox\LTI\Util\LogHelper;
 use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
 
 /**
@@ -73,6 +74,7 @@ class Controller extends Base
      */
     public function getOidcAuthenticationRequest(): void
     {
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
         // Do something with the OIDC request when I receive it
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#3-platform-side-oidc-authentication
         try {
@@ -82,12 +84,7 @@ class Controller extends Base
                 $this->toolMapper,
             )->build($this->request);
         } catch (LtiExceptionInterface $e) {
-            $this->logger->error(
-                __METHOD__ . ': error',
-                [
-                    'message' => $e->getMessage(),
-                ],
-            );
+            LogHelper::logControllerError($this->logger, __METHOD__, $this->request, $e);
             throw $e;
         }
 
@@ -122,6 +119,7 @@ class Controller extends Base
      */
     public function getOauthAccessTokenRequest(): void
     {
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
         $clientRepository = new ClientRepository($this->registrations, null, $this->logger);
         $factory          = new AuthorizationServerFactory(
             $clientRepository,
@@ -147,12 +145,7 @@ class Controller extends Base
                 KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER,
             );
         } catch (OAuthServerException $e) {
-            $this->logger->error(
-                __METHOD__ . ': error',
-                [
-                    'message' => $e->getMessage(),
-                ],
-            );
+            LogHelper::logControllerError($this->logger, __METHOD__, $this->request, $e);
             throw $e;
         }
     }
@@ -178,6 +171,7 @@ class Controller extends Base
      */
     public function getJsonWebKeySet(): void
     {
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
         $jwksExporter   = new JwksExporter($this->keyChains);
         $this->response = $this->responseAsJson($jwksExporter->export(KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_KEY_SET_NAME));
     }
@@ -196,17 +190,14 @@ class Controller extends Base
      */
     public function getReceiveDeepLinkingResponse(ToolModel $tool): void
     {
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
         // Validate launch
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
         $result = new ToolOriginatingLaunchFactory($this->registrations)->build($this->request);
         if ($result->hasError()) {
-            $this->logger->error(
-                __METHOD__ . ': result error',
-                [
-                    'message' => $result->getError(),
-                ],
-            );
-            throw new LtiException($result->getError());
+            $e = new LtiException($result->getError());
+            LogHelper::logControllerError($this->logger, __METHOD__, $this->request, $e);
+            throw $e;
         }
 
         // Each content item should be a link, which may be launched as a
@@ -215,12 +206,7 @@ class Controller extends Base
         try {
             $resourceLinks = new ResourceCollectionFactory()->createFromClaim($contentItems)->normalize();
         } catch (LtiExceptionInterface $e) {
-            $this->logger->error(
-                __METHOD__ . ': result error',
-                [
-                    'message' => $result->getError(),
-                ],
-            );
+            LogHelper::logControllerError($this->logger, __METHOD__, $this->request, $e);
             throw $e;
         }
 
