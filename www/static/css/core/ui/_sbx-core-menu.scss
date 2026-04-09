@@ -217,8 +217,6 @@ body.sbx-body {
         & #left-menu {
             border-radius: var(--sbx-config-box-roundness);
             box-shadow: var(--sbx-shadow-m);
-            left: 1rem;
-            top: 1rem;
         }
     }
 
@@ -227,8 +225,6 @@ body.sbx-body {
         & #msgs {
             border-radius: var(--sbx-config-box-roundness);
             box-shadow: var(--sbx-shadow-m);
-            right: 1rem;
-            top: 1rem;
         }
     }
 
