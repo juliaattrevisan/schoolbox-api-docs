@@ -246,7 +246,7 @@ class Helper
     private function shouldOmitFromStylesheet(Config $config): bool
     {
         $categoryName = $config->getSkinSubcategory()?->getCategory()?->getName();
-        if (!is_string($categoryName) || $categoryName === '') {
+        if (!is_string($categoryName) || trim($categoryName) === '') {
             return false;
         }
 
