@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Learnosity\Export\Json;
 
 use League\Flysystem\FilesystemException;
 use LearnositySdk\Exceptions\ValidationException;
+use Ramsey\Uuid\Uuid;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Resource\Storage\FilesystemProxy;
@@ -471,19 +472,9 @@ class Exporter
      */
     private function generateGuid(): string
     {
-        $uuid = md5(uniqid((string)mt_rand(), true));
-
         /* Add an arbitrary prefix to the start of this string to make it clear that
          * it's one of our own making, not belonging to learnosity at all
          */
-        return sprintf(
-            '%s-%s-%s-%s-%s-%s',
-            'sb',
-            substr($uuid, 0, 8),
-            substr($uuid, 8, 4),
-            substr($uuid, 12, 4),
-            substr($uuid, 16, 4),
-            substr($uuid, 20, 12)
-        );
+        return 'sb-' . Uuid::uuid4()->toString();
     }
 }
