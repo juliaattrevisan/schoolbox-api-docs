@@ -148,8 +148,10 @@ class Mapper extends BaseMapper
                     {$this->getColumnString()},
                     {$this->getJoinColumnString('pastoral_bulk_import_tags', 'tag')}
                 FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-                INNER JOIN `pastoral_bulk_import_tags` AS `v_tag` ON `pastoral_bulk_import`.`id` = `v_tag`.`pastoral_bulk_import_id`
-                INNER JOIN `lu_pastoral_tag` AS `tag` ON `tag`.`id` = `v_tag`.`tag_id` AND `tag`.`deleted_at` IS NULL
+                INNER JOIN `pastoral_bulk_import_tags` AS `v_tag`
+                    ON {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}.{$this->getDatabase()->getQuoter()->quoteIdentifier($this->getIdentifierColumn())} = `v_tag`.`pastoral_bulk_import_id`
+                INNER JOIN {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getJoinMapper('pastoral_bulk_import_tags')->getTable())} AS `tag`
+                    ON `tag`.`id` = `v_tag`.`tag_id` AND `tag`.`deleted_at` IS NULL
                 WHERE {$pb->in('id', $ids)->getWhereIntersect()}
             ");
             $tagModels = [];
