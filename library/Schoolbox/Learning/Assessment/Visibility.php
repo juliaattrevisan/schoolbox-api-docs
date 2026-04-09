@@ -232,7 +232,7 @@ class Visibility
                 $isPublished = $now->gte($childLearnerParticipant->getPublishDate());
             } else {
                 $closeDate   = $assessable->getCloseAt();
-                $isPublished = $assessable->isPublished($childLearner);
+                $isPublished = $assessable->isPublished($childLearner, $now);
             }
             return $isPublished && ($showClosed || $now->lt($closeDate));
         }
