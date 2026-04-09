@@ -276,7 +276,7 @@ class Controller extends ConfigController
     private function persistPostedConfigs(array $postedConfigs): void
     {
         $database        = $this->getConfigMapper()->getDatabase();
-        $existingConfigs = $this->getConfigMapper()->findByPredicates($this->buildConfigPredicate())->indexBy('id');
+        $existingConfigs = $this->getConfigMapper()->findByPredicates($this->buildConfigPredicate())->indexBy(ConfigMapper::COL_ID);
 
         foreach ($postedConfigs as $configId => $value) {
             if (!$existingConfigs->keyExists($configId)) {
