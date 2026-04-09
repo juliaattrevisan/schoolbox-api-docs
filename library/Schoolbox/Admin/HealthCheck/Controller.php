@@ -585,6 +585,7 @@ class Controller extends Base
         $database = FolderMapper::getInstance()->getDatabase();
         // Note the text output for the 'Visible' column deliberately matches the text used in the options on the
         // 'Visibility' selector on the 'Admin > LMS > Work Types' page (defined in Admin\Lists\Controller).
+        // The text values returned here have been approved by PST.
         $statement = $database->prepare("
         SELECT
             NAME as 'Work Type',
