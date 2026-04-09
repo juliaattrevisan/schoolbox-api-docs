@@ -17,6 +17,7 @@ use Schoolbox\Filter\IDefinition;
 use Schoolbox\Filter\Page\Model;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -178,12 +179,16 @@ class Factory extends Filter\AbstractFactory
      */
     private function getMaxViewerAccessToVieweeFolders(User $viewer, User $viewee): int
     {
-        $vieweeFolderIds = $this->folderMapper->findFolderIdsForUser(
-            $viewee,
-            true,                    // Include subject folders.
-            UserAccess::ACCESS_READ, // Only return folders where viewee is a learner (see Access::isLearner()).
-            true                     // Only return matches that match access_level exactly.
-        );
+        try {
+            $vieweeFolderIds = $this->folderMapper->findFolderIdsForUser(
+                $viewee,
+                true,                    // Include subject folders.
+                UserAccess::ACCESS_READ, // Only return folders where viewee is a learner (see Access::isLearner()).
+                true                     // Only return matches that match access_level exactly.
+            );
+        } catch (DefinitionException) {
+            $vieweeFolderIds = []; // In case of mapper error, assume no folders.
+        }
 
         if (empty($vieweeFolderIds)) {
             return UserAccess::ACCESS_DENY;
