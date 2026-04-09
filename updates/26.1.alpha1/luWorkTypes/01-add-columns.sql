@@ -7,4 +7,5 @@ ADD COLUMN permitted_task tinyint(1) unsigned NOT NULL DEFAULT 0 AFTER permitted
 ADD COLUMN permitted_quiz tinyint(1) unsigned NOT NULL DEFAULT 0 AFTER permitted_task,
 ADD COLUMN permitted_lti tinyint(1) unsigned NOT NULL DEFAULT 0 AFTER permitted_quiz,
 ADD COLUMN permitted_lesson_plan tinyint(1) unsigned NOT NULL DEFAULT 0 AFTER permitted_lti,
-ADD COLUMN permitted_dialog_agent tinyint(1) unsigned NOT NULL DEFAULT 0 AFTER permitted_lesson_plan;
+ADD COLUMN permitted_dialog_agent tinyint(1) unsigned NOT NULL DEFAULT 0 AFTER permitted_lesson_plan,
+ADD COLUMN permitted_reporting_activity tinyint(1) unsigned NOT NULL DEFAULT 0 AFTER permitted_dialog_agent;
