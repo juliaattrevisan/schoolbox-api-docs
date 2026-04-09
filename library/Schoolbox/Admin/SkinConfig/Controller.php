@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\SkinConfig;
 
 use Alaress\Database\Predicate;
 use Alaress\Module\Cache\Rebuilder;
+use Alaress\Web\Request\Values;
 use Alaress\Web\Controller\ConfigController;
 use Crell\ApiProblem\ApiProblem;
 use Psr\SimpleCache\CacheInterface;
@@ -334,8 +335,8 @@ class Controller extends ConfigController
                             continue;
                         }
 
-                        $optionId = filter_var($option['id'], FILTER_VALIDATE_INT);
-                        if ($optionId === false) {
+                        $optionId = (new Values($option))->getInt('id');
+                        if ($optionId === null) {
                             continue;
                         }
 
