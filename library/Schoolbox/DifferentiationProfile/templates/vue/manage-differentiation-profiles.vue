@@ -131,7 +131,7 @@ const { maxScrollableHeight } = useMaxScrollableHeight(
             <teleport to="#download-csv-container">
                 <a
                     href="#export-to-csv"
-                    class="l-flex l-gap-s f-no-bkg f-no-margins"
+                    class="l-flex l-gap-s"
                     aria-label="Export to CSV"
                     title="Export to CSV"
                     @click.prevent="rowsStore.exportToCSV(props.routes.exportCsv)"
