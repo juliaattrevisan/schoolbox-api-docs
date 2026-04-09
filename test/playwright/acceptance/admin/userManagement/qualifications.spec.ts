@@ -1,6 +1,5 @@
-import { test } from "@schoolboxTest/playwright/support/integrations";
+import { expect, test } from "@schoolboxTest/playwright/support/integrations";
 import QualificationList from "@schoolboxTest/playwright/support/page/admin/userManagement/QualificationList";
-import Common from "@schoolboxTest/playwright/support/page/Common";
 
 /**
  * check the Qualifications list admin page is accessible at /adminv2/lists/qualification
@@ -16,15 +15,11 @@ import Common from "@schoolboxTest/playwright/support/page/Common";
  */
 test.describe.serial("Admin User Management - Lists: Qualifications", () => {
     let qualificationList: QualificationList;
-    let common: Common;
 
     const qualificationName = "Test Qualification PLW";
-    const qualificationNameSecond = "Test Qualification PLW 2";
-    const qualificationNameThird = "Test Qualification PLW 3";
 
     test.beforeEach(async ({ tester, page }) => {
         qualificationList = new QualificationList(tester, page);
-        common = new Common(page);
         await tester.loginAsAdmin();
     });
 
@@ -98,52 +93,70 @@ test.describe.serial("Admin User Management - Lists: Qualifications", () => {
         await qualificationList.checkRowWithNameIsNotPresented(qualificationName);
     });
 
-    test("rows present drag handles and reordering persists after save and page reload", async ({ tester, page }) => {
-        // tester.isGoingTo("navigate to the Qualifications list page and add two new qualification rows");
-        await qualificationList.goto();
+    test("rows present drag handles and reordering persists after save and page reload", async ({
+        tester,
+        page,
+        db,
+    }) => {
+        try {
+            tester.isGoingTo(
+                "navigate to the Qualifications list, resort the items and verify the order is persisted after save and page reload",
+            );
+            const item1 = 1;
+            const item2 = 3;
 
-        // await qualificationList.clickAddNewRowButton();
-        // const firstNewRowIndex = (await qualificationList.getRowCount()) - 1;
-        // await qualificationList.fillNameInRow(firstNewRowIndex, qualificationNameSecond);
+            await qualificationList.goto();
 
-        // await qualificationList.clickAddNewRowButton();
-        // const secondNewRowIndex = (await qualificationList.getRowCount()) - 1;
-        // await qualificationList.fillNameInRow(secondNewRowIndex, qualificationNameThird);
+            const initialItemsOrder = await qualificationList.getItemsOrder();
 
-        // tester.isGoingTo("save both new qualifications and confirm the save-successful toast");
-        // await qualificationList.clickSaveButton();
-        // await qualificationList.checkSaveSuccessToast();
+            tester.isGoingTo("Verify Pre-unit Quiz to be above Post to Forum: Prologue in the initial order");
+            expect(initialItemsOrder.indexOf(item1.toString())).toBeLessThan(
+                initialItemsOrder.indexOf(item2.toString()),
+            );
 
-        // tester.isGoingTo("check that a drag-and-drop grab handle is visible on every row");
-        // await qualificationList.checkGrabHandlesArePresented();
+            tester.isGoingTo("drag the the item VCE above DP Year 1");
+            await qualificationList.dragAndDropItem(item2, item1);
+            const newItemOrder = await qualificationList.getItemsOrder();
 
-        // tester.isGoingTo("reload the page to get the stable persisted row order");
-        // await page.reload();
+            tester.isGoingTo("verify that the items have been correctly reordered");
+            expect(newItemOrder.indexOf(item2.toString())).toBeLessThan(newItemOrder.indexOf(item1.toString()));
 
-        tester.isGoingTo("verify the initial order (PLW 2 before PLW 3) and then drag PLW 2 to after PLW 3");
-        await qualificationList.checkRowAIsBeforeRowB(qualificationNameSecond, qualificationNameThird);
-        const indexSecond = await qualificationList.getRowIndexByName(qualificationNameSecond);
-        const indexThird = await qualificationList.getRowIndexByName(qualificationNameThird);
-        await qualificationList.dragRowToPosition(indexSecond, indexThird);
+            await page.reload();
 
-        tester.isGoingTo("save the reordered list and verify the new order persists after page reload");
-        await qualificationList.clickSaveButton();
-        // await qualificationList.checkSaveSuccessToast();
-        // await page.reload();
-        // await qualificationList.checkRowAIsBeforeRowB(qualificationNameThird, qualificationNameSecond);
+            const finalItemOrder = await qualificationList.getItemsOrder();
+            expect(finalItemOrder).toEqual(newItemOrder);
+        } finally {
+            tester.isGoingTo("reorder the items back to the initial order to not impact other tests");
+            await db.updateInDatabase("lu_qualification", { sequence: 1 }, { "name like": "DP Year 1" });
+            await db.updateInDatabase("lu_qualification", { sequence: 3 }, { "name like": "VCE" });
+        }
     });
 
-    // /**
-    //  * Soft-deleting test data so it does not impact other test suites.
-    //  */
-    // test.afterAll(async ({ baseTester, db }) => {
-    //     baseTester.isGoingTo(
-    //         "update deleted_at for qualifications created in this test so they do not impact the next suite of tests",
-    //     );
-    //     await db.updateInDatabase(
-    //         "lu_qualification",
-    //         { deleted_at: "2022-01-15 11:22:34" },
-    //         { "name like": "Test Qualification PLW%", deleted_at: null },
-    //     );
-    // });
+    test("checking the empty state is presented when there are no qualifications", async ({ tester, page, db }) => {
+        try {
+            tester.isGoingTo("soft delete all qualifications in the database to trigger the empty state");
+            await db.updateInDatabase("lu_qualification", { deleted_at: "2022-01-15 11:22:34" }, { deleted_at: null });
+
+            tester.isGoingTo("navigate to the Qualifications list admin page and check the empty state is presented");
+            await qualificationList.goto();
+            await qualificationList.checkEmptyStateIsPresented();
+        } finally {
+            tester.isGoingTo("revert the soft delete of qualifications to not impact other tests");
+            await db.updateInDatabase("lu_qualification", { deleted_at: null }, { deleted_at: "2022-01-15 11:22:34" });
+        }
+    });
+
+    /**
+     * Soft-deleting test data so it does not impact other test suites.
+     */
+    test.afterAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo(
+            "update deleted_at for qualifications created in this test so they do not impact the next suite of tests",
+        );
+        await db.updateInDatabase(
+            "lu_qualification",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "name like": "Test Qualification PLW%", deleted_at: null },
+        );
+    });
 });

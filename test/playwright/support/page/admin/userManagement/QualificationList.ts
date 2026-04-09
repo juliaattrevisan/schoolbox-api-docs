@@ -253,13 +253,48 @@ export default class QualificationList {
     }
 
     /**
-     * Asserts that every row in the list has a visible drag-and-drop grab handle.
+     * Get current order of list items
+     * @returns - The order of qualification IDs
      */
-    async checkGrabHandlesArePresented(): Promise<void> {
-        const count = await this.getRowCount();
-        for (let i = 0; i < count; i += 1) {
-            await expect(this.getRowLocator(i).getByTestId(QualificationList.DATA_TEST_GRIP)).toBeVisible();
+    async getItemsOrder(): Promise<string[]> {
+        const allActivityRowSelector = /^admin-list-row-/;
+        const pageOrder = await this.page
+            .getByTestId(allActivityRowSelector)
+            .evaluateAll((activityRows) => activityRows.map((activityRow) => activityRow.getAttribute("data-row-id")));
+        return pageOrder.filter((id): id is string => id !== null);
+    }
+
+    /**
+     * drag and drop an item to a new position
+     * @param itemIdToDrag - The ID of the item to drag to
+     * @param itemIdToDragFrom - The ID of the item to drag from
+     */
+    async dragAndDropItem(itemIdToDrag: number, itemIdToDragFrom: number): Promise<void> {
+        const itemRow = this.page.locator(`li[data-row-id="${itemIdToDrag}"]`);
+
+        const dragHandle = itemRow.locator("div.grip.ui-sortable-handle");
+        await dragHandle.scrollIntoViewIfNeeded();
+        await dragHandle.hover();
+        await this.page.mouse.down();
+
+        const courseBuilderComponent = this.page.locator(`ul[class="information-list sortable ui-sortable"]`);
+
+        // Move mouse to top of container, then wait for the reorder to happen
+        await courseBuilderComponent.hover({ position: { x: 0, y: 30 } });
+
+        this.tester.isGoingTo("keep dragging and wait for items to reorder");
+        let newItemOrder = await this.getItemsOrder();
+        const startTime = Date.now();
+        while (
+            newItemOrder.indexOf(itemIdToDrag.toString()) > newItemOrder.indexOf(itemIdToDragFrom.toString()) &&
+            Date.now() - startTime < 5000 // Timeout after 5 seconds
+        ) {
+            newItemOrder = await this.getItemsOrder();
         }
+
+        await this.page.mouse.up();
+
+        await this.page.getByTestId("admin-list-save-button").click();
     }
 
     /**
@@ -297,22 +332,6 @@ export default class QualificationList {
         expect(options).toContain(QualificationList.SYSTEM_PURPOSE_DIPLOMA);
         expect(options).toContain(QualificationList.SYSTEM_PURPOSE_ANTICIPATED);
         expect(options).toContain(QualificationList.SYSTEM_PURPOSE_COURSE);
-    }
-
-    /**
-     * Asserts that in the current DOM order the row named nameFirst appears before the row named nameSecond.
-     * Uses toPass() to retry until row data has loaded.
-     * @param nameFirst - Name value expected to appear at a lower index
-     * @param nameSecond - Name value expected to appear at a higher index
-     */
-    async checkRowAIsBeforeRowB(nameFirst: string, nameSecond: string): Promise<void> {
-        await expect(async () => {
-            const indexFirst = await this.getRowIndexByName(nameFirst);
-            const indexSecond = await this.getRowIndexByName(nameSecond);
-            expect(indexFirst).not.toBe(-1);
-            expect(indexSecond).not.toBe(-1);
-            expect(indexFirst).toBeLessThan(indexSecond);
-        }).toPass();
     }
 
     /**
