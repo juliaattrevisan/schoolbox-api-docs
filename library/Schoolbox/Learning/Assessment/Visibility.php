@@ -206,6 +206,8 @@ class Visibility
         $workType = $assessable->getWorkType();
 
         try {
+            // There is an edge-case here where a parent has multiple children who are learners in the same class, and
+            // they have different participation plans.  Since that edge-case is so unlikely, we'll just ignore it for now.
             $childLearner = $this->access->getChildLearnerOfParent(
                 $nonInstructorNonLearner,
                 $assessable->getBaseContext()->getFolder()

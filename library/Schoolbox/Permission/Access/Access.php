@@ -273,6 +273,9 @@ class Access
 
 
     /**
+     * Return the first child of $parent who is found to be a learner in the specified folder.
+     * Use this only in situations where you do not care which of possibly multiple child learners is returned.
+     *
      * @param User         $parent
      * @param Folder\Model $folder
      * @return ?User
