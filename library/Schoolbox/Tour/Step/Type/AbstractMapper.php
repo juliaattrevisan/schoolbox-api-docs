@@ -28,29 +28,29 @@ abstract class AbstractMapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->registerCallback(self::CALLBACK_PRESAVE, function ($model) {
-            return $this->preSave($model);
-        });
+//        $this->registerCallback(self::CALLBACK_PRESAVE, function ($model) {
+//            return $this->preSave($model);
+//        });
     }
 
-    /**
-     * @param AbstractModel $model
-     * @return bool
-     */
-    private function preSave($model)
-    {
-        if ($model->getUuid()) {
-            // already got an ID; do nothing
-
-            // TODO consider validating that it's *actually* a UUID
-            return true;
-        }
-
-        // TODO find a way to do this without the pre-query
-        $model->setUuid($this->database->query('SELECT UUID()')->fetchColumn());
-
-        return true;
-    }
+//    /**
+//     * @param AbstractModel $model
+//     * @return bool
+//     */
+//    private function preSave($model)
+//    {
+//        if ($model->getUuid()) {
+//            // already got an ID; do nothing
+//
+//            // TODO consider validating that it's *actually* a UUID
+//            return true;
+//        }
+//
+//        // TODO find a way to do this without the pre-query
+//        $model->setUuid($this->database->query('SELECT UUID()')->fetchColumn());
+//
+//        return true;
+//    }
 
     /**
      * @inheritdoc

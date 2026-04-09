@@ -54,33 +54,33 @@ class Mapper extends BaseMapper
             'other_key' => 'tour_uuid',
         ]);
 
-        $this->registerCallback(self::CALLBACK_PRESAVE, function (Model $model) {
-            return $this->preSave($model);
-        });
+//        $this->registerCallback(self::CALLBACK_PRESAVE, function (Model $model) {
+//            return $this->preSave($model);
+//        });
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, function (Model $model) {
             return $this->postDelete($model);
         });
     }
 
-    /**
-     * @param Model $model
-     * @return bool
-     */
-    private function preSave(Model $model)
-    {
-        if ($model->getUuid()) {
-            // already got an ID; do nothing
-
-            // TODO consider validating that it's *actually* a UUID
-            return true;
-        }
-
-        // TODO find a way to do this without the pre-query
-        $model->setUuid($this->database->query('SELECT UUID()')->fetchColumn());
-
-        return true;
-    }
+//    /**
+//     * @param Model $model
+//     * @return bool
+//     */
+//    private function preSave(Model $model)
+//    {
+//        if ($model->getUuid()) {
+//            // already got an ID; do nothing
+//
+//            // TODO consider validating that it's *actually* a UUID
+//            return true;
+//        }
+//
+//        // TODO find a way to do this without the pre-query
+//        $model->setUuid($this->database->query('SELECT UUID()')->fetchColumn());
+//
+//        return true;
+//    }
 
     /**
      * @inheritdoc
