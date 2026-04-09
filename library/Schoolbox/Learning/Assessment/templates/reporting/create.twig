@@ -93,6 +93,10 @@
 <fieldset>
     <legend>Supporting Data</legend>
 
+    {% set supportingDataEnable = assessment.supportingDataEnable %}
+    {% set supportingDataCollapseState = supportingDataEnable ? 'uncollapsed' : 'collapsed' %}
+    {% set supportingDataHideClass = supportingDataEnable ? '' : ' hide' %}
+
     <div class="row">
         <div class="small-12 columns">
             <label>Enable Supporting Data</label>
@@ -100,13 +104,13 @@
             <div class="switch">
                 <input type="hidden" name="reporting[supporting][enable]" value="0" />
 
-                {% set checked = '' %}
-
-                {% if assessment.supportingDataEnable %}
-                    {% set checked = 'checked="checked"' %}
-                {% endif %}
-
-                <input id="supporting-enable" name="reporting[supporting][enable]" type="checkbox" {{ checked }} />
+                <input
+                    id="supporting-enable"
+                    name="reporting[supporting][enable]"
+                    type="checkbox"
+                    data-collapser="supporting-data"
+                    {% if supportingDataEnable %}checked="checked"{% endif %}
+                />
                 <label for="supporting-enable">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>
@@ -115,7 +119,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row{{supportingDataHideClass}}" data-collapsable="supporting-data" data-collapse-state="{{ supportingDataCollapseState }}">
         <div class="small-12 columns">
             <label for="reporting-range">Date Range</label>
             {# TODO Jezwords #}
@@ -137,7 +141,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row{{supportingDataHideClass}}" data-collapsable="supporting-data" data-collapse-state="{{ supportingDataCollapseState }}">
         <div class="small-12 columns">
             {# Curriculum Nodes for Supporting Data #}
             {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
@@ -158,7 +162,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row{{supportingDataHideClass}}" data-collapsable="supporting-data" data-collapse-state="{{ supportingDataCollapseState }}">
         <div class="small-12 columns">
             <label for="supporting-folders">{{ locale.class.properPlural }}</label>
             {# TODO Jezwords #}
@@ -182,33 +186,36 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row{{supportingDataHideClass}}" data-collapsable="supporting-data" data-collapse-state="{{ supportingDataCollapseState }}">
         <div class="small-12 columns">
             <label>Work Types</label>
             <p class="meta">Select which work types will be presented as supporting data.</p>
 
-            {# TODO Snake Lord, the checkbox container in the pantry is broken;
-             # need to implement the one on the Advanced Search control panel instead
-             #}
-            <div class="checklist">
-                <ul class="option-list">
-                    {% for workType in reporting.workTypes %}
-                        {% set checked = '' %}
-
-                        {% if workType.id in assessment.supportingDataWorkTypes.propertyValues('id') ?? [] %}
-                            {% set checked = 'checked="checked"' %}
-                        {% endif %}
-                        <li>
-                            <input id="checkbox-worktype-{{ workType.id }}" name="reporting[supporting][workTypes][]" type="checkbox" value="{{ workType.id }}" {{ checked }}/>
-                            <label for="checkbox-worktype-{{ workType.id }}">{{ workType.name }}</label>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
+            <ul class="option-list checklist checklist-container" data-supporting-work-types>
+                <li>
+                    <input id="checkbox-work-type-all" type="checkbox">
+                    <label for="checkbox-work-type-all">Select All</label>
+                </li>
+                {% for workType in reporting.workTypes %}
+                    <li class="checklist-wrapper">
+                        <input
+                            id="checkbox-worktype-{{ workType.id }}"
+                            name="reporting[supporting][workTypes][]"
+                            type="checkbox"
+                            value="{{ workType.id }}"
+                            {% if workType.id in assessment.supportingDataWorkTypes.propertyValues('id') ?? [] %}
+                                checked="checked"
+                            {% endif %}
+                            data-checkbox-work-type
+                        />
+                        <label for="checkbox-worktype-{{ workType.id }}">{{ workType.name }}</label>
+                    </li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row{{supportingDataHideClass}}" data-collapsable="supporting-data" data-collapse-state="{{ supportingDataCollapseState }}">
         <div class="small-12 columns">
             <label>{{ locale.activity.proper }} {{ locale.grades.properPlural }}</label>
             <p class="meta">
@@ -306,3 +313,20 @@
 
 {# Submit #}
 {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
+
+<script src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.js?v={{ config.site_version }}"></script>
+<script>
+    $(function() {
+        $("[data-supporting-work-types]").selectAll({
+            selector: "#checkbox-work-type-all",
+            checkboxes: "[data-checkbox-work-type]"
+        });
+
+        $('[data-collapser=supporting-data]').collapsable({
+            iconCollapsed: "",
+            iconExpanded: "",
+            preventDefault: false,
+            event: "change",
+        });
+    });
+</script>

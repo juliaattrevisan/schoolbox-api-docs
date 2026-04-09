@@ -850,6 +850,7 @@ input[type="checkbox"].plain {
     padding: 0;
     max-height: 13rem;
     border: $fieldset-border-width $fieldset-border-style var(--sbx-config-color-accent, $input-border-color);
+    overflow-y: auto;
 
     input[type="checkbox"]:not(.plain):not(:disabled) {
         border: none;
@@ -865,30 +866,17 @@ input[type="checkbox"].plain {
         + label {
             border-bottom: 1px solid var(--sbx-config-color-accent, $input-border-color);
             margin: 0;
-            padding: 0.5rem 0 0.5rem 2rem;
+            padding: 0.5rem 0 0.5rem 2.5rem;
             width: 100%;
 
             &:after,
             &:before {
-                padding: 0.5rem 0 0.5rem 0.5rem;
-                background-color: transparent;
+                margin: 0.5rem 0 0.5rem 0.5rem;
             }
 
             &:hover {
                 cursor: pointer;
                 background: $content-ui-background;
-
-                &:after,
-                &:before {
-                    background-color: transparent;
-                }
-            }
-        }
-
-        &:focus {
-            &:after,
-            &:before {
-                background-color: transparent;
             }
         }
     }
