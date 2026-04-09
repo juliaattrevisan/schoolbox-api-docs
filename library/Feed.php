@@ -243,128 +243,147 @@ class Feed
     {
         [$where, $params] = $this->buildPlaceholdersAndParams($folderIds);
 
-        $query = $this->db->prepare("
-            SELECT
-                assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start, assess.category_id as folderId,
-                u.title, u.firstname, u.preferred_name, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
-                c.name as cat_name, c.id as cat_id,
-                lwt.is_visible_to_parents, lwt.is_visible_to_learners,
-                a.work_type_id
-            FROM assess
-            JOIN assessment a on assess.assessment_id = a.id
-            LEFT JOIN lu_work_type lwt ON lwt.id = a.work_type_id
-            LEFT JOIN user u ON assess.user_id = u.id
-            LEFT JOIN folder c ON c.id = assess.category_id
-            WHERE assess.category_id IN {$where}
-            AND assess.start < NOW()
-            AND assess.deleted_at IS NULL
-            AND assess.availability = 'assess'
-            ORDER BY assess.created_at DESC LIMIT 0, :limit
-        ");
-        $this->executeWithLimit($query, $params, $limit);
-
         $userHandler = new User();
-
         $access = Access::getInstance();
         $onlineAssessments = [];
-        foreach ($query as $row) {
-            $folder = new Folder\Model()->setId($row['folderId']);
+        $offset = 0;
 
-            if ($row['work_type_id'] === null) {
-                // Skip work type restrictions.
-                // This is consistent with behaviour in Assessment\Visibility->isVisibleToUser().
-                continue;
+        // Fetch in batches to accumulate exactly $limit visible rows, since PHP-side visibility
+        // filtering may exclude some SQL rows and a single LIMIT query can under-return.
+        $batchSize = $limit;
+        while (count($onlineAssessments) < $limit) {
+            $query = "
+                SELECT
+                    assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start, assess.category_id as folderId,
+                    u.title, u.firstname, u.preferred_name, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
+                    c.name as cat_name, c.id as cat_id,
+                    lwt.is_visible_to_parents, lwt.is_visible_to_learners,
+                    a.work_type_id
+                FROM assess
+                JOIN assessment a on assess.assessment_id = a.id
+                LEFT JOIN lu_work_type lwt ON lwt.id = a.work_type_id
+                LEFT JOIN user u ON assess.user_id = u.id
+                LEFT JOIN folder c ON c.id = assess.category_id
+                WHERE assess.category_id IN {$where}
+                AND assess.start < NOW()
+                AND assess.deleted_at IS NULL
+                AND assess.availability = 'assess'
+                ORDER BY assess.created_at DESC LIMIT :offset, :batchSize
+            ";
+            $params['offset'] = $offset;
+            $params['batchSize'] = $batchSize;
+            $rows = $this->db->executeQuery($query, $params)->fetchAll();
+
+            if (empty($rows)) {
+                break;
             }
 
-            // Filter out rows that should not be visible due to lwt.is_visible_to_parents/lwt.is_visible_to_learners.
-            switch ($row['is_visible_to_parents'] . '-' . $row['is_visible_to_learners']) {
-                case '0-0':
-                    // Staff and instructors only (conditions here copied from Assessment\WorkType\Mapper)
-                    //  - instructors - always included
-                    //  - learners - always excluded
-                    //  - parents of learners - included only if instructors
-                    //  - users of role type 'staff' - included unless they are learners
-                    //  - other users of any role type - included only if instructors
-                    if (!$access->isInstructor($this->user, $folder)) {
-                        if ($access->isLearner($this->user, $folder)) {
-                            continue (2); // Skip row.
-                        }
-                        if (!$this->user->getRole()->isStaff()) {
-                            continue (2); // Skip row.
-                        }
+            foreach ($rows as $row) {
+                $folder = new Folder\Model()->setId($row['folderId']);
+
+                if ($row['work_type_id'] !== null) {
+                    // Filter out rows that should not be visible due to lwt.is_visible_to_parents/lwt.is_visible_to_learners.
+                    // When work_type_id is null, no visibility restriction applies (consistent with Assessment\Visibility->isVisibleToUser()).
+                    switch ($row['is_visible_to_parents'] . '-' . $row['is_visible_to_learners']) {
+                        case '0-0':
+                            // Staff and instructors only (conditions here copied from Assessment\WorkType\Mapper)
+                            //  - instructors - always included
+                            //  - learners - always excluded
+                            //  - parents of learners - included only if instructors
+                            //  - users of role type 'staff' - included unless they are learners
+                            //  - other users of any role type - included only if instructors
+                            if (!$access->isInstructor($this->user, $folder)) {
+                                if ($access->isLearner($this->user, $folder)) {
+                                    continue 2; // Skip row.
+                                }
+                                if (!$this->user->getRole()->isStaff()) {
+                                    continue 2; // Skip row.
+                                }
+                            }
+                            break;
+                        case '0-1':
+                            // Staff and instructors and learners
+                            //  - instructors - always included
+                            //  - learners - always included
+                            //  - parents of learners - included only if instructors or learners
+                            //  - users of role type 'staff' - always included
+                            //  - other users of any role type - included only if instructors or learners
+                            if (
+                                !$access->isInstructor($this->user, $folder) &&
+                                !$access->isLearner($this->user, $folder) &&
+                                !$this->user->getRole()->isStaff()
+                            ) {
+                                continue 2; // Skip row.
+                            }
+                            break;
+                        case '1-0':
+                            // Staff and instructors and parents
+                            //  - Instructors - always included
+                            //  - learners - always excluded
+                            //  - parents of learners - included unless they are learners
+                            //  - users of role type 'staff' - included unless they are learners
+                            //  - other users of any role type - included only if instructors
+                            if (!$access->isInstructor($this->user, $folder)) {
+                                if ($access->isLearner($this->user, $folder)) {
+                                    continue 2; // Skip row.
+                                }
+                                if (
+                                    !$access->isParentOfLearner($this->user, $folder) &&
+                                    !$this->user->getRole()->isStaff()
+                                ) {
+                                    continue 2; // Skip row.
+                                }
+                            }
+                            break;
+                        case '1-1':
+                            // Staff and instructors and learners and parents
+                            //  - instructors - always included
+                            //  - learners - always included
+                            //  - parents of learners - always included
+                            //  - users of role type 'staff' - always included
+                            //  - other users of any role type - included only if instructors or learners
+                            if (
+                                !$access->isInstructor($this->user, $folder) &&
+                                !$access->isLearner($this->user, $folder) &&
+                                !$access->isParentOfLearner($this->user, $folder) &&
+                                !$this->user->getRole()->isStaff()
+                            ) {
+                                continue 2; // Skip row.
+                            }
+                            break;
+                        default:
+                            throw new LogicException('Impossible case.');
                     }
-                    break;
-                case '0-1':
-                    // Staff and instructors and learners
-                    //  - instructors - always included
-                    //  - learners - always included
-                    //  - parents of learners - included only if instructors or learners
-                    //  - users of role type 'staff' - always included
-                    //  - other users of any role type - included only if instructors or learners
-                    if (
-                        !$access->isInstructor($this->user, $folder) &&
-                        !$access->isLearner($this->user, $folder) &&
-                        !$this->user->getRole()->isStaff()
-                    ) {
-                        continue (2); // Skip row.
-                    }
-                    break;
-                case '1-0':
-                    // Staff and instructors and parents
-                    //  - Instructors - always included
-                    //  - learners - always excluded
-                    //  - parents of learners - included unless they are learners
-                    //  - users of role type 'staff' - included unless they are learners
-                    //  - other users of any role type - included only if instructors
-                    if (!$access->isInstructor($this->user, $folder)) {
-                        if ($access->isLearner($this->user, $folder)) {
-                            continue (2); // Skip row.
-                        }
-                        if (
-                            !$access->isParentOfLearner($this->user, $folder) &&
-                            !$this->user->getRole()->isStaff()
-                        ) {
-                            continue (2); // Skip row.
-                        }
-                    }
-                    break;
-                case '1-1':
-                    // Staff and instructors and learners and parents
-                    //  - instructors - always included
-                    //  - learners - always included
-                    //  - parents of learners - always included
-                    //  - users of role type 'staff' - always included
-                    //  - other users of any role type - included only if instructors or learners
-                    if (
-                        !$access->isInstructor($this->user, $folder) &&
-                        !$access->isLearner($this->user, $folder) &&
-                        !$access->isParentOfLearner($this->user, $folder) &&
-                        !$this->user->getRole()->isStaff()
-                    ) {
-                        continue (2); // Skip row.
-                    }
-                    break;
-                default:
-                    throw new LogicException('Impossible case.');
+                }
+
+                $onlineAssessments[] = [
+                    'date'        => $row['start'],
+                    'type'        => 'icon-quiz',
+                    'message'     => $userHandler->formatName($row)
+                        . ' opened the quiz '
+                        . Scrub::text($row['heading']),
+                    'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' opened the quiz <a href="/assess/intro/' . $row['assess_id'] . '">'
+                        . Scrub::text($row['heading']) . '</a>',
+                    'external_id' => $row['external_id'],
+                    'user_name'   => $userHandler->formatName($row),
+                    'cat_name'    => $row['cat_name'],
+                    'cat_id'      => $row['cat_id'],
+                    'user_id'     => $row['uid'],
+                    'link'        => '/assess/intro/' . $row['assess_id'],
+                    'name'        => $row['heading'],
+                    'action'      => 'opened the quiz',
+                ];
+
+                if (count($onlineAssessments) >= $limit) {
+                    break 2; // Reached the limit; stop fetching.
+                }
             }
 
-            $onlineAssessments[] = [
-                'date'        => $row['start'],
-                'type'        => 'icon-quiz',
-                'message'     => $userHandler->formatName($row)
-                    . ' opened the quiz '
-                    . Scrub::text($row['heading']),
-                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' opened the quiz <a href="/assess/intro/' . $row['assess_id'] . '">'
-                    . Scrub::text($row['heading']) . '</a>',
-                'external_id' => $row['external_id'],
-                'user_name'   => $userHandler->formatName($row),
-                'cat_name'    => $row['cat_name'],
-                'cat_id'      => $row['cat_id'],
-                'user_id'     => $row['uid'],
-                'link'        => '/assess/intro/' . $row['assess_id'],
-                'name'        => $row['heading'],
-                'action'      => 'opened the quiz',
-            ];
+            if (count($rows) < $batchSize) {
+                break; // Fetched fewer rows than requested, so the result set is exhausted.
+            }
+
+            $offset += $batchSize;
         }
 
         return $onlineAssessments;
