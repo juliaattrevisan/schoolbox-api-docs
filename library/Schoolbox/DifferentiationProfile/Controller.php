@@ -257,7 +257,7 @@ class Controller extends Base
         $profiles = $cursor->retrieveResults(null);
 
         $headings = [
-            'student' => 'Student name',
+            'student' => 'Name',
             'updated_at' => 'Last updated',
             'status' => 'Status',
         ];
