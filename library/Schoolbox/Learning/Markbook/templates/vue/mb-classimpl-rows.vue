@@ -5,6 +5,7 @@ import MbClassStatisticRow from "./mb-class-statistic-row.vue";
 import MbClassimplRowStudent from "./mb-classimpl-row-student.vue";
 import type { Props as MbClassStatisticRowProps } from "./mb-class-statistic-row.vue";
 import type { MarkbookClassImplActivity } from "./types/payload";
+import { ACTIVITY_TYPE_REPORTING, ACTIVITY_TYPE_TASK } from "@schoolboxAssessment/Types/assessmentTypes";
 
 interface Props {
     type: "course" | "class";
@@ -25,9 +26,11 @@ const classStatisticRows: Omit<MbClassStatisticRowProps, "classImpl">[] = [
     {
         label: "Weight",
         statsKey: "weight",
+        hideForTypes: [ACTIVITY_TYPE_TASK],
         input: {
             key: "weight",
             allowCourseManaged: false,
+            readonlyForTypes: [ACTIVITY_TYPE_REPORTING],
             fetch: (aImpl: MarkbookClassImplActivity) => ({
                 url: `/learning/assessments/weight/${aImpl.id}`,
                 data: { assessmentId: aImpl.id, weight: aImpl.weight },
@@ -37,9 +40,11 @@ const classStatisticRows: Omit<MbClassStatisticRowProps, "classImpl">[] = [
     {
         label: `Weight in ${locale.project.proper()}`,
         statsKey: "weightInProject",
+        hideForTypes: [ACTIVITY_TYPE_TASK],
         input: {
             key: "weight",
             allowCourseManaged: false,
+            readonlyForTypes: [ACTIVITY_TYPE_REPORTING],
             fetch: (aImpl: MarkbookClassImplActivity) => ({
                 url: `/learning/assessments/weight/${aImpl.id}`,
                 data: { assessmentId: aImpl.id, weight: aImpl.weight },
@@ -104,6 +109,7 @@ const orderedClassImplStudents = window.Vue.computed(() => {
                 :class-impl="classImpl"
                 :label="row.label"
                 :stats-key="row.statsKey"
+                :hide-for-types="row.hideForTypes"
                 :input="'input' in row ? row.input : undefined"
                 :round="'round' in row ? row.round : undefined"
             />
@@ -117,6 +123,7 @@ const orderedClassImplStudents = window.Vue.computed(() => {
                 key: 'markVisibility',
                 selectOptions: markVisibilityOptions,
                 allowCourseManaged: true,
+                readonlyForTypes: [ACTIVITY_TYPE_REPORTING],
                 fetch: (aImpl) => ({
                     url: `/learning/assessments/visibility/${aImpl.id}`,
                     data: { assessmentId: aImpl.id, visibility: aImpl.markVisibility },

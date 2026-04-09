@@ -51,6 +51,7 @@ class AssessmentType implements IType
     public const TYPE_DIALOG_AGENT = 'dialogAgent';
     public const TYPE_REPORTING = 'reporting';
 
+    /** @see also in /library/Schoolbox/Assessment/Types/assessmentTypes.ts */
     public const ALL_TYPES = [
         self::TYPE_PROJECT,
         self::TYPE_DUE_WORK,
