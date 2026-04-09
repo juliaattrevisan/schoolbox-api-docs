@@ -36,7 +36,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Daemon\Kernel(
     'Mobile App Delivery Daemon',
     [
-        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'hc::',
+        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'hc:',
         Daemon\Kernel::OPTION_APP_LONG_OPTS  => [
             'help',
             'force-production',

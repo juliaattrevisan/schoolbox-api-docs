@@ -34,8 +34,8 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Daemon\Kernel(
     'Schedule',
     [
-        Daemon\Kernel::OPTION_ERRORS => E_ALL,
-        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'c::',
+        Daemon\Kernel::OPTION_ERRORS         => E_ALL,
+        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'c:',
     ],
 );
 
