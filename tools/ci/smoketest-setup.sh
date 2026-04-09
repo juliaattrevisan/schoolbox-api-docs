@@ -106,7 +106,7 @@ mariadb schoolbox -e "UPDATE config SET value='dev.schoolbox.cloud' WHERE name='
 ## set the external services correctly
 mariadb schoolbox -e "UPDATE config SET value='tcp://127.0.0.1:6379' WHERE name='redis_url';"
 mariadb schoolbox -e "UPDATE config SET value='tcp://127.0.0.1:6380' WHERE name='redis_ephemeral_url';"
-mariadb schoolbox -e "UPDATE config SET value='tcp://redis-storage:6379' WHERE name='taskd_redis_url';"
+mariadb schoolbox -e "UPDATE config SET value='tcp://127.0.0.1:6379' WHERE name='taskd_redis_url';"
 mariadb schoolbox -e "UPDATE config SET value='http://localhost:5002' WHERE name='presidio_analysis_host';"
 mariadb schoolbox -e "UPDATE config SET value='http://localhost:5001' WHERE name='presidio_anonymisation_host';"
 mariadb schoolbox -e "UPDATE config SET value='127.0.0.1' WHERE name='mail_smtp_host';"
