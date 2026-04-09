@@ -39,15 +39,9 @@ $body-bg: var(--sbx-config-color-body-background, var(--body-background)) !defau
 
 $login-form-background: var(--sbx-config-login-form-background, var(--login-form-background)) !default;
 
-<<<<<<< HEAD
-$accounts-menu-foreground: var(--sbx-config-color-menu-primary, var(--accounts-menu-foreground)) !default;
-$accounts-menu-background: var(--sbx-color-foreground-primary, var(--accounts-menu-background)) !default;
-$accounts-menu-hover: var(--sbx-config-color-active, var(--accounts-menu-hover)) !default;
-=======
 $accounts-menu-foreground: var(--sbx-config-color-menu-background, var(--accounts-menu-foreground)) !default;
 $accounts-menu-background: var(--sbx-config-color-menu-foreground, var(--accounts-menu-background)) !default;
 $accounts-menu-hover: var(--sbx-config-color-menu-hover, var(--accounts-menu-hover)) !default;
->>>>>>> ef2bc80ccf0 (Few custom property name changes [SA-21028])
 
 /*****************************
  Contrasts to skin color vars above
