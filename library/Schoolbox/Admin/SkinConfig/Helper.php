@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\SkinConfig;
 use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Color\Transformer;
+use Alaress\Web\Request\Values;
 use OzdemirBurak\Iris\Color\Hexa;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
@@ -219,16 +220,18 @@ class Helper
     private function extractPostedToggleEnabled(array $configs): ?bool
     {
         $toggle = $configs['toggle'] ?? null;
-        if (!is_array($toggle) || !array_key_exists('enabled', $toggle)) {
+        if (!is_array($toggle)) {
             return null;
         }
 
-        return filter_var($toggle['enabled'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        return (new Values($toggle))->getBool('enabled');
     }
 
     private function isPersistedSonarEnabled(): bool
     {
-        return filter_var((string) $this->configLoader->get(ConfigMapper::NAME_SONAR_UI_TOGGLE), FILTER_VALIDATE_BOOLEAN);
+        return (new Values([
+            ConfigMapper::NAME_SONAR_UI_TOGGLE => $this->configLoader->get(ConfigMapper::NAME_SONAR_UI_TOGGLE),
+        ]))->getBool(ConfigMapper::NAME_SONAR_UI_TOGGLE) ?? false;
     }
 
     private function resolvePreviewTypeId(?bool $sonarEnabled): int
