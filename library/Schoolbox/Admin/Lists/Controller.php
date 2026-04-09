@@ -32,6 +32,7 @@ use Schoolbox\IB\SystemPurpose\Model as SystemPurposeModel;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
+use Schoolbox\Learning\Assessment\Reporting\Model as Reporting;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\Lti\Model as Lti;
@@ -1209,6 +1210,13 @@ class Controller extends Base
                     ],
                     'permittedDialogAgent' => [
                         'caption'    => DialogAgent::getDefaultTypeName(),
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'permittedActivities',
+                    ],
+                    'permittedReportingActivity' => [
+                        'caption'    => Reporting::getDefaultTypeName(),
                         'checkbox'   => true,
                         'mandatory'  => true,
                         'default'    => false,
