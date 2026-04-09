@@ -104,8 +104,8 @@ async function onSaveSelected(): Promise<void> {
 </script>
 
 <template>
-    <div data-test="skin-config-container" class="l-pad-m--horiz">
-        <div v-if="loadError" class="small-12 columns" data-test="skin-config-load-error">
+    <div data-test="skin-config-container" class="l-flex-col l-gap-l l-pad-m--horiz">
+        <div v-if="loadError" data-test="skin-config-load-error">
             <request-error :further-info="loadError" />
         </div>
         <form method="post" class="l-flex-col l-gap-l skin-config-form" @submit.prevent="onSaveSelected">
