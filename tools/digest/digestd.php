@@ -31,8 +31,9 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Daemon\Kernel(
     'Digest',
     [
+        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'c::',
         Daemon\Kernel::OPTION_APP_LONG_OPTS => ['debug-interval:'],
-    ]
+    ],
 );
 
 // CREATE DIGEST APP

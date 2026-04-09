@@ -31,7 +31,13 @@ use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Daemon\Kernel('Schedule', [Daemon\Kernel::OPTION_ERRORS => E_ALL,]);
+$kernel = new Daemon\Kernel(
+    'Schedule',
+    [
+        Daemon\Kernel::OPTION_ERRORS => E_ALL,
+        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'c::',
+    ],
+);
 
 // CREATE SCHEDULER APP
 $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) use (&$scheduler): void {
