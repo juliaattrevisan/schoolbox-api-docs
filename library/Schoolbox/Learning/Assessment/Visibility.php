@@ -168,6 +168,7 @@ class Visibility
         if ($respectWorkTypeVisibility && $workType !== null && !$workType->isVisibleToLearners()) {
             return false;
         }
+        // Aside from the check above, visibility for learners is the same as for non-learners, so defer to below function.
         return $this->isVisibleToNonInstructorNonLearner($assessable, $learner, $showClosed, $now, $respectWorkTypeVisibility);
     }
 
