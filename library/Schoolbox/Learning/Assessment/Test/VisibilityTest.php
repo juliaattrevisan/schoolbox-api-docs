@@ -1350,7 +1350,7 @@ class VisibilityTest extends TestCase
                     return null;
                 }
                 $users = $this->buildUsers();
-                return $users[3];
+                return $users[2]; // Return learner user 'Cath'.
             });
         return $mockAccess;
     }
