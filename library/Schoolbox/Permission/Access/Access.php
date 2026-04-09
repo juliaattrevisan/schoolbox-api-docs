@@ -202,17 +202,16 @@ class Access
 
 
     /**
-     * Is the specified user an instructor for the specified folder ?
+     * Is the specified user an instructor for the specified folder?
      *
      * An instructor is any user with WRITE+ permission to a folder
      *
      * @param User         $user
      * @param Folder\Model $folder
      * @return bool
-     * @throws InvalidArgumentException
-     * @throws Mapper\Exception
-     * @throws LogicException
-     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException Due to getFolderAccess() call.
+     * @throws Mapper\Exception         Due to getFolderAccess() call.
+     * @throws LogicException           Due to getFolderAccess() call.
      */
     public function isInstructor(User $user, Folder\Model $folder): bool
     {
@@ -221,17 +220,16 @@ class Access
 
 
     /**
-     * Is the specified user a learner of the specified folder ?
+     * Is the specified user a learner of the specified folder?
      *
      * A learner is any user with READ permission to a folder
      *
      * @param User         $user
      * @param Folder\Model $folder
      * @return bool
-     * @throws InvalidArgumentException
-     * @throws Mapper\Exception
-     * @throws LogicException
-     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException Due to getFolderAccess() call.
+     * @throws Mapper\Exception         Due to getFolderAccess() call.
+     * @throws LogicException           Due to getFolderAccess() call.
      */
     public function isLearner(User $user, Folder\Model $folder): bool
     {
@@ -252,8 +250,9 @@ class Access
      * @param User         $user
      * @param Folder\Model $folder
      * @return bool
-     * @throws Mapper\Exception         If folder does not exist.
      * @throws InvalidArgumentException Due to getFolderAccess() call.
+     * @throws Mapper\Exception         Due to getFolderAccess() call.
+     * @throws LogicException           Due to getFolderAccess() call.
      */
     public function isParentOfLearner(User $user, Folder\Model $folder): bool
     {
@@ -277,7 +276,10 @@ class Access
      * @param User         $parent
      * @param Folder\Model $folder
      * @return ?User
-     * @throws MapperException
+     * @throws InvalidArgumentException Due to getFolderAccess() call.
+     * @throws MapperException          Due to getFolderAccess() call.
+     * @throws LogicException           Due to getFolderAccess() call.
+     * @throws UnexpectedValueException Due to getFolderAccess() call.
      * @see isParentOfLearner()
      */
     public function getChildLearnerOfParent(User $parent, Folder\Model $folder): ?User
@@ -473,6 +475,7 @@ class Access
      * @throws InvalidArgumentException TODO implement better annotation/handling for impossible logic exceptions
      * @throws Mapper\Exception         If folder does not exist.
      * @throws LogicException           If unable to build an ExternalUser instance
+     * @throws UnexpectedValueException Due to getNnianAncestors() call.
      */
     public function getFolderAccess(User $user, int $folderId, $cache = true): int
     {

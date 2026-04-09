@@ -64,8 +64,8 @@ class Visibility
 
         try {
             $viewerIsInstructor = $this->access->isInstructor($viewer, $folder);
-        } catch (MapperException) {
-            $viewerIsInstructor = false; // In case of mapper error, assume non-instructor.
+        } catch (MapperException | \LogicException | \UnexpectedValueException) {
+            $viewerIsInstructor = false; // In case of exception, assume non-instructor.
         }
 
         if ($viewerIsInstructor) {
@@ -74,8 +74,8 @@ class Visibility
 
         try {
             $viewerIsLearner = $this->access->isLearner($viewer, $folder);
-        } catch (MapperException) {
-            $viewerIsLearner = false; // In case of mapper error, assume non-learner.
+        } catch (MapperException | \LogicException | \UnexpectedValueException) {
+            $viewerIsLearner = false; // In case of exception, assume non-learner.
         }
 
         if ($viewerIsLearner) {
@@ -210,8 +210,8 @@ class Visibility
                 $nonInstructorNonLearner,
                 $assessable->getBaseContext()->getFolder()
             );
-        } catch (MapperException) {
-            $childLearner = null; // In case of mapper error, assume no child learner exists.
+        } catch (MapperException | \LogicException | \UnexpectedValueException) {
+            $childLearner = null; // In case of exception, assume no child learner exists.
         }
 
         // Handle the case where the user is a parent of a learner.
