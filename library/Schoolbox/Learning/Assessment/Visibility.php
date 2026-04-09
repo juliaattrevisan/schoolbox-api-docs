@@ -112,7 +112,7 @@ class Visibility
             return true;
         }
         if ($viewer->getRole()->isParent()) {
-            foreach ($viewer->getChildren() as $child) {
+            foreach (($viewer->getChildren() ?? []) as $child) {
                 if ($this->isVisibleToUser($assessment, $child, $showClosed, $now, $respectWorkTypeVisibility)) {
                     return true;
                 }
