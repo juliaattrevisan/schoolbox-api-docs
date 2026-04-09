@@ -1309,7 +1309,7 @@ class VisibilityTest extends TestCase
         $mockAccess
             ->expects($this->any())
             ->method('isInstructor')
-            ->willReturnCallback(function (User $user) {
+            ->willReturnCallback(function (User $user, Folder\Model $folder) {
                 return match ($user->getId()) {
                     1 => false,
                     2 => true,
@@ -1321,7 +1321,7 @@ class VisibilityTest extends TestCase
         $mockAccess
             ->expects($this->any())
             ->method('isLearner')
-            ->willReturnCallback(function (User $user) {
+            ->willReturnCallback(function (User $user, Folder\Model $folder) {
                 return match ($user->getId()) {
                     1 => false,
                     2 => false,
@@ -1332,20 +1332,8 @@ class VisibilityTest extends TestCase
             });
         $mockAccess
             ->expects($this->any())
-            ->method('isParentOfLearner')
-            ->willReturnCallback(function (User $user) {
-                return match ($user->getId()) {
-                    1 => false,
-                    2 => false,
-                    3 => false,
-                    4 => true,
-                    default => throw new \InvalidArgumentException("No access level defined for user '{$user->getId()}'"),
-                };
-            });
-        $mockAccess
-            ->expects($this->any())
             ->method('getChildLearnerOfParent')
-            ->willReturnCallback(function (User $user) {
+            ->willReturnCallback(function (User $user, Folder\Model $folder) {
                 if ($user->getId() !== 4) {
                     return null;
                 }
