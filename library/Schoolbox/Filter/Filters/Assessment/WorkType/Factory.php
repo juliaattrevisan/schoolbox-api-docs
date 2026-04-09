@@ -18,7 +18,7 @@ use Schoolbox\Filter\Page\Model;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Mapper\DefinitionException;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -198,7 +198,7 @@ class Factory extends Filter\AbstractFactory
         foreach ($vieweeFolderIds as $folderId) {
             try {
                 $access = $this->access->getFolderAccess($viewer, $folderId);
-            } catch (Exception) {
+            } catch (MapperException|\InvalidArgumentException|\LogicException) {
                 $access = UserAccess::ACCESS_DENY; // Assume no access in case of exception.
             }
             if ($access > $maxAccess) {
