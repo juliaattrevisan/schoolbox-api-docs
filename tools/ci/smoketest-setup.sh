@@ -103,6 +103,15 @@ echo 'started mariadb'
 mariadb schoolbox -e "UPDATE config SET value='vagrant' WHERE name='site_hostname';"
 mariadb schoolbox -e "UPDATE config SET value='dev.schoolbox.cloud' WHERE name='site_domain';"
 
+## set the external services correctly
+mariadb schoolbox -e "UPDATE config SET value='tcp://127.0.0.1:6379' WHERE name='redis_url';"
+mariadb schoolbox -e "UPDATE config SET value='tcp://127.0.0.1:6380' WHERE name='redis_ephemeral_url';"
+mariadb schoolbox -e "UPDATE config SET value='http://localhost:5002' WHERE name='presidio_analysis_host';"
+mariadb schoolbox -e "UPDATE config SET value='http://localhost:5001' WHERE name='presidio_anonymisation_host';"
+mariadb schoolbox -e "UPDATE config SET value='127.0.0.1' WHERE name='mail_smtp_host';"
+mariadb schoolbox -e "UPDATE config SET value='http://localhost:3000' WHERE name='gotenberg_host';"
+mariadb schoolbox -e "UPDATE config SET value='localhost' WHERE name='amqp_host';"
+
 # Sandbox has no ephemeral Redis instance; use the persistent instance.
 # This must happen both before and after updates:
 # * before, because the cache refresh must use the persistent URL
