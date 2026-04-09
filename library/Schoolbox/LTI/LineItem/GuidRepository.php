@@ -18,8 +18,10 @@ use OAT\Library\Lti1p3Ags\Model\LineItem\LineItemInterface;
 use OAT\Library\Lti1p3Ags\Repository\LineItemRepositoryInterface;
 use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
+use Schoolbox\GenericCollection;
 use Schoolbox\LTI\Assessment\LineItem as SchoolboxLineItem;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Url\Uri;
 use Throwable;
 
 /**
@@ -53,16 +55,25 @@ class GuidRepository implements LineItemRepositoryInterface
      */
     public function find(string $lineItemIdentifier): ?LineItemInterface
     {
-        $lineItem = $this->lineItemMapper->findByColumnList([
-            'lti_assessment_guid' => $this->guid,
-            'identifier_url'      => $lineItemIdentifier,
-        ])->first();
-        if ($lineItem) {
-            $this->logger->debug(
-                __METHOD__ . ': line item found',
-                $this->generateLogContext($lineItemIdentifier, $lineItem),
-            );
-            return $this->convertModelToLineItem($lineItem);
+        // Be more relaxed when finding a line item: match the path only.
+        // This is because the request's host may be different to the instance's
+        // host, due to reverse proxies.
+        // Whilst this could be handled by extracting the reverse proxy in
+        // `\Schoolbox\LTI\Platform\LineItem\Guid\Controller::createResponse`,
+        // matching the path only brings this into line with its sibling method
+        // `\Schoolbox\LTI\LineItem\SingleAssessmentRepository::find`.
+        $url = new Uri($lineItemIdentifier);
+        /** @var GenericCollection<SchoolboxLineItem\Model> $lineItems */
+        $lineItems = $this->lineItemMapper->findByColumn('lti_assessment_guid', $this->guid);
+        foreach ($lineItems as $lineItem) {
+            $identifierUrl = new Uri($lineItem->getIdentifierUrl());
+            if ($identifierUrl->getPath() === $url->getPath()) {
+                $this->logger->debug(
+                    __METHOD__ . ': line item found',
+                    $this->generateLogContext($lineItemIdentifier, $lineItem),
+                );
+                return $this->convertModelToLineItem($lineItem);
+            }
         }
         $this->logger->debug(
             __METHOD__ . ': line item not found',
