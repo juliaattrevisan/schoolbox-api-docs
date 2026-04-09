@@ -202,7 +202,7 @@ class Model implements ISoftDeletable, Sequential
     public function isVisibleToLearners(): bool
     {
         if (null === $this->isVisibleToLearners) {
-            throw new InsufficientHydrationException('Cannot determine student visibility from NULL property');
+            throw new InsufficientHydrationException('Cannot determine learner visibility from NULL property');
         }
         return $this->isVisibleToLearners;
     }
