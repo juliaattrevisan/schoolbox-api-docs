@@ -434,6 +434,11 @@ abstract class AbstractAssessment implements IAssessable
         $participant = $student ? $this->getParticipantIfExtant($student) : null;
         $publishDate = $participant ? $participant->getPublishDate() : $this->getPublishAt();
 
+        // A null publish date means the assessment has not been published.
+        if (null === $publishDate) {
+            return false;
+        }
+
         return $now->gte($publishDate);
     }
 
