@@ -241,11 +241,11 @@ class Controller extends ConfigController
     private function extractPostedToggleEnabled(array $configs): ?string
     {
         $toggle = $configs['toggle'] ?? null;
-        if (!is_array($toggle) || !array_key_exists('enabled', $toggle)) {
+        if (!is_array($toggle)) {
             return null;
         }
 
-        $enabled = filter_var($toggle['enabled'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        $enabled = (new Values($toggle))->getBool('enabled');
         if ($enabled === null) {
             return null;
         }
