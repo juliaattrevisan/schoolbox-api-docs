@@ -69,10 +69,10 @@ body.sbx-body {
             align-items: center;
             display: flex;
             overflow: hidden;
-            padding: var(--sbx-size-m);
-            padding-inline-end: calc(var(--sbx-size-m) * 2);
-            right: var(--sbx-size-m);
-            top: var(--sbx-size-m);
+            padding: 1rem;
+            padding-inline-end: 2rem;
+            right: 1rem;
+            top: 1.5rem;
             width: auto;
 
             // the margins have been removed from #hybrid-bar so revert back to the original position for smaller screens
@@ -91,132 +91,227 @@ body.sbx-body {
                 &:hover {
                     background: var(--sbx-config-color-menu-hover);
                 }
+            }
 
-                &::before {
-                    color: var(--sbx-color-alert-text);
-                    height: 100%;
-                    line-height: 1.9;
-                    width: 100%;
-                }
-
-                & span {
-                    background-color: var(--sbx-color-alert);
-                    font-size: 8px;
-                    position: absolute;
-                    right: -8px;
-                    top: -8px;
+            #header-search-input {
+                & button {
+                    border-radius: var(--sbx-config-field-roundness);
                 }
             }
-            & #notification-toggle[data-unread="0"] {
-                background: var(--sbx-config-color-menu-primary);
-                &:hover {
-                    background: var(--sbx-config-color-menu-hover);
-                }
+
+            // move the search results in so the right side is inline with the search input
+            .c-header-search__results {
+                margin-right: 72px;
             }
-        }
-    }
 
-    // Account dropdown
-    #account-content {
-        border-radius: var(--sbx-config-box-roundness);
-
-        // separator between account options and switch user list
-        & .separator {
-            color: var(--sbx-color-text-primary);
-            font-size: var(--sbx-font-size-s);
-            font-weight: 600;
-            text-transform: none;
-        }
-
-        .profile-options,
-        .profile-options-mobile {
-            a {
-                color: var(--sbx-config-color-accent);
+            // profile icon to trigger the account menu
+            #profile-drop {
+                margin-inline-end: 1rem;
+                height: 3rem;
+                width: 3rem;
+                top: 50%;
+                transform: translateY(-50%);
                 border-radius: var(--sbx-config-field-roundness);
-                &:hover {
-                    background: var(--sbx-config-color-active);
-                }
-                // icons next to account options
-                & [class^="icon"] {
-                    color: var(--sbx-config-color-accent);
-                    font-size: var(--sbx-font-size-s);
-                    line-height: 1.2;
-                }
-            }
-        }
-
-        .switch-user {
-            // switch user list
-            li.user {
-                border-radius: var(--sbx-config-field-roundness);
-                padding-block: var(--sbx-size-s);
-                padding-inline: var(--sbx-size-s);
+                overflow: hidden;
                 & img {
                     border-radius: var(--sbx-config-field-roundness);
                 }
-                & p {
-                    color: var(--sbx-color-text-primary);
-                    &:not(.meta) {
-                        font-weight: var(--sbx-font-weight-active);
+            }
+
+            // Notifications toggle, move it across with the margin tweak and add some padding to give it more room
+            #notifications {
+                align-items: center;
+                display: flex;
+                height: 2rem;
+                justify-content: center;
+                width: 2rem;
+
+                & sbx-icon {
+                    color: var(--sbx-config-color-accent-text);
+                    height: 100%;
+                    width: 100%;
+                }
+                & #notification-toggle[data-unread="0"] {
+                    background: var(--sbx-config-color-menu-primary);
+                    &:hover {
+                        background: var(--sbx-config-color-menu-hover);
                     }
                 }
+            }
+        }
+
+        // Account dropdown
+        #account-content {
+            border-radius: var(--sbx-config-box-roundness);
+
+            // separator between account options and switch user list
+            & .separator {
+                color: var(--sbx-color-text-primary);
+                font-size: var(--sbx-font-size-s);
+                font-weight: 600;
+                text-transform: none;
+            }
+
+            .profile-options,
+            .profile-options-mobile {
+                a {
+                    color: var(--sbx-config-color-accent);
+                    border-radius: var(--sbx-config-field-roundness);
+                    &:hover {
+                        background: var(--sbx-config-color-active);
+                    }
+                    // icons next to account options
+                    & [class^="icon"] {
+                        color: var(--sbx-config-color-accent);
+                        font-size: var(--sbx-font-size-s);
+                        line-height: 1.2;
+                    }
+                }
+            }
+
+            .switch-user {
+                // switch user list
+                li.user {
+                    border-radius: var(--sbx-config-field-roundness);
+                    padding-block: var(--sbx-size-s);
+                    padding-inline: var(--sbx-size-s);
+                    & img {
+                        border-radius: var(--sbx-config-field-roundness);
+                    }
+                    & p {
+                        color: var(--sbx-color-text-primary);
+                        &:not(.meta) {
+                            font-weight: var(--sbx-font-weight-active);
+                        }
+                    }
+                    &:hover {
+                        background: var(--sbx-config-color-active);
+                    }
+                }
+            }
+        }
+
+        // mobile account menu, when it goes into the left side menu
+        .account-menu-mobile {
+            // keep similar to the .separator styles in the desktop account menu for consistency, but with some tweaks for mobile
+            .separator {
+                color: var(--sbx-color-text-primary);
+                font-size: var(--sbx-font-size-s);
+                font-weight: var(--sbx-font-weight-active);
+                text-transform: none;
+            }
+
+            // add a bit of padding for breathing space
+            .switch-user-mobile {
+                li.user {
+                    padding-block: var(--sbx-size-xxs);
+                    padding-inline: var(--sbx-size-xs);
+                }
+            }
+
+            // remove the derived color
+            .user .card .meta {
+                color: var(--sbx-color-text-secondary);
+            }
+        }
+
+        // Left menu styles
+        #left-menu {
+            h3 {
+                color: var(--sbx-color-text-primary);
+                text-transform: none;
+            }
+            a {
+                color: var(--sbx-config-color-accent);
+                border-radius: var(--sbx-config-field-roundness);
+                font-size: var(--sbx-font-size-xs);
+            }
+            // to help differentiate the heading links from the list below
+            .side-menu-heading-link {
+                background: var(--sbx-color-foreground-secondary);
+                border-bottom: 1px solid var(--sbx-color-border);
+                border-radius: var(--sbx-config-field-roundness);
+                font-size: var(--sbx-font-size-s);
+                font-weight: var(--sbx-font-weight-active);
+            }
+            /* Ensure the Back link has the icon content and font-family */
+            .back {
+                a {
+                    text-transform: none;
+                    &:before {
+                        content: "\e655"; /* The icon character */
+                        font-family: "sbx-icons" !important; /* Forces the icon font */
+                    }
+                }
+            }
+        }
+
+        // Left menu styles when menu is not open
+        .off-canvas-wrap.move-right :not(.left-open) {
+            & #left-menu {
+                border-radius: var(--sbx-config-box-roundness);
+                box-shadow: var(--sbx-shadow-m);
+                left: 1rem;
+                top: 1rem;
+            }
+        }
+
+        // Notifications menu styles when menu is not open
+        .off-canvas-wrap.move-left :not(.right-open) {
+            & #msgs {
+                border-radius: var(--sbx-config-box-roundness);
+                box-shadow: var(--sbx-shadow-m);
+                right: 1rem;
+                top: 1rem;
+            }
+        }
+
+        // Notifications menu styles
+        #message-list {
+            padding: var(--sbx-size-xs);
+            #right-menu-dock,
+            .settings-button {
+                border-radius: var(--sbx-config-field-roundness);
+                color: var(--sbx-config-color-accent);
+                padding: var(--sbx-size-xs);
+                top: var(--sbx-size-xs);
                 &:hover {
                     background: var(--sbx-config-color-active);
                 }
             }
-        }
-    }
-
-    // mobile account menu, when it goes into the left side menu
-    .account-menu-mobile {
-        // keep similar to the .separator styles in the desktop account menu for consistency, but with some tweaks for mobile
-        .separator {
-            color: var(--sbx-color-text-primary);
-            font-size: var(--sbx-font-size-s);
-            font-weight: var(--sbx-font-weight-active);
-            text-transform: none;
-        }
-
-        // add a bit of padding for breathing space
-        .switch-user-mobile {
-            li.user {
-                padding-block: var(--sbx-size-xxs);
-                padding-inline: var(--sbx-size-xs);
+            #right-menu-dock {
+                left: var(--sbx-size-xs);
             }
-        }
+            .settings-button {
+                right: var(--sbx-size-xs);
+            }
 
-        // remove the derived color
-        .user .card .meta {
-            color: var(--sbx-color-text-secondary);
-        }
-    }
-
-    // Left menu styles
-    #left-menu {
-        h3 {
-            color: var(--sbx-color-text-primary);
-            text-transform: none;
-        }
-        a {
-            color: var(--sbx-config-color-accent);
-            border-radius: var(--sbx-config-field-roundness);
-            font-size: var(--sbx-font-size-xs);
-        }
-        // to help differentiate the heading links from the list below
-        .side-menu-heading-link {
-            background: var(--sbx-color-foreground-secondary);
-            border-bottom: 1px solid var(--sbx-color-border);
-            border-radius: var(--sbx-config-field-roundness);
-            font-size: var(--sbx-font-size-s);
-            font-weight: var(--sbx-font-weight-active);
-        }
-        /* Ensure the Back link has the icon content and font-family */
-        .back {
-            a {
+            #notification-toggle-full {
+                background-color: var(--sbx-color-foreground-primary);
+                color: var(--sbx-color-text-primary);
+                font-weight: var(--sbx-font-weight-active);
                 text-transform: none;
-                &:before {
-                    content: "\e655"; /* The icon character */
-                    font-family: "sbx-icons" !important; /* Forces the icon font */
+            }
+
+            // to distinguish the pwa setup from the other parts
+            .pwa-side-panel {
+                background: var(--sbx-color-foreground-secondary);
+                border-radius: var(--sbx-config-box-roundness);
+                margin-bottom: var(--sbx-size-s);
+            }
+
+            // the border is removed in www/static/css/core/ui/navigation/_offcanvas.scss
+            a.install-button,
+            a.enable-notif-button,
+            a.mark-all-read,
+            a[data-msgfooter-action] {
+                border-bottom: 1px solid var(--sbx-config-color-accent) !important;
+            }
+
+            #msg-content {
+                margin-top: var(--sbx-size-s);
+                li {
+                    padding: var(--sbx-size-xs);
                 }
             }
         }
