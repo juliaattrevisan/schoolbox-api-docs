@@ -59,10 +59,6 @@ class Mapper extends AbstractCourseMapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteUnits'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreFolder'));
 
-//        /* Assign a uuid if it doesn't already exist
-//         */
-//        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assignUuid']);
-
         $this->registerPersistSearchIndexCallbacks();
     }
 
@@ -353,23 +349,4 @@ class Mapper extends AbstractCourseMapper
         }
         $this->setFacultyRootFolder($facultyRoot);
     }
-
-
-//    /**
-//     * Asserts that every $courseSpec has a uuid prior to saving
-//     *
-//     * If it didn't already have one, it will be assigned one
-//     * Otherwise it'll maintain what it previously knew
-//     *
-//     * @param Model $courseSpec
-//     * @return bool
-//     */
-//    public function assignUuid(Model $courseSpec): bool
-//    {
-//        if ('' === trim((string)$courseSpec->getUuid())) {
-//            $courseSpec->setUuid((string)Uuid::uuid4());
-//        }
-//
-//        return true;
-//    }
 }

@@ -55,10 +55,6 @@ class Mapper extends AbstractUnitMapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAssessments'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreFolder'));
 
-//        /* Assign a uuid if it doesn't already exist
-//         */
-//        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assignUuid']);
-
         $this->registerPersistSearchIndexCallbacks();
     }
 
@@ -217,23 +213,4 @@ class Mapper extends AbstractUnitMapper
         $folderMapper->restoreSoftDeleted($folder);
         return true;
     }
-
-
-//    /**
-//     * Asserts that every $unitSpec has a uuid prior to saving
-//     *
-//     * If it didn't already have one, it will be assigned one
-//     * Otherwise it'll maintain what it previously knew
-//     *
-//     * @param Model $unitSpec
-//     * @return bool
-//     */
-//    public function assignUuid(Model $unitSpec): bool
-//    {
-//        if ('' === trim((string)$unitSpec->getUuid())) {
-//            $unitSpec->setUuid((string)Uuid::uuid4());
-//        }
-//
-//        return true;
-//    }
 }
