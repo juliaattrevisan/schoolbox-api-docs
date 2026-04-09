@@ -49,7 +49,7 @@ class Mapper extends AbstractCourseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('folder_id', FolderMapper::class, 'id', null, null, null, 'folder');
         $this->uses('subject_code', self::TYPE_STRING);
-        $this->uses('uuid', self::TYPE_STRING);
+        $this->uses('uuid', self::TYPE_STRING, self::COLUMN_UUID);
         $this->joins('template_id', CourseTemplateMapper::class, 'id', null, null, null, 'template');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
@@ -59,9 +59,9 @@ class Mapper extends AbstractCourseMapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteUnits'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreFolder'));
 
-        /* Assign a uuid if it doesn't already exist
-         */
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assignUuid']);
+//        /* Assign a uuid if it doesn't already exist
+//         */
+//        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assignUuid']);
 
         $this->registerPersistSearchIndexCallbacks();
     }
@@ -355,21 +355,21 @@ class Mapper extends AbstractCourseMapper
     }
 
 
-    /**
-     * Asserts that every $courseSpec has a uuid prior to saving
-     *
-     * If it didn't already have one, it will be assigned one
-     * Otherwise it'll maintain what it previously knew
-     *
-     * @param Model $courseSpec
-     * @return bool
-     */
-    public function assignUuid(Model $courseSpec): bool
-    {
-        if ('' === trim((string)$courseSpec->getUuid())) {
-            $courseSpec->setUuid((string)Uuid::uuid4());
-        }
-
-        return true;
-    }
+//    /**
+//     * Asserts that every $courseSpec has a uuid prior to saving
+//     *
+//     * If it didn't already have one, it will be assigned one
+//     * Otherwise it'll maintain what it previously knew
+//     *
+//     * @param Model $courseSpec
+//     * @return bool
+//     */
+//    public function assignUuid(Model $courseSpec): bool
+//    {
+//        if ('' === trim((string)$courseSpec->getUuid())) {
+//            $courseSpec->setUuid((string)Uuid::uuid4());
+//        }
+//
+//        return true;
+//    }
 }
