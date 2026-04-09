@@ -64,7 +64,7 @@ class Visibility
 
         try {
             $viewerIsInstructor = $this->access->isInstructor($viewer, $folder);
-        } catch (MapperException | \LogicException | \UnexpectedValueException) {
+        } catch (MapperException | \LogicException) {
             $viewerIsInstructor = false; // In case of exception, assume non-instructor.
         }
 
@@ -74,7 +74,7 @@ class Visibility
 
         try {
             $viewerIsLearner = $this->access->isLearner($viewer, $folder);
-        } catch (MapperException | \LogicException | \UnexpectedValueException) {
+        } catch (MapperException | \LogicException) {
             $viewerIsLearner = false; // In case of exception, assume non-learner.
         }
 
