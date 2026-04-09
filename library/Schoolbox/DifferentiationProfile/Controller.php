@@ -113,6 +113,10 @@ class Controller extends Base
         );
     }
 
+    /**
+     * Get all differentiation profile data with applied filters, sorting and pagination
+     * @return void
+     */
     public function getAllDifferentiationProfileData(): void
     {
         $adminConfigs         = $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1);
@@ -202,6 +206,10 @@ class Controller extends Base
         );
     }
 
+    /**
+     * Export differentiation profiles to CSV
+     * @return void
+     */
     public function exportDifferentiationProfilesToCsv(): void
     {
         $adminConfigs = $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1)->indexBy('name');
