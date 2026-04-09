@@ -79,6 +79,9 @@ class Model implements ISoftDeletable, Sequential
     /** @var ?bool */
     private ?bool $permittedDialogAgent = null;
 
+    /** @var ?bool */
+    private ?bool $permittedReportingActivity = null;
+
 
     /**
      * @return bool
@@ -394,5 +397,22 @@ class Model implements ISoftDeletable, Sequential
     public function setPermittedDialogAgent(bool $permittedDialogAgent): void
     {
         $this->permittedDialogAgent = $permittedDialogAgent;
+    }
+
+    /**
+     * @return ?bool
+     */
+    public function getPermittedReportingActivity(): ?bool
+    {
+        return $this->permittedReportingActivity;
+    }
+
+    /**
+     * @param bool $permittedReportingActivity
+     * @return void
+     */
+    public function setPermittedReportingActivity(bool $permittedReportingActivity): void
+    {
+        $this->permittedReportingActivity = $permittedReportingActivity;
     }
 }
