@@ -25,6 +25,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\LTI\Component\Homepage\Controller as LtiComponent;
 use Schoolbox\LTI\Provider\Model as Provider;
+use Schoolbox\LTI\Util\LogHelper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
@@ -158,6 +159,7 @@ class Controller extends Base
      */
     public function postComponentProvider($provider, $component)
     {
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
         $post = $this->requestPost;
 
         $this->updateComponentValue(
@@ -203,6 +205,7 @@ class Controller extends Base
      */
     public function postComponentPicker($component)
     {
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
         $post = $this->requestPost;
 
         // Make sure we got content items back from the provider
@@ -364,6 +367,7 @@ class Controller extends Base
      */
     public function getLaunch(Provider $provider, Component_ControllerAbstract $component, Folder $folder)
     {
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
 
         /* Provider might have been deleted, despite existing here
          * despite being specified - this means it's been deleted one way or another
@@ -553,6 +557,7 @@ class Controller extends Base
      */
     public function getComponentCallback($component)
     {
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
         $get = $this->requestQuery;
 
         //null coalesce as if this does not match any 'valid' response, it will throw an exception
