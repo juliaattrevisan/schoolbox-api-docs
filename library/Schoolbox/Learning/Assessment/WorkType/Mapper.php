@@ -76,6 +76,7 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('permitted_lti', self::TYPE_BOOLEAN);
         $this->uses('permitted_lesson_plan', self::TYPE_BOOLEAN);
         $this->uses('permitted_dialog_agent', self::TYPE_BOOLEAN);
+        $this->uses('permitted_reporting_activity', self::TYPE_BOOLEAN);
 
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('updated_by', self::TYPE_INTEGER);
