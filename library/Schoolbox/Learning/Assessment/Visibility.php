@@ -36,6 +36,7 @@ class Visibility
      * Does not consider whether a parent can see the assessment because one of their children can. This is to ensure the caller
      * can distinguish the case where a parent can view the assessment themselves, vs seeing it due to their child's visibility.
      *
+     * The below rules summarise the authoritative descriptions in Assessment\WorkType\Mapper.
      *  - Instructor               - can see anytime (so long as not past close and we are hiding closed)
      *  - Learner                  - excluded if the work type hides learners; otherwise same as staff/participant rules
      *  - Staff (non-learner)      - can see anytime (so long as not past close and we are hiding closed)
