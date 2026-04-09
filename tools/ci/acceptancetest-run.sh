@@ -41,7 +41,8 @@ echo "acceptancetest setup"
 cd /usr/share/schoolbox
 
 ## Run tests
-INSTANCE_ID=smoketest CI=true TZ='Australia/Melbourne' npx playwright test
+shard="${ACCEPTANCE_TEST_SHARD}/${ACCEPTANCE_TEST_SHARD_TOTAL}"
+INSTANCE_ID=smoketest CI=true TZ='Australia/Melbourne' npx playwright test --shard="$shard"
 
 testResult=$?;
 
@@ -63,8 +64,7 @@ mkdir -vp $initialdir/built-artifacts;
 echo "Creating artifact";
 artifactsDir="/usr/share/schoolbox/test/playwright/_output"
 if [ -d "$artifactsDir/artifacts" ]; then
-    cd $artifactsDir;
-    tar czf "$initialdir/built-artifacts/$branch-acceptancetest.tar.gz" artifacts;
+    cp -a "$artifactsDir/artifacts" "$initialdir/built-artifacts/";
 else
     echo "No playwright artifacts found";
 fi
