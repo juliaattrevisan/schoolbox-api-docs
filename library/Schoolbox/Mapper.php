@@ -133,9 +133,9 @@ abstract class Mapper implements IMapper
     public const COLUMN_JOIN_READONLY     = 16;
     public const COLUMN_JOIN_REVERSE      = 32;
     public const COLUMN_SOFTDELETE        = 64;
-    public const COLUMN_UUID              = 128;
-    public const COLUMN_IDENTIFIER_UUID   = self::COLUMN_IDENTIFIER | self::COLUMN_UUID;
-    public const COLUMN_ENUM       = 256;  // May only be persisted as one of a set of declared values
+    public const COLUMN_AUTOGENERATE_UUID = 128;
+    public const COLUMN_IDENTIFIER_UUID   = self::COLUMN_IDENTIFIER | self::COLUMN_AUTOGENERATE_UUID;
+    public const COLUMN_ENUM              = 256;  // May only be persisted as one of a set of declared values
 
     // Sort ordering
     public const SORT_ORDER_ASC  = 'asc';
@@ -1296,7 +1296,7 @@ abstract class Mapper implements IMapper
         if ($options & self::COLUMN_IDENTIFIER) {
             $map['identifier'] = true;
         }
-        if ($options & self::COLUMN_UUID) {
+        if ($options & self::COLUMN_AUTOGENERATE_UUID) {
             $map['uuid'] = true;
         }
         if ($options & self::COLUMN_CREATED_TIMESTAMP) {

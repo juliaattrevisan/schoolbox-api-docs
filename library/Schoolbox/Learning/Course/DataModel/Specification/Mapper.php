@@ -49,7 +49,7 @@ class Mapper extends AbstractCourseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('folder_id', FolderMapper::class, 'id', null, null, null, 'folder');
         $this->uses('subject_code', self::TYPE_STRING);
-        $this->uses('uuid', self::TYPE_STRING, self::COLUMN_UUID);
+        $this->uses('uuid', self::TYPE_STRING, self::COLUMN_AUTOGENERATE_UUID);
         $this->joins('template_id', CourseTemplateMapper::class, 'id', null, null, null, 'template');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);

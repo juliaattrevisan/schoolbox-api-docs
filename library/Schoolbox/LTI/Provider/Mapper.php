@@ -33,7 +33,7 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('lti_version', self::TYPE_STRING, self::COLUMN_ENUM, null, Model::LTI_VERSIONS);
-        $this->uses('deployment_id', self::TYPE_STRING, self::COLUMN_UUID);
+        $this->uses('deployment_id', self::TYPE_STRING, self::COLUMN_AUTOGENERATE_UUID);
         $this->uses('target', self::TYPE_STRING, self::COLUMN_ENUM, null, Model::TARGETS);
 
         // LTI 1.3 fields
