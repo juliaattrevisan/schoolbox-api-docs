@@ -270,7 +270,7 @@ class Feed
             $folder = new Folder\Model()->setId($row['folderId']);
 
             // Filter out rows that should not be visible due to lwt.is_visible_to_parents/lwt.is_visible_to_learners.
-            switch ($row['is_visible_to_parents'] . '-' . $row['is_visible_to_learners']) {
+            switch (($row['is_visible_to_parents'] ?? 0) . '-' . ($row['is_visible_to_learners'] ?? 0)) {
                 case '0-0':
                     // Staff and instructors only (conditions here copied from Assessment\WorkType\Mapper)
                     //  - instructors - always included
