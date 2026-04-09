@@ -44,6 +44,7 @@ use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\ResourceLink\LaunchFactory;
 use Schoolbox\LTI\Role\ClaimFactory as RoleClaimFactory;
 use Schoolbox\LTI\User\Codec as UserCodec;
+use Schoolbox\LTI\Util\LogHelper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -106,6 +107,7 @@ class Controller extends BaseController
         Component_ControllerAbstract $component,
         ToolModel $tool
     ): void {
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
         // Build a resource link
         $resourceLink = new LtiResourceLink(
             'component-' . $component->getInstance()->getId(),
@@ -177,6 +179,7 @@ class Controller extends BaseController
      */
     public function getGenerateDeepLinkingRequestForFolder(Folder $folder, ToolModel $tool): void
     {
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
         // Find the tool in the list of registrations
         $repository = $this->registrations->find($tool->getDeploymentId());
 
@@ -238,6 +241,7 @@ class Controller extends BaseController
      */
     public function getMembershipsForFolder(Folder $folder): void
     {
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
         // Build and validate membership request
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-nrps/doc/platform/
 

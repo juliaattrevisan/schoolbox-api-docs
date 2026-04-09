@@ -33,6 +33,7 @@ use Schoolbox\LTI\Assessment\Score as LtiAssessmentScore;
 use Schoolbox\LTI\LineItem\SingleAssessmentRepository;
 use Schoolbox\LTI\Score\SingleAssessmentScoreRepository;
 use Schoolbox\LTI\User\Codec as UserCodec;
+use Schoolbox\LTI\Util\LogHelper;
 
 /**
  * LTI Platform controller for line items.
@@ -102,6 +103,7 @@ class Controller extends BaseController
      */
     public function getLineItemForAssessment(Model $assessment): void
     {
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
         // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#get-line-item-service-endpoint
         $repository     = $this->createRepository($assessment);
         $handler        = new GetLineItemServiceServerRequestHandler($repository, logger: $this->logger);
@@ -119,6 +121,7 @@ class Controller extends BaseController
      */
     public function putLineItemForAssessment(Model $assessment): void
     {
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
         // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#update-line-item-service-endpoint
         $repository     = $this->createRepository($assessment);
         $handler        = new UpdateLineItemServiceServerRequestHandler($repository, logger: $this->logger);
@@ -153,6 +156,7 @@ class Controller extends BaseController
      */
     public function postScorePublishForAssessment(Model $assessment): void
     {
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
         // Line item repository: consists only of a single assessment
         $lineItemRepository = $this->createRepository($assessment);
 
