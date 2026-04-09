@@ -198,7 +198,7 @@ class Factory extends Filter\AbstractFactory
         foreach ($vieweeFolderIds as $folderId) {
             try {
                 $access = $this->access->getFolderAccess($viewer, $folderId);
-            } catch (MapperException|\InvalidArgumentException|\LogicException) {
+            } catch (MapperException | \InvalidArgumentException | \LogicException) {
                 $access = UserAccess::ACCESS_DENY; // Assume no access in case of exception.
             }
             if ($access > $maxAccess) {
