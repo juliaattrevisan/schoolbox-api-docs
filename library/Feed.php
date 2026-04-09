@@ -248,7 +248,8 @@ class Feed
                 assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start, assess.category_id as folderId,
                 u.title, u.firstname, u.preferred_name, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
                 c.name as cat_name, c.id as cat_id,
-                lwt.is_visible_to_parents, lwt.is_visible_to_learners
+                lwt.is_visible_to_parents, lwt.is_visible_to_learners,
+                a.work_type_id
             FROM assess
             JOIN assessment a on assess.assessment_id = a.id
             LEFT JOIN lu_work_type lwt ON lwt.id = a.work_type_id
@@ -269,8 +270,14 @@ class Feed
         foreach ($query as $row) {
             $folder = new Folder\Model()->setId($row['folderId']);
 
+            if ($row['work_type_id'] === null) {
+                // Skip work type restrictions.
+                // This is consistent with behaviour in Assessment\Visibility->isVisibleToUser().
+                continue;
+            }
+
             // Filter out rows that should not be visible due to lwt.is_visible_to_parents/lwt.is_visible_to_learners.
-            switch (($row['is_visible_to_parents'] ?? 0) . '-' . ($row['is_visible_to_learners'] ?? 0)) {
+            switch ($row['is_visible_to_parents'] . '-' . $row['is_visible_to_learners']) {
                 case '0-0':
                     // Staff and instructors only (conditions here copied from Assessment\WorkType\Mapper)
                     //  - instructors - always included
