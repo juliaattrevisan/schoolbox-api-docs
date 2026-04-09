@@ -242,7 +242,7 @@ class VisibilityTest extends TestCase
             [$isParticipant, $studentRole, $isInstructor, $workTypeSIL, $closed, $showClosed, $now, true],
             [$isParticipant, $studentRole, $isInstructor, $workTypeSIL, $closed, $hideClosed, $now, false],
 
-            // Participating student instructor, SIVO work type: Staff-Instructors.
+            // Participating student instructor, work type: Staff-Instructors.
             // I see it unless it's closed and hideClosed is on
             [$isParticipant, $studentRole, $isInstructor, $workTypeSI, $unpublished, $showClosed, $now, true],
             [$isParticipant, $studentRole, $isInstructor, $workTypeSI, $unpublished, $hideClosed, $now, true],
