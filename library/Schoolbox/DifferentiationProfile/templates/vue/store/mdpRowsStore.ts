@@ -111,7 +111,8 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
         addFilterSearchParams(searchParams, filters.value);
         searchParams.set(SearchParam.SORT_BY, sortBy.value);
         searchParams.set(SearchParam.ORDER, order.value);
-        window.location.href = `${newUrl.pathname}?${searchParams.toString()}`;
+        newUrl.search = searchParams.toString();
+        window.location.href = newUrl.toString();
     }
 
     return {
