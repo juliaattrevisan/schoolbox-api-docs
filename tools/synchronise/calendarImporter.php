@@ -9,10 +9,9 @@
 
 declare(strict_types=1);
 
+use Ramsey\Uuid\Uuid;
 use Schoolbox\Application\CliTool;
-use Schoolbox\External\Connector\Log\Guid;
 use Schoolbox\External\Importer\Endpoint;
-use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -150,7 +149,7 @@ NULLTYPE;
         /* This identifier indicates that the scheduler(s) were part of this
          * script execution together
          */
-        $runId = (new Guid())->generate();
+        $runId = Uuid::uuid4()->toString();
 
         /* Execute scheduler
          */

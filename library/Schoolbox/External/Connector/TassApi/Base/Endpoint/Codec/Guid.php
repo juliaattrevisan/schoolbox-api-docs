@@ -18,6 +18,8 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
  * link is calculated at runtime for the currently logged-in user
  * and needs those four pieces to function as a path to the
  * remote TASS systems
+ *
+ * Also note that despite its name, this is not an RFC 9562 UUID.
  */
 class Guid
 {

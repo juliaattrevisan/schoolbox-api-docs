@@ -9,14 +9,13 @@
 
 declare(strict_types=1);
 
+use Ramsey\Uuid\Uuid;
 use Schoolbox\Admin\Settings\FieldType\SelectMulti\Renderer;
 use Schoolbox\Application\CliTool;
-use Schoolbox\External\Connector\Log\Guid;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\External\Importer\Endpoint\Factory;
 use Schoolbox\Resource\Storage\FilesystemProxy;
-use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -160,7 +159,7 @@ HELP;
         /* This identifier indicates that the two schedulers were part of this
          * script execution together
          */
-        $runId = (new Guid())->generate();
+        $runId = Uuid::uuid4()->toString();
 
         /* Figure out which strats to import.
          *

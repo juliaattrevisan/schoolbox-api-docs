@@ -27,6 +27,7 @@ use PhpAmqpLib\Exception\AMQPIOException;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Ramsey\Uuid\Uuid;
 use Schoolbox\Column\Factory as ColumnFactory;
 use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
@@ -4708,15 +4709,19 @@ abstract class Mapper implements IMapper
             return $collection;
         }
 
-        // Set each UUID property
-        $query = $this->database->prepare('SELECT UUID()');
+        // Set each UUID property to a UUIDv7 value:
+        // UUIDv7 increments with time, which ensures that subsequent inserts
+        // append to the end of whatever index is on the column, instead of
+        // forcing an expensive rebalance.
         foreach ($collection as $model) {
             foreach ($uuidProperties as $uuidProperty) {
                 $existingUuid = $this->getModelProperty($model, $uuidProperty);
                 if (empty($existingUuid)) {
-                    $query->execute();
-                    $this->setModelProperty($model, $uuidProperty, $query->fetchColumn());
-                    $query->closeCursor();
+                    $this->setModelProperty(
+                        $model,
+                        $uuidProperty,
+                        Uuid::uuid7()->toString(),
+                    );
                 }
             }
         }
