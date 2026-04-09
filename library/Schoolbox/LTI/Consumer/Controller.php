@@ -20,6 +20,7 @@ use Component_ConfigMapper;
 use Component_ControllerAbstract;
 use DateTime;
 use Exception;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\LTI\Component\Homepage\Controller as LtiComponent;
@@ -129,9 +130,11 @@ class Controller extends Base
     private $baseUrl;
 
     /**
-     * Controller constructor
+     * Constructor
+     *
+     * @param LoggerInterface $logger Logger, for logging at least method calls.
      */
-    public function __construct()
+    public function __construct(private LoggerInterface $logger)
     {
         $this->componentConfigMapper           = Component_ConfigMapper::getInstance();
         $this->componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
