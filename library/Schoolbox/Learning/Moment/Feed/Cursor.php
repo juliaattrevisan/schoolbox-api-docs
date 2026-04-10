@@ -500,6 +500,10 @@ class Cursor implements ICursor
         $params['markVisibility']        = $visibility;
         $params['reviewRoute']           = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
 
+        // Note that since work type visibility is a bit complicated now (see comments above visibility constants in
+        // Assessment\WorkType\Mapper), filtering based on work type visibility must now be done in PHP instead of SQL,
+        // downstream of this function.  See calls to isVisibleTo...() functions in Feed\Hydrator->hydrateResults().
+
         return [$query, $params];
     }
 
@@ -563,6 +567,10 @@ class Cursor implements ICursor
         ");
         $params['userIdQuizFeedback'] = $this->viewee->getId();
         $params['markVisibility']     = $visibility;
+
+        // Note that since work type visibility is a bit complicated now (see comments above visibility constants in
+        // Assessment\WorkType\Mapper), filtering based on work type visibility must now be done in PHP instead of SQL,
+        // downstream of this function.  See calls to isVisibleTo...() functions in Feed\Hydrator->hydrateResults().
 
         return [$query, $params];
     }
