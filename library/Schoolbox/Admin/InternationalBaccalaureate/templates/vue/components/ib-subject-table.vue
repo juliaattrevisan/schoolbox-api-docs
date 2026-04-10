@@ -278,6 +278,7 @@ function updateStudentCount(rowId: string): void {
  * Saves the subject configuration to the server
  */
 async function saveSubjectConfiguration(): Promise<void> {
+    if (isSaving.value) return; // Prevent multiple simultaneous saves
     if (!props.saveEndpoint) return;
 
     try {
@@ -373,7 +374,6 @@ async function saveSubjectConfiguration(): Promise<void> {
                                             class="table-input l-flex__item--1"
                                             placeholder="Select languages"
                                             readonly
-                                            :disabled="isSaving"
                                         />
                                         <button
                                             type="button"
@@ -381,7 +381,6 @@ async function saveSubjectConfiguration(): Promise<void> {
                                             aria-label="Edit languages"
                                             title="Edit languages"
                                             :data-test="`ib-language-edit-${row.id}`"
-                                            :disabled="isSaving"
                                             @click="openLanguageModal(row.id)"
                                         >
                                             <sbx-icon name="modify"></sbx-icon>
@@ -421,7 +420,6 @@ async function saveSubjectConfiguration(): Promise<void> {
                                             class="table-input l-flex__item--1"
                                             placeholder="Select languages"
                                             readonly
-                                            :disabled="isSaving"
                                         />
                                         <button
                                             type="button"
@@ -429,7 +427,6 @@ async function saveSubjectConfiguration(): Promise<void> {
                                             aria-label="Edit languages"
                                             title="Edit languages"
                                             :data-test="`ib-language-edit-${row.id}`"
-                                            :disabled="isSaving"
                                             @click="openLanguageModal(row.id)"
                                         >
                                             <sbx-icon name="modify"></sbx-icon>
@@ -478,7 +475,6 @@ async function saveSubjectConfiguration(): Promise<void> {
                                             class="table-input l-flex__item--1"
                                             placeholder="Select languages"
                                             readonly
-                                            :disabled="isSaving"
                                         />
                                         <button
                                             type="button"
@@ -486,7 +482,6 @@ async function saveSubjectConfiguration(): Promise<void> {
                                             aria-label="Edit languages"
                                             title="Edit languages"
                                             :data-test="`ib-language-edit-${row.id}`"
-                                            :disabled="isSaving"
                                             @click="openLanguageModal(row.id)"
                                         >
                                             <sbx-icon name="modify"></sbx-icon>
@@ -502,7 +497,6 @@ async function saveSubjectConfiguration(): Promise<void> {
                                         :value="row.classCode"
                                         class="table-input"
                                         placeholder="Enter class codes (comma separated)"
-                                        :disabled="isSaving"
                                         @input="
                                             (event) =>
                                                 updateRowField(
@@ -520,7 +514,6 @@ async function saveSubjectConfiguration(): Promise<void> {
                                         :value="row.studentCount"
                                         class="table-input"
                                         type="text"
-                                        :disabled="isSaving"
                                         @input="
                                             (event) =>
                                                 updateRowField(
@@ -544,8 +537,7 @@ async function saveSubjectConfiguration(): Promise<void> {
             </div>
 
             <div class="form-actions">
-                <button type="button" class="button submit" :disabled="isSaving" @click="saveSubjectConfiguration">
-                    <i v-if="isSaving" class="fa fa-spinner fa-spin"></i>
+                <button type="button" class="button submit" @click="saveSubjectConfiguration">
                     {{ isSaving ? "Saving..." : `Save ${categoryTitle} Configuration` }}
                 </button>
             </div>
