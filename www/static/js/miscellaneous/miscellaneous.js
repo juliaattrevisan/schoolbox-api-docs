@@ -157,26 +157,22 @@ $(function () {
         });
 
         var $topMenuItems = $("#top-menu > li");
-        var topMenuWidth = $("#top-menu").width();
-        var firstMenuItemWidth = $topMenuItems.first().outerWidth();
-        var keepFirstFourVisible =
-            topMenuWidth > 0 &&
-            firstMenuItemWidth !== undefined &&
-            Math.abs(firstMenuItemWidth - topMenuWidth / 4) <= 1;
-
+        var $tabBar = $("nav.tab-bar");
         var searchButtonLeft = $searchButton.get(0).getBoundingClientRect().left;
+        var tabBarRight = $tabBar.length > 0 ? $tabBar.get(0).getBoundingClientRect().right : searchButtonLeft;
+        var isCompactTopBar = $tabBar.length > 0 ? Math.abs($tabBar.outerHeight() - 72) < 1 : true;
+        var overflowBoundary = isCompactTopBar ? searchButtonLeft : tabBarRight;
+        var firstItemTop = null;
 
         $topMenuItems.each(function (index) {
-            var itemRight = $(this).get(0).getBoundingClientRect().right;
+            var itemRect = $(this).get(0).getBoundingClientRect();
+            var itemRight = itemRect.right;
 
-            // Keep the first 4 visible when the mobile 25% layout is active.
-            if (keepFirstFourVisible && index < 4) {
-                toggleTopNavItem(true, $(this));
-
-                return;
+            if (firstItemTop === null) {
+                firstItemTop = itemRect.top;
             }
 
-            if (!hideRemainingItems && searchButtonLeft <= itemRight) {
+            if (!hideRemainingItems && (overflowBoundary <= itemRight || itemRect.top > firstItemTop + 1)) {
                 hideRemainingItems = true;
             }
 
