@@ -867,7 +867,8 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     private function getStats(): array
     {
         $processStats = [
-            'memory' => memory_get_usage(),
+            'mem_alloc' => memory_get_usage(true),
+            'mem_used'  => memory_get_usage(),
         ];
 
         $poolStats   = $this->taskDispatcher->getPoolStatus();
