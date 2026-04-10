@@ -19,20 +19,6 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 class CmsLogExample extends Base
 {
     /**
-     * This is an example with no db config, so set this to 365 days as an example, but we should be using the config loader to get this value from the config key defined in $retentionConfigKey
-     * @inheritDoc
-     */
-    protected function getRetentionDBDate(): ?string
-    {
-        try {
-            return $this->retentionPeriod->calculateDate(365);
-        } catch (SchoolboxException $e) {
-            $this->log->warning(sprintf("Invalid retention period '%s': %s. Skipping.", $this->config->get($this->retentionConfigKey), $e->getMessage()));
-            return null;
-        }
-    }
-
-    /**
      * @inheritDoc
      */
     public function getRetentionLabel(): string
