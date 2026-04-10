@@ -12,7 +12,9 @@ namespace Schoolbox\Application\Daemon;
 use Alaress\Async\Stomp\Implementation\Stream as Stomp;
 use Alaress\Database\Factory as BaseDatabaseFactory;
 use Alaress\Exception\IO\IOException;
+use Alaress\Jitter\Jitter;
 use Alaress\Lumberjack\Logger;
+use Alaress\Random\FloatGenerator;
 use Alaress\Redis\Async\Client as AsyncRedisClient;
 use Aura\Di\Container;
 use Clue\React\Redis\Factory as ReactRedisClientFactory;
@@ -419,8 +421,11 @@ EOL;
         $di->set('stomp', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */
             $conf = $di->get('config');
-            $conn = new Stomp\Connection(
-                $di->get('react.loop'),
+            /** @var LoopInterface $loop */
+            $loop = $di->get('react.loop');
+
+            $connFactory = fn () => new Stomp\Connection(
+                $loop,
                 new Protocol(null, Version::VERSION_1_1),
                 new Parser(),
                 $conf->get('amqp_host'),
@@ -429,7 +434,25 @@ EOL;
                 $conf->get('amqp_pass'),
                 $conf->get('amqp_vhost')
             );
-            return new Stomp\Client($conn);
+//            $conn = new Stomp\Connection(
+//                $loop,
+//                new Protocol(null, Version::VERSION_1_1),
+//                new Parser(),
+//                $conf->get('amqp_host'),
+//                (int)$conf->get('amqp_stomp_port'),
+//                $conf->get('amqp_user'),
+//                $conf->get('amqp_pass'),
+//                $conf->get('amqp_vhost')
+//            );
+
+            // Example jitter:
+            // 5 attempts, 1000ms between each
+            $jitter = new Jitter(new FloatGenerator(), maxAttempts: 5, baseTimeout: 1000);
+            return new Stomp\ReconnectingClient(
+                $connFactory,
+                $loop,
+                $jitter,
+            );
         }));
 
         // Redis queue subscription (not persistent)
