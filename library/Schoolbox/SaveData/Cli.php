@@ -256,7 +256,7 @@ HELP;
         }
         $this->getLogger()->info("dumping db to $directory/$filename");
         $dumpcmd = sprintf(
-            "mariadb-dump --single-transaction -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -h %s -u %s -p%s %s > %s/%s",
+            "mariadb-dump --single-transaction -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -h %s -u %s -p%s %s | sed -E \"s/^\/\*\!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g\" > %s/%s",
             SQL_host,
             SQL_user,
             SQL_passwd,

@@ -38,7 +38,7 @@ echo "... setting up tzdata"
 mariadb-tzinfo-to-sql /usr/share/zoneinfo | mariadb -u root mysql -pPassw0rd!
 
 echo "... setting up instance data"
-mariadb schoolbox < "$initialdir"/data/schoolbox.sql
+cat "$initialdir"/data/schoolbox.sql | sed -E \"s/^\/\*\!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g\" | mariadb schoolbox
 
 echo "... updating instance data"
 mariadb schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name IN ('resource_booking_enabled','pastoral_enabled','ups_groups_enabled','eotc_enabled','fixtures_enabled','qr_login_enabled','mail_enable');"
