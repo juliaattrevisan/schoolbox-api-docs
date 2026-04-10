@@ -6,6 +6,7 @@
  */
 
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import IBGeneralConfig from "./components/ib-general-config.vue";
 import IBSubjectTable from "./components/ib-subject-table.vue";
 import type { IBCategory, IBConfiguration } from "../js/types/ibConfigurationTypes";
@@ -141,10 +142,7 @@ window.Vue.onMounted((): void => {
         <section class="content tabs-content">
             <div class="content active">
                 <div v-if="isLoading" class="loader"></div>
-                <div v-else-if="loadError" class="alert alert-box alert">
-                    <i class="fa fa-exclamation-triangle"></i>
-                    {{ loadError }}
-                </div>
+                <data-load-error v-else-if="loadError" data-title="configuration" :further-info="loadError" />
                 <IBGeneralConfig
                     v-else-if="isGeneralConfigTab"
                     :configurations="currentConfigurations"
