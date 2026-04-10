@@ -11,6 +11,7 @@ namespace Alaress\Async\Stomp\Implementation\Stream;
 
 use Alaress\Async\Stomp\IClient;
 use Alaress\Jitter\IJitter;
+use Closure;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Promise\Deferred;
@@ -44,18 +45,18 @@ class ReconnectingClient implements IClient
     private array $externalDisconnectHandlers = [];
 
     /**
-     * @param \Closure(): IClient  $factory  Creates a fresh IClient on each connect attempt.
+     * @param Closure(): IClient   $factory  Creates a fresh IClient on each connect attempt.
      * @param LoopInterface        $loop
      * @param IJitter              $jitter
      * @param LoggerInterface|null $log      Optional; logging can be wired in later.
      */
     public function __construct(
-        private \Closure $factory,
+        private Closure $factory,
         private LoopInterface $loop,
         private IJitter $jitter,
         private ?LoggerInterface $log = null,
     ) {
-        $this->inner = ($this->factory)();
+        $this->inner = call_user_func($this->factory);
     }
 
     /**
@@ -64,14 +65,15 @@ class ReconnectingClient implements IClient
     public function connect(): PromiseInterface
     {
         $deferred = new Deferred();
+        $this->log->debug("Connecting to STOMP client...");
         $this->inner->connect()->then(
             function () use ($deferred): void {
-                $this->inner->onDisconnect(function (): void {
-                    $this->scheduleReconnect();
-                });
+                $this->log->debug("Connected to STOMP client");
+                $this->inner->onDisconnect($this->scheduleReconnect(...));
                 $deferred->resolve($this);
             },
             function ($error) use ($deferred): void {
+                $this->log->warning("Connected to STOMP client");
                 $deferred->reject($error);
             }
         );
@@ -116,12 +118,10 @@ class ReconnectingClient implements IClient
                     foreach ($this->subscriptions as [$dest, $ackMode, $cb, $headers]) {
                         $this->inner->subscribeWithAck($dest, $ackMode, $cb, $headers);
                     }
-                    $this->inner->onDisconnect(function (): void {
-                        $this->scheduleReconnect();
-                    });
+                    $this->inner->onDisconnect($this->scheduleReconnect(...));
                     $this->reconnectAttempts = 0;
                     foreach ($this->externalDisconnectHandlers as $handler) {
-                        ($handler)();
+                        call_user_func($handler);
                     }
                 },
                 function (): void {
@@ -130,9 +130,7 @@ class ReconnectingClient implements IClient
                     // React Promise v3 catches exceptions thrown inside .then() callbacks,
                     // so MaxAttemptsExceededException would be silently swallowed if thrown
                     // here. The zero-delay timer escapes the promise chain.
-                    $this->loop->addTimer(0, function (): void {
-                        $this->scheduleReconnect();
-                    });
+                    $this->loop->addTimer(0, $this->scheduleReconnect(...));
                 }
             );
         });

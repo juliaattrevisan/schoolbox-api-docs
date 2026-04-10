@@ -452,6 +452,7 @@ EOL;
                 $connFactory,
                 $loop,
                 $jitter,
+                $this->createDefaultLogger(),
             );
         }));
 
