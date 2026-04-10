@@ -56,12 +56,6 @@ class Controller extends Base
                 ->asArray();
             $this->response = $this->responseAsJson($problem)->withStatus(404);
             return;
-        } catch (\Throwable $e) {
-            $problem = (new ApiProblem('Something Broke: ' . $e->getMessage()))
-                ->setStatus(555)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)->withStatus(555);
-            return;
         }
 
         /**
