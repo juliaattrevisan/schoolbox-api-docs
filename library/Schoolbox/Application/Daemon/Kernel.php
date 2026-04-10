@@ -425,35 +425,27 @@ EOL;
             /** @var LoopInterface $loop */
             $loop = $di->get('react.loop');
 
-            $connFactory = fn () => new Stomp\Connection(
-                $loop,
-                new Protocol(null, Version::VERSION_1_1),
-                new Parser(),
-                $conf->get('amqp_host'),
-                (int)$conf->get('amqp_stomp_port'),
-                $conf->get('amqp_user'),
-                $conf->get('amqp_pass'),
-                $conf->get('amqp_vhost')
+            $clientFactory = fn () => new Stomp\Client(
+                new Stomp\Connection(
+                    $loop,
+                    new Protocol(null, Version::VERSION_1_1),
+                    new Parser(),
+                    $conf->get('amqp_host'),
+                    (int)$conf->get('amqp_stomp_port'),
+                    $conf->get('amqp_user'),
+                    $conf->get('amqp_pass'),
+                    $conf->get('amqp_vhost'),
+                ),
             );
-//            $conn = new Stomp\Connection(
-//                $loop,
-//                new Protocol(null, Version::VERSION_1_1),
-//                new Parser(),
-//                $conf->get('amqp_host'),
-//                (int)$conf->get('amqp_stomp_port'),
-//                $conf->get('amqp_user'),
-//                $conf->get('amqp_pass'),
-//                $conf->get('amqp_vhost')
-//            );
 
             // Example jitter:
             // 5 attempts, 1000ms between each
             $jitter = new Jitter(new FloatGenerator(), maxAttempts: 5, baseTimeout: 1000);
             return new Stomp\ReconnectingClient(
-                $connFactory,
+                $clientFactory,
                 $loop,
                 $jitter,
-                new Logger(STDOUT, STDERR, Level::Debug, Logger::getAvailableFields(), false),
+                new Logger(STDOUT, STDERR, Level::Debug->value, Logger::getAvailableFields(), false),
             );
         }));
 
