@@ -11,6 +11,7 @@ namespace Alaress\Async\Stomp\Implementation\Stream;
 
 use Alaress\Async\Stomp\IClient;
 use Alaress\Jitter\IJitter;
+use Alaress\Jitter\MaxAttemptsExceededException;
 use Closure;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -72,15 +73,15 @@ class ReconnectingClient implements IClient
     public function connect(): PromiseInterface
     {
         $deferred = new Deferred();
-        $this->log->debug("Connecting to STOMP client...");
+        $this->log->debug("Connecting to STOMP queue...");
         $this->inner->connect()->then(
             function () use ($deferred): void {
-                $this->log->debug("Connected to STOMP client");
+                $this->log->debug("Connected to STOMP queue");
                 $this->inner->onDisconnect($this->scheduleReconnect(...));
                 $deferred->resolve($this);
             },
             function ($error) use ($deferred): void {
-                $this->log->warning("Connected to STOMP client");
+                $this->log->warning("Connection to STOMP queue failed", ['exception' => $error]);
                 $deferred->reject($error);
             }
         );
@@ -112,34 +113,51 @@ class ReconnectingClient implements IClient
      * Throws MaxAttemptsExceededException (via Jitter::calculateJitter) when
      * attempts are exhausted. When called from a timer callback this exception
      * propagates through the ReactPHP event loop and kills the daemon.
+     *
+     * @throws MaxAttemptsExceededException if max number of attempts is passed.
      */
     private function scheduleReconnect(): void
     {
-        // May throw MaxAttemptsExceededException — intentionally uncaught.
         $delay = $this->jitter->calculateJitter($this->reconnectAttempts);
+        $this->log->info(
+            "Disconnected from STOMP queue: attempting to reconnect",
+            [
+                'attempts' => $this->reconnectAttempts,
+                'delay'    => $delay / 1000,
+            ],
+        );
 
-        $this->loop->addTimer($delay / 1000, function (): void {
-            $this->inner = call_user_func($this->factory);
-            $this->inner->connect()->then(
-                function (): void {
-                    foreach ($this->subscriptions as [$dest, $ackMode, $cb, $headers]) {
-                        $this->inner->subscribeWithAck($dest, $ackMode, $cb, $headers);
+        $this->loop->addTimer(
+            $delay / 1000,
+            function (): void {
+                $this->log->debug("Reconnecting to STOMP queue...");
+                $this->inner = call_user_func($this->factory);
+                $this->inner->connect()->then(
+                    function (): void {
+                        $this->log->debug("Reconnected to STOMP queue: resubscribing to subscriptions");
+                        foreach ($this->subscriptions as [$dest, $ackMode, $cb, $headers]) {
+                            $this->inner->subscribeWithAck($dest, $ackMode, $cb, $headers);
+                        }
+                        $this->inner->onDisconnect($this->scheduleReconnect(...));
+                        $this->reconnectAttempts = 0;
+                        foreach ($this->externalDisconnectHandlers as $handler) {
+                            call_user_func($handler);
+                        }
+                    },
+                    function (): void {
+                        $this->reconnectAttempts++;
+                        $this->log->warning(
+                            "Reconnection to STOMP queue failed",
+                            ['attempts' => $this->reconnectAttempts,],
+                        );
+                        // Use addTimer(0) rather than calling scheduleReconnect() directly here.
+                        // React Promise v3 catches exceptions thrown inside .then() callbacks,
+                        // so MaxAttemptsExceededException would be silently swallowed if thrown
+                        // here. The zero-delay timer escapes the promise chain.
+                        $this->loop->addTimer(0, $this->scheduleReconnect(...));
                     }
-                    $this->inner->onDisconnect($this->scheduleReconnect(...));
-                    $this->reconnectAttempts = 0;
-                    foreach ($this->externalDisconnectHandlers as $handler) {
-                        call_user_func($handler);
-                    }
-                },
-                function (): void {
-                    $this->reconnectAttempts++;
-                    // Use addTimer(0) rather than calling scheduleReconnect() directly here.
-                    // React Promise v3 catches exceptions thrown inside .then() callbacks,
-                    // so MaxAttemptsExceededException would be silently swallowed if thrown
-                    // here. The zero-delay timer escapes the promise chain.
-                    $this->loop->addTimer(0, $this->scheduleReconnect(...));
-                }
-            );
-        });
+                );
+            }
+        );
     }
 }
