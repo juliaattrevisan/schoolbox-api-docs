@@ -58,12 +58,19 @@ function onConfirm(): void {
 
 <template>
     <BasicModal v-model:is-open="isOpen" :has-background-click="true" size="s">
-        <div class="l-flex-col l-gap-s f-no-margins">
+        <div class="l-flex-col l-gap-s f-no-margins checklist">
             <h2>Select Languages</h2>
-            <div v-for="lang in availableLanguages" :key="lang.code">
-                <input :id="`lang-${lang.code}`" v-model="localSelectedLanguages" type="checkbox" :value="lang.code" />
-                <label :for="`lang-${lang.code}`">{{ lang.name }}</label>
-            </div>
+            <ul class="option-list">
+                <li v-for="lang in availableLanguages" :key="lang.code">
+                    <input
+                        :id="`lang-${lang.code}`"
+                        v-model="localSelectedLanguages"
+                        type="checkbox"
+                        :value="lang.code"
+                    />
+                    <label :for="`lang-${lang.code}`">{{ lang.name }}</label>
+                </li>
+            </ul>
             <div class="l-flex l-gap-xs f-no-margins">
                 <button class="button l-flex__item--1" @click.prevent="isOpen = false">Cancel</button>
                 <button class="button submit l-flex__item--1" @click.prevent="onConfirm">Confirm</button>
