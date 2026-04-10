@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import LanguageSelectionModal from "./language-selection-modal.vue";
 
 interface SubjectRow {
@@ -531,9 +532,8 @@ async function saveSubjectConfiguration(): Promise<void> {
                 </table>
             </template>
 
-            <div v-if="saveError" class="alert alert-box alert">
-                <i class="fa fa-exclamation-triangle"></i>
-                {{ saveError }}
+            <div v-if="saveError" class="l-mar-m--bottom">
+                <request-error :further-info="saveError" />
             </div>
 
             <div class="form-actions">

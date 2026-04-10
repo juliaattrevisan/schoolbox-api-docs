@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import type { IBConfiguration } from "../../js/types/ibConfigurationTypes";
 
 interface Props {
@@ -86,9 +87,8 @@ window.Vue.onMounted(async () => {
                     />
                 </div>
 
-                <div v-if="saveError" class="alert-box alert small-12 columns">
-                    <i class="fa fa-exclamation-triangle"></i>
-                    {{ saveError }}
+                <div v-if="saveError" class="l-mar-m--bottom">
+                    <request-error :further-info="saveError" />
                 </div>
 
                 <div class="small-12 columns">
