@@ -440,7 +440,7 @@ EOL;
 
             // Example jitter:
             // 5 attempts, 1000ms between each
-            $jitter = new Jitter(new FloatGenerator(), maxAttempts: 5, baseTimeout: 1000);
+            $jitter = new Jitter(new FloatGenerator(), maxAttempts: 10, baseTimeout: 1000);
             return new Stomp\ReconnectingClient(
                 $clientFactory,
                 $loop,
