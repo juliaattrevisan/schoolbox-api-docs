@@ -127,13 +127,22 @@ class Mapper extends \Schoolbox\Mapper
             $rubric->setAssessmentModel($assessment);
 
             /* Figure out the capability mark type which might be optional
+             *
+             * Note that the ui coerces users into having selected a Capability Mark Type when enabling rubrics
+             * even if that Capability Mark Type is "None" - "None" still fulfils the same programmatic interface as
+             * any other numeric mark type (percentage, letter grade, etc)
+             *
+             * The only real way this would catastrophically fail is when capability mark type was null but that would
+             * be because of bad data, not the normal day-to-day usage
              */
             $capabilityMarkType = $this->hydrateJoin($row, 'capabilityMarkType', 'capabilityMarkType');
             $rubric->setCapabilityMarkType($capabilityMarkType);
 
             /* If it was a Letter Grade, go find its levels
+             * A Capability Mark Type instance is always presumed to have existed here, even if that was "None"
+             * but I've added a nullsafe operator anyway, because AI doesn't know about this.
              */
-            if (SubmissionBox\MarkType::SLUG_LETTER === $rubric->getCapabilityMarkType()->getSlug()) {
+            if (SubmissionBox\MarkType::SLUG_LETTER === $rubric->getCapabilityMarkType()?->getSlug()) {
                 /** @var SubmissionBox\GradeLevel\Group\Model $capabilityGradeGroup */
                 $capabilityGradeGroup = $this->getJoinMapper('capabilityGradeGroup')->findByIdWithFallback($rubric->getCapabilityGradeGroup()->getId());
 
