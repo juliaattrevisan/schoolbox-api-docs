@@ -251,25 +251,27 @@ class Feed
         // Fetch in batches to accumulate exactly $limit visible rows, since PHP-side visibility
         // filtering may exclude some SQL rows and a single LIMIT query can under-return.
         $batchSize = $limit;
+
+        $query = "
+            SELECT
+                assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start, assess.category_id as folderId,
+                u.title, u.firstname, u.preferred_name, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
+                c.name as cat_name, c.id as cat_id,
+                lwt.is_visible_to_parents, lwt.is_visible_to_learners,
+                a.work_type_id
+            FROM assess
+            JOIN assessment a on assess.assessment_id = a.id
+            LEFT JOIN lu_work_type lwt ON lwt.id = a.work_type_id
+            LEFT JOIN user u ON assess.user_id = u.id
+            LEFT JOIN folder c ON c.id = assess.category_id
+            WHERE assess.category_id IN {$where}
+            AND assess.start < NOW()
+            AND assess.deleted_at IS NULL
+            AND assess.availability = 'assess'
+            ORDER BY assess.created_at DESC LIMIT :offset, :batchSize
+        ";
+
         while (count($onlineAssessments) < $limit) {
-            $query = "
-                SELECT
-                    assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start, assess.category_id as folderId,
-                    u.title, u.firstname, u.preferred_name, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
-                    c.name as cat_name, c.id as cat_id,
-                    lwt.is_visible_to_parents, lwt.is_visible_to_learners,
-                    a.work_type_id
-                FROM assess
-                JOIN assessment a on assess.assessment_id = a.id
-                LEFT JOIN lu_work_type lwt ON lwt.id = a.work_type_id
-                LEFT JOIN user u ON assess.user_id = u.id
-                LEFT JOIN folder c ON c.id = assess.category_id
-                WHERE assess.category_id IN {$where}
-                AND assess.start < NOW()
-                AND assess.deleted_at IS NULL
-                AND assess.availability = 'assess'
-                ORDER BY assess.created_at DESC LIMIT :offset, :batchSize
-            ";
             $params['offset'] = $offset;
             $params['batchSize'] = $batchSize;
             $rows = $this->db->executeQuery($query, $params)->fetchAll();
