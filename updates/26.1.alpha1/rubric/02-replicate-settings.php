@@ -192,6 +192,16 @@ HELP;
      */
     private function reportDivergence(): void
     {
+        /* The WHERE clause checks for:
+         *     - rubric_instance rows that have a null id, signifying that a row was meant to be here, but wasn't
+         *       (.........for whatever reason, idk what causes it: maybe someone misconstructed via the API, or simply
+         *       because it's bad data that somehow survived till now)
+         *
+         *     - nullsafe comparisons between identifiers. But, business logic normally prevents the Cap Mark Type
+         *       and Cap Grade Group ids from being null. The ui forced users to choose "None" as a mark type and also
+         *       saved 1 as the Cap Grade Group even if you never chose any. Circumstantially, these two columns are
+         *       never null in most normal use cases afaik; only really edge case/broken data would have that.
+         */
         $result = $this->getDatabaseInternal()->executeQuery("
             SELECT 
                 sb.id, 
@@ -207,9 +217,10 @@ HELP;
             LEFT JOIN rubric_instance ri ON sb.assessment_id = ri.assessment_id 
             WHERE a.deleted_at IS NULL AND sb.use_rubric = 1 AND
             (
-                sb.rubric_capability_mark_type_id != ri.rubric_capability_mark_type_id
-                OR sb.rubric_capability_grade_group_id != ri.rubric_capability_grade_group_id
-                OR sb.rubric_mark_range != ri.rubric_mark_range
+                ri.id IS NULL
+                OR NOT (sb.rubric_capability_mark_type_id <=> ri.rubric_capability_mark_type_id)
+                OR NOT (sb.rubric_capability_grade_group_id <=> ri.rubric_capability_grade_group_id)
+                OR NOT (sb.rubric_mark_range <=> ri.rubric_mark_range)
             )
         ")->fetchAll(\PDO::FETCH_ASSOC);
 
