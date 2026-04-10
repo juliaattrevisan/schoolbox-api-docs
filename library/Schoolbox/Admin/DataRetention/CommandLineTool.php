@@ -222,7 +222,7 @@ class CommandLineTool extends CliTool\App
         $logger->notice(sprintf("Script will end at or before '%s'", date('Y-m-d H:i:s', $endTime)));
         $logger->notice(sprintf("Chunk size: %s", $chunkSize));
         $logger->notice(sprintf("Loop count: %s", $loopCount));
-        if ($retentionPeriod->getRetentionDays() !== 0) {
+        if ($retentionPeriod->getRetentionDays()) {
             $logger->notice(sprintf("Overriding retention period to '%s' days", $retentionPeriod->getRetentionDays()));
         }
 

@@ -33,7 +33,7 @@ class RetentionPeriodTest extends TestCase
         $rp = new RetentionPeriod();
 
         // By convention getRetentionDays() returns 0 when no value is set.
-        $this->assertSame(0, $rp->getRetentionDays());
+        $this->assertNull($rp->getRetentionDays());
     }
 
     /**
@@ -106,10 +106,10 @@ class RetentionPeriodTest extends TestCase
      * Ensure constructor accepts valid inputs (int and null) and that the object state reflects those values.
      *
      * @param int|null $input
-     * @param int $expectedDays
+     * @param int|null $expectedDays
      */
     #[DataProvider('providerConstructorValidValues')]
-    public function testConstructorAcceptsValidValues(int|null $input, int $expectedDays): void
+    public function testConstructorAcceptsValidValues(?int $input, ?int $expectedDays): void
     {
         // The constructor accepts only the types the production class allows
         // (int|null). This test exercises that path and confirms the object
@@ -123,7 +123,7 @@ class RetentionPeriodTest extends TestCase
     public static function providerConstructorValidValues(): array
     {
         return [
-            'null disables retention' => [null, 0],
+            'null disables retention' => [null, null],
             'int 10 days' => [10, 10],
         ];
     }

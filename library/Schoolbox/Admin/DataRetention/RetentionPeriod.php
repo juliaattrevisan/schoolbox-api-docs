@@ -14,7 +14,7 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class RetentionPeriod
 {
-    private ?\Alaress_Date_Format $date = null; // database format e.g. '2024-01-01 00:00:00'
+    private ?string $date = null; // database format e.g. '2024-01-01 00:00:00'
 
     /**
      * Construct with an optional day-count. Use null to indicate "retain indefinitely".
@@ -26,7 +26,7 @@ class RetentionPeriod
     {
         if (null !== $days) {
             // Compute database date using the project's date helper
-            $this->date = \Alaress_Date_Format::newNaturalDate(sprintf("-%d days", $this->days));
+            $this->date = \Alaress_Date_Format::newNaturalDate(sprintf("-%d days", $this->days))->getDatabaseDate();
         }
     }
 
@@ -50,7 +50,7 @@ class RetentionPeriod
     {
         if ($this->date) {
             // just return what we calculated before
-            return $this->date->getDatabaseDate();
+            return $this->date;
         }
         if (!new ValidRetentionPeriod()->isSatisfiedBy($days)) {
             // we stored an illegal value but tried to continue: die loudly as a safety precaution
@@ -58,16 +58,16 @@ class RetentionPeriod
         }
 
         $this->days = $days;
-        $this->date = \Alaress_Date_Format::newNaturalDate(sprintf("-%d days", $this->days));
-        return $this->date->getDatabaseDate();
+        $this->date = \Alaress_Date_Format::newNaturalDate(sprintf("-%d days", $this->days))->getDatabaseDate();
+        return $this->date;
     }
 
     /**
      * Get the retention period in days, or 0 if not set
-     * @return int
+     * @return null|int
      */
-    public function getRetentionDays(): int
+    public function getRetentionDays(): ?int
     {
-        return $this->days ?? 0;
+        return $this->days;
     }
 }

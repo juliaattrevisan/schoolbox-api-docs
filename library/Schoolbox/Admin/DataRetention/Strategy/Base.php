@@ -173,6 +173,12 @@ abstract class Base implements IStrategy
      */
     protected function calculateDate(): ?string
     {
+        // if retention period is not set, return null
+        if ($this->config->get($this->retentionConfigKey) === null) {
+            $this->log->warning(sprintf("Retention period not set for '%s'. Skipping.", $this->getStrategyName()));
+            return null;
+        }
+
         try {
             return $this->retentionPeriod->calculateDate((int)$this->config->get($this->retentionConfigKey));
         } catch (SchoolboxException $e) {
