@@ -34,10 +34,10 @@ jobs:
     strategy:
       matrix:
         build:
-          - runs-on: onprem-k3s
+          - runs-on: ubuntu-24.04
             platform: linux
             arch: amd64
-          - runs-on: onprem-k3s-arm
+          - runs-on: ubuntu-24.04-arm
             platform: linux
             arch: arm64
         phpVersion:
@@ -124,7 +124,7 @@ jobs:
         env:
           - prod
           - dev
-    runs-on: onprem-k3s
+    runs-on: ubuntu-24.04
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -181,10 +181,10 @@ jobs:
     strategy:
       matrix:
         build:
-          - runs-on: onprem-k3s
+          - runs-on: ubuntu-24.04
             platform: linux
             arch: amd64
-          - runs-on: onprem-k3s-arm
+          - runs-on: ubuntu-24.04-arm
             platform: linux
             arch: arm64
         phpVersion:
@@ -273,7 +273,7 @@ jobs:
         env:
           - prod
           - dev
-    runs-on: onprem-k3s
+    runs-on: ubuntu-24.04
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
