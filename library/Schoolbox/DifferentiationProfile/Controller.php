@@ -106,12 +106,17 @@ class Controller extends Base
                 'routes' => [
                     'getData' => $this->getRouteIfAuthorized('differentiationProfiles.getAllDifferentiationProfileData'),
                     'genAi' => $this->getRouteIfAuthorized('openai.postDifferentiation'),
+                    'exportCsv' => $this->getRouteIfAuthorized('differentiationProfiles.exportDifferentiationProfilesToCsv'),
                 ]
             ],
             "Manage $translation"
         );
     }
 
+    /**
+     * Get all differentiation profile data with applied filters, sorting and pagination
+     * @return void
+     */
     public function getAllDifferentiationProfileData(): void
     {
         $adminConfigs         = $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1);
@@ -199,6 +204,138 @@ class Controller extends Base
                 ],
             ]
         );
+    }
+
+    /**
+     * Export differentiation profiles to CSV
+     * @return void
+     */
+    public function exportDifferentiationProfilesToCsv(): void
+    {
+        $adminConfigs = $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1)->indexBy('name');
+
+        $request = $this->requestQuery['filter_selection'] ?? [];
+        if (!is_array($request)) {
+            $this->sendJsonError('Invalid filter selection format.', 400);
+            return;
+        }
+
+        $page  = \Schoolbox\Filter\Page\Model::PAGE_DIFFERENTIATION_PROFILE;
+        $codec = new \Schoolbox\Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
+
+        // Convert the request into a set of selections, and update them in the frontend
+        $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
+        $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+
+        // Convert the set of selections into actual filters
+        $dynamicFilters = $this->filterFactoryFactory->convertSelectionsToFilters(
+            $selectionsPerFilter,
+            $this->getUser(),
+            $page,
+        );
+
+        /** @var Filter\Filters\DifferentiationProfile\Finder $finder */
+        $finder = Filter\Filters\DifferentiationProfile\Finder::getInstance($this->filterMapper, $this->mapper);
+
+        $orderBy = $this->requestQuery->get('sortBy', Cursor::CURSOR_DEFAULT_ORDER_BY);
+        $order = strtolower($this->requestQuery->get('order', $this->mapper::SORT_ORDER_ASC));
+
+        $sortOrder = match ($orderBy) {
+            Cursor::CURSOR_ORDER_BY_UPDATED_AT => [
+                'differentiation_profiles.updated_at' => $order,
+                'p.student_id'  => $order,
+            ],
+            /* Default to sorting by student name
+             */
+            default => [
+                's.lastname'    => $order,
+                's.chosen_name' => $order,
+                'p.student_id'  => $order,
+            ]
+        };
+
+        $cursor = new Cursor(
+            $this->getUser(),
+            $finder,
+            $dynamicFilters,
+            $orderBy,
+            $sortOrder,
+        );
+
+        $profiles = $cursor->retrieveResults(null);
+
+        $headings = [
+            'student' => 'Name',
+            'updated_at' => 'Last updated',
+            'status' => 'Status',
+        ];
+
+        foreach ($adminConfigs as $adminConfig) {
+            $headings[$adminConfig->getName()] = $adminConfig->getTerminology() ?: $adminConfig->getTitle();
+        }
+
+        $data = $profiles->map(fn(Model $profile) => $this->csvProfileRow($profile))->reindex();
+
+        $exporter = new \Report_Exporter('differentiation_profiles');
+        $exporter->setHeadings($headings);
+        $exporter->setData($data);
+        $exporter->exportCSV();
+    }
+
+    /**
+     * Mapping value to the csv column
+     *
+     * @param Model $profile
+     * @return array
+     */
+    private function csvProfileRow(Model $profile): array
+    {
+        return [
+            'student' => $profile->getStudent()->getFullName(),
+            'updated_at' => $profile->getUpdatedAt()?->getShort() ?? '',
+            'status' => implode(', ', $this->csvStatus($profile)),
+            'adjustment_category' => $this->csvCollectionNames($profile->getAdjustmentCategory()),
+            'adjustment_level' => $this->csvCollectionNames($profile->getAdjustmentLevel()),
+            'overview' => ($profile->getOverview() ?? ''),
+            'interests_strengths' => ($profile->getInterestsStrengths() ?? ''),
+            'needs_challenges' => ($profile->getNeedsChallenges() ?? ''),
+            'strategies_adjustments' => ($profile->getStrategiesAdjustments() ?? ''),
+            'goals' => ($profile->getGoals() ?? ''),
+        ];
+    }
+
+    private function csvCollectionNames(?Collection $collection): string
+    {
+        if (null === $collection || $collection->count() === 0) {
+            return '';
+        }
+
+        return implode(', ', $collection->map(fn($item) => $item->getName())->getAll());
+    }
+
+    /**
+     * @param Model $profile
+     * @return array
+     */
+    private function csvStatus(Model $profile): array
+    {
+        $status = [];
+
+        if ($profile->isExpired()) {
+            $status[] = 'Expired';
+        }
+        if ($profile->isOutOfDate()) {
+            $status[] = 'Out of Date';
+        }
+        if (!$profile->isPopulated()) {
+            $status[] = 'Unpopulated';
+        }
+
+        if ($status === []) {
+            $status[] = 'Active';
+        }
+
+        return $status;
     }
 
     /**

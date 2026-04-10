@@ -127,6 +127,20 @@ const { maxScrollableHeight } = useMaxScrollableHeight(
                 @next="rowsStore.onPaginate"
             />
         </div>
+        <template v-if="props.routes.exportCsv">
+            <teleport to="#download-csv-container">
+                <a
+                    href="#export-to-csv"
+                    class="l-flex l-gap-s"
+                    aria-label="Export to CSV"
+                    title="Export to CSV"
+                    @click.prevent="rowsStore.exportToCSV(props.routes.exportCsv)"
+                >
+                    <sbx-icon name="export" />
+                    Export to CSV
+                </a>
+            </teleport>
+        </template>
     </template>
     <pastoral-records-modal
         v-model:url="linkedRecordsStore.url"
