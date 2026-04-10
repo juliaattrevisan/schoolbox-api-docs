@@ -59,7 +59,7 @@ class Moments extends Base
 
         $statement = $this->database->prepare($query);
         $statement->execute([
-            'old'   => $this->getRetentionDBDate(),
+            'old'   => $this->calculateDate(),
         ]);
 
         $toDelete = $statement->fetch();
@@ -87,7 +87,7 @@ class Moments extends Base
      */
     protected function getIdsToDelete(): array
     {
-        $this->log->info('Deleting learning moments older than ' . $this->getRetentionDBDate());
+        $this->log->info('Deleting learning moments older than ' . $this->calculateDate());
         $query = "
             SELECT
                 id,
@@ -98,7 +98,7 @@ class Moments extends Base
 
         $statement = $this->database->prepare($query);
         $statement->execute([
-            'old'   => $this->getRetentionDBDate(),
+            'old'   => $this->calculateDate(),
         ]);
 
         return $statement->fetchAll(\PDO::FETCH_ASSOC);

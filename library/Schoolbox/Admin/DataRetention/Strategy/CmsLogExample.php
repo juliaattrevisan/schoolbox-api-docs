@@ -42,7 +42,7 @@ class CmsLogExample extends Base
 
         $statement = $this->database->prepare($query);
         $statement->execute([
-            'old'   => $this->getRetentionDBDate(),
+            'old'   => $this->calculateDate(),
         ]);
 
         $count = $statement->fetchColumn();
@@ -57,7 +57,7 @@ class CmsLogExample extends Base
      */
     protected function getIdsToDelete(): array
     {
-        $this->log->info('Deleting logs older than ' . $this->getRetentionDBDate());
+        $this->log->info('Deleting logs older than ' . $this->calculateDate());
         $query = "
             SELECT
                 id
@@ -67,7 +67,7 @@ class CmsLogExample extends Base
 
         $statement = $this->database->prepare($query);
         $statement->execute([
-            'old'   => $this->getRetentionDBDate(),
+            'old'   => $this->calculateDate(),
         ]);
 
         // collate ids to delete

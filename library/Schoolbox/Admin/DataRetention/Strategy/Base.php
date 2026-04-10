@@ -78,7 +78,7 @@ abstract class Base implements IStrategy
      */
     public function process(): void
     {
-        $deleteOlderThan = $this->getRetentionDBDate();
+        $deleteOlderThan = $this->calculateDate();
         if ($deleteOlderThan === null) {
             return;
         }
@@ -171,7 +171,7 @@ abstract class Base implements IStrategy
      * or looks up the retention period from config using $retentionConfigKey
      * @return string|null
      */
-    protected function getRetentionDBDate(): ?string
+    protected function calculateDate(): ?string
     {
         try {
             return $this->retentionPeriod->calculateDate((int)$this->config->get($this->retentionConfigKey));

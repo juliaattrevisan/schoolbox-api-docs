@@ -56,7 +56,7 @@ class MyFiles extends Base
 
         $statement = $this->database->prepare($query);
         $statement->execute([
-            'old'   => $this->getRetentionDBDate(),
+            'old'   => $this->calculateDate(),
         ]);
 
         $filesToDelete = $statement->fetch();
@@ -70,7 +70,7 @@ class MyFiles extends Base
 
         $statement = $this->database->prepare($query);
         $statement->execute([
-            'old'   => $this->getRetentionDBDate(),
+            'old'   => $this->calculateDate(),
         ]);
 
         $folderToDelete = $statement->fetch();
@@ -91,7 +91,7 @@ class MyFiles extends Base
      */
     protected function getIdsToDelete(): array
     {
-        $this->log->info('Deleting MyFiles older than ' . $this->getRetentionDBDate());
+        $this->log->info('Deleting MyFiles older than ' . $this->calculateDate());
         $filesTable = self::TABLE_NAME_FILE;
         $filesQuery = "
             SELECT
@@ -103,7 +103,7 @@ class MyFiles extends Base
 
         $statement = $this->database->prepare($filesQuery);
         $statement->execute([
-            'old'   => $this->getRetentionDBDate(),
+            'old'   => $this->calculateDate(),
         ]);
 
         // collate ids to delete
@@ -121,7 +121,7 @@ class MyFiles extends Base
 
         $folderStatement = $this->database->prepare($folderQuery);
         $folderStatement->execute([
-            'old'   => $this->getRetentionDBDate(),
+            'old'   => $this->calculateDate(),
         ]);
 
         // collate ids to delete
