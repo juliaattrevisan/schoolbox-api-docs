@@ -35,31 +35,33 @@
                 </ul>
             {% elseif registry | length %}
                 <h2 class="subheader">Applications Registered</h2>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>App Token</th>
-                        <th>Device</th>
-                        <th>App</th>
-                        <th>Created</th>
-                        <th>Last Used</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for registration in registry %}
+                <div class="scrollable">
+                    <table>
+                        <thead>
                         <tr>
-                            <td><a href="{{ routeLookup('adminNotifications.testPush', { userId: registration.user.id }) }}"
-                                   title="Test sending a message to this user">{{ registration.user.formatName }}</a></td>
-                            <td><span class="tkn" title="{{ registration.token }}">{{ registration.token }}</span></td>
-                            <td><span class="tkn" title="{{ registration.deviceId }}">{{ registration.deviceId }}</span></td>
-                            <td><a href="{{ routeLookup('adminNotifications.getApps') }}" class="tkn" title="{{ registration.service.appIdentifier }}">{{ registration.service.appIdentifier }}</a> ({{ registration.service.providerName }})</td>
-                            <td title="{{ registration.createdAt.database }}">{{ registration.createdAt.local }}</td>
-                            <td title="{{ registration.touchedAt.database }}">{{ registration.touchedAt.local }}</td>
+                            <th>User</th>
+                            <th>App Token</th>
+                            <th>Device</th>
+                            <th>App</th>
+                            <th>Created</th>
+                            <th>Last Used</th>
                         </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        {% for registration in registry %}
+                            <tr>
+                                <td><a href="{{ routeLookup('adminNotifications.testPush', { userId: registration.user.id }) }}"
+                                    title="Test sending a message to this user">{{ registration.user.formatName }}</a></td>
+                                <td><span class="tkn" title="{{ registration.token }}">{{ registration.token }}</span></td>
+                                <td><span class="tkn" title="{{ registration.deviceId }}">{{ registration.deviceId }}</span></td>
+                                <td><a href="{{ routeLookup('adminNotifications.getApps') }}" class="tkn" title="{{ registration.service.appIdentifier }}">{{ registration.service.appIdentifier }}</a> ({{ registration.service.providerName }})</td>
+                                <td title="{{ registration.createdAt.database }}">{{ registration.createdAt.local }}</td>
+                                <td title="{{ registration.touchedAt.database }}">{{ registration.touchedAt.local }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% else %}
                 <div class="empty-state">
                     <i class="icon-mobile"></i>
