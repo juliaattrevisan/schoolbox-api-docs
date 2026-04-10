@@ -38,7 +38,7 @@ echo "... setting up tzdata"
 mariadb-tzinfo-to-sql /usr/share/zoneinfo | mariadb -u root mysql -pPassw0rd!
 
 echo "... setting up instance data"
-mariadb schoolbox < "$initialdir"/data/schoolbox.sql
+cat "$initialdir"/data/schoolbox.sql | sed -E "s/^\/\*\!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mariadb schoolbox
 
 echo "... updating instance data"
 mariadb schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name IN ('resource_booking_enabled','pastoral_enabled','ups_groups_enabled','eotc_enabled','fixtures_enabled','qr_login_enabled','mail_enable');"
@@ -102,6 +102,19 @@ echo 'started mariadb'
 # in default data, it doesn't match vagrant.dev.schoolbox.cloud
 mariadb schoolbox -e "UPDATE config SET value='vagrant' WHERE name='site_hostname';"
 mariadb schoolbox -e "UPDATE config SET value='dev.schoolbox.cloud' WHERE name='site_domain';"
+
+### enable stack traces for debugging purposes, as this is a smoketest environment and we want to be able to easily debug any issues that arise
+mariadb schoolbox -e "UPDATE config SET value='1' WHERE name='debug_show_stack_trace';"
+
+## set the external services correctly
+mariadb schoolbox -e "UPDATE config SET value='tcp://127.0.0.1:6379' WHERE name='redis_url';"
+mariadb schoolbox -e "UPDATE config SET value='tcp://127.0.0.1:6380' WHERE name='redis_ephemeral_url';"
+mariadb schoolbox -e "UPDATE config SET value='tcp://127.0.0.1:6379' WHERE name='taskd_redis_url';"
+mariadb schoolbox -e "UPDATE config SET value='http://localhost:5002' WHERE name='presidio_analysis_host';"
+mariadb schoolbox -e "UPDATE config SET value='http://localhost:5001' WHERE name='presidio_anonymisation_host';"
+mariadb schoolbox -e "UPDATE config SET value='127.0.0.1' WHERE name='mail_smtp_host';"
+mariadb schoolbox -e "UPDATE config SET value='http://localhost:3000' WHERE name='gotenberg_host';"
+mariadb schoolbox -e "UPDATE config SET value='localhost' WHERE name='amqp_host';"
 
 # Sandbox has no ephemeral Redis instance; use the persistent instance.
 # This must happen both before and after updates:
