@@ -134,9 +134,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         $this->reactLoop->addPeriodicTimer(
             5,
-            function () {
-                $this->log->info(json_encode($this->taskDispatcher->getPoolStatus()));
-            }
+            fn () => $this->log->info(json_encode($this->getStats())),
         );
     }
 
@@ -849,5 +847,41 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             $this->reactLoop->cancelTimer($this->inactivityScanTimer);
             $this->inactivityScanTimer = null;
         }
+    }
+
+    /**
+     * Record the following stats, among others:
+     *
+     * For this process:
+     * * memory usage
+     * * queue length
+     * * worker count
+     *
+     * For each worker:
+     * * memory usage
+     * * uptime
+     * * requests handled
+     *
+     * @return array
+     */
+    private function getStats(): array
+    {
+        $processStats = [
+            'memory' => memory_get_usage(),
+        ];
+
+        $poolStats   = $this->taskDispatcher->getPoolStatus();
+        $workerStats = [];
+//        foreach (($poolStats['workers'] ?? []) as $poolName => $poolStat) {}
+
+//        $pipeStats = [
+//            'count'   => $this->pipes->count(),
+//            'fdLimit' => $this->fdLimit,
+//        ];
+        return [
+            'process' => $processStats,
+//            'pipes' => $pipeStats,
+            'pool'  => $poolStats,
+        ];
     }
 }
