@@ -34,12 +34,22 @@ $app = new class extends CliTool\App
 
 
     /**
+     * --report
+     *
+     * Print the divergence report for whatever exists in the db at the moment.
+     * This doesn't run the mutations or anything: just tells you about schema contents, then exists.
+     */
+    private const OPT_LONG_REPORT = 'report';
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_REPORT,
         ];
     }
 
@@ -68,6 +78,13 @@ Usage: 02-replicate-settings.php [-vvv]
 
 
 HELP;
+            return;
+        }
+
+        /* Only describe the divergences in the current schema atm.
+         */
+        if ($this->getOpt(self::OPT_LONG_REPORT)) {
+            $this->reportDivergence();
             return;
         }
 
