@@ -35,11 +35,9 @@ class ValidRetentionPeriodTest extends TestCase
     #[DataProvider('providerInvalidRetentionPeriods')]
     public function testInvalidValuesRaiseException(mixed $input): void
     {
-        $this->expectException(SchoolboxException::class);
-
         $spec = new ValidRetentionPeriod();
 
-        $spec->isSatisfiedBy($input);
+        $this->assertFalse($spec->isSatisfiedBy($input));
     }
 
     public static function providerValidRetentionPeriods(): array
