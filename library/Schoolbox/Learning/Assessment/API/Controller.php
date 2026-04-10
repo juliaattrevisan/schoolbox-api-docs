@@ -56,11 +56,11 @@ class Controller extends Base
                 ->asArray();
             $this->response = $this->responseAsJson($problem)->withStatus(404);
             return;
-        } catch (\PDOException $e) {
-            $problem = (new ApiProblem('Database error: ' . $e->getMessage()))
-                ->setStatus(500)
+        } catch (\Throwable $e) {
+            $problem = (new ApiProblem('Something Broke: ' . $e->getMessage()))
+                ->setStatus(555)
                 ->asArray();
-            $this->response = $this->responseAsJson($problem)->withStatus(500);
+            $this->response = $this->responseAsJson($problem)->withStatus(555);
             return;
         }
 
