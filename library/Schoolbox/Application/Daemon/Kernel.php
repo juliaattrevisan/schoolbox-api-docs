@@ -20,6 +20,7 @@ use Aura\Di\Container;
 use Clue\React\Redis\Factory as ReactRedisClientFactory;
 use ErrorException;
 use Exception;
+use Monolog\Level;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use RangeException;
@@ -452,7 +453,7 @@ EOL;
                 $connFactory,
                 $loop,
                 $jitter,
-                $this->createDefaultLogger(),
+                new Logger(STDOUT, STDERR, Level::Debug, Logger::getAvailableFields(), false),
             );
         }));
 
