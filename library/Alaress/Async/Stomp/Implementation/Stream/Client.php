@@ -60,6 +60,15 @@ class Client implements IClient
     /**
      * @inheritDoc
      */
+    public function onDisconnect(callable $callback): void
+    {
+        $this->connection->onClose($callback);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
     public function connect(): PromiseInterface
     {
         $deferred = new Deferred();

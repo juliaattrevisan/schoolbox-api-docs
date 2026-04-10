@@ -44,6 +44,14 @@ interface IClient
     public function subscribeWithAck(string $destination, string $ackMode, callable $callback, array $headers = []);
 
     /**
+     * Registers a callback to be invoked when this connection is lost.
+     *
+     * @param callable $callback
+     * @return void
+     */
+    public function onDisconnect(callable $callback): void;
+
+    /**
      * Connects to a Stomp queue.
      *
      * @return PromiseInterface Resolves when the queue is connected to,
