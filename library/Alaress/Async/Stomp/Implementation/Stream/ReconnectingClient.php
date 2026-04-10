@@ -17,6 +17,7 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
+use Throwable;
 
 /**
  * Decorator around IClient that transparently reconnects and replays
@@ -131,7 +132,13 @@ class ReconnectingClient implements IClient
             $delay / 1000,
             function (): void {
                 $this->log->debug("Reconnecting to STOMP queue...");
-                $this->inner = call_user_func($this->factory);
+                try {
+                    $this->inner = call_user_func($this->factory);
+                } catch (Throwable $e) {
+                    $this->log->warning("Reconnection to STOMP queue failed", ['exception' => $e]);
+                    $this->reconnectAttempts++;
+                    return;
+                }
                 $this->inner->connect()->then(
                     function (): void {
                         $this->log->debug("Reconnected to STOMP queue: resubscribing to subscriptions");
