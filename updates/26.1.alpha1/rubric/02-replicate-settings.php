@@ -223,6 +223,7 @@ HELP;
             SELECT 
                 sb.id, 
                 sb.assessment_id,
+                ri.id AS rubric_instance_id,
                 sb.rubric_capability_mark_type_id AS submission_box_rubric_capability_mark_type_id,
                 ri.rubric_capability_mark_type_id AS rubric_instance_rubric_capability_mark_type_id,
                 sb.rubric_capability_grade_group_id AS submission_box_rubric_capability_grade_group_id,
