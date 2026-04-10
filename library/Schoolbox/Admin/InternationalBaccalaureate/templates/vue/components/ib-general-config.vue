@@ -20,6 +20,7 @@ const currentValues = window.Vue.ref<Record<string, string>>(
  * Saves the general configuration to the server
  */
 async function saveGeneralConfig(): Promise<void> {
+    if (isSaving.value) return; // Prevent multiple simultaneous saves
     if (!props.saveEndpoint) return;
 
     isSaving.value = true;
@@ -70,7 +71,6 @@ async function saveGeneralConfig(): Promise<void> {
                         v-model="currentValues[config.key]"
                         :type="config.type"
                         :data-test="`ib-configuration-input-${config.key}`"
-                        :disabled="isSaving"
                     />
                 </div>
 
@@ -80,8 +80,7 @@ async function saveGeneralConfig(): Promise<void> {
                 </div>
 
                 <div class="small-12 columns">
-                    <button type="submit" class="button submit" :disabled="isSaving">
-                        <div v-if="isSaving" class="loader"></div>
+                    <button type="submit" class="button submit">
                         {{ isSaving ? "Saving..." : "Save General Configuration" }}
                     </button>
                 </div>
