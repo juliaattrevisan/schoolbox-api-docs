@@ -36,12 +36,19 @@ class ReconnectingClient implements IClient
      * Stored subscriptions: each entry is [destination, ackMode, callback, headers].
      *
      * @var array<int, array{string, string, callable, array}>
+     * @noinspection PhpPropertyOnlyWrittenInspection - this is read in `scheduleReconnect`
      */
     private array $subscriptions = [];
 
+    /**
+     * How many times has this client attempted to reconnect?
+     */
     private int $reconnectAttempts = 0;
 
-    /** @var callable[] */
+    /**
+     * @var array<callable>
+     * @noinspection PhpPropertyOnlyWrittenInspection - this is read in `scheduleReconnect`
+     */
     private array $externalDisconnectHandlers = [];
 
     /**
@@ -112,7 +119,7 @@ class ReconnectingClient implements IClient
         $delay = $this->jitter->calculateJitter($this->reconnectAttempts);
 
         $this->loop->addTimer($delay / 1000, function (): void {
-            $this->inner = ($this->factory)();
+            $this->inner = call_user_func($this->factory);
             $this->inner->connect()->then(
                 function (): void {
                     foreach ($this->subscriptions as [$dest, $ackMode, $cb, $headers]) {
