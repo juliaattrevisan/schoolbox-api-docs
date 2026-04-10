@@ -31,6 +31,10 @@ class Visibility
                 $availableVisibilities[] = IAssessable::MARK_VISIBILITY_STUDENT;
                 break;
 
+            case IAssessable::MARK_VISIBILITY_PARENT:
+                $availableVisibilities[] = IAssessable::MARK_VISIBILITY_PARENT;
+                break;
+
             case IAssessable::MARK_VISIBILITY_PARENT_STUDENT:
             default:
                 $availableVisibilities[] = IAssessable::MARK_VISIBILITY_STUDENT;

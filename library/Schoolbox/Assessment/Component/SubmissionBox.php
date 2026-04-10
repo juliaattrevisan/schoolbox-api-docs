@@ -37,6 +37,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 
     public const MARK_VISIBILITY_STAFF_ONLY           = 0;
     public const MARK_VISIBILITY_STAFF_AND_STUDENT    = 1;
+    public const MARK_VISIBILITY_STAFF_AND_PARENT     = 3;
     public const MARK_VISIBILITY_STAFF_STUDENT_PARENT = 2;
 
     //Mark Visibility strings

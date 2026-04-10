@@ -706,6 +706,9 @@ abstract class AbstractAssessment implements IAssessable
             case self::MARK_VISIBILITY_STUDENT:
                 return $roleType === Role::STAFF || $roleType === Role::STUDENT;
 
+            case self::MARK_VISIBILITY_PARENT:
+                return $roleType === Role::STAFF || $roleType === Role::PARENT;
+
             case self::MARK_VISIBILITY_PRIVATE:
             default:
                 return $roleType === Role::STAFF;
