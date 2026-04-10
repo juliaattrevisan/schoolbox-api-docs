@@ -445,7 +445,7 @@ EOL;
                 $clientFactory,
                 $loop,
                 $jitter,
-                new Logger(STDOUT, STDERR, Level::Debug->value, Logger::getAvailableFields(), false),
+                new Logger(STDOUT, STDERR, Level::Debug->value, Logger::getAvailableFields(), true),
             );
         }));
 
