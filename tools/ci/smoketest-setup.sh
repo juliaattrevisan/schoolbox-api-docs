@@ -103,6 +103,9 @@ echo 'started mariadb'
 mariadb schoolbox -e "UPDATE config SET value='vagrant' WHERE name='site_hostname';"
 mariadb schoolbox -e "UPDATE config SET value='dev.schoolbox.cloud' WHERE name='site_domain';"
 
+### enable stack traces for debugging purposes, as this is a smoketest environment and we want to be able to easily debug any issues that arise
+mariadb schoolbox -e "UPDATE config SET value='1' WHERE name='debug_show_stack_trace';"
+
 ## set the external services correctly
 mariadb schoolbox -e "UPDATE config SET value='tcp://127.0.0.1:6379' WHERE name='redis_url';"
 mariadb schoolbox -e "UPDATE config SET value='tcp://127.0.0.1:6380' WHERE name='redis_ephemeral_url';"
