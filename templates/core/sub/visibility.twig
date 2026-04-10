@@ -9,11 +9,16 @@
 
 {% apply spaceless %}
 <label>
+<<<<<<< HEAD
     Feedback Visibility
     <span data-tooltip class="hint has-tip tip-top"
      title="This controls who can view feedback for this {{ locale.translate('activity', false, false)}}. Feedback can only be shown to roles included in the Activity Audience.">
      ?
     </span>
+=======
+    Mark Visibility
+    <span data-tooltip class="hint has-tip tip-top"  title="If role is not able to access the activity due to visibility from work type they will not be able to view marks even if allowed from this option.  Note 'marks' here includes feedback.">?</span>
+>>>>>>> 564beeb6c0c (Slight change to tooltip text [SA-22007])
     <select name="visibility" data-test="assessment-form-select-visibility">
         {% for currentOption, label in allOptions %}
             <option value="{{ currentOption }}"
