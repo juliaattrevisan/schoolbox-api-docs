@@ -140,8 +140,6 @@ window.Vue.onMounted((): void => {
 
         <section class="content tabs-content">
             <div class="content active">
-                <h2>{{ currentCategory.title }}</h2>
-
                 <div v-if="isLoading" class="loader"></div>
                 <div v-else-if="loadError" class="alert alert-box alert">
                     <i class="fa fa-exclamation-triangle"></i>
