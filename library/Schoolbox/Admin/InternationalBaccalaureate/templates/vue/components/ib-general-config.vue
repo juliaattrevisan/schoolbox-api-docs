@@ -48,6 +48,14 @@ async function saveGeneralConfig(): Promise<void> {
     isSaving.value = false;
     toast.timeout({ text: `${props.categoryTitle} configuration saved successfully` });
 }
+
+/*
+ * Reinitialise tooltips on mount to ensure they work correctly after the template is rendered
+ */
+window.Vue.onMounted(async () => {
+    await window.Vue.nextTick();
+    $(document).foundation("tooltip", "reflow");
+});
 </script>
 
 <template>
@@ -62,7 +70,11 @@ async function saveGeneralConfig(): Promise<void> {
                 <div v-for="config in configurations" :key="config.id" class="small-12 columns">
                     <label :for="`config-${config.key}`">
                         {{ config.label }}
-                        <span v-if="config.description" :title="config.description" class="hint has-tip tip-top"
+                        <span
+                            v-if="config.description"
+                            data-tooltip
+                            :title="config.description"
+                            class="hint has-tip tip-top"
                             >?</span
                         >
                     </label>
