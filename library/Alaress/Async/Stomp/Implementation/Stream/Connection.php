@@ -20,6 +20,7 @@ use Stomp\Exception\StompException;
 use Stomp\Protocol;
 use Stomp\Transport\Frame as BaseFrame;
 use Stomp\Transport\Parser;
+use Throwable;
 
 /**
  * Streaming connection to a STOMP server.
@@ -166,8 +167,9 @@ class Connection
         // Setup the stream
         try {
             $this->setupStream();
-        } catch (ConnectionException $e) {
+        } catch (Throwable $e) {
             $deferred->reject($e);
+            return $this->connectionPromise;
         }
 
         // Now attempt to connect, waiting for a response.
@@ -191,7 +193,7 @@ class Connection
             if ($frame instanceof BaseFrame) {
                 $this->stream->removeListener('connect', $onConnect);
                 $onError($frame);
-            } elseif ($frame instanceof \Throwable) {
+            } elseif ($frame instanceof Throwable) {
                 throw $frame;
             }
         });
