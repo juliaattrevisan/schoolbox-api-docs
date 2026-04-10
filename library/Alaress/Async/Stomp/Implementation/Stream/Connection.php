@@ -77,7 +77,7 @@ class Connection
     private $parser;
 
 
-    private DuplexStreamInterface $stream;
+    private ?DuplexStreamInterface $stream = null;
 
 
     /**

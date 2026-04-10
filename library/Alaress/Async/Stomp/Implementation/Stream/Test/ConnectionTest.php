@@ -97,6 +97,13 @@ class ConnectionTest extends TestCase
         $this->assertNotSame($promise1, $promise2);
     }
 
+    public function testDestructWithoutConnectDoesNotThrow(): void
+    {
+        $conn = $this->makeConnection();
+        unset($conn); // should not throw
+        $this->addToAssertionCount(1);
+    }
+
     public function testOnCloseNotFiredBeforeStreamCloses(): void
     {
         $conn   = $this->makeConnection();
