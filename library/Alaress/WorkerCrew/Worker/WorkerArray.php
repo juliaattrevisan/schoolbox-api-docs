@@ -241,12 +241,16 @@ class WorkerArray implements WorkerBundleInterface
 
         $time = microtime(true);
         foreach ($this->workers as $pid => $w) {
-            $memory = null;
-            $usage = file_get_contents("/proc/$pid/statm");
+            $vmSize = null;
+            $vmRss  = null;
+            $usage  = file_get_contents("/proc/$pid/statm");
             if ($usage) {
-                // second value in $usage should be actual usage
-                [, $memory] = explode(' ', $usage);
-                $memory = intval($memory);
+                // statm values:
+                // first value is vmSize (all allocated memory)
+                // second value is vmRss (currently used memory)
+                [$vmSize, $vmRss] = explode(' ', $usage);
+                $vmSize = intval($vmSize);
+                $vmRss  = intval($vmRss);
             }
             $status[$pid] = array(
                 'proc'   => $w->getCommand(),
@@ -257,7 +261,8 @@ class WorkerArray implements WorkerBundleInterface
                 'requests' => $w->getRequestCount(),
                 // How to get memory usage out of a worker?
                 // May need to query /proc/$pid/statm
-                'memory' => $memory,
+                'mem_alloc' => $vmSize,
+                'mem_used'  => $vmRss,
             );
             if ($w->getTask() instanceof Task) {
                 $status[$pid]['task'] = $w->getTask()->getCommand();
