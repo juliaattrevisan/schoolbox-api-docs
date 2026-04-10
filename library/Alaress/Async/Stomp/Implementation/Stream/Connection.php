@@ -14,6 +14,7 @@ use React\EventLoop\LoopInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use React\Stream\DuplexResourceStream as Stream;
+use React\Stream\DuplexStreamInterface;
 use Schoolbox\Url\Uri;
 use Stomp\Exception\StompException;
 use Stomp\Protocol;
@@ -76,16 +77,19 @@ class Connection
     private $parser;
 
 
-    /**
-     * @var Stream
-     */
-    private $stream;
+    private DuplexStreamInterface $stream;
 
 
     /**
      * @var PromiseInterface|null
      */
     private $connectionPromise;
+
+
+    /**
+     * @var callable[]
+     */
+    private array $onCloseCallbacks = [];
 
 
     /**
@@ -129,6 +133,15 @@ class Connection
         if ($this->stream instanceof Stream) {
             $this->stream->close();
         }
+    }
+
+
+    /**
+     * Register a callback to be invoked when the stream closes.
+     */
+    public function onClose(callable $callback): void
+    {
+        $this->onCloseCallbacks[] = $callback;
     }
 
 
@@ -228,27 +241,39 @@ class Connection
 
 
     /**
-     * Creates the stream connection to the STOMP server, and sets up a
-     * connection to its data feed.
+     * Creates the underlying duplex stream for the given host and port.
+     *
+     * Extracted as a protected method so test subclasses can inject a fake
+     * stream without opening a real socket.
+     *
+     * @throws ConnectionException if the socket cannot be opened.
      */
-    private function setupStream(): void
+    protected function createStream(string $host, int $port): DuplexStreamInterface
     {
         $socket = stream_socket_client(
-            sprintf('tcp://%s:%d/', $this->host, $this->port),
+            sprintf('tcp://%s:%d/', $host, $port),
             $errno,
             $errstr
         );
         if (!$socket) {
             throw new ConnectionException($errstr, $errno);
         }
+        return new Stream($socket, $this->loop);
+    }
 
-        // Create the stream, subscribe to its data event
-        $this->stream = new Stream($socket, $this->loop);
+
+    /**
+     * Creates the stream connection to the STOMP server, and sets up a
+     * connection to its data feed.
+     */
+    private function setupStream(): void
+    {
+        $this->stream = $this->createStream($this->host, $this->port);
+
         $this->stream->on('data', function ($data): void {
             $this->parser->addData($data);
             while ($frame = $this->parser->nextFrame()) {
                 if ($frame instanceof BaseFrame) {
-                    // What kind of frame?
                     switch ($frame->getCommand()) {
                         case 'CONNECTED':
                             $this->stream->emit('connect', [$frame]);
@@ -261,6 +286,13 @@ class Connection
                             break;
                     }
                 }
+            }
+        });
+
+        $this->stream->once('close', function (): void {
+            $this->connectionPromise = null;
+            foreach ($this->onCloseCallbacks as $callback) {
+                ($callback)();
             }
         });
     }
