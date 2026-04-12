@@ -24,7 +24,8 @@ class ReconnectingClientTest extends TestCase
      * Build a mock IClient whose connect() resolves immediately and whose
      * onDisconnect() captures the registered callback for later manual firing.
      *
-     * Pass a variable by reference as $captureDisconnect to receive the handler.
+     * @param callable|null &$captureDisconnect A reference to a method which will be called on disconnect.
+     * @return IClient
      */
     private function makeInnerClient(?callable &$captureDisconnect = null): IClient
     {
@@ -40,8 +41,8 @@ class ReconnectingClientTest extends TestCase
     /**
      * Build a mock LoopInterface that records addTimer calls.
      *
-     * Each entry in $timers is [float $delay, callable $callback].
-     * Invoke $timers[N][1]() to fire a timer manually in tests.
+     * @param array<array{0: float, 1: callable}> &$timers A reference to any timers which get added via `addTimer`.
+     *                                                     Call $timers[N][1]() to fire a timer manually in tests.
      */
     private function makeLoop(array &$timers): LoopInterface
     {
@@ -54,10 +55,9 @@ class ReconnectingClientTest extends TestCase
         return $loop;
     }
 
-    // -------------------------------------------------------------------------
-    // Basic delegation
-    // -------------------------------------------------------------------------
-
+    /**
+     * Test that `connect` calls the client's `connect` method.
+     */
     public function testConnectDelegatesToInnerClient(): void
     {
         $inner = $this->createMock(IClient::class);
@@ -73,6 +73,10 @@ class ReconnectingClientTest extends TestCase
         $client->connect();
     }
 
+    /**
+     * Test that `subscribeWithAck` calls the client's `subscribeWithAck`
+     * method.
+     */
     public function testSubscribeWithAckDelegatesToInnerClient(): void
     {
         $inner = $this->createMock(IClient::class);
@@ -92,6 +96,10 @@ class ReconnectingClientTest extends TestCase
         $client->subscribeWithAck('queue.test', IClient::ACK_MODE_CLIENT_INDIVIDUAL, fn () => null);
     }
 
+    /**
+     * Test that a client's `connect` method returns a rejected promise when the
+     * internal connection is rejected.
+     */
     public function testConnectRejectsWhenInnerClientRejects(): void
     {
         $rejectDeferred = new Deferred();
@@ -115,6 +123,10 @@ class ReconnectingClientTest extends TestCase
         $this->assertSame('initial connect failed', $rejectedWith->getMessage());
     }
 
+    /**
+     * Test that the client's `connect` method's promise resolves with an
+     * instance of itself.
+     */
     public function testConnectResolvesWithReconnectingClientInstance(): void
     {
         $inner  = $this->makeInnerClient();
@@ -132,10 +144,10 @@ class ReconnectingClientTest extends TestCase
         $this->assertSame($client, $resolved);
     }
 
-    // -------------------------------------------------------------------------
-    // Reconnect loop — success path
-    // -------------------------------------------------------------------------
-
+    /**
+     * Test that a timer method is added when a disconnect is triggered:
+     * presumably, this timer will attempt to reconnect.
+     */
     public function testDisconnectTriggersTimerViaLoop(): void
     {
         $timers         = [];
@@ -155,6 +167,9 @@ class ReconnectingClientTest extends TestCase
         $this->assertCount(1, $timers, 'addTimer should be called once on disconnect');
     }
 
+    /**
+     * Test that a connection re-subscribes to its queues on reconnect.
+     */
     public function testSubscriptionsReplayedOnReconnect(): void
     {
         $timers         = [];
@@ -184,6 +199,11 @@ class ReconnectingClientTest extends TestCase
         $timers[0][1]();    // fire fn1 → connect succeeds → replay subscriptions
     }
 
+
+    /**
+     * Test that a connection's attempt counter resets to zero after it has
+     * successfully reconnected.
+     */
     public function testAttemptCounterResetsAfterSuccessfulReconnect(): void
     {
         $timers         = [];
@@ -218,6 +238,9 @@ class ReconnectingClientTest extends TestCase
         $this->assertSame([0], $capturedAttempts);
     }
 
+    /**
+     * Test that a client's disconnect callback fires upon its disconnection.
+     */
     public function testOnDisconnectExternalHandlerFiredAfterReconnect(): void
     {
         $timers         = [];
@@ -250,18 +273,17 @@ class ReconnectingClientTest extends TestCase
         $this->assertTrue($externalFired);
     }
 
-    // -------------------------------------------------------------------------
-    // Reconnect loop — failure path
-    //
-    // The failure path fires TWO timers per failed attempt:
-    //   timers[N]   = the jitter-delay timer for the connect attempt itself
-    //   timers[N+1] = the zero-delay reschedule timer added by the rejection handler
-    //
-    // This is necessary because React Promise v3 catches exceptions thrown
-    // inside .then() callbacks; using addTimer(0) escapes the promise chain
-    // so MaxAttemptsExceededException propagates through the event loop.
-    // -------------------------------------------------------------------------
-
+    /**
+     * Test that a failed reconnection attempt increments the attempt counter.
+     *
+     * Note that the failure path tests have two timers per failed attempt:
+     * * timers[N]:   the jitter-delay timer for the connect attempt itself
+     * * timers[N+1]: the zero-delay reschedule timer added by the rejection handler
+     *
+     * This is necessary because React Promise v3 catches exceptions thrown
+     * inside .then() callbacks; using addTimer(0) escapes the promise chain
+     * so MaxAttemptsExceededException propagates through the event loop.
+     */
     public function testFailedReconnectIncrementsAttemptCounter(): void
     {
         $timers         = [];
@@ -299,6 +321,10 @@ class ReconnectingClientTest extends TestCase
         $this->assertSame([0, 1], $capturedAttempts);
     }
 
+    /**
+     * Test that if an exception was thrown in the client factory when
+     * reconnecting, that the attempt counter is incremented.
+     */
     public function testFactoryThrowInTimerReschedulesAndIncrementsCounter(): void
     {
         $timers         = [];
@@ -340,6 +366,10 @@ class ReconnectingClientTest extends TestCase
         $this->assertSame([0, 1], $capturedAttempts);
     }
 
+    /**
+     * Test that if the maximum number of attempts to reconnect has been
+     * reached, that a `MaxAttemptsExceededException` is thrown.
+     */
     public function testMaxAttemptsExceptionThrownWhenExhausted(): void
     {
         $timers         = [];
