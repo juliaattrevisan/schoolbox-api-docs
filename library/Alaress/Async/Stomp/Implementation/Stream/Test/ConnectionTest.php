@@ -105,16 +105,12 @@ class ConnectionTest extends TestCase
      */
     public function testConnectionPromiseResetAfterClose(): void
     {
-        $conn    = $this->makeConnection();
-        $stream1 = new ThroughStream();
-        $conn->prepareStream($stream1);
+        $conn   = $this->makeConnection();
+        $stream = new ThroughStream();
+        $conn->prepareStream($stream);
 
         $promise1 = $conn->connect();
-
-        $stream2 = new ThroughStream();
-        $conn->prepareStream($stream2);
-        $stream1->close();
-
+        $stream->close();
         $promise2 = $conn->connect();
 
         $this->assertNotSame($promise1, $promise2);
