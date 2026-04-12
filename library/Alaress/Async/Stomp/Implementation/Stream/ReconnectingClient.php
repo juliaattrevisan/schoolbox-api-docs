@@ -137,6 +137,7 @@ class ReconnectingClient implements IClient
                 } catch (Throwable $e) {
                     $this->log?->warning("Reconnection to STOMP queue failed", ['exception' => $e]);
                     $this->reconnectAttempts++;
+                    $this->loop->addTimer(0, $this->scheduleReconnect(...));
                     return;
                 }
                 $this->inner->connect()->then(

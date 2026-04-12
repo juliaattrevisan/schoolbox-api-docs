@@ -89,6 +89,29 @@ class ReconnectingClientTest extends TestCase
         $client->subscribeWithAck('queue.test', IClient::ACK_MODE_CLIENT_INDIVIDUAL, fn () => null);
     }
 
+    public function testConnectRejectsWhenInnerClientRejects(): void
+    {
+        $rejectDeferred = new Deferred();
+        $rejectDeferred->reject(new \RuntimeException('initial connect failed'));
+
+        $inner = $this->createMock(IClient::class);
+        $inner->method('connect')->willReturn($rejectDeferred->promise());
+
+        $client = new ReconnectingClient(
+            fn () => $inner,
+            $this->createMock(LoopInterface::class),
+            $this->createMock(IJitter::class),
+        );
+
+        $rejectedWith = null;
+        $client->connect()->then(null, function ($error) use (&$rejectedWith): void {
+            $rejectedWith = $error;
+        });
+
+        $this->assertInstanceOf(\RuntimeException::class, $rejectedWith);
+        $this->assertSame('initial connect failed', $rejectedWith->getMessage());
+    }
+
     public function testConnectResolvesWithReconnectingClientInstance(): void
     {
         $inner  = $this->makeInnerClient();
@@ -270,6 +293,47 @@ class ReconnectingClientTest extends TestCase
         $timers[0][1]();    // fn1: connect fails → rejection → reconnectAttempts=1 → addTimer(0, fn2)
         $timers[1][1]();    // fn2: scheduleReconnect(1) → calculateJitter(1) → addTimer(fn3)
 
+        $this->assertSame([0, 1], $capturedAttempts);
+    }
+
+    public function testFactoryThrowInTimerReschedulesAndIncrementsCounter(): void
+    {
+        $timers         = [];
+        $disconnectHook = null;
+
+        $firstInner = $this->makeInnerClient($disconnectHook);
+
+        $callCount = 0;
+        $factory   = function () use (&$callCount, $firstInner): IClient {
+            $callCount++;
+            if ($callCount > 1) {
+                throw new \RuntimeException('factory failed');
+            }
+            return $firstInner;
+        };
+
+        $capturedAttempts = [];
+        $jitter           = $this->createMock(IJitter::class);
+        $jitter->method('calculateJitter')
+            ->willReturnCallback(function (int $attempts) use (&$capturedAttempts): float {
+                $capturedAttempts[] = $attempts;
+                return 0.0;
+            });
+
+        $loop   = $this->makeLoop($timers);
+        $client = new ReconnectingClient($factory, $loop, $jitter);
+        $client->connect();
+
+        $disconnectHook();  // drop → scheduleReconnect(0) → calculateJitter(0) → addTimer(fn1)
+        $timers[0][1]();    // fn1: factory throws → reconnectAttempts=1 → addTimer(0, fn2)
+
+        // The zero-delay reschedule timer must have been enqueued
+        $this->assertCount(2, $timers, 'A zero-delay reschedule timer should be enqueued after factory failure');
+        // Attempt counter was incremented
+        $this->assertSame([0], $capturedAttempts);
+
+        // Firing fn2 should call calculateJitter(1)
+        $timers[1][1]();    // fn2: scheduleReconnect(1) → calculateJitter(1) → addTimer(fn3)
         $this->assertSame([0, 1], $capturedAttempts);
     }
 
