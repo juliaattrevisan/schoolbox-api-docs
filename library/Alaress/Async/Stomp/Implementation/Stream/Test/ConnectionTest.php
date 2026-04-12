@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Alaress\Async\Stomp\Implementation\Stream\Test;
 
 use Alaress\Async\Stomp\Implementation\Stream\Connection;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\TestCase;
 use React\EventLoop\LoopInterface;
 use React\Stream\DuplexStreamInterface;
@@ -13,29 +14,17 @@ use Stomp\Protocol\Protocol;
 use Stomp\Protocol\Version;
 use Stomp\Transport\Parser;
 
-/**
- * Subclass that injects a ThroughStream instead of opening a real socket.
- */
-class TestableConnection extends Connection
-{
-    private ?ThroughStream $nextStream = null;
-
-    public function prepareStream(ThroughStream $stream): void
-    {
-        $this->nextStream = $stream;
-    }
-
-    protected function createStream(string $host, int $port): DuplexStreamInterface
-    {
-        return $this->nextStream ?? new ThroughStream();
-    }
-}
-
+#[CoversMethod(Connection::class, 'onClose')]
 class ConnectionTest extends TestCase
 {
-    private function makeConnection(): TestableConnection
+    /**
+     * Create dummy connection with a ThroughStream instead of a real socket.
+     *
+     * @return Connection
+     */
+    private function makeConnection(): Connection
     {
-        return new TestableConnection(
+        return new class (
             $this->createMock(LoopInterface::class),
             new Protocol(null, Version::VERSION_1_1),
             new Parser(),
@@ -43,8 +32,20 @@ class ConnectionTest extends TestCase
             61613,
             'guest',
             'guest',
-            '/'
-        );
+            '/',
+        ) extends Connection {
+            private ?ThroughStream $nextStream = null;
+
+            public function prepareStream(ThroughStream $stream): void
+            {
+                $this->nextStream = $stream;
+            }
+
+            protected function createStream(string $host, int $port): DuplexStreamInterface
+            {
+                return $this->nextStream ?? new ThroughStream();
+            }
+        };
     }
 
     public function testOnCloseCallbackFiredWhenStreamCloses(): void
@@ -71,8 +72,12 @@ class ConnectionTest extends TestCase
         $conn->prepareStream($stream);
 
         $count = 0;
-        $conn->onClose(function () use (&$count): void { $count++; });
-        $conn->onClose(function () use (&$count): void { $count++; });
+        $conn->onClose(function () use (&$count): void {
+            $count++;
+        });
+        $conn->onClose(function () use (&$count): void {
+            $count++;
+        });
 
         $conn->connect();
         $stream->close();

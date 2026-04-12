@@ -8,6 +8,7 @@ use Alaress\Async\Stomp\IClient;
 use Alaress\Async\Stomp\Implementation\Stream\ReconnectingClient;
 use Alaress\Jitter\IJitter;
 use Alaress\Jitter\MaxAttemptsExceededException;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\TestCase;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
@@ -15,6 +16,8 @@ use React\Promise\Deferred;
 
 use function React\Promise\resolve;
 
+#[CoversMethod(ReconnectingClient::class, 'connect')]
+#[CoversMethod(ReconnectingClient::class, 'onDisconnect')]
 class ReconnectingClientTest extends TestCase
 {
     /**
