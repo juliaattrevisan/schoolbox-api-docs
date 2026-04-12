@@ -438,8 +438,7 @@ EOL;
                 ),
             );
 
-            // Example jitter:
-            // 5 attempts, 1000ms between each
+            // 10 reconnect attempts, 1000ms base timeout (exponential backoff with jitter)
             $jitter = new Jitter(new FloatGenerator(), maxAttempts: 10, baseTimeout: 1000);
             return new Stomp\ReconnectingClient(
                 $clientFactory,

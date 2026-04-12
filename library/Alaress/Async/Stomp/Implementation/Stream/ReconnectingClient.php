@@ -99,9 +99,15 @@ class ReconnectingClient implements IClient
     }
 
     /**
-     * @inheritDoc
+     * Registers a callback to be invoked after a successful reconnect and subscription replay.
      *
-     * Registered callbacks fire after a successful reconnect and subscription replay.
+     * Note: unlike a bare Client, this implementation does NOT fire the callback immediately
+     * on disconnect — it fires after the connection has been re-established and subscriptions
+     * replayed. This allows callers to re-register any connection-dependent state only once
+     * a usable connection is available again.
+     *
+     * If the maximum number of reconnect attempts is exhausted and the daemon exits,
+     * the callback will not fire.
      */
     public function onDisconnect(callable $callback): void
     {
