@@ -74,15 +74,15 @@ class ReconnectingClient implements IClient
     public function connect(): PromiseInterface
     {
         $deferred = new Deferred();
-        $this->log->debug("Connecting to STOMP queue...");
+        $this->log?->debug("Connecting to STOMP queue...");
         $this->inner->connect()->then(
             function () use ($deferred): void {
-                $this->log->debug("Connected to STOMP queue");
+                $this->log?->debug("Connected to STOMP queue");
                 $this->inner->onDisconnect($this->scheduleReconnect(...));
                 $deferred->resolve($this);
             },
             function ($error) use ($deferred): void {
-                $this->log->warning("Connection to STOMP queue failed", ['exception' => $error]);
+                $this->log?->warning("Connection to STOMP queue failed", ['exception' => $error]);
                 $deferred->reject($error);
             }
         );
@@ -120,7 +120,7 @@ class ReconnectingClient implements IClient
     private function scheduleReconnect(): void
     {
         $delay = $this->jitter->calculateJitter($this->reconnectAttempts);
-        $this->log->info(
+        $this->log?->info(
             "Disconnected from STOMP queue: attempting to reconnect",
             [
                 'attempts' => $this->reconnectAttempts,
@@ -131,17 +131,17 @@ class ReconnectingClient implements IClient
         $this->loop->addTimer(
             $delay / 1000,
             function (): void {
-                $this->log->debug("Reconnecting to STOMP queue...");
+                $this->log?->debug("Reconnecting to STOMP queue...");
                 try {
                     $this->inner = call_user_func($this->factory);
                 } catch (Throwable $e) {
-                    $this->log->warning("Reconnection to STOMP queue failed", ['exception' => $e]);
+                    $this->log?->warning("Reconnection to STOMP queue failed", ['exception' => $e]);
                     $this->reconnectAttempts++;
                     return;
                 }
                 $this->inner->connect()->then(
                     function (): void {
-                        $this->log->debug("Reconnected to STOMP queue: resubscribing to subscriptions");
+                        $this->log?->debug("Reconnected to STOMP queue: resubscribing to subscriptions");
                         foreach ($this->subscriptions as [$dest, $ackMode, $cb, $headers]) {
                             $this->inner->subscribeWithAck($dest, $ackMode, $cb, $headers);
                         }
@@ -153,7 +153,7 @@ class ReconnectingClient implements IClient
                     },
                     function (): void {
                         $this->reconnectAttempts++;
-                        $this->log->warning(
+                        $this->log?->warning(
                             "Reconnection to STOMP queue failed",
                             ['attempts' => $this->reconnectAttempts,],
                         );
