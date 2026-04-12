@@ -48,6 +48,10 @@ class ConnectionTest extends TestCase
         };
     }
 
+    /**
+     * Test that a connection's close callback fires whenever its stream closes
+     * for whatever reason.
+     */
     public function testOnCloseCallbackFiredWhenStreamCloses(): void
     {
         $conn   = $this->makeConnection();
@@ -65,6 +69,10 @@ class ConnectionTest extends TestCase
         $this->assertTrue($fired);
     }
 
+    /**
+     * Test that all on-close callbacks are fired whenever a connection's stream
+     * closes.
+     */
     public function testMultipleOnCloseCallbacksAllFire(): void
     {
         $conn   = $this->makeConnection();
@@ -85,6 +93,16 @@ class ConnectionTest extends TestCase
         $this->assertSame(2, $count);
     }
 
+    /**
+     * Test that a connection's connect method does not return the same promise
+     * before and after its stream closes.
+     *
+     * This is required because:
+     * * the connect method's promise will be a resolved promise after a
+     *   successful connection
+     * * if a disconnect happens, a resolved promise is no longer appropriate as
+     *   the connection in the initial promise is gone
+     */
     public function testConnectionPromiseResetAfterClose(): void
     {
         $conn    = $this->makeConnection();
@@ -102,13 +120,21 @@ class ConnectionTest extends TestCase
         $this->assertNotSame($promise1, $promise2);
     }
 
+    /**
+     * Test that destroying a connection object without actually connecting does
+     * not raise an error.
+     */
     public function testDestructWithoutConnectDoesNotThrow(): void
     {
         $conn = $this->makeConnection();
-        unset($conn); // should not throw
+        unset($conn);
         $this->addToAssertionCount(1);
     }
 
+    /**
+     * Test that the connection's on-close callback doesn't trigger before the
+     * stream closes.
+     */
     public function testOnCloseNotFiredBeforeStreamCloses(): void
     {
         $conn   = $this->makeConnection();

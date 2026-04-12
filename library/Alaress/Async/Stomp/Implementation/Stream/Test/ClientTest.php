@@ -13,10 +13,15 @@ use PHPUnit\Framework\TestCase;
 #[CoversMethod(Connection::class, 'onClose')]
 class ClientTest extends TestCase
 {
+    /**
+     * Test that a STOMP client's on-disconnect callback delegates to its
+     * internal connection's on-close callback.
+     */
     public function testOnDisconnectDelegatesToConnectionOnClose(): void
     {
         $conn = $this->createMock(Connection::class);
-        $cb   = function (): void {};
+        $cb   = function (): void {
+        };
 
         $conn->expects($this->once())
             ->method('onClose')
