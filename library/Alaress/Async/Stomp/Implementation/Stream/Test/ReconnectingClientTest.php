@@ -36,6 +36,7 @@ class ReconnectingClientTest extends TestCase
     private function makeInnerClient(?callable &$captureDisconnect = null): IClient&MockObject
     {
         $client = $this->createMock(IClient::class);
+        /** @noinspection PhpParamsInspection - null is a valid parameter to resolve() */
         $client->method('connect')->willReturn(resolve(null));
         $client->method('onDisconnect')
             ->willReturnCallback(function (callable $cb) use (&$captureDisconnect): void {
@@ -67,6 +68,7 @@ class ReconnectingClientTest extends TestCase
     public function testConnectDelegatesToInnerClient(): void
     {
         $inner = $this->createMock(IClient::class);
+        /** @noinspection PhpParamsInspection - null is a valid parameter to resolve() */
         $inner->expects($this->once())->method('connect')->willReturn(resolve(null));
         $inner->method('onDisconnect');
 
@@ -86,6 +88,7 @@ class ReconnectingClientTest extends TestCase
     public function testSubscribeWithAckDelegatesToInnerClient(): void
     {
         $inner = $this->createMock(IClient::class);
+        /** @noinspection PhpParamsInspection - null is a valid parameter to resolve() */
         $inner->method('connect')->willReturn(resolve(null));
         $inner->method('onDisconnect');
         $inner->expects($this->once())

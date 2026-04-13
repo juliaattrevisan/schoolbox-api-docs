@@ -61,6 +61,7 @@ class ConnectionTest extends TestCase
     {
         $conn   = $this->makeConnection();
         $stream = new ThroughStream();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection - prepareStream is defined on innner class */
         $conn->prepareStream($stream);
 
         $fired = false;
@@ -82,6 +83,7 @@ class ConnectionTest extends TestCase
     {
         $conn   = $this->makeConnection();
         $stream = new ThroughStream();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection - prepareStream is defined on innner class */
         $conn->prepareStream($stream);
 
         $count = 0;
@@ -112,6 +114,7 @@ class ConnectionTest extends TestCase
     {
         $conn   = $this->makeConnection();
         $stream = new ThroughStream();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection - prepareStream is defined on innner class */
         $conn->prepareStream($stream);
 
         $promise1 = $conn->connect();
@@ -140,6 +143,7 @@ class ConnectionTest extends TestCase
     {
         $conn   = $this->makeConnection();
         $stream = new ThroughStream();
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection - prepareStream is defined on innner class */
         $conn->prepareStream($stream);
 
         $fired = false;
