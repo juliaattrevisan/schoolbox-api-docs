@@ -17,10 +17,10 @@ use Schoolbox\Realtime\Memory;
 class WorkerArray implements WorkerBundleInterface
 {
     /** @var Worker[] */
-    protected $workers = array();
+    protected $workers = [];
 
     /** @var array */
-    protected $pipes = array();
+    protected $pipes = [];
 
     /** @var AlaressIPCProtocol */
     protected $protocol;
@@ -229,33 +229,19 @@ class WorkerArray implements WorkerBundleInterface
      */
     public function getStatus()
     {
-        $status = array();
-
-        $list = array(
+        $status = [];
+        $list = [
             Worker::READY   => 'READY',
             Worker::BUSY    => 'BUSY',
             Worker::DONE    => 'DONE',
             Worker::ENDED   => 'ENDED',
             Worker::ERROR   => 'ERROR',
             Worker::SENDING => 'SENDING',
-        );
+        ];
 
         $time = microtime(true);
         foreach ($this->workers as $pid => $w) {
-//            $vmSize = null;
-//            $vmRss  = null;
-//            $usage  = file_get_contents("/proc/$pid/statm");
-//            if ($usage) {
-//                // statm values:
-//                // first value is vmSize (all allocated memory)
-//                // second value is vmRss (currently used memory)
-//                // need to account for pagesize
-//                $pagesize = 4096;
-//                [$vmSize, $vmRss] = explode(' ', $usage);
-//                $vmSize = intval($vmSize) * $pagesize;
-//                $vmRss  = intval($vmRss) * $pagesize;
-//            }
-            $status[$pid] = array(
+            $status[$pid] = [
                 'proc'     => $w->getCommand(),
                 'status'   => $list[$w->getStatus()],
                 'task'     => '(none)',
@@ -263,7 +249,7 @@ class WorkerArray implements WorkerBundleInterface
                 'uptime'   => $time - $w->getStart(),
                 'requests' => $w->getRequestCount(),
                 'memory'   => Memory::getUsage((int)$pid),
-            );
+            ];
             if ($w->getTask() instanceof Task) {
                 $status[$pid]['task'] = $w->getTask()->getCommand();
             }
