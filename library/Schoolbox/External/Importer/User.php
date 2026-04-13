@@ -230,7 +230,7 @@ class User extends AbstractImporter
         $this->userHydrators[] = new User\Hydrator\Field('Alt Email', 'setAltEmail', true);
         $this->userHydrators[] = new User\Hydrator\Lookup('House', 'setSchoolHouse', $this->houseList);
         $this->userHydrators[] = new User\Hydrator\Lookup('Residential House', 'setResidentialHouse', $this->residentialHouseList);
-        $this->userHydrators[] = new User\Hydrator\Lookup('Residential House', 'setResidentialHouse', $this->residentialHouseList);
+        $this->userHydrators[] = new User\Hydrator\Lookup('Pronoun', 'setPronoun', $this->pronounList);
         $this->userHydrators[] = new User\Hydrator\Nationality('Nationality');
         $this->userHydrators[] = new User\Hydrator\Language('Language');
         $this->userHydrators[] = new User\Hydrator\Qualification('Qualification', $this->qualificationList);
