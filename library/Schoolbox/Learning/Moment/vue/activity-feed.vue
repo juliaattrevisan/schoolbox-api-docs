@@ -575,8 +575,9 @@ window.Vue.onMounted(async () => {
                             v-if="props.routes.getAwardAsAchievementForm"
                             :href="getReturnUrl(props.routes.getAwardAsAchievementForm)"
                             title="Award achievement"
-                            class="achievement icon-achievement"
+                            class="achievement"
                         >
+                            <sbx-icon name="achievement"></sbx-icon>
                             <span>Award Achievement</span>
                         </a>
                     </div>
