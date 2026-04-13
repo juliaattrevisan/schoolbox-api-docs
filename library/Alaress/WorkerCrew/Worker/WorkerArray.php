@@ -248,9 +248,11 @@ class WorkerArray implements WorkerBundleInterface
                 // statm values:
                 // first value is vmSize (all allocated memory)
                 // second value is vmRss (currently used memory)
+                // need to account for pagesize
+                $pagesize = 4096;
                 [$vmSize, $vmRss] = explode(' ', $usage);
-                $vmSize = intval($vmSize);
-                $vmRss  = intval($vmRss);
+                $vmSize = intval($vmSize) * $pagesize;
+                $vmRss  = intval($vmRss) * $pagesize;
             }
             $status[$pid] = array(
                 'proc'   => $w->getCommand(),
