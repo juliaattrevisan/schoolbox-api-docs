@@ -567,7 +567,10 @@ class Controller extends WebController\Base
                         ]
                     ),
                 ],
-                'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get(ConfigMapper::NAME_SUBMISSION_VISIBILITY_MAX)),
+                'availableVisibilities' => Visibility::getAvailableVisibilities(
+                    $this->getConfigLoader()->get('mark_visibility_allow_students'),
+                    $this->getConfigLoader()->get('mark_visibility_allow_parents'),
+                ),
                 'submissionErrorStates' => $this->stateMapper->findAll()->map(fn(State $state) => [
                     'id' => $state->getId(),
                     'name' => $state->getDisplayAs(),
