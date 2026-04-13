@@ -400,8 +400,9 @@ class ReconnectingClientTest extends TestCase
         $call   = 0;
         $jitter = $this->createMock(IJitter::class);
         $jitter->method('calculateJitter')
-            ->willReturnCallback(function (int $attempts) use (&$call): float {
+            ->willReturnCallback(function () use (&$call): float {
                 return match ($call++) {
+                    /** @phpstan-ignore-next-line - this value may be zero */
                     0       => 0.0,
                     default => throw new MaxAttemptsExceededException('max attempts exceeded'),
                 };
