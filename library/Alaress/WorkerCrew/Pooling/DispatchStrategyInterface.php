@@ -225,4 +225,12 @@ interface DispatchStrategyInterface
      * @return int
      */
     public function getWorkerWriteTimeout(): int;
+
+
+    /**
+     * The interval (in seconds) at which daemon metrics should be reported.
+     *
+     * @return int
+     */
+    public function getMetricInterval(): int;
 }

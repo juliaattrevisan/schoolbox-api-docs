@@ -44,6 +44,8 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
     const TASK_TIMETABLE = 'timetable';
     const TASK_MOBILE    = 'mobile';
 
+    const METRIC_INTERVAL = 60;
+
     protected $flywheelSpins;
 
 
@@ -385,5 +387,16 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
     public function getWorkerWriteTimeout(): int
     {
         return static::WORKER_WRITE_TIMEOUT;
+    }
+
+
+    /**
+     * The interval (in seconds) at which daemon metrics should be reported.
+     *
+     * @return int
+     */
+    public function getMetricInterval(): int
+    {
+        return static::METRIC_INTERVAL;
     }
 }
