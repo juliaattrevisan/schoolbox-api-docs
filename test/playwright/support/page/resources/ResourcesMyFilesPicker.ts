@@ -84,7 +84,7 @@ export default class ResourcesMyFilesPicker {
      * Clicks the Audio option
      */
     async clickAudio(): Promise<void> {
-        const audioIcon = this.page.locator('button:has(sbx-icon[name="mic"])');
+        const audioIcon = this.page.locator('sbx-icon[name="mic"]');
         await audioIcon.click();
     }
 
@@ -92,7 +92,7 @@ export default class ResourcesMyFilesPicker {
      * Clicks the Photo option
      */
     async clickPhoto(): Promise<void> {
-        const photoIcon = this.page.locator('div[class="icon-photo"]');
+        const photoIcon = this.page.locator('sbx-icon[name="camera"]');
         await photoIcon.click();
     }
 
@@ -100,7 +100,7 @@ export default class ResourcesMyFilesPicker {
      * Clicks the Video option
      */
     async clickVideo(): Promise<void> {
-        const videoIcon = this.page.locator('div[class="icon-video"]');
+        const videoIcon = this.page.locator('sbx-icon[name="video"]');
         await videoIcon.click();
     }
 

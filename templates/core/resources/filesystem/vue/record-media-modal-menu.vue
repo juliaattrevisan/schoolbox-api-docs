@@ -186,28 +186,28 @@ export default {
     <div v-if="hasChecked" class="pseudo-video" ref="pseudoVideo">
         <button v-if="isAudioSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)">
             <div>
-                <sbx-icon name="mic"></sbx-icon>
+                <sbx-icon name="mic" size="var(--sbx-icon-size)"></sbx-icon>
                 <span>Audio</span>
                 <aside>Say something with an audio only recording.</aside>
             </div>
         </button>
         <button v-if="isVideoSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.PHOTO)">
             <div>
-                <div class="icon-photo"></div>
+                <sbx-icon name="camera" size="var(--sbx-icon-size)"></sbx-icon>
                 <span>Photo</span>
                 <aside>Use a computer camera to take a photo.</aside>
             </div>
         </button>
         <button v-if="isVideoSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.CAMERA)">
             <div>
-                <sbx-icon name="video" size="3rem"></sbx-icon>
+                <sbx-icon name="video" size="var(--sbx-icon-size)"></sbx-icon>
                 <span>Video</span>
                 <aside>Use a computer camera to create a video recording.</aside>
             </div>
         </button>
         <button v-if="!hasDeviceCapture" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.SCREEN)">
             <div>
-                <sbx-icon name="screen-capture"></sbx-icon>
+                <sbx-icon name="screen-capture" size="var(--sbx-icon-size)"></sbx-icon>
                 <span>Screen</span>
                 <aside>Create a computer screen recording.</aside>
             </div>
@@ -216,10 +216,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "@css/core/base/variables";
-
-$font-family-icon: "schoolbox";
-
 .pseudo-video {
     position: absolute;
     width: 100%;
@@ -250,45 +246,8 @@ $font-family-icon: "schoolbox";
     }
 }
 
-.icon {
-    font-family: $font-family-icon;
-    &:before {
-        color: var(--sbx-config-color-accent, $content-ui-foreground);
-        font-size: 3rem;
-        padding: 0;
-    }
-}
-
-.icon-mic {
-    @extend .icon;
-    &:before {
-        content: "\e641";
-    }
-}
-
-.icon-photo {
-    @extend .icon;
-    &:before {
-        content: "\e65c";
-    }
-}
-
-.icon-video {
-    @extend .icon;
-    &:before {
-        content: "\e674";
-    }
-}
-
-.menu-item .sbx-icon {
-    color: var(--sbx-config-color-accent, $content-ui-foreground);
-}
-
-.icon-screen-capture {
-    @extend .icon;
-    &:before {
-        content: "\e921";
-    }
+sbx-icon {
+    --sbx-icon-size: 3rem;
 }
 
 @media screen and (max-width: 950px) {
@@ -298,8 +257,8 @@ $font-family-icon: "schoolbox";
     .menu-item span {
         font-size: 0.875rem;
     }
-    .icon:before {
-        font-size: 2rem;
+    sbx-icon {
+        --sbx-icon-size: 2rem;
     }
 }
 
@@ -307,12 +266,12 @@ $font-family-icon: "schoolbox";
     .menu-item {
         margin-right: 0.25rem;
         margin-top: 0.25rem;
-        .icon:before {
-            font-size: 1.5rem;
-        }
         aside {
             display: none;
         }
+    }
+    sbx-icon {
+        --sbx-icon-size: 1.5rem;
     }
 }
 </style>
