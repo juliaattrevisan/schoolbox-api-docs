@@ -148,8 +148,10 @@ class Mapper extends \Schoolbox\Mapper
 
                 /* This probably doesn't happen, but if the capability grade group wasn't found at all, set as null
                  */
-                if (null !== $capabilityGradeGroup->getId()) {
+                if (null !== $capabilityGradeGroup?->getId()) {
                     $rubric->setCapabilityGradeGroup($capabilityGradeGroup);
+                } else {
+                    $rubric->setCapabilityGradeGroup(null);
                 }
             }
 
