@@ -144,9 +144,13 @@ class Mapper extends \Schoolbox\Mapper
              */
             if (SubmissionBox\MarkType::SLUG_LETTER === $rubric->getCapabilityMarkType()?->getSlug()) {
                 /** @var SubmissionBox\GradeLevel\Group\Model $capabilityGradeGroup */
-                $capabilityGradeGroup = $this->getJoinMapper('capabilityGradeGroup')->findByIdWithFallback($rubric->getCapabilityGradeGroup()->getId());
+                $capabilityGradeGroup = $this->getJoinMapper('capabilityGradeGroup')->findByIdWithFallback($rubric->getCapabilityGradeGroup()?->getId());
 
-                $rubric->setCapabilityGradeGroup($capabilityGradeGroup);
+                /* This probably doesn't happen, but if the capability grade group wasn't found at all, set as null
+                 */
+                if (null !== $capabilityGradeGroup->getId()) {
+                    $rubric->setCapabilityGradeGroup($capabilityGradeGroup);
+                }
             }
 
             $stack->add($rubric);
