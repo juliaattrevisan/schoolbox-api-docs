@@ -132,11 +132,6 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         $this->taskDispatcher = new Dispatcher($reactLoop, $this, $log, $strat);
         $this->fdLimit        = $fdLimit - self::FD_LIMIT_BUFFER;
         $this->log->debug('Instantiated PipeManager');
-
-        $this->reactLoop->addPeriodicTimer(
-            5,
-            fn () => $this->log->info(json_encode($this->getStats())),
-        );
     }
 
     /**
@@ -866,7 +861,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      *
      * @return array
      */
-    private function getStats(): array
+    public function getStats(): array
     {
         $pid             = getmypid();
         $dispatcherStats = $this->taskDispatcher->getStatus();

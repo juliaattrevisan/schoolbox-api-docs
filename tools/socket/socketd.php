@@ -74,7 +74,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
 
     $log->info(implode($delim, ['Using strategy:'] + $stratBuilder->summarise()), ['char' => '+']);
 
-    $pipeManager = (new PipeManagerFactory(
+    $pipeManager = new PipeManagerFactory(
         $loop,
         $sessionSerializeHandler,
         $log,
@@ -85,7 +85,13 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $redisAsyncClientRepository,
         $stratBuilder->build($flags),
         $kernel->getHardLimit(Kernel::RLIMIT_FILE_DESCRIPTORS),
-    ))->build();
+    )->build();
+
+    // Add metric logging at this level I guess?
+    $loop->addPeriodicTimer(
+        5,
+        fn () => $log->info(json_encode($pipeManager->getStats())),
+    );
 
     $wss = new Ratchet\WebSocket\WsServer($pipeManager);
     $wss->enableKeepAlive($loop);
