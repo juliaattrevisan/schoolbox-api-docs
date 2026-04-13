@@ -128,11 +128,12 @@ class CommandLineTool extends CliTool\App
             $maxTime = self::DEFAULT_MAX_TIME;
         }
         $endTime = time() + $maxTime;
+        $endDateTime = new \Alaress_Date_Format($endTime, 'U')->getDatabase();
 
         $logger->info(
             sprintf(
                 "Attempting to acquire process lock. will release at end, or after '%s', whichever comes first.",
-                date('Y-m-d H:i:s', $endTime)
+                $endDateTime
             ),
         );
         try {
@@ -219,7 +220,7 @@ class CommandLineTool extends CliTool\App
 
         // log the settings we are running with
         $logger->notice(sprintf("Running %s:", $this->perform() ? "with perform" : "in dry-run mode"));
-        $logger->notice(sprintf("Script will end at or before '%s'", date('Y-m-d H:i:s', $endTime)));
+        $logger->notice(sprintf("Script will end at or before '%s'", $endDateTime));
         $logger->notice(sprintf("Chunk size: %s", $chunkSize));
         $logger->notice(sprintf("Loop count: %s", $loopCount));
         if ($retentionPeriod->getRetentionDays()) {
@@ -246,7 +247,7 @@ class CommandLineTool extends CliTool\App
 
                 // if we have passed the end time, stop for now and continue tomorrow
                 if (time() > $endTime) {
-                    $logger->notice(sprintf("End time of '%s' reached, stopping for now", date('Y-m-d H:i:s', $endTime)));
+                    $logger->notice(sprintf("End time of '%s' reached, stopping for now", $endDateTime));
                     return;
                 }
 
