@@ -12,6 +12,11 @@ namespace Schoolbox\Realtime\Routing;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Responder class used by the schedule daemon.
+ *
+ * AFAICT this exists only to fulfil an interface.
+ */
 class DispatchResponder implements TaskResponseHandlerInterface
 {
     /** @var LoggerInterface */
@@ -53,5 +58,15 @@ class DispatchResponder implements TaskResponseHandlerInterface
     public function handleError($identifier, $command, $data)
     {
         $this->log->notice("Received worker error for '$command': $data");
+    }
+
+
+    /**
+     * This implementation of `TaskResponseHandlerInterface` returns no useful
+     * stats, so it returns an empty array.
+     */
+    public function getStats(): array
+    {
+        return [];
     }
 }
