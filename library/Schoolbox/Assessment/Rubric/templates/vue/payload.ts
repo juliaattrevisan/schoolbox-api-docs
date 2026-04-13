@@ -21,12 +21,12 @@ export type RubricGridCreateIndicatorResponse = {
  * @see /library/Schoolbox/Assessment/Rubric/Grid/Factory.php $rubricData
  */
 type RubricGridFormPayload = {
-    level: { id: number; name: string }[];
+    level: { id: number | ""; name: string }[];
     group: { id: number | ""; name: string; maxValue: number | null }[];
     criterion: Record<
         number, // indicatorId
         {
-            id: number;
+            id: number | "";
             groupId: number;
             name: string;
             on?: 1;
@@ -53,13 +53,15 @@ type RubricGridFormPayload = {
  * @returns the converted payload
  */
 export function translateGridToFormPayload(grid: RubricGrid): RubricGridFormPayload {
+    // TODO: allow backend to accept negative IDs?
+
     const gridData: RubricGridFormPayload = {
         level: grid.levels.map((level) => ({
-            id: level.id,
+            id: level.id >= 0 ? level.id : "", // the backend expects empty IDs for new levels
             name: level.name,
         })),
         group: grid.capabilities.map((capability) => ({
-            id: capability.id >= 0 ? capability.id : "", // the backend expects empty IDs for new capabilities (I think)
+            id: capability.id >= 0 ? capability.id : "", // the backend expects empty IDs for new capabilities
             name: capability.name,
             maxValue: capability.maxValue,
         })),
@@ -75,14 +77,14 @@ export function translateGridToFormPayload(grid: RubricGrid): RubricGridFormPayl
     for (const capability of grid.capabilities) {
         for (const indicator of capability.indicators) {
             gridData.criterion[indicator.id] = {
-                id: indicator.id,
+                id: indicator.id >= 0 ? indicator.id : "", // the backend expects empty IDs for new indicators
                 groupId: capability.id,
                 name: indicator.name,
                 on: indicator.hasUsage ? 1 : undefined,
             };
 
             gridData.descriptor[indicator.id] = indicator.descriptors.map((descriptor) => ({
-                id: descriptor.id >= 0 ? descriptor.id : "", // the backend expects empty IDs for new descriptors (I think)
+                id: descriptor.id >= 0 ? descriptor.id : "", // the backend expects empty IDs for new descriptors
                 text: descriptor.description.trim(),
                 points: (descriptor.maxValue ?? "").toString(),
             }));

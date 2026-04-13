@@ -249,6 +249,14 @@ window.Vue.watch(formValue, () => {
         window.jQuery(formValueRef.value).valid();
     }
 });
+
+/** Rubrics by default have 2 levels if none already exist */
+window.Vue.onMounted(() => {
+    if (rubricGridLevels.value.length === 0) {
+        addLevel("", null);
+        addLevel("", null);
+    }
+});
 </script>
 
 <template>

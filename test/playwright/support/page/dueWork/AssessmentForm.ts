@@ -62,7 +62,7 @@ export default class AssessmentForm {
 
     static readonly DATA_TEST_RUBRIC_INDICATOR_TOGGLE = "rubric-indicator-toggle";
 
-    static readonly DATA_TEST_RUBRIC_DESCRIPTOR_CELL = "rubric-descriptor-cell-"; // Append "-[descriptorIndex]"
+    static readonly DATA_TEST_RUBRIC_DESCRIPTOR_CELL = "rubric-descriptor-cell"; // Append "-[descriptorIndex]"
 
     static readonly DATA_TEST_RUBRIC_DESCRIPTOR_MAX_VALUE = "rubric-descriptor-max-value";
 

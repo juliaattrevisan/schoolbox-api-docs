@@ -5,7 +5,6 @@
  *
  * This creates a form element for each rubric with the name "rubric[${rubricId}]"
  * which contains a JSON-encoded version of the rubric grid for the backend to process
- * TODO: multiple rubric support comes soon
  */
 
 import { cloneDeep } from "es-toolkit";

@@ -97,12 +97,12 @@ test.describe("Due Work - Mark type tests", () => {
         await assessmentForm.clickAddRubric();
         await assessmentForm.clickCreateRubricManually();
         await assessmentForm.addRubricLevel();
-        await assessmentForm.toggleRubricIndicator(0, 426);
-        await assessmentForm.fillRubricCriterionPoints(0, 426, 0, "1");
-        await assessmentForm.fillRubricCriterionPoints(0, 426, 1, "2");
-        await assessmentForm.toggleRubricIndicator(0, 420);
-        await assessmentForm.fillRubricCriterionPoints(0, 420, 0, "1");
-        await assessmentForm.fillRubricCriterionPoints(0, 420, 1, "2");
+        await assessmentForm.toggleRubricIndicator(86, 426);
+        await assessmentForm.fillRubricCriterionPoints(86, 426, 0, "1");
+        await assessmentForm.fillRubricCriterionPoints(86, 426, 1, "2");
+        await assessmentForm.toggleRubricIndicator(87, 420);
+        await assessmentForm.fillRubricCriterionPoints(87, 420, 0, "1");
+        await assessmentForm.fillRubricCriterionPoints(87, 420, 1, "2");
         await assessmentForm.clickCreate();
 
         // Now back on the unit planner page, import the unit into the homepage
@@ -153,12 +153,12 @@ test.describe("Due Work - Mark type tests", () => {
         await assessmentForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await assessmentForm.clickAddRubric();
         await assessmentForm.clickCreateRubricManually();
-        await assessmentForm.toggleRubricIndicator(0, 452);
-        await assessmentForm.fillRubricCriterionPoints(0, 452, 0, "1");
-        await assessmentForm.fillRubricCriterionPoints(0, 452, 1, "2");
-        await assessmentForm.toggleRubricIndicator(0, 446);
-        await assessmentForm.fillRubricCriterionPoints(0, 446, 0, "1");
-        await assessmentForm.fillRubricCriterionPoints(0, 446, 1, "2");
+        await assessmentForm.toggleRubricIndicator(74, 452);
+        await assessmentForm.fillRubricCriterionPoints(74, 452, 0, "1");
+        await assessmentForm.fillRubricCriterionPoints(74, 452, 1, "2");
+        await assessmentForm.toggleRubricIndicator(76, 446);
+        await assessmentForm.fillRubricCriterionPoints(76, 446, 0, "1");
+        await assessmentForm.fillRubricCriterionPoints(76, 446, 1, "2");
         await assessmentForm.create();
     });
 

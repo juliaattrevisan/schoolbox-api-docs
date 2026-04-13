@@ -115,6 +115,7 @@ window.Vue.onMounted(() => {
                 v-if="props.indicator.inUseExcludingAssessment"
                 class="checkbox-label rb-criterion rb-readonly rb-indicator-name"
                 :for="`rb-indicator-${componentId}`"
+                data-test="rubric-indicator-toggle"
             >
                 {{ indicatorName }}
                 <span
