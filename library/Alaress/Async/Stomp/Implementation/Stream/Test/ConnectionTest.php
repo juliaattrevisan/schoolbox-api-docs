@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @copyright Copyright 2026, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
+ */
+
 declare(strict_types=1);
 
 namespace Alaress\Async\Stomp\Implementation\Stream\Test;

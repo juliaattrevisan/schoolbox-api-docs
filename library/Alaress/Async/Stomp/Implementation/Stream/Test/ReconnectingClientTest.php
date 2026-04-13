@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @copyright Copyright 2026, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
+ */
+
 declare(strict_types=1);
 
 namespace Alaress\Async\Stomp\Implementation\Stream\Test;
@@ -9,6 +14,7 @@ use Alaress\Async\Stomp\Implementation\Stream\ReconnectingClient;
 use Alaress\Jitter\IJitter;
 use Alaress\Jitter\MaxAttemptsExceededException;
 use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
@@ -25,9 +31,9 @@ class ReconnectingClientTest extends TestCase
      * onDisconnect() captures the registered callback for later manual firing.
      *
      * @param callable|null &$captureDisconnect A reference to a method which will be called on disconnect.
-     * @return IClient
+     * @return IClient&MockObject
      */
-    private function makeInnerClient(?callable &$captureDisconnect = null): IClient
+    private function makeInnerClient(?callable &$captureDisconnect = null): IClient&MockObject
     {
         $client = $this->createMock(IClient::class);
         $client->method('connect')->willReturn(resolve(null));
@@ -84,7 +90,7 @@ class ReconnectingClientTest extends TestCase
         $inner->method('onDisconnect');
         $inner->expects($this->once())
             ->method('subscribeWithAck')
-            ->with('queue.test', IClient::ACK_MODE_CLIENT_INDIVIDUAL, $this->isType('callable'));
+            ->with('queue.test', IClient::ACK_MODE_CLIENT_INDIVIDUAL, $this->isCallable());
 
         $client = new ReconnectingClient(
             fn () => $inner,
