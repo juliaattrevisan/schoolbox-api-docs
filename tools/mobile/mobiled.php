@@ -185,6 +185,11 @@ HELP;
             $asyncRedis->psubscribe($topic, $scheduler);
             $log->info("Listening on redis://$topic");
         });
+
+        $loop->addPeriodicTimer(
+            5,
+            fn () => $log->info(json_encode($scheduler->getStats())),
+        );
     } catch (ConnectionException $e) {
         $log->alert('AMQP server is offline or STOMP misconfigured: ' . $e->getMessage(), ['exception' => $e]);
     } catch (AMQPRuntimeException $e) {
