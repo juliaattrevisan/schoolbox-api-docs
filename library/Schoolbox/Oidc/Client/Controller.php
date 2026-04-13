@@ -13,6 +13,7 @@ use Alaress\Codec\ICodec;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Controller\Exception as ControllerException;
 use Aura\Router\Exception\RouteNotFound;
+use Authenticator;
 use CoderCat\JWKToPEM;
 use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
@@ -24,10 +25,16 @@ use League\OAuth2\Client\Provider\AbstractProvider;
 use OpenIDConnectClient\AccessToken;
 use OpenIDConnectClient\OpenIDConnectProvider;
 use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
+use Schoolbox\API\Token\JwtParser;
+use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
+use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+use Schoolbox\Application\Exception\PasswordExpired as SchoolboxPasswordExpiredException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\Oidc\CacheHelper;
@@ -45,15 +52,23 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Client         $httpClient Required for querying discovery URL
-     * @param ICodec         $codec      Required for encoding/decoding state
-     * @param CacheInterface $cache      Required for caching discovery response
-     *                                   and keys
+     * @param Client            $httpClient      Required for querying discovery URL
+     * @param ICodec            $codec           Required for encoding/decoding state
+     * @param CacheInterface    $cache           Required for caching discovery response
+     *                                           and keys
+     * @param Authenticator     $auth            Authenticator, for creating a user session after the OIDC token has
+     *                                           been verified.
+     * @param JwtParser\IParser $jwtParser       JWT parser, for identifying the Schoolbox user described by the OIDC
+     *                                           provider's id_token.
+     * @param LoggerInterface   $jwtParserLogger Logger for JWT parsing failures.
      */
     public function __construct(
         private Client $httpClient,
         private ICodec $codec,
         private CacheInterface $cache,
+        private Authenticator $auth,
+        private JwtParser\IParser $jwtParser,
+        private LoggerInterface $jwtParserLogger,
     ) {
     }
 
@@ -96,7 +111,7 @@ class Controller extends Base
             if (!$this->verifyNonce($decodedIdToken['nonce'] ?? null, $cookieNonce)) {
                 return;
             }
-            $this->redirectToSessionInit($requestState, $idToken);
+            $this->completeLogin($requestState, $idToken);
             return;
         }
 
@@ -122,7 +137,7 @@ class Controller extends Base
             $idToken = $idTokenResponse->getBody()->getContents();
 
             // Cannot check nonce, as it won't exist in a userinfo JWT
-            $this->redirectToSessionInit($requestState, $idToken);
+            $this->completeLogin($requestState, $idToken);
             return;
         }
 
@@ -141,7 +156,7 @@ class Controller extends Base
             if (!$this->verifyNonce($decodedAccessToken->getIdToken()->claims()->get('nonce'), $cookieNonce)) {
                 return;
             }
-            $this->redirectToSessionInit($requestState, $decodedAccessToken->getIdToken()->toString());
+            $this->completeLogin($requestState, $decodedAccessToken->getIdToken()->toString());
             return;
         }
 
@@ -402,24 +417,48 @@ class Controller extends Base
     }
 
     /**
-     * Create a redirect response sending the user to the init session URL.
+     * Authenticate the user from the ID token and redirect to the post-login
+     * landing page.
      *
-     * @param string $requestState The encoded state of the request: may contain a URL to redirect to after session init
-     * @param string $idToken      The ID token to forward to the init session URL.
-     * @return void
-     * @throws RouteNotFound
+     * Starts a Schoolbox session in-process instead of redirecting via
+     * `/api/session?jwt=...`. Forwarding the id_token through a URL is
+     * rejected by Safari when the token exceeds its URL-length limit, so the
+     * token must never appear in the redirect.
+     *
+     * @param string $requestState The encoded state of the request: may contain a URL to redirect to after login
+     * @param string $idToken      The ID token from the OIDC provider.
      */
-    private function redirectToSessionInit(string $requestState, string $idToken): void
+    private function completeLogin(string $requestState, string $idToken): void
     {
-        $decodedState = $this->codec->decode($requestState);
-        $loginUri     = (new Uri())
-            ->withPath($this->routeGenerator->generate('api.initSessionFromQueryString'))
-            ->withQuery(
-                http_build_query([
-                    'jwt'      => $idToken,
-                    'redirect' => $decodedState['redirect'] ?? '/',
-                ])
+        try {
+            $user = $this->jwtParser->determineUser($idToken);
+            $this->auth->createSession(
+                $user->getUsername(),
+                null,
+                $this->jwtParser->bypassIpTracking(),
             );
-        $this->response = $this->redirectTemporary($loginUri->__toString());
+        } catch (
+            JwtParser\Exception\Unparseable
+            | JwtParser\Exception\Rejected
+            | JwtParser\Exception\InvalidIdentity
+            | SchoolboxAccessDeniedException
+            | SchoolboxAccountDisabledException
+            | SchoolboxNotFoundException
+            | SchoolboxPasswordExpiredException $e
+        ) {
+            $this->jwtParserLogger->warning(
+                sprintf('Could not authenticate user from OIDC id_token: %s', $e->getMessage()),
+            );
+            $this->response = $this->responseFromTemplateUnthemed(
+                '@loginOidc/error.twig',
+                ['error' => $e->getMessage()],
+            );
+            return;
+        }
+
+        $decodedState = $this->codec->decode($requestState);
+        $redirect     = (string)($decodedState['redirect'] ?? '/');
+        $target       = (new Uri($redirect))->isAbsolutePath() ? $redirect : '/';
+        $this->response = $this->redirectFound($target);
     }
 }

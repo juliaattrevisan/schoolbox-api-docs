@@ -13,6 +13,7 @@ use Alaress\Codec\Json\Base64;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Authenticator;
 
 /**
  * Module for OpenID Connect logins.
@@ -51,6 +52,9 @@ class Module extends BaseModule
             $this->injector->get('httpClient'),
             new Base64(),
             $this->injector->get('oidc.cache'),
+            new Authenticator(),
+            $this->injector->get('user.jwtParser'),
+            $this->injector->get('user.jwtParser.logger'),
         );
     }
 }
