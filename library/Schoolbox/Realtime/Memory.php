@@ -48,7 +48,7 @@ class Memory
             // statm values:
             // first value is vmSize (all allocated memory)
             // second value is vmRss (currently used memory)
-            $usages = preg_split($usage, '/\s+/');
+            $usages = preg_split('/\s+/', $usage, flags: PREG_SPLIT_NO_EMPTY);
             $vmRss  = filter_var($usages[1] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
             if (!isset($vmRss)) {
                 trigger_error(
