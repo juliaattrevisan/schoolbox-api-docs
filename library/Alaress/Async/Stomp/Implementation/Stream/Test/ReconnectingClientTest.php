@@ -151,7 +151,7 @@ class ReconnectingClientTest extends TestCase
     public function testDisconnectTriggersTimerViaLoop(): void
     {
         $timers         = [];
-        $disconnectHook = null;
+        $disconnectHook = fn () => null;
 
         $inner  = $this->makeInnerClient($disconnectHook);
         $loop   = $this->makeLoop($timers);
@@ -173,7 +173,7 @@ class ReconnectingClientTest extends TestCase
     public function testSubscriptionsReplayedOnReconnect(): void
     {
         $timers         = [];
-        $disconnectHook = null;
+        $disconnectHook = fn () => null;
 
         $firstInner  = $this->makeInnerClient($disconnectHook);
         $secondInner = $this->makeInnerClient();
@@ -207,7 +207,7 @@ class ReconnectingClientTest extends TestCase
     public function testAttemptCounterResetsAfterSuccessfulReconnect(): void
     {
         $timers         = [];
-        $disconnectHook = null;
+        $disconnectHook = fn () => null;
 
         $firstInner  = $this->makeInnerClient($disconnectHook);
         $secondInner = $this->makeInnerClient();
@@ -244,7 +244,7 @@ class ReconnectingClientTest extends TestCase
     public function testOnDisconnectExternalHandlerFiredAfterReconnect(): void
     {
         $timers         = [];
-        $disconnectHook = null;
+        $disconnectHook = fn () => null;
 
         $firstInner  = $this->makeInnerClient($disconnectHook);
         $secondInner = $this->makeInnerClient();
@@ -287,7 +287,7 @@ class ReconnectingClientTest extends TestCase
     public function testFailedReconnectIncrementsAttemptCounter(): void
     {
         $timers         = [];
-        $disconnectHook = null;
+        $disconnectHook = fn () => null;
 
         $firstInner = $this->makeInnerClient($disconnectHook);
 
@@ -298,7 +298,7 @@ class ReconnectingClientTest extends TestCase
 
         $callCount = 0;
         $clients   = [$firstInner, $secondInner];
-        $factory   = function () use (&$callCount, $clients): IClient {
+        $factory   = function () use (&$callCount, $clients, $secondInner): IClient {
             return $clients[$callCount++] ?? $secondInner;
         };
 
@@ -328,7 +328,7 @@ class ReconnectingClientTest extends TestCase
     public function testFactoryThrowInTimerReschedulesAndIncrementsCounter(): void
     {
         $timers         = [];
-        $disconnectHook = null;
+        $disconnectHook = fn () => null;
 
         $firstInner = $this->makeInnerClient($disconnectHook);
 
@@ -373,7 +373,7 @@ class ReconnectingClientTest extends TestCase
     public function testMaxAttemptsExceptionThrownWhenExhausted(): void
     {
         $timers         = [];
-        $disconnectHook = null;
+        $disconnectHook = fn () => null;
 
         $firstInner = $this->makeInnerClient($disconnectHook);
 
@@ -384,7 +384,7 @@ class ReconnectingClientTest extends TestCase
 
         $callCount = 0;
         $clients   = [$firstInner, $secondInner];
-        $factory   = function () use (&$callCount, $clients): IClient {
+        $factory   = function () use (&$callCount, $clients, $secondInner): IClient {
             return $clients[$callCount++] ?? $secondInner;
         };
 
