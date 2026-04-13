@@ -94,7 +94,7 @@ class Module extends BaseModule
                     }
                 }
             }
-            if (!isset($student, $feedback)) {
+            if (!isset($learner, $feedback)) {
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
             }
         } elseif (isset($params['learner']) && $params['learner'] instanceof User) {
@@ -108,7 +108,7 @@ class Module extends BaseModule
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
             }
         }
-        var_dump('test');
+
         return [
             'assessment' => $assessment,
             'feedback'   => $feedback,
@@ -143,7 +143,7 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller();
+        return new Controller($this->getErrorMapper());
     }
 
 

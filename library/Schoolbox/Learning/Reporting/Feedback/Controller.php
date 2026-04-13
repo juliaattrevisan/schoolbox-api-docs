@@ -11,10 +11,12 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Reporting\Feedback;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Reporting;
 use Schoolbox\Learning\Assessment\Reporting\Model;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
 use Twig\Error\Error;
 
 class Controller extends Base
@@ -22,7 +24,9 @@ class Controller extends Base
     /**
      * Controller constructor.
      */
-    public function __construct() {
+    public function __construct(
+        private ErrorMapper $errorMapper,
+    ) {
     }
 
 
@@ -30,28 +34,50 @@ class Controller extends Base
      * A redirect to the first participant who had a feedback
      *
      * @param Reporting\Model $assessment
+     * @throws RouteNotFound
      */
     public function getFirstParticipantFeedback(Reporting\Model $assessment): void
     {
+        $participants = $assessment->getAllParticipants()->filter(fn($participant) => !$participant->isExcluded());
+        $firstParticipant = $participants->first()?->getUser();
 
-        // TODO for $reporting, find the first participant with a feedback id
+        if ($firstParticipant instanceof User) {
+            $this->response = $this->redirectFound(
+                $this->routeGenerator->generate('learningReportingFeedback.getParticularFeedback', [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment' => $assessment,
+                    'learnerId' => $firstParticipant->getId(),
+                    'learner' => $firstParticipant,
+                ])
+            );
 
-        // TODO redirect to getParticularFeedback() for that person.
+            return;
+        }
+
+        /* If the participant list is empty, nothing can be shown
+         */
+        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
     }
 
 
     /**
-     * A redirect to the first participant who had a feedback
+     * The screen that lets you provide feedback to a particular student
      *
      * @param Model $assessment
+     * @param User $learner
+     * @param Reporting\Feedback\Model|null $feedback
      * @throws Error
      */
-    public function getParticularFeedback(Reporting\Model $assessment): void
-    {
+    public function getParticularFeedback(
+        Reporting\Model $assessment,
+        \Schoolbox\User $learner,
+        Reporting\Feedback\Model $feedback = null,
+    ): void {
         $this->response = $this->responseFromTemplate('@learningReportingFeedback/index.twig', [
-            'reporting' => $assessment
-        ], 'Example');
-
+            'reporting' => $assessment,
+            'learner' => $learner,
+            'feedback' => $feedback,
+        ], 'Feedback');
     }
 
 
