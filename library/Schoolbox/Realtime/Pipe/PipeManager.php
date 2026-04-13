@@ -871,8 +871,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             'mem_used'  => memory_get_usage(),
         ];
 
+        $dispatcherStats = $this->taskDispatcher->getStatus();
+
         $poolStats   = $this->taskDispatcher->getPoolStatus();
-        $workerStats = [];
+//        $workerStats = [];
 //        foreach (($poolStats['workers'] ?? []) as $poolName => $poolStat) {}
 
 //        $pipeStats = [
@@ -881,7 +883,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 //        ];
         return [
             'process' => $processStats,
-//            'pipes' => $pipeStats,
+            'dispatcher' => $dispatcherStats,
             'pool'  => $poolStats,
         ];
     }
