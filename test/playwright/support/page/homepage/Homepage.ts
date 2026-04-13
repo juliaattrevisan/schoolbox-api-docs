@@ -83,6 +83,8 @@ export default class Homepage {
 
     static readonly DATA_TEST_HOMEPAGE_COMPONENT_TITLEBAR_NAME = "homepage-component-titlebar-name";
 
+    static readonly COMPONENT_EMPTY_STATE = "div.empty-state";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -414,5 +416,14 @@ export default class Homepage {
         expect(Number.isFinite(componentId), `Bad id format: ${componentIdStr}`).toBeTruthy();
 
         return componentId;
+    }
+
+    /**
+     * check the empty state is presented in a homepage component
+     * @param componentName - the component to be located
+     */
+    async verifyComponentEmptyStateIsShown(componentName: string): Promise<void> {
+        const component = this.locateComponentByName(componentName);
+        await expect(component.locator(Homepage.COMPONENT_EMPTY_STATE)).toBeVisible();
     }
 }

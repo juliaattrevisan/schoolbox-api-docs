@@ -110,7 +110,7 @@ export default class UnitPlanner {
         const pageOrder = await this.page
             .getByTestId(allUnitRowSelector)
             .evaluateAll((unitRows) => unitRows.map((unitRow) => unitRow.getAttribute("data-test-unit-id")));
-        return pageOrder.filter((id) => id !== null);
+        return pageOrder.filter((id): id is string => id !== null);
     }
 
     /**
@@ -143,6 +143,20 @@ export default class UnitPlanner {
         }
 
         await this.page.mouse.up();
+    }
+
+    /**
+     * Get the current order of activities
+     * @returns - The order of activity IDs
+     */
+    async getActivityOrder(): Promise<string[]> {
+        const allActivityRowSelector = /^unit-planner-activity-title-/;
+        const pageOrder = await this.page
+            .getByTestId(allActivityRowSelector)
+            .evaluateAll((activityRows) =>
+                activityRows.map((activityRow) => activityRow.getAttribute("data-test-activity-id")),
+            );
+        return pageOrder.filter((id): id is string => id !== null);
     }
 
     /**

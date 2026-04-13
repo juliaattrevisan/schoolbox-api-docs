@@ -134,7 +134,12 @@ window.Vue.onUnmounted(() => {
                         :class="'icon-' + kebabCase(props.activity.assessmentType)"
                         :title="startCase(props.activity.assessmentType)"
                     ></span>
-                    <p>{{ props.activity.title }}</p>
+                    <p
+                        :data-test="`unit-planner-activity-title-${props.activity.title}`"
+                        :data-test-activity-id="props.activity.id"
+                    >
+                        {{ props.activity.title }}
+                    </p>
                 </component>
             </div>
         </div>
