@@ -22,8 +22,7 @@ class Visibility
     public static function getAvailableVisibilities(
         bool $markVisibilityAllowStudents,
         bool $markVisibilityAllowParents
-    ): array
-    {
+    ): array {
         $availableVisibilities = [
             IAssessable::MARK_VISIBILITY_PRIVATE,
         ];
