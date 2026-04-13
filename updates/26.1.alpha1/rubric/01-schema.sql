@@ -4,7 +4,7 @@
 
 CREATE TABLE rubric_instance
 (
-    `id`                               INT          NOT NULL AUTO_INCREMENT,
+    `id`                               INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `assessment_id`                    INT UNSIGNED NOT NULL,
     `rubric_capability_mark_type_id`   INT,
     `rubric_capability_grade_group_id` INT,
