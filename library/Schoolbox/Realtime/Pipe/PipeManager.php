@@ -846,20 +846,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     }
 
     /**
-     * Record the following stats, among others:
-     *
-     * For this process:
-     * * memory usage
-     *
-     * For the dispatcher:
-     * * queue length
-     *
-     * For each worker:
-     * * memory usage
-     * * uptime
-     * * requests handled
-     *
-     * @return array
+     * @inheritdoc
      */
     public function getStats(): array
     {

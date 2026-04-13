@@ -30,4 +30,22 @@ interface TaskResponseHandlerInterface
      * @return void              - this method does not return any value
      */
     public function handleError($identifier, $command, $data);
+
+    /**
+     * Get the following stats, among others:
+     *
+     * For this process:
+     * * memory usage
+     *
+     * For the dispatcher:
+     * * queue length
+     *
+     * For each worker:
+     * * memory usage
+     * * uptime
+     * * requests handled
+     *
+     * @return array
+     */
+    public function getStats(): array;
 }
