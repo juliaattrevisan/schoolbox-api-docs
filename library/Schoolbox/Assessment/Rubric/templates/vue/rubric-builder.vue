@@ -74,7 +74,7 @@ const allRubricsSum = window.Vue.computed(() => {
         totalSum += parseFloat((rubricSum * weightMultiplier).toFixed(2));
     }
 
-    return totalSum;
+    return parseFloat(totalSum.toFixed(2));
 });
 
 /**
