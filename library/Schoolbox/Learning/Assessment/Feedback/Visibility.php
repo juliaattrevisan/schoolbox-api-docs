@@ -14,32 +14,27 @@ use Schoolbox\Learning\Assessment\IAssessable;
 class Visibility
 {
     /**
-     * Available visibilities for assessments
-     * @param int $visibilityMax
+     * Return an array of available mark visibilities for assessments.
+     * @param bool $markVisibilityAllowStudents
+     * @param bool $markVisibilityAllowParents
      * @return array
      */
-    public static function getAvailableVisibilities(int $visibilityMax): array
+    public static function getAvailableVisibilities(
+        bool $markVisibilityAllowStudents,
+        bool $markVisibilityAllowParents
+    ): array
     {
         $availableVisibilities = [
             IAssessable::MARK_VISIBILITY_PRIVATE,
         ];
-        switch ($visibilityMax) {
-            case IAssessable::MARK_VISIBILITY_PRIVATE:
-                break;
-
-            case IAssessable::MARK_VISIBILITY_STUDENT:
-                $availableVisibilities[] = IAssessable::MARK_VISIBILITY_STUDENT;
-                break;
-
-            case IAssessable::MARK_VISIBILITY_PARENT:
-                $availableVisibilities[] = IAssessable::MARK_VISIBILITY_PARENT;
-                break;
-
-            case IAssessable::MARK_VISIBILITY_PARENT_STUDENT:
-            default:
-                $availableVisibilities[] = IAssessable::MARK_VISIBILITY_STUDENT;
-                $availableVisibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
-                break;
+        if ($markVisibilityAllowStudents) {
+            $availableVisibilities[] = IAssessable::MARK_VISIBILITY_STUDENT;
+        }
+        if ($markVisibilityAllowParents) {
+            $availableVisibilities[] = IAssessable::MARK_VISIBILITY_PARENT;
+        }
+        if ($markVisibilityAllowStudents && $markVisibilityAllowParents) {
+            $availableVisibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
         }
         return $availableVisibilities;
     }
