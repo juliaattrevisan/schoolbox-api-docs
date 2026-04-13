@@ -1519,12 +1519,12 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @param GenericCollection $nationalityCollection
+     * @param ?GenericCollection $nationalityCollection
      * @return self
      */
-    public function setNationalityCollection(GenericCollection $nationalityCollection): self
+    public function setNationalityCollection(?GenericCollection $nationalityCollection): self
     {
-        $nationalityCollection->assertCollectionOf(NationalityModel::class);
+        $nationalityCollection?->assertCollectionOf(NationalityModel::class);
         $this->nationalityCollection = $nationalityCollection;
         return $this;
     }
@@ -1538,12 +1538,12 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @param GenericCollection $languageCollection
+     * @param ?GenericCollection $languageCollection
      * @return self
      */
-    public function setLanguageCollection(GenericCollection $languageCollection): self
+    public function setLanguageCollection(?GenericCollection $languageCollection): self
     {
-        $languageCollection->assertCollectionOf(LanguageModel::class);
+        $languageCollection?->assertCollectionOf(LanguageModel::class);
         $this->languageCollection = $languageCollection;
         return $this;
     }

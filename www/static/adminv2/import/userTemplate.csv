@@ -1,4 +1,4 @@
-"Delete?","Schoolbox User ID","Username","External ID","Title","First Name","Preferred Name","Surname","Pronoun","Position Title","Role","Campus","Password","Alt Email","Year","House","Residential House","E-Portfolio?","Hide Contact Details?","Hide Timetable?","Email Address From Username?","Use External Mail Client?","Display Graph on Student Grade Card?","Superuser?","Account Enabled?"
-,,"jerome092",1256,"Mr","Jerome","Jerry","Spartan",(he/him),,"Senior Students","Senior",,,,,,"Y","N","N","Y","N","Y","N","Y"
-,,"alice130",4562,"Mrs","Alice",,"Spartan",(she/her),"Admissions Manager","Teachers","Junior, Senior",,,,,,"Y","N","Y","Y","N","Y","N","Y"
-,,"douglas042",2346,,"Douglas",,"Spartan",,,"Parents","ELC, Senior",,"douglasAlt@alaress.com.au",,,,"Y","Y","N","N","N","Y","N","Y"
+Delete?,Schoolbox User ID,Username,External ID,Title,First Name,Preferred Name,Surname,Pronoun,Position Title,Role,Campus,Password,Alt Email,Year,House,Residential House,Nationality,Language,Qualification,E-Portfolio?,Hide Contact Details?,Hide Timetable?,Email Address From Username?,Use External Mail Client?,Display Graph on Student Grade Card?,Superuser?,Account Enabled?
+,,jerome092,1256,Mr,Jerome,Jerry,Spartan,(he/him),,Senior Student,Senior,,,,,,"Australian, American",English,DP Year 1,Y,N,N,Y,N,Y,N,Y
+,,alice130,4562,Mrs,Alice,,Spartan,(she/her),Admissions Manager,Academic Staff,"Junior, Senior",,,,,,Brazilian,"Portugese, English",VCE,Y,N,Y,Y,N,Y,N,Y
+,,douglas042,2346,,Douglas,,Spartan,,,Parents,"ELC, Senior",,douglasAlt@alaress.com.au,,,,,,,Y,Y,N,N,N,Y,N,Y

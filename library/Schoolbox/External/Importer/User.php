@@ -14,6 +14,8 @@ use HouseMapper;
 use HouseResidential as HouseResidentialModel;
 use Schoolbox\Campus as CampusModel;
 use Schoolbox\CampusMapper;
+use Schoolbox\IB\Qualification\Model as QualificationModel;
+use Schoolbox\IB\Qualification\Mapper as QualificationMapper;
 use Schoolbox\Role as RoleModel;
 use Schoolbox\RoleMapper;
 use Schoolbox\Sync\Provisioner\ValidUser;
@@ -76,6 +78,11 @@ class User extends AbstractImporter
     protected array|PronounModel $pronounList = [];
 
     /**
+     * @var array|QualificationModel[]
+     */
+    protected array|QualificationModel $qualificationList = [];
+
+    /**
      * A list of user identifier classes - each one will in turn attempt to
      * retrieve a UserModel from the row.
      *
@@ -108,7 +115,7 @@ class User extends AbstractImporter
     public static function getFormat()
     {
         $format = [
-            'Delete?'                      => 'Is this user to be deleted?',
+            'Delete?'                              => 'Is this user to be deleted?',
             'Schoolbox User ID'                    => 'The user\'s internal Schoolbox ID number',
             'Username'                             => 'The unique name the user uses to log in',
             'External ID'                          => 'The user\'s ID number in your external system',
@@ -125,6 +132,9 @@ class User extends AbstractImporter
             'Year'                                 => '',
             'House'                                => '',
             'Residential House'                    => '',
+            'Nationality'                          => '',
+            'Language'                             => '',
+            'Qualification'                        => '',
             'E-Portfolio?'                         => '',
             'Hide Contact Details?'                => '',
             'Hide Timetable?'                      => '',
@@ -183,6 +193,12 @@ class User extends AbstractImporter
             $this->pronounList[$pronoun->__toString()] = $pronoun;
         }
 
+        // Qualifications
+        foreach (QualificationMapper::getInstance()->disableCache()->findAll() as $qualification) {
+            /** @var QualificationModel $qualification */
+            $this->qualificationList[$qualification->getName()] = $qualification;
+        }
+
         // Identifiers
         $this->userIdentifiers[] = new User\Identifier\UserId($this->userMapper);
         $this->userIdentifiers[] = new User\Identifier\Username($this->userMapper);
@@ -215,6 +231,9 @@ class User extends AbstractImporter
         $this->userHydrators[] = new User\Hydrator\Lookup('House', 'setSchoolHouse', $this->houseList);
         $this->userHydrators[] = new User\Hydrator\Lookup('Residential House', 'setResidentialHouse', $this->residentialHouseList);
         $this->userHydrators[] = new User\Hydrator\Lookup('Pronoun', 'setPronoun', $this->pronounList);
+        $this->userHydrators[] = new User\Hydrator\Nationality('Nationality');
+        $this->userHydrators[] = new User\Hydrator\Language('Language');
+        $this->userHydrators[] = new User\Hydrator\Qualification('Qualification', $this->qualificationList);
     }
 
     /**
