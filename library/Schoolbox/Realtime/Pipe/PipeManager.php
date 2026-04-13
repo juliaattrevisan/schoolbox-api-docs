@@ -866,9 +866,29 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     private function getStats(): array
     {
+        $pid    = getmypid();
+        $vmSize = null;
+        $vmRss  = null;
+        $usage  = file_get_contents("/proc/$pid/statm");
+        if ($usage) {
+            // statm values:
+            // first value is vmSize (all allocated memory)
+            // second value is vmRss (currently used memory)
+            // need to account for pagesize
+            $pagesize = 4096;
+            [$vmSize, $vmRss] = explode(' ', $usage);
+            $vmSize = intval($vmSize) * $pagesize;
+            $vmRss  = intval($vmRss) * $pagesize;
+        }
+
+        // Note that memory_get_usage only gets the memory assigned to PHP
+        // itself: any other memory assigned to the script isn't reported.
+        // Need to reference /proc/$pid/statm to determine actual usage.
         $processStats = [
-            'mem_alloc' => memory_get_usage(true),
-            'mem_used'  => memory_get_usage(),
+            'mem_alloc' => $vmSize,
+            'mem_used'  => $vmRss,
+            'php_mem_alloc' => memory_get_usage(true),
+            'php_mem_used'  => memory_get_usage(),
         ];
 
         $dispatcherStats = $this->taskDispatcher->getStatus();
