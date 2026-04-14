@@ -163,4 +163,41 @@ class Controller extends Base
             'participant' => $participant,
         ], 'Feedback');
     }
+
+
+    /**
+     * Posts feedback for a particular person. If the $feedback existed already, update that with the new POST payload
+     * or spawn a whole new $feedback instance and then persist that.
+     *
+     * @param Model $assessment
+     * @param User $learner
+     * @param Reporting\Feedback\Model|null $feedback
+     * @return void
+     */
+    public function postParticularFeedback(
+        Reporting\Model $assessment,
+        \Schoolbox\User $learner,
+        ?Reporting\Feedback\Model $feedback = null,
+    ): void {
+        // TODO check that $learner is indeed a participant of $assessment
+
+
+        // TODO Check if $feedback is null; if so, we're spawning a whole new one for this person
+
+        // TODO Otherwise, update $feedback's properties
+
+//        $feedback = new \Schoolbox\Learning\Assessment\Reporting\Feedback\Model()
+//            ->setAssessable($assessmentMapperProxy->findById(1688))
+//            ->setReporting($reportingMapper->findByid(2))
+//            ->setReviewee($userMapper->findByid(20))
+//            ->setReviewer($userMapper->findByid(2))
+//            ->setNormalisedMark(99)
+//            ->setHumanReadableMark('14 / 117')
+//            ->setInstructorMark('Emerging')
+//            ->setComment('moshae why')
+//            ->setPublishedBy($userMapper->findById(2)->getId())
+//            ->setPublishedAt(\Alaress_Date_Format::now());
+
+        // TODO Save it
+    }
 }
