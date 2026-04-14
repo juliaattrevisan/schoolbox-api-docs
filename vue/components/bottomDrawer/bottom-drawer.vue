@@ -88,6 +88,7 @@ export default {
         initResizeObserver() {
             this.resizeObserver = new ResizeObserver(() => this.updatePosition());
             this.resizeObserver.observe(this.$el);
+            this.observeDrawerElement();
         },
 
         destroyResizeObserver() {
@@ -103,6 +104,17 @@ export default {
             return this.$refs.drawerContainer instanceof HTMLElement ? this.$refs.drawerContainer : null;
         },
 
+        observeDrawerElement() {
+            if (this.resizeObserver === null) {
+                return;
+            }
+
+            const drawerElement = this.getDrawerElement();
+            if (drawerElement !== null) {
+                this.resizeObserver.observe(drawerElement);
+            }
+        },
+
         clearContainerOffset() {
             const containerEl = document.getElementById("container");
             if (containerEl === null) {
@@ -111,6 +123,24 @@ export default {
 
             containerEl.style.removeProperty("--bottom-drawer-offset");
             containerEl.removeAttribute("data-has-bottom-drawer");
+        },
+
+        updateContainerOffset() {
+            const containerEl = document.getElementById("container");
+            const drawerElement = this.getDrawerElement();
+
+            if (containerEl === null || drawerElement === null) {
+                return;
+            }
+
+            if (!this.showDrawer || this.position !== "fixed") {
+                this.clearContainerOffset();
+                return;
+            }
+
+            const drawerHeight = Math.ceil(drawerElement.getBoundingClientRect().height);
+            containerEl.style.setProperty("--bottom-drawer-offset", `${drawerHeight}px`);
+            containerEl.setAttribute("data-has-bottom-drawer", "true");
         },
 
         /**
@@ -127,6 +157,7 @@ export default {
             this.width = `${elementRect.width}px`;
             this.left = `${elementRect.x}px`;
             this.position = elementRect.width <= this.unanchorWidth && !this.isAlwaysAnchored ? `static` : `fixed`;
+            this.updateContainerOffset();
         },
     },
 };

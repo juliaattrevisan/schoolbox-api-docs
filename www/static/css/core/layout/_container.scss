@@ -9,7 +9,15 @@
 }
 
 #container {
-    padding-top: 1rem;
+    --bottom-drawer-offset: 0px;
+    --container-padding-top: 1rem;
+    --container-padding-right: 0px;
+    --container-padding-bottom: 0px;
+    --container-padding-left: 0px;
+    padding-top: var(--container-padding-top);
+    padding-right: var(--container-padding-right);
+    padding-bottom: calc(var(--container-padding-bottom) + var(--bottom-drawer-offset));
+    padding-left: var(--container-padding-left);
     min-height: calc(100vh - 222px);
 
     @media #{$medium-up} {
@@ -18,15 +26,24 @@
     }
 
     @media #{$large-up} {
-        padding: 1rem;
+        --container-padding-right: 1rem;
+        --container-padding-bottom: 1rem;
+        --container-padding-left: 1rem;
     }
 }
 
 // used on pages that have the new spacing styles applied
 #container.c-container {
-    padding: var(--spacing-xl);
+    --container-padding-top: var(--spacing-xl);
+    --container-padding-right: var(--spacing-xl);
+    --container-padding-bottom: var(--spacing-xl);
+    --container-padding-left: var(--spacing-xl);
+
     @media #{$small-only} {
-        padding: var(--spacing-m);
+        --container-padding-top: var(--spacing-m);
+        --container-padding-right: var(--spacing-m);
+        --container-padding-bottom: var(--spacing-m);
+        --container-padding-left: var(--spacing-m);
     }
 }
 
