@@ -15,7 +15,6 @@ use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Reporting;
 use Schoolbox\Learning\Assessment\Reporting\Model;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Twig\Error\Error;
 
@@ -78,27 +77,5 @@ class Controller extends Base
             'learner' => $learner,
             'feedback' => $feedback,
         ], 'Feedback');
-    }
-
-
-    /**
-     * Process the form vars
-     */
-    public function postExample(): void
-    {
-        try {
-            $user = $this->userMapper->findById($this->requestPost['id']);
-        } catch (MapperException $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
-        }
-
-        $this->response = $this->responseFromTemplate(
-            '@learningReportingFeedback/index.twig',
-            [
-                'user' => $user,
-                'var1' => $this->requestPost['var1'],
-            ],
-            'Example Form Output',
-        );
     }
 }
