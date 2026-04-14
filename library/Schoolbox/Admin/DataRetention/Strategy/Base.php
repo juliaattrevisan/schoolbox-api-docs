@@ -173,8 +173,15 @@ abstract class Base implements IStrategy
      */
     protected function calculateDate(): ?string
     {
+        // if we are using an override date, then return that
+        // check if we have a date set in config (if so, use it)
+        // if we have no override and no config, then we can just return null
+        if ($this->retentionPeriod->getRetentionDays() !== null) {
+            return $this->retentionPeriod->calculateDate(0);
+        }
+
         // if retention period is not set, return null
-        if ($this->config->get($this->retentionConfigKey) === null) {
+        if ($this->config->get($this->retentionConfigKey) === null || '' === $this->config->get($this->retentionConfigKey)) {
             $this->log->warning(sprintf("Retention period not set for '%s'. Skipping.", $this->getStrategyName()));
             return null;
         }
