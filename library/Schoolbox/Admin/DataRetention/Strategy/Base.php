@@ -168,15 +168,13 @@ abstract class Base implements IStrategy
      * e.g. '2024-01-01 00:00:00'
      * null if no retention period is set (i.e. do not hard delete this data)
      *
-     * Either uses the cli option --retention-period=xx(days) if set,
+     * Either uses the cached retentionPeriod from the cli option --retention-period=xx(days),
      * or looks up the retention period from config using $retentionConfigKey
      * @return string|null
      */
     protected function calculateDate(): ?string
     {
         // if we are using an override date, then return that
-        // check if we have a date set in config (if so, use it)
-        // if we have no override and no config, then we can just return null
         if ($this->retentionPeriod->getRetentionDays() !== null) {
             return $this->retentionPeriod->calculateDate(0);
         }
@@ -192,6 +190,7 @@ abstract class Base implements IStrategy
             $this->log->warning(sprintf("Invalid retention period '%s' stored; cannot calculate date cutoff.. Skipping.", $this->config->get($this->retentionConfigKey)));
         }
 
+        // return the admin config for this strat
         try {
             return $this->retentionPeriod->calculateDate((int)$this->config->get($this->retentionConfigKey));
         } catch (SchoolboxException $e) {
