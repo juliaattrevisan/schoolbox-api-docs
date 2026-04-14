@@ -332,7 +332,7 @@ export default {
                         title="View DKIM TXT Record"
                         @click.prevent="onClickGetKey(props.row)"
                     >
-                        <sbx-icon name="open" />
+                        <sbx-icon name="view" />
                     </button>
                     <button
                         type="button"
