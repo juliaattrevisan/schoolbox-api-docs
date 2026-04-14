@@ -184,7 +184,7 @@ class RetentionPeriodTest extends TestCase
         $this->expectException(\TypeError::class);
 
         // Attempt construction with an explicitly invalid type.
-        new RetentionPeriod($input);
+        $var = new RetentionPeriod($input);
     }
 
 
