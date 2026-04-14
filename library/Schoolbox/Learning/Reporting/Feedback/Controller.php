@@ -14,8 +14,6 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
-use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as Response;
-use Schoolbox\Learning\Assessment\DialogAgent\Response\Status;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Reporting;
@@ -75,6 +73,7 @@ class Controller extends Base
      * @param User $learner
      * @param Reporting\Feedback\Model|null $feedback
      * @throws Error
+     * @throws RouteNotFound
      */
     public function getParticularFeedback(
         Reporting\Model $assessment,
@@ -112,7 +111,19 @@ class Controller extends Base
                     $authoritativeFeedback = $assessment->getAuthoritativeFeedback($participant, true);
                 }
 
-                $status = $feedback ?? Status::INCOMPLETE;
+                /* These now require the Status enum for the state of a feedback. In dialog agents this represented the
+                 * state of a response, but we have no such scenario in reporting activities. The closest synonym seems
+                 * to be the existence (and state) of a feedback
+                 */
+                $status = Reporting\Feedback\Status::INCOMPLETE;
+
+                if ($feedback) {
+                    if ($feedback->isDraft()) {
+                        $status = Reporting\Feedback\Status::DRAFT;
+                    } elseif ($feedback->isPublished()) {
+                        $status = Reporting\Feedback\Status::PUBLISHED;
+                    }
+                }
 
                 $participantCarousel[] = [
                     'id' => $participant->getUser()->getId(),
