@@ -69,12 +69,6 @@
     } only %}
 {% endblock %}
 
-{# Only show two columns if there's something to preview
- # Students can be given Feedback without an online submitted file
- # in which case there's only one column to display, not two
- #}
-{% set twoColumns = '' %}
-
 <div class="row">
     <div class="small-12 columns">
         {% block subheading %}
@@ -84,9 +78,6 @@
                 </div>
             </div>
         {% endblock %}
-
-        {# No instructions for the inline grader screen #}
-        {% block instructions %}{% endblock %}
 
         {# Grading logic and structure #}
         <div class="row mark-scheme" data-assessment-status data-participant="{{ participant.user.id }}">
