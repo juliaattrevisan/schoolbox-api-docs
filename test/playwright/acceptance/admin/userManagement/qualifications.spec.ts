@@ -132,7 +132,7 @@ test.describe.serial("Admin User Management - Lists: Qualifications", () => {
         }
     });
 
-    test("checking the empty state is presented when there are no qualifications", async ({ tester, page, db }) => {
+    test("checking the empty state is presented when there are no qualifications", async ({ tester, db }) => {
         try {
             tester.isGoingTo("soft delete all qualifications in the database to trigger the empty state");
             await db.updateInDatabase("lu_qualification", { deleted_at: "2022-01-15 11:22:34" }, { deleted_at: null });

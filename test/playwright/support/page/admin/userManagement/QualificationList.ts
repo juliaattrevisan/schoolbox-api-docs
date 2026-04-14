@@ -2,7 +2,6 @@ import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceT
 import type { Locator, Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 import Common from "../../Common";
-import SummativePreview from "../lms/summativeReports/SummativePreview";
 
 /**
  * Page object for the Admin > Lists > Qualifications page (/adminv2/lists/qualification).
