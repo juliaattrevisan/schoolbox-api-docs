@@ -37,6 +37,7 @@
                     opacity: 1;
                 }
             }
+            /* Removed the icon- class because it was only used for font icons, and we don’t need that anymore.
             a[class*="icon-"],
             a[class^="icon-"] {
                 padding: 0;
@@ -62,7 +63,7 @@
                     background-color: var(--sbx-config-color-active, rgba(0, 0, 0, 0.1));
                     text-decoration: none;
                 }
-            }
+            }*/
 
             a[aria-expanded="true"] {
                 background-color: var(--sbx-color-foreground-primary, $content-ui-background);
