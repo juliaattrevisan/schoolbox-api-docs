@@ -109,12 +109,11 @@
                                 {% if saveToCourseRoute %}
                                     <li>
                                         <a href="{{ saveToCourseRoute }}"
-                                        class="icon-export"
                                         data-reveal-id="component{{ component.instance.id }}-save-to-course-modal-{{ lesson.id }}"
                                         data-method="{{ saveToCourseMethod }}"
                                         data-spec-assessment-id="{{ specAssessment.id ?? null }}"
                                         data-spec-assessment-title="{{ specAssessment.title ?? null }}"
-                                        >Save to Course...</a>
+                                        ><sbx-icon name="export"></sbx-icon>Save to Course...</a>
                                         {% include '@learningAssessment/outline/saveToCourseModal.twig' with {
                                             assessment: lesson,
                                             specAssessment: specAssessment ?? null,

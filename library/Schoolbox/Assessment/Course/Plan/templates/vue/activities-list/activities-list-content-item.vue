@@ -155,10 +155,9 @@ window.Vue.onUnmounted(() => {
                 <li v-if="props.activity._links.export">
                     <a
                         :href="getReturnUrl(props.activity._links.export)"
-                        class="icon-export"
                         title="Copy this task into classes"
                         :data-test="`unit-planner-export-activity-${props.activity.id}`"
-                        >Export to Classes</a
+                        ><sbx-icon name="export"></sbx-icon>Export to Classes</a
                     >
                 </li>
                 <li v-if="props.activity._links.modify">

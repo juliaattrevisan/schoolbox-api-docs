@@ -201,7 +201,7 @@ Data:
                                             </li>
                                         {% endif %}
                                         {% if similarityReportRoute %}<li><a class="icon-due-work" href="{{ similarityReportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Similarity Report</a></li>{% endif %}
-                                        {% if exportRoute %}<li><a href="{{ exportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-export">Export to Classes</a></li>{% endif %}
+                                        {% if exportRoute %}<li><a href="{{ exportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}"><sbx-icon name="export"></sbx-icon>Export to Classes</a></li>{% endif %}
 
                                         {% if assessable is quiz %}
                                              {% if horizontalMarkingRoute %}
