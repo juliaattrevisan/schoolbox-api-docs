@@ -154,7 +154,7 @@ class Factory
     protected $closeAt;
 
     /**
-     * @var int
+     * @var string
      */
     private $markVisibility;
 
@@ -1085,7 +1085,7 @@ class Factory
     }
 
     /**
-     * @return int
+     * @return string
      */
     protected function getMarkVisibility()
     {
@@ -1093,7 +1093,7 @@ class Factory
     }
 
     /**
-     * @param int $markVisibility
+     * @param string $markVisibility
      * @return static
      */
     protected function setMarkVisibility($markVisibility)
