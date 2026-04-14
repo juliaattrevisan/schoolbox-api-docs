@@ -51,21 +51,78 @@ export default {
             width: "", // as the drawer is position: fixed, need to use ResizeObserver to track the parent containers width
             left: "", // as the drawer is position: fixed, need to use ResizeObserver to track the parent containers left position
             position: "", // can be fixed/static when isAlwaysAnchored is set to false
+            resizeObserver: null,
         };
     },
 
+    watch: {
+        showDrawer() {
+            this.$nextTick(() => {
+                this.updatePosition();
+
+                if (!this.showDrawer) {
+                    this.clearContainerOffset();
+                }
+            });
+        },
+
+        isAlwaysAnchored() {
+            this.updatePosition();
+        },
+
+        unanchorWidth() {
+            this.updatePosition();
+        },
+    },
+
     mounted() {
-        const resizeObserver = new ResizeObserver(() => this.updatePosition());
-        resizeObserver.observe(this.$el);
+        this.updatePosition();
+        this.initResizeObserver();
+    },
+
+    beforeUnmount() {
+        this.destroyResizeObserver();
     },
 
     methods: {
+        initResizeObserver() {
+            this.resizeObserver = new ResizeObserver(() => this.updatePosition());
+            this.resizeObserver.observe(this.$el);
+        },
+
+        destroyResizeObserver() {
+            if (this.resizeObserver !== null) {
+                this.resizeObserver.disconnect();
+                this.resizeObserver = null;
+            }
+
+            this.clearContainerOffset();
+        },
+
+        getDrawerElement() {
+            return this.$refs.drawerContainer instanceof HTMLElement ? this.$refs.drawerContainer : null;
+        },
+
+        clearContainerOffset() {
+            const containerEl = document.getElementById("container");
+            if (containerEl === null) {
+                return;
+            }
+
+            containerEl.style.removeProperty("--bottom-drawer-offset");
+            containerEl.removeAttribute("data-has-bottom-drawer");
+        },
+
         /**
          * To keep the width and left position of the bottom-drawer the same as the parent container
          * which will change depending on whether the side menu is opened/closed, browser resized etc
          * And to also 'unanchor' the drawer from the bottom of the browser window when required
          */
         updatePosition() {
+            if (!(this.$el instanceof HTMLElement)) {
+                return;
+            }
+
             const elementRect = this.$el.getBoundingClientRect();
             this.width = `${elementRect.width}px`;
             this.left = `${elementRect.x}px`;
@@ -79,6 +136,7 @@ export default {
     <div>
         <transition name="slide">
             <div
+                ref="drawerContainer"
                 v-show="showDrawer"
                 class="bottom-drawer-container"
                 :class="{ 'bottom-drawer-container--no-pad': !hasPadding }"
