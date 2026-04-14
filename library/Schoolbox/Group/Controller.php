@@ -268,6 +268,89 @@ class Controller extends BaseController
     }
 
     /**
+     * Search/list groups for API consumers
+     *
+     * @return void
+     * @throws MapperException
+     * @since 26.0
+     * @api   GET /groups/search
+     */
+    public function apiGetGroups(): void
+    {
+        $q         = $this->requestQuery->get('q') ?? '';
+        $typeRaw   = $this->requestQuery->get('type');
+        $limitRaw  = $this->requestQuery->get('limit');
+        $cursor    = $this->requestQuery->get('cursor');
+
+        // Validate and resolve limit
+        if ($limitRaw !== null) {
+            // ctype_digit rejects empty string, negative signs, and non-integer values; the > 0 check is for clarity
+            if (!ctype_digit((string)$limitRaw) || (int)$limitRaw <= 0) {
+                $this->sendJsonError('Invalid limit value.', 400);
+                return;
+            }
+            $limit = (int)$limitRaw;
+        } else {
+            $limit = Group::DEFAULT_GROUP_API_LIMIT;
+        }
+
+        // Validate and resolve type
+        if ($typeRaw !== null) {
+            $typeStr = (string)$typeRaw;
+            if (!array_key_exists($typeStr, Group::TYPE_NAME_TO_VAL)) {
+                $this->sendJsonError('Invalid type value.', 400);
+                return;
+            }
+            $type = Group::TYPE_NAME_TO_VAL[$typeStr];
+        } else {
+            $type = null;
+        }
+
+        // Decode cursor
+        if ($cursor !== null && $cursor !== '') {
+            $decoded = base64_decode($cursor, true);
+            if ($decoded === false || !is_array($decoded = json_decode($decoded, true))) {
+                $this->sendJsonError('Invalid cursor value.', 400);
+                return;
+            }
+            $cursorId = isset($decoded['id']) ? (int)$decoded['id'] : null;
+        } else {
+            $cursorId = null;
+        }
+
+        ['results' => $groups, 'nextCursor' => $nextCursor] =
+            $this->groupMapper->findAllForApi($q, $type, $limit, $cursorId);
+
+        // Build results array
+        $results = [];
+        foreach ($groups as $group) {
+            $folder = $group->getFolder();
+            $codes  = [];
+            foreach ($folder->getCodes() ?? [] as $code) {
+                if ($code->isDeleted()) {
+                    continue;
+                }
+                $codes[] = $code->getCode();
+            }
+            $results[] = [
+                'id'          => $folder->getId(),
+                'name'        => $folder->getName(),
+                'codes'       => $codes,
+                'type'        => $group->getTypeString(),
+                'url'         => sprintf('/groups/%d', $folder->getId()), // TODO: use routeGenerator->generate() once the named route for /groups/{id} is confirmed
+                'memberCount' => $group->getMemberCount(),
+            ];
+        }
+
+        // Encode next cursor
+        $next = $nextCursor !== null
+            ? base64_encode(json_encode(['id' => $nextCursor], JSON_THROW_ON_ERROR)) // $nextCursor is always int; json_encode cannot fail
+            : null;
+
+        $this->response = $this->responseAsJson(['results' => $results, 'next' => $next]);
+    }
+
+    /**
      * grab group objects with error checking:
      * does the group actually exist?
      *

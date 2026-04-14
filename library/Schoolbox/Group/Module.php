@@ -47,6 +47,9 @@ class Module extends BaseModule
         $this->register('POST', '/delete', 'postMyGroupDelete', $loggedInAccess);
         $this->register('POST', '/notify', 'postMyGroupNotify', $loggedInAccess);
         $this->register('POST', '/favourite', 'postMyGroupFavourite', $loggedInAccess);
+
+        $hasApiAccess = new Rule\All(new Rule\IsLoggedIn(), new Rule\IsSuperuser());
+        $this->register('GET', '/search', 'apiGetGroups', $hasApiAccess);
     }
 
     /**
