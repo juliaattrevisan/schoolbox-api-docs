@@ -19,7 +19,7 @@ class KeyGenerator implements IKeyGenerator
     /**
      * Standard separator for key parts.
      */
-    private const PART_SEPARATOR = ':';
+    private const PART_SEPARATOR = '.';
 
     /**
      * @var array<string>
