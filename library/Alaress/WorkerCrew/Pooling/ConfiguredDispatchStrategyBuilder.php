@@ -94,19 +94,20 @@ class ConfiguredDispatchStrategyBuilder
             ? sprintf('max %d', $this->maxRequestsPerWorker)
             : 'no max';
         return [
-            'queue'  => sprintf(
+            'metrics' => sprintf("Metrics every %dms", $this->metricInterval),
+            'queue'   => sprintf(
                 "Queue:    %d warn, %d max, %dms check interval",
                 $this->queueWarnSize,
                 $this->queueMaxSize,
                 $this->queueDelay,
             ),
-            'worker' => sprintf(
+            'worker'  => sprintf(
                 "Workers:  %d min, %d max, %s requests/worker",
                 $this->minWorkers,
                 $this->maxWorkers,
                 $maxRequestsPerWorkerOutput,
             ),
-            'task'   => sprintf(
+            'task'    => sprintf(
                 "Timeouts: %dms write accept, %dms execution (soft), %dms execution (hard)",
                 $this->workerWriteTimeout,
                 $this->workerTimeoutSoft,

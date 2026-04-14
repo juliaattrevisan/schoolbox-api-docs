@@ -44,7 +44,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
     const TASK_TIMETABLE = 'timetable';
     const TASK_MOBILE    = 'mobile';
 
-    const METRIC_INTERVAL = 60;
+    const METRIC_INTERVAL = 60000;
 
     protected $flywheelSpins;
 
