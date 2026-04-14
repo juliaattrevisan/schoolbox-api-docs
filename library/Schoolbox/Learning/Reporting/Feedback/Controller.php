@@ -71,10 +71,10 @@ class Controller extends Base
     public function getParticularFeedback(
         Reporting\Model $assessment,
         \Schoolbox\User $learner,
-        Reporting\Feedback\Model $feedback = null,
+        ?Reporting\Feedback\Model $feedback = null,
     ): void {
         $this->response = $this->responseFromTemplate('@learningReportingFeedback/index.twig', [
-            'reporting' => $assessment,
+            'assessment' => $assessment,
             'learner' => $learner,
             'feedback' => $feedback,
         ], 'Feedback');

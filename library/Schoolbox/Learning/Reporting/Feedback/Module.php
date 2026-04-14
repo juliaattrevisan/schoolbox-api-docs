@@ -53,7 +53,7 @@ class Module extends BaseModule
         };
 
         $this->register('GET', '/{assessmentId}/feedback/view', 'getFirstParticipantFeedback', $lmsStaff, $preloadAssessment);
-        $this->register('GET', '/{assessmentId}/{learnerId}/feedback/{feedbackId:\d+}', 'getParticularFeedback', $lmsStaff, $preloadParticipant);
+        $this->register('GET', '/{assessmentId}/{learnerId}/feedback{/feedbackId:\d+}', 'getParticularFeedback', $lmsStaff, $preloadParticipant);
     }
 
 
