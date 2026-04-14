@@ -196,10 +196,11 @@ class Profile implements IStrategy
     private function importStudent(array $person, string $externalId): void
     {
         $firstname = trim((string)($person['first_name'] ?? ''));
-        $firstnamePreferred = (new FirstMeaningfulValue())->find([
-            trim((string)($person['display_name'] ?? '')),
-            $firstname,
-        ]);
+        /* Edlink's documented Person schema doesn't expose a preferred first name
+         * (display_name is the full display name). Leave unmapped for now — having
+         * the concept not mapped to anything is acceptable.
+         */
+        $firstnamePreferred = '';
         $lastname = trim((string)($person['last_name'] ?? ''));
         $email = trim((string)($person['email'] ?? ''));
         $phone = trim((string)($person['phone'] ?? ''));
@@ -295,9 +296,8 @@ class Profile implements IStrategy
         }
 
         $this->log->info(sprintf(
-            'Adding student profile for %s (preferred: %s) (%s) year=%s',
+            'Adding student profile for %s (%s) year=%s',
             $fullname,
-            $firstnamePreferred,
             $externalId,
             $yearLevel
         ));
@@ -313,10 +313,11 @@ class Profile implements IStrategy
     private function importStaff(array $person, string $externalId, array $roles): void
     {
         $firstname = trim((string)($person['first_name'] ?? ''));
-        $firstnamePreferred = (new FirstMeaningfulValue())->find([
-            trim((string)($person['display_name'] ?? '')),
-            $firstname,
-        ]);
+        /* Edlink's documented Person schema doesn't expose a preferred first name
+         * (display_name is the full display name). Leave unmapped for now — having
+         * the concept not mapped to anything is acceptable.
+         */
+        $firstnamePreferred = '';
         $lastname = trim((string)($person['last_name'] ?? ''));
         $email = trim((string)($person['email'] ?? ''));
         $phone = trim((string)($person['phone'] ?? ''));
@@ -375,9 +376,8 @@ class Profile implements IStrategy
             ->setUsername($username);
 
         $this->log->info(sprintf(
-            'Adding staff profile for %s (preferred: %s) (%s)',
+            'Adding staff profile for %s (%s)',
             $fullname,
-            $firstnamePreferred,
             $externalId
         ));
 
