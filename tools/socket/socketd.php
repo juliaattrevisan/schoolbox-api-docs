@@ -69,6 +69,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     $redisAsyncClientRepository = $di->get('multiInstance.redisAsyncClientRepository');
 
     $stratBuilder = new ConfiguredDispatchStrategyBuilder((new ConfigurationReader($conf))->readConfig());
+    $strat        = $stratBuilder->build($flags);
 
     $delim = \array_key_exists(Daemon\Kernel::OPT_LONG_PORCELAIN, $opts) ? ' ' : "\n    ";
 
@@ -83,13 +84,13 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $connectorRepository,
         $redisClientRepository,
         $redisAsyncClientRepository,
-        $stratBuilder->build($flags),
+        $strat,
         $kernel->getHardLimit(Kernel::RLIMIT_FILE_DESCRIPTORS),
     )->build();
 
     // Add metric logging at this level I guess?
     $loop->addPeriodicTimer(
-        $conf->getMetricInterval() / 1000,
+        $strat->getMetricInterval() / 1000,
         fn () => $log->info(json_encode($pipeManager->getStats())),
     );
 
