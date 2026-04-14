@@ -156,11 +156,10 @@ class MyFiles extends Base
         // Delete files before folders so folder deletions don't fail due to my_file rows referencing them
         $filesDeleted = $this->deleteFiles($fileIds);
 
-        // Delete folders (iteratively deleting leaf folders to avoid parent FK violations)
+        // Delete folders
         $foldersDeleted = $this->deleteFolders($folderIds);
 
         // note: transaction commit/rollback is handled by Base::process(), do not commit here
-
         if ($this->perform) {
             $this->log->notice(
                 sprintf(
