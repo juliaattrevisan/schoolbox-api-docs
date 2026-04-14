@@ -9,7 +9,30 @@ name: Check JS
 on:
   pull_request:
     branches: ["develop", "master"]
-    paths: ["**.js", "**.ts", "**.vue", "**.scss", ".eslintignore", ".eslintrc.js", "package.json", "tsconfig.json", "npm-shrinkwrap.json"]
+    paths:
+      - "**.js"
+      - "**.ts"
+      - "**.vue"
+      - "**.scss"
+      - ".eslintignore"
+      - ".eslintrc.js"
+      - "package.json"
+      - "tsconfig.json"
+      - "npm-shrinkwrap.json"
+      - ".github/workflows/node.js.yml"
+  push:
+    branches: ["develop", "master"]
+    paths:
+      - "**.js"
+      - "**.ts"
+      - "**.vue"
+      - "**.scss"
+      - ".eslintignore"
+      - ".eslintrc.js"
+      - "package.json"
+      - "tsconfig.json"
+      - "npm-shrinkwrap.json"
+      - ".github/workflows/node.js.yml"
 
 # Cancel on push to same branch
 concurrency:
@@ -17,84 +40,99 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  install-deps:
     timeout-minutes: 25
     runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        node-version: [20.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 20.x
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20.x
           cache: 'npm'
       - run: npm ci
+
+      - name: Upload node_modules artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: schoolbox-node-modules
+          path: node_modules
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+
+  build:
+    needs: install-deps
+    timeout-minutes: 25
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      - uses: actions/download-artifact@v4
+        with:
+          name: schoolbox-node-modules
+          path: .
       - run: npm run build --if-present
       - run: npm test
 
   typecheck:
+    needs: install-deps
     timeout-minutes: 25
     runs-on: ubuntu-24.04
 
-    strategy:
-      matrix:
-        node-version: [20.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 20.x
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-      - run: npm ci
+          node-version: 20.x
+      - uses: actions/download-artifact@v4
+        with:
+          name: schoolbox-node-modules
+          path: .
 
       - name: Typecheck
         run: npm run typecheck
 
   eslint:
+    needs: install-deps
     timeout-minutes: 25
     runs-on: ubuntu-24.04
 
-    strategy:
-      matrix:
-        node-version: [20.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 20.x
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-      - run: npm ci
+          node-version: 20.x
+      - uses: actions/download-artifact@v4
+        with:
+          name: schoolbox-node-modules
+          path: .
 
       - name: Check ESLint Compliance
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
         run: npm run lint
 
   prettier:
+    needs: install-deps
     timeout-minutes: 25
     runs-on: ubuntu-24.04
 
-    strategy:
-      matrix:
-        node-version: [20.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 20.x
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-      - run: npm ci
+          node-version: 20.x
+      - uses: actions/download-artifact@v4
+        with:
+          name: schoolbox-node-modules
+          path: .
 
       - name: Check Prettier Compliance
         run: npm run prettier:check
