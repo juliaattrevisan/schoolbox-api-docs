@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Timeline;
 
 use Closure;
-use Schoolbox\Collection;
 
 /**
  * Generic timeline builder.
@@ -45,17 +44,10 @@ class Generic extends Full
             ? $this->participant->getSubmittedResponses()
             : $this->participant->getAllResponses();
 
-        // Can feedbacks be seen due to minumum visibility?
-        // If the assessment doesn't support mark visibility, then assume that
-        // feedbacks are always visible.
-        $isFeedbackVisible = true;
-        if ($isFeedbackVisible) {
-            $feedbacks = $includeUnpublishedInstructorFeedback
-                ? $this->participant->getPublishedFeedbacks()
-                : $this->participant->getAllFeedbacks();
-        } else {
-            $feedbacks = new Collection();
-        }
+        // This assessment type doesn't support mark visibility, so feedbacks are always visible.
+        $feedbacks = $includeUnpublishedInstructorFeedback
+            ? $this->participant->getPublishedFeedbacks()
+            : $this->participant->getAllFeedbacks();
         $this->recombined = $this->recombined
             ->merge($feedbacks)
             ->merge($responses)

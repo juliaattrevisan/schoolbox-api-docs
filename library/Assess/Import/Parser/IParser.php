@@ -53,7 +53,7 @@ interface IParser extends \Evaluation\Import\Parser\IParser
     public function getDuration();
 
     /**
-     * @return int
+     * @return string
      */
     public function getMarkVisibility();
 

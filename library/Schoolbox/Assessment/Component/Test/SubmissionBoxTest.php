@@ -36,9 +36,13 @@ class SubmissionBoxTest extends TestCase
 
     public function testMarkVisibilityConstantsAreStrings(): void
     {
+        // @phpstan-ignore method.alreadyNarrowedType
         $this->assertIsString(SubmissionBox::MARK_VISIBILITY_STAFF_ONLY);
+        // @phpstan-ignore method.alreadyNarrowedType
         $this->assertIsString(SubmissionBox::MARK_VISIBILITY_STAFF_AND_STUDENT);
+        // @phpstan-ignore method.alreadyNarrowedType
         $this->assertIsString(SubmissionBox::MARK_VISIBILITY_STAFF_AND_PARENT);
+        // @phpstan-ignore method.alreadyNarrowedType
         $this->assertIsString(SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT);
     }
 

@@ -450,7 +450,7 @@ class CourseQuiz extends CourseAssessmentAbstract
      * @param int                 $maxAttempts
      * @param float               $weight
      * @param bool                $anonymousSubmissions
-     * @param int                 $markVisibility
+     * @param string              $markVisibility
      * @param string              $createdAt
      * @param int                 $quizOwnerId
      * @param Folder\Model        $unitSpecFolder
@@ -734,7 +734,7 @@ class CourseQuiz extends CourseAssessmentAbstract
      * @param int                 $maxAttempts
      * @param float               $weight
      * @param int                 $position
-     * @param int                 $markVisibility
+     * @param string              $markVisibility
      * @return Quiz\Model
      * @throws Database\Exception
      */

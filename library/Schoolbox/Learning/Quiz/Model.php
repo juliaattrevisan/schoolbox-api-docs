@@ -788,7 +788,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getMarkVisibility()
     {

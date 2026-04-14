@@ -184,7 +184,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $markedUsingRange;
 
     /**
-     * @var int
+     * @var string
      */
     protected $mark_visibility;
 
