@@ -33,13 +33,13 @@ class Generic extends Full
      * @param bool $includeUnpublishedSelfReflectionFeedback
      * @param bool $includeUnpublishedInstructorFeedback
      * @param bool $includeDraftResponses
-     * @param int  $minimumVisibility
+     * @param array $allowedVisibilities
      */
     protected function recombine(
         $includeUnpublishedSelfReflectionFeedback,
         $includeUnpublishedInstructorFeedback,
         $includeDraftResponses,
-        $minimumVisibility
+        $allowedVisibilities
     ) {
         $responses = $includeDraftResponses
             ? $this->participant->getSubmittedResponses()
@@ -48,7 +48,7 @@ class Generic extends Full
         // Can feedbacks be seen due to minumum visibility?
         // If the assessment doesn't support mark visibility, then assume that
         // feedbacks are always visible.
-        $isFeedbackVisible = $this->participant->getAssessable()->getMarkVisibility() >= $minimumVisibility;
+        $isFeedbackVisible = true;
         if ($isFeedbackVisible) {
             $feedbacks = $includeUnpublishedInstructorFeedback
                 ? $this->participant->getPublishedFeedbacks()

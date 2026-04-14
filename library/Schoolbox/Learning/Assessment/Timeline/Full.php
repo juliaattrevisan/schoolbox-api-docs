@@ -69,7 +69,7 @@ class Full
      */
     public function getForParent()
     {
-        return $this->getTimeline(false, false, false, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT);
+        return $this->getTimeline(false, false, false, [AbstractAssessment::MARK_VISIBILITY_PARENT, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT]);
     }
 
     /**
@@ -84,7 +84,7 @@ class Full
      */
     public function getForTeacher()
     {
-        return $this->getTimeline(false, true, true, AbstractAssessment::MARK_VISIBILITY_PRIVATE);
+        return $this->getTimeline(false, true, true, [AbstractAssessment::MARK_VISIBILITY_PRIVATE, AbstractAssessment::MARK_VISIBILITY_STUDENT, AbstractAssessment::MARK_VISIBILITY_PARENT, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT]);
     }
 
 
@@ -100,7 +100,7 @@ class Full
      */
     public function getForStudent()
     {
-        return $this->getTimeline(true, false, true, AbstractAssessment::MARK_VISIBILITY_STUDENT);
+        return $this->getTimeline(true, false, true, [AbstractAssessment::MARK_VISIBILITY_STUDENT, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT]);
     }
 
 
@@ -114,7 +114,7 @@ class Full
      */
     public function getForAdmin()
     {
-        return $this->getTimeline(true, true, true, AbstractAssessment::MARK_VISIBILITY_PRIVATE);
+        return $this->getTimeline(true, true, true, [AbstractAssessment::MARK_VISIBILITY_PRIVATE, AbstractAssessment::MARK_VISIBILITY_STUDENT, AbstractAssessment::MARK_VISIBILITY_PARENT, AbstractAssessment::MARK_VISIBILITY_PARENT_STUDENT]);
     }
 
 
@@ -159,14 +159,14 @@ class Full
      * @param bool $includeUnpublishedSelfReflectionFeedback
      * @param bool $includeUnpublishedInstructorFeedback
      * @param bool $includeDraftResponses
-     * @param int  $minimumVisibility          Assessment mark's visibility must be at least this
+     * @param array $allowedVisibilities        Assessment mark's visibility must be one of these
      * @return Collection
      */
     protected function getTimeline(
         $includeUnpublishedSelfReflectionFeedback,
         $includeUnpublishedInstructorFeedback,
         $includeDraftResponses,
-        $minimumVisibility
+        $allowedVisibilities
     ) {
         // TODO evaluate the appropriateness of caching here
 //        if (!$this->getHasRecombined()) {
@@ -174,7 +174,7 @@ class Full
             $includeUnpublishedSelfReflectionFeedback,
             $includeUnpublishedInstructorFeedback,
             $includeDraftResponses,
-            $minimumVisibility
+            $allowedVisibilities
         );
 //            $this->setHasRecombined(true);
 //        }
@@ -191,17 +191,20 @@ class Full
      * @param bool $includeUnpublishedSelfReflectionFeedback
      * @param bool $includeUnpublishedInstructorFeedback
      * @param bool $includeDraftResponses
-     * @param int  $minimumVisibility
+     * @param array $allowedVisibilities
      */
     protected function recombine(
         $includeUnpublishedSelfReflectionFeedback,
         $includeUnpublishedInstructorFeedback,
         $includeDraftResponses,
-        $minimumVisibility
+        $allowedVisibilities
     ) {
         $processedFeedback = [];
 
-        $isFeedbackVisible = $this->getParticipant()->getAssessable()->getMarkVisibility() >= $minimumVisibility;
+        $isFeedbackVisible = in_array(
+            $this->getParticipant()->getAssessable()->getMarkVisibility(),
+            $allowedVisibilities
+        );
 
         // Filter for feedback display:
         // If somehow not due work feedback: exclude
