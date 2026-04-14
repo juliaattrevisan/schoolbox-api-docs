@@ -440,7 +440,8 @@ test.describe("Due Work - Mark type tests", () => {
         tester.isGoingTo("navigate to the class markbook page");
         await page.goto(classLink);
         await homepage.openLinkMenu();
-        await page.locator("[data-dropdown-content] a sbx-icon[name='curriculum']").click();
+        // find sbx icon, then get the parent <a> tag and click it
+        await page.locator("[data-dropdown-content] a sbx-icon[name='curriculum']").first().locator("..").click();
 
         const assessmentId1 = await markbook.getAssessmentId(dueWorkName1);
         const assessmentId2 = await markbook.getAssessmentId(dueWorkName2);
