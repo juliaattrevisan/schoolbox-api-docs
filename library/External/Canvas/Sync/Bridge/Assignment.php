@@ -126,9 +126,9 @@ class Assignment
      *
      * @see https://community.canvaslms.com/docs/DOC-12961
      * @param bool $muted
-     * @return int
+     * @return string
      */
-    public function getMarkVisibility(bool $muted): int
+    public function getMarkVisibility(bool $muted): string
     {
         // If muted, students cannot see grades left on assignment in Canvas
         if ($muted) {

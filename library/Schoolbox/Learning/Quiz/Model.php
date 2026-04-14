@@ -175,9 +175,9 @@ class Model implements ISoftDeletable, IAssessableDataModel
     protected $deleted;
 
     /**
-     * @var int
+     * @var string
      */
-    protected $mark_visibility = 0;
+    protected $mark_visibility = IAssessable::MARK_VISIBILITY_PRIVATE;
 
     /** @var null|string */
     private $externalId;
@@ -775,7 +775,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-     * @param  int $mark_visibility
+     * @param  string $mark_visibility
      * @return $this
      */
     public function setMarkVisibility($mark_visibility)
