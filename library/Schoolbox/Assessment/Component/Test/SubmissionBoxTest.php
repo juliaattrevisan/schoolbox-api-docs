@@ -45,6 +45,8 @@ class SubmissionBoxTest extends TestCase
     public function testMarkVisibilityStringsMapCorrectly(): void
     {
         $strings = SubmissionBox::MARK_VISIBILITY_STRINGS;
+        $this->assertIsString(array_key_first($strings), 'MARK_VISIBILITY_STRINGS must be keyed by string constants, not integers');
+        $this->assertCount(4, $strings);
         $this->assertSame('Staff Only',              $strings[SubmissionBox::MARK_VISIBILITY_STAFF_ONLY]);
         $this->assertSame('Staff & Student',         $strings[SubmissionBox::MARK_VISIBILITY_STAFF_AND_STUDENT]);
         $this->assertSame('Staff & Parent',          $strings[SubmissionBox::MARK_VISIBILITY_STAFF_AND_PARENT]);
