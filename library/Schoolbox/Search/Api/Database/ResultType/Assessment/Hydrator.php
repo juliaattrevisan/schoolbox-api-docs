@@ -53,6 +53,7 @@ class Hydrator extends BaseHydrator
         'assessment.task',
         'assessment.quiz',
         'assessment.dialogAgent',
+        'assessment.reporting',
     ];
 
     /**
