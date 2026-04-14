@@ -33,6 +33,7 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
+        $this->uses('sequence', self::TYPE_INTEGER);
     }
 
     /**
@@ -41,7 +42,7 @@ class Mapper extends BaseMapper
     protected function getDefaultOrderByParams(): array
     {
         return [
-            'name' => 'ASC',
+            'sequence' => 'ASC',
         ];
     }
 }

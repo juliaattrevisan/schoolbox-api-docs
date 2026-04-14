@@ -42,27 +42,14 @@ class Controller extends ConfigController
 
         // Fetch IB groups from database
         $groupMapper = new IBGroupMapper();
-        $groupModels = $groupMapper->findByColumnList([]);
+        $groupModels = $groupMapper->findAll();
 
-        $coreCategory = null;
         foreach ($groupModels as $groupModel) {
-            $category = [
+            $categories[] = [
                 'id' => $groupModel->getId(),
                 'name' => strtolower(str_replace(' ', '-', $groupModel->getName())),
                 'title' => $groupModel->getName()
             ];
-
-            // Keep Core category separate to add at the end
-            if ($groupModel->getName() === 'Core') {
-                $coreCategory = $category;
-            } else {
-                $categories[] = $category;
-            }
-        }
-
-        // Add Core category at the end
-        if ($coreCategory) {
-            $categories[] = $coreCategory;
         }
 
         $this->response = $this->responseFromTemplate(
@@ -84,57 +71,30 @@ class Controller extends ConfigController
     {
         $configurations = [];
 
-        if ($categoryId === 0) { // General tab - load from config table
-            try {
-                $configMapper = $this->getConfigMapper();
+        if ($categoryId === 0) { // General tab - load from preloaded config
+            $configLoader = $this->getConfigLoader();
 
-                // Get IB config entries that should exist from migration
-                $schoolNameConfig = $configMapper->findOneByColumn(ConfigMapper::COL_NAME, 'ib_school_name');
-                $schoolCodeConfig = $configMapper->findOneByColumn(ConfigMapper::COL_NAME, 'ib_school_code');
-
-                $configurations = [];
-
-                if ($schoolNameConfig !== null) {
-                    $configurations[] = [
-                        'id' => $schoolNameConfig->getId(),
-                        'categoryId' => 0,
-                        'key' => 'ib_school_name',
-                        'value' => $schoolNameConfig->getValue() ?? '',
-                        'description' => $schoolNameConfig->getDescription() ?? 'Enter the school\'s name as registered with the IB.',
-                        'type' => 'text',
-                        'label' => $schoolNameConfig->getTitle() ?? 'School Name'
-                    ];
-                }
-
-                if ($schoolCodeConfig !== null) {
-                    $configurations[] = [
-                        'id' => $schoolCodeConfig->getId(),
-                        'categoryId' => 0,
-                        'key' => 'ib_school_code',
-                        'value' => $schoolCodeConfig->getValue() ?? '',
-                        'description' => $schoolCodeConfig->getDescription() ?? 'Enter the school\'s code as provided by the IB.',
-                        'type' => 'text',
-                        'label' => $schoolCodeConfig->getTitle() ?? 'School Code'
-                    ];
-                }
-
-                // If no records found, return empty array (migration hasn't been run)
-                if (empty($configurations)) {
-                    $configurations = [];
-                }
-            } catch (Exception $e) {
-                // If there's an error loading from config, return empty array
-                $configurations = [];
-            }
-        } else {
-            // All other tabs - return empty array for dummy content
-            $configurations = [];
+            $configurations = [
+                [
+                    'categoryId' => 0,
+                    'key' => ConfigMapper::NAME_IB_SCHOOL_NAME,
+                    'value' => $configLoader->get(ConfigMapper::NAME_IB_SCHOOL_NAME) ?? '',
+                    'description' => 'Enter the school\'s name as registered with the IB.',
+                    'type' => 'text',
+                    'label' => 'School Name'
+                ],
+                [
+                    'categoryId' => 0,
+                    'key' => ConfigMapper::NAME_IB_SCHOOL_CODE,
+                    'value' => $configLoader->get(ConfigMapper::NAME_IB_SCHOOL_CODE) ?? '',
+                    'description' => 'Enter the school\'s code as provided by the IB.',
+                    'type' => 'text',
+                    'label' => 'School Code'
+                ],
+            ];
         }
 
-        // Set proper headers
-        header('Content-Type: application/json');
-        echo json_encode($configurations);
-        exit;
+        $this->response = $this->responseAsJson($configurations);
     }
 
     /**
@@ -146,7 +106,9 @@ class Controller extends ConfigController
     {
         try {
             $groupSubjectMapper = new IBGroupSubjectMapper();
-            $groupSubjects = $groupSubjectMapper->findByGroupId($groupId);
+            $groupSubjects = $groupSubjectMapper->findByColumn('group_id', $groupId, [
+                'order' => ['s.name' => 'ASC', 'level' => 'ASC'],
+            ]);
 
             $subjects = [];
             foreach ($groupSubjects as $groupSubject) {
@@ -156,13 +118,9 @@ class Controller extends ConfigController
                 ];
             }
 
-            header('Content-Type: application/json');
-            echo json_encode($subjects);
-            exit;
+            $this->response = $this->responseAsJson($subjects);
         } catch (Exception $e) {
-            header('Content-Type: application/json', true, 500);
-            echo json_encode(['error' => $e->getMessage()]);
-            exit;
+            $this->response = $this->responseAsJson(['error' => $e->getMessage()])->withStatus(500);
         }
     }
 
@@ -176,9 +134,8 @@ class Controller extends ConfigController
         $data = (array) $this->requestPost;
 
         if (!isset($data['key']) || !isset($data['value'])) {
-            header('Content-Type: application/json', true, 400);
-            echo json_encode(['success' => false, 'message' => 'Invalid request data']);
-            exit;
+            $this->response = $this->responseAsJson(['success' => false, 'message' => 'Invalid request data'])->withStatus(400);
+            return;
         }
 
         $this->updateConfig(
@@ -186,9 +143,7 @@ class Controller extends ConfigController
             $this->buildIbConfigPredicate()
         );
 
-        header('Content-Type: application/json');
-        echo json_encode(['success' => true, 'message' => 'Configuration saved successfully']);
-        exit;
+        $this->response = $this->responseAsJson(['success' => true, 'message' => 'Configuration saved successfully']);
     }
 
     private function buildIbConfigPredicate(): Predicate\Builder

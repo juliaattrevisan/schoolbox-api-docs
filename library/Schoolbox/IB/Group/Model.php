@@ -31,6 +31,12 @@ class Model implements JsonSerializable
     private ?string $name = null;
 
     /**
+     * Display sequence for ordering
+     * @var int|null
+     */
+    private ?int $sequence = null;
+
+    /**
      * @return string|null
      */
     public function getName(): ?string
@@ -49,6 +55,24 @@ class Model implements JsonSerializable
     }
 
     /**
+     * @return int|null
+     */
+    public function getSequence(): ?int
+    {
+        return $this->sequence;
+    }
+
+    /**
+     * @param int|null $sequence
+     * @return self
+     */
+    public function setSequence(?int $sequence): self
+    {
+        $this->sequence = $sequence;
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function jsonSerialize(): array
@@ -56,6 +80,7 @@ class Model implements JsonSerializable
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),
+            'sequence' => $this->getSequence(),
         ];
     }
 }

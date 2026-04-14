@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Schoolbox\IB\GroupSubject;
 
 use JsonSerializable;
+use Schoolbox\IB\Group\Model as GroupModel;
 use Schoolbox\IB\Subject\Model as SubjectModel;
 use Schoolbox\Mapper\Traits\Model\Id;
 
@@ -32,12 +33,6 @@ class Model implements JsonSerializable
     private ?int $groupId = null;
 
     /**
-     * IB Subject ID
-     * @var int|null
-     */
-    private ?int $subjectId = null;
-
-    /**
      * Subject Level (SL or HL)
      * @var string|null
      */
@@ -47,6 +42,11 @@ class Model implements JsonSerializable
      * @var SubjectModel|null
      */
     private ?SubjectModel $subject = null;
+
+    /**
+     * @var GroupModel|null
+     */
+    private ?GroupModel $group = null;
 
     /**
      * @return int|null
@@ -63,24 +63,6 @@ class Model implements JsonSerializable
     public function setGroupId(?int $groupId): self
     {
         $this->groupId = $groupId;
-        return $this;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getSubjectId(): ?int
-    {
-        return $this->subjectId;
-    }
-
-    /**
-     * @param int|null $subjectId
-     * @return self
-     */
-    public function setSubjectId(?int $subjectId): self
-    {
-        $this->subjectId = $subjectId;
         return $this;
     }
 
@@ -121,6 +103,24 @@ class Model implements JsonSerializable
     }
 
     /**
+     * @return GroupModel|null
+     */
+    public function getGroup(): ?GroupModel
+    {
+        return $this->group;
+    }
+
+    /**
+     * @param GroupModel|null $group
+     * @return self
+     */
+    public function setGroup(?GroupModel $group): self
+    {
+        $this->group = $group;
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function jsonSerialize(): array
@@ -128,7 +128,7 @@ class Model implements JsonSerializable
         return [
             'id' => $this->getId(),
             'groupId' => $this->getGroupId(),
-            'subjectId' => $this->getSubjectId(),
+            'subjectId' => $this->getSubject()?->getId(),
             'level' => $this->getLevel(),
         ];
     }

@@ -19,7 +19,7 @@ CREATE TABLE `ib_group_subjects` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `group_id` int(11) NOT NULL,
     `subject_id` int(11) NOT NULL,
-    `level` enum('HL','SL','') DEFAULT '' COMMENT 'Level can be empty for Core subjects',
+    `level` enum('HL','SL') DEFAULT NULL COMMENT 'Level is null for Core subjects',
     PRIMARY KEY (`id`),
     KEY `idx_group_id` (`group_id`),
     KEY `idx_subject_id` (`subject_id`),
@@ -181,6 +181,6 @@ INSERT INTO `ib_group_subjects` (`group_id`, `subject_id`, `level`) VALUES
 -- Core Group (no levels for Core subjects)
 SET @core = (SELECT id FROM lu_ib_groups WHERE name = 'Core');
 INSERT INTO `ib_group_subjects` (`group_id`, `subject_id`, `level`) VALUES
-(@core, (SELECT id FROM lu_ib_subjects WHERE name = 'Theory of Knowledge (TOK)'), ''),
-(@core, (SELECT id FROM lu_ib_subjects WHERE name = 'Extended Essay (EE)'), ''),
-(@core, (SELECT id FROM lu_ib_subjects WHERE name = 'Creativity, Activity, Service (CAS)'), '');
+(@core, (SELECT id FROM lu_ib_subjects WHERE name = 'Theory of Knowledge (TOK)'), NULL),
+(@core, (SELECT id FROM lu_ib_subjects WHERE name = 'Extended Essay (EE)'), NULL),
+(@core, (SELECT id FROM lu_ib_subjects WHERE name = 'Creativity, Activity, Service (CAS)'), NULL);
