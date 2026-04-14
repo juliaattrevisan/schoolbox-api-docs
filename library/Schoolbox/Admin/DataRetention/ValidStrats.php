@@ -20,9 +20,6 @@ namespace Schoolbox\Admin\DataRetention;
  */
 class ValidStrats
 {
-    // retain Cms Log entries (This is an example of how to build a stat)
-    public const string CMSLOG = 'cmslog';
-
     // retain learning moments and their associated data
     public const string MOMENTS = 'moments';
 
@@ -33,7 +30,6 @@ class ValidStrats
      * These are valid as csv values in the arg
      */
     public const array STRATS_WHITELIST = [
-//        self::CMSLOG,
         self::MOMENTS,
         self::MYFILES,
     ];

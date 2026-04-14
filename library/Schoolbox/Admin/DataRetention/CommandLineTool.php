@@ -170,7 +170,7 @@ class CommandLineTool extends CliTool\App
         }
 
         /**
-         * get the strats to run, default all. This is a csv of strats, e.g. "cmslogexample,moments". If the result is an empty string, then we will run all strats.
+         * get the strats to run, default all. This is a csv of strats, e.g. "moments,myFiles". If the result is an empty string, then we will run all strats.
          */
         $csvStrats = (string)$this->getOpt(self::OPT_LONG_STRATS);
         $validStrats = new ValidStrats($csvStrats);
