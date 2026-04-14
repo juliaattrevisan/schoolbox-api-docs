@@ -336,14 +336,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.manage-qrcodes {
-    padding-bottom: 190px; // allow space for bottom-drawer at the bottom
-    @media (max-width: 760px) {
-        //as it will no longer be anchored below this point, we don't need the extra padding
-        padding-bottom: 1rem;
-    }
-}
-
 .selected-count {
     display: inline-block;
     margin-right: 0.5rem;
