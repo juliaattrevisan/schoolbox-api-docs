@@ -158,6 +158,7 @@ class Controller extends Base
              */
             'participantCarousel' => $participantCarousel,
             /* For saving feedbacks
+             * TODO inject this dependency
              */
             'errors' => StateMapper::getInstance()->listDisplayValues(),
             'participant' => $participant,
