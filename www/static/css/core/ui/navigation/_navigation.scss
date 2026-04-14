@@ -188,6 +188,10 @@ $allow-sidebar-stash: $large-up;
     }
 
     .top-menu {
+        a > sbx-icon {
+            display: block;
+            margin: 0 auto var(--spacing-xs);
+        }
         @include inline-list;
         margin: 0;
         height: inherit;
@@ -732,9 +736,4 @@ $allow-sidebar-stash: $large-up;
 // Injected when the search bar is hovered or focused and gets removed when the user clicked on other elements
 .search-is-active {
     z-index: calc((--sbx-depth-pop-over) + 1) !important;
-}
-
-#top-menu a > sbx-icon {
-    display: block;
-    margin: 0 auto var(--spacing-xs);
 }
