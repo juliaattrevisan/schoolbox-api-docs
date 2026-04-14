@@ -646,12 +646,6 @@ class Controller extends Base
                         WHEN value = '1' then 'Staff & Students'
                         WHEN value = '2' then 'Staff, Students their Parents'
                     END,
-                IF(c.name = 'submission_visibility_max',
-                    CASE
-                        WHEN value = '0' then 'Staff Only'
-                        WHEN value = '1' then 'Staff & Students'
-                        WHEN value = '2' then 'Staff, Students their Parents'
-                    END,
                 IF(c.name = 'overall_grade',
                     CASE
                         WHEN value = '-2' then 'Percentage'
@@ -661,7 +655,7 @@ class Controller extends Base
                 IF(c.name = 'default_grade_group', sgg.name,
                 IF(c.name = 'lms_resubmit_window',value,
                 IF(c.name = 'lms_duetime_default',value,
-                IF(value, 'ON', 'OFF'))))))) AS 'Option Selection'
+                IF(value, 'ON', 'OFF')))))) AS 'Option Selection'
         FROM
             config c
         LEFT JOIN
@@ -700,7 +694,8 @@ class Controller extends Base
                      'view_rank',
                      'lms_resubmit_window',
                      'lms_duetime_default',
-                     'submission_visibility_max'
+                     'mark_visibility_allow_students',
+                     'mark_visibility_allow_parents'
 
         )
         ORDER BY
