@@ -122,9 +122,3 @@ function onFormDataChange() {
         </bottom-drawer>
     </div>
 </template>
-
-<style scoped>
-.save-container {
-    min-height: 30px; /*to provide a bit of space for the bottom-drawer */
-}
-</style>

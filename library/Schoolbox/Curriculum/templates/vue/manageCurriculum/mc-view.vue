@@ -60,9 +60,3 @@ function onCreateNewSelected(): void {
         </div>
     </div>
 </template>
-
-<style lang="scss" scoped>
-.row {
-    margin-bottom: 180px; /* provide a minimum space to allow the bottom-drawer.vue */
-}
-</style>

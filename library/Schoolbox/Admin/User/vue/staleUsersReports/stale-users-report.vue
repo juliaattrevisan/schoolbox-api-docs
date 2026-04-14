@@ -330,10 +330,6 @@ export default {
     position: relative;
 }
 
-.VueTables--client {
-    padding-bottom: 100px; // allow space for bottom-drawer at the bottom
-}
-
 .selected-count {
     margin-right: 1rem;
 }
