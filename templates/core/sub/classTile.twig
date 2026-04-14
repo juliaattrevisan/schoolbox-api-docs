@@ -81,7 +81,7 @@
                 <sbx-pop-out content-id="class-options{{ class.id }}"></sbx-pop-out>
             </nav>
             <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
-                <li><a href="{{ gradesRoute }}" class="icon-approve">{{ locale.grades.properPlural }}</a></li>
+                <li><a href="{{ gradesRoute }}"> <sbx-icon name="approve"></sbx-icon> {{ locale.grades.properPlural }}</a></li>
             </ul>
         {% endif %}
         {% endblock %}
