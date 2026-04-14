@@ -20,13 +20,13 @@
 
     <li>
         <a class="account-menu__link" href="/search/user/{{ user.current.id }}">
-            <sbx-icon name="staff-students" size="0.875rem" color="var(--sbx-color-text-primary)"></sbx-icon>
+            <sbx-icon name="staff-students" size="0.875rem" color="var(--sbx-config-color-menu-primary"></sbx-icon>
             <span>Profile</span>
         </a>
     </li>
     <li>
         <a class="account-menu__link" href="/settings/notifications">
-            <sbx-icon name="settings" size="0.875rem" color="var(--sbx-color-text-primary)"></sbx-icon>
+            <sbx-icon name="settings" size="0.875rem" color="var(--sbx-config-color-menu-primary)"></sbx-icon>
             <span>Notification Settings</span>
         </a>
     </li>
@@ -34,7 +34,7 @@
     {% if adminHomeUrl %}
         <li>
             <a class="account-menu__link" href="{{ adminHomeUrl }}">
-                <sbx-icon name="locked" size="0.875rem" color="var(--sbx-color-text-primary)"></sbx-icon>
+                <sbx-icon name="locked" size="0.875rem" color="var(--sbx-config-color-menu-primary)"></sbx-icon>
                 <span>Administration</span>
             </a>
         </li>
@@ -44,7 +44,7 @@
     {% if user.current.role.staff and config.show_schoolbox_help_link %}
         <li>
             <a class="account-menu__link" href="{{ routeLookup('helpSso.sendTokenToHelp') }}" target="_blank">
-                <sbx-icon name="help" size="0.875rem" color="var(--sbx-color-text-primary)"></sbx-icon>
+                <sbx-icon name="help" size="0.875rem" color="var(--sbx-config-color-menu-primary)"></sbx-icon>
                 <span>Online Help</span>
             </a>
         </li>
@@ -52,7 +52,7 @@
 
     <li>
         <a class="account-menu__link" href="/logout.php">
-            <sbx-icon name="logout" size="0.875rem" color="var(--sbx-color-text-primary)"></sbx-icon>
+            <sbx-icon name="logout" size="0.875rem" color="var(--sbx-config-color-menu-primary)"></sbx-icon>
             <span>Logout</span>
         </a>
     </li>
