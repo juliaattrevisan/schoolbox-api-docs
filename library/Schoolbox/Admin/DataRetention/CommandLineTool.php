@@ -187,10 +187,6 @@ class CommandLineTool extends CliTool\App
         /** @var Strategy\IStrategy[] $bus */
         $bus = [];
 
-        // add bus for cmsLogExample // clear things from the cmsLog older than 1 year (possible options are 1 Day, 30 Days, 365 Days, <null>)
-        if ($validStrats->isStratEnabled(ValidStrats::CMSLOG)) {
-            $bus[] = new Strategy\CmsLogExample($logger, $this->perform(), $this->getDatabaseInternal(), $lock, $this->getConfig(), $endTime, $retentionPeriod, $loopCount, $chunkSize);
-        }
         if ($validStrats->isStratEnabled(ValidStrats::MOMENTS)) {
             $bus[] = new Strategy\Moments(
                 $logger,
