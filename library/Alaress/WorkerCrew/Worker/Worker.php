@@ -13,15 +13,18 @@ use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Psr\Log\LoggerInterface;
 use RangeException;
 
-class Worker extends PipeWriter
+class Worker
 {
-    const READY = 0x1;
-    const BUSY  = 0x2;
-    const DONE  = 0x4;
-    const ENDED = 0x8;
-    const ERROR = 0x10;
-    const ALL   = 0x1F;
+    const READY    = 0x1;
+    const BUSY     = 0x2;
+    const DONE     = 0x4;
+    const ENDED    = 0x8;
+    const ERROR    = 0x10;
+    const SENDING  = 0x20;
+    const ALL      = self::READY | self::BUSY | self::DONE | self::ENDED | self::ERROR | self::SENDING;
 
+    /** @var LoggerInterface */
+    protected $log;
 
     /** @var string */
     protected $cmd;
@@ -33,7 +36,7 @@ class Worker extends PipeWriter
     protected $status;
     /** @var float */
     protected $start;
-    /** @var Task */
+    /** @var Task|null */
     protected $task;
     /** @var int */
     protected int $requestCount = 0;
@@ -52,7 +55,6 @@ class Worker extends PipeWriter
      */
     public function __construct($cmd, $pp, $pipes, $strat)
     {
-        parent::__construct($strat, null, $pipes[0]);
         $this->cmd    = $cmd;
         $this->pp     = $pp;
         $this->pipes  = $pipes;
@@ -133,45 +135,66 @@ class Worker extends PipeWriter
     {
         // the Map of Transition Validity
         $map = array(
-            self::BUSY  => array(
+            self::BUSY    => array(
                 self::DONE  => function ($worker) {
-                        /** @var Worker $worker */
-                        $worker->markTaskComplete();
-                        return true;
+                    /** @var Worker $worker */
+                    $worker->markTaskComplete();
+                    return true;
                 },
                 self::ERROR => function ($worker) {
-                        /** @var Worker $worker */
-                        return true;
+                    /** @var Worker $worker */
+                    return true;
                 },
             ),
-            self::DONE  => array(
+            self::DONE    => array(
                 self::READY => function ($worker) {
-                        /** @var Worker $worker */
-                        $worker->clearTask();
-                        return true;
+                    /** @var Worker $worker */
+                    $worker->clearTask();
+                    return true;
                 },
             ),
-            self::ERROR => array(
+            self::ERROR   => array(
                 self::ENDED => function ($worker) {
-                        /** @var Worker $worker */
-                        $worker->clearTask();
-                        return true;
+                    /** @var Worker $worker */
+                    $worker->clearTask();
+                    return true;
                 },
             ),
-            self::READY => array(
-                self::BUSY  => function ($worker) {
-                        /** @var Worker $worker */
-                        // task must already be set (ie. use self::setTask())
-                        return $worker->getTask() instanceof Task;
+            self::READY   => array(
+                self::BUSY    => function ($worker) {
+                    /** @var Worker $worker */
+                    // task must already be set (ie. use self::prepareTask())
+                    return $worker->getTask() instanceof Task;
+                },
+                self::SENDING => function ($worker) {
+                    /** @var Worker $worker */
+                    // task must already be set (ie. use self::prepareTask())
+                    return $worker->getTask() instanceof Task;
                 },
                 self::ENDED => function ($worker) {
-                        /** @var Worker $worker */
-                        $worker->clearTask();
-                        return true;
+                    /** @var Worker $worker */
+                    $worker->clearTask();
+                    return true;
                 },
                 self::ERROR => function ($worker) {
-                        /** @var Worker $worker */
-                        return true;
+                    /** @var Worker $worker */
+                    return true;
+                },
+            ),
+            self::SENDING => array(
+                self::BUSY  => function ($worker) {
+                    /** @var Worker $worker */
+                    return true;
+                },
+                self::DONE  => function ($worker) {
+                    /** @var Worker $worker */
+                    $worker->markTaskComplete();
+                    return true;
+                },
+                self::ERROR => function ($worker) {
+                    /** @var Worker $worker */
+                    $worker->clearTask();
+                    return true;
                 },
             ),
         );
@@ -195,22 +218,23 @@ class Worker extends PipeWriter
 
 
     /**
+     * Prepare a task for async dispatch: records the task, transitions to SENDING, and returns
+     * the serialised payload for Pool to write via WritableResourceStream.
+     *
      * @param object $identifier
      * @param string $cmd
      * @param string $args
      * @throws RangeException
-     * @return self
+     * @return string serialised payload ready to write to worker stdin
      */
-    public function setTask($identifier, $cmd, $args)
+    public function prepareTask($identifier, $cmd, $args): string
     {
         if ($this->getStatus() != self::READY) {
-            // go find someone else to do your dirty work
             throw new RangeException("Already tasked, cannot accept another");
         }
-        $this->write($this->strat->composeTaskString($cmd, $args));
         $this->task = new Task($identifier, $cmd, $args);
-        $this->setStatus(self::BUSY);
-        return $this;
+        $this->setStatus(self::SENDING);
+        return $this->strat->composeTaskString($cmd, $args);
     }
 
 

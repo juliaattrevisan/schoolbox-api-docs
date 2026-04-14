@@ -27,6 +27,7 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
     protected $queueMaxSize;
     protected $workerTimeoutSoft;
     protected $workerTimeoutHard;
+    protected $workerWriteTimeout;
     protected $maxRequestsPerWorker;
 
 
@@ -42,20 +43,34 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
      * @param int    $workerTimeoutHard
      * @param string $flags
      * @param int    $maxRequestsPerWorker
+     * @param int    $workerWriteTimeout
      */
-    public function __construct($minWorkers, $maxWorkers, $maxFlywheel, $queueDelay, $queueWarnSize, $queueMaxSize, $idleTimeout, $workerTimeoutSoft, $workerTimeoutHard, $flags = '', $maxRequestsPerWorker = DefaultDispatchStrategy::MAX_REQUESTS_PER_WORKER)
-    {
+    public function __construct(
+        $minWorkers,
+        $maxWorkers,
+        $maxFlywheel,
+        $queueDelay,
+        $queueWarnSize,
+        $queueMaxSize,
+        $idleTimeout,
+        $workerTimeoutSoft,
+        $workerTimeoutHard,
+        $flags = '',
+        $maxRequestsPerWorker = DefaultDispatchStrategy::MAX_REQUESTS_PER_WORKER,
+        $workerWriteTimeout = DefaultDispatchStrategy::WORKER_WRITE_TIMEOUT,
+    ) {
         parent::__construct($flags);
-        $this->flywheelSpins = $maxFlywheel;
-        $this->minWorkers    = $minWorkers;
-        $this->maxWorkers    = $maxWorkers;
-        $this->queueDelay    = $queueDelay;
-        $this->queueWarnSize = $queueWarnSize;
-        $this->queueMaxSize  = $queueMaxSize;
-        $this->maxFlywheel   = $maxFlywheel;
-        $this->idleTimeout   = $idleTimeout;
+        $this->flywheelSpins        = $maxFlywheel;
+        $this->minWorkers           = $minWorkers;
+        $this->maxWorkers           = $maxWorkers;
+        $this->queueDelay           = $queueDelay;
+        $this->queueWarnSize        = $queueWarnSize;
+        $this->queueMaxSize         = $queueMaxSize;
+        $this->maxFlywheel          = $maxFlywheel;
+        $this->idleTimeout          = $idleTimeout;
         $this->workerTimeoutSoft    = $workerTimeoutSoft;
         $this->workerTimeoutHard    = $workerTimeoutHard;
+        $this->workerWriteTimeout   = $workerWriteTimeout;
         $this->maxRequestsPerWorker = $maxRequestsPerWorker;
         $this->protocol             = new AlaressIPCProtocol();
     }
@@ -98,7 +113,7 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
         }
 
         // if number of workers THAT ARE NOT ENDED OR ERRORED is below the cap, spawn a new one
-        if ($workers->countWhere(~(Worker::ENDED & Worker::ERROR)) < $this->maxWorkers) {
+        if ($workers->countWhere(~(Worker::ENDED | Worker::ERROR)) < $this->maxWorkers) {
             return 0;
         }
 
@@ -174,5 +189,14 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
     public function getMaxRequestsPerWorker(): int
     {
         return $this->maxRequestsPerWorker;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getWorkerWriteTimeout(): int
+    {
+        return $this->workerWriteTimeout;
     }
 }

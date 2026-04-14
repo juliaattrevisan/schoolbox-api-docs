@@ -24,6 +24,8 @@ use InvalidArgumentException;
 use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use React\EventLoop\TimerInterface;
+use React\Stream\WritableResourceStream;
 use RuntimeException;
 
 /**
@@ -55,6 +57,15 @@ class Pool extends EventEmitter implements PoolInterface
 
     /** @var array (IOStream[][]) */
     protected $streams = array();
+
+    /** @var WritableResourceStream[] */
+    protected $inStreams = [];
+
+    /** @var TimerInterface[] */
+    protected $writeTimers = [];
+
+    /** @var callable[] */
+    protected $drainListeners = [];
 
 
     /**
@@ -229,6 +240,7 @@ class Pool extends EventEmitter implements PoolInterface
         $worker->attachLogger($this->log);
 
         $this->workers->attach($pid, $worker);
+        $this->inStreams[$pid] = new WritableResourceStream($pipes[self::DATA_IN], $this->loop);
 
         // create listenable stream objects
         foreach ($this->ioListeners as $k => $listener) {
@@ -255,6 +267,17 @@ class Pool extends EventEmitter implements PoolInterface
             $stream->close();
         }
         unset($this->streams[$pid]);
+
+        if (isset($this->writeTimers[$pid])) {
+            $this->loop->cancelTimer($this->writeTimers[$pid]);
+            unset($this->writeTimers[$pid]);
+        }
+
+        if (isset($this->inStreams[$pid])) {
+            $this->inStreams[$pid]->close();
+            unset($this->inStreams[$pid]);
+        }
+
         $this->workers->detach($pid);
         $this->log->debug("Detached worker {{$pid}}");
     }
@@ -272,7 +295,51 @@ class Pool extends EventEmitter implements PoolInterface
         if (!$this->workers->contains($pid)) {
             throw new RuntimeException("Cannot assign task to nonexistent worker: $pid");
         }
-        $this->workers->getByProcessId($pid)->setTask($identifier, $cmd, $args);
+
+        $payload = $this->workers->getByProcessId($pid)->prepareTask($identifier, $cmd, $args);
+        $stream  = $this->inStreams[$pid];
+
+        $written = $stream->write($payload);
+
+        if ($written) {
+            // written to kernel buffer without backpressure: transition immediately
+            $this->setWorkerStatus($pid, Worker::BUSY);
+            return;
+        }
+
+        // backpressure:
+        // React has buffered the data; wait for drain before marking BUSY.
+        // Also: release the worker if it is blocked on write
+        $this->writeTimers[$pid] = $this->loop->addTimer(
+            $this->strat->getWorkerWriteTimeout() / 1000,
+            function () use ($pid): void {
+                $this->log->error("Worker {{$pid}} blocked on write, killing", ['char' => '-']);
+                unset($this->writeTimers[$pid]);
+                $this->releaseWorker($pid, self::RELEASE_HARD);
+                $this->emit('ready');
+            },
+        );
+
+        // Set up a listener when the stream has been fully read by the worker:
+        // * cancel the release worker timer
+        // * cancel the listener itself
+        // * set the worker as BUSY
+        // This listener will itself be canceled when the worker is marked as
+        // DONE, to handle the case where a worker transitioned straight from
+        // SENDING to DONE.
+        $drainListener = function () use ($pid): void {
+            if (!$this->workers->contains($pid)) {
+                return;
+            }
+            if (isset($this->writeTimers[$pid])) {
+                $this->loop->cancelTimer($this->writeTimers[$pid]);
+                unset($this->writeTimers[$pid]);
+            }
+            unset($this->drainListeners[$pid]);
+            $this->setWorkerStatus($pid, Worker::BUSY);
+        };
+        $this->drainListeners[$pid] = $drainListener;
+        $stream->once('drain', $drainListener);
     }
 
 
@@ -496,6 +563,21 @@ class Pool extends EventEmitter implements PoolInterface
 
         $oldStatus = $worker->getStatus();
         $newStatus = $worker->setStatus($status);
+
+        // if the worker responded before drain fired:
+        // * cancel the drain listener so it doesn't incorrectly transition a
+        //   subsequent task to BUSY
+        // * cancel the write timer so it doesn't incorrectly kill the worker
+        if ($oldStatus === Worker::SENDING && $newStatus === Worker::DONE) {
+            if (isset($this->drainListeners[$pid])) {
+                $this->inStreams[$pid]->removeListener('drain', $this->drainListeners[$pid]);
+                unset($this->drainListeners[$pid]);
+            }
+            if (isset($this->writeTimers[$pid])) {
+                $this->loop->cancelTimer($this->writeTimers[$pid]);
+                unset($this->writeTimers[$pid]);
+            }
+        }
 
         // don't bother telling us about attempts to change to the same state
         if ($status != $oldStatus) {

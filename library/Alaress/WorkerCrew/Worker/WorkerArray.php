@@ -231,11 +231,12 @@ class WorkerArray implements WorkerBundleInterface
         $status = array();
 
         $list = array(
-            Worker::READY => 'READY',
-            Worker::BUSY  => 'BUSY',
-            Worker::DONE  => 'DONE',
-            Worker::ENDED => 'ENDED',
-            Worker::ERROR => 'ERROR',
+            Worker::READY   => 'READY',
+            Worker::BUSY    => 'BUSY',
+            Worker::DONE    => 'DONE',
+            Worker::ENDED   => 'ENDED',
+            Worker::ERROR   => 'ERROR',
+            Worker::SENDING => 'SENDING',
         );
 
         foreach ($this->workers as $pid => $w) {
