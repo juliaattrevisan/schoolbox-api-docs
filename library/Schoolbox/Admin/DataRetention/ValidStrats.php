@@ -43,7 +43,7 @@ class ValidStrats
      * because we'll probably reuse this a few times and
      * we can save some cycles
      *
-     * @var array
+     * @var string[]
      */
     private array $filteredStrats;
 
@@ -86,7 +86,9 @@ class ValidStrats
     }
 
     /**
-     * get filtered strats
+     * Return the validated, de-duplicated strategy names parsed from the constructor CSV input.
+     *
+     * @return string[]
      */
     public function getFilteredStrats(): array
     {
