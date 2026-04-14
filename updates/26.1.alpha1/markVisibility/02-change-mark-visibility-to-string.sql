@@ -28,7 +28,7 @@ UPDATE `project` SET `mark_visibility` = CASE `_mark_visibility`
     WHEN 1 THEN 'staffAndStudent'
     WHEN 2 THEN 'staffStudentAndParent'
     WHEN 3 THEN 'staffAndParent'
-    ELSE NULL
+    ELSE 'staffAndStudent'
 END;
 
 
@@ -62,7 +62,7 @@ UPDATE `assess` SET `mark_visibility` = CASE `_mark_visibility`
     WHEN 1 THEN 'staffAndStudent'
     WHEN 2 THEN 'staffStudentAndParent'
     WHEN 3 THEN 'staffAndParent'
-    ELSE NULL
+    ELSE 'staffAndStudent'
 END;
 
 
