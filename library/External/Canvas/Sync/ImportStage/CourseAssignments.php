@@ -477,7 +477,7 @@ class CourseAssignments extends CourseAssessmentAbstract
         float $weight,
         string $createdAt,
         string $updatedAt,
-        int $markVisibility,
+        string $markVisibility,
         int $position,
         string $selfReviewability,
         ?WorkType\Model $workType

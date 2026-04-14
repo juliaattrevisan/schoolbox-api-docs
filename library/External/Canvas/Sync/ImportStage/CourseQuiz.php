@@ -467,7 +467,7 @@ class CourseQuiz extends CourseAssessmentAbstract
         int $maxAttempts,
         float $weight,
         bool $anonymousSubmissions,
-        int $markVisibility,
+        string $markVisibility,
         string $createdAt,
         int $quizOwnerId,
         Folder\Model $unitSpecFolder
@@ -752,7 +752,7 @@ class CourseQuiz extends CourseAssessmentAbstract
         int $maxAttempts,
         float $weight,
         int $position,
-        int $markVisibility
+        string $markVisibility
     ): Quiz\Model {
         $assessment = $this->createAssessment(
             $unitSpecFolder->getUnitSpecification(),
