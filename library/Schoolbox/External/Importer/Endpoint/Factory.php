@@ -371,7 +371,10 @@ class Factory implements IFactory
                 $this->validStrats,
                 $this->logger,
                 $this->perform,
+                $this->host,
+                $this->key,
                 $this->watchlist,
+                Loader::getInstance()->get('photo_sis_import'),
                 /* Profile pieces
                  */
                 UserProfile\Mapper::getInstance()->disableCache(),

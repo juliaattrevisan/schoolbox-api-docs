@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\Edlink\Base\Endpoint;
 
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
+use SensitiveParameter;
 
 /**
  * Class Status
@@ -20,17 +21,24 @@ use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 class Status implements IStatus
 {
     /**
-     * Path to the config file
+     * Status constructor.
      */
-    private const CONFIG_FILE = __DIR__ . '/config.json';
+    public function __construct(
+        private string $host,
+        #[SensitiveParameter] private string $key
+    ) {
+    }
 
     /**
      * @inheritDoc
      */
     public function isReachable(): bool
     {
-        $config = $this->loadConfig();
-        (new Api($config['token']))->retrieve('GET', 'people?$first=1');
+        try {
+            (new Api(host: $this->host, apiKey: $this->key))->retrieve('GET', 'people?$first=1');
+        } catch (\DomainException | \InvalidArgumentException | \RuntimeException $e) {
+            return false;
+        }
 
         return true;
     }
@@ -41,9 +49,8 @@ class Status implements IStatus
     public function getReport(): ?array
     {
         try {
-            $config = $this->loadConfig();
-            $api = new Api($config['token']);
-        } catch (\RuntimeException | \DomainException $e) {
+            $api = new Api(host: $this->host, apiKey: $this->key);
+        } catch (\DomainException | \InvalidArgumentException $e) {
             return [[
                 'message' => 'Cannot access api endpoint',
                 'reason' => $e->getMessage(),
@@ -52,28 +59,5 @@ class Status implements IStatus
         }
 
         return (new Specification($api))->check();
-    }
-
-    /**
-     * Load configuration from the local config.json file
-     *
-     * @return array
-     * @throws \RuntimeException
-     */
-    private function loadConfig(): array
-    {
-        if (!file_exists(self::CONFIG_FILE)) {
-            throw new \RuntimeException(
-                'Edlink config file not found. Copy config.json.example to config.json and add your integration access token.'
-            );
-        }
-
-        $config = json_decode(file_get_contents(self::CONFIG_FILE), true, 512, JSON_THROW_ON_ERROR);
-
-        if (empty($config['token'])) {
-            throw new \RuntimeException('Edlink config.json must contain a non-empty "token" field.');
-        }
-
-        return $config;
     }
 }

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Edlink\Base\Endpoint\TimetableCalendar;
 
+use Alaress_Date_Format;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
@@ -16,6 +17,7 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\ClassCode;
 use Schoolbox\External\Connector\Edlink\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Edlink\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Edlink\Base\Endpoint\Lookup\PeopleIds;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
@@ -25,8 +27,9 @@ use Schoolbox\Mapper\Exception;
  * with the 'timetable' classification, and sis_class / sis_class_user records.
  *
  * Edlink does not provide individual lesson instances with start/end times.
- * Instead, each Class gets a single timetable event spanning its session dates,
- * and enrollments define who is involved in each class.
+ * Instead, each Class gets a single timetable event spanning its session dates
+ * (clamped to the Factory's configured date window), and enrollments define
+ * who is involved in each class.
  *
  * @package Schoolbox\External\Connector\Edlink\Base\Endpoint\TimetableCalendar
  */
@@ -43,66 +46,55 @@ class Classes implements IStrategy
     private const NUM_PER_PAGE = 10000;
 
     /**
-     * A list of classEntries we've already created, keyed by class code
+     * ClassEntries we've already created, keyed by class code
      *
      * @var array<string, ClassEntry>
      */
     private array $classEntries = [];
 
     /**
-     * A list of classInvolvements we've already created, keyed by classEntryId.externalId
+     * ClassInvolvements we've already created, keyed by classEntryId.externalId
      *
      * @var array<int, array<string, bool>>
      */
     private array $classInvolvements = [];
 
     /**
-     * Session lookup: Edlink session ID → session data (name, start_date, end_date)
+     * Session lookup: Edlink session ID => session data (name, start_date, end_date)
      *
      * @var array<string, array>
      */
     private array $sessions = [];
 
     /**
-     * Course lookup: Edlink course ID → course data (name, code)
+     * Course lookup: Edlink course ID => course data (name, code)
      *
      * @var array<string, array>
      */
     private array $courses = [];
 
     /**
-     * Maps Edlink UUID → resolved external ID (SIS ID) for people
-     * Used to resolve enrollment person_id to the same external ID used by the Profile importer
-     *
-     * @var array<string, string>
-     */
-    private array $edlinkIdToExternalId = [];
-
-    /**
-     * Class lookup: Edlink class ID → class data
-     * Needed to resolve enrollments back to classes
+     * Class lookup: Edlink class ID => class data, needed to resolve enrollments
+     * back to classes.
      *
      * @var array<string, array>
      */
     private array $edlinkClasses = [];
 
     /**
-     * @param LoggerInterface                            $log
-     * @param bool                                       $perform
-     * @param IApi                                       $api
-     * @param \Schoolbox\External\Event\Mapper           $eventMapper
-     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
-     * @param ClassEntryMapper                           $classEntryMapper
-     * @param ClassInvolvementMapper                     $classInvolvementMapper
+     * Classes constructor.
      */
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
         private IApi $api,
+        private PeopleIds $peopleIds,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         private ClassEntryMapper $classEntryMapper,
-        private ClassInvolvementMapper $classInvolvementMapper
+        private ClassInvolvementMapper $classInvolvementMapper,
+        private Alaress_Date_Format $fromDate,
+        private Alaress_Date_Format $toDate
     ) {
     }
 
@@ -111,7 +103,11 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-        $this->log->info('Processing timetables from Edlink.');
+        $this->log->info(sprintf(
+            'Processing timetables from Edlink between %s and %s.',
+            $this->fromDate->getDatabase(),
+            $this->toDate->getDatabase()
+        ));
 
         /* Preload sessions for date ranges
          */
@@ -123,17 +119,18 @@ class Classes implements IStrategy
         $this->log->info('Preloading courses.');
         $this->preloadCourses();
 
-        /* Import classes → sis_event + sis_class
+        /* Ensure the PeopleIds lookup is populated. This is a no-op when
+         * Profile sync ran earlier and populated the map already.
+         */
+        $this->log->info('Ensuring Edlink UUID -> external ID map is populated.');
+        $this->peopleIds->generate($this->api);
+
+        /* Import classes -> sis_event + sis_class
          */
         $this->log->info('Importing classes.');
         $this->importClasses();
 
-        /* Preload people ID mapping so enrollments use SIS IDs, not Edlink UUIDs
-         */
-        $this->log->info('Preloading people ID mappings.');
-        $this->preloadPeopleIds();
-
-        /* Import enrollments → sis_class_user
+        /* Import enrollments -> sis_class_user
          */
         $this->log->info('Importing enrollments.');
         $this->importEnrollments();
@@ -229,8 +226,6 @@ class Classes implements IStrategy
 
     /**
      * Process a single class from Edlink
-     *
-     * @param array $class
      */
     private function processClass(array $class): void
     {
@@ -277,42 +272,68 @@ class Classes implements IStrategy
             'course_name' => $courseName,
         ];
 
-        /* Resolve session dates for the event
+        /* Resolve session dates for the event, clamped to the configured window
          */
         $startAt = null;
         $finishAt = null;
-        $sessionIds = $class['session_ids'] ?? [];
 
-        foreach ($sessionIds as $sessionId) {
-            if (isset($this->sessions[$sessionId])) {
-                $session = $this->sessions[$sessionId];
+        foreach ($class['session_ids'] ?? [] as $sessionId) {
+            if (!isset($this->sessions[$sessionId])) {
+                continue;
+            }
 
-                if (null !== $session['start_date']) {
-                    $sessionStart = $this->parseEdlinkDate($session['start_date']);
+            $session = $this->sessions[$sessionId];
 
-                    if (null !== $sessionStart && (null === $startAt || $sessionStart->lt($startAt))) {
-                        $startAt = $sessionStart;
-                    }
+            if (null !== $session['start_date']) {
+                $sessionStart = $this->parseEdlinkDate($session['start_date']);
+
+                if (null !== $sessionStart && (null === $startAt || $sessionStart->lt($startAt))) {
+                    $startAt = $sessionStart;
                 }
+            }
 
-                if (null !== $session['end_date']) {
-                    $sessionEnd = $this->parseEdlinkDate($session['end_date']);
+            if (null !== $session['end_date']) {
+                $sessionEnd = $this->parseEdlinkDate($session['end_date']);
 
-                    if (null !== $sessionEnd && (null === $finishAt || $sessionEnd->gt($finishAt))) {
-                        $finishAt = $sessionEnd;
-                    }
+                if (null !== $sessionEnd && (null === $finishAt || $sessionEnd->gt($finishAt))) {
+                    $finishAt = $sessionEnd;
                 }
             }
         }
 
-        /* Fall back to now ± 6 months if no session dates
+        /* Skip classes entirely outside the configured window.
+         *
+         * This check MUST happen before the clamp below, otherwise classes
+         * from defunct terms would be clamped into the current window and
+         * written as sis_events that don't reflect reality.
          */
-        if (null === $startAt) {
-            $startAt = \Alaress_Date_Format::now();
+        if (null !== $finishAt && $finishAt->lt($this->fromDate)) {
+            $this->log->debug(sprintf(
+                'Skipping class %s (%s) — ended before window (%s < %s)',
+                $className,
+                $classCode,
+                $finishAt->getDatabase(),
+                $this->fromDate->getDatabase()
+            ));
+            return;
         }
-        if (null === $finishAt) {
-            $finishAt = \Alaress_Date_Format::now()->addMonths(6);
+
+        if (null !== $startAt && $startAt->gt($this->toDate)) {
+            $this->log->debug(sprintf(
+                'Skipping class %s (%s) — starts after window (%s > %s)',
+                $className,
+                $classCode,
+                $startAt->getDatabase(),
+                $this->toDate->getDatabase()
+            ));
+            return;
         }
+
+        /* Default to the configured window if Edlink didn't give us dates.
+         * Otherwise clamp the session dates into the window.
+         */
+        $startAt = null === $startAt || $startAt->lt($this->fromDate) ? $this->fromDate : $startAt;
+        $finishAt = null === $finishAt || $finishAt->gt($this->toDate) ? $this->toDate : $finishAt;
 
         /* Periods from Edlink (array of strings like ["1", "2"])
          */
@@ -395,8 +416,6 @@ class Classes implements IStrategy
 
     /**
      * Process a single enrollment
-     *
-     * @param array $enrollment
      */
     private function processEnrollment(array $enrollment): void
     {
@@ -420,8 +439,7 @@ class Classes implements IStrategy
             return;
         }
 
-        $classData = $this->edlinkClasses[$classId];
-        $classCode = $classData['code'];
+        $classCode = $this->edlinkClasses[$classId]['code'];
 
         if (!isset($this->classEntries[$classCode])) {
             return;
@@ -429,14 +447,14 @@ class Classes implements IStrategy
 
         $classEntry = $this->classEntries[$classCode];
 
-        /* Deduplicate: skip if we've already created this involvement
-         */
-        $classEntryId = $classEntry->getId();
-
         /* Resolve person_id (Edlink UUID) to the SIS external ID
          * used by the Profile importer
          */
-        $externalId = $this->edlinkIdToExternalId[$personId] ?? $personId;
+        $externalId = $this->peopleIds->resolve($personId);
+
+        /* Deduplicate: skip if we've already created this involvement
+         */
+        $classEntryId = $classEntry->getId();
 
         if (isset($this->classInvolvements[$classEntryId][$externalId])) {
             return;
@@ -455,98 +473,17 @@ class Classes implements IStrategy
         $this->log->debug(sprintf(
             'Created enrollment for %s in %s (%s)',
             $externalId,
-            $classData['name'],
+            $this->edlinkClasses[$classId]['name'],
             $classCode
         ));
-    }
-
-    /**
-     * Preload all people from the /people endpoint to build an Edlink UUID → SIS ID mapping
-     * This ensures enrollment external IDs match the IDs used by the Profile importer
-     */
-    private function preloadPeopleIds(): void
-    {
-        $nextUrl = sprintf('people?$first=%s', self::NUM_PER_PAGE);
-
-        for ($i = 0; ($nextUrl && $i < self::MAX_CALLS); $i++) {
-            $response = $this->api->retrieve('GET', $nextUrl);
-
-            if (!isset($response['$data']) || !\count($response['$data'])) {
-                break;
-            }
-
-            foreach ($response['$data'] as $person) {
-                $edlinkId = trim((string)($person['id'] ?? ''));
-
-                if ('' === $edlinkId) {
-                    continue;
-                }
-
-                $externalId = $this->resolveExternalId($person);
-
-                if ('' !== $externalId) {
-                    $this->edlinkIdToExternalId[$edlinkId] = $externalId;
-                }
-            }
-
-            $nextUrl = $response['$next'] ?? false;
-        }
-
-        $this->log->info(sprintf('Loaded %d people ID mappings.', \count($this->edlinkIdToExternalId)));
-    }
-
-    /**
-     * Resolve the best external ID for a person from Edlink data.
-     * Mirrors the logic in Profile\Profile::resolveExternalId()
-     *
-     * @param array $person
-     * @return string
-     */
-    private function resolveExternalId(array $person): string
-    {
-        $edlinkId = trim((string)($person['id'] ?? ''));
-        $identifiers = $person['identifiers'] ?? [];
-
-        if (\is_array($identifiers) && \count($identifiers)) {
-            $idLookup = [];
-
-            foreach ($identifiers as $identifier) {
-                if (!\is_array($identifier)) {
-                    continue;
-                }
-
-                $type = trim((string)($identifier['type'] ?? ''));
-                $value = trim((string)($identifier['value'] ?? ''));
-
-                if ('' !== $type && '' !== $value) {
-                    $idLookup[$type] = $value;
-                }
-            }
-
-            foreach (['sis_id', 'student_id', 'staff_id'] as $preferredType) {
-                if (isset($idLookup[$preferredType])) {
-                    return $idLookup[$preferredType];
-                }
-            }
-
-            if (\count($idLookup)) {
-                return $idLookup[array_key_first($idLookup)];
-            }
-        }
-
-        return $edlinkId;
     }
 
     /**
      * Parse an Edlink ISO 8601 date string into an Alaress_Date_Format
      *
      * Edlink sends dates like "2025-09-01T00:00:00.000Z"
-     * Alaress_Date_Format::newDatabaseDate expects "Y-m-d H:i:s"
-     *
-     * @param string $dateString
-     * @return \Alaress_Date_Format|null
      */
-    private function parseEdlinkDate(string $dateString): ?\Alaress_Date_Format
+    private function parseEdlinkDate(string $dateString): ?Alaress_Date_Format
     {
         if ('' === $dateString) {
             return null;
@@ -555,7 +492,7 @@ class Classes implements IStrategy
         try {
             $dateTime = new \DateTimeImmutable($dateString);
 
-            return \Alaress_Date_Format::newDatabaseDate(
+            return Alaress_Date_Format::newDatabaseDate(
                 $dateTime->format('Y-m-d H:i:s'),
                 new \DateTimeZone($dateTime->format('e') !== 'Z' ? $dateTime->format('e') : 'UTC')
             );

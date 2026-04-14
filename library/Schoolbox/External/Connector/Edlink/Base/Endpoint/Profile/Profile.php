@@ -9,11 +9,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Edlink\Base\Endpoint\Profile;
 
+use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\Connector\Edlink\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Edlink\Base\Endpoint\Lookup\PeopleIds;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Watchlist;
-use Schoolbox\External\Connector\Edlink\Base\Endpoint\IApi;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper\Exception;
@@ -54,16 +56,15 @@ class Profile implements IStrategy
     private const CATEGORY_EMPLOYEE = 'employee';
 
     /**
-     * Preferred identifier types from the Edlink identifiers array, in priority order.
-     * The first match wins. Falls back to Edlink UUID if none found.
+     * How long to wait when downloading photos from Edlink-signed URLs
      */
-    private const IDENTIFIER_PRIORITY = ['sis_id', 'student_id', 'staff_id'];
+    private const PHOTO_TIMEOUT = 15;
 
     /**
      * Tracks parent persons we've already imported, keyed by resolved external ID
      * Used to avoid duplicate parent profiles when multiple students share a parent
      *
-     * @var array
+     * @var array<string, bool>
      */
     private array $importedParents = [];
 
@@ -76,43 +77,24 @@ class Profile implements IStrategy
     private array $emergencyContactCount = [];
 
     /**
-     * Maps Edlink UUID → resolved external ID (SIS ID)
-     * Used by importAgents() to look up the SIS ID for students/parents
-     * that were already imported by importPeople()
-     *
-     * @var array<string, string>
+     * Dedicated guzzle client for downloading photos from Edlink-signed URLs.
+     * Separate from the API client because photo URLs aren't on the API host
+     * and shouldn't receive our Bearer token.
      */
-    private array $edlinkIdToExternalId = [];
+    private Client $photoClient;
 
     /**
-     * School lookup: Edlink school ID → school name
-     * Used to resolve campus names from school_ids
-     *
-     * @var array<string, string>
-     */
-    private array $schools = [];
-
-    /**
-     * @param ValidStrats                     $validStrats
-     * @param LoggerInterface                 $log
-     * @param bool                            $perform
-     * @param IApi                            $api
-     * @param array                           $watchlist
-     * @param bool                            $importPhotos
-     * @param UserProfile\Mapper              $baseProfileMapper
-     * @param UserProfile\Student\Mapper      $studentProfileMapper
-     * @param UserProfile\Parent\Mapper       $parentProfileMapper
-     * @param UserProfile\Staff\Mapper        $staffProfileMapper
-     * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param StorageMapper                   $storageMapper
+     * Profile constructor.
      */
     public function __construct(
         private ValidStrats $validStrats,
         private LoggerInterface $log,
         private bool $perform,
         private IApi $api,
+        private Watchlist $watcher,
         private array $watchlist,
-        private bool $importPhotos,
+        private bool $includePhoto,
+        private PeopleIds $peopleIds,
         private UserProfile\Mapper $baseProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
         private UserProfile\Parent\Mapper $parentProfileMapper,
@@ -120,6 +102,10 @@ class Profile implements IStrategy
         private UserProfile\Relationship\Mapper $relationshipMapper,
         private StorageMapper $storageMapper
     ) {
+        $this->photoClient = new Client([
+            'timeout' => self::PHOTO_TIMEOUT,
+            'http_errors' => true,
+        ]);
     }
 
     /**
@@ -127,11 +113,6 @@ class Profile implements IStrategy
      */
     public function import(): void
     {
-        /* Preload schools for campus name resolution
-         */
-        $this->log->info('Preloading schools from Edlink.');
-        $this->preloadSchools();
-
         /* Import people (students and staff)
          */
         if ($this->validStrats->isStudentStratEnabled()
@@ -161,17 +142,6 @@ class Profile implements IStrategy
         for ($i = 0; ($nextUrl && $i < self::MAX_CALLS); $i++) {
             $response = $this->api->retrieve('GET', $nextUrl);
 
-            /* Diagnostic: log the response keys so we can see what Edlink actually returns
-             */
-            if ($i === 0) {
-                $this->log->info(sprintf(
-                    'DIAGNOSTIC: Response keys=%s, record count=%s, raw first 200 chars=%s',
-                    json_encode(array_keys($response)),
-                    isset($response['$data']) ? \count($response['$data']) : 'KEY_NOT_FOUND',
-                    substr(json_encode($response), 0, 200)
-                ));
-            }
-
             if (!isset($response['$data']) || !\count($response['$data'])) {
                 break;
             }
@@ -183,33 +153,19 @@ class Profile implements IStrategy
                     continue;
                 }
 
-                /* Resolve the external ID: prefer SIS ID from identifiers[], fall back to Edlink UUID
-                 */
-                $externalId = $this->resolveExternalId($person);
+                $externalId = PeopleIds::resolveExternalId($person);
 
                 if ('' === $externalId) {
                     $externalId = $edlinkId;
                 }
 
-                /* Temporary diagnostic: log the first few people's identifier resolution
+                /* Share the mapping with the Classes strategy
                  */
-                if ($i === 0) {
-                    $this->log->info(sprintf(
-                        'DIAGNOSTIC: Edlink ID=%s, resolved externalId=%s, roles=%s, identifiers=%s',
-                        $edlinkId,
-                        $externalId,
-                        json_encode($person['roles'] ?? 'NOT_SET'),
-                        json_encode($person['identifiers'] ?? 'NOT_SET')
-                    ));
-                }
-
-                /* Cache the mapping so importAgents() can resolve IDs later
-                 */
-                $this->edlinkIdToExternalId[$edlinkId] = $externalId;
+                $this->peopleIds->set($edlinkId, $externalId);
 
                 /* Apply watchlist filter if set
                  */
-                if (\count($this->watchlist) && !Watchlist::isOnWatchlist($externalId, $this->watchlist)) {
+                if (!$this->watcher->isOnWatchlist($externalId, $this->watchlist)) {
                     continue;
                 }
 
@@ -236,15 +192,14 @@ class Profile implements IStrategy
 
     /**
      * Import a single student profile
-     *
-     * @param array  $person
-     * @param string $externalId
      */
     private function importStudent(array $person, string $externalId): void
     {
         $firstname = trim((string)($person['first_name'] ?? ''));
-        $middleName = trim((string)($person['middle_name'] ?? ''));
-        $firstnamePreferred = trim((string)($person['first_name'] ?? ''));
+        $firstnamePreferred = (new FirstMeaningfulValue())->find([
+            trim((string)($person['display_name'] ?? '')),
+            $firstname,
+        ]);
         $lastname = trim((string)($person['last_name'] ?? ''));
         $email = trim((string)($person['email'] ?? ''));
         $phone = trim((string)($person['phone'] ?? ''));
@@ -268,7 +223,7 @@ class Profile implements IStrategy
 
         /* State ID from identifiers array for studies code
          */
-        $stateId = $this->resolveIdentifierByType($person, 'state_id');
+        $stateId = PeopleIds::resolveIdentifierByType($person, 'state_id');
 
         $fullname = trim("{$firstname} {$lastname}");
 
@@ -297,7 +252,7 @@ class Profile implements IStrategy
 
         /* Download photo if available and photo import is enabled
          */
-        if ($this->importPhotos && !empty($person['picture_url'])) {
+        if ($this->includePhoto && !empty($person['picture_url'])) {
             $this->downloadPhoto($studentBaseProfile, $person['picture_url']);
         }
 
@@ -354,19 +309,17 @@ class Profile implements IStrategy
 
     /**
      * Import a single staff profile
-     *
-     * @param array  $person
-     * @param string $externalId
-     * @param array  $roles
      */
     private function importStaff(array $person, string $externalId, array $roles): void
     {
         $firstname = trim((string)($person['first_name'] ?? ''));
-        $firstnamePreferred = trim((string)($person['first_name'] ?? ''));
+        $firstnamePreferred = (new FirstMeaningfulValue())->find([
+            trim((string)($person['display_name'] ?? '')),
+            $firstname,
+        ]);
         $lastname = trim((string)($person['last_name'] ?? ''));
         $email = trim((string)($person['email'] ?? ''));
         $phone = trim((string)($person['phone'] ?? ''));
-        $title = '';
 
         $username = (new FirstMeaningfulValue())->find([
             $email,
@@ -401,14 +354,13 @@ class Profile implements IStrategy
 
         $staffBaseProfile
             ->setExternalId($externalId)
-            ->setTitle($title)
             ->setFirstname($firstname)
             ->setFirstnamePreferred($firstnamePreferred)
             ->setLastname($lastname);
 
         /* Download photo if available and photo import is enabled
          */
-        if ($this->importPhotos && !empty($person['picture_url'])) {
+        if ($this->includePhoto && !empty($person['picture_url'])) {
             $this->downloadPhoto($staffBaseProfile, $person['picture_url']);
         }
 
@@ -437,7 +389,7 @@ class Profile implements IStrategy
     /**
      * Import parent/guardian relationships from the /agents endpoint
      *
-     * Agents describe observer→target relationships.
+     * Agents describe observer->target relationships.
      * observer_id = the parent/guardian (Person ID)
      * target_id = the student (Person ID)
      * relationship = "parent" or "guardian"
@@ -447,8 +399,8 @@ class Profile implements IStrategy
         $nextUrl = sprintf('agents?$first=%s', self::NUM_PER_PAGE);
 
         for ($i = 0; ($nextUrl && $i < self::MAX_CALLS); $i++) {
-            /* Use $expand=observer to get the parent's Person data inline
-             * This avoids a separate API call per parent
+            /* Use $expand=observer,target to get Person data inline,
+             * avoiding a separate API call per agent.
              */
             $response = $this->api->retrieve('GET', $nextUrl . '&$expand=observer,target');
 
@@ -474,13 +426,17 @@ class Profile implements IStrategy
                     continue;
                 }
 
-                /* Resolve external IDs: use cached mapping from importPeople() if available,
-                 * otherwise resolve from the expanded person data
+                /* Resolve external IDs via the shared lookup, with fallback
+                 * to inline resolution from the expanded person data.
                  */
-                $observerExternalId = $this->edlinkIdToExternalId[$observerEdlinkId]
-                    ?? $this->resolveExternalId($observerPerson);
-                $studentExternalId = $this->edlinkIdToExternalId[$studentEdlinkId]
-                    ?? $this->resolveExternalId($studentPerson);
+                $observerExternalId = $this->peopleIds->resolve($observerEdlinkId);
+                if ($observerExternalId === $observerEdlinkId) {
+                    $observerExternalId = PeopleIds::resolveExternalId($observerPerson);
+                }
+                $studentExternalId = $this->peopleIds->resolve($studentEdlinkId);
+                if ($studentExternalId === $studentEdlinkId) {
+                    $studentExternalId = PeopleIds::resolveExternalId($studentPerson);
+                }
 
                 if ('' === $observerExternalId || '' === $studentExternalId) {
                     continue;
@@ -489,12 +445,6 @@ class Profile implements IStrategy
                 $isPrimaryContact = \in_array('primary_contact', $flags, true);
                 $isAlternateContact = \in_array('alternate_contact', $flags, true);
                 $isEmergencyContact = \in_array('emergency_contact', $flags, true);
-
-                /* Additional flags available but not yet used:
-                 * - has_custody: observer has legal custody of the student
-                 * - lives_with: student lives with the observer
-                 * - pickup_rights: observer is authorised to pick up the student
-                 */
 
                 /* Import as parent if flagged as primary or alternate contact
                  */
@@ -520,9 +470,6 @@ class Profile implements IStrategy
 
     /**
      * Import a single parent profile
-     *
-     * @param array  $person
-     * @param string $externalId
      */
     private function importParent(array $person, string $externalId): void
     {
@@ -530,7 +477,6 @@ class Profile implements IStrategy
         $lastname = trim((string)($person['last_name'] ?? ''));
         $email = trim((string)($person['email'] ?? ''));
         $phone = trim((string)($person['phone'] ?? ''));
-        $title = '';
         $username = (new FirstMeaningfulValue())->find([$email, $externalId]);
 
         try {
@@ -550,7 +496,6 @@ class Profile implements IStrategy
 
         $parentBaseProfile
             ->setExternalId($externalId)
-            ->setTitle($title)
             ->setFirstname($firstname)
             ->setLastname($lastname);
 
@@ -576,10 +521,6 @@ class Profile implements IStrategy
 
     /**
      * Create a parent-student relationship record
-     *
-     * @param string $parentExternalId
-     * @param string $studentExternalId
-     * @param string $relationshipType
      */
     private function createRelationship(string $parentExternalId, string $studentExternalId, string $relationshipType): void
     {
@@ -621,12 +562,9 @@ class Profile implements IStrategy
     }
 
     /**
-     * Import an emergency contact onto a student profile
+     * Import an emergency contact onto a student profile.
      *
      * Fills slots 1-3 in order. Contacts beyond 3 are skipped.
-     *
-     * @param array  $person            The emergency contact's person data
-     * @param string $studentExternalId The student's external ID
      */
     private function importEmergencyContact(array $person, string $studentExternalId): void
     {
@@ -679,17 +617,15 @@ class Profile implements IStrategy
     }
 
     /**
-     * Download a photo from a URL and attach it to the base profile
-     *
-     * @param UserProfile\Model $baseProfile
-     * @param string            $url
+     * Download a photo from an Edlink-signed URL and attach it to the base profile.
      */
     private function downloadPhoto(UserProfile\Model $baseProfile, string $url): void
     {
         try {
-            $imageContent = @file_get_contents($url);
+            $response = $this->photoClient->request('GET', $url);
+            $imageContent = $response->getBody()->getContents();
 
-            if (false === $imageContent || '' === $imageContent) {
+            if ('' === $imageContent) {
                 return;
             }
 
@@ -710,50 +646,9 @@ class Profile implements IStrategy
     }
 
     /**
-     * Resolve the best external ID for a person from Edlink data.
-     *
-     * Checks the identifiers[] array for SIS-provided IDs (sis_id, student_id, staff_id)
-     * in priority order. Falls back to the Edlink UUID if no SIS identifier is found.
-     *
-     * @param array $person
-     * @return string
-     */
-    /**
-     * Preload all schools into a lookup array for campus name resolution
-     */
-    private function preloadSchools(): void
-    {
-        $nextUrl = sprintf('schools?$first=%s', self::NUM_PER_PAGE);
-
-        for ($i = 0; ($nextUrl && $i < self::MAX_CALLS); $i++) {
-            $response = $this->api->retrieve('GET', $nextUrl);
-
-            if (!isset($response['$data']) || !\count($response['$data'])) {
-                break;
-            }
-
-            foreach ($response['$data'] as $school) {
-                $id = trim((string)($school['id'] ?? ''));
-                $name = trim((string)($school['name'] ?? ''));
-
-                if ('' !== $id && '' !== $name) {
-                    $this->schools[$id] = $name;
-                }
-            }
-
-            $nextUrl = $response['$next'] ?? false;
-        }
-
-        $this->log->info(sprintf('Loaded %d schools.', \count($this->schools)));
-    }
-
-    /**
      * Parse an Edlink ISO 8601 date string into an Alaress_Date_Format
      *
      * Edlink sends dates like "2010-05-15T00:00:00.000Z" or "2010-05-15"
-     *
-     * @param string $dateString
-     * @return \Alaress_Date_Format|null
      */
     private function parseEdlinkDate(string $dateString): ?\Alaress_Date_Format
     {
@@ -772,81 +667,5 @@ class Profile implements IStrategy
             $this->log->warning(sprintf('Could not parse Edlink date: %s', $dateString));
             return null;
         }
-    }
-
-    /**
-     * Resolve a single identifier value by type from the identifiers[] array
-     *
-     * @param array  $person
-     * @param string $type
-     * @return string
-     */
-    private function resolveIdentifierByType(array $person, string $type): string
-    {
-        $identifiers = $person['identifiers'] ?? [];
-
-        if (!\is_array($identifiers)) {
-            return '';
-        }
-
-        foreach ($identifiers as $identifier) {
-            if (!\is_array($identifier)) {
-                continue;
-            }
-
-            $idType = trim((string)($identifier['type'] ?? ''));
-            $value = trim((string)($identifier['value'] ?? ''));
-
-            if ($idType === $type && '' !== $value) {
-                return $value;
-            }
-        }
-
-        return '';
-    }
-
-    private function resolveExternalId(array $person): string
-    {
-        $edlinkId = trim((string)($person['id'] ?? ''));
-        $identifiers = $person['identifiers'] ?? [];
-
-        if (\is_array($identifiers) && \count($identifiers)) {
-            /* Build a type → value lookup from the identifiers array
-             * Edlink identifiers are [{type: "sis_id", value: "12345"}, ...]
-             */
-            $idLookup = [];
-
-            foreach ($identifiers as $identifier) {
-                if (!\is_array($identifier)) {
-                    continue;
-                }
-
-                $type = trim((string)($identifier['type'] ?? ''));
-                $value = trim((string)($identifier['value'] ?? ''));
-
-                if ('' !== $type && '' !== $value) {
-                    $idLookup[$type] = $value;
-                }
-            }
-
-            /* Check priority list for the first available SIS identifier
-             */
-            foreach (self::IDENTIFIER_PRIORITY as $preferredType) {
-                if (isset($idLookup[$preferredType])) {
-                    return $idLookup[$preferredType];
-                }
-            }
-
-            /* If none of the preferred types matched, use the first available identifier
-             * (this catches provider-specific types like canvas_id, powerschool_id, etc.)
-             */
-            if (\count($idLookup)) {
-                return $idLookup[array_key_first($idLookup)];
-            }
-        }
-
-        /* Fall back to Edlink UUID
-         */
-        return $edlinkId;
     }
 }

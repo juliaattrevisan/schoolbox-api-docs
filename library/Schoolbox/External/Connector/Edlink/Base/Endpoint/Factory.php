@@ -13,20 +13,21 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\Edlink\Base\Endpoint\Lookup\PeopleIds;
 use Schoolbox\External\Connector\ValidStrats;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use SensitiveParameter;
 
 /**
  * Class Factory
  *
  * The overall import recipe for Edlink. A composite of multiple classes each
  * of which has its own particular responsibility.
- *
- * Configuration is loaded from a local config.json file in this directory.
  *
  * @package Schoolbox\External\Connector\Edlink\Base\Endpoint
  */
@@ -38,33 +39,28 @@ class Factory
     public const SOURCE_NAME = 'suds_edlink';
 
     /**
-     * Path to the config file, relative to this directory
+     * Get timetable classes occurring this far in the past
+     * Measured in months, defaults to -1 month
      */
-    private const CONFIG_FILE = __DIR__ . '/config.json';
+    private const FROM = -1;
 
     /**
-     * @param ValidStrats                                $validStrats
-     * @param LoggerInterface                            $log
-     * @param bool                                       $perform
-     * @param array                                      $watchlist
-     * @param UserProfile\Mapper                         $baseProfileMapper
-     * @param UserProfile\Student\Mapper                 $studentProfileMapper
-     * @param UserProfile\Parent\Mapper                  $parentProfileMapper
-     * @param UserProfile\Staff\Mapper                   $staffProfileMapper
-     * @param UserProfile\Relationship\Mapper            $relationshipMapper
-     * @param StorageMapper                              $storageMapper
-     * @param \Schoolbox\External\Event\Mapper           $eventMapper
-     * @param ClassEntryMapper                           $classEntryMapper
-     * @param ClassInvolvementMapper                     $classInvolvementMapper
-     * @param ClassPeriodMapper                          $classPeriodMapper
-     * @param TimetablePeriodMapper                      $periodMapper
-     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+     * Get timetable classes up to this far into the future
+     * Measured in months, defaults to 6 months
+     */
+    private const TO = 6;
+
+    /**
+     * Factory constructor.
      */
     public function __construct(
         private ValidStrats $validStrats,
         private LoggerInterface $log,
         private bool $perform,
+        private string $host,
+        #[SensitiveParameter] private string $key,
         private array $watchlist,
+        private bool $includePhoto,
         /* Profile pieces */
         private UserProfile\Mapper $baseProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
@@ -83,54 +79,34 @@ class Factory
     }
 
     /**
-     * Load configuration from the local config.json file
-     *
-     * @return array
-     * @throws \RuntimeException
-     */
-    private function loadConfig(): array
-    {
-        if (!file_exists(self::CONFIG_FILE)) {
-            throw new \RuntimeException(
-                'Edlink config file not found. Copy config.json.example to config.json and add your integration access token.'
-            );
-        }
-
-        $config = json_decode(file_get_contents(self::CONFIG_FILE), true, 512, JSON_THROW_ON_ERROR);
-
-        if (empty($config['token'])) {
-            throw new \RuntimeException('Edlink config.json must contain a non-empty "token" field.');
-        }
-
-        return $config;
-    }
-
-    /**
      * @return GenericCollection
-     * @throws \RuntimeException
+     * @throws \DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
     public function produce(): GenericCollection
     {
-        $this->log->info('EDLINK DIAGNOSTIC: Factory::produce() called');
-
-        $config = $this->loadConfig();
-
-        $this->log->info(sprintf('EDLINK DIAGNOSTIC: Config loaded, token length=%d', strlen($config['token'])));
-
-        /* Spawn an Api instance using the token from config
+        /* Schedule/SUDS Timetable: Date Range
          */
-        $api = new Api($config['token']);
+        $fromDate = \Alaress_Date_Format::now()->addMonths(self::FROM)->startOfMonth();
+        $toDate = \Alaress_Date_Format::now()->addMonths(self::TO)->endOfMonth();
 
-        $importPhotos = (bool)($config['import_photos'] ?? true);
+        /* Spawn an Api instance
+         */
+        $api = new Api(host: $this->host, apiKey: $this->key);
 
+        /* Watchlist helper instance (reused across strategies)
+         */
+        $watcher = new Watchlist();
+
+        /* Shared Edlink UUID -> external ID lookup, populated by Profile and
+         * consumed by Classes. Generated on demand when only timetable sync
+         * is enabled.
+         */
+        $peopleIds = new PeopleIds();
+
+        /* Command bus
+         */
         $bus = new GenericCollection(IStrategy::class);
-
-        $this->log->info(sprintf(
-            'EDLINK DIAGNOSTIC: profileEnabled=%s, timetableEnabled=%s',
-            $this->validStrats->isProfileStratEnabled() ? 'true' : 'false',
-            $this->validStrats->isTimetableStratEnabled() ? 'true' : 'false'
-        ));
 
         if ($this->validStrats->isProfileStratEnabled()) {
             $bus
@@ -148,8 +124,10 @@ class Factory
                     $this->log,
                     $this->perform,
                     $api,
+                    $watcher,
                     $this->watchlist,
-                    $importPhotos,
+                    $this->includePhoto,
+                    $peopleIds,
                     $this->baseProfileMapper,
                     $this->studentProfileMapper,
                     $this->parentProfileMapper,
@@ -184,10 +162,13 @@ class Factory
                     $this->log,
                     $this->perform,
                     $api,
+                    $peopleIds,
                     $this->eventMapper,
                     $this->overridesMapper,
                     $this->classEntryMapper,
-                    $this->classInvolvementMapper
+                    $this->classInvolvementMapper,
+                    $fromDate,
+                    $toDate
                 ))
                 ->add(new TimetableCalendar\Cleanup(
                     $this->log,

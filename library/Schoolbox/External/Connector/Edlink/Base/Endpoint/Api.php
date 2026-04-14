@@ -21,9 +21,14 @@ use SensitiveParameter;
 class Api implements IApi
 {
     /**
-     * Edlink API base URL (hardcoded — no self-hosted option)
+     * Default Edlink API base URI; used when no host override is provided.
      */
-    private const BASE_URI = 'https://ed.link/api/v2/graph/';
+    private const DEFAULT_BASE_URI = 'https://ed.link/api/v2/graph/';
+
+    /**
+     * API path appended to the configured host.
+     */
+    private const API_PATH = '/api/v2/graph/';
 
     /**
      * Number of seconds to wait before retrying a failed endpoint
@@ -51,48 +56,68 @@ class Api implements IApi
     private Client $client;
 
     /**
+     * The base uri used for stripping endpoint prefixes in ApiUsage.
+     */
+    private string $baseUri = '';
+
+    /**
+     * Cache the decoded credentials for diagnostics.
+     *
+     * @var array
+     */
+    private array $credentials = [];
+
+    /**
      * Constructor.
      *
-     * @param string $token The Edlink integration access token
+     * @param string $host   Optional base host override. Empty string falls back to ed.link.
+     * @param string $apiKey The DSN-encoded credentials (token=...).
+     * @param int    $timeout
+     * @throws \DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    public function __construct(#[SensitiveParameter] string $token)
-    {
-        $this->client = $this->initClient($token, self::DEFAULT_TIMEOUT);
-        $this->apiUsage = new ApiUsage(self::BASE_URI);
+    public function __construct(
+        private string $host,
+        #[SensitiveParameter] private string $apiKey,
+        private int $timeout = self::DEFAULT_TIMEOUT
+    ) {
+        $this->client = $this->initClient($this->host, $this->apiKey, $this->timeout);
+        $this->apiUsage = new ApiUsage($this->baseUri);
     }
 
     /**
      * Set up guzzle client
      *
-     * @param string $token
-     * @param int    $timeout
-     * @return Client
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \DomainException
      */
-    private function initClient(#[SensitiveParameter] string $token, int $timeout): Client
+    private function initClient(string $host, #[SensitiveParameter] string $dsn, int $timeout): Client
     {
-        $headers = [
-            'Authorization' => "Bearer {$token}",
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-        ];
+        $this->credentials = (new Codec\DSN())->decode($dsn);
+
+        /* Host defaults to ed.link when the admin hasn't set one.
+         * When an override is supplied (staging / self-hosted), append the
+         * standard API path.
+         */
+        $host = trim($host);
+        $this->baseUri = '' === $host
+            ? self::DEFAULT_BASE_URI
+            : rtrim($host, '/') . self::API_PATH;
 
         return new Client([
-            'headers' => $headers,
-            'base_uri' => self::BASE_URI,
+            'base_uri' => $this->baseUri,
             'timeout' => $timeout,
             'http_errors' => false,
+            'headers' => [
+                'Authorization' => "Bearer {$this->credentials['token']}",
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
         ]);
     }
 
     /**
      * @inheritDoc
      *
-     * @param string $method
-     * @param string $endpoint
-     * @param array  $params
-     * @return array
      * @throws \RuntimeException
      * @throws \DomainException
      * @throws \JsonException
@@ -100,9 +125,6 @@ class Api implements IApi
     public function retrieve(string $method, string $endpoint, array $params = []): array
     {
         $response = null;
-
-        $this->apiUsage->record($endpoint);
-
         $fails = 0;
 
         while ($fails < self::NUM_RETRY) {
@@ -113,12 +135,14 @@ class Api implements IApi
                     $options[RequestOptions::QUERY] = $params;
                 }
 
+                $start = microtime(true);
                 $response = $this->client->request($method, $endpoint, $options);
+                $end = microtime(true);
+
+                $this->apiUsage->record($endpoint, $end - $start);
             } catch (\GuzzleHttp\Exception\GuzzleException $e) {
                 $fails++;
-
                 sleep(self::NAP_TIMEOUT);
-
                 continue;
             }
 
@@ -138,7 +162,6 @@ class Api implements IApi
             }
 
             $fails++;
-
             sleep(self::NAP_TIMEOUT);
         }
 
@@ -168,5 +191,15 @@ class Api implements IApi
     public function getUsage(): ApiUsage
     {
         return $this->apiUsage;
+    }
+
+    /**
+     * Get decoded DSN pieces.
+     *
+     * @return array
+     */
+    public function getCredentials(): array
+    {
+        return $this->credentials;
     }
 }

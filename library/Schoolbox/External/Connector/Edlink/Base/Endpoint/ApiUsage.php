@@ -19,35 +19,38 @@ namespace Schoolbox\External\Connector\Edlink\Base\Endpoint;
 class ApiUsage
 {
     /**
+     * A list of (endpoint, count, duration) tuples
+     *
      * @var array
      */
     private array $usage = [];
 
     /**
-     * @var string
+     * ApiUsage constructor.
      */
-    private string $baseUri;
-
-    /**
-     * @param string $baseUri
-     */
-    public function __construct(string $baseUri)
+    public function __construct(private string $baseUri)
     {
-        $this->baseUri = $baseUri;
     }
 
     /**
-     * @param string $endpoint
+     * Increment count and total duration spent in an endpoint
      */
-    public function record(string $endpoint): void
+    public function record(string $endpoint, float $duration): void
     {
+        /* Remove querystring params and base-uri prefix so that paginated
+         * calls for the same endpoint collapse into a single row.
+         */
         $baseEndpoint = str_replace($this->baseUri, '', explode('?', $endpoint)[0]);
 
         if (!isset($this->usage[$baseEndpoint])) {
-            $this->usage[$baseEndpoint] = 0;
+            $this->usage[$baseEndpoint] = [
+                'count' => 0,
+                'duration' => 0.0
+            ];
         }
 
-        $this->usage[$baseEndpoint]++;
+        $this->usage[$baseEndpoint]['count']++;
+        $this->usage[$baseEndpoint]['duration'] += $duration;
     }
 
     /**
