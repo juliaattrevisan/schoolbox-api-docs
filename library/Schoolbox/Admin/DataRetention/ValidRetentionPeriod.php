@@ -10,8 +10,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\DataRetention;
 
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
-
 /**
  * Specification-style validator for CLI --retention-period values.
  */
