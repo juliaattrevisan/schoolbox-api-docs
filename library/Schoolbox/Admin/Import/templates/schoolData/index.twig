@@ -21,6 +21,11 @@
         let sisConfigElements = $('#schooldata_import_endpoint_host, #schooldata_import_endpoint_key, #schooldata_import_frequency, #schooldata_import_dailyorg_time, #schooldata_import_dailyorg_time-field, #schooldata_import_managed_hours, #schooldata_import_managed_hours-field, #schooldata_import_timeout');
         let csvConfigElements = $('#schooldata_import_frequency, #schooldata_import_managed_hours, #schooldata_import_managed_hours-field, #schooldata_import_timeout');
 
+        {# Data sources that always hit a fixed host (configured in the connector),
+         # so the shared Endpoint Host field is not needed.
+         #}
+        let hostlessDataSources = ['edlink'];
+
         {# On document.ready, using dataSource, decide which island to show:
          # it's one of either csv island or config island
          #}
@@ -186,6 +191,14 @@
 
             $('[data-data-source="'+dataSource+'"]').show();
             $('[data-data-source="'+dataSource+'"] input').prop('disabled', false);
+
+            /* Some data sources always hit a fixed host (e.g. Edlink talks to
+             * ed.link); hide the shared Endpoint Host field for those so the
+             * admin isn't asked for something the connector ignores.
+             */
+            if (hostlessDataSources.indexOf(dataSource) !== -1) {
+                $('#schooldata_import_endpoint_host').parent('div').hide();
+            }
         }
 
         /* Live Update as per UPS implementation
