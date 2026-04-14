@@ -415,7 +415,7 @@ class Factory
         $this->setShuffleItems((int)($post['shuffleItems'] ?? 0));
         $this->setPromptsMode((int)($post['promptsMode'] ?? 0));
         $this->setMaxAttempts((int)($post['maxAttempts'] ?? 0));
-        $this->setMarkVisibility((int)($post['visibility'] ?? 0));
+        $this->setMarkVisibility($post['visibility'] ?? IAssessable::MARK_VISIBILITY_PRIVATE);
         $this->setCompletionMessage($post['completion_message'] ?? '');
 
         // LTI needs this to instantiate correctly
