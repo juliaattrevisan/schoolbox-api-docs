@@ -7,60 +7,72 @@ namespace Schoolbox\Admin\DataRetention\Test;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Admin\DataRetention\ValidRetentionPeriod;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class ValidRetentionPeriodTest extends TestCase
 {
-    /**
-     * @param int|string $input
-     */
-    #[DataProvider('providerValidRetentionPeriods')]
-    public function testAcceptsPositiveIntegersAndNumericStrings(null|int|string $input): void
+    #[DataProvider('providerIsSatisfiedBy')]
+    public function testIsSatisfiedBy(mixed $input, bool $expected): void
     {
         $spec = new ValidRetentionPeriod();
 
-        $this->assertTrue($spec->isSatisfiedBy($input));
+        $this->assertSame($expected, $spec->isSatisfiedBy($input));
     }
 
-    public function testEmptyStringIsRejected(): void
-    {
-        $spec = new ValidRetentionPeriod();
-
-        $this->assertFalse($spec->isSatisfiedBy(''));
-    }
-
-    /**
-     * @param mixed $input
-     */
-    #[DataProvider('providerInvalidRetentionPeriods')]
-    public function testInvalidValuesRaiseException(mixed $input): void
-    {
-        $spec = new ValidRetentionPeriod();
-
-        $this->assertFalse($spec->isSatisfiedBy($input));
-    }
-
-    public static function providerValidRetentionPeriods(): array
+    public static function providerIsSatisfiedBy(): array
     {
         return [
-            'null' => [null],
-            'int 1' => [1],
-            'int 30' => [30],
-            'string 1' => ['1'],
-            'string 365' => ['365'],
-            'string 2556' => ['2556'], // 7 years (days)
-        ];
-    }
-
-    public static function providerInvalidRetentionPeriods(): array
-    {
-        return [
-            'int zero' => [0],
-            'int negative' => [-1],
-            'string zero' => ['0'],
-            'string negative' => ['-5'],
-            'string decimal' => ['1.5'],
-            'string non-numeric' => ['foo'],
+            'null (default retention period)' => [ // label
+                null, // input
+                true // expected value (output)
+            ],
+            'int 1' => [
+                1,
+                true
+            ],
+            'int 30' => [
+                30,
+                true
+            ],
+            'string 1' => [
+                '1',
+                true
+            ],
+            'string 365' => [
+                '365',
+                true
+            ],
+            'string 2556' => [
+                '2556', // 7 years (days)
+                true
+            ],
+            'empty string' => [
+                '',
+                false
+            ],
+            'int zero' => [
+                0,
+                false
+            ],
+            'int negative' => [
+                -1,
+                false
+            ],
+            'string zero' => [
+                '0',
+                false
+            ],
+            'string negative' => [
+                '-5',
+                false
+            ],
+            'string decimal' => [
+                '1.5',
+                false
+            ],
+            'string non-numeric' => [
+                'foo',
+                false
+            ],
         ];
     }
 }
