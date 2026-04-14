@@ -24,10 +24,6 @@ class RetentionPeriod
      */
     public function __construct(private int|null $days = null)
     {
-        if (null !== $days) {
-            // Compute database date using the project's date helper
-            $this->date = \Alaress_Date_Format::newNaturalDate(sprintf("-%d days", $this->days))->getDatabaseDate();
-        }
     }
 
     /**
@@ -48,17 +44,23 @@ class RetentionPeriod
      */
     public function calculateDate(int $days): string
     {
-        if ($this->date) {
-            // just return what we calculated before
-            return $this->date;
-        }
-        if (!new ValidRetentionPeriod()->isSatisfiedBy($days)) {
-            // we stored an illegal value but tried to continue: die loudly as a safety precaution
-            throw new SchoolboxException('Invalid retention period value stored; cannot calculate date cutoff.');
+        // if we haven't cached the days (no override)
+        // we validate and cache that now
+        if (!$this->days) {
+            if (!new ValidRetentionPeriod()->isSatisfiedBy($days)) {
+                // we stored an illegal value but tried to continue: die loudly as a safety precaution
+                throw new SchoolboxException('Invalid retention period value stored; cannot calculate date cutoff.');
+            }
+
+            $this->days = $days;
         }
 
-        $this->days = $days;
-        $this->date = \Alaress_Date_Format::newNaturalDate(sprintf("-%d days", $this->days))->getDatabaseDate();
+        // cache the db date, so we don't need to keep calling
+        if ($this->date === null) {
+            $this->date = \Alaress_Date_Format::newNaturalDate(sprintf("-%d days", $this->days))->getDatabaseDate();
+        }
+
+        // return the cached date
         return $this->date;
     }
 
