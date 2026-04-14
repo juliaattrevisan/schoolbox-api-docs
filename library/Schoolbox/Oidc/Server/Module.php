@@ -140,32 +140,37 @@ class Module extends BaseModule
             ),
         );
 
-        // Auth code grant:
-        // auth codes expire after 10 minutes, refresh tokens after 1 month
+        // Auth codes expire after 10 minutes
+        $authCodeExpiry = new DateInterval('PT10M');
+
+        // All access tokens expire after 1 hour, regardless of grant type
+        $accessTokenExpiry = new DateInterval('PT1H');
+
+        // Refresh tokens expire after 1 month
+        $refreshTokenExpiry = new DateInterval('P1M');
+
+        // Enable auth code grant
         $authCodeGrant = new Grant\AuthCode(
             $authCodeRepository,
             $refreshTokenRepository,
-            new DateInterval('PT10M'),
+            $authCodeExpiry,
         );
-        $authCodeGrant->setRefreshTokenTTL(new DateInterval('P1M'));
-        $authServer->enableGrantType($authCodeGrant);
+        $authCodeGrant->setRefreshTokenTTL($refreshTokenExpiry);
+        $authServer->enableGrantType($authCodeGrant, $accessTokenExpiry);
 
-        // Refresh code grant: expires after 1 month
+        // Enable refresh code grant
         $refreshCodeGrant = new Server\Grant\RefreshTokenGrant($refreshTokenRepository);
-        $refreshCodeGrant->setRefreshTokenTTL(new DateInterval('P1M'));
-        $authServer->enableGrantType($refreshCodeGrant);
+        $refreshCodeGrant->setRefreshTokenTTL($refreshTokenExpiry);
+        $authServer->enableGrantType($refreshCodeGrant, $accessTokenExpiry);
 
-        // Client credentials grant: access tokens expire after 1 hour
-        $authServer->enableGrantType(
-            new Server\Grant\ClientCredentialsGrant(),
-            new DateInterval('PT1H'),
-        );
+        // Enable client credentials grant
+        $authServer->enableGrantType(new Server\Grant\ClientCredentialsGrant(), $accessTokenExpiry);
 
         // Implicit grant: apparently deprecated, but is required according to:
         // https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
-        // Nonetheless, access tokens expire after 1 hour
-        $implicitGrant = new Grant\Implicit(new DateInterval('PT1H'), '?');
-        $authServer->enableGrantType($implicitGrant);
+        // Nonetheless, enable it
+        $implicitGrant = new Grant\Implicit($accessTokenExpiry, '?');
+        $authServer->enableGrantType($implicitGrant, $accessTokenExpiry);
 
         return new Controller(
             $authServer,
