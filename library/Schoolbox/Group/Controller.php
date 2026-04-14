@@ -279,12 +279,19 @@ class Controller extends BaseController
     {
         $q         = $this->requestQuery->get('q') ?? '';
         $typeRaw   = $this->requestQuery->get('type');
-        $limit     = $this->requestQuery->getInt('limit') ?? Group::DEFAULT_GROUP_API_LIMIT;
+        $limitRaw  = $this->requestQuery->get('limit');
         $cursor    = $this->requestQuery->get('cursor');
 
-        if ($limit <= 0) {
-            $this->sendJsonError('Invalid limit value.', 400);
-            return;
+        // Validate and resolve limit
+        if ($limitRaw !== null) {
+            // ctype_digit rejects empty string, negative signs, and non-integer values; the > 0 check is for clarity
+            if (!ctype_digit((string)$limitRaw) || (int)$limitRaw <= 0) {
+                $this->sendJsonError('Invalid limit value.', 400);
+                return;
+            }
+            $limit = (int)$limitRaw;
+        } else {
+            $limit = Group::DEFAULT_GROUP_API_LIMIT;
         }
 
         // Validate and resolve type
