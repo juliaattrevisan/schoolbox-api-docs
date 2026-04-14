@@ -14,6 +14,7 @@ use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use PDO;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -179,6 +180,7 @@ class GroupMapper extends Mapper
      * @param int      $limit  Maximum number of results to return.
      * @param int|null $cursor Return only groups with folder id > this value. Null means start from beginning.
      * @return array{results: \Schoolbox\GenericCollection, nextCursor: int|null}
+     * @throws Exception
      */
     public function findAllForApi(string $q, ?int $type, int $limit, ?int $cursor): array
     {
@@ -193,7 +195,7 @@ class GroupMapper extends Mapper
 
         if ($q !== '') { // empty string = no name filter
             $conditions[] = 'f.name LIKE :name';
-            $params['name'] = "%{$q}%";
+            $params['name'] = '%' . $this->database->getQuoter()->escapeForLike($q) . '%';
         }
 
         if ($type !== null) {

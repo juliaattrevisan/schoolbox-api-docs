@@ -271,33 +271,27 @@ class Controller extends BaseController
      * Search/list groups for API consumers
      *
      * @return void
-     * @api   GET /groups/search
+     * @throws MapperException
      * @since 26.0
+     * @api   GET /groups/search
      */
     public function apiGetGroups(): void
     {
-        $q         = (string)($this->requestQuery->get('q') ?? '');
+        $q         = $this->requestQuery->get('q') ?? '';
         $typeRaw   = $this->requestQuery->get('type');
-        $limitRaw  = $this->requestQuery->get('limit');
+        $limit     = $this->requestQuery->getInt('limit') ?? Group::DEFAULT_GROUP_API_LIMIT;
         $cursor    = $this->requestQuery->get('cursor');
 
-        // Validate and resolve limit
-        if ($limitRaw !== null) {
-            // ctype_digit rejects empty string, negative signs, and non-integer values; the > 0 check is for clarity
-            if (!ctype_digit((string)$limitRaw) || (int)$limitRaw <= 0) {
-                $this->sendJsonError('Invalid limit value', 400);
-                return;
-            }
-            $limit = (int)$limitRaw;
-        } else {
-            $limit = 50;
+        if ($limit <= 0) {
+            $this->sendJsonError('Invalid limit value.', 400);
+            return;
         }
 
         // Validate and resolve type
         if ($typeRaw !== null) {
             $typeStr = (string)$typeRaw;
             if (!array_key_exists($typeStr, Group::TYPE_NAME_TO_VAL)) {
-                $this->sendJsonError('Invalid type value', 400);
+                $this->sendJsonError('Invalid type value.', 400);
                 return;
             }
             $type = Group::TYPE_NAME_TO_VAL[$typeStr];
@@ -309,7 +303,7 @@ class Controller extends BaseController
         if ($cursor !== null && $cursor !== '') {
             $decoded = base64_decode($cursor, true);
             if ($decoded === false || !is_array($decoded = json_decode($decoded, true))) {
-                $this->sendJsonError('Invalid cursor value', 400);
+                $this->sendJsonError('Invalid cursor value.', 400);
                 return;
             }
             $cursorId = isset($decoded['id']) ? (int)$decoded['id'] : null;

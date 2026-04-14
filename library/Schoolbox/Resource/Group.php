@@ -29,6 +29,8 @@ class Group
     public const MODERATED_TYPE_NAME = 'moderated';
     public const FREE_TYPE_NAME      = 'free';
 
+    public const int DEFAULT_GROUP_API_LIMIT = 500;
+
     public const TYPE_NAME_TO_VAL = [
         self::PRIVATE_TYPE_NAME   => self::PRIVATE_GROUP,
         self::MODERATED_TYPE_NAME => self::MODERATED_GROUP,
@@ -63,6 +65,13 @@ class Group
      * @var bool
      */
     private bool $notificationDisabled = false;
+
+    /**
+     * Transient: total active members for this group, populated by GroupMapper::findAllForApi().
+     * Not persisted to the database.
+     * Defaults to NULL when it's not hydrated to distinguish from 0 members.
+     */
+    private ?int $memberCount = null;
 
     /**
      * Test if group is private
@@ -179,15 +188,9 @@ class Group
     }
 
     /**
-     * Transient: total active members for this group, populated by GroupMapper::findAllForApi().
-     * Not persisted to the database.
+     * @return ?int
      */
-    private int $memberCount = 0;
-
-    /**
-     * @return int
-     */
-    public function getMemberCount(): int
+    public function getMemberCount(): ?int
     {
         return $this->memberCount;
     }
