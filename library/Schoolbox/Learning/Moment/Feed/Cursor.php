@@ -462,14 +462,23 @@ class Cursor implements ICursor
 
         // Determine mark visibility.
         if ($this->viewer->getRole()->isStaff()) {
-            $visibility = IAssessable::MARK_VISIBILITY_PRIVATE;
+            $visibilities = [
+                IAssessable::MARK_VISIBILITY_PRIVATE,
+                IAssessable::MARK_VISIBILITY_STUDENT,
+                IAssessable::MARK_VISIBILITY_PARENT,
+                IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
+            ];
         } elseif ($this->viewer->getRole()->isStudent()) {
-            $visibility = IAssessable::MARK_VISIBILITY_STUDENT;
+            $visibilities   = [IAssessable::MARK_VISIBILITY_STUDENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
+            $filterWorkType = true;
         } elseif ($this->viewer->getRole()->isParent()) {
-            $visibility = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
+            $visibilities   = [IAssessable::MARK_VISIBILITY_PARENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
+            $filterWorkType = true;
         } else {
             throw new UnexpectedValueException('Unexpected User: ' . $this->viewer->getId());
         }
+
+        $visibilityPlaceholders = implode(', ', array_map(fn($i) => ":markVisibility{$i}", range(0, count($visibilities) - 1)));
 
         $query = 'SELECT ';
         $params = [];
@@ -486,18 +495,20 @@ class Cursor implements ICursor
         }
 
         $query .= (
-            'FROM `submission_return`
+            "FROM `submission_return`
              JOIN `submission_box` ON `submission_return`.`box_id` = `submission_box`.`id`
              JOIN `assessment` ON `assessment`.`id` = `submission_box`.`assessment_id`
              WHERE `review_route` = :reviewRoute
              AND `submission_return`.`published_at` IS NOT NULL
              AND `submission_return`.`owner` = :userIdDueWorkFeedback
-             AND `submission_box`.`mark_visibility` >= :markVisibility
+             AND `submission_box`.`mark_visibility` IN ($visibilityPlaceholders)
              AND `submission_return`.`deleted_at` IS NULL
-             AND `assessment`.`deleted_at` IS NULL '
+             AND `assessment`.`deleted_at` IS NULL "
         );
         $params['userIdDueWorkFeedback'] = $this->viewee->getId();
-        $params['markVisibility']        = $visibility;
+        foreach ($visibilities as $i => $v) {
+            $params["markVisibility{$i}"] = $v;
+        }
         $params['reviewRoute']           = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
 
         // Note that since work type visibility is a bit complicated now (see comments above visibility constants in
@@ -531,14 +542,23 @@ class Cursor implements ICursor
 
         // Determine mark visibility.
         if ($this->viewer->getRole()->isStaff()) {
-            $visibility = IAssessable::MARK_VISIBILITY_PRIVATE;
+            $visibilities = [
+                IAssessable::MARK_VISIBILITY_PRIVATE,
+                IAssessable::MARK_VISIBILITY_STUDENT,
+                IAssessable::MARK_VISIBILITY_PARENT,
+                IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
+            ];
         } elseif ($this->viewer->getRole()->isStudent()) {
-            $visibility = IAssessable::MARK_VISIBILITY_STUDENT;
+            $visibilities   = [IAssessable::MARK_VISIBILITY_STUDENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
+            $filterWorkType = true;
         } elseif ($this->viewer->getRole()->isParent()) {
-            $visibility = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
+            $visibilities   = [IAssessable::MARK_VISIBILITY_PARENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT];
+            $filterWorkType = true;
         } else {
             throw new UnexpectedValueException('Unexpected User: ' . $this->viewer->getId());
         }
+
+        $visibilityPlaceholders = implode(', ', array_map(fn($i) => ":markVisibility{$i}", range(0, count($visibilities) - 1)));
 
         $query = 'SELECT ';
         $params = [];
@@ -561,12 +581,14 @@ class Cursor implements ICursor
             JOIN `assessment` ON `assessment`.`id` = `assess`.`assessment_id`
             WHERE `assess_attempt`.`reviewed_at` IS NOT NULL
             AND `assess_attempt`.`user_id` = :userIdQuizFeedback
-            AND `assess`.`mark_visibility` >= :markVisibility
+            AND `assess`.`mark_visibility` IN ($visibilityPlaceholders)
             AND `assess_attempt`.`deleted_at` IS NULL
             AND `assessment`.`deleted_at` IS NULL
         ");
         $params['userIdQuizFeedback'] = $this->viewee->getId();
-        $params['markVisibility']     = $visibility;
+        foreach ($visibilities as $i => $v) {
+            $params["markVisibility{$i}"] = $v;
+        }
 
         // Note that since work type visibility is a bit complicated now (see comments above visibility constants in
         // Assessment\WorkType\Mapper), filtering based on work type visibility must now be done in PHP instead of SQL,
