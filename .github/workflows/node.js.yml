@@ -19,7 +19,7 @@ concurrency:
 jobs:
   build:
     timeout-minutes: 25
-    runs-on: onprem-k3s
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         node-version: [20.x]
@@ -38,7 +38,7 @@ jobs:
 
   typecheck:
     timeout-minutes: 25
-    runs-on: onprem-k3s
+    runs-on: ubuntu-24.04
 
     strategy:
       matrix:
@@ -59,7 +59,7 @@ jobs:
 
   eslint:
     timeout-minutes: 25
-    runs-on: onprem-k3s
+    runs-on: ubuntu-24.04
 
     strategy:
       matrix:
@@ -80,7 +80,7 @@ jobs:
 
   prettier:
     timeout-minutes: 25
-    runs-on: onprem-k3s
+    runs-on: ubuntu-24.04
 
     strategy:
       matrix:
