@@ -195,7 +195,7 @@ class CommandLineTool extends CliTool\App
                 $lock,
                 $this->getConfig(),
                 $endTime,
-                $retentionPeriod,
+                clone $retentionPeriod,
                 $loopCount,
                 $chunkSize,
             );
@@ -208,7 +208,7 @@ class CommandLineTool extends CliTool\App
                 $lock,
                 $this->getConfig(),
                 $endTime,
-                $retentionPeriod,
+                clone $retentionPeriod,
                 $loopCount,
                 $chunkSize,
             );
