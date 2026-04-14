@@ -48,16 +48,16 @@ const buttonCount = window.Vue.computed(() => {
                 class="icon-report"
                 title="View Curriculum Coverage Report"
             ></a>
-            <!-- TODO(SA-22099): Replace this legacy add/close icon toggle with `sbx-icon` once the toggle states are rendered explicitly. -->
             <a
                 v-if="!store.isReadOnly"
                 href="#create-curriculum"
                 data-interaction="create-curriculum"
                 data-test="toggle-create-curriculum"
-                :class="`icon ${addCurriculumStore.isOpen ? 'icon-close' : 'icon-add'}`"
+                class="sbx-icon-only-button"
                 title="Create New Curriculum"
                 @click.prevent="onCreateNewSelected"
             >
+                <sbx-icon :name="addCurriculumStore.isOpen ? 'close' : 'add'"></sbx-icon>
             </a>
         </nav>
     </div>

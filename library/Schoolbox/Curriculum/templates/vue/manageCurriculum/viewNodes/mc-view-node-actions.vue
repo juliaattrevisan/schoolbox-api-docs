@@ -53,23 +53,24 @@ function onUpdateToggleSelected(): void {
         Export {{ props.title }}
     </a>
     <button
-        :class="`button-action-option ${props.isUpdating ? 'icon-close' : 'icon-modify'}`"
+        class="sbx-icon-only-button"
         :title="`Update ${props.title}`"
+        :aria-label="`Update ${props.title}`"
         :disabled="props.isViewing || props.isAdding"
         data-test-update
         @click.prevent="onUpdateToggleSelected"
     >
-        Update {{ props.title }}
+        <sbx-icon :name="props.isUpdating ? 'close' : 'modify'"></sbx-icon>
     </button>
-    <!-- TODO(SA-22099): Replace this legacy add/close icon toggle with `sbx-icon` once the toggle states are rendered explicitly. -->
     <button
-        :class="`button-action-option ${props.isAdding ? 'icon-close' : 'icon-add'}`"
+        class="sbx-icon-only-button"
         :title="`Add subsection to ${props.title}`"
+        :aria-label="`Add subsection to ${props.title}`"
         :disabled="props.isViewing || props.isUpdating"
         data-test-add
         @click.prevent="onAddSubsectionToggleSelected"
     >
-        Add subsection to {{ props.title }}
+        <sbx-icon :name="props.isAdding ? 'close' : 'add'"></sbx-icon>
     </button>
 </template>
 
