@@ -231,16 +231,17 @@ interface IAssessable extends ISoftDeletable
      *
      * * self::MARK_VISIBILITY_PRIVATE: only staff may view
      * * self::MARK_VISIBILITY_STUDENT: staff and students may view
+     * * self::MARK_VISIBILITY_PARENT: staff and parents may view
      * * self::MARK_VISIBILITY_PARENT_STUDENT: staff, students and parents may view
      *
-     * @return int
+     * @return string
      */
     public function getMarkVisibility();
 
     /**
      * Sets the mark visibility of this assessment.
      *
-     * @param int $markVisibility
+     * @param string $markVisibility
      * @return static
      */
     public function setMarkVisibility($markVisibility);
