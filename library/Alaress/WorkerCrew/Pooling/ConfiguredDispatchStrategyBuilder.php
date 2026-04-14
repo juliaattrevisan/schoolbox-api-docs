@@ -44,6 +44,9 @@ class ConfiguredDispatchStrategyBuilder
     /** @var int */
     protected $workerWriteTimeout = DefaultDispatchStrategy::WORKER_WRITE_TIMEOUT;
 
+    /** @var int */
+    protected $metricInterval = DefaultDispatchStrategy::METRIC_INTERVAL;
+
 
     /**
      * @param array $conf
@@ -77,6 +80,7 @@ class ConfiguredDispatchStrategyBuilder
             $flags,
             $this->maxRequestsPerWorker,
             $this->workerWriteTimeout,
+            $this->metricInterval,
         );
     }
 
