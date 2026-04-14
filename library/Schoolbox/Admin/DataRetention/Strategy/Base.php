@@ -15,6 +15,7 @@ namespace Schoolbox\Admin\DataRetention\Strategy;
 use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\DataRetention\RetentionPeriod;
+use Schoolbox\Admin\DataRetention\ValidRetentionPeriod;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\IConfigLoader;
 use Symfony\Component\Lock\LockInterface;
@@ -184,6 +185,11 @@ abstract class Base implements IStrategy
         if ($this->config->get($this->retentionConfigKey) === null || '' === $this->config->get($this->retentionConfigKey)) {
             $this->log->warning(sprintf("Retention period not set for '%s'. Skipping.", $this->getStrategyName()));
             return null;
+        }
+
+        // validate the admin config, before using it.
+        if (!new ValidRetentionPeriod()->isSatisfiedBy((int)$this->config->get($this->retentionConfigKey))) {
+            $this->log->warning(sprintf("Invalid retention period '%s' stored; cannot calculate date cutoff.. Skipping.", $this->config->get($this->retentionConfigKey)));
         }
 
         try {
