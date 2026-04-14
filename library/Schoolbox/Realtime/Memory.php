@@ -93,5 +93,4 @@ class Memory
         }
         return self::$pageSize;
     }
-
 }
