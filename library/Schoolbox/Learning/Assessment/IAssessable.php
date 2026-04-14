@@ -27,10 +27,10 @@ use Schoolbox\Curriculum\Node;
 
 interface IAssessable extends ISoftDeletable
 {
-    public const int MARK_VISIBILITY_PRIVATE        = SubmissionBox::MARK_VISIBILITY_STAFF_ONLY;
-    public const int MARK_VISIBILITY_STUDENT        = SubmissionBox::MARK_VISIBILITY_STAFF_AND_STUDENT;
-    public const int MARK_VISIBILITY_PARENT         = SubmissionBox::MARK_VISIBILITY_STAFF_AND_PARENT;
-    public const int MARK_VISIBILITY_PARENT_STUDENT = SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT;
+    public const string MARK_VISIBILITY_PRIVATE        = SubmissionBox::MARK_VISIBILITY_STAFF_ONLY;
+    public const string MARK_VISIBILITY_STUDENT        = SubmissionBox::MARK_VISIBILITY_STAFF_AND_STUDENT;
+    public const string MARK_VISIBILITY_PARENT         = SubmissionBox::MARK_VISIBILITY_STAFF_AND_PARENT;
+    public const string MARK_VISIBILITY_PARENT_STUDENT = SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT;
 
     /**
      * The default readable name for this type of assessment, NOT translated
