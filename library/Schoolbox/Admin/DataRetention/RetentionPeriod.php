@@ -18,7 +18,10 @@ class RetentionPeriod
 
     /**
      * Construct with an optional day-count. Use null to indicate "retain indefinitely".
-     * Accepts integer, numeric string, or null.
+     * Accepts:
+     * int (override whatever we pass through caculateDate, every strat gets this days value),
+     * or null (no override, calculateDate will and cache the days value on first call, and use that for all subsequent calls).
+     *
      * @param int|null $days
      * @throws SchoolboxException
      */
