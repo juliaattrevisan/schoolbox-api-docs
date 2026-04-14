@@ -212,9 +212,9 @@ window.Vue.onMounted(() => {
 */
 .sbx-button--component-action.sbx-body {
     background: var(--sbx-color-foreground-primary);
-    border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+    border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
     border-radius: var(--sbx-config-field-roundness);
-    color: var(--sbx-color-accent);
+    color: var(--sbx-config-color-accent);
     font-size: var(--sbx-font-size-s);
     font-weight: var(--sbx-font-weight-normal);
     text-transform: capitalize;
@@ -224,7 +224,7 @@ window.Vue.onMounted(() => {
     background-color: var(
         --sbx-color-foreground-primary
     ); /* ^foundation-fixes^ - remove the use of --content-ui-hover */
-    color: var(--sbx-color-accent); /* ^foundation-fixes^ - remove the change of text colour on hover */
+    color: var(--sbx-config-color-accent); /* ^foundation-fixes^ - remove the change of text colour on hover */
     filter: brightness(1.1);
 }
 

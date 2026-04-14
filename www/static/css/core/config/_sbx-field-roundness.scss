@@ -52,7 +52,8 @@ body.sbx-body {
     .alert-box-icon .close,
     .selected-item,
     .selected-nodes-container,
-    blockquote {
+    blockquote,
+    .clr-field button {
         border-radius: var(--sbx-config-field-roundness) !important;
     }
 }

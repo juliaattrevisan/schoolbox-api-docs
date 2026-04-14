@@ -128,8 +128,8 @@ Long term they will reference the design colour tokens
 }
 
 .sbx-label-button:focus {
-    border-color: var(--sbx-color-accent, black);
-    outline: var(--sbx-border-width-normal, 1px) solid var(--sbx-color-accent, black);
+    border-color: var(--sbx-config-color-accent, black);
+    outline: var(--sbx-border-width-normal, 1px) solid var(--sbx-config-color-accent, black);
     outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 

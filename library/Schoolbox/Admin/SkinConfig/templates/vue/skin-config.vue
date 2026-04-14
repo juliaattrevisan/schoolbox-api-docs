@@ -5,9 +5,9 @@
  */
 
 import { apiRequest } from "@js/util/sbx/apiUtils";
-import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import type { Routes, SkinConfigData } from "../js/types/skinConfigTypes";
+import ScCategories from "./sc-categories.vue";
 import { useSkinConfigState } from "./composable/useSkinConfigState";
 import { useSkinPreview } from "./composable/useSkinPreview";
 
@@ -19,11 +19,47 @@ const props = defineProps<{
 const isProcessing = window.Vue.ref(false);
 const loadError = window.Vue.ref<string | null>(null);
 const saveText = window.Vue.computed(() => (isProcessing.value ? "Saving..." : "Save"));
-const { configs, saveContainer, hasUnsavedChanges, showSaveDrawer, resetToSavedState, markCurrentAsSaved } =
+const { configs, hasUnsavedChanges, initialiseColourPickers, resetToSavedState, markCurrentAsSaved } =
     useSkinConfigState(props.configs, isProcessing, () => {
         schedulePreviewRefresh();
     });
 const { schedulePreviewRefresh } = useSkinPreview(configs, props.routes.preview);
+
+/**
+ * Persist the toggle state immediately, then reload the page so server-rendered assets are reapplied.
+ */
+async function onToggleChanged(): Promise<void> {
+    if (isProcessing.value) {
+        return;
+    }
+    const previousToggleEnabled = !configs.value.toggle.enabled;
+    const toast = window.sbProps.toastActivate("Saving...");
+    try {
+        isProcessing.value = true;
+        loadError.value = null;
+        const response = await apiRequest({
+            url: props.routes.post,
+            method: "POST",
+            body: {
+                configs: {
+                    toggle: configs.value.toggle,
+                },
+            },
+        });
+        if (!response.success) {
+            throw new Error(response.message || "Failed to save");
+        }
+        window.location.reload();
+    } catch (error) {
+        configs.value.toggle.enabled = previousToggleEnabled;
+        const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
+        loadError.value = errorMessage;
+        toast.timeout({ text: errorMessage, isSuccess: false });
+        await initialiseColourPickers();
+    } finally {
+        isProcessing.value = false;
+    }
+}
 
 /**
  * Restore the last saved config state.
@@ -68,112 +104,50 @@ async function onSaveSelected(): Promise<void> {
 </script>
 
 <template>
-    <div data-test="skin-config-container">
-        <div v-if="loadError" class="small-12 columns" data-test="custom-participation-load-error">
+    <div data-test="skin-config-container" class="l-flex-col l-gap-l l-pad-m--horiz">
+        <div v-if="loadError" data-test="skin-config-load-error">
             <request-error :further-info="loadError" />
         </div>
-        <form method="post" class="skin-config-form" @submit.prevent="onSaveSelected">
-            <div
-                v-for="(subcategories, categoryKey) in configs"
-                :key="categoryKey"
-                class="small-12 island"
-                :data-test="`skin-config-category-${categoryKey}`"
-            >
-                <div class="row">
-                    <div class="list-item">
-                        <div class="small-12 island">
-                            <h2 class="subheader">{{ categoryKey }}</h2>
-                        </div>
-                    </div>
-                </div>
-                <section>
-                    <fieldset
-                        v-for="(subcategory, index) in subcategories"
-                        :key="subcategory.name || `default-${index}`"
-                        class="content"
-                        :data-test="`skin-config-subcategory-${subcategory.name || `default-${index}`}`"
+        <form method="post" class="l-flex-col l-gap-l skin-config-form" @submit.prevent="onSaveSelected">
+            <div class="c-island l-pad-m">
+                <label id="skin-config-toggle" class="inline-block" for="skin-config-toggle-field">
+                    <span>{{ configs.toggle.title }}</span>
+                    <span
+                        v-if="configs.toggle.description"
+                        data-tooltip
+                        class="hint has-tip tip-bottom"
+                        :title="configs.toggle.description"
+                        >?</span
                     >
-                        <div v-if="subcategory.name" class="small-12 columns">
-                            <h3>{{ subcategory.name }}</h3>
-                        </div>
-                        <div
-                            v-for="option in subcategory.options"
-                            :key="option.id"
-                            :class="[
-                                option.type === 'textarea'
-                                    ? 'small-12 columns'
-                                    : 'small-12 medium-6 large-4 l-mar-m--bottom columns',
-                            ]"
-                        >
-                            <label :id="option.name" :for="`${option.name}-field`" class="inline-block">
-                                <span>{{ option.title || option.name }}</span>
-                                <span
-                                    v-if="option.description"
-                                    data-tooltip
-                                    class="has-tip tip-top hint"
-                                    data-allow-html="true"
-                                    :title="option.description"
-                                    >?</span
-                                >
-                            </label>
-                            <div v-if="option.type === 'colour'">
-                                <input
-                                    :id="`${option.name}-field`"
-                                    v-model="option.value"
-                                    type="text"
-                                    :name="option.name"
-                                    data-colour-picker
-                                    :disabled="!option.editable"
-                                    @input="schedulePreviewRefresh"
-                                    @change="schedulePreviewRefresh"
-                                />
-                            </div>
-                            <div v-else-if="option.type === 'textarea'">
-                                <textarea
-                                    :id="`${option.name}-field`"
-                                    v-model="option.value"
-                                    :name="option.name"
-                                    rows="8"
-                                    :disabled="!option.editable"
-                                    @input="schedulePreviewRefresh"
-                                    @change="schedulePreviewRefresh"
-                                />
-                            </div>
-                        </div>
-                    </fieldset>
-                </section>
+                </label>
+                <div class="switch f-no-margins">
+                    <input
+                        id="skin-config-toggle-field"
+                        v-model="configs.toggle.enabled"
+                        type="checkbox"
+                        name="advanced_ui_enabled"
+                        autocomplete="off"
+                        data-test="skin-config-toggle-input"
+                        :disabled="isProcessing"
+                        @change="onToggleChanged"
+                    />
+                    <label for="skin-config-toggle-field" data-test="skin-config-toggle">
+                        <span>On</span>
+                        <span>Off</span>
+                    </label>
+                </div>
             </div>
-            <div ref="saveContainer" class="save-drawer-anchor">
-                <bottom-drawer :show-drawer="showSaveDrawer">
-                    <div class="l-flex l-flex--justify l-gap-xs">
-                        <button
-                            v-if="hasUnsavedChanges"
-                            type="button"
-                            class="button l-flex__item--1"
-                            @click="onUndoChanges"
-                        >
-                            Undo Changes
-                        </button>
-                        <button
-                            name="btnSubmit"
-                            class="button submit l-flex__item--1"
-                            data-test="skin-config-save-submit"
-                        >
-                            {{ saveText }}
-                        </button>
-                    </div>
-                </bottom-drawer>
+            <sc-categories :configs="configs" @preview-refresh="schedulePreviewRefresh" />
+            <div class="l-flex l-flex--justify l-gap-xs">
+                <button v-if="hasUnsavedChanges" type="button" class="button l-flex__item--1" @click="onUndoChanges">
+                    Undo Changes
+                </button>
+                <button class="button submit l-flex__item--1" data-test="skin-config-save-submit">
+                    {{ saveText }}
+                </button>
             </div>
         </form>
     </div>
 </template>
 
-<style scoped>
-.skin-config-form {
-    padding-bottom: 100px;
-}
-
-.save-drawer-anchor {
-    min-height: 30px;
-}
-</style>
+<style scoped></style>

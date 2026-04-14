@@ -57,7 +57,7 @@ async function onCreateSelected(): Promise<void> {
     <template v-if="props.unit.activities._routes.create">
         <div v-if="component === null && extraActivitiesComponents === 0" class="component-action">
             <section>
-                <button @click.prevent="onCreateSelected">{{ createText }}</button>
+                <button class="button" @click.prevent="onCreateSelected">{{ createText }}</button>
             </section>
         </div>
         <div v-else-if="extraActivitiesComponents > 0" class="component-action">

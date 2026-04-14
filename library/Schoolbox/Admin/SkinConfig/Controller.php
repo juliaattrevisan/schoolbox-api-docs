@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\SkinConfig;
 
 use Alaress\Database\Predicate;
 use Alaress\Module\Cache\Rebuilder;
+use Alaress\Web\Request\Values;
 use Alaress\Web\Controller\ConfigController;
 use Crell\ApiProblem\ApiProblem;
 use Psr\SimpleCache\CacheInterface;
@@ -102,7 +103,7 @@ class Controller extends ConfigController
                     'description' => $config->getDescription(),
                 ];
             } else {
-                $categoryName  = strtolower($config->getSkinSubcategory()->getCategory()->getName()); // e.g. "Colours" -> "colours"
+                $categoryName  = $config->getSkinSubcategory()->getCategory()->getName();
                 $subcategoryId = $config->getSkinSubcategory()->getId();
                 $type          = $config->getType()->getId() === ConfigMapper::TYPE_SONAR_SKIN_CONFIG ? 'sonar' : 'existing';
 
@@ -145,10 +146,23 @@ class Controller extends ConfigController
      */
     public function postConfig(): void
     {
+        $postedConfigs = $this->requestPost->get('configs') ?? [];
+        $database = $this->getConfigMapper()->getDatabase();
+
         try {
-            $this->persistPostedConfigs($this->flattenPostedConfigs($this->requestPost->get('configs') ?? []));
+            $database->beginTransaction();
+
+            $toggleEnabled = $this->extractPostedToggleEnabled($postedConfigs);
+            if ($toggleEnabled !== null) {
+                $this->persistSonarToggleConfig($toggleEnabled);
+            }
+
+            $this->persistPostedConfigs($this->flattenPostedConfigs($postedConfigs));
+
+            $database->commit();
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {
+            $database->rollBack();
             $status  = Response::HTTP_INTERNAL_SERVER_ERROR;
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($status);
@@ -211,9 +225,45 @@ class Controller extends ConfigController
     {
         return $this->getConfigMapper()
                     ->getPredicateBuilder()
-                    ->equals('type_id', ConfigMapper::TYPE_SKIN_CONFIG)
+                    ->in('type_id', [
+                        ConfigMapper::TYPE_SKIN_CONFIG,
+                        ConfigMapper::TYPE_SONAR_SKIN_CONFIG,
+                    ])
                     ->equals('hidden', 'false')
                     ->equals('editable', 'true');
+    }
+
+    /**
+     * Extract the posted Sonar toggle value and normalise it to the persisted config string.
+     *
+     * @param array<array-key, mixed> $configs
+     */
+    private function extractPostedToggleEnabled(array $configs): ?string
+    {
+        $toggle = $configs['toggle'] ?? null;
+        if (!is_array($toggle)) {
+            return null;
+        }
+
+        $enabled = (new Values($toggle))->getBool('enabled');
+        if ($enabled === null) {
+            return null;
+        }
+
+        return $enabled ? '1' : '0';
+    }
+
+    /**
+     * Persist the Advanced UI feature toggle as a separate named config row.
+     */
+    private function persistSonarToggleConfig(string $enabled): void
+    {
+        $toggleConfig = $this->getConfigMapper()->findOneByColumn('name', ConfigMapper::NAME_SONAR_UI_TOGGLE);
+        if ($toggleConfig->getValue() === $enabled) {
+            return;
+        }
+
+        $this->getConfigMapper()->save($toggleConfig->setValue($enabled));
     }
 
     /**
@@ -222,50 +272,36 @@ class Controller extends ConfigController
      * Uses the standard field serializers, but saves via constrained SQL updates instead of ConfigMapper::save()
      * so Skin Config join metadata is not re-persisted during save.
      *
-     * @param array<string, string|null> $postedConfigs
+     * @param array<int, string|null> $postedConfigs
      */
     private function persistPostedConfigs(array $postedConfigs): void
     {
         $database        = $this->getConfigMapper()->getDatabase();
-        $existingConfigs = $this->getConfigMapper()->findByPredicates($this->buildConfigPredicate())->indexBy(ConfigMapper::COL_NAME);
+        $existingConfigs = $this->getConfigMapper()->findByPredicates($this->buildConfigPredicate())->indexBy('id');
 
-        $database->beginTransaction();
-        try {
-            foreach ($postedConfigs as $name => $value) {
-                if (!$existingConfigs->keyExists($name)) {
-                    continue;
-                }
-
-                /** @var Config $existingConfig */
-                $existingConfig  = $existingConfigs[$name];
-                $valueSerializer = $this->getFieldStrategyFactory()->makeValueSerializer($existingConfig->getFieldId());
-                $newValue        = $valueSerializer->serializeValue($value, $existingConfig);
-
-                if ($newValue === $existingConfig->getValue()) {
-                    continue;
-                }
-
-                $database->prepareQuery(
-                    'UPDATE config
-                    SET value = :value
-                    WHERE configID = :configID
-                        AND type_id = :typeId
-                        AND hidden = :hidden
-                        AND editable = :editable',
-                    [
-                        'value'    => $newValue,
-                        'configID' => $existingConfig->getId(),
-                        'typeId'   => ConfigMapper::TYPE_SKIN_CONFIG,
-                        'hidden'   => 'false',
-                        'editable' => 'true',
-                    ]
-                )->execute();
+        foreach ($postedConfigs as $configId => $value) {
+            if (!$existingConfigs->keyExists($configId)) {
+                continue;
             }
 
-            $database->commit();
-        } catch (\Throwable $e) {
-            $database->rollBack();
-            throw $e;
+            /** @var Config $existingConfig */
+            $existingConfig  = $existingConfigs[$configId];
+            $valueSerializer = $this->getFieldStrategyFactory()->makeValueSerializer($existingConfig->getFieldId());
+            $newValue        = $valueSerializer->serializeValue($value, $existingConfig);
+
+            if ($newValue === $existingConfig->getValue()) {
+                continue;
+            }
+
+            $database->prepareQuery(
+                'UPDATE config
+                SET value = :value
+                WHERE configID = :configID',
+                [
+                    'value'    => $newValue,
+                    'configID' => $existingConfig->getId(),
+                ]
+            )->execute();
         }
     }
 
@@ -273,12 +309,16 @@ class Controller extends ConfigController
      * Flatten the posted nested Skin Config payload to a name/value map.
      *
      * @param array<array-key, mixed> $configs
-     * @return array<string, string|null>
+     * @return array<int, string|null>
      */
     private function flattenPostedConfigs(array $configs): array
     {
         $flattenedConfigs = [];
         foreach ($configs as $type => $categories) {
+            if ($type === 'toggle') {
+                continue;
+            }
+
             if (!is_array($categories)) {
                 continue;
             }
@@ -291,10 +331,16 @@ class Controller extends ConfigController
                         continue;
                     }
                     foreach ($subcategory['options'] as $option) {
-                        if (!is_array($option) || !isset($option['name']) || !is_string($option['name'])) {
+                        if (!is_array($option) || !isset($option['id'])) {
                             continue;
                         }
-                        $flattenedConfigs[$option['name']] = isset($option['value']) && is_string($option['value']) ? $option['value'] : null;
+
+                        $optionId = (new Values($option))->getInt('id');
+                        if ($optionId === null) {
+                            continue;
+                        }
+
+                        $flattenedConfigs[$optionId] = isset($option['value']) && is_string($option['value']) ? $option['value'] : null;
                     }
                 }
             }

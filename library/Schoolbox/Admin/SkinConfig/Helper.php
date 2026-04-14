@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\SkinConfig;
 use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Color\Transformer;
+use Alaress\Web\Request\Values;
 use OzdemirBurak\Iris\Color\Hexa;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
@@ -19,6 +20,8 @@ use Schoolbox\IConfigLoader;
 
 class Helper
 {
+    private const string NAME_SONAR_SKIN_CUSTOM_CSS = 'skin_sonar_custom_css';
+
     public function __construct(
         private ConfigMapper $configMapper,
         private IConfigLoader $configLoader,
@@ -33,7 +36,12 @@ class Helper
      */
     public function buildPreviewData(array $configs): array
     {
-        return $this->buildTwigData($this->extractConfigOverrides($configs));
+        $typeId = $this->resolvePreviewTypeId($this->extractPostedToggleEnabled($configs));
+
+        return $this->buildTwigData(
+            $this->extractConfigOverrides($this->extractPostedConfigSection($configs, $typeId)),
+            $typeId,
+        );
     }
 
     /**
@@ -43,20 +51,24 @@ class Helper
      */
     public function buildPersistedData(): array
     {
-        return $this->buildTwigData([]);
+        return $this->buildTwigData([], $this->resolvePreviewTypeId($this->isPersistedSonarEnabled()));
     }
 
     /**
      * @param array<int, string|null> $configOverrides
      * @return array{colors: array<string, array<string, mixed>>, customCss: string}
      */
-    private function buildTwigData(array $configOverrides): array
+    private function buildTwigData(array $configOverrides, int $typeId): array
     {
-        $previewConfigs = $this->getPreviewConfigs();
+        $previewConfigs = $this->getPreviewConfigs($typeId);
         $colorFactory = new ColorFactory();
         $transformer = new Transformer();
         $colors = [];
         foreach ($previewConfigs as $config) {
+            if ($this->shouldOmitFromStylesheet($config)) {
+                continue;
+            }
+
             $customProperty = $this->getCustomProperty($config);
             if ($customProperty === null) {
                 continue;
@@ -93,8 +105,24 @@ class Helper
         }
         return [
             'colors' => $colors,
-            'customCss' => $this->getPreviewCustomCss($previewConfigs, $configOverrides),
+            'customCss' => $this->getPreviewCustomCss($previewConfigs, $configOverrides, $typeId),
         ];
+    }
+
+    /**
+     * @param array<array-key, mixed> $configs
+     * @return array<array-key, mixed>
+     */
+    private function extractPostedConfigSection(array $configs, int $typeId): array
+    {
+        if (!array_key_exists('existing', $configs) && !array_key_exists('sonar', $configs)) {
+            return $configs;
+        }
+
+        $sectionKey = $typeId === ConfigMapper::TYPE_SONAR_SKIN_CONFIG ? 'sonar' : 'existing';
+        $section = $configs[$sectionKey] ?? [];
+
+        return is_array($section) ? $section : [];
     }
 
     /**
@@ -126,11 +154,11 @@ class Helper
     /**
      * @return array<int, Config>
      */
-    private function getPreviewConfigs(): array
+    private function getPreviewConfigs(int $typeId): array
     {
         $previewConfigs = [];
         $criteria = [
-            'type_id' => ConfigMapper::TYPE_SKIN_CONFIG,
+            'type_id' => $typeId,
             'hidden' => 'false',
             'editable' => 'true',
         ];
@@ -153,7 +181,7 @@ class Helper
      */
     private function createColorTwigVars(Color $color, string $cssVar): array
     {
-        $hsl = new Hexa($color->getAsHexAlpha())->toHsla();
+        $hsl = (new Hexa($color->getAsHexAlpha()))->toHsla();
         return [
             'cssVar' => $cssVar,
             'colorObject' => $color,
@@ -171,16 +199,68 @@ class Helper
      * @param array<int, Config> $previewConfigs
      * @param array<int, string|null> $configOverrides
      */
-    private function getPreviewCustomCss(array $previewConfigs, array $configOverrides): string
+    private function getPreviewCustomCss(array $previewConfigs, array $configOverrides, int $typeId): string
     {
+        $customCssConfigName = $this->getCustomCssConfigName($typeId);
+
         foreach ($previewConfigs as $config) {
-            if ($config->getName() !== ConfigMapper::NAME_SKIN_CUSTOM_CSS) {
+            if ($config->getName() !== $customCssConfigName) {
                 continue;
             }
             $value = $configOverrides[$config->getId()] ?? $config->getValue();
             return is_string($value) ? $value : '';
         }
-        return (string) $this->configLoader->get(ConfigMapper::NAME_SKIN_CUSTOM_CSS);
+
+        return (string) $this->configLoader->get($customCssConfigName);
+    }
+
+    /**
+     * @param array<array-key, mixed> $configs
+     */
+    private function extractPostedToggleEnabled(array $configs): ?bool
+    {
+        $toggle = $configs['toggle'] ?? null;
+        if (!is_array($toggle)) {
+            return null;
+        }
+
+        return (new Values($toggle))->getBool('enabled');
+    }
+
+    private function isPersistedSonarEnabled(): bool
+    {
+        return (new Values([
+            ConfigMapper::NAME_SONAR_UI_TOGGLE => $this->configLoader->get(ConfigMapper::NAME_SONAR_UI_TOGGLE),
+        ]))->getBool(ConfigMapper::NAME_SONAR_UI_TOGGLE) ?? false;
+    }
+
+    private function resolvePreviewTypeId(?bool $sonarEnabled): int
+    {
+        return $sonarEnabled ? ConfigMapper::TYPE_SONAR_SKIN_CONFIG : ConfigMapper::TYPE_SKIN_CONFIG;
+    }
+
+    private function getCustomCssConfigName(int $typeId): string
+    {
+        return $typeId === ConfigMapper::TYPE_SONAR_SKIN_CONFIG
+            ? self::NAME_SONAR_SKIN_CUSTOM_CSS
+            : ConfigMapper::NAME_SKIN_CUSTOM_CSS;
+    }
+
+    private function shouldOmitFromStylesheet(Config $config): bool
+    {
+        $categoryName = $config->getSkinSubcategory()?->getCategory()?->getName();
+        if (!is_string($categoryName) || trim($categoryName) === '') {
+            return false;
+        }
+
+        return in_array(
+            strtolower($categoryName),
+            [
+                ConfigMapper::NAME_SKIN_CATEGORY_ROUNDNESS,
+                ConfigMapper::NAME_SKIN_CATEGORY_DROP_SHADOW,
+            ],
+            true,
+        );
     }
 
     /**

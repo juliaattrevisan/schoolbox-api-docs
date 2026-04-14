@@ -92,21 +92,21 @@ SET
     );
 
 SET
-    @subcategory_general = (
-        SELECT id
-        FROM lu_skin_config_subcategory
-        WHERE
-            category_id = @category_colours
-            AND name = 'General'
-    );
-
-SET
     @subcategory_menu = (
         SELECT id
         FROM lu_skin_config_subcategory
         WHERE
             category_id = @category_colours
             AND name = 'Menu'
+    );
+
+SET
+    @subcategory_general = (
+        SELECT id
+        FROM lu_skin_config_subcategory
+        WHERE
+            category_id = @category_colours
+            AND name = 'General'
     );
 
 SET
@@ -178,7 +178,7 @@ SET
         SELECT `value`
         FROM config
         WHERE
-            name = 'skin_colour_accent_background'
+            name = 'skin_colour_content_ui_selected'
         LIMIT 1
     );
 
@@ -228,6 +228,15 @@ SET
     );
 
 SET
+    @value_skin_colour_sonar_login_background = (
+        SELECT `value`
+        FROM config
+        WHERE
+            name = 'skin_colour_login_background'
+        LIMIT 1
+    );
+
+SET
     @value_skin_sonar_custom_css = (
         SELECT `value`
         FROM config
@@ -261,62 +270,6 @@ INSERT INTO
         options
     )
 VALUES (
-        'skin_colour_body_background',
-        @value_skin_colour_body_background,
-        'Body Background Colour',
-        'The background colour of every page.',
-        @config_colour_field_id,
-        @sonar_config_type_id,
-        'true',
-        'false',
-        'false',
-        'settings',
-        @settings_sequence_start + 1,
-        '{"customProperty":"--sbx-config-color-body-background","contrast":"--sbx-color-text-primary"}'
-    ),
-    (
-        'skin_colour_accent',
-        @value_skin_colour_accent,
-        'Accent Colour',
-        'The colour used in interactive elements like buttons, links and check boxes.',
-        @config_colour_field_id,
-        @sonar_config_type_id,
-        'true',
-        'false',
-        'false',
-        'settings',
-        @settings_sequence_start + 2,
-        '{"customProperty":"--sbx-config-color-accent","contrast":"--sbx-color-foreground-primary"}'
-    ),
-    (
-        'skin_colour_accent_text',
-        '#ffffff',
-        'Accent Text Colour',
-        'The text colour for when displayed over the Accent Colour.',
-        @config_colour_field_id,
-        @sonar_config_type_id,
-        'true',
-        'false',
-        'false',
-        'settings',
-        @settings_sequence_start + 3,
-        '{"customProperty":"--sbx-config-color-accent-text","contrast":"--sbx-config-color-accent"}'
-    ),
-    (
-        'skin_colour_active',
-        @value_skin_colour_active,
-        'Active Colour',
-        'The colour used to indicate active elements, like active filters, selected menu items and hover states.',
-        @config_colour_field_id,
-        @sonar_config_type_id,
-        'true',
-        'false',
-        'false',
-        'settings',
-        @settings_sequence_start + 4,
-        '{"customProperty":"--sbx-config-color-active","contrast":"--sbx-config-color-accent"}'
-    ),
-    (
         'skin_colour_menu_background',
         @value_skin_colour_menu_background,
         'Menu Background Colour',
@@ -327,7 +280,7 @@ VALUES (
         'false',
         'false',
         'settings',
-        @settings_sequence_start + 5,
+        @settings_sequence_start + 1,
         '{"customProperty":"--sbx-config-color-menu-background","contrast":"--sbx-config-color-menu-foreground"}'
     ),
     (
@@ -341,13 +294,13 @@ VALUES (
         'false',
         'false',
         'settings',
-        @settings_sequence_start + 6,
+        @settings_sequence_start + 2,
         '{"customProperty":"--sbx-config-color-menu-foreground","contrast":"--sbx-config-color-menu-background"}'
     ),
     (
         'skin_colour_menu_hover',
         @value_skin_colour_menu_hover,
-        'Hover Menu Colour',
+        'Menu Hover Colour',
         'The background colour of the element when the mouse is hovering over a menu element.',
         @config_colour_field_id,
         @sonar_config_type_id,
@@ -355,22 +308,64 @@ VALUES (
         'false',
         'false',
         'settings',
-        @settings_sequence_start + 7,
+        @settings_sequence_start + 3,
         '{"customProperty":"--sbx-config-color-menu-hover","contrast":"--sbx-config-color-menu-foreground"}'
     ),
     (
-        'skin_colour_component_heading_text',
-        @value_skin_colour_component_heading_text,
-        'Component Heading Text Colour',
-        'The colour of the heading text on homepage components.',
+        'skin_colour_body_background',
+        @value_skin_colour_body_background,
+        'Body Background Colour',
+        'The background colour of every page.',
         @config_colour_field_id,
         @sonar_config_type_id,
         'true',
         'false',
         'false',
         'settings',
-        @settings_sequence_start + 8,
-        '{"customProperty":"--sbx-config-color-component-heading-text","contrast":"--sbx-config-color-component-heading-background"}'
+        @settings_sequence_start + 4,
+        '{"customProperty":"--sbx-config-color-body-background","contrast":"--sbx-color-text-primary"}'
+    ),
+    (
+        'skin_colour_accent',
+        @value_skin_colour_accent,
+        'Accent Colour',
+        'The colour used in interactive elements like buttons, links and check boxes.',
+        @config_colour_field_id,
+        @sonar_config_type_id,
+        'true',
+        'false',
+        'false',
+        'settings',
+        @settings_sequence_start + 5,
+        '{"customProperty":"--sbx-config-color-accent","contrast":"--sbx-color-foreground-primary"}'
+    ),
+    (
+        'skin_colour_accent_text',
+        '#ffffff',
+        'Accent Text Colour',
+        'The text colour for when displayed over the Accent Colour.',
+        @config_colour_field_id,
+        @sonar_config_type_id,
+        'true',
+        'false',
+        'false',
+        'settings',
+        @settings_sequence_start + 6,
+        '{"customProperty":"--sbx-config-color-accent-text","contrast":"--sbx-config-color-accent"}'
+    ),
+    (
+        'skin_colour_active',
+        @value_skin_colour_active,
+        'Active Colour',
+        'The colour used to indicate active elements, like active filters, selected menu items and hover states.',
+        @config_colour_field_id,
+        @sonar_config_type_id,
+        'true',
+        'false',
+        'false',
+        'settings',
+        @settings_sequence_start + 7,
+        '{"customProperty":"--sbx-config-color-active","contrast":"--sbx-config-color-accent"}'
     ),
     (
         'skin_colour_component_heading_background',
@@ -383,8 +378,22 @@ VALUES (
         'false',
         'false',
         'settings',
-        @settings_sequence_start + 9,
+        @settings_sequence_start + 8,
         '{"customProperty":"--sbx-config-color-component-heading-background","contrast":"--sbx-config-color-component-heading-text"}'
+    ),
+    (
+        'skin_colour_component_heading_text',
+        @value_skin_colour_component_heading_text,
+        'Component Heading Text Colour',
+        'The colour of the heading text on homepage components.',
+        @config_colour_field_id,
+        @sonar_config_type_id,
+        'true',
+        'false',
+        'false',
+        'settings',
+        @settings_sequence_start + 9,
+        '{"customProperty":"--sbx-config-color-component-heading-text","contrast":"--sbx-config-color-component-heading-background"}'
     ),
     (
         'skin_colour_sonar_login_background',
@@ -402,7 +411,7 @@ VALUES (
     ),
     (
         'skin_colour_sonar_login_foreground',
-        @value_skin_colour_sonar_login_foreground,
+        '#ffffff',
         'Login Foreground Colour',
         'The foreground colour of the login form on the login page.',
         @config_colour_field_id,

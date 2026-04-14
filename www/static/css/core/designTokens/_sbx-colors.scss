@@ -5,15 +5,18 @@
  */
 
 :root {
-    // Configurable
+    // Configurable - these will be overridden by www/css/core/skin.css.php from Skin Config, but are defined here as fallbacks
     --sbx-config-color-body-background: #e5eff7;
     --sbx-config-color-accent: #001691;
     --sbx-config-color-accent-text: #ffffff;
     --sbx-config-color-active: #d2edf2;
-    --sbx-config-color-menu-primary: #001691;
-    --sbx-config-color-menu-secondary: #fff;
+    --sbx-config-color-menu-background: #001691;
+    --sbx-config-color-menu-foreground: #fff;
     --sbx-config-color-menu-hover: #009eb2;
+    --sbx-config-color-component-heading-background: #001691;
+    --sbx-config-color-component-heading-text: #cce0ef;
     --sbx-config-login-form-background: hsla(230.9, 100%, 28.43%, 0.35);
+    --sbx-config-login-form-foreground: #ffffff;
 
     // Core
     --sbx-color-foreground-primary: #ffffff;

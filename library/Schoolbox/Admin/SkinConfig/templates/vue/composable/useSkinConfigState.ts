@@ -39,32 +39,16 @@ export function useSkinConfigState(
     configs: Ref<SkinConfigData>;
     saveContainer: Ref<HTMLDivElement | null>;
     hasUnsavedChanges: Readonly<Ref<boolean>>;
-    showSaveDrawer: Readonly<Ref<boolean>>;
+    initialiseColourPickers: () => Promise<void>;
     resetToSavedState: () => Promise<void>;
     markCurrentAsSaved: () => Promise<void>;
 } {
     const savedConfigs = window.Vue.ref(cloneConfigs(initialConfigs));
     const configs = window.Vue.ref<SkinConfigData>(cloneConfigs(initialConfigs));
     const saveContainer = window.Vue.ref<HTMLDivElement | null>(null);
-    const isAtBottomOfPage = window.Vue.ref(false);
     const initialConfigSnapshot = window.Vue.ref(serializeConfigs(savedConfigs.value));
     const currentConfigSnapshot = window.Vue.computed(() => serializeConfigs(configs.value));
     const hasUnsavedChanges = window.Vue.computed(() => initialConfigSnapshot.value !== currentConfigSnapshot.value);
-    const showSaveDrawer = window.Vue.computed(() => hasUnsavedChanges.value || isAtBottomOfPage.value);
-    let intersectionObserver: IntersectionObserver | null = null;
-
-    /**
-     * Track whether the bottom save area is currently visible on screen.
-     */
-    function initIntersectionObserver(): void {
-        if (saveContainer.value === null) {
-            return;
-        }
-        intersectionObserver = new IntersectionObserver((elements) => {
-            isAtBottomOfPage.value = elements[0].intersectionRatio !== 0;
-        });
-        intersectionObserver.observe(saveContainer.value);
-    }
 
     /**
      * Initialise colour picker inputs once the component has rendered.
@@ -120,20 +104,18 @@ export function useSkinConfigState(
         await updateColourPickerColours();
     }
 
+    /**
+     * Initialise the colour pickers when the component mounts so they reflect the initial config values.
+     */
     window.Vue.onMounted(() => {
-        initIntersectionObserver();
         void initialiseColourPickers();
-    });
-
-    window.Vue.onBeforeUnmount(() => {
-        intersectionObserver?.disconnect();
     });
 
     return {
         configs,
         saveContainer,
         hasUnsavedChanges,
-        showSaveDrawer,
+        initialiseColourPickers,
         resetToSavedState,
         markCurrentAsSaved,
     };

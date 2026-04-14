@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-$selectize-font-size: rem-calc(($base-font-size - 3));
+$selectize-font-size: var(--sbx-font-size-xs, rem-calc(($base-font-size - 3)));
 $selectize-line-height: 18px !default;
 
 $selectize-color-text: $body-font-color;
@@ -73,10 +73,11 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
     &.multi {
         .selectize-input > div {
             background: $content-ui-background;
+            color: var(--sbx-color-text-primary, #333);
             padding: 0 0.5rem 0 0.5rem;
             font-size: $selectize-font-size;
             font-weight: $font-weight-normal;
-            border-radius: 3px;
+            border-radius: var(--sbx-config-field-roundness, 3px);
             a {
                 padding: 0.5rem !important;
                 width: 1.5rem !important;
