@@ -16,7 +16,7 @@ namespace Schoolbox\Admin\DataRetention;
  * This is a thin, testable helper around simple csv parsing and whitelisting:
  *  - Only names present in the provided valid strategy list are returned.
  *  - Comparison is currently case-sensitive to preserve existing behaviour.
- *  - Order is preserved and duplicates are removed.
+ *  - Duplicates are removed.
  */
 class ValidStrats
 {
