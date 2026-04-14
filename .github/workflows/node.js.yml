@@ -51,12 +51,13 @@ jobs:
           node-version: 20.x
           cache: 'npm'
       - run: npm ci
+      - run: tar -cf node_modules.tar node_modules
 
-      - name: Upload node_modules artifact
+      - name: Upload node_modules tarball artifact
         uses: actions/upload-artifact@v4
         with:
           name: schoolbox-node-modules
-          path: node_modules
+          path: node_modules.tar
           compression-level: 0
           if-no-files-found: error
           retention-days: 1
@@ -75,6 +76,7 @@ jobs:
         with:
           name: schoolbox-node-modules
           path: .
+      - run: tar -xf node_modules.tar
       - run: npm run build --if-present
       - run: npm test
 
@@ -93,6 +95,7 @@ jobs:
         with:
           name: schoolbox-node-modules
           path: .
+      - run: tar -xf node_modules.tar
 
       - name: Typecheck
         run: npm run typecheck
@@ -112,6 +115,7 @@ jobs:
         with:
           name: schoolbox-node-modules
           path: .
+      - run: tar -xf node_modules.tar
 
       - name: Check ESLint Compliance
         env:
@@ -133,6 +137,7 @@ jobs:
         with:
           name: schoolbox-node-modules
           path: .
+      - run: tar -xf node_modules.tar
 
       - name: Check Prettier Compliance
         run: npm run prettier:check
