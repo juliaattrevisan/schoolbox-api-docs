@@ -199,7 +199,7 @@ class GroupMapper extends Mapper
         }
 
         if ($type !== null) {
-            $conditions[] = 'ug.type = :type';
+            $conditions[] = 'type = :type';
             $params['type'] = $type;
         }
 
@@ -212,11 +212,11 @@ class GroupMapper extends Mapper
 
         $query = "
             SELECT
-                {$this->getColumnString('ug')},
+                {$this->getColumnString()},
                 {$this->getJoinColumnString('folder', 'f')},
                 COALESCE(mc.cnt, 0) AS member_count
-            FROM `{$this->getTable()}` ug
-            INNER JOIN {$this->getJoinSql('folder', 'ug', 'f')}
+            FROM `{$this->getTable()}`
+            INNER JOIN {$this->getJoinSql('folder', '', 'f')}
             LEFT JOIN (
                 SELECT sid, COUNT(*) AS cnt
                 FROM userAccess
