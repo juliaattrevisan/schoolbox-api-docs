@@ -148,7 +148,7 @@ class Controller extends Base
             'interactionLocked' => $isInteractionLocked,
             'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())
                 ->add([ $assessment->getTitle(), $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) ])
-                ->add(['Inline Grader', '']),
+                ->add(['Feedback', '']),
             'carousel' =>  (new \Schoolbox\Learning\Reporting\Feedback\StudentCarousel\Standard(
                 $this->routeGenerator,
                 $learner,
