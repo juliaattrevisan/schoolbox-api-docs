@@ -137,10 +137,11 @@ async function onAction(type: keyof typeof selectedResultActions.value): Promise
         </div>
         <div class="l-flex-row l-flex--justify l-gap-xs">
             <button
-                class="button l-flex__item--1-auto icon-approve submit"
+                class="button l-flex__item--1-auto submit"
                 :disabled="selectedResultActions.publish.length === 0"
                 @click="onAction('publish')"
             >
+                <sbx-icon name="approve"></sbx-icon>
                 Publish
             </button>
         </div>

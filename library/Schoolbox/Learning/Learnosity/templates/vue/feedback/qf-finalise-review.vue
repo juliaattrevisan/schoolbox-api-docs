@@ -109,10 +109,11 @@ function onCancelSelected(): void {
 
 <template>
     <button
-        class="button full-width icon-approve submit"
+        class="button full-width submit"
         :disabled="!store.isLoaded || store.isProcessing"
         @click.prevent="onSelected"
     >
+        <sbx-icon name="approve"></sbx-icon>
         {{ buttonText }}
     </button>
     <reveal-modal ref="modalEl" :close-on-background-click="false" @closed="onCancelSelected">
@@ -123,7 +124,8 @@ function onCancelSelected(): void {
         </p>
         <ul class="flex-list">
             <li>
-                <button class="button icon-approve submit" @click.prevent="onConfirmSelected">
+                <button class="button submit" @click.prevent="onConfirmSelected">
+                    <sbx-icon name="approve"></sbx-icon>
                     {{ confirmButtonText }}
                 </button>
             </li>

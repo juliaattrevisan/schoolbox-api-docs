@@ -32,7 +32,7 @@ async function onApprove(): Promise<void> {
     <!-- Approve on the cohort report is special, if it's already approved then you'll still technically have access
       -- to re-approve it, but showing this button may be confusing in the workflow. So hide it if it's already published -->
     <li v-if="props.entry._links.publish && props.entry.currentState !== EvidenceStatus.PUBLISHED">
-        <a class="icon-approve" @click.prevent="onApprove"> {{ props.entry._labels.publish }}</a>
+        <a @click.prevent="onApprove"><sbx-icon name="approve"></sbx-icon> {{ props.entry._labels.publish }}</a>
     </li>
     <li v-if="props.entry._links.reject">
         <a class="icon-surveys" @click.prevent="crmStore.openModal(props.entry, CohortReportModalType.CONFIRM_REJECT)">

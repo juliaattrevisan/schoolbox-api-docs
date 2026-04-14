@@ -313,11 +313,12 @@ window.Vue.watch(
         </button>
         <nav>
             <button
-                class="button submit icon-approve"
+                class="button submit"
                 type="submit"
                 data-test="dialog-agent-response-submit"
                 @click="openSubmitModal"
             >
+                <sbx-icon name="approve"></sbx-icon>
                 Submit
             </button>
         </nav>

@@ -50,16 +50,14 @@
                 href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
                 data-series-id="{{ event.booking.event.seriesId }}"
                 data-set-status="approved"
-                class="icon-approve"
-            >Approve</a>
+            ><sbx-icon name="approve"></sbx-icon>Approve</a>
         </li>
     {% elseif booking.clash | length == 1 %}
         <li>
             <a
                 href="{{ routeLookup('resourceBooking.clashApprove', {old: booking.clash[0].booking.id, new: event.booking.id}) }}"
                 data-set-status="approved"
-                class="icon-approve"
-            >Approve Clash Booking / Reject Original Booking</a>
+            ><sbx-icon name="approve"></sbx-icon>Approve Clash Booking / Reject Original Booking</a>
         </li>
     {% endif %}
 

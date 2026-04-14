@@ -197,7 +197,8 @@ async function onResolve(): Promise<void> {
         </a>
     </li>
     <li v-if="props.response?._routes.submit">
-        <button class="icon-approve" data-test="das-actions-submit" @click="onSubmit">
+        <button data-test="das-actions-submit" @click="onSubmit">
+            <sbx-icon name="approve"></sbx-icon>
             {{ isSameUser ? `Submit ${locale.dialogAgent.proper()}` : `Submit on behalf of ${props.user.fullName}` }}
         </button>
     </li>
