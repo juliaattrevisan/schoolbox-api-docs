@@ -91,15 +91,15 @@
         {# Grading logic and structure #}
         <div class="row mark-scheme" data-assessment-status data-participant="{{ participant.user.id }}">
             <div class="small-12 island">
-                <form method="post" data-feedback-form="{{ participant.user.id }}" action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {
+                <form method="post" data-feedback-form="{{ participant.user.id }}" action="{{ routeLookupIfAuthorized('learningReportingFeedback.postFeedback', {
                     assessmentId: assessment.id,
-                    studentId:    participant.user.id,
-                    responseId:   response.id ?? null,
                     assessment:   assessment,
-                    student:      participant.user
+                    studentId:    learner.id,
+                    student:      learner,
+                    feedbackId:   feedback.id ?? null
                 }) }}">
                     <section>
-                        <input type="hidden" name="responseId" value="" />
+                        <input type="hidden" name="feedbackId" value="" />
                         {# Required so that this form is recognised as containing a rubric and files #}
                         <input name="fromInlineGrader" value="true" type="hidden"/>
 

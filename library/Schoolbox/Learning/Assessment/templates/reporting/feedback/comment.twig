@@ -53,12 +53,8 @@
                 targetElements: ["#{{ textareaId }}"],
                 showWordCount: true,
                 maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
-                {% if selfAssessment %}
-                    toolbar: "comment",
-                {% else %}
-                    hasTokens: true,
-                    toolbar: "comment_ai",
-                {% endif %}
+                hasTokens: true,
+                toolbar: "comment_ai",
                 mirrorChangeEvents: true, // To keep jquery.dynamic-feedback.js in sync
                 {% if editorTemplates is defined %}
                     templates: {{ editorTemplates|json_encode|raw }},
