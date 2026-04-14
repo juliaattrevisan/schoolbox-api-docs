@@ -15,7 +15,7 @@ class ValidRetentionPeriodTest extends TestCase
      * @param int|string $input
      */
     #[DataProvider('providerValidRetentionPeriods')]
-    public function testAcceptsPositiveIntegersAndNumericStrings(int|string $input): void
+    public function testAcceptsPositiveIntegersAndNumericStrings(null|int|string $input): void
     {
         $spec = new ValidRetentionPeriod();
 
@@ -43,6 +43,7 @@ class ValidRetentionPeriodTest extends TestCase
     public static function providerValidRetentionPeriods(): array
     {
         return [
+            'null' => [null],
             'int 1' => [1],
             'int 30' => [30],
             'string 1' => ['1'],

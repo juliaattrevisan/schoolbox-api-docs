@@ -21,12 +21,17 @@ class ValidRetentionPeriod
      * Validates a CLI retention period value.
      * Accepts a positive integer or a digit-only numeric string.
      * Returns false for empty, zero, negative, or non-numeric values.
+     * NULL is special, and valid, indicating no retention period (i.e. keep indefinitely).
      *
-     * @param int|string $days
+     * @param null|int|string $days
      * @return bool
      */
-    public function isSatisfiedBy(int|string $days): bool
+    public function isSatisfiedBy(null|int|string $days): bool
     {
+        if (null === $days) {
+            return true;
+        }
+
         if ('' === $days) {
             return false;
         }
