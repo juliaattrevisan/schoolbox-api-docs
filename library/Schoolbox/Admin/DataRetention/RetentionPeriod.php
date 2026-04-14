@@ -27,12 +27,12 @@ class RetentionPeriod
     }
 
     /**
-     * Set the retention period. Accepts integer days, numeric string, or null to disable hard deletion.
-     * @param int $days
+     * Set the retention period. Accepts integer days, or null to disable hard deletion.
+     * @param null|int $days
      * @return self
      * @throws SchoolboxException
      */
-    public function setRetentionPeriod(int $days): self
+    public function setRetentionPeriod(null|int $days): self
     {
         $this->days = $days;
         return $this;
