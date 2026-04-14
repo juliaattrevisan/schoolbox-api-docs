@@ -187,7 +187,7 @@ HELP;
         });
 
         $loop->addPeriodicTimer(
-            5,
+            $strat->getMetricInterval() / 1000,
             fn () => $log->info(json_encode($scheduler->getStats())),
         );
     } catch (ConnectionException $e) {

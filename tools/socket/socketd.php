@@ -89,7 +89,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
 
     // Add metric logging at this level I guess?
     $loop->addPeriodicTimer(
-        5,
+        $conf->getMetricInterval() / 1000,
         fn () => $log->info(json_encode($pipeManager->getStats())),
     );
 
