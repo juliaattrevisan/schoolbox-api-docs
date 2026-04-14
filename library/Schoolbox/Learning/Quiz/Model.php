@@ -259,7 +259,10 @@ class Model implements ISoftDeletable, IAssessableDataModel
      */
     public function isMarkShownToParents()
     {
-        return $this->getMarkVisibility() == IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
+        return in_array(
+            $this->getMarkVisibility(),
+            [IAssessable::MARK_VISIBILITY_PARENT, IAssessable::MARK_VISIBILITY_PARENT_STUDENT]
+        );
     }
 
     /**
