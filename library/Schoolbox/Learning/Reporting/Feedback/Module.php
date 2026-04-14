@@ -15,9 +15,11 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -143,7 +145,21 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller($this->getErrorMapper());
+        $bakery = new BreadcrumbFactory(
+            $this->getRouter()->getGenerator(),
+            $this->getAuthorizer(),
+            $this->getMapperFactory()->get(Access::class),
+        );
+
+        /** @var \Schoolbox\Learning\Assessment\Participant\DataSource */
+        $participantDataSource = $this->injector->get('participantDataSource');
+
+        return new Controller(
+            $this->getErrorMapper(),
+            $bakery,
+            $this->getMapperFactory()->get(\Schoolbox\Assessment\Term\Mapper::class),
+            $participantDataSource,
+        );
     }
 
 

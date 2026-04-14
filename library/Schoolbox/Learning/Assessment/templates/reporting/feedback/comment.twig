@@ -1,0 +1,70 @@
+{#
+    Renders an input where teachers can insert feedback comment
+
+    Usage: [
+        participant:        Participant
+        feedback:           IFeedback
+        tabindex:           int
+        readonly:           bool            Should textarea be rendered as readonly?
+        selfAssessment:     bool            Is this being viewed in a self assessment context?
+        selfReflection:     bool            Is this being viewed in a self reflection context?
+        blindMode:          bool            If you're in Blind Mode, hide any identifying features
+        isRichText:         bool            Should the textarea be rendered as a rich text editor?
+        prefix              string          Optional prefix to the textarea ID (comment-[prefix]-[participant.user.id])
+    ]
+    editorTemplates array Retrieve any pre-existing editor templates to insert into the 'Body' rich text editor
+#}
+
+{% if selfAssessment %}
+    {% set placeholder = 'Your ' ~ locale.selfAssessment %}
+{% elseif selfReflection %}
+    {% set placeholder = 'Your ' ~ locale.selfReflection %}
+{% elseif readonly %}
+    {% set placeholder = '(no comment given)' %}
+{% elseif blindMode %}
+    {% set placeholder = 'Feedback' %}
+{% else %}
+    {% set placeholder = 'Feedback for ' ~ participant.user.givenName %}
+{% endif %}
+
+{% set prefix = prefix is defined ? prefix ~ '-' : '' %}
+{% set textareaId = 'comment-' ~ prefix ~ participant.user.id %}
+
+<label>Comment
+    <p class="meta">Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on creation.</p>
+    <textarea
+            tabindex="{{ tabIndex }}"
+            id="{{ textareaId }}"
+            data-feedback-comment="{{ participant.user.id }}"
+            name="comment"
+            data-test="assessment-feedback-comment-textarea-{{ participant.user.id }}"
+            placeholder="{{ placeholder }}"
+            rows="3"
+            {% if readonly %}readonly{% endif %}
+    >{{ feedback is not null ? feedback.comment : ''}}</textarea>
+</label>
+
+{% if isRichText %}
+    <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}'></script>
+    <script>
+    document.dispatchEvent(
+        new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ["#{{ textareaId }}"],
+                showWordCount: true,
+                maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
+                {% if selfAssessment %}
+                    toolbar: "comment",
+                {% else %}
+                    hasTokens: true,
+                    toolbar: "comment_ai",
+                {% endif %}
+                mirrorChangeEvents: true, // To keep jquery.dynamic-feedback.js in sync
+                {% if editorTemplates is defined %}
+                    templates: {{ editorTemplates|json_encode|raw }},
+                {% endif %}
+            },
+        }),
+    );
+    </script>
+{% endif %}
