@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Edlink\Base\Endpoint;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Config\Loader;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
@@ -91,7 +92,7 @@ class Factory
         $toDate = \Alaress_Date_Format::now()->addMonths(self::TO)->endOfMonth();
 
         $timezone = new \DateTimeZone(
-            (string)\Loader::getInstance()->get('date_timezone') ?: 'UTC'
+            (string)Loader::getInstance()->get('date_timezone') ?: 'UTC'
         );
 
         /* Spawn an Api instance
