@@ -26,10 +26,11 @@ use Schoolbox\Mapper\Exception;
  * Import classes and enrollments from Edlink, saving them as sis_event records
  * with the 'timetable' classification, and sis_class / sis_class_user records.
  *
- * Edlink does not provide individual lesson instances with start/end times.
- * Instead, each Class gets a single timetable event spanning its session dates
- * (clamped to the Factory's configured date window), and enrollments define
- * who is involved in each class.
+ * For each class we expand its session date range × its periods × each period's
+ * matching weekdays into individual sis_event rows (one per lesson occurrence),
+ * with start_at/finish_at constructed from the period's start_time/end_time in
+ * the school's local timezone. Classes with no periods or whose periods produce
+ * no occurrences in the window are skipped with a warning.
  *
  * @package Schoolbox\External\Connector\Edlink\Base\Endpoint\TimetableCalendar
  */
