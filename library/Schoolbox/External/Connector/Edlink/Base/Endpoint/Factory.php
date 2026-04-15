@@ -90,6 +90,10 @@ class Factory
         $fromDate = \Alaress_Date_Format::now()->addMonths(self::FROM)->startOfMonth();
         $toDate = \Alaress_Date_Format::now()->addMonths(self::TO)->endOfMonth();
 
+        $timezone = new \DateTimeZone(
+            (string)\Loader::getInstance()->get('date_timezone') ?: 'UTC'
+        );
+
         /* Spawn an Api instance
          */
         $api = new Api(host: $this->host, apiKey: $this->key);
@@ -168,7 +172,8 @@ class Factory
                     $this->classEntryMapper,
                     $this->classInvolvementMapper,
                     $fromDate,
-                    $toDate
+                    $toDate,
+                    $timezone
                 ))
                 ->add(new TimetableCalendar\Cleanup(
                     $this->log,

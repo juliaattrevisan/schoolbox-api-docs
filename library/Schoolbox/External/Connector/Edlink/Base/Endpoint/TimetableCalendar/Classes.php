@@ -94,7 +94,8 @@ class Classes implements IStrategy
         private ClassEntryMapper $classEntryMapper,
         private ClassInvolvementMapper $classInvolvementMapper,
         private Alaress_Date_Format $fromDate,
-        private Alaress_Date_Format $toDate
+        private Alaress_Date_Format $toDate,
+        private \DateTimeZone $timezone
     ) {
     }
 
