@@ -151,8 +151,8 @@
                                 {% endif %}
                             {% endblock %}
 
-                            {# Feedback comment textarea #}
-                            {% block comment %}
+                            {# Feedback comment textarea is optional based on Reporting activity configuration #}
+                            {% if assessment.feedbackCommentsEnable %}
                                 <div class="small-12{% if '' != assessment.instructorMarkScheme.template %} medium-9{% endif %} column">
                                     {% include '@learningAssessment/reporting/feedback/comment.twig' with {
                                         participant: participant,
@@ -166,7 +166,7 @@
                                         editorTemplates: editorTemplates ?? [],
                                     } only %}
                                 </div>
-                            {% endblock %}
+                            {% endif %}
                         </fieldset>
 
                         {# Action Bar #}
