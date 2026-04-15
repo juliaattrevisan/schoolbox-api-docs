@@ -21,7 +21,7 @@ class Import implements IStrategy
 {
     use RecallSupport;
 
-    private const MSO_SPORT_PATH = 'mso-sport.ashx';
+    private const string MSO_SPORT_PATH = 'mso-sport.ashx';
 
     public function __construct(
         private LoggerInterface $log,

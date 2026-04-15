@@ -19,7 +19,7 @@ use Symfony\Component\Lock\LockInterface;
  */
 class Import implements IStrategy
 {
-    private const RESULTS_PATH = 'results.ashx';
+    private const string RESULTS_PATH = 'results.ashx';
 
     public function __construct(
         private LoggerInterface $log,

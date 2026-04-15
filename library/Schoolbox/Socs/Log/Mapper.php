@@ -19,7 +19,7 @@ use Schoolbox\GenericCollection;
  */
 class Mapper extends \Schoolbox\Mapper
 {
-    private const EXPIRY_THRESHOLD = 7;
+    private const int EXPIRY_THRESHOLD = 7;
 
     protected function mapping(): void
     {

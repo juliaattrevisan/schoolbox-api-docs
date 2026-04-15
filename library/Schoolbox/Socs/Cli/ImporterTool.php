@@ -23,18 +23,18 @@ use Schoolbox\Socs\Log\Mapper as SocsLogMapper;
  */
 class ImporterTool extends CliTool\App
 {
-    public const LOCK_NAME = 'socs_importer';
+    public const string LOCK_NAME = 'socs_importer';
 
     // this may be unique to each school, but we don't know yet... so hard coding it here for now...
-    private const SOCS_SCHOOL_ID = '2460';
+    private const string SOCS_SCHOOL_ID = '2460';
 
-    private const OPT_LONG_HELP = 'help';
-    private const OPT_LONG_INSTANCE = 'instance:';
-    private const OPT_LONG_FIXTURES = 'fixtures';
-    private const OPT_LONG_RESULTS = 'results';
-    private const OPT_LONG_TEAMS = 'teams';
-    private const LOCK_TTL = 120;
-    private const DEFAULT_TIMEOUT = 3600;
+    private const string OPT_LONG_HELP = 'help';
+    private const string OPT_LONG_INSTANCE = 'instance:';
+    private const string OPT_LONG_FIXTURES = 'fixtures';
+    private const string OPT_LONG_RESULTS = 'results';
+    private const string OPT_LONG_TEAMS = 'teams';
+    private const int LOCK_TTL = 120;
+    private const int DEFAULT_TIMEOUT = 3600;
 
     /**
      * Declare long CLI options accepted by the SOCS importer.

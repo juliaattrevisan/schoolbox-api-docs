@@ -29,7 +29,7 @@ class Import implements IStrategy
 {
     use RecallSupport;
 
-    private const FIXTURES_PATH = 'fixturecalendar.ashx';
+    private const string FIXTURES_PATH = 'fixturecalendar.ashx';
 
     /** @var array<string,int> */
     private array $userExternalIdLookup = [];

@@ -20,9 +20,9 @@ class Model
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
 
-    public const STATUS_RUNNING = 'running';
-    public const STATUS_COMPLETE = 'complete';
-    public const STATUS_ERROR = 'error';
+    public const string STATUS_RUNNING = 'running';
+    public const string STATUS_COMPLETE = 'complete';
+    public const string STATUS_ERROR = 'error';
 
     private string $runId;
 

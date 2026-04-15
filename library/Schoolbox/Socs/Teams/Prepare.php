@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Schoolbox\Socs\Teams;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 use Schoolbox\Socs\IStrategy;
