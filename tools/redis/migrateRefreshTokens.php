@@ -56,13 +56,8 @@ $app = new class extends CliTool\App {
         // This unavoidably requires a full table scan.
         $keyspace = new Keyspace($redisClient, self::OLD_KEY_PREFIX . '*');
         foreach ($keyspace as $key) {
-            [$val, $ttl] = $redisClient->transaction(
-                function ($tx) use ($key) {
-                    $tx->get($key);
-                    $tx->ttl($key);
-                }
-            );
-
+            $val    = $redisClient->get($key);
+            $ttl    = $redisClient->ttl($key);
             $newKey = str_replace(self::OLD_KEY_PREFIX, self::NEW_KEY_PREFIX, $key);
             switch ($ttl) {
                 case -2:
