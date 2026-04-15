@@ -1,0 +1,12 @@
+{##
+ # Dynamic Feedback javascript
+ # note that nextUrl is defined elsewhere, in the parent, by some other javascript
+ #
+ # This extends the one in Due Work, because it's the same behaviour. We don't really have a single point
+ # of control for these little snippet/fragment js
+ #
+ # @param string $publishText     A button in the Publish call to action...
+ # @param string $publishingText  ...which changes to this once clicked and an async request occurs
+ # @param string $publishedText   ...finally ending with this word
+ #}
+{% extends '@learningDueWorkResponse/inlineGrading/fragments/dynamicFeedback.twig' %}
