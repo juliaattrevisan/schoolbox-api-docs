@@ -254,8 +254,14 @@ class Controller extends Base
             ->setAssessable($assessment)
             ->setReporting($reporting)
             ->setReviewee($learner)
-            ->setReviewer($this->getUser())
-            ->setComment($post['comment'] ?? '');
+            ->setComment(null)
+            ->setReviewer($this->getUser());
+
+        /* Feedback Comments are optional based on the Reporting toggle
+         */
+        if ($assessment->getFeedbackCommentsEnable()) {
+            $feedback->setComment($post['comment'] ?? '');
+        }
 
         /** Get mark schemes
          * - Instructor mark scheme is used to normalise what was inputted by the user
