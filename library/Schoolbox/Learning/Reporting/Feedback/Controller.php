@@ -92,7 +92,6 @@ class Controller extends Base
         \Schoolbox\User $learner,
         ?Reporting\Feedback\Model $feedback = null,
     ): void {
-        $participant = $assessment->getParticipant($learner);
 
         // Is the page being displayed in readonly mode?
         $isInteractionLocked = (new LockedChecker($this->termMapper))->isLockedForInteractions($assessment);
@@ -105,6 +104,8 @@ class Controller extends Base
             'assessmentId' => $assessment->getId(),
         ]);
 
+        /* Calculate ParticipantCarousel people: note that this reuses the $participant var, so be careful about that.
+         */
         $participantCarousel = [];
 
         if ($statusRoute) {
@@ -153,10 +154,14 @@ class Controller extends Base
             }
         }
 
+        /* After we've figured out the ParticipantCarousel we can reuse this $participant var
+         */
+        $participant = $assessment->getParticipant($learner);
+
         $this->response = $this->responseFromTemplate('@learningReportingFeedback/index.twig', [
             'assessment' => $assessment,
             'learner' => $learner,
-            'feedback' => $feedback,
+            'feedback' => $feedback ?? $assessment->getAuthoritativeFeedback($participant, false),
             'interactionLocked' => $isInteractionLocked,
             'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())
                 ->add([ $assessment->getTitle(), $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) ])
