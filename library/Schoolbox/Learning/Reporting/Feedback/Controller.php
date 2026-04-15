@@ -117,7 +117,7 @@ class Controller extends Base
 
                 if ($participant->getAllFeedbacks()->count()) {
                     /** @var \Schoolbox\Learning\Assessment\Reporting\Feedback\Model|null $authoritativeFeedback */
-                    $authoritativeFeedback = $assessment->getAuthoritativeFeedback($participant, true);
+                    $authoritativeFeedback = $assessment->getAuthoritativeFeedback($participant, false);
                 }
 
                 /* These now require the Status enum for the state of a feedback. In dialog agents this represented the

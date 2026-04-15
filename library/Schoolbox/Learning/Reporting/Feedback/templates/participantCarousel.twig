@@ -55,13 +55,11 @@
                 item.user._links.avatar ?? `/portrait.php?id=${item.user.id}&size=square64`;
             template.querySelector('[data-template="fullName"]').textContent = item.user.fullName;
 
-            /** convert between dialog agent status and status labels */
+            /** convert between reporting feedback status and status labels */
             const statusLabelClassMap = {
                 'incomplete': 'unsubmitted',
-                'in-progress': 'highlight',
-                'locked': 'submitted-late',
-                'requires-assistance': 'submitted',
-                'submitted': 'reviewed',
+                'draft': 'highlight',
+                'published': 'reviewed',
             };
 
             template.querySelector('[data-template="status"]').innerText = item.statusLabel;
