@@ -134,7 +134,7 @@ function onMouseOut(event: MouseEvent): void {
             />
             <button
                 for="search-field"
-                class="c-filter-search-term__button no-text"
+                class="c-filter-search-term__button no-text sbx-icon-only-button"
                 title="Search"
                 data-test="sp-submit-button"
                 @mouseover="onMouseOver"

@@ -111,7 +111,7 @@ function retryResponse(): void {
             </p>
             <div v-if="props.allowRetry && isLatestMessage" class="l-mar-xs--left">
                 <button
-                    class="button f-no-icon-button"
+                    class="button f-no-icon-button sbx-icon-only-button"
                     type="button"
                     title="Retry"
                     data-tooltip

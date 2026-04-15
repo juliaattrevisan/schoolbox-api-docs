@@ -397,7 +397,7 @@ export default {
                             <button
                                 v-if="(group.isForceFollow || group.isMsgDisabled) && (isEnrolled || isPrivate)"
                                 title="Disabled force follow button"
-                                class="group-action"
+                                class="group-action sbx-icon-only-button"
                                 :disabled="true"
                             >
                                 <sbx-icon :name="group.isForceFollow ? 'notifications' : 'notifications-hollow'" />

@@ -142,7 +142,7 @@ function onMouseOut(event: MouseEvent): void {
         <button
             for="search-field"
             type="button"
-            class="c-search-input__button"
+            class="c-search-input__button sbx-icon-only-button"
             title="Search"
             aria-label="Search"
             data-test="search-input-button"

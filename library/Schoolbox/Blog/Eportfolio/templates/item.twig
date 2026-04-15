@@ -41,7 +41,7 @@
     </div>
     {% if isRouteAuthorized('eportfolioBlog.getModify', {page: page, blog: record }) %}
         <nav>
-            <a href="{{ routeLookup('eportfolioBlog.getModify', {pageId: page.getPageId, id: record.getId}) }}" title="Modify Blog post"><sbx-icon name="modify"></sbx-icon></a>
+            <a href="{{ routeLookup('eportfolioBlog.getModify', {pageId: page.getPageId, id: record.getId}) }}" title="Modify Blog post" class="sbx-icon-only-button"><sbx-icon name="modify"></sbx-icon></a>
         </nav>
     {% endif %}
 </div>

@@ -39,7 +39,7 @@ $data = {
             </div>
             {% if not attachzone.readonly %}
             <nav>
-                <a href="/storage/fetch.php?hash={{ attachment.hash|split(':')[1] }}&save=1" title="Download"><sbx-icon name="download"></sbx-icon></a>
+                <a href="/storage/fetch.php?hash={{ attachment.hash|split(':')[1] }}&save=1" title="Download" class="sbx-icon-only-button"><sbx-icon name="download"></sbx-icon></a>
                 <a href="#" data-dz-remove title="Remove" class="sbx-button--has-icon" aria-label="Remove">
                     <sbx-icon name="delete"></sbx-icon>
                     Remove

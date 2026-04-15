@@ -168,7 +168,7 @@ export default {
         <button
             @click.prevent="onOpenPopUpSelected"
             :disabled="isPopOutDisabled"
-            class="update-button button"
+            class="update-button button sbx-icon-only-button"
             title="Modify"
         >
             <sbx-icon name="modify"></sbx-icon>

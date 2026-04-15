@@ -76,7 +76,7 @@
 
                 {% if isRouteAuthorized('blog.getModify', { blog: blog, folder: folder }) %}
                     <nav>
-                        <a href="{{ routeLookup('blog.getModify', { id: blog.getId }) }}" title="Modify Blog post"><sbx-icon name="modify"></sbx-icon></a>
+                        <a href="{{ routeLookup('blog.getModify', { id: blog.getId }) }}" title="Modify Blog post" class="sbx-icon-only-button"><sbx-icon name="modify"></sbx-icon></a>
                     </nav>
                 {% endif %}
 

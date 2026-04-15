@@ -160,6 +160,7 @@ const isSaving = window.Vue.computed(() => {
                 <a
                     ref="removeBtn"
                     title="Remove"
+                    class="sbx-icon-only-button"
                     :data-test="`${peFieldsStore.getFieldIdentifier(props.field)}-remove`"
                     @click="isRemovePanelOpen = !isRemovePanelOpen"
                 >
