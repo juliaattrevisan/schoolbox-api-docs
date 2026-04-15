@@ -25,8 +25,9 @@ require_once __DIR__ . '/../../../conf/core/require.php';
  */
 $app = new class extends CliTool\App {
     // Old and new key prefixes
-    private const string OLD_KEY_PREFIX = 'oidcServer.' . INSTANCE_ID . ':access_token';
-    private const string NEW_KEY_PREFIX = 'oidcServer.' . INSTANCE_ID . '.access_token';
+    private const string KEY_PREFIX = 'oidcServer.' . INSTANCE_ID . ':accessToken';
+    private const string OLD_PART_SEPARATOR = ':';
+    private const string NEW_PART_SEPARATOR = '.';
 
     /**
      * Run the tool
@@ -44,7 +45,9 @@ $app = new class extends CliTool\App {
 
         // Find any keys with the old prefix, and migrate them to the new one.
         // This unavoidably requires a full table scan.
-        $keyspace = new Keyspace($redisClient, self::OLD_KEY_PREFIX . '.*');
+        $oldKeyPrefix = self::KEY_PREFIX . self::OLD_PART_SEPARATOR;
+        $newKeyPrefix = self::KEY_PREFIX . self::NEW_PART_SEPARATOR;
+        $keyspace     = new Keyspace($redisClient, $oldKeyPrefix . '*');
         foreach ($keyspace as $key) {
             [$val, $ttl] = $redisClient->transaction(
                 function ($tx) use ($key) {
@@ -53,7 +56,7 @@ $app = new class extends CliTool\App {
                 }
             );
 
-            $newKey = str_replace(self::OLD_KEY_PREFIX, self::NEW_KEY_PREFIX, $key);
+            $newKey = str_replace($oldKeyPrefix, $newKeyPrefix, $key);
             switch ($ttl) {
                 case -2:
                     $logger->debug('Access token has expired: not migrating', ['oldKey' => $key, 'newKey' => $newKey]);
@@ -71,7 +74,7 @@ $app = new class extends CliTool\App {
                         'Migrating access token with expiry',
                         ['oldKey' => $key, 'newKey' => $newKey, 'ttl' => $ttl],
                     );
-                    $redisClient->setex($newKey, $val, $ttl);
+                    $redisClient->setex($newKey, $ttl, $val);
                     break;
             }
         }
