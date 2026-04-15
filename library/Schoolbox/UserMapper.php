@@ -138,11 +138,23 @@ class UserMapper extends Mapper
         $this->joinsVia('user_qualification', QualificationMapper::class, 'id', 'qualification_id', 'user_id', null, null, null, 'qualificationCollection');
         $this->uses('ib_candidate_number', self::TYPE_STRING);
 
-        $this->joinsReverseMulti(
-            'user_id',
-            User\Nationality\Mapper::class,
-            'nationalityCollection',
+//        $this->joinsReverseMulti(
+//            'user_id',
+//            User\Nationality\Mapper::class,
+//            'nationalityCollection',
+//            'nationality',
+//        );
+
+        $this->joinsVia(
+            'user_nationality',
+            Nationality\Mapper::class,
+            'id',
             'nationality',
+            'user_id',
+            null,
+            null,
+            null,
+            'nationalityCollection'
         );
 
         $this->joinsReverseMulti(
@@ -181,7 +193,7 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'addUsernameToCache']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCommunityPortalPassword']);
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE, $this->updateNationality(...));
+//        $this->registerCallback(self::CALLBACK_POSTSAVE, $this->updateNationality(...));
         $this->registerCallback(self::CALLBACK_POSTSAVE, $this->updateLanguage(...));
 
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'blockAlaressUserDeletion']);
@@ -219,6 +231,24 @@ class UserMapper extends Mapper
     private function updateNationality(User $user, ?User $previous = null): void
     {
         $nationalityCollection = $user->getNationalityCollection();
+        $nationalityLookup =
+            Schoolbox\Nationality\Mapper::getInstance()
+                                        ->findByColumn('id', Collection::arrayColumn($nationalityCollection, 'id'))->indexBy('id');
+
+        $realUser = UserMapper::getInstance()->findById($user->getId());
+
+        $nationalityCollection->map(function (User\Nationality\Model $userNationality) use ($nationalityLookup, $realUser) {
+            $nationalityId = $userNationality->getId();
+            if (isset($nationalityLookup[$nationalityId])) {
+                $userNationality->setNationality($nationalityLookup[$nationalityId]->getName());
+            }
+
+            if (null == $userNationality->getUser()) {
+                $userNationality->setUser($realUser);
+            }
+            return $userNationality;
+        });
+
         if (null === $nationalityCollection) {
             // Null means relation was not loaded/changed; avoid saving a null model.
             return;
@@ -468,7 +498,7 @@ class UserMapper extends Mapper
         $qualificationMapper = $this->getJoinMapper('user_qualification');
 
         /** @var User\Nationality\Mapper $nationalityMapper */
-        $nationalityMapper = $this->getJoinMapper('nationality');
+        $nationalityMapper = $this->getJoinMapper('user_nationality');
 
         /** @var User\Language\Mapper $languageMapper */
         $languageMapper = $this->getJoinMapper('language');
@@ -522,7 +552,7 @@ class UserMapper extends Mapper
             $userIds          = array_keys($users);
             $campusesByUserId = $campusMapper->findForOtherMapper($this, 'userCampus', $userIds);
             $qualificationsByUserId = $qualificationMapper->findForOtherMapper($this, 'user_qualification', $userIds);
-            $nationalityByUserId = $nationalityMapper->findForOtherMapper($this, 'nationality', $userIds);
+            $nationalityByUserId = $nationalityMapper->findForOtherMapper($this, 'user_nationality', $userIds);
             $languageByUserId = $languageMapper->findForOtherMapper($this, 'language', $userIds);
 
             foreach ($users as $userId => $user) {
