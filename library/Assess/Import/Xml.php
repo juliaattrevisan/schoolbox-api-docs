@@ -115,6 +115,8 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
                 return new \Assess\Import\Parser\V165($xml);
             case IParser::FORMAT_VERSION_170:
                 return new \Assess\Import\Parser\V170($xml);
+            case IParser::FORMAT_VERSION_261:
+                return new \Assess\Import\Parser\V261($xml);
             default:
                 throw new DomainException('No parser found for version: ' . $fileFormatVersion);
         }
