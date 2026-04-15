@@ -33,12 +33,7 @@ END;
 
 
 # reporting
-# Rename old INT column (preserves data for rollback).
-ALTER TABLE `reporting` CHANGE `mark_visibility` `_mark_visibility` tinyint(4) DEFAULT NULL;
-
-# Add new ENUM column with equivalent string default.
-ALTER TABLE `reporting` ADD COLUMN `mark_visibility` ENUM('staffOnly','staffAndStudent','staffAndParent','staffStudentAndParent') DEFAULT NULL;
-
+# Note the 'ALTER TABLE' commands for reporting have been incorporated into the CREATE TABLE command in updates/26.1.alpha1/reporting/01-schema.sql.
 # Populate new column from old values.
 # The old column was nullable, so in case of bad data we leave as null.
 UPDATE `reporting` SET `mark_visibility` = CASE `_mark_visibility`
