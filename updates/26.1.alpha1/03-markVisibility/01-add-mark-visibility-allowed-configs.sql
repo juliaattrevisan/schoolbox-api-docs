@@ -33,9 +33,9 @@ VALUES (
     'Enable grade visibility options involving students',
     (
         CASE @submissionVisibilityMax
-            WHEN 0 THEN 'false'
-            WHEN 1 THEN 'true'
-            WHEN 2 THEN 'true'
+            WHEN 0 THEN ‘0’
+            WHEN 1 THEN ‘1’
+            WHEN 2 THEN ‘1’
         END
     ),
     "Toggling this to ‘ON’ will allow grade visibility options involving students to be selected.  Changing this setting will not affect already published grades.",
@@ -55,9 +55,9 @@ VALUES (
     'Enable grade visibility options involving parents',
     (
         CASE @submissionVisibilityMax
-            WHEN 0 THEN 'false'
-            WHEN 1 THEN 'false'
-            WHEN 2 THEN 'true'
+            WHEN 0 THEN ‘0’
+            WHEN 1 THEN ‘0’
+            WHEN 2 THEN ‘1’
         END
     ),
     "Toggling this to ‘ON’ will allow grade visibility options involving parents to be selected.  Changing this setting will not affect already published grades.",
