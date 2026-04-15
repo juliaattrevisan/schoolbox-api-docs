@@ -245,7 +245,7 @@ export default {
 
 <template>
     <div class="c-island l-pad-m manage-qrcodes">
-        <div v-if="isDataLoaded && hasStudents" class="l-flex-row l-gap-m">
+        <div v-if="isDataLoaded && hasStudents" class="students l-flex-row l-gap-m">
             <manage-qr-codes-student
                 v-for="student in students"
                 :key="student.id"
@@ -369,13 +369,6 @@ export default {
         flex: 1 0 100%;
     }
 }
-
-.students {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    padding: 1rem 0;
-}
 </style>
 
 <style>
@@ -384,17 +377,14 @@ export default {
 }
 
 @media print {
-    .students {
-        display: block !important; /* This is required for '.student break-inside: avoid' to work (in manage-qr-codes-student.vue) */
-    }
-
     body,
     .manage-qrcodes {
         background: white; /* ensure white background, may have been changed by custom styles */
     }
 
     #container,
-    .island {
+    .f-container,
+    .manage-qrcodes {
         padding: 0; /* to get more of the page estate */
     }
 
