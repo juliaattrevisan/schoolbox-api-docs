@@ -229,6 +229,7 @@ class Controller extends Base
          */
         $post = $this->requestPost->getArrayCopy();
 
+        /** @var \Schoolbox\Learning\Assessment\Reporting\Feedback\Model $feedback */
         $feedback
             ->setAssessable($assessment)
             ->setReporting($reporting)
@@ -289,5 +290,33 @@ class Controller extends Base
         }
 
         $this->feedbackDataSource->save($feedback);
+
+        /**
+         * We need to retrieve the new plan below, but it won't have been hydrated into $participant yet
+         * Force re-hydration so that we can get the actual plan
+         */
+        $this->participantDataSource->loadParticipationIntoAssessment(
+            $assessment,
+            $learner
+        );
+
+        $plan = $participant->getPlan();
+
+        $data = [
+            'success' => true,
+            'message' => 'OK',
+            'id'      => $feedback->getId(),
+            /* these extra fields are currently used by the Markbook to keep things responsive */
+            'normalisedMark'              => $feedback->getNormalisedMark(),
+            'humanReadableMark'           => $feedback->getHumanReadableMark(),
+            'humanReadableInstructorMark' => $feedback->getInstructorMark(),
+            'plan' => [
+                'isDynamic' => $plan->getIsDynamic(),
+                'name' => $plan->getName(),
+                'dueDate' => $plan->getDueDate()?->getShort() ?? null,
+            ],
+        ];
+
+        $this->response = $this->responseAsJson($data);
     }
 }
