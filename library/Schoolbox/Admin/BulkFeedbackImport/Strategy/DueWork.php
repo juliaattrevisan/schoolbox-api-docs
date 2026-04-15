@@ -249,7 +249,6 @@ class DueWork implements IStrategy
             $folder['title'],
             $folder['id']
         ), self::INFO);
-
     }
 
 

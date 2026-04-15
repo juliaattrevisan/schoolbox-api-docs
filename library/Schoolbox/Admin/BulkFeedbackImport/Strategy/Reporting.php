@@ -280,7 +280,6 @@ class Reporting implements IStrategy
             $folder['title'],
             $folder['id']
         ), self::INFO);
-
     }
 
 

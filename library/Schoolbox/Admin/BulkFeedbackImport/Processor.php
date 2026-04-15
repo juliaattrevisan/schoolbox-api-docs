@@ -108,7 +108,6 @@ class Processor
         private \Schoolbox\Learning\Assessment\WorkType\Model $workType,
         private bool $perform
     ) {
-
     }
 
 
