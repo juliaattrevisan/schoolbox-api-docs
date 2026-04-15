@@ -67,4 +67,9 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     $asyncRedis->psubscribe($topic, $scheduler);
 
     $log->info("Listening on redis://$topic");
+
+    $loop->addPeriodicTimer(
+        $strat->getMetricInterval() / 1000,
+        fn () => $log->info(json_encode($scheduler->getStats())),
+    );
 });

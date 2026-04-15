@@ -266,6 +266,20 @@ class Dispatcher implements DispatcherInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getStatus(): array
+    {
+        return [
+            'queue' => [
+                'count' => $this->q->count(),
+                'warn'  => (int)$this->strat->getWarningQueueLength(),
+                'max'   => (int)$this->strat->getMaxQueueLength(),
+            ],
+        ];
+    }
+
+    /**
      * @return array
      */
     public function getPoolStatus()

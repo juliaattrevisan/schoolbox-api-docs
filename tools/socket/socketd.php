@@ -69,12 +69,13 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     $redisAsyncClientRepository = $di->get('multiInstance.redisAsyncClientRepository');
 
     $stratBuilder = new ConfiguredDispatchStrategyBuilder((new ConfigurationReader($conf))->readConfig());
+    $strat        = $stratBuilder->build($flags);
 
     $delim = \array_key_exists(Daemon\Kernel::OPT_LONG_PORCELAIN, $opts) ? ' ' : "\n    ";
 
     $log->info(implode($delim, ['Using strategy:'] + $stratBuilder->summarise()), ['char' => '+']);
 
-    $pipeManager = (new PipeManagerFactory(
+    $pipeManager = new PipeManagerFactory(
         $loop,
         $sessionSerializeHandler,
         $log,
@@ -83,9 +84,15 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $connectorRepository,
         $redisClientRepository,
         $redisAsyncClientRepository,
-        $stratBuilder->build($flags),
+        $strat,
         $kernel->getHardLimit(Kernel::RLIMIT_FILE_DESCRIPTORS),
-    ))->build();
+    )->build();
+
+    // Add metric logging at this level I guess?
+    $loop->addPeriodicTimer(
+        $strat->getMetricInterval() / 1000,
+        fn () => $log->info(json_encode($pipeManager->getStats())),
+    );
 
     $wss = new Ratchet\WebSocket\WsServer($pipeManager);
     $wss->enableKeepAlive($loop);

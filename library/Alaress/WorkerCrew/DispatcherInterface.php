@@ -21,6 +21,17 @@ interface DispatcherInterface
     public function enqueue($identifier, $command, $data);
 
     /**
+     * Returns the status of the dispatcher itself.
+     *
+     * Currently, this includes its queue length (the number of messages the
+     * dispatcher has received, but is yet to process), and the warning and max
+     * for this value.
+     *
+     * @return array
+     */
+    public function getStatus(): array;
+
+    /**
      * Returns the current status of the worker pool
      *
      * @return array

@@ -12,14 +12,15 @@ namespace Alaress\WorkerCrew\Worker;
 use Alaress\WorkerCrew\IPC\AlaressIPCProtocol;
 use OutOfBoundsException;
 use RuntimeException;
+use Schoolbox\Realtime\Memory;
 
 class WorkerArray implements WorkerBundleInterface
 {
     /** @var Worker[] */
-    protected $workers = array();
+    protected $workers = [];
 
     /** @var array */
-    protected $pipes = array();
+    protected $pipes = [];
 
     /** @var AlaressIPCProtocol */
     protected $protocol;
@@ -228,23 +229,27 @@ class WorkerArray implements WorkerBundleInterface
      */
     public function getStatus()
     {
-        $status = array();
-
-        $list = array(
+        $status = [];
+        $list = [
             Worker::READY   => 'READY',
             Worker::BUSY    => 'BUSY',
             Worker::DONE    => 'DONE',
             Worker::ENDED   => 'ENDED',
             Worker::ERROR   => 'ERROR',
             Worker::SENDING => 'SENDING',
-        );
+        ];
 
+        $time = microtime(true);
         foreach ($this->workers as $pid => $w) {
-            $status[$pid] = array(
-                'proc'   => $w->getCommand(),
-                'status' => $list[$w->getStatus()],
-                'task'   => '(none)'
-            );
+            $status[$pid] = [
+                'proc'     => $w->getCommand(),
+                'status'   => $list[$w->getStatus()],
+                'task'     => '(none)',
+                'start'    => $w->getStart(),
+                'uptime'   => $time - $w->getStart(),
+                'requests' => $w->getRequestCount(),
+                'memory'   => Memory::getUsage((int)$pid),
+            ];
             if ($w->getTask() instanceof Task) {
                 $status[$pid]['task'] = $w->getTask()->getCommand();
             }

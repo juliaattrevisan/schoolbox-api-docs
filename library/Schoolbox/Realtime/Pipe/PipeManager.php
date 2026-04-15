@@ -26,6 +26,7 @@ use Ratchet\MessageComponentInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
 use Schoolbox\MultiInstance\InstanceRepository;
+use Schoolbox\Realtime\Memory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\ProcessException;
 use Schoolbox\Realtime\SessionException;
@@ -842,5 +843,20 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             $this->reactLoop->cancelTimer($this->inactivityScanTimer);
             $this->inactivityScanTimer = null;
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStats(): array
+    {
+        $pid             = getmypid();
+        $dispatcherStats = $this->taskDispatcher->getStatus();
+        $poolStats       = $this->taskDispatcher->getPoolStatus();
+        return [
+            'memory'     => $pid ? Memory::getUsage($pid) : null,
+            'dispatcher' => $dispatcherStats,
+            'pool'       => $poolStats,
+        ];
     }
 }

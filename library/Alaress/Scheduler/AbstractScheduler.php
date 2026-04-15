@@ -29,6 +29,7 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
 use Schoolbox\External;
+use Schoolbox\Realtime\Memory;
 
 abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHandlerInterface
 {
@@ -432,6 +433,22 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
             $this->log->warning("[AbstractScheduler] Rescheduling '{$identifier->getEventObjectId()} - {$identifier->getLabel()}' in " . self::RETRY_TIME, ['char' => '-']);
             $this->schedule($identifier, $this->timerCallback($identifier), true, self::RETRY_TIME);
         }
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getStats(): array
+    {
+        $pid             = getmypid();
+        $dispatcherStats = $this->dispatcher->getStatus();
+        $poolStats       = $this->dispatcher->getPoolStatus();
+        return [
+            'memory'     => $pid ? Memory::getUsage($pid) : null,
+            'dispatcher' => $dispatcherStats,
+            'pool'       => $poolStats,
+        ];
     }
 
 

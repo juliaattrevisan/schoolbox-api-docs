@@ -29,6 +29,7 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
     protected $workerTimeoutHard;
     protected $workerWriteTimeout;
     protected $maxRequestsPerWorker;
+    protected $metricInterval;
 
 
     /**
@@ -58,6 +59,7 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
         $flags = '',
         $maxRequestsPerWorker = DefaultDispatchStrategy::MAX_REQUESTS_PER_WORKER,
         $workerWriteTimeout = DefaultDispatchStrategy::WORKER_WRITE_TIMEOUT,
+        $metricInterval = DefaultDispatchStrategy::METRIC_INTERVAL,
     ) {
         parent::__construct($flags);
         $this->flywheelSpins        = $maxFlywheel;
@@ -72,6 +74,7 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
         $this->workerTimeoutHard    = $workerTimeoutHard;
         $this->workerWriteTimeout   = $workerWriteTimeout;
         $this->maxRequestsPerWorker = $maxRequestsPerWorker;
+        $this->metricInterval       = $metricInterval;
         $this->protocol             = new AlaressIPCProtocol();
     }
 
@@ -198,5 +201,14 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
     public function getWorkerWriteTimeout(): int
     {
         return $this->workerWriteTimeout;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getMetricInterval(): int
+    {
+        return $this->metricInterval;
     }
 }
