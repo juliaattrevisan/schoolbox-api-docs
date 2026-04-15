@@ -227,16 +227,21 @@ class Controller extends Base
         if (null === $feedback) {
             $authoritativeFeedback = $participant->getAuthoritativeFeedback(false);
 
-            /* If we didn't find an authoritative feedback spawn a whole new one; this person never had feedback.
+            /* Resume an existing draft feedback if it exists, otherwise spawn a new feedback instance.
              *
+             * If we didn't find an authoritative feedback spawn a whole new one; this person never had feedback.
              * Or, if we found an authoritative feedback but it was published, spawn a whole new one; this creates a new
              * version of the feedback and adds it to the stack like every other learning activity's behaviour. Without
              * this check you'd end up recycling exactly one feedback every time.
              */
-            if (null === $authoritativeFeedback || $authoritativeFeedback->isPublished()) {
-                $feedback = new Reporting\Feedback\Model();
-            } else {
+            if (null !== $authoritativeFeedback && $authoritativeFeedback->isDraft()) {
+                /* Resume an existing draft feedback
+                 */
                 $feedback = $authoritativeFeedback;
+            } else {
+                /* All other scenarios spawn a new feedback instance
+                 */
+                $feedback = new Reporting\Feedback\Model();
             }
         }
 
