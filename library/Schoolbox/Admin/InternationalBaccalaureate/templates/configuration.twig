@@ -10,9 +10,11 @@
         <div id="ib-configuration-container">
             <ib-configuration
                 :categories="{{ (categories ?? []) | json_encode }}"
+                configuration-endpoint="{{ routeLookupIfAuthorized('internationalBaccalaureate.getConfigurationData') }}"
+                save-endpoint="{{ routeLookupIfAuthorized('internationalBaccalaureate.saveConfiguration') }}"
+                subjects-endpoint="{{ routeLookupIfAuthorized('internationalBaccalaureate.getCategorySubjects') }}"
             />
         </div>
-        <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/library/Schoolbox/Admin/InternationalBaccalaureate/templates/css/ib-configuration.css?v={{ config.site_version }}" />
         <script src="{{ CDN_PREFIX }}/js/bundle/ibConfiguration.js?v={{ config.site_version }}"></script>
     </div>
 </div>

@@ -6,3 +6,16 @@ export type IBCategory = {
     name: string;
     title: string;
 };
+
+/**
+ * A single configuration entry for an IB DP subject category.
+ */
+export type IBConfiguration = {
+    id: number;
+    key: string;
+    value: string;
+    categoryId: number;
+    label: string;
+    description?: string;
+    type: string;
+};

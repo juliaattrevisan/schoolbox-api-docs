@@ -16,7 +16,10 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Admin\Settings\FieldStrategyFactory;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 class Module extends BaseModule
 {
@@ -36,6 +39,9 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '/configuration', 'getConfiguration', $ruleIBCoordinatorAccess);
+        $this->register('GET', '/configuration/api/subjects/{groupId}', 'getCategorySubjects', $ruleIBCoordinatorAccess);
+        $this->register('GET', '/configuration/api/{categoryId}', 'getConfigurationData', $ruleIBCoordinatorAccess);
+        $this->register('POST', '/configuration/api/save', 'saveConfiguration', $ruleIBCoordinatorAccess);
         $this->register('GET', '/registrations', 'getRegistrations', $ruleIBCoordinatorAccess);
     }
 
@@ -44,7 +50,12 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller();
+        return new Controller(
+            $this->getMapperFactory()->get(ConfigMapper::class),
+            new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
+            $this->injector->get('moduleCache.rebuilder'),
+            $this->injector->get('oidc.cache'),
+        );
     }
 
     /**

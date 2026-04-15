@@ -214,7 +214,9 @@ body.sbx-body {
      * These need a border radius on hover to match design
      */
     nav a[class*="icon-"]:hover,
-    nav a[class^="icon-"]:hover {
+    nav a[class^="icon-"]:hover,
+    .sbx-icon-only-button,
+    .sbx-icon-only-button:hover {
         border-radius: var(--sbx-config-field-roundness) !important;
     }
 

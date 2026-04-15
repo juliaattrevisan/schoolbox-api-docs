@@ -12,10 +12,15 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\InternationalBaccalaureate;
 
-use Alaress\Web\Controller\Base as BaseController;
+use Alaress\Database\Predicate;
+use Alaress\Web\Controller\ConfigController;
+use Exception;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IB\Group\Mapper as IBGroupMapper;
+use Schoolbox\IB\GroupSubject\Mapper as IBGroupSubjectMapper;
 
-class Controller extends BaseController
+class Controller extends ConfigController
 {
     /**
      * DP Subject Configuration page
@@ -25,49 +30,28 @@ class Controller extends BaseController
     public function getConfiguration(): void
     {
         $pageCurrent = '/adminv2/international-baccalaureate/configuration';
-        // Define IB configuration categories
+
+        // Add General Configuration tab manually
         $categories = [
             [
-                'id' => 1,
+                'id' => 0,
                 'name' => 'general',
                 'title' => 'General Configuration'
-            ],
-            [
-                'id' => 2,
-                'name' => 'studies-in-language-and-literature',
-                'title' => 'Studies in Language and Literature'
-            ],
-            [
-                'id' => 3,
-                'name' => 'language-acquisition',
-                'title' => 'Language Acquisition'
-            ],
-            [
-                'id' => 4,
-                'name' => 'individuals-and-societies',
-                'title' => 'Individuals and Societies'
-            ],
-            [
-                'id' => 5,
-                'name' => 'sciences',
-                'title' => 'Sciences'
-            ],
-            [
-                'id' => 6,
-                'name' => 'mathematics',
-                'title' => 'Mathematics'
-            ],
-            [
-                'id' => 7,
-                'name' => 'the-arts',
-                'title' => 'The Arts'
-            ],
-            [
-                'id' => 8,
-                'name' => 'core',
-                'title' => 'Core'
             ]
         ];
+
+        // Fetch IB groups from database
+        $groupMapper = new IBGroupMapper();
+        $groupModels = $groupMapper->findAll();
+
+        foreach ($groupModels as $groupModel) {
+            $categories[] = [
+                'id' => $groupModel->getId(),
+                'name' => strtolower(str_replace(' ', '-', $groupModel->getName())),
+                'title' => $groupModel->getName()
+            ];
+        }
+
         $this->response = $this->responseFromTemplate(
             '@internationalBaccalaureate/configuration.twig',
             [
@@ -77,6 +61,98 @@ class Controller extends BaseController
             ]
         );
     }
+
+    /**
+     * Get configuration data for a specific category
+     *
+     * @api GET /adminv2/international-baccalaureate/configuration/api/{categoryId}
+     */
+    public function getConfigurationData(int $categoryId): void
+    {
+        $configurations = [];
+
+        if ($categoryId === 0) { // General tab - load from preloaded config
+            $configLoader = $this->getConfigLoader();
+
+            $configurations = [
+                [
+                    'categoryId' => 0,
+                    'key' => ConfigMapper::NAME_IB_SCHOOL_NAME,
+                    'value' => $configLoader->get(ConfigMapper::NAME_IB_SCHOOL_NAME) ?? '',
+                    'description' => 'Enter the school\'s name as registered with the IB.',
+                    'type' => 'text',
+                    'label' => 'School Name'
+                ],
+                [
+                    'categoryId' => 0,
+                    'key' => ConfigMapper::NAME_IB_SCHOOL_CODE,
+                    'value' => $configLoader->get(ConfigMapper::NAME_IB_SCHOOL_CODE) ?? '',
+                    'description' => 'Enter the school\'s code as provided by the IB.',
+                    'type' => 'text',
+                    'label' => 'School Code'
+                ],
+            ];
+        }
+
+        $this->response = $this->responseAsJson($configurations);
+    }
+
+    /**
+     * Get subjects for a specific category
+     *
+     * @api GET /adminv2/international-baccalaureate/configuration/api/subjects/{groupId}
+     */
+    public function getCategorySubjects(int $groupId): void
+    {
+        try {
+            $groupSubjectMapper = new IBGroupSubjectMapper();
+            $groupSubjects = $groupSubjectMapper->findByColumn('group_id', $groupId, [
+                'order' => ['s.name' => 'ASC', 'level' => 'ASC'],
+            ]);
+
+            $subjects = [];
+            foreach ($groupSubjects as $groupSubject) {
+                $subjects[] = [
+                    'subject' => $groupSubject->getSubject()->getName(),
+                    'level' => $groupSubject->getLevel() ?: ''
+                ];
+            }
+
+            $this->response = $this->responseAsJson($subjects);
+        } catch (Exception $e) {
+            $this->response = $this->responseAsJson(['error' => $e->getMessage()])->withStatus(500);
+        }
+    }
+
+    /**
+     * Save configuration data
+     *
+     * @api POST /adminv2/international-baccalaureate/configuration/api/save
+     */
+    public function saveConfiguration(): void
+    {
+        $data = (array) $this->requestPost;
+
+        if (!isset($data['key']) || !isset($data['value'])) {
+            $this->response = $this->responseAsJson(['success' => false, 'message' => 'Invalid request data'])->withStatus(400);
+            return;
+        }
+
+        $this->updateConfig(
+            [$data['key'] => $data['value']],
+            $this->buildIbConfigPredicate()
+        );
+
+        $this->response = $this->responseAsJson(['success' => true, 'message' => 'Configuration saved successfully']);
+    }
+
+    private function buildIbConfigPredicate(): Predicate\Builder
+    {
+        return $this->getConfigMapper()
+                    ->getPredicateBuilder()
+                    ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_IB);
+    }
+
     /**
      * Registration Reports page
      *
