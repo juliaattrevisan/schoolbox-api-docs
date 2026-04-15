@@ -537,6 +537,96 @@ class Classes implements IStrategy
     }
 
     /**
+     * Expand a class's session date range into individual lesson occurrences.
+     *
+     * For each period the class meets, generate one (start_at, finish_at) tuple
+     * per matching weekday in the [from, to] range. Times are interpreted in the
+     * school's local timezone.
+     *
+     * @param array<string> $periodIds Period IDs the class meets in
+     * @return list<array{start_at: Alaress_Date_Format, finish_at: Alaress_Date_Format, period_id: string, period_name: string, date: string}>
+     */
+    private function expandOccurrences(
+        Alaress_Date_Format $from,
+        Alaress_Date_Format $to,
+        array $periodIds
+    ): array {
+        return self::expandOccurrencesForTest($from, $to, $periodIds, $this->periods, $this->timezone);
+    }
+
+    /**
+     * Pure expansion helper — exposed as static for unit testing.
+     *
+     * @param array<string> $periodIds
+     * @param array<string, array{name: string, start_time: ?string, end_time: ?string, days: array<string>}> $periodsLookup
+     * @return list<array{start_at: Alaress_Date_Format, finish_at: Alaress_Date_Format, period_id: string, period_name: string, date: string}>
+     */
+    public static function expandOccurrencesForTest(
+        Alaress_Date_Format $from,
+        Alaress_Date_Format $to,
+        array $periodIds,
+        array $periodsLookup,
+        \DateTimeZone $timezone
+    ): array {
+        $occurrences = [];
+
+        /* Iterate each calendar day in [from, to] inclusive. */
+        $cursor = new \DateTimeImmutable($from->getDatabase(), $timezone);
+        $end    = new \DateTimeImmutable($to->getDatabase(), $timezone);
+
+        while ($cursor <= $end) {
+            $weekday = strtolower($cursor->format('l')); // "monday", "tuesday", ...
+            $dateStr = $cursor->format('Y-m-d');
+
+            foreach ($periodIds as $periodId) {
+                if (!isset($periodsLookup[$periodId])) {
+                    continue;
+                }
+
+                $period = $periodsLookup[$periodId];
+                $startTime = $period['start_time'] ?? null;
+                $endTime = $period['end_time'] ?? null;
+
+                if (null === $startTime || null === $endTime) {
+                    continue;
+                }
+
+                /* SPIKE-NOTE: assumes Period.days is an array of lowercase weekday
+                 * strings. If the real Edlink payload uses a different shape (e.g.
+                 * abbreviations like "Mon", a bitmask, or nested under
+                 * meeting_times), adapt this match. */
+                if (!\in_array($weekday, $period['days'], true)) {
+                    continue;
+                }
+
+                $startAt = Alaress_Date_Format::newDatabaseDate(
+                    sprintf('%s %s', $dateStr, $startTime),
+                    $timezone
+                );
+                $finishAt = Alaress_Date_Format::newDatabaseDate(
+                    sprintf('%s %s', $dateStr, $endTime),
+                    $timezone
+                );
+
+                $occurrences[] = [
+                    'start_at' => $startAt,
+                    'finish_at' => $finishAt,
+                    'period_id' => $periodId,
+                    'period_name' => $period['name'],
+                    'date' => $dateStr,
+                ];
+            }
+
+            $cursor = $cursor->modify('+1 day');
+        }
+
+        /* Sort chronologically so callers can rely on order. */
+        usort($occurrences, fn($a, $b) => $a['start_at']->getDatabase() <=> $b['start_at']->getDatabase());
+
+        return $occurrences;
+    }
+
+    /**
      * Parse an Edlink ISO 8601 date string into an Alaress_Date_Format
      *
      * Edlink sends dates like "2025-09-01T00:00:00.000Z"
