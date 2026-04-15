@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
+use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Reporting;
@@ -30,9 +31,11 @@ class Controller extends Base
     public function __construct(
         private ErrorMapper $errorMapper,
         private BreadcrumbFactory $bakery,
+        private \Schoolbox\Learning\Assessment\DataModel\Reporting\Mapper $reportingMapper,
         private \Schoolbox\Assessment\Term\Mapper $termMapper,
         private StateMapper $stateMapper,
         private Participant\DataSource $participantDataSource,
+        private IFeedbackDataSource $feedbackDataSource,
     ) {
         /* TODO Technical Uplift Candidate
          *  StateMapper.
@@ -205,22 +208,64 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
 
-        // TODO Check if $feedback is null; if so, we're spawning a whole new one for this person
+        /* Check that the subobject exists: annoyingly, this is required
+         */
+        try {
+            $reporting = $this->reportingMapper->findOneByColumn('assessment_id', $assessment->getId());
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            /* For some reason this couldn't be found: maybe multiplayer schoolbox where someone deleted it while you
+             * were actively using it
+             */
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+        }
 
-        // TODO Otherwise, update $feedback's properties
+        /* Check if $feedback is null; if so, we're spawning a whole new one for this person
+         */
+        if (null === $feedback) {
+            $feedback = new Reporting\Feedback\Model();
+        }
 
-//        $feedback = new \Schoolbox\Learning\Assessment\Reporting\Feedback\Model()
-//            ->setAssessable($assessmentMapperProxy->findById(1688))
-//            ->setReporting($reportingMapper->findByid(2))
-//            ->setReviewee($userMapper->findByid(20))
-//            ->setReviewer($userMapper->findByid(2))
-//            ->setNormalisedMark(99)
-//            ->setHumanReadableMark('14 / 117')
-//            ->setInstructorMark('Emerging')
-//            ->setComment('moshae why')
-//            ->setPublishedBy($userMapper->findById(2)->getId())
-//            ->setPublishedAt(\Alaress_Date_Format::now());
+        /* Update props and persist it
+         */
+        $post = $this->requestPost->getArrayCopy();
 
-        // TODO Save it
+        $feedback
+            ->setAssessable($assessment)
+            ->setReporting($reporting)
+            ->setReviewee($learner)
+            ->setReviewer($this->getUser())
+            ->setComment($post['comment'] ?? '');
+
+        /** Get mark schemes
+         * - Instructor mark scheme is used to normalise what was inputted by the user
+         * - Learner mark scheme is used when displaying the mark back to learners/parents
+         */
+        $instructorScheme = $assessment->getInstructorMarkScheme();
+        $learnerScheme = $assessment->getMarkScheme();
+
+        /* This human readable mark is given by the instructor, from which we derive the normalised mark
+         */
+        $humanReadableMark = $post['mark'] ?? '';
+        $normalisedMark = $instructorScheme->getNormalisedMark($post['mark'] ?? '');
+
+        /* Find out what the learner's version would have been and save that too
+         * Arguably you could skip this derivation, only doing it if $instructor scheme was different to $learner scheme
+         */
+        $learnerHumanReadableMark = $learnerScheme->getHumanReadableMark($normalisedMark);
+
+        $feedback
+            ->setNormalisedMark($normalisedMark)
+            ->setHumanReadableMark($learnerHumanReadableMark)
+            ->setInstructorMark($humanReadableMark);
+
+        /* This publish=1 param tuple is sent only when Publish And Continue is clicked
+         */
+        if (1 === (int)($post['publish'] ?? null)) {
+            $feedback
+                ->setPublishedBy($this->getUser()->getId())
+                ->setPublishedAt(\Alaress_Date_Format::now());
+        }
+
+        $this->feedbackDataSource->save($feedback);
     }
 }

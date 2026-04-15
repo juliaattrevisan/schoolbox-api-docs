@@ -152,15 +152,14 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Access::class),
         );
 
-        /** @var \Schoolbox\Learning\Assessment\Participant\DataSource */
-        $participantDataSource = $this->injector->get('participantDataSource');
-
         return new Controller(
             $this->getErrorMapper(),
             $bakery,
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\Reporting\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Assessment\Term\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\DueWork\StateMapper::class),
-            $participantDataSource,
+            $this->injector->get('participantDataSource'),
+            $this->injector->get('feedbackDataSource'),
         );
     }
 
