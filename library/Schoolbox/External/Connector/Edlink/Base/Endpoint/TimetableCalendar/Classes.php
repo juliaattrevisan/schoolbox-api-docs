@@ -67,6 +67,13 @@ class Classes implements IStrategy
     private array $sessions = [];
 
     /**
+     * Period lookup: Edlink period ID => period data (name, start_time, end_time, days)
+     *
+     * @var array<string, array>
+     */
+    private array $periods = [];
+
+    /**
      * Course lookup: Edlink course ID => course data (name, code)
      *
      * @var array<string, array>
@@ -120,6 +127,11 @@ class Classes implements IStrategy
         $this->log->info('Preloading courses.');
         $this->preloadCourses();
 
+        /* Preload periods for bell-schedule slot data
+         */
+        $this->log->info('Preloading periods.');
+        $this->preloadPeriods();
+
         /* Ensure the PeopleIds lookup is populated. This is a no-op when
          * Profile sync ran earlier and populated the map already.
          */
@@ -168,6 +180,51 @@ class Classes implements IStrategy
         }
 
         $this->log->info(sprintf('Loaded %d sessions.', \count($this->sessions)));
+    }
+
+    /**
+     * Preload all periods from Edlink into a lookup keyed by period ID.
+     *
+     * Periods describe the bell-schedule slots (name + time range + days of week).
+     */
+    private function preloadPeriods(): void
+    {
+        $nextUrl = sprintf('periods?$first=%s', self::NUM_PER_PAGE);
+
+        for ($i = 0; ($nextUrl && $i < self::MAX_CALLS); $i++) {
+            $response = $this->api->retrieve('GET', $nextUrl);
+
+            if (!isset($response['$data']) || !\count($response['$data'])) {
+                break;
+            }
+
+            foreach ($response['$data'] as $period) {
+                $id = trim((string)($period['id'] ?? ''));
+                if ('' === $id) {
+                    continue;
+                }
+
+                $this->periods[$id] = [
+                    'name' => trim((string)($period['name'] ?? '')),
+                    'start_time' => $period['start_time'] ?? null,
+                    'end_time' => $period['end_time'] ?? null,
+                    'days' => $period['days'] ?? [],
+                ];
+
+                $this->log->debug(sprintf(
+                    'Loaded period %s: %s (%s-%s, days=%s)',
+                    $id,
+                    $this->periods[$id]['name'],
+                    $this->periods[$id]['start_time'] ?? 'null',
+                    $this->periods[$id]['end_time'] ?? 'null',
+                    implode(',', $this->periods[$id]['days'])
+                ));
+            }
+
+            $nextUrl = $response['$next'] ?? false;
+        }
+
+        $this->log->info(sprintf('Loaded %d periods from Edlink', \count($this->periods)));
     }
 
     /**
