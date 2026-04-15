@@ -20,7 +20,7 @@
 <div class="row">
     <div class="card small-12 column meta-preview">
         {# Links don't yet have thumbnails. Eventually add them here? #}
-        <a class="size-32" href="{{ file.getHref() }}" target="_blank"><sbx-icon name="link"></sbx-icon></a>
+        <a class="size-32 sbx-icon-only-button" href="{{ file.getHref() }}" target="_blank"><sbx-icon name="link"></sbx-icon></a>
         <h3><a href="{{ file.getHref() }}"target="_blank">{{ file.description }}</a>
             <span class="hint has-tip" data-reveal-id="modal-link-{{ file.id }}" title="View link information">?</span>
         </h3>

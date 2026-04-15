@@ -108,7 +108,7 @@
                         {% endif %}
 
                         {% if isRouteAuthorized('resourceItem.edit', {id: item.id, item: item}) %}
-                        <a class="resource-name resource-edit-link" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}"><sbx-icon name="modify"></sbx-icon></a>
+                        <a class="resource-name resource-edit-link sbx-icon-only-button" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}"><sbx-icon name="modify"></sbx-icon></a>
                         {% endif %}
                     </nav>
                     <article>{{ item.description|purify }}</article>

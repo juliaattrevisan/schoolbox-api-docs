@@ -425,7 +425,7 @@
                                 data-title-undock="{{ undockNotifsTitle }}"
                             ></a>
                             <label id="notification-toggle-full">Notifications</label>
-                            <a class="settings-button" href="{{ routeLookup("notifications.configure") }}" aria-label="Modify notification settings" title="Modify notification settings"><sbx-icon name="settings"></sbx-icon></a>
+                            <a class="settings-button sbx-icon-only-button" href="{{ routeLookup("notifications.configure") }}" aria-label="Modify notification settings" title="Modify notification settings"><sbx-icon name="settings"></sbx-icon></a>
                         </li>
                         {% include '@notifications/pwa.twig' with { pwaPage: 'sidebar' } %}
                         <li>
@@ -449,7 +449,7 @@
                                             </div>
                                         </div>
                                         <nav>
-                                            <a data-msgitem-ack class="no-pad" title="Mark as read"><sbx-icon name="approve"></sbx-icon></a>
+                                            <a data-msgitem-ack class="no-pad sbx-icon-only-button" title="Mark as read"><sbx-icon name="approve"></sbx-icon></a>
                                         </nav>
                                     </li>
                                 </ul>

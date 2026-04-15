@@ -239,9 +239,9 @@ Data:
                                 : null
                             %}
                             {% if kamiExportRoute %}
-                                <a href="{{ kamiExportRoute }}" data-kami-export title="Download annotated document"><sbx-icon name="download"></sbx-icon></a>
+                                <a href="{{ kamiExportRoute }}" data-kami-export title="Download annotated document" class="sbx-icon-only-button"><sbx-icon name="download"></sbx-icon></a>
                             {% else %}
-                                <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1" title="Download"><sbx-icon name="download"></sbx-icon></a>
+                                <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1" title="Download" class="sbx-icon-only-button"><sbx-icon name="download"></sbx-icon></a>
                             {% endif %}
                         </nav>
                     </li>

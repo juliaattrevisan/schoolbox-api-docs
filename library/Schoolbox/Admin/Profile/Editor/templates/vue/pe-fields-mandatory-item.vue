@@ -60,7 +60,7 @@ const fieldSaveError = window.Vue.computed(() => {
         <nav>
             <a
                 ref="editBtn"
-                class="settings"
+                class="settings sbx-icon-only-button"
                 title="Settings"
                 :data-test="`${peFieldsStore.getFieldIdentifier(props.field)}-settings`"
                 @click="isEditPanelOpen = !isEditPanelOpen"

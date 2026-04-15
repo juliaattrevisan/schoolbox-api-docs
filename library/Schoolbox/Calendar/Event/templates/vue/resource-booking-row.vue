@@ -167,6 +167,7 @@ async function postDeleteBookingForm(): Promise<void> {
                 href="#"
                 title="Modify Booking"
                 aria-label="Modify Booking"
+                class="sbx-icon-only-button"
                 @click.prevent="toggleEditForm"
                 ><sbx-icon name="modify"></sbx-icon
             ></a>

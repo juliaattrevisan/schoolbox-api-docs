@@ -29,11 +29,11 @@
     </div>
     <nav>
         <!-- BEGIN reply -->
-            <a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}" title="Post Reply"><sbx-icon name="reply"></sbx-icon></a>
+            <a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}" title="Post Reply" class="sbx-icon-only-button"><sbx-icon name="reply"></sbx-icon></a>
         <!-- END reply -->
         <!-- BEGIN modify_thread -->
         <a class="sbx-icon-only-button no-text" href="/forum/modifyForm.php?toggleLock={THREAD_ID}" title="{LOCK_UNLOCK} Thread" aria-label="{LOCK_UNLOCK} Thread"><sbx-icon name="locked"></sbx-icon></a>
-        <a href="/forum/modifyForm.php?deleteThread={THREAD_ID}" data-action="delete" data-relation="thread" title="Delete Thread"><sbx-icon name="delete"></sbx-icon></a>
+        <a href="/forum/modifyForm.php?deleteThread={THREAD_ID}" data-action="delete" data-relation="thread" title="Delete Thread" class="sbx-icon-only-button"><sbx-icon name="delete"></sbx-icon></a>
         <!-- END modify_thread -->
     </nav>
 </div>

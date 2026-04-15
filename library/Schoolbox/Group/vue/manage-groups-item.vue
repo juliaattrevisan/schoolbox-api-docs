@@ -376,7 +376,7 @@ export default {
                             <button
                                 v-if="isEnrolled || isPrivate"
                                 title="Toggle Favourites"
-                                class="group-action"
+                                class="group-action sbx-button--has-icon"
                                 aria-label="Toggle Favourites"
                                 :disabled="isProcessing"
                                 @click="toggleFavourites"
@@ -387,7 +387,7 @@ export default {
                             <button
                                 v-if="!group.isForceFollow && !group.isMsgDisabled && (isEnrolled || isPrivate)"
                                 title="Toggle Notifications"
-                                class="group-action"
+                                class="group-action sbx-button--has-icon"
                                 :disabled="isProcessing"
                                 @click="toggleNotifications"
                             >

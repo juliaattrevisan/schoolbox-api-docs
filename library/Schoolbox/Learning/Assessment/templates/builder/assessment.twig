@@ -44,11 +44,7 @@ Usage:
             <sbx-pop-out content-id="dropdown-{{ assessment.id }}"></sbx-pop-out>
         </nav>
         <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ assessment.id }}">
-<<<<<<< HEAD
             <li><a href="{{ routeLookup('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" class="icon-export" title="Copy this task into classes" data-test="builder-export-activity-{{ assessment.id }}">Export to Classes</a></li>
-=======
-            <li><a href="{{ routeLookup('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" class="sbx-button--has-icon" title="Copy this task into classes"><sbx-icon name="export"></sbx-icon>Export to Classes</a></li>
->>>>>>> 93efbc4388a (Replace legacy icon-export links/buttons with sbx-icon[SA-22181])
 
             {% include '@learningAssessment/fragments/modifyLinks.twig' with {
                 assessment: assessment,

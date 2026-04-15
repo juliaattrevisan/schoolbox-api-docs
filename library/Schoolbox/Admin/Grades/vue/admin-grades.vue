@@ -242,6 +242,7 @@ export default {
                         <a
                             href="#"
                             title="Remove Grouping"
+                            class="sbx-icon-only-button"
                             :class="{ disabled: saveInProgress }"
                             @click.prevent="openDeleteGradeGroupModal(groupIndex)"
                             ><sbx-icon name="delete"></sbx-icon
@@ -305,6 +306,7 @@ export default {
                                     <a
                                         title="Remove Level"
                                         href="#"
+                                        class="sbx-icon-only-button"
                                         :class="{ disabled: saveInProgress }"
                                         @click.prevent="deleteGradeLevel(groupIndex, levelIndex)"
                                         ><sbx-icon name="delete"></sbx-icon
