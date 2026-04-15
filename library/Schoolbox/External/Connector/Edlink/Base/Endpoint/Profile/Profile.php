@@ -204,6 +204,9 @@ class Profile implements IStrategy
         $lastname = trim((string)($person['last_name'] ?? ''));
         $email = trim((string)($person['email'] ?? ''));
         $phone = trim((string)($person['phone'] ?? ''));
+        if ('' === $phone && !empty($person['phone_numbers'])) {
+            $phone = trim((string)($person['phone_numbers'][0]['number'] ?? ''));
+        }
 
         /* Demographics
          */
@@ -321,6 +324,9 @@ class Profile implements IStrategy
         $lastname = trim((string)($person['last_name'] ?? ''));
         $email = trim((string)($person['email'] ?? ''));
         $phone = trim((string)($person['phone'] ?? ''));
+        if ('' === $phone && !empty($person['phone_numbers'])) {
+            $phone = trim((string)($person['phone_numbers'][0]['number'] ?? ''));
+        }
 
         $username = (new FirstMeaningfulValue())->find([
             $email,
@@ -477,6 +483,9 @@ class Profile implements IStrategy
         $lastname = trim((string)($person['last_name'] ?? ''));
         $email = trim((string)($person['email'] ?? ''));
         $phone = trim((string)($person['phone'] ?? ''));
+        if ('' === $phone && !empty($person['phone_numbers'])) {
+            $phone = trim((string)($person['phone_numbers'][0]['number'] ?? ''));
+        }
         $username = (new FirstMeaningfulValue())->find([$email, $externalId]);
 
         try {
@@ -582,6 +591,9 @@ class Profile implements IStrategy
             . trim((string)($person['last_name'] ?? ''))
         );
         $phone = trim((string)($person['phone'] ?? ''));
+        if ('' === $phone && !empty($person['phone_numbers'])) {
+            $phone = trim((string)($person['phone_numbers'][0]['number'] ?? ''));
+        }
 
         if ('' === $name && '' === $phone) {
             return;
