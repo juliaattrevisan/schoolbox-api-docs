@@ -422,7 +422,7 @@ class Subnav
                 ],
             ],
             '/adminv2/international-baccalaureate' => [
-                'name'       => 'Intl. Baccalaureate',
+                'name'       => 'IB',
                 'visible'    => $userIsSuperuser || $userHasServicePermissionIBCoordinator,
                 'searchable' => false,
                 'children'   => [
