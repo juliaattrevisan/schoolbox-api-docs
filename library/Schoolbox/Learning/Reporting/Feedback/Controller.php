@@ -92,10 +92,6 @@ class Controller extends Base
         \Schoolbox\User $learner,
         ?Reporting\Feedback\Model $feedback = null,
     ): void {
-
-        // Is the page being displayed in readonly mode?
-        $isInteractionLocked = (new LockedChecker($this->termMapper))->isLockedForInteractions($assessment);
-
         /**
          * Generate the participant carousel, only if you have access to the status page
          */
@@ -162,7 +158,8 @@ class Controller extends Base
             'assessment' => $assessment,
             'learner' => $learner,
             'feedback' => $feedback ?? $assessment->getAuthoritativeFeedback($participant, false),
-            'interactionLocked' => $isInteractionLocked,
+            // Is the page being displayed in readonly mode?
+            'interactionLocked' => (new LockedChecker($this->termMapper))->isLockedForInteractions($assessment),
             'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())
                 ->add([ $assessment->getTitle(), $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) ])
                 ->add(['Feedback', '']),
