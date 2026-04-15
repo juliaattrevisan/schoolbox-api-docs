@@ -245,18 +245,40 @@ class Controller extends Base
 
         /* This human readable mark is given by the instructor, from which we derive the normalised mark
          */
-        $humanReadableMark = $post['mark'] ?? '';
-        $normalisedMark = $instructorScheme->getNormalisedMark($post['mark'] ?? '');
+        $instructorHumanReadableMark = $post['mark'] ?? '';
 
-        /* Find out what the learner's version would have been and save that too
-         * Arguably you could skip this derivation, only doing it if $instructor scheme was different to $learner scheme
+        /* Apparently this is how you detect a Submission State: an exception is thrown
+         * trying to interpret it as one of the Mark Schemes. No wonder it was classified
+         * as the $errors var. Wild!
+         *
+         * Shanked from Learning/Assessment/DueWork/Feedback/Factory.php::210
          */
-        $learnerHumanReadableMark = $learnerScheme->getHumanReadableMark($normalisedMark);
+        try {
+            $normalisedMark = $instructorScheme->getNormalisedMark($instructorHumanReadableMark);
+
+            /* Find out what the learner's version would have been and save that too
+             * Arguably you could skip this derivation, only doing it if $instructor scheme was different to $learner scheme
+             */
+            $learnerHumanReadableMark = $learnerScheme->getHumanReadableMark($normalisedMark);
+        } catch (\InvalidArgumentException $e) {
+            if ('' !== $instructorHumanReadableMark) {
+                /* If it's a Submission State, save the text as the human readable mark
+                 * and derive its normalised mark from the uh Lists in admin
+                 */
+                $code = $this->stateMapper->findOneByColumn('display_as', $instructorHumanReadableMark);
+
+                $normalisedMark = $code->getNormaliseAs();
+
+                /* There isn't a learner-specific Submission State: it's the same for both parties.
+                 */
+                $learnerHumanReadableMark = $instructorHumanReadableMark;
+            }
+        }
 
         $feedback
             ->setNormalisedMark($normalisedMark)
             ->setHumanReadableMark($learnerHumanReadableMark)
-            ->setInstructorMark($humanReadableMark);
+            ->setInstructorMark($instructorHumanReadableMark);
 
         /* This publish=1 param tuple is sent only when Publish And Continue is clicked
          */
