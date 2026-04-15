@@ -74,7 +74,7 @@ class Import implements IStrategy
         ];
 
         // if we are importing humans, we only get 7 days of data, so it needs to be intentional
-        if (!$this->importHumans) {
+        if ($this->importHumans) {
             $this->log->info('SOCS fixtures is importing humans attached to fixtures; limiting to 7 days');
             $query['TS'] = 1;
         }

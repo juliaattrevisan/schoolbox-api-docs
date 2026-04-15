@@ -90,7 +90,13 @@ class Factory
                 $this->log,
                 $this->perform,
                 $this->lock,
-                $matchupMapper
+                $matchupMapper,
+                $sportMapper,
+                $seasonMapper,
+                $divisionMapper,
+                $teamMapper,
+                $venueMapper,
+                $schoolMapper,
             ))
             ->add(new Fixtures\Import(
                 $this->log,
@@ -132,7 +138,13 @@ class Factory
                 $this->log,
                 $this->perform,
                 $this->lock,
-                $matchupMapper
+                $matchupMapper,
+                $sportMapper,
+                $seasonMapper,
+                $divisionMapper,
+                $teamMapper,
+                $venueMapper,
+                $schoolMapper,
             ));
         }
 
