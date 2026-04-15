@@ -44,10 +44,12 @@ class Controller extends Base
 
 
     /**
-     * A redirect to the first participant who had a feedback
+     * A redirect to the first participant in the set.
+     * It doesn't care whether they already have a feedback or not.
      *
      * @param Reporting\Model $assessment
      * @throws RouteNotFound
+     * @throws \Exception
      */
     public function getFirstParticipantFeedback(Reporting\Model $assessment): void
     {
@@ -74,7 +76,7 @@ class Controller extends Base
 
 
     /**
-     * The screen that lets you provide feedback to a particular student
+     * The screen that lets you provide feedback to a particular $learner
      *
      * @param Model $assessment
      * @param User $learner
