@@ -31,8 +31,15 @@ class Controller extends Base
         private ErrorMapper $errorMapper,
         private BreadcrumbFactory $bakery,
         private \Schoolbox\Assessment\Term\Mapper $termMapper,
+        private StateMapper $stateMapper,
         private Participant\DataSource $participantDataSource,
     ) {
+        /* TODO Technical Uplift Candidate
+         *  StateMapper.
+         *  Submission States are currently in the Due Work folder, but should be promoted into a more global space.
+         *  They are used among multiple learning activities: due work, quiz, reporting (at time of writing) as are the
+         *  Mark Types stuff.
+         */
     }
 
 
@@ -158,9 +165,8 @@ class Controller extends Base
              */
             'participantCarousel' => $participantCarousel,
             /* For saving feedbacks
-             * TODO inject this dependency
              */
-            'errors' => StateMapper::getInstance()->listDisplayValues(),
+            'errors' => $this->stateMapper->listDisplayValues(),
             'participant' => $participant,
         ], 'Feedback');
     }

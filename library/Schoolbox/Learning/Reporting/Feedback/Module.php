@@ -159,6 +159,7 @@ class Module extends BaseModule
             $this->getErrorMapper(),
             $bakery,
             $this->getMapperFactory()->get(\Schoolbox\Assessment\Term\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\DueWork\StateMapper::class),
             $participantDataSource,
         );
     }
