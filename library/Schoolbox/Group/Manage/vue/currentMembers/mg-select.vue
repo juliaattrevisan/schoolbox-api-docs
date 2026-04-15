@@ -114,11 +114,7 @@ function onRemoveMembersSelected() {
                 </button>
             </li>
             <li>
-                <button
-                    @click.prevent="onRemoveMembersSelected"
-                    class="button submit"
-                    :disabled="store.isProcessing"
-                >
+                <button @click.prevent="onRemoveMembersSelected" class="button submit" :disabled="store.isProcessing">
                     <sbx-icon name="delete"></sbx-icon>
                     Remove {{ membersStore.selectedMembersPlural }}
                 </button>

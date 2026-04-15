@@ -394,7 +394,8 @@ export default {
                                     href="#delete-comment"
                                     class="no-text"
                                     title="Delete comment"
-                                ><sbx-icon name="delete"></sbx-icon></a>
+                                    ><sbx-icon name="delete"></sbx-icon
+                                ></a>
                             </nav>
                             <media-article :content="comment.content"></media-article>
                         </li>

@@ -72,7 +72,9 @@ window.Vue.onMounted(() => {
                                 aria-label="Delete"
                                 :data-test="`up-add-units-delete-${index}`"
                                 @click.prevent="addUnitsStore.remove(index)"
-                            ><sbx-icon name="delete"></sbx-icon></button>
+                            >
+                                <sbx-icon name="delete"></sbx-icon>
+                            </button>
                         </div>
                         <label v-if="addUnitsStore.validationErrors[index]" class="error"
                             >Please add a {{ locale.unit.translate(false, false) }} name</label

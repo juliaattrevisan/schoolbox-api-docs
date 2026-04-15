@@ -83,11 +83,7 @@ function onDeleteNodesSelected(): void {
                     </button>
                 </li>
                 <li>
-                    <button
-                        class="button alert"
-                        data-test="delete-nodes"
-                        @click.prevent="onDeleteNodesSelected"
-                    >
+                    <button class="button alert" data-test="delete-nodes" @click.prevent="onDeleteNodesSelected">
                         <sbx-icon name="delete"></sbx-icon>
                         Delete {{ selectedNodesSummary }}
                     </button>

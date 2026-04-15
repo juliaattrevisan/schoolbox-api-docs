@@ -423,7 +423,11 @@ export default {
                                     <li>
                                         <a :href="badge._links.update" class="icon-modify" title="Modify">Modify</a>
                                     </li>
-                                    <li><a @click.prevent="openDeleteModal(badge)"><sbx-icon name="delete"></sbx-icon>Delete</a></li>
+                                    <li>
+                                        <a @click.prevent="openDeleteModal(badge)"
+                                            ><sbx-icon name="delete"></sbx-icon>Delete</a
+                                        >
+                                    </li>
                                 </ul>
                                 <p class="meta" v-if="badge.category" :title="'Category: ' + badge.category.name">
                                     {{ badge.category.name }}

@@ -462,7 +462,8 @@ window.Vue.watch(
                                 @click.prevent="
                                     deleteEvidence(mfStore.moment.evidence.findIndex((e) => e === evidence))
                                 "
-                            ><sbx-icon name="delete"></sbx-icon></a>
+                                ><sbx-icon name="delete"></sbx-icon
+                            ></a>
                         </nav>
                     </li>
                 </ul>

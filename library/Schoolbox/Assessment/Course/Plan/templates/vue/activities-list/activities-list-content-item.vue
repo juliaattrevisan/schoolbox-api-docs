@@ -188,7 +188,8 @@ window.Vue.onUnmounted(() => {
                     <a
                         :data-test="`unit-planner-delete-activity-${props.activity.id}`"
                         @click.prevent="activitiesListDeleteModalStore.prompt(props.activity, () => emit('deleted'))"
-                    ><sbx-icon name="delete"></sbx-icon>Delete</a>
+                        ><sbx-icon name="delete"></sbx-icon>Delete</a
+                    >
                 </li>
             </ul>
         </template>

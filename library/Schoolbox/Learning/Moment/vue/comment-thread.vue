@@ -323,7 +323,8 @@ export default {
                                     title="Delete comment"
                                     data-test="learning-moment-delete-comment"
                                     @click.prevent="showDeleteModal(index)"
-                                ><sbx-icon name="delete"></sbx-icon></a>
+                                    ><sbx-icon name="delete"></sbx-icon
+                                ></a>
                             </nav>
                             <media-article
                                 data-test="learning-moment-comment-thread-comment"
