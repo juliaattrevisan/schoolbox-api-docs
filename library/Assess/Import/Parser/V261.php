@@ -23,6 +23,7 @@ class V261 extends V170
      */
     public function getMarkVisibility(): string
     {
+        // Value is a valid IAssessable::MARK_VISIBILITY_* constant written by the 26.1+ exporter.
         return (string) $this->getXml()->markvisibility;
     }
 }
