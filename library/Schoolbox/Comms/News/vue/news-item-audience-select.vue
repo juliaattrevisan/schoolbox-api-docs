@@ -756,15 +756,13 @@ export default {
                     :placeholder="audiencePlaceholder"
                     required
                 />
-                <button type="button" class="button sbx-button--has-icon" @click.prevent="openBrowseModal">
+                <button type="button" class="button" @click.prevent="openBrowseModal">
                     <sbx-icon name="drag-drop"></sbx-icon>
                     Browse&hellip;
                 </button>
             </div>
             <input type="hidden" name="audience" :value="audienceFormString" />
         </div>
-    </div>
-</template>
 
         <template v-if="!audienceIsReadOnly">
             <div data-reveal id="audience-browse" class="reveal-modal no-pad">
