@@ -221,10 +221,23 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
 
-        /* Check if $feedback is null; if so, we're spawning a whole new one for this person
+        /* Check if $feedback is null; if so, we're spawning a whole new one for this person,
+         * or we can resume an existing draft
          */
         if (null === $feedback) {
-            $feedback = new Reporting\Feedback\Model();
+            $authoritativeFeedback = $participant->getAuthoritativeFeedback(false);
+
+            /* If we didn't find an authoritative feedback spawn a whole new one; this person never had feedback.
+             *
+             * Or, if we found an authoritative feedback but it was published, spawn a whole new one; this creates a new
+             * version of the feedback and adds it to the stack like every other learning activity's behaviour. Without
+             * this check you'd end up recycling exactly one feedback every time.
+             */
+            if (null === $authoritativeFeedback || $authoritativeFeedback->isPublished()) {
+                $feedback = new Reporting\Feedback\Model();
+            } else {
+                $feedback = $authoritativeFeedback;
+            }
         }
 
         /* Update props and persist it
