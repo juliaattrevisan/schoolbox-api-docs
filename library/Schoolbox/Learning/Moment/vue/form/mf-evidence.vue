@@ -450,14 +450,14 @@ window.Vue.watch(
                         <nav>
                             <a
                                 v-if="evidence.storage._links.fetch"
-                                class="no-text"
+                                class="no-text sbx-icon-only-button"
                                 :href="evidence.storage._links.fetch"
                                 title="Download"
                                 download
                                 ><sbx-icon name="download"></sbx-icon
                             ></a>
                             <a
-                                class="no-text"
+                                class="no-text sbx-icon-only-button"
                                 href="#"
                                 title="Delete Evidence"
                                 data-test="mf-evidence-delete"

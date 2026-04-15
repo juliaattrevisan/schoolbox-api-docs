@@ -404,7 +404,7 @@ window.Vue.watch(modifySelected, (newSelected) => {
                                 <nav>
                                     <a
                                         href="#modify"
-                                        class="no-text"
+                                        class="no-text sbx-icon-only-button"
                                         title="Modify this client"
                                         aria-label="Modify this client"
                                         @click.prevent="showModifyModal(row)"
@@ -412,7 +412,7 @@ window.Vue.watch(modifySelected, (newSelected) => {
                                     ></a>
                                     <a
                                         href="#regenerate"
-                                        class="no-text"
+                                        class="no-text sbx-icon-only-button"
                                         title="Regenerate this client&rsquo;s secret"
                                         aria-label="Regenerate this client&rsquo;s secret"
                                         @click.prevent="showRegenerateModal(row)"
@@ -420,7 +420,7 @@ window.Vue.watch(modifySelected, (newSelected) => {
                                     ></a>
                                     <a
                                         href="#delete"
-                                        class="no-text"
+                                        class="no-text sbx-icon-only-button"
                                         title="Delete this client"
                                         aria-label="Delete this client"
                                         @click.prevent="showDeleteModal(row)"

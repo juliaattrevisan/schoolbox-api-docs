@@ -73,7 +73,7 @@ const activityLink = window.Vue.computed(() => {
         </p>
     </div>
     <nav v-if="props.canModify">
-        <a class="no-text" title="Unlink Assessment" @click.prevent="handleUnlinkClick()"
+        <a class="no-text sbx-icon-only-button" title="Unlink Assessment" @click.prevent="handleUnlinkClick()"
             ><sbx-icon name="close"></sbx-icon
         ></a>
     </nav>

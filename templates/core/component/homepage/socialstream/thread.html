@@ -24,11 +24,11 @@
     </div>
     <nav>
         <!-- BEGIN socialstream_post_has_delete -->
-        <a href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_POST_POST_ID}" class="no-text" title='Delete post' data-socialstream-delete><sbx-icon name="delete"></sbx-icon></a>
+        <a href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_POST_POST_ID}" class="no-text sbx-icon-only-button" title='Delete post' data-socialstream-delete><sbx-icon name="delete"></sbx-icon></a>
         <!-- END socialstream_post_has_delete -->
 
         <!-- BEGIN socialstream_post_has_add -->
-            <a href="#" class="no-text" title="Add Reply" data-parentid="{SOCIALSTREAM_POST_POST_ID}" data-reveal-id="socialstream-reply-{COMPONENT_INSTANCE_ID}" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-add-post-link><sbx-icon name="reply"></sbx-icon></a>
+            <a href="#" class="no-text sbx-icon-only-button" title="Add Reply" data-parentid="{SOCIALSTREAM_POST_POST_ID}" data-reveal-id="socialstream-reply-{COMPONENT_INSTANCE_ID}" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-add-post-link><sbx-icon name="reply"></sbx-icon></a>
         <!-- END socialstream_post_has_add -->
     </nav>
     <article data-body>
@@ -130,11 +130,11 @@
             </div>
             <nav>
                 <!-- BEGIN socialstream_comment_has_delete -->
-                <a href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_COMMENT_POST_ID}" title="Delete Comment" data-socialstream-delete><sbx-icon name="delete"></sbx-icon></a>
+                <a href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_COMMENT_POST_ID}" title="Delete Comment" data-socialstream-delete class="sbx-icon-only-button"><sbx-icon name="delete"></sbx-icon></a>
                 <!-- END socialstream_comment_has_delete -->
 
                 <!-- BEGIN socialstream_comment_has_add -->
-                    <a href="#" title="Add Reply" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_COMMENT_POST_ID}" data-reveal-id="socialstream-reply-{COMPONENT_INSTANCE_ID}" data-add-post-link><sbx-icon name="reply"></sbx-icon></a>
+                    <a href="#" title="Add Reply" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_COMMENT_POST_ID}" data-reveal-id="socialstream-reply-{COMPONENT_INSTANCE_ID}" data-add-post-link class="sbx-icon-only-button"><sbx-icon name="reply"></sbx-icon></a>
                 <!-- END socialstream_comment_has_add -->
             </nav>
             <article data-body>
@@ -236,7 +236,7 @@
                     </div>
                     <nav>
                         <!-- BEGIN socialstream_reply_has_delete -->
-                        <a href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_REPLY_POST_ID}" title="Delete Reply" data-socialstream-delete><sbx-icon name="delete"></sbx-icon></a>
+                        <a href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_REPLY_POST_ID}" title="Delete Reply" data-socialstream-delete class="sbx-icon-only-button"><sbx-icon name="delete"></sbx-icon></a>
                         <!-- END socialstream_reply_has_delete -->
                     </nav>
                     <article data-body>
