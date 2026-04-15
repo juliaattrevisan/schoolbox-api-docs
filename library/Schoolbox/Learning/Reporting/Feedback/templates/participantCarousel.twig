@@ -118,5 +118,35 @@
         const currentOption = ize.getOption(ize.getValue());
         refreshNav(navPrev, ize.getAdjacentOption(currentOption, -1)[0] ?? null);
         refreshNav(navNext, ize.getAdjacentOption(currentOption, 1)[0] ?? null);
+
+        /**
+         * This manages the behaviour of Continue. It's a hybrid of the old duework carousel + dialog agent carousel,
+         * but the latter doesn't have a Continue button afaict
+         */
+        function actionNext(tgt) {
+            let ize = tgt[0].selectize;
+            let val = ize.getOption(ize.getValue());
+            let nextHref = ize.getAdjacentOption(val, 1);
+            let nextUrl;
+
+            {# Use the next human's href, otherwise go back to assessment's status screen #}
+            if (nextHref.data('value') !== undefined) {
+                nextUrl = nextHref.data('value');
+            } else {
+                nextUrl = '{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}';
+            }
+
+            {# if we have a returnURL then lets use that, else do the default #}
+            let params = new URLSearchParams(window.location.search);
+            let returnUrl = params.get('returnUrl');
+
+            if (null !== returnUrl) {
+                nextUrl = atob(returnUrl);
+            }
+
+            $('#continue-button').attr('href', nextUrl);
+        }
+
+        actionNext($('select[name=student-select]'));
     });
 </script>
