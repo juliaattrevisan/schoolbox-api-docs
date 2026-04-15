@@ -77,9 +77,13 @@ export default {
 </script>
 
 <template>
-    <li :class="[isUnselectedRow ? 'un-selected-row' : '', 'list-item-container']" :data-row-id="row.id">
+    <li
+        :data-test="`admin-list-row-${row.id}`"
+        :class="[isUnselectedRow ? 'un-selected-row' : '', 'list-item-container']"
+        :data-row-id="row.id"
+    >
         <div :class="`actions-small-${canDelete ? '1' : '0'}`">
-            <div v-if="isSortable" class="grip ui-sortable-handle"></div>
+            <div v-if="isSortable" class="grip ui-sortable-handle" data-test="admin-list-row-grip"></div>
 
             <div class="list-item">
                 <div
@@ -115,6 +119,7 @@ export default {
                     <template v-else>
                         <input
                             type="text"
+                            data-test="admin-list-row-input-field"
                             :required="field.mandatory"
                             :placeholder="field.caption"
                             v-model="row[field.id]"
@@ -135,6 +140,7 @@ export default {
                     class="delete-row-button icon-delete"
                     href="#delete-row"
                     title="Delete Row"
+                    :data-test="`admin-list-row-delete-button-${row.id}`"
                 ></a>
             </nav>
         </div>

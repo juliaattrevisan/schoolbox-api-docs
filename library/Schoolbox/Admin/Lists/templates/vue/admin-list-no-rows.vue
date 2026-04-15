@@ -22,7 +22,7 @@ export default {
 </script>
 
 <template>
-    <div id="listEmptyState" class="empty-state">
+    <div id="listEmptyState" class="empty-state" data-test="admin-list-empty-state">
         <i class="icon-list"></i>
         <p>
             The {{ loadedData.title }} list is empty.<br /><a

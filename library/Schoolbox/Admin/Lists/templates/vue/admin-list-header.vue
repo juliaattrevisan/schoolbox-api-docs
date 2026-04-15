@@ -29,7 +29,7 @@ export default {
 
 <template>
     <div :class="`${isSortable ? 'sortable' : ''}`">
-        <header :class="`list-header actions-small-${canDelete ? '1' : '0'}`">
+        <header data-test="admin-list-header" :class="`list-header actions-small-${canDelete ? '1' : '0'}`">
             <div class="list-item">
                 <label
                     v-for="(field, index) in headerFields"

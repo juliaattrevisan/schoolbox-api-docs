@@ -29,6 +29,7 @@ export default {
                 href="#add-new-row"
                 data-button="add-row"
                 class="button"
+                data-test="admin-list-add-row-button"
                 :disabled="isProcessing"
                 >Add New Row</a
             >

@@ -116,7 +116,12 @@ export default {
             </div>
             <ul class="flex-list buttons">
                 <li>
-                    <a @click.prevent="onConfirmDeleteRowSelected" class="button submit">Yes</a>
+                    <a
+                        @click.prevent="onConfirmDeleteRowSelected"
+                        class="button submit"
+                        data-test="admin-list-confirm-delete"
+                        >Yes</a
+                    >
                 </li>
                 <li>
                     <a @click.prevent="onCancelDeleteRowSelected" class="button">Cancel</a>
