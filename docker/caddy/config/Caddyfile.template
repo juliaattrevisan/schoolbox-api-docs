@@ -53,6 +53,7 @@ https:// {
     reverse_proxy {
 ${FRANKENPHP_UPSTREAMS}
         lb_policy round_robin
+        header_up Host {hostport}
         transport http {
             tls_insecure_skip_verify
         }
