@@ -387,52 +387,73 @@ class Classes implements IStrategy
             return;
         }
 
-        /* Default to the configured window if Edlink didn't give us dates.
-         * Otherwise clamp the session dates into the window.
-         */
-        $startAt = null === $startAt || $startAt->lt($this->fromDate) ? $this->fromDate : $startAt;
-        $finishAt = null === $finishAt || $finishAt->gt($this->toDate) ? $this->toDate : $finishAt;
+        /* Clamp session range into the configured window so we don't generate
+         * occurrences outside [fromDate, toDate]. The earlier guard already
+         * skipped classes entirely outside the window. */
+        $rangeStart = null === $startAt || $startAt->lt($this->fromDate) ? $this->fromDate : $startAt;
+        $rangeEnd   = null === $finishAt || $finishAt->gt($this->toDate) ? $this->toDate : $finishAt;
 
-        /* Periods from Edlink (array of strings like ["1", "2"])
-         */
-        $periods = $class['periods'] ?? [];
-        $period = \count($periods) ? implode(', ', $periods) : '';
-
-        /* Create sis_event
-         */
-        $guid = $classId;
-
-        try {
-            $event = $this->eventMapper->findOneByColumn('guid', $guid);
-            $logPrefix = 'Reusing existing';
-        } catch (Exception $e) {
-            $event = $this->eventMapper->createModel();
-            $logPrefix = 'Creating new';
-        }
-
-        $event
-            ->setTitle($className)
-            ->setDetail($courseName ?: null)
-            ->setCode($classCode)
-            ->setPeriod($period)
-            ->setStartAt($startAt)
-            ->setFinishAt($finishAt)
-            ->setClassification(Model::CLASSIFICATION_TIMETABLE)
-            ->setGuid($guid)
-            ->setSource(Factory::SOURCE_NAME);
-
-        $this->log->debug(sprintf(
-            '%s timetable event %s (%s) %s-%s',
-            $logPrefix,
-            $className,
-            $classCode,
-            $startAt->getDatabase(),
-            $finishAt->getDatabase()
+        $periodIds = array_values(array_filter(
+            $class['periods'] ?? [],
+            fn($p) => '' !== trim((string)$p)
         ));
 
-        if ($this->perform) {
-            $this->eventMapper->save($event);
+        if (\count($periodIds) === 0) {
+            $this->log->warning(sprintf(
+                'Class %s (%s) has no periods — skipping (no occurrences to write)',
+                $className,
+                $classCode
+            ));
+            return;
         }
+
+        $occurrences = $this->expandOccurrences($rangeStart, $rangeEnd, $periodIds);
+
+        if (\count($occurrences) === 0) {
+            $this->log->warning(sprintf(
+                'Class %s (%s) produced 0 occurrences from %d period(s) over %s..%s',
+                $className,
+                $classCode,
+                \count($periodIds),
+                $rangeStart->getDatabase(),
+                $rangeEnd->getDatabase()
+            ));
+            return;
+        }
+
+        foreach ($occurrences as $occ) {
+            /* Per-occurrence guid — must be deterministic so re-imports update
+             * existing rows rather than duplicating. */
+            $guid = sprintf('%s_%s_%s', $classId, $occ['period_id'], $occ['date']);
+
+            try {
+                $event = $this->eventMapper->findOneByColumn('guid', $guid);
+            } catch (Exception $e) {
+                $event = $this->eventMapper->createModel();
+            }
+
+            $event
+                ->setTitle($className)
+                ->setDetail($courseName ?: null)
+                ->setCode($classCode)
+                ->setPeriod($occ['period_name'])
+                ->setStartAt($occ['start_at'])
+                ->setFinishAt($occ['finish_at'])
+                ->setClassification(Model::CLASSIFICATION_TIMETABLE)
+                ->setGuid($guid)
+                ->setSource(Factory::SOURCE_NAME);
+
+            if ($this->perform) {
+                $this->eventMapper->save($event);
+            }
+        }
+
+        $this->log->debug(sprintf(
+            'Wrote %d occurrence(s) for class %s (%s)',
+            \count($occurrences),
+            $className,
+            $classCode
+        ));
 
         /* Create sis_class (deduplicate by code)
          */
