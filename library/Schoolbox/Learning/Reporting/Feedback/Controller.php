@@ -307,6 +307,9 @@ class Controller extends Base
             'message' => 'OK',
             'id'      => $feedback->getId(),
             /* these extra fields are currently used by the Markbook to keep things responsive */
+            /* Presumably that ^^^ means these fields are used to dynamically update the ui since posting feedback is an
+             * asynchronous request in most usages.
+             */
             'normalisedMark'              => $feedback->getNormalisedMark(),
             'humanReadableMark'           => $feedback->getHumanReadableMark(),
             'humanReadableInstructorMark' => $feedback->getInstructorMark(),
