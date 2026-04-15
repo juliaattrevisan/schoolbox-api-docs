@@ -104,7 +104,7 @@ CREATE TABLE `assess` (
   CONSTRAINT `fk_assess_assessment_id` FOREIGN KEY (`assessment_id`) REFERENCES `assessment` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_assess_learnosity_source_assessment_id_fk` FOREIGN KEY (`learnosity_source_assessment_id`) REFERENCES `assessment` (`id`),
   CONSTRAINT `fk_assess_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=128 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -122,7 +122,7 @@ CREATE TABLE `assess_answer` (
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`answer_id`),
   KEY `fk_assess_answer_assess_question1` (`question_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=164 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=926 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -158,7 +158,7 @@ CREATE TABLE `assess_attempt` (
   KEY `idx_assess_attempt_finish` (`finish`),
   CONSTRAINT `fk_assess_attempt_reviewer_id` FOREIGN KEY (`reviewer_id`) REFERENCES `user` (`id`),
   CONSTRAINT `fk_assess_attempt_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -203,7 +203,7 @@ CREATE TABLE `assess_question` (
   KEY `fk_assess_question_assess_luQuestionType1` (`type_id`),
   KEY `fk_assess_question_assess_section1` (`section_id`),
   KEY `deleted_at` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=163 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=921 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -226,7 +226,7 @@ CREATE TABLE `assess_question_bank` (
   KEY `question_category_id` (`question_category_id`),
   KEY `type_id` (`type_id`),
   KEY `deleted_at` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -247,7 +247,7 @@ CREATE TABLE `assess_question_category` (
   PRIMARY KEY (`question_category_id`),
   KEY `parent_id` (`parent_id`),
   KEY `deleted_at` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -273,7 +273,7 @@ CREATE TABLE `assess_response` (
   KEY `fk_assess_response_assess_question1` (`question_id`),
   KEY `fk_assess_response_assess_section1` (`section_id`),
   KEY `deleted_at` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=170 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=740 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -296,7 +296,7 @@ CREATE TABLE `assess_section` (
   KEY `fk_assess_section_assess1` (`assess_id`),
   KEY `assess_id` (`assess_id`),
   KEY `deleted_at` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=146 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -334,7 +334,7 @@ CREATE TABLE `assessment` (
   KEY `assessment_original_assessment_id` (`original_assessment_id`),
   CONSTRAINT `fk_assessment_original_assessment_id` FOREIGN KEY (`original_assessment_id`) REFERENCES `assessment` (`id`),
   CONSTRAINT `fk_assessment_work_type_id` FOREIGN KEY (`work_type_id`) REFERENCES `lu_work_type` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=1687 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=733 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -449,7 +449,7 @@ CREATE TABLE `assessment_view` (
   CONSTRAINT `assessment_view_assessment_id_fk` FOREIGN KEY (`assessment_id`) REFERENCES `assessment` (`id`),
   CONSTRAINT `assessment_view_participant_fk` FOREIGN KEY (`participant_id`) REFERENCES `user` (`id`),
   CONSTRAINT `assessment_view_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=615 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -484,7 +484,7 @@ CREATE TABLE `badge` (
   CONSTRAINT `fk_achievement_badge_created_by_id` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_achievement_badge_image_hash` FOREIGN KEY (`image_hash`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_achievement_badge_updated_by_id` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=1802 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -505,7 +505,7 @@ CREATE TABLE `badge_category` (
   PRIMARY KEY (`id`),
   KEY `fk_achievement_badge_category_created_by_id` (`created_by`),
   CONSTRAINT `fk_achievement_badge_category_created_by_id` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -536,7 +536,7 @@ CREATE TABLE `badge_user` (
   CONSTRAINT `fk_badge_user_awarded_by_id` FOREIGN KEY (`awarded_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_badge_user_badge_id` FOREIGN KEY (`badge_id`) REFERENCES `badge` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_badge_user_recipient_id` FOREIGN KEY (`recipient_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=87 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -578,7 +578,7 @@ CREATE TABLE `blog` (
   KEY `deleted` (`deleted_at`),
   CONSTRAINT `fk_blog_folder_id` FOREIGN KEY (`folder_id`) REFERENCES `folder` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_blog_owner_id` FOREIGN KEY (`owner_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -602,7 +602,7 @@ CREATE TABLE `blog_comment` (
   KEY `deleted` (`deleted_at`),
   CONSTRAINT `fk_blog_comment_blog_id` FOREIGN KEY (`blog_id`) REFERENCES `blog` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_blog_comment_owner_id` FOREIGN KEY (`owner_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -625,7 +625,7 @@ CREATE TABLE `blog_image` (
   KEY `fk_blog_image_storage_hash_idx` (`hash`),
   CONSTRAINT `fk_blog_image_blog_id` FOREIGN KEY (`blog_id`) REFERENCES `blog` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_blog_image_storage_hash` FOREIGN KEY (`hash`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -643,7 +643,7 @@ CREATE TABLE `bookmarks` (
   PRIMARY KEY (`id`),
   KEY `owner` (`owner`),
   CONSTRAINT `fk_bookmarks_user_id` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -664,7 +664,7 @@ CREATE TABLE `calendar_connector` (
   KEY `status_idx` (`status`),
   KEY `connector_idx` (`connector_class`(191)),
   KEY `type_idx` (`event_type`(191))
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -749,7 +749,7 @@ CREATE TABLE `clipboard_import_log` (
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `finish_at_idx` (`finish_at`,`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=17433 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -772,7 +772,7 @@ CREATE TABLE `cmsLog` (
   KEY `time` (`time`),
   KEY `object` (`object`),
   KEY `action` (`action`)
-) ENGINE=InnoDB AUTO_INCREMENT=2226 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=133 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -821,7 +821,7 @@ CREATE TABLE `comms_news_article` (
   CONSTRAINT `fk_comms_news_article_discussion_thread_id` FOREIGN KEY (`discussion_thread_id`) REFERENCES `discussion_thread` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_comms_news_article_featured_image_hash` FOREIGN KEY (`feature_image_hash`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_comms_news_article_rejected_by` FOREIGN KEY (`rejected_by`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=86 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -844,7 +844,7 @@ CREATE TABLE `comms_news_article_file` (
   KEY `storage_id` (`storage_id`),
   CONSTRAINT `fk_comms_news_article_file` FOREIGN KEY (`article_id`) REFERENCES `comms_news_article` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_comms_news_article_file_storage` FOREIGN KEY (`storage_id`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -893,7 +893,7 @@ CREATE TABLE `comms_news_article_statistics` (
   KEY `comms_news_article_statistics_deleted_at_index` (`deleted_at`),
   CONSTRAINT `fk_comms_news_statistics_article_id` FOREIGN KEY (`article_id`) REFERENCES `comms_news_article` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_comms_news_statistics_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=270 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -919,7 +919,7 @@ CREATE TABLE `comms_news_article_statistics_cumulative` (
   UNIQUE KEY `idx_cnasc_date_article_id` (`date`,`article_id`,`type`,`referrer`,`role_type`,`role_id`),
   KEY `fk_comms_news_statistics_cumulative_article_id` (`article_id`),
   CONSTRAINT `fk_comms_news_statistics_cumulative_article_id` FOREIGN KEY (`article_id`) REFERENCES `comms_news_article` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=353 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1044,7 +1044,7 @@ CREATE TABLE `component_config_instance` (
   KEY `component_config_instance_value_index` (`value`(768)),
   CONSTRAINT `fk_component_config_instance_component_config_definition_id` FOREIGN KEY (`component_config_definition_id`) REFERENCES `component_config_definition` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_component_config_instance_component_instance_id` FOREIGN KEY (`component_instance_id`) REFERENCES `component_instance` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=14870 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9553 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1095,7 +1095,7 @@ CREATE TABLE `component_instance` (
   KEY `module` (`module`),
   KEY `position` (`position`),
   CONSTRAINT `fk_component_instance_component_definition_id` FOREIGN KEY (`component_definition_id`) REFERENCES `component_definition` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=5696 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4896 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1125,7 +1125,7 @@ CREATE TABLE `config` (
   KEY `config_type_id` (`type_id`),
   CONSTRAINT `fk_config_field_id` FOREIGN KEY (`field_id`) REFERENCES `lu_config_field` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_config_type_id` FOREIGN KEY (`type_id`) REFERENCES `lu_config_type` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=759 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=772 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1142,10 +1142,8 @@ CREATE TABLE `courseTemplates` (
   `unitTemplateId` int(11) NOT NULL,
   `sequence` int(11) NOT NULL,
   `deleted_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `courseTemplates_homepageTemplate_id_fk` (`courseTemplateId`),
-  KEY `unitTemplates_homepageTemplate_id_fk2` (`unitTemplateId`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1161,7 +1159,7 @@ CREATE TABLE `course_builder_config` (
   `permission` int(11) DEFAULT NULL,
   `page` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1184,7 +1182,7 @@ CREATE TABLE `course_implementation` (
   KEY `folder_id` (`folder_id`),
   CONSTRAINT `course_implementation_ibfk_1` FOREIGN KEY (`folder_id`) REFERENCES `folder` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_course_implementation_course_specification_id` FOREIGN KEY (`course_specification_id`) REFERENCES `course_specification` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1209,7 +1207,7 @@ CREATE TABLE `course_specification` (
   KEY `course_specification_courseTemplates_id_fk` (`template_id`),
   CONSTRAINT `course_specification_courseTemplates_id_fk` FOREIGN KEY (`template_id`) REFERENCES `courseTemplates` (`id`),
   CONSTRAINT `fk_course_specification_folder_id` FOREIGN KEY (`folder_id`) REFERENCES `folder` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1238,7 +1236,7 @@ CREATE TABLE `course_unit_implementation` (
   KEY `fk_course_unit_implementation_course_unit_specification_id_idx` (`course_unit_specification_id`),
   CONSTRAINT `fk_course_unit_implementation_course_implementation_id` FOREIGN KEY (`course_implementation_id`) REFERENCES `course_implementation` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_course_unit_implementation_course_unit_specification_id` FOREIGN KEY (`course_unit_specification_id`) REFERENCES `course_unit_specification` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1261,7 +1259,7 @@ CREATE TABLE `course_unit_specification` (
   UNIQUE KEY `uuid_UNIQUE` (`uuid`),
   KEY `fk_course_unit_course_specification_id_idx` (`course_specification_id`),
   CONSTRAINT `fk_course_unit_course_specification_id` FOREIGN KEY (`course_specification_id`) REFERENCES `course_specification` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=176 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1325,7 +1323,7 @@ CREATE TABLE `curriculum_node` (
   KEY `deleted` (`deleted_at`),
   KEY `idx_curriculum_node_code` (`code`),
   CONSTRAINT `curriculum_node_ibfk_2` FOREIGN KEY (`curriculum_node_parent_id`) REFERENCES `curriculum_node` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11593 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=308 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1468,7 +1466,7 @@ CREATE TABLE `dialog_agent` (
   CONSTRAINT `fk_da_deletedby` FOREIGN KEY (`deleted_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_da_scenario` FOREIGN KEY (`scenario_id`) REFERENCES `dialog_agent_scenario` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_da_updatedby` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1672,7 +1670,7 @@ CREATE TABLE `dialog_agent_scenario_field_context` (
   KEY `fk_dasfc_dialog_agent_idx` (`dialog_agent_id`),
   CONSTRAINT `fk_dasfc_dasf` FOREIGN KEY (`scenario_field_id`) REFERENCES `dialog_agent_scenario_field` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_dasfc_dialog_agent` FOREIGN KEY (`dialog_agent_id`) REFERENCES `dialog_agent` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1704,7 +1702,7 @@ CREATE TABLE `differentiation_profiles` (
   CONSTRAINT `fk_differentiation_profiles_created_by_user_id` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`),
   CONSTRAINT `fk_differentiation_profiles_student_id` FOREIGN KEY (`student_id`) REFERENCES `user` (`id`),
   CONSTRAINT `fk_differentiation_profiles_updated_by_user_id` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1779,7 +1777,7 @@ CREATE TABLE `discussion_thread` (
   `updated_at` datetime NOT NULL,
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1802,7 +1800,7 @@ CREATE TABLE `discussion_thread_comment` (
   KEY `fk_discussion_thread_comment_author_id` (`author_id`),
   CONSTRAINT `fk_discussion_thread_comment_author_id` FOREIGN KEY (`author_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_discussion_thread_comment_discussion_thread_id` FOREIGN KEY (`discussion_thread_id`) REFERENCES `discussion_thread` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1858,7 +1856,7 @@ CREATE TABLE `editor_template` (
   CONSTRAINT `fk_editor_template_creator` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_editor_template_deleter` FOREIGN KEY (`deleted_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_editor_template_updater` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2121,7 +2119,7 @@ CREATE TABLE `eotc_permission` (
   KEY `campus_id` (`campus_id`),
   KEY `status_id` (`status_id`),
   KEY `deleted_at` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2174,7 +2172,7 @@ CREATE TABLE `eportfolio_component_advancedlist_item` (
   KEY `eportfolio_component_advancedlist_item_storage_hash_fk` (`imagehash`),
   CONSTRAINT `eportfolio_component_advancedlist_item_component_instance_fk` FOREIGN KEY (`component_instance_id`) REFERENCES `component_instance` (`id`),
   CONSTRAINT `eportfolio_component_advancedlist_item_storage_hash_fk` FOREIGN KEY (`imagehash`) REFERENCES `storage` (`hash`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2192,7 +2190,7 @@ CREATE TABLE `eportfolio_component_basiclist_item` (
   PRIMARY KEY (`id`),
   KEY `eportfolio_component_basiclist_item_component_instance_fk` (`component_instance_id`),
   CONSTRAINT `eportfolio_component_basiclist_item_component_instance_fk` FOREIGN KEY (`component_instance_id`) REFERENCES `component_instance` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2216,7 +2214,7 @@ CREATE TABLE `eportfolio_component_blog` (
   KEY `fk_eportfolio_component_blog_owner_id_idx` (`owner_id`),
   CONSTRAINT `fk_eportfolio_component_blog_owner_id` FOREIGN KEY (`owner_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_eportfolio_component_blog_page_id` FOREIGN KEY (`page_id`) REFERENCES `eportfolio_page` (`page_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2239,7 +2237,7 @@ CREATE TABLE `eportfolio_component_blog_comment` (
   KEY `fk_eportfolio_component_blog_comment_owner_id_idx` (`owner_id`),
   CONSTRAINT `fk_eportfolio_component_blog_comment_blog_id` FOREIGN KEY (`blog_id`) REFERENCES `eportfolio_component_blog` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_eportfolio_component_blog_comment_owner_id` FOREIGN KEY (`owner_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2262,7 +2260,7 @@ CREATE TABLE `eportfolio_component_blog_image` (
   KEY `fk_eportfolio_component_blog_image_hash_idx` (`hash`),
   CONSTRAINT `fk_eportfolio_component_blog_image_blog_id` FOREIGN KEY (`blog_id`) REFERENCES `eportfolio_component_blog` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_eportfolio_component_blog_image_hash` FOREIGN KEY (`hash`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2284,7 +2282,7 @@ CREATE TABLE `eportfolio_component_filelist_item` (
   KEY `fk_eportfolio_component_filelist_file_id` (`file_id`),
   CONSTRAINT `fk_eportfolio_component_filelist_file_id` FOREIGN KEY (`file_id`) REFERENCES `my_file` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_eportfolio_component_filelist_page_id` FOREIGN KEY (`page_id`) REFERENCES `eportfolio_page` (`page_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2303,7 +2301,7 @@ CREATE TABLE `eportfolio_component_linklist_item` (
   PRIMARY KEY (`id`),
   KEY `eportfolio_component_linklist_item_component_instance_fk` (`component_instance_id`),
   CONSTRAINT `eportfolio_component_linklist_item_component_instance_fk` FOREIGN KEY (`component_instance_id`) REFERENCES `component_instance` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2321,7 +2319,7 @@ CREATE TABLE `eportfolio_component_textbox_item` (
   PRIMARY KEY (`id`),
   KEY `eportfolio_component_textbox_item_component_instance_fk` (`component_instance_id`),
   CONSTRAINT `eportfolio_component_textbox_item_component_instance_fk` FOREIGN KEY (`component_instance_id`) REFERENCES `component_instance` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2440,7 +2438,7 @@ CREATE TABLE `eportfolio_page` (
   KEY `deleted` (`deleted_at`),
   KEY `fk_eportfolio_page_user_id_idx` (`uid`),
   CONSTRAINT `fk_eportfolio_page_user_id` FOREIGN KEY (`uid`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2458,7 +2456,7 @@ CREATE TABLE `eportfolio_permission` (
   PRIMARY KEY (`id`),
   KEY `fk_eportfolio_permission_page_id_idx` (`page_id`),
   CONSTRAINT `fk_eportfolio_permission_page_id` FOREIGN KEY (`page_id`) REFERENCES `eportfolio_page` (`page_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2480,7 +2478,7 @@ CREATE TABLE `eportfolio_showcase_item` (
   KEY `uid_idx` (`uid`),
   CONSTRAINT `eportfolio_showcase_item_submission_box_id_fk` FOREIGN KEY (`submission_box_id`) REFERENCES `submission_box` (`id`),
   CONSTRAINT `eportfolio_showcase_item_user_id_fk` FOREIGN KEY (`uid`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2520,7 +2518,7 @@ CREATE TABLE `etherpad_pad` (
   KEY `pad_id` (`pad_id`(191)),
   KEY `homepage_id` (`homepage_id`),
   CONSTRAINT `fk_etherpad_pad_folder_id` FOREIGN KEY (`homepage_id`) REFERENCES `folder` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2563,7 +2561,7 @@ CREATE TABLE `event` (
   CONSTRAINT `fk_event_author_id` FOREIGN KEY (`author_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_event_owner_id` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_event_type_id` FOREIGN KEY (`type`) REFERENCES `luEventType` (`eventTypeID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=799 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2632 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2585,7 +2583,7 @@ CREATE TABLE `event_attendance` (
   KEY `status` (`status`),
   CONSTRAINT `fk_event_attendance_event_id` FOREIGN KEY (`event_id`) REFERENCES `event` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_event_attendance_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2710,7 +2708,7 @@ CREATE TABLE `file` (
   CONSTRAINT `fk_file_modified_by` FOREIGN KEY (`modified_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_file_owner_id` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_file_storage_hash` FOREIGN KEY (`hash`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=186 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2766 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2727,7 +2725,7 @@ CREATE TABLE `filter` (
   PRIMARY KEY (`id`),
   KEY `idx_filter_entity` (`entity`),
   KEY `idx_filter_class` (`class`)
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2747,7 +2745,7 @@ CREATE TABLE `filter_default` (
   KEY `idx_filter_default_filter_option_id` (`filter_option_id`),
   KEY `idx_filter_default_role_type` (`role_type`),
   CONSTRAINT `fk_filter_default_filter_option_id` FOREIGN KEY (`filter_option_id`) REFERENCES `filter_option` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=146 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2767,7 +2765,7 @@ CREATE TABLE `filter_option` (
   KEY `idx_filter_option_filter_page_id` (`filter_page_id`),
   KEY `idx_filter_option_key` (`key`),
   CONSTRAINT `fk_filter_option_filter_page_id` FOREIGN KEY (`filter_page_id`) REFERENCES `filter_page` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=98 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2788,7 +2786,7 @@ CREATE TABLE `filter_page` (
   KEY `idx_filter_option_filter_id` (`filter_id`),
   KEY `idx_filter_option_page` (`page`),
   CONSTRAINT `fk_filter_option_filter_id` FOREIGN KEY (`filter_id`) REFERENCES `filter` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2846,7 +2844,7 @@ CREATE TABLE `folder` (
   CONSTRAINT `fk_folder_deleted_by` FOREIGN KEY (`deleted_by`) REFERENCES `user` (`id`),
   CONSTRAINT `fk_folder_image_hash` FOREIGN KEY (`image_hash`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_folder_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=391 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci CHECKSUM=1 DELAY_KEY_WRITE=1;
+) ENGINE=InnoDB AUTO_INCREMENT=323 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci CHECKSUM=1 DELAY_KEY_WRITE=1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2908,7 +2906,7 @@ CREATE TABLE `forumPost` (
   KEY `parentID` (`parentID`),
   CONSTRAINT `fk_forumPost_thread_id` FOREIGN KEY (`threadID`) REFERENCES `forumThread` (`threadID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_forumPost_user_id` FOREIGN KEY (`userID`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2935,7 +2933,7 @@ CREATE TABLE `forumThread` (
   KEY `userID` (`userID`),
   CONSTRAINT `fk_forumThread_folder_id` FOREIGN KEY (`categoryID`) REFERENCES `folder` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_forumThread_user_id` FOREIGN KEY (`userID`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2999,7 +2997,7 @@ CREATE TABLE `groups` (
   KEY `deleted_at_idx` (`deleted_at`),
   KEY `fk_groups_user_id` (`updated_by`),
   CONSTRAINT `fk_groups_user_id` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3030,7 +3028,7 @@ CREATE TABLE `homepageTemplate` (
   `right_column_width` float DEFAULT 29.9,
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3170,7 +3168,7 @@ CREATE TABLE `kami_document` (
   KEY `kami_document_submission_box_id_fk` (`worksheet_template_submission_box_id`),
   CONSTRAINT `fk_kami_student_submission_file_id` FOREIGN KEY (`student_submission_file_id`) REFERENCES `student_submission_file` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `kami_document_submission_box_id_fk` FOREIGN KEY (`worksheet_template_submission_box_id`) REFERENCES `submission_box` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=95 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3195,7 +3193,7 @@ CREATE TABLE `lesson_plan` (
   KEY `fk_lesson_plan_assessment` (`assessment_id`),
   CONSTRAINT `fk_lesson_plan_assessment` FOREIGN KEY (`assessment_id`) REFERENCES `assessment` (`id`),
   CONSTRAINT `fk_lesson_plan_lesson_plan_template` FOREIGN KEY (`lesson_plan_template_id`) REFERENCES `lesson_plan_template` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=160 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3240,7 +3238,7 @@ CREATE TABLE `lesson_plan_field` (
   KEY `fk_lesson_plan_field_lesson_plan_template_field_idx` (`lesson_plan_template_field_id`),
   CONSTRAINT `fk_lesson_plan_field_lesson_plan` FOREIGN KEY (`lesson_plan_id`) REFERENCES `lesson_plan` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_lesson_plan_field_lesson_plan_template_field` FOREIGN KEY (`lesson_plan_template_field_id`) REFERENCES `lesson_plan_template_field` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=857 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3263,7 +3261,7 @@ CREATE TABLE `lesson_plan_file` (
   KEY `fk_lesson_plan_file` (`storage_hash`),
   CONSTRAINT `fk_lesson_plan_file` FOREIGN KEY (`storage_hash`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_lesson_plan_file_lesson_plan` FOREIGN KEY (`lesson_plan_id`) REFERENCES `lesson_plan` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3291,7 +3289,7 @@ CREATE TABLE `lesson_plan_template` (
   CONSTRAINT `fk_lesson_plan_template_creator` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_lesson_plan_template_deleter` FOREIGN KEY (`deleted_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_lesson_plan_template_updater` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3315,7 +3313,7 @@ CREATE TABLE `lesson_plan_template_field` (
   PRIMARY KEY (`id`),
   KEY `fk_lesson_plan_template_idx` (`lesson_plan_template_id`),
   CONSTRAINT `fk_lesson_plan_template` FOREIGN KEY (`lesson_plan_template_id`) REFERENCES `lesson_plan_template` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=113 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3343,7 +3341,7 @@ CREATE TABLE `link` (
   KEY `owner` (`owner`),
   CONSTRAINT `fk_link_folder_id` FOREIGN KEY (`category`) REFERENCES `folder` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_link_owner_id` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3383,7 +3381,7 @@ CREATE TABLE `login_log` (
   PRIMARY KEY (`id`),
   KEY `username` (`username`),
   KEY `date` (`date`)
-) ENGINE=InnoDB AUTO_INCREMENT=2116 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=77 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3513,7 +3511,7 @@ CREATE TABLE `lti_provider` (
   `available_for_component` tinyint(1) DEFAULT 1,
   `available_for_assessment` tinyint(1) DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3530,7 +3528,7 @@ CREATE TABLE `lti_provider_redirect_url` (
   PRIMARY KEY (`id`),
   KEY `lti_provider_redirect_url_lti_provider_id_fk` (`lti_provider_id`),
   CONSTRAINT `lti_provider_redirect_url_lti_provider_id_fk` FOREIGN KEY (`lti_provider_id`) REFERENCES `lti_provider` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3576,7 +3574,7 @@ CREATE TABLE `luEventType` (
   KEY `event_type_idx` (`eventType`),
   KEY `fk_luEventType_user_id` (`updated_by`),
   CONSTRAINT `fk_luEventType_user_id` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3597,7 +3595,7 @@ CREATE TABLE `luResidentialHouse` (
   PRIMARY KEY (`id`),
   KEY `fk_luResidentialHouse_user_id` (`updated_by`),
   CONSTRAINT `fk_luResidentialHouse_user_id` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3642,7 +3640,7 @@ CREATE TABLE `lu_config_type` (
   `sequence` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `lu_config_type_type` (`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3680,7 +3678,7 @@ CREATE TABLE `lu_pastoral_action` (
   `updated_at` datetime NOT NULL,
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3725,7 +3723,7 @@ CREATE TABLE `lu_pastoral_severity` (
   PRIMARY KEY (`id`),
   KEY `fk_lu_pastoral_severity_user_id` (`updated_by`),
   CONSTRAINT `fk_lu_pastoral_severity_user_id` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3760,7 +3758,7 @@ CREATE TABLE `lu_pastoral_subtype` (
   KEY `fk_lu_pastoral_subtype_user_id` (`updated_by`),
   CONSTRAINT `fk_lu_pastoral_category_pastoral_type_id` FOREIGN KEY (`pastoral_type_id`) REFERENCES `lu_pastoral_type` (`id`),
   CONSTRAINT `fk_lu_pastoral_subtype_user_id` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3777,7 +3775,7 @@ CREATE TABLE `lu_pastoral_tag` (
   `updated_at` datetime NOT NULL,
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3815,7 +3813,7 @@ CREATE TABLE `lu_pastoral_type` (
   CONSTRAINT `fk_lu_pastoral_type_pastoral_document_classification_conf_id` FOREIGN KEY (`pastoral_document_classification_confidential_id`) REFERENCES `lu_pastoral_document_classification` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_lu_pastoral_type_pastoral_document_classification_id` FOREIGN KEY (`pastoral_document_classification_id`) REFERENCES `lu_pastoral_document_classification` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_lu_pastoral_type_user_id` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3894,7 +3892,7 @@ CREATE TABLE `lu_skin_config_category` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3911,7 +3909,7 @@ CREATE TABLE `lu_skin_config_subcategory` (
   PRIMARY KEY (`id`),
   KEY `idx_skin_config_category_category_id` (`category_id`),
   CONSTRAINT `fk_skin_config_category_category` FOREIGN KEY (`category_id`) REFERENCES `lu_skin_config_category` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3941,6 +3939,15 @@ CREATE TABLE `lu_work_type` (
   `external_result_type` varchar(50) DEFAULT NULL,
   `show_on_grades_page` tinyint(1) DEFAULT NULL,
   `staff_or_instructor_visible_only` tinyint(1) NOT NULL,
+  `is_visible_to_parents` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `is_visible_to_students` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `permitted_project` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `permitted_due_work` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `permitted_task` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `permitted_quiz` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `permitted_lti` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `permitted_lesson_plan` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `permitted_dialog_agent` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `sequence` int(11) unsigned NOT NULL,
   `updated_by` int(11) unsigned NOT NULL,
   `created_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
@@ -3949,7 +3956,7 @@ CREATE TABLE `lu_work_type` (
   PRIMARY KEY (`id`),
   KEY `fk_lu_work_type_user_id` (`updated_by`),
   CONSTRAINT `fk_lu_work_type_user_id` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3980,7 +3987,7 @@ CREATE TABLE `lu_year_level` (
   `updated_at` datetime NOT NULL,
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4013,7 +4020,7 @@ CREATE TABLE `menu_side` (
   `target` varchar(200) DEFAULT NULL,
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=281 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=295 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4032,7 +4039,7 @@ CREATE TABLE `menu_side_campus` (
   KEY `fk_menu_side_campus_campus_id_idx` (`campus_id`),
   CONSTRAINT `fk_menu_side_campus_campus_id` FOREIGN KEY (`campus_id`) REFERENCES `luCampus` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `menu_side_campus_menu_side_id_fk` FOREIGN KEY (`menu_side_id`) REFERENCES `menu_side` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=75 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=82 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4051,7 +4058,7 @@ CREATE TABLE `menu_side_role` (
   KEY `fk_menu_side_role_role_id_idx` (`role_id`),
   CONSTRAINT `fk_menu_side_role_role_id` FOREIGN KEY (`role_id`) REFERENCES `groups` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `menu_side_role_menu_side_id_fk` FOREIGN KEY (`menu_side_id`) REFERENCES `menu_side` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=133 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4090,7 +4097,7 @@ CREATE TABLE `menu_top` (
   `deleted_at` datetime DEFAULT NULL,
   `plan_hide` tinyint(1) DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4109,7 +4116,7 @@ CREATE TABLE `menu_top_campus` (
   KEY `fk_menu_top_campus_campus_id_idx` (`campus_id`),
   CONSTRAINT `fk_menu_top_campus_campus_id` FOREIGN KEY (`campus_id`) REFERENCES `luCampus` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `menu_top_campus_menu_top_id_fk` FOREIGN KEY (`menu_top_id`) REFERENCES `menu_top` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=173 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=82 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4128,7 +4135,7 @@ CREATE TABLE `menu_top_role` (
   KEY `fk_menu_top_role_role_id_idx` (`role_id`),
   CONSTRAINT `fk_menu_top_role_role_id` FOREIGN KEY (`role_id`) REFERENCES `groups` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `menu_top_role_menu_top_id_fk` FOREIGN KEY (`menu_top_id`) REFERENCES `menu_top` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=264 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=145 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4213,7 +4220,7 @@ CREATE TABLE `moment` (
   CONSTRAINT `fk_evidence_rejected_by` FOREIGN KEY (`rejected_by`) REFERENCES `user` (`id`),
   CONSTRAINT `fk_evidence_submitted_by` FOREIGN KEY (`submitted_by`) REFERENCES `user` (`id`),
   CONSTRAINT `fk_evidence_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4234,7 +4241,7 @@ CREATE TABLE `moment_evidence` (
   KEY `moment_evidence_moment_id_index` (`moment_id`),
   CONSTRAINT `moment_evidence_moment_id_fk` FOREIGN KEY (`moment_id`) REFERENCES `moment` (`id`),
   CONSTRAINT `moment_evidence_storage_hash_fk` FOREIGN KEY (`hash`) REFERENCES `storage` (`hash`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4374,7 +4381,7 @@ CREATE TABLE `msg_source` (
   KEY `key` (`key`),
   KEY `namespace_3` (`namespace`),
   KEY `role_type` (`role_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=197 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=194 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4435,7 +4442,7 @@ CREATE TABLE `my_file` (
   CONSTRAINT `fk_myFile_storage_hash` FOREIGN KEY (`hash`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `myFile_myFolder_id_fk` FOREIGN KEY (`parent`) REFERENCES `my_folder` (`id`),
   CONSTRAINT `myFile_user_id_fk` FOREIGN KEY (`owner`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4457,7 +4464,7 @@ CREATE TABLE `my_folder` (
   KEY `owner` (`owner`),
   CONSTRAINT `fk_myFolder_owner_id` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `myFolder_myFolder_id_fk` FOREIGN KEY (`parent`) REFERENCES `my_folder` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4480,7 +4487,7 @@ CREATE TABLE `newsTopic` (
   UNIQUE KEY `idx_newsTopic_slug` (`slug`),
   KEY `fk_newsTopic_id` (`updated_by`),
   CONSTRAINT `fk_newsTopic_id` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4505,7 +4512,7 @@ CREATE TABLE `oidc_relying_party` (
   UNIQUE KEY `oidc_client_client_id` (`client_id`),
   KEY `oidc_relying_party_user_id_fk` (`client_credentials_user_id`),
   CONSTRAINT `oidc_relying_party_user_id_fk` FOREIGN KEY (`client_credentials_user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4576,7 +4583,7 @@ CREATE TABLE `openai_log` (
   KEY `openai_log_user_id_fk` (`user_id`),
   KEY `openai_log_session` (`session_id`),
   CONSTRAINT `openai_log_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4594,7 +4601,7 @@ CREATE TABLE `package` (
   `installed` tinyint(1) DEFAULT NULL,
   `hidden` enum('true','false') DEFAULT 'false',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Contains packages that are available for install';
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Contains packages that are available for install';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4616,7 +4623,7 @@ CREATE TABLE `participant` (
   KEY `participant_user_id_fk` (`user_id`),
   CONSTRAINT `participant_participant_plan_id_fk` FOREIGN KEY (`participant_plan_id`) REFERENCES `participant_plan` (`id`),
   CONSTRAINT `participant_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=719 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=469 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4643,7 +4650,7 @@ CREATE TABLE `participant_plan` (
   KEY `participant_plan_assessment_id_fk` (`assessment_id`),
   KEY `participant_plan_duedate_index` (`due_date`),
   CONSTRAINT `participant_plan_assessment_id_fk` FOREIGN KEY (`assessment_id`) REFERENCES `assessment` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1414 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=583 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4688,7 +4695,7 @@ CREATE TABLE `pastoral` (
   CONSTRAINT `fk_pastoral_severity` FOREIGN KEY (`severity_id`) REFERENCES `lu_pastoral_severity` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_pastoral_student_id` FOREIGN KEY (`student_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_pastoral_type` FOREIGN KEY (`type_id`) REFERENCES `lu_pastoral_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4720,7 +4727,7 @@ CREATE TABLE `pastoral_access` (
   CONSTRAINT `fk_pastoral_access_group_id` FOREIGN KEY (`group_id`) REFERENCES `pastoral_group` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_pastoral_access_role_id` FOREIGN KEY (`role_id`) REFERENCES `groups` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_pastoral_access_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=180 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4745,7 +4752,7 @@ CREATE TABLE `pastoral_attachment` (
   KEY `fk_pastoral_attachment_hash` (`hash`),
   CONSTRAINT `fk_pastoral_attachment` FOREIGN KEY (`pastoral_id`) REFERENCES `pastoral` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_pastoral_attachment_hash` FOREIGN KEY (`hash`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4780,7 +4787,7 @@ CREATE TABLE `pastoral_audience` (
   CONSTRAINT `pastoral_audience_subtype_id` FOREIGN KEY (`subtype_id`) REFERENCES `lu_pastoral_subtype` (`id`),
   CONSTRAINT `pastoral_audience_type_id` FOREIGN KEY (`type_id`) REFERENCES `lu_pastoral_type` (`id`),
   CONSTRAINT `pastoral_audience_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4799,7 +4806,7 @@ CREATE TABLE `pastoral_audit` (
   `search` varchar(255) DEFAULT NULL,
   `created_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=268 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4846,7 +4853,7 @@ CREATE TABLE `pastoral_bulk_import` (
   CONSTRAINT `fk_pastoral_bulk_import_type` FOREIGN KEY (`type_id`) REFERENCES `lu_pastoral_type` (`id`),
   CONSTRAINT `fk_pastoral_bulk_import_undone_by` FOREIGN KEY (`undone_by`) REFERENCES `user` (`id`),
   CONSTRAINT `fk_pastoral_bulk_import_zip_hash` FOREIGN KEY (`zip_hash`) REFERENCES `storage` (`hash`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4878,7 +4885,7 @@ CREATE TABLE `pastoral_bulk_import_access` (
   CONSTRAINT `fk_pastoral_bulk_import_access_pastoral_bulk_import_id` FOREIGN KEY (`pastoral_bulk_import_id`) REFERENCES `pastoral_bulk_import` (`id`),
   CONSTRAINT `fk_pastoral_bulk_import_access_role_id` FOREIGN KEY (`role_id`) REFERENCES `groups` (`id`),
   CONSTRAINT `fk_pastoral_bulk_import_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4921,7 +4928,7 @@ CREATE TABLE `pastoral_comment` (
   KEY `pastoral_comment_deleted_at_index` (`deleted_at`),
   CONSTRAINT `fk_pastoral_comment` FOREIGN KEY (`pastoral_id`) REFERENCES `pastoral` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_pastoral_comment_owner_id` FOREIGN KEY (`owner_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4941,7 +4948,7 @@ CREATE TABLE `pastoral_group` (
   PRIMARY KEY (`id`),
   KEY `fk_pastoral_group_user_id_idx` (`user_id`),
   CONSTRAINT `fk_pastoral_group_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4965,7 +4972,7 @@ CREATE TABLE `pastoral_group_member` (
   CONSTRAINT `fk_pastoral_group_member_author_id` FOREIGN KEY (`author_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_pastoral_group_member_group_id` FOREIGN KEY (`group_id`) REFERENCES `pastoral_group` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_pastoral_group_member_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5012,7 +5019,7 @@ CREATE TABLE `pastoral_record_action` (
   CONSTRAINT `fk_pastoral_record_action_action_id` FOREIGN KEY (`action_id`) REFERENCES `lu_pastoral_action` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_pastoral_record_action_pastoral_id` FOREIGN KEY (`pastoral_id`) REFERENCES `pastoral` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_pastoral_record_action_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5057,7 +5064,7 @@ CREATE TABLE `pastoral_report` (
   PRIMARY KEY (`id`),
   KEY `pastoral_report_user_id_fk` (`owner_id`),
   CONSTRAINT `pastoral_report_user_id_fk` FOREIGN KEY (`owner_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5080,7 +5087,7 @@ CREATE TABLE `pastoral_report_access` (
   CONSTRAINT `fk_pastoral_report_access` FOREIGN KEY (`pastoral_report_id`) REFERENCES `pastoral_report` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_pastoral_report_access_group_id` FOREIGN KEY (`group_id`) REFERENCES `pastoral_group` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_pastoral_report_access_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5102,7 +5109,7 @@ CREATE TABLE `pastoral_report_dashboard` (
   KEY `pastoral_report_dashboard_user_id_fk` (`user_id`),
   CONSTRAINT `pastoral_report_dashboard_pastoral_report_id_fk` FOREIGN KEY (`report_id`) REFERENCES `pastoral_report` (`id`),
   CONSTRAINT `pastoral_report_dashboard_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5149,7 +5156,7 @@ CREATE TABLE `pastoral_revision` (
   CONSTRAINT `fk_pastoral_revision_severity` FOREIGN KEY (`severity_id`) REFERENCES `lu_pastoral_severity` (`id`),
   CONSTRAINT `fk_pastoral_revision_student_id` FOREIGN KEY (`student_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_pastoral_revision_type` FOREIGN KEY (`type_id`) REFERENCES `lu_pastoral_type` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=88 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5189,7 +5196,7 @@ CREATE TABLE `pastoral_type_action` (
   CONSTRAINT `fk_pastoral_type_action_action_id` FOREIGN KEY (`action_id`) REFERENCES `lu_pastoral_action` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_pastoral_type_action_subtype_id` FOREIGN KEY (`subtype_id`) REFERENCES `lu_pastoral_subtype` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_pastoral_type_action_type_id` FOREIGN KEY (`type_id`) REFERENCES `lu_pastoral_type` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=83 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5268,7 +5275,7 @@ CREATE TABLE `plagscan_document` (
   KEY `plagscan_document_status` (`status`),
   CONSTRAINT `fk_plagscan_document_student_submission_file_id` FOREIGN KEY (`student_submission_file_id`) REFERENCES `student_submission_file` (`id`),
   CONSTRAINT `fk_storage_hash_storage_hash` FOREIGN KEY (`storage_hash`) REFERENCES `storage` (`hash`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=95 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5312,7 +5319,7 @@ CREATE TABLE `poll` (
   KEY `close` (`close`),
   CONSTRAINT `fk_poll_created_by` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_poll_folder_id` FOREIGN KEY (`folder_id`) REFERENCES `folder` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5355,7 +5362,7 @@ CREATE TABLE `profile_button` (
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `profile_button_roletype_index` (`roletype`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5374,7 +5381,7 @@ CREATE TABLE `profile_button_campus_availability` (
   KEY `fk_profile_button_campus_availability_campus_id_idx` (`campus_id`),
   CONSTRAINT `fk_profile_button_campus_availability_campus_id` FOREIGN KEY (`campus_id`) REFERENCES `luCampus` (`id`),
   CONSTRAINT `profile_button_campus_availability_profile_button_id_fk` FOREIGN KEY (`profile_button_id`) REFERENCES `profile_button` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5393,7 +5400,7 @@ CREATE TABLE `profile_button_campus_visibility` (
   KEY `fk_profile_button_campus_visibility_campus_id_idx` (`campus_id`),
   CONSTRAINT `fk_profile_button_campus_visibility_campus_id` FOREIGN KEY (`campus_id`) REFERENCES `luCampus` (`id`),
   CONSTRAINT `profile_button_campus_visibility_profile_button_id_fk` FOREIGN KEY (`profile_button_id`) REFERENCES `profile_button` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5412,7 +5419,7 @@ CREATE TABLE `profile_button_role_availability` (
   KEY `fk_profile_button_role_availability_role_id_idx` (`role_id`),
   CONSTRAINT `fk_profile_button_role_availability_role_id` FOREIGN KEY (`role_id`) REFERENCES `groups` (`id`),
   CONSTRAINT `profile_button_role_availability_profile_button_id_fk` FOREIGN KEY (`profile_button_id`) REFERENCES `profile_button` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=128 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5431,7 +5438,7 @@ CREATE TABLE `profile_button_role_visibility` (
   KEY `fk_profile_button_role_visibility_role_id_idx` (`role_id`),
   CONSTRAINT `fk_profile_button_role_visibility_role_id` FOREIGN KEY (`role_id`) REFERENCES `groups` (`id`),
   CONSTRAINT `profile_button_role_visibility_profile_button_id_fk` FOREIGN KEY (`profile_button_id`) REFERENCES `profile_button` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=207 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=118 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5459,7 +5466,7 @@ CREATE TABLE `profile_field` (
   KEY `roletype` (`roletype`),
   KEY `field` (`field`),
   KEY `sequence` (`sequence`)
-) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5477,7 +5484,7 @@ CREATE TABLE `profile_field_campus_availability` (
   KEY `profile_field_profile_field_campus_availability` (`profile_field_id`),
   KEY `fk_profile_field_campus_availability_campus_id_idx` (`campus_id`),
   CONSTRAINT `fk_profile_field_campus_availability_campus_id` FOREIGN KEY (`campus_id`) REFERENCES `luCampus` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=146 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=99 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5494,7 +5501,7 @@ CREATE TABLE `profile_field_roletype_visibility` (
   PRIMARY KEY (`id`),
   KEY `profile_field_profile_field_roletype_visibility` (`profile_field_id`),
   KEY `fk_profile_field_roletype_visibility_idx` (`roletype`)
-) ENGINE=InnoDB AUTO_INCREMENT=136 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5533,7 +5540,7 @@ CREATE TABLE `profile_tab_campus_availability` (
   KEY `profile_tab_profile_tab_campus_availability` (`profile_tab_id`),
   KEY `fk_profile_tab_campus_availability_campus_id_idx` (`campus_id`),
   CONSTRAINT `fk_profile_tab_campus_availability_campus_id` FOREIGN KEY (`campus_id`) REFERENCES `luCampus` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5579,7 +5586,7 @@ CREATE TABLE `project` (
   CONSTRAINT `fk_project_grade_group_id` FOREIGN KEY (`grade_group_id`) REFERENCES `submission_grade_group` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_project_mark_type_id` FOREIGN KEY (`mark_type_id`) REFERENCES `submission_mark_type` (`mark_type_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_project_owner_id` FOREIGN KEY (`owner_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=285 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5621,7 +5628,7 @@ CREATE TABLE `project_result` (
   KEY `idx_project_result_assessment_id_user_id` (`assessment_id`,`user_id`),
   CONSTRAINT `fk_project_result_assessment_id` FOREIGN KEY (`assessment_id`) REFERENCES `assessment` (`id`),
   CONSTRAINT `fk_project_result_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=234 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5698,6 +5705,115 @@ CREATE TABLE `reportcard_comment` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `reporting`
+--
+
+DROP TABLE IF EXISTS `reporting`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `reporting` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `assessment_id` int(10) unsigned NOT NULL,
+  `instructor_mark_type` int(11) DEFAULT NULL,
+  `mark_type` int(11) NOT NULL,
+  `instructor_grade_group_id` int(11) DEFAULT NULL,
+  `grade_group_id` int(11) DEFAULT NULL,
+  `instructor_max_mark` decimal(14,11) DEFAULT NULL,
+  `max_mark` decimal(14,11) DEFAULT NULL,
+  `mark_visibility` tinyint(4) DEFAULT NULL,
+  `feedback_comments_enable` tinyint(4) DEFAULT NULL COMMENT 'a toggle: if enabled, staff can write comments in their reporting feedbacks',
+  `supporting_data_enable` tinyint(4) DEFAULT NULL COMMENT 'Supporting Data section is shown',
+  `supporting_data_range` enum('current_academic_period','previous_academic_period','current_and_previous_academic_period','current_academic_year','current_and_previous_academic_year') DEFAULT NULL COMMENT 'These translate into from/to date range for supporting data',
+  `supporting_data_folders` enum('current_only','any_folders') DEFAULT NULL COMMENT 'corresponds to "the students in my folder specifically", or "any folder where my students had a published feedback"',
+  `supporting_data_markbook_enable` tinyint(4) DEFAULT NULL COMMENT 'a toggle: if enabled, the minimal mega markbook is generated',
+  `created_at` datetime NOT NULL,
+  `created_by` int(10) unsigned NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `updated_by` int(10) unsigned NOT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_r_assessment_idx` (`assessment_id`),
+  KEY `fk_r_createdby_idx` (`created_by`),
+  KEY `fk_r_updatedby_idx` (`updated_by`),
+  KEY `fk_r_deletedby_idx` (`deleted_by`),
+  CONSTRAINT `fk_r_assessment` FOREIGN KEY (`assessment_id`) REFERENCES `assessment` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_r_createdby` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_r_deletedby` FOREIGN KEY (`deleted_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_r_updatedby` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `reporting_curriculum_node`
+--
+
+DROP TABLE IF EXISTS `reporting_curriculum_node`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `reporting_curriculum_node` (
+  `reporting_id` int(11) NOT NULL,
+  `curriculum_node_id` int(11) NOT NULL,
+  UNIQUE KEY `fk_rc_unique` (`reporting_id`,`curriculum_node_id`),
+  KEY `fk_rcn_reporting_id_idx` (`reporting_id`),
+  KEY `fk_rcn_cni_curriculum_node_idx` (`curriculum_node_id`),
+  CONSTRAINT `fk_rcn_cni_curriculum_node` FOREIGN KEY (`curriculum_node_id`) REFERENCES `curriculum_node` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_rcn_reporting_id` FOREIGN KEY (`reporting_id`) REFERENCES `reporting` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `reporting_feedback`
+--
+
+DROP TABLE IF EXISTS `reporting_feedback`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `reporting_feedback` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `reporting_id` int(11) NOT NULL,
+  `learner_id` int(10) unsigned NOT NULL,
+  `instructor_id` int(10) unsigned NOT NULL,
+  `norm_mark` decimal(14,11) DEFAULT NULL,
+  `mark` varchar(255) DEFAULT NULL,
+  `instructor_mark` varchar(255) DEFAULT NULL,
+  `comment` mediumtext DEFAULT NULL,
+  `published_at` datetime DEFAULT NULL,
+  `published_by` int(10) unsigned DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_rf_reporting_idx` (`reporting_id`),
+  KEY `fk_rf_learner_idx` (`learner_id`),
+  KEY `fk_rf_instructor_idx` (`instructor_id`),
+  KEY `fk_rf_publisher_idx` (`published_by`),
+  CONSTRAINT `fk_rf_instructor` FOREIGN KEY (`instructor_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_rf_learner` FOREIGN KEY (`learner_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_rf_publisher` FOREIGN KEY (`published_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_rf_reporting` FOREIGN KEY (`reporting_id`) REFERENCES `reporting` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `reporting_work_type`
+--
+
+DROP TABLE IF EXISTS `reporting_work_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `reporting_work_type` (
+  `reporting_id` int(11) NOT NULL,
+  `work_type_id` int(11) NOT NULL,
+  UNIQUE KEY `fk_aw_unique` (`reporting_id`,`work_type_id`),
+  KEY `fk_rwt_reporting_id_idx` (`reporting_id`),
+  KEY `fk_rwt_wti_work_type_idx` (`work_type_id`),
+  CONSTRAINT `fk_rwt_reporting_id` FOREIGN KEY (`reporting_id`) REFERENCES `reporting` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_rwt_wti_work_type` FOREIGN KEY (`work_type_id`) REFERENCES `lu_work_type` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `resource`
 --
 
@@ -5731,7 +5847,7 @@ CREATE TABLE `resource` (
   CONSTRAINT `fk_resource_image_hash` FOREIGN KEY (`image_hash`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `resource_resource_category_id` FOREIGN KEY (`resource_category_id`) REFERENCES `resource_category` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `resource_resource_moderation_type_id` FOREIGN KEY (`resource_moderation_type_id`) REFERENCES `lu_resource_moderation_type` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5762,7 +5878,7 @@ CREATE TABLE `resource_booking` (
   KEY `deleted` (`deleted_at`),
   CONSTRAINT `resource_booking_resource_booking_status_id` FOREIGN KEY (`resource_booking_status_id`) REFERENCES `lu_resource_booking_status` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `resource_booking_resource_id` FOREIGN KEY (`resource_id`) REFERENCES `resource` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=176 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5780,7 +5896,7 @@ CREATE TABLE `resource_category` (
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `deleted` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5799,7 +5915,7 @@ CREATE TABLE `resource_moderator` (
   KEY `resource_moderator_resource_id` (`resource_id`),
   KEY `resource_moderator_moderator_id` (`moderator_id`),
   CONSTRAINT `resource_moderator_resource_id` FOREIGN KEY (`resource_id`) REFERENCES `resource` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5819,7 +5935,7 @@ CREATE TABLE `resource_relation` (
   KEY `resource_relation_extra_resource_id` (`extra_resource_id`),
   CONSTRAINT `resource_relation_extra_resource_id` FOREIGN KEY (`extra_resource_id`) REFERENCES `resource` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `resource_relation_resource_id` FOREIGN KEY (`resource_id`) REFERENCES `resource` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5838,7 +5954,7 @@ CREATE TABLE `resource_role_permission` (
   UNIQUE KEY `resource_role_unique` (`resource_id`,`role_id`),
   KEY `resource_role_role` (`role_id`),
   CONSTRAINT `resource_role_resource` FOREIGN KEY (`resource_id`) REFERENCES `resource` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=337 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5857,7 +5973,7 @@ CREATE TABLE `rubric_capability` (
   PRIMARY KEY (`id`),
   KEY `deleted` (`deleted_at`),
   KEY `parent_id` (`parent_id`,`parent_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=290 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=262 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5879,7 +5995,7 @@ CREATE TABLE `rubric_capability_mark` (
   KEY `return_id` (`return_id`),
   CONSTRAINT `fk_rubric_group_mark_return_id` FOREIGN KEY (`return_id`) REFERENCES `submission_return` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_rubric_group_mark_rubric_group_id` FOREIGN KEY (`rubric_capability_id`) REFERENCES `rubric_capability` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=4028 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=231 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5922,7 +6038,7 @@ CREATE TABLE `rubric_descriptor` (
   KEY `deleted_at` (`deleted_at`),
   CONSTRAINT `fk_rubric_descriptor_criterion_id` FOREIGN KEY (`rubric_indicator_id`) REFERENCES `rubric_indicator` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_rubric_descriptor_level_id` FOREIGN KEY (`level_id`) REFERENCES `rubric_level` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=6426 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4082 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5941,7 +6057,7 @@ CREATE TABLE `rubric_indicator` (
   KEY `deleted` (`deleted_at`),
   KEY `rubric_criterion_rubric_group_idx` (`rubric_capability_id`),
   CONSTRAINT `rubric_criterion_rubric_group` FOREIGN KEY (`rubric_capability_id`) REFERENCES `rubric_capability` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=834 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=485 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5963,7 +6079,7 @@ CREATE TABLE `rubric_indicator_mark` (
   KEY `rubric_descriptor_mark_rubric_group_mark_id` (`rubric_capability_mark_id`),
   CONSTRAINT `fk_rubric_descriptor_mark_rubric_group_mark_id` FOREIGN KEY (`rubric_capability_mark_id`) REFERENCES `rubric_capability_mark` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_rubric_mark_descriptor_id` FOREIGN KEY (`descriptor_id`) REFERENCES `rubric_descriptor` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=7142 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2586 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6004,7 +6120,7 @@ CREATE TABLE `rubric_level` (
   KEY `sequence` (`sequence`),
   KEY `deleted_at` (`deleted_at`),
   CONSTRAINT `fk_rubric_level_box_id` FOREIGN KEY (`box_id`) REFERENCES `submission_box` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=1151 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=959 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6048,7 +6164,7 @@ CREATE TABLE `search_index` (
   FULLTEXT KEY `search_index_title_index` (`title`),
   CONSTRAINT `search_index_folder_id_fk` FOREIGN KEY (`folder_id`) REFERENCES `folder` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `search_index_user_id_fk` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=846841 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9238 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6064,7 +6180,7 @@ CREATE TABLE `sis_class` (
   `code` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=806 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6084,7 +6200,7 @@ CREATE TABLE `sis_class_period` (
   KEY `class_period_class_id` (`class_id`),
   KEY `class_period_period_id` (`period_id`),
   KEY `class_period_teacher_external_id` (`teacher_external_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4431 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6102,7 +6218,7 @@ CREATE TABLE `sis_class_user` (
   UNIQUE KEY `class_user_involvement` (`class_id`,`external_id`),
   KEY `class_user_class_id` (`class_id`),
   KEY `class_user_external_id` (`external_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3065 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=75 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6155,8 +6271,9 @@ CREATE TABLE `sis_event` (
   KEY `code` (`code`),
   KEY `location` (`location`),
   KEY `source` (`source`),
-  KEY `start_at_idx` (`start_at`),
-  KEY `guid` (`guid`)
+  KEY `guid` (`guid`),
+  KEY `type` (`type`),
+  KEY `start_at_idx` (`start_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -6265,7 +6382,7 @@ CREATE TABLE `sis_timetable_cycle` (
   `finish` date DEFAULT NULL,
   `start_day` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6286,7 +6403,7 @@ CREATE TABLE `sis_timetable_period` (
   `usable` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `day` (`day`,`sequence`,`cycle_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1051 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6303,6 +6420,7 @@ CREATE TABLE `sis_user_profile` (
   `firstname` varchar(255) DEFAULT NULL,
   `preferred_firstname` varchar(255) DEFAULT NULL,
   `lastname` varchar(255) DEFAULT NULL,
+  `pronoun` varchar(255) DEFAULT NULL,
   `portrait_hash` varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci DEFAULT NULL,
   `metadata` longtext DEFAULT NULL CHECK (json_valid(`metadata`)),
   `created_at` datetime NOT NULL,
@@ -6311,7 +6429,7 @@ CREATE TABLE `sis_user_profile` (
   UNIQUE KEY `idx_external_id` (`external_id`),
   KEY `sis_user_profile_storage_hash_fk` (`portrait_hash`),
   CONSTRAINT `sis_user_profile_storage_hash_fk` FOREIGN KEY (`portrait_hash`) REFERENCES `storage` (`hash`)
-) ENGINE=InnoDB AUTO_INCREMENT=98 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6497,7 +6615,7 @@ CREATE TABLE `socialstream_post` (
   CONSTRAINT `fk_socialstream_post_folder_id` FOREIGN KEY (`homepage_id`) REFERENCES `folder` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_socialstream_post_image_hash` FOREIGN KEY (`cache_hash`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_socialstream_post_user_id` FOREIGN KEY (`owner_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6518,7 +6636,7 @@ CREATE TABLE `sportsfixtures_coach` (
   KEY `sportsfixtures_coach__name` (`name`(191)),
   KEY `sportsfixtures_coach__user` (`user_id`),
   CONSTRAINT `fk_sportsfixtures_coach_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6545,7 +6663,7 @@ CREATE TABLE `sportsfixtures_division` (
   KEY `external_id_idx` (`external_id`),
   CONSTRAINT `sportsfixtures_division_ibfk_1` FOREIGN KEY (`sport_id`) REFERENCES `sportsfixtures_sport` (`id`),
   CONSTRAINT `sportsfixtures_division_ibfk_2` FOREIGN KEY (`season_id`) REFERENCES `sportsfixtures_season` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6566,7 +6684,7 @@ CREATE TABLE `sportsfixtures_division_user` (
   KEY `sportsfixtures_division_user__user` (`user_id`),
   CONSTRAINT `fk_sportsfixtures_division_user__division` FOREIGN KEY (`division_id`) REFERENCES `sportsfixtures_division` (`id`),
   CONSTRAINT `fk_sportsfixtures_division_user_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6584,7 +6702,7 @@ CREATE TABLE `sportsfixtures_import` (
   `updated_at` datetime NOT NULL,
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6609,7 +6727,7 @@ CREATE TABLE `sportsfixtures_import_errors` (
   PRIMARY KEY (`id`),
   KEY `sportsfixtures_import_errors_storage_hash_fk` (`hash`),
   CONSTRAINT `sportsfixtures_import_errors_storage_hash_fk` FOREIGN KEY (`hash`) REFERENCES `storage` (`hash`)
-) ENGINE=InnoDB AUTO_INCREMENT=296 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=114 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6653,7 +6771,7 @@ CREATE TABLE `sportsfixtures_match` (
   CONSTRAINT `sportsfixtures_match_ibfk_3` FOREIGN KEY (`venue_id`) REFERENCES `sportsfixtures_venue` (`id`),
   CONSTRAINT `sportsfixtures_match_ibfk_4` FOREIGN KEY (`home_team_id`) REFERENCES `sportsfixtures_team` (`id`),
   CONSTRAINT `sportsfixtures_match_ibfk_5` FOREIGN KEY (`away_team_id`) REFERENCES `sportsfixtures_team` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6675,7 +6793,7 @@ CREATE TABLE `sportsfixtures_match_itineraryitem` (
   KEY `match_id` (`match_id`),
   KEY `deleted_at_idx` (`deleted_at`),
   CONSTRAINT `sportsfixtures_match_itineraryitem_ibfk_1` FOREIGN KEY (`match_id`) REFERENCES `sportsfixtures_match` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6698,7 +6816,7 @@ CREATE TABLE `sportsfixtures_position` (
   KEY `deleted_at_idx` (`deleted_at`),
   KEY `external_id_idx` (`external_id`),
   CONSTRAINT `sportsfixtures_position_ibfk_1` FOREIGN KEY (`sport_id`) REFERENCES `sportsfixtures_sport` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6725,7 +6843,7 @@ CREATE TABLE `sportsfixtures_result` (
   CONSTRAINT `fk_sportsfixtures_result_team` FOREIGN KEY (`team_id`) REFERENCES `sportsfixtures_team` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `sportsfixtures_result_ibfk_1` FOREIGN KEY (`match_id`) REFERENCES `sportsfixtures_match` (`id`),
   CONSTRAINT `sportsfixtures_result_ibfk_2` FOREIGN KEY (`status_id`) REFERENCES `sportsfixtures_status` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6765,7 +6883,7 @@ CREATE TABLE `sportsfixtures_season` (
   PRIMARY KEY (`id`),
   KEY `deleted_at_idx` (`deleted_at`),
   KEY `archived_at_idx` (`archived_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6827,7 +6945,7 @@ CREATE TABLE `sportsfixtures_team` (
   KEY `deleted_at_idx` (`deleted_at`),
   KEY `external_id_idx` (`external_id`),
   CONSTRAINT `sportsfixtures_team_ibfk_1` FOREIGN KEY (`division_id`) REFERENCES `sportsfixtures_division` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6871,7 +6989,7 @@ CREATE TABLE `sportsfixtures_team_participantcoach` (
   CONSTRAINT `fk_sportsfixtures_team_participantcoach_match` FOREIGN KEY (`match_id`) REFERENCES `sportsfixtures_match` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_sportsfixtures_team_participantcoach_team` FOREIGN KEY (`team_id`) REFERENCES `sportsfixtures_team` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_sportsfixtures_team_participantcoach_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=99 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6898,7 +7016,7 @@ CREATE TABLE `sportsfixtures_team_participantposition` (
   CONSTRAINT `fk_sportsfixtures_team_participantposition_match` FOREIGN KEY (`match_id`) REFERENCES `sportsfixtures_match` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_sportsfixtures_team_participantposition_team` FOREIGN KEY (`team_id`) REFERENCES `sportsfixtures_team` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_sportsfixtures_team_participantposition_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6926,7 +7044,7 @@ CREATE TABLE `sportsfixtures_team_participantuser` (
   CONSTRAINT `fk_sportsfixtures_team_participantuser_match` FOREIGN KEY (`match_id`) REFERENCES `sportsfixtures_match` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_sportsfixtures_team_participantuser_team` FOREIGN KEY (`team_id`) REFERENCES `sportsfixtures_team` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_sportsfixtures_team_participantuser_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6949,7 +7067,7 @@ CREATE TABLE `sportsfixtures_team_position` (
   CONSTRAINT `fk_sportsfixtures_team_position__team` FOREIGN KEY (`team_id`) REFERENCES `sportsfixtures_team` (`id`),
   CONSTRAINT `fk_sportsfixtures_team_position_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `sportsfixtures_team_position_ibfk_1` FOREIGN KEY (`position_id`) REFERENCES `sportsfixtures_position` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6970,7 +7088,7 @@ CREATE TABLE `sportsfixtures_team_user` (
   KEY `sportsfixtures_team_user__user` (`user_id`),
   CONSTRAINT `fk_sportsfixtures_team_user__team` FOREIGN KEY (`team_id`) REFERENCES `sportsfixtures_team` (`id`),
   CONSTRAINT `fk_sportsfixtures_team_user_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -6993,7 +7111,7 @@ CREATE TABLE `sportsfixtures_venue` (
   PRIMARY KEY (`id`),
   KEY `deleted_at_idx` (`deleted_at`),
   KEY `external_id_idx` (`external_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7019,7 +7137,7 @@ CREATE TABLE `storage` (
   KEY `deleted` (`expired_at`),
   KEY `ext` (`ext`),
   KEY `uploaded_on` (`uploaded_on`)
-) ENGINE=InnoDB AUTO_INCREMENT=2303 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3417 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7065,7 +7183,7 @@ CREATE TABLE `student_submission` (
   CONSTRAINT `fk_student_submission_box_id` FOREIGN KEY (`box_id`) REFERENCES `submission_box` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_student_submission_owner` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_student_submission_submitted_by` FOREIGN KEY (`submitted_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=122 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7093,7 +7211,7 @@ CREATE TABLE `student_submission_file` (
   KEY `uuid` (`uuid`(191)),
   CONSTRAINT `fk_student_submission_file_hash` FOREIGN KEY (`hash`) REFERENCES `storage` (`hash`),
   CONSTRAINT `fk_student_submission_file_student_submission` FOREIGN KEY (`student_submission_id`) REFERENCES `student_submission` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=106 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7150,7 +7268,7 @@ CREATE TABLE `submission_box` (
   CONSTRAINT `fk_submission_box_submission_grade_group_id` FOREIGN KEY (`submission_grade_group_id`) REFERENCES `submission_grade_group` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_submission_box_submission_instructor_grade_group_id` FOREIGN KEY (`submission_instructor_grade_group_id`) REFERENCES `submission_grade_group` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `submission_box_storage_hash_fk` FOREIGN KEY (`worksheet_template_hash`) REFERENCES `storage` (`hash`)
-) ENGINE=InnoDB AUTO_INCREMENT=630 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=305 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7171,7 +7289,7 @@ CREATE TABLE `submission_box_file` (
   KEY `box_id` (`box_id`),
   CONSTRAINT `fk_submission_box_file_box_id` FOREIGN KEY (`box_id`) REFERENCES `submission_box` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_submission_box_file_storage_hash` FOREIGN KEY (`storage_id`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=228 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7195,7 +7313,7 @@ CREATE TABLE `submission_errors` (
   KEY `fk_submission_errors_user_id` (`updated_by`),
   KEY `code` (`code`),
   CONSTRAINT `fk_submission_errors_user_id` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7223,7 +7341,7 @@ CREATE TABLE `submission_grade` (
   CONSTRAINT `fk_submission_grade_created_by_id` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`),
   CONSTRAINT `fk_submission_grade_submission_grade_group_id` FOREIGN KEY (`submission_grade_group_id`) REFERENCES `submission_grade_group` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_submission_grade_updated_by_id` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=77 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7246,7 +7364,7 @@ CREATE TABLE `submission_grade_group` (
   KEY `fk_submission_grade_group_updated_by_id_idx` (`updated_by`),
   CONSTRAINT `fk_submission_grade_group_created_by_id` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`),
   CONSTRAINT `fk_submission_grade_group_updated_by_id` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7323,7 +7441,7 @@ CREATE TABLE `submission_return` (
   CONSTRAINT `fk_submission_return_marker` FOREIGN KEY (`marker`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_submission_return_owner` FOREIGN KEY (`owner`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_submission_return_publisher` FOREIGN KEY (`published_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=416 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=157 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7350,7 +7468,7 @@ CREATE TABLE `submission_return_file` (
   KEY `uuid` (`uuid`(191)),
   CONSTRAINT `fk_submission_return_file_hash` FOREIGN KEY (`hash`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `submission_return_file_return_id` FOREIGN KEY (`submission_return_id`) REFERENCES `submission_return` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7375,7 +7493,7 @@ CREATE TABLE `summative_report` (
   PRIMARY KEY (`id`),
   KEY `summative_report_logo_hash_fk` (`logo_hash`),
   CONSTRAINT `summative_report_logo_hash_fk` FOREIGN KEY (`logo_hash`) REFERENCES `storage` (`hash`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7412,7 +7530,7 @@ CREATE TABLE `task` (
   KEY `task_deleted_at` (`deleted_at`),
   KEY `deleted` (`deleted_at`),
   CONSTRAINT `fk_task_assessment_id` FOREIGN KEY (`assessment_id`) REFERENCES `assessment` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=543 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=472 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7439,7 +7557,7 @@ CREATE TABLE `task_completion` (
   CONSTRAINT `task_completion_ibfk_1` FOREIGN KEY (`task_id`) REFERENCES `task` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `task_completion_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `user` (`id`),
   CONSTRAINT `task_completion_ibfk_3` FOREIGN KEY (`marking_user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=253 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=338 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7462,7 +7580,7 @@ CREATE TABLE `task_file` (
   KEY `storage_id` (`storage_id`),
   CONSTRAINT `fk_task_file` FOREIGN KEY (`task_id`) REFERENCES `task` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_task_file_storage` FOREIGN KEY (`storage_id`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7533,7 +7651,7 @@ CREATE TABLE `textbox` (
   CONSTRAINT `fk_textBox_deleted_by` FOREIGN KEY (`deleted_by`) REFERENCES `user` (`id`),
   CONSTRAINT `fk_textBox_folder_id` FOREIGN KEY (`folder_id`) REFERENCES `folder` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_textBox_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=409 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=176 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7571,7 +7689,7 @@ CREATE TABLE `tile` (
   KEY `background_image_hash` (`background_image_hash`),
   CONSTRAINT `fk_tile_background_image_hash` FOREIGN KEY (`background_image_hash`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `tile_tile_layout` FOREIGN KEY (`tile_layout_id`) REFERENCES `tile_layout` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=528 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=371 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7596,7 +7714,7 @@ CREATE TABLE `tile_layout` (
   `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `deleted` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=328 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=136 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7697,7 +7815,7 @@ CREATE TABLE `tour_audience_role` (
   CONSTRAINT `tour_audience_role_moderator_user_id_fk` FOREIGN KEY (`moderator_user_id`) REFERENCES `user` (`id`),
   CONSTRAINT `tour_audience_role_role_id_fk` FOREIGN KEY (`role_id`) REFERENCES `groups` (`id`),
   CONSTRAINT `tour_audience_role_tour_uuid_fk` FOREIGN KEY (`tour_uuid`) REFERENCES `tour` (`uuid`)
-) ENGINE=InnoDB AUTO_INCREMENT=110 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7860,7 +7978,7 @@ CREATE TABLE `turnitin_group` (
   KEY `turnitin_status_idx` (`status`),
   KEY `fk_turnitin_submission_box_id` (`submission_box_id`),
   CONSTRAINT `fk_turnitin_submission_box_id` FOREIGN KEY (`submission_box_id`) REFERENCES `submission_box` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7914,7 +8032,7 @@ CREATE TABLE `turnitin_report` (
   KEY `turnitin_status_idx` (`status`),
   KEY `fk_turnitin_subfile_id` (`student_submission_file_id`),
   CONSTRAINT `fk_turnitin_subfile_id` FOREIGN KEY (`student_submission_file_id`) REFERENCES `student_submission_file` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -7985,7 +8103,7 @@ CREATE TABLE `ups_custom_hydrator` (
   KEY `class` (`class`),
   KEY `role_type` (`role_type`),
   KEY `role_type_2` (`role_type`,`enabled`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -8007,7 +8125,7 @@ CREATE TABLE `ups_effect` (
   KEY `effect_type_id` (`effect_type_id`),
   CONSTRAINT `ups_effect_ibfk_1` FOREIGN KEY (`rule_id`) REFERENCES `ups_rule` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `ups_effect_ibfk_2` FOREIGN KEY (`effect_type_id`) REFERENCES `ups_effect_type` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -8044,7 +8162,7 @@ CREATE TABLE `ups_log` (
   PRIMARY KEY (`id`),
   KEY `ups_log_storage_hash_fk` (`hash`),
   CONSTRAINT `ups_log_storage_hash_fk` FOREIGN KEY (`hash`) REFERENCES `storage` (`hash`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -8064,7 +8182,7 @@ CREATE TABLE `ups_rule` (
   PRIMARY KEY (`id`),
   KEY `role_type` (`role_type`),
   KEY `role_type_2` (`role_type`,`enabled`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -8106,6 +8224,7 @@ CREATE TABLE `user` (
   `created_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
   `updated_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
   `deleted_at` datetime DEFAULT NULL,
+  `ib_candidate_number` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `synergy` (`synergy_id`),
   KEY `username` (`username`),
@@ -8124,7 +8243,7 @@ CREATE TABLE `user` (
   CONSTRAINT `fk_user_residential_house_id` FOREIGN KEY (`residential_house_id`) REFERENCES `luResidentialHouse` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_user_role_id` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_user_year_id` FOREIGN KEY (`year_id`) REFERENCES `lu_year_level` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=85 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -8221,7 +8340,7 @@ CREATE TABLE `user_assume_log` (
   `ip` varchar(39) CHARACTER SET ascii COLLATE ascii_general_ci DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1043 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -8253,6 +8372,23 @@ CREATE TABLE `user_jwt_id` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `user_language`
+--
+
+DROP TABLE IF EXISTS `user_language`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user_language` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(4) unsigned NOT NULL,
+  `language` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_language_user_id` (`user_id`),
+  CONSTRAINT `fk_user_language_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `user_link`
 --
 
@@ -8269,6 +8405,23 @@ CREATE TABLE `user_link` (
   KEY `linked_user_id` (`linked_user_id`),
   CONSTRAINT `fk_user_link_linked_user_id` FOREIGN KEY (`linked_user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_user_link_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `user_nationality`
+--
+
+DROP TABLE IF EXISTS `user_nationality`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user_nationality` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(4) unsigned NOT NULL,
+  `nationality` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_nationality_user_id` (`user_id`),
+  CONSTRAINT `fk_user_nationality_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -8572,7 +8725,7 @@ CREATE TABLE `video_queue` (
   KEY `fk_video_queue_uploaded_by` (`uploaded_by`),
   CONSTRAINT `fk_video_queue_storage_hash` FOREIGN KEY (`hash`) REFERENCES `storage` (`hash`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_video_queue_uploaded_by` FOREIGN KEY (`uploaded_by`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -8622,7 +8775,7 @@ CREATE TABLE `wiki` (
   KEY `deleted_at` (`deleted_at`),
   CONSTRAINT `fk_wiki_folder_id` FOREIGN KEY (`categoryID`) REFERENCES `folder` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_wiki_latestRevision_wikiRevision_revisionID` FOREIGN KEY (`latestRevision`) REFERENCES `wikiRevision` (`revisionID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -8644,7 +8797,7 @@ CREATE TABLE `wikiRevision` (
   KEY `userID` (`userID`),
   CONSTRAINT `fk_wikiRevision_user_id` FOREIGN KEY (`userID`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_wikiRevision_wiki_id` FOREIGN KEY (`wikiID`) REFERENCES `wiki` (`wikiID`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -8655,12 +8808,12 @@ CREATE TABLE `wikiRevision` (
 /*!50001 SET @saved_cs_client          = @@character_set_client */;
 /*!50001 SET @saved_cs_results         = @@character_set_results */;
 /*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8mb3 */;
-/*!50001 SET character_set_results     = utf8mb3 */;
-/*!50001 SET collation_connection      = utf8mb3_general_ci */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_uca1400_ai_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`schoolboxdocker`@`%` SQL SECURITY DEFINER */
-/*!50001 VIEW `v_assessment_feedback` AS (select `sb`.`assessment_id` AS `assessment_id`,'submission_return' AS `feedback_table`,`sr`.`id` AS `feedback_id`,`sr`.`owner` AS `student_id`,`sr`.`review_route` AS `review_route`,`sr`.`published_at` AS `published_at` from (`submission_return` `sr` join `submission_box` `sb` on(`sr`.`box_id` = `sb`.`id`)) where `sr`.`deleted_at` is null) union (select `ass`.`assessment_id` AS `assessment_id`,'assess_attempt' AS `feedback_table`,`aa`.`attempt_id` AS `feedback_id`,`aa`.`user_id` AS `student_id`,'instructor' AS `review_route`,`aa`.`reviewed_at` AS `published_at` from (`assess_attempt` `aa` join `assess` `ass` on(`aa`.`assess_id` = `ass`.`assess_id`)) where `aa`.`deleted_at` is null and `aa`.`reviewed_at` is not null and `ass`.`assessment_id` is not null) union (select `t`.`assessment_id` AS `assessment_id`,'task_completion' AS `feedback_table`,`tc`.`id` AS `feedback_id`,`tc`.`student_id` AS `student_id`,'instructor' AS `review_route`,`tc`.`completion_date` AS `published_at` from (`task_completion` `tc` join `task` `t` on(`tc`.`task_id` = `t`.`id`)) where `tc`.`deleted_at` is null and `tc`.`completion_date` is not null and `tc`.`completion_status` = 3) union (select `la`.`assessment_id` AS `assessment_id`,'lti_assessment_score' AS `feedback_table`,`sc`.`id` AS `feedback_id`,`sc`.`student_id` AS `student_id`,'instructor' AS `review_route`,`sc`.`created_at` AS `published_at` from (`lti_assessment_score` `sc` join `lti_assessment` `la` on(`sc`.`lti_assessment_id` = `la`.`id`)) where `sc`.`deleted_at` is null and `sc`.`is_feedback` = 1) order by `assessment_id`,`student_id` */;
+/*!50001 VIEW `v_assessment_feedback` AS (select `sb`.`assessment_id` AS `assessment_id`,'submission_return' AS `feedback_table`,`sr`.`id` AS `feedback_id`,`sr`.`owner` AS `student_id`,`sr`.`review_route` AS `review_route`,`sr`.`published_at` AS `published_at` from (`submission_return` `sr` join `submission_box` `sb` on(`sr`.`box_id` = `sb`.`id`)) where `sr`.`deleted_at` is null) union (select `ass`.`assessment_id` AS `assessment_id`,'assess_attempt' AS `feedback_table`,`aa`.`attempt_id` AS `feedback_id`,`aa`.`user_id` AS `student_id`,'instructor' AS `review_route`,`aa`.`reviewed_at` AS `published_at` from (`assess_attempt` `aa` join `assess` `ass` on(`aa`.`assess_id` = `ass`.`assess_id`)) where `aa`.`deleted_at` is null and `aa`.`reviewed_at` is not null and `ass`.`assessment_id` is not null) union (select `t`.`assessment_id` AS `assessment_id`,'task_completion' AS `feedback_table`,`tc`.`id` AS `feedback_id`,`tc`.`student_id` AS `student_id`,'instructor' AS `review_route`,`tc`.`completion_date` AS `published_at` from (`task_completion` `tc` join `task` `t` on(`tc`.`task_id` = `t`.`id`)) where `tc`.`deleted_at` is null and `tc`.`completion_date` is not null and `tc`.`completion_status` = 3) union (select `la`.`assessment_id` AS `assessment_id`,'lti_assessment_score' AS `feedback_table`,`sc`.`id` AS `feedback_id`,`sc`.`student_id` AS `student_id`,'instructor' AS `review_route`,`sc`.`created_at` AS `published_at` from (`lti_assessment_score` `sc` join `lti_assessment` `la` on(`sc`.`lti_assessment_id` = `la`.`id`)) where `sc`.`deleted_at` is null and `sc`.`is_feedback` = 1) union (select `reporting`.`assessment_id` AS `assessment_id`,'reporting_feedback' AS `feedback_table`,`reporting_feedback`.`id` AS `feedback_id`,`reporting_feedback`.`learner_id` AS `student_id`,'instructor' AS `review_route`,`reporting_feedback`.`published_at` AS `published_at` from (`reporting_feedback` join `reporting` on(`reporting_feedback`.`reporting_id` = `reporting`.`id`)) where `reporting_feedback`.`deleted_at` is null) order by `assessment_id`,`student_id` */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -8729,10 +8882,10 @@ CREATE TABLE `wikiRevision` (
 /*!50001 SET @saved_col_connection     = @@collation_connection */;
 /*!50001 SET character_set_client      = utf8mb4 */;
 /*!50001 SET character_set_results     = utf8mb4 */;
-/*!50001 SET collation_connection      = utf8mb4_unicode_ci */;
+/*!50001 SET collation_connection      = utf8mb4_uca1400_ai_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`schoolboxdocker`@`%` SQL SECURITY DEFINER */
-/*!50001 VIEW `v_most_recent_feedback` AS select `sb`.`assessment_id` AS `assessment_id`,'submission_return' AS `feedback_table`,max(`sr1`.`id`) AS `feedback_id`,`sr1`.`owner` AS `student_id`,`sr1`.`review_route` AS `review_route`,`sr1`.`published_at` AS `published_at` from ((`submission_return` `sr1` join (select `submission_return`.`box_id` AS `box_id`,`submission_return`.`owner` AS `owner`,`submission_return`.`review_route` AS `review_route`,max(`submission_return`.`published_at`) AS `max_published_at` from `submission_return` where `submission_return`.`deleted_at` is null and `submission_return`.`published_at` is not null group by `submission_return`.`box_id`,`submission_return`.`owner`,`submission_return`.`review_route`) `t1` on(`t1`.`box_id` = `sr1`.`box_id` and `t1`.`owner` = `sr1`.`owner` and `t1`.`review_route` = `sr1`.`review_route` and `sr1`.`published_at` = `t1`.`max_published_at`)) join `submission_box` `sb` on(`sr1`.`box_id` = `sb`.`id`)) group by `sb`.`assessment_id`,`sr1`.`owner`,`sr1`.`review_route` union select `a`.`assessment_id` AS `assessment_id`,'assess_attempt' AS `feedback_table`,max(`aa1`.`attempt_id`) AS `feedback_id`,`aa1`.`user_id` AS `student_id`,'instructor' AS `review_route`,`aa1`.`reviewed_at` AS `published_at` from ((`assess_attempt` `aa1` join (select `assess_attempt`.`assess_id` AS `assess_id`,`assess_attempt`.`user_id` AS `user_id`,max(`assess_attempt`.`reviewed_at`) AS `max_reviewed_at` from `assess_attempt` where `assess_attempt`.`reviewed_at` is not null and `assess_attempt`.`deleted_at` is null group by `assess_attempt`.`assess_id`,`assess_attempt`.`user_id`) `t1` on(`t1`.`assess_id` = `aa1`.`assess_id` and `t1`.`user_id` = `aa1`.`user_id` and `aa1`.`reviewed_at` = `t1`.`max_reviewed_at`)) join `assess` `a` on(`aa1`.`assess_id` = `a`.`assess_id`)) group by `a`.`assessment_id`,`aa1`.`user_id` union select `t`.`assessment_id` AS `assessment_id`,'task_completion' AS `feedback_table`,max(`tc`.`id`) AS `feedback_id`,`tc`.`student_id` AS `student_id`,'instructor' AS `review_route`,`tc`.`completion_date` AS `published_at` from ((`task_completion` `tc` join (select `task_completion`.`task_id` AS `task_id`,`task_completion`.`student_id` AS `student_id`,max(`task_completion`.`completion_date`) AS `max_completion_date` from `task_completion` where `task_completion`.`completion_status` = 3 and `task_completion`.`deleted_at` is null group by `task_completion`.`task_id`,`task_completion`.`student_id`) `t1` on(`tc`.`task_id` = `t1`.`task_id` and `tc`.`student_id` = `t1`.`student_id` and `tc`.`completion_date` = `t1`.`max_completion_date`)) join `task` `t` on(`t`.`id` = `tc`.`task_id`)) group by `t`.`assessment_id`,`tc`.`student_id` union select `la`.`assessment_id` AS `assessment_id`,'lti_assessment_score' AS `feedback_table`,max(`las`.`id`) AS `feedback_id`,`las`.`student_id` AS `student_id`,'instructor' AS `review_route`,`las`.`created_at` AS `published_at` from ((`lti_assessment_score` `las` join (select `lti_assessment_score`.`lti_assessment_id` AS `lti_assessment_id`,`lti_assessment_score`.`student_id` AS `student_id`,max(`lti_assessment_score`.`created_at`) AS `max_created_at` from `lti_assessment_score` where `lti_assessment_score`.`deleted_at` is null and `lti_assessment_score`.`is_feedback` = 1) `t1` on(`las`.`lti_assessment_id` = `t1`.`lti_assessment_id` and `las`.`student_id` = `t1`.`student_id` and `las`.`created_at` = `t1`.`max_created_at`)) join `lti_assessment` `la` on(`las`.`lti_assessment_id` = `la`.`id`)) group by `la`.`assessment_id`,`las`.`student_id` */;
+/*!50001 VIEW `v_most_recent_feedback` AS select `sb`.`assessment_id` AS `assessment_id`,'submission_return' AS `feedback_table`,max(`sr1`.`id`) AS `feedback_id`,`sr1`.`owner` AS `student_id`,`sr1`.`review_route` AS `review_route`,`sr1`.`published_at` AS `published_at` from ((`submission_return` `sr1` join (select `submission_return`.`box_id` AS `box_id`,`submission_return`.`owner` AS `owner`,`submission_return`.`review_route` AS `review_route`,max(`submission_return`.`published_at`) AS `max_published_at` from `submission_return` where `submission_return`.`deleted_at` is null and `submission_return`.`published_at` is not null group by `submission_return`.`box_id`,`submission_return`.`owner`,`submission_return`.`review_route`) `t1` on(`t1`.`box_id` = `sr1`.`box_id` and `t1`.`owner` = `sr1`.`owner` and `t1`.`review_route` = `sr1`.`review_route` and `sr1`.`published_at` = `t1`.`max_published_at`)) join `submission_box` `sb` on(`sr1`.`box_id` = `sb`.`id`)) group by `sb`.`assessment_id`,`sr1`.`owner`,`sr1`.`review_route` union select `a`.`assessment_id` AS `assessment_id`,'assess_attempt' AS `feedback_table`,max(`aa1`.`attempt_id`) AS `feedback_id`,`aa1`.`user_id` AS `student_id`,'instructor' AS `review_route`,`aa1`.`reviewed_at` AS `published_at` from ((`assess_attempt` `aa1` join (select `assess_attempt`.`assess_id` AS `assess_id`,`assess_attempt`.`user_id` AS `user_id`,max(`assess_attempt`.`reviewed_at`) AS `max_reviewed_at` from `assess_attempt` where `assess_attempt`.`reviewed_at` is not null and `assess_attempt`.`deleted_at` is null group by `assess_attempt`.`assess_id`,`assess_attempt`.`user_id`) `t1` on(`t1`.`assess_id` = `aa1`.`assess_id` and `t1`.`user_id` = `aa1`.`user_id` and `aa1`.`reviewed_at` = `t1`.`max_reviewed_at`)) join `assess` `a` on(`aa1`.`assess_id` = `a`.`assess_id`)) group by `a`.`assessment_id`,`aa1`.`user_id` union select `t`.`assessment_id` AS `assessment_id`,'task_completion' AS `feedback_table`,max(`tc`.`id`) AS `feedback_id`,`tc`.`student_id` AS `student_id`,'instructor' AS `review_route`,`tc`.`completion_date` AS `published_at` from ((`task_completion` `tc` join (select `task_completion`.`task_id` AS `task_id`,`task_completion`.`student_id` AS `student_id`,max(`task_completion`.`completion_date`) AS `max_completion_date` from `task_completion` where `task_completion`.`completion_status` = 3 and `task_completion`.`deleted_at` is null group by `task_completion`.`task_id`,`task_completion`.`student_id`) `t1` on(`tc`.`task_id` = `t1`.`task_id` and `tc`.`student_id` = `t1`.`student_id` and `tc`.`completion_date` = `t1`.`max_completion_date`)) join `task` `t` on(`t`.`id` = `tc`.`task_id`)) group by `t`.`assessment_id`,`tc`.`student_id` union select `la`.`assessment_id` AS `assessment_id`,'lti_assessment_score' AS `feedback_table`,max(`las`.`id`) AS `feedback_id`,`las`.`student_id` AS `student_id`,'instructor' AS `review_route`,`las`.`created_at` AS `published_at` from ((`lti_assessment_score` `las` join (select `lti_assessment_score`.`lti_assessment_id` AS `lti_assessment_id`,`lti_assessment_score`.`student_id` AS `student_id`,max(`lti_assessment_score`.`created_at`) AS `max_created_at` from `lti_assessment_score` where `lti_assessment_score`.`deleted_at` is null and `lti_assessment_score`.`is_feedback` = 1) `t1` on(`las`.`lti_assessment_id` = `t1`.`lti_assessment_id` and `las`.`student_id` = `t1`.`student_id` and `las`.`created_at` = `t1`.`max_created_at`)) join `lti_assessment` `la` on(`las`.`lti_assessment_id` = `la`.`id`)) group by `la`.`assessment_id`,`las`.`student_id` union select `reporting`.`assessment_id` AS `assessment_id`,'reporting_feedback' AS `feedback_table`,max(`reporting_feedback`.`id`) AS `feedback_id`,`reporting_feedback`.`learner_id` AS `student_id`,'instructor' AS `review_route`,`reporting_feedback`.`published_at` AS `published_at` from ((`reporting_feedback` join (select `reporting_feedback`.`reporting_id` AS `reporting_id`,`reporting_feedback`.`learner_id` AS `student_id`,max(`reporting_feedback`.`published_at`) AS `max_published_at` from `reporting_feedback` where `reporting_feedback`.`deleted_at` is null group by `reporting_feedback`.`reporting_id`,`reporting_feedback`.`learner_id`) `t1` on(`reporting_feedback`.`reporting_id` = `t1`.`reporting_id` and `reporting_feedback`.`learner_id` = `t1`.`student_id` and `reporting_feedback`.`created_at` = `t1`.`max_published_at`)) join `reporting` on(`reporting_feedback`.`reporting_id` = `reporting`.`id`)) group by `reporting`.`assessment_id`,`reporting_feedback`.`learner_id` */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -8854,4 +9007,4 @@ CREATE TABLE `wikiRevision` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2026-03-24  5:06:43
+-- Dump completed on 2026-04-15  4:21:34
