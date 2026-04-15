@@ -14,7 +14,7 @@
            title="{{ tab.title }}"
            {% if tab.target is not empty %}target="{{ tab.target }}"{% endif %}
         >
-            <sbx-icon name="{{ tab.icon }}" color="var(--sbx-config-color-menu-secondary, var(--navigation-foreground))" size="1.30rem"></sbx-icon>
+            <sbx-icon name="{{ tab.icon }}" color="var(--sbx-color-foreground-primary, var(--body-foreground))" size="1.30rem"></sbx-icon>
             <span>{{ tab.text }}</span>
         </a>
     </li>
