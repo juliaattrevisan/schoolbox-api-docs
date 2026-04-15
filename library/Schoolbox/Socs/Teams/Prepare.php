@@ -55,15 +55,14 @@ class Prepare implements IStrategy
         }
 
         $seasonId = (int)$season->getId();
-        $db = $this->teamMapper->getDatabase();
 
         // Mark teams whose divisions belong to the SOCS Fixtures season as
         // "stale" until they are re-saved by the current import run.
-        $sql = "UPDATE sportsfixtures_team t
+        $sql = "UPDATE {$this->teamMapper->getTable()} t
             INNER JOIN sportsfixtures_division d ON t.division_id = d.id
             SET t.updated_at = '0000-00-00 00:00:00'
             WHERE d.season_id = {$seasonId}";
-        $db->query($sql);
+        $this->teamMapper->getDatabase()->query($sql);
 
         $this->log->info('Marked existing SOCS teams attached to the SOCS Fixtures season as stale.');
     }

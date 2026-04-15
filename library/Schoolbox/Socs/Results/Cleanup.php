@@ -39,12 +39,10 @@ class Cleanup implements IStrategy
         if ($this->perform) {
             $this->lock->refresh();
 
-            $db = $this->resultMapper->getDatabase();
-
             // Soft-delete results that were not touched during this import
             // run. Any results that were re-imported will have an updated
             // timestamp and are preserved.
-            $db->query("UPDATE sportsfixtures_result SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $this->resultMapper->getDatabase()->query("UPDATE {$this->resultMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
         }
 
         $this->log->info('Soft-deleting fixtures results that did not appear in the SOCS results import.');

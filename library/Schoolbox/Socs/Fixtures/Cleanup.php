@@ -5,7 +5,13 @@ declare(strict_types=1);
 namespace Schoolbox\Socs\Fixtures;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
+use Schoolbox\Fixtures\School\Mapper as SchoolMapper;
+use Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
+use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
+use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
+use Schoolbox\Fixtures\Venue\Mapper as VenueMapper;
 use Schoolbox\Socs\IStrategy;
 use Symfony\Component\Lock\LockInterface;
 
@@ -23,7 +29,13 @@ class Cleanup implements IStrategy
         private LoggerInterface $log,
         private bool $perform,
         private LockInterface $lock,
-        private MatchupMapper $matchupMapper
+        private MatchupMapper $matchupMapper,
+        private SportMapper $sportMapper,
+        private SeasonMapper $seasonMapper,
+        private DivisionMapper $divisionMapper,
+        private TeamMapper $teamMapper,
+        private VenueMapper $venueMapper,
+        private SchoolMapper $schoolMapper
     ) {
     }
 
@@ -39,19 +51,17 @@ class Cleanup implements IStrategy
         if ($this->perform) {
             $this->lock->refresh();
 
-            $db = $this->matchupMapper->getDatabase();
-
             // Soft-delete SOCS matchups that were not touched during this
             // import run. Their related results are removed via mapper
             // callbacks when the matchup is soft-deleted.
-            $db->query("UPDATE sportsfixtures_match SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $this->matchupMapper->getDatabase()->query("UPDATE {$this->matchupMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
             // Soft-delete sports that were not touched during this import run.
-            $db->query("UPDATE sportsfixtures_sport SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
-            $db->query("UPDATE sportsfixtures_season SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
-            $db->query("UPDATE sportsfixtures_division SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
-            $db->query("UPDATE sportsfixtures_team SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
-            $db->query("UPDATE sportsfixtures_venue SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
-            $db->query("UPDATE sportsfixtures_school SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $this->sportMapper->getDatabase()->query("UPDATE {$this->sportMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $this->seasonMapper->getDatabase()->query("UPDATE {$this->seasonMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $this->divisionMapper->getDatabase()->query("UPDATE {$this->divisionMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $this->teamMapper->getDatabase()->query("UPDATE {$this->teamMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $this->venueMapper->getDatabase()->query("UPDATE {$this->venueMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $this->schoolMapper->getDatabase()->query("UPDATE {$this->schoolMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
         }
 
         $this->log->info('Soft-deleting SOCS matchups that did not appear in the import.');
