@@ -270,6 +270,9 @@ class Controller extends Base
         $instructorScheme = $assessment->getInstructorMarkScheme();
         $learnerScheme = $assessment->getMarkScheme();
 
+        $normalisedMark = null;
+        $learnerHumanReadableMark = null;
+
         /* This human readable mark is given by the instructor, from which we derive the normalised mark
          */
         $instructorHumanReadableMark = $post['mark'] ?? '';
