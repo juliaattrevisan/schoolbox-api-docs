@@ -13,19 +13,20 @@ use Predis\ClientInterface;
 use Predis\Collection\Iterator\Keyspace;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Oidc\CacheHelper;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
 /**
- * CLI tool for migrating access tokens which may have somehow been stored with
+ * CLI tool for migrating refresh tokens which may have somehow been stored with
  * the disallowed : part separator.
  *
- * Only access tokens are migrated, as other token types don't last long enough
+ * Only refresh tokens are migrated, as other token types don't last long enough
  * to be worth migrating.
  */
 $app = new class extends CliTool\App {
     // Old and new key prefixes
-    private const string KEY_PREFIX = 'oidcServer.' . INSTANCE_ID . ':accessToken';
+    private const string KEY_PREFIX = 'oidcServer.' . INSTANCE_ID . ':' . CacheHelper::REFRESH_TOKEN_KEY;
     private const string OLD_KEY_PREFIX = self::KEY_PREFIX . self::OLD_PART_SEPARATOR;
     private const string NEW_KEY_PREFIX = self::KEY_PREFIX . self::NEW_PART_SEPARATOR;
     private const string OLD_PART_SEPARATOR = ':';
@@ -41,7 +42,7 @@ $app = new class extends CliTool\App {
         $logger = $this->getLogger();
         $logger->info(
             sprintf(
-                'Migrating access tokens in old key prefix "%s" to new prefix "%s"',
+                'Migrating refresh tokens in old key prefix "%s" to new prefix "%s"',
                 self::OLD_KEY_PREFIX,
                 self::NEW_KEY_PREFIX,
             ),
@@ -65,23 +66,23 @@ $app = new class extends CliTool\App {
             $newKey = str_replace(self::OLD_KEY_PREFIX, self::NEW_KEY_PREFIX, $key);
             switch ($ttl) {
                 case -2:
-                    $logger->debug(sprintf('Access token "%s" has expired: not migrating', $key));
+                    $logger->debug(sprintf('Refresh token "%s" has expired: not migrating', $key));
                     break;
 
                 case -1:
                     $keysMigrated[$key] = $newKey;
-                    $logger->debug(sprintf('Migrating access token "%s" to "%s" without expiry', $key, $newKey));
+                    $logger->debug(sprintf('Migrating refresh token "%s" to "%s" without expiry', $key, $newKey));
                     $redisClient->set($newKey, $val);
                     break;
 
                 default:
                     $keysMigrated[$key] = $newKey;
-                    $logger->debug(sprintf('Migrating access token "%s" to "%s" with expiry %d', $key, $newKey, $ttl));
+                    $logger->debug(sprintf('Migrating refresh token "%s" to "%s" with expiry %d', $key, $newKey, $ttl));
                     $redisClient->setex($newKey, $ttl, $val);
                     break;
             }
         }
-        $logger->info(sprintf('Migration finished: %d keys migrated', count($keysMigrated)));
+        $logger->info(sprintf('Migration finished: %d refresh tokens migrated', count($keysMigrated)));
     }
 
     /* allow to be run as any user */
