@@ -121,7 +121,9 @@ async function onDelete(): Promise<void> {
             </p>
 
             <textarea v-model="rejectReason" name="rejectionReason"></textarea>
-            <button type="submit" @click="onReject"><sbx-icon name="surveys"></sbx-icon>Request update</button>
+            <button type="submit" class="sbx-button--has-icon" @click="onReject">
+                <sbx-icon name="surveys"></sbx-icon>Request update
+            </button>
         </template>
 
         <template v-else-if="crmStore.modalType === CohortReportModalType.CONFIRM_DELETE">

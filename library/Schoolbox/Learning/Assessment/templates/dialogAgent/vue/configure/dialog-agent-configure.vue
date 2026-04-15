@@ -139,10 +139,14 @@ window.Vue.onMounted(async () => {
         </nav>
         <ul id="header-options" class="f-dropdown" data-dropdown-content aria-hidden="true">
             <li v-if="modifyRoute">
-                <a :href="modifyRoute"><sbx-icon name="modify"></sbx-icon> Modify Settings </a>
+                <a :href="modifyRoute" class="sbx-button--has-icon"
+                    ><sbx-icon name="modify"></sbx-icon> Modify Settings
+                </a>
             </li>
             <li>
-                <button @click="isPromptModalOpen = true"><sbx-icon name="ai"></sbx-icon>View Agent Prompt</button>
+                <button @click="isPromptModalOpen = true" class="sbx-button--has-icon">
+                    <sbx-icon name="ai"></sbx-icon>View Agent Prompt
+                </button>
             </li>
         </ul>
     </div>

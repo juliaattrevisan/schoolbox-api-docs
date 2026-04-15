@@ -95,7 +95,7 @@ function updateTopNavItems() {
                 </li>
                 <li>
                     <button
-                        class="button-show-notifications"
+                        class="button-show-notifications sbx-button--has-icon"
                         :data-unread="unreadNotifications"
                         aria-label="Show Notifications"
                         aria-expanded="false"

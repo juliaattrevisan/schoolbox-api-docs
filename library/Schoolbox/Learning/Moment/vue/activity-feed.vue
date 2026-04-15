@@ -753,6 +753,7 @@ window.Vue.onMounted(async () => {
                                                 <a
                                                     v-if="item.object._links.modifyForm"
                                                     :href="getReturnUrl(item.object._links.modifyForm)"
+                                                    class="sbx-button--has-icon"
                                                     title="Modify"
                                                     :data-test="`learning-moment-popout-option-modify-${item.object.id}`"
                                                 >
@@ -762,6 +763,7 @@ window.Vue.onMounted(async () => {
                                             <li>
                                                 <a
                                                     v-if="item.object._links.delete"
+                                                    class="sbx-button--has-icon"
                                                     title="Delete"
                                                     :data-test="`learning-moment-delete-${item.object.id}`"
                                                     @click.prevent="showDeleteModal(item)"

@@ -37,7 +37,7 @@ Usage:
                     data-moment-type="video"
                     data-record-video-button
                     href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=video{% endif %}"
-                    class="share-video"
+                    class="share-video sbx-button--has-icon"
                     data-test="learning-moment-evidence-share-video"
                     title="Record a video"
                 >
@@ -48,7 +48,7 @@ Usage:
                     data-moment-type="audio"
                     data-record-audio-button
                     href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=audio{% endif %}"
-                    class="share-audio"
+                    class="share-audio sbx-button--has-icon"
                     data-test="learning-moment-evidence-share-audio"
                     title="Record audio"
                 >
@@ -59,7 +59,7 @@ Usage:
                     data-action="shareLearningMoment"
                     data-moment-type="upload"
                     href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=upload{% endif %}"
-                    class="share-file"
+                    class="share-file sbx-button--has-icon"
                     data-test="learning-moment-evidence-share-file"
                     title="Upload file"
                 >
@@ -69,7 +69,7 @@ Usage:
                     data-action="shareLearningMoment"
                     data-moment-type="text"
                     href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=text{% endif %}"
-                    class="share-text"
+                    class="share-text sbx-button--has-icon"
                     data-test="learning-moment-evidence-share-text"
                     title="Write something"
                 >
@@ -139,7 +139,7 @@ Usage:
                     </ul>
 
                     <ul class="flex-list buttons l-mar-m--top">
-                        <li><a class="button" data-moment-share-submit disabled><sbx-icon name="share"></sbx-icon>Share Learning Moment</a></li>
+                        <li><a class="button sbx-button--has-icon" data-moment-share-submit disabled><sbx-icon name="share"></sbx-icon>Share Learning Moment</a></li>
                     </ul>
                 {% else %}
                     <div class="empty-state">

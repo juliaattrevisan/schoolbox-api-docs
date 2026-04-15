@@ -70,6 +70,7 @@ function onPrintSelected(): void {
         <li v-if="props.routes.importIntoClasses">
             <a
                 :data-test="`up-header-${props.course.id}-import-link`"
+                class="sbx-button--has-icon"
                 :href="getReturnUrl(props.routes.importIntoClasses!)"
                 ><sbx-icon name="import"></sbx-icon>Import into {{ locale.class.translate(true, true) }}</a
             >

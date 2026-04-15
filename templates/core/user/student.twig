@@ -520,7 +520,7 @@
                                         </nav>
                                         <ul class="f-dropdown" data-dropdown-content id="email-teachers-{{ groupIdentifier }}">
                                             <li>
-                                                <a id="email-all-{{ groupIdentifier }}" href="#" title="Email all {{ group }} teachers"><sbx-icon name="email"></sbx-icon>Email all {{ group }} teachers</a>
+                                                <a id="email-all-{{ groupIdentifier }}" href="#" title="Email all {{ group }} teachers" class="sbx-button--has-icon"><sbx-icon name="email"></sbx-icon>Email all {{ group }} teachers</a>
                                             </li>
                                         </ul>
                                         <form id="email-all-form-{{ groupIdentifier }}" action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" method="post">
@@ -629,7 +629,7 @@
                                                             {% if not teacher.email is empty %}
                                                                 <li>
                                                                     {% set replyTo = teacher.getFormattedEmailDisplay %}
-                                                                    <a href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}"><sbx-icon name="email"></sbx-icon>Email {{ teacher.formatName }}</a>
+                                                                    <a href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}" class="sbx-button--has-icon"><sbx-icon name="email"></sbx-icon>Email {{ teacher.formatName }}</a>
                                                                 </li>
                                                             {% endif %}
                                                         {% endfor %}
@@ -727,7 +727,7 @@
                                                         {% if not owner.email is empty %}
                                                             <li>
                                                                 {% set replyTo = owner.getFormattedEmailDisplay %}
-                                                                <a href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}"><sbx-icon name="email"></sbx-icon>Email {{ owner.formatName }}</a>
+                                                                <a href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}" class="sbx-button--has-icon"><sbx-icon name="email"></sbx-icon>Email {{ owner.formatName }}</a>
                                                             </li>
                                                         {% endif %}
                                                     {% endfor %}

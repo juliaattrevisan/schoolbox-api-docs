@@ -32,21 +32,21 @@
                 <sbx-pop-out content-id="class-options{{ class.id }}"></sbx-pop-out>
             </nav>
             <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
-                <li><a href="{{ routeLookup('learning.getClassListPage', {folderId: class.id, folder: class}) }}"><sbx-icon name="class-list"></sbx-icon>Class List</a></li>
+                <li><a href="{{ routeLookup('learning.getClassListPage', {folderId: class.id, folder: class}) }}" class="sbx-button--has-icon"><sbx-icon name="class-list"></sbx-icon>Class List</a></li>
                 {% set classMarkbookRoute = routeLookupIfAuthorized(
                     'learningMarkbook.getMarkbookForClassAndTerm',
                     {folder: class, folderId: class.id, term: term, termCode: term.code})
                 %}
-                {% if classMarkbookRoute %}<li><a href="{{ classMarkbookRoute }}"><sbx-icon name="curriculum"></sbx-icon>Class Markbook</a></li>{% endif %}
+                {% if classMarkbookRoute %}<li><a href="{{ classMarkbookRoute }}" class="sbx-button--has-icon"><sbx-icon name="curriculum"></sbx-icon>Class Markbook</a></li>{% endif %}
                 {% set rubricMarkbookRoute = routeLookupIfAuthorized('rubricMarkbook.getMarkbook', {folder: class, folderId: class.id}) %}
-                {% if rubricMarkbookRoute %}<li><a href="{{ rubricMarkbookRoute }}"><sbx-icon name="curriculum"></sbx-icon>Rubric Markbook</a></li>{% endif %}
+                {% if rubricMarkbookRoute %}<li><a href="{{ rubricMarkbookRoute }}" class="sbx-button--has-icon"><sbx-icon name="curriculum"></sbx-icon>Rubric Markbook</a></li>{% endif %}
                 {% set cohortReportRoute = routeLookupIfAuthorized('learningMomentEvidence.getCohortReport', {folder: class, folderId: class.id}) %}
-                {% if cohortReportRoute %}<li><a href="{{ cohortReportRoute }}"><sbx-icon name="share"></sbx-icon>Cohort Learning Moments</a></li>{% endif %}
+                {% if cohortReportRoute %}<li><a href="{{ cohortReportRoute }}" class="sbx-button--has-icon"><sbx-icon name="share"></sbx-icon>Cohort Learning Moments</a></li>{% endif %}
                 {% set badgeAwardRoute = routeLookupIfAuthorized('learningBadgeAward.getListPage', {folder: class, folderId: class.id}) %}
-                {% if badgeAwardRoute %}<li><a href="{{ badgeAwardRoute }}"><sbx-icon name="achievement"></sbx-icon>Badge Report</a></li>{% endif %}
+                {% if badgeAwardRoute %}<li><a href="{{ badgeAwardRoute }}" class="sbx-button--has-icon"><sbx-icon name="achievement"></sbx-icon>Badge Report</a></li>{% endif %}
                 {% set classPastoralRoute = routeLookupIfAuthorized('pastoralClassReportModule.getReport', {folder: class, folderId: class.id}) %}
-                {% if classPastoralRoute %}<li><a href="{{ classPastoralRoute }}"><sbx-icon name="pastoral"></sbx-icon>{{ locale.pastoralCare.proper }} Report</a></li>{% endif %}
-                <li><a href="{{ routeLookup('folder.getFolderModify', {id: class.id}) }}"><sbx-icon name="modify"></sbx-icon>Modify</a></li>
+                {% if classPastoralRoute %}<li><a href="{{ classPastoralRoute }}" class="sbx-button--has-icon"><sbx-icon name="pastoral"></sbx-icon>{{ locale.pastoralCare.proper }} Report</a></li>{% endif %}
+                <li><a href="{{ routeLookup('folder.getFolderModify', {id: class.id}) }}" class="sbx-button--has-icon"><sbx-icon name="modify"></sbx-icon>Modify</a></li>
                 {% set routes = {} %}
                 {% set intellischoolRoute = routeLookupIfAuthorized('intellischool.getClassAnalytics', {folderId: class.id}) %}
                 {% if courses | length %}
@@ -62,10 +62,10 @@
                 {% if routes or intellischoolRoute %}
                     <li class="separator">Analytics</li>
                     {% for route in routes %}
-                        <li><a href="{{ route.url }}"><sbx-icon name="poll"></sbx-icon>{{ route.title }}</a></li>
+                        <li><a href="{{ route.url }}" class="sbx-button--has-icon"><sbx-icon name="poll"></sbx-icon>{{ route.title }}</a></li>
                     {% endfor %}
                     {% if intellischoolRoute %}
-                        <li><a href="{{ intellischoolRoute }}"><sbx-icon name="intellischool"></sbx-icon>Intellischool Analytics</a></li>
+                        <li><a href="{{ intellischoolRoute }}" class="sbx-button--has-icon"><sbx-icon name="intellischool"></sbx-icon>Intellischool Analytics</a></li>
                     {% endif %}
                 {% endif %}
 
@@ -81,7 +81,7 @@
                 <sbx-pop-out content-id="class-options{{ class.id }}"></sbx-pop-out>
             </nav>
             <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
-                <li><a href="{{ gradesRoute }}"> <sbx-icon name="approve"></sbx-icon> {{ locale.grades.properPlural }}</a></li>
+                <li><a href="{{ gradesRoute }}" class="sbx-button--has-icon"> <sbx-icon name="approve"></sbx-icon> {{ locale.grades.properPlural }}</a></li>
             </ul>
         {% endif %}
         {% endblock %}

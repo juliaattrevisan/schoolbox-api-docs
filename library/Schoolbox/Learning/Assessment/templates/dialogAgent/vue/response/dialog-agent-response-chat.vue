@@ -313,7 +313,7 @@ window.Vue.watch(
         </button>
         <nav>
             <button
-                class="button submit"
+                class="button submit sbx-button--has-icon"
                 type="submit"
                 data-test="dialog-agent-response-submit"
                 @click="openSubmitModal"

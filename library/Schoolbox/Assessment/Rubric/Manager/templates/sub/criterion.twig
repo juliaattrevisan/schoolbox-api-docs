@@ -97,9 +97,10 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
     <ul id="dropdown-i{{ criterionId }}" class="f-dropdown" data-dropdown-content="">
         {% if criterionUsageCount > 0 %}
             <li>
-                <a
-                   data-reveal-id="criterion-{{ criterion.id }}"
-                   href="#"><sbx-icon name="info"></sbx-icon>Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}</a>
+                     <a
+                         data-reveal-id="criterion-{{ criterion.id }}"
+                         href="#"
+                         class="sbx-button--has-icon"><sbx-icon name="info"></sbx-icon>Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}</a>
             </li>
         {% endif %}
         <li>

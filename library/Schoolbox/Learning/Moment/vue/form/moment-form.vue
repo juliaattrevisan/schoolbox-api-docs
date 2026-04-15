@@ -91,7 +91,11 @@ window.Vue.onMounted(() => {
             </nav>
             <ul id="mf-pop-out" class="f-dropdown" data-dropdown-content>
                 <li>
-                    <a :href="mfStore.moment._links.delete" @click.prevent="() => mfStore.deleteMoment()">
+                    <a
+                        :href="mfStore.moment._links.delete"
+                        class="sbx-button--has-icon"
+                        @click.prevent="() => mfStore.deleteMoment()"
+                    >
                         <sbx-icon name="delete"></sbx-icon>
                         Delete
                     </a>

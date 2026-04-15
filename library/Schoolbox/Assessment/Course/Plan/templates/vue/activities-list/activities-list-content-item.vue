@@ -155,6 +155,7 @@ window.Vue.onUnmounted(() => {
                 <li v-if="props.activity._links.export">
                     <a
                         :href="getReturnUrl(props.activity._links.export)"
+                        class="sbx-button--has-icon"
                         title="Copy this task into classes"
                         :data-test="`unit-planner-export-activity-${props.activity.id}`"
                         ><sbx-icon name="export"></sbx-icon>Export to Classes</a
@@ -163,6 +164,7 @@ window.Vue.onUnmounted(() => {
                 <li v-if="props.activity._links.modify">
                     <a
                         :href="getReturnUrl(props.activity._links.modify)"
+                        class="sbx-button--has-icon"
                         :data-test="`unit-planner-modify-activity-${props.activity.id}`"
                         ><sbx-icon name="modify"></sbx-icon
                         >{{
@@ -186,6 +188,7 @@ window.Vue.onUnmounted(() => {
                 <li v-if="props.activity._links.delete">
                     <a
                         :data-test="`unit-planner-delete-activity-${props.activity.id}`"
+                        class="sbx-button--has-icon"
                         @click.prevent="activitiesListDeleteModalStore.prompt(props.activity, () => emit('deleted'))"
                         ><sbx-icon name="delete"></sbx-icon>Delete</a
                     >

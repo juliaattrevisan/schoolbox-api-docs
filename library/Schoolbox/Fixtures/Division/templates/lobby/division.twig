@@ -40,6 +40,7 @@
                                 <li>
                                     {% if currentTeam.team in playerData.teams %}
                                                      <a href="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: currentTeam.team.id}) }}"
+                                                         class="sbx-button--has-icon"
                                                          data-remove-team-player="{{ playerData.player.id }}"
                                                          data-affected-team="{{ currentTeam.team.id }}"><sbx-icon name="close"></sbx-icon>Remove Player from {{ currentTeam.team.name }}</a>
                                     {% else %}

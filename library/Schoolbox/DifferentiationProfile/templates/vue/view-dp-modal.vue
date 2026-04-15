@@ -125,7 +125,7 @@ function onClose(): void {
                     <a
                         v-if="props.customisationsRoute"
                         :href="`${props.customisationsRoute}`"
-                        class="button l-flex l-gap-s"
+                        class="button l-flex l-gap-s sbx-button--has-icon"
                     >
                         <sbx-icon name="group"></sbx-icon>
                         View Customisations

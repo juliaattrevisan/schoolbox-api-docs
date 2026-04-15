@@ -247,6 +247,7 @@ export default {
                                                 <li>
                                                     <a
                                                         @click.prevent="openAchievementWithdrawModal(award)"
+                                                        class="sbx-button--has-icon"
                                                         title="Withdraw achievement"
                                                         ><sbx-icon name="withdraw-achievement"></sbx-icon>Withdraw
                                                         achievement</a
@@ -258,11 +259,15 @@ export default {
                                                     <a
                                                         @click.prevent="awardAchievement(award)"
                                                         title="Award achievement"
+                                                        class="sbx-button--has-icon"
                                                         ><sbx-icon name="showcase"></sbx-icon>Award achievement</a
                                                     >
                                                 </li>
                                                 <li>
-                                                    <a @click.prevent="openGoalWithdrawModal(award)" title="Remove goal"
+                                                    <a
+                                                        @click.prevent="openGoalWithdrawModal(award)"
+                                                        title="Remove goal"
+                                                        class="sbx-button--has-icon"
                                                         ><sbx-icon name="close"></sbx-icon>Remove goal</a
                                                     >
                                                 </li>

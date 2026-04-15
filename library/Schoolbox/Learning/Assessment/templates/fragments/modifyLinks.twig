@@ -28,6 +28,7 @@
         <a
             data-test="{{ dataTestPrefix }}modify-{{ assessment.id }}"
             href="{{ modifyRoute }}{{ returnUrlParam }}"
+            class="sbx-button--has-icon"
             ><sbx-icon name="modify"></sbx-icon>Modify
             {# Since Quiz/Dialog Agents have an extra button, distinguish what this "Modify" means #}
             {% if assessment is quiz or assessment is dialogAgent %}
@@ -48,6 +49,7 @@
             <a
                 data-test="{{ dataTestPrefix }}modify-contents-{{ assessment.id }}"
                 href="{{ modifyContentsRoute }}{{ returnUrlParam }}"
+                class="sbx-button--has-icon"
             ><sbx-icon name="modify"></sbx-icon>Modify Contents</a>
         </li>
     {% endif %}
@@ -60,6 +62,7 @@
             <a
                 data-test="{{ dataTestPrefix }}configure-agent-{{ assessment.id }}"
                 href="{{ configureAgentRoute }}{{ returnUrlParam }}"
+                class="sbx-button--has-icon"
             ><sbx-icon name="modify"></sbx-icon>Configure Agent</a>
         </li>
     {% endif %}

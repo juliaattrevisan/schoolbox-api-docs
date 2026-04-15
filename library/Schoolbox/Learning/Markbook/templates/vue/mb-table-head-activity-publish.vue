@@ -180,7 +180,9 @@ async function onPublishAll(): Promise<void> {
 </script>
 
 <template>
-    <button @click.prevent="openPublishModal"><sbx-icon name="approve"></sbx-icon> Publish Grades & Feedback</button>
+    <button class="sbx-button--has-icon" @click.prevent="openPublishModal">
+        <sbx-icon name="approve"></sbx-icon> Publish Grades & Feedback
+    </button>
 
     <basic-modal v-if="isPublishModalOpen" v-model:is-open="isPublishModalOpen" has-background-click>
         <h2>Publish Drafts</h2>

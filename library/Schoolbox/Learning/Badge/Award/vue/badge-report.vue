@@ -266,7 +266,7 @@ export default {
             </h3>
             <button @click.prevent="onClearStudentSelection" class="button-clear">Clear selection</button>
             <div class="l-flex-row l-gap-s">
-                <a :href="getUrl('goal')" title="Set goal" class="button l-flex__item--1"
+                <a :href="getUrl('goal')" title="Set goal" class="button l-flex__item--1 sbx-button--has-icon"
                     ><sbx-icon name="goal"></sbx-icon>Set goal</a
                 >
                 <a

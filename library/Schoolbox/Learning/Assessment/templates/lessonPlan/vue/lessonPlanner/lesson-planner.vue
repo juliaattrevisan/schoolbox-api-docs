@@ -41,7 +41,7 @@ window.Vue.onMounted(() => {
                 <button
                     v-if="sbProps.aiFeatures.lessonplan?.enabled"
                     type="button"
-                    class="button expand"
+                    class="button expand sbx-button--has-icon"
                     @click="() => lpStore.openModal()"
                 >
                     <sbx-icon name="ai"></sbx-icon>

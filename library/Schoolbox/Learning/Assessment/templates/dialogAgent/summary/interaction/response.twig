@@ -86,13 +86,14 @@
                                 <a
                                     href="{{ setAuthoritativeRoute }}"
                                     data-set-authoritative="{{ setAuthoritativeRoute}}"
+                                    class="sbx-button--has-icon"
                                 ><sbx-icon name="match"></sbx-icon>Set as Authoritative Response</a>
                             </li>
                         {% endif %}
 
                         {% if deleteRoute %}
                             <li><a href="{{ viewRoute }}"
-                                   class="sbx-icon-only-button no-text"
+                                class="sbx-button--has-icon"
                                    title="Delete response"
                                    data-delete="{{ deleteRoute }}"
                                    aria-label="Delete response">

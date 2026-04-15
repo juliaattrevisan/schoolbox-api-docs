@@ -27,7 +27,7 @@
 {% block headerOptionsMiddle %}
     {% set rescoreRoute = routeLookupIfAuthorized('learnosity.postRescoreAttempts', {assessment: assessment, assessmentId: assessment.id}) %}
     {% if rescoreRoute and not isSpecification %}
-        <li><a href="{{ rescoreRoute }}" data-rescore><sbx-icon name="quiz"></sbx-icon>Rescore all attempts</a></li>
+        <li><a href="{{ rescoreRoute }}" data-rescore class="sbx-button--has-icon"><sbx-icon name="quiz"></sbx-icon>Rescore all attempts</a></li>
 
         <script>
             $(function() {
@@ -67,10 +67,10 @@
 {% block headerOptions %}
     {% if not isSpecification %}
         <li>
-            <a href="{{ routeLookup('learnosity.getHorizontalMarking', { assessmentId: assessment.id }) }}"><sbx-icon name="class-list"></sbx-icon>Review horizontally</a>
+            <a href="{{ routeLookup('learnosity.getHorizontalMarking', { assessmentId: assessment.id }) }}" class="sbx-button--has-icon"><sbx-icon name="class-list"></sbx-icon>Review horizontally</a>
         </li>
         <li>
-            <a data-download="attempts" href="{{ routeLookup('learnosity.getExportAttempts', { assessmentId: assessment.id }) }}"><sbx-icon name="download"></sbx-icon>Download All</a>
+            <a data-download="attempts" href="{{ routeLookup('learnosity.getExportAttempts', { assessmentId: assessment.id }) }}" class="sbx-button--has-icon"><sbx-icon name="download"></sbx-icon>Download All</a>
         </li>
         <li class="separator">Bulk Actions</li>
         <li>

@@ -146,7 +146,7 @@
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
         {% if item.id and isRouteAuthorized('resourceItem.delete:post', {id: item.id, item: item}) %}
-        <li><a id="resource-delete" title="Delete" data-action="{{ routeLookup('resourceItem.delete:post', {id: item.id}) }}"><sbx-icon name="delete"></sbx-icon>Delete</a></li>
+        <li><a id="resource-delete" title="Delete" data-action="{{ routeLookup('resourceItem.delete:post', {id: item.id}) }}" class="sbx-button--has-icon"><sbx-icon name="delete"></sbx-icon>Delete</a></li>
         {% endif %}
     </ul>
 </div>

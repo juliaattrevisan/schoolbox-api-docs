@@ -78,8 +78,8 @@
             <sbx-pop-out content-id="project-options{{ assessment.id }}"></sbx-pop-out>
         </nav>
         <ul data-dropdown-content class="f-dropdown" id="project-options{{ assessment.id }}">
-            {% if statusRoute %}<li><a href="{{ statusRoute }}"><sbx-icon name="progress"></sbx-icon>View Status</a></li>{% endif %}
-            {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}"><sbx-icon name="modify"></sbx-icon>Modify</a></li>{% endif %}
+            {% if statusRoute %}<li><a href="{{ statusRoute }}" class="sbx-button--has-icon"><sbx-icon name="progress"></sbx-icon>View Status</a></li>{% endif %}
+            {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="sbx-button--has-icon"><sbx-icon name="modify"></sbx-icon>Modify</a></li>{% endif %}
         </ul>
     {% endif %}
 </div>

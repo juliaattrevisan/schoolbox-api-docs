@@ -81,7 +81,7 @@ function onAddToDescription(): void {
             sbProps.aiFeatures.learningactivitycustomisation?.enabled &&
             props.participant._links.differentiationProfile
         "
-        class="button f-no-margins"
+        class="button f-no-margins sbx-button--has-icon"
         type="button"
         @click.prevent="onViewSuggestedCustomisation"
     >

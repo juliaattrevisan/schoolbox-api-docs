@@ -74,7 +74,7 @@ function clearSelection(): void {
             </template>
             <template v-else>
                 <button
-                    class="button l-flex__item--1-auto"
+                    class="button l-flex__item--1-auto sbx-button--has-icon"
                     @click.prevent="
                         handleActionSelected(
                             selectedList,
@@ -86,7 +86,7 @@ function clearSelection(): void {
                     Modify Existing {{ locale.activity.translate(false, true) }}
                 </button>
                 <button
-                    class="button l-flex__item--1-auto"
+                    class="button l-flex__item--1-auto sbx-button--has-icon"
                     @click.prevent="handleActionSelected(selectedList, 'exclude')"
                 >
                     <sbx-icon name="staff-students"></sbx-icon>
@@ -94,7 +94,7 @@ function clearSelection(): void {
                 </button>
                 <button
                     v-if="props.customisations.length > 0"
-                    class="button l-flex__item--1-auto"
+                    class="button l-flex__item--1-auto sbx-button--has-icon"
                     @click.prevent="handleOpenIncludeInExistingModal"
                 >
                     <sbx-icon name="list"></sbx-icon>
@@ -102,7 +102,7 @@ function clearSelection(): void {
                 </button>
                 <button
                     v-if="props.routes.getAssessmentParticipationCopyActivity"
-                    class="button l-flex__item--1-auto"
+                    class="button l-flex__item--1-auto sbx-button--has-icon"
                     data-test="custom-participation-copy-activity"
                     @click.prevent="
                         handleActionSelected(
@@ -115,7 +115,7 @@ function clearSelection(): void {
                     Create Copy of {{ locale.activity.translate(false, true) }}
                 </button>
                 <button
-                    class="button l-flex__item--1-auto"
+                    class="button l-flex__item--1-auto sbx-button--has-icon"
                     @click.prevent="
                         handleActionSelected(
                             selectedList,

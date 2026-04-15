@@ -79,7 +79,7 @@ function onGenerateSelected(): void {
             </a>
             <button
                 v-if="sbProps.aiFeatures.differentiation?.enabled && headerStore.hasEnabledTextFields"
-                class="button f-no-margins"
+                class="button f-no-margins sbx-button--has-icon"
                 @click="onGenerateSelected"
             >
                 <sbx-icon name="ai"></sbx-icon>

@@ -47,7 +47,7 @@ Usage:
 <<<<<<< HEAD
             <li><a href="{{ routeLookup('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" class="icon-export" title="Copy this task into classes" data-test="builder-export-activity-{{ assessment.id }}">Export to Classes</a></li>
 =======
-            <li><a href="{{ routeLookup('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" title="Copy this task into classes"><sbx-icon name="export"></sbx-icon>Export to Classes</a></li>
+            <li><a href="{{ routeLookup('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" class="sbx-button--has-icon" title="Copy this task into classes"><sbx-icon name="export"></sbx-icon>Export to Classes</a></li>
 >>>>>>> 93efbc4388a (Replace legacy icon-export links/buttons with sbx-icon[SA-22181])
 
             {% include '@learningAssessment/fragments/modifyLinks.twig' with {
@@ -57,7 +57,7 @@ Usage:
                 returnUrl: RETURN_URL.current,
             } only %}
 
-            <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" data-action="delete-assessment" data-test="builder-delete-activity-{{ assessment.id }}"><sbx-icon name="delete"></sbx-icon>Delete</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" data-action="delete-assessment" data-test="builder-delete-activity-{{ assessment.id }}" class="sbx-button--has-icon"><sbx-icon name="delete"></sbx-icon>Delete</a></li>
         </ul>
         <div data-reveal class="reveal-modal" id="export-modal-{{ assessment.id }}"></div>
     </div>

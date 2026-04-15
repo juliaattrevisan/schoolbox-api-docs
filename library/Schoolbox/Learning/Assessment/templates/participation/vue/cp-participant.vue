@@ -139,7 +139,7 @@ function onOpenIncludeInExistingModal(): void {
         <td v-if="canSuggestCustomisation">
             <button
                 v-if="props.participant._links.differentiationProfile"
-                class="button f-no-margins"
+                class="button f-no-margins sbx-button--has-icon"
                 type="button"
                 @click.prevent="onViewSuggestedCustomisation"
             >
@@ -188,6 +188,7 @@ function onOpenIncludeInExistingModal(): void {
                         <li class="separator">Manage</li>
                         <li>
                             <button
+                                class="sbx-button--has-icon"
                                 @click.prevent="
                                     onActionSelected(
                                         `${props.routes.getLearningPlanNewUrl}?student=${props.participant.user.id}&${getReturnUrl()}`,
@@ -199,13 +200,17 @@ function onOpenIncludeInExistingModal(): void {
                             </button>
                         </li>
                         <li>
-                            <button @click.prevent="onActionSelected('exclude')">
+                            <button class="sbx-button--has-icon" @click.prevent="onActionSelected('exclude')">
                                 <sbx-icon name="staff-students"></sbx-icon>
                                 Exclude Student
                             </button>
                         </li>
                         <li>
-                            <button v-if="customisations.length > 0" @click.prevent="onOpenIncludeInExistingModal">
+                            <button
+                                v-if="customisations.length > 0"
+                                class="sbx-button--has-icon"
+                                @click.prevent="onOpenIncludeInExistingModal"
+                            >
                                 <sbx-icon name="list"></sbx-icon>
                                 Include in Existing Customisation
                             </button>
@@ -213,6 +218,7 @@ function onOpenIncludeInExistingModal(): void {
                         <li class="separator">Create</li>
                         <li v-if="props.routes.getAssessmentParticipationCopyActivity">
                             <button
+                                class="sbx-button--has-icon"
                                 @click.prevent="
                                     onActionSelected(
                                         `${props.routes.getAssessmentParticipationCopyActivity}?student=${props.participant.user.id}&original=${props.assessmentId}&${getReturnUrl()}`,
@@ -225,6 +231,7 @@ function onOpenIncludeInExistingModal(): void {
                         </li>
                         <li>
                             <button
+                                class="sbx-button--has-icon"
                                 @click.prevent="
                                     onActionSelected(
                                         `${props.routes.getAssessmentParticipationNewActivity}?student=${props.participant.user.id}&original=${props.assessmentId}&${getReturnUrl()}`,

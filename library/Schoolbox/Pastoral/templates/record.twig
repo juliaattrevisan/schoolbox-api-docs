@@ -85,7 +85,7 @@
                 <li class="separator">Students With Related Records</li>
                 {% for student in linkedStudents %}
                     <li>
-                        <a href="{{ routeLookup('pastoral.getStudent', {studentId: student.student_id}) }}"><sbx-icon name="user"></sbx-icon>
+                        <a href="{{ routeLookup('pastoral.getStudent', {studentId: student.student_id}) }}" class="sbx-button--has-icon"><sbx-icon name="user"></sbx-icon>
                             {{ student.first_name }} {{ student.last_name }} ({{ student.count }})
                         </a>
                     </li>

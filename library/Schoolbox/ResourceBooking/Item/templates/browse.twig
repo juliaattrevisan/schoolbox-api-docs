@@ -14,21 +14,21 @@
     </nav>
     <ul class="f-dropdown" data-dropdown-content id="options">
         <li>
-            <a data-reveal-id="search-modal" title="Search Resources"><sbx-icon name="search"></sbx-icon>Search Resources</a>
+            <a data-reveal-id="search-modal" title="Search Resources" class="sbx-button--has-icon"><sbx-icon name="search"></sbx-icon>Search Resources</a>
         </li>
         {% if isRouteAuthorized('resourceCategory.browse') %}
             <li>
-                <a href="{{  routeLookup('resourceCategory.browse') }}" title="Resource Categories"><sbx-icon name="list"></sbx-icon>Resource Categories</a>
+                <a href="{{  routeLookup('resourceCategory.browse') }}" title="Resource Categories" class="sbx-button--has-icon"><sbx-icon name="list"></sbx-icon>Resource Categories</a>
             </li>
         {% endif %}
         {% if isRouteAuthorized('resourceBookingReport.index') %}
             <li>
-                <a href="{{  routeLookup('resourceBookingReport.index') }}" title="Booking Report"><sbx-icon name="report"></sbx-icon>Booking Report</a>
+                <a href="{{  routeLookup('resourceBookingReport.index') }}" title="Booking Report" class="sbx-button--has-icon"><sbx-icon name="report"></sbx-icon>Booking Report</a>
             </li>
         {% endif %}
         {% if categoryId %}
         <li>
-            <a href="{{  routeLookup('resourceCategory.read', {id: categoryId}) }}" title="Availability Calendar"><sbx-icon name="calendar"></sbx-icon>Availability Calendar</a>
+            <a href="{{  routeLookup('resourceCategory.read', {id: categoryId}) }}" title="Availability Calendar" class="sbx-button--has-icon"><sbx-icon name="calendar"></sbx-icon>Availability Calendar</a>
         </li>
         {% endif %}
         {% if isRouteAuthorized('resourceItem.add') %}

@@ -40,12 +40,12 @@
                     <ul id="google-file-{{ loop.index }}" class="f-dropdown" data-dropdown-content>
                            <li><a data-action="delete"
                                href="{{ routeLookupIfAuthorized('googleFile.deleteGoogleFile', {googleFileId: googleFile.id, googleFile: googleFile}) }}"
-                               title="Remove"><sbx-icon name="delete"></sbx-icon>Remove</a>
+                               title="Remove" class="sbx-button--has-icon"><sbx-icon name="delete"></sbx-icon>Remove</a>
                         </li>
                         <li><a data-action="permission"
                                data-id="{{ googleFile.googleId }}" data-edit-level="{{ googleFile.editLevel }}"
                                data-comment-level="{{ googleFile.commentLevel }}"
-                               title="Change permissions"><sbx-icon name="group"></sbx-icon>Change permissions</a></li>
+                               title="Change permissions" class="sbx-button--has-icon"><sbx-icon name="group"></sbx-icon>Change permissions</a></li>
                     </ul>
                 {% endif %}
             </li>

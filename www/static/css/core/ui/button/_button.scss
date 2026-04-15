@@ -387,6 +387,9 @@ button.submit {
     align-items: center;
     gap: var(--spacing-s);
 }
+.button.sbx-button--has-icon {
+    justify-content: center;
+}
 
 .sbx-button--has-icon sbx-icon {
     flex: 0 0 auto;

@@ -392,6 +392,7 @@ export default {
                                     <li>
                                         <a
                                             @click.prevent="openAwardAsAchievementModal(badge)"
+                                            class="sbx-button--has-icon"
                                             title="Award achievement"
                                         >
                                             <sbx-icon name="achievement"></sbx-icon>
@@ -399,7 +400,11 @@ export default {
                                         </a>
                                     </li>
                                     <li v-if="badge.allowAsGoal">
-                                        <a @click.prevent="openSetAsGoalModal(badge)" title="Set goal">
+                                        <a
+                                            @click.prevent="openSetAsGoalModal(badge)"
+                                            class="sbx-button--has-icon"
+                                            title="Set goal"
+                                        >
                                             <sbx-icon name="goal"></sbx-icon>
                                             Set goal
                                         </a>
@@ -407,6 +412,7 @@ export default {
                                     <li>
                                         <a
                                             @click.prevent="openAchievementWithdrawModal(badge)"
+                                            class="sbx-button--has-icon"
                                             title="Withdraw achievement"
                                         >
                                             <sbx-icon name="withdraw-achievement"></sbx-icon>
@@ -424,13 +430,13 @@ export default {
                                         </a>
                                     </li>
                                     <li>
-                                        <a :href="badge._links.update" title="Modify">
+                                        <a :href="badge._links.update" class="sbx-button--has-icon" title="Modify">
                                             <sbx-icon name="modify"></sbx-icon>
                                             Modify
                                         </a>
                                     </li>
                                     <li>
-                                        <a @click.prevent="openDeleteModal(badge)"
+                                        <a @click.prevent="openDeleteModal(badge)" class="sbx-button--has-icon"
                                             ><sbx-icon name="delete"></sbx-icon>Delete</a
                                         >
                                     </li>

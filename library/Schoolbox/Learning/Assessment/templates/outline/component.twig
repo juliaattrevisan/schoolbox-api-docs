@@ -59,13 +59,13 @@
 <section>
 {% if filterList and not readOnly%}
     <p class="component-titlebar meta">
-            <a title="View / Edit filter" data-action="filtered"><sbx-icon name="filter"></sbx-icon>This is being filtered</a>
+            <a title="View / Edit filter" data-action="filtered" class="sbx-button--has-icon"><sbx-icon name="filter"></sbx-icon>This is being filtered</a>
     </p>
 {% endif %}
     {% if (courseImplementation.units ?? [])|length %}
         <p class="component-titlebar meta">
             {% if courseSpecification.folder.id in accessibleFolderIds %}
-                <a href="{{ '/homepage/' ~ courseSpecification.folder.id }}" title="Visit course page"><sbx-icon name="course"></sbx-icon>{{ courseSpecification.title }}</a>
+                <a href="{{ '/homepage/' ~ courseSpecification.folder.id }}" title="Visit course page" class="sbx-button--has-icon"><sbx-icon name="course"></sbx-icon>{{ courseSpecification.title }}</a>
             {% else %}
                 <a class="icon-course">{{ courseSpecification.title }}</a>
             {% endif %}

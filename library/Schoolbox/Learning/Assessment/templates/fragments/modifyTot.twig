@@ -22,13 +22,13 @@
     </nav>
     <ul data-dropdown-content id="header-options" class="f-dropdown">
         {% if gradeRoute %}
-        <li><a href="{{ gradeRoute }}"><sbx-icon name="task"></sbx-icon>View and {{ locale.grades }} submission</a></li>
+        <li><a href="{{ gradeRoute }}" class="sbx-button--has-icon"><sbx-icon name="task"></sbx-icon>View and {{ locale.grades }} submission</a></li>
         {% endif %}
 
         {# if we are on course level, we should hide the status page
          #}
         {% if assessment.isImplementation and  viewRoute %}
-            <li><a href="{{ viewRoute }}"><sbx-icon name="progress"></sbx-icon>View Status</a></li>
+            <li><a href="{{ viewRoute }}" class="sbx-button--has-icon"><sbx-icon name="progress"></sbx-icon>View Status</a></li>
         {% endif %}
 
         {# Students must have ePortfolio enabled, otherwise they can't do this
@@ -41,9 +41,9 @@
                  #}
                 {% if isShowcased %}
                     {% if USER.id == student.id %}
-                        <a data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='0' title="Remove from ePortfolio"><sbx-icon name="showcase"></sbx-icon>Remove from ePortfolio</a>
+                        <a data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='0' title="Remove from ePortfolio" class="sbx-button--has-icon"><sbx-icon name="showcase"></sbx-icon>Remove from ePortfolio</a>
                     {% else %}
-                        <a data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='0' title="Remove from {{ student.givenName }}'s ePortfolio"><sbx-icon name="showcase"></sbx-icon>Remove from {{ student.givenName }}'s ePortfolio</a>
+                        <a data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='0' title="Remove from {{ student.givenName }}'s ePortfolio" class="sbx-button--has-icon"><sbx-icon name="showcase"></sbx-icon>Remove from {{ student.givenName }}'s ePortfolio</a>
                     {% endif %}
                 {# Allow publish only if the assessment has responses or feedback
                  #}
@@ -52,9 +52,9 @@
                      # or if you're publishing on behalf of a student to *their* eportfolio
                      #}
                     {% if USER.id == student.id %}
-                        <a data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='1' title="Publish to ePortfolio"><sbx-icon name="showcase"></sbx-icon>Publish to ePortfolio</a>
+                        <a data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='1' title="Publish to ePortfolio" class="sbx-button--has-icon"><sbx-icon name="showcase"></sbx-icon>Publish to ePortfolio</a>
                     {% else %}
-                        <a data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='1' title="Publish to {{ student.givenName }}'s ePortfolio"><sbx-icon name="showcase"></sbx-icon>Publish to {{ student.givenName }}'s ePortfolio</a>
+                        <a data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='1' title="Publish to {{ student.givenName }}'s ePortfolio" class="sbx-button--has-icon"><sbx-icon name="showcase"></sbx-icon>Publish to {{ student.givenName }}'s ePortfolio</a>
                     {% endif %}
                 {% endif %}
             </li>
@@ -88,7 +88,7 @@
             assessment: assessment
         }) %}
         {% if viewCustomParticipationRoute %}
-            <li><a href="{{ viewCustomParticipationRoute }}"><sbx-icon name="group"></sbx-icon>Student Participation</a></li>
+            <li><a href="{{ viewCustomParticipationRoute }}" class="sbx-button--has-icon"><sbx-icon name="group"></sbx-icon>Student Participation</a></li>
         {% endif %}
 
         {% include '@learningAssessment/fragments/modifyLinks.twig' with {
@@ -105,7 +105,7 @@
         {% if assessment is lessonPlan and hasStudentView is defined and hasStudentView %}
             {% if assessment.visibility == 'student' %}
                 <li class="separator" data-has-student-view-separator>You are in Teacher View</li>
-                <li><a data-has-student-view="staff"><sbx-icon data-has-student-view-icon name="staff-students"></sbx-icon><span data-has-student-view-label>Switch to Student View</span></a></li>
+                <li><a data-has-student-view="staff" class="sbx-button--has-icon"><sbx-icon data-has-student-view-icon name="staff-students"></sbx-icon><span data-has-student-view-label>Switch to Student View</span></a></li>
 
                 <script>
                     $(function() {

@@ -610,23 +610,30 @@ export default {
                         <a
                             @click.prevent="openShareLearningMomentDialog"
                             :class="{
+                                'sbx-button--has-icon': true,
                                 disabled: selectedStudentLearningMomentsEnabledIds.length === 0,
                             }"
                             ><sbx-icon name="share"></sbx-icon>Share Learning Moment</a
                         >
                     </li>
                     <li v-if="badgesEnabled">
-                        <a :href="buildSetGoalUrl()" :class="{ disabled: selectedStudentIds.length === 0 }"
+                        <a
+                            :href="buildSetGoalUrl()"
+                            :class="{ 'sbx-button--has-icon': true, disabled: selectedStudentIds.length === 0 }"
                             ><sbx-icon name="goal"></sbx-icon>Set Goals</a
                         >
                     </li>
                     <li v-if="badgesEnabled">
-                        <a :href="buildAwardAchievementUrl()" :class="{ disabled: selectedStudentIds.length === 0 }"
+                        <a
+                            :href="buildAwardAchievementUrl()"
+                            :class="{ 'sbx-button--has-icon': true, disabled: selectedStudentIds.length === 0 }"
                             ><sbx-icon name="achievement"></sbx-icon>Award Achievements</a
                         >
                     </li>
                     <li v-if="pastoralEnabled">
-                        <a @click.prevent="addPastoralRecord" :class="{ disabled: selectedStudentIds.length === 0 }"
+                        <a
+                            @click.prevent="addPastoralRecord"
+                            :class="{ 'sbx-button--has-icon': true, disabled: selectedStudentIds.length === 0 }"
                             ><sbx-icon name="user"></sbx-icon>Add {{ pastoralCareLabel }} Record</a
                         >
                     </li>
@@ -634,6 +641,7 @@ export default {
                         <a
                             @click.prevent="openMailDialog"
                             :class="{ disabled: selectedStudentExternalIds.length === 0 }"
+                            class="sbx-button--has-icon"
                             ><sbx-icon name="email"></sbx-icon>Compose Email</a
                         >
                     </li>

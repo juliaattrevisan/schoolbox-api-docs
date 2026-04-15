@@ -19,14 +19,14 @@
     <ul data-dropdown-content class="f-dropdown" id="component{{ componentInstance.id }}-options-task{{ assessment.id }}">
         {% if hasAssessmentRoutes %}
             <li class="separator">{{ locale.translate('activity', false, true) }}</li>
-            {% if statusRoute %}<li><a href="{{ statusRoute }}" data-test="course-outline-view-status-{{ assessment.id }}"><sbx-icon name="progress"></sbx-icon>View Status</a></li>{% endif %}
+            {% if statusRoute %}<li><a href="{{ statusRoute }}" data-test="course-outline-view-status-{{ assessment.id }}" class="sbx-button--has-icon"><sbx-icon name="progress"></sbx-icon>View Status</a></li>{% endif %}
             {% if assessment is dueWork %}
                 {% set viewGradeRoute = routeLookupIfAuthorized('learningDueWorkResponse.getFirstParticipantResponse', {
                     assessmentId: assessment.id,
                     assessment: assessment,
                 }) %}
                 {% if viewGradeRoute %}
-                    <li><a data-test="course-outline-view-grade-submissions-{{ assessment.id }}" href="{{ viewGradeRoute }}"><sbx-icon name="task"></sbx-icon>View and {{ locale.grades }} submissions</a></li>
+                    <li><a data-test="course-outline-view-grade-submissions-{{ assessment.id }}" href="{{ viewGradeRoute }}" class="sbx-button--has-icon"><sbx-icon name="task"></sbx-icon>View and {{ locale.grades }} submissions</a></li>
                 {% endif %}
             {% endif %}
             {% if assessment is dialogAgent %}
@@ -35,7 +35,7 @@
                     assessment: assessment,
                 }) %}
                 {% if viewResponseRoute %}
-                    <li><a href="{{ viewResponseRoute }}"><sbx-icon name="task"></sbx-icon>View Responses</a></li>
+                    <li><a href="{{ viewResponseRoute }}" class="sbx-button--has-icon"><sbx-icon name="task"></sbx-icon>View Responses</a></li>
                 {% endif %}
             {% endif %}
             {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
@@ -43,24 +43,24 @@
                 assessment: assessment
             }) %}
             {% if viewCustomParticipationRoute %}
-                <li><a data-test="course-outline-custom-participation-{{ assessment.id }}" href="{{ viewCustomParticipationRoute }}"><sbx-icon name="group"></sbx-icon>Student Participation</a></li>
+                <li><a data-test="course-outline-custom-participation-{{ assessment.id }}" href="{{ viewCustomParticipationRoute }}" class="sbx-button--has-icon"><sbx-icon name="group"></sbx-icon>Student Participation</a></li>
             {% endif %}
             {% if assessment is dueWork and assessment.enableWorksheet and kamiWorksheetRoute %}
                 <li>
-                    <a id="kamiWorksheet" href="{{ kamiWorksheetRoute }}"><sbx-icon name="surveys"></sbx-icon>Class View</a>
+                    <a id="kamiWorksheet" href="{{ kamiWorksheetRoute }}" class="sbx-button--has-icon"><sbx-icon name="surveys"></sbx-icon>Class View</a>
                 </li>
             {% endif %}
-            {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="View Similarity Report" data-test="course-outline-similarity-report-{{ assessment.id }}"><sbx-icon name="due-work"></sbx-icon>Similarity Report</a></li>{% endif %}
+            {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="View Similarity Report" data-test="course-outline-similarity-report-{{ assessment.id }}" class="sbx-button--has-icon"><sbx-icon name="due-work"></sbx-icon>Similarity Report</a></li>{% endif %}
             {%  if assessment is dueWork and assessment.useRubric %}
                 <li>
                     <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessment.id }) }}"
-                       data-test="course-outline-rubric-report-{{ assessment.id }}"><sbx-icon name="criteria"></sbx-icon>Rubric Report</a>
+                       data-test="course-outline-rubric-report-{{ assessment.id }}" class="sbx-button--has-icon"><sbx-icon name="criteria"></sbx-icon>Rubric Report</a>
                 </li>
             {% endif %}
 
             {% if modifyRoute %}
                 {% if assessment is quiz %}
-                    <li><a data-test="course-outline-horizontal-{{ assessment.id }}" href="{{ routeLookup('learnosity.getHorizontalMarking', { assessmentId: assessment.id }) }}"><sbx-icon name="class-list"></sbx-icon>Review horizontally</a></li>
+                    <li><a data-test="course-outline-horizontal-{{ assessment.id }}" href="{{ routeLookup('learnosity.getHorizontalMarking', { assessmentId: assessment.id }) }}" class="sbx-button--has-icon"><sbx-icon name="class-list"></sbx-icon>Review horizontally</a></li>
                 {% endif %}
 
                 {% include '@learningAssessment/fragments/modifyLinks.twig' with {
@@ -73,7 +73,7 @@
             {% endif %}
 
             {% if deleteRoute %}<li><a href="{{ deleteRoute }}"
-                                   class="sbx-icon-only-button no-text"
+                                   class="sbx-button--has-icon"
                                    data-action="delete"
                                    data-test="activity-delete-{{ assessment.id }}"
                                    title="Delete this {{ locale.assessment }}"
@@ -92,7 +92,7 @@
                        data-method="{{ saveToCourseMethod }}"
                        data-spec-assessment-id="{{ specAssessment.id ?? null }}"
                        data-spec-assessment-title="{{ specAssessment.title ?? null }}"
-                    ><sbx-icon name="export"></sbx-icon>Save to Course...</a>
+                       class="sbx-button--has-icon"><sbx-icon name="export"></sbx-icon>Save to Course...</a>
                     {% include '@learningAssessment/outline/saveToCourseModal.twig' with {
                         assessment: assessment,
                         specAssessment: specAssessment ?? null,

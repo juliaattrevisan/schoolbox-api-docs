@@ -331,7 +331,7 @@ window.Vue.watch(
             Take a photo
         </a>
         <a
-            class="share-video"
+            class="share-video sbx-button--has-icon"
             data-test="learning-moment-evidence-share-video"
             :title="canAddEvidence ? 'Record a video' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="(MediaType.VIDEO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
@@ -340,7 +340,7 @@ window.Vue.watch(
             <sbx-icon name="video"></sbx-icon>Record a video
         </a>
         <a
-            class="share-audio"
+            class="share-audio sbx-button--has-icon"
             data-test="learning-moment-evidence-share-audio"
             :title="canAddEvidence ? 'Record audio' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="(MediaType.AUDIO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
@@ -350,7 +350,7 @@ window.Vue.watch(
             Record audio
         </a>
         <a
-            class="share-file"
+            class="share-file sbx-button--has-icon"
             data-test="learning-moment-evidence-share-file"
             :title="canAddEvidence ? 'Upload file' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="MediaType.UPLOAD === mediaType || !canAddEvidence || undefined"
@@ -360,7 +360,7 @@ window.Vue.watch(
         </a>
         <a
             v-if="!(showDescriptionEditor || MediaType.TEXT === mediaType)"
-            class="share-text"
+            class="share-text sbx-button--has-icon"
             data-test="learning-moment-evidence-share-text"
             title="Write something"
             @click.prevent="changeMediaType(MediaType.TEXT, true)"

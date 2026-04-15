@@ -51,6 +51,7 @@ function onDeleteUnit(): void {
                 <li v-if="props.unit._routes.importIntoClasses">
                     <a
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-import-link`"
+                        class="sbx-button--has-icon"
                         :href="getReturnUrl(props.unit._routes.importIntoClasses!)"
                         ><sbx-icon name="import"></sbx-icon>Import into {{ locale.class.translate(true, true) }}
                     </a>
@@ -58,6 +59,7 @@ function onDeleteUnit(): void {
                 <li v-if="props.unit._routes.modify">
                     <a
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-modify-link`"
+                        class="sbx-button--has-icon"
                         :href="getReturnUrl(props.unit._routes.modify!)"
                         ><sbx-icon name="modify"></sbx-icon>Modify</a
                     >
@@ -67,6 +69,7 @@ function onDeleteUnit(): void {
                     <!-- we ignore this li as the formatting is adding whitespace -->
                     <button
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-delete-button`"
+                        class="sbx-button--has-icon"
                         @click.prevent="onDeleteUnit"
                     ><sbx-icon name="delete"></sbx-icon>Delete
                     </button>

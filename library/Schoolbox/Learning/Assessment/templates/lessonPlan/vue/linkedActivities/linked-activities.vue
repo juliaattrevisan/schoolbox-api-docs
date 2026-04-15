@@ -219,7 +219,7 @@ window.Vue.onMounted(() => {
                 <br />
                 <a
                     href="#"
-                    class="button expand"
+                    class="button expand sbx-button--has-icon"
                     :class="{
                         disabled: store.getAddedActivities().length === 0 && store.getRemovedActivities().length === 0,
                     }"

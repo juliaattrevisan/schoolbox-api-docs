@@ -41,7 +41,7 @@ const isModalDisabled = window.Vue.computed(() => activitiesListDeleteModalStore
             <ul class="flex-list">
                 <li>
                     <button
-                        class="button submit"
+                        class="button submit sbx-button--has-icon"
                         data-test-confirm-delete-activity
                         :disabled="activitiesListDeleteModalStore.isProcessing"
                         @click.prevent="activitiesListDeleteModalStore.confirm()"

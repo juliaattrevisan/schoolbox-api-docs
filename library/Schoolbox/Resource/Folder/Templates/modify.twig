@@ -274,17 +274,17 @@
 
             {# Only show 'Modify Group' in the jelly-tot if we are actually editing a group #}
             {% if folder.isGroup and userAccess == moderate %}
-                <li><a href="{{ routeLookup('group.getModify', {folderId: folder.id, folder: folder}) }}" title="Manage individual user access to this folder"><sbx-icon name="group"></sbx-icon>Manage Group</a></li>
+                <li><a href="{{ routeLookup('group.getModify', {folderId: folder.id, folder: folder}) }}" title="Manage individual user access to this folder" class="sbx-button--has-icon"><sbx-icon name="group"></sbx-icon>Manage Group</a></li>
             {% endif %}
 
-            <li><a class="sbx-icon-only-button no-text"
+            <li><a class="sbx-button--has-icon"
                    data-interaction="delete"
                    title="Delete Folder"
                    aria-label="Delete Folder">
                 <sbx-icon name="delete"></sbx-icon>
                 Delete Folder
             </a></li>
-            <li><a data-reset-homepage-content><sbx-icon name="refresh"></sbx-icon>Reset Content</a>
+            <li><a data-reset-homepage-content class="sbx-button--has-icon"><sbx-icon name="refresh"></sbx-icon>Reset Content</a>
         </ul>
     {% endif %}
 

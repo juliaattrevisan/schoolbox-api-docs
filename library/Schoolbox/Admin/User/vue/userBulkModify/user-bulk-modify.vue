@@ -511,7 +511,7 @@ export default {
                     <button @click.prevent="onModifySelected" class="submit">Modify</button>
                 </li>
                 <li class="one-third">
-                    <button @click.prevent="onDeleteUsersSelected" class="alert button-delete">
+                    <button @click.prevent="onDeleteUsersSelected" class="alert button-delete sbx-button--has-icon">
                         <sbx-icon name="delete"></sbx-icon>
                         Delete Users
                     </button>

@@ -17,6 +17,7 @@
             <li>
                 <a
                     href="{{ modifyRoute }}?returnUrl={{ returnUrl }}"
+                    class="sbx-button--has-icon"
                 ><sbx-icon name="modify"></sbx-icon>Modify Approved Booking</a>
             </li>
         {% endif %}
@@ -27,6 +28,7 @@
         <li>
             <a
                 href="{{ modifyRoute }}?returnUrl={{ returnUrl }}"
+                class="sbx-button--has-icon"
             ><sbx-icon name="modify"></sbx-icon>Modify{% if booking.clash %} Clash{% endif %} Booking</a>
         </li>
     {% endif %}
@@ -35,6 +37,7 @@
         <li>
             <a
                 href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}"
+                class="sbx-button--has-icon"
             ><sbx-icon name="modify"></sbx-icon>Manage Clashes on Calendar</a>
         </li>
     {% endif %}
@@ -47,6 +50,7 @@
                 href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
                 data-series-id="{{ event.booking.event.seriesId }}"
                 data-set-status="approved"
+                class="sbx-button--has-icon"
             ><sbx-icon name="approve"></sbx-icon>Approve</a>
         </li>
     {% elseif booking.clash | length == 1 %}
@@ -54,6 +58,7 @@
             <a
                 href="{{ routeLookup('resourceBooking.clashApprove', {old: booking.clash[0].booking.id, new: event.booking.id}) }}"
                 data-set-status="approved"
+                class="sbx-button--has-icon"
             ><sbx-icon name="approve"></sbx-icon>Approve Clash Booking / Reject Original Booking</a>
         </li>
     {% endif %}

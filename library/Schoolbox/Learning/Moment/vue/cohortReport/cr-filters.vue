@@ -137,7 +137,7 @@ async function applyFilters(): Promise<void> {
                             Clear filters
                         </button>
                         <button
-                            class="button submit l-flex__item--1 f-no-margins"
+                            class="button submit l-flex__item--1 f-no-margins sbx-button--has-icon"
                             data-test="cr-filter-apply-button"
                             @click.prevent="applyFilters"
                         >

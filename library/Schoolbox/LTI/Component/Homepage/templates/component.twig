@@ -132,10 +132,10 @@
             ></iframe>
         {% elseif provider.isTargetWindow %}
             <section class="content">
-                <a id="lti-link{{ componentInstanceId }}"
+                     <a id="lti-link{{ componentInstanceId }}"
                    target="lti-link"
                    href="{{ src }}?context=componentInstance-{{ componentInstanceId }}"
-                   class="button full-width">
+                         class="button full-width sbx-button--has-icon">
                     <sbx-icon name="external-link"></sbx-icon>
                     {% if embedUrl %}Launch embedded tool{% else %}Select content to embed{% endif %}
                 </a>

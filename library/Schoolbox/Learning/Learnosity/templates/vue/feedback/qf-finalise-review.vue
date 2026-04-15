@@ -109,7 +109,7 @@ function onCancelSelected(): void {
 
 <template>
     <button
-        class="button full-width submit"
+        class="button full-width submit sbx-button--has-icon"
         :disabled="!store.isLoaded || store.isProcessing"
         @click.prevent="onSelected"
     >
@@ -124,7 +124,7 @@ function onCancelSelected(): void {
         </p>
         <ul class="flex-list">
             <li>
-                <button class="button submit" @click.prevent="onConfirmSelected">
+                <button class="button submit sbx-button--has-icon" @click.prevent="onConfirmSelected">
                     <sbx-icon name="approve"></sbx-icon>
                     {{ confirmButtonText }}
                 </button>

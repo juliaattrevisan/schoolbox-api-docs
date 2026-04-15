@@ -315,7 +315,7 @@ export default {
                 </div>
                 <button
                     @click.prevent="onGenerateCodesSelected()"
-                    class="button submit options-list__option"
+                    class="button submit options-list__option sbx-button--has-icon"
                     title="Generate codes"
                     :disabled="isGenerateCodesDisabled"
                 >
@@ -324,7 +324,7 @@ export default {
                 </button>
                 <button
                     @click.prevent="onPrintSelected()"
-                    class="button submit options-list__option"
+                    class="button submit options-list__option sbx-button--has-icon"
                     title="Print codes"
                     :disabled="!hasGeneratedCodes"
                 >

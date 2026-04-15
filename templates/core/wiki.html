@@ -46,21 +46,21 @@
 	</div>
 	<nav>
         <!-- BEGIN modify_link -->
-		<a href="/wiki/modify/{WIKI_ID}" title="Modify"><sbx-icon name="modify"></sbx-icon></a>
+		<a href="/wiki/modify/{WIKI_ID}" title="Modify" class="sbx-button--has-icon"><sbx-icon name="modify"></sbx-icon></a>
         <!-- END modify_link -->
         <sbx-pop-out content-id="more-options"></sbx-pop-out>
 	</nav>
 	<ul class="f-dropdown" data-dropdown-content="" id="more-options">
 		<!-- BEGIN lock_link -->
-		<li><a href="/wiki/modifyForm.php?toggleLock={WIKI_ID}"><sbx-icon name="locked"></sbx-icon>Lock</a></li>
+		<li><a href="/wiki/modifyForm.php?toggleLock={WIKI_ID}" class="sbx-button--has-icon"><sbx-icon name="locked"></sbx-icon>Lock</a></li>
 		<!-- END lock_link -->
 		<!-- BEGIN unlock_link -->
 		<li class="separator">This wiki is locked</li>
-		<li><a href="/wiki/modifyForm.php?toggleLock={WIKI_ID}"><sbx-icon name="unlocked"></sbx-icon>Unlock</a></li>
+		<li><a href="/wiki/modifyForm.php?toggleLock={WIKI_ID}" class="sbx-button--has-icon"><sbx-icon name="unlocked"></sbx-icon>Unlock</a></li>
 		<!-- END unlock_link -->
 		<!-- BEGIN delete_link -->
 		<li><a href="/wiki/modifyForm.php?delete={WIKI_ID}"
-			   class="sbx-icon-only-button no-text"
+			   class="sbx-button--has-icon"
 			   data-delete-wiki
 			   title="Delete wiki"
 			   aria-label="Delete wiki">
@@ -69,10 +69,10 @@
 			</a></li>
 		<!-- END delete_link -->
 		<!-- BEGIN revert_link -->
-		<li><a href="/wiki/modifyForm.php?wikiID={WIKI_ID}&revert={CURRENT_REVISION}" data-revert><sbx-icon name="refresh"></sbx-icon>Revert to this revision</a></li>
+		<li><a href="/wiki/modifyForm.php?wikiID={WIKI_ID}&revert={CURRENT_REVISION}" data-revert class="sbx-button--has-icon"><sbx-icon name="refresh"></sbx-icon>Revert to this revision</a></li>
 		<!-- END revert_link -->
 		<!-- BEGIN export_link -->
-		<li><a href="/wiki/exportForm.php?wikiID={WIKI_ID}"><sbx-icon name="download"></sbx-icon>{EXPORT}</a></li>
+		<li><a href="/wiki/exportForm.php?wikiID={WIKI_ID}" class="sbx-button--has-icon"><sbx-icon name="download"></sbx-icon>{EXPORT}</a></li>
 		<!-- END export_link -->
 	</ul>
 </div>

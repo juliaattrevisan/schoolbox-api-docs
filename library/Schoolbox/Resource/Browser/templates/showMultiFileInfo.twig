@@ -7,7 +7,7 @@
         {% if access >= 2 and files|length %}
             {% set fileActionList %}
                 <li>
-                    <a class="sbx-icon-only-button no-text"
+                    <a class="sbx-button--has-icon"
                        data-action="delete"
                        href="/cms/fileForm.php?fileList={{ files|join(',') }}&deleteList=1"
                        title="Delete files"

@@ -81,7 +81,7 @@ Usage:
                 <li>
                     <div class="tiny card small-12">
                         {% if linkToUnits %}
-                    <a title="Visit {{ unit.folder.name }} homepage" href="/homepage/{{ unit.folder.id }}"><sbx-icon name="unit"></sbx-icon>{{ unit.folder.name }}</a>
+                    <a title="Visit {{ unit.folder.name }} homepage" href="/homepage/{{ unit.folder.id }}" class="sbx-button--has-icon"><sbx-icon name="unit"></sbx-icon>{{ unit.folder.name }}</a>
                         {% else %}
                             <div class="icon-unit"></div>{{ unit.folder.name }}
                         {% endif %}

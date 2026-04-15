@@ -14,11 +14,11 @@
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
         <li class="separator">{ASSESS_KIND}</li>
-        <li><a href="{MODIFY_URL}{RETURN_URL_MODIFY}"><sbx-icon name="modify"></sbx-icon>Modify</a></li>
+        <li><a href="{MODIFY_URL}{RETURN_URL_MODIFY}" class="sbx-button--has-icon"><sbx-icon name="modify"></sbx-icon>Modify</a></li>
         <!-- BEGIN view_results_link -->
-        <li><a href="/{ASSESS_KIND_LC}/results/{ASSESS_ASSESS_ID}{RETURN_URL}"><sbx-icon name="poll"></sbx-icon>View Results</a></li>
+        <li><a href="/{ASSESS_KIND_LC}/results/{ASSESS_ASSESS_ID}{RETURN_URL}" class="sbx-button--has-icon"><sbx-icon name="poll"></sbx-icon>View Results</a></li>
         <!-- END view_results_link -->
-        <li><a href="/{ASSESS_KIND_LC}/intro/{ASSESS_ASSESS_ID}"><sbx-icon name="quiz"></sbx-icon>Preview</a></li>
+        <li><a href="/{ASSESS_KIND_LC}/intro/{ASSESS_ASSESS_ID}" class="sbx-button--has-icon"><sbx-icon name="quiz"></sbx-icon>Preview</a></li>
         <!--
             This template is shared by Quiz and Survey.
             Survey will continue to use the old GET delete page.
@@ -26,7 +26,7 @@
          -->
 
         <!-- BEGIN delete_survey -->
-        <li><a class="sbx-icon-only-button no-text"
+        <li><a class="sbx-button--has-icon"
                href="/survey/delete/{ASSESS_ASSESS_ID}{RETURN_URL}"
                data-delete
                title="Delete survey"
@@ -56,7 +56,7 @@
                 });
             });
         </script>
-        <li><a class="sbx-icon-only-button no-text"
+        <li><a class="sbx-button--has-icon"
                href="/learning/assessments/{ASSESSMENT_ID}/delete{RETURN_URL}"
                data-post-delete
                title="Delete quiz"
@@ -66,7 +66,7 @@
         </a></li>
         <!-- END delete_quiz -->
 
-        <li><a href="/{ASSESS_KIND_LC}/export/xml/{ASSESS_ASSESS_ID}"><sbx-icon name="export"></sbx-icon>Export</a></li>
+        <li><a href="/{ASSESS_KIND_LC}/export/xml/{ASSESS_ASSESS_ID}" class="sbx-button--has-icon"><sbx-icon name="export"></sbx-icon>Export</a></li>
         <li class="separator">Section</li>
         <li><a class="sbx-button--has-icon" href="/{ASSESS_KIND_LC}/section/create/{ASSESS_ASSESS_ID}{RETURN_URL}"><sbx-icon name="add"></sbx-icon>Add Section</a></li>
     </ul>

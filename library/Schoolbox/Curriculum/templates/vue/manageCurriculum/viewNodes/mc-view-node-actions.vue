@@ -46,7 +46,7 @@ function onUpdateToggleSelected(): void {
     <a
         v-if="node._links?.getExport && node.children?.length"
         :href="node._links.getExport"
-        class="button-action-option"
+        class="button-action-option sbx-button--has-icon"
         :title="`Export ${props.title}`"
         data-test-export
     >

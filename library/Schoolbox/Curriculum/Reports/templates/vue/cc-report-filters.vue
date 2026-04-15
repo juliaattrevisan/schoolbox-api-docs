@@ -60,7 +60,7 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
         </div>
         <div>
             <a
-                class="l-flex-row l-gap-s f-no-bkg f-no-margins"
+                class="l-flex-row l-gap-s f-no-bkg f-no-margins sbx-button--has-icon"
                 aria-label="Export to CSV"
                 title="Export to CSV"
                 data-test="cc-report-filters-export-button"

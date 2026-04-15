@@ -463,7 +463,7 @@ export default {
                         </div>
                         <div class="status__column">
                             <a
-                                class="button button-status"
+                                class="button button-status sbx-button--has-icon"
                                 :href="props.row.submission._links.inline_grader"
                                 title="Review submission"
                                 ><sbx-icon name="approve"></sbx-icon>Review submission</a
