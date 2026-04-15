@@ -129,10 +129,10 @@ class Controller extends Base
                  */
                 $status = Reporting\Feedback\Status::INCOMPLETE;
 
-                if ($feedback) {
-                    if ($feedback->isDraft()) {
+                if ($authoritativeFeedback) {
+                    if ($authoritativeFeedback->isDraft()) {
                         $status = Reporting\Feedback\Status::DRAFT;
-                    } elseif ($feedback->isPublished()) {
+                    } elseif ($authoritativeFeedback->isPublished()) {
                         $status = Reporting\Feedback\Status::PUBLISHED;
                     }
                 }
@@ -279,7 +279,7 @@ class Controller extends Base
         $feedback
             ->setNormalisedMark($normalisedMark)
             ->setHumanReadableMark($learnerHumanReadableMark)
-            ->setInstructorMark($instructorHumanReadableMark);
+            ->setHumanReadableInstructorMark($instructorHumanReadableMark);
 
         /* This publish=1 param tuple is sent only when Publish And Continue is clicked
          */
@@ -312,7 +312,7 @@ class Controller extends Base
              */
             'normalisedMark'              => $feedback->getNormalisedMark(),
             'humanReadableMark'           => $feedback->getHumanReadableMark(),
-            'humanReadableInstructorMark' => $feedback->getInstructorMark(),
+            'humanReadableInstructorMark' => $feedback->getHumanReadableInstructorMark(),
             'plan' => [
                 'isDynamic' => $plan->getIsDynamic(),
                 'name' => $plan->getName(),

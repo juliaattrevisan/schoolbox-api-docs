@@ -68,7 +68,7 @@ class Model extends AbstractFeedback
     /**
      * @return string|null
      */
-    public function getInstructorMark(): ?string
+    public function getHumanReadableInstructorMark(): ?string
     {
         return $this->instructorMark;
     }
@@ -78,7 +78,7 @@ class Model extends AbstractFeedback
      * @param string|null $instructorMark
      * @return $this
      */
-    public function setInstructorMark(?string $instructorMark): self
+    public function setHumanReadableInstructorMark(?string $instructorMark): self
     {
         $this->instructorMark = $instructorMark;
         return $this;
