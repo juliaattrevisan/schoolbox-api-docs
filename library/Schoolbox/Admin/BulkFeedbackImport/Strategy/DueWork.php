@@ -24,7 +24,7 @@ class DueWork implements IStrategy
     /**
      * A column whose presence decides we'll use this strat
      */
-    public const string DISCRIMINATING_COLUMN = 'normalised mark';
+    public const string DISCRIMINATING_COLUMN = 'Normalised Mark';
 
 
     /**
@@ -118,7 +118,7 @@ class DueWork implements IStrategy
      * @param array $learner
      * @param array $assessmentData
      * @param \Alaress_Date_Format $adf The derived publish date of the feedback
-     * @param mixed $normalisedMark A normalised mark, if present; data type could be anything from a csv
+     * @param mixed $value A normalised mark, if present; data type could be anything from a csv
      * @param mixed $comment A comment, if present; data type could be anything from a csv
      * @param User $creator
      * @return void
@@ -132,7 +132,7 @@ class DueWork implements IStrategy
         array $learner,
         array $assessmentData,
         \Alaress_Date_Format $adf,
-        mixed $normalisedMark,
+        mixed $value,
         mixed $comment,
         \Schoolbox\User $creator
     ): void {
@@ -169,7 +169,7 @@ class DueWork implements IStrategy
         /* Compute human-readable mark from assessment's mark scheme instead
          * It must be between 0 and 100, inclusive
          */
-        $normalisedMark = (float)trim((string)$normalisedMark);
+        $normalisedMark = (float)trim((string)$value);
 
         if ($normalisedMark < 0 || $normalisedMark > 100) {
             $this->log(sprintf(
@@ -251,6 +251,18 @@ class DueWork implements IStrategy
         ), self::INFO);
 
     }
+
+
+    /**
+     * The column in the csv that defines this strat
+     *
+     * @return string
+     */
+    public function getDiscriminatorColumn(): string
+    {
+        return self::DISCRIMINATING_COLUMN;
+    }
+
 
     /**
      * Returns a list of expected columns unique to the due work import template

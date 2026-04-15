@@ -20,6 +20,14 @@ interface IStrategy
 
 
     /**
+     * The column in the csv that defines this strat
+     *
+     * @return string
+     */
+    public function getDiscriminatorColumn(): string;
+
+
+    /**
      * Returns a list of expected columns unique to the due work import template
      *
      * @return array|string[]

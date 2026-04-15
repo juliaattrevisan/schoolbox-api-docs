@@ -16,8 +16,6 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\L10n\Mapper as L10nMapper;
-use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 
@@ -70,6 +68,9 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Resource\Storage\Mapper::class),
             $this->getMapperFactory()->get(SubmissionBoxMapper::class),
             $this->getMapperFactory()->get(ReturnedWorkMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\Reporting\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\DueWork\StateMapper::class),
+            $this->injector->get('feedbackDataSource'),
             $this->injector->get('l10n'),
         );
     }

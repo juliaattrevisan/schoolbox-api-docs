@@ -18,6 +18,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -47,6 +49,9 @@ class Controller extends Base
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
         private SubmissionBoxMapper $submissionBoxMapper,
         private ReturnedWorkMapper $returnedWorkMapper,
+        private \Schoolbox\Learning\Assessment\DataModel\Reporting\Mapper $reportingMapper,
+        private StateMapper $stateMapper,
+        private IFeedbackDataSource $feedbackDataSource,
         protected RosettaStone $rosettaStone,
     ) {
     }
@@ -119,6 +124,9 @@ class Controller extends Base
             $this->folderMapper,
             $this->submissionBoxMapper,
             $this->returnedWorkMapper,
+            $this->reportingMapper,
+            $this->stateMapper,
+            $this->feedbackDataSource,
             $this->rosettaStone,
             trim((string)$this->getConfigLoader()->get('date_local')),
             $settings['assessmentTitle'],
@@ -170,6 +178,9 @@ class Controller extends Base
             $this->folderMapper,
             $this->submissionBoxMapper,
             $this->returnedWorkMapper,
+            $this->reportingMapper,
+            $this->stateMapper,
+            $this->feedbackDataSource,
             $this->rosettaStone,
             trim((string)$this->getConfigLoader()->get('date_local')),
             $settings['assessmentTitle'],

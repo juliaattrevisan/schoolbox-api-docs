@@ -11,12 +11,14 @@ namespace Schoolbox\Admin\BulkFeedbackImport;
 
 use League\Flysystem\FilesystemException;
 use Schoolbox\Admin\BulkFeedbackImport\Strategy\DueWork;
+use Schoolbox\Admin\BulkFeedbackImport\Strategy\Reporting;
 use Schoolbox\Admin\BulkFeedbackImport\Strategy\IStrategy;
 use Schoolbox\Admin\Import\Profile\Reader;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Folder\Mapper;
@@ -80,6 +82,9 @@ class Processor
      * @param Mapper $folderMapper
      * @param SubmissionBoxMapper $submissionBoxMapper
      * @param ReturnedWorkMapper $returnedWorkMapper
+     * @param \Schoolbox\Learning\Assessment\DataModel\Reporting\Mapper $reportingMapper
+     * @param StateMapper $stateMapper
+     * @param IFeedbackDataSource $feedbackDataSource
      * @param RosettaStone $rosettaStone
      * @param string $dateLocal
      * @param string $assessmentTitle
@@ -93,6 +98,9 @@ class Processor
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         private SubmissionBoxMapper $submissionBoxMapper,
         private ReturnedWorkMapper $returnedWorkMapper,
+        private \Schoolbox\Learning\Assessment\DataModel\Reporting\Mapper $reportingMapper,
+        private StateMapper $stateMapper,
+        private IFeedbackDataSource $feedbackDataSource,
         private RosettaStone $rosettaStone,
         private string $dateLocal,
         private string $assessmentTitle,
@@ -114,7 +122,7 @@ class Processor
     {
         $headers = array_map('strtolower', $headerRow);
 
-        if (in_array(DueWork::DISCRIMINATING_COLUMN, $headers)) {
+        if (in_array(strtolower(DueWork::DISCRIMINATING_COLUMN), $headers)) {
             return new DueWork(
                 $this->perform,
                 $this->assessmentMapperProxy,
@@ -125,10 +133,19 @@ class Processor
                 $this->returnedWorkMapper
             );
         }
-//        if (in_array(Reporting::DISCRIMINATING_COLUMN, $headers)) {
-//            return new Reporting(
-//            );
-//        }
+
+        if (in_array(strtolower(Reporting::DISCRIMINATING_COLUMN), $headers)) {
+            return new Reporting(
+                $this->perform,
+                $this->assessmentMapperProxy,
+                $this->rosettaStone,
+                $this->assessmentTitle,
+                $this->userMapper,
+                $this->reportingMapper,
+                $this->stateMapper,
+                $this->feedbackDataSource,
+            );
+        }
 
         throw new \RuntimeException('Unknown feedback importer strategy.');
     }
@@ -328,7 +345,7 @@ class Processor
                     $learner,
                     $assessmentData,
                     $adf,
-                    $row['Normalised Mark'],
+                    $row[$strategy->getDiscriminatorColumn()],
                     $row['Comment'],
                     $creator
                 );
