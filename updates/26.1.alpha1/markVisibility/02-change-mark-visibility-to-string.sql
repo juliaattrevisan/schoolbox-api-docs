@@ -6,11 +6,11 @@ ALTER TABLE `submission_box` CHANGE `mark_visibility` `_mark_visibility` tinyint
 ALTER TABLE `submission_box` ADD COLUMN `mark_visibility` ENUM('staffOnly','staffAndStudent','staffAndParent','staffStudentAndParent') NOT NULL DEFAULT 'staffOnly';
 
 # Populate new column from old values.
+# The old column was not nullable, so in case of bad data we must choose a value.  Chose 'staffOnly' for safety as that is most restrictive.
 UPDATE `submission_box` SET `mark_visibility` = CASE `_mark_visibility`
     WHEN 0 THEN 'staffOnly'
     WHEN 1 THEN 'staffAndStudent'
     WHEN 2 THEN 'staffStudentAndParent'
-    WHEN 3 THEN 'staffAndParent'
     ELSE 'staffOnly'
 END;
 
@@ -23,12 +23,12 @@ ALTER TABLE `project` CHANGE `mark_visibility` `_mark_visibility` int(11) DEFAUL
 ALTER TABLE `project` ADD COLUMN `mark_visibility` ENUM('staffOnly','staffAndStudent','staffAndParent','staffStudentAndParent') DEFAULT 'staffAndStudent';
 
 # Populate new column from old values.
+# The old column was not nullable, so in case of bad data we must choose a value.  Chose 'staffOnly' for safety as that is most restrictive.
 UPDATE `project` SET `mark_visibility` = CASE `_mark_visibility`
     WHEN 0 THEN 'staffOnly'
     WHEN 1 THEN 'staffAndStudent'
     WHEN 2 THEN 'staffStudentAndParent'
-    WHEN 3 THEN 'staffAndParent'
-    ELSE 'staffAndStudent'
+    ELSE 'staffOnly'
 END;
 
 
@@ -40,11 +40,11 @@ ALTER TABLE `reporting` CHANGE `mark_visibility` `_mark_visibility` tinyint(4) D
 ALTER TABLE `reporting` ADD COLUMN `mark_visibility` ENUM('staffOnly','staffAndStudent','staffAndParent','staffStudentAndParent') DEFAULT NULL;
 
 # Populate new column from old values.
+# The old column was nullable, so in case of bad data we leave as null.
 UPDATE `reporting` SET `mark_visibility` = CASE `_mark_visibility`
     WHEN 0 THEN 'staffOnly'
     WHEN 1 THEN 'staffAndStudent'
     WHEN 2 THEN 'staffStudentAndParent'
-    WHEN 3 THEN 'staffAndParent'
     ELSE NULL
 END WHERE `_mark_visibility` IS NOT NULL;
 
@@ -57,12 +57,12 @@ ALTER TABLE `assess` CHANGE `mark_visibility` `_mark_visibility` int(1) DEFAULT 
 ALTER TABLE `assess` ADD COLUMN `mark_visibility` ENUM('staffOnly','staffAndStudent','staffAndParent','staffStudentAndParent') DEFAULT 'staffAndStudent';
 
 # Populate new column from old values.
+# The old column was not nullable, so in case of bad data we must choose a value.  Chose 'staffOnly' for safety as that is most restrictive.
 UPDATE `assess` SET `mark_visibility` = CASE `_mark_visibility`
     WHEN 0 THEN 'staffOnly'
     WHEN 1 THEN 'staffAndStudent'
     WHEN 2 THEN 'staffStudentAndParent'
-    WHEN 3 THEN 'staffAndParent'
-    ELSE 'staffAndStudent'
+    ELSE 'staffOnly'
 END;
 
 
@@ -74,10 +74,10 @@ ALTER TABLE `lti_assessment` CHANGE `mark_visibility` `_mark_visibility` int(11)
 ALTER TABLE `lti_assessment` ADD COLUMN `mark_visibility` ENUM('staffOnly','staffAndStudent','staffAndParent','staffStudentAndParent') DEFAULT NULL;
 
 # Populate new column from old values.
+# The old column was nullable, so in case of bad data we leave as null.
 UPDATE `lti_assessment` SET `mark_visibility` = CASE `_mark_visibility`
     WHEN 0 THEN 'staffOnly'
     WHEN 1 THEN 'staffAndStudent'
     WHEN 2 THEN 'staffStudentAndParent'
-    WHEN 3 THEN 'staffAndParent'
     ELSE NULL
 END WHERE `_mark_visibility` IS NOT NULL;
