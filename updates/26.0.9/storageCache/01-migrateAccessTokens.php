@@ -26,6 +26,8 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $app = new class extends CliTool\App {
     // Old and new key prefixes
     private const string KEY_PREFIX = 'oidcServer.' . INSTANCE_ID . ':accessToken';
+    private const string OLD_KEY_PREFIX = self::KEY_PREFIX . self::OLD_PART_SEPARATOR;
+    private const string NEW_KEY_PREFIX = self::KEY_PREFIX . self::NEW_PART_SEPARATOR;
     private const string OLD_PART_SEPARATOR = ':';
     private const string NEW_PART_SEPARATOR = '.';
 
@@ -36,18 +38,22 @@ $app = new class extends CliTool\App {
      */
     public function run(): void
     {
-        /** @var ClientInterface $redisClient */
-        $redisClient = $this->getDi()->get('redis.storage');
-
         $logger = $this->getLogger();
+        $logger->info(
+            sprintf(
+                'Migrating access tokens in old key prefix "%s" to new prefix "%s"',
+                self::OLD_KEY_PREFIX,
+                self::NEW_KEY_PREFIX,
+            ),
+        );
 
+        /** @var ClientInterface $redisClient */
+        $redisClient  = $this->getDi()->get('redis.storage');
         $keysMigrated = [];
 
         // Find any keys with the old prefix, and migrate them to the new one.
         // This unavoidably requires a full table scan.
-        $oldKeyPrefix = self::KEY_PREFIX . self::OLD_PART_SEPARATOR;
-        $newKeyPrefix = self::KEY_PREFIX . self::NEW_PART_SEPARATOR;
-        $keyspace     = new Keyspace($redisClient, $oldKeyPrefix . '*');
+        $keyspace = new Keyspace($redisClient, self::OLD_KEY_PREFIX . '*');
         foreach ($keyspace as $key) {
             [$val, $ttl] = $redisClient->transaction(
                 function ($tx) use ($key) {
@@ -56,24 +62,21 @@ $app = new class extends CliTool\App {
                 }
             );
 
-            $newKey = str_replace($oldKeyPrefix, $newKeyPrefix, $key);
+            $newKey = str_replace(self::OLD_KEY_PREFIX, self::NEW_KEY_PREFIX, $key);
             switch ($ttl) {
                 case -2:
-                    $logger->debug('Access token has expired: not migrating', ['oldKey' => $key, 'newKey' => $newKey]);
+                    $logger->debug(sprintf('Access token "%s" has expired: not migrating', $key));
                     break;
 
                 case -1:
                     $keysMigrated[$key] = $newKey;
-                    $logger->debug('Migrating access token without expiry', ['oldKey' => $key, 'newKey' => $newKey]);
+                    $logger->debug(sprintf('Migrating access token "%s" to "%s" without expiry', $key, $newKey));
                     $redisClient->set($newKey, $val);
                     break;
 
                 default:
                     $keysMigrated[$key] = $newKey;
-                    $logger->debug(
-                        'Migrating access token with expiry',
-                        ['oldKey' => $key, 'newKey' => $newKey, 'ttl' => $ttl],
-                    );
+                    $logger->debug(sprintf('Migrating access token "%s" to "%s" with expiry %d', $key, $newKey, $ttl));
                     $redisClient->setex($newKey, $ttl, $val);
                     break;
             }
