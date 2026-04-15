@@ -182,14 +182,28 @@ class Controller extends Base
      * @param User $learner
      * @param Reporting\Feedback\Model|null $feedback
      * @return void
+     * @throws \Exception
      */
     public function postParticularFeedback(
         Reporting\Model $assessment,
         \Schoolbox\User $learner,
         ?Reporting\Feedback\Model $feedback = null,
     ): void {
-        // TODO check that $learner is indeed a participant of $assessment
+        /* Check that $learner is indeed a participant of $assessment
+         */
+        $participant = $assessment->getParticipantIfExtant($learner);
 
+        /* Not a participant? Or, you're excluded:
+         * 404, I suppose: you came here directly, or multiplayer schoolbox happened. The participant carousel we built
+         * was meant to omit excluded participants.
+         */
+        if (null === $participant) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+        }
+
+        if ($participant->isExcluded()) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+        }
 
         // TODO Check if $feedback is null; if so, we're spawning a whole new one for this person
 
