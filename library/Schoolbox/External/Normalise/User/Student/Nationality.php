@@ -5,8 +5,8 @@ namespace Schoolbox\External\Normalise\User\Student;
 class Nationality
 {
     private $id = '';
-
     private $name = '';
+    private $code = '';
 
     public function __construct()
     {
@@ -32,6 +32,28 @@ class Nationality
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Set code
+     *
+     * @param string $code
+     * @return $this
+     */
+    public function setCode($code)
+    {
+        $this->code = $code;
+        return $this;
+    }
+
+    /**
+     * Get code
+     *
+     * @return string
+     */
+    public function getCode()
+    {
+        return $this->code;
     }
 
     /**
