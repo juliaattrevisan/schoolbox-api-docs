@@ -207,8 +207,8 @@ class Classes implements IStrategy
 
                 $this->periods[$id] = [
                     'name' => trim((string)($period['name'] ?? '')),
-                    'start_time' => $period['start_time'] ?? null,
-                    'end_time' => $period['end_time'] ?? null,
+                    'start_time' => self::normaliseTimeOfDay($period['start_time'] ?? null),
+                    'end_time' => self::normaliseTimeOfDay($period['end_time'] ?? null),
                     'days' => $period['days'] ?? [],
                 ];
 
@@ -646,6 +646,29 @@ class Classes implements IStrategy
         usort($occurrences, fn($a, $b) => $a['start_at']->getDatabase() <=> $b['start_at']->getDatabase());
 
         return $occurrences;
+    }
+
+    /**
+     * Normalise an Edlink period time to a clock-time (H:i:s) in school local time.
+     *
+     * Edlink returns period times as ISO 8601 datetimes anchored at the Unix
+     * epoch with a Z suffix (e.g. "1970-01-01T09:00:00.000Z"). The epoch date
+     * is a placeholder and the Z suffix is a Powerschool pass-through — the
+     * time-of-day is intended to be interpreted in the school's local
+     * timezone. Extract just H:i:s; return null when the input is null,
+     * empty, or unparseable.
+     */
+    private static function normaliseTimeOfDay(?string $value): ?string
+    {
+        if (null === $value || '' === $value) {
+            return null;
+        }
+
+        try {
+            return (new \DateTimeImmutable($value))->format('H:i:s');
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**
