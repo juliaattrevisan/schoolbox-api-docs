@@ -8,89 +8,34 @@
 
 declare(strict_types=1);
 
-use Monolog\Logger;
-use Predis\ClientInterface;
-use Predis\Collection\Iterator\Keyspace;
-use Schoolbox\Application\CliKernelAbstract;
-use Schoolbox\Application\CliTool;
-use Schoolbox\Oidc\CacheHelper;
+use Schoolbox\Application\CliTool\App;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
-/**
- * CLI tool for migrating refresh tokens which may have somehow been stored with
- * the disallowed : part separator.
- *
- * Only refresh tokens are migrated, as other token types don't last long enough
- * to be worth migrating.
- */
-$app = new class extends CliTool\App {
-    // Old and new key prefixes
-    private const string KEY_PREFIX = 'oidcServer.' . INSTANCE_ID . ':' . CacheHelper::REFRESH_TOKEN_KEY;
-    private const string OLD_KEY_PREFIX = self::KEY_PREFIX . self::OLD_PART_SEPARATOR;
-    private const string NEW_KEY_PREFIX = self::KEY_PREFIX . self::NEW_PART_SEPARATOR;
-    private const string OLD_PART_SEPARATOR = ':';
-    private const string NEW_PART_SEPARATOR = '.';
+$scriptName = realpath(__DIR__ . '/../../../tools/redis/migrateRefreshTokens.php');
+$script     = 'php ' . escapeshellarg($scriptName) . ' -p';
 
-    /**
-     * Run the tool
-     *
-     * @return void
-     */
-    public function run(): void
-    {
-        $logger = $this->getLogger();
-        $logger->info(
-            sprintf(
-                'Migrating refresh tokens in old key prefix "%s" to new prefix "%s"',
-                self::OLD_KEY_PREFIX,
-                self::NEW_KEY_PREFIX,
-            ),
-        );
+$sudo    = 'sudo -u ' . escapeshellarg(App::WEB_PROCESS_USER);
+$logFile = '/var/log/schoolbox/' . INSTANCE_ID . '/migrate-refresh-tokens.log';
 
-        /** @var ClientInterface $redisClient */
-        $redisClient  = $this->getDi()->get('redis.storage');
-        $keysMigrated = [];
+// Can't pipe whilst retaining sudo user AFAIK:
+// need to tee and send output to null
+$tee     = $sudo . ' tee -a ' . escapeshellarg($logFile) . ' > /dev/null';
+$command = $sudo . ' ' . ($script . ' --perform 2>&1 | ' . $tee);
 
-        // Find any keys with the old prefix, and migrate them to the new one.
-        // This unavoidably requires a full table scan.
-        $keyspace = new Keyspace($redisClient, self::OLD_KEY_PREFIX . '*');
-        foreach ($keyspace as $key) {
-            [$val, $ttl] = $redisClient->transaction(
-                function ($tx) use ($key) {
-                    $tx->get($key);
-                    $tx->ttl($key);
-                }
-            );
+// Run the whole thing in background
+echo "Running migrate refresh tokens script as background process:\n$command\n";
+$proc = proc_open(
+    "($command)",
+    [
+        0 => STDIN,
+        1 => STDOUT,
+        2 => STDERR,
+    ],
+    $pipes,
+);
+$procStatus = proc_get_status($proc);
+printf("Beginning migrate refresh tokens script (pid: %d)\n", $procStatus['pid']);
 
-            $newKey = str_replace(self::OLD_KEY_PREFIX, self::NEW_KEY_PREFIX, $key);
-            switch ($ttl) {
-                case -2:
-                    $logger->debug(sprintf('Refresh token "%s" has expired: not migrating', $key));
-                    break;
-
-                case -1:
-                    $keysMigrated[$key] = $newKey;
-                    $logger->debug(sprintf('Migrating refresh token "%s" to "%s" without expiry', $key, $newKey));
-                    $redisClient->set($newKey, $val);
-                    break;
-
-                default:
-                    $keysMigrated[$key] = $newKey;
-                    $logger->debug(sprintf('Migrating refresh token "%s" to "%s" with expiry %d', $key, $newKey, $ttl));
-                    $redisClient->setex($newKey, $ttl, $val);
-                    break;
-            }
-        }
-        $logger->info(sprintf('Migration finished: %d refresh tokens migrated', count($keysMigrated)));
-    }
-
-    /* allow to be run as any user */
-    public function runAsRoot(): ?bool
-    {
-        return null;
-    }
-};
-
-/** @noinspection PhpUnhandledExceptionInspection */
-(new CliTool\Kernel($app, [CliKernelAbstract::OPTION_LEVEL => Logger::INFO], true))->runApp();
+// Exit: the process will continue to run in background.
+exit;
