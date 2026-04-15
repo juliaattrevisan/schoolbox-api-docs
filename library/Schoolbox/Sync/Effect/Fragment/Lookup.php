@@ -39,6 +39,7 @@ class Lookup
         'userAccessWrite' => '\Schoolbox\Resource\GroupMapper',
         'userAccessRemove' => '\Schoolbox\Resource\GroupMapper',
         'pronoun' => '\Schoolbox\User\Pronoun\Mapper',
+        'nationalityCollection' => '\Schoolbox\Nationality\Mapper',
     ];
 
     /**

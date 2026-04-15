@@ -67,6 +67,7 @@ class FieldFactory
                     'boardingHouse.code' => 'Boarding House Code',
                     'boardingStatus'     => 'Boarding Status',
                     'gender'             => 'Gender',
+                    'nationality[].name' => 'Nationalities',
                 ];
                 break;
             case Role::PARENT:

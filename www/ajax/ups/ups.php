@@ -25,6 +25,9 @@ if ($_GET['type'] == 'groups') {
 } else if ($_GET['type'] == 'campus') {
     $mapper = \Schoolbox\CampusMapper::getInstance();
     $allResults = $mapper->findCampuses($query);
+} else if ($_GET['type'] == 'nationality') {
+    $mapper = \Schoolbox\Nationality\Mapper::getInstance();
+    $allResults = $mapper->findNationalities($query);
 }
 
 if ($allResults->count()) {

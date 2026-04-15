@@ -438,7 +438,7 @@ class Factory
         if ($viewee->getNationalityCollection()) {
             $nationality = implode(
                 ', ',
-                $viewee->getNationalityCollection()->indexBy('nationality')->keys()
+                $viewee->getNationalityCollection()->indexBy('name')->keys()
             );
         }
 
