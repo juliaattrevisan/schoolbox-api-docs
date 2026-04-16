@@ -14,6 +14,8 @@ use League\Flysystem\FilesystemException;
 use Schoolbox\Admin\BulkFeedbackImport\Strategy\Feedback\DueWork;
 use Schoolbox\Admin\BulkFeedbackImport\Strategy\Feedback\IStrategy;
 use Schoolbox\Admin\BulkFeedbackImport\Strategy\Feedback\Reporting;
+use Schoolbox\Admin\BulkFeedbackImport\Strategy\Mark\HumanReadableMark;
+use Schoolbox\Admin\BulkFeedbackImport\Strategy\Mark\NormalisedMark;
 use Schoolbox\Admin\Import\Profile\Reader;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -179,14 +181,19 @@ class Processor
         $reader = new Reader($this->filesystemProxy->readStream($file), true);
         $headerRow = $reader->readHeaderRow();
 
-        /* A list of warnings/errors/scenarios that schools must fix before we can continue
+        /* Figure out what column to use as a basis for discovering (normalised mark, learner human readable mark and
+         * instructor human readable mark) tuple. It's presumed to be consistent throughout the csv.
          */
-        $errors = 0;
+        $markStrategy = $this->selectMarkStrategy($headerRow);
 
         /* Load a particular file
          */
         $reader = new Reader($this->filesystemProxy->readStream($file), true);
-        $reader->setExpectedColumns($this->selectCsvStrategy($headerRow));
+        $reader->setExpectedColumns($markStrategy->getExpectedColumns());
+
+        /* A list of warnings/errors/scenarios that schools must fix before we can continue
+         */
+        $errors = 0;
 
         /* Maintain a row counter
          */
@@ -200,6 +207,8 @@ class Processor
          */
         $this->assessmentQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_ASSESSMENT_TITLE_WORKTYPE);
 
+        /* Start processing the csv body itself
+         */
         foreach ($reader as $row) {
             /* Remember the row number in the csv, starting at 1
              * This is used to log errors to help humans locate them in the csv itself
@@ -371,7 +380,7 @@ class Processor
                 /* Interpret the csv structure to figure out where marks come from and how to derive all three pieces
                  */
                 try {
-                    $vals = $this->calculateMarks($assessment, $headerRow, $row);
+                    $vals = $markStrategy->calculate($row, $assessment);
                 } catch (\RuntimeException $e) {
                     $this->log(sprintf(
                         'Row %s: normalised mark must be between 0 and 100 for %s "%s"',
@@ -410,38 +419,6 @@ class Processor
 
 
     /**
-     * Based on the normalised/human readable columns, figure out which Expected Columns to process
-     *
-     * @param array $headerRow
-     * @return array
-     */
-    private function selectCsvStrategy(array $headerRow): array
-    {
-        if (in_array('Normalised Mark', $headerRow)) {
-            return [
-                'Class Code',
-                'Student External ID',
-                'Normalised Mark',
-                'Comment',
-                'Publish Date'
-            ];
-        }
-
-        if (in_array('Human Readable Grade', $headerRow)) {
-            return [
-                'Class Code',
-                'Student External ID',
-                'Human Readable Grade',
-                'Comment',
-                'Publish Date'
-            ];
-        }
-
-        throw new \RuntimeException('Unknown csv importer strategy.');
-    }
-
-
-    /**
      * Based on the assessment identifiers, figure out which feedback-saving strategy to use.
      *
      * @param array $assessmentData
@@ -468,141 +445,22 @@ class Processor
      *    - learner human readable mark
      *    - instructor human readable mark
      *
-     * @param IAssessable $assessment
      * @param array $headerRow
-     * @param array $row
-     * @return array
+     * @return Strategy\Mark\IStrategy
      */
-    private function calculateMarks(IAssessable $assessment, array $headerRow, array $row): array
+    private function selectMarkStrategy(array $headerRow): Strategy\Mark\IStrategy
     {
         $normalisedMarkColumn = 'Normalised Mark';
         $humanReadableGradeColumn = 'Human Readable Grade';
 
-        $normalisedMark = null;
-        $learnerHumanReadableMark = null;
-        $instructorHumanReadableMark = null;
-
-        /** Get mark schemes
-         * - Instructor mark scheme is used to normalise what was inputted by the user
-         * - Learner mark scheme is used when displaying the mark back to learners/parents
-         */
-        $instructorScheme = $assessment->getInstructorMarkScheme();
-        $learnerScheme = $assessment->getMarkScheme();
-
-        /* If a Normalised Mark column exists in the header, derive Human Readable marks from Normalised Mark.
-         */
         if (in_array($normalisedMarkColumn, $headerRow)) {
-            $normalisedMark = (float)trim((string)$row[$normalisedMarkColumn]);
-
-            /* This is what the student would see
+            /* If a Normalised Mark column exists in the header, derive Human Readable marks from Normalised Mark.
              */
-            $learnerHumanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
-
-            /* This is what the instructor would see, due to SA-18452
-             * Disgustingly typehint this getInstructorMarkScheme() method which is unique to two activities atm
+            return new NormalisedMark($this->stateMapper, $normalisedMarkColumn);
+        } elseif (in_array($humanReadableGradeColumn, $headerRow)) {
+            /* If a Human Readable Grade column exists in the header, derive Normalised Mark from Human Readable Grade.
              */
-            /** @var \Schoolbox\Learning\Assessment\DueWork\Model|\Schoolbox\Learning\Assessment\Reporting\Model $assessment */
-            $instructorHumanReadableMark = $assessment->getInstructorMarkScheme()->getHumanReadableMark($normalisedMark);
-
-            /* Add a really specific error circumstance where we calculated something illegal
-             */
-            if ($normalisedMark < 0 || $normalisedMark > 100) {
-                throw new \RuntimeException('Invalid normalised mark calculated.');
-            }
-
-            /* Apparently this is how you detect a Submission State: an exception is thrown
-             * trying to interpret it as one of the Mark Schemes. No wonder it was classified
-             * as the $errors var. Wild!
-             *
-             * Shanked from Learning/Assessment/DueWork/Feedback/Factory.php::210
-             */
-            try {
-                /* Find out what the learner's version would have been and save that too
-                 * Arguably you could skip this derivation, only doing it if $instructor scheme was different to $learner scheme
-                 */
-                $learnerHumanReadableMark = $learnerScheme->getHumanReadableMark($normalisedMark);
-            } catch (\InvalidArgumentException $e) {
-                if ('' !== $instructorHumanReadableMark) {
-                    /* If it's a Submission State, save the text as the human readable mark
-                     * and derive its normalised mark from the uh Lists in admin
-                     *
-                     * If this fails, presume it's a freeform text and just save a human readable mark only
-                     */
-                    try {
-                        $code = $this->stateMapper->findOneByColumn('display_as', $instructorHumanReadableMark);
-
-                        $normalisedMark = $code->getNormaliseAs();
-
-                        /* There isn't a learner-specific Submission State: it's the same for both parties.
-                         */
-                        $learnerHumanReadableMark = $instructorHumanReadableMark;
-                    } catch (\Schoolbox\Mapper\Exception $e) {
-                        /* Freeform text; learners see the same thing as instructors and there's no normalised mark
-                         */
-                        $normalisedMark = null;
-                        $learnerHumanReadableMark = $instructorHumanReadableMark;
-                    }
-                }
-            }
-
-            /* Compile all three data points into a tuple that processRow can use
-             */
-            return [
-                'normalisedMark' => $normalisedMark,
-                'learnerHumanReadableMark' => $learnerHumanReadableMark,
-                'instructorHumanReadableMark' => $instructorHumanReadableMark,
-            ];
-        }
-
-        /* If a Human Readable Grade column exists in the header, derive Normalised Mark from Human Readable Grade.
-         */
-        if (in_array($humanReadableGradeColumn, $headerRow)) {
-            $instructorHumanReadableMark = trim((string)$row[$humanReadableGradeColumn]);
-
-            /* Apparently this is how you detect a Submission State: an exception is thrown
-             * trying to interpret it as one of the Mark Schemes. No wonder it was classified
-             * as the $errors var. Wild!
-             *
-             * Shanked from Learning/Assessment/DueWork/Feedback/Factory.php::210
-             */
-            try {
-                $normalisedMark = $instructorScheme->getNormalisedMark($instructorHumanReadableMark);
-
-                /* Find out what the learner's version would have been and save that too
-                 * Arguably you could skip this derivation, only doing it if $instructor scheme was different to $learner scheme
-                 */
-                $learnerHumanReadableMark = $learnerScheme->getHumanReadableMark($normalisedMark);
-            } catch (\InvalidArgumentException $e) {
-                if ('' !== $instructorHumanReadableMark) {
-                    /* If it's a Submission State, save the text as the human readable mark
-                     * and derive its normalised mark from the uh Lists in admin
-                     *
-                     * If this fails, presume it's a freeform text and just save a human readable mark only
-                     */
-                    try {
-                        $code = $this->stateMapper->findOneByColumn('display_as', $instructorHumanReadableMark);
-
-                        $normalisedMark = $code->getNormaliseAs();
-
-                        /* There isn't a learner-specific Submission State: it's the same for both parties.
-                         */
-                        $learnerHumanReadableMark = $instructorHumanReadableMark;
-                    } catch (\Schoolbox\Mapper\Exception $e) {
-                        /* Freeform text; learners see the same thing as instructors and there's no normalised mark
-                         */
-                        $normalisedMark = null;
-                        $learnerHumanReadableMark = $instructorHumanReadableMark;
-                    }
-                }
-            }
-
-            /* Compile all three data points into a tuple that processRow can use
-             */
-            return [
-                'normalisedMark' => $normalisedMark,
-                'learnerHumanReadableMark' => $learnerHumanReadableMark,
-                'instructorHumanReadableMark' => $instructorHumanReadableMark,
-            ];
+            return new HumanReadableMark($this->stateMapper, $humanReadableGradeColumn);
         }
 
         /* We should never be here, but you never know: they could upload a totally random csv
