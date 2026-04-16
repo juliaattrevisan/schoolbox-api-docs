@@ -35,14 +35,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public const SELF_REVIEWABILITY_REFLECT_ONLY = 'reflect-only'; // learner can only reflect on their work, but not give grades
     public const SELF_REVIEWABILITY_FULL         = 'full';         // learner can give reflect and give grades
 
-    // Mark Visibility strings
-    public const MARK_VISIBILITY_STRINGS = [
-        IAssessable::MARK_VISIBILITY_PRIVATE        => IAssessable::MARK_VISIBILITY_PRIVATE_STRING,
-        IAssessable::MARK_VISIBILITY_STUDENT        => IAssessable::MARK_VISIBILITY_STUDENT_STRING,
-        IAssessable::MARK_VISIBILITY_PARENT         => IAssessable::MARK_VISIBILITY_PARENT_STRING,
-        IAssessable::MARK_VISIBILITY_PARENT_STUDENT => IAssessable::MARK_VISIBILITY_PARENT_STUDENT_STRING,
-    ];
-
     /**
      * @var int|null
      */
