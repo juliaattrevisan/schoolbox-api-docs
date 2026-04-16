@@ -11,12 +11,13 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\BulkFeedbackImport;
 
 use League\Flysystem\FilesystemException;
-use Schoolbox\Admin\BulkFeedbackImport\Strategy\DueWork;
-use Schoolbox\Admin\BulkFeedbackImport\Strategy\Reporting;
-use Schoolbox\Admin\BulkFeedbackImport\Strategy\IStrategy;
+use Schoolbox\Admin\BulkFeedbackImport\Strategy\Feedback\DueWork;
+use Schoolbox\Admin\BulkFeedbackImport\Strategy\Feedback\IStrategy;
+use Schoolbox\Admin\BulkFeedbackImport\Strategy\Feedback\Reporting;
 use Schoolbox\Admin\Import\Profile\Reader;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -27,7 +28,6 @@ use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Model;
-use Schoolbox\L10n\RosettaStone;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 

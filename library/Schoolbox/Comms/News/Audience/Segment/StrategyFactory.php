@@ -10,17 +10,18 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience\Segment;
 
 use Alaress\Database\Connector\IConnector;
+use External_UserInterface;
+use Schoolbox\Admin\BulkFeedbackImport\Strategy\Feedback\IStrategy;
 use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Composite;
 use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Permission\Access\RoleAccessMapper;
 use UnexpectedValueException;
-use External_UserInterface;
 
 /**
  * Responsible for enumeration of the IStrategy interface

@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\BulkFeedbackImport\Strategy;
+namespace Schoolbox\Admin\BulkFeedbackImport\Strategy\Feedback;
 
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Exception;

@@ -32,11 +32,11 @@ interface IStrategy
      * This is an inherent property of the entityType's relationship to users
      * Does not consider whether a user is *allowed* to do so.
      *
-     * @see IStrategy::canAudienceToEntityValue(User $user, ?string $entityValue)
+     * @return bool
+     * @see \Schoolbox\Admin\BulkFeedbackImport\Strategy\Feedback\IStrategy::canAudienceToEntityValue(User $user, ?string $entityValue)
      *
      * Note that null !== empty. Eg year = ['', null] are different. The first is a non-null entity.
      *
-     * @return bool
      */
     public static function isValidNullEntityValue(): bool;
 
