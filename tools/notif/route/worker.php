@@ -63,7 +63,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
                 INSTANCE_ID,
                 $di->get('amqp'),
                 $client,
-                $di->get('stomp'),
+                $di->get('stomp.plain'),
             ),
             INSTANCE_ID,
         )
