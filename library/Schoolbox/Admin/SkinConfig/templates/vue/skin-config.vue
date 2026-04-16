@@ -32,16 +32,15 @@ const { schedulePreviewRefresh } = useSkinPreview(configs, props.routes.preview)
  */
 async function scrollToHighestColourError(): Promise<void> {
     await window.Vue.nextTick();
-
     const titleLabels = Array.from(document.querySelectorAll<HTMLElement>("[data-skin-config-colour-error-label]"));
     if (titleLabels.length === 0) {
         return;
     }
-
     const highestError = titleLabels.reduce((highest, element) => {
-        return element.getBoundingClientRect().top < highest.getBoundingClientRect().top ? element : highest;
+        const elementTop = element.getBoundingClientRect().top + window.scrollY;
+        const highestTop = highest.getBoundingClientRect().top + window.scrollY;
+        return elementTop < highestTop ? element : highest;
     });
-
     highestError.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
