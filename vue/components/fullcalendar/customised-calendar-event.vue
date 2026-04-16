@@ -7,7 +7,7 @@
  * To customise the display of the event, ensuring the background/text colour is readable
  *
  */
-import tinycolor from "tinycolor2";
+import { mostReadable, TinyColor } from "@ctrl/tinycolor";
 import { EVENT_VARIANTS } from "@schoolboxCalendarEvent/event-variants";
 import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 
@@ -131,11 +131,9 @@ export default {
         updateTextColor() {
             if (!this.isEventInListComponent) {
                 //don't do for list view, only within month/week views
-                const readableTextColor = tinycolor
-                    .mostReadable(this.eventBackgroundColor, ["black", "white"])
-                    .toRgbString();
+                const readableTextColor = mostReadable(this.eventBackgroundColor, ["black", "white"]).toRgbString();
                 // no need to set color, if white
-                if (readableTextColor === tinycolor("white").toRgbString()) {
+                if (readableTextColor === new TinyColor("white").toRgbString()) {
                     return;
                 }
 
