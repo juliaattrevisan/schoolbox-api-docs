@@ -212,7 +212,7 @@ class Processor
 
                     $adf = new \Alaress_Date_Format($combined, $format);
                 } catch (\Carbon\Exceptions\InvalidFormatException $e) {
-                    $this->log(sprintf("Row %s: Invalid date format. Make sure it's correct and try again.", $i), self::WARNING);
+                    $this->log(sprintf("Row %s: Invalid date format. Make sure it's correct and try again.", $i), IStrategy::WARNING);
 
                     $errors++;
 
