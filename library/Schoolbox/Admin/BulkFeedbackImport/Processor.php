@@ -352,7 +352,7 @@ class Processor
             /* Use each strat's processRow() method to interpret how to put this data into a feedback
              */
             foreach ($candidateAssessments as $assessmentData) {
-                /* For some reason we don't an assessment identifier; that's pretty catastrophic
+                /* For some reason we don't have an assessment identifier; that's pretty catastrophic
                  * This shouldn't ever be the case
                  */
                 if (null === $assessmentData['assessment_id']) {
