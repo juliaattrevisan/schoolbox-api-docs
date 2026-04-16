@@ -10,7 +10,7 @@ const INVALID_COLOUR_ERROR = "Enter a valid colour.";
  * @returns The user-facing validation message.
  */
 function getLowContrastError(contrastOption: SkinConfigOption): string {
-    return `Must contrast sufficiently against ${contrastOption.name}`;
+    return `Must contrast sufficiently against ${contrastOption.title ?? contrastOption.name}`;
 }
 
 /**
