@@ -84,8 +84,13 @@ class Standard
         $allParticipants = $this->prefilterParticipants();
 
         foreach ($allParticipants as $currentParticipant) {
-            // CSS/label rules
-            // TODO move CSS/label generation to participant class, and dedupe usages
+            /* There was an idea from the Due Work Carousel where the css styles and labels were supposed to be
+             * refactored into the Participant class, but I'm not sure exactly what that meant.
+             *
+             * TODO @zac, you might have a bigger vision for this fragment seeing as you came from the dialog agent
+             *  carousel: there's a statusMap that I've manipulated but that starts to diverge from previous
+             *  implementatioms of the Carousel idea in general. See InlineGrader/Standard.php:104
+             */
 
             /* Scrub it
              */
@@ -96,7 +101,7 @@ class Standard
                     <div class=\"card small-10\">
                         <img src=\"/portrait.php?id={$currentParticipant->getUser()->getId()}&size=square64\" alt=\"View Profile\" />
                         <p>{$fullname}</p>
-                        <span class=\"label status \" data-test=\"assessment-student-carousel-statusLabel-{$currentParticipant->getUser()->getId()}\"></span>
+                        <span class=\"label status\" data-test=\"assessment-student-carousel-statusLabel-{$currentParticipant->getUser()->getId()}\"></span>
                     </div>
                 </div>
             ";
