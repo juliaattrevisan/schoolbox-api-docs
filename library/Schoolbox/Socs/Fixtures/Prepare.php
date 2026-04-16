@@ -38,7 +38,9 @@ class Prepare implements IStrategy
         private DivisionMapper $divisionMapper,
         private TeamMapper $teamMapper,
         private VenueMapper $venueMapper,
-        private SchoolMapper $schoolMapper
+        private SchoolMapper $schoolMapper,
+        private TeamCoachMapper $teamCoachMapper,
+        private TeamPlayerMapper $teamPlayerMapper,
     ) {
     }
 
@@ -66,10 +68,8 @@ class Prepare implements IStrategy
 
             /* Hard deletions for relationships that do not use updated_at. */
             $db = $this->teamMapper->getDatabase();
-            $teamCoachMapper = TeamCoachMapper::getInstance();
-            $teamPlayerMapper = TeamPlayerMapper::getInstance();
-            $db->query("DELETE FROM {$teamCoachMapper->getTable()}");
-            $db->query("DELETE FROM {$teamPlayerMapper->getTable()}");
+            $db->query("DELETE FROM {$this->teamCoachMapper->getTable()}");
+            $db->query("DELETE FROM {$this->teamPlayerMapper->getTable()}");
         }
 
         $this->log->info('Preparing previously-imported SOCS matchups for create/update.');

@@ -97,6 +97,8 @@ class Factory
                 $teamMapper,
                 $venueMapper,
                 $schoolMapper,
+                $teamCoachMapper,
+                $teamPlayerMapper,
             ))
             ->add(new Fixtures\Import(
                 $this->log,
