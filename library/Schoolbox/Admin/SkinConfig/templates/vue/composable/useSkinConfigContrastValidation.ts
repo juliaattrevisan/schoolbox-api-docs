@@ -1,3 +1,8 @@
+/**
+ * Centralise Skin Config Sonar colour validation in one composable so the form
+ * can reactively report invalid colours and low-contrast combinations without
+ * duplicating contrast-checking logic across components or template code.
+ */
 import { isReadable, TinyColor } from "@ctrl/tinycolor";
 import type { ComputedRef, Ref } from "vue";
 import type { SkinConfigData, SkinConfigOption, SkinConfigOptionErrorMap } from "../../js/types/skinConfigTypes";
