@@ -35,21 +35,18 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public const SELF_REVIEWABILITY_REFLECT_ONLY = 'reflect-only'; // learner can only reflect on their work, but not give grades
     public const SELF_REVIEWABILITY_FULL         = 'full';         // learner can give reflect and give grades
 
-    public const MARK_VISIBILITY_STAFF_ONLY           = 'staffOnly';
-    public const MARK_VISIBILITY_STAFF_AND_STUDENT    = 'staffAndStudent';
-    public const MARK_VISIBILITY_STAFF_AND_PARENT     = 'staffAndParent';
-    public const MARK_VISIBILITY_STAFF_STUDENT_PARENT = 'staffStudentAndParent';
+    // Mark Visibility consts (deprecated - use those defined in IAssessable directly instead of these)
+    public const MARK_VISIBILITY_STAFF_ONLY           = IAssessable::MARK_VISIBILITY_PRIVATE;
+    public const MARK_VISIBILITY_STAFF_AND_STUDENT    = IAssessable::MARK_VISIBILITY_STUDENT;
+    public const MARK_VISIBILITY_STAFF_AND_PARENT     = IAssessable::MARK_VISIBILITY_PARENT;
+    public const MARK_VISIBILITY_STAFF_STUDENT_PARENT = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
 
-    //Mark Visibility strings
-    public const MARK_VISIBILITY_STAFF_ONLY_STRING = 'Staff Only';
-    public const MARK_VISIBILITY_STAFF_AND_STUDENT_STRING = 'Staff & Student';
-    public const MARK_VISIBILITY_STAFF_AND_PARENT_STRING = 'Staff & Parent';
-    public const MARK_VISIBILITY_STAFF_STUDENT_PARENT_STRING = 'Staff, Student & Parent';
+    // Mark Visibility strings
     public const MARK_VISIBILITY_STRINGS = [
-        self::MARK_VISIBILITY_STAFF_ONLY           => self::MARK_VISIBILITY_STAFF_ONLY_STRING,
-        self::MARK_VISIBILITY_STAFF_AND_STUDENT    => self::MARK_VISIBILITY_STAFF_AND_STUDENT_STRING,
-        self::MARK_VISIBILITY_STAFF_AND_PARENT     => self::MARK_VISIBILITY_STAFF_AND_PARENT_STRING,
-        self::MARK_VISIBILITY_STAFF_STUDENT_PARENT => self::MARK_VISIBILITY_STAFF_STUDENT_PARENT_STRING,
+        self::MARK_VISIBILITY_STAFF_ONLY           => IAssessable::MARK_VISIBILITY_PRIVATE_STRING,
+        self::MARK_VISIBILITY_STAFF_AND_STUDENT    => IAssessable::MARK_VISIBILITY_STUDENT_STRING,
+        self::MARK_VISIBILITY_STAFF_AND_PARENT     => IAssessable::MARK_VISIBILITY_PARENT_STRING,
+        self::MARK_VISIBILITY_STAFF_STUDENT_PARENT => IAssessable::MARK_VISIBILITY_PARENT_STUDENT_STRING,
     ];
 
     /**

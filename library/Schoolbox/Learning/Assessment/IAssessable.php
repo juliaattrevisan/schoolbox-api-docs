@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Assessment;
 
 use InvalidArgumentException;
 use RuntimeException;
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\GenericCollection;
@@ -27,10 +26,16 @@ use Schoolbox\Curriculum\Node;
 
 interface IAssessable extends ISoftDeletable
 {
-    public const string MARK_VISIBILITY_PRIVATE        = SubmissionBox::MARK_VISIBILITY_STAFF_ONLY;
-    public const string MARK_VISIBILITY_STUDENT        = SubmissionBox::MARK_VISIBILITY_STAFF_AND_STUDENT;
-    public const string MARK_VISIBILITY_PARENT         = SubmissionBox::MARK_VISIBILITY_STAFF_AND_PARENT;
-    public const string MARK_VISIBILITY_PARENT_STUDENT = SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT;
+    public const string MARK_VISIBILITY_PRIVATE        = 'staffOnly';
+    public const string MARK_VISIBILITY_STUDENT        = 'staffAndStudent';
+    public const string MARK_VISIBILITY_PARENT         = 'staffAndParent';
+    public const string MARK_VISIBILITY_PARENT_STUDENT = 'staffStudentAndParent';
+
+    // Human-readable versions of the above consts (for use in the UI).
+    public const string MARK_VISIBILITY_PRIVATE_STRING        = 'Staff Only';
+    public const string MARK_VISIBILITY_STUDENT_STRING        = 'Staff & Student';
+    public const string MARK_VISIBILITY_PARENT_STRING         = 'Staff & Parent';
+    public const string MARK_VISIBILITY_PARENT_STUDENT_STRING = 'Staff, Student & Parent';
 
     /**
      * The default readable name for this type of assessment, NOT translated
