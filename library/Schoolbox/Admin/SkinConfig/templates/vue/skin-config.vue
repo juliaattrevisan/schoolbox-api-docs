@@ -99,7 +99,6 @@ async function onSaveSelected(): Promise<void> {
     }
 
     if (configs.value.toggle.enabled && hasColourErrors.value) {
-        loadError.value = "Resolve colour contrast errors before saving.";
         await scrollToHighestColourError();
         return;
     }

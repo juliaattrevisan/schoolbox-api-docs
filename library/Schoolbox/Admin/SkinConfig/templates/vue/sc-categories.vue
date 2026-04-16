@@ -89,11 +89,7 @@ function onPreviewRefresh(): void {
                                 @input="onPreviewRefresh"
                                 @change="onPreviewRefresh"
                             />
-                            <label
-                                v-if="props.colourErrors[option.id]"
-                                class="error"
-                                :for="`${option.name}-field`"
-                            >
+                            <label v-if="props.colourErrors[option.id]" class="error" :for="`${option.name}-field`">
                                 {{ props.colourErrors[option.id] }}
                             </label>
                         </div>
