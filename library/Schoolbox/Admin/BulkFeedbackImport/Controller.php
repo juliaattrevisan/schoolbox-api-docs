@@ -33,7 +33,7 @@ class Controller extends Base
     /**
      * Number of minutes this source csv should exist
      */
-    private const CSV_DURATION = 15;
+    private const int CSV_DURATION = 15;
 
 
     /**
