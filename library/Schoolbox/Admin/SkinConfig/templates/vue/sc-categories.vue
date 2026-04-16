@@ -3,10 +3,11 @@
  * Child component for rendering visible Skin Config categories.
  */
 
-import type { SkinConfigData } from "../js/types/skinConfigTypes";
+import type { SkinConfigData, SkinConfigOptionErrorMap } from "../js/types/skinConfigTypes";
 
 const props = defineProps<{
     configs: SkinConfigData;
+    colourErrors: SkinConfigOptionErrorMap;
 }>();
 
 const emit = defineEmits<{
@@ -78,10 +79,14 @@ function onPreviewRefresh(): void {
                                 type="text"
                                 :name="option.name"
                                 data-colour-picker
+                                :class="{ error: props.colourErrors[option.id] }"
                                 :disabled="!option.editable"
                                 @input="onPreviewRefresh"
                                 @change="onPreviewRefresh"
                             />
+                            <label v-if="props.colourErrors[option.id]" class="error" :for="`${option.name}-field`">
+                                {{ props.colourErrors[option.id] }}
+                            </label>
                         </div>
                         <div v-else-if="option.type === 'textarea'">
                             <textarea

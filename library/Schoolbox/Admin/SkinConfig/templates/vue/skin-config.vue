@@ -8,6 +8,7 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import type { Routes, SkinConfigData } from "../js/types/skinConfigTypes";
 import ScCategories from "./sc-categories.vue";
+import { useSkinConfigContrastValidation } from "./composable/useSkinConfigContrastValidation";
 import { useSkinConfigState } from "./composable/useSkinConfigState";
 import { useSkinPreview } from "./composable/useSkinPreview";
 
@@ -23,6 +24,7 @@ const { configs, hasUnsavedChanges, initialiseColourPickers, resetToSavedState, 
     useSkinConfigState(props.configs, isProcessing, () => {
         schedulePreviewRefresh();
     });
+const { colourErrors } = useSkinConfigContrastValidation(configs);
 const { schedulePreviewRefresh } = useSkinPreview(configs, props.routes.preview);
 
 /**
@@ -137,7 +139,7 @@ async function onSaveSelected(): Promise<void> {
                     </label>
                 </div>
             </div>
-            <sc-categories :configs="configs" @preview-refresh="schedulePreviewRefresh" />
+            <sc-categories :configs="configs" :colour-errors="colourErrors" @preview-refresh="schedulePreviewRefresh" />
             <div class="l-flex l-flex--justify l-gap-xs">
                 <button v-if="hasUnsavedChanges" type="button" class="button l-flex__item--1" @click="onUndoChanges">
                     Undo Changes
