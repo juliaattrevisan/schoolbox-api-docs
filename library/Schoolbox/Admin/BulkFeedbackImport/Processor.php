@@ -195,8 +195,7 @@ class Processor
              */
             $i++;
 
-            /* Compute publish date from csv
-             * and also make it the same as created_at and updated_at to better keep track
+            /* Compute publish date from csv and also make it the same as created_at and updated_at to better keep track
              * of things after an import has occurred
              */
             $datetime = trim((string)$row['Publish Date']);
@@ -337,6 +336,8 @@ class Processor
                 continue;
             }
 
+            /* Use each strat's processRow() method to interpret how to put this data into a feedback
+             */
             foreach ($candidateAssessments as $assessmentData) {
                 $strategy->processRow(
                     $i,
