@@ -16,6 +16,10 @@ use Schoolbox\Campus as CampusModel;
 use Schoolbox\CampusMapper;
 use Schoolbox\IB\Qualification\Model as QualificationModel;
 use Schoolbox\IB\Qualification\Mapper as QualificationMapper;
+use Schoolbox\Nationality\Model as NationalityModel;
+use Schoolbox\Nationality\Mapper as NationalityMapper;
+use Schoolbox\Language\Model as LanguageModel;
+use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Role as RoleModel;
 use Schoolbox\RoleMapper;
 use Schoolbox\Sync\Provisioner\ValidUser;
@@ -82,6 +86,9 @@ class User extends AbstractImporter
      */
     protected array|QualificationModel $qualificationList = [];
 
+    protected array|NationalityModel $nationalityList = [];
+
+    protected array|LanguageModel $languageList = [];
     /**
      * A list of user identifier classes - each one will in turn attempt to
      * retrieve a UserModel from the row.
@@ -199,6 +206,17 @@ class User extends AbstractImporter
             $this->qualificationList[$qualification->getName()] = $qualification;
         }
 
+        foreach (NationalityMapper::getInstance()->disableCache()->findAll() as $nationality) {
+            /** @var NationalityModel $nationality */
+            $this->nationalityList[$nationality->getName()] = $nationality;
+        }
+
+        foreach (LanguageMapper::getInstance()->disableCache()->findAll() as $language) {
+            /** @var LanguageModel $language */
+            $this->languageList[$language->getName()] = $language;
+        }
+
+
         // Identifiers
         $this->userIdentifiers[] = new User\Identifier\UserId($this->userMapper);
         $this->userIdentifiers[] = new User\Identifier\Username($this->userMapper);
@@ -231,8 +249,8 @@ class User extends AbstractImporter
         $this->userHydrators[] = new User\Hydrator\Lookup('House', 'setSchoolHouse', $this->houseList);
         $this->userHydrators[] = new User\Hydrator\Lookup('Residential House', 'setResidentialHouse', $this->residentialHouseList);
         $this->userHydrators[] = new User\Hydrator\Lookup('Pronoun', 'setPronoun', $this->pronounList);
-        $this->userHydrators[] = new User\Hydrator\Nationality('Nationality');
-        $this->userHydrators[] = new User\Hydrator\Language('Language');
+        $this->userHydrators[] = new User\Hydrator\Nationality('Nationality', $this->nationalityList);
+        $this->userHydrators[] = new User\Hydrator\Language('Language', $this->languageList);
         $this->userHydrators[] = new User\Hydrator\Qualification('Qualification', $this->qualificationList);
     }
 

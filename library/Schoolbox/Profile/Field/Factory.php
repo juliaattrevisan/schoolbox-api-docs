@@ -449,7 +449,7 @@ class Factory
         if ($viewee->getLanguageCollection()) {
             $languages = implode(
                 ', ',
-                $viewee->getLanguageCollection()->indexBy('language')->keys()
+                $viewee->getLanguageCollection()->indexBy('name')->keys()
             );
         }
 

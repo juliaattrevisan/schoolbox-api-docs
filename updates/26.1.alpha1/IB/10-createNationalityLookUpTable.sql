@@ -11,4 +11,6 @@ VALUES
     ('AUS', 'Australian'),
     ('JAP', 'Japanese'),
     ('ESP', 'Spanish'),
-    ('CHN', 'Chinese');
+    ('CHN', 'Chinese'),
+    ('USA', 'American'),
+    ('BRA', 'Brazilian');

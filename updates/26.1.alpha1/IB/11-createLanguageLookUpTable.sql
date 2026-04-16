@@ -10,4 +10,6 @@ INSERT INTO lu_language (code, name)
 VALUES
     ('JAP', 'Japanese'),
     ('ESP', 'Spanish'),
+    ('PRT', 'Portugese'),
+    ('ENG', 'English'),
     ('CHN', 'Chinese');
