@@ -370,7 +370,20 @@ class Processor
 
                 /* Interpret the csv structure to figure out where marks come from and how to derive all three pieces
                  */
-                $vals = $this->calculateMarks($assessment, $headerRow, $row);
+                try {
+                    $vals = $this->calculateMarks($assessment, $headerRow, $row);
+                } catch (\RuntimeException $e) {
+                    $this->log(sprintf(
+                        'Row %s: normalised mark must be between 0 and 100 for %s "%s"',
+                        $i,
+                        $this->rosettaStone->translate('activity', false),
+                        $this->assessmentTitle,
+                    ), IStrategy::WARNING);
+
+                    $errors++;
+
+                    continue;
+                }
 
                 $strategy->processRow(
                     $i,
@@ -491,22 +504,11 @@ class Processor
             /** @var \Schoolbox\Learning\Assessment\DueWork\Model|\Schoolbox\Learning\Assessment\Reporting\Model $assessment */
             $instructorHumanReadableMark = $assessment->getInstructorMarkScheme()->getHumanReadableMark($normalisedMark);
 
-            /* TODO restore error logging
+            /* Add a really specific error circumstance where we calculated something illegal
              */
-//            if ($normalisedMark < 0 || $normalisedMark > 100) {
-//                $this->log(sprintf(
-//                    'Row %s: normalised mark must be between 0 and 100 for %s "%s"',
-//                    $i,
-//                    $this->rosettaStone->translate('activity', false),
-//                    $this->assessmentTitle,
-//                ), IStrategy::WARNING);
-//
-//                /* Returns after an increment of errors
-//                 */
-//                $this->errorCount++;
-//
-//                return;
-//            }
+            if ($normalisedMark < 0 || $normalisedMark > 100) {
+                throw new \RuntimeException('Invalid normalised mark calculated.');
+            }
 
             /* Apparently this is how you detect a Submission State: an exception is thrown
              * trying to interpret it as one of the Mark Schemes. No wonder it was classified
