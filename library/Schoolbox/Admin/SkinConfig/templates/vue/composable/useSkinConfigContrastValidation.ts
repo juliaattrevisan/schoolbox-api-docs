@@ -3,7 +3,15 @@ import type { ComputedRef, Ref } from "vue";
 import type { SkinConfigData, SkinConfigOption, SkinConfigOptionErrorMap } from "../../js/types/skinConfigTypes";
 
 const INVALID_COLOUR_ERROR = "Enter a valid colour.";
-const LOW_CONTRAST_ERROR = "Colour contrast must meet AA standard.";
+
+/**
+ * Build the low contrast validation message for a colour option.
+ * @param contrastOption The option that the edited colour must contrast against.
+ * @returns The user-facing validation message.
+ */
+function getLowContrastError(contrastOption: SkinConfigOption): string {
+    return `Must contrast sufficiently against ${contrastOption.name}`;
+}
 
 /**
  * Collect all Sonar colour options from the current Skin Config payload.
@@ -71,7 +79,7 @@ export function useSkinConfigContrastValidation(configs: Ref<SkinConfigData>): {
             }
 
             if (!isReadable(option.value, contrastOption.value, { level: "AA", size: "small" })) {
-                errors[option.id] = LOW_CONTRAST_ERROR;
+                errors[option.id] = getLowContrastError(contrastOption);
             }
         });
 
