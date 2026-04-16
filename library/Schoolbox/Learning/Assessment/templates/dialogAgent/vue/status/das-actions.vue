@@ -199,19 +199,19 @@ async function onResolve(): Promise<void> {
         </a>
     </li>
     <li v-if="props.response?._routes.submit">
-        <button data-test="das-actions-submit" @click="onSubmit" class="sbx-button--has-icon">
+        <button data-test="das-actions-submit" class="sbx-button--has-icon" @click="onSubmit">
             <sbx-icon name="approve"></sbx-icon>
             {{ isSameUser ? `Submit ${locale.dialogAgent.proper()}` : `Submit on behalf of ${props.user.fullName}` }}
         </button>
     </li>
     <li v-if="props.response?._routes.reset">
-        <button data-test="das-actions-reset" @click="onReset" class="sbx-button--has-icon">
+        <button data-test="das-actions-reset" class="sbx-button--has-icon" @click="onReset">
             <sbx-icon name="refresh"></sbx-icon>
             {{ `Reset ${locale.dialogAgent.proper()}` }}
         </button>
     </li>
     <li v-if="props.response?._routes.reopen">
-        <button data-test="das-actions-reopen" @click="onReopen" class="sbx-button--has-icon">
+        <button data-test="das-actions-reopen" class="sbx-button--has-icon" @click="onReopen">
             <sbx-icon name="undo"></sbx-icon>
             {{ `Reopen ${locale.dialogAgent.proper()}` }}
         </button>

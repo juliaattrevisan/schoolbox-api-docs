@@ -144,7 +144,7 @@ window.Vue.onMounted(async () => {
                 </a>
             </li>
             <li>
-                <button @click="isPromptModalOpen = true" class="sbx-button--has-icon">
+                <button class="sbx-button--has-icon" @click="isPromptModalOpen = true">
                     <sbx-icon name="ai"></sbx-icon>View Agent Prompt
                 </button>
             </li>

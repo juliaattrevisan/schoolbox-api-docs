@@ -32,14 +32,14 @@ async function onApprove(): Promise<void> {
     <!-- Approve on the cohort report is special, if it's already approved then you'll still technically have access
       -- to re-approve it, but showing this button may be confusing in the workflow. So hide it if it's already published -->
     <li v-if="props.entry._links.publish && props.entry.currentState !== EvidenceStatus.PUBLISHED">
-        <a @click.prevent="onApprove" class="sbx-button--has-icon"
+        <a class="sbx-button--has-icon" @click.prevent="onApprove"
             ><sbx-icon name="approve"></sbx-icon> {{ props.entry._labels.publish }}</a
         >
     </li>
     <li v-if="props.entry._links.reject">
         <a
-            @click.prevent="crmStore.openModal(props.entry, CohortReportModalType.CONFIRM_REJECT)"
             class="sbx-button--has-icon"
+            @click.prevent="crmStore.openModal(props.entry, CohortReportModalType.CONFIRM_REJECT)"
             ><sbx-icon name="surveys"></sbx-icon>Request Update</a
         >
     </li>
@@ -50,8 +50,8 @@ async function onApprove(): Promise<void> {
     </li>
     <li v-if="props.entry._links.delete">
         <a
-            @click.prevent="crmStore.openModal(props.entry, CohortReportModalType.CONFIRM_DELETE)"
             class="sbx-button--has-icon"
+            @click.prevent="crmStore.openModal(props.entry, CohortReportModalType.CONFIRM_DELETE)"
         >
             <sbx-icon name="delete"></sbx-icon>
             Delete
