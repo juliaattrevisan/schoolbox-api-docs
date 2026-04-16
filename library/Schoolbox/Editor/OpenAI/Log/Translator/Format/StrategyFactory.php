@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace Schoolbox\Editor\OpenAI\Log\Translator\Format;
 
 use InvalidArgumentException;
-use Schoolbox\Admin\BulkFeedbackImport\Strategy\Feedback\IStrategy;
 use Schoolbox\Editor\OpenAI\Log\LogFormat;
 
 /**
