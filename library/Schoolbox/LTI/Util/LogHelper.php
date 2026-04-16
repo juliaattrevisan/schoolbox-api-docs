@@ -58,9 +58,10 @@ class LogHelper
         $logger->error(
             $methodName . ': error',
             [
-                'method'  => $request->getMethod(),
-                'path'    => $request->getUri()->getPath(),
-                'message' => $exception->getMessage(),
+                'method'    => $request->getMethod(),
+                'path'      => $request->getUri()->getPath(),
+                'message'   => $exception->getMessage(),
+                'exception' => $exception,
             ],
         );
     }
