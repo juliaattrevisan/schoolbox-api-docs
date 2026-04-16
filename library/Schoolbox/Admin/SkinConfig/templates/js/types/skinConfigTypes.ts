@@ -16,6 +16,7 @@ export type SkinConfigOption = {
     title: string | null;
     description: string | null;
     customProperty: string | null;
+    contrast: string | null;
     type: "checkbox" | "colour" | "select" | "textarea";
     editable: boolean;
     hidden: boolean;

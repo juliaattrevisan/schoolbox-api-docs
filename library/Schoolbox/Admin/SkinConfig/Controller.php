@@ -120,6 +120,7 @@ class Controller extends ConfigController
                     'title'          => $config->getTitle(),
                     'description'    => $config->getDescription(),
                     'customProperty' => $this->getCustomProperty($config),
+                    'contrast'       => $this->getContrastProperty($config),
                     'type'           => $this->getOptionType($config, $fieldMap),
                     'editable'       => $config->getEditable(),
                     'hidden'         => $config->getHidden(),
@@ -216,6 +217,23 @@ class Controller extends ConfigController
         }
         $customProperty = $decoded['customProperty'] ?? null;
         return is_string($customProperty) && $customProperty !== '' ? $customProperty : null;
+    }
+
+    /**
+     * Extract the raw contrast mapping from config options metadata.
+     */
+    private function getContrastProperty(Config $config): ?string
+    {
+        $options = $config->getOptions();
+        if ($options === null || trim($options) === '') {
+            return null;
+        }
+        $decoded = json_decode($options, true);
+        if (!is_array($decoded)) {
+            return null;
+        }
+        $contrast = $decoded['contrast'] ?? null;
+        return is_string($contrast) && $contrast !== '' ? $contrast : null;
     }
 
     /**
