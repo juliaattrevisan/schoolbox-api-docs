@@ -7,9 +7,9 @@
 
 namespace Schoolbox\Nationality;
 
-use Schoolbox\Campus;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception;
 
 class Mapper extends BaseMapper
 {
@@ -25,11 +25,11 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Find all campuses matching a certain name
+     * Find all nationalities matching a certain name
      *
      * @param string $name
-     * @return GenericCollection|Campus[]
-     * @throws Mapper\Exception
+     * @return GenericCollection
+     * @throws Exception
      */
     public function findNationalities($name = ''): GenericCollection
     {

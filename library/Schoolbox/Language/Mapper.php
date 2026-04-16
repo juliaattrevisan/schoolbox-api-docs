@@ -9,6 +9,7 @@ namespace Schoolbox\Language;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception;
 
 class Mapper extends BaseMapper
 {
@@ -28,7 +29,7 @@ class Mapper extends BaseMapper
      *
      * @param string $name
      * @return GenericCollection|Model[]
-     * @throws Mapper\Exception
+     * @throws Exception
      */
     public function findLanguages($name = ''): GenericCollection
     {
