@@ -416,10 +416,10 @@ class UserMapper extends Mapper
         /** @var QualificationMapper $qualificationMapper */
         $qualificationMapper = $this->getJoinMapper('user_qualification');
 
-        /** @var User\Nationality\Mapper $nationalityMapper */
+        /** @var Nationality\Mapper $nationalityMapper */
         $nationalityMapper = $this->getJoinMapper('user_nationality');
 
-        /** @var User\Language\Mapper $languageMapper */
+        /** @var Language\Mapper $languageMapper */
         $languageMapper = $this->getJoinMapper('user_language');
 
         foreach ($statement as $row) {
