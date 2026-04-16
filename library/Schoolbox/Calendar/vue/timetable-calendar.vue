@@ -233,8 +233,9 @@ export default {
         this.registerListCustomInputFields();
 
         // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
-        let quickSwitchIcon = document.createElement("a");
-        quickSwitchIcon.setAttribute("class", "adtp-btn icon-calendar no-text");
+        let quickSwitchIcon = document.createElement("sbx-icon");
+        quickSwitchIcon.setAttribute("name", "calendar");
+        quickSwitchIcon.setAttribute("aria-hidden", "true");
         document.getElementsByClassName("fc-quickSwitchButton-button")[0].appendChild(quickSwitchIcon);
 
         this.selectedOption = this.options["selectedUserOption"];

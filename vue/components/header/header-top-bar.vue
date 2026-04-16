@@ -95,12 +95,14 @@ function updateTopNavItems() {
                 </li>
                 <li>
                     <button
-                        class="button-show-notifications icon-notifications"
+                        class="button-show-notifications"
+                        :class="unreadNotifications > 0 ? 'sbx-button--has-icon' : 'sbx-icon-only-button'"
                         :data-unread="unreadNotifications"
                         aria-label="Show Notifications"
                         aria-expanded="false"
                         @click="$emit('openNotificationsMenu')"
                     >
+                        <sbx-icon name="notifications"></sbx-icon>
                         {{ unreadNotifications > 0 ? unreadNotifications : "" }}
                     </button>
                 </li>
@@ -188,9 +190,11 @@ ul {
         background-color: #fa4a47;
         color: #fff;
     }
-    &:before {
+
+    .sbx-icon {
         padding-right: 5px; //bring the number in closer
     }
+
     &:hover {
         background-color: var(--navigation-hover);
     }

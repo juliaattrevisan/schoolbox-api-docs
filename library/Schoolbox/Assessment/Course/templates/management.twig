@@ -131,7 +131,7 @@ Usage:
                 </div>
             </div>
             <nav>
-                <a href="{{ routeLookup('courseImport.getImport', { courseSpecId: 0, folderId: folder.id }) }}" class="icon-add" title="Import Course" data-course-selector></a>
+                <a href="{{ routeLookup('courseImport.getImport', { courseSpecId: 0, folderId: folder.id }) }}" class="sbx-icon-only-button" title="Import Course" aria-label="Import Course" data-course-selector><sbx-icon name="add"></sbx-icon></a>
             </nav>
         </div>
 
@@ -174,20 +174,20 @@ Usage:
                     <ul class="f-dropdown" data-dropdown-content="" id="courseDropdown-{{ currentCourse.id }}">
                         {% if not componentNames[currentCourse.id] %}
                             <li>
-                                <a href="{{ routeLookup('courseImport.restoreCourse', { courseImplId: currentCourse.id }) }}" class="icon-undo" title="Restore Component" data-restore-course="{{ currentCourse.specification.folder.name }}" data-restore-folder="{{ folder.id }}" data-restore-component="{{ courseComponentId is defined ? courseComponentId : 0 }}">Restore Component</a>
+                                <a href="{{ routeLookup('courseImport.restoreCourse', { courseImplId: currentCourse.id }) }}" class="sbx-button--has-icon" title="Restore Component" data-restore-course="{{ currentCourse.specification.folder.name }}" data-restore-folder="{{ folder.id }}" data-restore-component="{{ courseComponentId is defined ? courseComponentId : 0 }}"><sbx-icon name="undo"></sbx-icon>Restore Component</a>
                             </li>
                         {% endif %}
                         {% if not currentCourse.specification.folder.isDeleted and not currentCourse.specification.isDeleted %}
                         <li>
                             <a
                                 href="{{ routeLookup('courseImport.getModify', {courseImplId: currentCourse.id}) }}?{{ returnUrlName }}={{ encodedReturnUrl }}"
-                                class="icon-modify"
+                                class="sbx-button--has-icon"
                                 title="Modify Import"
-                            >Modify</a>
+                            ><sbx-icon name="modify"></sbx-icon>Modify</a>
                         </li>
                         {% endif %}
                         <li>
-                            <a href="{{ routeLookup('courseImport.importDelete', { courseImplId: currentCourse.id }) }}" class="icon-delete" title="Permanently Delete Import" data-delete>Delete</a>
+                            <a href="{{ routeLookup('courseImport.importDelete', { courseImplId: currentCourse.id }) }}" class="sbx-button--has-icon" title="Permanently Delete Import" data-delete><sbx-icon name="delete"></sbx-icon>Delete</a>
                         </li>
                     </ul>
 

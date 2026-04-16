@@ -8,17 +8,17 @@
                 <!-- END titlebar_read -->
                 <div data-component-titlebar-container data-action-count="2" class="actions-small-2">
                     <div class="list-item">
-                        <h2 title="{component.definition.name}"><!-- BEGIN drag_handle --><a href="#" class="icon-grip" id="drag{COMPONENT_INSTANCE_ID}" data-component-handle></a><!-- END drag_handle -->{component.definition.name}</h2>
+                        <h2 title="{component.definition.name}"><!-- BEGIN drag_handle --><a href="#" id="drag{COMPONENT_INSTANCE_ID}" data-component-handle><sbx-icon name="grip"></sbx-icon></a><!-- END drag_handle -->{component.definition.name}</h2>
                     </div>
                     <nav>
                         <!-- BEGIN settings_link -->
-                        <a data-target='settings' data-state='closed' href="#" class="icon-settings settings edit" title="Settings"></a>
+                        <a data-target='settings' data-state='closed' href="#" class="settings edit sbx-icon-only-button" title="Settings"><sbx-icon name="settings"></sbx-icon></a>
                         <!-- END settings_link -->
                         <!-- BEGIN settings_collapse -->
                         <a data-collapser="true" href="#" class="{CONFIG_COLLAPSED_ICON} collapse" title="Expand/collapse content"></a>
                         <!-- END settings_collapse -->
                         <!-- BEGIN settings_close -->
-                        <a data-target="delete" data-state='closed' href="#" class="icon-close" title="Close"></a>
+                        <a data-target="delete" data-state='closed' href="#" title="Close"><sbx-icon name="close"></sbx-icon></a>
                         <!-- END settings_close -->
                     </nav>
                 </div>

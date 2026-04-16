@@ -67,7 +67,7 @@
 
             {% if isRouteAuthorized('eportfolioBlog.getModify', {page: page, blog: blog }) %}
                 <nav>
-                    <a class="icon-modify" href="{{ routeLookup('eportfolioBlog.getModify', {pageId: page.getPageId, id: blog.getId}) }}" title="Modify Blog post"></a>
+                    <a href="{{ routeLookup('eportfolioBlog.getModify', {pageId: page.getPageId, id: blog.getId}) }}" title="Modify Blog post" class="sbx-icon-only-button"><sbx-icon name="modify"></sbx-icon></a>
                 </nav>
             {% endif %}
 
@@ -100,7 +100,14 @@
 
                             {% if isRouteAuthorized('eportfolioBlog.postCommentDelete', {comment: comment, page: page }) %}
                             <nav>
-                                <a data-interaction="deletecomment" class="icon-delete" data-blog-id="{{ blog.getId }}" data-comment-id="{{ comment.getId }}"></a>
+                                <a data-interaction="deletecomment"
+                                   class="sbx-icon-only-button no-text"
+                                   data-blog-id="{{ blog.getId }}"
+                                   data-comment-id="{{ comment.getId }}"
+                                   title="Delete comment"
+                                   aria-label="Delete comment">
+                                    <sbx-icon name="delete"></sbx-icon>
+                                </a>
                             </nav>
                             {% endif %}
 

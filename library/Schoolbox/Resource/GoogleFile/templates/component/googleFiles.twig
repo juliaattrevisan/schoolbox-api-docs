@@ -38,14 +38,14 @@
                         <sbx-pop-out content-id="google-file-{{ loop.index }}"></sbx-pop-out>
                     </nav>
                     <ul id="google-file-{{ loop.index }}" class="f-dropdown" data-dropdown-content>
-                        <li><a class="icon-bin" data-action="delete"
+                           <li><a data-action="delete"
                                href="{{ routeLookupIfAuthorized('googleFile.deleteGoogleFile', {googleFileId: googleFile.id, googleFile: googleFile}) }}"
-                               title="Remove">Remove</a>
+                               title="Remove" class="sbx-button--has-icon"><sbx-icon name="delete"></sbx-icon>Remove</a>
                         </li>
-                        <li><a class="icon-group" data-action="permission"
+                        <li><a data-action="permission"
                                data-id="{{ googleFile.googleId }}" data-edit-level="{{ googleFile.editLevel }}"
                                data-comment-level="{{ googleFile.commentLevel }}"
-                               title="Change permissions">Change permissions</a></li>
+                               title="Change permissions" class="sbx-button--has-icon"><sbx-icon name="group"></sbx-icon>Change permissions</a></li>
                     </ul>
                 {% endif %}
             </li>

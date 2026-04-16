@@ -321,49 +321,51 @@ window.Vue.watch(
 <template>
     <div class="share-work-buttons l-grid l-gap-m l-mar-m--bottom">
         <a
-            class="icon-camera share-photo"
+            class="share-photo sbx-button--has-icon"
             data-test="learning-moment-evidence-share-photo"
             :title="canAddEvidence ? 'Take a photo' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="(MediaType.PHOTO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.PHOTO)"
         >
+            <sbx-icon name="camera"></sbx-icon>
             Take a photo
         </a>
         <a
-            class="icon-video share-video"
+            class="share-video sbx-button--has-icon"
             data-test="learning-moment-evidence-share-video"
             :title="canAddEvidence ? 'Record a video' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="(MediaType.VIDEO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.VIDEO)"
         >
-            Record a video
+            <sbx-icon name="video"></sbx-icon>Record a video
         </a>
         <a
-            class="icon-audio share-audio"
+            class="share-audio sbx-button--has-icon"
             data-test="learning-moment-evidence-share-audio"
             :title="canAddEvidence ? 'Record audio' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="(MediaType.AUDIO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.AUDIO)"
         >
+            <sbx-icon name="audio"></sbx-icon>
             Record audio
         </a>
         <a
-            class="icon-upload share-file"
+            class="share-file sbx-button--has-icon"
             data-test="learning-moment-evidence-share-file"
             :title="canAddEvidence ? 'Upload file' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="MediaType.UPLOAD === mediaType || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.UPLOAD)"
         >
-            Upload file
+            <sbx-icon name="upload"></sbx-icon>Upload file
         </a>
         <a
             v-if="!(showDescriptionEditor || MediaType.TEXT === mediaType)"
-            class="icon-textbox share-text"
+            class="share-text sbx-button--has-icon"
             data-test="learning-moment-evidence-share-text"
             title="Write something"
             @click.prevent="changeMediaType(MediaType.TEXT, true)"
         >
-            Write something
+            <sbx-icon name="textbox"></sbx-icon>Write something
         </a>
     </div>
 
@@ -448,19 +450,21 @@ window.Vue.watch(
                         <nav>
                             <a
                                 v-if="evidence.storage._links.fetch"
-                                class="icon-download no-text"
+                                class="no-text sbx-icon-only-button"
                                 :href="evidence.storage._links.fetch"
                                 title="Download"
                                 download
+                                ><sbx-icon name="download"></sbx-icon
                             ></a>
                             <a
-                                class="icon-delete no-text"
+                                class="no-text sbx-icon-only-button"
                                 href="#"
                                 title="Delete Evidence"
                                 data-test="mf-evidence-delete"
                                 @click.prevent="
                                     deleteEvidence(mfStore.moment.evidence.findIndex((e) => e === evidence))
                                 "
+                                ><sbx-icon name="delete"></sbx-icon
                             ></a>
                         </nav>
                     </li>

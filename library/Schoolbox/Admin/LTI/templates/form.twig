@@ -117,7 +117,11 @@
                             <input name="redirect_urls[-1][id]" type="hidden" />
                             <input name="redirect_urls[-1][redirect_url]" />
                         </div>
-                        <nav><a class="delete-row-button icon-delete" title="Delete this Redirect URL" data-action="delete"></a></nav>
+                        <nav>
+                            <a class="delete-row-button sbx-icon-only-button" title="Delete this Redirect URL" aria-label="Delete this Redirect URL" data-action="delete">
+                                <sbx-icon name="delete"></sbx-icon>
+                            </a>
+                        </nav>
                     </div>
                 </li>
                 {% for i, redirectUrl in (provider.redirectUrls ?? []) %}
@@ -127,7 +131,11 @@
                             <input name="redirect_urls[{{ i }}][id]" type="hidden" value="{{ redirectUrl.id }}" />
                             <input name="redirect_urls[{{ i }}][redirect_url]" value="{{ redirectUrl.redirectUrl }}" />
                         </div>
-                        <nav><a class="delete-row-button icon-delete" title="Delete this Redirect URL" data-action="delete"></a></nav>
+                        <nav>
+                            <a class="delete-row-button sbx-icon-only-button" title="Delete this Redirect URL" aria-label="Delete this Redirect URL" data-action="delete">
+                                <sbx-icon name="delete"></sbx-icon>
+                            </a>
+                        </nav>
                     </div>
                 </li>
                 {% endfor %}
@@ -198,7 +206,10 @@
                        value="{{ issuer }}">
                 <a href="#"
                    data-clipboard-text="{{ issuer }}"
-                   class="button icon-copy">Copy</a>
+                     class="button sbx-button--has-icon">
+                      <sbx-icon name="copy"></sbx-icon>
+                      Copy
+                  </a>
             </div>
         </div>
 
@@ -215,7 +226,10 @@
                        value="{{ oidcAuthenticationUrl }}">
                 <a href="#"
                    data-clipboard-text="{{ oidcAuthenticationUrl }}"
-                   class="button icon-copy">Copy</a>
+                     class="button sbx-button--has-icon">
+                      <sbx-icon name="copy"></sbx-icon>
+                      Copy
+                  </a>
             </div>
         </div>
 
@@ -232,7 +246,10 @@
                        value="{{ oauthAccessTokenUrl }}">
                 <a href="#"
                    data-clipboard-text="{{ oauthAccessTokenUrl }}"
-                   class="button icon-copy">Copy</a>
+                     class="button sbx-button--has-icon">
+                      <sbx-icon name="copy"></sbx-icon>
+                      Copy
+                  </a>
             </div>
         </div>
 
@@ -249,7 +266,10 @@
                        value="{{ jsonWebKeySetUrl }}">
                 <a href="#"
                    data-clipboard-text="{{ jsonWebKeySetUrl }}"
-                   class="button icon-copy">Copy</a>
+                     class="button sbx-button--has-icon">
+                      <sbx-icon name="copy"></sbx-icon>
+                      Copy
+                  </a>
             </div>
         </div>
 
@@ -267,7 +287,10 @@
                        value="{{ provider.deploymentId ?? '' }}">
                 <a href="#"
                    data-clipboard-text="{{ provider.deploymentId ?? '' }}"
-                   class="button icon-copy {% if isNew %}disabled{% endif %}">Copy</a>
+                   class="button sbx-button--has-icon {% if isNew %}disabled{% endif %}">
+                    <sbx-icon name="copy"></sbx-icon>
+                    Copy
+                </a>
             </div>
         </div>
     </fieldset>

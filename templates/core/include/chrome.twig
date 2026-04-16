@@ -329,7 +329,8 @@
                     {% block messaging %}
                         {% if ws.enabled and user.current.id %}
                             <section class="right-small" id="notifications">
-                                <a class="right-off-canvas-toggle icon-notifications" id="notification-toggle" data-unread="{{ ws.unread }}">
+                                <a class="right-off-canvas-toggle" id="notification-toggle" data-unread="{{ ws.unread }}" aria-label="Notifications">
+                                    <sbx-icon name="notifications" color="currentColor" size="1.25rem"></sbx-icon>
                                     <span data-unread-count>{{ ws.unread ?? '' }}</span>
                                 </a>
                             </section>
@@ -424,11 +425,11 @@
                                 data-title-undock="{{ undockNotifsTitle }}"
                             ></a>
                             <label id="notification-toggle-full">Notifications</label>
-                            <a class="icon-settings settings-button" href="{{ routeLookup("notifications.configure") }}" aria-label="Modify notification settings" title="Modify notification settings"></a>
+                            <a class="settings-button sbx-icon-only-button" href="{{ routeLookup("notifications.configure") }}" aria-label="Modify notification settings" title="Modify notification settings"><sbx-icon name="settings"></sbx-icon></a>
                         </li>
                         {% include '@notifications/pwa.twig' with { pwaPage: 'sidebar' } %}
                         <li>
-                            <a id="msg-mar" class="mark-all-read button icon-approve" href="#">Mark all read</a>
+                            <a id="msg-mar" class="mark-all-read button sbx-button--has-icon" href="#"><sbx-icon name="approve"></sbx-icon> Mark all read</a>
                         </li>
                         <li>
                             <section>
@@ -448,7 +449,7 @@
                                             </div>
                                         </div>
                                         <nav>
-                                            <a data-msgitem-ack class="icon-approve no-pad" title="Mark as read"></a>
+                                            <a data-msgitem-ack class="no-pad sbx-icon-only-button" title="Mark as read"><sbx-icon name="approve"></sbx-icon></a>
                                         </nav>
                                     </li>
                                 </ul>

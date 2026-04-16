@@ -5,7 +5,7 @@
         <ul id="answerCollection" class="information-list no-pad">
         </ul>
 
-        <a class="button icon-add" href="#" data-add-answer>Add answer option</a>
+        <a class="button sbx-button--has-icon" href="#" data-add-answer><sbx-icon name="add"></sbx-icon>Add answer option</a>
     </div>
 </fieldset>
 
@@ -25,7 +25,13 @@
             </label>
         </div>
         <div class="small-1 columns">
-            <a class="button icon-delete" data-delete title="Remove"></a>
+            <a class="button sbx-button--has-icon"
+               data-delete
+               title="Remove"
+               aria-label="Remove">
+                <sbx-icon name="delete"></sbx-icon>
+                Remove
+            </a>
         </div>
     </li>
 </ul>

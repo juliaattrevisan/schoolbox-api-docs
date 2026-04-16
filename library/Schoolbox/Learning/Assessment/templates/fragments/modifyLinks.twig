@@ -26,10 +26,10 @@
 {% if modifyRoute %}
     <li>
         <a
-            class="icon-modify"
             data-test="{{ dataTestPrefix }}modify-{{ assessment.id }}"
             href="{{ modifyRoute }}{{ returnUrlParam }}"
-            >Modify
+            class="sbx-button--has-icon"
+            ><sbx-icon name="modify"></sbx-icon>Modify
             {# Since Quiz/Dialog Agents have an extra button, distinguish what this "Modify" means #}
             {% if assessment is quiz or assessment is dialogAgent %}
                 Settings
@@ -47,10 +47,10 @@
     {% if modifyContentsRoute %}
         <li>
             <a
-                class="icon-modify"
                 data-test="{{ dataTestPrefix }}modify-contents-{{ assessment.id }}"
                 href="{{ modifyContentsRoute }}{{ returnUrlParam }}"
-            >Modify Contents</a>
+                class="sbx-button--has-icon"
+            ><sbx-icon name="modify"></sbx-icon>Modify Contents</a>
         </li>
     {% endif %}
 {% endif %}
@@ -60,10 +60,10 @@
     {% if configureAgentRoute %}
         <li>
             <a
-                class="icon-modify"
                 data-test="{{ dataTestPrefix }}configure-agent-{{ assessment.id }}"
                 href="{{ configureAgentRoute }}{{ returnUrlParam }}"
-            >Configure Agent</a>
+                class="sbx-button--has-icon"
+            ><sbx-icon name="modify"></sbx-icon>Configure Agent</a>
         </li>
     {% endif %}
 {% endif %}

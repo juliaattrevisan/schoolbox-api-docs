@@ -182,7 +182,9 @@ function onPreviewRefresh(): void {
                         <div class="small-12">
                             <ul class="flex-list buttons">
                                 <li>
-                                    <a href="#" class="f-no-margins"> <sbx-icon name="previous"></sbx-icon>Return</a>
+                                    <a href="#" class="f-no-margins sbx-button--has-icon">
+                                        <sbx-icon name="previous"></sbx-icon>Return</a
+                                    >
                                 </li>
                                 <li><a href="#" class="submit f-no-margins">Publish News</a></li>
                             </ul>

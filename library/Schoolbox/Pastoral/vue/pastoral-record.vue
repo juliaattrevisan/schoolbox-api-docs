@@ -126,7 +126,8 @@ window.Vue.onMounted((): void => {
                                 download
                                 rel="download"
                                 title="Download"
-                                class="icon-download"
+                                class="sbx-icon-only-button"
+                                ><sbx-icon name="download"></sbx-icon
                             ></a>
                         </nav>
                     </li>

@@ -66,28 +66,31 @@ function onDeleteNodesSelected(): void {
             <ul class="flex-list">
                 <li v-if="selectedNodesStore.allNodesEnabled">
                     <button
-                        class="button icon-view-hollow"
+                        class="button sbx-button--has-icon"
                         data-test="disable-nodes"
                         @click.prevent="onEnableNodesSelected(false)"
                     >
+                        <sbx-icon name="view-hollow"></sbx-icon>
                         Disable {{ selectedNodesSummary }}
                     </button>
                 </li>
                 <li v-else-if="selectedNodesStore.allNodesDisabled">
                     <button
-                        class="button icon-view"
+                        class="button sbx-button--has-icon"
                         data-test="enable-nodes"
                         @click.prevent="onEnableNodesSelected(true)"
                     >
+                        <sbx-icon name="view"></sbx-icon>
                         Enable {{ selectedNodesSummary }}
                     </button>
                 </li>
                 <li>
                     <button
-                        class="button icon-delete alert"
+                        class="button alert sbx-button--has-icon"
                         data-test="delete-nodes"
                         @click.prevent="onDeleteNodesSelected"
                     >
+                        <sbx-icon name="delete"></sbx-icon>
                         Delete {{ selectedNodesSummary }}
                     </button>
                 </li>

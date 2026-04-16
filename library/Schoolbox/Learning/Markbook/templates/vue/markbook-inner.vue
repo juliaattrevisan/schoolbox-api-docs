@@ -120,7 +120,9 @@ const exportReportRoute = window.Vue.computed(() => {
             <ul id="header-options" class="f-dropdown" data-dropdown-content>
                 <li class="separator">Report</li>
                 <li>
-                    <a :href="exportReportRoute" class="icon-download"> Download Spreadsheet </a>
+                    <a :href="exportReportRoute" class="sbx-button--has-icon"
+                        ><sbx-icon name="download"></sbx-icon> Download Spreadsheet
+                    </a>
                 </li>
             </ul>
         </template>

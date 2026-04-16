@@ -12,9 +12,9 @@ export default class AssessmentPage {
 
     static readonly DATA_TEST_LINK_JELLY_TOT = "sbx-pop-out-header-options";
 
-    static readonly SELECTOR_LINK_MODIFY = "#header-options a.icon-modify";
+    static readonly SELECTOR_LINK_MODIFY = '#header-options a:has(sbx-icon[name="modify"])';
 
-    static readonly SELECTOR_LINK_STATUS = "#header-options a.icon-progress";
+    static readonly SELECTOR_LINK_STATUS = '#header-options a:has(sbx-icon[name="progress"])';
 
     static readonly DATA_TEST_ASSESSMENT_SUMMARY_CREATE_BUTTON = "assessment-summary-create-button";
 

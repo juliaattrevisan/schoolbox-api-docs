@@ -187,32 +187,38 @@ async function onResolve(): Promise<void> {
 
 <template>
     <li v-if="props.showView && props.response?._routes.view">
-        <a :href="props.response._routes.view" class="icon-view" data-test="das-actions-view">
+        <a :href="props.response._routes.view" data-test="das-actions-view" class="sbx-button--has-icon">
+            <sbx-icon name="view"></sbx-icon>
             {{ `View ${locale.dialogAgent.proper()}` }}
         </a>
     </li>
     <li v-if="props.summaryRoute">
-        <a :href="props.summaryRoute" class="icon-history" data-test="das-actions-summary">
+        <a :href="props.summaryRoute" data-test="das-actions-summary" class="sbx-button--has-icon">
+            <sbx-icon name="history"></sbx-icon>
             {{ `${locale.dialogAgent.proper()} History` }}
         </a>
     </li>
     <li v-if="props.response?._routes.submit">
-        <button class="icon-approve" data-test="das-actions-submit" @click="onSubmit">
+        <button data-test="das-actions-submit" class="sbx-button--has-icon" @click="onSubmit">
+            <sbx-icon name="approve"></sbx-icon>
             {{ isSameUser ? `Submit ${locale.dialogAgent.proper()}` : `Submit on behalf of ${props.user.fullName}` }}
         </button>
     </li>
     <li v-if="props.response?._routes.reset">
-        <button class="icon-refresh" data-test="das-actions-reset" @click="onReset">
+        <button data-test="das-actions-reset" class="sbx-button--has-icon" @click="onReset">
+            <sbx-icon name="refresh"></sbx-icon>
             {{ `Reset ${locale.dialogAgent.proper()}` }}
         </button>
     </li>
     <li v-if="props.response?._routes.reopen">
-        <button class="icon-undo" data-test="das-actions-reopen" @click="onReopen">
+        <button data-test="das-actions-reopen" class="sbx-button--has-icon" @click="onReopen">
+            <sbx-icon name="undo"></sbx-icon>
             {{ `Reopen ${locale.dialogAgent.proper()}` }}
         </button>
     </li>
     <li v-if="props.response?._routes.assistanceResolve">
-        <button class="icon-medical" data-test="das-actions-assistanceResolve" @click="onResolve">
+        <button class="sbx-button--has-icon" data-test="das-actions-assistanceResolve" @click="onResolve">
+            <sbx-icon name="medical"></sbx-icon>
             {{ `Resolve Assistance Request` }}
         </button>
     </li>

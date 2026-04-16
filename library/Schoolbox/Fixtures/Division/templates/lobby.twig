@@ -36,7 +36,9 @@
     </div>
     {% if division.teams | length %}
     <nav>
-        <a href="{{ routeLookup('sportsfixturesMatch.getList', { contextId: division.id }) }}" class="icon-match" title="View Fixture"></a>
+        <a href="{{ routeLookup('sportsfixturesMatch.getList', { contextId: division.id }) }}" class="sbx-icon-only-button" title="View Fixture" aria-label="View Fixture">
+            <sbx-icon name="match"></sbx-icon>
+        </a>
     </nav>
     {% endif %}
 </div>
@@ -50,8 +52,12 @@
                 </div>
             </div>
             <nav>
-                <a href="#" class="icon-add" title="Add Players" data-reveal-id="addPlayersModal"></a>
-                <a href="#" class="icon-upload" title="Upload Player List" data-reveal-id="uploadPlayersModal"></a>
+                <a href="#" class="sbx-icon-only-button" title="Add Players" aria-label="Add Players" data-reveal-id="addPlayersModal">
+                    <sbx-icon name="add"></sbx-icon>
+                </a>
+                <a href="#" class="sbx-icon-only-button" title="Upload Player List" aria-label="Upload Player List" data-reveal-id="uploadPlayersModal">
+                    <sbx-icon name="upload"></sbx-icon>
+                </a>
             </nav>
         </div>
         <div class="row">
@@ -90,7 +96,9 @@
                 </div>
             </div>
             <nav>
-                <a href="{{ routeLookup('sportsfixturesTeam.getCreateForm', {contextId: division.id}) }}" class="icon-add" title="Add Team"></a>
+                <a href="{{ routeLookup('sportsfixturesTeam.getCreateForm', {contextId: division.id}) }}" class="sbx-icon-only-button" title="Add Team" aria-label="Add Team">
+                    <sbx-icon name="add"></sbx-icon>
+                </a>
             </nav>
         </div>
 

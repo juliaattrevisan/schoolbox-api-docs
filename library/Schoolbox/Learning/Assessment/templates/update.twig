@@ -171,15 +171,15 @@
             {% if assessment is quiz %}
                 {% set exportRoute = routeLookupIfAuthorized('learnosity.getExportToJson', {assessment: assessment, assessmentId: assessment.id}) %}
                 <li>
-                    <a href="{{ exportRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}" class="icon-download" title="Download a file to reuse this quiz elsewhere">Export quiz as file</a>
+                    <a href="{{ exportRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}" title="Download a file to reuse this quiz elsewhere" class="sbx-button--has-icon"><sbx-icon name="download"></sbx-icon>Export quiz as file</a>
                 </li>
             {% endif %}
             {% if viewCustomParticipationRoute %}
-                <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
+                <li><a href="{{ viewCustomParticipationRoute }}" class="sbx-button--has-icon"><sbx-icon name="group"></sbx-icon>Student Participation</a></li>
             {% endif %}
             {% if deleteRoute %}
                 <li>
-                    <a class="icon-delete" title="Delete" data-delete>Delete {{ locale.activity }}</a>
+                    <a title="Delete" data-delete class="sbx-button--has-icon"><sbx-icon name="delete"></sbx-icon>Delete {{ locale.activity }}</a>
                 </li>
             {% endif %}
         </ul>

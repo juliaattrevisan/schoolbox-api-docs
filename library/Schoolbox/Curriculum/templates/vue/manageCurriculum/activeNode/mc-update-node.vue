@@ -148,12 +148,13 @@ function onCancelSelected(): void {
                                 <button
                                     ref="updateButton"
                                     type="submit"
-                                    class="button icon-modify submit"
+                                    class="button submit sbx-button--has-icon"
                                     data-test="update-node"
                                     :data-submit-button-for="ckeditorIdAttr"
                                     :disabled="isUpdateDisabled"
                                     @click.prevent="onUpdateSelected"
                                 >
+                                    <sbx-icon name="modify"></sbx-icon>
                                     {{ updateButtonText }}
                                 </button>
                             </li>

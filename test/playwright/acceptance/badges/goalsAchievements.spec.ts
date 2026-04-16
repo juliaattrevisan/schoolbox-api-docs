@@ -211,7 +211,7 @@ test.describe("Goals and Achievements tests", () => {
         await expect(page.locator("#container")).toContainText("Great job, Jana!");
 
         tester.isGoingTo("Get the evidence updated");
-        await page.locator('[class="icon-modify"]').last().click();
+        await page.locator('a:has(sbx-icon[name="modify"])').last().click();
         await tester.fillCKEditorById("reason", "Well done, Jana!");
         await badges.clickEvidenceSubmitButton();
 
@@ -264,7 +264,7 @@ test.describe("Goals and Achievements tests", () => {
         await expect(page.locator("#container")).toContainText("Awarding this as achievement with evidence");
 
         tester.isGoingTo("Get the evidence updated and ensure it is presented properly");
-        await page.locator('[class="icon-modify"]').last().click();
+        await page.locator('a:has(sbx-icon[name="modify"])').last().click();
         await tester.fillCKEditorById("reason", "This is updated");
         await badges.clickEvidenceSubmitButton();
         tester.isGoingTo("Ensure the evidence text is updated");

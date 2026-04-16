@@ -33,7 +33,7 @@ export default class SummaryPage {
      * @param categoryId - The ID of the category
      */
     async addToQuestionBank(questionId: number, categoryId: number): Promise<void> {
-        await this.page.click(`#question_${questionId} a.icon-download`);
+        await this.page.click(`#question_${questionId} a sbx-icon[name="download"]`);
         await this.page.waitForSelector("#question-bank");
         await this.page.click(`#node_${categoryId}_anchor`);
         await this.page.click('input[type=submit][value="Add To Question Bank"]');
@@ -47,7 +47,7 @@ export default class SummaryPage {
      */
     async clickAddFromQuestionBank(sectionId: number): Promise<void> {
         await this.page.click(`[data-test=sbx-pop-out-section${sectionId}-options]`);
-        await this.page.click(`#section${sectionId}-options a.icon-download`);
+        await this.page.click(`#section${sectionId}-options a sbx-icon[name="download"]`);
         await expect(this.page.locator(`h2.subheader:has-text("Categories")`)).toBeVisible();
     }
 
@@ -57,7 +57,7 @@ export default class SummaryPage {
      */
     async clickNewQuestion(sectionId: number): Promise<void> {
         await this.page.click(`[data-test=sbx-pop-out-section${sectionId}-options]`);
-        await this.page.click(`#section${sectionId}-options a.icon-add`);
+        await this.page.click(`#section${sectionId}-options a.sbx-button--has-icon`);
         await expect(this.page.locator(`h2.subheader:has-text("Create Question")`)).toBeVisible();
     }
 }

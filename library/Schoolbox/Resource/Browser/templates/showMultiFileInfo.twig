@@ -7,7 +7,14 @@
         {% if access >= 2 and files|length %}
             {% set fileActionList %}
                 <li>
-                    <a class="icon-delete" data-action="delete" href="/cms/fileForm.php?fileList={{ files|join(',') }}&deleteList=1">Delete</a>
+                    <a class="sbx-button--has-icon"
+                       data-action="delete"
+                       href="/cms/fileForm.php?fileList={{ files|join(',') }}&deleteList=1"
+                       title="Delete files"
+                       aria-label="Delete files">
+                        <sbx-icon name="delete"></sbx-icon>
+                        Delete
+                    </a>
                 </li>
             {% endset %}
             {% include '@resourceBrowser/actionBar.twig' with { id: 'file-actions', list: fileActionList, sizing: { small: 1, medium: 2, large: 2, xlarge: 4, xxlarge: 4 } } %}

@@ -40,7 +40,7 @@
     </div>
     {% if isRouteAuthorized('blog.getModify', { blog: record, folder: record.getFolder }) %}
     <nav>
-        <a class="icon icon-modify" href="{{ routeLookup('blog.getModify', { id: record.getId }) }}" title="Modify"></a>
+        <a class="icon sbx-icon-only-button" href="{{ routeLookup('blog.getModify', { id: record.getId }) }}" title="Modify"><sbx-icon name="modify"></sbx-icon></a>
     </nav>
     {% endif %}
 </div>
@@ -86,7 +86,13 @@
 
                         {% if isRouteAuthorized('blog.postCommentDelete', { comment: comment, folder: record.getFolder}) %}
                             <nav>
-                                <a class="icon icon-delete" data-interaction="delete" data-comment-id="{{ comment.getId }}"></a>
+                                <a class="sbx-icon-only-button no-text"
+                                   data-interaction="delete"
+                                   data-comment-id="{{ comment.getId }}"
+                                   title="Delete comment"
+                                   aria-label="Delete comment">
+                                    <sbx-icon name="delete"></sbx-icon>
+                                </a>
                             </nav>
                         {% endif %}
 

@@ -89,7 +89,7 @@ export default class ResourceUI extends Plugin {
                 <span class="meter" style="width: 0%" data-progress-meter></span>
             </div>
             <nav>
-                <a href="#" data-remove-upload="" title="Remove" class="icon-close"></a>
+                <a href="#" data-remove-upload="" title="Remove" class="sbx-icon-only-button"><sbx-icon name="close"></sbx-icon></a>
             </nav>
         `;
         this.uploadContainer.appendChild(container);

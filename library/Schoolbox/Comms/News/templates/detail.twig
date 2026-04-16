@@ -115,11 +115,21 @@ Data:
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
 
         {% if modifyRoute %}
-            <li><a class="icon-modify" href="{{ modifyRoute }}">Modify</a></li>
+            <li>
+                <a class="sbx-button--has-icon" href="{{ modifyRoute }}">
+                    <sbx-icon name="modify"></sbx-icon>
+                    Modify
+                </a>
+            </li>
         {% endif %}
 
         {% if deleteRoute %}
-            <li><a class="icon-delete" href="{{ deleteRoute }}{{ returnUrlQueryString }}" data-delete="{{ article.title|default('(untitled)') }}">Delete</a></li>
+            <li>
+                <a class="sbx-button--has-icon" href="{{ deleteRoute }}{{ returnUrlQueryString }}" data-delete="{{ article.title|default('(untitled)') }}">
+                    <sbx-icon name="delete"></sbx-icon>
+                    Delete
+                </a>
+            </li>
         {% endif %}
 
         {# 'Unpublish' action
@@ -128,11 +138,21 @@ Data:
          # anything before awaiting moderation doesn't need a reject/unpublish button
          #}
         {% if rejectRoute is defined and rejectRoute and article.isApproved %}
-            <li><a class="icon-undo" id="unpublish-article" href="{{ rejectRoute }}{{ returnUrlQueryString }}" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
+            <li>
+                <a class="sbx-button--has-icon" id="unpublish-article" href="{{ rejectRoute }}{{ returnUrlQueryString }}" data-reject="{{ article.title }}">
+                    <sbx-icon name="undo"></sbx-icon>
+                    {{ rejectVerb }}
+                </a>
+            </li>
         {% endif %}
 
         {% if statisticsRoute %}
-            <li><a class="icon-progress" href="{{ statisticsRoute }}">Statistics</a></li>
+            <li>
+                <a class="sbx-button--has-icon" href="{{ statisticsRoute }}">
+                    <sbx-icon name="progress"></sbx-icon>
+                    Statistics
+                </a>
+            </li>
         {% endif %}
     </ul>
     {% endif %}

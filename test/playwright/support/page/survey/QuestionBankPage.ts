@@ -48,6 +48,6 @@ export default class QuestionBankPage {
         const questionListItem = this.page
             .locator("#questionBankForm > section > ul > li")
             .filter({ hasText: question });
-        await questionListItem.locator("nav > a.icon-modify").click();
+        await questionListItem.locator('nav > a:has(sbx-icon[name="modify"])').click();
     }
 }

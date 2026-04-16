@@ -28,7 +28,9 @@
         </div>
     </div>
     <nav>
-        <a href="#" class="icon-down-arrow" data-collapser="liss-input-payloads-all"></a>
+        <a href="#" class="sbx-icon-only-button" data-collapser="liss-input-payloads-all" aria-label="Toggle LISS input payloads">
+            <sbx-icon name="down-arrow"></sbx-icon>
+        </a>
     </nav>
 </div>
 <table>
@@ -61,7 +63,11 @@
                     {% set deleteRoute = routeLookupIfAuthorized('adminImportIndex.postDeleteLissPayload') %}
                     {% if deleteRoute %}
                         <td class="actions-small-1">
-                            <nav><a href="{{ deleteRoute }}" class="icon-delete" data-delete="{{ file.hash }}"></a></nav>
+                            <nav>
+                                <a href="{{ deleteRoute }}" class="sbx-icon-only-button" data-delete="{{ file.hash }}" title="Delete" aria-label="Delete">
+                                    <sbx-icon name="delete"></sbx-icon>
+                                </a>
+                            </nav>
                         </td>
                     {% else %}
                         <td></td>
@@ -101,7 +107,11 @@
                 {% set deleteRoute = routeLookupIfAuthorized('adminImportIndex.postDeleteLissPayload') %}
                 {% if deleteRoute %}
                     <td class="actions-small-1">
-                        <nav><a href="{{ deleteRoute }}" class="icon-delete" data-delete="{{ file.hash }}"></a></nav>
+                        <nav>
+                            <a href="{{ deleteRoute }}" class="sbx-icon-only-button" data-delete="{{ file.hash }}" title="Delete" aria-label="Delete">
+                                <sbx-icon name="delete"></sbx-icon>
+                            </a>
+                        </nav>
                     </td>
                 {% else %}
                     <td></td>
@@ -111,5 +121,3 @@
         </tbody>
     </table>
 </div>
-
-

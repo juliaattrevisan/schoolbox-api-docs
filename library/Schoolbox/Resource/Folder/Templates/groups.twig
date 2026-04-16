@@ -20,7 +20,7 @@
         </div>
     </div>
     <nav>
-        <a class="icon-group" href="/group/join" title="Join Other Groups"></a>
+        <a class="sbx-icon-only-button no-text" href="/group/join" title="Join Other Groups" aria-label="Join Other Groups"><sbx-icon name="group"></sbx-icon></a>
     </nav>
 </div>
 <div class="row">
@@ -53,14 +53,14 @@
                             </nav>
                             <ul data-dropdown-content class="f-dropdown" id="class-options{{ group.id }}">
                                 {% if (isAccessWrite or isAccessAdmin) %}
-                                    <li><a href="{{ routeLookup('folder.getFolderModify', {id: group.id}) }}" class="icon-modify">Modify Folder</a></li>
-                                    <li><a href="/statistics/homepage/{{ group.id }}" class="icon-report">View Statistics</a></li>
+                                    <li><a href="{{ routeLookup('folder.getFolderModify', {id: group.id}) }}" class="sbx-button--has-icon"><sbx-icon name="modify"></sbx-icon>Modify Folder</a></li>
+                                    <li><a href="/statistics/homepage/{{ group.id }}" class="sbx-button--has-icon"><sbx-icon name="report"></sbx-icon>View Statistics</a></li>
                                 {% endif %}
                                 {% if isAccessAdmin %}
-                                    <li><a href="{{ routeLookup('group.getModify', {folderId: group.id, folder: group}) }}" class="icon-group">Manage Group</a></li>
+                                    <li><a href="{{ routeLookup('group.getModify', {folderId: group.id, folder: group}) }}" class="sbx-button--has-icon"><sbx-icon name="group"></sbx-icon>Manage Group</a></li>
                                 {% endif %}
                                 {% if ((not isPrivate) and (isAccessWrite or isAccessRead)) %}
-                                    <li><a href="/group/joinForm.php?leave={{ group.id }}&return=true" data-confirm-leave class="icon-logout">Leave Group</a></li>
+                                    <li><a href="/group/joinForm.php?leave={{ group.id }}&return=true" data-confirm-leave class="sbx-button--has-icon"><sbx-icon name="logout"></sbx-icon>Leave Group</a></li>
                                 {% endif %}
                             </ul>
                         {% endif %}

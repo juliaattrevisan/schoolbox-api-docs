@@ -122,7 +122,7 @@
                                         <div class="small-{{ subject.grade ? 8 : 12 }} card">
                                             {% if gradePath %}
                                                 <a href="{{ gradePath }}" title="View {{ locale.grades.properPlural }}">
-                                                    <span class="icon-home size-32" title="{{ subject.folder.title }}"></span>
+                                                    <sbx-icon name="home" size="2rem"></sbx-icon>
                                                     <p>{{ subject.folder.title }}</p>
                                                 </a>
                                             {% else %}
@@ -165,7 +165,7 @@
 
                                         </div>
                                         <nav>
-                                            <a href="{{ mailHandle }}{{ teacher.email }}" class="icon-email" title="Email {{ teacher.formatName }}"></a>
+                                            <a href="{{ mailHandle }}{{ teacher.email }}" title="Email {{ teacher.formatName }}" class="sbx-icon-only-button"><sbx-icon name="email"></sbx-icon></a>
                                         </nav>
                                     </li>
                                 {% endfor %}

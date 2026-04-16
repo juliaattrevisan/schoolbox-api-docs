@@ -54,7 +54,7 @@
             </div>
             {% if isModify and isRouteAuthorized('pastoral.postRecordDelete', {record: record}) %}
                 <nav class="hide" id="formPastoralDelete">
-                    <a href="#" data-delete class="icon-delete" title="Delete {{ locale.pastoral.proper }} Record"></a>
+                    <a href="#" data-delete class="sbx-icon-only-button" title="Delete {{ locale.pastoral.proper }} Record" aria-label="Delete {{ locale.pastoral.proper }} Record"><sbx-icon name="delete"></sbx-icon></a>
                 </nav>
             {% endif %}
         </div>

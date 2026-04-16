@@ -15,7 +15,7 @@ export default class Datepicker {
      * Check if the calendar picker date is the same as the expected date
      */
     async clickSelectDateButton(): Promise<void> {
-        await this.page.locator('a[class="adtp-btn icon-calendar"]').first().click();
+        await this.page.locator("a[data-adtp-btn]").first().click();
         await this.tester.common.waitForModalToBeOpen();
     }
 

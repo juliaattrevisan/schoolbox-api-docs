@@ -20,10 +20,11 @@ function onSelected(): void {
 <template>
     <button
         v-if="itemsStore.hasPreviousItem"
-        class="button full-width icon-previous"
+        class="button full-width sbx-button--has-icon"
         :disabled="!itemsStore.hasPreviousItem || store.isProcessing"
         @click.prevent="onSelected"
     >
+        <sbx-icon name="previous"></sbx-icon>
         Previous item
     </button>
 </template>

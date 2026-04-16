@@ -9,18 +9,26 @@
 {% set viewFilesName  = (folder.id != 0 and (user.isSuperuser or access >= 2)) ? 'Manage Files' : 'View Files' %}
 {% set routeManageGroup = routeLookupIfAuthorized('group.getModify', {folderId: folder.id, folder: folder}) %}
 
-{% if folder.hasHomepage %}<li><a class="icon-home"     data-action="folder"   data-test="resource-action-homepage" href="/homepage/{{ folder.id }}">Homepage</a></li>{% endif %}
-{% if routeModify        %}<li><a class="icon-modify"   data-action="modify"   href="{{ routeModify }}">Modify</a></li>{% endif %}
-{% if routePostFile      %}<li><a class="icon-drop-box" data-action="file"     href="{{ routePostFile }}">Post File</a></li>{% endif %}
-{% if routeViewFiles     %}<li><a class="icon-files"    data-action="file"     href="{{ routeViewFiles }}">{{ viewFilesName }}</a></li>{% endif %}
-{% if routeCreate        %}<li><a class="icon-folder"   data-action="folder"   href="{{ routeCreate }}">Add Folder</a></li>{% endif %}
-{% if routeAddLink       %}<li><a class="icon-link"     data-action="link"     href="{{ routeAddLink }}">Add Link</a></li>{% endif %}
-{% if routeDownload      %}<li><a class="icon-download" data-action="download" href="{{ routeDownload }}" title="{{ folder.name }}">Download</a></li>{% endif %}
-{% if routeUploadZip     %}<li><a class="icon-upload"   data-action="zip"      href="{{ routeUploadZip }}">Upload ZIP</a></li>{% endif %}
-{% if routeDelete        %}<li><a class="icon-delete"   data-action="delete"   href="{{ routeDelete }}" data-delete>Delete</a></li>{% endif %}
+{% if folder.hasHomepage %}<li><a data-action="folder" data-test="resource-action-homepage" href="/homepage/{{ folder.id }}" class="sbx-button--has-icon"><sbx-icon name="home"></sbx-icon>Homepage</a></li>{% endif %}
+{% if routeModify        %}<li><a data-action="modify" href="{{ routeModify }}" class="sbx-button--has-icon"><sbx-icon name="modify"></sbx-icon>Modify</a></li>{% endif %}
+{% if routePostFile      %}<li><a data-action="file" href="{{ routePostFile }}" class="sbx-button--has-icon"><sbx-icon name="drop-box"></sbx-icon>Post File</a></li>{% endif %}
+{% if routeViewFiles     %}<li><a data-action="file" href="{{ routeViewFiles }}" class="sbx-button--has-icon"><sbx-icon name="files"></sbx-icon>{{ viewFilesName }}</a></li>{% endif %}
+{% if routeCreate        %}<li><a data-action="folder" href="{{ routeCreate }}" class="sbx-button--has-icon"><sbx-icon name="folder"></sbx-icon>Add Folder</a></li>{% endif %}
+{% if routeAddLink       %}<li><a data-action="link" href="{{ routeAddLink }}" class="sbx-button--has-icon"><sbx-icon name="link"></sbx-icon>Add Link</a></li>{% endif %}
+{% if routeDownload      %}<li><a data-action="download" href="{{ routeDownload }}" title="{{ folder.name }}" class="sbx-button--has-icon"><sbx-icon name="download"></sbx-icon>Download</a></li>{% endif %}
+{% if routeUploadZip     %}<li><a data-action="zip" href="{{ routeUploadZip }}" class="sbx-button--has-icon"><sbx-icon name="upload"></sbx-icon>Upload ZIP</a></li>{% endif %}
+{% if routeDelete        %}<li><a class="sbx-button--has-icon"
+                                   data-action="delete"
+                                   href="{{ routeDelete }}"
+                                   data-delete
+                                   title="Delete folder"
+                                   aria-label="Delete folder">
+    <sbx-icon name="delete"></sbx-icon>
+    Delete
+</a></li>{% endif %}
 
 {% if folder.group and routeManageGroup %}
     <li>
-        <a class="icon-group-managers" data-action="manage" href="{{ routeManageGroup }}">Manage Group</a>
+        <a data-action="manage" href="{{ routeManageGroup }}" class="sbx-button--has-icon"><sbx-icon name="group-managers"></sbx-icon>Manage Group</a>
     </li>
 {% endif %}

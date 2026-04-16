@@ -72,11 +72,11 @@ Usage:
         </div>
         {% if hasAdd %}
             <nav>
-                <a href="{{ routeLookup('course.newCourse') }}" class="icon-add" data-test="course-list-icon-add"></a>
+                <a href="{{ routeLookup('course.newCourse') }}" class="sbx-icon-only-button" title="Add Course" aria-label="Add Course" data-test="course-list-icon-add"><sbx-icon name="add"></sbx-icon></a>
                 {# intellischool anlytics, hide if it is not setup, both routes, have the same perms (settings) #}
                 {% set intellischoolCohortUrl = routeLookupIfAuthorized('intellischool.getCohortProfile') %}
                 {% if intellischoolCohortUrl %}
-                    <a href="{{ intellischoolCohortUrl }}" title="Cohort Analytics" class="icon-intellischool"></a>
+                    <a href="{{ intellischoolCohortUrl }}" title="Cohort Analytics" aria-label="Cohort Analytics" class="sbx-icon-only-button"><sbx-icon name="intellischool"></sbx-icon></a>
                 {% endif %}
             </nav>
         {% endif %}

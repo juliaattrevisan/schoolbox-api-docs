@@ -595,7 +595,7 @@
                                 fileName +
                                 " failed: " +
                                 errorMessage +
-                                '</p></div></div><nav><a href="#" data-dz-remove="" title="Remove" class="icon-close"></a></nav></li>',
+                                '</p></div></div><nav><a href="#" data-dz-remove="" title="Remove" class="sbx-icon-only-button"><sbx-icon name="close"></sbx-icon></a></nav></li>',
                         );
                     this.element.querySelector(".az-error-list").appendChild(failedFileItem);
                 } else {

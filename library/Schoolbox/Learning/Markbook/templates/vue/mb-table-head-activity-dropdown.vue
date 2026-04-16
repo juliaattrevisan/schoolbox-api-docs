@@ -34,42 +34,55 @@ const viewStudentParticipationLink = window.Vue.computed(() => {
 <template>
     <li class="separator">Activity</li>
     <li v-if="props.activity._links?.summary" :data-test="`markbook-assessment-dropdown-${props.activity.id}-view`">
-        <a :href="getReturnUrl(props.activity._links.summary)" class="icon-view">View</a>
+        <a :href="getReturnUrl(props.activity._links.summary)" class="sbx-button--has-icon"
+            ><sbx-icon name="view"></sbx-icon>View</a
+        >
     </li>
     <li v-if="viewStatusLink" :data-test="`markbook-assessment-dropdown-${props.activity.id}-view-status`">
-        <a :href="viewStatusLink" class="icon-progress">View Status</a>
+        <a :href="viewStatusLink" class="sbx-button--has-icon"><sbx-icon name="progress"></sbx-icon>View Status</a>
     </li>
     <li
         v-if="viewStudentParticipationLink"
         :data-test="`markbook-assessment-dropdown-${props.activity.id}-student-participation`"
     >
-        <a :href="viewStudentParticipationLink" class="icon-group">Student Participation</a>
+        <a :href="viewStudentParticipationLink" class="sbx-button--has-icon"
+            ><sbx-icon name="group"></sbx-icon>Student Participation</a
+        >
     </li>
     <li v-if="props.activity._links?.modify" :data-test="`markbook-assessment-dropdown-${props.activity.id}-modify`">
-        <a :href="getReturnUrl(props.activity._links.modify)" class="icon-modify">{{
-            props.activity.assessmentType === ACTIVITY_TYPE_QUIZ ||
-            props.activity.assessmentType === ACTIVITY_TYPE_DIALOG_AGENT
-                ? "Modify Settings"
-                : "Modify"
-        }}</a>
+        <a :href="getReturnUrl(props.activity._links.modify)" class="sbx-button--has-icon"
+            ><sbx-icon name="modify"></sbx-icon
+            >{{
+                props.activity.assessmentType === ACTIVITY_TYPE_QUIZ ||
+                props.activity.assessmentType === ACTIVITY_TYPE_DIALOG_AGENT
+                    ? "Modify Settings"
+                    : "Modify"
+            }}</a
+        >
     </li>
     <li
         v-if="props.activity._links?.modifyContent"
         :data-test="`markbook-assessment-dropdown-${props.activity.id}-modify-content`"
     >
-        <a :href="getReturnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Content</a>
+        <a :href="getReturnUrl(props.activity._links.modifyContent)" class="sbx-button--has-icon"
+            ><sbx-icon name="modify"></sbx-icon>Modify Content</a
+        >
     </li>
     <li
         v-if="props.activity._links?.configureAgent"
         :data-test="`markbook-assessment-dropdown-${props.activity.id}-configure-agent`"
     >
-        <a :href="getReturnUrl(props.activity._links.configureAgent)" class="icon-modify">Configure Agent</a>
+        <a :href="getReturnUrl(props.activity._links.configureAgent)" class="sbx-button--has-icon"
+            ><sbx-icon name="modify"></sbx-icon>Configure Agent</a
+        >
     </li>
     <li
         v-if="props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK && viewStatusLink"
         :data-test="`markbook-assessment-dropdown-${props.activity.id}-import-feedback`"
     >
-        <a :href="`${viewStatusLink}&importFeedback`" class="icon-upload">Import Feedback</a>
+        <a :href="`${viewStatusLink}&importFeedback`" class="sbx-button--has-icon"
+            ><sbx-icon name="upload"></sbx-icon>Import Feedback</a
+        >
     </li>
 
     <!-- Additional check for whether all impls are writable before opening the bulk publish -->

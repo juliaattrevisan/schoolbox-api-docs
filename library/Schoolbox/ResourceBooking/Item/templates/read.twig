@@ -29,9 +29,9 @@
         </div>
     </div>
     <nav>
-        <a class="icon-search" data-reveal-id="search-modal" title="Search Resources"></a>
+        <a data-reveal-id="search-modal" title="Search Resources" class="sbx-icon-only-button"><sbx-icon name="search"></sbx-icon></a>
         {% if isRouteAuthorized('resourceItem.edit', {id: item.id, item: item}) %}
-            <a class="resource-name resource-edit-link icon-modify" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}"></a>
+            <a class="resource-name resource-edit-link sbx-icon-only-button" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}"><sbx-icon name="modify"></sbx-icon></a>
         {% endif %}
     </nav>
 </div>
@@ -142,4 +142,3 @@
     </div>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
-

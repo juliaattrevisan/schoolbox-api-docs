@@ -65,23 +65,25 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
         {% if new %}
             {# New criterion: show delete button, no are you sure #}
             {# Hide it until the item is actually in use, though #}
-            <a class="icon-delete hide"
+            <a class="sbx-icon-only-button no-text hide"
                data-template="rubric-criterion-delete"
                data-rubric-criterion-name=""
                data-rubric-criterion=""
                data-role="remove-criterion"
                title="Delete {{ locale.rubricCriterion.proper }}"
-               href="#"></a>
+               aria-label="Delete {{ locale.rubricCriterion.proper }}"
+               href="#"><sbx-icon name="delete"></sbx-icon></a>
         {% else %}
             {# Existing criteria: #}
             {# If in use: show usage #}
             {# If not readonly: show delete #}
             {% if readonly %}
                 {# if readonly, show button for showing assessments which use this criterion #}
-                <a class="icon-info"
+                     <a class="sbx-icon-only-button no-text"
                    data-reveal-id="criterion-{{ criterion.id }}"
                    href="#"
-                   title="Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}"></a>
+                         title="Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}"
+                         aria-label="Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}"><sbx-icon name="info"></sbx-icon></a>
             {% else %}
                 {# show tot #}
                 {# delete button, with "are you sure" if it has been saved already #}
@@ -95,17 +97,23 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
     <ul id="dropdown-i{{ criterionId }}" class="f-dropdown" data-dropdown-content="">
         {% if criterionUsageCount > 0 %}
             <li>
-                <a class="icon-info"
-                   data-reveal-id="criterion-{{ criterion.id }}"
-                   href="#">Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}</a>
+                     <a
+                         data-reveal-id="criterion-{{ criterion.id }}"
+                         href="#"
+                         class="sbx-button--has-icon"><sbx-icon name="info"></sbx-icon>Show {{ locale.dueWork.plural }} using {{ locale.rubricCriterion }}</a>
             </li>
         {% endif %}
         <li>
-            <a class="icon-delete"
-               data-rubric-criterion="{{ criterionId }}"
-               data-rubric-criterion-name="{{ new ? '' : criterion.name }}"
-               data-role="remove-criterion"
-               href="#">Delete {{ locale.rubricCriterion.proper }}</a>
+                <a
+                    class="sbx-icon-only-button no-text"
+                    data-rubric-criterion="{{ criterionId }}"
+                    data-rubric-criterion-name="{{ new ? '' : criterion.name }}"
+                    data-role="remove-criterion"
+                    href="#"
+                    title="Delete {{ locale.rubricCriterion.proper }}"
+                    aria-label="Delete {{ locale.rubricCriterion.proper }}">
+                     <sbx-icon name="delete"></sbx-icon>
+                </a>
         </li>
     </ul>
 

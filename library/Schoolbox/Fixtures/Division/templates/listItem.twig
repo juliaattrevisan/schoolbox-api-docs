@@ -21,12 +21,29 @@
 
     {% set action = division.season.isArchived ? 'View' : 'Manage' %}
     <nav>
-        <a href="{{ routeLookup('sportsfixturesDivision.getModifyForm', {entityId: division.id}) }}" class="icon-modify" title="Modify"></a>
+        <a href="{{ routeLookup('sportsfixturesDivision.getModifyForm', {entityId: division.id}) }}" class="sbx-icon-only-button" title="Modify" aria-label="Modify">
+            <sbx-icon name="modify"></sbx-icon>
+        </a>
         <sbx-pop-out content-id="sportsfixtures-division-{{ division.getId() }}-actions"></sbx-pop-out>
     </nav>
     <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-division-{{ division.getId() }}-actions">
-        <li><a href="{{ routeLookup('sportsfixturesTeam.getList', {contextId: division.id}) }}" class="icon-team" title="{{ action }} Teams in {{ division.name }}">{{ action }} Teams</a></li>
-        <li><a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}" class="icon-match" title="{{ action }} Matches in {{ division.name }}">{{ action }} Matches</a></li>
-        <li><a href="{{ routeLookup('sportsfixturesDivision.deleteEntity', {entityId: division.id}) }}" class="icon-delete" title="Delete" data-delete="{{ division.id }}">Delete</a></li>
+        <li>
+            <a href="{{ routeLookup('sportsfixturesTeam.getList', {contextId: division.id}) }}" class="sbx-button--has-icon" title="{{ action }} Teams in {{ division.name }}">
+                <sbx-icon name="group"></sbx-icon>
+                {{ action }} Teams
+            </a>
+        </li>
+        <li>
+            <a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}" class="sbx-button--has-icon" title="{{ action }} Matches in {{ division.name }}">
+                <sbx-icon name="match"></sbx-icon>
+                {{ action }} Matches
+            </a>
+        </li>
+        <li>
+            <a href="{{ routeLookup('sportsfixturesDivision.deleteEntity', {entityId: division.id}) }}" class="sbx-button--has-icon" title="Delete" data-delete="{{ division.id }}">
+                <sbx-icon name="delete"></sbx-icon>
+                Delete
+            </a>
+        </li>
     </ul>
 </li>

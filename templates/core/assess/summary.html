@@ -14,11 +14,11 @@
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
         <li class="separator">{ASSESS_KIND}</li>
-        <li><a class="icon-modify" href="{MODIFY_URL}{RETURN_URL_MODIFY}">Modify</a></li>
+        <li><a href="{MODIFY_URL}{RETURN_URL_MODIFY}" class="sbx-button--has-icon"><sbx-icon name="modify"></sbx-icon>Modify</a></li>
         <!-- BEGIN view_results_link -->
-        <li><a class="icon-poll" href="/{ASSESS_KIND_LC}/results/{ASSESS_ASSESS_ID}{RETURN_URL}">View Results</a></li>
+        <li><a href="/{ASSESS_KIND_LC}/results/{ASSESS_ASSESS_ID}{RETURN_URL}" class="sbx-button--has-icon"><sbx-icon name="poll"></sbx-icon>View Results</a></li>
         <!-- END view_results_link -->
-        <li><a class="icon-quiz" href="/{ASSESS_KIND_LC}/intro/{ASSESS_ASSESS_ID}">Preview</a></li>
+        <li><a href="/{ASSESS_KIND_LC}/intro/{ASSESS_ASSESS_ID}" class="sbx-button--has-icon"><sbx-icon name="quiz"></sbx-icon>Preview</a></li>
         <!--
             This template is shared by Quiz and Survey.
             Survey will continue to use the old GET delete page.
@@ -26,7 +26,14 @@
          -->
 
         <!-- BEGIN delete_survey -->
-        <li><a class="icon-delete" href="/survey/delete/{ASSESS_ASSESS_ID}{RETURN_URL}" data-delete>Delete</a></li>
+        <li><a class="sbx-button--has-icon"
+               href="/survey/delete/{ASSESS_ASSESS_ID}{RETURN_URL}"
+               data-delete
+               title="Delete survey"
+               aria-label="Delete survey">
+            <sbx-icon name="delete"></sbx-icon>
+            Delete
+        </a></li>
         <!-- END delete_survey -->
 
         <!-- BEGIN delete_quiz -->
@@ -49,12 +56,19 @@
                 });
             });
         </script>
-        <li><a class="icon-delete" href="/learning/assessments/{ASSESSMENT_ID}/delete{RETURN_URL}" data-post-delete>Delete</a></li>
+        <li><a class="sbx-button--has-icon"
+               href="/learning/assessments/{ASSESSMENT_ID}/delete{RETURN_URL}"
+               data-post-delete
+               title="Delete quiz"
+               aria-label="Delete quiz">
+            <sbx-icon name="delete"></sbx-icon>
+            Delete
+        </a></li>
         <!-- END delete_quiz -->
 
-        <li><a class="icon-export" href="/{ASSESS_KIND_LC}/export/xml/{ASSESS_ASSESS_ID}">Export</a></li>
+        <li><a href="/{ASSESS_KIND_LC}/export/xml/{ASSESS_ASSESS_ID}" class="sbx-button--has-icon"><sbx-icon name="export"></sbx-icon>Export</a></li>
         <li class="separator">Section</li>
-        <li><a class="icon-add" href="/{ASSESS_KIND_LC}/section/create/{ASSESS_ASSESS_ID}{RETURN_URL}">Add Section</a></li>
+        <li><a class="sbx-button--has-icon" href="/{ASSESS_KIND_LC}/section/create/{ASSESS_ASSESS_ID}{RETURN_URL}"><sbx-icon name="add"></sbx-icon>Add Section</a></li>
     </ul>
 </div>
 

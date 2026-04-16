@@ -23,6 +23,7 @@
         }
         .c-search-input__button {
             background-color: var(--sbx-config-color-menu-hover, var(--navigation-hover));
+            color: var(--navigation-foreground);
         }
         ::placeholder {
             color: black;
@@ -38,6 +39,7 @@
         }
         &__button {
             background-color: var(--sbx-config-color-menu-primary, var(--navigation-background));
+            color: var(--navigation-foreground);
         }
     }
 
@@ -47,6 +49,13 @@
         h3 {
             margin: 0; // clear .tab-bar h3 margins
         }
+    }
+
+    &__search-button {
+        align-items: center;
+        display: flex;
+        gap: var(--spacing-xs);
+        justify-content: center;
     }
 }
 

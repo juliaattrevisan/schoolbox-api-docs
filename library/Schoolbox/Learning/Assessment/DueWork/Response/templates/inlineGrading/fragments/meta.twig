@@ -40,9 +40,9 @@
 
 
         <ul id="header-options" class="f-dropdown" data-dropdown-content>
-            <li><a class="icon-history" href="{{ summaryRoute }}">{{ locale.submissionHistory.proper }}</a></li>
+            <li><a class="sbx-button--has-icon" href="{{ summaryRoute }}"><sbx-icon name="history"></sbx-icon>{{ locale.submissionHistory.proper }}</a></li>
             {% if response and deleteRoute %}
-                <li><a class="icon-delete" data-delete="{{ deleteRoute }}">Delete Submission</a></li>
+                <li><a class="sbx-button--has-icon" data-delete="{{ deleteRoute }}"><sbx-icon name="delete"></sbx-icon>Delete Submission</a></li>
             {% endif %}
         </ul>
     {% endif %}

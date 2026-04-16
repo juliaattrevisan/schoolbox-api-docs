@@ -46,29 +46,32 @@ function onUpdateToggleSelected(): void {
     <a
         v-if="node._links?.getExport && node.children?.length"
         :href="node._links.getExport"
-        class="button-action-option icon-export"
+        class="button-action-option sbx-button--has-icon"
         :title="`Export ${props.title}`"
         data-test-export
     >
+        <sbx-icon name="export"></sbx-icon>
         Export {{ props.title }}
     </a>
     <button
-        :class="`button-action-option ${props.isUpdating ? 'icon-close' : 'icon-modify'}`"
+        class="sbx-icon-only-button"
         :title="`Update ${props.title}`"
+        :aria-label="`Update ${props.title}`"
         :disabled="props.isViewing || props.isAdding"
         data-test-update
         @click.prevent="onUpdateToggleSelected"
     >
-        Update {{ props.title }}
+        <sbx-icon :name="props.isUpdating ? 'close' : 'modify'"></sbx-icon>
     </button>
     <button
-        :class="`button-action-option ${props.isAdding ? 'icon-close' : 'icon-add'}`"
+        class="sbx-icon-only-button"
         :title="`Add subsection to ${props.title}`"
+        :aria-label="`Add subsection to ${props.title}`"
         :disabled="props.isViewing || props.isUpdating"
         data-test-add
         @click.prevent="onAddSubsectionToggleSelected"
     >
-        Add subsection to {{ props.title }}
+        <sbx-icon :name="props.isAdding ? 'close' : 'add'"></sbx-icon>
     </button>
 </template>
 

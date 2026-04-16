@@ -66,5 +66,13 @@ export default {
 </script>
 
 <template>
-    <a :href="link" class="icon-rss" title="Download RSS feed for this topic" id="rss"></a>
+    <a
+        :href="link"
+        class="sbx-icon-only-button"
+        title="Download RSS feed for this topic"
+        aria-label="Download RSS feed for this topic"
+        id="rss"
+    >
+        <sbx-icon name="rss" />
+    </a>
 </template>

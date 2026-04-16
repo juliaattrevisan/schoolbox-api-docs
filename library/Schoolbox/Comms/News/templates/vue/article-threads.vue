@@ -392,8 +392,9 @@ export default {
                                     v-if="comment._links.delete.auth"
                                     @click.prevent="showDeleteModal(index)"
                                     href="#delete-comment"
-                                    class="icon-delete no-text"
+                                    class="no-text sbx-icon-only-button"
                                     title="Delete comment"
+                                    ><sbx-icon name="delete"></sbx-icon
                                 ></a>
                             </nav>
                             <media-article :content="comment.content"></media-article>

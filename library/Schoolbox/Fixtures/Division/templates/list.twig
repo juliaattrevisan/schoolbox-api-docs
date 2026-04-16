@@ -46,7 +46,9 @@
                 </div>
             </div>
             <nav>
-                <a href='{{ routeLookup('sportsfixturesDivision.getCreateForm', {contextId: sport.id}) }}' class="icon-add" title="Add Division to {{ sport.name }}"></a>
+                <a href='{{ routeLookup('sportsfixturesDivision.getCreateForm', {contextId: sport.id}) }}' class="sbx-icon-only-button" title="Add Division to {{ sport.name }}" aria-label="Add Division to {{ sport.name }}">
+                    <sbx-icon name="add"></sbx-icon>
+                </a>
             </nav>
         </div>
 

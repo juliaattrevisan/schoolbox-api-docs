@@ -23,7 +23,7 @@
             </section>
 
             <ul class="flex-list buttons">
-                <li><a href="/modules/eotc/manage/modify?eventID={EVENT_ID}" class="button icon-previous">Back</a></li>
+                <li><a href="/modules/eotc/manage/modify?eventID={EVENT_ID}" class="button sbx-button--has-icon"><sbx-icon name="previous"></sbx-icon>Back</a></li>
                 <li><input type="submit" value="Submit" /></li>
             </ul>
         </form>
@@ -61,8 +61,8 @@
                     <td>{RESOURCEBOOKING_END}</td>
                     <td class="actions-small-2">
                         <nav>
-                            <a aria-haspopup="true" href="/resource-booking/booking/{RESOURCEBOOKING_ID}/edit?returnUrl={RETURN_URL}" class="icon-modify" alt="Remove Booking" title="Update Booking"></a>
-                            <a aria-haspopup="true" href="/modules/eotc/manage/resources/bookingForm/delete/{RESOURCEBOOKING_ID}" class="icon-delete" alt="Remove Booking" title="Remove Booking" data-action="delete"></a>
+                            <a aria-haspopup="true" href="/resource-booking/booking/{RESOURCEBOOKING_ID}/edit?returnUrl={RETURN_URL}" alt="Remove Booking" title="Update Booking" class="sbx-icon-only-button"><sbx-icon name="modify"></sbx-icon></a>
+                            <a aria-haspopup="true" href="/modules/eotc/manage/resources/bookingForm/delete/{RESOURCEBOOKING_ID}" alt="Remove Booking" title="Remove Booking" data-action="delete" class="sbx-icon-only-button"><sbx-icon name="delete"></sbx-icon></a>
                         </nav>
                     </td>
                 </tr>

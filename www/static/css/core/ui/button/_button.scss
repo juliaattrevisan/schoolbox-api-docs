@@ -341,7 +341,7 @@ button.submit {
 .sbx-icon-only-button {
     align-items: center;
     background: none;
-    display: flex;
+    display: inline-flex;
     justify-content: center;
     min-height: 40px;
     min-width: 40px;
@@ -370,4 +370,28 @@ button.submit {
     align-items: center;
     display: inline-flex;
     gap: var(--spacing-s);
+}
+
+// a button with only SVG icons that displays inline with text
+.f-dropdown a.sbx-button--has-icon {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-s);
+}
+
+.f-dropdown a.sbx-button--has-icon sbx-icon {
+    line-height: 1;
+}
+.sbx-button--has-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-s);
+}
+.button.sbx-button--has-icon {
+    justify-content: center;
+}
+
+.sbx-button--has-icon sbx-icon {
+    flex: 0 0 auto;
+    line-height: 1;
 }

@@ -39,10 +39,11 @@ const mfStore = useMomentFormStore();
             ></textarea>
             <button
                 type="submit"
-                class="icon-surveys"
+                class="sbx-button--has-icon"
                 data-test="learning-moment-request-update-confirm"
                 @click="() => mfStore.reject(true)"
             >
+                <sbx-icon name="surveys"></sbx-icon>
                 Request update
             </button>
         </template>

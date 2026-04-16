@@ -74,7 +74,7 @@ function clearSelection(): void {
             </template>
             <template v-else>
                 <button
-                    class="icon-modify button l-flex__item--1-auto"
+                    class="button l-flex__item--1-auto sbx-button--has-icon"
                     @click.prevent="
                         handleActionSelected(
                             selectedList,
@@ -82,24 +82,27 @@ function clearSelection(): void {
                         )
                     "
                 >
+                    <sbx-icon name="modify"></sbx-icon>
                     Modify Existing {{ locale.activity.translate(false, true) }}
                 </button>
                 <button
-                    class="icon-staff-students button l-flex__item--1-auto"
+                    class="button l-flex__item--1-auto sbx-button--has-icon"
                     @click.prevent="handleActionSelected(selectedList, 'exclude')"
                 >
+                    <sbx-icon name="staff-students"></sbx-icon>
                     Exclude {{ selectedList.length === 1 ? "Student" : "Students" }}
                 </button>
                 <button
                     v-if="props.customisations.length > 0"
-                    class="icon-list button l-flex__item--1-auto"
+                    class="button l-flex__item--1-auto sbx-button--has-icon"
                     @click.prevent="handleOpenIncludeInExistingModal"
                 >
+                    <sbx-icon name="list"></sbx-icon>
                     Include in Existing Customisation
                 </button>
                 <button
                     v-if="props.routes.getAssessmentParticipationCopyActivity"
-                    class="icon-copy button l-flex__item--1-auto"
+                    class="button l-flex__item--1-auto sbx-button--has-icon"
                     data-test="custom-participation-copy-activity"
                     @click.prevent="
                         handleActionSelected(
@@ -108,10 +111,11 @@ function clearSelection(): void {
                         )
                     "
                 >
+                    <sbx-icon name="copy"></sbx-icon>
                     Create Copy of {{ locale.activity.translate(false, true) }}
                 </button>
                 <button
-                    class="icon-submissions button l-flex__item--1-auto"
+                    class="button l-flex__item--1-auto sbx-button--has-icon"
                     @click.prevent="
                         handleActionSelected(
                             selectedList,
@@ -119,6 +123,7 @@ function clearSelection(): void {
                         )
                     "
                 >
+                    <sbx-icon name="submissions"></sbx-icon>
                     Create New {{ locale.activity.translate(false, true) }}
                 </button>
             </template>

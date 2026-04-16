@@ -79,7 +79,11 @@ function toggleCollapse(assessmentId: number): void {
 
 <template>
     <Teleport v-if="exportRouteFiltered" to="#header-options">
-        <li><a class="icon-export" :href="exportRouteFiltered">Export CSV</a></li>
+        <li>
+            <a :href="exportRouteFiltered" class="sbx-button--has-icon"
+                ><sbx-icon name="export"></sbx-icon>Export CSV</a
+            >
+        </li>
     </Teleport>
 
     <!-- TODO: bulk actions -->
@@ -148,4 +152,4 @@ function toggleCollapse(assessmentId: number): void {
     </div>
 </template>
 
-<style scoped lang="scss"></style>
+<li><a :href="exportRouteFiltered" class="sbx-button--has-icon"><sbx-icon name="export"></sbx-icon>Export CSV</a></li>

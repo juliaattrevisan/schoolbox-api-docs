@@ -189,11 +189,12 @@ const isActive = window.Vue.computed(() => {
         <button
             v-if="store.hasLoadedOk"
             type="button"
-            class="button icon-curriculum"
+            class="button sbx-button--has-icon"
             title="Browse and select from the Curriculum"
             data-test="cs-search-input-browse-button"
             @click.prevent="onBrowseSelected"
         >
+            <sbx-icon name="curriculum"></sbx-icon>
             Browse
         </button>
     </div>

@@ -361,7 +361,8 @@ const searchButtonText = window.Vue.computed(() => {
                 </div>
             </div>
             <div class="l-flex-col">
-                <a class="button f-no-margins t-lh--normal icon-search" :href="searchButtonHref">
+                <a class="button f-no-margins t-lh--normal c-header-search__search-button" :href="searchButtonHref">
+                    <sbx-icon name="search" size="1rem" color="currentColor" />
                     {{ searchButtonText }}
                 </a>
             </div>

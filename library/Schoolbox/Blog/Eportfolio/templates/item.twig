@@ -41,7 +41,7 @@
     </div>
     {% if isRouteAuthorized('eportfolioBlog.getModify', {page: page, blog: record }) %}
         <nav>
-            <a class="icon-modify" href="{{ routeLookup('eportfolioBlog.getModify', {pageId: page.getPageId, id: record.getId}) }}" title="Modify Blog post"></a>
+            <a href="{{ routeLookup('eportfolioBlog.getModify', {pageId: page.getPageId, id: record.getId}) }}" title="Modify Blog post" class="sbx-icon-only-button"><sbx-icon name="modify"></sbx-icon></a>
         </nav>
     {% endif %}
 </div>
@@ -88,7 +88,13 @@
 
                         {% if isRouteAuthorized('eportfolioBlog.postCommentDelete', {comment: comment, page: page }) %}
                             <nav>
-                                <a class="icon icon-delete" data-interaction="delete" data-comment-id="{{ comment.getId }}"></a>
+                                <a class="sbx-icon-only-button no-text"
+                                   data-interaction="delete"
+                                   data-comment-id="{{ comment.getId }}"
+                                   title="Delete comment"
+                                   aria-label="Delete comment">
+                                    <sbx-icon name="delete"></sbx-icon>
+                                </a>
                             </nav>
                         {% endif %}
 

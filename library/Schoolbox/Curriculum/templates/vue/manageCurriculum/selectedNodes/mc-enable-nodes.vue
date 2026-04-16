@@ -110,11 +110,12 @@ function onModalClosed(): void {
         <ul class="flex-list">
             <li>
                 <button
-                    class="button icon-approve submit"
+                    class="button submit sbx-button--has-icon"
                     data-test="confirm-enable-nodes"
                     :disabled="enableNodesStore.isProcessing"
                     @click.prevent="onEnableSelected"
                 >
+                    <sbx-icon name="approve"></sbx-icon>
                     {{ enabledButtonText }}
                 </button>
             </li>

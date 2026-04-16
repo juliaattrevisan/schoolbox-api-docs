@@ -165,10 +165,11 @@ async function postDeleteBookingForm(): Promise<void> {
             <a
                 v-if="canModify"
                 href="#"
-                class="icon-modify"
                 title="Modify Booking"
                 aria-label="Modify Booking"
+                class="sbx-icon-only-button"
                 @click.prevent="toggleEditForm"
+                ><sbx-icon name="modify"></sbx-icon
             ></a>
         </div>
     </div>

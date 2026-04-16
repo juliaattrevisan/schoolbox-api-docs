@@ -176,7 +176,9 @@
 
                         <nav>
                             {% if not season.archived %}
-                                <a href='{{ routeLookup('sportsfixturesMatch.getCreateForm', {contextId: division.id}) }}?season={{ season.id }}' class="icon-add" title="Add Match to {{ division.name }} {{ division.sport.name }} {{ season.name }} "></a>
+                                <a href='{{ routeLookup('sportsfixturesMatch.getCreateForm', {contextId: division.id}) }}?season={{ season.id }}' class="sbx-icon-only-button" title="Add Match to {{ division.name }} {{ division.sport.name }} {{ season.name }} " aria-label="Add Match to {{ division.name }} {{ division.sport.name }} {{ season.name }} ">
+                                    <sbx-icon name="add"></sbx-icon>
+                                </a>
                             {% endif %}
                         </nav>
                     </div>

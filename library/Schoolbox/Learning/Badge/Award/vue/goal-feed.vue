@@ -241,9 +241,10 @@ export default {
                                                     <li>
                                                         <a
                                                             @click.prevent="openAchievementWithdrawModal(award)"
-                                                            class="icon-withdraw-achievement"
+                                                            class="sbx-button--has-icon"
                                                             title="Withdraw achievement"
-                                                            >Withdraw achievement</a
+                                                            ><sbx-icon name="withdraw-achievement"></sbx-icon>Withdraw
+                                                            achievement</a
                                                         >
                                                     </li>
                                                 </template>
@@ -251,17 +252,17 @@ export default {
                                                     <li>
                                                         <a
                                                             @click.prevent="awardAchievement(award)"
-                                                            class="icon-showcase"
                                                             title="Award achievement"
-                                                            >Award achievement</a
+                                                            class="sbx-button--has-icon"
+                                                            ><sbx-icon name="showcase"></sbx-icon>Award achievement</a
                                                         >
                                                     </li>
                                                     <li>
                                                         <a
                                                             @click.prevent="openGoalWithdrawModal(award)"
-                                                            class="icon-close"
                                                             title="Remove goal"
-                                                            >Remove goal</a
+                                                            class="sbx-button--has-icon"
+                                                            ><sbx-icon name="close"></sbx-icon>Remove goal</a
                                                         >
                                                     </li>
                                                 </template>

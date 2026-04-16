@@ -477,7 +477,13 @@ export default {
             <div class="actions-small-1 row" v-if="canModify()">
                 <div class="list-item"></div>
                 <nav>
-                    <a :href="this.ENDPOINTS.modifyPath(this.event.id)" class="icon-modify" title="Modify Event"></a>
+                    <a
+                        :href="this.ENDPOINTS.modifyPath(this.event.id)"
+                        class="sbx-icon-only-button"
+                        title="Modify Event"
+                        aria-label="Modify Event"
+                        ><sbx-icon name="modify"></sbx-icon
+                    ></a>
                 </nav>
             </div>
         </div>
@@ -672,12 +678,13 @@ export default {
                     <h2>Resource Bookings</h2>
                     <nav v-if="canModify()" class="l-flex-row l-flex--align-center f-no-margins">
                         <a
-                            class="icon-add f-no-margins"
+                            class="sbx-icon-only-button f-no-margins"
                             href="#"
                             @click.prevent="showAddResourceBookingsModal()"
                             aria-label="Add resource bookings"
                             title="Add resource bookings"
                         >
+                            <sbx-icon name="add"></sbx-icon>
                         </a>
                     </nav>
                 </div>

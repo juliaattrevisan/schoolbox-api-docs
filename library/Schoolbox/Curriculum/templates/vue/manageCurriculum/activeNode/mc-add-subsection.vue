@@ -147,12 +147,13 @@ function onCancelSelected(): void {
                                 <button
                                     ref="addButton"
                                     type="submit"
-                                    class="button icon-add submit"
+                                    class="button submit sbx-button--has-icon"
                                     data-test-add-subsection
                                     :data-submit-button-for="ckeditorIdAttr"
                                     :disabled="isAddDisabled"
                                     @click.prevent="onAddSubsectionSelected"
                                 >
+                                    <sbx-icon name="add"></sbx-icon>
                                     {{ addButtonText }}
                                 </button>
                             </li>

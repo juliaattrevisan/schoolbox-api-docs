@@ -19,7 +19,7 @@
     <ul id="header-options" class="f-dropdown" data-dropdown-content="" aria-hidden="true">
         {% for year in badgeYears %}
         <li>
-            <a href="{{ routeLookup('superstar.getCandidates', {'year': year}) }}" class="icon-progress" title="{{ year }}">{{ year }}</a>
+            <a href="{{ routeLookup('superstar.getCandidates', {'year': year}) }}" class="sbx-button--has-icon" title="{{ year }}"><sbx-icon name="progress"></sbx-icon>{{ year }}</a>
         </li>
         {% endfor %}
     </ul>
@@ -59,7 +59,7 @@
                             <h2 class="subheader">{{ unitSpecData.title }}</h2>
                         </div>
                         <nav>
-                            <a class="icon-view" title="Show previous awards for this unit" data-previously-awarded-toggle="{{ unitSpecId }}"></a>
+                            <a class="sbx-icon-only-button no-text" title="Show previous awards for this unit" aria-label="Show previous awards for this unit" data-previously-awarded-toggle="{{ unitSpecId }}"><sbx-icon name="view"></sbx-icon></a>
                         </nav>
                     </div>
                     <section>
@@ -102,10 +102,12 @@
 
                 /* Toggle eyeball icon
                  */
-                if ('icon-view' === $(this).attr('class')) {
-                    $(this).removeClass('icon-view').addClass('icon-view-hollow');
+                let icon = $(this).find('sbx-icon');
+
+                if ('view' === icon.attr('name')) {
+                    icon.attr('name', 'view-hollow');
                 } else {
-                    $(this).removeClass('icon-view-hollow').addClass('icon-view');
+                    icon.attr('name', 'view');
                 }
             });
         });
@@ -183,7 +185,7 @@
                         </div>
                         <nav>
                             {% if not previouslyAwarded %}
-                                <a class='icon-badge' href="{{ badgeMapping[unitSpecId][type].route }}" data-award="{{ actionable.id }}"></a>
+                                <a class='sbx-icon-only-button no-text' href="{{ badgeMapping[unitSpecId][type].route }}" data-award="{{ actionable.id }}" title="Award badge" aria-label="Award badge"><sbx-icon name="badge"></sbx-icon></a>
                             {% endif %}
                         </nav>
                     </li>

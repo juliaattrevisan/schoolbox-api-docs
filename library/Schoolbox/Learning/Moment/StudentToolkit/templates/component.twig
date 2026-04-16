@@ -15,15 +15,15 @@
         </div>
         <div class="buttons">
             {% if createLearningMomentEvidenceUrl %}
-                <a class="button icon-share" href="#" data-reveal-id="component{{ component.instance.id }}-shareWork">Share Learning</a>
+                <a class="button sbx-button--has-icon" href="#" data-reveal-id="component{{ component.instance.id }}-shareWork"><sbx-icon name="share"></sbx-icon>Share Learning</a>
             {% endif %}
             {% if config.badges_enabled %}
-                <a class="button icon-goal"
-                   href="{{ routeLookupIfAuthorized('learningBadgeAward.getSetAsGoalForSelfForm') }}?{{ RETURN_URL.name }}={{ returnUrl ?? RETURN_URL.current }}">Set My Goals</a>
+                     <a class="button sbx-button--has-icon"
+                         href="{{ routeLookupIfAuthorized('learningBadgeAward.getSetAsGoalForSelfForm') }}?{{ RETURN_URL.name }}={{ returnUrl ?? RETURN_URL.current }}"><sbx-icon name="goal"></sbx-icon>Set My Goals</a>
             {% endif %}
-            <a class="button icon-advanced-list" href="/search/user/{{ user.id }}#activity">My Activity</a>
+            <a class="button sbx-button--has-icon" href="/search/user/{{ user.id }}#activity"><sbx-icon name="advanced-list"></sbx-icon>My Activity</a>
             {% if config.badges_enabled %}
-                <a class="button icon-trophy" href="/search/user/{{ user.id }}#achievements">My Achievements</a>
+                <a class="button sbx-button--has-icon" href="/search/user/{{ user.id }}#achievements"><sbx-icon name="achievement"></sbx-icon>My Achievements</a>
             {% endif %}
         </div>
     </div>

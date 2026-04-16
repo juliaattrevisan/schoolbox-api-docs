@@ -96,11 +96,12 @@ function onModalClosed(): void {
         <ul class="flex-list">
             <li>
                 <button
-                    class="button icon-approve submit"
+                    class="button submit sbx-button--has-icon"
                     data-test="confirm-delete-node"
                     :disabled="deleteNodesStore.isProcessing"
                     @click.prevent="onDeleteSelected"
                 >
+                    <sbx-icon name="approve"></sbx-icon>
                     {{ deleteButtonText }}
                 </button>
             </li>

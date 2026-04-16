@@ -241,9 +241,11 @@ export default {
                             <a
                                 v-if="article._links.update.auth"
                                 :href="article._links.update.href"
-                                class="icon-modify no-text"
+                                class="sbx-icon-only-button"
                                 :title="'Modify this ' + localeNews"
-                            ></a>
+                                :aria-label="'Modify this ' + localeNews"
+                                ><sbx-icon name="modify"
+                            /></a>
                         </nav>
                     </li>
                 </ul>

@@ -23,7 +23,9 @@
                         </div>
                     </div>
                     <nav>
-                        <a href="{{ createRoute }}" class="icon-add" title="Add a {{ locale.lessonPlan }} template"></a>
+                        <a href="{{ createRoute }}" class="sbx-icon-only-button" title="Add a {{ locale.lessonPlan }} template" aria-label="Add a {{ locale.lessonPlan }} template">
+                            <sbx-icon name="add"></sbx-icon>
+                        </a>
                     </nav>
                 </div>
                 <section>
@@ -67,7 +69,9 @@
                                 <nav>
                                     {# Fudge some accessibility text here later, I guess #}
                                     {% if updateRoute %}
-                                        <a class="icon-modify" href="{{ updateRoute }}" title="Modify"></a>
+                                        <a class="sbx-icon-only-button" href="{{ updateRoute }}" title="Modify" aria-label="Modify">
+                                            <sbx-icon name="modify"></sbx-icon>
+                                        </a>
                                     {% endif %}
 
                                     {% if enableRoute or deleteRoute %}
@@ -77,13 +81,18 @@
                                 <ul class="f-dropdown" data-dropdown-content id="lpt-{{ lessonPlanTemplate.id }}" aria-hidden="true">
                                     {% if enableRoute %}
                                         {% if lessonPlanTemplate.enabled %}
-                                            {% set icon = 'icon-view' %}
+                                            {% set icon = 'view' %}
                                             {% set action = 'Disable visibility' %}
                                         {% else %}
-                                            {% set icon = 'icon-view-hollow' %}
+                                            {% set icon = 'hidden' %}
                                             {% set action = 'Enable visibility' %}
                                         {% endif %}
-                                        <li><a class="{{ icon }}" href="{{ enableRoute }}" title="{{ action }}" data-toggle-enable-state="{{ lessonPlanTemplate.id }}">{{ action }}</a></li>
+                                        <li>
+                                            <a class="sbx-button--has-icon" href="{{ enableRoute }}" title="{{ action }}" data-toggle-enable-state="{{ lessonPlanTemplate.id }}">
+                                                <sbx-icon name="{{ icon }}"></sbx-icon>
+                                                {{ action }}
+                                            </a>
+                                        </li>
                                         <script>
                                             $(function() {
                                                 $('#container').on('click', 'a[data-toggle-enable-state="{{ lessonPlanTemplate.id }}"]', function(event) {
@@ -167,7 +176,12 @@
                                                 });
                                             });
                                         </script>
-                                        <li><a class="icon-delete" href="{{ deleteRoute }}" title="Delete" data-delete="{{ lessonPlanTemplate.id }}">Delete template</a></li>
+                                        <li>
+                                            <a class="sbx-button--has-icon" href="{{ deleteRoute }}" title="Delete" data-delete="{{ lessonPlanTemplate.id }}">
+                                                <sbx-icon name="delete"></sbx-icon>
+                                                Delete template
+                                            </a>
+                                        </li>
                                     {% endif %}
                                 </ul>
                             </li>

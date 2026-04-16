@@ -31,7 +31,7 @@
          # needed isNull is same as(false) to test if getExcludedAt() has valid data.
          # I was not able to just test as getExcluedAt() is null, or find a better way
          #}
-        <li class="icon-close">Excluded from {{ locale.activity }}</li>
+        <li class="sbx-button--has-icon"><sbx-icon name="close"></sbx-icon>Excluded from {{ locale.activity }}</li>
     {% endif %}
 
     {% if lastViews is not empty %}

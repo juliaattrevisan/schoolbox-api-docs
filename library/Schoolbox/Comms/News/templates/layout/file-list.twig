@@ -59,7 +59,9 @@
                         </div>
                     </div>
                     <nav>
-                        <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1&name={{ currentFile.basename|url_encode }}" title="Download" class="icon-download"></a>
+                        <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1&name={{ currentFile.basename|url_encode }}" title="Download" class="sbx-icon-only-button" aria-label="Download">
+                            <sbx-icon name="download"></sbx-icon>
+                        </a>
                     </nav>
                 </li>
             {% endfor %}

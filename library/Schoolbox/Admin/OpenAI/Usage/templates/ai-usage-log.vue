@@ -292,11 +292,16 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                             <td>{{ 200 !== session.returnCode ? "Error" : "" }}</td>
                             <td class="actions-small-1">
                                 <nav v-if="session.id !== null && session.logFormat !== null && session._routes.getLog">
-                                    <a
-                                        class="icon-eye"
-                                        :disabled="session.id.toString() === selectedSessionId?.toString() || undefined"
+                                    <button
+                                        type="button"
+                                        class="sbx-icon-only-button f-no-margins"
+                                        title="View session details"
+                                        aria-label="View session details"
+                                        :disabled="session.id.toString() === selectedSessionId?.toString()"
                                         @click="() => openSessionDetails(session)"
-                                    ></a>
+                                    >
+                                        <sbx-icon name="view" />
+                                    </button>
                                 </nav>
                             </td>
                         </tr>
@@ -344,7 +349,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
 
                 <div v-if="!('log' in selectedSessionInfo)" class="loader"></div>
                 <div v-else-if="selectedSessionInfo.log.length === 0" class="empty-state">
-                    <i class="icon-view-hollow"></i>
+                    <sbx-icon name="hidden" size="2rem" />
                     <p>
                         The {{ props.features[selectedSessionInfo.session.feature].title }} feature does not support
                         previews for this session.

@@ -80,7 +80,7 @@ export default class MarkbookPage {
             .locator("[data-test=sbx-pop-out-tab-control] [data-test=sbx-pop-out-tab-control-button]")
             .click();
         // Markbook
-        await this.page.locator("a.icon-curriculum").first().click();
+        await this.page.locator("a sbx-icon[name='curriculum']").first().click();
         await expect(this.page.locator(`h1:has-text("Class Markbook for Demo Class Page 2")`)).toBeVisible();
     }
 

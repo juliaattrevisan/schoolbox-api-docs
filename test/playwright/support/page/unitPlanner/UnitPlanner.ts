@@ -254,7 +254,7 @@ export default class UnitPlanner {
         await this.page
             .getByTestId(UnitPlanner.DATA_TEST_ACTIVITY_DELETE.replace("{activityId}", activityId.toString()))
             .click();
-        await this.page.locator("button.button.icon-approve.submit").last().click();
+        await this.page.locator('button.button.submit:has(sbx-icon[name="approve"])').last().click();
         await expect(this.page.getByTestId("toast")).toHaveAttribute("data-test-is-success", "true");
     }
 

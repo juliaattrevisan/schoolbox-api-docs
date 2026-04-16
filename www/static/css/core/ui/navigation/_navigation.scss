@@ -188,6 +188,10 @@ $allow-sidebar-stash: $large-up;
     }
 
     .top-menu {
+        a > sbx-icon {
+            display: block;
+            margin: 0 auto var(--spacing-xs);
+        }
         @include inline-list;
         margin: 0;
         height: inherit;
@@ -637,6 +641,20 @@ $allow-sidebar-stash: $large-up;
                     background-color: transparent;
                 }
             }
+        }
+    }
+}
+
+.profile-options,
+.profile-options-mobile {
+    .account-menu__link {
+        align-items: center;
+        color: var(--sbx-color-text-primary);
+        display: flex;
+        gap: var(--spacing-s);
+
+        sbx-icon {
+            flex-shrink: 0;
         }
     }
 }

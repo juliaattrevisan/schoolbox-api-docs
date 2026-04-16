@@ -246,10 +246,10 @@
                         <sbx-pop-out content-id="suds-options"></sbx-pop-out>
                     </nav>
                     <ul id="suds-options" class="f-dropdown" data-dropdown-content>
-                        <li><a data-perform-update="{{ strats.full }}" href='#' class="icon-export" title="Update profile and timetable data for students, parents and staff">Update user data and timetables</a></li>
-                        <li><a data-perform-update="{{ strats.profiles }}" href='#' class="icon-export" title="Update profile data for students, parents and staff">Update user data only</a></li>
-                        <li><a data-perform-update="{{ strats.timetable }}" href='#' class="icon-export" title="Update timetables for students and staff">Update timetable data only</a></li>
-                        <li><a data-perform-update="{{ strats.calendar }}" href='#' class="icon-export" title="Update calendar data if your SIS supports it">Update calendar data only</a></li>
+                        <li><a data-perform-update="{{ strats.full }}" href='#' class="sbx-button--has-icon" title="Update profile and timetable data for students, parents and staff"><sbx-icon name="export"></sbx-icon>Update user data and timetables</a></li>
+                        <li><a data-perform-update="{{ strats.profiles }}" href='#' class="sbx-button--has-icon" title="Update profile data for students, parents and staff"><sbx-icon name="export"></sbx-icon>Update user data only</a></li>
+                        <li><a data-perform-update="{{ strats.timetable }}" href='#' class="sbx-button--has-icon" title="Update timetables for students and staff"><sbx-icon name="export"></sbx-icon>Update timetable data only</a></li>
+                        <li><a data-perform-update="{{ strats.calendar }}" href='#' class="sbx-button--has-icon" title="Update calendar data if your SIS supports it"><sbx-icon name="export"></sbx-icon>Update calendar data only</a></li>
                     </ul>
                     {% endif %}
                 </div>
@@ -322,28 +322,28 @@
             <section class="content">
                 <p>You can download the current state of your data below.</p>
 
-                <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'staff'}) }}" class="icon-download button">Export Staff Data</a>
-                <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'student'}) }}" class="icon-download button">Export Student Data</a>
-                <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'parent'}) }}" class="icon-download button">Export Parent Data</a>
-                <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'relationship'}) }}" class="icon-download button">Export Relationship Data</a>
+                <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'staff'}) }}" class="button sbx-button--has-icon"><sbx-icon name="download"></sbx-icon>Export Staff Data</a>
+                <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'student'}) }}" class="button sbx-button--has-icon"><sbx-icon name="download"></sbx-icon>Export Student Data</a>
+                <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'parent'}) }}" class="button sbx-button--has-icon"><sbx-icon name="download"></sbx-icon>Export Parent Data</a>
+                <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'relationship'}) }}" class="button sbx-button--has-icon"><sbx-icon name="download"></sbx-icon>Export Relationship Data</a>
 
                 {% if cyclicGrid %}
                     {# Only show these buttons if you're using the cyclic grid
                      # Kamar, Live Connectors and No Data Source download from cyclic grid
                      #}
-                    <a href="{{ routeLookupIfAuthorized('adminImportTimetableStructure.getExport') }}" class="icon-download button">Export Timetable Structure</a>
-                    <a href="{{ routeLookupIfAuthorized('adminImportTimetable.getExport') }}" class="icon-download button">Export Timetable</a>
+                    <a href="{{ routeLookupIfAuthorized('adminImportTimetableStructure.getExport') }}" class="button sbx-button--has-icon"><sbx-icon name="download"></sbx-icon>Export Timetable Structure</a>
+                    <a href="{{ routeLookupIfAuthorized('adminImportTimetable.getExport') }}" class="button sbx-button--has-icon"><sbx-icon name="download"></sbx-icon>Export Timetable</a>
                 {% else %}
                     {# Otherwise, provide link to download csvs from SUDS Timetable and SUDS Events
                      #}
-                    <a href="{{ routeLookupIfAuthorized('adminImportIndex.getClassesExport') }}" class="icon-download button">Export Classes</a>
-                    <a href="{{ routeLookupIfAuthorized('adminImportIndex.getTimetableExport') }}" class="icon-download button">Export Timetable</a>
+                    <a href="{{ routeLookupIfAuthorized('adminImportIndex.getClassesExport') }}" class="button sbx-button--has-icon"><sbx-icon name="download"></sbx-icon>Export Classes</a>
+                    <a href="{{ routeLookupIfAuthorized('adminImportIndex.getTimetableExport') }}" class="button sbx-button--has-icon"><sbx-icon name="download"></sbx-icon>Export Timetable</a>
                 {% endif %}
 
                 {# Timetable Enrolments (sis_class_user) is actually the same in both cases
                  # since we reused that concept
                  #}
-                <a href="{{ routeLookupIfAuthorized('adminImportTimetableEnrolment.getExport') }}" class="icon-download button">Export Timetable Enrolments</a>
+                <a href="{{ routeLookupIfAuthorized('adminImportTimetableEnrolment.getExport') }}" class="button sbx-button--has-icon"><sbx-icon name="download"></sbx-icon>Export Timetable Enrolments</a>
             </section>
         </div>
     </div>

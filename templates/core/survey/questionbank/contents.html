@@ -144,11 +144,11 @@
                             </div>
                         </div>
                         <nav>
-                            <a class="icon-view" href="#" title="Show Answers" data-show-answer-content="{QUESTION_BANK_ID}"></a>
+                               <a href="#" title="Show Answers" data-show-answer-content="{QUESTION_BANK_ID}" class="sbx-icon-only-button"><sbx-icon name="view"></sbx-icon></a>
                             <!-- BEGIN show_delete -->
-                            <a class="icon-delete" href="/survey/questionbank/question/delete/{QUESTION_BANK_ID}" title="Delete" data-delete-question></a>
+                            <a href="/survey/questionbank/question/delete/{QUESTION_BANK_ID}" title="Delete" data-delete-question class="sbx-icon-only-button"><sbx-icon name="delete"></sbx-icon></a>
                             <!-- END show_delete -->
-                            <a class="icon-modify" href="/survey/questionbank/question/modify/{QUESTION_BANK_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}" title="Modify"></a>
+                            <a href="/survey/questionbank/question/modify/{QUESTION_BANK_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}" title="Modify" class="sbx-icon-only-button"><sbx-icon name="modify"></sbx-icon></a>
                         </nav>
                         <article>{QUESTION}</article>
                         <div class="small-12 columns">
@@ -229,7 +229,7 @@
             </div>
             <div class="content">
                 <!-- BEGIN has_edit_category -->
-                <a class="button icon-modify" href="#" data-reveal-id="edit-category-modal">Edit Category</a>
+                <a class="button sbx-button--has-icon" href="#" data-reveal-id="edit-category-modal"><sbx-icon name="modify"></sbx-icon>Edit Category</a>
 
                 <div id="edit-category-modal" class='reveal-modal' data-reveal>
                     <form action='/survey/questionbank/modify.php' class="top" method='post'>
@@ -249,7 +249,7 @@
                 </div>
                 <!-- END has_edit_category -->
 
-                <a class="button icon-add" href="#" data-reveal-id="add-subcategory-modal">Add Subcategory</a>
+                <a class="button sbx-button--has-icon" href="#" data-reveal-id="add-subcategory-modal"><sbx-icon name="add"></sbx-icon>Add Subcategory</a>
 
                 <div id="add-subcategory-modal" class='reveal-modal' data-reveal>
                     <form action='/survey/questionbank/create' class="top" method='post'>
@@ -268,7 +268,7 @@
                     </form>
                 </div>
 
-                <a href='/survey/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}' class="button icon-delete">Remove this category</a>
+                <a href='/survey/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}' class="button sbx-button--has-icon"><sbx-icon name="delete"></sbx-icon>Remove this category</a>
             </div>
         </section>
     </div>

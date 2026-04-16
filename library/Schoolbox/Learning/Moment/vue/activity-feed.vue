@@ -546,34 +546,38 @@ window.Vue.onMounted(async () => {
                             v-if="props.routes.getCreateEvidenceForm"
                             href="#"
                             title="Share Learning"
-                            class="learning icon-share"
+                            class="learning"
                             data-reveal-id="shareLearningMoment"
                             data-test="learning-moment-evidence-share"
                         >
+                            <sbx-icon name="share"></sbx-icon>
                             <span>Share Learning</span>
                         </a>
                         <a
                             v-if="props.routes.getSetAsGoalForm"
                             :href="getReturnUrl(props.routes.getSetAsGoalForm)"
                             title="Set goals"
-                            class="goals icon-goal"
+                            class="goals"
                         >
+                            <sbx-icon name="goal"></sbx-icon>
                             <span>Set Goals</span>
                         </a>
                         <a
                             v-if="props.routes.getSetAsGoalForSelfForm"
                             :href="getReturnUrl(props.routes.getSetAsGoalForSelfForm)"
                             title="Set goals"
-                            class="goals icon-goal"
+                            class="goals"
                         >
+                            <sbx-icon name="goal"></sbx-icon>
                             <span>Set My Goals</span>
                         </a>
                         <a
                             v-if="props.routes.getAwardAsAchievementForm"
                             :href="getReturnUrl(props.routes.getAwardAsAchievementForm)"
                             title="Award achievement"
-                            class="achievement icon-achievement"
+                            class="achievement"
                         >
+                            <sbx-icon name="achievement"></sbx-icon>
                             <span>Award Achievement</span>
                         </a>
                     </div>
@@ -749,21 +753,22 @@ window.Vue.onMounted(async () => {
                                                 <a
                                                     v-if="item.object._links.modifyForm"
                                                     :href="getReturnUrl(item.object._links.modifyForm)"
-                                                    class="icon-modify"
+                                                    class="sbx-button--has-icon"
                                                     title="Modify"
                                                     :data-test="`learning-moment-popout-option-modify-${item.object.id}`"
                                                 >
-                                                    Modify
+                                                    <sbx-icon name="modify"></sbx-icon>Modify
                                                 </a>
                                             </li>
                                             <li>
                                                 <a
                                                     v-if="item.object._links.delete"
-                                                    class="icon-delete"
+                                                    class="sbx-button--has-icon"
                                                     title="Delete"
                                                     :data-test="`learning-moment-delete-${item.object.id}`"
                                                     @click.prevent="showDeleteModal(item)"
                                                 >
+                                                    <sbx-icon name="delete"></sbx-icon>
                                                     Delete
                                                 </a>
                                             </li>

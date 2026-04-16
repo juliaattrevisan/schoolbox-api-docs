@@ -120,26 +120,29 @@ async function onAction(type: keyof typeof selectedResultActions.value): Promise
 
         <div class="l-flex-row l-flex--justify l-gap-xs">
             <button
-                class="button l-flex__item--1-auto icon-delete"
+                class="button l-flex__item--1-auto sbx-button--has-icon"
                 :disabled="selectedResultActions.delete.length === 0"
                 @click="onAction('delete')"
             >
+                <sbx-icon name="delete"></sbx-icon>
                 Delete
             </button>
             <button
-                class="button l-flex__item--1-auto icon-surveys"
+                class="button l-flex__item--1-auto sbx-button--has-icon"
                 :disabled="selectedResultActions.reject.length === 0"
                 @click="onAction('reject')"
             >
+                <sbx-icon name="surveys"></sbx-icon>
                 Request Update
             </button>
         </div>
         <div class="l-flex-row l-flex--justify l-gap-xs">
             <button
-                class="button l-flex__item--1-auto icon-approve submit"
+                class="button l-flex__item--1-auto submit sbx-button--has-icon"
                 :disabled="selectedResultActions.publish.length === 0"
                 @click="onAction('publish')"
             >
+                <sbx-icon name="approve"></sbx-icon>
                 Publish
             </button>
         </div>

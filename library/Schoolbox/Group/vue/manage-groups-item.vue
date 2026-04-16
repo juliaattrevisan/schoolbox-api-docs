@@ -357,50 +357,51 @@ export default {
                                 <button
                                     v-if="!isRequestToJoin && !(isPrivate || isAdmin)"
                                     title="Join"
-                                    class="group-action icon-add"
+                                    class="group-action sbx-button--has-icon"
                                     @click="join"
                                 >
+                                    <sbx-icon name="add"></sbx-icon>
                                     Join
                                 </button>
                                 <button
                                     v-else-if="!(isPrivate || isAdmin)"
                                     title="Request to join"
-                                    class="group-action icon-add"
+                                    class="group-action sbx-button--has-icon"
                                     @click="join"
                                 >
+                                    <sbx-icon name="add"></sbx-icon>
                                     Request to join
                                 </button>
                             </template>
                             <button
                                 v-if="isEnrolled || isPrivate"
                                 title="Toggle Favourites"
-                                :class="['group-action', isFavourite ? 'icon-favourite' : 'icon-favourite-hollow']"
+                                class="group-action sbx-button--has-icon"
+                                aria-label="Toggle Favourites"
                                 :disabled="isProcessing"
                                 @click="toggleFavourites"
                             >
+                                <sbx-icon :name="isFavourite ? 'favourite' : 'favourite-hollow'" />
                                 Toggle Favourites
                             </button>
                             <button
                                 v-if="!group.isForceFollow && !group.isMsgDisabled && (isEnrolled || isPrivate)"
                                 title="Toggle Notifications"
-                                :class="[
-                                    'group-action',
-                                    isNotificationsOn ? 'icon-notifications' : 'icon-notifications-hollow',
-                                ]"
+                                class="group-action sbx-button--has-icon"
                                 :disabled="isProcessing"
                                 @click="toggleNotifications"
                             >
+                                <sbx-icon :name="isNotificationsOn ? 'notifications' : 'notifications-hollow'" />
                                 Toggle Notifications
                             </button>
                             <button
                                 v-if="(group.isForceFollow || group.isMsgDisabled) && (isEnrolled || isPrivate)"
                                 title="Disabled force follow button"
-                                :class="[
-                                    'group-action',
-                                    group.isForceFollow ? 'icon-notifications' : 'icon-notifications-hollow',
-                                ]"
+                                class="group-action sbx-icon-only-button"
                                 :disabled="true"
-                            ></button>
+                            >
+                                <sbx-icon :name="group.isForceFollow ? 'notifications' : 'notifications-hollow'" />
+                            </button>
                         </div>
                     </transition>
                 </div>
@@ -422,32 +423,43 @@ export default {
                         </nav>
                         <ul data-dropdown-content class="f-dropdown" :id="`class-options${group.id}`">
                             <li v-if="group.isAccessWrite || group.isAccessAdmin">
-                                <a :href="group.modifyLink" class="icon-modify" title="Modify Folder">Modify Folder</a>
+                                <a :href="group.modifyLink" class="sbx-button--has-icon" title="Modify Folder"
+                                    ><sbx-icon name="modify" />Modify Folder</a
+                                >
                             </li>
                             <li v-if="group.isAccessWrite || group.isAccessAdmin">
                                 <a
                                     :href="`/statistics/homepage/${group.id}`"
-                                    class="icon-report"
+                                    class="sbx-button--has-icon"
                                     title="View Statistics"
-                                    >View Statistics</a
+                                    ><sbx-icon name="report" />View Statistics</a
                                 >
                             </li>
                             <li v-if="group.isAccessAdmin">
-                                <a :href="`/group/modify/${group.id}`" class="icon-group" title="Manage Group"
-                                    >Manage Group</a
+                                <a :href="`/group/modify/${group.id}`" class="sbx-button--has-icon" title="Manage Group"
+                                    ><sbx-icon name="group" />Manage Group</a
                                 >
                             </li>
                             <li v-if="isEnrolled">
-                                <a href="#" class="icon-logout" @click="leave" title="Leave Group">Leave</a>
+                                <a href="#" class="sbx-button--has-icon" @click="leave" title="Leave Group"
+                                    ><sbx-icon name="logout" />Leave</a
+                                >
                             </li>
                             <li v-else-if="isMembershipPending">
-                                <a href="#" class="icon-logout" @click="leave" title="Cancel membership request"
-                                    >Cancel membership request</a
+                                <a
+                                    href="#"
+                                    class="sbx-button--has-icon"
+                                    @click="leave"
+                                    title="Cancel membership request"
+                                    ><sbx-icon name="logout" />Cancel membership request</a
                                 >
                             </li>
                             <li v-if="group.cohortReportLink">
-                                <a :href="group.cohortReportLink" class="icon-share" title="Cohort Learning Moments"
-                                    >Cohort Learning Moments</a
+                                <a
+                                    :href="group.cohortReportLink"
+                                    class="sbx-button--has-icon"
+                                    title="Cohort Learning Moments"
+                                    ><sbx-icon name="share" />Cohort Learning Moments</a
                                 >
                             </li>
                         </ul>
@@ -481,12 +493,17 @@ export default {
     @include disabled-button;
     background: none;
     font-size: 0;
-    &:before {
-        //tweak the icon display
+    .sbx-icon {
         color: var(--accent-foreground);
-        font-size: 1.5rem;
-        padding: 0;
+        display: inline-flex;
     }
+
+    :deep(.sbx-icon__svg) {
+        height: 1.5rem;
+        padding: 0;
+        width: 1.5rem;
+    }
+
     &:hover {
         opacity: 0.8;
     }

@@ -56,7 +56,7 @@
             {% endif %}
 
             {% if routeRecordDelete %}
-                <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
+                <a data-delete id="{{ record.id }}" class="sbx-icon-only-button no-text" href="#" title="Delete" aria-label="Delete"><sbx-icon name="delete"></sbx-icon></a>
                 <script>
                     $('[data-delete]').on('click', function (event) {
                         event.preventDefault();
@@ -76,7 +76,7 @@
             {% endif %}
 
             {% if routeRecordUpdate %}
-                <a class="icon-modify no-text" href="{{ routeRecordUpdate }}" title="Modify"></a>
+                <a class="sbx-icon-only-button no-text" href="{{ routeRecordUpdate }}" title="Modify" aria-label="Modify"><sbx-icon name="modify"></sbx-icon></a>
             {% endif %}
         </nav>
 
@@ -85,7 +85,7 @@
                 <li class="separator">Students With Related Records</li>
                 {% for student in linkedStudents %}
                     <li>
-                        <a href="{{ routeLookup('pastoral.getStudent', {studentId: student.student_id}) }}" class="icon-user">
+                        <a href="{{ routeLookup('pastoral.getStudent', {studentId: student.student_id}) }}" class="sbx-button--has-icon"><sbx-icon name="user"></sbx-icon>
                             {{ student.first_name }} {{ student.last_name }} ({{ student.count }})
                         </a>
                     </li>

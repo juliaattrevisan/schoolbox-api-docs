@@ -1,13 +1,20 @@
 {% if folder.id == 0 %}
-    <li><a class="icon-folder"   data-action="folder"   href="/cms/networkFolder/new/{{ folder.id }}">Add Folder</a></li>
+    <li><a data-action="folder"   href="/cms/networkFolder/new/{{ folder.id }}" class="sbx-button--has-icon"><sbx-icon name="folder"></sbx-icon>Add Folder</a></li>
 {% else %}
     {% if access >= 2 or user.isSuperuser %}
-        <li><a class="icon-modify"   data-action="modify"   href="/cms/networkFolder/{{ folder.id }}">Modify</a></li>
-        <li><a class="icon-drop-box" data-action="file"     href="/cms/networkFile/new/{{ folder.id }}">Post File</a></li>
-        <li><a class="icon-folder"   data-action="folder"   href="/cms/networkFolder/new/{{ folder.id }}">Add Folder</a></li>
-        <li><a class="icon-download" data-action="download" href="#">Download</a></li>
+        <li><a data-action="modify" href="/cms/networkFolder/{{ folder.id }}" class="sbx-button--has-icon"><sbx-icon name="modify"></sbx-icon>Modify</a></li>
+        <li><a data-action="file"     href="/cms/networkFile/new/{{ folder.id }}" class="sbx-button--has-icon"><sbx-icon name="drop-box"></sbx-icon>Post File</a></li>
+        <li><a data-action="folder"   href="/cms/networkFolder/new/{{ folder.id }}" class="sbx-button--has-icon"><sbx-icon name="folder"></sbx-icon>Add Folder</a></li>
+        <li><a data-action="download" href="#" class="sbx-button--has-icon"><sbx-icon name="download"></sbx-icon>Download</a></li>
     {% endif %}
     {% if access >= 2 or user.isSuperuser %}
-        <li><a class="icon-delete"   data-action="delete"   href="/cms/networkFolderForm.php?ajax=1&delete={{ folder.id }}">Delete</a></li>
+        <li><a class="sbx-button--has-icon"
+               data-action="delete"
+               href="/cms/networkFolderForm.php?ajax=1&delete={{ folder.id }}"
+               title="Delete folder"
+               aria-label="Delete folder">
+            <sbx-icon name="delete"></sbx-icon>
+            Delete
+        </a></li>
     {% endif %}
 {% endif %}

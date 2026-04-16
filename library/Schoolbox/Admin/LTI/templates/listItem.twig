@@ -24,7 +24,11 @@
         } only %}
     </div>
     <nav>
-        <a href="#" class="icon-down-arrow" data-collapser="provider-{{ identifier }}"></a>
-        <a href="#" class="icon-delete" data-provider-action="delete" data-post-action="{{ routeLookup('adminLti.postDelete', {providerId: provider.id}) }}"></a>
+        <a href="#" class="sbx-icon-only-button" data-collapser="provider-{{ identifier }}" aria-label="Toggle provider details">
+            <sbx-icon name="down-arrow"></sbx-icon>
+        </a>
+        <a href="#" class="sbx-icon-only-button" data-provider-action="delete" data-post-action="{{ routeLookup('adminLti.postDelete', {providerId: provider.id}) }}" aria-label="Delete tool">
+            <sbx-icon name="delete"></sbx-icon>
+        </a>
     </nav>
 </div>

@@ -51,8 +51,12 @@
                         </div>
                     </div>
                     <nav>
-                        <a href="{{ routeLookup('sportsfixturesResult.deleteEntity', {entityId: match.result[team.id].id}) }}" class="icon-delete" title="Delete" data-delete="{{ match.result[team.id].id }}"></a>
-                        <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: match.result[team.id].id}) }}" class="icon-modify" title="Modify"></a>
+                        <a href="{{ routeLookup('sportsfixturesResult.deleteEntity', {entityId: match.result[team.id].id}) }}" class="sbx-icon-only-button" title="Delete" aria-label="Delete" data-delete="{{ match.result[team.id].id }}">
+                            <sbx-icon name="delete"></sbx-icon>
+                        </a>
+                        <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: match.result[team.id].id}) }}" class="sbx-icon-only-button" title="Modify" aria-label="Modify">
+                            <sbx-icon name="modify"></sbx-icon>
+                        </a>
                     </nav>
                 </div>
             </div>

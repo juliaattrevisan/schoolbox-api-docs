@@ -23,7 +23,9 @@
             </div>
             <nav>
                 {% if not allResults|length %}
-                <a href='{{ routeLookup('sportsfixturesResult.getCreateForm', {contextId: match.id}) }}' class="icon-add" title="Add Results to {{ match.name }}"></a>
+                <a href='{{ routeLookup('sportsfixturesResult.getCreateForm', {contextId: match.id}) }}' class="sbx-icon-only-button" title="Add Results to {{ match.name }}" aria-label="Add Results to {{ match.name }}">
+                    <sbx-icon name="add"></sbx-icon>
+                </a>
                 {% endif %}
             </nav>
         </div>
@@ -43,7 +45,9 @@
                             </div>
                         </div>
                         <nav>
-                            <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: currentResult.id}) }}" class="icon-modify" title="Modify"></a>
+                            <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: currentResult.id}) }}" class="sbx-icon-only-button" title="Modify" aria-label="Modify">
+                                <sbx-icon name="modify"></sbx-icon>
+                            </a>
                         </nav>
                     </li>
                     {% endfor %}

@@ -30,7 +30,7 @@
             "        <input type='text' name='rubricResultLabels[" + nRows + "]' maxlength='{{ maxCharsPerLabel }}' required/>\n" +
             "    </div>\n" +
             "    <nav>\n" +
-            "        <a class='icon-delete' title='Delete rubric result set item' onclick='removeRow(" + nRows + ")'></a>\n" +
+            "        <a class='sbx-icon-only-button' title='Delete rubric result set item' aria-label='Delete rubric result set item' onclick='removeRow(" + nRows + ")'><sbx-icon name='delete'></sbx-icon></a>\n" +
             "    </nav>\n" +
             "</div>\n"
         );
@@ -136,8 +136,8 @@
                                                required/>
                                     </div>
                                     <nav>
-                                        <a class="icon-delete" title="Delete rubric result set item"
-                                           onclick='removeRow({{ row.value }})'></a>
+                                        <a class="sbx-icon-only-button" title="Delete rubric result set item"
+                                           aria-label="Delete rubric result set item" onclick='removeRow({{ row.value }})'><sbx-icon name="delete"></sbx-icon></a>
                                     </nav>
                                 </div>
                             {% endfor %}

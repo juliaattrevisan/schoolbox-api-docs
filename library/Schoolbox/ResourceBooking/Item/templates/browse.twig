@@ -14,30 +14,30 @@
     </nav>
     <ul class="f-dropdown" data-dropdown-content id="options">
         <li>
-            <a class="icon-search" data-reveal-id="search-modal" title="Search Resources">Search Resources</a>
+            <a data-reveal-id="search-modal" title="Search Resources" class="sbx-button--has-icon"><sbx-icon name="search"></sbx-icon>Search Resources</a>
         </li>
         {% if isRouteAuthorized('resourceCategory.browse') %}
             <li>
-                <a class="icon-list" href="{{  routeLookup('resourceCategory.browse') }}" title="Resource Categories">Resource Categories</a>
+                <a href="{{  routeLookup('resourceCategory.browse') }}" title="Resource Categories" class="sbx-button--has-icon"><sbx-icon name="list"></sbx-icon>Resource Categories</a>
             </li>
         {% endif %}
         {% if isRouteAuthorized('resourceBookingReport.index') %}
             <li>
-                <a class="icon-report" href="{{  routeLookup('resourceBookingReport.index') }}" title="Booking Report">Booking Report</a>
+                <a href="{{  routeLookup('resourceBookingReport.index') }}" title="Booking Report" class="sbx-button--has-icon"><sbx-icon name="report"></sbx-icon>Booking Report</a>
             </li>
         {% endif %}
         {% if categoryId %}
         <li>
-            <a class="icon-calendar" href="{{  routeLookup('resourceCategory.read', {id: categoryId}) }}" title="Availability Calendar">Availability Calendar</a>
+            <a href="{{  routeLookup('resourceCategory.read', {id: categoryId}) }}" title="Availability Calendar" class="sbx-button--has-icon"><sbx-icon name="calendar"></sbx-icon>Availability Calendar</a>
         </li>
         {% endif %}
         {% if isRouteAuthorized('resourceItem.add') %}
             <li class="separator">Admin Actions</li>
             <li>
-                <a id="resource-create" rel="create-form" class="icon-add" href="{{ routeLookup('resourceItem.add') }}" title="Add Resource">Add Resource</a>
+                <a id="resource-create" rel="create-form" class="sbx-button--has-icon" href="{{ routeLookup('resourceItem.add') }}" title="Add Resource"><sbx-icon name="add"></sbx-icon>Add Resource</a>
             </li>
             <li>
-                <a id="resource-create" rel="create-form" class="icon-add" href="{{ routeLookup('resourceCategory.add') }}" title="Add Category">Add Category</a>
+                <a id="resource-create" rel="create-form" class="sbx-button--has-icon" href="{{ routeLookup('resourceCategory.add') }}" title="Add Category"><sbx-icon name="add"></sbx-icon>Add Category</a>
             </li>
         {% endif %}
     </ul>
@@ -104,11 +104,11 @@
                         #}
 
                         {% if isRouteAuthorized('resourceBooking.book', {id: item.id, item: item}) %}
-                        <a class="icon-add resource-book-link" id="resource-book-{{item.id}}" title="Book" href="{{ routeLookup('resourceBooking.book', {id: item.id}) }}"></a>
+                        <a class="resource-book-link sbx-icon-only-button" id="resource-book-{{item.id}}" title="Book" href="{{ routeLookup('resourceBooking.book', {id: item.id}) }}"><sbx-icon name="add"></sbx-icon></a>
                         {% endif %}
 
                         {% if isRouteAuthorized('resourceItem.edit', {id: item.id, item: item}) %}
-                        <a class="icon-modify resource-name resource-edit-link" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}"></a>
+                        <a class="resource-name resource-edit-link sbx-icon-only-button" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}"><sbx-icon name="modify"></sbx-icon></a>
                         {% endif %}
                     </nav>
                     <article>{{ item.description|purify }}</article>

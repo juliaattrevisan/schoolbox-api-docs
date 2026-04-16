@@ -155,17 +155,18 @@ window.Vue.onUnmounted(() => {
                 <li v-if="props.activity._links.export">
                     <a
                         :href="getReturnUrl(props.activity._links.export)"
-                        class="icon-export"
+                        class="sbx-button--has-icon"
                         title="Copy this task into classes"
                         :data-test="`unit-planner-export-activity-${props.activity.id}`"
-                        >Export to Classes</a
+                        ><sbx-icon name="export"></sbx-icon>Export to Classes</a
                     >
                 </li>
                 <li v-if="props.activity._links.modify">
                     <a
                         :href="getReturnUrl(props.activity._links.modify)"
-                        class="icon-modify"
+                        class="sbx-button--has-icon"
                         :data-test="`unit-planner-modify-activity-${props.activity.id}`"
+                        ><sbx-icon name="modify"></sbx-icon
                         >{{
                             props.activity.assessmentType === ACTIVITY_TYPE_QUIZ ||
                             props.activity.assessmentType === ACTIVITY_TYPE_DIALOG_AGENT
@@ -175,19 +176,21 @@ window.Vue.onUnmounted(() => {
                     >
                 </li>
                 <li v-if="props.activity._links.modifyContent">
-                    <a :href="getReturnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Contents</a>
+                    <a :href="getReturnUrl(props.activity._links.modifyContent)" class="sbx-button--has-icon"
+                        ><sbx-icon name="modify" />Modify Contents</a
+                    >
                 </li>
                 <li v-if="props.activity._links.configureAgent">
-                    <a :href="getReturnUrl(props.activity._links.configureAgent)" class="icon-modify"
-                        >Configure Agent
+                    <a :href="getReturnUrl(props.activity._links.configureAgent)" class="sbx-button--has-icon"
+                        ><sbx-icon name="modify" />Configure Agent
                     </a>
                 </li>
                 <li v-if="props.activity._links.delete">
                     <a
-                        class="icon-delete"
                         :data-test="`unit-planner-delete-activity-${props.activity.id}`"
+                        class="sbx-button--has-icon"
                         @click.prevent="activitiesListDeleteModalStore.prompt(props.activity, () => emit('deleted'))"
-                        >Delete</a
+                        ><sbx-icon name="delete"></sbx-icon>Delete</a
                     >
                 </li>
             </ul>

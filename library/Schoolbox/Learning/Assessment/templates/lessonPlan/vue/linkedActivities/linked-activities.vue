@@ -219,12 +219,13 @@ window.Vue.onMounted(() => {
                 <br />
                 <a
                     href="#"
-                    class="button expand icon-link"
+                    class="button expand sbx-button--has-icon"
                     :class="{
                         disabled: store.getAddedActivities().length === 0 && store.getRemovedActivities().length === 0,
                     }"
                     @click.prevent="store.saveSelectedActivities()"
                 >
+                    <sbx-icon name="link"></sbx-icon>
                     {{ linkedActivitiesButtonText }}
                 </a>
             </section>

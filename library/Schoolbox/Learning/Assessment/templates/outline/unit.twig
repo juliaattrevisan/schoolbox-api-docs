@@ -49,11 +49,19 @@
                     <li class="separator">Manage</li>
                     {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getRedirect', {courseSpec: unit.specification.course, courseSpecId: unit.specification.course.id, unitSpec: unit.specification, unitSpecId: unit.specification.id, folder: unit.course.folder, folderId: unit.course.folder.id}) %}
                     {% if courseMarkbookRoute %}
-                        <li><a href="{{ courseMarkbookRoute }}" class="icon-curriculum" data-test="course-outline-menu-course-markbook">Course Markbook</a></li>
+                        <li><a href="{{ courseMarkbookRoute }}" data-test="course-outline-menu-course-markbook" class="sbx-button--has-icon"><sbx-icon name="curriculum"></sbx-icon>Course Markbook</a></li>
                     {% else %}
-                        <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForClass', {folder: unit.course.folder, folderId: unit.course.folder.id}) }}" class="icon-curriculum">Class Markbook</a></li>
+                        <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForClass', {folder: unit.course.folder, folderId: unit.course.folder.id}) }}" class="sbx-button--has-icon"><sbx-icon name="curriculum"></sbx-icon>Class Markbook</a></li>
                     {% endif %}
-                    <li><a href="{{ routeLookupIfAuthorized('course.deleteUnitImplementation', {id: unit.id}) }}" data-action="delete-unit" data-test="course-outline-unit-delete" class="icon-delete" title="Delete this {{ locale.unit }}">Delete</a></li>
+                    <li><a href="{{ routeLookupIfAuthorized('course.deleteUnitImplementation', {id: unit.id}) }}"
+                           data-action="delete-unit"
+                           data-test="course-outline-unit-delete"
+                              class="sbx-button--has-icon"
+                           title="Delete this {{ locale.unit }}"
+                           aria-label="Delete this {{ locale.unit }}">
+                        <sbx-icon name="delete"></sbx-icon>
+                        Delete
+                    </a></li>
                 </ul>
                 {% endif %}
 

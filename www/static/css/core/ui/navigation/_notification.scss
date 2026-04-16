@@ -17,11 +17,11 @@ $allow-notification-stash: $xlarge-up;
     &[data-unread] {
         color: var(--sbx-config-color-menu-foreground, $navigation-foreground);
 
-        /* The colour of the bell in its idle state
-         */
-        &:before {
+        /* The colour of the bell in its idle state */
+        sbx-icon {
             color: inherit;
-            display: inline-block;
+            display: inline-flex;
+            height: 1.25rem;
             width: 1.25rem;
         }
 

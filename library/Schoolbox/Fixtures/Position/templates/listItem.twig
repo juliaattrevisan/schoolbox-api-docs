@@ -13,8 +13,7 @@
         ? routeLookup('sportsfixturesPosition.deleteEntity', { entityId: position.id })
         : '#'
         }}"
-       class="icon-delete"
        title="Delete"
-       data-delete="{{ position.id ?? '' }}"></a>
+       data-delete="{{ position.id ?? '' }}"><sbx-icon name="delete"></sbx-icon></a>
 </nav>
 {% endif %}

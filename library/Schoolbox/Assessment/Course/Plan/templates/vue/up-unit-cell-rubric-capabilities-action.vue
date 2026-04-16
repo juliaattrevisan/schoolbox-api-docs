@@ -29,13 +29,20 @@ const props = defineProps<Props>();
 
             <ul :id="`dropdown-unit-${props.unit.id}-rubric-capabilities`" class="f-dropdown" data-dropdown-content>
                 <li v-if="props.unit.rubricCapabilities._routes.manageCourse">
-                    <a class="icon-criteria" :href="getReturnUrl(props.unit.rubricCapabilities._routes.manageCourse)">
-                        Manage Course {{ locale.rubricGroup.translate(true, true) }}
+                    <a
+                        class="sbx-button--has-icon"
+                        :href="getReturnUrl(props.unit.rubricCapabilities._routes.manageCourse)"
+                    >
+                        <sbx-icon name="criteria" />Manage Course {{ locale.rubricGroup.translate(true, true) }}
                     </a>
                 </li>
                 <li v-if="props.unit.rubricCapabilities._routes.manageUnit">
-                    <a class="icon-criteria" :href="getReturnUrl(props.unit.rubricCapabilities._routes.manageUnit)">
-                        Manage {{ locale.unit.translate(false, true) }} {{ locale.rubricGroup.translate(true, true) }}
+                    <a
+                        class="sbx-button--has-icon"
+                        :href="getReturnUrl(props.unit.rubricCapabilities._routes.manageUnit)"
+                    >
+                        <sbx-icon name="criteria" />Manage {{ locale.unit.translate(false, true) }}
+                        {{ locale.rubricGroup.translate(true, true) }}
                     </a>
                 </li>
             </ul>

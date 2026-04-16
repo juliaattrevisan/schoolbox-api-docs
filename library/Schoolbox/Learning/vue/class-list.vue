@@ -610,38 +610,39 @@ export default {
                         <a
                             @click.prevent="openShareLearningMomentDialog"
                             :class="{
+                                'sbx-button--has-icon': true,
                                 disabled: selectedStudentLearningMomentsEnabledIds.length === 0,
-                                'icon-share': true,
                             }"
-                            >Share Learning Moment</a
+                            ><sbx-icon name="share"></sbx-icon>Share Learning Moment</a
                         >
                     </li>
                     <li v-if="badgesEnabled">
                         <a
                             :href="buildSetGoalUrl()"
-                            :class="{ disabled: selectedStudentIds.length === 0, 'icon-goal': true }"
-                            >Set Goals</a
+                            :class="{ 'sbx-button--has-icon': true, disabled: selectedStudentIds.length === 0 }"
+                            ><sbx-icon name="goal"></sbx-icon>Set Goals</a
                         >
                     </li>
                     <li v-if="badgesEnabled">
                         <a
                             :href="buildAwardAchievementUrl()"
-                            :class="{ disabled: selectedStudentIds.length === 0, 'icon-achievement': true }"
-                            >Award Achievements</a
+                            :class="{ 'sbx-button--has-icon': true, disabled: selectedStudentIds.length === 0 }"
+                            ><sbx-icon name="achievement"></sbx-icon>Award Achievements</a
                         >
                     </li>
                     <li v-if="pastoralEnabled">
                         <a
                             @click.prevent="addPastoralRecord"
-                            :class="{ disabled: selectedStudentIds.length === 0, 'icon-user': true }"
-                            >Add {{ pastoralCareLabel }} Record</a
+                            :class="{ 'sbx-button--has-icon': true, disabled: selectedStudentIds.length === 0 }"
+                            ><sbx-icon name="user"></sbx-icon>Add {{ pastoralCareLabel }} Record</a
                         >
                     </li>
                     <li v-if="mailEnabled && currentUserCanEmail">
                         <a
                             @click.prevent="openMailDialog"
-                            :class="{ disabled: selectedStudentExternalIds.length === 0, 'icon-email': true }"
-                            >Compose Email</a
+                            :class="{ disabled: selectedStudentExternalIds.length === 0 }"
+                            class="sbx-button--has-icon"
+                            ><sbx-icon name="email"></sbx-icon>Compose Email</a
                         >
                     </li>
                 </ul>
@@ -759,6 +760,7 @@ export default {
                                         <slot name="student-menu-items" v-bind:student="student">
                                             <li v-for="(element, index) in student.routes" :key="index">
                                                 <a :href="element.href" :class="element.class" :title="element.title">
+                                                    <sbx-icon v-if="element.icon" :name="element.icon"></sbx-icon>
                                                     {{ element.label }}
                                                 </a>
                                             </li>
@@ -769,11 +771,12 @@ export default {
                             <td class="show-for-medium-up" v-if="differentiationEnabled">
                                 <button
                                     v-if="student._links.differentiationProfile"
-                                    class="button icon-learning-support"
+                                    class="button sbx-button--has-icon"
                                     type="button"
                                     :data-test="`class-list-${student.id}-view-differentiation-profile`"
                                     @click.prevent="onDPSelected(student)"
                                 >
+                                    <sbx-icon name="learning-support"></sbx-icon>
                                     View {{ locale.differentiationProfile.translate(false, true) }}
                                 </button>
                             </td>

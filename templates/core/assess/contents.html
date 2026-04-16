@@ -60,11 +60,18 @@
     </nav>
     <ul class="f-dropdown" data-dropdown-content id="section{SECTION_SECTION_ID}-options">
         <li class="separator">Section</li>
-        <li><a class="icon-modify" href="/{ASSESS_KIND_LC}/section/modify/{SECTION_SECTION_ID}{RETURN_URL}">Modify</a></li>
-        <li><a class="icon-delete" href="/{ASSESS_KIND_LC}/section/delete/{SECTION_SECTION_ID}{RETURN_URL}" data-delete-section>Delete</a></li>
+        <li><a href="/{ASSESS_KIND_LC}/section/modify/{SECTION_SECTION_ID}{RETURN_URL}" class="sbx-button--has-icon"><sbx-icon name="modify"></sbx-icon>Modify</a></li>
+        <li><a class="sbx-button--has-icon"
+               href="/{ASSESS_KIND_LC}/section/delete/{SECTION_SECTION_ID}{RETURN_URL}"
+               data-delete-section
+               title="Delete section"
+               aria-label="Delete section">
+            <sbx-icon name="delete"></sbx-icon>
+            Delete
+        </a></li>
         <li class="separator">Question</li>
-        <li><a class="icon-add" href="/{ASSESS_KIND_LC}/question/create/{SECTION_SECTION_ID}{RETURN_URL}">New Question</a></li>
-        <li><a class="icon-download" href="/{ASSESS_KIND_LC}/questionbank/contents/0/{ASSESS_ASSESS_ID}/{SECTION_SECTION_ID}{RETURN_URL}">Add from Question Bank</a></li>
+        <li><a class="sbx-button--has-icon" href="/{ASSESS_KIND_LC}/question/create/{SECTION_SECTION_ID}{RETURN_URL}"><sbx-icon name="add"></sbx-icon>New Question</a></li>
+        <li><a href="/{ASSESS_KIND_LC}/questionbank/contents/0/{ASSESS_ASSESS_ID}/{SECTION_SECTION_ID}{RETURN_URL}" class="sbx-button--has-icon"><sbx-icon name="download"></sbx-icon>Add from Question Bank</a></li>
     </ul>
 </div>
 <!-- BEGIN has_section_description -->
@@ -101,9 +108,15 @@
                 </div>
             </div>
             <nav>
-                <a class="icon-delete" href="/{ASSESS_KIND_LC}/question/delete/{QUESTION_QUESTION_ID}{RETURN_URL}" title="Delete" data-delete-question></a>
-                <a class="icon-modify" href="/{ASSESS_KIND_LC}/question/modify/{QUESTION_QUESTION_ID}{RETURN_URL}" title="Modify"></a>
-                <a class="icon-download" href="/{ASSESS_KIND_LC}/questionbank/addQuestion/{QUESTION_QUESTION_ID}{RETURN_URL}" data-reveal-id="question-bank" data-reveal-ajax="true" title="Import into Question Bank"></a>
+                <a class="sbx-icon-only-button no-text"
+                   href="/{ASSESS_KIND_LC}/question/delete/{QUESTION_QUESTION_ID}{RETURN_URL}"
+                   title="Delete"
+                   data-delete-question
+                   aria-label="Delete question">
+                    <sbx-icon name="delete"></sbx-icon>
+                </a>
+                <a href="/{ASSESS_KIND_LC}/question/modify/{QUESTION_QUESTION_ID}{RETURN_URL}" title="Modify" class="sbx-icon-only-button"><sbx-icon name="modify"></sbx-icon></a>
+                <a href="/{ASSESS_KIND_LC}/questionbank/addQuestion/{QUESTION_QUESTION_ID}{RETURN_URL}" data-reveal-id="question-bank" data-reveal-ajax="true" title="Import into Question Bank" class="sbx-icon-only-button"><sbx-icon name="download"></sbx-icon></a>
             </nav>
         </li>
         <!-- END question -->

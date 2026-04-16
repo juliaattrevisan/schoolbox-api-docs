@@ -143,7 +143,7 @@
                     <h2 class="subheader">Homepage Templates</h2>
                 </div>
                 <nav>
-                    <a data-reveal-id="newDialog" class="icon-add" href="#" title="Create"></a>
+                    <a data-reveal-id="newDialog" class="sbx-icon-only-button" href="#" title="Create"><sbx-icon name="add"></sbx-icon></a>
                 </nav>
             </div>
 
@@ -164,8 +164,14 @@
                                 </script>
                             </div>
                             <nav>
-                                <a data-reveal-id="renameDialog" class="icon-modify" href="#" title="Rename"></a>
-                                <a data-button="delete" class="icon-delete" href="#" title="Delete"></a>
+                                <a data-reveal-id="renameDialog" href="#" title="Rename" class="sbx-icon-only-button"><sbx-icon name="modify"></sbx-icon></a>
+                                <a data-button="delete"
+                                   class="sbx-icon-only-button no-text"
+                                   href="#"
+                                   title="Delete"
+                                   aria-label="Delete">
+                                    <sbx-icon name="delete"></sbx-icon>
+                                </a>
                             </nav>
                         </div>
                     </form>

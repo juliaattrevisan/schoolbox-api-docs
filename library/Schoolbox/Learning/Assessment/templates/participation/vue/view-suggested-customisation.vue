@@ -81,10 +81,11 @@ function onAddToDescription(): void {
             sbProps.aiFeatures.learningactivitycustomisation?.enabled &&
             props.participant._links.differentiationProfile
         "
-        class="button icon-ai f-no-margins"
+        class="button f-no-margins sbx-button--has-icon"
         type="button"
         @click.prevent="onViewSuggestedCustomisation"
     >
+        <sbx-icon name="ai"></sbx-icon>
         {{ props.participant.cachedSuggestedCustomisation ? "View" : "Generate" }} Suggested Customisation
     </button>
     <basic-modal v-model:is-open="isOpen">

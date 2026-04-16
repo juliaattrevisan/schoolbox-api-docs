@@ -56,7 +56,7 @@ set upsConfig = {
                 <h2>You have no log extension file type!</h2>
                 <p>The User Provisioning System will not run if it cannot create logs.</p>
                 <p>Add a new file type with the "log" extension, or add this extension to an existing file type.</p>
-                <a href="/adminv2/allowed-file/" class="button icon-next">Fix this now</a>
+                <a href="/adminv2/allowed-file/" class="button sbx-button--has-icon"><sbx-icon name="next"></sbx-icon>Fix this now</a>
             </div>
             {% endif %}
 
@@ -113,17 +113,17 @@ set upsConfig = {
                             <span>Off</span>
                         </label>
                     </span>
-                    <a class="icon-down-arrow" title="Expand/Collapse All Rules" data-expand-all data-collapse-state="collapsed"></a>
+                    <a class="sbx-icon-only-button" title="Expand/Collapse All Rules" aria-label="Expand/Collapse All Rules" data-expand-all data-collapse-state="collapsed"><sbx-icon name="down-arrow"></sbx-icon></a>
                     <sbx-pop-out content-id="ruleset-options"></sbx-pop-out>
                 </nav>
                 <ul id="ruleset-options" class="f-dropdown" data-dropdown-content>
                     <li class="separator">Ruleset</li>
-                    <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
-                    <li><a href='{{ routeLookup('upsRuleset.dryRun', {rulesetId: rulesetId}) }}' class="icon-export" title="Perform Dry Run">Perform Dry Run</a></li>
-                    <li><a data-perform-update href='#' class="icon-export" title="Perform Live Update">Perform Live Update</a></li>
+                    <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="sbx-button--has-icon" title="Add New Rule"><sbx-icon name="add"></sbx-icon>Add New Rule</a></li>
+                    <li><a href='{{ routeLookup('upsRuleset.dryRun', {rulesetId: rulesetId}) }}' class="sbx-button--has-icon" title="Perform Dry Run"><sbx-icon name="export"></sbx-icon>Perform Dry Run</a></li>
+                    <li><a data-perform-update href='#' class="sbx-button--has-icon" title="Perform Live Update"><sbx-icon name="export"></sbx-icon>Perform Live Update</a></li>
                     <li class="separator">Help</li>
-                    <li><a class="icon-help" data-reveal-id="token-list" title="Tell me about Tokens and Filters">About Tokens and Filters</a></li>
-                    <li><a class="icon-help" data-reveal-id="string-match" title="Tell me about how to match strings">About String Matching</a></li>
+                    <li><a class="sbx-button--has-icon" data-reveal-id="token-list" title="Tell me about Tokens and Filters"><sbx-icon name="help"></sbx-icon>About Tokens and Filters</a></li>
+                    <li><a class="sbx-button--has-icon" data-reveal-id="string-match" title="Tell me about how to match strings"><sbx-icon name="help"></sbx-icon>About String Matching</a></li>
                 </ul>
             </div>
             <div>
@@ -167,7 +167,7 @@ set upsConfig = {
                                 </div>
 
                                 <nav>
-                                    <a href="#" class="icon-down-arrow" data-collapser="rule-{{ currentRule.id }}-contents" title="Expand/Collapse Content"></a>
+                                    <a href="#" class="sbx-icon-only-button" data-collapser="rule-{{ currentRule.id }}-contents" title="Expand/Collapse Content" aria-label="Expand/Collapse Content"><sbx-icon name="down-arrow"></sbx-icon></a>
                                     <sbx-pop-out content-id="rule-{{ currentRule.id }}-options"></sbx-pop-out>
                                 </nav>
                             </div>
@@ -214,15 +214,15 @@ set upsConfig = {
 
                             <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
                                 <li class="separator">Rule</li>
-                                <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
-                                <li><a href="/adminv2/ups/rule/edit/{{ currentRule.id }}" class="icon-modify" title="Edit Rule">Edit Rule</a></li>
-                                <li><a href="/adminv2/ups/rule/delete/{{ currentRule.id }}" class="icon-delete" data-rule-delete="{{ currentRule.id }}" title="Delete Rule">Delete Rule</a></li>
+                                <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="sbx-button--has-icon" title="Add New Rule"><sbx-icon name="add"></sbx-icon>Add New Rule</a></li>
+                                <li><a href="/adminv2/ups/rule/edit/{{ currentRule.id }}" class="sbx-button--has-icon" title="Edit Rule"><sbx-icon name="modify"></sbx-icon>Edit Rule</a></li>
+                                <li><a href="/adminv2/ups/rule/delete/{{ currentRule.id }}" class="sbx-button--has-icon" data-rule-delete="{{ currentRule.id }}" title="Delete Rule"><sbx-icon name="delete"></sbx-icon>Delete Rule</a></li>
                                 <li class="separator">Conditions</li>
-                                <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.general }}" class="icon-add" title="Add new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
-                                <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.userExists }}" class="icon-add" title="Add new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
+                                <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.general }}" class="sbx-button--has-icon" title="Add new General Condition" data-condition-create="{{ currentRule.id }}"><sbx-icon name="add"></sbx-icon>General Condition</a></li>
+                                <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.userExists }}" class="sbx-button--has-icon" title="Add new User Exists Condition" data-condition-create="{{ currentRule.id }}"><sbx-icon name="add"></sbx-icon>User Exists Condition</a></li>
                                 <li class="separator">Effects</li>
-                                <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}" class="icon-add" title="Add new Effect" data-effect-create="{{ currentRule.id }}">Add New Effect</a></li>
-                                <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}/skip" class="icon-add" title="Skip" data-effect-create="{{ currentRule.id }}">Skip User</a></li>
+                                <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}" class="sbx-button--has-icon" title="Add new Effect" data-effect-create="{{ currentRule.id }}"><sbx-icon name="add"></sbx-icon>Add New Effect</a></li>
+                                <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}/skip" class="sbx-button--has-icon" title="Skip" data-effect-create="{{ currentRule.id }}"><sbx-icon name="add"></sbx-icon>Skip User</a></li>
                             </ul>
                         </li>
                         {% endfor %}

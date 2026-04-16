@@ -67,11 +67,11 @@
                                 }) %}
 
                                 {% if kamiExportRoute %}
-                                    <li><a href="{{ kamiExportRoute }}" data-kami-export class="icon-download" title="Download annotated document">Download annotated document</a></li>
+                                    <li><a href="{{ kamiExportRoute }}" data-kami-export class="sbx-button--has-icon" title="Download annotated document"><sbx-icon name="download"></sbx-icon>Download annotated document</a></li>
                                 {% endif %}
                             {% endif %}
                             <li>
-                                <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=true" class='icon-download' title="Download original">Download original</a>
+                                <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=true" class='sbx-button--has-icon' title="Download original"><sbx-icon name="download"></sbx-icon>Download original</a>
                             </li>
                         </ul>
                     </li>

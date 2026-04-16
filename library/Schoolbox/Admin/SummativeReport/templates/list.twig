@@ -23,7 +23,9 @@
                         </div>
                     </div>
                     <nav>
-                        <a href="{{ createRoute }}" class="icon-add" title="Add a summative report"></a>
+                        <a href="{{ createRoute }}" class="sbx-icon-only-button" title="Add a summative report" aria-label="Add a summative report">
+                            <sbx-icon name="add"></sbx-icon>
+                        </a>
                     </nav>
                 </div>
                 <section>
@@ -56,21 +58,29 @@
                             <nav>
                                 {% set previewRoute = routeLookupIfAuthorized('adminSummativeReport.getPreview', {report: report, reportId: report.id}) %}
                                 {% if previewRoute %}
-                                    <a class="icon-eye" href="{{ previewRoute }}" title="Preview Report" data-test="summative-report-preview-{{ report.title }}" data-preview></a>
+                                    <a class="sbx-icon-only-button" href="{{ previewRoute }}" title="Preview Report" aria-label="Preview Report" data-test="summative-report-preview-{{ report.title }}" data-preview>
+                                        <sbx-icon name="view"></sbx-icon>
+                                    </a>
                                 {% endif %}
 
                                 {% set generateRoute = routeLookupIfAuthorized('adminSummativeReport.getGenerate', {report: report, reportId: report.id}) %}
                                 {% if generateRoute %}
-                                <a class="icon-download" href="{{ generateRoute }}" title="Download" data-test="summative-report-download-{{ report.title }}"></a>
+                                <a class="sbx-icon-only-button" href="{{ generateRoute }}" title="Download" aria-label="Download" data-test="summative-report-download-{{ report.title }}">
+                                    <sbx-icon name="download"></sbx-icon>
+                                </a>
                                 {% endif %}
 
                                 {% if updateRoute %}
-                                    <a class="icon-modify" href="{{ updateRoute }}" title="Modify" data-test="summative-report-modify-{{ report.title }}"></a>
+                                    <a class="sbx-icon-only-button" href="{{ updateRoute }}" title="Modify" aria-label="Modify" data-test="summative-report-modify-{{ report.title }}">
+                                        <sbx-icon name="modify"></sbx-icon>
+                                    </a>
                                 {% endif %}
 
                                 {% set dupeRoute = routeLookupIfAuthorized('adminSummativeReport.getDuplicate', {report: report, reportId: report.id}) %}
                                 {% if dupeRoute %}
-                                <a class="icon-copy" href="{{ dupeRoute }}" title="Duplicate" data-test="summative-report-copy-{{ report.title }}"></a>
+                                <a class="sbx-icon-only-button" href="{{ dupeRoute }}" title="Duplicate" aria-label="Duplicate" data-test="summative-report-copy-{{ report.title }}">
+                                    <sbx-icon name="copy"></sbx-icon>
+                                </a>
                                 {% endif %}
 
                                 {% set deleteRoute = routeLookupIfAuthorized('adminSummativeReport.postDelete', {report: report, reportId: report.id}) %}
@@ -124,7 +134,9 @@
                                             });
                                         });
                                     </script>
-                                    <a class="icon-delete" href="{{ deleteRoute }}" title="Delete" data-delete="{{ report.id }}" data-test="summative-report-delete-{{ report.title }}"></a>
+                                    <a class="sbx-icon-only-button" href="{{ deleteRoute }}" title="Delete" aria-label="Delete" data-delete="{{ report.id }}" data-test="summative-report-delete-{{ report.title }}">
+                                        <sbx-icon name="delete"></sbx-icon>
+                                    </a>
                                 {% endif %}
                             </nav>
                         </li>

@@ -33,22 +33,22 @@ Usage:
         </div>
         <nav>
             <span class="show-for-large-up">
-                <a href="{{ routeLookup('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}" class="icon-export" title="Copy this activity into classes"></a>
+                <a href="{{ routeLookup('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}" class="sbx-icon-only-button no-text" title="Copy this activity into classes" aria-label="Copy this activity into classes"><sbx-icon name="export"></sbx-icon></a>
                 {% if assessment is quiz %}
-                    <a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}" class="icon-modify" title="Modify"></a>
+                    <a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}" class="sbx-icon-only-button no-text" title="Modify" aria-label="Modify"><sbx-icon name="modify"></sbx-icon></a>
                 {% else %}
-                    <a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}" class="icon-modify" title="Modify"></a>
+                    <a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}" class="sbx-icon-only-button no-text" title="Modify" aria-label="Modify"><sbx-icon name="modify"></sbx-icon></a>
                 {% endif %}
-                <a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}" data-action="delete-assessment" class="icon-delete" title="Delete"></a>
+                <a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}" data-action="delete-assessment" class="sbx-icon-only-button no-text" title="Delete" aria-label="Delete"><sbx-icon name="delete"></sbx-icon></a>
             </span>
             <span class="hide-for-large-up">
                 <sbx-pop-out content-id="dropdown-{{ assessment.id }}"></sbx-pop-out>
             </span>
         </nav>
         <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ assessment.id }}">
-            <li><a href="{{ routeLookup('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}" class="icon-export" title="Copy this activity into classes">Export</a></li>
-            <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}" class="icon-modify">Modify</a></li>
-            <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}" data-action="delete-assessment" class="icon-delete">Delete</a></li>
+            <li><a href="{{ routeLookup('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessment.id}) }}?returnUrl={{ encodedReturnUrl }}" class="sbx-button--has-icon" title="Copy this activity into classes"><sbx-icon name="export"></sbx-icon>Export</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}" class="sbx-button--has-icon"><sbx-icon name="modify"></sbx-icon>Modify</a></li>
+            <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}" data-action="delete-assessment" class="sbx-button--has-icon"><sbx-icon name="delete"></sbx-icon>Delete</a></li>
         </ul>
     </div>
 </li>

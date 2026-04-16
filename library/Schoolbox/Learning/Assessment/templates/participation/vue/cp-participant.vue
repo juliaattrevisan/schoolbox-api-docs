@@ -127,21 +127,23 @@ function onOpenIncludeInExistingModal(): void {
         <td v-if="props.differentiationEnabled">
             <button
                 v-if="props.participant._links.differentiationProfile"
-                class="button icon-learning-support f-no-margins"
+                class="button sbx-button--has-icon f-no-margins"
                 type="button"
                 :data-test="`cp-participant-${props.participant.user.id}-view-differentiation-profile`"
                 @click.prevent="onViewDP"
             >
+                <sbx-icon name="learning-support"></sbx-icon>
                 View {{ locale.differentiationProfile.translate(false, true) }}
             </button>
         </td>
         <td v-if="canSuggestCustomisation">
             <button
                 v-if="props.participant._links.differentiationProfile"
-                class="button icon-ai f-no-margins"
+                class="button f-no-margins sbx-button--has-icon"
                 type="button"
                 @click.prevent="onViewSuggestedCustomisation"
             >
+                <sbx-icon name="ai"></sbx-icon>
                 {{ props.participant.cachedSuggestedCustomisation ? "View" : "Generate" }} Suggested Customisation
             </button>
         </td>
@@ -173,7 +175,11 @@ function onOpenIncludeInExistingModal(): void {
                     <template v-if="hasCustomisation(props.participant)">
                         <li class="separator">Manage</li>
                         <li>
-                            <button class="icon-close" @click.prevent="onActionSelected('removeCustomisation')">
+                            <button
+                                class="sbx-button--has-icon"
+                                @click.prevent="onActionSelected('removeCustomisation')"
+                            >
+                                <sbx-icon name="close"></sbx-icon>
                                 Remove Customisation
                             </button>
                         </li>
@@ -182,52 +188,57 @@ function onOpenIncludeInExistingModal(): void {
                         <li class="separator">Manage</li>
                         <li>
                             <button
-                                class="icon-modify"
+                                class="sbx-button--has-icon"
                                 @click.prevent="
                                     onActionSelected(
                                         `${props.routes.getLearningPlanNewUrl}?student=${props.participant.user.id}&${getReturnUrl()}`,
                                     )
                                 "
                             >
+                                <sbx-icon name="modify"></sbx-icon>
                                 Modify Existing {{ locale.activity.translate(false, true) }}
                             </button>
                         </li>
                         <li>
-                            <button class="icon-staff-students" @click.prevent="onActionSelected('exclude')">
+                            <button class="sbx-button--has-icon" @click.prevent="onActionSelected('exclude')">
+                                <sbx-icon name="staff-students"></sbx-icon>
                                 Exclude Student
                             </button>
                         </li>
                         <li>
                             <button
                                 v-if="customisations.length > 0"
-                                class="icon-list"
+                                class="sbx-button--has-icon"
                                 @click.prevent="onOpenIncludeInExistingModal"
                             >
+                                <sbx-icon name="list"></sbx-icon>
                                 Include in Existing Customisation
                             </button>
                         </li>
                         <li class="separator">Create</li>
                         <li v-if="props.routes.getAssessmentParticipationCopyActivity">
                             <button
-                                class="icon-copy"
+                                class="sbx-button--has-icon"
                                 @click.prevent="
                                     onActionSelected(
                                         `${props.routes.getAssessmentParticipationCopyActivity}?student=${props.participant.user.id}&original=${props.assessmentId}&${getReturnUrl()}`,
                                     )
                                 "
                             >
+                                <sbx-icon name="copy"></sbx-icon>
                                 Create Copy of {{ locale.activity.translate(false, true) }}
                             </button>
                         </li>
                         <li>
                             <button
-                                class="icon-submissions"
+                                class="sbx-button--has-icon"
                                 @click.prevent="
                                     onActionSelected(
                                         `${props.routes.getAssessmentParticipationNewActivity}?student=${props.participant.user.id}&original=${props.assessmentId}&${getReturnUrl()}`,
                                     )
                                 "
                             >
+                                <sbx-icon name="submissions"></sbx-icon>
                                 Create New {{ locale.activity.translate(false, true) }}
                             </button>
                         </li>

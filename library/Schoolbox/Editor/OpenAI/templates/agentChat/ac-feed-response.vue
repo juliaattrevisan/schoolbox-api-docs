@@ -111,7 +111,7 @@ function retryResponse(): void {
             </p>
             <div v-if="props.allowRetry && isLatestMessage" class="l-mar-xs--left">
                 <button
-                    class="button f-no-icon-button"
+                    class="button f-no-icon-button sbx-icon-only-button"
                     type="button"
                     title="Retry"
                     data-tooltip
@@ -143,7 +143,9 @@ function retryResponse(): void {
         <div v-else class="ac-feed-response-container">
             <div v-if="imageSrc" class="actions-small-1">
                 <nav>
-                    <a :href="imageSrc" class="icon-download" title="Download" download></a>
+                    <a :href="imageSrc" class="sbx-icon-only-button" title="Download" aria-label="Download" download
+                        ><sbx-icon name="download"></sbx-icon
+                    ></a>
                 </nav>
                 <img :src="imageSrc" @click="() => acStore.spawnLightbox(props.message.entryKey)" />
             </div>

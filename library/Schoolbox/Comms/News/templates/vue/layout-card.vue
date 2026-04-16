@@ -154,15 +154,20 @@ export default {
                     <a
                         v-if="article._links.update.auth"
                         :href="article._links.update.href"
-                        class="icon-modify no-text"
+                        class="sbx-icon-only-button"
                         :title="'Modify this ' + localeNewsPlural"
-                    ></a>
+                        :aria-label="'Modify this ' + localeNewsPlural"
+                        ><sbx-icon name="modify"
+                    /></a>
                     <a
                         v-if="configSaveForLater"
                         @click="saveForLater(article)"
-                        :class="[savedArticleIds.indexOf(article.id) >= 0 ? 'icon-favourite' : 'icon-favourite-hollow']"
+                        class="sbx-icon-only-button"
                         title="Save for later"
-                    ></a>
+                        aria-label="Save for later"
+                    >
+                        <sbx-icon :name="savedArticleIds.indexOf(article.id) >= 0 ? 'favourite' : 'favourite-hollow'" />
+                    </a>
                 </div>
             </div>
         </div>

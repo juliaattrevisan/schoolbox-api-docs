@@ -17,7 +17,9 @@
     </div>
     <nav>
         {% if hasMatchModify and not match.season.archived %}
-        <a href="{{ routeLookup('sportsfixturesMatch.getModifyForm', {entityId: match.id}) }}" class="icon-modify" title="Modify"></a>
+        <a href="{{ routeLookup('sportsfixturesMatch.getModifyForm', {entityId: match.id}) }}" class="sbx-icon-only-button" title="Modify" aria-label="Modify">
+            <sbx-icon name="modify"></sbx-icon>
+        </a>
         {% endif %}
     </nav>
 </div>
@@ -87,5 +89,3 @@
     </div>
     {% endif %}
 {% endif %}
-
-

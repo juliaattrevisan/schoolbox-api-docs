@@ -102,9 +102,9 @@
                 </div>
                 <nav>
                     <!-- BEGIN has_modify_event -->
-                    <a href="/modules/eotc/manage/modify?eventID={EVENT_ID}" class="icon-modify" title="Modify Event"></a>
+                    <a href="/modules/eotc/manage/modify?eventID={EVENT_ID}" title="Modify Event" class="sbx-icon-only-button"><sbx-icon name="modify"></sbx-icon></a>
                     <!-- END has_modify_event -->
-                    <a href="/calendar/{EVENT_DATESTAMP}/{EVENT_AUTHOR_ID}" class="icon-calendar" title="View In Calendar"></a>
+                    <a href="/calendar/{EVENT_DATESTAMP}/{EVENT_AUTHOR_ID}" title="View In Calendar" aria-label="View In Calendar" class="sbx-icon-only-button"><sbx-icon name="calendar"></sbx-icon></a>
                 </nav>
             </li>
         </ul>
@@ -157,8 +157,8 @@
                 </div>
             </div>
             <nav>
-                <a href="/modules/eotc/status/attendance/csv/{EVENT_ID}" class="icon-export" title="Download CSV"></a>
-                <a href="/modules/eotc/status/attendance/list/{EVENT_ID}" class="icon-view" title="View List"></a>
+                <a href="/modules/eotc/status/attendance/csv/{EVENT_ID}" title="Download CSV" class="sbx-icon-only-button"><sbx-icon name="export"></sbx-icon></a>
+                    <a href="/modules/eotc/status/attendance/list/{EVENT_ID}" title="View List" class="sbx-icon-only-button"><sbx-icon name="view"></sbx-icon></a>
             </nav>
         </div>
 

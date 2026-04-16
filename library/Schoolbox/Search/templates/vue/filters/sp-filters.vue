@@ -129,10 +129,11 @@ window.Vue.watch(
                             Clear filters
                         </button>
                         <button
-                            class="button submit l-flex__item--1 icon-search f-no-margins"
+                            class="button submit l-flex__item--1 f-no-margins sbx-button--has-icon"
                             data-test="sp-filter-apply-button"
                             @click.prevent="onSearch"
                         >
+                            <sbx-icon name="search"></sbx-icon>
                             Search
                         </button>
                     </div>

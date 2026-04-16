@@ -168,9 +168,11 @@ export default {
         <button
             @click.prevent="onOpenPopUpSelected"
             :disabled="isPopOutDisabled"
-            class="update-button button icon-modify"
+            class="update-button button sbx-icon-only-button"
             title="Modify"
-        ></button>
+        >
+            <sbx-icon name="modify"></sbx-icon>
+        </button>
     </div>
 </template>
 

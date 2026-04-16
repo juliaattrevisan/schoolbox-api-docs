@@ -128,9 +128,10 @@ rejectMembersStore.$onAction(({ name, after, onError }) => {
         <li>
             <button
                 @click.prevent="onApproveMembersSelected"
-                class="button submit icon-add"
+                class="button submit sbx-button--has-icon"
                 :disabled="store.isProcessing"
             >
+                <sbx-icon name="add"></sbx-icon>
                 {{ appproveButtonText }}
             </button>
         </li>

@@ -72,13 +72,13 @@ $(function () {
         <span class="button left icon-grip" data-tile-grip></span>
         {# Hidden form input for this tile - used in sorting #}
         <input type="hidden" name="tile[]" value="{{ tile.id|e('html_attr') }}" />
-        <a href="{{ routeLookup('tile.delete:post', {id: tile.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}"
-           class="button icon-delete right"
-           data-role="delete"
-           title="Delete"></a>
+          <a href="{{ routeLookup('tile.delete:post', {id: tile.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}"
+              class="button right sbx-button--has-icon"
+              data-role="delete"
+              title="Delete"><sbx-icon name="delete"></sbx-icon>Delete</a>
         <a href="{{ routeLookup('tile.edit', {id: tile.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}"
-           class="button icon-modify right"
-           title="Modify"></a>
+              class="button right sbx-icon-only-button"
+              title="Modify"><sbx-icon name="modify"></sbx-icon></a>
     </div>
     {% endif %}
 </li>

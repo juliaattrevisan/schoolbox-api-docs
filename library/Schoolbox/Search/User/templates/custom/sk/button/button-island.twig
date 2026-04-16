@@ -1,7 +1,7 @@
 {% extends '@searchUser:core/button/button-island.twig' %}
 {% block custom_buttons %}
     <li>
-        <a href="{{ routeLookup('customStkOleReport.reportList', {studentId: user.id}) }}" class="icon-document">Reports</a>
+        <a href="{{ routeLookup('customStkOleReport.reportList', {studentId: user.id}) }}" class="sbx-button--has-icon"><sbx-icon name="document"></sbx-icon>Reports</a>
     </li>
 
     {# Obey access rules for non-ib students #}
@@ -9,7 +9,7 @@
 
     {% if nceaRoute %}
         <li>
-            <a href="{{ nceaRoute }}" class="icon-progress">NCEA Progress</a>
+            <a href="{{ nceaRoute }}" class="sbx-button--has-icon"><sbx-icon name="progress"></sbx-icon>NCEA Progress</a>
         </li>
     {% endif %}
 {% endblock custom_buttons %}

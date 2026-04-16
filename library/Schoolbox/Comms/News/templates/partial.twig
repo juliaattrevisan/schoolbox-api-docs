@@ -78,7 +78,9 @@
                 <nav>
                     {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {article: article, articleId: article.id}) %}
                     {% if not readonly and modifyRoute %}
-                        <a class="icon-modify" href="{{ modifyRoute }}" title="Modify this {{ locale.news }}"></a>
+                        <a class="sbx-icon-only-button" href="{{ modifyRoute }}" title="Modify this {{ locale.news }}" aria-label="Modify this {{ locale.news }}">
+                            <sbx-icon name="modify"></sbx-icon>
+                        </a>
                     {% endif %}
                     {% if config.save_for_later %}
                     {% include '@commsNewsSaveForLater/activator.twig' with {

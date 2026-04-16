@@ -172,7 +172,12 @@ export default {
             </h3>
             <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple files</span>
             <button @click.prevent="onClearFileSelectionSelected" class="button-clear">Clear file selection</button>
-            <button @click.prevent="onDeleteFilesSelected" class="button submit icon-delete">
+            <button
+                @click.prevent="onDeleteFilesSelected"
+                class="button submit sbx-button--has-icon"
+                aria-label="Delete selected files"
+            >
+                <sbx-icon name="delete"></sbx-icon>
                 Delete {{ selectedFilesCountWithRowName }}
             </button>
         </bottom-drawer>

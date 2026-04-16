@@ -9,18 +9,18 @@
 </nav>
 <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
     {% if routeReportBuilder %}
-        <li><a href="{{ routeReportBuilder }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder">Report Builder</a></li>
+        <li><a href="{{ routeReportBuilder }}" class="sbx-button--has-icon" title="{{ locale.pastoral.proper }} Report Builder"><sbx-icon name="result"></sbx-icon>Report Builder</a></li>
     {% endif %}
     {% if routeBulkImport %}
-        <li><a href="{{ routeBulkImport }}" class="icon-upload" title="Bulk Import {{ locale.pastoral.proper }} Records">Bulk Import</a></li>
+        <li><a href="{{ routeBulkImport }}" class="sbx-button--has-icon" title="Bulk Import {{ locale.pastoral.proper }} Records"><sbx-icon name="upload"></sbx-icon>Bulk Import</a></li>
     {% endif %}
     {% if routeGetGroups %}
-        <li><a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups">Manage Groups</a></li>
+        <li><a href="{{ routeGetGroups }}" class="sbx-button--has-icon" title="Manage {{ locale.pastoral.proper }} Groups"><sbx-icon name="group"></sbx-icon>Manage Groups</a></li>
     {% endif %}
     {% if routeGetAudiences %}
-        <li><a href="{{ routeGetAudiences }}" class="icon-settings" title="Manage Flag, Audience and Template Defaults">Manage {{ locale.pastoral.proper }} Record Settings</a></li>
+        <li><a href="{{ routeGetAudiences }}" class="sbx-button--has-icon" title="Manage Flag, Audience and Template Defaults"><sbx-icon name="settings"></sbx-icon>Manage {{ locale.pastoral.proper }} Record Settings</a></li>
     {% endif %}
     {% if routeDPManage %}
-        <li><a href="{{ routeDPManage }}" class="icon-advanced-list" title="Manage {{ locale.differentiationProfile.properPlural }}">Manage {{ locale.differentiationProfile.properPlural }}</a></li>
+        <li><a href="{{ routeDPManage }}" class="sbx-button--has-icon" title="Manage {{ locale.differentiationProfile.properPlural }}"><sbx-icon name="advanced-list"></sbx-icon>Manage {{ locale.differentiationProfile.properPlural }}</a></li>
     {% endif %}
 </ul>

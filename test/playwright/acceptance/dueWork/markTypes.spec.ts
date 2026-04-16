@@ -405,7 +405,7 @@ test.describe("Due Work - Mark type tests", () => {
         const courseOutlineUnit = courseOutline.locator("li[data-unit]").filter({ hasText: unitName });
         newUnitId = Number(await courseOutlineUnit.getAttribute("data-unit"));
         await courseOutlineUnit.getByTestId(`sbx-pop-out-${courseOutlineId}-unit-options${newUnitId}-button`).click();
-        await courseOutlineUnit.locator("[data-dropdown-content] a.icon-curriculum").click();
+        await courseOutlineUnit.locator("[data-dropdown-content] a sbx-icon[name='curriculum']").click();
 
         const assessmentId1 = await markbook.getAssessmentId(dueWorkName1);
         const assessmentId2 = await markbook.getAssessmentId(dueWorkName2);
@@ -440,7 +440,8 @@ test.describe("Due Work - Mark type tests", () => {
         tester.isGoingTo("navigate to the class markbook page");
         await page.goto(classLink);
         await homepage.openLinkMenu();
-        await page.locator("[data-dropdown-content] a.icon-curriculum").filter({ hasText: "Class Markbook" }).click();
+        // find sbx icon, then get the parent <a> tag and click it
+        await page.locator("[data-dropdown-content] a sbx-icon[name='curriculum']").first().locator("..").click();
 
         const assessmentId1 = await markbook.getAssessmentId(dueWorkName1);
         const assessmentId2 = await markbook.getAssessmentId(dueWorkName2);

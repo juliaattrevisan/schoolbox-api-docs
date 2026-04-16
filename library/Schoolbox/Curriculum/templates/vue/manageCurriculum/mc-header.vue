@@ -45,18 +45,21 @@ const buttonCount = window.Vue.computed(() => {
             <a
                 v-if="props.routeCurriculumCoverage"
                 :href="props.routeCurriculumCoverage"
-                class="icon-report"
+                class="sbx-icon-only-button no-text"
                 title="View Curriculum Coverage Report"
+                aria-label="View Curriculum Coverage Report"
+                ><sbx-icon name="report"></sbx-icon
             ></a>
             <a
                 v-if="!store.isReadOnly"
                 href="#create-curriculum"
                 data-interaction="create-curriculum"
                 data-test="toggle-create-curriculum"
-                :class="`icon ${addCurriculumStore.isOpen ? 'icon-close' : 'icon-add'}`"
+                class="sbx-icon-only-button"
                 title="Create New Curriculum"
                 @click.prevent="onCreateNewSelected"
             >
+                <sbx-icon :name="addCurriculumStore.isOpen ? 'close' : 'add'"></sbx-icon>
             </a>
         </nav>
     </div>

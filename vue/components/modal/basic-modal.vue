@@ -95,7 +95,7 @@ function onBackgroundClick(): void {
                     <slot name="footer"></slot>
                     <button
                         v-if="props.showCloseButton"
-                        class="close-modal"
+                        class="close-modal sbx-icon-only-button"
                         title="Close modal"
                         aria-label="Close modal"
                         data-test="basic-modal-close-button"

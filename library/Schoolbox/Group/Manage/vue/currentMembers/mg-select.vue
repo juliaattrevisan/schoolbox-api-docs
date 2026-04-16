@@ -107,18 +107,20 @@ function onRemoveMembersSelected() {
             <li v-if="store.emailEnabled">
                 <button
                     @click.prevent="onEmailMembersSelected"
-                    class="button submit icon-email"
+                    class="button submit sbx-button--has-icon"
                     :disabled="store.isProcessing"
                 >
+                    <sbx-icon name="email"></sbx-icon>
                     Email {{ membersStore.selectedMembersPlural }}
                 </button>
             </li>
             <li>
                 <button
                     @click.prevent="onRemoveMembersSelected"
-                    class="button submit icon-delete"
+                    class="button submit sbx-button--has-icon"
                     :disabled="store.isProcessing"
                 >
+                    <sbx-icon name="delete"></sbx-icon>
                     Remove {{ membersStore.selectedMembersPlural }}
                 </button>
             </li>

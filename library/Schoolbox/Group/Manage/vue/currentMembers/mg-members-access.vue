@@ -136,11 +136,12 @@ rejectMembersStore.$onAction(({ name, args, after, onError }) => {
     <ul v-if="props.member.accessType === 'none'" class="flex-list">
         <li>
             <button
-                class="button expand icon-add"
+                class="button expand sbx-button--has-icon"
                 title="Approve Membership"
                 :disabled="store.isProcessing"
                 @click.prevent="onApproveMembershipSelected(props.member)"
             >
+                <sbx-icon name="add"></sbx-icon>
                 {{ approveButtonText }}
             </button>
         </li>

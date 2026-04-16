@@ -30,46 +30,46 @@
     {% set kamiWorksheetRoute = routeLookupIfAuthorized('learningAssessment.getWorksheet', {assessmentId: assessment.id, assessment: assessment}) %}
     {% if assessment.enableWorksheet and assessment.kamiWorksheetTemplate and kamiWorksheetRoute and assessment.isImplementation%}
         <li>
-            <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">Class View</a>
+            <a id="kamiWorksheet" href="{{ kamiWorksheetRoute }}" class="sbx-button--has-icon"><sbx-icon name="surveys"></sbx-icon>Class View</a>
         </li>
     {% endif %}
 
     {% if not allReadonly %}
         <li>
-            <a id="import-feedback" data-reveal-id="importFeedbackModal" class="icon-upload">Import Feedback</a>
+            <a id="import-feedback" data-reveal-id="importFeedbackModal" class="sbx-button--has-icon"><sbx-icon name="upload"></sbx-icon>Import Feedback</a>
         </li>
     {% endif %}
 
     {% if assessment.isImplementation %}
         {% if blindReviewUrl %}
         <li>
-            <a href="{{ blindReviewUrl }}" class="icon-task">Blind Review</a>
+            <a href="{{ blindReviewUrl }}" class="sbx-button--has-icon"><sbx-icon name="task"></sbx-icon>Blind Review</a>
         </li>
         {% endif %}
 
         {% if download %}
-            <li><a class="icon-download" data-mass="publish" data-reveal-id="mass-download">Download All</a></li>
+            <li><a data-mass="publish" data-reveal-id="mass-download" class="sbx-button--has-icon"><sbx-icon name="download"></sbx-icon>Download All</a></li>
         {% endif %}
 
         {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessment.id, assessment: assessment}) %}
         {% if similarityReportRoute %}
-            <li><a href="{{ similarityReportRoute }}" class="icon-due-work">Similarity Report</a></li>
+            <li><a href="{{ similarityReportRoute }}" class="sbx-button--has-icon"><sbx-icon name="due-work"></sbx-icon>Similarity Report</a></li>
         {% endif %}
 
         {% if assessment.useRubric %}
             <li>
                 <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessment.id }) }}"
-                   class="icon-criteria">Rubric Report</a>
+                   class="sbx-button--has-icon"><sbx-icon name="criteria"></sbx-icon>Rubric Report</a>
             </li>
         {% endif %}
         {% if not allReadonly %}
             <li class="separator">Bulk Actions</li>
-            <li><a class="icon-approve" data-mass="submit" data-reveal-id="manage-submissions">Manage submissions</a></li>
-            <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish grades & feedback</a></li>
+            <li><a class="sbx-button--has-icon" data-mass="submit" data-reveal-id="manage-submissions"><sbx-icon name="approve"></sbx-icon>Manage submissions</a></li>
+            <li><a class="sbx-button--has-icon" data-mass="publish" data-reveal-id="mass-publish"><sbx-icon name="approve"></sbx-icon>Publish grades & feedback</a></li>
 
             {% set rescoreRoute = routeLookupIfAuthorized('learningAssessment.getRescore', {assessment: assessment, assessmentId: assessment.id}) %}
             {% if rescoreRoute %}
-                <li><a class="icon-due-work" href="{{ rescoreRoute }}">Rescore {{ locale.grades.plural }}</a></li>
+                <li><a href="{{ rescoreRoute }}" class="sbx-button--has-icon"><sbx-icon name="due-work"></sbx-icon>Rescore {{ locale.grades.plural }}</a></li>
             {% endif %}
         {% endif %}
     {% endif %}

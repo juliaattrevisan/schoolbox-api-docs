@@ -260,7 +260,8 @@ class StudentLists
             $studentSisRecord['routes']['email'] = [
                 'label' => 'Email',
                 'href'  => $this->mailHandle . $user->getEmail(),
-                'class' => 'icon-email',
+                'class' => '',
+                'icon'  => 'email',
                 'title' => 'Send Email',
             ];
         }

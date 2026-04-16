@@ -50,28 +50,28 @@ function onDeleteUnit(): void {
                 </li>
                 <li v-if="props.unit._routes.importIntoClasses">
                     <a
-                        class="icon-import"
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-import-link`"
+                        class="sbx-button--has-icon"
                         :href="getReturnUrl(props.unit._routes.importIntoClasses!)"
-                        >Import into {{ locale.class.translate(true, true) }}
+                        ><sbx-icon name="import"></sbx-icon>Import into {{ locale.class.translate(true, true) }}
                     </a>
                 </li>
                 <li v-if="props.unit._routes.modify">
                     <a
-                        class="icon-modify"
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-modify-link`"
+                        class="sbx-button--has-icon"
                         :href="getReturnUrl(props.unit._routes.modify!)"
-                        >Modify</a
+                        ><sbx-icon name="modify"></sbx-icon>Modify</a
                     >
                 </li>
                 <!-- prettier-ignore -->
                 <li v-if="props.unit._routes.delete">
                     <!-- we ignore this li as the formatting is adding whitespace -->
                     <button
-                        class="icon-delete"
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-delete-button`"
+                        class="sbx-button--has-icon"
                         @click.prevent="onDeleteUnit"
-                    >Delete
+                    ><sbx-icon name="delete"></sbx-icon>Delete
                     </button>
                 </li>
             </ul>

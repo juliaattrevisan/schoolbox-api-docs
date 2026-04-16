@@ -169,7 +169,12 @@ Data:
                 <a href="#" class="icon-{{ collapsed ? 'down' : 'up' }}-arrow" data-collapser="feedback-{{ responseId }}-{{ currentFeedback.id }}"></a>
             {% endif %}
             {% if deleteRoute and deleteIcon %}
-                <a class="icon-delete" data-delete="{{ deleteRoute }}"></a>
+                <a class="sbx-icon-only-button no-text"
+                   data-delete="{{ deleteRoute }}"
+                   title="Delete feedback"
+                   aria-label="Delete feedback">
+                    <sbx-icon name="delete"></sbx-icon>
+                </a>
             {% endif %}
         </nav>
 
@@ -234,9 +239,9 @@ Data:
                                 : null
                             %}
                             {% if kamiExportRoute %}
-                                <a href="{{ kamiExportRoute }}" data-kami-export class="icon-download" title="Download annotated document"></a>
+                                <a href="{{ kamiExportRoute }}" data-kami-export title="Download annotated document" class="sbx-icon-only-button"><sbx-icon name="download"></sbx-icon></a>
                             {% else %}
-                                <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1" class="icon-download" title="Download"></a>
+                                <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1" title="Download" class="sbx-icon-only-button"><sbx-icon name="download"></sbx-icon></a>
                             {% endif %}
                         </nav>
                     </li>

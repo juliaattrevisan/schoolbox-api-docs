@@ -27,7 +27,7 @@
     <div class="button-action small-12 columns">
         <h1>Badges</h1>
         {% if routeLookupIfAuthorized('learningBadge.getCreateForm') %}
-        <a href="{{ routeLookup('learningBadge.getCreateForm') }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-add button" title="Create Badge">Create Badge</a>
+        <a href="{{ routeLookup('learningBadge.getCreateForm') }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="button sbx-button--has-icon" title="Create Badge"><sbx-icon name="add"></sbx-icon>Create Badge</a>
         {% endif %}
     </div>
 </div>

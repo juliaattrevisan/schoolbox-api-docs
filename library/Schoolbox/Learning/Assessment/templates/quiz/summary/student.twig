@@ -155,23 +155,23 @@
                             <nav>
                                 {% if attempt.learnosityReference %}
                                     {% if not finished and canAttempt %}
-                                        <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id}) }}" class="icon-next" title="Resume"></a>
+                                        <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id}) }}" class="sbx-icon-only-button no-text" title="Resume" aria-label="Resume"><sbx-icon name="next"></sbx-icon></a>
                                     {% else %}
                                         {% set reviewRoute = routeLookupIfAuthorized('learnosity.getReview', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) %}
                                         {% if reviewRoute %}
-                                            <a href="{{ reviewRoute }}" class="icon-view" title="Review"></a>
+                                            <a href="{{ reviewRoute }}" title="Review" class="sbx-icon-only-button"><sbx-icon name="view"></sbx-icon></a>
                                         {% endif %}
 
                                         {% set feedbackRoute = routeLookupIfAuthorized('learnosity.getFeedback', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) %}
                                         {% if feedbackRoute %}
-                                            <a href="{{ feedbackRoute }}" class="icon-quiz" title="View and grade"></a>
+                                            <a href="{{ feedbackRoute }}" class="sbx-icon-only-button no-text" title="View and grade" aria-label="View and grade"><sbx-icon name="quiz"></sbx-icon></a>
                                         {% endif %}
                                     {% endif %}
                                 {% endif %}
 
                                 {% set deleteRoute = routeLookupIfAuthorized('learningQuiz.postAttemptDelete', {assessmentId: assessment.id, assessment: assessment}) %}
                                 {% if deleteRoute %}
-                                    <a href="{{ deleteRoute }}" class="icon-delete" title="Delete Attempt" data-delete="{{ attempt.id }}"></a>
+                                    <a href="{{ deleteRoute }}" title="Delete Attempt" data-delete="{{ attempt.id }}" class="sbx-icon-only-button"><sbx-icon name="delete"></sbx-icon></a>
                                 {% endif %}
                             </nav>
                         </td>

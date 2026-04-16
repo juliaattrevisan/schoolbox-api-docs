@@ -392,36 +392,54 @@ export default {
                                     <li>
                                         <a
                                             @click.prevent="openAwardAsAchievementModal(badge)"
-                                            class="icon-achievement"
+                                            class="sbx-button--has-icon"
                                             title="Award achievement"
-                                            >Award achievement</a
                                         >
+                                            <sbx-icon name="achievement"></sbx-icon>
+                                            Award achievement
+                                        </a>
                                     </li>
                                     <li v-if="badge.allowAsGoal">
-                                        <a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set goal"
-                                            >Set goal</a
+                                        <a
+                                            @click.prevent="openSetAsGoalModal(badge)"
+                                            class="sbx-button--has-icon"
+                                            title="Set goal"
                                         >
+                                            <sbx-icon name="goal"></sbx-icon>
+                                            Set goal
+                                        </a>
                                     </li>
                                     <li>
                                         <a
                                             @click.prevent="openAchievementWithdrawModal(badge)"
-                                            class="icon-withdraw-achievement"
+                                            class="sbx-button--has-icon"
                                             title="Withdraw achievement"
-                                            >Withdraw achievement</a
                                         >
+                                            <sbx-icon name="withdraw-achievement"></sbx-icon>
+                                            Withdraw achievement
+                                        </a>
                                     </li>
                                     <li v-if="badge.allowAsGoal">
                                         <a
                                             @click.prevent="openGoalWithdrawModal(badge)"
-                                            class="icon-close"
+                                            class="sbx-button--has-icon"
                                             title="Remove goal"
-                                            >Remove goal</a
                                         >
+                                            <sbx-icon name="close"></sbx-icon>
+                                            Remove goal
+                                        </a>
                                     </li>
                                     <li>
-                                        <a :href="badge._links.update" class="icon-modify" title="Modify">Modify</a>
+                                        <a :href="badge._links.update" class="sbx-button--has-icon" title="Modify">
+                                            <sbx-icon name="modify"></sbx-icon>
+                                            Modify
+                                        </a>
                                     </li>
-                                    <li><a @click.prevent="openDeleteModal(badge)" class="icon-delete">Delete</a></li>
+                                    <li>
+                                        <a @click.prevent="openDeleteModal(badge)" class="sbx-button--has-icon"
+                                            ><sbx-icon name="delete"></sbx-icon>Delete</a
+                                        >
+                                    </li>
                                 </ul>
                                 <p class="meta" v-if="badge.category" :title="'Category: ' + badge.category.name">
                                     {{ badge.category.name }}

@@ -18,19 +18,30 @@
         {% include '@adminTerms/form.twig' with {term: term} %}
     </div>
     <nav>
-        <a href="#" class="icon-down-arrow" data-collapser="term-{{ term.getId() }}"></a>
+        <a href="#" class="sbx-icon-only-button" data-collapser="term-{{ term.getId() }}" aria-label="Toggle term details">
+            <sbx-icon name="down-arrow"></sbx-icon>
+        </a>
         <sbx-pop-out content-id="term-{{ term.getId() }}-dropdown"></sbx-pop-out>
     </nav>
     <ul class="f-dropdown" data-term-dropdown data-dropdown-content id="term-{{ term.getId() }}-dropdown">
         <li>
             {% if term.getArchived() %}
-                <a href="#" data-term-action="restore" data-post-action="{{ routeLookup('adminTerms.postRestoreTerm', {id: term.getId()}) }}" class="icon-undo">Restore</a>
+                <a href="#" data-term-action="restore" data-post-action="{{ routeLookup('adminTerms.postRestoreTerm', {id: term.getId()}) }}" class="sbx-button--has-icon">
+                    <sbx-icon name="undo"></sbx-icon>
+                    Restore
+                </a>
             {% else %}
-                <a href="#" data-term-action="archive" data-post-action="{{ routeLookup('adminTerms.postArchiveTerm', {id: term.getId()}) }}" class="icon-archive">Archive</a>
+                <a href="#" data-term-action="archive" data-post-action="{{ routeLookup('adminTerms.postArchiveTerm', {id: term.getId()}) }}" class="sbx-button--has-icon">
+                    <sbx-icon name="archive"></sbx-icon>
+                    Archive
+                </a>
             {% endif %}
         </li>
         <li>
-            <a href="#" data-term-action="delete" data-post-action="{{ routeLookup('adminTerms.postDeleteTerm', {id: term.getId()}) }}" class="icon-delete">Delete</a>
+            <a href="#" data-term-action="delete" data-post-action="{{ routeLookup('adminTerms.postDeleteTerm', {id: term.getId()}) }}" class="sbx-button--has-icon">
+                <sbx-icon name="delete"></sbx-icon>
+                Delete
+            </a>
         </li>
     </ul>
 </li>

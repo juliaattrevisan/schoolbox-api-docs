@@ -17,7 +17,7 @@ export default class Item {
 
     static readonly DATA_TEST_DOT_MENU_BUTTON = "sbx-pop-out-header-options-button";
 
-    static readonly LINK_MODIFY = "a.icon-modify";
+    static readonly LINK_MODIFY = 'a:has(sbx-icon[name="modify"])';
 
     static readonly LINK_PREVIOUS = ".icon-previous";
 

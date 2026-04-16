@@ -28,7 +28,7 @@
     {% if assessment.url|length %}
     <div class="card small-12">
         <a href="{{ assessment.url }}" target="_blank" title="Visit {{ assessment.url }}">
-            <div class="icon-link"></div>
+            <sbx-icon name="link"></sbx-icon>
             <p>{{ assessment.url }}</p>
         </a>
     </div>
@@ -53,7 +53,7 @@
     <section>
         <div class="card small-12">
             <a href="{{ preview.fragment }}" target="_blank" title="Visit {{ preview.fragment }}">
-                <div class="icon-link"></div>
+                <sbx-icon name="link"></sbx-icon>
                 <h3>{{ assessment.title }}</h3>
                 <p class="meta">{{ preview.fragment }}</p>
             </a>
@@ -68,4 +68,3 @@
     </section>
 
 {% endif %}
-

@@ -23,11 +23,18 @@
     </div>
     <nav>
         {%- if not currentMatch.season.isArchived -%}
-            <a href="{{ routeLookup('sportsfixturesMatch.getModifyForm', {entityId: currentMatch.id}) }}" class="icon-modify" title="Modify"></a>
+            <a href="{{ routeLookup('sportsfixturesMatch.getModifyForm', {entityId: currentMatch.id}) }}" class="sbx-icon-only-button" title="Modify" aria-label="Modify">
+                <sbx-icon name="modify"></sbx-icon>
+            </a>
         {%- endif -%}
         <sbx-pop-out content-id="sportsfixtures-match-{{ currentMatch.getId() }}-actions"></sbx-pop-out>
     </nav>
     <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-match-{{ currentMatch.getId() }}-actions">
-        <li><a href="{{ routeLookup('sportsfixturesMatch.deleteEntity', {entityId: currentMatch.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentMatch.id }}">Delete</a></li>
+        <li>
+            <a href="{{ routeLookup('sportsfixturesMatch.deleteEntity', {entityId: currentMatch.id}) }}" class="sbx-button--has-icon" title="Delete" data-delete="{{ currentMatch.id }}">
+                <sbx-icon name="delete"></sbx-icon>
+                Delete
+            </a>
+        </li>
     </ul>
 </li>

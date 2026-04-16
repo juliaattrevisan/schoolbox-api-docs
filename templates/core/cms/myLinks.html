@@ -41,7 +41,7 @@ $(function() {
                 </div>
             </div>
             <nav>
-                <a href="#" data-reveal-id="add-link" class="icon-add" title="Add new link"></a>
+                <a href="#" data-reveal-id="add-link" class="sbx-icon-only-button" title="Add new link"><sbx-icon name="add"></sbx-icon></a>
             </nav>
         </div>
     </div>
@@ -66,15 +66,22 @@ $(function() {
                     <div class="list-item">
                         <div class="card small-12">
                             <a href="{MYLINK_URL}">
-                                <span class="size-32 icon-link"></span>
+                                <sbx-icon name="link" size="2rem"></sbx-icon>
                                 <p>{MYLINK_DESCRIPTION}</p>
                                 <p class="meta">{MYLINK_URL}</p>
                             </a>
                         </div>
                     </div>
                     <nav>
-                        <a href="/cms/myLinksForm.php?delete=1" data-delete="{MYLINK_ID}" class="icon-delete" data-interaction="delete" title="Delete this link"></a>
-                        <a href="#" data-reveal-id="modify-link-{MYLINK_ID}" class="icon-modify" data-interaction="show-open-form" title="Modify this link"></a>
+                        <a href="/cms/myLinksForm.php?delete=1"
+                           data-delete="{MYLINK_ID}"
+                           class="sbx-icon-only-button no-text"
+                           data-interaction="delete"
+                           title="Delete this link"
+                           aria-label="Delete this link">
+                            <sbx-icon name="delete"></sbx-icon>
+                        </a>
+                        <a href="#" data-reveal-id="modify-link-{MYLINK_ID}" data-interaction="show-open-form" title="Modify this link" class="sbx-icon-only-button"><sbx-icon name="modify"></sbx-icon></a>
                     </nav>
                     <div id="modify-link-{MYLINK_ID}" data-reveal class="reveal-modal" aria-labelledby="modify-link-label-{MYLINK_ID}" aria-hidden="true" role="dialog">
                         <h2 id="modify-link-label-{MYLINK_ID}">Modify Link</h2>
@@ -100,7 +107,7 @@ $(function() {
                                     <label for="url-{MYLINK_ID}" class="required">Link</label>
                                     <div class="input-group">
                                         <input id="url-{MYLINK_ID}" name="url" type="text" maxlength="2048" class="required" value="{MYLINK_URL}" />
-                                        <a id="modifyLinkButton-{MYLINK_ID}" class="button icon-link">Browse</a>
+                                        <a id="modifyLinkButton-{MYLINK_ID}" class="button sbx-button--has-icon"><sbx-icon name="link"></sbx-icon>Browse</a>
                                     </div>
                                 </div>
                                 <div class="small-12 medium-6 columns">
@@ -142,7 +149,7 @@ $(function() {
                         <label for="url-new" class="required">Link</label>
                         <div class="input-group">
                             <input id="url-new" name="url" type="text" maxlength="2048" class="required" />
-                            <a id="addLinkButton" class="button icon-link">Browse</a>
+                            <a id="addLinkButton" class="button sbx-button--has-icon"><sbx-icon name="link"></sbx-icon>Browse</a>
                         </div>
                     </div>
                     <div class="small-12 medium-6 columns">

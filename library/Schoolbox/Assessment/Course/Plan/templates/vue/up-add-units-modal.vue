@@ -65,14 +65,16 @@ window.Vue.onMounted(() => {
                             />
                             <button
                                 v-if="index > 0"
-                                class="button button--icon-only icon-delete f-no-margins"
+                                class="button button--icon-only f-no-margins"
                                 type="button"
                                 :disabled="addUnitsStore.newUnits.length === 1"
                                 title="Delete"
                                 aria-label="Delete"
                                 :data-test="`up-add-units-delete-${index}`"
                                 @click.prevent="addUnitsStore.remove(index)"
-                            ></button>
+                            >
+                                <sbx-icon name="delete"></sbx-icon>
+                            </button>
                         </div>
                         <label v-if="addUnitsStore.validationErrors[index]" class="error"
                             >Please add a {{ locale.unit.translate(false, false) }} name</label
@@ -82,11 +84,12 @@ window.Vue.onMounted(() => {
                 <div>
                     <button
                         v-if="addUnitsStore.newUnits.length < MAX_UNITS"
-                        class="button icon-add f-no-margins"
+                        class="button sbx-button--has-icon f-no-margins"
                         data-test="up-add-units-add"
                         type="button"
                         @click.prevent="addUnitsStore.add()"
                     >
+                        <sbx-icon name="add"></sbx-icon>
                         Add another
                     </button>
                 </div>

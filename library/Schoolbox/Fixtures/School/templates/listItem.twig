@@ -9,5 +9,7 @@
 </div>
 <nav>
     <span data-unsaved-indicator class="icon-info hide" title="Not yet saved"></span>
-    <a href="{{ routeLookup('sportsfixturesSchool.postDeleteSchool', {entityId: school.id ?? ''}) }}" class="icon-delete" title="Delete" data-delete></a>
+    <a href="{{ routeLookup('sportsfixturesSchool.postDeleteSchool', {entityId: school.id ?? ''}) }}" class="sbx-icon-only-button" title="Delete" aria-label="Delete" data-delete>
+        <sbx-icon name="delete"></sbx-icon>
+    </a>
 </nav>

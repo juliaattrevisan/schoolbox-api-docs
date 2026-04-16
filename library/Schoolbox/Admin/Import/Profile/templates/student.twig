@@ -21,9 +21,9 @@
                         <ul class="flex-list buttons">
                             <li>
                                 {% if numProfiles %}
-                                    <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'student'}) }}" class="icon-export button">Export Student Data</a>
+                                    <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'student'}) }}" class="button sbx-button--has-icon"><sbx-icon name="export"></sbx-icon>Export Student Data</a>
                                 {% else %}
-                                    <a href="{{ CDN_PREFIX }}/adminv2/import/profile/student.csv" class="icon-download button">Download Student Template</a>
+                                    <a href="{{ CDN_PREFIX }}/adminv2/import/profile/student.csv" class="button sbx-button--has-icon"><sbx-icon name="download"></sbx-icon>Download Student Template</a>
                                 {% endif %}
                             </li>
                             <li>
