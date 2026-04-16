@@ -77,11 +77,11 @@
         {# Grading logic and structure #}
         <div class="row mark-scheme" data-assessment-status data-participant="{{ participant.user.id }}">
             <div class="small-12 island">
-                <form method="post" data-feedback-form="{{ participant.user.id }}" action="{{ routeLookupIfAuthorized('learningReportingFeedback.postFeedback', {
+                <form method="post" data-feedback-form="{{ participant.user.id }}" action="{{ routeLookupIfAuthorized('learningReportingFeedback.postParticularFeedback', {
                     assessmentId: assessment.id,
                     assessment:   assessment,
-                    studentId:    learner.id,
-                    student:      learner,
+                    learnerId:    learner.id,
+                    learner:      learner,
                     feedbackId:   feedback.id ?? null
                 }) }}">
                     <section>
