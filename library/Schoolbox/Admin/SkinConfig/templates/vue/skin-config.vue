@@ -28,17 +28,17 @@ const { colourErrors, hasColourErrors } = useSkinConfigContrastValidation(config
 const { schedulePreviewRefresh } = useSkinPreview(configs, props.routes.preview);
 
 /**
- * Scroll to the highest inline colour validation error on the page.
+ * Scroll to the highest colour field label with a validation error on the page.
  */
 async function scrollToHighestColourError(): Promise<void> {
     await window.Vue.nextTick();
 
-    const errorElements = Array.from(document.querySelectorAll<HTMLElement>("[data-skin-config-colour-error]"));
-    if (errorElements.length === 0) {
+    const titleLabels = Array.from(document.querySelectorAll<HTMLElement>("[data-skin-config-colour-error-label]"));
+    if (titleLabels.length === 0) {
         return;
     }
 
-    const highestError = errorElements.reduce((highest, element) => {
+    const highestError = titleLabels.reduce((highest, element) => {
         return element.getBoundingClientRect().top < highest.getBoundingClientRect().top ? element : highest;
     });
 

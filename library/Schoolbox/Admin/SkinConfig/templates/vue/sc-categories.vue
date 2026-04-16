@@ -61,7 +61,12 @@ function onPreviewRefresh(): void {
                         :key="option.id"
                         :class="[option.type === 'textarea' ? 'small-12' : 'small-12 medium-6 large-4']"
                     >
-                        <label :id="option.name" :for="`${option.name}-field`" class="inline-block">
+                        <label
+                            :id="option.name"
+                            :for="`${option.name}-field`"
+                            class="inline-block"
+                            :data-skin-config-colour-error-label="props.colourErrors[option.id] ? '' : null"
+                        >
                             <span>{{ option.title || option.name }}</span>
                             <span
                                 v-if="option.description"
@@ -88,7 +93,6 @@ function onPreviewRefresh(): void {
                                 v-if="props.colourErrors[option.id]"
                                 class="error"
                                 :for="`${option.name}-field`"
-                                data-skin-config-colour-error
                             >
                                 {{ props.colourErrors[option.id] }}
                             </label>
