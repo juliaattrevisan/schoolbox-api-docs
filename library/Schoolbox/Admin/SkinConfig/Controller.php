@@ -207,16 +207,7 @@ class Controller extends ConfigController
      */
     private function getCustomProperty(Config $config): ?string
     {
-        $options = $config->getOptions();
-        if ($options === null || trim($options) === '') {
-            return null;
-        }
-        $decoded = json_decode($options, true);
-        if (!is_array($decoded)) {
-            return null;
-        }
-        $customProperty = $decoded['customProperty'] ?? null;
-        return is_string($customProperty) && $customProperty !== '' ? $customProperty : null;
+        return $this->getStringOptionValue($config, 'customProperty');
     }
 
     /**
@@ -224,16 +215,34 @@ class Controller extends ConfigController
      */
     private function getContrastProperty(Config $config): ?string
     {
+        return $this->getStringOptionValue($config, 'contrast');
+    }
+
+    /**
+     * Extract a string config option from the JSON-encoded options payload.
+     */
+    private function getStringOptionValue(Config $config, string $key): ?string
+    {
+        $optionValue = $this->getDecodedOptions($config)[$key] ?? null;
+
+        return is_string($optionValue) && $optionValue !== '' ? $optionValue : null;
+    }
+
+    /**
+     * Decode the JSON-encoded options payload for a config row.
+     *
+     * @return array<string, mixed>
+     */
+    private function getDecodedOptions(Config $config): array
+    {
         $options = $config->getOptions();
         if ($options === null || trim($options) === '') {
-            return null;
+            return [];
         }
+
         $decoded = json_decode($options, true);
-        if (!is_array($decoded)) {
-            return null;
-        }
-        $contrast = $decoded['contrast'] ?? null;
-        return is_string($contrast) && $contrast !== '' ? $contrast : null;
+
+        return is_array($decoded) ? $decoded : [];
     }
 
     /**
