@@ -121,9 +121,19 @@ function onPreviewRefresh(): void {
                                         </h2>
                                     </div>
                                     <nav>
-                                        <a href="#" class="icon-settings settings edit" title="Settings"></a>
-                                        <a href="#" class="icon-up-arrow collapse" title="Expand/collapse content"></a>
-                                        <a href="#" class="icon-close" title="Close"></a>
+                                        <a
+                                            href="#"
+                                            class="icon-settings settings edit"
+                                            title="Settings"
+                                            @click.prevent
+                                        ></a>
+                                        <a
+                                            href="#"
+                                            class="icon-up-arrow collapse"
+                                            title="Expand/collapse content"
+                                            @click.prevent
+                                        ></a>
+                                        <a href="#" class="icon-close" title="Close" @click.prevent></a>
                                     </nav>
                                 </div>
                             </div>
@@ -167,36 +177,36 @@ function onPreviewRefresh(): void {
                             <sbx-pop-out content-id="pop-out-1" button-text="Create Activity"></sbx-pop-out>
                             <ul id="pop-out-1" class="f-dropdown" data-dropdown-content>
                                 <li>
-                                    <a class="icon-project" href="#">Project</a>
+                                    <a class="icon-project" href="#" @click.prevent>Project</a>
                                 </li>
                                 <li>
-                                    <a class="icon-due-work" href="#">Due Work</a>
+                                    <a class="icon-due-work" href="#" @click.prevent>Due Work</a>
                                 </li>
                                 <li>
-                                    <a class="icon-task" href="#">Task</a>
+                                    <a class="icon-task" href="#" @click.prevent>Task</a>
                                 </li>
                                 <li>
-                                    <a class="icon-quiz" href="#">Quiz</a>
+                                    <a class="icon-quiz" href="#" @click.prevent>Quiz</a>
                                 </li>
                                 <li>
-                                    <a class="icon-lti" href="#">3rd Party Assessment</a>
+                                    <a class="icon-lti" href="#" @click.prevent>3rd Party Assessment</a>
                                 </li>
                                 <li>
-                                    <a class="icon-lesson-plan" href="#">Lesson Plan</a>
+                                    <a class="icon-lesson-plan" href="#" @click.prevent>Lesson Plan</a>
                                 </li>
                                 <li>
-                                    <a class="icon-dialog-agent" href="#">Discussion</a>
+                                    <a class="icon-dialog-agent" href="#" @click.prevent>Discussion</a>
                                 </li>
                             </ul>
                         </div>
                         <div class="small-12">
                             <ul class="flex-list buttons">
                                 <li>
-                                    <a href="#" class="f-no-margins sbx-button--has-icon">
-                                        <sbx-icon name="previous"></sbx-icon>Return</a
-                                    >
+                                    <a href="#" class="f-no-margins sbx-button--has-icon" @click.prevent>
+                                        <sbx-icon name="previous"></sbx-icon>Return
+                                    </a>
                                 </li>
-                                <li><a href="#" class="submit f-no-margins">Publish News</a></li>
+                                <li><a href="#" class="submit f-no-margins" @click.prevent>Publish News</a></li>
                             </ul>
                         </div>
                         <div class="small-12 medium-4">
@@ -205,7 +215,7 @@ function onPreviewRefresh(): void {
                                 <div data-applied-filter-tab="22" class="applied-filter-tab">
                                     <span class="label filter">
                                         <span data-filter-name="">Category</span>
-                                        <a href="#" class="close" title="Remove filter">×</a>
+                                        <a href="#" class="close" title="Remove filter" @click.prevent>×</a>
                                     </span>
                                     <ul data-selected-list="" class="selected-list">
                                         <li class="selected-item">Learning</li>
