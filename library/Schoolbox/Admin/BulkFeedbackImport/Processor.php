@@ -369,7 +369,7 @@ class Processor
                 /* Select a strategy to process feedbacks at runtime: due work and reporting save in different places
                  * using different structures
                  */
-                $strategy = $this->selectFeedbackStrategy($assessmentData);
+                $feedbackStrategy = $this->selectFeedbackStrategy($assessmentData);
 
                 /* Try to spawn an IAssessable instance
                  *
@@ -397,7 +397,7 @@ class Processor
                     continue;
                 }
 
-                $strategy->processRow(
+                $feedbackStrategy->processRow(
                     $i,
                     $folder,
                     $learner,
@@ -414,9 +414,9 @@ class Processor
         }
 
         return [
-            'messages' => array_merge($this->messages, $strategy->getMessages()),
-            'errors' => $errors + $strategy->getErrorCount(),
-            'links' => $strategy->getLinks()
+            'messages' => array_merge($this->messages, $feedbackStrategy->getMessages()),
+            'errors' => $errors + $feedbackStrategy->getErrorCount(),
+            'links' => $feedbackStrategy->getLinks()
         ];
     }
 
