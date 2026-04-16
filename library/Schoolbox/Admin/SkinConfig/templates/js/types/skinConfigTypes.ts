@@ -22,6 +22,8 @@ export type SkinConfigOption = {
     hidden: boolean;
 };
 
+export type SkinConfigOptionErrorMap = Partial<Record<number, string>>;
+
 /**
  * A skin config subcategory containing a list of options
  */

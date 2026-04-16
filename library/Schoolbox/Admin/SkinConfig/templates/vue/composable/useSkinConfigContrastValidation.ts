@@ -1,0 +1,75 @@
+import { isReadable, TinyColor } from "@ctrl/tinycolor";
+import type { ComputedRef, Ref } from "vue";
+import type { SkinConfigData, SkinConfigOption, SkinConfigOptionErrorMap } from "../../js/types/skinConfigTypes";
+
+const INVALID_COLOUR_ERROR = "Enter a valid colour.";
+const LOW_CONTRAST_ERROR = "Colour contrast must meet AA standard.";
+
+function getSonarColourOptions(configs: SkinConfigData): SkinConfigOption[] {
+    return Object.values(configs.sonar)
+        .flatMap((subcategories) => subcategories)
+        .flatMap((subcategory) => subcategory.options)
+        .filter((option) => option.type === "colour");
+}
+
+function isValidColour(value: string | null): value is string {
+    return value !== null && new TinyColor(value).isValid;
+}
+
+/**
+ * Build reactive Sonar colour validation state from the current Skin Config draft.
+ */
+export function useSkinConfigContrastValidation(configs: Ref<SkinConfigData>): {
+    colourErrors: ComputedRef<SkinConfigOptionErrorMap>;
+    hasColourErrors: ComputedRef<boolean>;
+} {
+    const colourErrors = window.Vue.computed<SkinConfigOptionErrorMap>(() => {
+        if (!configs.value.toggle.enabled) {
+            return {};
+        }
+
+        const colourOptions = getSonarColourOptions(configs.value);
+        const optionsByCustomProperty = new Map<string, SkinConfigOption>();
+        const errors: SkinConfigOptionErrorMap = {};
+
+        colourOptions.forEach((option) => {
+            if (option.customProperty !== null) {
+                optionsByCustomProperty.set(option.customProperty, option);
+            }
+        });
+
+        colourOptions.forEach((option) => {
+            if (!isValidColour(option.value)) {
+                errors[option.id] = INVALID_COLOUR_ERROR;
+                return;
+            }
+
+            if (option.contrast === null) {
+                return;
+            }
+
+            const contrastOption = optionsByCustomProperty.get(option.contrast);
+            if (contrastOption === undefined) {
+                return;
+            }
+
+            if (!isValidColour(contrastOption.value)) {
+                errors[option.id] = INVALID_COLOUR_ERROR;
+                return;
+            }
+
+            if (!isReadable(option.value, contrastOption.value, { level: "AA", size: "small" })) {
+                errors[option.id] = LOW_CONTRAST_ERROR;
+            }
+        });
+
+        return errors;
+    });
+
+    const hasColourErrors = window.Vue.computed(() => Object.keys(colourErrors.value).length > 0);
+
+    return {
+        colourErrors,
+        hasColourErrors,
+    };
+}
