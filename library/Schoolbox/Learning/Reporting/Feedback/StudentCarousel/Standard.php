@@ -10,8 +10,6 @@ namespace Schoolbox\Learning\Reporting\Feedback\StudentCarousel;
 
 use Aura\Router\Generator;
 use Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Reporting;
 use Schoolbox\User;
@@ -20,7 +18,7 @@ use Schoolbox\User;
  * Class StudentCarousel
  *
  * A cyclic selectize element that appears at the top of reporting feedback.
- * Allows you to load a student, mark thme, then visit the next (or previous) guy in the list
+ * Allows you to load a student, mark the,, then visit the next (or previous) guy in the list
  *
  * This is a replica of the Inline Grader student carousel; this replica doesn't need to know anything
  * about student submissions though.
@@ -65,7 +63,7 @@ class Standard
      *
      * @return Collection<Participant>
      */
-    private function prefilterParticipants()
+    private function prefilterParticipants(): Collection
     {
         /* Always disregard Excluded user
          */
@@ -89,7 +87,7 @@ class Standard
              *
              * TODO @zac, you might have a bigger vision for this fragment seeing as you came from the dialog agent
              *  carousel: there's a statusMap that I've manipulated but that starts to diverge from previous
-             *  implementatioms of the Carousel idea in general. See InlineGrader/Standard.php:104
+             *  implementations of the Carousel idea in general. See InlineGrader/Standard.php:104
              */
 
             /* Scrub it
@@ -106,14 +104,12 @@ class Standard
                 </div>
             ";
 
-            $person = [
+            $allPeople[] = [
                 'text' => $fullname,
                 'value' => $this->getUrl($currentParticipant->getUser()),
                 'html' => $html,
                 'submitted' => $currentParticipant->isFeedbackRequired(),
             ];
-
-            $allPeople[] = $person;
         }
 
         return $allPeople;
@@ -129,12 +125,10 @@ class Standard
      */
     private function getUrl(User $user): string
     {
-        $url = $this->routeGenerator->generate('learningReportingFeedback.getParticularFeedback', [
+        return $this->routeGenerator->generate('learningReportingFeedback.getParticularFeedback', [
             'assessmentId' => $this->assessment->getId(),
             'studentId'    => $user->getId(),
             'assessment'   => $this->assessment
         ]);
-
-        return $url;
     }
 }
