@@ -1,5 +1,6 @@
 import "@melloware/coloris/dist/coloris.css";
 import Coloris from "@melloware/coloris";
+import tinycolor from "tinycolor2";
 import { colourPickerInitialiseEventName } from "./colourPickerEvent";
 import "./colour-picker.css";
 
@@ -34,3 +35,5 @@ document.addEventListener(colourPickerInitialiseEventName, (e) => {
         el: targetEl,
     });
 });
+
+window.tinycolor = tinycolor;
