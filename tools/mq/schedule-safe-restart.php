@@ -85,7 +85,7 @@ set_error_handler(
 $loop  = $kernel->getDependencyInjector()->get('react.loop');
 
 /** @var IClient $stomp */
-$stomp = $kernel->getDependencyInjector()->get('stomp');
+$stomp = $kernel->getDependencyInjector()->get('stomp.plain');
 
 /** @var Connector $amqpConn */
 $amqpConn = $kernel->getDependencyInjector()->get('amqp');
@@ -238,6 +238,11 @@ function verifyFrameTrigger(IFrame $input, LoggerInterface $log)
 function interrogate($input, LoggerInterface $log, ContainerInterface $di)
 {
     // BEWARE! CUTLERY!
+    // TODO review whether this still needs to fork.
+    //      We already handle many failures in-process via exceptions/Throwable
+    //      and the shutdown handler below, but some crash/fatal scenarios are
+    //      still not reliably catchable in-process, so the fork currently
+    //      provides isolation for those cases.
     $pid = pcntl_fork();
 
     switch ($pid) {
