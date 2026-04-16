@@ -26,7 +26,7 @@ class Widgets
     {
         $page->dropDown(
             'mark_visibility_drop',
-            $this->getAvailableOptions(),
+            self::getAvailableOptions(),
             $value,
             'marktype',
             array(
