@@ -26,9 +26,24 @@ const { configs, hasUnsavedChanges, initialiseColourPickers, resetToSavedState, 
     });
 const { colourErrors, hasColourErrors } = useSkinConfigContrastValidation(configs);
 const { schedulePreviewRefresh } = useSkinPreview(configs, props.routes.preview);
-const isSaveDisabled = window.Vue.computed(
-    () => isProcessing.value || (configs.value.toggle.enabled && hasColourErrors.value),
-);
+
+/**
+ * Scroll to the highest inline colour validation error on the page.
+ */
+async function scrollToHighestColourError(): Promise<void> {
+    await window.Vue.nextTick();
+
+    const errorElements = Array.from(document.querySelectorAll<HTMLElement>("[data-skin-config-colour-error]"));
+    if (errorElements.length === 0) {
+        return;
+    }
+
+    const highestError = errorElements.reduce((highest, element) => {
+        return element.getBoundingClientRect().top < highest.getBoundingClientRect().top ? element : highest;
+    });
+
+    highestError.scrollIntoView({ behavior: "smooth", block: "start" });
+}
 
 /**
  * Persist the toggle state immediately, then reload the page so server-rendered assets are reapplied.
@@ -79,12 +94,16 @@ async function onUndoChanges(): Promise<void> {
  * Persist the current Skin Config payload to the backend.
  */
 async function onSaveSelected(): Promise<void> {
-    if (isSaveDisabled.value) {
-        if (configs.value.toggle.enabled && hasColourErrors.value) {
-            loadError.value = "Resolve colour contrast errors before saving.";
-        }
+    if (isProcessing.value) {
         return;
     }
+
+    if (configs.value.toggle.enabled && hasColourErrors.value) {
+        loadError.value = "Resolve colour contrast errors before saving.";
+        await scrollToHighestColourError();
+        return;
+    }
+
     const toast = window.sbProps.toastActivate("Saving...");
     try {
         isProcessing.value = true;
@@ -150,11 +169,7 @@ async function onSaveSelected(): Promise<void> {
                 <button v-if="hasUnsavedChanges" type="button" class="button l-flex__item--1" @click="onUndoChanges">
                     Undo Changes
                 </button>
-                <button
-                    class="button submit l-flex__item--1"
-                    data-test="skin-config-save-submit"
-                    :disabled="isSaveDisabled"
-                >
+                <button class="button submit l-flex__item--1" data-test="skin-config-save-submit">
                     {{ saveText }}
                 </button>
             </div>
