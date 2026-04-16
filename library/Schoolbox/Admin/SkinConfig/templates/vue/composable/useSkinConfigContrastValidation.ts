@@ -3,7 +3,7 @@
  * can reactively report invalid colours and low-contrast combinations without
  * duplicating contrast-checking logic across components or template code.
  */
-import { isReadable, TinyColor } from "@ctrl/tinycolor";
+import tinycolor from "tinycolor2";
 import type { ComputedRef, Ref } from "vue";
 import type { SkinConfigData, SkinConfigOption, SkinConfigOptionErrorMap } from "../../js/types/skinConfigTypes";
 
@@ -36,7 +36,7 @@ function getSonarColourOptions(configs: SkinConfigData): SkinConfigOption[] {
  * @returns True when the value can be parsed as a colour.
  */
 function isValidColour(value: string | null): value is string {
-    return value !== null && new TinyColor(value).isValid;
+    return value !== null && tinycolor(value).isValid();
 }
 
 /**
@@ -83,7 +83,7 @@ export function useSkinConfigContrastValidation(configs: Ref<SkinConfigData>): {
                 return;
             }
 
-            if (!isReadable(option.value, contrastOption.value, { level: "AA", size: "small" })) {
+            if (!tinycolor.isReadable(option.value, contrastOption.value, { level: "AA", size: "small" })) {
                 errors[option.id] = getLowContrastError(contrastOption);
             }
         });
