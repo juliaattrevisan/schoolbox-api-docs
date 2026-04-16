@@ -5,6 +5,11 @@ import type { SkinConfigData, SkinConfigOption, SkinConfigOptionErrorMap } from 
 const INVALID_COLOUR_ERROR = "Enter a valid colour.";
 const LOW_CONTRAST_ERROR = "Colour contrast must meet AA standard.";
 
+/**
+ * Collect all Sonar colour options from the current Skin Config payload.
+ * @param configs The current Skin Config payload.
+ * @returns The flattened list of Sonar colour options.
+ */
 function getSonarColourOptions(configs: SkinConfigData): SkinConfigOption[] {
     return Object.values(configs.sonar)
         .flatMap((subcategories) => subcategories)
@@ -12,12 +17,19 @@ function getSonarColourOptions(configs: SkinConfigData): SkinConfigOption[] {
         .filter((option) => option.type === "colour");
 }
 
+/**
+ * Determine whether the provided value is a valid colour string.
+ * @param value The colour value to validate.
+ * @returns True when the value can be parsed as a colour.
+ */
 function isValidColour(value: string | null): value is string {
     return value !== null && new TinyColor(value).isValid;
 }
 
 /**
  * Build reactive Sonar colour validation state from the current Skin Config draft.
+ * @param configs The current draft Skin Config state.
+ * @returns Reactive colour validation errors and a summary error flag.
  */
 export function useSkinConfigContrastValidation(configs: Ref<SkinConfigData>): {
     colourErrors: ComputedRef<SkinConfigOptionErrorMap>;

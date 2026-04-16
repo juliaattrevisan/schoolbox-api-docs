@@ -24,8 +24,9 @@ const { configs, hasUnsavedChanges, initialiseColourPickers, resetToSavedState, 
     useSkinConfigState(props.configs, isProcessing, () => {
         schedulePreviewRefresh();
     });
-const { colourErrors } = useSkinConfigContrastValidation(configs);
+const { colourErrors, hasColourErrors } = useSkinConfigContrastValidation(configs);
 const { schedulePreviewRefresh } = useSkinPreview(configs, props.routes.preview);
+const isSaveDisabled = window.Vue.computed(() => isProcessing.value || (configs.value.toggle.enabled && hasColourErrors.value));
 
 /**
  * Persist the toggle state immediately, then reload the page so server-rendered assets are reapplied.
@@ -76,7 +77,10 @@ async function onUndoChanges(): Promise<void> {
  * Persist the current Skin Config payload to the backend.
  */
 async function onSaveSelected(): Promise<void> {
-    if (isProcessing.value) {
+    if (isSaveDisabled.value) {
+        if (configs.value.toggle.enabled && hasColourErrors.value) {
+            loadError.value = "Resolve colour contrast errors before saving.";
+        }
         return;
     }
     const toast = window.sbProps.toastActivate("Saving...");
@@ -144,7 +148,7 @@ async function onSaveSelected(): Promise<void> {
                 <button v-if="hasUnsavedChanges" type="button" class="button l-flex__item--1" @click="onUndoChanges">
                     Undo Changes
                 </button>
-                <button class="button submit l-flex__item--1" data-test="skin-config-save-submit">
+                <button class="button submit l-flex__item--1" data-test="skin-config-save-submit" :disabled="isSaveDisabled">
                     {{ saveText }}
                 </button>
             </div>
