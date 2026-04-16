@@ -450,17 +450,14 @@ class Processor
      */
     private function selectMarkStrategy(array $headerRow): Strategy\Mark\IStrategy
     {
-        $normalisedMarkColumn = 'Normalised Mark';
-        $humanReadableGradeColumn = 'Human Readable Grade';
-
-        if (in_array($normalisedMarkColumn, $headerRow)) {
+        if (in_array(NormalisedMark::DISCRIMINATOR_COLUMN, $headerRow)) {
             /* If a Normalised Mark column exists in the header, derive Human Readable marks from Normalised Mark.
              */
-            return new NormalisedMark($this->stateMapper, $normalisedMarkColumn);
-        } elseif (in_array($humanReadableGradeColumn, $headerRow)) {
+            return new NormalisedMark($this->stateMapper);
+        } elseif (in_array(HumanReadableMark::DISCRIMINATOR_COLUMN, $headerRow)) {
             /* If a Human Readable Grade column exists in the header, derive Normalised Mark from Human Readable Grade.
              */
-            return new HumanReadableMark($this->stateMapper, $humanReadableGradeColumn);
+            return new HumanReadableMark($this->stateMapper);
         }
 
         /* We should never be here, but you never know: they could upload a totally random csv

@@ -16,12 +16,18 @@ use Schoolbox\Learning\DueWork\StateMapper;
 class NormalisedMark implements IStrategy
 {
     /**
+     * The presence of this column causes this strategy to spawn, used to process each row in the csv accordingly
+     */
+    public const string DISCRIMINATOR_COLUMN = 'Normalised Mark';
+
+
+    /**
      * The columns that are expected in this csv format
      */
     private const array EXPECTED_COLUMNS = [
         'Class Code',
         'Student External ID',
-        'Normalised Mark',
+        self::DISCRIMINATOR_COLUMN,
         'Comment',
         'Publish Date'
     ];
@@ -31,9 +37,8 @@ class NormalisedMark implements IStrategy
      * Constructor.
      *
      * @param StateMapper $stateMapper
-     * @param string $column
      */
-    public function __construct(private StateMapper $stateMapper, private string $column)
+    public function __construct(private StateMapper $stateMapper)
     {
     }
 
@@ -55,7 +60,7 @@ class NormalisedMark implements IStrategy
         $instructorScheme = $assessment->getInstructorMarkScheme();
         $learnerScheme = $assessment->getMarkScheme();
 
-        $normalisedMark = (float)trim((string)$row[$this->column]);
+        $normalisedMark = (float)trim((string)$row[self::DISCRIMINATOR_COLUMN]);
 
         /* This is what the student would see
          */

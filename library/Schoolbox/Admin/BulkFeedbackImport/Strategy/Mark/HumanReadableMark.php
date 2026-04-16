@@ -16,12 +16,18 @@ use Schoolbox\Learning\DueWork\StateMapper;
 class HumanReadableMark implements IStrategy
 {
     /**
+     * The presence of this column causes this strategy to spawn, used to process each row in the csv accordingly
+     */
+    public const string DISCRIMINATOR_COLUMN = 'Human Readable Grade';
+
+
+    /**
      * The columns that are expected in this csv format
      */
     private const array EXPECTED_COLUMNS = [
         'Class Code',
         'Student External ID',
-        'Human Readable Grade',
+        self::DISCRIMINATOR_COLUMN,
         'Comment',
         'Publish Date'
     ];
@@ -31,9 +37,8 @@ class HumanReadableMark implements IStrategy
      * Constructor.
      *
      * @param StateMapper $stateMapper
-     * @param string $column
      */
-    public function __construct(private StateMapper $stateMapper, private string $column)
+    public function __construct(private StateMapper $stateMapper)
     {
     }
 
@@ -58,7 +63,7 @@ class HumanReadableMark implements IStrategy
         $instructorScheme = $assessment->getInstructorMarkScheme();
         $learnerScheme = $assessment->getMarkScheme();
 
-        $instructorHumanReadableMark = trim((string)$row[$this->column]);
+        $instructorHumanReadableMark = trim((string)$row[self::DISCRIMINATOR_COLUMN]);
 
         /* Apparently this is how you detect a Submission State: an exception is thrown
          * trying to interpret it as one of the Mark Schemes. No wonder it was classified
