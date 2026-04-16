@@ -59,7 +59,7 @@ export default class Homepage {
 
     static readonly ELEMENT_COMPONENT_SETTINGS = 'a.settings.edit:has(sbx-icon[name="settings"])';
 
-    static readonly ELEMENT_REMOVE_ICON = "a.icon-close";
+    static readonly DATA_TEST_REMOVE_ICON = "homepage-component-close";
 
     static readonly ELEMENT_COMPONENT_EDIT_HEADING = 'input[name="componentname"]';
 
@@ -251,7 +251,7 @@ export default class Homepage {
      * Click the component remove icon
      */
     async clickComponentRemoveIcon(): Promise<void> {
-        await this.page.locator(Homepage.ELEMENT_REMOVE_ICON).first().click();
+        await this.page.getByTestId(Homepage.DATA_TEST_REMOVE_ICON).first().click();
     }
 
     /**
