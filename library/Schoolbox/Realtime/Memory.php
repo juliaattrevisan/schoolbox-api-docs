@@ -28,6 +28,7 @@ class Memory
      * in pages rather than bytes.
      */
     private static ?int $pageSize = null;
+    private static bool $pageSizeInitialized = false;
 
     /**
      * Report a process' memory usage, in bytes.
@@ -88,7 +89,8 @@ class Memory
      */
     private static function getPageSize(): ?int
     {
-        if (!isset(self::$pageSize)) {
+        if (!self::$pageSizeInitialized) {
+            self::$pageSizeInitialized = true;
             self::$pageSize = filter_var(exec('getconf PAGESIZE'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
         }
         return self::$pageSize;
