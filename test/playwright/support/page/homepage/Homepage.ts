@@ -59,8 +59,6 @@ export default class Homepage {
 
     static readonly ELEMENT_COMPONENT_SETTINGS = 'a.settings.edit:has(sbx-icon[name="settings"])';
 
-    // static readonly ELEMENT_REMOVE_ICON = `a[data-target="delete"]`;
-
     static readonly DATA_TEST_REMOVE_ICON = "homepage-component-close";
 
     static readonly ELEMENT_COMPONENT_EDIT_HEADING = 'input[name="componentname"]';
