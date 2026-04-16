@@ -39,10 +39,22 @@ test.describe.skip("Markbook mark visibility sync between mark books and activit
 
     test.afterEach(async ({ baseTester, db }) => {
         baseTester.isGoingTo("clean up - reset the course markbook filters");
-        await db.updateInDatabase("submission_box", { mark_visibility: "staffStudentAndParent" }, { assessment_id: dueWorkId });
-        await db.updateInDatabase("submission_box", { mark_visibility: "staffStudentAndParent" }, { assessment_id: dueWorkSpecId });
+        await db.updateInDatabase(
+            "submission_box",
+            { mark_visibility: "staffStudentAndParent" },
+            { assessment_id: dueWorkId },
+        );
+        await db.updateInDatabase(
+            "submission_box",
+            { mark_visibility: "staffStudentAndParent" },
+            { assessment_id: dueWorkSpecId },
+        );
         await db.updateInDatabase("assess", { mark_visibility: "staffStudentAndParent" }, { assessment_id: quizId });
-        await db.updateInDatabase("assess", { mark_visibility: "staffStudentAndParent" }, { assessment_id: quizSpecId });
+        await db.updateInDatabase(
+            "assess",
+            { mark_visibility: "staffStudentAndParent" },
+            { assessment_id: quizSpecId },
+        );
         await db.updateInDatabase(
             "filter_selection",
             { selected: 0 },
