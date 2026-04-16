@@ -33,10 +33,10 @@ export default class SummaryPage {
      * @param categoryId - The ID of the category
      */
     async addToQuestionBank(questionId: number, categoryId: number): Promise<void> {
-        await this.page.click(`#question_${questionId} a sbx-icon[name="download"]`);
+        await this.page.locator(`#question_${questionId} a sbx-icon[name="download"]`).click();
         await this.page.waitForSelector("#question-bank");
-        await this.page.click(`#node_${categoryId}_anchor`);
-        await this.page.click('input[type=submit][value="Add To Question Bank"]');
+        await this.page.locator(`#node_${categoryId}_anchor`).click();
+        await this.page.locator('input[type=submit][value="Add To Question Bank"]').click();
         await this.page.waitForSelector("#bank-success");
         await this.page.reload();
     }
@@ -46,8 +46,8 @@ export default class SummaryPage {
      * @param sectionId - The ID of the section
      */
     async clickAddFromQuestionBank(sectionId: number): Promise<void> {
-        await this.page.click(`[data-test=sbx-pop-out-section${sectionId}-options]`);
-        await this.page.click(`#section${sectionId}-options a sbx-icon[name="download"]`);
+        await this.page.locator(`[data-test=sbx-pop-out-section${sectionId}-options]`).click();
+        await this.page.locator(`#section${sectionId}-options a sbx-icon[name="download"]`).click();
         await expect(this.page.locator(`h2.subheader:has-text("Categories")`)).toBeVisible();
     }
 
@@ -56,8 +56,8 @@ export default class SummaryPage {
      * @param sectionId - The ID of the section
      */
     async clickNewQuestion(sectionId: number): Promise<void> {
-        await this.page.click(`[data-test=sbx-pop-out-section${sectionId}-options]`);
-        await this.page.click(`#section${sectionId}-options a.sbx-button--has-icon`);
+        await this.page.locator(`[data-test=sbx-pop-out-section${sectionId}-options]`).click();
+        await this.page.getByTestId(`sbx-button-add-question`).click();
         await expect(this.page.locator(`h2.subheader:has-text("Create Question")`)).toBeVisible();
     }
 }
