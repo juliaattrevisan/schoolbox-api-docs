@@ -1,21 +1,48 @@
 import "@melloware/coloris/dist/coloris.css";
 import Coloris from "@melloware/coloris";
-import { isReadable, mostReadable, readability, TinyColor } from "@ctrl/tinycolor";
+import { fromRatio, isReadable, mostReadable, names, random, readability, TinyColor } from "@ctrl/tinycolor";
 import { colourPickerInitialiseEventName } from "./colourPickerEvent";
 import "./colour-picker.css";
 
 type TinyColorInput = ConstructorParameters<typeof TinyColor>[0];
+type TinyColorValue = Exclude<TinyColorInput, undefined>;
+const hexNames = Object.fromEntries(Object.entries(names).map(([name, hex]) => [hex, name]));
 
+/**
+ * Preserve the legacy global tinycolor(...) factory while using the ctrl tinycolor package internally.
+ * @param color Color input passed through to TinyColor.
+ * @returns TinyColor instance for the supplied input.
+ */
 function tinycolor(color: TinyColorInput): TinyColor {
     return new TinyColor(color);
 }
 
-Object.assign(tinycolor, {
+const tinycolorCompat = Object.assign(tinycolor, {
     TinyColor,
+    equals(color1?: TinyColorInput, color2?: TinyColorInput) {
+        if (!color1 || !color2) {
+            return false;
+        }
+
+        return new TinyColor(color1).equals(color2);
+    },
+    fromRatio(ratio?: TinyColorInput) {
+        if (!ratio || typeof ratio !== "object") {
+            return new TinyColor(ratio);
+        }
+
+        return fromRatio(ratio as Parameters<typeof fromRatio>[0]);
+    },
+    hexNames,
     isReadable,
+    mix(color1: TinyColorValue, color2: TinyColorValue, amount?: number) {
+        return new TinyColor(color1).mix(color2, amount);
+    },
     mostReadable,
+    names,
+    random,
     readability,
-});
+}) as Window["tinycolor"];
 
 const colorPickerDefaults = {
     theme: "default",
@@ -49,4 +76,4 @@ document.addEventListener(colourPickerInitialiseEventName, (e) => {
     });
 });
 
-window.tinycolor = tinycolor;
+window.tinycolor = tinycolorCompat as unknown as typeof window.tinycolor;
