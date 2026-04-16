@@ -114,15 +114,15 @@ class Reporting implements IStrategy
     /**
      * Process one row from the csv
      *
-     * @param int $i
-     * @param array $folder
+     * @param int $i A row counter so we can tell people about the line we're processing in the csv (ie. where errors occur in the csv)
+     * @param array $folder The folder in which the assessment lives
      * @param string $externalId External identifier of $learner
-     * @param array $learner
-     * @param array $assessmentData
+     * @param array $learner The student who is receiving the feedback
+     * @param array $assessmentData A row from the $assessmentQuery result set
      * @param \Alaress_Date_Format $adf The derived publish date of the feedback
-     * @param mixed $value A human readable mark, if present; data type could be anything from a csv
-     * @param mixed $comment A comment, if present; data type could be anything from a csv
-     * @param User $creator
+     * @param string $value A human readable mark, if present; data type could be anything from a csv
+     * @param string $comment A comment, if present; data type could be anything from a csv
+     * @param User $creator The presumed author of the feedback (specified in the ui)
      * @return void
      * @throws Exception
      * @throws Deleted
@@ -134,8 +134,8 @@ class Reporting implements IStrategy
         array $learner,
         array $assessmentData,
         \Alaress_Date_Format $adf,
-        mixed $value,
-        mixed $comment,
+        string $value,
+        string $comment,
         \Schoolbox\User $creator
     ): void {
         $reportingId = $assessmentData['reporting_id'] ?? null;
