@@ -11,10 +11,9 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\BulkFeedbackImport\Strategy;
 
 use Schoolbox\L10n\RosettaStone;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DataModel\Reporting\Mapper;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
-use Schoolbox\Learning\DueWork\StateMapper;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
@@ -25,41 +24,7 @@ class Reporting implements IStrategy
     /**
      * A column whose presence decides we'll use this strat
      */
-    public const string DISCRIMINATING_COLUMN = 'Human Readable Mark';
-
-
-    /**
-     * The column headings unique to the Due Work import template for feedbacks
-     */
-    private const array EXPECTED_COLUMNS = [
-        'Class Code',
-        'Student External ID',
-        'Human Readable Mark',
-        'Comment',
-        'Publish Date'
-    ];
-
-
-    /**
-     * A reporting-specific query to find assessments.
-     *
-     * Used to find a relationship between a folder and a particular assessment by its (assessment title, worktype) combo
-     */
-    private const string QUERY_ASSESSMENT_TITLE_WORKTYPE = "
-        SELECT
-            a.id AS assessment_id,
-            a.title AS assessment_title,
-            r.id AS reporting_id
-        FROM mv_assessment_relation mvar
-        INNER JOIN assessment a ON a.id = mvar.assessment_id
-        INNER JOIN reporting r ON r.assessment_id = a.id
-        INNER JOIN folder f ON mvar.folder_id = f.id
-        WHERE mvar.folder_id = :folderId
-        AND a.work_type_id = :workTypeId
-        AND a.title = :assessmentTitle
-        AND a.deleted_at IS NULL
-        AND f.deleted_at IS NULL
-    ";
+    public const string DISCRIMINATING_COLUMN = 'reporting_id';
 
 
     /**
@@ -90,22 +55,16 @@ class Reporting implements IStrategy
      * Constructor.
      *
      * @param bool $perform
-     * @param MapperProxy $assessmentMapperProxy
      * @param RosettaStone $rosettaStone
      * @param string $assessmentTitle
-     * @param UserMapper $userMapper
      * @param Mapper $reportingMapper
-     * @param StateMapper $stateMapper
      * @param IFeedbackDataSource $feedbackDataSource
      */
     public function __construct(
         private bool $perform,
-        private \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy,
         private \Schoolbox\L10n\RosettaStone $rosettaStone,
         private string $assessmentTitle,
-        private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Learning\Assessment\DataModel\Reporting\Mapper $reportingMapper,
-        private StateMapper $stateMapper,
         private IFeedbackDataSource $feedbackDataSource,
     ) {
     }
@@ -116,11 +75,13 @@ class Reporting implements IStrategy
      *
      * @param int $i A row counter so we can tell people about the line we're processing in the csv (ie. where errors occur in the csv)
      * @param array $folder The folder in which the assessment lives
-     * @param string $externalId External identifier of $learner
-     * @param array $learner The student who is receiving the feedback
+     * @param \Schoolbox\User $learner The student who is receiving the feedback
+     * @param IAssessable $assessment A reporting domain instance
      * @param array $assessmentData A row from the $assessmentQuery result set
      * @param \Alaress_Date_Format $adf The derived publish date of the feedback
-     * @param string $value A human readable mark, if present; data type could be anything from a csv
+     * @param null|float $normalisedMark A numeric value out of 100
+     * @param null|string $learnerHumanReadableMark Corresponds to a mark type/submission state that learners/families see
+     * @param null|string $instructorHumanReadableMark Corresponds to a mark type/submission state that staff see
      * @param string $comment A comment, if present; data type could be anything from a csv
      * @param User $creator The presumed author of the feedback (specified in the ui)
      * @return void
@@ -130,11 +91,13 @@ class Reporting implements IStrategy
     public function processRow(
         int $i,
         array $folder,
-        string $externalId,
-        array $learner,
+        \Schoolbox\User $learner,
+        IAssessable $assessment,
         array $assessmentData,
         \Alaress_Date_Format $adf,
-        string $value,
+        ?float $normalisedMark,
+        ?string $learnerHumanReadableMark,
+        ?string $instructorHumanReadableMark,
         string $comment,
         \Schoolbox\User $creator
     ): void {
@@ -160,19 +123,10 @@ class Reporting implements IStrategy
             return;
         }
 
-        /* Try to spawn an IAssessable instance
-         *
-         * Note that this is horribly non-performant since it requires the assessmentMapperProxy
-         * to do enormous amounts of heavy lifting: you could shortcut this by maybe spawning stubs
-         * containing only the Mark Scheme chosen by the assessment...
-         */
-        /** @var \Schoolbox\Learning\Assessment\Reporting\Model $assessment */
-        $assessment = $this->assessmentMapperProxy->findById($assessmentId);
-
         /* Find the Reporting sub object, as annoying as that is
          */
         try {
-            $reporting = $this->reportingMapper->findOneByColumn('assessment_id', $assessment->getId());
+            $reporting = $this->reportingMapper->findOneByColumn('assessment_id', $assessmentId);
         } catch (\Schoolbox\Mapper\Exception $e) {
             /* For some reason this couldn't be found: maybe multiplayer schoolbox where someone deleted it while you
              * were actively using it
@@ -181,10 +135,6 @@ class Reporting implements IStrategy
 
             return;
         }
-
-        /* Slam in a new reporting feedback; we reuse this $learner further down for logging
-         */
-        $learner = $this->userMapper->findById($learner['id']);
 
         /* Spawn a new feedback and assign properties
          */
@@ -198,49 +148,7 @@ class Reporting implements IStrategy
         /* Feedback Comments are optional based on the Reporting toggle
          */
         if ($assessment->getFeedbackCommentsEnable()) {
-            $feedback->setComment(trim((string)$comment));
-        }
-
-        /** Get mark schemes
-         * - Instructor mark scheme is used to normalise what was inputted by the user
-         * - Learner mark scheme is used when displaying the mark back to learners/parents
-         */
-        $instructorScheme = $assessment->getInstructorMarkScheme();
-        $learnerScheme = $assessment->getMarkScheme();
-
-        $normalisedMark = null;
-        $learnerHumanReadableMark = null;
-
-        /* This human readable mark is given by the instructor, from which we derive the normalised mark
-         */
-        $instructorHumanReadableMark = trim((string)$value);
-
-        /* Apparently this is how you detect a Submission State: an exception is thrown
-         * trying to interpret it as one of the Mark Schemes. No wonder it was classified
-         * as the $errors var. Wild!
-         *
-         * Shanked from Learning/Assessment/DueWork/Feedback/Factory.php::210
-         */
-        try {
-            $normalisedMark = $instructorScheme->getNormalisedMark($instructorHumanReadableMark);
-
-            /* Find out what the learner's version would have been and save that too
-             * Arguably you could skip this derivation, only doing it if $instructor scheme was different to $learner scheme
-             */
-            $learnerHumanReadableMark = $learnerScheme->getHumanReadableMark($normalisedMark);
-        } catch (\InvalidArgumentException $e) {
-            if ('' !== $instructorHumanReadableMark) {
-                /* If it's a Submission State, save the text as the human readable mark
-                 * and derive its normalised mark from the uh Lists in admin
-                 */
-                $code = $this->stateMapper->findOneByColumn('display_as', $instructorHumanReadableMark);
-
-                $normalisedMark = $code->getNormaliseAs();
-
-                /* There isn't a learner-specific Submission State: it's the same for both parties.
-                 */
-                $learnerHumanReadableMark = $instructorHumanReadableMark;
-            }
+            $feedback->setComment(trim($comment));
         }
 
         $feedback
@@ -274,46 +182,13 @@ class Reporting implements IStrategy
             $instructorHumanReadableMark,
             $normalisedMark,
             $learner->getFullName(),
-            $externalId,
+            $learner->getExternalId(),
             $this->rosettaStone->translate('activity', false),
             $assessment->getTitle(),
             $assessment->getId(),
             $folder['title'],
             $folder['id']
         ), self::INFO);
-    }
-
-
-    /**
-     * The column in the csv that defines this strat
-     *
-     * @return string
-     */
-    public function getDiscriminatorColumn(): string
-    {
-        return self::DISCRIMINATING_COLUMN;
-    }
-
-
-    /**
-     * Returns a list of expected columns unique to the due work import template
-     *
-     * @return array|string[]
-     */
-    public function getExpectedColumns(): array
-    {
-        return self::EXPECTED_COLUMNS;
-    }
-
-
-    /**
-     * The query used to find assessments quickly
-     *
-     * @return string
-     */
-    public function getAssessmentQuery(): string
-    {
-        return self::QUERY_ASSESSMENT_TITLE_WORKTYPE;
     }
 
 
@@ -334,6 +209,17 @@ class Reporting implements IStrategy
 
     /* Getters/Setters
      */
+
+    /**
+     * The column in the csv that defines this strat
+     *
+     * @return string
+     */
+    public function getDiscriminatorColumn(): string
+    {
+        return self::DISCRIMINATING_COLUMN;
+    }
+
 
     /**
      * @return array

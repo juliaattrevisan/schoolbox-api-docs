@@ -13,53 +13,17 @@ namespace Schoolbox\Admin\BulkFeedbackImport\Strategy;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\L10n\RosettaStone;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 class DueWork implements IStrategy
 {
     /**
      * A column whose presence decides we'll use this strat
      */
-    public const string DISCRIMINATING_COLUMN = 'Normalised Mark';
-
-
-    /**
-     * The column headings unique to the Due Work import template for feedbacks
-     */
-    private const array EXPECTED_COLUMNS = [
-        'Class Code',
-        'Student External ID',
-        'Normalised Mark',
-        'Comment',
-        'Publish Date'
-    ];
-
-
-    /**
-     * A due work-specific query to find assessments. It directly references submission boxes due to a time constraint
-     * in the implementation; I haven't modernised it or addressed its shortcomings
-     *
-     * Used to find a relationship between a folder and a particular assessment by its (assessment title, worktype) combo
-     */
-    private const string QUERY_ASSESSMENT_TITLE_WORKTYPE = "
-        SELECT
-            a.id AS assessment_id,
-            a.title AS assessment_title,
-            sb.id AS box_id
-        FROM mv_assessment_relation mvar
-        INNER JOIN assessment a ON a.id = mvar.assessment_id
-        INNER JOIN submission_box sb ON sb.assessment_id = a.id
-        INNER JOIN folder f ON mvar.folder_id = f.id
-        WHERE mvar.folder_id = :folderId
-        AND a.work_type_id = :workTypeId
-        AND a.title = :assessmentTitle
-        AND a.deleted_at IS NULL
-        AND f.deleted_at IS NULL
-    ";
+    public const string DISCRIMINATING_COLUMN = 'box_id';
 
 
     /**
@@ -90,19 +54,15 @@ class DueWork implements IStrategy
      * Constructor.
      *
      * @param bool $perform
-     * @param MapperProxy $assessmentMapperProxy
      * @param RosettaStone $rosettaStone
      * @param string $assessmentTitle
-     * @param UserMapper $userMapper
      * @param SubmissionBoxMapper $submissionBoxMapper
      * @param ReturnedWorkMapper $returnedWorkMapper
      */
     public function __construct(
         private bool $perform,
-        private \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy,
         private \Schoolbox\L10n\RosettaStone $rosettaStone,
         private string $assessmentTitle,
-        private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Assessment\Component\SubmissionBoxMapper $submissionBoxMapper,
         private \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper $returnedWorkMapper,
     ) {
@@ -114,11 +74,13 @@ class DueWork implements IStrategy
      *
      * @param int $i A row counter so we can tell people about the line we're processing in the csv (ie. where errors occur in the csv)
      * @param array $folder The folder in which the assessment lives
-     * @param string $externalId External identifier of $learner
-     * @param array $learner The student who is receiving the feedback
+     * @param \Schoolbox\User $learner The student who is receiving the feedback
+     * @param IAssessable $assessment A due work domain instance
      * @param array $assessmentData A row from the $assessmentQuery result set
      * @param \Alaress_Date_Format $adf The derived publish date of the feedback
-     * @param string $value A normalised mark, if present; data type could be anything from a csv
+     * @param null|float $normalisedMark A numeric value out of 100
+     * @param null|string $learnerHumanReadableMark Corresponds to a mark type/submission state that learners/families see
+     * @param null|string $instructorHumanReadableMark Corresponds to a mark type/submission state that staff see
      * @param string $comment A comment, if present; data type could be anything from a csv
      * @param User $creator The presumed author of the feedback (specified in the ui)
      * @return void
@@ -128,11 +90,13 @@ class DueWork implements IStrategy
     public function processRow(
         int $i,
         array $folder,
-        string $externalId,
-        array $learner,
+        \Schoolbox\User $learner,
+        IAssessable $assessment,
         array $assessmentData,
         \Alaress_Date_Format $adf,
-        string $value,
+        ?float $normalisedMark,
+        ?string $learnerHumanReadableMark,
+        ?string $instructorHumanReadableMark,
         string $comment,
         \Schoolbox\User $creator
     ): void {
@@ -158,51 +122,8 @@ class DueWork implements IStrategy
             return;
         }
 
-        /* Try to spawn an IAssessable instance
-         *
-         * Note that this is horribly non-performant since it requires the assessmentMapperProxy
-         * to do enormous amounts of heavy lifting: you could shortcut this by maybe spawning stubs
-         * containing only the Mark Scheme chosen by the assessment...
-         */
-        $assessment = $this->assessmentMapperProxy->findById($assessmentId);
-
-        /* Compute human-readable mark from assessment's mark scheme instead
-         * It must be between 0 and 100, inclusive
-         */
-        $normalisedMark = (float)trim((string)$value);
-
-        if ($normalisedMark < 0 || $normalisedMark > 100) {
-            $this->log(sprintf(
-                'Row %s: normalised mark must be between 0 and 100 for %s "%s"',
-                $i,
-                $this->rosettaStone->translate('activity', false),
-                $this->assessmentTitle,
-            ), self::WARNING);
-
-            /* Returns after an increment of errors
-             */
-            $this->errorCount++;
-
-            return;
-        }
-
-        /* This is what the student would see
-         */
-        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
-
-        /* This is what the instructor would see, due to SA-18452
-         */
-        /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
-        $instructorHumanReadableMark = $assessment->getInstructorMarkScheme()->getHumanReadableMark($normalisedMark);
-
-        /* Actual marks and comments
-         */
-        $comment = trim((string)$comment);
-
         /* Slam in a new submission_return
          */
-        $learner = $this->userMapper->findById($learner['id']);
-
         if ($this->perform) {
             /* TODO inefficient/non-conventional, I know
              *  Solution had a time constraint.
@@ -214,8 +135,8 @@ class DueWork implements IStrategy
                 ->setMarker($creator)
                 ->setOwner($learner)
                 ->setReviewRoute('instructor')
-                ->setComment($comment)
-                ->setHumanReadableMark($humanReadableMark)
+                ->setComment(trim($comment))
+                ->setHumanReadableMark($learnerHumanReadableMark)
                 ->setHumanReadableInstructorMark($instructorHumanReadableMark)
                 ->setNormalizedMark($normalisedMark)
                 ->setResubmissionRequired(false)
@@ -239,50 +160,17 @@ class DueWork implements IStrategy
         $this->log(sprintf(
             'Row %s: added grade %s (instructor grade %s, normalised mark %s) for %s (%s) in %s "%s" (%s) found in folder "%s" (%s)',
             $i,
-            $humanReadableMark,
+            $learnerHumanReadableMark,
             $instructorHumanReadableMark,
             $normalisedMark,
             $learner->getFullName(),
-            $externalId,
+            $learner->getExternalId(),
             $this->rosettaStone->translate('activity', false),
             $assessment->getTitle(),
             $assessment->getId(),
             $folder['title'],
             $folder['id']
         ), self::INFO);
-    }
-
-
-    /**
-     * The column in the csv that defines this strat
-     *
-     * @return string
-     */
-    public function getDiscriminatorColumn(): string
-    {
-        return self::DISCRIMINATING_COLUMN;
-    }
-
-
-    /**
-     * Returns a list of expected columns unique to the due work import template
-     *
-     * @return array|string[]
-     */
-    public function getExpectedColumns(): array
-    {
-        return self::EXPECTED_COLUMNS;
-    }
-
-
-    /**
-     * The query used to find assessments quickly
-     *
-     * @return string
-     */
-    public function getAssessmentQuery(): string
-    {
-        return self::QUERY_ASSESSMENT_TITLE_WORKTYPE;
     }
 
 
@@ -303,6 +191,17 @@ class DueWork implements IStrategy
 
     /* Getters/Setters
      */
+
+    /**
+     * The column in the csv that defines this strat
+     *
+     * @return string
+     */
+    public function getDiscriminatorColumn(): string
+    {
+        return self::DISCRIMINATING_COLUMN;
+    }
+
 
     /**
      * @return array

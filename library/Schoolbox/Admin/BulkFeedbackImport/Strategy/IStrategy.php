@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\BulkFeedbackImport\Strategy;
 
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
@@ -25,16 +26,15 @@ interface IStrategy
     /**
      * Process one row from the csv
      *
-     * Note that each strat has its own meaning of $value, which is a bit of awkward polymorphism for you to think about
-     * when you compose strats to interpret and process a MOSTLY-the-same csv.
-     *
      * @param int $i A row counter so we can tell people about the line we're processing in the csv (ie. where errors occur in the csv)
      * @param array $folder The folder in which the assessment lives
-     * @param string $externalId External identifier of $learner
-     * @param array $learner The student who is receiving the feedback
+     * @param \Schoolbox\User $learner The student who is receiving the feedback
+     * @param IAssessable $assessment A due work or reporting domain instance
      * @param array $assessmentData A row from the $assessmentQuery result set
      * @param \Alaress_Date_Format $adf The derived publish date of the feedback
-     * @param string $value A human readable/normalised mark, if present; data type could be anything from a csv
+     * @param null|float $normalisedMark A numeric value out of 100
+     * @param null|string $learnerHumanReadableMark Corresponds to a mark type/submission state that learners/families see
+     * @param null|string $instructorHumanReadableMark Corresponds to a mark type/submission state that staff see
      * @param string $comment A comment, if present; data type could be anything from a csv
      * @param User $creator The presumed author of the feedback (specified in the ui)
      * @return void
@@ -44,11 +44,13 @@ interface IStrategy
     public function processRow(
         int $i,
         array $folder,
-        string $externalId,
-        array $learner,
+        \Schoolbox\User $learner,
+        IAssessable $assessment,
         array $assessmentData,
         \Alaress_Date_Format $adf,
-        string $value,
+        ?float $normalisedMark,
+        ?string $learnerHumanReadableMark,
+        ?string $instructorHumanReadableMark,
         string $comment,
         \Schoolbox\User $creator
     ): void;
@@ -60,22 +62,6 @@ interface IStrategy
      * @return string
      */
     public function getDiscriminatorColumn(): string;
-
-
-    /**
-     * Returns a list of expected columns unique to the due work import template
-     *
-     * @return array|string[]
-     */
-    public function getExpectedColumns(): array;
-
-
-    /**
-     * The query used to find assessments quickly
-     *
-     * @return string
-     */
-    public function getAssessmentQuery(): string;
 
 
     /**
