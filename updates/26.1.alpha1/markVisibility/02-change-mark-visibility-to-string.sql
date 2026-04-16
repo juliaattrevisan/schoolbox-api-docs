@@ -3,7 +3,7 @@
 ALTER TABLE `submission_box` CHANGE `mark_visibility` `_mark_visibility` tinyint(1) NOT NULL DEFAULT 0;
 
 # Add new ENUM column with equivalent string default.
-ALTER TABLE `submission_box` ADD COLUMN `mark_visibility` ENUM('staffOnly','staffAndStudent','staffAndParent','staffStudentAndParent') NOT NULL DEFAULT 'staffOnly';
+ALTER TABLE `submission_box` ADD COLUMN `mark_visibility` ENUM('staffOnly','staffAndStudent','staffAndParent','staffStudentAndParent') NOT NULL DEFAULT 'staffOnly' AFTER `_mark_visibility`;
 
 # Populate new column from old values.
 # The old column was not nullable, so in case of bad data we must choose a value.  Chose 'staffOnly' for safety as that is most restrictive.
@@ -20,7 +20,7 @@ END;
 ALTER TABLE `project` CHANGE `mark_visibility` `_mark_visibility` int(11) DEFAULT 1;
 
 # Add new ENUM column with equivalent string default.
-ALTER TABLE `project` ADD COLUMN `mark_visibility` ENUM('staffOnly','staffAndStudent','staffAndParent','staffStudentAndParent') DEFAULT 'staffAndStudent';
+ALTER TABLE `project` ADD COLUMN `mark_visibility` ENUM('staffOnly','staffAndStudent','staffAndParent','staffStudentAndParent') DEFAULT 'staffAndStudent' AFTER `_mark_visibility`;
 
 # Populate new column from old values.
 # The old column was not nullable, so in case of bad data we must choose a value.  Chose 'staffOnly' for safety as that is most restrictive.
@@ -43,7 +43,7 @@ END;
 ALTER TABLE `assess` CHANGE `mark_visibility` `_mark_visibility` int(1) DEFAULT 1;
 
 # Add new ENUM column with equivalent string default.
-ALTER TABLE `assess` ADD COLUMN `mark_visibility` ENUM('staffOnly','staffAndStudent','staffAndParent','staffStudentAndParent') DEFAULT 'staffAndStudent';
+ALTER TABLE `assess` ADD COLUMN `mark_visibility` ENUM('staffOnly','staffAndStudent','staffAndParent','staffStudentAndParent') DEFAULT 'staffAndStudent' AFTER `_mark_visibility`;
 
 # Populate new column from old values.
 # The old column was not nullable, so in case of bad data we must choose a value.  Chose 'staffOnly' for safety as that is most restrictive.
@@ -60,7 +60,7 @@ END;
 ALTER TABLE `lti_assessment` CHANGE `mark_visibility` `_mark_visibility` int(11) DEFAULT NULL;
 
 # Add new ENUM column with equivalent string default.
-ALTER TABLE `lti_assessment` ADD COLUMN `mark_visibility` ENUM('staffOnly','staffAndStudent','staffAndParent','staffStudentAndParent') DEFAULT NULL;
+ALTER TABLE `lti_assessment` ADD COLUMN `mark_visibility` ENUM('staffOnly','staffAndStudent','staffAndParent','staffStudentAndParent') DEFAULT NULL AFTER `_mark_visibility`;
 
 # Populate new column from old values.
 # The old column was nullable, so in case of bad data we leave as null.
