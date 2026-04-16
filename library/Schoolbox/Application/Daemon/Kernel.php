@@ -463,7 +463,7 @@ EOL;
                 (int)$conf->get('amqp_stomp_port'),
                 $conf->get('amqp_user'),
                 $conf->get('amqp_pass'),
-                $conf->get('amqp_vhost')
+                $conf->get('amqp_vhost'),
             );
             return new Stomp\Client($conn);
         }));
