@@ -85,7 +85,7 @@ set_error_handler(
 $loop  = $kernel->getDependencyInjector()->get('react.loop');
 
 /** @var IClient $stomp */
-$stomp = $kernel->getDependencyInjector()->get('stomp');
+$stomp = $kernel->getDependencyInjector()->get('stomp.plain');
 
 /** @var Connector $amqpConn */
 $amqpConn = $kernel->getDependencyInjector()->get('amqp');
@@ -238,6 +238,9 @@ function verifyFrameTrigger(IFrame $input, LoggerInterface $log)
 function interrogate($input, LoggerInterface $log, ContainerInterface $di)
 {
     // BEWARE! CUTLERY!
+    // TODO this doesn't need to fork:
+    //      the only reason this forks is uncatchable errors, which now can
+    //      always be caught with Throwable
     $pid = pcntl_fork();
 
     switch ($pid) {

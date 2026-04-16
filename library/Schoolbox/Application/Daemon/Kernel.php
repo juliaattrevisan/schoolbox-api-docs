@@ -448,6 +448,30 @@ EOL;
             );
         }));
 
+        // Plain (non-reconnecting) STOMP client — use for short-lived scripts that do not
+        // need transparent reconnection and must not hold a reference to the event loop
+        // across PHP shutdown (ReconnectingClient creates a circular reference via its
+        // scheduleReconnect callback that can segfault during GC if the loop is freed first).
+        $di->set('stomp.plain', $di->lazy(function () use ($di) {
+            /** @var IConfigLoader $conf */
+            $conf = $di->get('config');
+            /** @var LoopInterface $loop */
+            $loop = $di->get('react.loop');
+
+            return new Stomp\Client(
+                new Stomp\Connection(
+                    $loop,
+                    new Protocol(null, Version::VERSION_1_1),
+                    new Parser(),
+                    $conf->get('amqp_host'),
+                    (int)$conf->get('amqp_stomp_port'),
+                    $conf->get('amqp_user'),
+                    $conf->get('amqp_pass'),
+                    $conf->get('amqp_vhost'),
+                ),
+            );
+        }));
+
         // Redis queue subscription (not persistent)
         $di->set('redis.signalQueue.sub', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */
