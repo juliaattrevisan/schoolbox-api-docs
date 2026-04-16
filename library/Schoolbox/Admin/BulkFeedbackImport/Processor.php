@@ -146,6 +146,9 @@ class Processor
         private \Schoolbox\Learning\Assessment\WorkType\Model $workType,
         private bool $perform
     ) {
+        /* These feedback strats allow us to potentially explore all supported activities. We don't know ahead of time
+         * which activities match the ones specified in the csv; could be one of these or even both.
+         */
         $this->dueWorkStrategy = new DueWork(
             $this->perform,
             $this->rosettaStone,
