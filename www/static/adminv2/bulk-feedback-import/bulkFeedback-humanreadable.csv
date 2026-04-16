@@ -1,10 +1,12 @@
 Class Code,Student External ID,Human Readable Grade,Comment,Publish Date
-9ENGA,71KW79QH,"19 / 22","Great job, Julia!","27/12/2025"
-9ENGA,BZZP5EMN,"20 / 22","Excellent, Josh!","15/01/2025"
-9ENGA,GHJSADF,"Incomplete",,
-10MATA,DPA1KX3U,"A+","Keep it up, Justin!","2/03/2025"
-10MATA,2ISDH5G8,"D-","Try harder, Jez!","02/03/2025"
-11REGA,25FP5WOX,"14 days",,
+9ENGA,71KW79QH,"19 / 22","Great job, Julia! You got 19 out of 22 total marks.","27/12/2025"
+9ENGA,BZZP5EMN,"20 / 22","Excellent, Josh! You got 20 out of 22 total marks.","15/01/2025"
+9ENGA,GHJSADF,"Incomplete","You need to finish your work. This has matched the submission state ’Incomplete’.",
+10MATA,DPA1KX3U,"A+","Keep it up, Justin! You’re letter grade on the grading scheme ‘15 point scale’ is an A+.","2/03/2025"
+10MATA,2ISDH5G8,"Complete","Try harder, Jez! You’re letter grade on the grading scheme ‘Progress’ is a Complete.","2/03/2025"
+11REGA,25FP5WOX,"14 days","This is free text saying ‘14 days'",
 11REGA,12ZIMYZ6,"2 days",,
-12GEO1,EJX2FOCJ,"-10 %",,"08/04/2025"
-12GEO2,EOBZC8QB,"25 %",,"08/04/2025"
+12GEO1,EJX2FOCJ,"-10%","Your progress has worsened Johannes. You have a free text grade saying ‘-10%’","8/04/2025"
+12GEO2,EOBZC8QB,"25%","Your progress has improved Jessica. You have a free text grade saying ‘25%’","8/04/2025"
+9PHE1,71KW79QH,"51 %","Good work this semester Jai. You got a percentage of 51 % this semester",
+9PHE1,BZZP5EMN,"86 %","Excellent work this semester Jing. You got a percentage of 86 % this semester.",
