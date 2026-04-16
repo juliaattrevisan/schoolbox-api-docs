@@ -11,7 +11,7 @@ export interface Props {
         allowCourseManaged?: boolean;
         key: keyof MarkbookClassImplActivity;
         selectOptions?: {
-            value: number;
+            value: string | number;
             /** WARNING: This label is output as v-html to allow for icons, so ensure sanitization occurs beforehand */
             label: string;
             /** An icon to display if the mark is readonly, if unset will show a disabled input field */
