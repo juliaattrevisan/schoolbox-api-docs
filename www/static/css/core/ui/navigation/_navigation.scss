@@ -207,15 +207,6 @@ $allow-sidebar-stash: $large-up;
                 @extend .size-24;
                 @extend .no-text;
 
-                &.navthis {
-                    // DONE use slightly opaque background
-                    background-color: css-scale-color($navigation-background-contrast, $alpha: -96%);
-                    &:before,
-                    span {
-                        color: $icon-nav-highlight-color;
-                    }
-                }
-
                 &:hover {
                     background-color: $navigation-hover;
                 }
