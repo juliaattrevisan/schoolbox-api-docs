@@ -17,6 +17,7 @@ test.describe("Links Component Tests", () => {
     let linksComponent: Locator;
     let linkTitle: string = "Test Link Automation";
     const newLinkTitle: string = "Test Link Automation Updated";
+    const newWindowLinkTitle: string = "Test Link Automation New Window";
     const linkUrl: string = "https://www.youtube.com";
     const linkDsc: string = "Description here";
 
@@ -151,6 +152,27 @@ test.describe("Links Component Tests", () => {
         const sortedLinks = await Links.getAllLinks(linksComponent);
         tester.isGoingTo(sortedLinks.toString());
         expect(sortedLinks).toEqual([newLinkTitle, "Where did English come from?", "Plain English Romeo and Juliet"]);
+    });
+
+    test("Verify Links open-in markup", async ({ tester }) => {
+        tester.isGoingTo("Navigate to 9A English homepage and verify links render without preview markup");
+        await homepage.goto(83);
+        linksComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
+
+        const sameWindowLink = Links.getLink(linksComponent, linkTitle);
+        await expect(sameWindowLink).not.toHaveAttribute("data-plugin", "preview");
+        await expect(sameWindowLink).not.toHaveAttribute("target", /.+/);
+        await expect(sameWindowLink).not.toHaveAttribute("rel", /.+/);
+
+        tester.isGoingTo("Add a new-window link and verify it uses target blank without preview markup");
+        await links.addLink(linksComponent, newWindowLinkTitle, linkUrl, linkDsc, false, true);
+
+        const newWindowLink = Links.getLink(linksComponent, newWindowLinkTitle);
+        await expect(newWindowLink).not.toHaveAttribute("data-plugin", "preview");
+        await expect(newWindowLink).toHaveAttribute("target", "_blank");
+        await expect(newWindowLink).toHaveAttribute("rel", "external");
+
+        await links.deleteLink(linksComponent, newWindowLinkTitle);
     });
 
     test.afterAll(async ({ baseTester, db, api }) => {

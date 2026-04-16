@@ -13,6 +13,8 @@ export default class Links {
 
     static readonly ELEMENT_DESCRIPTION_TEXTBOX = 'textarea[id="comment"]';
 
+    static readonly ELEMENT_OPEN_IN_SELECT = 'select[name="target"]';
+
     static readonly ELEMENT_VISIBILITY_CHECKBOX = 'label[for="visible"]';
 
     static readonly ELEMENT_ADD_LINK_BUTTON = 'input[value="Add Link"]';
@@ -21,7 +23,7 @@ export default class Links {
 
     static readonly ELEMENT_LINK_TITLE_NONTRANSLUCENT = 'div a[title="{linkTitle}"]';
 
-    static readonly ELEMENT_PREVIEW_LINKS = '[class="action-list"] li a[data-plugin="preview"]';
+    static readonly ELEMENT_LINKS = '[class="action-list"] li h3 a';
 
     static readonly ELEMENT_ADD_LINK_BUTTON_IN_COMPONENT = `a[href="/cms/link/new/{homepageId}"]`;
 
@@ -73,12 +75,14 @@ export default class Links {
         url: string,
         description: string,
         expectedVisiblity: boolean,
+        openInNewWindow: boolean = false,
     ): Promise<void> {
         this.tester.isGoingTo("Add a tile , add a url, add a Description and select visibility and Click add link");
         await this.clickAddLink(linkComponent);
         await this.page.fill(Links.ELEMENT_TITLE_TEXTBOX, title);
         await this.page.fill(Links.ELEMENT_URL_TEXTBOX, url);
         await this.page.fill(Links.ELEMENT_DESCRIPTION_TEXTBOX, description);
+        await this.page.selectOption(Links.ELEMENT_OPEN_IN_SELECT, openInNewWindow ? "_blank" : "");
         const actualVisibility = await this.page.isChecked(Links.ELEMENT_VISIBILITY_CHECKBOX); // Default from UI
         if (expectedVisiblity && !actualVisibility) {
             // User want to keep the link visible but by default the checkbix was marked hidden
@@ -183,9 +187,13 @@ export default class Links {
      * @returns An array of link titles
      */
     public static async getAllLinks(linkComponent: Locator): Promise<string[]> {
-        const linksLocator = linkComponent.locator(Links.ELEMENT_PREVIEW_LINKS);
+        const linksLocator = linkComponent.locator(Links.ELEMENT_LINKS);
         const linktexts = await linksLocator.allTextContents();
         return linktexts;
+    }
+
+    public static getLink(linkComponent: Locator, linkTitle: string): Locator {
+        return linkComponent.locator(`h3 a[title='${linkTitle}']`);
     }
 
     /*
