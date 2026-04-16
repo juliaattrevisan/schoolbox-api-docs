@@ -10,6 +10,7 @@ export enum ResultTypes {
     ASSESSMENT_TASK = "assessment.task",
     ASSESSMENT_QUIZ = "assessment.quiz",
     ASSESSMENT_DIALOG_AGENT = "assessment.dialogAgent",
+    ASSESSMENT_REPORTING = "assessment.reporting",
     BADGE = "badge",
     BLOG = "blog",
     EVENT = "event",
