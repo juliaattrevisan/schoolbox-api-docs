@@ -60,6 +60,8 @@ class HumanReadableMark implements IStrategy
          * - Instructor mark scheme is used to normalise what was inputted by the user
          * - Learner mark scheme is used when displaying the mark back to learners/parents
          */
+        /* scuffed polymorphism from 2016 sorry */
+        /** @var \Schoolbox\Learning\Assessment\DueWork\Model|\Schoolbox\Learning\Assessment\Reporting\Model $assessment */
         $instructorScheme = $assessment->getInstructorMarkScheme();
         $learnerScheme = $assessment->getMarkScheme();
 

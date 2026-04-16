@@ -146,6 +146,7 @@ class Reporting implements IStrategy
 
         /* Feedback Comments are optional based on the Reporting toggle
          */
+        /** @var \Schoolbox\Learning\Assessment\Reporting\Model $assessment */
         if ($assessment->getFeedbackCommentsEnable()) {
             $feedback->setComment(trim($comment));
         }

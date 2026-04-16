@@ -57,6 +57,8 @@ class NormalisedMark implements IStrategy
          * - Instructor mark scheme is used to normalise what was inputted by the user
          * - Learner mark scheme is used when displaying the mark back to learners/parents
          */
+        /* scuffed polymorphism from 2016 sorry */
+        /** @var \Schoolbox\Learning\Assessment\DueWork\Model|\Schoolbox\Learning\Assessment\Reporting\Model $assessment */
         $instructorScheme = $assessment->getInstructorMarkScheme();
         $learnerScheme = $assessment->getMarkScheme();
 
@@ -69,7 +71,6 @@ class NormalisedMark implements IStrategy
         /* This is what the instructor would see, due to SA-18452
          * Disgustingly typehint this getInstructorMarkScheme() method which is unique to two activities atm
          */
-        /** @var \Schoolbox\Learning\Assessment\DueWork\Model|\Schoolbox\Learning\Assessment\Reporting\Model $assessment */
         $instructorHumanReadableMark = $instructorScheme->getHumanReadableMark($normalisedMark);
 
         /* Add a really specific error circumstance where we calculated something illegal
