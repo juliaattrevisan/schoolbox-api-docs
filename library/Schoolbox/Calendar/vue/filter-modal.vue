@@ -3,7 +3,7 @@
 /* eslint-disable @eslint-community/eslint-comments/no-unlimited-disable -- see below */
 /* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
-import tinycolor from "tinycolor2";
+import { mostReadable } from "@ctrl/tinycolor";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 
 const FILTER_CHANGED = "filterChanged";
@@ -159,7 +159,7 @@ export default {
         getEventTypeStyles(eventType) {
             return {
                 backgroundColor: eventType.color,
-                color: tinycolor.mostReadable(eventType.color, ["black", "white"]).toRgbString(),
+                color: mostReadable(eventType.color, ["black", "white"]).toRgbString(),
             };
         },
     },
