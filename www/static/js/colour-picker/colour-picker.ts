@@ -1,8 +1,21 @@
 import "@melloware/coloris/dist/coloris.css";
 import Coloris from "@melloware/coloris";
-import tinycolor from "tinycolor2";
+import { isReadable, mostReadable, readability, TinyColor } from "@ctrl/tinycolor";
 import { colourPickerInitialiseEventName } from "./colourPickerEvent";
 import "./colour-picker.css";
+
+type TinyColorInput = ConstructorParameters<typeof TinyColor>[0];
+
+function tinycolor(color: TinyColorInput): TinyColor {
+    return new TinyColor(color);
+}
+
+Object.assign(tinycolor, {
+    TinyColor,
+    isReadable,
+    mostReadable,
+    readability,
+});
 
 const colorPickerDefaults = {
     theme: "default",

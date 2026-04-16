@@ -10,6 +10,7 @@ import type Vue from "vue";
 import type dayjs from "dayjs";
 import type { lightGallery } from "lightgallery";
 import type { LightGallery } from "lightgallery/lightgallery";
+import type { isReadable, mostReadable, readability, TinyColor } from "@ctrl/tinycolor";
 import type { DefineComponent } from "vue";
 import type { apiRequest } from "@js/util/sbx/apiUtils";
 import type { InitLightGallery } from "@js/image-lightbox/imageLightbox";
@@ -28,6 +29,17 @@ type Dropzone = {
     addFile(file: File): void;
     isValidFile(file: File, acceptedFiles: string): boolean;
 };
+
+type TinyColorInput = ConstructorParameters<typeof TinyColor>[0];
+
+interface TinycolorGlobal {
+    (color: TinyColorInput): TinyColor;
+    new (color: TinyColorInput): TinyColor;
+    TinyColor: typeof TinyColor;
+    isReadable: typeof isReadable;
+    mostReadable: typeof mostReadable;
+    readability: typeof readability;
+}
 
 declare global {
     const $: JQueryStatic;
@@ -117,6 +129,7 @@ declare global {
         };
         siteVersion: string;
         STORYBOOK_ENV: string;
+        tinycolor: TinycolorGlobal;
         Vue: typeof Vue;
         sbx: {
             chained: typeof chained;
