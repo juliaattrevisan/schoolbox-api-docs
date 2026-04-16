@@ -166,6 +166,7 @@ class Reporting implements IStrategy
          * to do enormous amounts of heavy lifting: you could shortcut this by maybe spawning stubs
          * containing only the Mark Scheme chosen by the assessment...
          */
+        /** @var \Schoolbox\Learning\Assessment\Reporting\Model $assessment */
         $assessment = $this->assessmentMapperProxy->findById($assessmentId);
 
         /* Find the Reporting sub object, as annoying as that is

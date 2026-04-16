@@ -192,6 +192,7 @@ class DueWork implements IStrategy
 
         /* This is what the instructor would see, due to SA-18452
          */
+        /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
         $instructorHumanReadableMark = $assessment->getInstructorMarkScheme()->getHumanReadableMark($normalisedMark);
 
         /* Actual marks and comments
