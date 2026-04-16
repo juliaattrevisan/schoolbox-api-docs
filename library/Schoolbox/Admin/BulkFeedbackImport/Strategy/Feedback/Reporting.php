@@ -84,8 +84,6 @@ class Reporting implements IStrategy
      * @param string $comment A comment, if present; data type could be anything from a csv
      * @param User $creator The presumed author of the feedback (specified in the ui)
      * @return void
-     * @throws Exception
-     * @throws Deleted
      */
     public function processRow(
         int $i,
