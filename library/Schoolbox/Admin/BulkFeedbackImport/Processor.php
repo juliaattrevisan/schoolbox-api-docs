@@ -22,7 +22,6 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -38,7 +37,7 @@ class Processor
     /**
      * Assume a default time of 1:11pm
      */
-    private const PUBLISH_TIME = '13:11:11';
+    private const string PUBLISH_TIME = '13:11:11';
 
 
     /**
@@ -413,10 +412,35 @@ class Processor
             }
         }
 
+        /* Collect all the messages from all the feedback strats
+         */
+        $messages = array_merge(
+            $this->messages,
+            $this->dueWorkStrategy->getMessages(),
+            $this->reportingStrategy->getMessages()
+        );
+
+        /* Collect all the errors from all feedback strats
+         */
+        $errors += $this->dueWorkStrategy->getErrorCount();
+        $errors += $this->reportingStrategy->getErrorCount();
+
+        /* Collect all the links from all the feedback strats
+         */
+        $links = array_merge(
+            $this->dueWorkStrategy->getLinks(),
+            $this->reportingStrategy->getLinks()
+        );
+
+        /* It's possible someone will try to upload a csv file that only contains the header row;
+         * These nullsafe/nullcoalesces circumvent that exceedingly unusual situation.
+         *
+         * It renders an empty Preview panel and empty Results/Links panel in the Perform mode of the import.
+         */
         return [
-            'messages' => array_merge($this->messages, $feedbackStrategy->getMessages()),
-            'errors' => $errors + $feedbackStrategy->getErrorCount(),
-            'links' => $feedbackStrategy->getLinks()
+            'messages' => $messages,
+            'errors' => $errors,
+            'links' => $links,
         ];
     }
 
@@ -454,7 +478,7 @@ class Processor
     private function selectMarkStrategy(array $headerRow): Strategy\Mark\IStrategy
     {
         if (in_array(NormalisedMark::DISCRIMINATOR_COLUMN, $headerRow)) {
-            /* If a Normalised Mark column exists in the header, derive Human Readable marks from Normalised Mark.
+            /* If a Normalised Mark column exists in the header, derive Human Readable Grades from Normalised Mark.
              */
             return new NormalisedMark($this->stateMapper);
         } elseif (in_array(HumanReadableMark::DISCRIMINATOR_COLUMN, $headerRow)) {
