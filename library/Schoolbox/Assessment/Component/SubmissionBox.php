@@ -35,18 +35,12 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public const SELF_REVIEWABILITY_REFLECT_ONLY = 'reflect-only'; // learner can only reflect on their work, but not give grades
     public const SELF_REVIEWABILITY_FULL         = 'full';         // learner can give reflect and give grades
 
-    // Mark Visibility consts (deprecated - use those defined in IAssessable directly instead of these)
-    public const MARK_VISIBILITY_STAFF_ONLY           = IAssessable::MARK_VISIBILITY_PRIVATE;
-    public const MARK_VISIBILITY_STAFF_AND_STUDENT    = IAssessable::MARK_VISIBILITY_STUDENT;
-    public const MARK_VISIBILITY_STAFF_AND_PARENT     = IAssessable::MARK_VISIBILITY_PARENT;
-    public const MARK_VISIBILITY_STAFF_STUDENT_PARENT = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
-
     // Mark Visibility strings
     public const MARK_VISIBILITY_STRINGS = [
-        self::MARK_VISIBILITY_STAFF_ONLY           => IAssessable::MARK_VISIBILITY_PRIVATE_STRING,
-        self::MARK_VISIBILITY_STAFF_AND_STUDENT    => IAssessable::MARK_VISIBILITY_STUDENT_STRING,
-        self::MARK_VISIBILITY_STAFF_AND_PARENT     => IAssessable::MARK_VISIBILITY_PARENT_STRING,
-        self::MARK_VISIBILITY_STAFF_STUDENT_PARENT => IAssessable::MARK_VISIBILITY_PARENT_STUDENT_STRING,
+        IAssessable::MARK_VISIBILITY_PRIVATE        => IAssessable::MARK_VISIBILITY_PRIVATE_STRING,
+        IAssessable::MARK_VISIBILITY_STUDENT        => IAssessable::MARK_VISIBILITY_STUDENT_STRING,
+        IAssessable::MARK_VISIBILITY_PARENT         => IAssessable::MARK_VISIBILITY_PARENT_STRING,
+        IAssessable::MARK_VISIBILITY_PARENT_STUDENT => IAssessable::MARK_VISIBILITY_PARENT_STUDENT_STRING,
     ];
 
     /**

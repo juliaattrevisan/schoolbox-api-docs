@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as Grad
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeLevelGroupModel;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper as GradeLevelMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Quiz;
 use Schoolbox\UserMapper;
@@ -132,9 +133,9 @@ class Assignment
     {
         // If muted, students cannot see grades left on assignment in Canvas
         if ($muted) {
-            return SubmissionBox::MARK_VISIBILITY_STAFF_ONLY;
+            return IAssessable::MARK_VISIBILITY_PRIVATE;
         }
-        return SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT;
+        return IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
     }
 
 

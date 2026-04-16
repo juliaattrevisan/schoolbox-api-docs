@@ -34,27 +34,15 @@ class SubmissionBoxTest extends TestCase
         $this->markTestIncomplete('Mark type model hasn\'t been added yet');
     }
 
-    public function testMarkVisibilityConstantsAreStrings(): void
-    {
-        // @phpstan-ignore method.alreadyNarrowedType
-        $this->assertIsString(SubmissionBox::MARK_VISIBILITY_STAFF_ONLY);
-        // @phpstan-ignore method.alreadyNarrowedType
-        $this->assertIsString(SubmissionBox::MARK_VISIBILITY_STAFF_AND_STUDENT);
-        // @phpstan-ignore method.alreadyNarrowedType
-        $this->assertIsString(SubmissionBox::MARK_VISIBILITY_STAFF_AND_PARENT);
-        // @phpstan-ignore method.alreadyNarrowedType
-        $this->assertIsString(SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT);
-    }
-
     public function testMarkVisibilityStringsMapCorrectly(): void
     {
         $strings = SubmissionBox::MARK_VISIBILITY_STRINGS;
         $this->assertIsString(array_key_first($strings), 'MARK_VISIBILITY_STRINGS must be keyed by string constants, not integers');
         $this->assertCount(4, $strings);
-        $this->assertSame('Staff Only', $strings[SubmissionBox::MARK_VISIBILITY_STAFF_ONLY]);
-        $this->assertSame('Staff & Student', $strings[SubmissionBox::MARK_VISIBILITY_STAFF_AND_STUDENT]);
-        $this->assertSame('Staff & Parent', $strings[SubmissionBox::MARK_VISIBILITY_STAFF_AND_PARENT]);
-        $this->assertSame('Staff, Student & Parent', $strings[SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT]);
+        $this->assertSame('Staff Only', $strings[IAssessable::MARK_VISIBILITY_PRIVATE]);
+        $this->assertSame('Staff & Student', $strings[IAssessable::MARK_VISIBILITY_STUDENT]);
+        $this->assertSame('Staff & Parent', $strings[IAssessable::MARK_VISIBILITY_PARENT]);
+        $this->assertSame('Staff, Student & Parent', $strings[IAssessable::MARK_VISIBILITY_PARENT_STUDENT]);
     }
 
     public function testIsMarkShownToStudents(): void
