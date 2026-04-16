@@ -175,11 +175,11 @@ class Reporting implements IStrategy
         ];
 
         $this->log(sprintf(
-            'Row %s: added grade %s (instructor grade %s, normalised mark %s) for %s (%s) in %s "%s" (%s) found in folder "%s" (%s)',
+            'Row %s: added grade %s (instructor grade "%s", normalised mark %s) for %s (%s) in %s "%s" (%s) found in folder "%s" (%s)',
             $i,
             $learnerHumanReadableMark,
             $instructorHumanReadableMark,
-            $normalisedMark,
+            $normalisedMark ?? 'null',
             $learner->getFullName(),
             $learner->getExternalId(),
             $this->rosettaStone->translate('activity', false),
