@@ -69,6 +69,8 @@ class FieldFactory
                     'gender'             => 'Gender',
                     'nationality[].code' => 'Nationality Code(s)',
                     'nationality[].name' => 'Nationalities',
+                    'language[].code'    => 'Language Code(s)',
+                    'language[].name'    => 'Language(s)',
                 ];
                 break;
             case Role::PARENT:

@@ -149,6 +149,7 @@ class Student extends Base
         $this->setGuardians(new Collection());
         $this->setCampus(new Collection());
         $this->setNationality(new Collection());
+        $this->setLanguage(new Collection());
     }
 
     /**
@@ -395,5 +396,16 @@ class Student extends Base
     public function getNationality(): Collection
     {
         return $this->nationality;
+    }
+
+    public function setLanguage(Collection $language): self
+    {
+        $this->language = $language;
+        return $this;
+    }
+
+    public function getLanguage(): Collection
+    {
+        return $this->language;
     }
 }

@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Nationality\Mapper as NationalityMapper;
+use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise;
 use Schoolbox\GenericCollection;
@@ -596,10 +597,15 @@ class Provisioner
         $houses                                = $residentialHouseMapper->findAll();
         $this->idToNameMap['residentialHouse'] = array_combine($houses->getPropertyValues('id'), $houses->getPropertyValues('house'));
 
-        /** @var NationalityMapper $campusMapper */
+        /** @var NationalityMapper $nationalityMapper */
         $nationalityMapper                          = $this->userMapper->getJoinMapper('user_nationality');
         $nationalities                              = $nationalityMapper->findAll();
         $this->idToNameMap['nationalityCollection'] = array_combine($nationalities->getPropertyValues('id'), $nationalities->getPropertyValues('name'));
+
+        /** @var LanguageMapper $languageMapper */
+        $languageMapper                             = $this->userMapper->getJoinMapper('user_language');
+        $nationalities                              = $languageMapper->findAll();
+        $this->idToNameMap['languageCollection'] = array_combine($nationalities->getPropertyValues('id'), $nationalities->getPropertyValues('name'));
     }
 
     /**

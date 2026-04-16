@@ -82,6 +82,7 @@ class Factory
         'displayGradeGraph' => 'Display Comparative Graph on Grades',
 
         'nationalityCollection' => 'Nationality',
+        'languageCollection' => 'Language',
     ];
 
 
@@ -98,6 +99,7 @@ class Factory
         'campusCollection' => 'campus',
         'campusCollectionRemove' => 'campus',
         'nationalityCollection' => 'nationality',
+        'languageCollection' => 'language',
     ];
 
 
