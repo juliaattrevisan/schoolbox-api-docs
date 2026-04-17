@@ -2,7 +2,7 @@
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import LanguageSelectionModal from "./language-selection-modal.vue";
-import type { IBLanguages } from "../js/types/ibConfigurationTypes";
+import type { IBLanguages } from "../../js/types/ibConfigurationTypes";
 
 interface SubjectRow {
     id: string;
