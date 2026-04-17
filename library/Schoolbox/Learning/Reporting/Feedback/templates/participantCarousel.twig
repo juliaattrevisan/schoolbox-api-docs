@@ -125,9 +125,9 @@
          * but the latter doesn't have a Continue button afaict
          */
         function actionNext(tgt) {
-            let ize = tgt[0].selectize;
-            let val = ize.getOption(ize.getValue());
-            let nextHref = ize.getAdjacentOption(val, 1);
+            const ize = tgt[0].selectize;
+            const val = ize.getOption(ize.getValue());
+            const nextHref = ize.getAdjacentOption(val, 1);
             let nextUrl;
 
             {# Use the next human's href, otherwise go back to assessment's status screen #}
