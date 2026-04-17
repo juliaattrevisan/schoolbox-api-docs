@@ -52,83 +52,83 @@
 
                 {% for critIndex, critUsage in groupUsage.indicatorUsages %}
                     {% set indicatorId   = critUsage.indicator.id %}
-                <tr
-                    data-group="{{ rubricId }}-{{ groupUsage.capability.id }}"
-                    data-capability-id="{{ groupUsage.capability.id }}"
-                    data-indicator-id="{{ indicatorId }}"
-                >
-                    {# yay html tables... -_-; #}
-                    {% if rowspan %}
-                        <th class="rb-group-name markdown" rowspan="{{ rowspan }}"><span>{{ groupUsage.capability.name | markdown }}</span></th>
-                        {% set rowspan = 0 %}
-                    {% endif %}
-
-                    <th class="rb-criterion-name markdown">{{ critUsage.indicator.name | markdown }}</th>
-
-                    {% set indicatorMark = rubricMarkedGrid
-                        ? rubricMarkedGrid.retrieveIndicatorMark(critUsage)
-                        : null %}
-                    {% set indicatorMarkDescriptor = indicatorMark
-                        ? indicatorMark.descriptor
-                        : null %}
-                    {% set selfAssessmentIndicatorMark = selfAssessmentFeedback
-                        ? selfAssessmentFeedback.rubricMarkedGrid.retrieveIndicatorMark(critUsage)
-                        : null %}
-
-                    {% for levelIndex, level in rubricGrid.levels %}
-
-                        {% set descriptor = critUsage.retrieveDescriptor(levelIndex) %}
-
-                        {% if descriptor %}
-
-                            {% set inputId %}{{ formField }}[{{ indicatorId }}][{{ level.id }}]{% endset %}
-                            {% set isDescriptorSelected = indicatorMarkDescriptor == descriptor %}
-                            {% set isMarkDisplayed      = isDescriptorSelected and rubricGrid.assessment.isFeedbackVisibleToUser(USER) %}
-                            {% set blindMode            = blindMode %}
-
-                            <td>
-                                {# This container displays rubric levels for the mobile view. #}
-                                <div class="hide-for-large-up l-pad-m hide-on-print"><p><b>{{ level.name | markdown }}</b></p></div>
-                                {% include '@rubric/descriptor-markable.twig' %}
-                            </td>
-
-                        {% else %}
-                            <td class="rb-blank hide-for-medium-down">&nbsp;</td>
+                    <tr
+                        data-group="{{ rubricId }}-{{ groupUsage.capability.id }}"
+                        data-capability-id="{{ groupUsage.capability.id }}"
+                        data-indicator-id="{{ indicatorId }}"
+                    >
+                        {# yay html tables... -_-; #}
+                        {% if rowspan %}
+                            <th class="rb-group-name markdown" rowspan="{{ rowspan }}"><span>{{ groupUsage.capability.name | markdown }}</span></th>
+                            {% set rowspan = 0 %}
                         {% endif %}
 
-                    {% endfor %}
-                </tr>
+                        <th class="rb-criterion-name markdown">{{ critUsage.indicator.name | markdown }}</th>
+
+                        {% set indicatorMark = rubricMarkedGrid
+                            ? rubricMarkedGrid.retrieveIndicatorMark(critUsage)
+                            : null %}
+                        {% set indicatorMarkDescriptor = indicatorMark
+                            ? indicatorMark.descriptor
+                            : null %}
+                        {% set selfAssessmentIndicatorMark = selfAssessmentFeedback
+                            ? selfAssessmentFeedback.rubricMarkedGrid.retrieveIndicatorMark(critUsage)
+                            : null %}
+
+                        {% for levelIndex, level in rubricGrid.levels %}
+
+                            {% set descriptor = critUsage.retrieveDescriptor(levelIndex) %}
+
+                            {% if descriptor %}
+
+                                {% set inputId %}{{ formField }}[{{ indicatorId }}][{{ level.id }}]{% endset %}
+                                {% set isDescriptorSelected = indicatorMarkDescriptor == descriptor %}
+                                {% set isMarkDisplayed      = isDescriptorSelected and rubricGrid.assessment.isFeedbackVisibleToUser(USER) %}
+                                {% set blindMode            = blindMode %}
+
+                                <td>
+                                    {# This container displays rubric levels for the mobile view. #}
+                                    <div class="hide-for-large-up l-pad-m hide-on-print"><p><b>{{ level.name | markdown }}</b></p></div>
+                                    {% include '@rubric/descriptor-markable.twig' %}
+                                </td>
+
+                            {% else %}
+                                <td class="rb-blank hide-for-medium-down">&nbsp;</td>
+                            {% endif %}
+
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+
+                {% include '@rubric/group-row-markable.twig' %}
+
             {% endfor %}
 
-            {% include '@rubric/group-row-markable.twig' %}
+            {% if showRubricTotal and markType.mode != "none"  %}
 
-    {% endfor %}
+                {% set rubricScaledMark = rubricMarkedGrid.calculateScaledMark ?? null %}
+                {% set rubricMax        = rubricGrid.calculateMaxValueFromCapabilities %}
 
-    {% if showRubricTotal and markType.mode != "none"  %}
+                <tr>
+                    <th class="rb-final-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
+                        <span data-final-summary="{{ rubricId }}"
+                            data-scaled-mark="{{ rubricScaledMark }}"
+                            data-max="{{ rubricMax }}"
+                            data-mark-type="{{ markType.mode }}">
 
-        {% set rubricScaledMark = rubricMarkedGrid.calculateScaledMark ?? null %}
-        {% set rubricMax        = rubricGrid.calculateMaxValueFromCapabilities %}
+                            {{ rubricMarkedGrid.retrieveHumanReadableMark ?? null }}
+                        </span>
 
-        <tr>
-            <th class="rb-final-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
-                <span data-final-summary="{{ rubricId }}"
-                      data-scaled-mark="{{ rubricScaledMark }}"
-                      data-max="{{ rubricMax }}"
-                      data-mark-type="{{ markType.mode }}">
-
-                    {{ rubricMarkedGrid.retrieveHumanReadableMark ?? null }}
-                </span>
-
-                {# Self-Assessment: only show the mark if it's self graded, as if it's self-reflect only they never marked themselves #}
-                {% if selfAssessmentFeedback is not null and selfAssessmentFeedback.isSelfGrading and selfAssessmentFeedback.humanReadableInstructorMark %}
-                    {# Although the student entered the mark using the display mark type, we show it here using the input mark type so that
-                     # it matches what the instructor is currently entering so it can be easily compared.
-                     #}
-                    ({{ selfAssessmentFeedback.humanReadableInstructorMark }} given in {{ locale.selfAssessment.proper }})
-                {% endif %}
-            </th>
-        </tr>
-    {% endif %}
+                        {# Self-Assessment: only show the mark if it's self graded, as if it's self-reflect only they never marked themselves #}
+                        {% if selfAssessmentFeedback is not null and selfAssessmentFeedback.isSelfGrading and selfAssessmentFeedback.humanReadableInstructorMark %}
+                            {# Although the student entered the mark using the display mark type, we show it here using the input mark type so that
+                            # it matches what the instructor is currently entering so it can be easily compared.
+                            #}
+                            ({{ selfAssessmentFeedback.humanReadableInstructorMark }} given in {{ locale.selfAssessment.proper }})
+                        {% endif %}
+                    </th>
+                </tr>
+            {% endif %}
 
         </tbody>
     </table>
