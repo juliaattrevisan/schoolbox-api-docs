@@ -372,6 +372,11 @@ button.submit {
     gap: var(--spacing-s);
 }
 
+// center align submit buttons
+.button.sbx-button.submit {
+    justify-content: center;
+}
+
 // a button with only SVG icons that displays inline with text
 .f-dropdown a.sbx-button--has-icon {
     display: flex;

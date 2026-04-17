@@ -312,18 +312,20 @@ export default {
             </div>
             <button
                 @click.prevent="onGenerateCodesSelected()"
-                class="button submit icon-tiles options-list__option"
+                class="button submit sbx-button options-list__option"
                 title="Generate codes"
                 :disabled="isGenerateCodesDisabled"
             >
+                <sbx-icon name="tiles"></sbx-icon>
                 {{ generateCodesStatus }}
             </button>
             <button
                 @click.prevent="onPrintSelected()"
-                class="button submit icon-print options-list__option"
+                class="button submit sbx-button options-list__option"
                 title="Print codes"
                 :disabled="!hasGeneratedCodes"
             >
+                <sbx-icon name="print"></sbx-icon>
                 Print codes
             </button>
         </div>
