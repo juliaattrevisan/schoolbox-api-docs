@@ -25,7 +25,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Find all campuses matching a certain name
+     * Find all languages matching a certain name
      *
      * @param string $name
      * @return GenericCollection|Model[]

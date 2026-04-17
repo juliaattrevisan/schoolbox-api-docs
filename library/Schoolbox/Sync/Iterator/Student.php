@@ -111,7 +111,7 @@ class Student extends IteratorIterator
 
         /* Language
          */
-        $language = new User\Student\Nationality();
+        $language = new User\Student\Language();
         $language->setName($currentResult['student_language'] ?? '');
         $language->setCode($currentResult['student_language_code'] ?? '');
         $student->getLanguage()->add($language);

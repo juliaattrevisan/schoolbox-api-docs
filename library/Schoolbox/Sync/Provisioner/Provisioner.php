@@ -603,9 +603,9 @@ class Provisioner
         $this->idToNameMap['nationalityCollection'] = array_combine($nationalities->getPropertyValues('id'), $nationalities->getPropertyValues('name'));
 
         /** @var LanguageMapper $languageMapper */
-        $languageMapper                             = $this->userMapper->getJoinMapper('user_language');
-        $nationalities                              = $languageMapper->findAll();
-        $this->idToNameMap['languageCollection'] = array_combine($nationalities->getPropertyValues('id'), $nationalities->getPropertyValues('name'));
+        $languageMapper                          = $this->userMapper->getJoinMapper('user_language');
+        $languages                               = $languageMapper->findAll();
+        $this->idToNameMap['languageCollection'] = array_combine($languages->getPropertyValues('id'), $languages->getPropertyValues('name'));
     }
 
     /**
