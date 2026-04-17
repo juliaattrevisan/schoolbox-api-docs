@@ -46,6 +46,10 @@ export default class CustomisationRecords {
         await expect(this.page.locator('tr[data-test^="lazy-grid-row-"]')).toHaveCount(count);
     }
 
+    async expectPaginationSummary(start: number, end: number, total: number): Promise<void> {
+        await expect(this.page.locator(".cursor-pagination b")).toHaveText(`${start}-${end} of ${total}`);
+    }
+
     async sortColumn(columnName: string, clicks: number = 1): Promise<void> {
         for (let index = 0; index < clicks; index += 1) {
             await this.page

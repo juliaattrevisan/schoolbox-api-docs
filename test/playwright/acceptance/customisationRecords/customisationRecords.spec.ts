@@ -60,6 +60,9 @@ test.describe("Customisation Records", () => {
         await customisationRecords.expectGridVisible();
         await customisationRecords.expectGridRecordCount(4);
 
+        tester.isGoingTo("verify the pagination summary at the bottom shows the proper number of records");
+        await customisationRecords.expectPaginationSummary(1, 4, 4);
+
         tester.isGoingTo("verify the first record shows the user picture, name, year, and campus");
         await customisationRecords.expectFirstUserDetailsVisible(["Ali,", "Year 9", "Secondary Student"]);
 
