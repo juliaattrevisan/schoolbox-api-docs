@@ -87,6 +87,23 @@ test.describe("Customisation Records", () => {
         await customisationRecords.expectFirstRowColumnToContain("type", "New Activity");
     });
 
+    test("exporting to csv downloads a file", async ({ tester, page }) => {
+        const customisationRecords: CustomisationRecords = new CustomisationRecords(tester, page);
+
+        try {
+            tester.isGoingTo("open the customisation records page and apply filters so export is available");
+            await customisationRecords.goto();
+            await customisationRecords.removeAllAppliedFilters();
+            await customisationRecords.applyFilters();
+            await customisationRecords.expectGridVisible();
+
+            tester.isGoingTo("export the customisation records to csv and confirm the file downloads");
+            await customisationRecords.expectCsvDownload("report-customisation_records.csv.csv");
+        } finally {
+            // No cleanup required for CSV export verification.
+        }
+    });
+
     test("create customisation and check it is properly presented in the grid", async ({ tester, page, db }) => {
         const customisationRecords: CustomisationRecords = new CustomisationRecords(tester, page);
         const studentParticipation = new StudentParticipation(tester, page);

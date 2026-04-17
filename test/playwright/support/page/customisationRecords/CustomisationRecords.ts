@@ -38,6 +38,16 @@ export default class CustomisationRecords {
         await this.page.getByTestId(CustomisationRecords.DATA_TEST_APPLY_FILTERS_BUTTON).click();
     }
 
+    async expectCsvDownload(expectedFileName: string): Promise<void> {
+        const [download] = await Promise.all([
+            this.page.waitForEvent("download"),
+            this.page.getByRole("link", { name: "Export to CSV" }).click(),
+        ]);
+
+        await expect(download.failure()).resolves.toBeNull();
+        expect(download.suggestedFilename()).toBe(expectedFileName);
+    }
+
     async expectGridVisible(): Promise<void> {
         await expect(this.page.getByTestId(CustomisationRecords.DATA_TEST_FIRST_USER_CELL)).toBeVisible();
     }
