@@ -53,9 +53,9 @@ class Decorator implements DecoratorInterface
     /**
      * Calculates $hours + $minutes into seconds
      *
-     * Technical Uplift Candidate:
-     * Note that this duped QuizDecorator. This is the second time it's been in use, so the next time we do this,
-     * it's probably worth splitting out.
+     * TODO Technical Uplift Candidate:
+     *  Note that this duped QuizDecorator. This is the second time it's been in use, so the next time we do this,
+     *  it's probably worth splitting out.
      *
      * @param int $hours
      * @param int $minutes
