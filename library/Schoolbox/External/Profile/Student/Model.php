@@ -43,6 +43,8 @@ class Model
      */
     private ?string $campusName = null;
 
+    private ?string $nationality = null;
+
     /**
      * @var string|null
      */
@@ -990,6 +992,24 @@ class Model
     public function setCampusName(?string $campusName): self
     {
         $this->campusName = $campusName;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getNationality(): ?string
+    {
+        return  $this->nationality;
+    }
+
+    /**
+     * @param string|null $nationality
+     * @return $this
+     */
+    public function setNationality(?string $nationality): self
+    {
+        $this->nationality = $nationality;
         return $this;
     }
 }
