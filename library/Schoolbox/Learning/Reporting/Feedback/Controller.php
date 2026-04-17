@@ -163,11 +163,6 @@ class Controller extends Base
             'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())
                 ->add([ $assessment->getTitle(), $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) ])
                 ->add(['Feedback', '']),
-            'carousel' =>  (new \Schoolbox\Learning\Reporting\Feedback\StudentCarousel\Standard(
-                $this->routeGenerator,
-                $learner,
-                $assessment
-            )),
             /* Participant Carousel; note that this is aliased to "students" in the twig fragment
              */
             'participantCarousel' => $participantCarousel,

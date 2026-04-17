@@ -4,8 +4,9 @@
  #
  # Cycle through students participating in an assessment
  #
- # @param array   $students          - an array of students to populate the selector, each item is directly passed into selectize
- # @param int     $selectedStudentId - the currently selected student's user ID
+ # @param IAssessable $assessment  A reporting instance
+ # @param array $students          an array of students to populate the selector, each item is directly passed into selectize
+ # @param int$selectedStudentId    the currently selected student's user ID
  #}
 
 <script src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
