@@ -12,6 +12,8 @@ export default class CustomisationRecords {
 
     static readonly DATA_TEST_FIRST_USER_CELL = "lazy-grid-row-cell-0-0-user";
 
+    static readonly DATA_TEST_RECORDS_CONTAINER = "customisation-records-container";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -44,6 +46,19 @@ export default class CustomisationRecords {
         await expect(this.page.locator('tr[data-test^="lazy-grid-row-"]')).toHaveCount(count);
     }
 
+    async sortColumn(columnName: string, clicks: number = 1): Promise<void> {
+        for (let index = 0; index < clicks; index += 1) {
+            await this.page
+                .getByTestId(CustomisationRecords.DATA_TEST_RECORDS_CONTAINER)
+                .getByRole("button", { name: columnName })
+                .click();
+        }
+    }
+
+    async expectFirstRowColumnToContain(columnKey: string, value: string): Promise<void> {
+        await expect(this.getRowCell(0, columnKey)).toContainText(value);
+    }
+
     async expectFirstUserDetailsVisible(values: string[]): Promise<void> {
         const firstUserCell = this.getFirstUserCell();
 
@@ -56,5 +71,17 @@ export default class CustomisationRecords {
 
     private getFirstUserCell(): Locator {
         return this.page.getByTestId(CustomisationRecords.DATA_TEST_FIRST_USER_CELL);
+    }
+
+    private getRowCell(rowIndex: number, columnKey: string): Locator {
+        const columnIndexMap: Record<string, number> = {
+            user: 0,
+            created_at: 1,
+            class: 2,
+            unit: 3,
+            type: 4,
+        };
+
+        return this.page.getByTestId(`lazy-grid-row-cell-${rowIndex}-${columnIndexMap[columnKey]}-${columnKey}`);
     }
 }
