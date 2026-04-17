@@ -88,19 +88,25 @@ window.Vue.onMounted(() => {
         <th>
             <span class="sequencer">
                 <a
-                    class="icon-up-arrow"
+                    class="sbx-icon-only-button no-text"
                     :class="{ disabled: !props.canMovePrev }"
                     title="Move up"
+                    aria-label="Move up"
                     :aria-disabled="!props.canMovePrev"
                     @click.prevent="props.canMovePrev && emit('move', -1)"
-                ></a>
+                >
+                    <sbx-icon name="up-arrow" />
+                </a>
                 <a
-                    class="icon-down-arrow"
+                    class="sbx-icon-only-button no-text"
                     :class="{ disabled: !props.canMoveNext }"
                     title="Move down"
+                    aria-label="Move down"
                     :aria-disabled="!props.canMoveNext"
                     @click.prevent="props.canMoveNext && emit('move', 1)"
-                ></a>
+                >
+                    <sbx-icon name="down-arrow" />
+                </a>
             </span>
 
             <input

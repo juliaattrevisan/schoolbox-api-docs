@@ -31,19 +31,25 @@ const componentId = window.Vue.useId();
 
         <span class="sequencer">
             <a
-                class="icon-previous"
+                class="sbx-icon-only-button no-text"
                 :class="{ disabled: !props.canMovePrev }"
                 title="Move left"
+                aria-label="Move left"
                 :aria-disabled="!props.canMovePrev"
                 @click.prevent="props.canMovePrev && emit('move', -1)"
-            ></a>
+            >
+                <sbx-icon name="previous" />
+            </a>
             <a
-                class="icon-next"
+                class="sbx-icon-only-button no-text"
                 :class="{ disabled: !props.canMoveNext }"
                 title="Move right"
+                aria-label="Move right"
                 :aria-disabled="!props.canMoveNext"
                 @click.prevent="props.canMoveNext && emit('move', 1)"
-            ></a>
+            >
+                <sbx-icon name="next" />
+            </a>
         </span>
     </th>
 </template>
