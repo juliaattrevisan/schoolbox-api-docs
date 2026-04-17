@@ -13,6 +13,7 @@
                 configuration-endpoint="{{ routeLookupIfAuthorized('internationalBaccalaureate.getConfigurationData') }}"
                 save-endpoint="{{ routeLookupIfAuthorized('internationalBaccalaureate.saveConfiguration') }}"
                 subjects-endpoint="{{ routeLookupIfAuthorized('internationalBaccalaureate.getCategorySubjects') }}"
+                :languages="{{ (languages ?? []) | json_encode }}"
             />
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/ibConfiguration.js?v={{ config.site_version }}"></script>

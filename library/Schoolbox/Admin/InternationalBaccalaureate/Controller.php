@@ -13,15 +13,33 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\InternationalBaccalaureate;
 
 use Alaress\Database\Predicate;
+use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Exception;
+use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IB\Group\Mapper as IBGroupMapper;
+use Schoolbox\IB\Group\Model as IBGroupModel;
 use Schoolbox\IB\GroupSubject\Mapper as IBGroupSubjectMapper;
+use Schoolbox\Language\Mapper as LanguageMapper;
+use Schoolbox\Language\Model as LanguageModel;
 
 class Controller extends ConfigController
 {
+    public function __construct(
+        ConfigMapper $configMapper,
+        private IBGroupMapper $groupMapper,
+        private IBGroupSubjectMapper $groupSubjectMapper,
+        private LanguageMapper $languageMapper,
+        FieldStrategyFactory $fieldStrategyFactory,
+        Rebuilder $rebuilder,
+        CacheInterface $oidcCache
+    ) {
+        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
+    }
+
     /**
      * DP Subject Configuration page
      *
@@ -36,28 +54,37 @@ class Controller extends ConfigController
             [
                 'id' => 0,
                 'name' => 'general',
-                'title' => 'General Configuration'
-            ]
+                'title' => 'General Configuration',
+            ],
         ];
 
         // Fetch IB groups from database
-        $groupMapper = new IBGroupMapper();
-        $groupModels = $groupMapper->findAll();
+        $groupModels = $this->groupMapper->findAll();
 
+        /** @var IBGroupModel $groupModel */
         foreach ($groupModels as $groupModel) {
             $categories[] = [
                 'id' => $groupModel->getId(),
                 'name' => strtolower(str_replace(' ', '-', $groupModel->getName())),
-                'title' => $groupModel->getName()
+                'title' => $groupModel->getName(),
             ];
         }
+
+        $languages = $this->languageMapper->findAll()->map(
+            fn(LanguageModel $language) => [
+                'id' => $language->getId(),
+                'code' => $language->getCode(),
+                'name' => $language->getName(),
+            ]
+        );
 
         $this->response = $this->responseFromTemplate(
             '@internationalBaccalaureate/configuration.twig',
             [
                 'pageCurrent' => $pageCurrent,
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
-                'categories' => $categories
+                'categories' => $categories,
+                'languages' => $languages,
             ]
         );
     }
@@ -81,7 +108,7 @@ class Controller extends ConfigController
                     'value' => $configLoader->get(ConfigMapper::NAME_IB_SCHOOL_NAME) ?? '',
                     'description' => 'Enter the school\'s name as registered with the IB.',
                     'type' => 'text',
-                    'label' => 'School Name'
+                    'label' => 'School Name',
                 ],
                 [
                     'categoryId' => 0,
@@ -89,7 +116,7 @@ class Controller extends ConfigController
                     'value' => $configLoader->get(ConfigMapper::NAME_IB_SCHOOL_CODE) ?? '',
                     'description' => 'Enter the school\'s code as provided by the IB.',
                     'type' => 'text',
-                    'label' => 'School Code'
+                    'label' => 'School Code',
                 ],
             ];
         }
@@ -105,16 +132,19 @@ class Controller extends ConfigController
     public function getCategorySubjects(int $groupId): void
     {
         try {
-            $groupSubjectMapper = new IBGroupSubjectMapper();
-            $groupSubjects = $groupSubjectMapper->findByColumn('group_id', $groupId, [
-                'order' => ['s.name' => 'ASC', 'level' => 'ASC'],
-            ]);
+            $groupSubjects = $this->groupSubjectMapper->findByColumn(
+                'group_id',
+                $groupId,
+                [
+                    'order' => ['s.name' => 'ASC', 'level' => 'ASC'],
+                ]
+            );
 
             $subjects = [];
             foreach ($groupSubjects as $groupSubject) {
                 $subjects[] = [
                     'subject' => $groupSubject->getSubject()->getName(),
-                    'level' => $groupSubject->getLevel() ?: ''
+                    'level' => $groupSubject->getLevel() ?: '',
                 ];
             }
 
@@ -165,7 +195,7 @@ class Controller extends ConfigController
             '@internationalBaccalaureate/registrations.twig',
             [
                 'pageCurrent' => $pageCurrent,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent)
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
             ]
         );
     }
