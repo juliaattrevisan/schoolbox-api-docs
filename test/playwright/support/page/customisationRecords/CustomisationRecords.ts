@@ -61,16 +61,23 @@ export default class CustomisationRecords {
     }
 
     async clickFirstRowColumnLink(columnKey: string): Promise<void> {
-        await this.page.locator(`tr[data-test^="lazy-grid-row-"] [data-test$="-${columnKey}"] a`).first().click();
+        const link = this.page.locator(`tr[data-test^="lazy-grid-row-"] [data-test$="-${columnKey}"] a`).first();
+
+        await link.scrollIntoViewIfNeeded();
+        await expect(link).toBeVisible();
+        await link.click();
     }
 
     async clickRowColumnLink(rowText: string, columnKey: string): Promise<void> {
-        await this.page
+        const link = this.page
             .locator('tr[data-test^="lazy-grid-row-"]')
             .filter({ hasText: rowText })
             .locator(`[data-test$="-${columnKey}"] a`)
-            .first()
-            .click();
+            .first();
+
+        await link.scrollIntoViewIfNeeded();
+        await expect(link).toBeVisible();
+        await link.click();
     }
 
     async sortColumn(columnName: string, clicks: number = 1): Promise<void> {

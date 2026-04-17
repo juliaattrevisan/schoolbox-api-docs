@@ -208,6 +208,14 @@ test.describe("Customisation Records", () => {
                 unitTitle,
                 "New Activity",
             ]);
+
+            tester.isGoingTo(
+                "click the customised activity link for the new activity and verify it redirects to the activity view page",
+            );
+            await Promise.all([
+                page.waitForURL(/\/learning\/assessments\/\d+(?:\/\d+)?(?:\?.*)?$/),
+                customisationRecords.clickRowColumnLink(customActivityTitle, "customised_activity"),
+            ]);
         } finally {
             await cleanupCustomActivity(db, customActivityTitle);
         }
