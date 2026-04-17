@@ -60,6 +60,10 @@ export default class CustomisationRecords {
         await expect(this.page.locator(".cursor-pagination b")).toHaveText(`${start}-${end} of ${total}`);
     }
 
+    async clickFirstRowColumnLink(columnKey: string): Promise<void> {
+        await this.page.locator(`tr[data-test^="lazy-grid-row-"] [data-test$="-${columnKey}"] a`).first().click();
+    }
+
     async sortColumn(columnName: string, clicks: number = 1): Promise<void> {
         for (let index = 0; index < clicks; index += 1) {
             await this.page

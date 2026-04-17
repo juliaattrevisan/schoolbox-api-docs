@@ -104,6 +104,26 @@ test.describe("Customisation Records", () => {
         }
     });
 
+    test("clicking the original activity redirects to the activity view page", async ({ tester, page }) => {
+        const customisationRecords: CustomisationRecords = new CustomisationRecords(tester, page);
+
+        try {
+            tester.isGoingTo(
+                "open the customisation records page and apply filters so the original activity links are shown",
+            );
+            await customisationRecords.goto();
+            await customisationRecords.removeAllAppliedFilters();
+            await customisationRecords.applyFilters();
+            await customisationRecords.expectGridVisible();
+
+            tester.isGoingTo("click the original activity link and verify it redirects to the activity view page");
+            await customisationRecords.clickFirstRowColumnLink("original_activity");
+            await expect(page).toHaveURL(/\/learning\/assessments\/\d+(?:\/\d+)?(?:\?.*)?$/);
+        } finally {
+            // No cleanup required for navigation verification.
+        }
+    });
+
     test("create customisation and check it is properly presented in the grid", async ({ tester, page, db }) => {
         const customisationRecords: CustomisationRecords = new CustomisationRecords(tester, page);
         const studentParticipation = new StudentParticipation(tester, page);
