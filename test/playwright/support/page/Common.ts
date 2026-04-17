@@ -155,6 +155,9 @@ export default class Common {
      */
     static readonly DATA_TEST_EMPTY_STATE = "course-list-results-empty-state";
 
+    // empty state text eg: share learning moments, set goals etc
+    static readonly STUDENT_META_TEXT = "ul.meta";
+
     constructor(page: Page) {
         this.page = page;
     }
@@ -521,5 +524,34 @@ export default class Common {
      */
     async verifyEmptyStateIsShown(): Promise<void> {
         await expect(this.page.getByTestId(Common.DATA_TEST_EMPTY_STATE)).toBeVisible();
+    }
+
+    /**
+     * Check whether or not the meta is presenting the proper student name for one or more students
+     * @param expectedStudentNames - The student names that should be present in the meta, e.g. ["Ms Jana Reed", "Jamal Ali"]
+     * @param notExpectedStudentNames - The student names that should not be present in the meta, e.g. ["Ms Penelope Li"]
+     */
+    async checkMetaStudentNames(expectedStudentNames: string[], notExpectedStudentNames: string[] = []): Promise<void> {
+        for (const expectedStudentName of expectedStudentNames) {
+            await expect(this.page.locator(Common.STUDENT_META_TEXT)).toContainText(expectedStudentName);
+        }
+        for (const notExpectedStudentName of notExpectedStudentNames) {
+            await expect(this.page.locator(Common.STUDENT_META_TEXT)).not.toContainText(notExpectedStudentName);
+        }
+    }
+
+    /**
+     * Check text under the selectize-input class element
+     * @param expectedTexts - The texts that should be present in the selectize input, e.g. ["Ms Jana Reed", "Jamal Ali"]
+     * @param notExpectedTexts - The texts that should not be present in the selectize input, e.g. ["Ms Penelope Li"]
+     */
+    async checkSelectizeInput(expectedTexts: string[], notExpectedTexts: string[] = []): Promise<void> {
+        const selectizeInput = this.page.locator(".has-options");
+        for (const expectedText of expectedTexts) {
+            await expect(selectizeInput).toContainText(expectedText);
+        }
+        for (const notExpectedText of notExpectedTexts) {
+            await expect(selectizeInput).not.toContainText(notExpectedText);
+        }
     }
 }
