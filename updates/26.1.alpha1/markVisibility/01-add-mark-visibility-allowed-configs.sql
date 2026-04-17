@@ -33,13 +33,13 @@ VALUES (
     'Enable grade visibility options involving students',
     (
         CASE @submissionVisibilityMax
-            WHEN 0 THEN ‘0’
-            WHEN 1 THEN ‘1’
-            WHEN 2 THEN ‘1’
-            ELSE ‘0’
+            WHEN 0 THEN '0'
+            WHEN 1 THEN '1'
+            WHEN 2 THEN '1'
+            ELSE '0'
         END
     ),
-    "Toggling this to ‘ON’ will allow grade visibility options involving students to be selected.  Changing this setting will not affect already published grades.",
+    "Toggling this to 'ON' will allow grade visibility options involving students to be selected.  Changing this setting will not affect already published grades.",
     @fieldIdBoolean,
     @typeIdLmsPolicy,
     'true',
@@ -56,13 +56,13 @@ VALUES (
     'Enable grade visibility options involving parents',
     (
         CASE @submissionVisibilityMax
-            WHEN 0 THEN ‘0’
-            WHEN 1 THEN ‘0’
-            WHEN 2 THEN ‘1’
-            ELSE ‘0’
+            WHEN 0 THEN '0'
+            WHEN 1 THEN '0'
+            WHEN 2 THEN '1'
+            ELSE '0'
         END
     ),
-    "Toggling this to ‘ON’ will allow grade visibility options involving parents to be selected.  Changing this setting will not affect already published grades.",
+    "Toggling this to 'ON' will allow grade visibility options involving parents to be selected.  Changing this setting will not affect already published grades.",
     @fieldIdBoolean,
     @typeIdLmsPolicy,
     'true',
