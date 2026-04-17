@@ -1,0 +1,21 @@
+/**
+ * Box drop shadow config
+ * Applied to UI "boxes" in Advanced UI
+ * Box = surface on page background (not inside an island)
+ */
+
+:root {
+    --sbx-config-box-drop-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+body.sbx-body {
+    //Base box surfaces
+    .island section,
+    .c-island,
+    .empty-state,
+    .empty-state-flex-centered,
+    .hybrid-bar,
+    .scrollable:has(table.timetable) {
+        box-shadow: var(--sbx-config-box-drop-shadow);
+    }
+}
