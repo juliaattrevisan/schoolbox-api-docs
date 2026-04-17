@@ -59,6 +59,16 @@ export default class CustomisationRecords {
         await expect(this.getRowCell(0, columnKey)).toContainText(value);
     }
 
+    async expectGridRowVisibleWithValues(values: string[]): Promise<void> {
+        const row = this.page.locator('tr[data-test^="lazy-grid-row-"]').filter({ hasText: values[0] });
+
+        await expect(row).toBeVisible();
+
+        for (const value of values) {
+            await expect(row).toContainText(value);
+        }
+    }
+
     async expectFirstUserDetailsVisible(values: string[]): Promise<void> {
         const firstUserCell = this.getFirstUserCell();
 

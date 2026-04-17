@@ -62,6 +62,43 @@ export default class StudentParticipation {
     }
 
     /**
+     * Check whether the student's row currently contains the given text
+     * @param studentName - The name of the student for row lookup
+     * @param text - The text to look for in the row
+     * @returns Whether the row contains the given text
+     */
+    async studentRowContainsText(studentName: string, text: string): Promise<boolean> {
+        const studentRow = this.page.locator("tr").filter({ hasText: studentName });
+        return (await studentRow.getByText(text).count()) > 0;
+    }
+
+    /**
+     * Remove any existing customisation for a student if one is present
+     * @param userId - The user ID of the student
+     * @param studentName - The name of the student for verification
+     * @returns Whether a customisation was present and removed
+     */
+    async removeAnyCustomisationIfPresent(userId: string, studentName: string): Promise<boolean> {
+        this.tester.isGoingTo(`Check whether participant ${userId} (${studentName}) already has a customisation`);
+        await this.page
+            .getByTestId(StudentParticipation.DATA_TEST_POP_OUT_PARTICIPANT_BUTTON.replace("{userId}", userId))
+            .click();
+
+        const removeCustomisationButton = this.page
+            .locator(`[id="participant-${userId}"]`)
+            .getByRole("button", { name: /Remove Customisation/ });
+
+        if ((await removeCustomisationButton.count()) === 0) {
+            return false;
+        }
+
+        this.tester.isGoingTo("Remove the existing customisation");
+        await removeCustomisationButton.click();
+        await expect(this.page.getByText("Customisation removed successfully")).toBeVisible();
+        return true;
+    }
+
+    /**
      * choose one of the activities to create for a specific student
      * @param activityType - The type of activity to create: task, dueWork, quiz
      */
