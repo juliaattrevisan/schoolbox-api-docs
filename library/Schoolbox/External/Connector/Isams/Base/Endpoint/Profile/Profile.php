@@ -209,6 +209,7 @@ class Profile implements IStrategy
             $yearLevel = trim((string)$student->NCYear);
 
             $nationalities = trim((string)$student->Nationalities);
+            $languages = trim((string)$student->Languages);
 
             /* A shortcut for convenience in logging
              * (Sometimes people don't have all the parts of their name; odd but ok)
@@ -357,7 +358,8 @@ class Profile implements IStrategy
                 /* SEN (Special Education Needs)
                  */
                 ->setSpecialNeeds($this->findSpecialNeeds($studentId))
-                ->setNationality($nationalities);
+                ->setNationalities($nationalities)
+                ->setLanguages($languages);
 
 
             /* Date of birth requires special treatment as ADF doesn't deal with nulls well

@@ -43,7 +43,8 @@ class Model
      */
     private ?string $campusName = null;
 
-    private ?string $nationality = null;
+    private ?string $nationalities = null;
+    private ?string $languages = null;
 
     /**
      * @var string|null
@@ -998,18 +999,29 @@ class Model
     /**
      * @return string|null
      */
-    public function getNationality(): ?string
+    public function getNationalities(): ?string
     {
-        return  $this->nationality;
+        return  $this->nationalities;
     }
 
     /**
-     * @param string|null $nationality
+     * @param string|null $nationalities
      * @return $this
      */
-    public function setNationality(?string $nationality): self
+    public function setNationalities(?string $nationalities): self
     {
-        $this->nationality = $nationality;
+        $this->nationalities = $nationalities;
+        return $this;
+    }
+
+    public function getLanguages(): ?string
+    {
+        return $this->languages;
+    }
+
+    public function setLanguages(?string $languages): self
+    {
+        $this->languages = $languages;
         return $this;
     }
 }
