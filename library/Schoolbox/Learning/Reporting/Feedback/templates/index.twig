@@ -33,9 +33,7 @@
 {# Participant Carousel #}
 {% block participantCarousel %}
     {% include '@learningReportingFeedback/participantCarousel.twig' with {
-        participant: participant,
         assessment: assessment,
-        blindMode: false,
         students: participantCarousel,
         selectedStudentId: learner.id
     } only %}
