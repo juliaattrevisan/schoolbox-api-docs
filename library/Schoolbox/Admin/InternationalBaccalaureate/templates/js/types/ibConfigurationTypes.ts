@@ -19,3 +19,9 @@ export type IBConfiguration = {
     description?: string;
     type: string;
 };
+
+export type IBLanguages = {
+    id: number;
+    code: string;
+    name: string;
+};

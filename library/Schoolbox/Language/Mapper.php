@@ -21,6 +21,7 @@ class Mapper extends BaseMapper
         $this->hasTable('lu_language');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('code', self::TYPE_STRING);
         $this->uses('name', self::TYPE_STRING);
     }
 
@@ -58,5 +59,13 @@ class Mapper extends BaseMapper
         }
 
         return $allLanguages;
+    }
+
+    protected function getDefaultOrderByParams(): array
+    {
+        return [
+            'name' => self::SORT_ORDER_ASC,
+            'code' => self::SORT_ORDER_ASC
+        ];
     }
 }

@@ -2,6 +2,7 @@
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import LanguageSelectionModal from "./language-selection-modal.vue";
+import type { IBLanguages } from "../js/types/ibConfigurationTypes";
 
 interface SubjectRow {
     id: string;
@@ -21,6 +22,7 @@ interface Props {
     categoryId: number;
     saveEndpoint: string;
     ibSubjects: Array<{ subject: string; level: string }>;
+    ibLanguages: IBLanguages[];
 }
 
 const props = defineProps<Props>();
@@ -36,6 +38,19 @@ const isCoreCategory = window.Vue.computed(() => {
     return props.categoryName.toLowerCase() === "core";
 });
 
+const defaultLanguageCode = window.Vue.computed<string | null>(() => {
+    const englishLanguage = props.ibLanguages.find((language) => {
+        const languageCode = language.code.toLowerCase();
+        return language.name.toLowerCase() === "english" || languageCode === "en" || languageCode === "eng";
+    });
+
+    return englishLanguage?.code ?? props.ibLanguages[0]?.code ?? null;
+});
+
+function getDefaultLanguages(): string[] {
+    return defaultLanguageCode.value ? [defaultLanguageCode.value] : [];
+}
+
 /**
  * Initializes subject rows from the ibSubjects prop.
  */
@@ -48,7 +63,7 @@ function initializeSubjectRows(): void {
             id: `diploma_${index}`,
             subject: subjectData.subject,
             level: subjectData.level,
-            languages: ["en"], // English selected by default
+            languages: getDefaultLanguages(),
             classCode: "",
             studentCount: 0,
             tableType: "Diploma Program Year 2 [Diploma]",
@@ -58,7 +73,7 @@ function initializeSubjectRows(): void {
             id: `course_${index}`,
             subject: subjectData.subject,
             level: subjectData.level,
-            languages: ["en"], // English selected by default
+            languages: getDefaultLanguages(),
             classCode: "",
             studentCount: 0,
             tableType: "Diploma Course [Course]",
@@ -76,7 +91,7 @@ function initializeSubjectRows(): void {
             id: `${props.categoryName}_subject_${index}`,
             subject: subjectData.subject,
             level: subjectData.level,
-            languages: [],
+            languages: getDefaultLanguages(),
             classCode: "",
             studentCount: 0,
         }));
@@ -194,29 +209,9 @@ function getLanguageDisplayText(row: SubjectRow): string {
  * @returns The language name
  */
 function getLanguageName(code: string): string {
-    const languageNames: { [key: string]: string } = {
-        en: "English",
-        es: "Spanish",
-        fr: "French",
-        de: "German",
-        it: "Italian",
-        pt: "Portuguese",
-        ru: "Russian",
-        zh: "Chinese",
-        ja: "Japanese",
-        ko: "Korean",
-        ar: "Arabic",
-        hi: "Hindi",
-        nl: "Dutch",
-        sv: "Swedish",
-        no: "Norwegian",
-        da: "Danish",
-        fi: "Finnish",
-        pl: "Polish",
-        cs: "Czech",
-        hu: "Hungarian",
-    };
-    return languageNames[code] || code;
+    const matchedLanguage = props.ibLanguages.find((language) => language.code.toLowerCase() === code.toLowerCase());
+
+    return matchedLanguage?.name || code;
 }
 
 /**
@@ -226,7 +221,7 @@ function getLanguageName(code: string): string {
 function getCurrentRowLanguages(): string[] {
     if (!currentEditingRow.value) return [];
     const row = subjectRows.value.find((r) => r.id === currentEditingRow.value);
-    return row?.languages || [];
+    return row?.languages.length ? row.languages : getDefaultLanguages();
 }
 
 /**
@@ -545,6 +540,7 @@ async function saveSubjectConfiguration(): Promise<void> {
 
         <LanguageSelectionModal
             v-model:is-open="isLanguageModalOpen"
+            :available-languages="props.ibLanguages"
             :selected-languages="getCurrentRowLanguages()"
             @close="closeLanguageModal"
             @languages-selected="onLanguagesSelected"

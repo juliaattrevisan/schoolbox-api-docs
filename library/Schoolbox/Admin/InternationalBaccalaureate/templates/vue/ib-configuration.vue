@@ -9,13 +9,14 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import IBGeneralConfig from "./components/ib-general-config.vue";
 import IBSubjectTable from "./components/ib-subject-table.vue";
-import type { IBCategory, IBConfiguration } from "../js/types/ibConfigurationTypes";
+import type { IBCategory, IBConfiguration, IBLanguages } from "../js/types/ibConfigurationTypes";
 
 interface Props {
     categories: IBCategory[]; // The IB subject group categories to display
     configurationEndpoint: string; // The endpoint to fetch configuration data from
     saveEndpoint: string; // The endpoint to save configuration data to
     subjectsEndpoint: string; // The endpoint to fetch subjects for a category
+    languages: IBLanguages[];
 }
 const props = defineProps<Props>();
 
@@ -158,6 +159,7 @@ window.Vue.onMounted((): void => {
                     :category-id="currentCategory.id"
                     :save-endpoint="saveEndpoint"
                     :ib-subjects="currentSubjectsFromAPI"
+                    :ib-languages="languages"
                 />
             </div>
         </section>
