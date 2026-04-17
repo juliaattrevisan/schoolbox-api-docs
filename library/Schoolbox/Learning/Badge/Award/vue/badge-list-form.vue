@@ -432,7 +432,9 @@ export default {
         ></badge-list>
 
         <ul class="flex-list buttons">
-            <li><a :href="returnUrl" class="button">Return to previous page</a></li>
+            <li>
+                <a :href="returnUrl" class="button" data-test="badge-page-return-button">Return to previous page</a>
+            </li>
         </ul>
 
         <bottom-drawer :showDrawer="selectedBadges.length > 0">

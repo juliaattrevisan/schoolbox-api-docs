@@ -608,6 +608,7 @@ export default {
                 <ul class="flex-list flex-wrap buttons">
                     <li v-if="learningMomentsEnabled">
                         <a
+                            data-test="class-list-share-learning-moment-button"
                             @click.prevent="openShareLearningMomentDialog"
                             :class="{
                                 'sbx-button--has-icon': true,
@@ -620,11 +621,13 @@ export default {
                         <a
                             :href="buildSetGoalUrl()"
                             :class="{ 'sbx-button--has-icon': true, disabled: selectedStudentIds.length === 0 }"
+                            data-test="class-list-set-goal-button"
                             ><sbx-icon name="goal"></sbx-icon>Set Goals</a
                         >
                     </li>
                     <li v-if="badgesEnabled">
                         <a
+                            data-test="class-list-award-achievement-button"
                             :href="buildAwardAchievementUrl()"
                             :class="{ 'sbx-button--has-icon': true, disabled: selectedStudentIds.length === 0 }"
                             ><sbx-icon name="achievement"></sbx-icon>Award Achievements</a
@@ -632,6 +635,7 @@ export default {
                     </li>
                     <li v-if="pastoralEnabled">
                         <a
+                            data-test="class-list-add-pastoral-record-button"
                             @click.prevent="addPastoralRecord"
                             :class="{ 'sbx-button--has-icon': true, disabled: selectedStudentIds.length === 0 }"
                             ><sbx-icon name="user"></sbx-icon>Add {{ pastoralCareLabel }} Record</a
@@ -639,6 +643,7 @@ export default {
                     </li>
                     <li v-if="mailEnabled && currentUserCanEmail">
                         <a
+                            data-test="class-list-compose-email-button"
                             @click.prevent="openMailDialog"
                             :class="{ disabled: selectedStudentExternalIds.length === 0 }"
                             class="sbx-button--has-icon"
@@ -664,17 +669,21 @@ export default {
                         <tr>
                             <th width="40" v-if="showCheckboxes">
                                 <input type="checkbox" id="select-all" v-model="allSelected" />
-                                <label for="select-all" class="checkbox-label"></label>
+                                <label for="select-all" class="checkbox-label" data-test="checkbox-select-all"></label>
                             </th>
                             <td></td>
                             <th>Name</th>
                             <th class="show-for-medium-up" v-if="differentiationEnabled">
                                 {{ locale.differentiationProfile.translate(false, true) }}
                             </th>
-                            <th class="show-for-large-up">{{ yearLevelLabel }}</th>
+                            <th class="show-for-large-up" data-test="class-list-year-level-column">
+                                {{ yearLevelLabel }}
+                            </th>
                             <th class="show-for-large-up" v-if="showTutorGroupColumn">Tutor Group</th>
                             <th class="show-for-medium-up" v-if="showCoreGroupColumn">Core Group</th>
-                            <th class="show-for-medium-up" v-if="showHouseColumn">{{ houseLabel }}</th>
+                            <th class="show-for-medium-up" v-if="showHouseColumn" data-test="class-list-house-column">
+                                {{ houseLabel }}
+                            </th>
                             <th class="show-for-medium-up">Last Visited</th>
                             <td></td>
                         </tr>
@@ -688,7 +697,11 @@ export default {
                                     :id="'id-' + index"
                                     v-model="student.isChecked"
                                 />
-                                <label :for="'id-' + index" class="checkbox-label"></label>
+                                <label
+                                    :for="'id-' + index"
+                                    class="checkbox-label"
+                                    :data-test="`checkbox-${student.id}`"
+                                ></label>
                             </td>
                             <td>
                                 <img
@@ -700,7 +713,10 @@ export default {
                                 <div class="l-flex-col l-gap-s">
                                     <div class="l-flex-row l-gap-s">
                                         <template v-if="student.id">
-                                            <a :href="'/search/user/' + student.id">
+                                            <a
+                                                :data-test="`class-list-${student.id}-username`"
+                                                :href="'/search/user/' + student.id"
+                                            >
                                                 {{ student.lastname + ", " + student.firstname }}
                                                 {{
                                                     student.preferredname && student.preferredname != student.firstname
@@ -759,7 +775,12 @@ export default {
                                     >
                                         <slot name="student-menu-items" v-bind:student="student">
                                             <li v-for="(element, index) in student.routes" :key="index">
-                                                <a :href="element.href" :class="element.class" :title="element.title">
+                                                <a
+                                                    :data-test="`class-list-${student.id}-menu-item-${element.label}`"
+                                                    :href="element.href"
+                                                    :class="element.class"
+                                                    :title="element.title"
+                                                >
                                                     <sbx-icon v-if="element.icon" :name="element.icon"></sbx-icon>
                                                     {{ element.label }}
                                                 </a>
@@ -780,13 +801,27 @@ export default {
                                     View {{ locale.differentiationProfile.translate(false, true) }}
                                 </button>
                             </td>
-                            <td class="show-for-large-up">{{ student.yearlevel }}</td>
-                            <td class="show-for-medium-up" v-if="showTutorGroupColumn">
+                            <td class="show-for-large-up" :data-test="`class-list-${student.id}-year-level`">
+                                {{ student.yearlevel }}
+                            </td>
+                            <td
+                                class="show-for-medium-up"
+                                v-if="showTutorGroupColumn"
+                                data-test="class-list-tutor-group-column"
+                            >
                                 {{ student.StudentTutorDescription }}
                             </td>
                             <td class="show-for-medium-up" v-if="showCoreGroupColumn">{{ student.StudentForm }}</td>
-                            <td class="show-for-medium-up" v-if="showHouseColumn">{{ student.house }}</td>
-                            <td class="show-for-medium-up">{{ student.lastAccessTime }}</td>
+                            <td
+                                class="show-for-medium-up"
+                                v-if="showHouseColumn"
+                                :data-test="`class-list-${student.id}-house`"
+                            >
+                                {{ student.house }}
+                            </td>
+                            <td class="show-for-medium-up" :data-test="`class-list-${student.id}-last-access-time`">
+                                {{ student.lastAccessTime }}
+                            </td>
                             <td class="no-pad">
                                 <div class="actions-small-1" v-if="student.id && Object.keys(student.routes).length">
                                     <nav>

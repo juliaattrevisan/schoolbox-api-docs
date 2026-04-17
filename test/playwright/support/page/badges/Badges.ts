@@ -21,6 +21,8 @@ export default class Badges {
 
     static readonly DATA_TEST_MODAL_BUTTON_SET_GOAL_ACHIEVEMENT = "badge-award-confirm";
 
+    static readonly DATA_TEST_BUTTON_RETURN = "badge-page-return-button";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -144,5 +146,12 @@ export default class Badges {
      */
     async clickEvidenceSubmitButton(): Promise<void> {
         await this.page.click("input[type=submit]");
+    }
+
+    /**
+     * click return to previous page button
+     */
+    async clickReturnButton(): Promise<void> {
+        await this.page.getByTestId(Badges.DATA_TEST_BUTTON_RETURN).click();
     }
 }
