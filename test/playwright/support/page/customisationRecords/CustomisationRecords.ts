@@ -64,6 +64,15 @@ export default class CustomisationRecords {
         await this.page.locator(`tr[data-test^="lazy-grid-row-"] [data-test$="-${columnKey}"] a`).first().click();
     }
 
+    async clickRowColumnLink(rowText: string, columnKey: string): Promise<void> {
+        await this.page
+            .locator('tr[data-test^="lazy-grid-row-"]')
+            .filter({ hasText: rowText })
+            .locator(`[data-test$="-${columnKey}"] a`)
+            .first()
+            .click();
+    }
+
     async sortColumn(columnName: string, clicks: number = 1): Promise<void> {
         for (let index = 0; index < clicks; index += 1) {
             await this.page
