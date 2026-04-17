@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Timeline;
 
 use Closure;
+use Schoolbox\Collection;
 
 /**
  * Generic timeline builder.
@@ -26,8 +27,6 @@ class Generic extends Full
      * Since this timeline works with any sort of response and feedback:
      * * `$includeUnpublishedSelfReflectionFeedback` is ignored, as the concept
      *   of self-reflection exists only for due work
-     * * `$minimumVisibility` is ignored, as the concept of mark visibility
-     *   exists only for due work and quizzes
      *
      * @param bool $includeUnpublishedSelfReflectionFeedback
      * @param bool $includeUnpublishedInstructorFeedback
@@ -44,10 +43,19 @@ class Generic extends Full
             ? $this->participant->getSubmittedResponses()
             : $this->participant->getAllResponses();
 
-        // This assessment type doesn't support mark visibility, so feedbacks are always visible.
-        $feedbacks = $includeUnpublishedInstructorFeedback
-            ? $this->participant->getPublishedFeedbacks()
-            : $this->participant->getAllFeedbacks();
+        // Respect mark visibility if it has been explicitly configured; otherwise
+        // default to visible (some assessment types store a mark_visibility column
+        // but do not expose it in the UI, leaving it null).
+        $markVisibility = $this->participant->getAssessable()->getMarkVisibility();
+        $isFeedbackVisible = $markVisibility === null || in_array($markVisibility, $allowedVisibilities);
+
+        if ($isFeedbackVisible) {
+            $feedbacks = $includeUnpublishedInstructorFeedback
+                ? $this->participant->getPublishedFeedbacks()
+                : $this->participant->getAllFeedbacks();
+        } else {
+            $feedbacks = new Collection();
+        }
         $this->recombined = $this->recombined
             ->merge($feedbacks)
             ->merge($responses)
