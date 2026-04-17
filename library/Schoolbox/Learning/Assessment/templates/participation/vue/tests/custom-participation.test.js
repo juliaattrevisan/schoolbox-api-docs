@@ -94,6 +94,16 @@ test("bottom drawer is visible when two participants are selected", async () => 
     expect(wrapper.find('[data-test="custom-participation-bottom-drawer"]').isVisible()).toBe(true);
 });
 
+test("participant table opts into shared bottom drawer offset", () => {
+    const wrapper = mount(CustomParticipation, {
+        props: {
+            ...defaultProps,
+        },
+    });
+
+    expect(wrapper.find(".scrollable.c-bottom-drawer-offset-target").exists()).toBe(true);
+});
+
 test("When one of the three students is excluded, Copy Activity button does not appear", async () => {
     const wrapper = mount(CustomParticipation, {
         props: {

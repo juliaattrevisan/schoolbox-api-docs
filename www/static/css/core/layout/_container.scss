@@ -47,6 +47,12 @@
     }
 }
 
+#container[data-has-bottom-drawer="true"] {
+    .c-bottom-drawer-offset-target {
+        padding-bottom: calc(var(--bottom-drawer-offset) + var(--bottom-drawer-target-padding-bottom, 0px));
+    }
+}
+
 .admin-container {
     display: grid;
     grid-template-columns: 240px auto;
