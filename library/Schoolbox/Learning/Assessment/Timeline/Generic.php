@@ -44,7 +44,7 @@ class Generic extends Full
             : $this->participant->getAllResponses();
 
         // Respect mark visibility if it has been explicitly configured; otherwise
-        // default to visible (some assessment types store a mark_visibility column
+        // default to visible (LTI assessments store a mark_visibility column
         // but do not expose it in the UI, leaving it null).
         $markVisibility = $this->participant->getAssessable()->getMarkVisibility();
         $isFeedbackVisible = $markVisibility === null || in_array($markVisibility, $allowedVisibilities);
