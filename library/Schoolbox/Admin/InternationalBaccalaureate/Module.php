@@ -18,8 +18,11 @@ use Alaress\Web\Controller\Base;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\IB\Group\Mapper as IBGroupMapper;
+use Schoolbox\IB\GroupSubject\Mapper as IBGroupSubjectMapper;
 
 class Module extends BaseModule
 {
@@ -52,6 +55,9 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(ConfigMapper::class),
+            $this->getMapperFactory()->get(IBGroupMapper::class),
+            $this->getMapperFactory()->get(IBGroupSubjectMapper::class),
+            $this->getMapperFactory()->get(LanguageMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
             $this->injector->get('oidc.cache'),
