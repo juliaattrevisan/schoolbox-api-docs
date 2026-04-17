@@ -2,7 +2,12 @@
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import LanguageSelectionModal from "./language-selection-modal.vue";
-import type { IBLanguages } from "../../js/types/ibConfigurationTypes";
+
+interface IBLanguage {
+    id: number;
+    code: string;
+    name: string;
+}
 
 interface SubjectRow {
     id: string;
@@ -22,7 +27,7 @@ interface Props {
     categoryId: number;
     saveEndpoint: string;
     ibSubjects: Array<{ subject: string; level: string }>;
-    ibLanguages: IBLanguages[];
+    ibLanguages: IBLanguage[];
 }
 
 const props = defineProps<Props>();
@@ -47,6 +52,10 @@ const defaultLanguageCode = window.Vue.computed<string | null>(() => {
     return englishLanguage?.code ?? props.ibLanguages[0]?.code ?? null;
 });
 
+/**
+ * Gets the default language selection for new rows.
+ * @returns The English language code when available, otherwise the first configured language
+ */
 function getDefaultLanguages(): string[] {
     return defaultLanguageCode.value ? [defaultLanguageCode.value] : [];
 }

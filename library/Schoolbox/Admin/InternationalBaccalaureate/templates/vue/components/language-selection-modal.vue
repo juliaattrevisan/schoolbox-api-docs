@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
-import type { IBLanguages } from "../../js/types/ibConfigurationTypes";
+
+interface IBLanguage {
+    id: number;
+    code: string;
+    name: string;
+}
 
 interface Props {
-    availableLanguages: IBLanguages[];
+    availableLanguages: IBLanguage[];
     selectedLanguages: string[];
 }
 const props = defineProps<Props>();
