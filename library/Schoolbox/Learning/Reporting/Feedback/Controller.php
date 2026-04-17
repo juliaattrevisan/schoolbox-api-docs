@@ -100,6 +100,9 @@ class Controller extends Base
             'assessmentId' => $assessment->getId(),
         ]);
 
+        /* TODO Technical Uplift Candidate
+         *  Consolidate the ParticipantCarousel into a standardised structure that we can reuse across all the activities
+         */
         /* Calculate ParticipantCarousel people: note that this reuses the $participant var, so be careful about that.
          */
         $participantCarousel = [];
