@@ -43,8 +43,8 @@ class Widgets
      */
     public static function getAvailableOptions(): array
     {
-        $allowStudents = \Config::get('mark_visibility_allow_students') === 'true';
-        $allowParents  = \Config::get('mark_visibility_allow_parents') === 'true';
+        $allowStudents = (bool) \Config::get('mark_visibility_allow_students');
+        $allowParents  = (bool) \Config::get('mark_visibility_allow_parents');
         $available     = \Schoolbox\Learning\Assessment\Feedback\Visibility::getAvailableVisibilities($allowStudents, $allowParents);
         return array_intersect_key(self::getOptions(), array_flip($available));
     }

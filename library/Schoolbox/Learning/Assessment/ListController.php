@@ -508,8 +508,8 @@ class ListController extends Web\Controller\Base
     {
         $visibility            = $this->requestPost['visibility'];
         $availableVisibilities = FeedbackVisibility::getAvailableVisibilities(
-            $this->getConfigLoader()->get('mark_visibility_allow_students'),
-            $this->getConfigLoader()->get('mark_visibility_allow_parents'),
+            (bool) $this->getConfigLoader()->get('mark_visibility_allow_students'),
+            (bool) $this->getConfigLoader()->get('mark_visibility_allow_parents'),
         );
         if (!in_array($visibility, $availableVisibilities)) {
             $this->response = $this->responseAsJson(['error' => 'Invalid visibility'])->withStatus(500);

@@ -446,8 +446,8 @@ class Controller extends Base
                     'courseImport.getImport' => null, /* not relevant on the class markbook */
                 ],
                 'availableVisibilities' => Visibility::getAvailableVisibilities(
-                    $this->getConfigLoader()->get('mark_visibility_allow_students'),
-                    $this->getConfigLoader()->get('mark_visibility_allow_parents'),
+                    (bool) $this->getConfigLoader()->get('mark_visibility_allow_students'),
+                    (bool) $this->getConfigLoader()->get('mark_visibility_allow_parents'),
                 ),
                 'submissionErrorStates' => $this->stateMapper->findAll()->map(fn(State $state) => [
                     'id' => $state->getId(),
