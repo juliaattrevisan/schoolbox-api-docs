@@ -41,7 +41,9 @@ class Sync extends Base implements ISync
                 sups.house_name          AS student_house,
                 sups.boarding_status     AS student_boarder,
                 sups.boarding_house_name AS student_boarding_house,
-                sups.campus_name         AS student_campus
+                sups.campus_name         AS student_campus,
+                sups.nationalities       AS student_nationalities,
+                sups.languages           AS student_languages
             FROM        {$userProfileTable} `sup`
             JOIN        {$studentProfileTable} sups ON sup.id = sups.sis_user_profile_id
             WHERE       (sups.leaving_date IS NULL OR sups.leaving_date >= :now)
