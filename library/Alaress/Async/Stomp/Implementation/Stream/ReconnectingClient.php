@@ -84,9 +84,8 @@ class ReconnectingClient implements IClient
         // PHP shutdown functions run before GC/destructors. Stopping here prevents
         // scheduleReconnect() from registering an ev_timer on the dead loop when
         // Connection::__destruct() fires the onClose callback during teardown.
-        register_shutdown_function(fn () => $this->stop());
+        register_shutdown_function($this->stop(...));
     }
-
 
     /**
      * Cancel any pending reconnect timer and prevent further reconnect attempts.
@@ -94,12 +93,15 @@ class ReconnectingClient implements IClient
      * Safe to call on a stopped loop — cancelTimer() only operates on live C watchers
      * if the ev_loop is still alive, which it is at shutdown-function time.
      */
-    public function stop(): void
+    private function stop(): void
     {
         $this->stopped = true;
-        if ($this->pendingTimer !== null) {
+        if ($this->pendingTimer) {
+            $this->log?->debug("Shutdown received: stopping reconnection timer function");
             $this->loop->cancelTimer($this->pendingTimer);
             $this->pendingTimer = null;
+        } else {
+            $this->log?->debug("Shutdown received, but no reconnection timer function to stop");
         }
     }
 
