@@ -511,10 +511,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.badge-list-form {
-    padding-bottom: 100px; // allow space for bottom-drawer at the bottom
-}
-
 .selected-container {
     display: flex;
     align-items: baseline;

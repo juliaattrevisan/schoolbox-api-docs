@@ -244,21 +244,17 @@ export default {
 </script>
 
 <template>
-    <div class="small-12 island manage-qrcodes">
-        <div v-if="isDataLoaded && hasStudents">
-            <section class="content">
-                <div class="students">
-                    <manage-qr-codes-student
-                        v-for="student in students"
-                        :key="student.id"
-                        :student="student"
-                        :selectedStudents="selectedStudents"
-                        :expiry="expiry"
-                        :folder-name-with-code="folderNameWithCode"
-                        @student-selected="onStudentSelected"
-                    />
-                </div>
-            </section>
+    <div class="c-island l-pad-m manage-qrcodes">
+        <div v-if="isDataLoaded && hasStudents" class="students l-flex-row l-gap-m">
+            <manage-qr-codes-student
+                v-for="student in students"
+                :key="student.id"
+                :student="student"
+                :selectedStudents="selectedStudents"
+                :expiry="expiry"
+                :folder-name-with-code="folderNameWithCode"
+                @student-selected="onStudentSelected"
+            />
         </div>
 
         <div v-else-if="isDataLoaded && !hasStudents && !hasDataLoadError" class="empty-state">
@@ -272,78 +268,71 @@ export default {
         </div>
 
         <div v-else class="loader"></div>
-
-        <bottom-drawer :showDrawer="true" :is-always-anchored="false" :unanchor-width="760" class="bottom-drawer">
-            <h3 class="selected-count">
-                <em>{{ selectedStudentsStatus }}</em>
-            </h3>
-            <button @click.prevent="onToggleStudentSelection" class="button-toggle-selection">
-                {{ toggleStudentSelectionStatus }}
-            </button>
-            <div class="options-list">
-                <div class="options-list__option">
-                    <label class="required-with-tip"
-                        >Login destination
-                        <span
-                            data-tooltip
-                            class="hint has-tip tip-top"
-                            title="The page the student will be sent to after logging in with the QR code"
-                            >?</span
-                        ></label
-                    >
-                    <select v-model="destination">
-                        <option value="homepage">Homepage</option>
-                        <option value="dashboard">Dashboard</option>
-                        <option value="profile">Profile</option>
-                    </select>
-                </div>
-                <div class="options-list__option">
-                    <label
-                        >Login expiry
-                        <span
-                            data-tooltip
-                            class="hint has-tip tip-top"
-                            title="How long the login codes will last for. After this time they will need to be regenerated"
-                            >?</span
-                        ></label
-                    >
-                    <select v-model="expiryMonth">
-                        <option value="1">1 month</option>
-                        <option value="3">3 months</option>
-                        <option value="6">6 months</option>
-                    </select>
-                </div>
-                <button
-                    @click.prevent="onGenerateCodesSelected()"
-                    class="button submit options-list__option sbx-button--has-icon"
-                    title="Generate codes"
-                    :disabled="isGenerateCodesDisabled"
-                >
-                    <sbx-icon name="tiles"></sbx-icon>
-                    {{ generateCodesStatus }}
-                </button>
-                <button
-                    @click.prevent="onPrintSelected()"
-                    class="button submit options-list__option sbx-button--has-icon"
-                    title="Print codes"
-                    :disabled="!hasGeneratedCodes"
-                >
-                    <sbx-icon name="print"></sbx-icon>Print codes
-                </button>
-            </div>
-        </bottom-drawer>
     </div>
+
+    <bottom-drawer :showDrawer="true" :is-always-anchored="false" :unanchor-width="760" class="bottom-drawer">
+        <h3 class="selected-count">
+            <em>{{ selectedStudentsStatus }}</em>
+        </h3>
+        <button @click.prevent="onToggleStudentSelection" class="button-toggle-selection">
+            {{ toggleStudentSelectionStatus }}
+        </button>
+        <div class="options-list">
+            <div class="options-list__option">
+                <label class="required-with-tip"
+                    >Login destination
+                    <span
+                        data-tooltip
+                        class="hint has-tip tip-top"
+                        title="The page the student will be sent to after logging in with the QR code"
+                        >?</span
+                    ></label
+                >
+                <select v-model="destination">
+                    <option value="homepage">Homepage</option>
+                    <option value="dashboard">Dashboard</option>
+                    <option value="profile">Profile</option>
+                </select>
+            </div>
+            <div class="options-list__option">
+                <label
+                    >Login expiry
+                    <span
+                        data-tooltip
+                        class="hint has-tip tip-top"
+                        title="How long the login codes will last for. After this time they will need to be regenerated"
+                        >?</span
+                    ></label
+                >
+                <select v-model="expiryMonth">
+                    <option value="1">1 month</option>
+                    <option value="3">3 months</option>
+                    <option value="6">6 months</option>
+                </select>
+            </div>
+            <button
+                @click.prevent="onGenerateCodesSelected()"
+                class="button submit sbx-button options-list__option"
+                title="Generate codes"
+                :disabled="isGenerateCodesDisabled"
+            >
+                <sbx-icon name="tiles"></sbx-icon>
+                {{ generateCodesStatus }}
+            </button>
+            <button
+                @click.prevent="onPrintSelected()"
+                class="button submit sbx-button options-list__option"
+                title="Print codes"
+                :disabled="!hasGeneratedCodes"
+            >
+                <sbx-icon name="print"></sbx-icon>
+                Print codes
+            </button>
+        </div>
+    </bottom-drawer>
 </template>
 
 <style lang="scss" scoped>
-.manage-qrcodes {
-    padding-bottom: 190px; // allow space for bottom-drawer at the bottom
-    @media (max-width: 760px) {
-        //as it will no longer be anchored below this point, we don't need the extra padding
-        padding-bottom: 1rem;
-    }
-}
-
 .selected-count {
     display: inline-block;
     margin-right: 0.5rem;
@@ -382,13 +371,6 @@ export default {
         flex: 1 0 100%;
     }
 }
-
-.students {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    padding: 1rem 0;
-}
 </style>
 
 <style>
@@ -397,17 +379,14 @@ export default {
 }
 
 @media print {
-    .students {
-        display: block !important; /* This is required for '.student break-inside: avoid' to work (in manage-qr-codes-student.vue) */
-    }
-
     body,
     .manage-qrcodes {
         background: white; /* ensure white background, may have been changed by custom styles */
     }
 
     #container,
-    .island {
+    .f-container,
+    .manage-qrcodes {
         padding: 0; /* to get more of the page estate */
     }
 

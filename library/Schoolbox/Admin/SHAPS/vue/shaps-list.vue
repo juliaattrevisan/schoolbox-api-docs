@@ -369,10 +369,6 @@ export default {
 <style lang="scss">
 @import "@schoolboxVue/components/vueTables2/vueTables2";
 
-.VueTables--client {
-    padding-bottom: 100px; // allow space for bottom-drawer at the bottom
-}
-
 .selected-count {
     margin-right: 1rem;
 }

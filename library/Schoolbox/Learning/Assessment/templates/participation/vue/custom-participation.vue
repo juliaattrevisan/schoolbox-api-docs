@@ -160,7 +160,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
         </div>
 
         <div class="small-12 island">
-            <div v-if="filteredParticipants.length > 0" class="scrollable">
+            <div v-if="filteredParticipants.length > 0" class="scrollable c-bottom-drawer-offset-target">
                 <table>
                     <thead>
                         <tr>

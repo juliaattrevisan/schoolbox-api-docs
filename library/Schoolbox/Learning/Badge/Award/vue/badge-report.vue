@@ -286,10 +286,6 @@ export default {
     margin-top: 1rem;
 }
 
-.badge-report {
-    padding-bottom: 100px; // allow space for bottom-drawer at the bottom
-}
-
 .content {
     padding: 0; //remove the padding
 }
