@@ -72,7 +72,7 @@ class ModelToArray
         return [
             'id' => $capabilityUsage->getCapability()->getId(),
             // TODO: permissions, notably self assessment differs
-            'humanReadableMark' => $markedGrid->retrieveCapabilityMark($capabilityUsage)?->getValue(),
+            'humanReadableMark' => $markedGrid->retrieveCapabilityMark($capabilityUsage)?->getHumanReadableValue(),
             'indicators' => $indicators,
         ];
     }
