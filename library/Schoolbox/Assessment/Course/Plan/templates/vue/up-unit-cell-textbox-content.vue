@@ -174,4 +174,46 @@ defineExpose({ focusEditor, isEmpty });
 .ck.ck-editor__main .ck-source-editing-area textarea:focus {
     border: 0 !important;
 }
+
+/* Ensure the content of the textbox is printed correctly and not cut off with overflow issues */
+@media print {
+    #unit-planner-container,
+    #unit-planner-container * {
+        box-sizing: border-box !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    #unit-planner-container,
+    #unit-planner-container .editor-wrapper,
+    #unit-planner-container .editor-content,
+    #unit-planner-container figure,
+    #unit-planner-container .table,
+    #unit-planner-container figure.table,
+    #unit-planner-container table,
+    #unit-planner-container img {
+        overflow: visible !important;
+    }
+
+    #unit-planner-container table,
+    #unit-planner-container figure.table {
+        width: 100% !important;
+        max-width: 100% !important;
+        table-layout: fixed !important;
+    }
+
+    #unit-planner-container th,
+    #unit-planner-container td {
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    #unit-planner-container img,
+    #unit-planner-container figure img {
+        width: auto !important;
+        max-width: 100% !important;
+        height: auto !important;
+    }
+}
 </style>
