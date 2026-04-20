@@ -20,7 +20,7 @@ export type IBConfiguration = {
     type: string;
 };
 
-export type IBLanguages = {
+export type IBLanguage = {
     id: number;
     code: string;
     name: string;

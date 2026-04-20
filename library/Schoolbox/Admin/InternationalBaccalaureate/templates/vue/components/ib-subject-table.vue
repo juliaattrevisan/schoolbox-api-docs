@@ -2,18 +2,13 @@
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import LanguageSelectionModal from "./language-selection-modal.vue";
-
-interface IBLanguage {
-    id: number;
-    code: string;
-    name: string;
-}
+import type { IBLanguage } from "../../js/types/ibConfigurationTypes";
 
 interface SubjectRow {
     id: string;
     subject: string;
     level: string;
-    languages: string[];
+    languages: number[];
     classCode: string;
     studentCount: number;
     isLanguageRow?: boolean;
@@ -43,21 +38,20 @@ const isCoreCategory = window.Vue.computed(() => {
     return props.categoryName.toLowerCase() === "core";
 });
 
-const defaultLanguageCode = window.Vue.computed<string | null>(() => {
+const defaultLanguageId = window.Vue.computed<number | null>(() => {
     const englishLanguage = props.ibLanguages.find((language) => {
-        const languageCode = language.code.toLowerCase();
-        return language.name.toLowerCase() === "english" || languageCode === "en" || languageCode === "eng";
+        return language.name.toLowerCase() === "english";
     });
 
-    return englishLanguage?.code ?? props.ibLanguages[0]?.code ?? null;
+    return englishLanguage?.id ?? props.ibLanguages[0]?.id ?? null;
 });
 
 /**
  * Gets the default language selection for new rows.
- * @returns The English language code when available, otherwise the first configured language
+ * @returns The English language id when available, otherwise the first configured language
  */
-function getDefaultLanguages(): string[] {
-    return defaultLanguageCode.value ? [defaultLanguageCode.value] : [];
+function getDefaultLanguages(): number[] {
+    return defaultLanguageId.value ? [defaultLanguageId.value] : [];
 }
 
 /**
@@ -139,9 +133,9 @@ function closeLanguageModal(): void {
 
 /**
  * Handles language selection from the modal
- * @param selectedLanguages - Array of selected language codes
+ * @param selectedLanguages - Array of selected language ids
  */
-function onLanguagesSelected(selectedLanguages: string[]): void {
+function onLanguagesSelected(selectedLanguages: number[]): void {
     if (!currentEditingRow.value) return;
 
     const rowIndex = subjectRows.value.findIndex((row) => row.id === currentEditingRow.value);
@@ -213,21 +207,21 @@ function getLanguageDisplayText(row: SubjectRow): string {
 }
 
 /**
- * Gets the human-readable name for a language code
- * @param code - The language code
+ * Gets the human-readable name for a language id
+ * @param languageId - The language id
  * @returns The language name
  */
-function getLanguageName(code: string): string {
-    const matchedLanguage = props.ibLanguages.find((language) => language.code.toLowerCase() === code.toLowerCase());
+function getLanguageName(languageId: number): string {
+    const matchedLanguage = props.ibLanguages.find((language) => language.id === languageId);
 
-    return matchedLanguage?.name || code;
+    return matchedLanguage?.name || String(languageId);
 }
 
 /**
  * Gets the languages for the currently editing row
- * @returns Array of language codes for the current row
+ * @returns Array of language ids for the current row
  */
-function getCurrentRowLanguages(): string[] {
+function getCurrentRowLanguages(): number[] {
     if (!currentEditingRow.value) return [];
     const row = subjectRows.value.find((r) => r.id === currentEditingRow.value);
     return row?.languages.length ? row.languages : getDefaultLanguages();

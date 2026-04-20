@@ -1,26 +1,21 @@
 <script setup lang="ts">
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
-
-interface IBLanguage {
-    id: number;
-    code: string;
-    name: string;
-}
+import type { IBLanguage } from "../../js/types/ibConfigurationTypes";
 
 interface Props {
     availableLanguages: IBLanguage[];
-    selectedLanguages: string[];
+    selectedLanguages: number[];
 }
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
     close: [];
-    languagesSelected: [languages: string[]];
+    languagesSelected: [languages: number[]];
 }>();
 
 const isOpen = defineModel<boolean>("is-open", { default: false });
 
-const localSelectedLanguages = window.Vue.ref<string[]>([...props.selectedLanguages]);
+const localSelectedLanguages = window.Vue.ref<number[]>([...props.selectedLanguages]);
 
 // Reinitialize selection when modal opens so it reflects the correct row's languages
 window.Vue.watch(isOpen, (newVal) => {
@@ -45,14 +40,9 @@ function onConfirm(): void {
         <div class="l-flex-col l-gap-s f-no-margins checklist">
             <h2>Select Languages</h2>
             <ul class="option-list">
-                <li v-for="lang in props.availableLanguages" :key="lang.code">
-                    <input
-                        :id="`lang-${lang.code}`"
-                        v-model="localSelectedLanguages"
-                        type="checkbox"
-                        :value="lang.code"
-                    />
-                    <label :for="`lang-${lang.code}`">{{ lang.name }}</label>
+                <li v-for="lang in props.availableLanguages" :key="lang.id">
+                    <input :id="`lang-${lang.id}`" v-model="localSelectedLanguages" type="checkbox" :value="lang.id" />
+                    <label :for="`lang-${lang.id}`">{{ lang.name }}</label>
                 </li>
             </ul>
             <div class="l-flex l-gap-xs f-no-margins">
