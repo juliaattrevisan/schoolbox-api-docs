@@ -21,6 +21,16 @@ body.sbx-body {
         box-shadow: var(--sbx-config-box-drop-shadow);
     }
 
+    // have to shadow each section separately
+    .VueTables--client {
+        .VueTables__search,
+        .VueTables__wrapper,
+        .filters,
+        .VueTables__table-footer {
+            box-shadow: var(--sbx-config-box-drop-shadow);
+        }
+    }
+
     // Prevent box shadows from being applied to nested sections within islands
     .island section section {
         box-shadow: none;
