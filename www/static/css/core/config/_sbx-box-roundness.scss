@@ -41,6 +41,11 @@ body.sbx-body {
         border-radius: var(--sbx-config-box-roundness);
     }
 
+    // Let parent section’s rounded corners visually clip the alternating .information-list > li backgrounds
+    .island section:has(> .information-list) {
+        overflow: hidden;
+    }
+
     // this is to round an svg rect element
     .highcharts-background {
         rx: var(--sbx-config-box-roundness);

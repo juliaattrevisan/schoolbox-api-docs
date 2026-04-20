@@ -1,7 +1,7 @@
 /**
  * Box drop shadow config
  * Applied to UI "boxes" in Advanced UI
- * Box = surface on page background (not inside an island)
+ * Box = surface on page background (not inside an island) that typically has the --sbx-color-foreground-primary background color, such as islands, empty states, hybrid bars, etc.
  */
 
 :root {
@@ -9,7 +9,7 @@
 }
 
 body.sbx-body {
-    //Base box surfaces
+    // Apply box shadows to base box surfaces
     .island section,
     .c-island,
     .empty-state,
@@ -18,5 +18,10 @@ body.sbx-body {
     .scrollable:has(table.timetable),
     .side-nav {
         box-shadow: var(--sbx-config-box-drop-shadow);
+    }
+
+    // Prevent box shadows from being applied to nested sections within islands
+    .island section section {
+        box-shadow: none;
     }
 }
