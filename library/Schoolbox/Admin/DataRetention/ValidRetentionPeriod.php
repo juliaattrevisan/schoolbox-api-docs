@@ -30,10 +30,6 @@ class ValidRetentionPeriod
             return true;
         }
 
-        if ('' === $days) {
-            return false;
-        }
-
         // Normalise numeric string to int
         if (is_string($days)) {
             if (!ctype_digit($days)) {
