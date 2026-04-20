@@ -23,6 +23,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\IB\GroupSubject\Mapper as IBGroupSubjectMapper;
+use Schoolbox\IB\GroupSubject\Language\Mapper as IBGroupSubjectLanguageMapper;
 
 class Module extends BaseModule
 {
@@ -58,6 +59,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(ConfigMapper::class),
             $this->getMapperFactory()->get(IBGroupMapper::class),
             $this->getMapperFactory()->get(IBGroupSubjectMapper::class),
+            $this->getMapperFactory()->get(IBGroupSubjectLanguageMapper::class),
             $this->getMapperFactory()->get(LanguageMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),

@@ -9,7 +9,13 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import IBGeneralConfig from "./components/ib-general-config.vue";
 import IBSubjectTable from "./components/ib-subject-table.vue";
-import type { IBCategory, IBConfiguration, IBLanguage, IBRoutes } from "../js/types/ibConfigurationTypes";
+import type {
+    IBCategory,
+    IBConfiguration,
+    IBLanguage,
+    IBRoutes,
+    IBSubject,
+} from "../js/types/ibConfigurationTypes";
 
 interface Props {
     categories: IBCategory[]; // The IB subject group categories to display
@@ -25,7 +31,7 @@ const currentCategory = window.Vue.ref<IBCategory>(props.categories[0]);
 const isLoading = window.Vue.ref<boolean>(false);
 const loadError = window.Vue.ref<string | null>(null);
 const currentConfigurations = window.Vue.ref<IBConfiguration[]>([]);
-const currentSubjectsFromAPI = window.Vue.ref<Array<{ subject: string; level: string }>>([]);
+const currentSubjectsFromAPI = window.Vue.ref<IBSubject[]>([]);
 const ibLanguages = window.Vue.ref<IBLanguage[]>([]);
 const isLanguagesLoading = window.Vue.ref<boolean>(false);
 const languagesLoadError = window.Vue.ref<string | null>(null);
@@ -50,7 +56,7 @@ async function loadCategorySubjects(): Promise<void> {
     }
 
     const url = props.subjectsEndpoint.replace("{groupId}", currentCategory.value.id.toString());
-    const response = await apiRequest<Array<{ subject: string; level: string }>>({ url, method: "GET" });
+    const response = await apiRequest<IBSubject[]>({ url, method: "GET" });
 
     if (!response.success || !Array.isArray(response.data)) {
         console.error("Failed to load subjects:", response.success ? "Unexpected format" : response.message);
@@ -122,7 +128,12 @@ async function loadCategoryConfigurations(): Promise<void> {
         return;
     }
 
-    currentConfigurations.value = response.data;
+    if (isGeneralConfigTab.value) {
+        currentConfigurations.value = response.data;
+        return;
+    }
+
+    currentConfigurations.value = [];
 }
 
 /**

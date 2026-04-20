@@ -20,10 +20,14 @@ use Exception;
 use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
+use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\IB\Group\Model as IBGroupModel;
 use Schoolbox\IB\GroupSubject\Mapper as IBGroupSubjectMapper;
+use Schoolbox\IB\GroupSubject\Model as IBGroupSubjectModel;
+use Schoolbox\IB\GroupSubject\Language\Mapper as GroupSubjectLanguageMapper;
+use Schoolbox\IB\GroupSubject\Language\Model as GroupSubjectLanguageModel;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Language\Model as LanguageModel;
 
@@ -33,6 +37,7 @@ class Controller extends ConfigController
         ConfigMapper $configMapper,
         private IBGroupMapper $groupMapper,
         private IBGroupSubjectMapper $groupSubjectMapper,
+        private GroupSubjectLanguageMapper $groupSubjectLanguageMapper,
         private LanguageMapper $languageMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
@@ -80,7 +85,7 @@ class Controller extends ConfigController
                 'categories' => $categories,
                 '_routes' => [
                     'allLanguages' => $this->getRouteIfAuthorized('internationalBaccalaureate.getAllLanguages'),
-                ]
+                ],
             ]
         );
     }
@@ -152,11 +157,37 @@ class Controller extends ConfigController
                 ]
             );
 
+//            $subjectLanguages = $this->groupSubjectLanguageMapper
+//                ->findByColumn('group_subject_id', Collection::arrayColumn($groupSubjects, 'id'))
+//                ->groupByCallback(function (GroupSubjectLanguageModel $subjectLanguage) {
+//                    return $subjectLanguage->getGroupSubject()->getId();
+//                });
+
             $subjects = [];
+            /** @var IBGroupSubjectModel $groupSubject */
             foreach ($groupSubjects as $groupSubject) {
+//                $groupSubjectLanguages = $subjectLanguages->offsetExists($groupSubject->getId())
+//                    ? $subjectLanguages->offsetGet($groupSubject->getId())
+//                    : new Collection();
+
                 $subjects[] = [
+                    'id' => $groupSubject->getId(),
                     'subject' => $groupSubject->getSubject()->getName(),
                     'level' => $groupSubject->getLevel() ?: '',
+//                    'languages' => $groupSubjectLanguages
+//                        ->map(fn(GroupSubjectLanguageModel $language) => [
+//                            'languageId' => $language->getLanguage()?->getId(),
+//                            'classCode' => $language->getClassCode() ?? '',
+//                        ])
+//                        ->reindex()
+//                        ->getAll(),
+                    'languages' => $groupSubject->getLanguages()
+                        ->map(fn(GroupSubjectLanguageModel $language) => [
+                            'languageId' => $language->getLanguage()?->getId(),
+                            'classCode' => $language->getClassCode() ?? '',
+                        ])
+                        ->reindex()
+                        ->getAll(),
                 ];
             }
 
@@ -175,6 +206,11 @@ class Controller extends ConfigController
     {
         $data = (array) $this->requestPost;
 
+        if (isset($data['subjectLanguages'])) {
+            $this->saveSubjectLanguageConfiguration($data);
+            return;
+        }
+
         if (!isset($data['key']) || !isset($data['value'])) {
             $this->response = $this->responseAsJson(['success' => false, 'message' => 'Invalid request data'])->withStatus(400);
             return;
@@ -186,6 +222,69 @@ class Controller extends ConfigController
         );
 
         $this->response = $this->responseAsJson(['success' => true, 'message' => 'Configuration saved successfully']);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function saveSubjectLanguageConfiguration(array $data): void
+    {
+        $categoryId = isset($data['categoryId']) ? (int) $data['categoryId'] : 0;
+        $subjectLanguages = is_array($data['subjectLanguages'] ?? null) ? $data['subjectLanguages'] : null;
+
+        if ($categoryId <= 0 || $subjectLanguages === null) {
+            $this->response = $this->responseAsJson(['success' => false, 'message' => 'Invalid subject language request data'])->withStatus(400);
+            return;
+        }
+
+        try {
+            $groupSubjects = $this->groupSubjectMapper->findByColumn('group_id', $categoryId);
+            $groupSubjectIds = array_map(
+                static fn($groupSubjectId) => (int) $groupSubjectId,
+                $groupSubjects->map(fn($groupSubject) => $groupSubject->getId())->getAll()
+            );
+
+            if (empty($groupSubjectIds)) {
+                $this->response = $this->responseAsJson(['success' => false, 'message' => 'No group subjects found for category'])->withStatus(400);
+                return;
+            }
+
+            $allowedGroupSubjectIds = array_fill_keys($groupSubjectIds, true);
+            $modelsToSave = [];
+
+            foreach ($subjectLanguages as $subjectLanguage) {
+                if (!is_array($subjectLanguage)) {
+                    continue;
+                }
+
+                $groupSubjectId = (int) ($subjectLanguage['groupSubjectId'] ?? 0);
+                $languageId = (int) ($subjectLanguage['languageId'] ?? 0);
+
+                if (
+                    $groupSubjectId <= 0 ||
+                    $languageId <= 0 ||
+                    !isset($allowedGroupSubjectIds[$groupSubjectId])
+                ) {
+                    continue;
+                }
+
+                $modelsToSave[] = $this->groupSubjectLanguageMapper
+                    ->createModel()
+                    ->setGroupSubject($this->groupSubjectMapper->createModel()->setId($groupSubjectId))
+                    ->setLanguage($this->languageMapper->createModel()->setId($languageId))
+                    ->setClassCode(trim((string) ($subjectLanguage['classCode'] ?? '')));
+            }
+
+            $this->groupSubjectLanguageMapper->deleteByColumn('group_subject_id', $groupSubjectIds);
+
+            if (!empty($modelsToSave)) {
+                $this->groupSubjectLanguageMapper->save($modelsToSave);
+            }
+
+            $this->response = $this->responseAsJson(['success' => true, 'message' => 'Configuration saved successfully']);
+        } catch (Exception $e) {
+            $this->response = $this->responseAsJson(['success' => false, 'message' => $e->getMessage()])->withStatus(500);
+        }
     }
 
     private function buildIbConfigPredicate(): Predicate\Builder
