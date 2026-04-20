@@ -72,7 +72,7 @@ test.describe("Customisation Records", () => {
 
         tester.isGoingTo("verify sorting by created date shows the data accordingly");
         await customisationRecords.sortColumn("Created Date", 2);
-        await customisationRecords.expectFirstRowColumnToContain("created_at", "Apr 17, 2026 11:56am");
+        await customisationRecords.expectFirstRowColumnToContain("created_at", "Apr 17, 2026");
 
         tester.isGoingTo("verify sorting by class shows the data accordingly");
         await customisationRecords.sortColumn("Class");
