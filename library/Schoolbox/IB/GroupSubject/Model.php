@@ -128,11 +128,12 @@ class Model implements JsonSerializable
     }
 
     /**
-     * @param GenericCollection|GroupSubjectLanguageModel[]|null $languages
+     * @param GenericCollection $languages
      * @return $this
      */
     public function setLanguages(GenericCollection $languages): self
     {
+        $languages->assertCollectionOf(GroupSubjectLanguageModel::class);
         $this->languages = $languages;
         return $this;
     }
