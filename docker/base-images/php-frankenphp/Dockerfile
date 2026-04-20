@@ -53,19 +53,17 @@ RUN apt-get update && apt-get upgrade -y && \
         fileinfo \
         libxml \
         gd \
-        uv \
-        opcache && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+        opcache
 
-# Install XDebug on non-production, also copy base config
+# Install XDebug and uv on non-production, also copy base config
+# (uv event loop is not in prod, as prod doesn't run daemons in containers)
 RUN <<EOF
 case "$ENV" in
   prod)
     ln -s /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
     ;;
   dev)
-    install-php-extensions xdebug
+    install-php-extensions xdebug uv
     ln -s /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
     ;;
   *)
@@ -74,6 +72,9 @@ case "$ENV" in
     ;;
 esac
 EOF
+
+# Cleanup
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY ./usr/bin/* /usr/bin/
 COPY ./usr/local/bin/* /usr/local/bin/
