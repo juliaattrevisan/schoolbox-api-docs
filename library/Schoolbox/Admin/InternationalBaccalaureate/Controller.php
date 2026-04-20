@@ -15,6 +15,7 @@ namespace Schoolbox\Admin\InternationalBaccalaureate;
 use Alaress\Database\Predicate;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
+use Aura\Router\Exception\RouteNotFound;
 use Exception;
 use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
@@ -43,6 +44,7 @@ class Controller extends ConfigController
     /**
      * DP Subject Configuration page
      *
+     * @throws RouteNotFound
      * @api GET /adminv2/international-baccalaureate/configuration
      */
     public function getConfiguration(): void
@@ -70,6 +72,24 @@ class Controller extends ConfigController
             ];
         }
 
+        $this->response = $this->responseFromTemplate(
+            '@internationalBaccalaureate/configuration.twig',
+            [
+                'pageCurrent' => $pageCurrent,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
+                'categories' => $categories,
+                '_routes' => [
+                    'allLanguages' => $this->getRouteIfAuthorized('internationalBaccalaureate.getAllLanguages'),
+                ]
+            ]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function getAllLanguages(): void
+    {
         $languages = $this->languageMapper->findAll()->map(
             fn(LanguageModel $language) => [
                 'id' => $language->getId(),
@@ -78,15 +98,7 @@ class Controller extends ConfigController
             ]
         );
 
-        $this->response = $this->responseFromTemplate(
-            '@internationalBaccalaureate/configuration.twig',
-            [
-                'pageCurrent' => $pageCurrent,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
-                'categories' => $categories,
-                'languages' => $languages,
-            ]
-        );
+        $this->response = $this->responseAsJson($languages);
     }
 
     /**

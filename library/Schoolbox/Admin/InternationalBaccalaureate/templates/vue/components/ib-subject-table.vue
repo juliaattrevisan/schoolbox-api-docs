@@ -55,6 +55,23 @@ function getDefaultLanguages(): number[] {
 }
 
 /**
+ * Apply the default language to any rows that were initialised before languages loaded.
+ */
+function populateDefaultLanguagesForEmptyRows(): void {
+    const defaultLanguages = getDefaultLanguages();
+
+    if (defaultLanguages.length === 0) {
+        return;
+    }
+
+    subjectRows.value.forEach((row) => {
+        if (row.languages.length === 0) {
+            row.languages = [...defaultLanguages];
+        }
+    });
+}
+
+/**
  * Initializes subject rows from the ibSubjects prop.
  */
 function initializeSubjectRows(): void {
@@ -108,6 +125,16 @@ window.Vue.watch(
         initializeSubjectRows();
     },
     { deep: true, immediate: true },
+);
+
+window.Vue.watch(
+    () => props.ibLanguages,
+    (newLanguages, oldLanguages) => {
+        if (oldLanguages.length === 0 && newLanguages.length > 0) {
+            populateDefaultLanguagesForEmptyRows();
+        }
+    },
+    { deep: true },
 );
 
 // Initialize on mount

@@ -9,14 +9,14 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import IBGeneralConfig from "./components/ib-general-config.vue";
 import IBSubjectTable from "./components/ib-subject-table.vue";
-import type { IBCategory, IBConfiguration, IBLanguage } from "../js/types/ibConfigurationTypes";
+import type { IBCategory, IBConfiguration, IBLanguage, IBRoutes } from "../js/types/ibConfigurationTypes";
 
 interface Props {
     categories: IBCategory[]; // The IB subject group categories to display
     configurationEndpoint: string; // The endpoint to fetch configuration data from
     saveEndpoint: string; // The endpoint to save configuration data to
     subjectsEndpoint: string; // The endpoint to fetch subjects for a category
-    languages: IBLanguage[];
+    routes: IBRoutes;
 }
 const props = defineProps<Props>();
 
@@ -26,6 +26,9 @@ const isLoading = window.Vue.ref<boolean>(false);
 const loadError = window.Vue.ref<string | null>(null);
 const currentConfigurations = window.Vue.ref<IBConfiguration[]>([]);
 const currentSubjectsFromAPI = window.Vue.ref<Array<{ subject: string; level: string }>>([]);
+const ibLanguages = window.Vue.ref<IBLanguage[]>([]);
+const isLanguagesLoading = window.Vue.ref<boolean>(false);
+const languagesLoadError = window.Vue.ref<string | null>(null);
 const categoryParamName = "category";
 
 // Computed property to check if current tab is general config
@@ -56,6 +59,41 @@ async function loadCategorySubjects(): Promise<void> {
     }
 
     currentSubjectsFromAPI.value = response.data;
+}
+
+/**
+ * Load the available IB languages from the API route passed to the page.
+ */
+async function loadLanguages(): Promise<void> {
+    if (!props.routes.allLanguages) {
+        languagesLoadError.value = "Language list is unavailable";
+        ibLanguages.value = [];
+        return;
+    }
+
+    isLanguagesLoading.value = true;
+    languagesLoadError.value = null;
+
+    const response = await apiRequest<IBLanguage[]>({
+        url: props.routes.allLanguages,
+        method: "GET",
+    });
+
+    isLanguagesLoading.value = false;
+
+    if (!response.success) {
+        languagesLoadError.value = response.message;
+        ibLanguages.value = [];
+        return;
+    }
+
+    if (!Array.isArray(response.data)) {
+        languagesLoadError.value = "Unexpected response format";
+        ibLanguages.value = [];
+        return;
+    }
+
+    ibLanguages.value = response.data;
 }
 
 /**
@@ -121,6 +159,7 @@ window.Vue.onMounted((): void => {
             currentCategory.value = foundCategory;
         }
     }
+    void loadLanguages();
     void loadCategoryConfigurations();
     void loadCategorySubjects();
 });
@@ -152,6 +191,12 @@ window.Vue.onMounted((): void => {
                     :save-endpoint="saveEndpoint"
                     :category-title="currentCategory.title"
                 />
+                <div v-else-if="isLanguagesLoading" class="loader"></div>
+                <data-load-error
+                    v-else-if="languagesLoadError"
+                    data-title="languages"
+                    :further-info="languagesLoadError"
+                />
                 <IBSubjectTable
                     v-else
                     :category-name="currentCategory.name"
@@ -159,7 +204,7 @@ window.Vue.onMounted((): void => {
                     :category-id="currentCategory.id"
                     :save-endpoint="saveEndpoint"
                     :ib-subjects="currentSubjectsFromAPI"
-                    :ib-languages="languages"
+                    :ib-languages="ibLanguages"
                 />
             </div>
         </section>

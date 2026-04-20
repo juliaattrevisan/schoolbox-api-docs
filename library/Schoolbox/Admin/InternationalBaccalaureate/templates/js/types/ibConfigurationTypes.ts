@@ -25,3 +25,7 @@ export type IBLanguage = {
     code: string;
     name: string;
 };
+
+export type IBRoutes = {
+    allLanguages: string | null;
+};

@@ -32,7 +32,7 @@ class Mapper extends BaseMapper
      * @return GenericCollection|Model[]
      * @throws Exception
      */
-    public function findLanguages($name = ''): GenericCollection
+    public function findLanguages(string $name = ''): GenericCollection
     {
         $allLanguages = $this->createCollection();
 
