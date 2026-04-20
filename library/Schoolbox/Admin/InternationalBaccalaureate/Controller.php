@@ -157,30 +157,13 @@ class Controller extends ConfigController
                 ]
             );
 
-//            $subjectLanguages = $this->groupSubjectLanguageMapper
-//                ->findByColumn('group_subject_id', Collection::arrayColumn($groupSubjects, 'id'))
-//                ->groupByCallback(function (GroupSubjectLanguageModel $subjectLanguage) {
-//                    return $subjectLanguage->getGroupSubject()->getId();
-//                });
-
             $subjects = [];
             /** @var IBGroupSubjectModel $groupSubject */
             foreach ($groupSubjects as $groupSubject) {
-//                $groupSubjectLanguages = $subjectLanguages->offsetExists($groupSubject->getId())
-//                    ? $subjectLanguages->offsetGet($groupSubject->getId())
-//                    : new Collection();
-
                 $subjects[] = [
                     'id' => $groupSubject->getId(),
                     'subject' => $groupSubject->getSubject()->getName(),
                     'level' => $groupSubject->getLevel() ?: '',
-//                    'languages' => $groupSubjectLanguages
-//                        ->map(fn(GroupSubjectLanguageModel $language) => [
-//                            'languageId' => $language->getLanguage()?->getId(),
-//                            'classCode' => $language->getClassCode() ?? '',
-//                        ])
-//                        ->reindex()
-//                        ->getAll(),
                     'languages' => $groupSubject->getLanguages()
                         ->map(fn(GroupSubjectLanguageModel $language) => [
                             'languageId' => $language->getLanguage()?->getId(),
