@@ -87,7 +87,9 @@ const tabSaveError = window.Vue.computed(() => {
 $pe-tabs-width: 18rem; /* Prevent the tab from being too narrow */
 
 .pe-tabs-tab {
-    background-color: white;
+    background-color: var(--sbx-color-foreground-primary, white);
+    border: 1px solid var(--sbx-config-color-accent, white);
+    border-radius: var(--sbx-config-field-roundness, 0);
     height: min-content; /* Prevent another tab from expanding this one */
     width: $pe-tabs-width;
 
