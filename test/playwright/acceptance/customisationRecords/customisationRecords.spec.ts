@@ -67,23 +67,23 @@ test.describe("Customisation Records", () => {
         await customisationRecords.expectFirstUserDetailsVisible(["Ali,", "Year 9", "Secondary Student"]);
 
         tester.isGoingTo("verify sorting by name shows the data accordingly");
-        await customisationRecords.sortColumn("Name");
+        await customisationRecords.sortColumn("user");
         await customisationRecords.expectFirstRowColumnToContain("user", "Reed,");
 
         tester.isGoingTo("verify sorting by created date shows the data accordingly");
-        await customisationRecords.sortColumn("Created Date", 2);
+        await customisationRecords.sortColumn("created_at", 2);
         await customisationRecords.expectFirstRowColumnToContain("created_at", "May 9, 2018");
 
         tester.isGoingTo("verify sorting by class shows the data accordingly");
-        await customisationRecords.sortColumn("Class");
+        await customisationRecords.sortColumn("class");
         await customisationRecords.expectFirstRowColumnToContain("class", "9A English (9ENGA)");
 
         tester.isGoingTo("verify sorting by unit shows the data accordingly");
-        await customisationRecords.sortColumn("Unit");
+        await customisationRecords.sortColumn("unit");
         await customisationRecords.expectFirstRowColumnToContain("unit", "To Kill a Mockingbird");
 
         tester.isGoingTo("verify sorting by customisation type shows the data accordingly");
-        await customisationRecords.sortColumn("Customisation Type", 2);
+        await customisationRecords.sortColumn("type", 2);
         await customisationRecords.expectFirstRowColumnToContain("type", "Modified Activity");
     });
 
@@ -189,7 +189,7 @@ test.describe("Customisation Records", () => {
             await customisationRecords.applyFilters();
 
             tester.isGoingTo("sort by created date and check the new customisation is properly presented in the grid");
-            await customisationRecords.sortColumn("Created Date", 2);
+            await customisationRecords.sortColumn("created_at", 2);
             await customisationRecords.expectGridRowVisibleWithValues([
                 customActivityTitle,
                 "Reed,",

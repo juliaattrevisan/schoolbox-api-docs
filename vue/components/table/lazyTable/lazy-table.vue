@@ -42,6 +42,7 @@ function onSortSelected(key: string): void {
                     <button
                         v-if="item.isSortable"
                         class="title-button f-always-show"
+                        :data-test="`lazy-grid-sort-button-${item.key}`"
                         @click.prevent="onSortSelected(item.key)"
                     >
                         <span>

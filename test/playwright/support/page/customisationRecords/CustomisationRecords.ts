@@ -15,6 +15,8 @@ export default class CustomisationRecords {
 
     static readonly DATA_TEST_RECORDS_CONTAINER = "customisation-records-container";
 
+    static readonly DATA_TEST_SORT_BUTTON = "lazy-grid-sort-button-{columnKey}";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -78,11 +80,13 @@ export default class CustomisationRecords {
         await link.click();
     }
 
-    async sortColumn(columnName: string, clicks: number = 1): Promise<void> {
+    async sortColumn(columnKey: string, clicks: number = 1): Promise<void> {
+        const sortButton = CustomisationRecords.DATA_TEST_SORT_BUTTON.replace("{columnKey}", columnKey);
+
         for (let index = 0; index < clicks; index += 1) {
             await this.page
                 .getByTestId(CustomisationRecords.DATA_TEST_RECORDS_CONTAINER)
-                .getByRole("button", { name: columnName })
+                .getByTestId(sortButton)
                 .click();
         }
     }
