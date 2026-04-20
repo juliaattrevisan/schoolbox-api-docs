@@ -5,17 +5,18 @@
  */
 
 :root {
-    --sbx-config-box-drop-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --sbx-config-box-drop-shadow: var(--sbx-shadow-m);
 }
 
 body.sbx-body {
     //Base box surfaces
-    .island > section,
+    .island section,
     .c-island,
     .empty-state,
     .empty-state-flex-centered,
     .hybrid-bar,
-    .scrollable:has(table.timetable) {
+    .scrollable:has(table.timetable),
+    .side-nav {
         box-shadow: var(--sbx-config-box-drop-shadow);
     }
 }

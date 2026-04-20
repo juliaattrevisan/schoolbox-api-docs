@@ -3,7 +3,14 @@
 * All shadows used throughout Schoolbox are to be defined here.
 */
 :root {
-    --sbx-shadow-s: 0 2px 4px rgba(0, 0, 0, 0.1);
-    --sbx-shadow-m: 0 4px 8px rgba(0, 0, 0, 0.15);
-    --sbx-shadow-l: 0 8px 16px rgba(0, 0, 0, 0.2);
+    --sbx-shadow-s:
+        0.2px 0.3px 0.4px rgba(0, 0, 0, 0.1), 0.5px 1px 1.2px -0.8px rgba(0, 0, 0, 0.1),
+        1.3px 2.6px 3.2px -1.7px rgba(0, 0, 0, 0.1);
+    --sbx-shadow-m:
+        0.3px 0.5px 0.7px rgba(0, 0, 0, 0.1), 0.8px 1.6px 2px -0.8px rgba(0, 0, 0, 0.1),
+        2.1px 4.1px 5.2px -1.7px rgba(0, 0, 0, 0.1), 5px 10px 12.6px -2.5px rgba(0, 0, 0, 0.1);
+    --sbx-shadow-l:
+        0.5px 0.8px 1.1px rgba(0, 0, 0, 0.1), 1.2px 2.5px 3.1px -0.5px rgba(0, 0, 0, 0.1),
+        3px 6px 7.6px -1px rgba(0, 0, 0, 0.1), 7.1px 14.2px 17.9px -1.5px rgba(0, 0, 0, 0.1),
+        16px 32px 40.3px -2px rgba(0, 0, 0, 0.1);
 }
