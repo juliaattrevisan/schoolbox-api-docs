@@ -56,11 +56,7 @@ function getDefaultLanguages(): number[] {
     return defaultLanguageId.value ? [defaultLanguageId.value] : [];
 }
 
-function buildRowsForSubject(
-    subjectData: IBSubject,
-    index: number,
-    tableType?: string,
-): SubjectRow[] {
+function buildRowsForSubject(subjectData: IBSubject, index: number, tableType?: string): SubjectRow[] {
     const configurations = subjectData.languages;
     const rowId = tableType ? `${tableType}_${subjectData.id}_${index}` : `group_subject_${subjectData.id}`;
     const selectedLanguages = configurations.map((configuration) => configuration.languageId);
@@ -174,8 +170,11 @@ function onLanguagesSelected(selectedLanguages: number[]): void {
         mainRow.languages = selectedLanguages;
         mainRow.classCode = "";
 
-        const existingConfigurations = props.ibSubjects.find((subject) => subject.id === mainRow.groupSubjectId)?.languages ?? [];
-        const classCodeByLanguage = new Map(existingConfigurations.map((configuration) => [configuration.languageId, configuration.classCode]));
+        const existingConfigurations =
+            props.ibSubjects.find((subject) => subject.id === mainRow.groupSubjectId)?.languages ?? [];
+        const classCodeByLanguage = new Map(
+            existingConfigurations.map((configuration) => [configuration.languageId, configuration.classCode]),
+        );
 
         const newLanguageRows: SubjectRow[] = selectedLanguages.map((language, index) => ({
             id: `${mainRow.id}_lang_${index}`,

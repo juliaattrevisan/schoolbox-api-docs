@@ -9,13 +9,7 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import IBGeneralConfig from "./components/ib-general-config.vue";
 import IBSubjectTable from "./components/ib-subject-table.vue";
-import type {
-    IBCategory,
-    IBConfiguration,
-    IBLanguage,
-    IBRoutes,
-    IBSubject,
-} from "../js/types/ibConfigurationTypes";
+import type { IBCategory, IBConfiguration, IBLanguage, IBRoutes, IBSubject } from "../js/types/ibConfigurationTypes";
 
 interface Props {
     categories: IBCategory[]; // The IB subject group categories to display
