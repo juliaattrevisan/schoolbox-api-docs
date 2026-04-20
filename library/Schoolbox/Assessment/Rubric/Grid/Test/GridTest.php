@@ -679,7 +679,7 @@ class GridTest extends TestCase
             Generator::TEST_LEVELS,
             Generator::TEST_CAPABILITY_USAGES
         );
-        $grid1->getAssessment()->setUseMarkRange(true);
+        $grid1->getAssessment()->setUseMarkRange(true); // TODO: useMarkRange should be against a rubric grid
         $grid2->getAssessment()->setUseMarkRange(false);
         yield "different mark range" => [$grid1, $grid2, true];
 

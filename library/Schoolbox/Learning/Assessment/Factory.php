@@ -250,7 +250,6 @@ class Factory
         /* Due Work needs this to instantiate correctly
          */
         $this->setAcceptOnline((int)trim($post['acceptOnline'] ?? ''));
-        $this->setUseRubric((bool)($post['useRubric'] ?? ''));
         $this->setSimilarityCheckEnabled(trim($post['similarityCheckEnabled'] ?? '') === 'on');
 
         /**
@@ -287,10 +286,6 @@ class Factory
         }
 
         $this->setEnablePolicy(trim($post['enablePolicy'] ?? '') === 'on');
-
-        $this->setCapabilityMarkType((int)trim($post['capability-markType'] ?? ''));
-        $this->setCapabilityGradeGroup((int)trim($post['capability-gradingScheme'] ?? ''));
-        $this->setUseMarkRange(trim($post['useMarkRange'] ?? '') === 'on');
 
         // Only due works have a max mark.
         if (in_array($assessmentType, [AssessmentType::TYPE_DUE_WORK, AssessmentType::TYPE_REPORTING])) {
@@ -342,9 +337,33 @@ class Factory
             $this->setSelfReviewable(null);
         }
 
+        /* Rubrics
+         * - There will eventually be multiple rubrics, however at the moment $rubricId would only ever be the assessment ID
+         * - "Use Rubric" was previously a distinct option to choose, now it's just based on the existence of a rubric
+         */
         // TODO what should this be?
-        if (isset($post['formField'], $post[$post['formField']])) {
-            $this->setRubricData($post[$post['formField']]);
+        $this->setUseRubric(false);
+        // TODO TEMP: useMarkRange/capabilityMarkType/capabilityGradeGroup should be against the rubric, but need defaults
+        $this->setUseMarkRange(false);
+        $this->setCapabilityMarkType(MarkType::TYPE_NONE);
+        $this->setCapabilityGradeGroup(null);
+        if (isset($post['rubric'])) {
+            $rubrics = [];
+            foreach ($post['rubric'] as $rubricId => $rubricData) {
+                $rubrics[$rubricId] = json_decode($rubricData, true, 512, JSON_THROW_ON_ERROR);
+            }
+
+            if (\count($rubrics) > 0) {
+                // TODO Will this have a side effect of turning on rubrics for existing assessments if you re-save one that had a rubric but turned off...?
+                $this->setUseRubric(true);
+                $this->setRubricData($rubrics);
+
+                // TODO TEMP: useMarkRange/capabilityMarkType/capabilityGradeGroup should be against the rubric
+                $firstRubricData = $rubrics[array_key_first($rubrics)];
+                $this->setUseMarkRange($firstRubricData['useMarkRange']);
+                $this->setCapabilityMarkType(MarkType::slugToId($firstRubricData['capabilityMarkType']));
+                $this->setCapabilityGradeGroup($firstRubricData['capabilityGradeGroup']);
+            }
         }
 
         /* Check if any attached files existed in POST data

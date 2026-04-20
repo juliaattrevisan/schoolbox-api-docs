@@ -91,7 +91,7 @@
                                 </span>
                                 {% if descriptor.hasValue and config.rubric_show_points and rubricGrid.showDescriptorValue and showDescriptorValue %}
                                     <span class="rb-value used" >
-                                        {% if rubricGrid.assessment.useMarkRange and descriptor.hasRange %}
+                                        {% if rubricGrid.useMarkRange and descriptor.hasRange %}
                                             {% if isMarkDisplayed %}
                                                 <span class="range-selection-value">{{ indicatorMark.value }}</span>
                                             {% endif %}

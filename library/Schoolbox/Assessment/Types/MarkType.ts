@@ -2,13 +2,14 @@
  * The different mark types that can currently be set on an assessment
  */
 
-export const MARK_TYPE_TOTAL_MARK = "raw";
-export const MARK_TYPE_PERCENTAGE = "percent";
-export const MARK_TYPE_LETTER_GRADE = "letter";
-export const MARK_TYPE_NONE = "none";
+export enum MarkTypeSlug {
+    PERCENT = "percent",
+    LETTER = "letter",
+    TOTAL = "raw",
+    NONE = "none",
+}
 
-export type MarkType =
-    | typeof MARK_TYPE_TOTAL_MARK
-    | typeof MARK_TYPE_PERCENTAGE
-    | typeof MARK_TYPE_LETTER_GRADE
-    | typeof MARK_TYPE_NONE;
+export type MarkType = {
+    name: string; // the proper name of the mark type
+    slug: MarkTypeSlug; // the slug of the mark type
+};

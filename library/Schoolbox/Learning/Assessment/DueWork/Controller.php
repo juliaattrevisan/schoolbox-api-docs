@@ -58,6 +58,7 @@ use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Result\Mapper as RubricResultSetMapper;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Level;
+use Schoolbox\Assessment\Rubric\Grid\Translator\ModelToArray as RubricGridTranslator;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Error;
@@ -2031,16 +2032,22 @@ class Controller extends Assessment\Controller
 
         $resultSets = $this->resultSetMapper->findAll();
 
-        $rs = new Collection();
-
+        $rs = [];
         foreach ($resultSets as $result) {
-            if (!$rs[$result->getResultSetId()] instanceof ICollection) {
-                $rs[$result->getResultSetId()] = $this->resultSetMapper->createCollection();
+            if (!isset($rs[$result->getResultSetId()])) {
+                $rs[$result->getResultSetId()] = [
+                    'id' => $result->getResultSetId(),
+                    'results' => [],
+                ];
             }
-            $rs[$result->getResultSetId()][$result->getValue()] = $result;
+
+            $rs[$result->getResultSetId()]['results'][] = [
+                'value' => $result->getValue(),
+                'label' => $result->getLabel(),
+            ];
         }
 
-        $data['rubricResultSets'] = $rs;
+        $data['rubricResultSets'] = array_values($rs);
 
         // Do any students have marks for this rubric?
         $levelIds      = RubricLevelMapper::getInstance()->findIdsByColumn('b.assessment_id', $dueWork->getId());
@@ -2052,8 +2059,6 @@ class Controller extends Assessment\Controller
             ]
         );
 
-        $data['rubricHasMarks'] = $countMarkIds > 0;
-
         // The rubric grid can be used as is without Twig-wrangling
         $rubricGrid = $this->rubricMapper->retrieveGrid($dueWork, true);
         if (count($rubricGrid->getLevels()) === 0) {
@@ -2062,7 +2067,25 @@ class Controller extends Assessment\Controller
                        ->add(new Level())
                        ->add(new Level());
         }
-        $data['rubricGrid'] = $rubricGrid;
+        $data['rubricGrid'] = $rubricGrid; // TODO: remove legacy individual rubric grid, this will prevent the other spots from breaking until we get around to them
+
+        /**
+         * list of all rubric grids for this assessment
+         * @see also in /library/Schoolbox/Learning/Assessment/Controller.php:getCloneAssessmentForm
+         */
+        $data['rubricGrids'] = [];
+        $data['rubricGridsPayload'] = [];
+
+        // TODO: for now just one grid support, in the format of multiple
+        $rubricGridTranslator = new RubricGridTranslator();
+        if ($dueWork->getUseRubric()) {
+            $data['rubricGrids'][] = $rubricGrid;
+            $data['rubricGridsPayload'][] = $rubricGridTranslator($rubricGrid, $dueWork);
+        }
+
+        // for multiple rubrics, this allows the frontend to add another one
+        // TODO: this probably needs to be an endpoint of its own as I expect it would change if you changed the original rubric? there's some nuance around how capabilities/indicators are deduped
+        $data['rubricBlankGrid'] = $rubricGridTranslator($this->rubricMapper->retrieveBlankGrid($dueWork, true), $dueWork);
 
         return $data;
     }

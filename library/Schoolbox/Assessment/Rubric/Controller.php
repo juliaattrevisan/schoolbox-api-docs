@@ -13,6 +13,7 @@ use Alaress\Json\Decorator\LinkDecorator;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use UnexpectedValueException;
 use Schoolbox\Assessment\Rubric\DataModel\Capability;
@@ -22,6 +23,7 @@ use Schoolbox\Assessment\Rubric\Grid\Exporter\ArrayExporter;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Level;
+use Schoolbox\Assessment\Rubric\Grid\Translator\ModelToArray as RubricGridTranslator;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -52,13 +54,13 @@ class Controller extends BaseController
     /**
      * @var Capability\Mapper
      */
-    private $groupMapper;
+    private $capabilityMapper;
 
 
     /**
      * @var Indicator\Mapper
      */
-    private $criterionMapper;
+    private $indicatorMapper;
 
 
     /**
@@ -85,8 +87,8 @@ class Controller extends BaseController
      * @param RubricDataSource     $mapper
      * @param AssessmentDataSource $assessmentDataSource
      * @param FolderMapper         $folderMapper
-     * @param Capability\Mapper    $groupMapper
-     * @param Indicator\Mapper     $criterionMapper
+     * @param Capability\Mapper    $capabilityMapper
+     * @param Indicator\Mapper     $indicatorMapper
      * @param RosettaStone         $rosettaStone
      * @param MarkTypeMapper       $markTypeMapper
      * @param Group\Mapper         $gradeGroupMapper
@@ -95,8 +97,8 @@ class Controller extends BaseController
         RubricDataSource $mapper,
         AssessmentDataSource $assessmentDataSource,
         FolderMapper $folderMapper,
-        Capability\Mapper $groupMapper,
-        Indicator\Mapper $criterionMapper,
+        Capability\Mapper $capabilityMapper,
+        Indicator\Mapper $indicatorMapper,
         RosettaStone $rosettaStone,
         MarkTypeMapper $markTypeMapper,
         Group\Mapper $gradeGroupMapper
@@ -104,8 +106,8 @@ class Controller extends BaseController
         $this->mapper               = $mapper;
         $this->assessmentDataSource = $assessmentDataSource;
         $this->folderMapper         = $folderMapper;
-        $this->groupMapper          = $groupMapper;
-        $this->criterionMapper      = $criterionMapper;
+        $this->capabilityMapper     = $capabilityMapper;
+        $this->indicatorMapper      = $indicatorMapper;
         $this->rosettaStone         = $rosettaStone;
         $this->markTypeMapper       = $markTypeMapper;
         $this->gradeGroupMapper     = $gradeGroupMapper;
@@ -113,7 +115,7 @@ class Controller extends BaseController
 
 
     /**
-     * AJAX method for creating a new group or criterion
+     * AJAX method for creating a new capability or indicator
      *
      * @api POST /rubric
      * @since 156
@@ -121,18 +123,6 @@ class Controller extends BaseController
     public function create()
     {
         $post = $this->requestPost;
-
-        $formField = $post->get('formField', 'rb');
-
-        $context = [
-            'formField' => $formField,
-            'rubric' => [
-                'id' => $post->get('rubricId'),
-                'levels' => $post->get('levelCount') ? array_fill(0, $post->get('levelCount'), ':)') : [],
-            ],
-            'markPerCapability' => $post->getBool('markPerCapability', false),
-            'useMarkRange'      => $post->getBool('useMarkRange', false),
-        ];
 
         // Don't use just folder ID
         $folderId = $post->get('folderId');
@@ -153,15 +143,14 @@ class Controller extends BaseController
         for ($i = 0; $i < $levelCount; $i++) {
             $rubricGrid->getLevels()->add(new Level());
         }
-        $context['rubricGrid'] = $rubricGrid;
 
+        $rubricGridTranslator = new RubricGridTranslator();
 
-        if ($post->get('type') === 'criterion') {
-            $groupId    = $post->get('groupId');
-            $groupIndex = $post->get('groupIndex');
-            $groupName  = $post->get('groupName');
+        if ($post->get('type') === 'indicator') {
+            $capabilityId    = $post->get('capabilityId');
+            $capabilityName  = $post->get('capabilityName');
             $critName   = $post->get('name');
-            if (!$groupName) {
+            if (!$capabilityName) {
                 $this->sendJSONError(
                     $this->rosettaStone->translateSentence(
                         'Must supply {:rubricGroup|indef} {:rubricGroup} for new {:rubricCriterion}'
@@ -171,13 +160,13 @@ class Controller extends BaseController
             }
 
 
-            // Only if adding a criterion to an existing group:
+            // Only if adding an indicator to an existing capability:
             // Find the capability model, so that the indicator may be saved
             // into the capability (and its folder)
-            if ($groupId) {
-                $groupModel = $this->groupMapper->findById($groupId);
+            if ($capabilityId) {
+                $capabilityModel = $this->capabilityMapper->findById($capabilityId);
                 // Surely this capability is in a folder?
-                if ($groupModel->getParentType() !== Capability\Model::PARENT_TYPE_CATEGORY) {
+                if ($capabilityModel->getParentType() !== Capability\Model::PARENT_TYPE_CATEGORY) {
                     $this->sendJSONError(
                         $this->rosettaStone->translateSentence(
                             'May only create folder-level {:rubricCriterion|p}'
@@ -185,16 +174,16 @@ class Controller extends BaseController
                     );
                     return;
                 }
-                $folderId = $groupModel->getParentId();
+                $folderId = $capabilityModel->getParentId();
             }
 
-            $criterionModels = $this->criterionMapper->findByColumn('rubric_capability_id', $groupId);
-            $proposedGroup   = Util::normalizeName($groupName);
-            $proposedName    = Util::normalizeName($critName);
-            foreach ($criterionModels as $criterionModel) {
-                $normGroup = Util::normalizeName($criterionModel->getCapability()->getName());
-                $normName  = Util::normalizeName($criterionModel->getName());
-                if ($normGroup === $proposedGroup && $normName === $proposedName) {
+            $indicatorModels = $this->indicatorMapper->findByColumn('rubric_capability_id', $capabilityId);
+            $proposedCapabilityName = Util::normalizeName($capabilityName);
+            $proposedName = Util::normalizeName($critName);
+            foreach ($indicatorModels as $indicatorModel) {
+                $normCapability = Util::normalizeName($indicatorModel->getCapability()->getName());
+                $normName = Util::normalizeName($indicatorModel->getName());
+                if ($normCapability === $proposedCapabilityName && $normName === $proposedName) {
                     $this->sendJSONError(
                         $this->rosettaStone->translateSentence(
                             '{:rubricCriterion|c} already exists in this {:rubricGroup}'
@@ -204,45 +193,41 @@ class Controller extends BaseController
                 }
             }
 
-            // This criterion needs to be created
-            $criterionModel = $this->criterionMapper->findOrCreateOneForFolderByKey(
+            // This indicator needs to be created
+            $indicatorModel = $this->indicatorMapper->findOrCreateOneForFolderByKey(
                 $folderId,
                 $critName,
-                isset($groupModel) ? $groupModel->getName() : $groupName
+                isset($capabilityModel) ? $capabilityModel->getName() : $capabilityName
             );
 
-            $group = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
-                ->setId($criterionModel->getCapability()->getId())
-                ->setName($groupName);
-
             // Don't have to save anything yet
-            $criterion = (new \Schoolbox\Assessment\Rubric\RowSet\Indicator())
-                ->setId($criterionModel->getId())
+            $indicator = (new \Schoolbox\Assessment\Rubric\RowSet\Indicator())
+                ->setId($indicatorModel->getId())
                 ->setName($critName);
 
-            $context['rowspan']    = null;
-            $context['group']      = $group;
-            $context['crit']       = $criterion;
-            $context['groupIndex'] = $groupIndex;
-
-            $template = 'group-row-editable';
-        } elseif ($post->get('type') === 'group') {
-            // Does the list of crits/groups really need to be saved now?
-            // For some reason, groups aren't saved whilst criteria are?
-            // Probably because groups literally couldn't exist w/o criteria
-            $groupName = $post->get('name');
+            $indicatorData = $rubricGridTranslator->translateIndicator($rubricGrid, $indicator);
+            $this->response = $this->responseAsJson([
+                // this can differ to $capabilityId if we just had to create the capability to put the indicator in
+                'capabilityId' => $indicatorModel->getCapability()->getId(),
+                'indicator' => $indicatorData,
+            ]);
+        } elseif ($post->get('type') === 'capability') {
+            // Does the list of indicators/capabilities really need to be saved now?
+            // For some reason, capabilities aren't saved whilst criteria are?
+            // Probably because capabilities literally couldn't exist w/o criteria
+            $capabilityName = $post->get('name');
 
             // Next step: figure out what gets passed in
-            $group = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
+            $capability = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
 //                ->setId(rand(1, PHP_INT_MAX))
-                ->setName($groupName);
+                ->setName($capabilityName);
 
-            // Ensure the proposed Group name is not already in use.
-            $groupModels = $this->groupMapper->findForFolder($folderId);
-            $proposed    = Util::normalizeName($groupName);
-            foreach ($groupModels as $groupModel) {
-                $grouping = Util::normalizeName($groupModel->getName());
-                if ($proposed === $grouping) {
+            // Ensure the proposed Capability name is not already in use.
+            $capabilityModels = $this->capabilityMapper->findForFolder($folderId);
+            $proposedName = Util::normalizeName($capabilityName);
+            foreach ($capabilityModels as $capabilityModel) {
+                $normName = Util::normalizeName($capabilityModel->getName());
+                if ($proposedName === $normName) {
                     $this->sendJSONError(
                         $this->rosettaStone->translateSentence(
                             '{:rubricGroup|c} name already exists in this context'
@@ -252,20 +237,9 @@ class Controller extends BaseController
                 }
             }
 
-            $context['rowspan']    = 1;
-            $context['group']      = $group;
-            $context['groupIndex'] = $post->get('groupIndex');
-
-            $template = 'group-editable';
-        } else {
-            return;
+            $capabilityData = $rubricGridTranslator->translateCapability($rubricGrid, $capability);
+            $this->response = $this->responseAsJson($capabilityData);
         }
-
-
-        $this->response = $this->responseFromTemplateUnthemed(
-            "@rubric/$template.twig",
-            $context
-        );
     }
 
     /**
@@ -335,37 +309,16 @@ class Controller extends BaseController
             return;
         }
 
-        /* Obtain the grid html separately from the other rubric settings
+        /* Obtain the grid data separately from the other rubric settings
          *
          * Otherwise you have to infer the settings from what might have been visible in the grid
          */
-        $fragment = $this->responseFromTemplateUnthemed('@rubric/grid-editable.twig', $context = [
-            'formField'  => $post->get('formField', 'rb'),
-            'rubricGrid' => $assessment->getRubricGrid(),
-            'levelLimit' => $maxLevels,
-        ])->getBody()->getContents();
+        $rubricGridTranslator = new RubricGridTranslator();
+        $rubricGridPayload = $rubricGridTranslator($assessment->getRubricGrid(), $assessment);
 
-        $payload = [
-
-            /* Capability Mark Type value, if applicable
-             */
-            'capabilityMarkType' => $assessment->getCapabilityMarkType() ? $assessment->getCapabilityMarkType()->getId() : null,
-
-            /* Capability Grade Group value, if applicable
-             */
-            'capabilityGradeGroup' => $assessment->getCapabilityGradeGroup() ? $assessment->getCapabilityGradeGroup()->getId() : null,
-
-            /* Use Mark Range switch; grid-editable doesn't use this var
-             * This compiled payload ends up in grid-csv.twig as result of async request
-             */
-            'useMarkRange' => $assessment->getUseMarkRange(),
-
-            /* The rubric grid resulting from the csv import
-             */
-            'fragment' => $fragment,
-        ];
-
-        $this->response = $this->responseAsJson($payload);
+        $this->response = $this->responseAsJson([
+            'rubricGrid' => $rubricGridPayload,
+        ]);
     }
 
     /**
@@ -376,10 +329,12 @@ class Controller extends BaseController
      */
     public function download()
     {
-        $post         = $this->requestPost->get('rb');
-        $assessmentId = key($post);
-        $assessment   = $this->assessmentDataSource->findById($assessmentId);
+        // TODO: there's no permission check against here...
+        // TODO: ideally remove the need to provide an assessment at all if we can
+        $rubric = $this->requestPost->get('rubricGrid');
+        $assessmentId = $this->requestPost->getInt('assessmentId');
 
+        $assessment   = $this->assessmentDataSource->findById($assessmentId);
         if (!$assessment instanceof DueWork) {
             // This is an error. How do I generate one?
             // Note: I can't download rubrics for due works that don't exist yet
@@ -391,9 +346,9 @@ class Controller extends BaseController
          */
         $markType = null;
 
-        if ($this->requestPost['capability-markType']) {
+        if ($rubric['capabilityMarkType']) {
             try {
-                $markType = MarkTypeMapper::getInstance()->findById($this->requestPost['capability-markType']);
+                $markType = MarkTypeMapper::getInstance()->findOneByColumn('slug', $rubric['capabilityMarkType']);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $this->sendError('Unknown capability mark type selected');
                 return;
@@ -404,9 +359,9 @@ class Controller extends BaseController
          */
         $gradeGroup = null;
 
-        if ($this->requestPost['capability-gradingScheme'] !== null) {
+        if ($rubric['capabilityGradeGroup'] !== null) {
             try {
-                $gradeGroup = Group\Mapper::getInstance()->findById($this->requestPost['capability-gradingScheme']);
+                $gradeGroup = Group\Mapper::getInstance()->findById($rubric['capabilityGradeGroup']);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $this->sendError('Unknown capability grade group selected');
                 return;
@@ -415,11 +370,11 @@ class Controller extends BaseController
 
         $assessment->setCapabilityMarkType($markType)
                    ->setCapabilityGradeGroup($gradeGroup);
-        $assessment->setUseMarkRange($this->requestPost->getBool('useMarkRange') ?? false);
+        $assessment->setUseMarkRange($rubric['useMarkRange'] ?? false); // TODO: useMarkRange should be against a rubric
 
         $grid     = (new GridFactory())->buildFromPostData(
             $this->mapper->retrieveGrid($assessment, false),
-            $post,
+            [ $assessmentId => $rubric ], // TODO this will probably change as we further implement multi-grid support
             false
         );
         $basename = (new Url($assessment->getTitle()))->getSlug();
@@ -443,7 +398,19 @@ class Controller extends BaseController
      */
     public function determineMarkInvalidation(): void
     {
-        $post         = $this->requestPost->get('rb');
+        $post         = $this->requestPost->get('rubric');
+        $response = [
+            'compatible'    => true,
+            'affectedUsers' => [],
+        ];
+
+        // TODO: no rubric data? always compatible?
+        if (null === $post) {
+            $this->response = $this->responseAsJson($response)->withStatus(200);
+            return;
+        }
+
+        // TODO: multi-rubrics support
         $assessmentId = key($post);
 
 
@@ -468,22 +435,29 @@ class Controller extends BaseController
         // Need to load them separately due to object references: if I use the
         // same assessment in both retrieveGrid calls the current grid thinks
         // the current assessment state is the same as the proposed state.
-        $proposedAssessment = (clone $currentAssessment)
-            ->setCapabilityMarkType($this->markTypeMapper->createModel()->setId((int)($this->requestPost['capability-markType'] ?? '')))
-            ->setUseMarkRange($this->requestPost->getBool('useMarkRange', false));
+        $proposedAssessment = (clone $currentAssessment);
+
+        $rubricData = json_decode($post[$assessmentId], true);
+
+        // TODO: capabilityMarkType & useMarkRange come from the rubric data itself now, they shouldn't be against the assessment anymore
+        $capabilityMarkTypeSlug = $rubricData['capabilityMarkType'] ?? MarkType::SLUG_NONE;
+        $capabilityMarkType = $this->markTypeMapper->createModel()
+            ->setSlug($capabilityMarkTypeSlug)
+            ->setId(MarkType::slugToId($capabilityMarkTypeSlug));
+        $useMarkRange = $rubricData['useMarkRange'] ?? false;
+
+        $proposedAssessment->setCapabilityMarkType($capabilityMarkType);
+        $proposedAssessment->setUseMarkRange($useMarkRange);
+
         $proposedGrid = (new GridFactory())->buildFromPostData(
             $this->mapper->retrieveGrid($proposedAssessment, false),
-            $post,
+            [ $assessmentId => $rubricData ],
             false
         );
 
 
         // Is the proposed grid itself not valid?
         // Doesn't matter for the purpose of this exercise
-        $response = [
-            'compatible'    => true,
-            'affectedUsers' => [],
-        ];
         if (!$proposedGrid->isCompatibleWith($currentGrid)) {
             $response['compatible'] = false;
             $jsonDecorator = new PropertyDecorator();

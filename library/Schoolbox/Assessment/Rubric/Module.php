@@ -40,6 +40,7 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF)
+                // TODO: instructors (non-staff) mangaging rubrics they have acess to? otherwise they hit a 403
             )
         );
         $filePreload = function ($params) {

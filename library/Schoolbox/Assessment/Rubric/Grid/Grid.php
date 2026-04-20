@@ -82,6 +82,14 @@ class Grid
 
 
     /**
+     * Does this rubric use mark ranges?
+     *
+     * @var bool
+     */
+    private bool $useMarkRange;
+
+
+    /**
      * Constructor
      *
      * @param DueWork $assessment
@@ -94,6 +102,7 @@ class Grid
         $this->capabilityUsages  = new GenericCollection(CapabilityUsage::class);
         $this->levels            = new GenericCollection(Level::class);
         $this->markSchemeFactory = new MarkSchemeFactory();
+        $this->useMarkRange      = $assessment->getUseMarkRange(); // TODO: useMarkRange should be against a rubric
     }
 
 
@@ -347,6 +356,15 @@ class Grid
     public function getCapabilityMarkScheme(): IMarkScheme
     {
         return $this->markSchemeFactory->spawnForCapability($this->getAssessment());
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isUseMarkRange(): bool
+    {
+        return $this->useMarkRange;
     }
 
 

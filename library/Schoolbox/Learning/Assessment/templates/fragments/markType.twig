@@ -5,6 +5,8 @@
  # and a set of Grade Group instances. The latter conditionally shows,
  # depending on the setting of the former.
  #
+ # @see also /library/Schoolbox/Learning/Assessment/templates/fragments/vue/mark-type.vue
+ #
  # @param string $context               A string prefix for namespacing, so you can reuse this fragment in the same template
  # @param IAssessable $assessment       An assessment instance
  # @param array $allMarkTypes           tuples for (id, name) of mark types
@@ -30,7 +32,7 @@
  #}
 {% set markTypeLetterGrade = 2 %}
 {% set markTypeTotalMark = 3 %}
-{% set markTypeNone = 6 %}
+{% set markTypeNone = 6 %} {# also in MarkType.ts #}
 
 {# Suffix the context with a hyphen, if context was specified
  # This makes ids more bearable to read

@@ -7,10 +7,7 @@ import type { MarkType } from "@schoolboxAssessment/Types/MarkType";
  * object set up specifically for quiz vertical/horizontal marking
  */
 export type AssessmentMarkData = {
-    type: {
-        name: string; // the proper name of the mark type
-        slug: MarkType; // the slug of the mark type
-    };
+    type: MarkType;
     levels?: LetterGradeItem[];
     submissionStates: SubmissionState[];
 };

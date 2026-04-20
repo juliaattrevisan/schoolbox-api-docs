@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Tests\Support\Payload\Assessable;
 
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Learning\Assessment\AssessmentType;
 
 /**
@@ -67,15 +68,6 @@ trait FormTrait
             $this->setFormParam('instructor-gradingScheme', 1);
         }
         $this->setFormParam('resultset', '');
-        $this->setFormParam('formField', 'rb');
-        $this->setFormParam('useRubric', 0);
-        // 6 - none
-        $this->setFormParam('capability-markType', 6);
-        $this->setFormParam('capability-gradingScheme', 1);
-
-        foreach ([0, 1] as $index) {
-            $this->setRubricLevel($index, null, '');
-        }
 
         $this->setFormParam('curriculumCodes', '');
     }
@@ -88,36 +80,106 @@ trait FormTrait
         $this->setFormParam('title', $title);
     }
 
-    public function setRubricCapability(int $index, ?int $id, string $name, ?int $maxMark): void
+    private function getRubricFormParam(): ?array
     {
         $assessmentId = $this->getRubricAssessmentId();
 
-        $this->setFormParam("rb[$assessmentId][group][$index][maxValue]", $maxMark === null ? '' : (string)$maxMark);
-        $this->setFormParam("rb[$assessmentId][group][$index][id]", $id === null ? '' : (string)$id);
-        $this->setFormParam("rb[$assessmentId][group][$index][name]", $name);
+        $value = $this->getFormParam("rubric[$assessmentId]") ?? null;
+        if (!empty($value)) {
+            return json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+        }
+
+        // no rubric yet, add one and populate it with defaults
+        // TODO: this will change again when testing multiple rubrics
+        $this->setRubricFormParam([
+            'level' => [],
+            'group' => [],
+            'criterion' => [],
+            'descriptor' => [],
+            'title' => '',
+            'weight' => null,
+            'useMarkRange' => false,
+            'capabilityMarkType' => MarkType::SLUG_NONE,
+            'capabilityGradeGroup' => 1,
+        ]);
+
+        foreach ([0, 1] as $index) {
+            $this->setRubricLevel($index, null, '');
+        }
+
+        return $this->getRubricFormParam();
+    }
+
+    private function setRubricFormParam(array $rubricData): void
+    {
+        $assessmentId = $this->getRubricAssessmentId();
+        $this->setFormParam("rubric[$assessmentId]", json_encode($rubricData, JSON_THROW_ON_ERROR));
+    }
+
+    public function setRubricCapability(int $index, ?int $id, string $name, ?int $maxMark): void
+    {
+        $rubricData = $this->getRubricFormParam();
+
+        $rubricData['group'][$index]['maxValue'] = $maxMark === null ? '' : (string)$maxMark;
+        $rubricData['group'][$index]['id'] = $id === null ? '' : (string)$id;
+        $rubricData['group'][$index]['name'] = $name;
+
+        $this->setRubricFormParam($rubricData);
+    }
+
+    public function setRubricTitle(string $title): void
+    {
+        $rubricData = $this->getRubricFormParam();
+        $rubricData['title'] = $title;
+        $this->setRubricFormParam($rubricData);
+    }
+
+    public function setRubricWeight(?float $weight): void
+    {
+        $rubricData = $this->getRubricFormParam();
+        $rubricData['weight'] = $weight;
+        $this->setRubricFormParam($rubricData);
+    }
+
+    public function setRubricCapabilityMarkType(?string $markTypeSlug): void
+    {
+        $rubricData = $this->getRubricFormParam();
+        $rubricData['capabilityMarkType'] = $markTypeSlug;
+        $this->setRubricFormParam($rubricData);
+    }
+
+    public function setRubricCapabilityGradeGroup(?int $gradeGroupId): void
+    {
+        $rubricData = $this->getRubricFormParam();
+        $rubricData['capabilityGradeGroup'] = $gradeGroupId;
+        $this->setRubricFormParam($rubricData);
     }
 
     public function setRubricIndicator(int $indicatorId, int $capabilityId, string $name, bool $enabled): void
     {
-        $assessmentId = $this->getRubricAssessmentId();
+        $rubricData = $this->getRubricFormParam();
 
-        $this->setFormParam("rb[$assessmentId][criterion][$indicatorId][id]", $indicatorId);
-        $this->setFormParam("rb[$assessmentId][criterion][$indicatorId][groupId]", $capabilityId);
-        $this->setFormParam("rb[$assessmentId][criterion][$indicatorId][name]", $name);
+        $rubricData['criterion'][$indicatorId]['id'] = $indicatorId;
+        $rubricData['criterion'][$indicatorId]['groupId'] = $capabilityId;
+        $rubricData['criterion'][$indicatorId]['name'] = $name;
 
         if ($enabled) {
-            $this->setFormParam("rb[$assessmentId][criterion][$indicatorId][on]", 1);
+            $rubricData['criterion'][$indicatorId]['on'] = 1;
         } else {
-            $this->unsetFormParam("rb[$assessmentId][criterion][$indicatorId][on]");
+            unset($rubricData['criterion'][$indicatorId]['on']);
         }
+
+        $this->setRubricFormParam($rubricData);
     }
 
     public function setRubricLevel(int $index, ?int $id, string $name): void
     {
-        $assessmentId = $this->getRubricAssessmentId();
+        $rubricData = $this->getRubricFormParam();
 
-        $this->setFormParam("rb[$assessmentId][level][$index][id]", $id === null ? '' : (string)$id);
-        $this->setFormParam("rb[$assessmentId][level][$index][name]", $name);
+        $rubricData['level'][$index]['id'] = $id === null ? '' : (string)$id;
+        $rubricData['level'][$index]['name'] = $name;
+
+        $this->setRubricFormParam($rubricData);
     }
 
     public function setRubricDescription(
@@ -127,11 +189,13 @@ trait FormTrait
         string $descriptorText,
         ?float $descriptorPoints
     ): void {
-        $assessmentId = $this->getRubricAssessmentId();
+        $rubricData = $this->getRubricFormParam();
 
-        $this->setFormParam("rb[$assessmentId][descriptor][$indicatorId][$levelIndex][id]", $descriptorId === null ? '' : (string)$descriptorId);
-        $this->setFormParam("rb[$assessmentId][descriptor][$indicatorId][$levelIndex][text]", $descriptorText);
-        $this->setFormParam("rb[$assessmentId][descriptor][$indicatorId][$levelIndex][points]", $descriptorPoints === null ? '' : (string)$descriptorPoints);
+        $rubricData['descriptor'][$indicatorId][$levelIndex]['id'] = $descriptorId === null ? '' : (string)$descriptorId;
+        $rubricData['descriptor'][$indicatorId][$levelIndex]['text'] = $descriptorText;
+        $rubricData['descriptor'][$indicatorId][$levelIndex]['points'] = $descriptorPoints === null ? '' : (string)$descriptorPoints;
+
+        $this->setRubricFormParam($rubricData);
     }
 
     /**

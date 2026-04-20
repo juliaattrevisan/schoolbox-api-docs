@@ -30,6 +30,7 @@ class Factory
      *                       still succeed even if saving it will not.
      * @return Grid
      * @throws \InvalidArgumentException
+     * @see /library/Schoolbox/Assessment/Rubric/templates/vue/payload.ts
      */
     public function buildFromPostData(Grid $grid, array $postData, bool $validate = true): Grid
     {
@@ -41,11 +42,10 @@ class Factory
         $capabilities  = $rubricData['group']      ?? [];
         $indicators    = $rubricData['criterion']  ?? [];
         $descriptors   = $rubricData['descriptor'] ?? [];
-        $usesMarkRange = false;
+        $usesMarkRange = $rubricData['useMarkRange'] ?? false;
         $markPerCap    = false;
 
         if ($assessment instanceof DueWork) {
-            $usesMarkRange = $assessment->getUseMarkRange();
             $markPerCap    = $assessment->isMarkPerCapability();
         }
 

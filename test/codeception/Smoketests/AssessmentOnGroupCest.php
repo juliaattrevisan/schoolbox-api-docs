@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Tests\Smoketests;
 
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Tests\Support\IntegrationTester;
 use Tests\Support\Page\Duework\AssessmentForm;
 use Tests\Support\Payload;
@@ -125,7 +126,6 @@ class AssessmentOnGroupCest
         $assessment_title     = 'Testing Create Assessment with Rubric On Group Page ID ' . $groupPage->getId() . ' at ' . $timestamp;
         $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_FOLDER, $groupPage->getId(), $groupPage->getId(), AssessmentType::TYPE_DUE_WORK);
         $newAssessmentRequest->setTitle($assessment_title);
-        $newAssessmentRequest->setFormParam('useRubric', 'on');
         $newAssessmentRequest->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
         $this->setDefaultRubric($i, $newAssessmentRequest, $groupPage->getId());
 
@@ -221,7 +221,6 @@ class AssessmentOnGroupCest
         $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_FOLDER, $groupPage->getId(), $groupPage->getId(), AssessmentType::TYPE_DUE_WORK);
         $assessment_title     = 'Testing Mark Assessment with rubric On Homepage ID ' . $groupPage->getId() . ' at ' . $timestamp;
         $newAssessmentRequest->setTitle($assessment_title);
-        $newAssessmentRequest->setFormParam('useRubric', 'on');
         $newAssessmentRequest->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
         $this->setDefaultRubric($i, $newAssessmentRequest, $groupPage->getId());
         $i->amGoingTo('Send request create asessment on Group Page #' . $groupPage->getId());
@@ -636,8 +635,8 @@ class AssessmentOnGroupCest
         $indicatorNameSuffixes            = ['1', '2', '3'];
         $levelNameSuffixes                = ['A', 'B', 'C'];
 
-        $assessmentPayload->setFormParam('capability-markType', '1');
-        $assessmentPayload->setFormParam('capability-gradingScheme', '1');
+        $assessmentPayload->setRubricCapabilityMarkType(MarkType::SLUG_PERCENT);
+        $assessmentPayload->setRubricCapabilityGradeGroup(1);
         $assessmentPayload->setFormParam('maxMark', '12');
 
         // Set rubric levels
@@ -651,10 +650,8 @@ class AssessmentOnGroupCest
             $createCapabilityRequest = new CreateCapability(
                 $folder_id,
                 $assessmentId,
-                $capIndex + 1,
                 $capabilityName,
-                count($levelNameSuffixes),
-                false
+                \count($levelNameSuffixes)
             );
             $i->amGoingTo("send request to create capability, '$capabilityName'");
             $i->sendRequest($createCapabilityRequest);
@@ -669,20 +666,17 @@ class AssessmentOnGroupCest
                     $folder_id,
                     $assessmentId,
                     null,
-                    $capIndex + 1,
                     $indicatorName,
-                    count($levelNameSuffixes),
-                    false,
+                    \count($levelNameSuffixes),
                     $capabilityName
                 );
                 $i->amGoingTo("send request to create a indicator, '$indicatorName' in capability, '$capabilityName'");
                 $i->sendRequest($createIndicatorRequest);
                 $i->seeResponseCodeIs(200);
 
-                preg_match($patternCapabilityAndIndicatorIds, $i->grabResponse(), $matches);
-                $capabilityId = (int)$matches[2];
-                $indicatorId = (int)$matches[1];
-                unset($matches);
+                $indicatorResponse = json_decode($i->grabResponse(), true);
+                $capabilityId = $indicatorResponse['capabilityId'];
+                $indicatorId = $indicatorResponse['indicator']['id'];
 
                 $assessmentPayload->setRubricCapability($capIndex, $capabilityId, $capabilityName, 4);
                 $assessmentPayload->setRubricIndicator($indicatorId, $capabilityId, $indicatorName, true);

@@ -4,398 +4,63 @@
  # This is the assessment creational/updational section concerning the rubric grid.
  # It appears on the assessment modify screen at the bottom.
  #
- # @param Grid $rubricGrid                  An instance of Grid
+ # @param Grid $rubricGrids                 Instances of Grid for each rubric grid attached to this assessment
  # @param array $rubricAttachZone           An attachzone, for uploading rubric csvs
  # @param array $resultSets                 A Result Set chosen on the assessment modify screen to prepopulate rubric grid levels
- # @param bool $rubricHasMarks              Whether students have a feedback using this rubric grid
  # @param IAssessable $assessment           An assessment instance
- # @param int $markTypeTotalMark            The id of the Total Mark instance
- # @param array $capabilityMarkTypes        Tuples for (id, name) Mark Types available for rubric capabilities
- # @param array $capabilityGradingSchemes   Tuples for (id, name) Grading Schemes available for rubric capabilities
+ # @param array $capabilityMarkTypes        Mark Types available for rubric capabilities, matches /library/Schoolbox/Assessment/Types/MarkType.ts::MarkType
+ # @param array $capabilityGradingSchemes   Grading Schemes available for rubric capabilities, matches /library/Schoolbox/Learning/Assessment/templates/fragments/vue/mark-type.vue::GradeScheme
  # @param int defaultGradeGroup             Set in admin via default_grade_group config var
- # @param int markTypeNone                  The id of the mark type "None" (usually int 6)
  # @param bool $courseManagedReadonly       A bool to decide if this is readonly or not
  #}
-<div class="reveal-modal" data-reveal id="reveal-resultset">
-    <h2>Apply Result Set</h2>
-    <p>Choose a standard result set to apply to this {{ locale.translate('rubricCriterion') }} grid.</p>
-    <div class="alert-box warning">
-        <strong>Warning:</strong> this is a destructive action. Any existing level and descriptor data will be replaced with the chosen result set.
-    </div>
-    <h3>Available Result Sets</h3>
-    <div class="small-12 columns no-pad">
-        <ul class="option-list">
-        {% for resultSetId, resultSet in resultSets %}
-            <li>
-                <input id="rs-{{ resultSetId }}" type="radio" name="resultset" value="{{ resultSetId }}"{% if loop.first %} checked="checked"{% endif %}/>
-                <label for="rs-{{ resultSetId }}" class="radio-label">
-                    {%- for result in resultSet -%}
-                        {{ result.label }}{% if resultSet|length > 1 and not loop.last %}, {% endif %}
-                    {%- endfor -%}
-                </label>
-            </li>
-        {% endfor %}
-        </ul>
-        <ul class="flex-list buttons">
-            <li><a href="#" data-action="applyResultSet" class="submit button">Apply</a></li>
-            <li><a href="#" data-action="close" class="button">Cancel</a></li>
-        </ul>
-    </div>
 
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-    <div data-overlay class="wait-overlay hide">
-        <p>
-            Working...
-            <span class="loader"></span>
-        </p>
-    </div>
-</div>
-
-<div class="toast" data-alert data-relation="create-response"></div>
-
-
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/attacher/attacher.hide-watch.js?v={{ config.site_version }}"></script>
-<script type="text/javascript">
-    $(function() {
-        const capabilityMarkTypeNone = parseInt('{{ markTypeNone }}');
-
-
-        // Rubric ResultSets Modal
-        var $rsReveal     = $('#reveal-resultset');
-        var $interactions = $rsReveal.find('input,a');
-        var $overlay      = $rsReveal.find('[data-overlay]');
-
-        $rsReveal.on('closed.fndtn.reveal', function () {
-            // un-check the selected radio
-            $rsReveal.find('[type=radio]').prop('checked', false);
-
-            // re-enable all inputs and links
-            $interactions.prop('disabled', false);
-
-            $overlay.addClass('hide');
-
-        });
-
-        $('#apply-resultset').on('click', function (e) {
-            e.preventDefault();
-            $rsReveal.foundation('reveal', 'open');
-        });
-
-        $rsReveal.on('click', 'a', function (e) {
-            e.preventDefault();
-
-            var $button = $(this), rubricEditable, value, $input, $label, options ;
-
-            switch ($button.data('action')) {
-                case 'applyResultSet':
-
-                    let $rubric = $('table[data-rubric]');
-                    rubricEditable = $rubric.data('plugin_rubricEditable');
-
-                    if (rubricEditable) {
-
-                        $input = $rsReveal.find('input:checked');
-
-                        if ($input.length) {
-                            value  = $input.val();
-                            $label = $input.siblings('[for=' + $input.attr('id') + ']');
-
-                            // ensure value
-                            if (value > 0) {
-                                // get the list of options we're going to populate
-                                options = $label.text().split(',').map(function (v) { return v.trim(); });
-
-                                // prevent multi-submit
-                                $interactions.prop('disabled', true);
-                                $overlay.removeClass('hide');
-
-                                // break this out of main execution
-                                setTimeout(function () {
-                                    {% if rubricHasMarks %}
-                                        var originalDescriptorValues = getOriginalDescriptorValues();
-                                    {% endif %}
-
-                                    // apply the set
-                                    rubricEditable.applyResultSet(options);
-                                    $rsReveal.foundation('reveal', 'close');
-
-                                    {% if rubricHasMarks %}
-                                        applyOriginalDescriptorValues(originalDescriptorValues);
-                                        detectChangedDescriptorValues();
-                                    {% endif %}
-                                    // checkRubricTotal();
-                                }, 100);
-                            }
-                        }
-                    }
-                    break;
-                default:
-                    // only other known option is 'close'
-                    $rsReveal.foundation('reveal', 'close');
-                    break;
-            }
-        });
-
-        {# No need to output this if the Rubric has no marks #}
-        {% if rubricHasMarks %}
-
-            var $descriptorsChanged = $('[data-descriptors-changed]').hide();
-
-            // Each time we change the value of a descriptor
-            let $rubric = $('table[data-rubric]');
-            $rubric.on('blur keyup', '[data-descriptor-value-original]', function(){
-                detectChangedDescriptorValues();
-            });
-
-            // Each time the user toggles on/off a indicator
-            $rubric.on('change', '[data-criterion-name]', function(){
-                detectChangedDescriptorValues();
-            });
-
-
-            /**
-             * Gets an 2D array of original descriptor values, indexed by criterion.id, then level.index
-             *
-             * Applying a new result set may or may not change descriptor values. But by itself
-             * it blows away the original value. This function enables us to re-apply original values
-             * after apply a new result set to determine if marks should be invalidated.
-             */
-            function getOriginalDescriptorValues(){
-                var originalDescriptorValues = [];
-                $rubric.find('[data-descriptor-value-original]').each(function(idx, elem){
-                   var $elem = $(elem);
-                   var criterion = $elem.data('descriptor-criterion');
-                   var level = $elem.data('descriptor-level-index');
-
-                    // first time we've hit this row ?
-                    if('undefined' == typeof originalDescriptorValues[criterion]){
-                        originalDescriptorValues[criterion] = [];
-                    }
-                    originalDescriptorValues[criterion][level] = $elem.data('descriptor-value-original');
-                });
-                return originalDescriptorValues;
-            }
-
-            /**
-             * Re-applies original descriptor values after applying a new result set.
-             *
-             * This is because applying a new result set may or may not change descriptor values,
-             * but because it inserts new DOM elements, we need to manually re-apply the original values.
-             *
-             * @param {array} originalDescriptorValues  Indexed by criterion.id, then level.index
-             */
-            function applyOriginalDescriptorValues(originalDescriptorValues){
-
-                $rubric.find('[data-descriptor-value-original]').each(function(idx, elem){
-                    var $elem     = $(elem);
-                    var criterion = $elem.data('descriptor-criterion');
-                    var level     = $elem.data('descriptor-level-index');
-
-                    $elem.attr('data-descriptor-value-original', originalDescriptorValues[criterion][level]);
-                });
-            }
-
-            /**
-             * Examine all descriptors to see if any of their values differ from their original values.
-             *
-             * If so, shows a warning alert to the user that this action will invalidate existing marks.
-             *
-             * Only evaluates rows currently visible.
-             */
-            function detectChangedDescriptorValues()
-            {
-                var changesFound = false;
-                $rubric.find('[data-descriptor]:not(.hide-v) [data-descriptor-original]').each(function(idx, elem){
-                    var $elem = $(elem);
-
-                    // If a number, convert to float, else leave in string format.
-                    // This ensures that '0.0' === '0.000'
-                    var original = $elem.data('descriptor-value-original');
-                    var normOriginal = isNaN(parseFloat(original)) ? original : parseFloat(original);
-
-                    var current =$elem.val();
-                    var normCurrent = isNaN(parseFloat(current)) ? current : parseFloat(current);
-
-                    // Note the type comparison to detect '' !== 0
-                    if(normOriginal !== normCurrent){
-                        changesFound = true;
-                        return false;
-                    }
-                });
-
-                if(changesFound){
-                    $descriptorsChanged.show();
-                } else {
-                    $descriptorsChanged.hide();
-                }
-            }
-        {% endif %}
-
-
-        $("#useMarkRange").on('change', function() {
-            if ($("#useMarkRange").is(":checked")) {
-                $("td[data-descriptor] input").prop("placeholder", "Maximum points");
-            } else {
-                $("td[data-descriptor] input").prop("placeholder", "Points");
-            }
-        });
-
-
-        var toggleGroupMaxValues = function() {
-            var $groupMaxValueInputs = $('[data-group-max-value]'),
-                $groupMaxValueRows = $('[data-group-max-value-row]');
-
-            if (parseInt($('#capability-markType').val()) === capabilityMarkTypeNone) {
-                // Not using mark-per-group? Easy, hide all max value inputs
-                $groupMaxValueRows.addClass('hide');
-                $groupMaxValueInputs.addClass('hide').prop('disabled', true);
-
-            } else {
-                // Using mark-per-group? A little harder, show max value inputs for all in use
-                var $allCriterionRows = $('[data-group]');
-
-                // List of all groups, no duplicates
-                // TODO this is copypasted from elsewhere; figure out how to get it into a plugin!
-                var groupIdentifiers = new Set(
-                    $allCriterionRows
-                        .map(function() { return $(this).data('group'); })
-                        .toArray()
-                );
-
-                // Which groups are actually used?
-                var groupsInUse = {};
-                groupIdentifiers.forEach(function (groupIdentifier) {
-                    var $selectedCriteria = $allCriterionRows
-                        .filter('[data-group="'+groupIdentifier+'"]')
-                        .find('input[data-criterion-name]:checked');
-                    groupsInUse[groupIdentifier] = $selectedCriteria.length > 0;
-                });
-
-                // Switch on/off groups by whether they have a criterion in use
-                $groupMaxValueRows.each(function () {
-                    var $this = $(this),
-                        groupIdentifier = $this.data('group'),
-                        $thisGroupMaxValueRows = $groupMaxValueRows.filter('[data-group="'+groupIdentifier+'"]'),
-                        $thisGroupMaxValueInputs = $thisGroupMaxValueRows.find('[data-group-max-value]');
-                    if (groupIdentifier in groupsInUse && groupsInUse[groupIdentifier]) {
-                        $thisGroupMaxValueRows.removeClass('hide');
-                        $thisGroupMaxValueInputs.removeClass('hide').prop('disabled', false);
-                    } else {
-                        $thisGroupMaxValueRows.addClass('hide');
-                        $thisGroupMaxValueInputs.addClass('hide').prop('disabled', true);
-                    }
-                });
-            }
-        };
-
-
-        // Show/hide group marks based upon mark-per-group (NOT capability)
-        // Only show the group mark if at least one criterion is selected
-        // in the group
-        $("#capability-markType").on('change', toggleGroupMaxValues);
-        $('#rubric-attachable').on('change', 'input[data-criterion-name]', toggleGroupMaxValues);
-    });
-</script>
-
-
-<div class="row">
-    <div class="small-12 columns">
-        <label for="useRubric" class="inline-block">Use Rubric?</label>
-
-        {# For when the checkbox itself is disabled, since that won't submit to backend
-         # under those circumstances, inadvertently unlocking this setting
-         #}
-        <input type="hidden" name="useRubric" value="0" />
-
-        <div class="switch">
-            <input name="useRubric" id="useRubric" data-test="assessment-form-use-rubric" type="checkbox" {% if assessment.useRubric %}checked="checked"{% endif %} {% if courseManagedReadonly %}disabled{% endif %} />
-            <label for="useRubric">
-                <span class="icon-approve"></span>
-                <span class="icon-cancel"></span>
-            </label>
-        </div>
-    </div>
-</div>
-<fieldset class="{% if not assessment.useRubric %}hide{% endif %}" data-hide-watch="#useRubric">
-    <legend>Rubric marking options</legend>
-
-    {% include '@learningAssessment/fragments/markType.twig' with {
-        context: 'capability',
-        assessment: assessment,
-        allMarkTypes: capabilityMarkTypes,
-        allGradeSchemes: capabilityGradingSchemes,
-        selectedMaxMark: assessment.maxMark ?? null,
-        selectedMarkType: assessment.capabilityMarkType.id ?? null,
-        selectedGradeGroup: assessment.capabilityGradeGroup.id ?? null,
-        defaultGradeGroup: defaultGradeGroup,
-        renderMaxMark: false,
-        markTypeLabel: locale.rubricGroup.proper ~ ' Mark Type',
-        courseManagedReadonly: courseManagedReadonly
-    } %}
-
-    <div class="row">
-        <div class="small-12 columns">
-            <div id="useMarkRangePanel">
-                <label for="useMarkRange" class="inline-block">Use Mark Range</label>
-
-                {# For when the checkbox itself is disabled, since that won't submit to backend
-                 # under those circumstances, inadvertently unlocking this setting
-                 #}
-                <input type="hidden" name="useMarkRange" value="0" />
-
-                <div class="switch">
-                    <input name="useMarkRange" id="useMarkRange" type="checkbox" {% if assessment.useMarkRange %}checked="checked"{% endif %} {% if courseManagedReadonly %}disabled{% endif %} />
-                    <label for="useMarkRange">
-                        <span class="icon-approve"></span>
-                        <span class="icon-cancel"></span>
-                    </label>
-                </div>
-            </div>
-        </div>
-    </div>
-</fieldset>
-
-{# Sare away this entire rubric div off the viewport - there are too many interactable elements
- # to disable each of them reliably and sensibly, even though the grid itself doesn't perist.
- # Note that rubric grids can be insanely long and wide and distinguished
- #
- # ...so just boot it off your screen instead. I'm sure people will laugh, but whatevers
- # Show an informative instead
- #}
 {% if courseManagedReadonly %}
     <div class="row">
-        <div id="rubric-section" class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}">
+        <div class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}">
             <div class="small-12 columns no-pad">
-
-                {% include '@rubric/grid.twig' with {
-                    rubricGrid: rubricGrid,
-                    folderId: assessment.context.folder.id,
-                    usingMarkPerCapability: assessment.isMarkPerCapability,
-                    usingMarkRange: assessment.useMarkRange,
-                    idSuffix: idSuffix ?? '',
-                    showRubricTotal: true,
-                    showGroupTotal: assessment.markPerCapability,
-                    rubricMarkedGrid: false,
-                    showDescriptorValue: true
-                } only %}
+                {# TODO: deal with multiple readonly rubric grids #}
+                {% for rubricGrid in rubricGrids %}
+                    {% include '@rubric/grid.twig' with {
+                        rubricGrid: rubricGrid,
+                        folderId: assessment.context.folder.id,
+                        showRubricTotal: true,
+                        showGroupTotal: assessment.markPerCapability,
+                        rubricMarkedGrid: false,
+                        showDescriptorValue: true
+                    } only %}
+                {% endfor %}
             </div>
         </div>
     </div>
 {% else %}
     <div class="row">
-        <div id="rubric-section" class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}" data-hide-watch="#useRubric">
+        <div class="small-12 columns">
             <div class="small-12 columns no-pad">
-                <a href="#" id="apply-resultset" class="button">Apply Result Set</a>
-            </div>
-            <div class="small-12 columns no-pad">
-                {% include '@rubric/grid-csv.twig' with {
-                    rubricGrid: rubricGrid,
-                    attachzone: rubricAttachZone,
-                    folderId: assessment.context.folder.id,
-                    usingMarkPerCapability: assessment.isMarkPerCapability,
-                    usingMarkRange: assessment.useMarkRange,
-                    idSuffix: idSuffix ?? '',
-                } only %}
+                {% set assessmentId = assessment.id ? assessment.id : null %}
+                <div id="rubric-builder-container">
+                    <rubric-builder
+                        :rubric-grids-payload="{{ rubricGridsPayload|json_encode }}"
+                        :rubric-blank-grid="{{ rubricBlankGrid|json_encode }}"
+                        :result-sets="{{ resultSets|json_encode }}"
+                        :capability-mark-types="{{ capabilityMarkTypes|json_encode }}"
+                        :capability-grading-schemes="{{ capabilityGradingSchemes|json_encode }}"
+                        :default-grade-group="{{ defaultGradeGroup }}"
+                        :max-levels="{{ config.rubric_max_levels }}"
+                        :folder-id="{{ assessment.context.folder.id }}"
+                        route-rubric-create="{{ routeLookup("rubric.create") }}"
+                        route-rubric-import="{{ routeLookup("rubric.import") }}"
+                        :assessment-id="{{ assessmentId ? assessmentId : 'null' }}"
+                        {% if assessmentId %}
+                            route-rubric-download="{{ routeLookup('rubric.download') }}"
+                        {% endif %}
+                    />
+                </div>
+                <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricBuilder.js?v={{ config.site_version }}"></script>
+
+                {# TODO: bring this into Vue land one day, attachzone can't do that yet so just hide it here and click from within Vue instead #}
+                <div id="rubric-builder-import-attachzone" class="hide">
+                    {% include 'sub/attachzone.twig' with { attachzone: rubricAttachZone } %}
+                </div>
             </div>
         </div>
     </div>

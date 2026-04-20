@@ -74,10 +74,6 @@ class Create extends Request
             $this->setFormParam('instructor-gradingScheme', 1);
         }
         $this->setFormParam('resultset', 1);
-        $this->setFormParam('useRubric', 0);
-        // 6 - none
-        $this->setFormParam('capability-markType', 6);
-        $this->setFormParam('capability-gradingScheme', 1);
     }
 
 

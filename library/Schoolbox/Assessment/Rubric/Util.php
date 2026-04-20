@@ -26,6 +26,7 @@ class Util
      *
      * @param string $name
      * @return string
+     * @see /library/Schoolbox/Assessment/Rubric/templates/vue/rb-rubric-grid.vue::normaliseForComparison (must use the same logic)
      */
     public static function normalizeName(string $name): string
     {

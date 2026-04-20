@@ -32,7 +32,7 @@
             var formData = this;
             var rubricObjects = formData.filter(function(item) {
                 var name = item.name;
-                var regex = /rb([.*])*/;
+                var regex = /^rubric\[\-?\d+\]$/;
                 return name.match(regex);
             });
 

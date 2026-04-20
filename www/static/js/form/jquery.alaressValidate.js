@@ -467,6 +467,22 @@
     );
 
     /**
+     * Used in rubric to ensure a given rubric has at least one indicator
+     */
+    $.validator.addMethod(
+        "rubricHasIndicator",
+        function (value, element) {
+            const rubricBuilderRow = $(element).closest("[data-rubric-builder-row]");
+            return (
+                rubricBuilderRow.find("[data-criterion-name]").filter(function () {
+                    return $(this).is(":checked");
+                }).length > 0
+            );
+        },
+        "You must have at least one selected indicator if using a rubric",
+    );
+
+    /**
      * Used in rubric to ensure descriptors's values sequentially ascend, or descend, per indicator
      */
     $.validator.addMethod(
@@ -474,9 +490,11 @@
         function (value, indicatorCheckbox) {
             var valid = true;
 
-            if ($("#useMarkRange").is(":checked")) {
+            const rubricBuilderRow = $(indicatorCheckbox).closest("[data-rubric-builder-row]");
+
+            if (rubricBuilderRow.find("[data-rubric-use-mark-range-toggle]").is(":checked")) {
                 var descriptorList = $.makeArray(
-                    $(indicatorCheckbox).closest("tr[data-group]").find("[data-descriptor-value]"),
+                    $(indicatorCheckbox).closest("tr[data-indicator-row]").find("[data-descriptor-value]"),
                 );
 
                 var hasDescValue = function (descriptor) {

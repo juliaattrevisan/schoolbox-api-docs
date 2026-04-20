@@ -5,14 +5,6 @@ var scriptValidationRules = $("script[src*=validationRules]");
  */
 var validateOptions = {
     rules: {
-        useRubric: {
-            require_from_group: {
-                param: [1, "[data-criterion-name]"],
-                depends: function (element) {
-                    return element.checked;
-                },
-            },
-        },
         title: { required: true },
         weight: {
             required: true,
@@ -54,6 +46,7 @@ var validateOptions = {
              */
             error.insertAfter($element.siblings("[data-use-criterion-values]"));
         } else if ($element.is("#useRubric")) {
+            // TODO tweak useRubric logic
             // For validating if at least one indicator is selected
             error.insertAfter($element.closest("div.switch"));
         } else if ($element.is("[data-type-group]")) {
@@ -74,9 +67,6 @@ var validateOptions = {
     },
     messages: {
         weight: "The " + scriptValidationRules.attr("data-locale-grading-proper") + " weight should be zero or greater",
-        useRubric: {
-            require_from_group: "You must have at least one selected indicator if using a rubric",
-        },
         "submissionOptions[]": {
             require_from_group: "Please select at least one option",
         },
@@ -87,45 +77,41 @@ var validateOptions = {
 $(document).ready(function () {
     // Initialise validator - have to do this here, as the only other place it happens is in the mage on submit
     $("#assessmentForm").alaressValidate();
-
-    // Attach on-load rules -
-    // we can't pass these as options to alaressValidate because we need to loop through elements applying rules
-    attachValidationRules();
-
-    // Attach MutationObservers and on-change listeners
-    initDynamicValidationTriggers();
 });
 
 function initDynamicValidationTriggers() {
-    if ($("#useRubric").is(":checked")) {
+    // const moConfig = { attributes: false, childList: true, characterData: false };
+
+    // watch for new added builder rows
+    // var builderRowObserver = new MutationObserver(attachValidationRules);
+    // $("#rubric-builder-container").each(function () {
+    //     builderRowObserver.observe(this, moConfig);
+    // });
+
+    if ($("[data-rubric-builder-row]").length) {
         // on change of mark range setting
-        $("#useMarkRange").on("change", function () {
+        $("[data-rubric-use-mark-range-toggle]").on("change", function () {
             reValidate();
         });
 
         // Attach listener to run monotonicity validation on a descriptor row every time one of the contained descriptor values change
         $("[data-descriptor-value]").on("change", function () {
             var $changedDescriptor = $(this);
-            var $closestDescRow = $changedDescriptor
-                .closest("[data-descriptor]")
-                .prevAll("th")
-                .find("[data-criterion-name]");
+            var $closestDescRow = $changedDescriptor.closest("tr[data-indicator-row]").find("[data-criterion-name]");
             $closestDescRow.valid();
         });
 
-        var moConfig = { attributes: false, childList: true, characterData: false };
-
         // on change of number of levels
-        var levelObserver = new MutationObserver(attachValidationRules);
-        $("tr[data-group]").each(function () {
-            levelObserver.observe(this, moConfig);
-        });
+        // var levelObserver = new MutationObserver(attachValidationRules);
+        // $("[data-rubric-grid-level]").each(function () {
+        //     levelObserver.observe(this, moConfig);
+        // });
 
-        // on change of number of indicators/capabilities
-        var indicatorObserver = new MutationObserver(attachValidationRules);
-        $("table[data-rubric] tbody").each(function () {
-            indicatorObserver.observe(this, moConfig);
-        });
+        // // on change of number of indicators/capabilities
+        // var indicatorObserver = new MutationObserver(attachValidationRules);
+        // $("table[data-rubric] tbody").each(function () {
+        //     indicatorObserver.observe(this, moConfig);
+        // });
 
         // on change of checked indicators
         $("[data-criterion-name]").on("change", function () {
@@ -149,7 +135,12 @@ function initDynamicValidationTriggers() {
 
 function attachValidationRules() {
     // Don't attach rubric validation unless Use Rubric is on
-    if ($("#useRubric").is(":checked")) {
+    if ($("[data-rubric-builder-row]").length) {
+        // Each rubric must have at least 1 indicator (criterion) selected
+        $("[data-rubric-builder-row] [data-rubric-form-input]").each(function () {
+            $(this).rules("add", { rubricHasIndicator: true });
+        });
+
         // Validate decimal places on each descriptor
         // Only validate digits (i.e. string contains only numbers, no decimal places) if mark range is on
         // Always validate it's numeric and positive
@@ -161,7 +152,8 @@ function attachValidationRules() {
                 min: 0,
                 digits: {
                     depends: function () {
-                        return $("#useMarkRange").is(":checked");
+                        const rubricBuilderRow = $(this).closest("[data-rubric-builder-row]");
+                        return rubricBuilderRow.find("[data-rubric-use-mark-range-toggle]").is(":checked");
                     },
                 },
                 messages: {
@@ -173,16 +165,6 @@ function attachValidationRules() {
         // Validate all rows of descriptors
         $("[data-criterion-name]").each(function () {
             $(this).rules("add", { descriptorsAreMonotonic: true });
-        });
-
-        $("[data-group-max-value]:visible").each(function () {
-            $(this).rules("add", {
-                required: true,
-                number: true,
-                messages: {
-                    number: "Please enter a numeric value",
-                },
-            });
         });
     }
 }
@@ -308,6 +290,7 @@ var beforeAttemptingSubmit = function () {
         // because the solution is a little different.
         var messageCallback = function () {
             if ($('input[name="useRubric"]').is(":checked")) {
+                // todo: tweak useRubric logic
                 return "If using Total Mark with rubrics, at least one descriptor must have a points value greater than zero.";
             }
             return "This field must be a number greater than zero.";
@@ -330,6 +313,7 @@ var beforeAttemptingSubmit = function () {
         // because the solution is a little different.
         var messageCallback = function () {
             if ($('input[name="useRubric"]').is(":checked")) {
+                // todo: tweak useRubric logic
                 return "If using Total Mark with rubrics, at least one descriptor must have a points value greater than zero.";
             }
             return "This field must be a number greater than zero.";

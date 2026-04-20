@@ -3,7 +3,7 @@
  */
 
 import { isAbortError } from "@js/util/errorUtils";
-import { parseSseEvent } from "./fetchUtils";
+import { downloadResponse, parseSseEvent } from "./fetchUtils";
 
 /**
  * Metadata typically for API responses using a cursor for pagination
@@ -88,6 +88,19 @@ interface ApiRequestOptions<TBody extends ApiRequestBodyBase | undefined = undef
     signal?: AbortSignal;
 }
 
+interface DownloadApiRequestOptions<
+    TBody extends ApiRequestBodyBase | undefined = undefined,
+> extends ApiRequestOptions<TBody> {
+    /**
+     * Expected content types of the response, e.g. text/csv
+     */
+    accept: string[];
+    /**
+     * Filename to use for the download
+     */
+    filename: string;
+}
+
 export type SseMessageEvent<TEventType extends string = string, TMessageData = unknown> = {
     eventType: TEventType | undefined;
     data: ApiBaseResponse<TMessageData>;
@@ -114,27 +127,21 @@ interface SseApiRequestOptions<
 
 /**
  * Build a fetch request to an API endpoint
- * @param type - The type of the request response to expect (JSON or text/event-stream)
+ * @param accept - The Accept header to send with the request
  * @param options - The options for the request
  * @returns - A promise that resolves to the response from the server
  */
 async function buildRequest(
-    type: "application/json" | "text/event-stream",
+    accept: string[],
     options: ApiRequestOptions<ApiRequestBodyBase | undefined>,
 ): Promise<Response> {
     let { url } = options;
-
-    /** include application/json in a text/event-stream request to get the right error format */
-    let acceptHeader = "application/json";
-    if (type === "text/event-stream") {
-        acceptHeader = "application/json, text/event-stream";
-    }
 
     const requestOptions: RequestInit = {
         method: options.method,
         headers: {
             "Content-Type": "application/json",
-            Accept: acceptHeader,
+            Accept: accept.join(", "),
         },
         signal: options.signal,
     };
@@ -274,10 +281,11 @@ function parseResponse<TResponseData>(
  * @param options - Options for the API request
  * @returns - A typed response from the server including a success state
  */
-export async function apiRequest<TResponseData, TBody extends ApiRequestBodyBase | undefined = undefined>(
-    options: ApiRequestOptions<TBody>,
-): Promise<ApiBaseResponse<TResponseData>> {
-    const request = buildRequest("application/json", options);
+export async function apiRequest<
+    TResponseData,
+    TBody extends ApiRequestBodyBase | undefined = ApiRequestBodyBase | undefined,
+>(options: ApiRequestOptions<TBody>): Promise<ApiBaseResponse<TResponseData>> {
+    const request = buildRequest(["application/json"], options);
 
     let response: Response;
     try {
@@ -305,6 +313,54 @@ export async function apiRequest<TResponseData, TBody extends ApiRequestBodyBase
 }
 
 /**
+ * Generic function to make an API request and download the response as a file
+ * Validates that error responses still match our expected format
+ * @template TBody - The type of the request body
+ * @param options - Options for the API request, plus an optional fallback filename
+ * @returns - A typed response from the server including a success state
+ */
+export async function downloadApiRequest<TBody extends ApiRequestBodyBase | undefined = ApiRequestBodyBase | undefined>(
+    options: DownloadApiRequestOptions<TBody>,
+): Promise<ApiBaseResponse<Blob | null>> {
+    /** Include application/json in the Accept header to get the right error format */
+    const request = buildRequest(["application/json", ...options.accept], options);
+
+    let response: Response;
+    try {
+        response = await request;
+    } catch (e) {
+        if (!isAbortError(e)) {
+            // we only want to log non-abort errors
+            console.error("Failed to make API request", e, options);
+        }
+        const failureResponse: ApiBaseResponseUnknownFailure = {
+            success: false,
+            responseStatus: 0,
+            message: e instanceof Error ? e.message : "An unexpected error occurred",
+            name: e instanceof Error ? e.name : "Error",
+            detail: e,
+        };
+        return failureResponse;
+    }
+
+    const contentType = response.headers.get("Content-Type") || "";
+    if (response.status === 204) {
+        return parseResponse<null>("", response.status, contentType);
+    }
+
+    if (!options.accept.some((type) => contentType.includes(type)) || !response.ok) {
+        const responseBody = await response.text();
+        return parseResponse<null>(responseBody, response.status, contentType);
+    }
+
+    const blob = await downloadResponse(response, options.filename);
+    return {
+        success: true,
+        data: blob,
+    };
+}
+
+/**
  * Generic function to make an API request to the server
  * Validates that the response matches our expected format
  * API errors should follow RFC 9457 "API Problem", sending an event with the type "error" will be treated like this
@@ -320,7 +376,8 @@ export async function sseApiRequest<
     TResponseData,
     TBody extends ApiRequestBodyBase | undefined = undefined,
 >(options: SseApiRequestOptions<TMessageEvent, TBody>): Promise<ApiBaseResponse<TResponseData>> {
-    const request = buildRequest("text/event-stream", options);
+    /** include application/json in a text/event-stream request to get the right error format */
+    const request = buildRequest(["application/json", "text/event-stream"], options);
 
     let response: Response;
     try {

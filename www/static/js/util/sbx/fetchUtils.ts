@@ -46,3 +46,30 @@ export function parseSseEvent(rawEvent: string): { eventType: string | undefined
 
     return { eventType, data: dataLines.join("\n") };
 }
+
+/**
+ * Trigger a browser download for the provided response body
+ * @param response - The response containing the file to download
+ * @param filename - The filename to use for the download
+ * @returns The downloaded Blob
+ */
+export async function downloadResponse(response: Response, filename: string): Promise<Blob> {
+    // TODO: probably try extract the filename from content-disposition, it appears doing that properly for a lot of cases needs some investigation first
+
+    // Trigger the download
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    try {
+        const link = document.createElement("a");
+        link.href = objectUrl;
+        link.download = filename;
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    } finally {
+        URL.revokeObjectURL(objectUrl);
+    }
+
+    return blob;
+}

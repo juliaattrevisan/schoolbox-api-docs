@@ -351,6 +351,20 @@ class DataSource
 
 
     /**
+     * Retrieve a blank grid for the given assessment (aka, the default rubric)
+     * equivalent to what would be used if an assesment hasn't been persisted yet
+     *
+     * @param DueWorkModel $assessment
+     * @param bool         $getUsages
+     * @return Grid
+     */
+    public function retrieveBlankGrid(DueWorkModel $assessment, bool $getUsages): Grid
+    {
+        return new Grid($assessment, $this->retrieveRowSet($assessment->getContext(), $getUsages));
+    }
+
+
+    /**
      * Retrieve a grid for the given assessment.
      *
      * @param DueWorkModel $assessment
@@ -364,9 +378,9 @@ class DataSource
     public function retrieveGrid(DueWorkModel $assessment, bool $getUsages, bool $cloneNewRubric = false): Grid
     {
         // Build the rowset first
-        $grid = new Grid($assessment, $this->retrieveRowSet($assessment->getContext(), $getUsages));
+        $grid = $this->retrieveBlankGrid($assessment, $getUsages);
 
-        // Assessment isn't persisted yet? This has an empty grid
+        // Assessment isn't persisted yet? This has a blank grid
         if (!$assessment->getId()) {
             return $grid;
         }
@@ -412,6 +426,7 @@ class DataSource
         foreach ($descriptorModels as $descriptorModel) {
             $levelId     = $descriptorModel->getLevel()->getId();
             $indicatorId = $descriptorModel->getIndicator()->getId();
+            // TODO: check if setting to null when cloning is okay or not
             $descriptorId = $cloneNewRubric ? null : $descriptorModel->getId();
             $descriptor  = (new \Schoolbox\Assessment\Rubric\Grid\Descriptor())
                 ->setId($descriptorId)
@@ -426,6 +441,7 @@ class DataSource
         // Add levels
         foreach ($levelModels as $levelModel) {
             $levelId = $cloneNewRubric ? null : $levelModel->getId();
+            // TODO: check if setting to null when cloning is okay or not
             $level   = (new \Schoolbox\Assessment\Rubric\Grid\Level())
                 ->setId($levelId)
                 ->setName($levelModel->getName());
