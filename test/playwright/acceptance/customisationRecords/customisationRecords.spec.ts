@@ -90,38 +90,30 @@ test.describe("Customisation Records", () => {
     test("exporting to csv downloads a file", async ({ tester, page }) => {
         const customisationRecords: CustomisationRecords = new CustomisationRecords(tester, page);
 
-        try {
-            tester.isGoingTo("open the customisation records page and apply filters so export is available");
-            await customisationRecords.goto();
-            await customisationRecords.removeAllAppliedFilters();
-            await customisationRecords.applyFilters();
-            await customisationRecords.expectGridVisible();
+        tester.isGoingTo("open the customisation records page and apply filters so export is available");
+        await customisationRecords.goto();
+        await customisationRecords.removeAllAppliedFilters();
+        await customisationRecords.applyFilters();
+        await customisationRecords.expectGridVisible();
 
-            tester.isGoingTo("export the customisation records to csv and confirm the file downloads");
-            await customisationRecords.expectCsvDownload("report-customisation_records.csv.csv");
-        } finally {
-            // No cleanup required for CSV export verification.
-        }
+        tester.isGoingTo("export the customisation records to csv and confirm the file downloads");
+        await customisationRecords.expectCsvDownload("report-customisation_records.csv.csv");
     });
 
     test("clicking the original activity redirects to the activity view page", async ({ tester, page }) => {
         const customisationRecords: CustomisationRecords = new CustomisationRecords(tester, page);
 
-        try {
-            tester.isGoingTo(
-                "open the customisation records page and apply filters so the original activity links are shown",
-            );
-            await customisationRecords.goto();
-            await customisationRecords.removeAllAppliedFilters();
-            await customisationRecords.applyFilters();
-            await customisationRecords.expectGridVisible();
+        tester.isGoingTo(
+            "open the customisation records page and apply filters so the original activity links are shown",
+        );
+        await customisationRecords.goto();
+        await customisationRecords.removeAllAppliedFilters();
+        await customisationRecords.applyFilters();
+        await customisationRecords.expectGridVisible();
 
-            tester.isGoingTo("click the original activity link and verify it redirects to the activity view page");
-            await customisationRecords.clickFirstRowColumnLink("original_activity");
-            await expect(page).toHaveURL(/\/learning\/assessments\/\d+(?:\/\d+)?(?:\?.*)?$/);
-        } finally {
-            // No cleanup required for navigation verification.
-        }
+        tester.isGoingTo("click the original activity link and verify it redirects to the activity view page");
+        await customisationRecords.clickFirstRowColumnLink("original_activity");
+        await expect(page).toHaveURL(/\/learning\/assessments\/\d+(?:\/\d+)?(?:\?.*)?$/);
     });
 
     test("clicking the customised activity (modify) redirects to the participation plan page", async ({
@@ -130,23 +122,19 @@ test.describe("Customisation Records", () => {
     }) => {
         const customisationRecords: CustomisationRecords = new CustomisationRecords(tester, page);
 
-        try {
-            tester.isGoingTo(
-                "open the customisation records page and apply filters so the modified customised activity links are shown",
-            );
-            await customisationRecords.goto();
-            await customisationRecords.removeAllAppliedFilters();
-            await customisationRecords.applyFilters();
-            await customisationRecords.expectGridVisible();
+        tester.isGoingTo(
+            "open the customisation records page and apply filters so the modified customised activity links are shown",
+        );
+        await customisationRecords.goto();
+        await customisationRecords.removeAllAppliedFilters();
+        await customisationRecords.applyFilters();
+        await customisationRecords.expectGridVisible();
 
-            tester.isGoingTo(
-                "click the customised activity link for a modified activity and verify it redirects to the participation plan page",
-            );
-            await customisationRecords.clickRowColumnLink("Modified Activity", "customised_activity");
-            await expect(page).toHaveURL(/\/learning\/assessments\/\d+\/participation(?:\?.*)?$/);
-        } finally {
-            // No cleanup required for navigation verification.
-        }
+        tester.isGoingTo(
+            "click the customised activity link for a modified activity and verify it redirects to the participation plan page",
+        );
+        await customisationRecords.clickRowColumnLink("Modified Activity", "customised_activity");
+        await expect(page).toHaveURL(/\/learning\/assessments\/\d+\/participation(?:\?.*)?$/);
     });
 
     test("create customisation and check it is properly presented in the grid", async ({ tester, page, db }) => {
