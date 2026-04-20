@@ -4,33 +4,15 @@
  */
 
 import locale from "@js/terminology/rosettaStone";
-import { shiftArrayItem } from "@js/util/arrayUtils";
 import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import type { MarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
-import RfGridCapability from "./rf-grid-capability.vue";
-import { translateGridToFormPayload } from "./payload";
-import { MAX_CAPABILITY_LENGTH } from "./types";
-import type { RubricGrid, ResultSet } from "./types";
-
-type RubricMarkedGrid = {
-    // TODO
-    humanReadableMark: string | null;
-};
-
-type SelfAssessmentFeedback = {
-    /** whether this feedback was created via the learner self-grade workflow */
-    // isSelfGrading: boolean; // probably unnecessary if the existence of humanReadableMark is enough
-    /**
-     * the overall human-readable mark given
-     * null if it shouldn't be displayed (e.g. if not feedback.isSelfGrading)
-     */
-    humanReadableMark: string | null; // TODO: markable grid uses instructor mark type instead
-};
+import RrGridCapability from "./rr-grid-capability.vue";
+import type { RubricGrid, RubricMarkedGrid, RubricMarkedGridCapability } from "./types";
 
 interface Props {
     rubric: RubricGrid;
     rubricMarkedGrid: RubricMarkedGrid | null;
-    selfAssessmentFeedback: SelfAssessmentFeedback | null;
+    selfAssessmentFeedback: RubricMarkedGrid | null;
     assessmentMarkScheme: MarkScheme;
     /**
      * Whether to show the totals at the bottom of overall rubric
@@ -51,23 +33,30 @@ interface Props {
      */
     showDescriptorValue?: boolean;
 }
+
 const props = defineProps<Props>();
 
 // const rubricGridLevels = defineModel<RubricGrid["levels"]>("rubricGridLevels", { required: true });
 // const rubricGridCapabilities = defineModel<RubricGrid["capabilities"]>("rubricGridCapabilities", { required: true });
 
-const formValueRef = window.Vue.useTemplateRef<HTMLInputElement>("formValueRef");
-
 /** Supress level headings if none have names */
 const hasLevels = window.Vue.computed(() => props.rubric.levels.some((level) => level.name.trim().length > 0));
 
-/** Emit a change event so jquery.alaressValidate can pick it up for grid-based rules */
-const formValue = window.Vue.computed(() => JSON.stringify(translateGridToFormPayload(props.rubric)));
-window.Vue.watch(formValue, () => {
-    if (formValueRef.value) {
-        window.jQuery(formValueRef.value).valid();
+/**
+ * Find a capability mark for a specific capability in a RubricMarkedGrid
+ * @param capabilityId the id of the capability to find the mark for
+ * @param markedGrid the RubricMarkedGrid to find the mark in
+ * @returns the capability mark, or null if not found
+ */
+function findCapabilityMark(
+    capabilityId: number,
+    markedGrid: RubricMarkedGrid | null,
+): RubricMarkedGridCapability | null {
+    if (!markedGrid) {
+        return null;
     }
-});
+    return markedGrid.capabilities.find((cap) => cap.id === capabilityId) ?? null;
+}
 </script>
 
 <template>
@@ -81,47 +70,41 @@ window.Vue.watch(formValue, () => {
                 </tr>
             </thead>
             <tbody>
-                <!-- <rf-grid-capability
-                    v-for="(capability, index) in rubricGridCapabilities"
+                <rr-grid-capability
+                    v-for="capability in props.rubric.capabilities"
                     :key="capability.id"
-                    v-model:name="capability.name"
-                    v-model:indicators="capability.indicators"
-                    v-model:max-value="capability.maxValue"
                     :capability="capability"
-                    :levels="rubricGridLevels"
-                    :total-columns="totalColumns"
-                    :is-creating="isCreating"
-                    :max-levels="props.maxLevels"
-                    :capability-mark-type="props.capabilityMarkType"
-                    :use-mark-range="props.rubric.useMarkRange"
-                    :can-move-prev="index > 0"
-                    :can-move-next="index < rubricGridCapabilities.length - 1"
-                    @move="(dir) => shiftArrayItem(rubricGridCapabilities, index, dir)"
-                    @add-indicator-keydown="(e, nameRef) => onAddKeydown(e, 'indicator', capability, nameRef)"
-                /> -->
+                    :capability-mark="findCapabilityMark(capability.id, props.rubricMarkedGrid)"
+                    :self-assessment-capability-mark="findCapabilityMark(capability.id, props.selfAssessmentFeedback)"
+                    :levels="props.rubric.levels"
+                    :show-summary-capability="
+                        props.showGroupTotal &&
+                        !!props.rubricMarkedGrid &&
+                        props.rubric.capabilityMarkType !== null &&
+                        props.rubric.capabilityMarkType !== MarkTypeSlug.NONE
+                    "
+                />
 
-                <!-- {% include '@rubric/group-row-markable.twig' %} -->
+                <!-- Overall Mark -->
+                <tr
+                    v-if="
+                        props.showRubricTotal &&
+                        props.rubricMarkedGrid &&
+                        props.assessmentMarkScheme.context.mode !== MarkTypeSlug.NONE
+                    "
+                >
+                    <th class="rb-final-summary" :colspan="props.rubric.levels.length + 2">
+                        {{ props.rubricMarkedGrid.humanReadableMark }}
+
+                        <!-- Self-Assessment -->
+                        <template v-if="props.selfAssessmentFeedback?.humanReadableMark">
+                            {{ props.selfAssessmentFeedback.humanReadableMark }}
+                            given in
+                            {{ locale.selfAssessment.singular() }}
+                        </template>
+                    </th>
+                </tr>
             </tbody>
-
-            <!-- Overall Mark -->
-            <tr
-                v-if="
-                    props.showRubricTotal &&
-                    props.rubricMarkedGrid &&
-                    props.assessmentMarkScheme.context.mode !== MarkTypeSlug.NONE
-                "
-            >
-                <th class="rb-final-summary" :colspan="props.rubric.levels.length + 2">
-                    {{ props.rubricMarkedGrid.humanReadableMark }}
-
-                    <!-- Self-Assessment -->
-                    <template v-if="props.selfAssessmentFeedback?.humanReadableMark">
-                        {{ props.selfAssessmentFeedback.humanReadableMark }}
-                        given in
-                        {{ locale.selfAssessment.singular() }}
-                    </template>
-                </th>
-            </tr>
         </table>
     </div>
 </template>

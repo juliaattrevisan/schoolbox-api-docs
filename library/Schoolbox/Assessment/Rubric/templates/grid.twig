@@ -18,11 +18,12 @@
     <rubric-grid
         :rubric="{{ rubricGrid|json_encode }}"
         :rubric-marked-grid="{{ (rubricMarkedGrid ?? null)|json_encode }}"
-        :self-assessment-feedback="{{ (selfAssessmentFeedback ?? null)|json_encode }}"
+        :self-assessment-feedback="{{ (selfAssessmentFeedback.rubricMarkedGrid ?? null)|json_encode }}"
         :assessment-mark-scheme="{
             template: {{ rubricGrid.assessment.markScheme.template|json_encode }},
             context: {{ rubricGrid.assessment.markScheme.generateContext|json_encode }}
         }"
+        {# TODO: these are signs of likely permission issues #}
         {% if showRubricTotal ?? false %}show-rubric-total{% endif %}
         {% if showGroupTotal ?? false %}show-group-total{% endif %}
         {% if showDescriptorValue ?? false %}show-descriptor-value{% endif %}
@@ -40,24 +41,8 @@
     <tbody>
 
     {% for groupIndex, groupUsage in rubricGrid.capabilityUsages %}
-
-        {# Only show capability summary if there's something to actually show #}
-        {% set capabilityMark               = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
-        {% set selfAssessmentCapabilityMark = (selfAssessmentFeedback.isSelfGrading ?? false)
-            ? selfAssessmentFeedback.rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
-        {% set showSummaryForThisCapability =
-            (selfAssessmentCapabilityMark and selfAssessmentCapabilityMark.humanReadableValue)
-            or (showSummaryCapability and capabilityMark and capabilityMark.humanReadableValue) %}
-        {% set rowspan                      = groupUsage.indicatorUsages|length + (showSummaryForThisCapability ? 1 : 0) %}
-
         {% for critIndex, critUsage in groupUsage.indicatorUsages %}
             <tr>
-                {# yay html tables... -_-; #}
-                {% if rowspan %}
-                    <th class="rb-group-name markdown"  rowspan="{{ rowspan }}">{{ groupUsage.capability.name | markdown }}</th>
-                    {% set rowspan = 0 %}
-                {% endif %}
-
                 <th class="rb-criterion-name markdown">{{ critUsage.indicator.name | markdown }}</th>
 
                 {% set indicatorMark = rubricMarkedGrid
@@ -117,28 +102,6 @@
                 {% endfor %}
             </tr>
         {% endfor %}
-
-        {# Capability mark: needs to be rendered in human-readable form, use the assessment's mark scheme to do so #}
-        {% if showSummaryForThisCapability %}
-            <tr>
-                {# Capability Mark spans the following columns:
-                 #     + N descriptors (equivalent to N levels)
-                 #     + Indicator cell (always 1 cell)
-                 #         = N + 1 cells colspan
-                 #
-                 # (It does not span the capability cell itself)
-                 #}
-                <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 1 }}">
-                    {{ capabilityMark.humanReadableValue ?? '' }}
-
-                    {# Self-Assessment #}
-                    {% if selfAssessmentCapabilityMark and selfAssessmentCapabilityMark.humanReadableValue %}
-                        ({{ selfAssessmentCapabilityMark.humanReadableValue }} given in {{ locale.selfAssessment }})
-                    {% endif %}
-                </th>
-            </tr>
-        {% endif %}
-
     {% endfor %}
     </tbody>
 

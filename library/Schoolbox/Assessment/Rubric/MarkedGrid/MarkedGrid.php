@@ -254,6 +254,7 @@ class MarkedGrid implements JsonSerializable
 
     /**
      * @return array
+     * @see /library/Schoolbox/Assessment/Rubric/templates/vue/types.ts RubricMarkedGrid
      */
     public function jsonSerialize(): array
     {
@@ -263,10 +264,7 @@ class MarkedGrid implements JsonSerializable
 
         // TODO: also check access to various things matches what we expect (particularly whether students can see mark info assuming there's cases when they shouldn't?)
 
-        return [
-            // TODO: for self assessment, "only show the mark if it's self graded, as if it's self-reflect only they never marked themselves"
-            // ^^^^ {% if selfAssessmentFeedback and selfAssessmentFeedback.isSelfGrading and selfAssessmentFeedback.humanReadableMark %}
-            'humanReadableMark' => $this->retrieveHumanReadableMark(),
-        ];
+        $rubricMarkedGridTranslator = new Translator\ModelToArray();
+        return $rubricMarkedGridTranslator($this);
     }
 }

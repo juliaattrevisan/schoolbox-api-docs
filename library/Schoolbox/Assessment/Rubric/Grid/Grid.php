@@ -444,6 +444,7 @@ class Grid implements JsonSerializable
 
     /**
      * @return array
+     * @see /library/Schoolbox/Assessment/Rubric/templates/vue/types.ts RubricGrid
      */
     public function jsonSerialize(): array
     {

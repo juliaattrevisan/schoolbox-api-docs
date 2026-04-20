@@ -54,6 +54,33 @@ export type ResultSet = {
     results: { value: number; label: string }[];
 };
 
+// TODO: refine RubricMarkedGrid/associated types with the above/the API/etc
+
+/**
+ * @see /library/Schoolbox/Assessment/Rubric/MarkedGrid/Translator/ModelToArray.php
+ */
+export type RubricMarkedGrid = {
+    gridId: RubricGrid["id"];
+    /**
+     * the overall human-readable mark given
+     * null if it shouldn't be displayed / doesn't exist (e.g. for self assessment feedback, if feedback.isSelfGrading is false)
+     */
+    humanReadableMark: string | null; // TODO: markable grid uses instructor mark type instead for self assessment feedback
+    capabilities: RubricMarkedGridCapability[];
+};
+
+export type RubricMarkedGridCapability = {
+    id: RubricGridCapability["id"];
+    humanReadableMark: string | null;
+    indicators: RubricMarkedGridIndicator[];
+};
+
+export type RubricMarkedGridIndicator = {
+    id: RubricGridIndicator["id"];
+    humanReadableMark: string | null;
+    // descriptors: TODO
+};
+
 /**
  * maxCapabilityLength/maxIndicatorLength/maxDescriptorLength is 900, due to the way
  * browsers look at maxlength as character lenght, but mysql table looks at char byte length so
