@@ -101,29 +101,31 @@
             </form>
 
             <h2 class="subheader">Superusers</h2>
-            <table>
-                <colgroup>
-                    <col width="40%" />
-                    <col width="40%" />
-                    <col width="20%" />
-                </colgroup>
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Last Login</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- BEGIN superusers -->
-                <tr>
-                    <td>{SUPERUSER_NAME}</td>
-                    <td>{SUPERUSER_LOGIN}</td>
-                    <td><a class="no-text sbx-icon-only-button" title="Modify" href="/adminv2/user/{SUPERUSER_ID}/modify"><sbx-icon name="modify"></sbx-icon></a></td>
-                </tr>
-                <!-- END superusers -->
-                </tbody>
-            </table>
+            <section>
+                <table>
+                    <colgroup>
+                        <col width="40%" />
+                        <col width="40%" />
+                        <col width="20%" />
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Last Login</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- BEGIN superusers -->
+                    <tr>
+                        <td>{SUPERUSER_NAME}</td>
+                        <td>{SUPERUSER_LOGIN}</td>
+                        <td><a class="no-text sbx-icon-only-button" title="Modify" href="/adminv2/user/{SUPERUSER_ID}/modify"><sbx-icon name="modify"></sbx-icon></a></td>
+                    </tr>
+                    <!-- END superusers -->
+                    </tbody>
+                </table>
+            </section>
             <h2 class="subheader">Service Permissions</h2>
             <section>
                     <table>

@@ -16,7 +16,8 @@ body.sbx-body {
     .empty-state-flex-centered,
     .hybrid-bar,
     .scrollable:has(table.timetable),
-    .side-nav {
+    .side-nav,
+    .scrollable {
         box-shadow: var(--sbx-config-box-drop-shadow);
     }
 
