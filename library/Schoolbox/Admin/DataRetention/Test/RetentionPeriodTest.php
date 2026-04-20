@@ -15,6 +15,13 @@ class RetentionPeriodTest extends TestCase
      * The provider format acts as a registry of covered behaviours so future
      * changes can be evaluated by scanning inputs against explicit outcomes,
      * rather than reverse-engineering assertions from test logic.
+     *
+     * @param null|string $now
+     * @param null|int    $defaultDays
+     * @param null|int    $days
+     * @param null|int    $expectedDays
+     * @param string      $expected
+     * @return void
      */
     #[DataProvider('providerValidExample')]
     public function testValidExample(?string $now, ?int $defaultDays, ?int $days, ?int $expectedDays, string $expected): void
@@ -33,6 +40,8 @@ class RetentionPeriodTest extends TestCase
      * Uses fixed timestamps so the expected outcomes stay literal and easy to
      * audit. That keeps the tests focused on retention behaviour rather than on
      * duplicating date arithmetic inside the assertions.
+     *
+     * @return array
      */
     public static function providerValidExample(): array
     {
@@ -74,6 +83,14 @@ class RetentionPeriodTest extends TestCase
      * These cases document which source wins when the class is asked to resolve
      * a cutoff: explicit days, default admin days, or the value passed to
      * calculateDate().
+     *
+     * @param null|string $now
+     * @param null|int    $defaultDays
+     * @param null|int    $days
+     * @param int         $calculatedDays
+     * @param int         $expectedDays
+     * @param string      $expected
+     * @return void
      */
     #[DataProvider('providerCalculatedExample')]
     public function testCalculatedExample(?string $now, ?int $defaultDays, ?int $days, int $calculatedDays, int $expectedDays, string $expected): void
@@ -92,6 +109,8 @@ class RetentionPeriodTest extends TestCase
     /**
      * Fixed examples make precedence rules obvious without embedding date maths
      * in the test body.
+     *
+     * @return array
      */
     public static function providerCalculatedExample(): array
     {
@@ -127,6 +146,14 @@ class RetentionPeriodTest extends TestCase
      * Retention processing should use one stable cutoff for the life of the
      * helper. Recomputing against different day counts later in the same run
      * would make deletion decisions inconsistent.
+     *
+     * @param null|string $now
+     * @param null|int    $defaultDays
+     * @param null|int    $days
+     * @param int         $firstDays
+     * @param int         $secondDays
+     * @param string      $expected
+     * @return void
      */
     #[DataProvider('providerImmutableRetentionDate')]
     public function testImmutableRetentionDate(?string $now, ?int $defaultDays, ?int $days, int $firstDays, int $secondDays, string $expected): void
@@ -147,6 +174,8 @@ class RetentionPeriodTest extends TestCase
     /**
      * A single example is enough here because the behaviour under test is the
      * caching of the first derived date, not the arithmetic itself.
+     *
+     * @return array
      */
     public static function providerImmutableRetentionDate(): array
     {
@@ -165,6 +194,12 @@ class RetentionPeriodTest extends TestCase
     /**
      * Invalid values must fail loudly so a bad retention configuration cannot
      * silently broaden or narrow deletion scope.
+     *
+     * @param null|string $now
+     * @param null|int    $defaultDays
+     * @param null|int    $days
+     * @param int         $calculatedDays
+     * @return void
      */
     #[DataProvider('providerInvalidRetentionPeriods')]
     public function testInvalidRetentionPeriodsRaiseException(?string $now, ?int $defaultDays, ?int $days, int $calculatedDays): void
@@ -182,6 +217,8 @@ class RetentionPeriodTest extends TestCase
 
     /**
      * Keeps unsafe boundary values visible as named cases.
+     *
+     * @return array
      */
     public static function providerInvalidRetentionPeriods(): array
     {
@@ -211,6 +248,8 @@ class RetentionPeriodTest extends TestCase
      * The existing one-argument constructor is still used in production, so this
      * test protects backward compatibility while the richer constructor form is
      * available for deterministic unit tests.
+     *
+     * @return void
      */
     public function testLegacySingleIntegerConstructorRemainsSupported(): void
     {
@@ -222,6 +261,9 @@ class RetentionPeriodTest extends TestCase
     /**
      * Type errors are part of the contract here because invalid constructor
      * input should be rejected before any retention logic runs.
+     *
+     * @param mixed $input
+     * @return void
      */
     #[DataProvider('getTestErrorRaisedData')]
     public function testErrorRaised(mixed $input): void
@@ -234,6 +276,8 @@ class RetentionPeriodTest extends TestCase
     /**
      * Lists constructor inputs that should be rejected by PHP typing rather than
      * normalised by the helper.
+     *
+     * @return array
      */
     public static function getTestErrorRaisedData(): array
     {
@@ -251,6 +295,9 @@ class RetentionPeriodTest extends TestCase
     /**
      * Centralises test-date construction so provider cases can stay literal and
      * easy to read.
+     *
+     * @param null|string $now
+     * @return null|\Alaress_Date_Format
      */
     private function buildNow(?string $now): ?\Alaress_Date_Format
     {

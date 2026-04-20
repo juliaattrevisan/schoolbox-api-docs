@@ -27,6 +27,10 @@ class RetentionPeriod
      * cutoff datetime. Keeping both entry points here avoids test-only code
      * elsewhere while preserving the current runtime API.
      *
+     * @param mixed    $nowOrDays
+     * @param null|int $defaultDays
+     * @param null|int $days
+     * @return void
      */
     public function __construct(mixed $nowOrDays = null, ?int $defaultDays = null, ?int $days = null)
     {
@@ -53,6 +57,9 @@ class RetentionPeriod
     /**
      * Allows callers to replace the chosen retention period and clear any cached
      * cutoff so later calculations stay aligned with the new value.
+     *
+     * @param null|int $days
+     * @return self
      */
     public function setRetentionPeriod(?int $days): self
     {
@@ -68,6 +75,9 @@ class RetentionPeriod
      *
      * Caching matters because deletion strategies should make all decisions in
      * one run against a stable cutoff rather than drifting across repeated calls.
+     *
+     * @param int $days
+     * @return string
      * @throws SchoolboxException
      */
     public function calculateDate(int $days): string
@@ -96,6 +106,8 @@ class RetentionPeriod
      *
      * An empty string means no retention period has been resolved yet, which
      * keeps the indefinite-retention state easy for callers and tests to assert.
+     *
+     * @return string
      * @throws SchoolboxException
      */
     public function getRetentionDatabase(): string
@@ -114,6 +126,8 @@ class RetentionPeriod
     /**
      * Returns the resolved retention period in days, or null when no period has
      * been chosen yet.
+     *
+     * @return null|int
      */
     public function getRetentionDays(): ?int
     {
@@ -123,6 +137,8 @@ class RetentionPeriod
     /**
      * Clones the injected date so retention calculations cannot accidentally
      * mutate the caller's date object during resolution.
+     *
+     * @return \Alaress_Date_Format
      */
     private function getNow(): \Alaress_Date_Format
     {
