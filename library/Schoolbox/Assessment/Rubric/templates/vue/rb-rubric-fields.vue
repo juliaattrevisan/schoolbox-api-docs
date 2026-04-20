@@ -68,7 +68,7 @@ window.Vue.onMounted(() => {
                 <span
                     data-tooltip
                     class="hint has-tip tip-top"
-                    :title="`This value indicates how much this rubric's scoring contributes to the ${locale.grades.singular()} for the ${locale.activity.singular()} - a value of 0 indicates this rubric has no impact on the ${locale.grades.singular()}. Generally, this is a number between0 and 100. To contribute to the student weighted average ${locale.grades.singular()} for the ${locale.class.singular()}, a value must be applied to the ${locale.activity.singular()} weighting.`"
+                    :title="`This value indicates how much this rubric's scoring contributes to the ${locale.grades.singular()} for the ${locale.activity.singular()} - a value of 0 indicates this rubric has no impact on the ${locale.grades.singular()}. Generally, this is a number between 0 and 100. To contribute to the student weighted average ${locale.grades.singular()} for the ${locale.class.singular()}, a value must be applied to the ${locale.activity.singular()} weighting.`"
                 >
                     ?
                 </span>
