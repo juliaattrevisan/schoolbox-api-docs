@@ -9,264 +9,255 @@ use PHPUnit\Framework\TestCase;
 use Schoolbox\Admin\DataRetention\RetentionPeriod;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
-/**
- * Tests for the RetentionPeriod helper class.
- *
- * These tests follow the docs/mvc example style: they use PHPUnit DataProviders
- * for multiple-case coverage, test both expected successes and failure modes,
- * and explicitly assert PHP-level type errors where applicable.
- *
- * Key behaviours covered:
- *  - default construction state
- *  - validation and computation performed by calculateDate(int $days)
- *  - constructor behaviour for allowed inputs (int and null)
- *  - that calculateDate() uses the first computed value and ignores subsequent calls
- *  - TypeError behaviour when the constructor receives incompatible types
- */
 class RetentionPeriodTest extends TestCase
 {
     /**
-     * Confirm the default constructor state means "no override has been set yet".
-     *
-     * This matters because the production class distinguishes between an
-     * explicitly supplied retention period and the lazy path where the first
-     * successful calculateDate() call establishes the cached retention days.
-     *
-     * @return void
+     * The provider format acts as a registry of covered behaviours so future
+     * changes can be evaluated by scanning inputs against explicit outcomes,
+     * rather than reverse-engineering assertions from test logic.
      */
-    public function testDefaultConstructionRetainsIndefinitely(): void
+    #[DataProvider('providerValidExample')]
+    public function testValidExample(?string $now, ?int $defaultDays, ?int $days, ?int $expectedDays, string $expected): void
     {
-        // When no retention days are provided in the constructor, the object
-        // should indicate "retain indefinitely". The class represents this
-        // state as 0 days and an empty database date string.
-        $rp = new RetentionPeriod();
+        $retentionPeriod = new RetentionPeriod(
+            $this->buildNow($now),
+            $defaultDays,
+            $days,
+        );
 
-        // By convention getRetentionDays() returns 0 when no value is set.
-        $this->assertNull($rp->getRetentionDays());
+        $this->assertSame($expected, $retentionPeriod->getRetentionDatabase());
+        $this->assertSame($expectedDays, $retentionPeriod->getRetentionDays());
     }
 
     /**
-     * Test valid integer retention calculations by calling calculateDate().
-     *
-     * This asserts the normal happy path for retention processing: a valid day
-     * count is accepted, cached on the object, and converted into the database
-     * cutoff date format used by the deletion strategies.
-     *
-     * @param int $inputDays
-     * @return void
+     * Uses fixed timestamps so the expected outcomes stay literal and easy to
+     * audit. That keeps the tests focused on retention behaviour rather than on
+     * duplicating date arithmetic inside the assertions.
      */
-    #[DataProvider('providerValidIntegerRetentionPeriods')]
-    public function testValidIntegerRetentionPeriods(int $inputDays): void
-    {
-        // Use an instance with no pre-set constructor value and call calculateDate().
-        // calculateDate(int $days) is responsible for validating and computing
-        // the database-formatted cutoff date via the project's date helper.
-        $rp = new RetentionPeriod();
-
-        // Capture the returned database date string from the method under test.
-        $actual = $rp->calculateDate($inputDays);
-
-        // The call should have stored the validated days value in the object.
-        $this->assertSame($inputDays, $rp->getRetentionDays());
-
-        // Build the expected representation using the same helper the class
-        // uses so the assertion is robust to formatting behaviour.
-        $expected = \Alaress_Date_Format::newNaturalDate(sprintf('-%d days', $inputDays))->getDatabaseDate();
-
-        // The computed database date should match the expected value.
-        $this->assertSame($expected, $actual);
-    }
-
-    /**
-     * Provide representative valid retention periods for cutoff-date calculation.
-     *
-     * The cases cover a short retention window, a typical small multi-day
-     * value, and a long-lived annual-style value so the calculator is exercised
-     * across the ranges the CLI is expected to pass through.
-     *
-     * @return array
-     */
-    public static function providerValidIntegerRetentionPeriods(): array
+    public static function providerValidExample(): array
     {
         return [
-            'int 1 day' => [1],
-            'int 10 days' => [10],
-            'int 365 days' => [365],
+            'Default construction retains indefinitely' => [
+                null,
+                null,
+                null,
+                null,
+                '',
+            ],
+            'Specific retention days override default' => [
+                '2001-12-13 01:02:46',
+                10,
+                4,
+                4,
+                '2001-12-09 01:02:46',
+            ],
+            'Use default admin setting' => [
+                '2001-12-13 01:02:46',
+                10,
+                null,
+                10,
+                '2001-12-03 01:02:46',
+            ],
+            'Leap year date subtracts correctly' => [
+                '2024-03-01 12:00:00',
+                2,
+                null,
+                2,
+                '2024-02-28 12:00:00',
+            ],
         ];
     }
 
     /**
-     * Invalid integer inputs passed to calculateDate should raise SchoolboxException
-     * because ValidRetentionPeriod will reject them.
+     * Separates lazy resolution from construction-time expectations.
      *
-     * @param int $input
-     * @return void
+     * These cases document which source wins when the class is asked to resolve
+     * a cutoff: explicit days, default admin days, or the value passed to
+     * calculateDate().
      */
-    #[DataProvider('providerInvalidIntegerRetentionPeriods')]
-    public function testInvalidIntegerRetentionPeriodsRaiseException(int $input): void
+    #[DataProvider('providerCalculatedExample')]
+    public function testCalculatedExample(?string $now, ?int $defaultDays, ?int $days, int $calculatedDays, int $expectedDays, string $expected): void
     {
-        // For certain integer inputs the ValidRetentionPeriod spec will
-        // reject the value and the RetentionPeriod::calculateDate() method
-        // is expected to propagate a Schoolbox exception. We assert that here.
+        $retentionPeriod = new RetentionPeriod(
+            $this->buildNow($now),
+            $defaultDays,
+            $days,
+        );
+
+        $this->assertSame($expected, $retentionPeriod->calculateDate($calculatedDays));
+        $this->assertSame($expectedDays, $retentionPeriod->getRetentionDays());
+        $this->assertSame($expected, $retentionPeriod->getRetentionDatabase());
+    }
+
+    /**
+     * Fixed examples make precedence rules obvious without embedding date maths
+     * in the test body.
+     */
+    public static function providerCalculatedExample(): array
+    {
+        return [
+            'Calculated days are used when nothing is preset' => [
+                '2001-12-13 01:02:46',
+                null,
+                null,
+                4,
+                4,
+                '2001-12-09 01:02:46',
+            ],
+            'Explicit days win over later calculateDate input' => [
+                '2001-12-13 01:02:46',
+                null,
+                10,
+                1,
+                10,
+                '2001-12-03 01:02:46',
+            ],
+            'Default days win over later calculateDate input' => [
+                '2001-12-13 01:02:46',
+                10,
+                null,
+                1,
+                10,
+                '2001-12-03 01:02:46',
+            ],
+        ];
+    }
+
+    /**
+     * Retention processing should use one stable cutoff for the life of the
+     * helper. Recomputing against different day counts later in the same run
+     * would make deletion decisions inconsistent.
+     */
+    #[DataProvider('providerImmutableRetentionDate')]
+    public function testImmutableRetentionDate(?string $now, ?int $defaultDays, ?int $days, int $firstDays, int $secondDays, string $expected): void
+    {
+        $retentionPeriod = new RetentionPeriod(
+            $this->buildNow($now),
+            $defaultDays,
+            $days,
+        );
+
+        $first = $retentionPeriod->calculateDate($firstDays);
+        $second = $retentionPeriod->calculateDate($secondDays);
+
+        $this->assertSame($expected, $first);
+        $this->assertSame($first, $second);
+    }
+
+    /**
+     * A single example is enough here because the behaviour under test is the
+     * caching of the first derived date, not the arithmetic itself.
+     */
+    public static function providerImmutableRetentionDate(): array
+    {
+        return [
+            'First calculated date is reused' => [
+                '2001-12-13 01:02:46',
+                null,
+                null,
+                10,
+                20,
+                '2001-12-03 01:02:46',
+            ],
+        ];
+    }
+
+    /**
+     * Invalid values must fail loudly so a bad retention configuration cannot
+     * silently broaden or narrow deletion scope.
+     */
+    #[DataProvider('providerInvalidRetentionPeriods')]
+    public function testInvalidRetentionPeriodsRaiseException(?string $now, ?int $defaultDays, ?int $days, int $calculatedDays): void
+    {
         $this->expectException(SchoolboxException::class);
 
-        $rp = new RetentionPeriod();
+        $retentionPeriod = new RetentionPeriod(
+            $this->buildNow($now),
+            $defaultDays,
+            $days,
+        );
 
-        // Calling calculateDate with an invalid integer should raise the exception.
-        $rp->calculateDate($input);
+        $retentionPeriod->calculateDate($calculatedDays);
     }
 
     /**
-     * Provide integer values that must be rejected as unsafe retention periods.
-     *
-     * Zero and negative values are treated as invalid because they would either
-     * imply immediate deletion or a nonsensical future-facing cutoff.
-     *
-     * @return array
+     * Keeps unsafe boundary values visible as named cases.
      */
-    public static function providerInvalidIntegerRetentionPeriods(): array
+    public static function providerInvalidRetentionPeriods(): array
     {
         return [
-            'zero days' => [0],
-            'negative days' => [-1],
-        ];
-    }
-
-
-    /**
-     * Ensure constructor accepts valid inputs (int and null) and that the object state reflects those values.
-     *
-     * @param int|null $input
-     * @param int|null $expectedDays
-     * @return void
-     */
-    #[DataProvider('providerConstructorValidValues')]
-    public function testConstructorAcceptsValidValues(?int $input, ?int $expectedDays): void
-    {
-        // The constructor accepts only the types the production class allows
-        // (int|null). This test exercises that path and confirms the object
-        // state after construction.
-        $rp = new RetentionPeriod($input);
-
-        // The stored days value should reflect the constructor argument (or 0).
-        $this->assertSame($expectedDays, $rp->getRetentionDays());
-    }
-
-    /**
-     * Provide valid constructor arguments and the object state they should
-     * establish immediately.
-     *
-     * This keeps the constructor contract explicit: null leaves the object in
-     * lazy mode, while an integer preloads the retention-days override.
-     *
-     * @return array
-     */
-    public static function providerConstructorValidValues(): array
-    {
-        return [
-            'null disables retention' => [null, null],
-            'int 10 days' => [10, 10],
+            'Zero days are invalid when calculated' => [
+                '2001-12-13 01:02:46',
+                null,
+                null,
+                0,
+            ],
+            'Negative days are invalid when calculated' => [
+                '2001-12-13 01:02:46',
+                null,
+                null,
+                -1,
+            ],
+            'Invalid default days are rejected when resolved' => [
+                '2001-12-13 01:02:46',
+                0,
+                null,
+                4,
+            ],
         ];
     }
 
     /**
-     * Confirm an explicit constructor override wins over later calculateDate()
-     * arguments.
-     *
-     * This protects the CLI override behaviour: once a strategy is built with a
-     * chosen retention period, callers must not be able to silently replace it
-     * by passing a different value into calculateDate().
-     *
-     * @return void
+     * The existing one-argument constructor is still used in production, so this
+     * test protects backward compatibility while the richer constructor form is
+     * available for deterministic unit tests.
      */
-    public function testConstructorRetentionDaysOverrideCalculatedDate(): void
+    public function testLegacySingleIntegerConstructorRemainsSupported(): void
     {
-        // If the object was constructed with a days value, subsequent
-        // calculateDate() calls should honour the stored value rather than
-        // recalculating from the new argument. This mirrors the class' behaviour
-        // of caching the first computed date.
-        $rp = new RetentionPeriod(10);
+        $retentionPeriod = new RetentionPeriod(10);
 
-        // Pass a different value to calculateDate; implementation is expected
-        // to use the constructed value (10) rather than the supplied 1.
-        $actual = $rp->calculateDate(1);
-
-        // Stored days remain the constructor-provided value.
-        $this->assertSame(10, $rp->getRetentionDays());
-
-        // Expect the date that corresponds to '-10 days'. Use the project's
-        // helper for a consistent expected format.
-        $expected = \Alaress_Date_Format::newNaturalDate('-10 days')->getDatabaseDate();
-        $this->assertSame($expected, $actual);
+        $this->assertSame(10, $retentionPeriod->getRetentionDays());
     }
 
     /**
-     * Confirm the first calculated cutoff date becomes immutable for the life
-     * of the object.
-     *
-     * This matters because retention jobs should make all deletion decisions in
-     * one run against a single cached cutoff, rather than drifting if
-     * calculateDate() is called again with a different value later.
-     *
-     * @return void
-     */
-    public function testImmutableRetentionDate(): void
-    {
-        // When calculateDate() is called the first time it computes and caches
-        // the date. Subsequent calls should reuse that cached value, ignoring
-        // any different days argument passed in later calls.
-        $rp = new RetentionPeriod();
-
-        // First computation with 10 days
-        $first = $rp->calculateDate(10);
-        $this->assertSame(10, $rp->getRetentionDays());
-
-        // A subsequent call with a different days value should return the same first-computed date
-        $second = $rp->calculateDate(20);
-        $this->assertSame($first, $second);
-        $this->assertSame(10, $rp->getRetentionDays());
-    }
-
-
-    /**
-     * Verify that values with incompatible types (not int|string|null) raise a TypeError.
-     * This follows the docs/mvc example pattern for testing type errors.
-     *
-     * @param mixed $input
-     * @return void
+     * Type errors are part of the contract here because invalid constructor
+     * input should be rejected before any retention logic runs.
      */
     #[DataProvider('getTestErrorRaisedData')]
     public function testErrorRaised(mixed $input): void
     {
-        // The constructor for RetentionPeriod currently requires an int or null
-        // (it will type-hint for ?int in production code). Values of incompatible
-        // PHP types (float, object, array, resource) should cause a TypeError
-        // to be thrown by the PHP engine. Assert that behaviour here.
         $this->expectException(\TypeError::class);
 
-        // Attempt construction with an explicitly invalid type.
-        $var = new RetentionPeriod($input);
+        new RetentionPeriod($input);
     }
 
     /**
-     * Provide values that should be rejected by PHP's parameter typing before
-     * any retention logic runs.
-     *
-     * These cases document that the constructor contract is intentionally
-     * narrow: callers must provide either an integer day count or null.
-     *
-     * @return array
+     * Lists constructor inputs that should be rejected by PHP typing rather than
+     * normalised by the helper.
      */
     public static function getTestErrorRaisedData(): array
     {
         return [
-            [1.5],              // float
-            [new \stdClass()],  // object
-            [[]],               // array
-            [STDOUT],           // resource
-            ['3.14'],           // non-integer numeric string
-            ['abc'],            // non-numeric string
-            [''],               // empty string
+            [1.5],
+            [new \stdClass()],
+            [[]],
+            [STDOUT],
+            ['3.14'],
+            ['abc'],
+            [''],
         ];
+    }
+
+    /**
+     * Centralises test-date construction so provider cases can stay literal and
+     * easy to read.
+     */
+    private function buildNow(?string $now): ?\Alaress_Date_Format
+    {
+        if ($now === null) {
+            return null;
+        }
+
+        return new \Alaress_Date_Format($now, \Alaress_Date_Format::DATABASE_FORMAT);
     }
 }

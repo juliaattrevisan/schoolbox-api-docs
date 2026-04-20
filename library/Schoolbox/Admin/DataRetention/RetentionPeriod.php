@@ -14,67 +14,122 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class RetentionPeriod
 {
-    private ?string $date = null; // database format e.g. '2024-01-01 00:00:00'
+    private ?string $date = null;
+    private ?\Alaress_Date_Format $now = null;
+    private ?int $defaultDays = null;
+    private ?int $days = null;
 
     /**
-     * Construct with an optional day-count. Use null to indicate "retain indefinitely".
-     * Accepts:
-     * int (override whatever we pass through caculateDate, every strat gets this days value),
-     * or null (no override, calculateDate will and cache the days value on first call, and use that for all subsequent calls).
+     * Supports both the production CLI construction style and a deterministic
+     * unit-test style with an injected "now".
      *
-     * @param int|null $days
-     * @throws SchoolboxException
+     * The class exists to collapse multiple retention inputs down to one cached
+     * cutoff datetime. Keeping both entry points here avoids test-only code
+     * elsewhere while preserving the current runtime API.
+     *
      */
-    public function __construct(private int|null $days = null)
+    public function __construct(mixed $nowOrDays = null, ?int $defaultDays = null, ?int $days = null)
     {
+        if ($nowOrDays instanceof \Alaress_Date_Format || $nowOrDays === null) {
+            $this->now = $nowOrDays;
+            $this->defaultDays = $defaultDays;
+            $this->days = $days;
+            return;
+        }
+
+        if (is_int($nowOrDays) && $defaultDays === null && $days === null) {
+            $this->days = $nowOrDays;
+            return;
+        }
+
+        throw new \TypeError(
+            sprintf(
+                'RetentionPeriod expects (?Alaress_Date_Format, ?int, ?int) or (?int), %s given',
+                get_debug_type($nowOrDays),
+            ),
+        );
     }
 
     /**
-     * Set the retention period. Accepts integer days, or null to disable hard deletion.
-     * @param null|int $days
-     * @return self
-     * @throws SchoolboxException
+     * Allows callers to replace the chosen retention period and clear any cached
+     * cutoff so later calculations stay aligned with the new value.
      */
-    public function setRetentionPeriod(null|int $days): self
+    public function setRetentionPeriod(?int $days): self
     {
         $this->days = $days;
+        $this->date = null;
+
         return $this;
     }
 
     /**
-     * Get the retention period cutoff in database format, or empty string if not set
-     * @param int $days
-     * @return string
+     * Resolves the retention day count once and then derives a single cutoff
+     * datetime from it.
+     *
+     * Caching matters because deletion strategies should make all decisions in
+     * one run against a stable cutoff rather than drifting across repeated calls.
      * @throws SchoolboxException
      */
     public function calculateDate(int $days): string
     {
-        // if we haven't cached the days (no override)
-        // we validate and cache that now
-        if (!$this->days) {
-            if (!new ValidRetentionPeriod()->isSatisfiedBy($days)) {
-                // we stored an illegal value but tried to continue: die loudly as a safety precaution
+        if ($this->days === null) {
+            $resolvedDays = $this->defaultDays ?? $days;
+
+            if (!new ValidRetentionPeriod()->isSatisfiedBy($resolvedDays)) {
                 throw new SchoolboxException('Invalid retention period value stored; cannot calculate date cutoff.');
             }
 
-            $this->days = $days;
+            $this->days = $resolvedDays;
         }
 
-        // cache the db date, so we don't need to keep calling
         if ($this->date === null) {
-            $this->date = \Alaress_Date_Format::newNaturalDate(sprintf("-%d days", $this->days))->getDatabaseDate();
+            $this->date = $this->getNow()
+                ->addDays(0 - $this->days)
+                ->getDatabase();
         }
 
-        // return the cached date
         return $this->date;
     }
 
     /**
-     * Get the retention period in days, or 0 if not set
-     * @return null|int
+     * Returns the scalar database datetime this helper exists to provide.
+     *
+     * An empty string means no retention period has been resolved yet, which
+     * keeps the indefinite-retention state easy for callers and tests to assert.
+     * @throws SchoolboxException
+     */
+    public function getRetentionDatabase(): string
+    {
+        if ($this->date !== null) {
+            return $this->date;
+        }
+
+        if ($this->days === null && $this->defaultDays === null) {
+            return '';
+        }
+
+        return $this->calculateDate(0);
+    }
+
+    /**
+     * Returns the resolved retention period in days, or null when no period has
+     * been chosen yet.
      */
     public function getRetentionDays(): ?int
     {
         return $this->days;
+    }
+
+    /**
+     * Clones the injected date so retention calculations cannot accidentally
+     * mutate the caller's date object during resolution.
+     */
+    private function getNow(): \Alaress_Date_Format
+    {
+        if ($this->now instanceof \Alaress_Date_Format) {
+            return clone $this->now;
+        }
+
+        return \Alaress_Date_Format::now();
     }
 }
