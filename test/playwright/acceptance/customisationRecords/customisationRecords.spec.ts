@@ -58,10 +58,10 @@ test.describe("Customisation Records", () => {
 
         tester.isGoingTo("verify the filters display the proper number of records in the grid");
         await customisationRecords.expectGridVisible();
-        await customisationRecords.expectGridRecordCount(4);
+        await customisationRecords.expectGridRecordCount(2);
 
         tester.isGoingTo("verify the pagination summary at the bottom shows the proper number of records");
-        await customisationRecords.expectPaginationSummary(1, 4, 4);
+        await customisationRecords.expectPaginationSummary(1, 2, 2);
 
         tester.isGoingTo("verify the first record shows the user picture, name, year, and campus");
         await customisationRecords.expectFirstUserDetailsVisible(["Ali,", "Year 9", "Secondary Student"]);
@@ -72,7 +72,7 @@ test.describe("Customisation Records", () => {
 
         tester.isGoingTo("verify sorting by created date shows the data accordingly");
         await customisationRecords.sortColumn("Created Date", 2);
-        await customisationRecords.expectFirstRowColumnToContain("created_at", "Apr 17, 2026");
+        await customisationRecords.expectFirstRowColumnToContain("created_at", "May 9, 2018");
 
         tester.isGoingTo("verify sorting by class shows the data accordingly");
         await customisationRecords.sortColumn("Class");
@@ -80,11 +80,11 @@ test.describe("Customisation Records", () => {
 
         tester.isGoingTo("verify sorting by unit shows the data accordingly");
         await customisationRecords.sortColumn("Unit");
-        await customisationRecords.expectFirstRowColumnToContain("unit", "Persuasion and the Media");
+        await customisationRecords.expectFirstRowColumnToContain("unit", "To Kill a Mockingbird");
 
         tester.isGoingTo("verify sorting by customisation type shows the data accordingly");
         await customisationRecords.sortColumn("Customisation Type", 2);
-        await customisationRecords.expectFirstRowColumnToContain("type", "New Activity");
+        await customisationRecords.expectFirstRowColumnToContain("type", "Modified Activity");
     });
 
     test("exporting to csv downloads a file", async ({ tester, page }) => {

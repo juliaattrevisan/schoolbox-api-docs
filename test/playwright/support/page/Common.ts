@@ -503,6 +503,18 @@ export default class Common {
         await this.page.getByTestId(Common.DATA_TEST_APPLY_FILTERS).click();
     }
 
+    async removeAppliedFilters(): Promise<void> {
+        const removeFilterButtons = this.page.getByTitle("Remove filter");
+
+        while ((await removeFilterButtons.count()) > 0) {
+            await removeFilterButtons.first().click();
+        }
+    }
+
+    async applyFilters(): Promise<void> {
+        await this.page.getByTestId(Common.DATA_TEST_APPLY_FILTERS).click();
+    }
+
     // select a filter option in the filter dropdown
     async selectFilterOption(filterOption: string, optionValue: string): Promise<void> {
         const filterDropdown = Common.DATA_TEST_FILTER_DROPDOWN.replace("{filterOption}", filterOption);
@@ -513,7 +525,7 @@ export default class Common {
         await this.page.getByTestId(filterDropdown).click();
         await this.page.getByTestId(filterOptionSelector).click();
         await this.page.getByTestId(filterDropdown).click();
-        await this.page.getByTestId(Common.DATA_TEST_APPLY_FILTERS).click();
+        await this.applyFilters();
     }
 
     /**

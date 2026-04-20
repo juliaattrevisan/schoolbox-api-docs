@@ -1,14 +1,15 @@
 import { expect, type Locator, type Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 export default class CustomisationRecords {
     private tester: AcceptanceTester;
 
     private page: Page;
 
-    static readonly URL = "/customisations/records";
+    private common: Common;
 
-    static readonly DATA_TEST_APPLY_FILTERS_BUTTON = "panel-apply-filters-button";
+    static readonly URL = "/customisations/records";
 
     static readonly DATA_TEST_FIRST_USER_CELL = "lazy-grid-row-cell-0-0-user";
 
@@ -17,6 +18,7 @@ export default class CustomisationRecords {
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
+        this.common = new Common(page);
     }
 
     async goto(): Promise<void> {
@@ -26,16 +28,12 @@ export default class CustomisationRecords {
 
     async removeAllAppliedFilters(): Promise<void> {
         this.tester.isGoingTo("Remove all applied filters from the filter panel");
-        const removeFilterButtons = this.page.getByTitle("Remove filter");
-
-        while ((await removeFilterButtons.count()) > 0) {
-            await removeFilterButtons.first().click();
-        }
+        await this.common.removeAppliedFilters();
     }
 
     async applyFilters(): Promise<void> {
         this.tester.isGoingTo("Apply the current filters");
-        await this.page.getByTestId(CustomisationRecords.DATA_TEST_APPLY_FILTERS_BUTTON).click();
+        await this.common.applyFilters();
     }
 
     async expectCsvDownload(expectedFileName: string): Promise<void> {
