@@ -266,6 +266,7 @@ class RetentionPeriodTest extends TestCase
             [STDOUT],           // resource
             ['3.14'],           // non-integer numeric string
             ['abc'],            // non-numeric string
+            [''],               // empty string
         ];
     }
 }
