@@ -14,25 +14,29 @@
                                 that also controls this, false for self-reflections
  #}
 
-{% set markType = rubricGrid.assessment.markScheme.generateContext %}
-{% set showSummaryTotal = showRubricTotal and rubricMarkedGrid and markType.mode != "none" %}
+<div data-vue-app="rubric-grid">
+    <rubric-grid
+        :rubric="{{ rubricGrid|json_encode }}"
+        :rubric-marked-grid="{{ (rubricMarkedGrid ?? null)|json_encode }}"
+        :self-assessment-feedback="{{ (selfAssessmentFeedback ?? null)|json_encode }}"
+        :assessment-mark-scheme="{
+            template: {{ rubricGrid.assessment.markScheme.template|json_encode }},
+            context: {{ rubricGrid.assessment.markScheme.generateContext|json_encode }}
+        }"
+        {% if showRubricTotal ?? false %}show-rubric-total{% endif %}
+        {% if showGroupTotal ?? false %}show-group-total{% endif %}
+        {% if showDescriptorValue ?? false %}show-descriptor-value{% endif %}
+    />
+</div>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricGrid.js?v={{ config.site_version }}"></script>
+
+{# TODO: nothing to see here... temporary while there are two rubrics here #}
+<div style="background: var(--sbx-config-color-body-background, var(--body-background))"><br></div>
+
+
 {% set showSummaryCapability = showGroupTotal and rubricMarkedGrid and rubricGrid.assessment.isMarkPerCapability %}
 <div class="scrollable">
     <table class="rb markable">
-    {% set hasLevels = '' %}
-    {% for level in rubricGrid.levels %}
-        {% set hasLevels = hasLevels ~ level.name %}
-    {% endfor %}
-    {% if hasLevels | length %}
-    <thead>
-    <tr>
-        <th colspan="2"  scope="row">&nbsp;</th>
-        {% for level in rubricGrid.levels %}
-        <th scope="col" class="markdown">{{ level.name | markdown }}</th>
-        {% endfor %}
-    </tr>
-    </thead>
-    {% endif %}
     <tbody>
 
     {% for groupIndex, groupUsage in rubricGrid.capabilityUsages %}
@@ -136,20 +140,6 @@
         {% endif %}
 
     {% endfor %}
-
-    {# Overall mark #}
-    {% if showSummaryTotal %}
-        <tr>
-            <th class="rb-final-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
-                {{ rubricMarkedGrid.retrieveHumanReadableMark }}
-
-                {# Self-Assessment: only show the mark if it's self graded, as if it's self-reflect only they never marked themselves #}
-                {% if selfAssessmentFeedback and selfAssessmentFeedback.isSelfGrading and selfAssessmentFeedback.humanReadableMark %}
-                    ({{ selfAssessmentFeedback.humanReadableMark }} given in {{ locale.selfAssessment }})
-                {% endif %}
-            </th>
-        </tr>
-    {% endif %}
     </tbody>
 
 </table>

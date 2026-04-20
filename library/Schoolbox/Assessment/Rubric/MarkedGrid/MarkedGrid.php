@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
+use JsonSerializable;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
@@ -28,7 +29,7 @@ use Schoolbox\Learning\MarkScheme\IMarkScheme;
  * * a grid
  * * a set of marked capabilities, which in turn contain marked indicators
  */
-class MarkedGrid
+class MarkedGrid implements JsonSerializable
 {
     private const PRECISION = 2;
 
@@ -249,5 +250,23 @@ class MarkedGrid
     {
         $this->capabilityMarks = $capabilityMarks;
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        // TODO: similar to Grid->jsonSerialize, this is not final and will be easier to figure out what needs
+        // to be changed once we can see all the payloads for the builder/readonly/markable grids in action.
+        // To avoid passing thru a translator down very deep twig file chains in a lot of places, we can do it here for now
+
+        // TODO: also check access to various things matches what we expect (particularly whether students can see mark info assuming there's cases when they shouldn't?)
+
+        return [
+            // TODO: for self assessment, "only show the mark if it's self graded, as if it's self-reflect only they never marked themselves"
+            // ^^^^ {% if selfAssessmentFeedback and selfAssessmentFeedback.isSelfGrading and selfAssessmentFeedback.humanReadableMark %}
+            'humanReadableMark' => $this->retrieveHumanReadableMark(),
+        ];
     }
 }

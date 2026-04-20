@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid;
 
 use DomainException;
+use JsonSerializable;
 use RangeException;
 use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
@@ -33,7 +34,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
  *
  * The grid's descriptors are able to be inferred from the grid's level set and capability usage set.
  */
-class Grid
+class Grid implements JsonSerializable
 {
     /**
      * The capabilities that are actually in use on the rubric grid.
@@ -439,5 +440,22 @@ class Grid
     {
         $this->levels = $levels;
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        // TODO: this shouldn't be the same as Translator/ModelToArray.
+        // figure out what's actually needed then narrow it down and figure out the best payload structure
+        // for the builder/readonly/markable grids.
+        // There's also the assessment API to consider, i'm ignoring it for now as we'll need to change it regardless to accomidate multi rubrics
+        // To avoid passing thru a translator down very deep twig file chains in a lot of places, we can do it here for now
+
+        // TODO: also check access to various things matches what we expect (particularly whether students can see mark info assuming there's cases when they shouldn't?)
+
+        $rubricGridTranslator = new Translator\ModelToArray();
+        return $rubricGridTranslator($this);
     }
 }
