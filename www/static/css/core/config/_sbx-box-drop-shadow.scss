@@ -11,14 +11,23 @@
 body.sbx-body {
     // Apply box shadows to base box surfaces
     .island section,
+    .island > table,
     .c-island,
     .empty-state,
     .empty-state-flex-centered,
     .hybrid-bar,
     .scrollable:has(table.timetable),
     .side-nav,
-    .scrollable {
+    .scrollable,
+    .cover-photo,
+    .cr-results-grid {
         box-shadow: var(--sbx-config-box-drop-shadow);
+    }
+
+    // Undo unintended shadows on some elements
+    .island section section,
+    #permissions .scrollable {
+        box-shadow: none;
     }
 
     // have to shadow each section separately
@@ -29,10 +38,5 @@ body.sbx-body {
         .VueTables__table-footer {
             box-shadow: var(--sbx-config-box-drop-shadow);
         }
-    }
-
-    // Prevent box shadows from being applied to nested sections within islands
-    .island section section {
-        box-shadow: none;
     }
 }

@@ -61,7 +61,7 @@ body.sbx-body {
     }
 
     // Add colour alternating rows for better readability
-    table:not([class]) tr:nth-child(even),
+    table tr:nth-child(even),
     table.rubric tr:nth-child(even),
     table.diagonal-headings-table tr:nth-child(even),
     table.VueTables__table tr:nth-child(even),
