@@ -43,12 +43,6 @@ body.sbx-body {
         border-radius: var(--sbx-config-box-roundness);
     }
 
-    // Let parent section’s rounded corners visually clip the alternating backgrounds
-    .island section:has(> .information-list),
-    .island section:has(> .action-list) {
-        overflow: hidden;
-    }
-
     // this is to round an svg rect element
     .highcharts-background {
         rx: var(--sbx-config-box-roundness);
@@ -77,11 +71,6 @@ body.sbx-body {
     #component-layout .component-container .row > .island section:last-child {
         border-top-left-radius: 0;
         border-top-right-radius: 0;
-    }
-
-    // Hybrid bar /top menu
-    #hybrid-bar .tab-bar {
-        border-radius: var(--sbx-config-box-roundness);
     }
 
     // tables need to be rounded uniquely
