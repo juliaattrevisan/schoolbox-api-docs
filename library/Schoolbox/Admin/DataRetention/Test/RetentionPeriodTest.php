@@ -128,7 +128,7 @@ class RetentionPeriodTest extends TestCase
         ];
     }
 
-    public function testConstructorValueIsRespectedWhenCalculatingDateWithDifferentArgument(): void
+    public function testConstructorRetentionDaysOverrideCalculatedDate(): void
     {
         // If the object was constructed with a days value, subsequent
         // calculateDate() calls should honour the stored value rather than
@@ -150,7 +150,7 @@ class RetentionPeriodTest extends TestCase
     }
 
 
-    public function testCalculateDateUsesFirstComputedValueAndIgnoresSubsequentArguments(): void
+    public function testImmutableRetentionDate(): void
     {
         // When calculateDate() is called the first time it computes and caches
         // the date. Subsequent calls should reuse that cached value, ignoring
