@@ -61,6 +61,9 @@ class Mapper extends BaseMapper
         return $allLanguages;
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function getDefaultOrderByParams(): array
     {
         return [

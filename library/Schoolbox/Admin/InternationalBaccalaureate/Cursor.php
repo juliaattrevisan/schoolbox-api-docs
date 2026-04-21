@@ -83,8 +83,6 @@ class Cursor implements ICursor
             $this->languageMapper,
             $this->limit,
             [
-                'name' => $this->languageMapper::SORT_ORDER_ASC,
-                'code' => $this->languageMapper::SORT_ORDER_ASC,
                 'id' => $this->languageMapper::SORT_ORDER_ASC,
             ],
             $this->buildPredicateBuilder(),

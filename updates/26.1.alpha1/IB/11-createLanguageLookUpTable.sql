@@ -7,7 +7,8 @@ CREATE TABLE `lu_language`
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 INSERT INTO `lu_language` (`code`, `name`)
-VALUES ('ABK', 'ABKHAZIAN'),
+VALUES ('ENG', 'ENGLISH'),
+       ('ABK', 'ABKHAZIAN'),
        ('ACE', 'ACHINESE'),
        ('ACH', 'ACOLI'),
        ('AFD', 'AFD'),
@@ -121,7 +122,6 @@ VALUES ('ABK', 'ABKHAZIAN'),
        ('EGY', 'EGYPTIAN (ANCIENT)'),
        ('EKA', 'EKAJUK'),
        ('ELX', 'ELAMITE'),
-       ('ENG', 'ENGLISH'),
        ('ENM', 'ENGLISH, MIDDLE (1100-1500)'),
        ('ANG', 'ENGLISH, OLD (CA. 450-1100)'),
        ('EPO', 'ESPERANTO'),
