@@ -377,13 +377,14 @@ button.submit {
 }
 
 // a button with only SVG icons that displays inline with text
-.f-dropdown a.sbx-button--has-icon {
+.f-dropdown :is(a, button).sbx-button--has-icon {
     display: flex;
     align-items: flex-start;
     gap: var(--spacing-s);
+    justify-content: left;
 }
 
-.f-dropdown a.sbx-button--has-icon sbx-icon {
+.f-dropdown :is(a, button).sbx-button--has-icon sbx-icon {
     line-height: 1;
 }
 .sbx-button--has-icon {
