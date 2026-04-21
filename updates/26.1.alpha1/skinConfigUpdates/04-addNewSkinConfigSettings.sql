@@ -416,20 +416,6 @@ VALUES (
         '{"customProperty":"--sbx-config-login-form-foreground","contrast":"--sbx-config-login-form-background"}'
     ),
     (
-        'skin_field_roundness',
-        '0.5rem',
-        'Field Roundness',
-        'Add rounded corners to elements like check boxes, buttons and labels.',
-        @config_select_field_id,
-        @sonar_config_type_id,
-        'true',
-        'false',
-        'false',
-        'settings',
-        @settings_sequence_start + 12,
-        '{"customProperty":"--sbx-config-field-roundness","select":[{"name":"none","value":"0"},{"name":"Small","value":"0.25rem"},{"name":"Medium","value":"0.5rem"},{"name":"Large","value":"0.75rem"}]}'
-    ),
-    (
         'skin_box_roundness',
         '0.5rem',
         'Box Roundness',
@@ -440,8 +426,22 @@ VALUES (
         'false',
         'false',
         'settings',
-        @settings_sequence_start + 13,
+        @settings_sequence_start + 12,
         '{"customProperty":"--sbx-config-box-roundness","select":[{"name":"none","value":"0"},{"name":"Small","value":"0.25rem"},{"name":"Medium","value":"0.5rem"},{"name":"Large","value":"0.75rem"}]}'
+    ),
+    (
+        'skin_field_roundness',
+        '0.25rem',
+        'Field Roundness',
+        'Add rounded corners to elements like check boxes, buttons and labels.',
+        @config_select_field_id,
+        @sonar_config_type_id,
+        'true',
+        'false',
+        'false',
+        'settings',
+        @settings_sequence_start + 13,
+        '{"customProperty":"--sbx-config-field-roundness","select":[{"name":"none","value":"0"},{"name":"Small","value":"0.25rem"},{"name":"Medium","value":"0.5rem"},{"name":"Large","value":"0.75rem"}]}'
     ),
     (
         'skin_box_drop_shadow',

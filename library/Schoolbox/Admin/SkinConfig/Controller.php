@@ -135,10 +135,7 @@ class Controller extends ConfigController
         foreach ($data as $type => $categories) {
             foreach ($categories as $category => $subcategoryMap) {
                 if (is_array($subcategoryMap)) {
-                    $data[$type][$category] = array_values(array_map(
-                        fn (array $subcategory): array => $this->orderSubcategoryOptions($subcategory),
-                        $subcategoryMap,
-                    ));
+                    $data[$type][$category] = array_values($subcategoryMap);
                 }
             }
 
@@ -179,42 +176,6 @@ class Controller extends ConfigController
         }
 
         return $orderedCategories + $categories;
-    }
-
-    /**
-     * Reorder option rows within a subcategory where the UI needs a stable custom display order.
-     *
-     * @param array{name: ?string, options: array<int, array<string, mixed>>} $subcategory
-     * @return array{name: ?string, options: array<int, array<string, mixed>>}
-     */
-    private function orderSubcategoryOptions(array $subcategory): array
-    {
-        if (!isset($subcategory['options']) || !is_array($subcategory['options'])) {
-            return $subcategory;
-        }
-
-        $preferredOrder = [
-            'skin_box_roundness' => 0,
-            'skin_field_roundness' => 1,
-        ];
-
-        $optionNames = array_column($subcategory['options'], 'name');
-        if (!in_array('skin_box_roundness', $optionNames, true) || !in_array('skin_field_roundness', $optionNames, true)) {
-            return $subcategory;
-        }
-
-        usort($subcategory['options'], static function (array $left, array $right) use ($preferredOrder): int {
-            $leftOrder = $preferredOrder[$left['name'] ?? ''] ?? PHP_INT_MAX;
-            $rightOrder = $preferredOrder[$right['name'] ?? ''] ?? PHP_INT_MAX;
-
-            if ($leftOrder === $rightOrder) {
-                return 0;
-            }
-
-            return $leftOrder <=> $rightOrder;
-        });
-
-        return $subcategory;
     }
 
     /**
