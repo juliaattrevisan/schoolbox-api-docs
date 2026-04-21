@@ -209,6 +209,29 @@ class Controller extends ConfigController
                 ]
             );
 
+            $languageIds = [];
+            /** @var IBGroupSubjectModel $groupSubject */
+            foreach ($groupSubjects as $groupSubject) {
+                /** @var GroupSubjectLanguageModel $language */
+                foreach ($groupSubject->getLanguages() as $language) {
+                    $languageId = $language->getLanguage()?->getId();
+
+                    if ($languageId) {
+                        $languageIds[$languageId] = true;
+                    }
+                }
+            }
+
+            $languageNamesById = [];
+
+            if (!empty($languageIds)) {
+                $languages = $this->languageMapper->findByColumn('id', array_keys($languageIds));
+                $languageNamesById = array_combine(
+                    $languages->getPropertyValues('id'),
+                    $languages->getPropertyValues('name')
+                ) ?: [];
+            }
+
             $subjects = [];
             /** @var IBGroupSubjectModel $groupSubject */
             foreach ($groupSubjects as $groupSubject) {
@@ -217,11 +240,15 @@ class Controller extends ConfigController
                     'subject' => $groupSubject->getSubject()->getName(),
                     'level' => $groupSubject->getLevel() ?: '',
                     'languages' => $groupSubject->getLanguages()
-                        ->map(fn(GroupSubjectLanguageModel $language) => [
-                            'languageId' => $language->getLanguage()?->getId(),
-                            'languageName' => $language->getLanguage()?->getName(),
-                            'classCode' => $language->getClassCode() ?? '',
-                        ])
+                        ->map(
+                            fn(GroupSubjectLanguageModel $language) => [
+                                'languageId' => $language->getLanguage()?->getId(),
+                                'languageName' => ($languageId = $language->getLanguage()?->getId())
+                                    ? ($languageNamesById[$languageId] ?? null)
+                                    : null,
+                                'classCode' => $language->getClassCode() ?? '',
+                            ]
+                        )
                         ->reindex()
                         ->getAll(),
                 ];
@@ -299,6 +326,29 @@ class Controller extends ConfigController
             }
 
             $allowedGroupSubjectIds = array_fill_keys($groupSubjectIds, true);
+            $requestedLanguageIds = [];
+
+            foreach ($subjectLanguages as $subjectLanguage) {
+                if (!is_array($subjectLanguage)) {
+                    continue;
+                }
+
+                $languageId = (int) ($subjectLanguage['languageId'] ?? 0);
+
+                if ($languageId > 0) {
+                    $requestedLanguageIds[$languageId] = true;
+                }
+            }
+
+            $languagesById = [];
+
+            if (!empty($requestedLanguageIds)) {
+                $languagesById = $this->languageMapper
+                    ->findByColumn('id', array_keys($requestedLanguageIds))
+                    ->indexBy('id')
+                    ->getAll();
+            }
+
             $modelsToSave = [];
 
             foreach ($subjectLanguages as $subjectLanguage) {
@@ -312,7 +362,8 @@ class Controller extends ConfigController
                 if (
                     $groupSubjectId <= 0 ||
                     $languageId <= 0 ||
-                    !isset($allowedGroupSubjectIds[$groupSubjectId])
+                    !isset($allowedGroupSubjectIds[$groupSubjectId]) ||
+                    !isset($languagesById[$languageId])
                 ) {
                     continue;
                 }
@@ -320,7 +371,7 @@ class Controller extends ConfigController
                 $modelsToSave[] = $this->groupSubjectLanguageMapper
                     ->createModel()
                     ->setGroupSubject($this->groupSubjectMapper->createModel()->setId($groupSubjectId))
-                    ->setLanguage($this->languageMapper->createModel()->setId($languageId))
+                    ->setLanguage($languagesById[$languageId])
                     ->setClassCode(trim((string) ($subjectLanguage['classCode'] ?? '')));
             }
 
