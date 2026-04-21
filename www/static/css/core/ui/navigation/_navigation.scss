@@ -189,8 +189,10 @@ $allow-sidebar-stash: $large-up;
 
     .top-menu {
         a > sbx-icon {
+            color: var(--sbx-config-color-menu-foreground, var(--navigation-foreground));
             display: block;
             margin: 0 auto var(--spacing-xs);
+            transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
         }
         @include inline-list;
         margin: 0;
