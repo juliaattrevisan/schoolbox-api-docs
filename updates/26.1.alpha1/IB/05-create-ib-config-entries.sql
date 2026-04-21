@@ -15,17 +15,15 @@ MODIFY `module` ENUM(
 ) DEFAULT 'settings';
 
 -- Create IB config type
+-- Hard-code the ID to match ConfigMapper::TYPE_INTERNATIONAL_BACCALAUREATE.
+-- Hard-code sequence also to avoid dependence on script run order.
+SET @ib_config_id = 26;
 INSERT INTO
-    `lu_config_type` (`type`, `sequence`)
+    `lu_config_type` (`id`, `type`, `sequence`)
 VALUES (
+        @ib_config_id,
         'International Baccalaureate',
-        (
-            SELECT MAX(sequence) + 1
-            FROM (
-                    SELECT sequence
-                    FROM lu_config_type
-                ) AS t
-        )
+        25
     );
 
 -- Create IB configuration entries in the config table
@@ -56,12 +54,7 @@ VALUES (
                 field = 'input'
         ),
         NULL,
-        (
-            SELECT id
-            FROM lu_config_type
-            WHERE
-                type = 'International Baccalaureate'
-        ),
+        @ib_config_id,
         'true',
         'true',
         'false',
@@ -80,12 +73,7 @@ VALUES (
                 field = 'input'
         ),
         NULL,
-        (
-            SELECT id
-            FROM lu_config_type
-            WHERE
-                type = 'International Baccalaureate'
-        ),
+        @ib_config_id,
         'true',
         'true',
         'false',
