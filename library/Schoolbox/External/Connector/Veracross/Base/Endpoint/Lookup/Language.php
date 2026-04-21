@@ -100,6 +100,8 @@ class Language
 
                     if (!isset($this->lookup[$externalId])) {
                         $this->lookup[$externalId] = [
+                            /* Assuming every one is native english speaker by default
+                             */
                             'esl' => false,
                             'languages' => [],
                         ];

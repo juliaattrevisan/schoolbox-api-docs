@@ -21,6 +21,7 @@ use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Alert;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Citizenship;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ContactInfo;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\EmergencyContact;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Parents;
@@ -55,6 +56,7 @@ class Profile implements IStrategy
      * students:list
      * emergency_contacts:list
      * health.patients:list
+     * admission.citizenships:list
      * admission.languages:list
      * parents:list
      * relationships:list
@@ -67,6 +69,7 @@ class Profile implements IStrategy
         students:list
         emergency_contacts:list
         health.patients:list
+        admission.citizenships:list
         admission.languages:list
         parents:list
         relationships:list
@@ -236,6 +239,11 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
+        /* Prefetch a list of citizenship usages
+         */
+        $this->log->debug('Prefetching citizenships...');
+        $citizenshipLookup = (new Citizenship($this->api, $this->watchlist))->generate();
+
         /* Prefetch a list of language usages
          */
         $this->log->debug('Prefetching languages...');
@@ -382,6 +390,7 @@ class Profile implements IStrategy
                     $esl = (bool)($languageLookup[$externalId]['esl'] ?? false);
                     $ib = false;
                     $ilp = false;
+                    $nationalities = $citizenshipLookup[$externalId]['nationalities'] ?? null;
                     $languages = $languageLookup[$externalId]['languages'] ?? null;
 
                     /* Alerts
@@ -520,6 +529,7 @@ class Profile implements IStrategy
                         ->setIb($ib)
                         ->setIndividualLearningPlans($ilp)
                         ->setSpecialNeeds($specialNeeds)
+                        ->setNationalities($nationalities)
                         ->setLanguages($languages);
 
                     /* Date of birth requires special treatment as ADF doesn't deal with nulls well
@@ -633,7 +643,7 @@ class Profile implements IStrategy
 
         /* Unset lookups that we no longer need
          */
-        unset($languageLookup, $alertLookup, $photoLookup, $parentLookup, $relationshipLookup, $emergencyContactsLookup, $contactInfoLookup, $payloads);
+        unset($citizenshipLookup, $languageLookup, $alertLookup, $photoLookup, $parentLookup, $relationshipLookup, $emergencyContactsLookup, $contactInfoLookup, $payloads);
     }
 
 
