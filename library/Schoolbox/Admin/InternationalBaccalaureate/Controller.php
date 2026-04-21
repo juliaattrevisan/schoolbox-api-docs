@@ -235,7 +235,7 @@ class Controller extends ConfigController
 
     private function getDefaultLanguage(): ?LanguageModel
     {
-        $englishLanguage = $this->languageMapper->findByColumn('code', 'en')->first();
+        $englishLanguage = $this->languageMapper->findByColumn('code', 'ENG')->first();
 
         if ($englishLanguage instanceof LanguageModel) {
             return $englishLanguage;
