@@ -8,6 +8,7 @@
  * existing one — each with its own reactive state.
  */
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import CreateSessionModal from "./components/create-session-modal.vue";
 import type { RegistrationSession } from "../js/types/ibRegistrationTypes";
 
@@ -84,24 +85,20 @@ window.Vue.onMounted((): void => {
             <div v-if="isDiplomaLoading" class="loader" data-test="ib-registration-diploma-loading"></div>
 
             <template v-else>
-                <!-- Empty state -->
-                <div
-                    v-if="diplomaSessions.length === 0"
-                    class="empty-state-flex-centered"
-                    data-test="ib-registration-diploma-empty"
-                >
+                <empty-state v-if="diplomaSessions.length === 0" icon="icon-add">
                     <p>Student Registration Information for Diploma Program Year 2 [DIPLOMA]</p>
                     <p>
-                        No registration sessions found.
-                        <a
-                            href="#"
+                        No registration sessions exist.
+                        <button
+                            type="button"
+                            class="button"
                             data-test="ib-registration-diploma-add-link"
                             @click.prevent="isDiplomaModalOpen = true"
-                            >Add</a
                         >
-                        to create one.
+                            Create a new session
+                        </button>
                     </p>
-                </div>
+                </empty-state>
 
                 <!-- Populated state -->
                 <template v-else>

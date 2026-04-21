@@ -304,4 +304,14 @@ body.sbx-body {
     .profile-buttons {
         padding: var(--sbx-size-s);
     }
+
+    .empty-state-flex-centered {
+        button {
+            border: none;
+            background: none;
+            &:hover {
+                background: none;
+            }
+        }
+    }
 }
