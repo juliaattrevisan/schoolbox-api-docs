@@ -21,7 +21,7 @@ export default class Links {
 
     static readonly ELEMENT_LINK_TITLE_NONTRANSLUCENT = 'div a[title="{linkTitle}"]';
 
-    static readonly ELEMENT_PREVIEW_LINKS = '[class="action-list"] li a[data-plugin="preview"]';
+    static readonly ELEMENT_PREVIEW_LINKS = "link-list";
 
     static readonly ELEMENT_ADD_LINK_BUTTON_IN_COMPONENT = `a[href="/cms/link/new/{homepageId}"]`;
 
@@ -183,7 +183,7 @@ export default class Links {
      * @returns An array of link titles
      */
     public static async getAllLinks(linkComponent: Locator): Promise<string[]> {
-        const linksLocator = linkComponent.locator(Links.ELEMENT_PREVIEW_LINKS);
+        const linksLocator = linkComponent.getByTestId(Links.ELEMENT_PREVIEW_LINKS);
         const linktexts = await linksLocator.allTextContents();
         return linktexts;
     }
