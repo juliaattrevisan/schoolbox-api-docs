@@ -19,3 +19,34 @@ export type IBConfiguration = {
     description?: string;
     type: string;
 };
+
+export type IBLanguage = {
+    id: number;
+    code: string;
+    name: string;
+};
+
+export type IBLanguageListResponse = {
+    data: IBLanguage[];
+    metadata?: {
+        count?: number;
+        cursor?: {
+            current?: string | null;
+            next?: string | null;
+        };
+    };
+};
+
+export type IBSubject = {
+    id: number;
+    subject: string;
+    level: string;
+    languages: {
+        languageId: number;
+        classCode: string;
+    }[];
+};
+
+export type IBRoutes = {
+    searchLanguages: string | null;
+};

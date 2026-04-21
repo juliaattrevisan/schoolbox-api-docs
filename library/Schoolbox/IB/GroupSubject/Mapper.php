@@ -16,6 +16,7 @@ use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\IB\Subject\Mapper as SubjectMapper;
+use Schoolbox\IB\GroupSubject\Language\Mapper as GroupSubjectLanguageMapper;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
@@ -40,6 +41,13 @@ class Mapper extends BaseMapper
         $this->uses('level', self::TYPE_STRING);
         $this->joins('subject_id', SubjectMapper::class, 'id', null, null, 'subject', 'subject');
         $this->joins('group_id', IBGroupMapper::class, 'id', null, null, 'group', 'group');
+
+        $this->joinsReverseMulti(
+            'group_subject_id',
+            GroupSubjectLanguageMapper::class,
+            'languages',
+            'languages'
+        );
     }
 
     /**
@@ -60,12 +68,14 @@ class Mapper extends BaseMapper
     {
         $subjectMapper = $this->getJoinMapper('subject');
         $groupMapper   = $this->getJoinMapper('group');
+        $languageMapper   = $this->getJoinMapper('languages');
 
         return "
             SELECT
                 {$this->getColumnString()},
                 {$subjectMapper->getColumnString('s')},
-                {$groupMapper->getColumnString('g')}
+                {$groupMapper->getColumnString('g')},
+                {$languageMapper->getColumnString('l')}
         ";
     }
 
@@ -76,8 +86,9 @@ class Mapper extends BaseMapper
     {
         return "
             FROM `{$this->table}`
-            INNER JOIN {$this->getJoinSql('subject', '', 's', false)}
-            INNER JOIN {$this->getJoinSql('group', '', 'g', false)}
+            INNER JOIN {$this->getJoinSql('subject', '', 's')}
+            INNER JOIN {$this->getJoinSql('group', '', 'g')}
+            LEFT JOIN {$this->getJoinSql('languages', '', 'l')}
         ";
     }
 
@@ -88,6 +99,7 @@ class Mapper extends BaseMapper
     {
         $subjectMapper = $this->getJoinMapper('subject');
         $groupMapper   = $this->getJoinMapper('group');
+        $languageMapper   = $this->getJoinMapper('languages');
         $collection    = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -95,6 +107,14 @@ class Mapper extends BaseMapper
             $groupSubject->setSubject($subjectMapper->hydrate($row, 's'));
             $groupSubject->setGroup($groupMapper->hydrate($row, 'g'));
             $collection[$groupSubject->getId()] = $groupSubject;
+        }
+
+        /* Hydrates the languages
+         */
+        $languages = $languageMapper->findForOtherMapper($this, 'languages', $collection->getPropertyValues('id'));
+        /** @var Model $groupSubject */
+        foreach ($collection as $id => $groupSubject) {
+            $groupSubject->setLanguages($languages[$id] ?? $languageMapper->createCollection());
         }
 
         return $collection;

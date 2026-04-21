@@ -18,8 +18,12 @@ use Alaress\Web\Controller\Base;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\IB\Group\Mapper as IBGroupMapper;
+use Schoolbox\IB\GroupSubject\Mapper as IBGroupSubjectMapper;
+use Schoolbox\IB\GroupSubject\Language\Mapper as IBGroupSubjectLanguageMapper;
 
 class Module extends BaseModule
 {
@@ -39,8 +43,9 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '/configuration', 'getConfiguration', $ruleIBCoordinatorAccess);
-        $this->register('GET', '/configuration/api/subjects/{groupId}', 'getCategorySubjects', $ruleIBCoordinatorAccess);
-        $this->register('GET', '/configuration/api/{categoryId}', 'getConfigurationData', $ruleIBCoordinatorAccess);
+        $this->register('GET', '/configuration/api/subjects/{groupId:\\d+}', 'getCategorySubjects', $ruleIBCoordinatorAccess);
+        $this->register('GET', '/configuration/api/categories/{categoryId:\\d+}', 'getConfigurationData', $ruleIBCoordinatorAccess);
+        $this->register('GET', '/configuration/api/languages', 'searchLanguages', $ruleIBCoordinatorAccess);
         $this->register('POST', '/configuration/api/save', 'saveConfiguration', $ruleIBCoordinatorAccess);
         $this->register('GET', '/registrations', 'getRegistrations', $ruleIBCoordinatorAccess);
     }
@@ -52,6 +57,10 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(ConfigMapper::class),
+            $this->getMapperFactory()->get(IBGroupMapper::class),
+            $this->getMapperFactory()->get(IBGroupSubjectMapper::class),
+            $this->getMapperFactory()->get(IBGroupSubjectLanguageMapper::class),
+            $this->getMapperFactory()->get(LanguageMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
             $this->injector->get('oidc.cache'),

@@ -12,8 +12,10 @@ declare(strict_types=1);
 namespace Schoolbox\IB\GroupSubject;
 
 use JsonSerializable;
+use Schoolbox\GenericCollection;
 use Schoolbox\IB\Group\Model as GroupModel;
 use Schoolbox\IB\Subject\Model as SubjectModel;
+use Schoolbox\IB\GroupSubject\Language\Model as GroupSubjectLanguageModel;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
@@ -47,6 +49,11 @@ class Model implements JsonSerializable
      * @var GroupModel|null
      */
     private ?GroupModel $group = null;
+
+    /**
+     * @var GenericCollection|GroupSubjectLanguageModel[]|null
+     */
+    private ?GenericCollection $languages = null;
 
     /**
      * @return int|null
@@ -118,6 +125,25 @@ class Model implements JsonSerializable
     {
         $this->group = $group;
         return $this;
+    }
+
+    /**
+     * @param GenericCollection $languages
+     * @return $this
+     */
+    public function setLanguages(GenericCollection $languages): self
+    {
+        $languages->assertCollectionOf(GroupSubjectLanguageModel::class);
+        $this->languages = $languages;
+        return $this;
+    }
+
+    /**
+     * @return GenericCollection
+     */
+    public function getLanguages(): GenericCollection
+    {
+        return $this->languages;
     }
 
     /**

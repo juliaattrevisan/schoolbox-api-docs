@@ -2,12 +2,14 @@
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import LanguageSelectionModal from "./language-selection-modal.vue";
+import type { IBLanguage, IBSubject } from "../../js/types/ibConfigurationTypes";
 
 interface SubjectRow {
     id: string;
+    groupSubjectId: number;
     subject: string;
     level: string;
-    languages: string[];
+    languages: number[];
     classCode: string;
     studentCount: number;
     isLanguageRow?: boolean;
@@ -15,12 +17,19 @@ interface SubjectRow {
     tableType?: string;
 }
 
+interface SubjectSavePayload {
+    groupSubjectId: number;
+    languageId: number;
+    classCode: string;
+}
+
 interface Props {
     categoryName: string;
     categoryTitle: string;
     categoryId: number;
     saveEndpoint: string;
-    ibSubjects: Array<{ subject: string; level: string }>;
+    ibSubjects: IBSubject[];
+    ibLanguages: IBLanguage[];
 }
 
 const props = defineProps<Props>();
@@ -31,59 +40,103 @@ const subjectRows = window.Vue.ref<SubjectRow[]>([]);
 const currentEditingRow = window.Vue.ref<string | null>(null);
 const isLanguageModalOpen = window.Vue.ref<boolean>(false);
 
-// Check if this is a Core category
 const isCoreCategory = window.Vue.computed(() => {
     return props.categoryName.toLowerCase() === "core";
 });
 
+const defaultLanguageId = window.Vue.computed<number | null>(() => {
+    const englishLanguage = props.ibLanguages.find((language) => {
+        return language.name.toLowerCase() === "english";
+    });
+
+    return englishLanguage?.id ?? props.ibLanguages[0]?.id ?? null;
+});
+
 /**
- * Initializes subject rows from the ibSubjects prop.
+ * Get the default language selection for a subject row.
+ * @returns The default language ids for a subject row.
+ */
+function getDefaultLanguages(): number[] {
+    return defaultLanguageId.value ? [defaultLanguageId.value] : [];
+}
+
+/**
+ * Build the table rows for a subject and its configured languages.
+ * @param subjectData The subject configuration being transformed into table rows.
+ * @param index The position of the subject in the current collection.
+ * @param tableType The core table grouping label when applicable.
+ * @returns The main subject row and any child language rows.
+ */
+function buildRowsForSubject(subjectData: IBSubject, index: number, tableType?: string): SubjectRow[] {
+    const configurations = subjectData.languages;
+    const rowId = tableType ? `${tableType}_${subjectData.id}_${index}` : `group_subject_${subjectData.id}`;
+    const selectedLanguages = configurations.map((configuration) => configuration.languageId);
+    const mainRow: SubjectRow = {
+        id: rowId,
+        groupSubjectId: subjectData.id,
+        subject: subjectData.subject,
+        level: subjectData.level,
+        languages: selectedLanguages.length > 0 ? selectedLanguages : getDefaultLanguages(),
+        classCode: configurations.length === 1 ? configurations[0].classCode : "",
+        studentCount: 0,
+        tableType,
+    };
+
+    if (configurations.length <= 1) {
+        return [mainRow];
+    }
+
+    const languageRows = configurations.map((configuration, configIndex) => ({
+        id: `${rowId}_lang_${configIndex}`,
+        groupSubjectId: subjectData.id,
+        subject: subjectData.subject,
+        level: subjectData.level,
+        languages: [configuration.languageId],
+        classCode: configuration.classCode,
+        studentCount: 0,
+        isLanguageRow: true,
+        parentRowId: rowId,
+        tableType,
+    }));
+
+    return [mainRow, ...languageRows];
+}
+
+/**
+ * Apply the default language to rows that do not yet have one.
+ */
+function populateDefaultLanguagesForEmptyRows(): void {
+    const defaultLanguages = getDefaultLanguages();
+
+    if (defaultLanguages.length === 0) {
+        return;
+    }
+
+    subjectRows.value.forEach((row) => {
+        if (row.languages.length === 0) {
+            row.languages = [...defaultLanguages];
+        }
+    });
+}
+
+/**
+ * Initialise the subject rows for the current category.
  */
 function initializeSubjectRows(): void {
     if (isCoreCategory.value) {
-        // For Core category, create two separate tables using subjects from database via API
-        const coreSubjects = props.ibSubjects; // Now comes from database
-
-        const diplomaRows = coreSubjects.map((subjectData, index) => ({
-            id: `diploma_${index}`,
-            subject: subjectData.subject,
-            level: subjectData.level,
-            languages: ["en"], // English selected by default
-            classCode: "",
-            studentCount: 0,
-            tableType: "Diploma Program Year 2 [Diploma]",
-        }));
-
-        const courseRows = coreSubjects.map((subjectData, index) => ({
-            id: `course_${index}`,
-            subject: subjectData.subject,
-            level: subjectData.level,
-            languages: ["en"], // English selected by default
-            classCode: "",
-            studentCount: 0,
-            tableType: "Diploma Course [Course]",
-        }));
+        const diplomaRows = props.ibSubjects.flatMap((subjectData, index) =>
+            buildRowsForSubject(subjectData, index, "Diploma Program Year 2 [Diploma]"),
+        );
+        const courseRows = props.ibSubjects.flatMap((subjectData, index) =>
+            buildRowsForSubject(subjectData, index, "Diploma Course [Course]"),
+        );
 
         subjectRows.value = [...diplomaRows, ...courseRows];
-
-        // Keep student counts at 0 for Core subjects (as requested)
-        // subjectRows.value.forEach(row => {
-        //     void updateStudentCount(row.id);
-        // });
     } else {
-        // Regular subjects for other categories
-        subjectRows.value = props.ibSubjects.map((subjectData, index) => ({
-            id: `${props.categoryName}_subject_${index}`,
-            subject: subjectData.subject,
-            level: subjectData.level,
-            languages: [],
-            classCode: "",
-            studentCount: 0,
-        }));
+        subjectRows.value = props.ibSubjects.flatMap((subjectData, index) => buildRowsForSubject(subjectData, index));
     }
 }
 
-// Watch for changes to ibSubjects prop
 window.Vue.watch(
     () => props.ibSubjects,
     () => {
@@ -92,14 +145,23 @@ window.Vue.watch(
     { deep: true, immediate: true },
 );
 
-// Initialize on mount
+window.Vue.watch(
+    () => props.ibLanguages,
+    (newLanguages, oldLanguages) => {
+        if (oldLanguages.length === 0 && newLanguages.length > 0) {
+            populateDefaultLanguagesForEmptyRows();
+        }
+    },
+    { deep: true },
+);
+
 window.Vue.onMounted(() => {
     initializeSubjectRows();
 });
 
 /**
- * Opens the language selection modal for a specific row
- * @param rowId - The ID of the row to edit languages for
+ * Open the language selection modal for a row.
+ * @param rowId The row identifier to edit.
  */
 function openLanguageModal(rowId: string): void {
     currentEditingRow.value = rowId;
@@ -107,17 +169,17 @@ function openLanguageModal(rowId: string): void {
 }
 
 /**
- * Closes the language selection modal
+ * Clear the current language selection modal context.
  */
 function closeLanguageModal(): void {
     currentEditingRow.value = null;
 }
 
 /**
- * Handles language selection from the modal
- * @param selectedLanguages - Array of selected language codes
+ * Update the selected languages for the row being edited.
+ * @param selectedLanguages The language ids selected in the modal.
  */
-function onLanguagesSelected(selectedLanguages: string[]): void {
+function onLanguagesSelected(selectedLanguages: number[]): void {
     if (!currentEditingRow.value) return;
 
     const rowIndex = subjectRows.value.findIndex((row) => row.id === currentEditingRow.value);
@@ -125,58 +187,61 @@ function onLanguagesSelected(selectedLanguages: string[]): void {
 
     const mainRow = subjectRows.value[rowIndex];
 
-    // Remove existing language rows for this subject
     subjectRows.value = subjectRows.value.filter((row) => row.parentRowId !== mainRow.id);
 
     if (selectedLanguages.length === 0) {
-        // No languages selected, reset main row
         mainRow.languages = [];
+        mainRow.classCode = "";
     } else if (selectedLanguages.length === 1) {
-        // Single language, update main row
         mainRow.languages = selectedLanguages;
     } else {
-        // Multiple languages, create language rows
         mainRow.languages = selectedLanguages;
+        mainRow.classCode = "";
+
+        const existingConfigurations =
+            props.ibSubjects.find((subject) => subject.id === mainRow.groupSubjectId)?.languages ?? [];
+        const classCodeByLanguage = new Map(
+            existingConfigurations.map((configuration) => [configuration.languageId, configuration.classCode]),
+        );
 
         const newLanguageRows: SubjectRow[] = selectedLanguages.map((language, index) => ({
             id: `${mainRow.id}_lang_${index}`,
+            groupSubjectId: mainRow.groupSubjectId,
             subject: mainRow.subject,
             level: mainRow.level,
             languages: [language],
-            classCode: "",
+            classCode: classCodeByLanguage.get(language) ?? "",
             studentCount: 0,
             isLanguageRow: true,
             parentRowId: mainRow.id,
+            tableType: mainRow.tableType,
         }));
 
-        // Insert language rows after the main row
         subjectRows.value.splice(rowIndex + 1, 0, ...newLanguageRows);
     }
 }
 
 /**
- * Updates a field in a subject row
- * @param rowId - The ID of the row to update
- * @param field - The field to update
- * @param value - The new value for the field
+ * Update a field on a subject row.
+ * @param rowId The row identifier to update.
+ * @param field The row field being changed.
+ * @param value The updated value for the field.
  */
 function updateRowField(rowId: string, field: keyof SubjectRow, value: string | number): void {
     const row = subjectRows.value.find((r) => r.id === rowId);
     if (row && field in row) {
-        // Type assertion is safe here as we check the field exists in the row
         (row as Record<string, unknown>)[field] = value;
 
-        // Update student count when class code changes
         if (field === "classCode") {
-            void updateStudentCount(rowId);
+            updateStudentCount(rowId);
         }
     }
 }
 
 /**
- * Gets the display text for languages in a row
- * @param row - The subject row
- * @returns Display text for the languages
+ * Get the language display text for a subject row.
+ * @param row The subject row being displayed.
+ * @returns The label shown in the languages input.
  */
 function getLanguageDisplayText(row: SubjectRow): string {
     if (row.languages.length === 0) {
@@ -189,50 +254,29 @@ function getLanguageDisplayText(row: SubjectRow): string {
 }
 
 /**
- * Gets the human-readable name for a language code
- * @param code - The language code
- * @returns The language name
+ * Get the display name for a language.
+ * @param languageId The language identifier.
+ * @returns The display name for the language.
  */
-function getLanguageName(code: string): string {
-    const languageNames: { [key: string]: string } = {
-        en: "English",
-        es: "Spanish",
-        fr: "French",
-        de: "German",
-        it: "Italian",
-        pt: "Portuguese",
-        ru: "Russian",
-        zh: "Chinese",
-        ja: "Japanese",
-        ko: "Korean",
-        ar: "Arabic",
-        hi: "Hindi",
-        nl: "Dutch",
-        sv: "Swedish",
-        no: "Norwegian",
-        da: "Danish",
-        fi: "Finnish",
-        pl: "Polish",
-        cs: "Czech",
-        hu: "Hungarian",
-    };
-    return languageNames[code] || code;
+function getLanguageName(languageId: number): string {
+    const matchedLanguage = props.ibLanguages.find((language) => language.id === languageId);
+
+    return matchedLanguage?.name || String(languageId);
 }
 
 /**
- * Gets the languages for the currently editing row
- * @returns Array of language codes for the current row
+ * Get the selected languages for the row currently being edited.
+ * @returns The selected language ids for the active row.
  */
-function getCurrentRowLanguages(): string[] {
+function getCurrentRowLanguages(): number[] {
     if (!currentEditingRow.value) return [];
     const row = subjectRows.value.find((r) => r.id === currentEditingRow.value);
-    return row?.languages || [];
+    return row?.languages.length ? row.languages : getDefaultLanguages();
 }
 
 /**
- * Updates student count based on class codes or qualification
- * This would typically call an API to get actual student counts
- * @param rowId - The ID of the row to update student count for
+ * Update the displayed student count for a row.
+ * @param rowId The row identifier to update.
  */
 function updateStudentCount(rowId: string): void {
     const row = subjectRows.value.find((r) => r.id === rowId);
@@ -240,34 +284,21 @@ function updateStudentCount(rowId: string): void {
 
     try {
         if (isCoreCategory.value) {
-            // For Core subjects, count students based on qualification
-            const mockStudentCount = Math.floor(Math.random() * 150) + 50; // 50-200 students
+            const mockStudentCount = Math.floor(Math.random() * 150) + 50;
             row.studentCount = mockStudentCount;
-
-            // TODO: Replace with actual API call to get students by qualification
-            // const response = await fetch(`/api/student-count-by-qualification?subject=${row.subject}`);
-            // const data = await response.json();
-            // row.studentCount = data.totalStudents;
         } else {
-            // For regular subjects, count by class codes
             if (!row.classCode.trim()) {
                 row.studentCount = 0;
                 return;
             }
 
-            // Split class codes by comma and simulate student count
             const classCodes = row.classCode
                 .split(",")
                 .map((code) => code.trim())
                 .filter((code) => code);
-            const mockStudentCount = classCodes.length * Math.floor(Math.random() * 25) + 5; // 5-30 students per class
+            const mockStudentCount = classCodes.length * Math.floor(Math.random() * 25) + 5;
 
             row.studentCount = mockStudentCount;
-
-            // TODO: Replace with actual API call
-            // const response = await fetch(`/api/student-count?classCodes=${classCodes.join(',')}`);
-            // const data = await response.json();
-            // row.studentCount = data.totalStudents;
         }
     } catch (error) {
         console.error("Failed to fetch student count:", error);
@@ -276,45 +307,56 @@ function updateStudentCount(rowId: string): void {
 }
 
 /**
- * Saves the subject configuration to the server
+ * Build the payload used to save the subject configuration.
+ * @returns The subject configuration payload for the save request.
+ */
+function buildSubjectSavePayload(): SubjectSavePayload[] {
+    const payload = subjectRows.value
+        .filter((row) => row.isLanguageRow || row.languages.length <= 1)
+        .flatMap((row) => {
+            const languageId = row.languages[0];
+
+            if (!languageId) {
+                return [];
+            }
+
+            return [
+                {
+                    groupSubjectId: row.groupSubjectId,
+                    languageId,
+                    classCode: row.classCode.trim(),
+                },
+            ];
+        });
+
+    return payload.filter((item, index, items) => {
+        return (
+            items.findIndex((candidate) => {
+                return (
+                    candidate.groupSubjectId === item.groupSubjectId &&
+                    candidate.languageId === item.languageId &&
+                    candidate.classCode === item.classCode
+                );
+            }) === index
+        );
+    });
+}
+
+/**
+ * Save the subject configuration to the server.
  */
 async function saveSubjectConfiguration(): Promise<void> {
-    if (isSaving.value) return; // Prevent multiple simultaneous saves
+    if (isSaving.value) return;
     if (!props.saveEndpoint) return;
 
     try {
         isSaving.value = true;
         saveError.value = null;
 
-        // Prepare data for save
         const saveData = {
             categoryId: props.categoryId,
             categoryName: props.categoryName,
-            subjects: subjectRows.value
-                .filter((row) => !row.isLanguageRow)
-                .map((mainRow) => {
-                    const languageRows = subjectRows.value.filter((row) => row.parentRowId === mainRow.id);
-
-                    return {
-                        id: mainRow.id,
-                        subject: mainRow.subject,
-                        level: mainRow.level,
-                        languages:
-                            languageRows.length > 0
-                                ? languageRows.map((lr) => ({
-                                      language: lr.languages[0],
-                                      classCode: lr.classCode,
-                                      studentCount: lr.studentCount,
-                                  }))
-                                : [
-                                      {
-                                          language: mainRow.languages[0] || "",
-                                          classCode: mainRow.classCode,
-                                          studentCount: mainRow.studentCount,
-                                      },
-                                  ],
-                    };
-                }),
+            subjectLanguages: buildSubjectSavePayload(),
         };
 
         const response = await apiRequest<{ success: boolean }, Record<string, unknown>>({
@@ -348,9 +390,7 @@ async function saveSubjectConfiguration(): Promise<void> {
         </div>
 
         <div v-else>
-            <!-- Core Category: Two separate tables -->
             <template v-if="isCoreCategory">
-                <!-- Diploma Program Year 2 Table -->
                 <h3>Diploma Program Year 2 [Diploma]</h3>
                 <table class="subject-table">
                     <thead>
@@ -396,7 +436,6 @@ async function saveSubjectConfiguration(): Promise<void> {
                     </tbody>
                 </table>
 
-                <!-- Diploma Course Table -->
                 <h3 style="margin-top: 2rem">Diploma Course [Course]</h3>
                 <table class="subject-table">
                     <thead>
@@ -443,7 +482,6 @@ async function saveSubjectConfiguration(): Promise<void> {
                 </table>
             </template>
 
-            <!-- Other Categories: Single table -->
             <template v-else>
                 <table class="subject-table">
                     <thead>
@@ -545,6 +583,7 @@ async function saveSubjectConfiguration(): Promise<void> {
 
         <LanguageSelectionModal
             v-model:is-open="isLanguageModalOpen"
+            :available-languages="props.ibLanguages"
             :selected-languages="getCurrentRowLanguages()"
             @close="closeLanguageModal"
             @languages-selected="onLanguagesSelected"
