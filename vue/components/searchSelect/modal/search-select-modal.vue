@@ -239,16 +239,16 @@ window.Vue.watch(isOpen, async (newIsOpen) => {
         <basic-modal v-model:is-open="isOpen">
             <div class="l-flex-col l-gap-m">
                 <h2 class="f-no-margins">{{ props.title }}</h2>
+                <ss-selected
+                    v-if="props.showSelected"
+                    :selected="selected"
+                    form-value-name=""
+                    :is-single-select="false"
+                    :can-select-item="false"
+                    @remove="onRemove"
+                />
                 <div ref="searchSelectEl" class="f-no-margins">
                     <label :for="props.labelId">{{ props.label }}</label>
-                    <ss-selected
-                        v-if="props.showSelected"
-                        :selected="selected"
-                        form-value-name=""
-                        :is-single-select="false"
-                        :can-select-item="false"
-                        @remove="onRemove"
-                    />
                     <ss-query-input
                         v-model:query="query"
                         :label-id="props.labelId"
