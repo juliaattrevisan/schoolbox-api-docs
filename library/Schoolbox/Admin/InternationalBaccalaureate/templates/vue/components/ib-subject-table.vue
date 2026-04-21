@@ -52,10 +52,21 @@ const defaultLanguageId = window.Vue.computed<number | null>(() => {
     return englishLanguage?.id ?? props.ibLanguages[0]?.id ?? null;
 });
 
+/**
+ * Get the default language selection for a subject row.
+ * @returns The default language ids for a subject row.
+ */
 function getDefaultLanguages(): number[] {
     return defaultLanguageId.value ? [defaultLanguageId.value] : [];
 }
 
+/**
+ * Build the table rows for a subject and its configured languages.
+ * @param subjectData The subject configuration being transformed into table rows.
+ * @param index The position of the subject in the current collection.
+ * @param tableType The core table grouping label when applicable.
+ * @returns The main subject row and any child language rows.
+ */
 function buildRowsForSubject(subjectData: IBSubject, index: number, tableType?: string): SubjectRow[] {
     const configurations = subjectData.languages;
     const rowId = tableType ? `${tableType}_${subjectData.id}_${index}` : `group_subject_${subjectData.id}`;
@@ -91,6 +102,9 @@ function buildRowsForSubject(subjectData: IBSubject, index: number, tableType?: 
     return [mainRow, ...languageRows];
 }
 
+/**
+ * Apply the default language to rows that do not yet have one.
+ */
 function populateDefaultLanguagesForEmptyRows(): void {
     const defaultLanguages = getDefaultLanguages();
 
@@ -105,6 +119,9 @@ function populateDefaultLanguagesForEmptyRows(): void {
     });
 }
 
+/**
+ * Initialise the subject rows for the current category.
+ */
 function initializeSubjectRows(): void {
     if (isCoreCategory.value) {
         const diplomaRows = props.ibSubjects.flatMap((subjectData, index) =>
@@ -142,15 +159,26 @@ window.Vue.onMounted(() => {
     initializeSubjectRows();
 });
 
+/**
+ * Open the language selection modal for a row.
+ * @param rowId The row identifier to edit.
+ */
 function openLanguageModal(rowId: string): void {
     currentEditingRow.value = rowId;
     isLanguageModalOpen.value = true;
 }
 
+/**
+ * Clear the current language selection modal context.
+ */
 function closeLanguageModal(): void {
     currentEditingRow.value = null;
 }
 
+/**
+ * Update the selected languages for the row being edited.
+ * @param selectedLanguages The language ids selected in the modal.
+ */
 function onLanguagesSelected(selectedLanguages: number[]): void {
     if (!currentEditingRow.value) return;
 
@@ -193,6 +221,12 @@ function onLanguagesSelected(selectedLanguages: number[]): void {
     }
 }
 
+/**
+ * Update a field on a subject row.
+ * @param rowId The row identifier to update.
+ * @param field The row field being changed.
+ * @param value The updated value for the field.
+ */
 function updateRowField(rowId: string, field: keyof SubjectRow, value: string | number): void {
     const row = subjectRows.value.find((r) => r.id === rowId);
     if (row && field in row) {
@@ -204,6 +238,11 @@ function updateRowField(rowId: string, field: keyof SubjectRow, value: string | 
     }
 }
 
+/**
+ * Get the language display text for a subject row.
+ * @param row The subject row being displayed.
+ * @returns The label shown in the languages input.
+ */
 function getLanguageDisplayText(row: SubjectRow): string {
     if (row.languages.length === 0) {
         return "Select languages";
@@ -214,18 +253,31 @@ function getLanguageDisplayText(row: SubjectRow): string {
     }
 }
 
+/**
+ * Get the display name for a language.
+ * @param languageId The language identifier.
+ * @returns The display name for the language.
+ */
 function getLanguageName(languageId: number): string {
     const matchedLanguage = props.ibLanguages.find((language) => language.id === languageId);
 
     return matchedLanguage?.name || String(languageId);
 }
 
+/**
+ * Get the selected languages for the row currently being edited.
+ * @returns The selected language ids for the active row.
+ */
 function getCurrentRowLanguages(): number[] {
     if (!currentEditingRow.value) return [];
     const row = subjectRows.value.find((r) => r.id === currentEditingRow.value);
     return row?.languages.length ? row.languages : getDefaultLanguages();
 }
 
+/**
+ * Update the displayed student count for a row.
+ * @param rowId The row identifier to update.
+ */
 function updateStudentCount(rowId: string): void {
     const row = subjectRows.value.find((r) => r.id === rowId);
     if (!row) return;
@@ -254,6 +306,10 @@ function updateStudentCount(rowId: string): void {
     }
 }
 
+/**
+ * Build the payload used to save the subject configuration.
+ * @returns The subject configuration payload for the save request.
+ */
 function buildSubjectSavePayload(): SubjectSavePayload[] {
     const payload = subjectRows.value
         .filter((row) => row.isLanguageRow || row.languages.length <= 1)
@@ -286,6 +342,9 @@ function buildSubjectSavePayload(): SubjectSavePayload[] {
     });
 }
 
+/**
+ * Save the subject configuration to the server.
+ */
 async function saveSubjectConfiguration(): Promise<void> {
     if (isSaving.value) return;
     if (!props.saveEndpoint) return;
