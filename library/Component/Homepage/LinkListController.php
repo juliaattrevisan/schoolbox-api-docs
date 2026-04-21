@@ -143,6 +143,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             $this->setBlock('component_action', "submit_link", "submit_link_block");
             $this->setBlock('component_action', "view_all_links", "view_all_links_block");
             $this->setBlock('link', 'modify_link', 'modify_link_block');
+            $this->setBlock('link', 'link_target_external', 'link_target_external_block');
             $this->setBlock('link', 'owner_exists', 'owner_exists_block');
             $this->setBlock('link', 'owner_deleted', 'owner_deleted_block');
 
@@ -160,7 +161,6 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                     [
                         'LINK_ID'           => Scrub::text($currentLink->getId()),
                         'LINK_NAME'         => Scrub::text($currentLink->getDescription()),
-                        'LINK_TARGET'       => Scrub::text($currentLink->getLinkTarget()),
                         'LINK_POSTED_BY'    => Scrub::text($currentLink->getOwner()->formatName()),
                         'LINK_POSTED_BY_ID' => Scrub::text($currentLink->getOwner()->getId()),
                         'LINK_POSTED_DATE'  => Scrub::text($currentLink->getSubmitted()->getShort()),
@@ -176,6 +176,12 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                 } else {
                     $this->parse('owner_exists_block', 'owner_exists');
                     $this->setVar('owner_deleted_block', '');
+                }
+
+                if ($currentLink->getTarget() === '_blank') {
+                    $this->parse('link_target_external_block', 'link_target_external');
+                } else {
+                    $this->setVar('link_target_external_block', '');
                 }
 
                 // Controls
