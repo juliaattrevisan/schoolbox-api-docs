@@ -191,7 +191,10 @@ body.sbx-body {
     #component-layout .column-right .component-titlebar {
         background-color: var(--sbx-config-color-component-heading-background);
         h2,
-        nav a[class^="icon-"] {
+        nav a[class^="icon-"],
+        nav a[class*=" icon-"],
+        nav a.sbx-icon-only-button,
+        nav a.sbx-icon-only-button sbx-icon {
             color: var(--sbx-config-color-component-heading-text);
         }
     }

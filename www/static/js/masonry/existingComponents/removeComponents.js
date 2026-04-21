@@ -19,6 +19,30 @@ const BUTTON_SELECTOR = '[data-target="delete"]';
 const STATE_ATTRIBUTE = "data-state"; //can be 'opened' or 'closed'
 const PANEL_SELECTOR = '[data-component-panel="delete"]';
 
+function getAnimationTarget(button) {
+    const icon = button?.querySelector("sbx-icon");
+    const svg = icon?.shadowRoot?.querySelector(".sbx-icon__svg");
+
+    if (svg) {
+        return {
+            element: svg,
+            transformOrigin: "center center",
+        };
+    }
+
+    if (icon) {
+        return {
+            element: icon,
+            transformOrigin: "center center",
+        };
+    }
+
+    return {
+        element: button,
+        transformOrigin: ANIMATE_ORIGIN,
+    };
+}
+
 /**
  * Toggle the remove palette and manage the confirm/deny actions
  */
@@ -77,7 +101,8 @@ export function isOpen(component) {
 function open(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     toggleButton.setAttribute(STATE_ATTRIBUTE, "opened");
-    animateRotation(toggleButton, ANIMATE_OPEN_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
+    const { element, transformOrigin } = getAnimationTarget(toggleButton);
+    animateRotation(element, ANIMATE_OPEN_POSITION, transformOrigin, ANIMATE_SPEED);
     const panel = component.querySelector(PANEL_SELECTOR);
     slideDown(panel, ANIMATE_SPEED);
     if (isSettingsOpen(component)) {
@@ -93,7 +118,8 @@ function open(component) {
 export async function close(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     toggleButton.setAttribute(STATE_ATTRIBUTE, "closed");
-    animateRotation(toggleButton, ANIMATE_CLOSED_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
+    const { element, transformOrigin } = getAnimationTarget(toggleButton);
+    animateRotation(element, ANIMATE_CLOSED_POSITION, transformOrigin, ANIMATE_SPEED);
     const panel = component.querySelector(PANEL_SELECTOR);
     await slideUp(panel, ANIMATE_SPEED);
 }

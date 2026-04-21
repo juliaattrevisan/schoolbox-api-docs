@@ -54,10 +54,28 @@
 }
 
 /** Special Effects for Action Buttons **/
+#component-layout .column-top .component-titlebar nav,
+#component-layout .column-left .component-titlebar nav,
+#component-layout .column-right .component-titlebar nav {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.25rem;
+}
+
 #component-layout .column-top .component-titlebar nav a,
 #component-layout .column-left .component-titlebar nav a,
 #component-layout .column-right .component-titlebar nav a {
     opacity: 0.5;
+}
+
+#component-layout .column-top .component-titlebar nav a.sbx-icon-only-button,
+#component-layout .column-left .component-titlebar nav a.sbx-icon-only-button,
+#component-layout .column-right .component-titlebar nav a.sbx-icon-only-button {
+    align-items: center;
+    display: inline-flex !important;
+    justify-content: center;
+    margin: 0;
+    vertical-align: middle;
 }
 
 #component-layout .component-titlebar nav a:hover,
