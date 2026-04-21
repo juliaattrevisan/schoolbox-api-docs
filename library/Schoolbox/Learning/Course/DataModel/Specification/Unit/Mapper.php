@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\Course\DataModel\Specification\Unit;
 
 use Alaress\Database\Predicate\Builder;
 use PDOStatement;
-use Ramsey\Uuid\Uuid;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;

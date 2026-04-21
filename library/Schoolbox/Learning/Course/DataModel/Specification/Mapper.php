@@ -9,7 +9,6 @@
 namespace Schoolbox\Learning\Course\DataModel\Specification;
 
 use PDOStatement;
-use Ramsey\Uuid\Uuid;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;
