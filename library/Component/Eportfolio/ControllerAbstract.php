@@ -83,9 +83,10 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
         // Otherwise, twig will fail to replace these vars when rendering component templates.
         $this->setVar(
             array(
-                'CONFIG_COLLAPSED_ICON'  => 'icon-up-arrow',
-                'CONFIG_COLLAPSED_CLASS' => '',
-                'CONFIG_COLLAPSED_STATE' => 'uncollapsed',
+                'CONFIG_COLLAPSED_ICON'      => 'icon-up-arrow',
+                'CONFIG_COLLAPSED_SBX_ICON'  => 'up-arrow',
+                'CONFIG_COLLAPSED_CLASS'     => '',
+                'CONFIG_COLLAPSED_STATE'     => 'uncollapsed',
             )
         );
 

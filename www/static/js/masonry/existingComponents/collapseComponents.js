@@ -15,6 +15,24 @@ const ANIMATE_SPEED = 0.4;
 const PANEL_SELECTOR = '[data-collapsable="true"]';
 const BUTTON_SELECTOR = '[data-collapser="true"]';
 
+function getButtonIcon(button) {
+    return button?.querySelector("sbx-icon");
+}
+
+function hasSbxButtonIcon(button) {
+    return getButtonIcon(button) !== null;
+}
+
+function setButtonIconState(button, isOpen) {
+    const icon = getButtonIcon(button);
+
+    if (!icon) {
+        return;
+    }
+
+    icon.setAttribute("name", isOpen ? "up-arrow" : "down-arrow");
+}
+
 /**
  * Set up all components and listen for newly added ones
  */
@@ -64,12 +82,16 @@ export function isOpen(component) {
  */
 export async function open(component) {
     const collapseButton = component.querySelector(BUTTON_SELECTOR);
-    animateRotation(
-        collapseButton,
-        collapseButton.classList.contains("icon-up-arrow") ? ANIMATE_OPEN_POSITION : ANIMATE_CLOSED_POSITION,
-        ANIMATE_ORIGIN,
-        ANIMATE_SPEED,
-    );
+    if (hasSbxButtonIcon(collapseButton)) {
+        setButtonIconState(collapseButton, true);
+    } else {
+        animateRotation(
+            collapseButton,
+            isOpen(component) ? ANIMATE_OPEN_POSITION : ANIMATE_CLOSED_POSITION,
+            ANIMATE_ORIGIN,
+            ANIMATE_SPEED,
+        );
+    }
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute("data-collapse-state", "uncollapsed");
     collapsePanel.dispatchEvent(new CustomEvent("expandStart.collapsable"));
@@ -84,12 +106,16 @@ export async function open(component) {
  */
 export async function close(component) {
     const collapseButton = component.querySelector(BUTTON_SELECTOR);
-    animateRotation(
-        collapseButton,
-        collapseButton.classList.contains("icon-up-arrow") ? ANIMATE_CLOSED_POSITION : ANIMATE_OPEN_POSITION,
-        ANIMATE_ORIGIN,
-        ANIMATE_SPEED,
-    );
+    if (hasSbxButtonIcon(collapseButton)) {
+        setButtonIconState(collapseButton, false);
+    } else {
+        animateRotation(
+            collapseButton,
+            isOpen(component) ? ANIMATE_CLOSED_POSITION : ANIMATE_OPEN_POSITION,
+            ANIMATE_ORIGIN,
+            ANIMATE_SPEED,
+        );
+    }
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute("data-collapse-state", "collapsed");
     collapsePanel.dispatchEvent(new CustomEvent("collapseStart.collapsable"));

@@ -4,6 +4,45 @@
 (function () {
     const DEFAULT_ICON_COLLAPSED = "icon-down-arrow";
     const DEFAULT_ICON_EXPANDED = "icon-up-arrow";
+    const DEFAULT_SBX_ICON_COLLAPSED = "down-arrow";
+    const DEFAULT_SBX_ICON_EXPANDED = "up-arrow";
+
+    function getSbxIcon(toggle) {
+        return $(toggle).find("sbx-icon").first();
+    }
+
+    function hasExpandedIcon(toggle, expandedClass, expandedIconName) {
+        const sbxIcon = getSbxIcon(toggle);
+
+        if (sbxIcon.length) {
+            return sbxIcon.attr("name") === expandedIconName;
+        }
+
+        return $(toggle).hasClass(expandedClass);
+    }
+
+    function setCollapsedStateIcon(
+        toggle,
+        expanded,
+        collapsedClass,
+        expandedClass,
+        collapsedIconName,
+        expandedIconName,
+    ) {
+        const sbxIcon = getSbxIcon(toggle);
+
+        if (sbxIcon.length) {
+            sbxIcon.attr("name", expanded ? expandedIconName : collapsedIconName);
+            return;
+        }
+
+        if (expanded) {
+            $(toggle).removeClass(collapsedClass).addClass(expandedClass);
+            return;
+        }
+
+        $(toggle).removeClass(expandedClass).addClass(collapsedClass);
+    }
 
     /**
      * Compute dimensions dynamically
@@ -138,8 +177,10 @@
         // some places that aren't collapsable sometimes decide to call this, so fall back to the default icon if so
         const iconCollapsed = this.config?.iconCollapsed ?? DEFAULT_ICON_COLLAPSED;
         const iconExpanded = this.config?.iconExpanded ?? DEFAULT_ICON_EXPANDED;
+        const sbxIconCollapsed = this.config?.sbxIconCollapsed ?? DEFAULT_SBX_ICON_COLLAPSED;
+        const sbxIconExpanded = this.config?.sbxIconExpanded ?? DEFAULT_SBX_ICON_EXPANDED;
 
-        icon.removeClass(iconExpanded).addClass(iconCollapsed);
+        setCollapsedStateIcon(icon, false, iconCollapsed, iconExpanded, sbxIconCollapsed, sbxIconExpanded);
     };
 
     /**
@@ -151,11 +192,16 @@
         // some places that aren't collapsable sometimes decide to call this, so fall back to the default icon if so
         const iconCollapsed = this.config?.iconCollapsed ?? DEFAULT_ICON_COLLAPSED;
         const iconExpanded = this.config?.iconExpanded ?? DEFAULT_ICON_EXPANDED;
+        const sbxIconCollapsed = this.config?.sbxIconCollapsed ?? DEFAULT_SBX_ICON_COLLAPSED;
+        const sbxIconExpanded = this.config?.sbxIconExpanded ?? DEFAULT_SBX_ICON_EXPANDED;
 
-        if (icon.hasClass(iconExpanded)) {
-            icon.removeClass(iconExpanded).addClass(iconCollapsed);
-        } else {
-            icon.removeClass(iconCollapsed).addClass(iconExpanded);
-        }
+        setCollapsedStateIcon(
+            icon,
+            !hasExpandedIcon(icon, iconExpanded, sbxIconExpanded),
+            iconCollapsed,
+            iconExpanded,
+            sbxIconCollapsed,
+            sbxIconExpanded,
+        );
     };
 })(jQuery);
