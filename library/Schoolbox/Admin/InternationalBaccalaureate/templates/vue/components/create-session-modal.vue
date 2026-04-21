@@ -58,15 +58,15 @@ function onSubmit(): void {
 
 <template>
     <BasicModal v-model:is-open="isOpen" :has-background-click="true" size="s">
-        <div class="l-flex-col l-gap-s f-no-margins">
+        <div class="l-flex-col l-gap-m f-no-margins">
             <h2>Create New Examination Session</h2>
             <p>Configuring registration for Diploma Program Year 2 [DIPLOMA]</p>
 
-            <div class="sbx-alert sbx-alert--warning" role="alert">
+            <div class="alert-box" role="alert">
                 If incorrect students appear on the following report, please update the students' qualification.
             </div>
 
-            <div class="l-flex-col l-gap-xs">
+            <div class="l-flex-col l-gap-xs f-no-margins">
                 <label for="academic-year">Academic Year</label>
                 <input
                     id="academic-year"
@@ -78,16 +78,21 @@ function onSubmit(): void {
                 />
             </div>
 
-            <fieldset class="l-flex-col l-gap-xs">
+            <fieldset class="radiolist clear-fieldset">
                 <legend>Examination Session</legend>
-                <label>
-                    <input v-model="examinationSession" type="radio" name="examination-session" value="May" />
-                    May
-                </label>
-                <label>
-                    <input v-model="examinationSession" type="radio" name="examination-session" value="November" />
-                    November
-                </label>
+                <ul class="option-list l-flex-row l-gap-s f-no-margins">
+                    <li>
+                        <input id="may" v-model="examinationSession" type="radio" value="May" /><label for="may"
+                            >May</label
+                        >
+                    </li>
+                    <li>
+                        <input id="november" v-model="examinationSession" type="radio" value="November" /><label
+                            for="november"
+                            >November</label
+                        >
+                    </li>
+                </ul>
             </fieldset>
 
             <div class="l-flex l-gap-xs f-no-margins">

@@ -1243,6 +1243,16 @@ body.sbx-body {
     }
 }
 
+fieldset.clear-fieldset {
+    border: none;
+    margin: 0;
+    padding: 0;
+    legend {
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+}
+
 body:not(.sbx-body) {
     .checklist,
     .radiolist {

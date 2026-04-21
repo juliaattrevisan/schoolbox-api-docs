@@ -47,7 +47,8 @@ body.sbx-body {
     label,
     div,
     article,
-    table tr th {
+    table tr th,
+    legend {
         font-size: var(--sbx-font-size-s);
     }
 
@@ -73,10 +74,6 @@ body.sbx-body {
         font-weight: var(--sbx-font-weight-heading);
         padding: 10px;
         text-transform: none;
-    }
-
-    legend {
-        font-size: var(--sbx-font-size-m);
     }
 
     // Remove uppercase transformation for better readability
