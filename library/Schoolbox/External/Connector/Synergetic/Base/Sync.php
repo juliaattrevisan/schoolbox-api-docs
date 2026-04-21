@@ -85,7 +85,24 @@ class Sync extends Base implements ISync
                             vStudentsAll.StudentHouse                        AS student_house,
                             vStudentsAll.StudentBoarder                      AS student_boarder,
                             vStudentsAll.StudentBoardingHouse                AS student_boarding_house,
-                            StudentCampus                                 AS student_campus
+                            StudentCampus                                 AS student_campus,
+
+                            vStudentsAll.StudentNationalityCode as student_nationality_code,
+                            CASE
+                                WHEN vStudentsAll.StudentNationalityCode != '' THEN vStudentsAll.StudentNationalityDescription
+                                ELSE ''
+                            END as student_nationality,
+
+                            vStudentsAll.StudentNationality2Code as student_nationality2_code,
+                            CASE WHEN vStudentsAll.StudentNationality2Code != '' THEN vStudentsAll.StudentNationality2Description
+                                ELSE ''
+                            END as student_nationality2,
+
+                            vStudentsAll.StudentHomeLanguageCode as student_language_code,
+                            CASE WHEN vStudentsAll.StudentHomeLanguageCode != '' THEN vStudentsAll.StudentHomeLanguageDescription
+                                ELSE ''
+                            END as student_language
+
             FROM            dbo.vStudentsAll vStudentsAll
             LEFT JOIN       Community ON Community.ID = StudentID
             WHERE           FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND

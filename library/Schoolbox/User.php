@@ -30,8 +30,8 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\IB\Qualification\Model as QualificationModel;
 use Schoolbox\User\Pronoun\Model;
 use SensitiveParameter;
-use Schoolbox\User\Nationality\Model as NationalityModel;
-use Schoolbox\User\Language\Model as LanguageModel;
+use Schoolbox\Nationality\Model as NationalityModel;
+use Schoolbox\Language\Model as LanguageModel;
 
 class User implements Serializable, Linkable, ISoftDeletable, IModel
 {

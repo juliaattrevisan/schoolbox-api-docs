@@ -1,9 +1,8 @@
 -- Create user_nationality table to store the user's nationality
 CREATE TABLE user_nationality
 (
-    id          INT(11) auto_increment PRIMARY KEY,
     user_id     INT(4) unsigned NOT NULL,
-    nationality VARCHAR(255)    NOT NULL,
+    nationality int(11)    NOT NULL,
     CONSTRAINT fk_user_nationality_user_id
         FOREIGN KEY (user_id) REFERENCES user (id)
 );

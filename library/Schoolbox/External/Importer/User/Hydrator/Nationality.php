@@ -7,7 +7,7 @@
 
 namespace Schoolbox\External\Importer\User\Hydrator;
 
-use Schoolbox\IMapper;
+use Schoolbox\Nationality\Mapper as NationalityMapper;
 use Schoolbox\User as UserModel;
 use SensitiveParameter;
 
@@ -19,20 +19,16 @@ use SensitiveParameter;
 class Nationality implements HydratorInterface
 {
     /**
-     * The key in $row to set the value in the user to.
-     *
-     * @var string
-     */
-    protected $fieldname;
-
-    /**
      * Constructor
      *
      * @param string $fieldname
+     * @param array $lookupValues
+     *
      */
-    public function __construct($fieldname)
-    {
-        $this->fieldname = $fieldname;
+    public function __construct(
+        protected string $fieldname,
+        protected array $lookupValues
+    ) {
     }
 
     /**
@@ -40,24 +36,21 @@ class Nationality implements HydratorInterface
      */
     public function hydrate(#[SensitiveParameter] array $row, UserModel $user): UserModel
     {
-
-        $nationalityMapper = UserModel\Nationality\Mapper::getInstance();
+        // Does the field exist in $row?
         if (isset($row[$this->fieldname])) {
-            $collection = $nationalityMapper->createCollection();
-            $values = explode(',', $row[$this->fieldname]);
-            foreach ($values as $value) {
-                $value = trim($value);
-                if ('' === $value) {
-                    continue;
+            // Set based on code or name? Maybe name.
+            $nationalityList = NationalityMapper::getInstance()->createCollection();
+            foreach (explode(',', $row[$this->fieldname]) as $nationalityName) {
+                $nationalityName = trim($nationalityName);
+                if (strlen($nationalityName)) {
+                    if (array_key_exists($nationalityName, $this->lookupValues)) {
+                        $nationalityList->add($this->lookupValues[$nationalityName]);
+                    }
                 }
-                $collection->add(
-                    $nationalityMapper
-                        ->createModel()
-                        ->setNationality($value)
-                        ->setUser($user)
-                );
             }
-            return $user->setNationalityCollection($collection);
+            if (count($nationalityList) > 0) {
+                $user->setNationalityCollection($nationalityList);
+            }
         }
         return $user;
     }

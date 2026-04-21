@@ -112,6 +112,16 @@ class Student extends Base
     protected $house = null;
 
     /**
+     * @var \Schoolbox\Collection
+     */
+    protected $nationality = null;
+
+    /**
+     * @var \Schoolbox\Collection
+     */
+    protected $language = null;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -138,6 +148,8 @@ class Student extends Base
         $this->setPhoneMobile(new Phone());
         $this->setGuardians(new Collection());
         $this->setCampus(new Collection());
+        $this->setNationality(new Collection());
+        $this->setLanguage(new Collection());
     }
 
     /**
@@ -373,5 +385,27 @@ class Student extends Base
     {
         $this->boardingStatus = $boardingStatus;
         return $this;
+    }
+
+    public function setNationality(Collection $nationality): self
+    {
+        $this->nationality = $nationality;
+        return $this;
+    }
+
+    public function getNationality(): Collection
+    {
+        return $this->nationality;
+    }
+
+    public function setLanguage(Collection $language): self
+    {
+        $this->language = $language;
+        return $this;
+    }
+
+    public function getLanguage(): Collection
+    {
+        return $this->language;
     }
 }

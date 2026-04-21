@@ -97,6 +97,25 @@ class Student extends IteratorIterator
 
         $student->getCampus()->add($campus);
 
+        /* Nationality
+         */
+        $nationality = new User\Student\Nationality();
+        $nationality->setName($currentResult['student_nationality'] ?? '');
+        $nationality->setCode($currentResult['student_nationality_code'] ?? '');
+        $student->getNationality()->add($nationality);
+
+        $nationality2 = new User\Student\Nationality();
+        $nationality2->setName($currentResult['student_nationality2'] ?? '');
+        $nationality2->setCode($currentResult['student_nationality2_code'] ?? '');
+        $student->getNationality()->add($nationality2);
+
+        /* Language
+         */
+        $language = new User\Student\Language();
+        $language->setName($currentResult['student_language'] ?? '');
+        $language->setCode($currentResult['student_language_code'] ?? '');
+        $student->getLanguage()->add($language);
+
         $student->setCustomField1((string)($currentResult['custom_field1'] ?? null));
         $student->setCustomField2((string)($currentResult['custom_field2'] ?? null));
         $student->setCustomField3((string)($currentResult['custom_field3'] ?? null));

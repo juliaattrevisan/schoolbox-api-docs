@@ -80,6 +80,9 @@ class Factory
         'hideContacts' => 'Hide Contact Details',
         'hideTimetable' => 'Hide Timetable',
         'displayGradeGraph' => 'Display Comparative Graph on Grades',
+
+        'nationalityCollection' => 'Nationality',
+        'languageCollection' => 'Language',
     ];
 
 
@@ -95,6 +98,8 @@ class Factory
         'userAccessRemove' => 'groups',
         'campusCollection' => 'campus',
         'campusCollectionRemove' => 'campus',
+        'nationalityCollection' => 'nationality',
+        'languageCollection' => 'language',
     ];
 
 

@@ -1,9 +1,8 @@
 -- Create user_language table to store the user's languages
 CREATE TABLE user_language
 (
-    id          INT(11) auto_increment PRIMARY KEY,
     user_id     INT(4) unsigned NOT NULL,
-    language    VARCHAR(255)    NOT NULL,
+    language    int(11)    NOT NULL,
     CONSTRAINT fk_user_language_user_id
         FOREIGN KEY (user_id) REFERENCES user (id)
 );
