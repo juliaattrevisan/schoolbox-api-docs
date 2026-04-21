@@ -726,11 +726,11 @@ $train-line-unvisited-color: $content-ui-background;
                 &:after {
                     background: var(--sbx-config-color-active, $content-ui-background);
                 }
-                a span {
+                a :is(span, sbx-icon) {
                     background: var(--sbx-config-color-active, $content-ui-background);
                 }
             }
-            a span {
+            a :is(span, sbx-icon) {
                 box-shadow: 0 0 $train-line-visited-glow-blur var(--sbx-config-color-accent, $content-ui-foreground);
                 color: var(--sbx-config-color-accent-text, $content-ui-foreground-contrast);
             }
@@ -741,7 +741,7 @@ $train-line-unvisited-color: $content-ui-background;
             // Smaller stops that have no icons (Nub)
             // The 0.4 multiplier and offset is empirical - I don't know what the math is
             // to derive it from the stop size or segment width
-            span {
+            :is(span, sbx-icon) {
                 background: var(--sbx-config-color-accent, $content-ui-foreground);
                 border-radius: calc($train-line-stop-size / 2);
                 // DONE use contrasting color
@@ -763,6 +763,13 @@ $train-line-unvisited-color: $content-ui-background;
                     top: -1 * (calc(($train-line-stop-size - $train-line-segment-width) / 2));
                     width: $train-line-stop-size;
                 }
+            }
+
+            sbx-icon {
+                height: $train-line-stop-size;
+                left: calc(50% - (#{calc($train-line-stop-size / 2)}));
+                top: -1 * (calc(($train-line-stop-size - $train-line-segment-width) / 2));
+                width: $train-line-stop-size;
             }
         }
     }
