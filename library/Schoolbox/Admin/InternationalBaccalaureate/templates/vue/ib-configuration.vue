@@ -9,7 +9,14 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import IBGeneralConfig from "./components/ib-general-config.vue";
 import IBSubjectTable from "./components/ib-subject-table.vue";
-import type { IBCategory, IBConfiguration, IBLanguage, IBRoutes, IBSubject } from "../js/types/ibConfigurationTypes";
+import type {
+    IBCategory,
+    IBConfiguration,
+    IBLanguage,
+    IBLanguageListResponse,
+    IBRoutes,
+    IBSubject,
+} from "../js/types/ibConfigurationTypes";
 
 interface Props {
     categories: IBCategory[]; // The IB subject group categories to display
@@ -65,7 +72,7 @@ async function loadCategorySubjects(): Promise<void> {
  * Load the available IB languages from the API route passed to the page.
  */
 async function loadLanguages(): Promise<void> {
-    if (!props.routes.allLanguages) {
+    if (!props.routes.searchLanguages) {
         languagesLoadError.value = "Language list is unavailable";
         ibLanguages.value = [];
         return;
@@ -73,27 +80,27 @@ async function loadLanguages(): Promise<void> {
 
     isLanguagesLoading.value = true;
     languagesLoadError.value = null;
-
-    const response = await apiRequest<IBLanguage[]>({
-        url: props.routes.allLanguages,
+    const response = await apiRequest<IBLanguageListResponse>({
+        url: props.routes.searchLanguages,
         method: "GET",
     });
 
-    isLanguagesLoading.value = false;
-
     if (!response.success) {
+        isLanguagesLoading.value = false;
         languagesLoadError.value = response.message;
         ibLanguages.value = [];
         return;
     }
 
-    if (!Array.isArray(response.data)) {
+    if (!response.data || !Array.isArray(response.data.data)) {
+        isLanguagesLoading.value = false;
         languagesLoadError.value = "Unexpected response format";
         ibLanguages.value = [];
         return;
     }
 
-    ibLanguages.value = response.data;
+    isLanguagesLoading.value = false;
+    ibLanguages.value = response.data.data;
 }
 
 /**

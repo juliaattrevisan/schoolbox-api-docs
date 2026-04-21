@@ -26,6 +26,17 @@ export type IBLanguage = {
     name: string;
 };
 
+export type IBLanguageListResponse = {
+    data: IBLanguage[];
+    metadata?: {
+        count?: number;
+        cursor?: {
+            current?: string | null;
+            next?: string | null;
+        };
+    };
+};
+
 export type IBSubject = {
     id: number;
     subject: string;
@@ -37,5 +48,5 @@ export type IBSubject = {
 };
 
 export type IBRoutes = {
-    allLanguages: string | null;
+    searchLanguages: string | null;
 };
