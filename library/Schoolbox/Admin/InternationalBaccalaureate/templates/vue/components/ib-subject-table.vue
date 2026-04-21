@@ -535,7 +535,7 @@ async function saveSubjectConfiguration(): Promise<void> {
 </script>
 
 <template>
-    <div class="subject-table-container">
+    <div>
         <div v-if="subjectRows.length === 0" class="alert alert-info">
             <i class="fa fa-info-circle"></i>
             No subjects configured yet for {{ categoryTitle }}. Use the table below to add subjects.
@@ -544,7 +544,7 @@ async function saveSubjectConfiguration(): Promise<void> {
         <div v-else>
             <template v-if="isCoreCategory">
                 <h3>Diploma Program Year 2 [Diploma]</h3>
-                <table class="subject-table">
+                <table class="tiger-stripe">
                     <thead>
                         <tr>
                             <th>Subject</th>
@@ -590,7 +590,7 @@ async function saveSubjectConfiguration(): Promise<void> {
                 </table>
 
                 <h3 style="margin-top: 2rem">Diploma Course [Course]</h3>
-                <table class="subject-table">
+                <table class="tiger-stripe">
                     <thead>
                         <tr>
                             <th>Subject</th>
@@ -637,7 +637,7 @@ async function saveSubjectConfiguration(): Promise<void> {
             </template>
 
             <template v-else>
-                <table class="subject-table">
+                <table class="tiger-stripe">
                     <thead>
                         <tr>
                             <th>Subject</th>
@@ -736,7 +736,7 @@ async function saveSubjectConfiguration(): Promise<void> {
             </div>
         </div>
 
-        <SearchSelectModal
+        <search-select-modal
             v-model:selected="modalSelectedLanguages"
             v-model:is-open="isLanguageModalOpen"
             v-model:results="modalSearchResults"
