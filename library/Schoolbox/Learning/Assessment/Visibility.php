@@ -192,8 +192,10 @@ class Visibility
         bool $respectWorkTypeVisibility
     ): bool {
         // Handle the case where the user is a staff member.
-        // Deliberately handle this case before the 'parent of learner' case, because if a user is both a staff member
-        // and a parent of a learner, they should be treated as a staff member.
+        // Note we do not have to consider the case of a staff member who is also a parent of a learner.  That is
+        // because although it is possible to define such a user in the sis_... tables, Schoolbox's user provisioning
+        // process will create two users in that situation. One with role type 'staff', the other with role type
+        // 'parent'.
         if ($nonInstructorNonLearner->getRole()->isStaff()) {
             if ($showClosed) {
                 return true;
