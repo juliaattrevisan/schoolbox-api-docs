@@ -102,6 +102,9 @@ class Student extends IteratorIterator
             (string)($currentResult['student_nationality'] ?? ''),
             (string)($currentResult['student_nationality_code'] ?? '')
         );
+
+        /* Some sources have nationality stored in separate columns (ie synergetic)
+         */
         $this->addNationality(
             $student,
             (string)($currentResult['student_nationality2'] ?? ''),
@@ -131,6 +134,14 @@ class Student extends IteratorIterator
         return $student;
     }
 
+    /**
+     * To aggregate the nationality stack for the students
+     *
+     * @param User\Student $student
+     * @param string       $name
+     * @param string       $code
+     * @return void
+     */
     private function addNationality(User\Student $student, string $name = '', string $code = ''): void
     {
         $name = trim($name);
@@ -152,6 +163,14 @@ class Student extends IteratorIterator
         $student->getNationality()->add($nationality);
     }
 
+    /**
+     * To aggregate the language stack for the students
+     *
+     * @param User\Student $student
+     * @param string       $name
+     * @param string       $code
+     * @return void
+     */
     private function addLanguage(User\Student $student, string $name = '', string $code = ''): void
     {
         $name = trim($name);
