@@ -40,7 +40,10 @@ class Sync extends BaseSync
                 vStudents.StudentHouse         AS student_house,
                 vStudents.StudentBoarder       AS student_boarder,
                 vStudents.StudentBoardingHouse AS student_boarding_house,
-                StudentCampus                  AS student_campus
+                StudentCampus                  AS student_campus,
+                ''                             AS student_nationality,
+                ''                             AS student_nationality2,
+                ''                             AS student_language
             FROM dbo.vStudents vStudents
             LEFT JOIN Community ON Community.ID = vStudents.StudentID
             LEFT JOIN CommunityAttributes ca ON ca.ID = vStudents.StudentID

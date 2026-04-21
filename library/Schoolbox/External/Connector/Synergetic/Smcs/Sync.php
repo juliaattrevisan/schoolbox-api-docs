@@ -41,7 +41,10 @@ class Sync extends BaseSync
                             uvStudents.StudentHouse                        AS student_house,
                             uvStudents.StudentBoarder                      AS student_boarder,
                             uvStudents.StudentBoardingHouse                AS student_boarding_house,
-                            StudentCampus                                 AS student_campus
+                            StudentCampus                                 AS student_campus,
+                            ''                                            AS student_nationality,
+                            ''                                            AS student_nationality2,
+                            ''                                            AS student_language
             FROM            dbo.uvStudents uvStudents
             LEFT JOIN       Community ON Community.ID = StudentID
             WHERE           FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND

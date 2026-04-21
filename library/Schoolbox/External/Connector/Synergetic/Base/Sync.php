@@ -87,21 +87,21 @@ class Sync extends Base implements ISync
                             vStudentsAll.StudentBoardingHouse                AS student_boarding_house,
                             StudentCampus                                 AS student_campus,
 
-                            vStudentsAll.StudentNationalityCode as student_nationality_code,
+                            vStudentsAll.StudentNationalityCode AS student_nationality_code,
                             CASE
                                 WHEN vStudentsAll.StudentNationalityCode != '' THEN vStudentsAll.StudentNationalityDescription
                                 ELSE ''
-                            END as student_nationality,
+                            END AS student_nationality,
 
-                            vStudentsAll.StudentNationality2Code as student_nationality2_code,
+                            vStudentsAll.StudentNationality2Code AS student_nationality2_code,
                             CASE WHEN vStudentsAll.StudentNationality2Code != '' THEN vStudentsAll.StudentNationality2Description
                                 ELSE ''
-                            END as student_nationality2,
+                            END AS student_nationality2,
 
-                            vStudentsAll.StudentHomeLanguageCode as student_language_code,
+                            vStudentsAll.StudentHomeLanguageCode AS student_language_code,
                             CASE WHEN vStudentsAll.StudentHomeLanguageCode != '' THEN vStudentsAll.StudentHomeLanguageDescription
                                 ELSE ''
-                            END as student_language
+                            END AS student_language
 
             FROM            dbo.vStudentsAll vStudentsAll
             LEFT JOIN       Community ON Community.ID = StudentID

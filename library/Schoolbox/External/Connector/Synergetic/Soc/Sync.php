@@ -36,7 +36,10 @@ class Sync extends BaseSync
             student_house,
             student_gender,
             student_preferred,
-            student_surname
+            student_surname,
+            '' AS student_nationality,
+            '' AS student_nationality2,
+            '' AS student_language
             FROM dbo.uvSchoolBox_Parents;
         ";
 
