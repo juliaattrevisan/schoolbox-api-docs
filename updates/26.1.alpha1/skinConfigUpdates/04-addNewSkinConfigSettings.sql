@@ -2,10 +2,11 @@
 
 -- Add new config type for Sonar Skin Configs
 -- Hard-code the ID to match ConfigMapper::TYPE_SONAR_SKIN_CONFIG.
+SET @sonar_config_type_id = 28;
 INSERT INTO
     lu_config_type (id, type, sequence)
 VALUES (
-    28,
+    @sonar_config_type_id,
     'Sonar Skin Configs',
     (
         SELECT COALESCE(MAX(sequence), 0) + 1
@@ -14,15 +15,6 @@ VALUES (
 );
 
 -- New settings will be under Sonar Skin Configs config type
-SET
-    @sonar_config_type_id = (
-        SELECT id
-        FROM lu_config_type
-        WHERE
-            type = 'Sonar Skin Configs'
-        LIMIT 1
-    );
-
 -- Preset field types for new skin config settings
 SET
     @config_colour_field_id = (
