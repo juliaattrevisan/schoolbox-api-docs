@@ -16,6 +16,35 @@ const emit = defineEmits<{
 
 const configs = window.Vue.ref(props.configs);
 
+type SkinConfigSelectOption = {
+    label: string;
+    value: string;
+};
+
+const roundnessSelectOptions: SkinConfigSelectOption[] = [
+    {
+        label: "None",
+        value: "0",
+    },
+    {
+        label: "Small",
+        value: "0.25rem",
+    },
+    {
+        label: "Medium",
+        value: "0.5rem",
+    },
+    {
+        label: "Large",
+        value: "1rem",
+    },
+];
+
+const selectOptionsByName: Record<string, SkinConfigSelectOption[]> = {
+    skin_box_roundness: roundnessSelectOptions,
+    skin_field_roundness: roundnessSelectOptions,
+};
+
 window.Vue.watch(
     () => props.configs,
     (value) => {
@@ -41,6 +70,15 @@ const visibleConfigs = window.Vue.computed(() =>
  */
 function onPreviewRefresh(): void {
     emit("preview-refresh");
+}
+
+/**
+ * Return the hardcoded placeholder select choices for a Skin Config option.
+ * @param optionName Config name used to look up placeholder choices.
+ * @returns Hardcoded placeholder options for the matching select field.
+ */
+function getSelectOptions(optionName: string): SkinConfigSelectOption[] {
+    return selectOptionsByName[optionName] ?? [];
 }
 </script>
 
@@ -103,6 +141,24 @@ function onPreviewRefresh(): void {
                                 @input="onPreviewRefresh"
                                 @change="onPreviewRefresh"
                             />
+                        </div>
+                        <div v-else-if="option.type === 'select'">
+                            <select
+                                :id="`${option.name}-field`"
+                                v-model="option.value"
+                                :name="option.name"
+                                :disabled="!option.editable"
+                                @change="onPreviewRefresh"
+                            >
+                                <option value="">Select an option</option>
+                                <option
+                                    v-for="selectOption in getSelectOptions(option.name)"
+                                    :key="`${option.id}-${selectOption.value}`"
+                                    :value="selectOption.value"
+                                >
+                                    {{ selectOption.label }}
+                                </option>
+                            </select>
                         </div>
                     </div>
                 </div>
