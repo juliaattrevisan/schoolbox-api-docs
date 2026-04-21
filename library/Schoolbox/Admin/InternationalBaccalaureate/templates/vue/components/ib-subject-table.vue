@@ -743,6 +743,7 @@ async function saveSubjectConfiguration(): Promise<void> {
             v-model:is-open="isLanguageModalOpen"
             v-model:results="modalSearchResults"
             :default-results="modalDefaultResults"
+            show-selected
             label="Search languages"
             label-id="ib-language-modal-search"
             placeholder="Search for languages..."
