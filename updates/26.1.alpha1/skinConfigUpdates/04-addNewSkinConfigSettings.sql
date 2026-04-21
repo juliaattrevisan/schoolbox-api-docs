@@ -2,16 +2,14 @@
 
 -- Add new config type for Sonar Skin Configs
 -- Hard-code the ID to match ConfigMapper::TYPE_SONAR_SKIN_CONFIG.
+-- Hard-code sequence also to avoid dependence on script run order.
 SET @sonar_config_type_id = 28;
 INSERT INTO
     lu_config_type (id, type, sequence)
 VALUES (
     @sonar_config_type_id,
     'Sonar Skin Configs',
-    (
-        SELECT COALESCE(MAX(sequence), 0) + 1
-        FROM lu_config_type
-    )
+    27
 );
 
 -- New settings will be under Sonar Skin Configs config type
