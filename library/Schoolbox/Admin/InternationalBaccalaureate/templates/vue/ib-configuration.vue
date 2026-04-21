@@ -20,6 +20,7 @@ import type {
 
 interface Props {
     categories: IBCategory[]; // The IB subject group categories to display
+    defaultLanguage: IBLanguage | null;
     configurationEndpoint: string; // The endpoint to fetch configuration data from
     saveEndpoint: string; // The endpoint to save configuration data to
     subjectsEndpoint: string; // The endpoint to fetch subjects for a category
@@ -214,9 +215,11 @@ window.Vue.onMounted((): void => {
                     :category-name="currentCategory.name"
                     :category-title="currentCategory.title"
                     :category-id="currentCategory.id"
+                    :default-language="props.defaultLanguage"
                     :save-endpoint="saveEndpoint"
                     :ib-subjects="currentSubjectsFromAPI"
                     :ib-languages="ibLanguages"
+                    :search-languages-endpoint="props.routes.searchLanguages"
                 />
             </div>
         </section>

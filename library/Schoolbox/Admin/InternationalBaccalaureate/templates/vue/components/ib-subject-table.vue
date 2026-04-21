@@ -27,9 +27,11 @@ interface Props {
     categoryName: string;
     categoryTitle: string;
     categoryId: number;
+    defaultLanguage: IBLanguage | null;
     saveEndpoint: string;
     ibSubjects: IBSubject[];
     ibLanguages: IBLanguage[];
+    searchLanguagesEndpoint: string | null;
 }
 
 const props = defineProps<Props>();

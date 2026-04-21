@@ -63,6 +63,7 @@ class Controller extends ConfigController
     public function getConfiguration(): void
     {
         $pageCurrent = '/adminv2/international-baccalaureate/configuration';
+        $defaultLanguage = $this->getDefaultLanguage();
 
         // Add General Configuration tab manually
         $categories = [
@@ -91,6 +92,11 @@ class Controller extends ConfigController
                 'pageCurrent' => $pageCurrent,
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
                 'categories' => $categories,
+                'defaultLanguage' => $defaultLanguage ? [
+                    'id' => $defaultLanguage->getId(),
+                    'code' => $defaultLanguage->getCode(),
+                    'name' => $defaultLanguage->getName(),
+                ] : null,
                 '_routes' => [
                     'searchLanguages' => $this->getRouteIfAuthorized('internationalBaccalaureate.searchLanguages'),
                 ],
@@ -213,6 +219,7 @@ class Controller extends ConfigController
                     'languages' => $groupSubject->getLanguages()
                         ->map(fn(GroupSubjectLanguageModel $language) => [
                             'languageId' => $language->getLanguage()?->getId(),
+                            'languageName' => $language->getLanguage()?->getName(),
                             'classCode' => $language->getClassCode() ?? '',
                         ])
                         ->reindex()
@@ -224,6 +231,19 @@ class Controller extends ConfigController
         } catch (Exception $e) {
             $this->response = $this->responseAsJson(['error' => $e->getMessage()])->withStatus(500);
         }
+    }
+
+    private function getDefaultLanguage(): ?LanguageModel
+    {
+        $englishLanguage = $this->languageMapper->findByColumn('code', 'en')->first();
+
+        if ($englishLanguage instanceof LanguageModel) {
+            return $englishLanguage;
+        }
+
+        $firstLanguage = $this->languageMapper->findAll()->first();
+
+        return $firstLanguage instanceof LanguageModel ? $firstLanguage : null;
     }
 
     /**

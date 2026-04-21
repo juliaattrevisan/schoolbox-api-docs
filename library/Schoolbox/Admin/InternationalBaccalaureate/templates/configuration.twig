@@ -10,6 +10,7 @@
         <div id="ib-configuration-container">
             <ib-configuration
                 :categories="{{ (categories ?? []) | json_encode }}"
+                :default-language="{{ (defaultLanguage ?? null) | json_encode }}"
                 configuration-endpoint="{{ routeLookupIfAuthorized('internationalBaccalaureate.getConfigurationData') }}"
                 save-endpoint="{{ routeLookupIfAuthorized('internationalBaccalaureate.saveConfiguration') }}"
                 subjects-endpoint="{{ routeLookupIfAuthorized('internationalBaccalaureate.getCategorySubjects') }}"
