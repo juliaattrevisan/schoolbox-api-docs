@@ -304,7 +304,7 @@ class Feed
                             }
                             break;
                         case '0-1':
-                            // Staff and instructors and learners
+                            // Staff and instructors and learners (conditions here copied from Assessment\WorkType\Mapper)
                             //  - instructors - always included
                             //  - learners - always included
                             //  - parents of learners - included only if instructors or learners
@@ -319,7 +319,7 @@ class Feed
                             }
                             break;
                         case '1-0':
-                            // Staff and instructors and parents
+                            // Staff and instructors and parents (conditions here copied from Assessment\WorkType\Mapper)
                             //  - Instructors - always included
                             //  - learners - always excluded
                             //  - parents of learners - included unless they are learners
@@ -338,7 +338,7 @@ class Feed
                             }
                             break;
                         case '1-1':
-                            // Staff and instructors and learners and parents
+                            // Staff and instructors and learners and parents (conditions here copied from Assessment\WorkType\Mapper)
                             //  - instructors - always included
                             //  - learners - always included
                             //  - parents of learners - always included
