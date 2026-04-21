@@ -137,9 +137,44 @@ class Controller extends ConfigController
                     $data[$type][$category] = array_values($subcategoryMap);
                 }
             }
+
+            if (is_array($categories)) {
+                $data[$type] = $this->orderCategories($data[$type]);
+            }
         }
 
         return $data;
+    }
+
+    /**
+     * Reorder category groups so the primary admin display order is stable.
+     *
+     * @param array<string, array<int, array<string, mixed>>> $categories
+     * @return array<string, array<int, array<string, mixed>>>
+     */
+    private function orderCategories(array $categories): array
+    {
+        $preferredOrder = [
+            ConfigMapper::NAME_SKIN_CATEGORY_COLOURS,
+            ConfigMapper::NAME_SKIN_CATEGORY_ROUNDNESS,
+            ConfigMapper::NAME_SKIN_CATEGORY_DROP_SHADOW,
+            ConfigMapper::NAME_SKIN_CATEGORY_CSS,
+        ];
+
+        $orderedCategories = [];
+
+        foreach ($preferredOrder as $categoryName) {
+            foreach ($categories as $displayName => $subcategoryMap) {
+                if (strtolower($displayName) !== $categoryName) {
+                    continue;
+                }
+
+                $orderedCategories[$displayName] = $subcategoryMap;
+                unset($categories[$displayName]);
+            }
+        }
+
+        return $orderedCategories + $categories;
     }
 
     /**
