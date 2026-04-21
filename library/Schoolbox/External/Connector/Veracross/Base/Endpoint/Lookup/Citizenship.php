@@ -63,7 +63,7 @@ class Citizenship
             }
 
             foreach ($this->lookup as &$citizenshipData) {
-                $citizenshipData['nationalities'] = implode(', ', $citizenshipData['nationalities']);
+                $citizenshipData['nationalities'] = implode(',', $citizenshipData['nationalities']);
             }
 
             unset($citizenshipData);
