@@ -16,15 +16,17 @@ const isOpen = defineModel<boolean>("is-open", { default: false });
 
 const academicYear = window.Vue.ref<string>("");
 const examinationSession = window.Vue.ref<"May" | "November" | null>(null);
-
-const canSubmit = window.Vue.computed(() => academicYear.value.trim() !== "" && examinationSession.value !== null);
+const academicYearError = window.Vue.ref<string | null>(null);
+const examinationSessionError = window.Vue.ref<string | null>(null);
 
 /**
- * Resets the form fields to their initial state.
+ * Resets form fields and validation errors to their initial state.
  */
 function resetForm(): void {
     academicYear.value = "";
     examinationSession.value = null;
+    academicYearError.value = null;
+    examinationSessionError.value = null;
 }
 
 window.Vue.watch(isOpen, (newVal) => {
@@ -38,13 +40,29 @@ window.Vue.watch(isOpen, (newVal) => {
  * TODO(SA-22225): Replace with real POST to createEndpoint when backend is ready.
  */
 function onSubmit(): void {
-    if (!canSubmit.value) {
+    academicYearError.value = null;
+    examinationSessionError.value = null;
+
+    let isValid = true;
+
+    if (academicYear.value.trim() === "") {
+        academicYearError.value = "Please enter an academic year.";
+        isValid = false;
+    }
+
+    if (examinationSession.value === null) {
+        examinationSessionError.value = "Please select an examination session.";
+        isValid = false;
+    }
+
+    if (!isValid) {
         return;
     }
 
     const session: RegistrationSession = {
         id: Date.now(),
         title: `Diploma Program Year 2 [DIPLOMA] - ${examinationSession.value} ${academicYear.value.trim()}`,
+        qualificationType: "DIPLOMA",
         academicYear: academicYear.value.trim(),
         examSession: examinationSession.value as "May" | "November",
         createdAt: new Date().toISOString(),
@@ -58,7 +76,7 @@ function onSubmit(): void {
 
 <template>
     <BasicModal v-model:is-open="isOpen" :has-background-click="true" size="s">
-        <div class="l-flex-col l-gap-m f-no-margins">
+        <form class="l-flex-col l-gap-m f-no-margins" @submit.prevent="onSubmit">
             <h2>Create New Examination Session</h2>
             <p>Configuring registration for Diploma Program Year 2 [DIPLOMA]</p>
 
@@ -66,46 +84,49 @@ function onSubmit(): void {
                 If incorrect students appear on the following report, please update the students' qualification.
             </div>
 
-            <div class="l-flex-col l-gap-xs f-no-margins">
-                <label for="academic-yea" class="required">Academic Year</label>
+            <div class="l-flex-col l-gap-xs">
+                <label for="academic-year" class="required">Academic Year</label>
                 <input
                     id="academic-year"
                     v-model="academicYear"
                     type="text"
                     name="academic-year"
                     placeholder="e.g. 2026 or 2025/2026"
-                    required
                 />
+                <label v-if="academicYearError" class="error">{{ academicYearError }}</label>
             </div>
 
             <fieldset class="radiolist clear-fieldset">
                 <legend class="required">Examination Session</legend>
                 <ul class="option-list l-flex-row l-gap-s f-no-margins">
                     <li>
-                        <input id="may" v-model="examinationSession" type="radio" value="May" /><label for="may"
-                            >May</label
-                        >
+                        <input
+                            id="may"
+                            v-model="examinationSession"
+                            type="radio"
+                            name="examination-session"
+                            value="May"
+                        /><label for="may">May</label>
                     </li>
                     <li>
-                        <input id="november" v-model="examinationSession" type="radio" value="November" /><label
-                            for="november"
-                            >November</label
-                        >
+                        <input
+                            id="november"
+                            v-model="examinationSession"
+                            type="radio"
+                            name="examination-session"
+                            value="November"
+                        /><label for="november">November</label>
                     </li>
                 </ul>
+                <label v-if="examinationSessionError" class="error">{{ examinationSessionError }}</label>
             </fieldset>
 
             <div class="l-flex l-gap-xs f-no-margins">
                 <button type="button" class="button l-flex__item--1" @click.prevent="isOpen = false">Cancel</button>
-                <button
-                    type="button"
-                    class="button submit l-flex__item--1"
-                    :disabled="!canSubmit"
-                    @click.prevent="onSubmit"
-                >
+                <button class="button submit l-flex__item--1" data-test="ib-registration-create-session-submit">
                     Create Session
                 </button>
             </div>
-        </div>
+        </form>
     </BasicModal>
 </template>

@@ -28,7 +28,8 @@ const isDiplomaModalOpen = window.Vue.ref<boolean>(false);
 const localDiplomaSessionIds = window.Vue.ref<number[]>([]);
 
 /**
- * Fetches registration sessions for the Diploma Program Year 2 section.
+ * Fetches all registration sessions from the shared endpoint and filters
+ * to the Diploma Program Year 2 [DIPLOMA] section.
  * On failure, leaves the sessions list empty (shows empty state).
  */
 async function loadDiplomaSessions(): Promise<void> {
@@ -45,7 +46,7 @@ async function loadDiplomaSessions(): Promise<void> {
         return;
     }
 
-    diplomaSessions.value = response.data;
+    diplomaSessions.value = response.data.filter((s) => s.qualificationType === "DIPLOMA");
 }
 
 /**
@@ -128,9 +129,8 @@ window.Vue.onMounted((): void => {
                                     <div class="l-flex-col">
                                         <a href="#">{{ session.title }}</a>
                                         <small
-                                            >Session created on
-                                            {{ new Date(session.createdAt).toLocaleDateString() }} by
-                                            {{ session.createdBy }},
+                                            >Session created by {{ session.createdBy }} on
+                                            {{ new Date(session.createdAt).toLocaleDateString() }},
                                             {{ new Date(session.createdAt).toLocaleTimeString() }}</small
                                         >
                                     </div>

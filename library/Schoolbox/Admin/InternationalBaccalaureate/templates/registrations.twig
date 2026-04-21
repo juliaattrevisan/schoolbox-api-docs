@@ -7,9 +7,13 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
+        {#
+            TODO: Replace hardcoded endpoint URLs with routeLookupIfAuthorized() once
+            backend has registered the routes
+        #}
         <div
             id="ib-registration-app"
-            data-sessions-endpoint="/adminv2/international-baccalaureate/registrations/api/sessions/diploma"
+            data-sessions-endpoint="/adminv2/international-baccalaureate/registrations/api/sessions/"
             data-create-endpoint="/adminv2/international-baccalaureate/registrations/api/sessions"
         ></div>
         <script src="{{ CDN_PREFIX }}/js/bundle/ibRegistration.js?v={{ config.site_version }}"></script>
