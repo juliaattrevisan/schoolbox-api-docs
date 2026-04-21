@@ -67,7 +67,7 @@ function onSubmit(): void {
             </div>
 
             <div class="l-flex-col l-gap-xs f-no-margins">
-                <label for="academic-year">Academic Year</label>
+                <label for="academic-yea" class="required">Academic Year</label>
                 <input
                     id="academic-year"
                     v-model="academicYear"
@@ -79,7 +79,7 @@ function onSubmit(): void {
             </div>
 
             <fieldset class="radiolist clear-fieldset">
-                <legend>Examination Session</legend>
+                <legend class="required">Examination Session</legend>
                 <ul class="option-list l-flex-row l-gap-s f-no-margins">
                     <li>
                         <input id="may" v-model="examinationSession" type="radio" value="May" /><label for="may"
