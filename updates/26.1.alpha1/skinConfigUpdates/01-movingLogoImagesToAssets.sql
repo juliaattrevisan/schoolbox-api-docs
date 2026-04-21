@@ -14,7 +14,7 @@ SET
                          FROM lu_config_type
                          WHERE type = 'Skin Config');
 
--- Move all logo images to the new Assets config type.
+-- Move all logo images to the Skin Config type.
 UPDATE config
 SET type_id = @assetsTypeId
 WHERE type_id = @skinConfigTypeId
