@@ -8,13 +8,13 @@ VALUES (
     (SELECT MAX(sequence) + 1 FROM lu_config_type)
 );
 
--- Get the ID for the Assets config type.
+-- Get the ID for the Skin Config config type.
 SET
     @skinConfigTypeId = (SELECT id
                          FROM lu_config_type
                          WHERE type = 'Skin Config');
 
--- Move all logo images to the Skin Config type.
+-- Move all logo images to the new Assets config type.
 UPDATE config
 SET type_id = @assetsTypeId
 WHERE type_id = @skinConfigTypeId
