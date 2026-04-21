@@ -1,15 +1,17 @@
 -- Seed new skin configuration settings and map them into existing skin categories/subcategories.
 
 -- Add new config type for Sonar Skin Configs
+-- Hard-code the ID to match ConfigMapper::TYPE_SONAR_SKIN_CONFIG.
 INSERT INTO
-    lu_config_type (type, sequence)
+    lu_config_type (id, type, sequence)
 VALUES (
-        'Sonar Skin Configs',
-        (
-            SELECT COALESCE(MAX(sequence), 0) + 1
-            FROM lu_config_type
-        )
-    );
+    28,
+    'Sonar Skin Configs',
+    (
+        SELECT COALESCE(MAX(sequence), 0) + 1
+        FROM lu_config_type
+    )
+);
 
 -- New settings will be under Sonar Skin Configs config type
 SET

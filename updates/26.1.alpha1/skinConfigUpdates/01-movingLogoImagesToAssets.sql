@@ -1,7 +1,11 @@
 -- Creates the new Assets config type and moves all logo images to it.
-INSERT INTO lu_config_type (type, sequence)
-VALUES ('Assets',
-        (SELECT MAX(sequence) + 1 FROM lu_config_type));
+-- Hard-code the ID to match ConfigMapper::TYPE_ASSETS.
+INSERT INTO lu_config_type (id, type, sequence)
+VALUES (
+    27,
+    'Assets',
+    (SELECT MAX(sequence) + 1 FROM lu_config_type)
+);
 
 -- Get the IDs for the Skin Config and Assets config types.
 SET
