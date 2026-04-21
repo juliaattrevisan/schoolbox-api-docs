@@ -16,6 +16,7 @@ use Alaress\Database\Predicate;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
+use Crell\ApiProblem\ApiProblem;
 use Exception;
 use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
@@ -84,18 +85,47 @@ class Controller extends ConfigController
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
                 'categories' => $categories,
                 '_routes' => [
-                    'allLanguages' => $this->getRouteIfAuthorized('internationalBaccalaureate.getAllLanguages'),
+                    'searchLanguages' => $this->getRouteIfAuthorized('internationalBaccalaureate.searchLanguages'),
                 ],
             ]
         );
     }
 
     /**
-     * @return void
+     * Search the IB language list using a cursor.
+     *
+     * @api GET /adminv2/international-baccalaureate/configuration/api/languages
      */
-    public function getAllLanguages(): void
+    public function searchLanguages(): void
     {
-        $languages = $this->languageMapper->findAll()->map(
+        $search = trim((string) $this->requestQuery->get('query', ''));
+        $limit = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
+        $encodedCursor = $this->requestQuery->get('cursor');
+
+        if (null === $limit) {
+            $problem = (new ApiProblem('Limit must be a positive integer'))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
+
+        try {
+            $cursor = new Cursor(
+                $this->languageMapper,
+                $search,
+                $limit
+            );
+            $results = $cursor->retrieveResults($encodedCursor);
+        } catch (Exception | \ValueError $e) {
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
+
+        $data = $results->map(
             fn(LanguageModel $language) => [
                 'id' => $language->getId(),
                 'code' => $language->getCode(),
@@ -103,7 +133,16 @@ class Controller extends ConfigController
             ]
         );
 
-        $this->response = $this->responseAsJson($languages);
+        $this->response = $this->responseAsJson([
+            'data' => $data,
+            'metadata' => [
+                'count' => $cursor->retrieveResultCount(),
+                'cursor' => [
+                    'current' => $encodedCursor ?? $cursor->current($results),
+                    'next' => ($results->count() < $limit) ? null : $cursor->next($results),
+                ],
+            ],
+        ]);
     }
 
     /**
