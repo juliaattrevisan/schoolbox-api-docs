@@ -86,7 +86,7 @@ HELP
     {
         $this->getLogger()->info('Creating a new tour called: ' . $title);
 
-        $tourID = Uuid::uuid4()->toString();
+        $tourID = Uuid::uuid7()->toString();
 
         if ($this->perform()) {
             $statement = $this->getDatabaseInternal()->prepareQuery(
@@ -189,7 +189,7 @@ HELP
         if ($this->perform()) {
             $statement->execute(
                 [
-                    'trigger_uuid' => Uuid::uuid4()->toString(),
+                    'trigger_uuid' => Uuid::uuid7()->toString(),
                     'tour_uuid'    => $tourID,
                     'selector'     => $selector,
                     'event'        => $event,
@@ -234,7 +234,7 @@ HELP
                 )"
         );
 
-        $stepID = Uuid::uuid4()->toString();
+        $stepID = Uuid::uuid7()->toString();
 
         if ($this->perform()) {
             $statement->execute(
@@ -297,7 +297,7 @@ HELP
         );
         $statement->execute(
             [
-                'uuid'           => Uuid::uuid4()->toString(),
+                'uuid'           => Uuid::uuid7()->toString(),
                 'tour_step_uuid' => $stepID,
                 'title'          => trim($title),
                 'content'        => trim($body),
@@ -337,7 +337,7 @@ HELP
         );
         $statement->execute(
             [
-                'uuid'           => Uuid::uuid4()->toString(),
+                'uuid'           => Uuid::uuid7()->toString(),
                 'tour_step_uuid' => $stepID,
                 'content'        => trim($body),
                 'selector'       => $selector,
@@ -380,7 +380,7 @@ HELP
         );
         $statement->execute(
             [
-                'uuid'            => Uuid::uuid4()->toString(),
+                'uuid'            => Uuid::uuid7()->toString(),
                 'tour_step_uuid'  => $stepID,
                 'selector'        => $selector,
                 'event'           => $event,
