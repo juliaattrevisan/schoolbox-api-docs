@@ -6,6 +6,11 @@ export type Routes = {
     preview: string;
 };
 
+export type SkinConfigSelectOption = {
+    name: string;
+    value: string;
+};
+
 /**
  * A single editable skin configuration option
  */
@@ -18,6 +23,7 @@ export type SkinConfigOption = {
     customProperty: string | null;
     contrast: string | null;
     type: "checkbox" | "colour" | "select" | "textarea";
+    selectOptions?: SkinConfigSelectOption[];
     editable: boolean;
     hidden: boolean;
 };

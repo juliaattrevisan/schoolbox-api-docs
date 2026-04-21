@@ -3,7 +3,12 @@
  * Child component for rendering visible Skin Config categories.
  */
 
-import type { SkinConfigData, SkinConfigOptionErrorMap } from "../js/types/skinConfigTypes";
+import type {
+    SkinConfigData,
+    SkinConfigOption,
+    SkinConfigOptionErrorMap,
+    SkinConfigSelectOption,
+} from "../js/types/skinConfigTypes";
 
 const props = defineProps<{
     configs: SkinConfigData;
@@ -15,35 +20,6 @@ const emit = defineEmits<{
 }>();
 
 const configs = window.Vue.ref(props.configs);
-
-type SkinConfigSelectOption = {
-    label: string;
-    value: string;
-};
-
-const roundnessSelectOptions: SkinConfigSelectOption[] = [
-    {
-        label: "None",
-        value: "0",
-    },
-    {
-        label: "Small",
-        value: "0.25rem",
-    },
-    {
-        label: "Medium",
-        value: "0.5rem",
-    },
-    {
-        label: "Large",
-        value: "1rem",
-    },
-];
-
-const selectOptionsByName: Record<string, SkinConfigSelectOption[]> = {
-    skin_box_roundness: roundnessSelectOptions,
-    skin_field_roundness: roundnessSelectOptions,
-};
 
 window.Vue.watch(
     () => props.configs,
@@ -69,12 +45,12 @@ function onPreviewRefresh(): void {
 }
 
 /**
- * Return the hardcoded placeholder select choices for a Skin Config option.
- * @param optionName Config name used to look up placeholder choices.
- * @returns Hardcoded placeholder options for the matching select field.
+ * Return the configured select choices for a Skin Config option.
+ * @param option Skin Config option payload.
+ * @returns Select choices supplied by the backend payload.
  */
-function getSelectOptions(optionName: string): SkinConfigSelectOption[] {
-    return selectOptionsByName[optionName] ?? [];
+function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
+    return option.selectOptions ?? [];
 }
 </script>
 
@@ -148,11 +124,11 @@ function getSelectOptions(optionName: string): SkinConfigSelectOption[] {
                             >
                                 <option value="">Select an option</option>
                                 <option
-                                    v-for="selectOption in getSelectOptions(option.name)"
+                                    v-for="selectOption in getSelectOptions(option)"
                                     :key="`${option.id}-${selectOption.value}`"
                                     :value="selectOption.value"
                                 >
-                                    {{ selectOption.label }}
+                                    {{ selectOption.name }}
                                 </option>
                             </select>
                         </div>

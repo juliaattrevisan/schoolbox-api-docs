@@ -32,7 +32,7 @@ class Helper
      * Build the Twig payload used by the preview stylesheet response.
      *
      * @param array<array-key, mixed> $configs
-     * @return array{colors: array<string, array<string, mixed>>, customCss: string}
+      * @return array{colors: array<string, array<string, mixed>>, cssVariables: array<string, string>, customCss: string}
      */
     public function buildPreviewData(array $configs): array
     {
@@ -47,7 +47,7 @@ class Helper
     /**
      * Build the Twig payload used by the persisted skin stylesheet response.
      *
-     * @return array{colors: array<string, array<string, mixed>>, customCss: string}
+      * @return array{colors: array<string, array<string, mixed>>, cssVariables: array<string, string>, customCss: string}
      */
     public function buildPersistedData(): array
     {
@@ -56,7 +56,7 @@ class Helper
 
     /**
      * @param array<int, string|null> $configOverrides
-     * @return array{colors: array<string, array<string, mixed>>, customCss: string}
+     * @return array{colors: array<string, array<string, mixed>>, cssVariables: array<string, string>, customCss: string}
      */
     private function buildTwigData(array $configOverrides, int $typeId): array
     {
@@ -64,6 +64,7 @@ class Helper
         $colorFactory = new ColorFactory();
         $transformer = new Transformer();
         $colors = [];
+        $cssVariables = [];
         foreach ($previewConfigs as $config) {
             if ($this->shouldOmitFromStylesheet($config)) {
                 continue;
@@ -77,6 +78,12 @@ class Helper
             if (!is_string($value) || trim($value) === '') {
                 continue;
             }
+
+            if ($config->getFieldId() !== ConfigMapper::FIELD_COLOUR) {
+                $cssVariables[$customProperty] = $value;
+                continue;
+            }
+
             $baseColor = $colorFactory->build($value);
             $colors[$config->getName()] = $this->createColorTwigVars($baseColor, $customProperty);
             $contrastColor = $transformer->calculateTextColor($baseColor);
@@ -105,6 +112,7 @@ class Helper
         }
         return [
             'colors' => $colors,
+            'cssVariables' => $cssVariables,
             'customCss' => $this->getPreviewCustomCss($previewConfigs, $configOverrides, $typeId),
         ];
     }
@@ -256,7 +264,6 @@ class Helper
         return in_array(
             strtolower($categoryName),
             [
-                ConfigMapper::NAME_SKIN_CATEGORY_ROUNDNESS,
                 ConfigMapper::NAME_SKIN_CATEGORY_DROP_SHADOW,
             ],
             true,

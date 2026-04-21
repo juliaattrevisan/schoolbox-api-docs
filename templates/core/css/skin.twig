@@ -3,6 +3,9 @@
 {{ customCss | raw }}
 
 :root {
+    {% for cssVar, cssValue in cssVariables|default({}) %}
+        {{ cssVar | raw }}: {{ cssValue }};
+    {% endfor %}
     {% for configKey, colorOptions in colors %}
         {{ colorOptions.cssVar | raw }}-r: {{ colorOptions.r }};
         {{ colorOptions.cssVar | raw }}-g: {{ colorOptions.g }};

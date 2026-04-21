@@ -427,7 +427,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 12,
-        '{"customProperty":"--sbx-config-field-roundness","select":"none:small:medium:large"}'
+        '{"customProperty":"--sbx-config-field-roundness","select":[{"name":"none","value":"0"},{"name":"Small","value":"0.25rem"},{"name":"Medium","value":"0.5rem"},{"name":"Large","value":"0.75rem"}]}'
     ),
     (
         'skin_box_roundness',
@@ -441,7 +441,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 13,
-        '{"customProperty":"--sbx-config-box-roundness","select":"none:small:medium:large"}'
+        '{"customProperty":"--sbx-config-box-roundness","select":[{"name":"none","value":"0"},{"name":"Small","value":"0.25rem"},{"name":"Medium","value":"0.5rem"},{"name":"Large","value":"0.75rem"}]}'
     ),
     (
         'skin_box_drop_shadow',

@@ -122,6 +122,7 @@ class Controller extends ConfigController
                     'customProperty' => $this->getCustomProperty($config),
                     'contrast'       => $this->getContrastProperty($config),
                     'type'           => $this->getOptionType($config, $fieldMap),
+                    'selectOptions'  => $this->getSelectOptions($config),
                     'editable'       => $config->getEditable(),
                     'hidden'         => $config->getHidden(),
                 ];
@@ -251,6 +252,75 @@ class Controller extends ConfigController
     private function getContrastProperty(Config $config): ?string
     {
         return $this->getStringOptionValue($config, 'contrast');
+    }
+
+    /**
+     * Extract available select options from the JSON-encoded config metadata.
+     *
+     * @return array<int, array{name: string, value: string}>
+     */
+    private function getSelectOptions(Config $config): array
+    {
+        $selectOptions = $this->getDecodedOptions($config)['select'] ?? null;
+
+        if (is_array($selectOptions)) {
+            $parsedOptions = [];
+            foreach ($selectOptions as $selectOption) {
+                if (!is_array($selectOption)) {
+                    continue;
+                }
+
+                $name = $selectOption['name'] ?? null;
+                $value = $selectOption['value'] ?? null;
+                if (!is_string($name) || !is_string($value) || $name === '' || $value === '') {
+                    continue;
+                }
+
+                $parsedOptions[] = [
+                    'name' => $name,
+                    'value' => $value,
+                ];
+            }
+
+            return $parsedOptions;
+        }
+
+        if (!is_string($selectOptions) || trim($selectOptions) === '') {
+            return [];
+        }
+
+        $parsedOptions = [];
+        foreach (explode(':', $selectOptions) as $selectOption) {
+            $value = trim($selectOption);
+            if ($value === '') {
+                continue;
+            }
+
+            $parsedOptions[] = [
+                'name' => $value === 'none' ? 'None' : ucfirst($value),
+                'value' => $this->getLegacySelectOptionValue($config, $value),
+            ];
+        }
+
+        return $parsedOptions;
+    }
+
+    /**
+     * Map legacy select option labels to persisted values where Skin Config needs explicit CSS values.
+     */
+    private function getLegacySelectOptionValue(Config $config, string $value): string
+    {
+        if (!in_array($config->getName(), ['skin_field_roundness', 'skin_box_roundness'], true)) {
+            return $value;
+        }
+
+        return match ($value) {
+            'none' => '0',
+            'small' => '0.25rem',
+            'medium' => '0.5rem',
+            'large' => '0.75rem',
+            default => $value,
+        };
     }
 
     /**
