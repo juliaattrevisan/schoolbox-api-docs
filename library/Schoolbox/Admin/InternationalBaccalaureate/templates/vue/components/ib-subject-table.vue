@@ -5,7 +5,10 @@ import SearchSelectModal from "@schoolboxVue/components/searchSelect/modal/searc
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import type { IBLanguage, IBLanguageListResponse, IBSubject } from "../../js/types/ibConfigurationTypes";
 
-interface SubjectRow {
+/**
+ * A single row in the table
+ */
+type SubjectRow = {
     id: string;
     groupSubjectId: number;
     subject: string;
@@ -17,21 +20,27 @@ interface SubjectRow {
     isLanguageRow?: boolean;
     parentRowId?: string;
     tableType?: string;
-}
+};
 
-interface SubjectSavePayload {
+/**
+ * The payload sent to the server to save a subject's language configuration
+ */
+type SubjectSavePayload = {
     groupSubjectId: number;
     languageId: number;
     classCode: string;
-}
+};
 
+/**
+ * The shape of the configured languages for a subject as returned by the server, used to build the table rows
+ */
 type ConfiguredLanguage = {
     languageId: number;
     languageName: string | null;
     classCode: string;
 };
 
-interface Props {
+const props = defineProps<{
     categoryName: string;
     categoryTitle: string;
     categoryId: number;
@@ -39,9 +48,7 @@ interface Props {
     saveEndpoint: string;
     ibSubjects: IBSubject[];
     searchLanguagesEndpoint: string | null;
-}
-
-const props = defineProps<Props>();
+}>();
 
 const isSaving = window.Vue.ref<boolean>(false);
 const saveError = window.Vue.ref<string | null>(null);
@@ -49,7 +56,7 @@ const subjectRows = window.Vue.ref<SubjectRow[]>([]);
 const currentEditingRow = window.Vue.ref<string | null>(null);
 const isLanguageModalOpen = window.Vue.ref<boolean>(false);
 const modalSelectedLanguages = window.Vue.ref<SearchSelectItem[]>([]);
-const modalSelectionSnapshot = window.Vue.ref<SearchSelectItem[]>([]);
+const modalSelectionSnapshot = window.Vue.ref<SearchSelectItem[]>([]); // to determine whether a row needs to change on modal close
 const modalDefaultResults = window.Vue.ref<SearchSelectItem[]>([]);
 const modalSearchResults = window.Vue.ref<SearchSelectItem[]>([]);
 const cachedLanguageNames = window.Vue.ref<Record<number, string>>({});
@@ -70,7 +77,6 @@ function getDefaultLanguageNameMap(): Record<number, string> {
     if (!props.defaultLanguage) {
         return {};
     }
-
     return {
         [props.defaultLanguage.id]: props.defaultLanguage.name,
     };
@@ -110,11 +116,9 @@ function createLanguageNameMapFromItems(items: SearchSelectItem[]): Record<numbe
  */
 function refreshCachedLanguageNames(): void {
     const nextCache = { ...cachedLanguageNames.value, ...getDefaultLanguageNameMap() };
-
     props.ibSubjects.forEach((subject) => {
         Object.assign(nextCache, createLanguageNameMapFromSubjectLanguages(subject.languages));
     });
-
     cachedLanguageNames.value = nextCache;
 }
 
@@ -249,7 +253,7 @@ function closeLanguageModal(): void {
 }
 
 /**
- * Compare modal selections by language id.
+ * Compare modal selections by language id to determine whether the subject row should be updated on modal close.
  * @param previousSelection The original modal selection.
  * @param nextSelection The current modal selection.
  * @returns Whether the selection has changed.
@@ -260,11 +264,9 @@ function hasLanguageSelectionChanged(
 ): boolean {
     const previousIds = previousSelection.map((item) => item.id).sort((left, right) => left - right);
     const nextIds = nextSelection.map((item) => item.id).sort((left, right) => left - right);
-
     if (previousIds.length !== nextIds.length) {
         return true;
     }
-
     return previousIds.some((languageId, index) => languageId !== nextIds[index]);
 }
 
