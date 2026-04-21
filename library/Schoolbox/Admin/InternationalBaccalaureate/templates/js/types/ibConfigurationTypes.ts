@@ -30,10 +30,10 @@ export type IBSubject = {
     id: number;
     subject: string;
     level: string;
-    languages: Array<{
+    languages: {
         languageId: number;
         classCode: string;
-    }>;
+    }[];
 };
 
 export type IBRoutes = {
