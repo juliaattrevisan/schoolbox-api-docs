@@ -263,7 +263,7 @@ class Access
         }
 
         foreach ($children as $child) {
-            if ($this->getFolderAccess($child, $folder->getId()) === UserAccess::ACCESS_READ) {
+            if ($this->isLearner($child, $folder)) {
                 return true;
             }
         }
