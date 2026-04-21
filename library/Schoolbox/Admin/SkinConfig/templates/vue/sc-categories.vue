@@ -56,13 +56,9 @@ const activeConfigs = window.Vue.computed(() =>
     configs.value.toggle.enabled ? configs.value.sonar : configs.value.existing,
 );
 
-// Temporarily hide roundness and drop shadow until their controls are implemented.
+// Temporarily hide drop shadow until its control is implemented.
 const visibleConfigs = window.Vue.computed(() =>
-    Object.fromEntries(
-        Object.entries(activeConfigs.value).filter(
-            ([categoryKey]) => categoryKey !== "Roundness" && categoryKey !== "Drop Shadow",
-        ),
-    ),
+    Object.fromEntries(Object.entries(activeConfigs.value).filter(([categoryKey]) => categoryKey !== "Drop Shadow")),
 );
 
 /**
