@@ -379,9 +379,10 @@ class Profile implements IStrategy
 
                     /* Flags
                      */
-                    $esl = (bool)($languageLookup[$externalId] ?? false);
+                    $esl = (bool)($languageLookup[$externalId]['esl'] ?? false);
                     $ib = false;
                     $ilp = false;
+                    $languages = $languageLookup[$externalId]['languages'] ?? null;
 
                     /* Alerts
                      */
@@ -518,7 +519,8 @@ class Profile implements IStrategy
                         ->setEsl($esl)
                         ->setIb($ib)
                         ->setIndividualLearningPlans($ilp)
-                        ->setSpecialNeeds($specialNeeds);
+                        ->setSpecialNeeds($specialNeeds)
+                        ->setLanguages($languages);
 
                     /* Date of birth requires special treatment as ADF doesn't deal with nulls well
                      */
