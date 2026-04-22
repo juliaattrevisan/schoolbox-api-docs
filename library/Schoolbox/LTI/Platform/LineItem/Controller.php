@@ -34,6 +34,7 @@ use Schoolbox\LTI\LineItem\SingleAssessmentRepository;
 use Schoolbox\LTI\Score\SingleAssessmentScoreRepository;
 use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\LTI\Util\LogHelper;
+use Throwable;
 
 /**
  * LTI Platform controller for line items.
@@ -104,10 +105,15 @@ class Controller extends BaseController
     public function getLineItemForAssessment(Model $assessment): void
     {
         LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
-        // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#get-line-item-service-endpoint
-        $repository     = $this->createRepository($assessment);
-        $handler        = new GetLineItemServiceServerRequestHandler($repository, logger: $this->logger);
-        $this->response = $this->createResponse($handler);
+        try {
+            // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#get-line-item-service-endpoint
+            $repository     = $this->createRepository($assessment);
+            $handler        = new GetLineItemServiceServerRequestHandler($repository, logger: $this->logger);
+            $this->response = $this->createResponse($handler);
+        } catch (Throwable $e) {
+            LogHelper::logControllerError($this->logger, __METHOD__, $this->request, $e);
+            throw $e;
+        }
     }
 
     /**
@@ -122,10 +128,15 @@ class Controller extends BaseController
     public function putLineItemForAssessment(Model $assessment): void
     {
         LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
-        // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#update-line-item-service-endpoint
-        $repository     = $this->createRepository($assessment);
-        $handler        = new UpdateLineItemServiceServerRequestHandler($repository, logger: $this->logger);
-        $this->response = $this->createResponse($handler);
+        try {
+            // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#update-line-item-service-endpoint
+            $repository     = $this->createRepository($assessment);
+            $handler        = new UpdateLineItemServiceServerRequestHandler($repository, logger: $this->logger);
+            $this->response = $this->createResponse($handler);
+        } catch (Throwable $e) {
+            LogHelper::logControllerError($this->logger, __METHOD__, $this->request, $e);
+            throw $e;
+        }
     }
 
     /**
@@ -157,25 +168,30 @@ class Controller extends BaseController
     public function postScorePublishForAssessment(Model $assessment): void
     {
         LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
-        // Line item repository: consists only of a single assessment
-        $lineItemRepository = $this->createRepository($assessment);
+        try {
+            // Line item repository: consists only of a single assessment
+            $lineItemRepository = $this->createRepository($assessment);
 
-        // Score repository: consists only of a single assessment, and its scores
-        $scoreRepository = new SingleAssessmentScoreRepository(
-            $assessment,
-            $this->ltiAssessmentMapper,
-            $this->ltiAssessmentScoreMapper,
-            $this->userCodec,
-            $this->logger,
-        );
+            // Score repository: consists only of a single assessment, and its scores
+            $scoreRepository = new SingleAssessmentScoreRepository(
+                $assessment,
+                $this->ltiAssessmentMapper,
+                $this->ltiAssessmentScoreMapper,
+                $this->userCodec,
+                $this->logger,
+            );
 
-        // Handle the request: this validates the request body
-        $handler = new ScoreServiceServerRequestHandler(
-            $lineItemRepository,
-            $scoreRepository,
-            logger: $this->logger,
-        );
-        $this->response = $this->createResponse($handler);
+            // Handle the request: this validates the request body
+            $handler = new ScoreServiceServerRequestHandler(
+                $lineItemRepository,
+                $scoreRepository,
+                logger: $this->logger,
+            );
+            $this->response = $this->createResponse($handler);
+        } catch (Throwable $e) {
+            LogHelper::logControllerError($this->logger, __METHOD__, $this->request, $e);
+            throw $e;
+        }
     }
 
     /**
