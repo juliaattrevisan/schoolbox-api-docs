@@ -130,7 +130,7 @@ class Hydrator
             ? $this->attemptDataSource->findByColumnList(['attempt_id' => $quizFeedbackIds])->indexBy('id')
             : new GenericCollection(QuizFeedback::class);
 
-        $assessmentIds          = $dueWorkFeedbackResults->map(static function (DueWorkFeedback $feedback) {
+        $assessmentIds = $dueWorkFeedbackResults->map(static function (DueWorkFeedback $feedback) {
             return $feedback->getAssessable()->getId();
         });
 
@@ -140,7 +140,7 @@ class Hydrator
             return $feedback->getAssessable()->getId();
         }));
 
-        $assessments            = $this->assessmentDataSource->findAllByIds($assessmentIds->getAll())->indexBy('id');
+        $assessments = $this->assessmentDataSource->findAllByIds($assessmentIds->getAll())->indexBy('id');
         $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments);
 
         // Insert matching results into the collection
