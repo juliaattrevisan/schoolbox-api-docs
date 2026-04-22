@@ -166,11 +166,17 @@ function onMouseOut(event: MouseEvent): void {
     &__button {
         align-items: center;
         background-color: var(--content-ui-submit-background);
+        color: var(--content-ui-submit-foreground);
         display: flex;
         height: var(--tabbar-height);
         justify-content: center;
         margin: 0;
         padding: 0;
+
+        sbx-icon {
+            color: inherit;
+        }
+
         &:before {
             transition: all 0.2s ease-in;
             color: var(--content-ui-submit-foreground);
