@@ -230,7 +230,7 @@ export default {
 
     &:hover,
     &:focus {
-        background: none;
+        background: var(--sbx-config-color-active, var(--content-ui-hover));
     }
 
     &:before {
