@@ -18,3 +18,70 @@ services:
         required: true
       - path: ./../docker-toolsd.env
         required: false
+
+  # HTTP API for posting jobs to, and querying their status.
+  schoolbox-toolsd-api:
+    depends_on:
+      redis-storage:
+        condition: service_healthy
+    build:
+      context: ./schoolbox-toolsd
+      args:
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+    env_file:
+      - path: ./schoolbox-toolsd/default.env
+        required: true
+      - path: ./../docker-toolsd.env
+        required: false
+    command: [src/main.py, api, -p, '8080']
+
+  # The default Celery queue:
+  # unless otherwise specified, jobs will be sent to this queue.
+  schoolbox-toolsd-celery:
+    depends_on:
+      redis-storage:
+        condition: service_healthy
+    build:
+      context: ./schoolbox-toolsd
+      args:
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+    env_file:
+      - path: ./schoolbox-toolsd/default.env
+        required: true
+      - path: ./../docker-toolsd.env
+        required: false
+    command: [src/main.py, worker, -Q, default, -vv]
+
+  # An example Celery queue for UPS jobs.
+  schoolbox-toolsd-celery-ups:
+    depends_on:
+      redis-storage:
+        condition: service_healthy
+    build:
+      context: ./schoolbox-toolsd
+      args:
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+    env_file:
+      - path: ./schoolbox-toolsd/default.env
+        required: true
+      - path: ./../docker-toolsd.env
+        required: false
+    command: [src/main.py, worker, -Q, default, -vv]
+
+  # Flower is Celery's web-based monitoring tool.
+  schoolbox-toolsd-flower:
+    depends_on:
+      redis-storage:
+        condition: service_healthy
+    build:
+      context: ./schoolbox-toolsd
+      args:
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+    env_file:
+      - path: ./schoolbox-toolsd/default.env
+        required: true
+      - path: ./../docker-toolsd.env
+        required: false
+    ports:
+      - ${TOOLSD_FLOWER_PUBLISHED_PORT:-5555}:5555
+    command: [src/main.py, flower]
