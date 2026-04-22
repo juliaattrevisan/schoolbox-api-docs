@@ -5,6 +5,7 @@
 # it must be combined with a docker-compose which defines:
 # * schoolbox-frankenphp
 # * schoolbox-taskd
+# * schoolbox-toolsd
 # * schoolbox-cli
 
 services:

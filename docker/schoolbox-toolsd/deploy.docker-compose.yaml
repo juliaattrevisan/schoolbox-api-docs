@@ -1,0 +1,20 @@
+# This toolsd container contains toolsd's code within its image, with the only
+# local mounted filesystem being for its configuration.
+# This container is intended for:
+# * testing of deployments
+# * development, when the developer does not need to modify toolsd's code
+
+services:
+  schoolbox-toolsd:
+    depends_on:
+      redis-storage:
+        condition: service_healthy
+    build:
+      context: ./schoolbox-toolsd
+      args:
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+    env_file:
+      - path: ./schoolbox-toolsd/default.env
+        required: true
+      - path: ./../docker-toolsd.env
+        required: false

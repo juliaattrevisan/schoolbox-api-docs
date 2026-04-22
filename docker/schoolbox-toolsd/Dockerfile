@@ -1,0 +1,2 @@
+ARG PRIVATE_CONTAINER_REGISTRY=476058706527.dkr.ecr.ap-southeast-2.amazonaws.com
+FROM ${PRIVATE_CONTAINER_REGISTRY}/toolsd:latest

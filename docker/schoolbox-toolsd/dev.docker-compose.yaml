@@ -1,0 +1,29 @@
+# This toolsd container references a code base somewhere on the file system,
+# thus changes made to that container are made available immediately.
+# This container is intended for development of toolsd.
+
+services:
+  # Local toolsd definition:
+  # must assume that toolsd is in a sibling folder named `toolsd`
+  schoolbox-toolsd:
+    depends_on:
+      redis-storage:
+        condition: service_healthy
+    build:
+      context: ../../toolsd/server
+    env_file:
+      - path: ./schoolbox-toolsd/default.env
+        required: true
+      - path: ./../docker-toolsd.env
+        required: false
+    volumes:
+      - toolsd-code:/app
+
+# Also mount toolsd's code, so that changes are available without rebuilding
+volumes:
+  toolsd-code:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../../toolsd
