@@ -35,6 +35,10 @@ use Schoolbox\Language\Model as LanguageModel;
 
 class Controller extends ConfigController
 {
+    /* General Configuration ID
+     */
+    private const int GENERAL_CATEGORY_ID = 0;
+
     public function __construct(
         ConfigMapper $configMapper,
         private IBGroupMapper $groupMapper,
@@ -62,7 +66,7 @@ class Controller extends ConfigController
         // Add General Configuration tab manually
         $categories = [
             [
-                'id' => 0,
+                'id' => self::GENERAL_CATEGORY_ID,
                 'name' => 'general',
                 'title' => 'General Configuration',
             ],
@@ -156,12 +160,12 @@ class Controller extends ConfigController
     {
         $configurations = [];
 
-        if ($categoryId === 0) { // General tab - load from preloaded config
+        if ($categoryId === self::GENERAL_CATEGORY_ID) { // General tab - load from preloaded config
             $configLoader = $this->getConfigLoader();
 
             $configurations = [
                 [
-                    'categoryId' => 0,
+                    'categoryId' => self::GENERAL_CATEGORY_ID,
                     'key' => ConfigMapper::NAME_IB_SCHOOL_NAME,
                     'value' => $configLoader->get(ConfigMapper::NAME_IB_SCHOOL_NAME) ?? '',
                     'description' => 'Enter the school\'s name as registered with the IB.',
@@ -169,7 +173,7 @@ class Controller extends ConfigController
                     'label' => 'School Name',
                 ],
                 [
-                    'categoryId' => 0,
+                    'categoryId' => self::GENERAL_CATEGORY_ID,
                     'key' => ConfigMapper::NAME_IB_SCHOOL_CODE,
                     'value' => $configLoader->get(ConfigMapper::NAME_IB_SCHOOL_CODE) ?? '',
                     'description' => 'Enter the school\'s code as provided by the IB.',
@@ -349,18 +353,7 @@ class Controller extends ConfigController
                     continue;
                 }
 
-                $sessionsBySystemPurpose[$systemPurpose->getId()][] = [
-                    'id' => $session->getId(),
-                    'title' => sprintf(
-                        '%s - %s %s',
-                        $systemPurpose->getName(),
-                        $session->getExamSession(),
-                        $session->getAcademicYear()
-                    ),
-                    'academicYear' => $session->getAcademicYear(),
-                    'examinationSession' => $session->getExamSession(),
-                    'createdBy' => $session->getCreatedBy()?->getFullName(),
-                ];
+                $sessionsBySystemPurpose[$systemPurpose->getId()][] = $session->jsonSerialize();
             }
 
             $this->response = $this->responseAsJson($sessionsBySystemPurpose);
@@ -371,6 +364,63 @@ class Controller extends ConfigController
 
     public function createRegistrationSession(): void
     {
-        $this->response = $this->responseEmpty(201);
+        $post = $this->requestPost;
+
+        $systemPurposeId = $post->getInt('systemPurposeId');
+        $academicYear = trim((string)$post->get('academicYear'));
+        $examSession = trim((string)$post->get('examSession'));
+
+        if (
+            null === $systemPurposeId ||
+            '' === $academicYear ||
+            !in_array(
+                $examSession,
+                RegistrationSessionMapper::EXAM_SESSIONS,
+                true
+            )
+        ) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => 'Invalid registration session request data',
+            ])->withStatus(400);
+            return;
+        }
+
+        try {
+            $session = $this->registrationSessionMapper
+                ->createModel()
+                ->setSystemPurpose(
+                    $this->registrationSessionMapper
+                        ->getJoinMapper('systemPurpose')
+                        ->createModel()
+                        ->setId($systemPurposeId)
+                )
+                ->setAcademicYear($academicYear)
+                ->setExamSession($examSession)
+                ->setCreatedBy($this->getUser())
+                ->setUpdatedBy($this->getUser());
+
+            $this->registrationSessionMapper->save($session);
+
+            /** @var RegistrationSessionModel|null $createdSession */
+            $createdSession = $this->registrationSessionMapper->findById($session->getId());
+
+            if (!$createdSession || !$createdSession->getSystemPurpose()) {
+                $this->response = $this->responseAsJson([
+                    'success' => false,
+                    'message' => 'Registration session was created but could not be loaded',
+                ])->withStatus(500);
+                return;
+            }
+
+            $this->response = $this
+                ->responseAsJson($createdSession->jsonSerialize())
+                ->withStatus(201);
+        } catch (Exception $e) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ])->withStatus(500);
+        }
     }
 }

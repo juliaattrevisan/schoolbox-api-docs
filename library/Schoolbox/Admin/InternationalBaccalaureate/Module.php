@@ -52,7 +52,7 @@ class Module extends BaseModule
         $this->register('GET', '/registrations', 'getRegistrations', $ruleIBCoordinatorAccess);
 
         $this->register('GET', '/registrations/sessions', 'getRegistrationSessions', $ruleIBCoordinatorAccess);
-        $this->register('POST', '/registrations/sessions', 'createRegistrationsSession', $ruleIBCoordinatorAccess);
+        $this->register('POST', '/registrations/sessions', 'createRegistrationSession', $ruleIBCoordinatorAccess);
     }
 
     /**

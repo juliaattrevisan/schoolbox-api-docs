@@ -179,15 +179,17 @@ class Model implements ISoftDeletable, JsonSerializable
     {
         return [
             'id' => $this->getId(),
-            'systemPurpose' => $this->getSystemPurpose(),
+            'title' => sprintf(
+                '%s [%s] - %s %s',
+                $this->getSystemPurpose()->getName(),
+                $this->getSystemPurpose()->getCategory()->getName(),
+                $this->getExamSession(),
+                $this->getAcademicYear()
+            ),
             'academicYear' => $this->getAcademicYear(),
             'examSession' => $this->getExamSession(),
-            'createdAt' => $this->getCreatedAt(),
-            'createdBy' => $this->getCreatedBy(),
-            'updatedAt' => $this->getUpdatedAt(),
-            'updatedBy' => $this->getUpdatedBy(),
-            'deletedAt' => $this->getDeletedAt(),
-            'deletedBy' => $this->getDeletedBy(),
+            'createdAt' => $this->getCreatedAt()->toIso8601String(),
+            'createdBy' => $this->getCreatedBy()?->getFullName(),
         ];
     }
 }

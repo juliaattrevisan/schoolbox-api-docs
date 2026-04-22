@@ -25,9 +25,9 @@ CREATE TABLE `ib_registration_sessions`
         FOREIGN KEY (`deleted_by`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `ib_registration_sessions` (`system_purpose_id`, `academic_year`, `exam_session`, `created_by`)
-VALUES (1, '2025', 'November', 1),
-       (1, '2026', 'May', 1),
-       (2, '2025', 'November', 1),
-       (3, '2025', 'May', 1);
+INSERT INTO `ib_registration_sessions` (`system_purpose_id`, `academic_year`, `exam_session`, `created_by`, `updated_by`)
+VALUES (1, '2025', 'November', 1, 1),
+       (1, '2026', 'May', 1, 1),
+       (2, '2025', 'November', 1, 1),
+       (3, '2025', 'May', 1, 1);
 

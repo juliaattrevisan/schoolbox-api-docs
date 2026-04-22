@@ -61,10 +61,11 @@ class Mapper extends BaseMapper
     {
         return "
             SELECT {$this->getColumnString()},
-                   {$this->getJoinColumnString('systemPurpose', 'systemPurpose')},
-                   {$this->getJoinColumnString('createdBy', 'createdBy')},
-                   {$this->getJoinColumnString('updatedBy', 'updatedBy')},
-                   {$this->getJoinColumnString('deletedBy', 'deletedBy')}
+                   {$this->getJoinColumnString('systemPurpose', 'sp')},
+                   {$this->getJoinColumnString('systemPurpose.category', 'c')},
+                   {$this->getJoinColumnString('createdBy', 'uc')},
+                   {$this->getJoinColumnString('updatedBy', 'uu')},
+                   {$this->getJoinColumnString('deletedBy', 'ud')}
         ";
     }
 
@@ -75,10 +76,11 @@ class Mapper extends BaseMapper
     {
         return "
             FROM      {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('systemPurpose', '', 'systemPurpose')}
-            INNER JOIN {$this->getJoinSql('createdBy', '', 'createdBy', true)}
-            LEFT JOIN {$this->getJoinSql('updatedBy', '', 'updatedBy', true)}
-            LEFT JOIN {$this->getJoinSql('deletedBy', '', 'deletedBy', true)}
+            LEFT JOIN {$this->getJoinSql('systemPurpose', '', 'sp')}
+            LEFT JOIN {$this->getJoinSql('systemPurpose.category', 'sp', 'c')}
+            INNER JOIN {$this->getJoinSql('createdBy', '', 'uc')}
+            LEFT JOIN {$this->getJoinSql('updatedBy', '', 'uu')}
+            LEFT JOIN {$this->getJoinSql('deletedBy', '', 'ud')}
         ";
     }
 
@@ -104,13 +106,16 @@ class Mapper extends BaseMapper
             $session = $this->hydrate($row);
 
             if ($session) {
-                $session->setSystemPurpose($systemPurposeMapper->hydrate($row, 'systemPurpose'));
+                $systemPurpose = $systemPurposeMapper->hydrate($row, 'sp');
+                $systemPurpose->setCategory($systemPurposeMapper->getJoinMapper('category')->hydrate($row, 'c'));
+                $session->setSystemPurpose($systemPurpose);
+
                 /** @var User|null $createdBy */
-                $createdBy = $createdByMapper->hydrate($row, 'createdBy');
+                $createdBy = $createdByMapper->hydrate($row, 'uc');
                 /** @var User|null $updatedBy */
-                $updatedBy = $updatedByMapper->hydrate($row, 'updatedBy');
+                $updatedBy = $updatedByMapper->hydrate($row, 'uu');
                 /** @var User|null $deletedBy */
-                $deletedBy = $deletedByMapper->hydrate($row, 'deletedBy');
+                $deletedBy = $deletedByMapper->hydrate($row, 'ud');
 
                 if ($createdBy) {
                     $session->setCreatedBy($createdBy);
