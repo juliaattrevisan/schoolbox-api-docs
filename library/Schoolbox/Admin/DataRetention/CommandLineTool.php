@@ -314,10 +314,7 @@ OPTIONS
 {$stratsHelp}
                              e.g. hard delete only learning moment stuff: ./tools/dataRetention/process.php --strats=moments
     --retention-period=      Manually override the retention period for all strategies, for testing purposes (whole number of days, same format as the admin config value).
-                             Positive N: delete data soft-deleted more than N days ago ("N days ago" cutoff).
-                             0: safety guard – logs a warning and exits without deleting anything.
-                             Negative: invalid – logs a warning and exits without deleting anything.
-                             Only whole numbers are accepted; non-integer values will be rejected.
+                             A positive integer is expected.
     -p, --perform:           perform: *without* this flag, this tool will only do a dry run, outputting what would be
                              deleted
     -v[v[v]]:                verbosity: how much activity will be logged
