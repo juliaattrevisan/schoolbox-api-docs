@@ -48,6 +48,9 @@ class Module extends BaseModule
         $this->register('GET', '/configuration/api/languages', 'searchLanguages', $ruleIBCoordinatorAccess);
         $this->register('POST', '/configuration/api/save', 'saveConfiguration', $ruleIBCoordinatorAccess);
         $this->register('GET', '/registrations', 'getRegistrations', $ruleIBCoordinatorAccess);
+
+        $this->register('GET', '/registrations/sessions', 'getRegistrationSessions', $ruleIBCoordinatorAccess);
+        $this->register('POST', '/registrations/sessions', 'createRegistrationsSession', $ruleIBCoordinatorAccess);
     }
 
     /**

@@ -332,4 +332,15 @@ class Controller extends ConfigController
             ]
         );
     }
+
+    public function getRegistrationSessions(): void
+    {
+        
+        $this->response = $this->responseAsJson([]);
+    }
+
+    public function createRegistrationSession(): void
+    {
+        $this->response = $this->responseEmpty(201);
+    }
 }
