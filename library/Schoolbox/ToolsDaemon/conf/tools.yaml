@@ -1,0 +1,184 @@
+# Define the tools which may be run here.
+tools:
+  # The key is the tool's unique name:
+  # clients will pass that name to the daemon to invoke the command.
+  echo:
+    # The actual command that is run.
+    # Could possibly be an array, if the command has multiple parts,
+    # or has options which are always provided
+    # (e.g. `php /usr/share/schoolbox/tools/video/processor.php -p`)
+    command: echo
+
+    options:
+      # Required options which must be passed to the script.
+      required: []
+
+      # Allowed options which may be passed to the script.
+      # If empty, no options are allowed.
+      allowed: []
+
+      # Positional arguments (unnamed args after any flags).
+      # If omitted, no positional arguments are permitted.
+      positional:
+        min: 0
+
+    # Does this tool require an instance ID to be provided?
+    requiresInstanceId: false
+
+    # Is this tool idempotent?
+    # This affects whether it will be retried automatically or not,
+    # if the daemon dies whilst it is running.
+    idempotent: true
+
+    # If this tool fails: how many times should it be retried?
+    retry:
+      max: 3
+      jitter: 5
+
+    # How long should this tool be allowed to run for, before it times out?
+    maxExecutionTime: 600
+
+    # Which worker pool should run this tool?
+    # Some tools should be run in different pools, so that their assigned
+    # resources do not conflict with others.
+    # This value must match the `TOOLSD_POOL` environment variable provided to
+    # the instance of the toolsd worker pool which will run the tool.
+    pool: default
+
+    # Are multiples of the same tool allowed to run at once?
+    # (Runs are de-duplicated by their parameters)
+    allowDuplicates: true
+
+    # How long is allowed after the last run finished,
+    # before a duplicate of the same tool may be run again?
+    cooldown: 0
+
+    # If provided: the task should be run as this user.
+    # Otherwise: runs as the same user who is running the Celery service.
+    user: null
+
+  # A clone of the echo tool, running on the `ups` pool.
+  echoUps:
+    command: [echo, -n]
+    options:
+      required: []
+      allowed: []
+      positional:
+        min: 0
+    requiresInstanceId: false
+    idempotent: true
+    retry:
+      max: 3
+      jitter: 5
+    maxExecutionTime: 600
+    pool: ups
+    allowDuplicates: true
+    cooldown: 0
+    user: null
+
+#  # A real-world tool definition:
+#  # in this case, a UPS run triggered from the admin UI
+#  ups:
+#    command: tools/synchronise/userProvision.php
+#    options:
+#      required:
+#        # A role type must be provided
+#        - '-r'
+#      allowed:
+#        - '-v'
+#        - '-p'
+#        - '--perform'
+#        # Consider adding a --requesting-user parameter to this script,
+#        # so that this user ID may be notified once the import has finished
+#    requiresInstanceId: true
+#    idempotent: false
+#    retry:
+#      max: 0
+#    maxExecutionTime: 600
+#    allowDuplicates: false
+#    cooldown: 0
+#    pool: ups
+#    user: 'www-data'
+#
+#  # SUDS run triggered from the admin UI
+#  suds:
+#    command: tools/synchronise/sisImporter.php
+#    options:
+#      allowed:
+#        - '-v'
+#        - '-p'
+#        - '--perform'
+#        - '--watchlist'
+#        - '--strats'
+#        # Again consider adding a --requesting-user parameter to this script
+#        # Also note --file option is not viable: processes calling this job have
+#        # no inkling of which files exist on toolsd's file system.
+#        # Consider providing a storage hash instead?
+#    requiresInstanceId: true
+#    idempotent: false
+#    retry:
+#      max: 0
+#    maxExecutionTime: 7200
+#    allowDuplicates: false
+#    cooldown: 1800
+#    pool: ups
+#    user: 'www-data'
+#
+#  # A hypothetical image transcoding tool
+#  imageTranscode:
+#    command: tools/image/processSingle.php
+#    options:
+#      required:
+#        - '--hash'
+#      allowed:
+#        - '-v'
+#    requiresInstanceId: true
+#    idempotent: true
+#    retry:
+#      max: 5
+#      jitter: 5
+#    maxExecutionTime: 60
+#    allowDuplicates: true
+#    cooldown: 0
+#    pool: default
+#    user: 'www-data'
+#
+#  # prod-to-stg syncs
+#  prdToStgCloud:
+#    command: tools/prd-to-stg/cloud-prd-to-stg.sh
+#    options:
+#      required:
+#        - '--source-instance-id'
+#        - '--to-instance'
+#      allowed:
+#        - '--plan'
+#    requiresInstanceId: false
+#    idempotent: false
+#    retry:
+#      max: 0
+#    maxExecutionTime: 3600
+#    allowDuplicates: false
+#    cooldown: 1800
+#    pool: ups
+#    # Unsure of user required for cloud sync?
+#    user: 'root'
+#
+#  prdToStgOnPrem:
+#    command: [tools/prd-to-stg/on-prem-prd-to-stg.sh, --allow-escalation, --non-interactive]
+#    options:
+#      required:
+#        - '--source-instance-id'
+#        - '--to-instance'
+#      allowed:
+#        - '--date'
+#        - '--db-only'
+#        - '--full'
+#    requiresInstanceId: false
+#    idempotent: false
+#    retry:
+#      max: 0
+#    maxExecutionTime: 3600
+#    allowDuplicates: false
+#    cooldown: 1800
+#    pool: ups
+#    user: 'root'
