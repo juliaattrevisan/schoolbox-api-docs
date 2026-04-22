@@ -325,6 +325,7 @@ class Controller extends ConfigController
     /**
      * Registration Reports page
      *
+     * @throws RouteNotFound|\Twig\Error\Error
      * @api GET /adminv2/international-baccalaureate/registrations
      */
     public function getRegistrations(): void
@@ -335,6 +336,12 @@ class Controller extends ConfigController
             [
                 'pageCurrent' => $pageCurrent,
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
+                '_routes' => [
+                    'sessions' => [
+                        'list' => $this->getRouteIfAuthorized('internationalBaccalaureate.getRegistrationSessions'),
+                        'create' => $this->getRouteIfAuthorized('internationalBaccalaureate.createRegistrationSession')
+                    ]
+                ]
             ]
         );
     }
