@@ -477,7 +477,7 @@ export default {
 }
 .group-actions {
     //to put them in the top right corner
-    background: var(--accent-background);
+    background: var(--sbx-config-color-active, var(--accent-foreground));
     position: absolute;
     right: 0.5rem;
     top: 0.5rem;
@@ -486,7 +486,7 @@ export default {
 @mixin disabled-button {
     //both .group-action and .membership share the same disabled styling
     &:disabled {
-        color: var(--accent-foreground);
+        color: var(--sbx-config-color-active, var(--accent-foreground));
     }
 }
 .group-action {
@@ -494,7 +494,7 @@ export default {
     background: none;
     font-size: 0;
     .sbx-icon {
-        color: var(--accent-foreground);
+        color: var(--sbx-config-color-active, var(--accent-foreground));
         display: inline-flex;
     }
 
