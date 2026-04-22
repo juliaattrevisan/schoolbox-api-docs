@@ -28,14 +28,16 @@
             $component.on('click', 'a[data-interaction-has-customised]', function(event){
                 event.preventDefault();
                 const $customisedAssessments = $(this).closest('li').find('[data-customised-assessments]');
+                const icon = this.querySelector('sbx-icon');
                 if ($customisedAssessments.hasClass('hide')) {
                     $customisedAssessments.removeClass("hide").slideDown();
+                    icon?.setAttribute('name', 'up-arrow');
                 } else {
                     $customisedAssessments.slideUp(400, function() {
                         $(this).addClass("hide");
                     });
+                    icon?.setAttribute('name', 'down-arrow');
                 }
-                $(this).toggleClass('icon-down-arrow icon-up-arrow'); // switch icon to indicate next state
             });
 
             // Save form for task completion
