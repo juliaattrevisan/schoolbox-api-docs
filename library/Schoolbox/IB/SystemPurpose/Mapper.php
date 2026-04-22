@@ -87,7 +87,7 @@ class Mapper extends BaseMapper
             $systemPurpose = $this->hydrate($row);
 
             if ($systemPurpose) {
-                $systemPurpose->setCategory($categoryMapper->hydrate($row, 'category'));
+                $systemPurpose->setCategory($categoryMapper->hydrate($row, 'c'));
                 $systemPurposes[$systemPurpose->getId()] = $systemPurpose;
             }
         }
