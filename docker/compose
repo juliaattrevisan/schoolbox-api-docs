@@ -3,6 +3,7 @@
 declare PROJECT_NAME
 declare SCHOOLBOX_CLI_IMAGE_BUILD_FROM_LOCAL
 declare TASKD_BUILD_FROM_LOCAL
+declare TOOLSD_BUILD_FROM_LOCAL
 declare LTI_DEVKIT_ENABLE
 declare SECONDARY_INSTANCE_ENABLE
 
@@ -41,25 +42,45 @@ case "${TASKD_BUILD_FROM_LOCAL}" in
         ;;
 esac
 
-# Build profiles
-profiles=''
-case "${LTI_DEVKIT_ENABLE}" in
+# Which tools daemon compose file is used?
+# Like schoolbox-cli: a different one is used when using a locally built vs.
+# prebuilt image.
+toolsd_compose_file=''
+case "${TOOLSD_BUILD_FROM_LOCAL}" in
     1 | true | yes | on)
-        profiles="$profiles --profile lti"
+        toolsd_compose_file="docker/schoolbox-toolsd/dev.docker-compose.yaml"
         ;;
-esac
-case "${SECONDARY_INSTANCE_ENABLE}" in
-    1 | true | yes | on)
-        profiles="$profiles --profile second-instance"
+    *)
+        # Currently, there's no prebuilt toolsd:
+        # don't include it at all if it is not set
         ;;
 esac
 
-# Run docker compose with whatever the appropriate profiles are.
-docker compose --progress plain \
+# Build args
+args=(
+    --progress plain
     -p "${PROJECT_NAME}" \
     -f "docker/base.docker-compose.yaml" \
     -f "${frankenphp_compose_file}" \
     -f "${schoolbox_cli_compose_file}" \
     -f "${taskd_compose_file}" \
-    --env-file .docker-compose.env \
-    $profiles "$@"
+)
+if [[ -n $toolsd_compose_file ]]; then
+    args+=(-f "${toolsd_compose_file}")
+fi
+
+# Build profiles
+case "${LTI_DEVKIT_ENABLE}" in
+    1 | true | yes | on)
+        args+=(--profile lti)
+        ;;
+esac
+case "${SECONDARY_INSTANCE_ENABLE}" in
+    1 | true | yes | on)
+        args+=(--profile second-instance)
+        ;;
+esac
+args+=(--env-file .docker-compose.env)
+
+# Run docker compose with whatever the appropriate profiles are.
+docker compose "${args[@]}" "$@"
