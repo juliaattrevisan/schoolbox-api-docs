@@ -346,6 +346,13 @@ class Controller extends ConfigController
         );
     }
 
+    /**
+     * Get the list of all the registration sessions
+     *
+     * @return void
+     * @api GET /adminv2/international-baccalaureate/registrations/sessions
+     *
+     */
     public function getRegistrationSessions(): void
     {
         try {
@@ -369,6 +376,13 @@ class Controller extends ConfigController
         }
     }
 
+    /**
+     * Create registration sessions
+     *
+     * @return void
+     * @api POST /adminv2/international-baccalaureate/registrations/sessions
+     *
+     */
     public function createRegistrationSession(): void
     {
         $post = $this->requestPost;
