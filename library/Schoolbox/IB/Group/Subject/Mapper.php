@@ -9,14 +9,14 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\IB\GroupSubject;
+namespace Schoolbox\IB\Group\Subject;
 
 use PDO;
 use PDOStatement;
 use Schoolbox\GenericCollection;
+use Schoolbox\IB\Group\Subject\Language\Mapper as GroupSubjectLanguageMapper;
 use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\IB\Subject\Mapper as SubjectMapper;
-use Schoolbox\IB\GroupSubject\Language\Mapper as GroupSubjectLanguageMapper;
 use Schoolbox\Mapper as BaseMapper;
 
 /**

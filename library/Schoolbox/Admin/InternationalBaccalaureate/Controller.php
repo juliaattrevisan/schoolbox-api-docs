@@ -21,14 +21,13 @@ use Exception;
 use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
-use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IB\Group\Subject\Language\Mapper as GroupSubjectLanguageMapper;
+use Schoolbox\IB\Group\Subject\Language\Model as GroupSubjectLanguageModel;
+use Schoolbox\IB\Group\Subject\Mapper as IBGroupSubjectMapper;
+use Schoolbox\IB\Group\Subject\Model as IBGroupSubjectModel;
 use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\IB\Group\Model as IBGroupModel;
-use Schoolbox\IB\GroupSubject\Mapper as IBGroupSubjectMapper;
-use Schoolbox\IB\GroupSubject\Model as IBGroupSubjectModel;
-use Schoolbox\IB\GroupSubject\Language\Mapper as GroupSubjectLanguageMapper;
-use Schoolbox\IB\GroupSubject\Language\Model as GroupSubjectLanguageModel;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Language\Model as LanguageModel;
 
@@ -335,7 +334,7 @@ class Controller extends ConfigController
 
     public function getRegistrationSessions(): void
     {
-        
+
         $this->response = $this->responseAsJson([]);
     }
 

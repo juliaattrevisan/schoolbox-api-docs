@@ -9,13 +9,13 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\IB\GroupSubject;
+namespace Schoolbox\IB\Group\Subject;
 
 use JsonSerializable;
 use Schoolbox\GenericCollection;
+use Schoolbox\IB\Group\Subject\Language\Model as GroupSubjectLanguageModel;
 use Schoolbox\IB\Group\Model as GroupModel;
 use Schoolbox\IB\Subject\Model as SubjectModel;
-use Schoolbox\IB\GroupSubject\Language\Model as GroupSubjectLanguageModel;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
