@@ -168,7 +168,7 @@ export default {
         <button
             @click.prevent="onOpenPopUpSelected"
             :disabled="isPopOutDisabled"
-            class="update-button button sbx-icon-only-button"
+            class="update-button sbx-icon-only-button"
             title="Modify"
         >
             <sbx-icon name="modify"></sbx-icon>
@@ -223,9 +223,16 @@ export default {
 }
 
 .update-button {
+    background: none;
     flex: 0 0 40px;
     margin: 0px;
     padding: 0.5rem;
+
+    &:hover,
+    &:focus {
+        background: none;
+    }
+
     &:before {
         //to fix weird button wiggle on press otherwise
         float: none;
