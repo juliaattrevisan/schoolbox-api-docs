@@ -1,11 +1,9 @@
 # This toolsd container references a code base somewhere on the file system,
 # thus changes made to that container are made available immediately.
 # This container is intended for development of toolsd.
-
 services:
-  # Local toolsd definition:
-  # must assume that toolsd is in a sibling folder named `toolsd`
-  schoolbox-toolsd:
+  # HTTP API for posting jobs to, and querying their status.
+  schoolbox-toolsd-api:
     depends_on:
       redis-storage:
         condition: service_healthy
@@ -16,8 +14,60 @@ services:
         required: true
       - path: ./../docker-toolsd.env
         required: false
+    command: [src/main.py, api, -p, '8080']
     volumes:
-      - toolsd-code:/app
+      - toolsd-code:/usr/src/app
+
+  # The default Celery queue:
+  # unless otherwise specified, jobs will be sent to this queue.
+  schoolbox-toolsd-celery:
+    depends_on:
+      redis-storage:
+        condition: service_healthy
+    build:
+      context: ../../toolsd/server
+    env_file:
+      - path: ./schoolbox-toolsd/default.env
+        required: true
+      - path: ./../docker-toolsd.env
+        required: false
+    command: [src/main.py, worker, -Q, default, -vv]
+    volumes:
+      - toolsd-code:/usr/src/app
+
+  # An example Celery queue for UPS jobs.
+  schoolbox-toolsd-celery-ups:
+    depends_on:
+      redis-storage:
+        condition: service_healthy
+    build:
+      context: ../../toolsd/server
+    env_file:
+      - path: ./schoolbox-toolsd/default.env
+        required: true
+      - path: ./../docker-toolsd.env
+        required: false
+    command: [src/main.py, worker, -Q, default, -vv]
+    volumes:
+      - toolsd-code:/usr/src/app
+
+  # Flower is Celery's web-based monitoring tool.
+  schoolbox-toolsd-flower:
+    depends_on:
+      redis-storage:
+        condition: service_healthy
+    build:
+      context: ../../toolsd/server
+    env_file:
+      - path: ./schoolbox-toolsd/default.env
+        required: true
+      - path: ./../docker-toolsd.env
+        required: false
+    ports:
+      - ${TOOLSD_FLOWER_PUBLISHED_PORT:-5555}:5555
+    command: [src/main.py, flower]
+    volumes:
+      - toolsd-code:/usr/src/app
 
 # Also mount toolsd's code, so that changes are available without rebuilding
 volumes:
@@ -26,4 +76,4 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ../../toolsd
+      device: ../../toolsd/server
