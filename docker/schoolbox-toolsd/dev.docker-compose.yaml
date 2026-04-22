@@ -34,6 +34,9 @@ services:
     command: [src/main.py, worker, -Q, default, --tools-config, /conf/tools.yaml, --pools-config, /conf/pools.yaml, -vv]
     volumes:
       - toolsd-code:/usr/src/app
+    configs:
+      - source: toolsd
+        target: /conf/
 
   # An example Celery queue for UPS jobs.
   schoolbox-toolsd-celery-ups:
@@ -50,6 +53,9 @@ services:
     command: [src/main.py, worker, -Q, ups, --tools-config, /conf/tools.yaml, --pools-config, /conf/pools.yaml, -vv]
     volumes:
       - toolsd-code:/usr/src/app
+    configs:
+      - source: toolsd
+        target: /conf/
 
   # Flower is Celery's web-based monitoring tool.
   schoolbox-toolsd-flower:
