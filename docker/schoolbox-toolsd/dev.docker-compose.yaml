@@ -9,6 +9,10 @@ services:
         condition: service_healthy
     build:
       context: ../../toolsd/server
+    # TODO migrate this to an arg
+    environment:
+      TOOLSD_TOOLS_CONFIG: /conf/tools.yaml
+      TOOLSD_POOLS_CONFIG: /conf/pools.yaml
     env_file:
       - path: ./schoolbox-toolsd/default.env
         required: true
@@ -17,6 +21,9 @@ services:
     command: [src/main.py, api, -p, '8080']
     volumes:
       - toolsd-code:/usr/src/app
+    configs:
+      - source: toolsd
+        target: /conf/
 
   # The default Celery queue:
   # unless otherwise specified, jobs will be sent to this queue.
