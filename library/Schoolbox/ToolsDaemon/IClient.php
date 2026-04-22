@@ -37,9 +37,13 @@ interface IClient
      * Fetch the status of the job, identified by `$jobId`.
      *
      * @param string $jobId
-     * @return JobStatus
+     * @return array{
+     *     state: JobStatus,
+     *     result?: mixed,
+     *     error?: mixed,
+     * }
      */
-    public function getJobStatus(string $jobId): JobStatus;
+    public function getJobStatus(string $jobId): array;
 
     /**
      * Fetch the output of the job, identified by `$jobId`.
