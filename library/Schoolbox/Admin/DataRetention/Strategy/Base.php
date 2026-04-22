@@ -48,7 +48,11 @@ abstract class Base implements IStrategy
      * This should be in database format, e.g. '2024-01-01 00:00:00'
      */
 
-    // a hash lookup of (query, prepared statement) tuples
+    /**
+     * A hash lookup of cached prepared statements and how often they were reused.
+     *
+     * @var array<string, array{statement: \PDOStatement, count: int}>
+     */
     protected array $preparedStatements = [];
 
     /**
