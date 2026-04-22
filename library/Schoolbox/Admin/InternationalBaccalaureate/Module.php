@@ -24,6 +24,8 @@ use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\IB\Registrations\Sessions\Mapper as RegistrationSessionMapper;
+use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -64,6 +66,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(IBGroupSubjectMapper::class),
             $this->getMapperFactory()->get(IBGroupSubjectLanguageMapper::class),
             $this->getMapperFactory()->get(LanguageMapper::class),
+            $this->getMapperFactory()->get(RegistrationSessionMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
             $this->injector->get('oidc.cache'),

@@ -16,6 +16,8 @@ use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\IB\SystemPurpose\Mapper as SystemPurposeMapper;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 /**
  * Class Mapper
@@ -43,13 +45,13 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('system_purpose_id', SystemPurposeMapper::class, 'id', null, null, 'systemPurpose', 'systemPurpose');
         $this->uses('academic_year', self::TYPE_STRING, null, 'academicYear');
-        $this->uses('exam_session', self::TYPE_STRING, self::COLUMN_ENUM, 'examSession', Model::EXAM_SESSIONS);
+        $this->uses('exam_session', self::TYPE_STRING, null, 'examSession');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('created_by', self::TYPE_INTEGER, null, 'createdBy');
+        $this->joins('created_by', UserMapper::class, 'id', null, null, 'createdBy', 'createdBy');
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('updated_by', self::TYPE_INTEGER, null, 'updatedBy');
+        $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updatedBy', 'updatedBy');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->uses('deleted_by', self::TYPE_INTEGER, null, 'deletedBy');
+        $this->joins('deleted_by', UserMapper::class, 'id', null, null, 'deletedBy', 'deletedBy');
     }
 
     /**
@@ -59,7 +61,10 @@ class Mapper extends BaseMapper
     {
         return "
             SELECT {$this->getColumnString()},
-                   {$this->getJoinColumnString('systemPurpose', 'systemPurpose')}
+                   {$this->getJoinColumnString('systemPurpose', 'systemPurpose')},
+                   {$this->getJoinColumnString('createdBy', 'createdBy')},
+                   {$this->getJoinColumnString('updatedBy', 'updatedBy')},
+                   {$this->getJoinColumnString('deletedBy', 'deletedBy')}
         ";
     }
 
@@ -71,6 +76,9 @@ class Mapper extends BaseMapper
         return "
             FROM      {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('systemPurpose', '', 'systemPurpose')}
+            INNER JOIN {$this->getJoinSql('createdBy', '', 'createdBy', true)}
+            LEFT JOIN {$this->getJoinSql('updatedBy', '', 'updatedBy', true)}
+            LEFT JOIN {$this->getJoinSql('deletedBy', '', 'deletedBy', true)}
         ";
     }
 
@@ -84,6 +92,12 @@ class Mapper extends BaseMapper
     {
         /** @var SystemPurposeMapper $systemPurposeMapper */
         $systemPurposeMapper = $this->getJoinMapper('systemPurpose');
+        /** @var UserMapper $createdByMapper */
+        $createdByMapper = $this->getJoinMapper('createdBy');
+        /** @var UserMapper $updatedByMapper */
+        $updatedByMapper = $this->getJoinMapper('updatedBy');
+        /** @var UserMapper $deletedByMapper */
+        $deletedByMapper = $this->getJoinMapper('deletedBy');
         $sessions = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -91,6 +105,25 @@ class Mapper extends BaseMapper
 
             if ($session) {
                 $session->setSystemPurpose($systemPurposeMapper->hydrate($row, 'systemPurpose'));
+                /** @var User|null $createdBy */
+                $createdBy = $createdByMapper->hydrate($row, 'createdBy');
+                /** @var User|null $updatedBy */
+                $updatedBy = $updatedByMapper->hydrate($row, 'updatedBy');
+                /** @var User|null $deletedBy */
+                $deletedBy = $deletedByMapper->hydrate($row, 'deletedBy');
+
+                if ($createdBy) {
+                    $session->setCreatedBy($createdBy);
+                }
+
+                if ($updatedBy) {
+                    $session->setUpdatedBy($updatedBy);
+                }
+
+                if ($deletedBy) {
+                    $session->setDeletedBy($deletedBy);
+                }
+
                 $sessions[$session->getId()] = $session;
             }
         }

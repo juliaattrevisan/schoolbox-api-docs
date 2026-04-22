@@ -24,3 +24,10 @@ CREATE TABLE `ib_registration_sessions`
     CONSTRAINT `fk_ib_registration_sessions_deleted_by`
         FOREIGN KEY (`deleted_by`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `ib_registration_sessions` (`system_purpose_id`, `academic_year`, `exam_session`, `created_by`)
+VALUES (1, '2025', 'November', 1),
+       (1, '2026', 'May', 1),
+       (2, '2025', 'November', 1),
+       (3, '2025', 'May', 1);
+

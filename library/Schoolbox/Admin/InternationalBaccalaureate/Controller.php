@@ -28,6 +28,8 @@ use Schoolbox\IB\Group\Subject\Mapper as IBGroupSubjectMapper;
 use Schoolbox\IB\Group\Subject\Model as IBGroupSubjectModel;
 use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\IB\Group\Model as IBGroupModel;
+use Schoolbox\IB\Registrations\Sessions\Mapper as RegistrationSessionMapper;
+use Schoolbox\IB\Registrations\Sessions\Model as RegistrationSessionModel;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Language\Model as LanguageModel;
 
@@ -39,6 +41,7 @@ class Controller extends ConfigController
         private IBGroupSubjectMapper $groupSubjectMapper,
         private GroupSubjectLanguageMapper $groupSubjectLanguageMapper,
         private LanguageMapper $languageMapper,
+        private RegistrationSessionMapper $registrationSessionMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
         CacheInterface $oidcCache
@@ -334,8 +337,36 @@ class Controller extends ConfigController
 
     public function getRegistrationSessions(): void
     {
+        try {
+            $sessions = $this->registrationSessionMapper->findAll();
+            $sessionsBySystemPurpose = [];
 
-        $this->response = $this->responseAsJson([]);
+            /** @var RegistrationSessionModel $session */
+            foreach ($sessions as $session) {
+                $systemPurpose = $session->getSystemPurpose();
+
+                if (!$systemPurpose) {
+                    continue;
+                }
+
+                $sessionsBySystemPurpose[$systemPurpose->getId()][] = [
+                    'id' => $session->getId(),
+                    'title' => sprintf(
+                        '%s - %s %s',
+                        $systemPurpose->getName(),
+                        $session->getExamSession(),
+                        $session->getAcademicYear()
+                    ),
+                    'academicYear' => $session->getAcademicYear(),
+                    'examinationSession' => $session->getExamSession(),
+                    'createdBy' => $session->getCreatedBy()?->getFullName(),
+                ];
+            }
+
+            $this->response = $this->responseAsJson($sessionsBySystemPurpose);
+        } catch (Exception $e) {
+            $this->response = $this->responseAsJson(['error' => $e->getMessage()])->withStatus(500);
+        }
     }
 
     public function createRegistrationSession(): void
