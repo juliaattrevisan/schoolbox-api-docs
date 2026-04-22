@@ -25,7 +25,6 @@ use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\IB\Registrations\Sessions\Mapper as RegistrationSessionMapper;
-use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
