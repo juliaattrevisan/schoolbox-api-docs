@@ -176,7 +176,7 @@ class CommandLineTool extends CliTool\App
         $validStrats = new ValidStrats($csvStrats);
         // if no strats are valid, log and return
         if (count($validStrats->getFilteredStrats()) !== 0) {
-            $logger->notice(sprintf("Filtering to '%s' enable strats:", count($validStrats->getFilteredStrats())));
+            $logger->notice(sprintf("Filtering to '%s' enabled strats:", count($validStrats->getFilteredStrats())));
             $logger->notice(sprintf("    Enabled strats %s ", implode(', ', $validStrats->getFilteredStrats())));
         } else {
             $logger->notice("No strats specified, running all strats");
