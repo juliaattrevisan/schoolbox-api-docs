@@ -172,7 +172,7 @@ class Hydrator
                     $assessment = $assessments->offsetGet($dueWorkFeedback?->getAssessable()->getId());
                     if (
                         !$assessment
-                        || !$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->viewer, true, null, true)
+                        || !$this->visibility->isVisibleToUser($assessment, $this->viewer, true)
                         || !$assessment->isFeedbackVisibleToUser($this->viewer)
                     ) {
                         break;
@@ -192,7 +192,7 @@ class Hydrator
                     $assessment = $assessments->offsetGet($quizFeedback?->getAssessable()->getId());
                     if (
                         !$assessment
-                        || !$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->viewer, true, null, true)
+                        || !$this->visibility->isVisibleToUser($assessment, $this->viewer, true)
                         || !$assessment->isFeedbackVisibleToUser($this->viewer)
                     ) {
                         break;
