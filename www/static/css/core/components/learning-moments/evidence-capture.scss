@@ -2,18 +2,25 @@
     a {
         display: flex;
         align-items: center;
+        gap: 0.875rem;
         height: rem-calc(58);
         padding: 0 0.875rem;
         margin-bottom: 1rem;
         color: $anchor-font-color;
 
         &:before {
-            font-size: 2rem;
-            padding-right: 0.875rem;
+            font-size: 1.5rem;
+            padding-right: 0;
         }
         sbx-icon {
-            font-size: 2rem;
-            padding-right: 0.875rem;
+            align-items: center;
+            display: inline-flex;
+            flex: 0 0 1.5rem;
+            font-size: 1.5rem;
+            height: 1.5rem;
+            justify-content: center;
+            padding-right: 0;
+            width: 1.5rem;
         }
         &:hover {
             color: $white;
@@ -31,6 +38,9 @@
         &:before {
             color: $icon-color-image;
         }
+        sbx-icon {
+            color: $icon-color-image;
+        }
         &:hover {
             background-color: $icon-color-image;
         }
@@ -39,6 +49,9 @@
         border: 1px solid $icon-color-video-player;
         background-color: rgba($icon-color-video-player, 0.03);
         &:before {
+            color: $icon-color-video-player;
+        }
+        sbx-icon {
             color: $icon-color-video-player;
         }
         &:hover {
@@ -64,6 +77,9 @@
         &:before {
             color: $icon-color-files;
         }
+        sbx-icon {
+            color: $icon-color-files;
+        }
         &:hover {
             background-color: $icon-color-files;
         }
@@ -72,6 +88,9 @@
         border: 1px solid $emotion;
         background-color: rgba($emotion, 0.03);
         &:before {
+            color: $emotion;
+        }
+        sbx-icon {
             color: $emotion;
         }
         &:hover {
