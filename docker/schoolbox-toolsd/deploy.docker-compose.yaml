@@ -5,20 +5,6 @@
 # * development, when the developer does not need to modify toolsd's code
 
 services:
-  schoolbox-toolsd:
-    depends_on:
-      redis-storage:
-        condition: service_healthy
-    build:
-      context: ./schoolbox-toolsd
-      args:
-        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
-    env_file:
-      - path: ./schoolbox-toolsd/default.env
-        required: true
-      - path: ./../docker-toolsd.env
-        required: false
-
   # HTTP API for posting jobs to, and querying their status.
   schoolbox-toolsd-api:
     depends_on:
@@ -50,7 +36,7 @@ services:
         required: true
       - path: ./../docker-toolsd.env
         required: false
-    command: [src/main.py, worker, -Q, default, -vv]
+    command: [src/main.py, worker, -Q, default, --tools-config, /conf/tools.yaml, --pools-config, /conf/pools.yaml, -vv]
 
   # An example Celery queue for UPS jobs.
   schoolbox-toolsd-celery-ups:
@@ -66,7 +52,7 @@ services:
         required: true
       - path: ./../docker-toolsd.env
         required: false
-    command: [src/main.py, worker, -Q, default, -vv]
+    command: [src/main.py, worker, -Q, ups, --tools-config, /conf/tools.yaml, --pools-config, /conf/pools.yaml, -vv]
 
   # Flower is Celery's web-based monitoring tool.
   schoolbox-toolsd-flower:

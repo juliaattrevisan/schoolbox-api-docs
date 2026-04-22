@@ -31,7 +31,7 @@ services:
         required: true
       - path: ./../docker-toolsd.env
         required: false
-    command: [src/main.py, worker, -Q, default, -vv]
+    command: [src/main.py, worker, -Q, default, --tools-config, /conf/tools.yaml, --pools-config, /conf/pools.yaml, -vv]
     volumes:
       - toolsd-code:/usr/src/app
 
@@ -47,7 +47,7 @@ services:
         required: true
       - path: ./../docker-toolsd.env
         required: false
-    command: [src/main.py, worker, -Q, default, -vv]
+    command: [src/main.py, worker, -Q, ups, --tools-config, /conf/tools.yaml, --pools-config, /conf/pools.yaml, -vv]
     volumes:
       - toolsd-code:/usr/src/app
 
