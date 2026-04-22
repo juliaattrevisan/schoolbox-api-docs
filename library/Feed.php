@@ -281,8 +281,6 @@ class Feed
             }
 
             foreach ($rows as $row) {
-                $folder = new Folder\Model()->setId($row['folderId']);
-
                 if ($row['work_type_id'] !== null) {
                     // Filter out rows that should not be visible due to lwt.is_visible_to_parents/lwt.is_visible_to_learners.
                     // When work_type_id is null, no visibility restriction applies (consistent with Assessment\Visibility->isVisibleToUser()).
@@ -294,8 +292,8 @@ class Feed
                             //  - parents of learners - included only if instructors
                             //  - users of role type 'staff' - included unless they are learners
                             //  - other users of any role type - included only if instructors
-                            if (!$access->isInstructor($this->user, $folder)) {
-                                if ($access->isLearner($this->user, $folder)) {
+                            if (!$access->isInstructorInFolderId($this->user, $row['folderId'])) {
+                                if ($access->isLearnerInFolderId($this->user, $row['folderId'])) {
                                     continue 2; // Skip row.
                                 }
                                 if (!$this->user->getRole()->isStaff()) {
@@ -311,8 +309,8 @@ class Feed
                             //  - users of role type 'staff' - always included
                             //  - other users of any role type - included only if instructors or learners
                             if (
-                                !$access->isInstructor($this->user, $folder) &&
-                                !$access->isLearner($this->user, $folder) &&
+                                !$access->isInstructorInFolderId($this->user, $row['folderId']) &&
+                                !$access->isLearnerInFolderId($this->user, $row['folderId']) &&
                                 !$this->user->getRole()->isStaff()
                             ) {
                                 continue 2; // Skip row.
@@ -325,12 +323,12 @@ class Feed
                             //  - parents of learners - included unless they are learners
                             //  - users of role type 'staff' - included unless they are learners
                             //  - other users of any role type - included only if instructors
-                            if (!$access->isInstructor($this->user, $folder)) {
-                                if ($access->isLearner($this->user, $folder)) {
+                            if (!$access->isInstructorInFolderId($this->user, $row['folderId'])) {
+                                if ($access->isLearnerInFolderId($this->user, $row['folderId'])) {
                                     continue 2; // Skip row.
                                 }
                                 if (
-                                    !$access->isParentOfLearner($this->user, $folder) &&
+                                    !$access->isParentOfLearnerInFolderId($this->user, $row['folderId']) &&
                                     !$this->user->getRole()->isStaff()
                                 ) {
                                     continue 2; // Skip row.
@@ -345,9 +343,9 @@ class Feed
                             //  - users of role type 'staff' - always included
                             //  - other users of any role type - included only if instructors or learners
                             if (
-                                !$access->isInstructor($this->user, $folder) &&
-                                !$access->isLearner($this->user, $folder) &&
-                                !$access->isParentOfLearner($this->user, $folder) &&
+                                !$access->isInstructorInFolderId($this->user, $row['folderId']) &&
+                                !$access->isLearnerInFolderId($this->user, $row['folderId']) &&
+                                !$access->isParentOfLearnerInFolderId($this->user, $row['folderId']) &&
                                 !$this->user->getRole()->isStaff()
                             ) {
                                 continue 2; // Skip row.

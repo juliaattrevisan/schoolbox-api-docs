@@ -220,6 +220,21 @@ class Access
 
 
     /**
+     * This function should be used if the caller has a folderId but not a Folder object, and creating a Folder object
+     * would be onerous.  Otherwise, $this->isInstructor() should be preferred.
+     *
+     * @param User $user
+     * @param int  $folderId
+     * @return bool
+     * @throws MapperException
+     */
+    public function isInstructorInFolderId(User $user, int $folderId): bool
+    {
+        return $this->getFolderAccess($user, $folderId) >= UserAccess::ACCESS_WRITE;
+    }
+
+
+    /**
      * Is the specified user a learner of the specified folder?
      *
      * A learner is any user with READ permission to a folder
@@ -234,6 +249,21 @@ class Access
     public function isLearner(User $user, Folder\Model $folder): bool
     {
         return $this->getFolderAccess($user, $folder->getId()) === UserAccess::ACCESS_READ;
+    }
+
+
+    /**
+     * This function should be used if the caller has a folderId but not a Folder object, and creating a Folder object
+     * would be onerous.  Otherwise, $this->isLearner() should be preferred.
+     *
+     * @param User $user
+     * @param int  $folderId
+     * @return bool
+     * @throws MapperException
+     */
+    public function isLearnerInFolderId(User $user, int $folderId): bool
+    {
+        return $this->getFolderAccess($user, $folderId) === UserAccess::ACCESS_READ;
     }
 
 
@@ -264,6 +294,33 @@ class Access
 
         foreach ($children as $child) {
             if ($this->isLearner($child, $folder)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * This function should be used if the caller has a folderId but not a Folder object, and creating a Folder object
+     * would be onerous.  Otherwise, $this->isParentOfLearner() should be preferred.
+     *
+     * @param User $user
+     * @param int  $folderId
+     * @return bool
+     * @throws MapperException
+     */
+    public function isParentOfLearnerInFolderId(User $user, int $folderId): bool
+    {
+        $children = $user->getChildren();
+
+        if (null === $children) {
+            return false;
+        }
+
+        foreach ($children as $child) {
+            if ($this->isLearnerInFolderId($child, $folderId)) {
                 return true;
             }
         }
