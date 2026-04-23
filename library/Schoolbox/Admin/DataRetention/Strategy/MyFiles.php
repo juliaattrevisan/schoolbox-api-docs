@@ -335,12 +335,19 @@ class MyFiles extends Base
             return 0;
         }
 
-        $delPlaceholders = Builder::getArrayPlaceholders($folderIds, 'id');
-        $delStmt = $this->getPreparedStatement($this->deleteStatement('fo') . " FROM " . self::TABLE_NAME_FOLDER . " AS fo WHERE fo.id IN {$delPlaceholders}");
+        $rowsDeleted = 0;
 
-        $delStmt->execute(Builder::getArrayParameters($folderIds, 'id'));
+        foreach ($folderIds as $folderId) {
+            $delPlaceholders = Builder::getArrayPlaceholders([$folderId], 'id');
+            $delStmt = $this->getPreparedStatement(
+                $this->deleteStatement('fo') . " FROM " . self::TABLE_NAME_FOLDER . " AS fo WHERE fo.id IN {$delPlaceholders}"
+            );
 
-        return $delStmt->rowCount();
+            $delStmt->execute(Builder::getArrayParameters([$folderId], 'id'));
+            $rowsDeleted += $delStmt->rowCount();
+        }
+
+        return $rowsDeleted;
     }
 
     /**

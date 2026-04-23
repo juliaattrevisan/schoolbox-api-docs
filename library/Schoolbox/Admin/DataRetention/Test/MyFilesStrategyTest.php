@@ -185,4 +185,28 @@ class MyFilesStrategyTest extends TestCase
         $this->assertSame([301, 302, 303], $strategy->deletedFiles);
         $this->assertSame([32, 31, 30], $strategy->deletedFolders);
     }
+
+    public function testDeleteChunkDeletesSiblingBranchesLeafFirstBeforeSharedParent(): void
+    {
+        $strategy = $this->makeStrategy();
+        $strategy->setTree(
+            [
+                1 => [2, 3],
+                2 => [],
+                3 => [],
+            ],
+            [
+                1 => [11],
+                2 => [12],
+                3 => [13],
+            ],
+        );
+
+        $strategy->runDeleteChunk([
+            ['id' => 1, 'table' => 'my_folder'],
+        ]);
+
+        $this->assertSame([11, 12, 13], $strategy->deletedFiles);
+        $this->assertSame([2, 3, 1], $strategy->deletedFolders);
+    }
 }
