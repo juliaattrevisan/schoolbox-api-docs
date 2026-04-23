@@ -18,7 +18,7 @@ class NullClient implements IClient
     /**
      * @inheritdoc
      */
-    public function run(string $tool, array $options, ?string $instanceId = null, ?array $environment = null): string
+    public function run(JobRequest $request): string
     {
         return '';
     }

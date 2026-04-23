@@ -32,23 +32,16 @@ class Client implements IClient
     ) {
     }
 
-    public function run(string $tool, array $options, ?string $instanceId = null, ?array $environment = null): string
+    /**
+     * @inheritdoc
+     */
+    public function run(JobRequest $request): string
     {
         try {
-            $payload = [
-                'tool'    => $tool,
-                'options' => $options,
-            ];
-            if (isset($instanceId)) {
-                $payload['instanceId'] = $instanceId;
-            }
-            if (isset($environment)) {
-                $payload['environment'] = $environment;
-            }
             $response = $this->httpClient->request(
                 'POST',
                 $this->baseUri->withPath('/run'),
-                [RequestOptions::JSON => $payload],
+                [RequestOptions::JSON => $request->toPayload()],
             );
         } catch (GuzzleException $e) {
             throw new ClientException('Tools daemon returned an error: ' . $e->getMessage(), $e->getCode(), $e);
@@ -66,6 +59,9 @@ class Client implements IClient
         throw new ClientException('Tools daemon response did not include a jobId');
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getJobStatus(string $jobId): JobStatus
     {
         try {
@@ -91,6 +87,9 @@ class Client implements IClient
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getJobOutput(string $jobId): JobOutput
     {
         try {
