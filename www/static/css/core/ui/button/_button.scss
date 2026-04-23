@@ -340,6 +340,7 @@ button.submit {
 
 .sbx-icon-only-button {
     align-items: center;
+    border-radius: var(--sbx-config-field-roundness, 0);
     display: inline-flex;
     justify-content: center;
     min-height: 40px;
