@@ -30,6 +30,11 @@ export type SkinConfigOption = {
 
 export type SkinConfigOptionErrorMap = Partial<Record<number, string>>;
 
+export type SkinConfigContrastToken = {
+    label: string;
+    value: string;
+};
+
 /**
  * A skin config subcategory containing a list of options
  */
@@ -56,6 +61,7 @@ export type SkinConfigToggle = {
  * The expected payload for the Skin Config app
  */
 export type SkinConfigData = {
+    contrastTokens: Record<string, SkinConfigContrastToken>;
     toggle: SkinConfigToggle;
     existing: SkinConfigSection;
     sonar: SkinConfigSection;

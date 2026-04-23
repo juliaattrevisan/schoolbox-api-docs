@@ -26,6 +26,22 @@ use Twig\Environment;
 
 class Controller extends ConfigController
 {
+    /**
+     * Fixed design-token colours that Skin Config options may need to contrast against.
+     *
+     * @var array<string, array{label: string, value: string}>
+     */
+    private const FIXED_CONTRAST_TOKENS = [
+        '--sbx-color-text-primary' => [
+            'label' => 'the colour black',
+            'value' => '#000000',
+        ],
+        '--sbx-color-foreground-primary' => [
+            'label' => 'the colour white',
+            'value' => '#ffffff',
+        ],
+    ];
+
     public function __construct(
         ConfigMapper $configMapper,
         readonly private FieldMapper $fieldMapper,
@@ -132,17 +148,21 @@ class Controller extends ConfigController
             return $carry;
         }, []);
 
-        // Convert subcategory maps to indexed arrays for JSON output
-        foreach ($data as $type => $categories) {
-            foreach ($categories as $category => $subcategoryMap) {
+        $data['contrastTokens'] = self::FIXED_CONTRAST_TOKENS;
+
+        // Convert only section subcategory maps to indexed arrays for JSON output.
+        foreach (['existing', 'sonar'] as $type) {
+            if (!isset($data[$type]) || !is_array($data[$type])) {
+                continue;
+            }
+
+            foreach ($data[$type] as $category => $subcategoryMap) {
                 if (is_array($subcategoryMap)) {
                     $data[$type][$category] = array_values($subcategoryMap);
                 }
             }
 
-            if (is_array($categories)) {
-                $data[$type] = $this->orderCategories($data[$type]);
-            }
+            $data[$type] = $this->orderCategories($data[$type]);
         }
 
         return $data;
