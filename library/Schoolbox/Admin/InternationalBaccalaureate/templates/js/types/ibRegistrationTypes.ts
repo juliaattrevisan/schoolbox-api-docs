@@ -6,7 +6,7 @@ export type RegistrationSession = {
     id: number;
     title: string;
     academicYear: string; // Free text, e.g. "2026" or "2025/2026"
-    examinationSession: "May" | "November";
+    examSession: "May" | "November";
     createdAt: string; // ISO 8601 timestamp
-    createdBy: string; // Display name of the user who created the session
+    createdBy: string | null; // Display name of the user who created the session
 };
