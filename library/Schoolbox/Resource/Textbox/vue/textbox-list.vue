@@ -524,7 +524,7 @@ export default {
                                     <a
                                         href="#"
                                         @click.prevent="attemptToDeleteTextbox(index)"
-                                        class="sbx-icon-only-button no-text"
+                                        class="sbx-icon-only-button"
                                         title="Delete"
                                         aria-label="Delete"
                                         ><sbx-icon name="delete"></sbx-icon
