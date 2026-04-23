@@ -102,10 +102,10 @@ class Mapper extends Schoolbox\Mapper
     public function getVisibilityFromBooleans(bool $isVisibleToParents, bool $isVisibleToLearners): string
     {
         return match ([$isVisibleToParents, $isVisibleToLearners]) {
-            [false, false] => Mapper::VISIBILITY_STAFF_INSTRUCTORS,
-            [false, true ] => Mapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS,
-            [true , false] => Mapper::VISIBILITY_STAFF_INSTRUCTORS_PARENTS,
-            [true , true ] => Mapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS_PARENTS,
+            [false, false] => self::VISIBILITY_STAFF_INSTRUCTORS,
+            [false, true ] => self::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS,
+            [true , false] => self::VISIBILITY_STAFF_INSTRUCTORS_PARENTS,
+            [true , true ] => self::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS_PARENTS,
         };
     }
 }
