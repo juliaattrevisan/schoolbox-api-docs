@@ -120,6 +120,7 @@ class Controller extends ConfigController
                     'title'          => $config->getTitle(),
                     'description'    => $config->getDescription(),
                     'customProperty' => $this->getCustomProperty($config),
+                    'contrast'       => $this->getContrastProperty($config),
                     'type'           => $this->getOptionType($config, $fieldMap),
                     'editable'       => $config->getEditable(),
                     'hidden'         => $config->getHidden(),
@@ -206,16 +207,42 @@ class Controller extends ConfigController
      */
     private function getCustomProperty(Config $config): ?string
     {
+        return $this->getStringOptionValue($config, 'customProperty');
+    }
+
+    /**
+     * Extract the raw contrast mapping from config options metadata.
+     */
+    private function getContrastProperty(Config $config): ?string
+    {
+        return $this->getStringOptionValue($config, 'contrast');
+    }
+
+    /**
+     * Extract a string config option from the JSON-encoded options payload.
+     */
+    private function getStringOptionValue(Config $config, string $key): ?string
+    {
+        $optionValue = $this->getDecodedOptions($config)[$key] ?? null;
+
+        return is_string($optionValue) && $optionValue !== '' ? $optionValue : null;
+    }
+
+    /**
+     * Decode the JSON-encoded options payload for a config row.
+     *
+     * @return array<string, mixed>
+     */
+    private function getDecodedOptions(Config $config): array
+    {
         $options = $config->getOptions();
         if ($options === null || trim($options) === '') {
-            return null;
+            return [];
         }
+
         $decoded = json_decode($options, true);
-        if (!is_array($decoded)) {
-            return null;
-        }
-        $customProperty = $decoded['customProperty'] ?? null;
-        return is_string($customProperty) && $customProperty !== '' ? $customProperty : null;
+
+        return is_array($decoded) ? $decoded : [];
     }
 
     /**

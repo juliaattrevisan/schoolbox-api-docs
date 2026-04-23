@@ -16,10 +16,13 @@ export type SkinConfigOption = {
     title: string | null;
     description: string | null;
     customProperty: string | null;
+    contrast: string | null;
     type: "checkbox" | "colour" | "select" | "textarea";
     editable: boolean;
     hidden: boolean;
 };
+
+export type SkinConfigOptionErrorMap = Partial<Record<number, string>>;
 
 /**
  * A skin config subcategory containing a list of options
