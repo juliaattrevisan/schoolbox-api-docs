@@ -106,6 +106,7 @@ class Controller extends ConfigController
                 $categoryName  = $config->getSkinSubcategory()->getCategory()->getName();
                 $subcategoryId = $config->getSkinSubcategory()->getId();
                 $type          = $config->getType()->getId() === ConfigMapper::TYPE_SONAR_SKIN_CONFIG ? 'sonar' : 'existing';
+                $decodedOptions = $this->getDecodedOptions($config);
 
                 // Create subcategory bucket once
                 $carry[$type][$categoryName][$subcategoryId] ??= [
@@ -119,10 +120,10 @@ class Controller extends ConfigController
                     'value'          => $config->getValue(),
                     'title'          => $config->getTitle(),
                     'description'    => $config->getDescription(),
-                    'customProperty' => $this->getCustomProperty($config),
-                    'contrast'       => $this->getContrastProperty($config),
+                    'customProperty' => $this->getCustomProperty($decodedOptions),
+                    'contrast'       => $this->getContrastProperty($decodedOptions),
                     'type'           => $this->getOptionType($config, $fieldMap),
-                    'selectOptions'  => $this->getSelectOptions($config),
+                    'selectOptions'  => $this->getSelectOptions($config, $decodedOptions),
                     'editable'       => $config->getEditable(),
                     'hidden'         => $config->getHidden(),
                 ];
@@ -240,28 +241,33 @@ class Controller extends ConfigController
 
     /**
      * Extract the raw CSS custom property mapping from config options metadata.
+     *
+     * @param array<string, mixed> $decodedOptions
      */
-    private function getCustomProperty(Config $config): ?string
+    private function getCustomProperty(array $decodedOptions): ?string
     {
-        return $this->getStringOptionValue($config, 'customProperty');
+        return $this->getStringOptionValue($decodedOptions, 'customProperty');
     }
 
     /**
      * Extract the raw contrast mapping from config options metadata.
+     *
+     * @param array<string, mixed> $decodedOptions
      */
-    private function getContrastProperty(Config $config): ?string
+    private function getContrastProperty(array $decodedOptions): ?string
     {
-        return $this->getStringOptionValue($config, 'contrast');
+        return $this->getStringOptionValue($decodedOptions, 'contrast');
     }
 
     /**
      * Extract available select options from the JSON-encoded config metadata.
      *
      * @return array<int, array{name: string, value: string}>
+     * @param array<string, mixed> $decodedOptions
      */
-    private function getSelectOptions(Config $config): array
+    private function getSelectOptions(Config $config, array $decodedOptions): array
     {
-        $selectOptions = $this->getDecodedOptions($config)['select'] ?? null;
+        $selectOptions = $decodedOptions['select'] ?? null;
 
         if (is_array($selectOptions)) {
             $parsedOptions = [];
@@ -325,10 +331,12 @@ class Controller extends ConfigController
 
     /**
      * Extract a string config option from the JSON-encoded options payload.
+     *
+     * @param array<string, mixed> $decodedOptions
      */
-    private function getStringOptionValue(Config $config, string $key): ?string
+    private function getStringOptionValue(array $decodedOptions, string $key): ?string
     {
-        $optionValue = $this->getDecodedOptions($config)[$key] ?? null;
+        $optionValue = $decodedOptions[$key] ?? null;
 
         return is_string($optionValue) && $optionValue !== '' ? $optionValue : null;
     }
