@@ -35,17 +35,20 @@ class Client implements IClient
     public function run(string $tool, array $options, ?string $instanceId = null, ?array $environment = null): string
     {
         try {
+            $payload = [
+                'tool'    => $tool,
+                'options' => $options,
+            ];
+            if (isset($instanceId)) {
+                $payload['instanceId'] = $instanceId;
+            }
+            if (isset($environment)) {
+                $payload['environment'] = $environment;
+            }
             $response = $this->httpClient->request(
-                'GET',
+                'POST',
                 $this->baseUri->withPath('/run'),
-                [
-                    RequestOptions::JSON => [
-                        'tool'        => $tool,
-                        'options'     => $options,
-                        'instanceId'  => $instanceId,
-                        'environment' => $environment,
-                    ],
-                ]
+                [RequestOptions::JSON => $payload],
             );
         } catch (GuzzleException $e) {
             throw new ClientException('Tools daemon returned an error: ' . $e->getMessage(), $e->getCode(), $e);
@@ -57,7 +60,7 @@ class Client implements IClient
             throw new ClientException('Tools daemon response was not parseable: ' . $e->getMessage(), $e->getCode(), $e);
         }
 
-        if (!isset($responseBody['jobId'])) {
+        if (isset($responseBody['jobId'])) {
             return (string)$responseBody['jobId'];
         }
         throw new ClientException('Tools daemon response did not include a jobId');
