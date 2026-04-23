@@ -38,17 +38,6 @@ abstract class Base implements IStrategy
     protected string $retentionConfigKey = '';
 
     /**
-     * This is how we work out how long to retain soft deleted data for. Or if we should hard delete it at all.
-     * This is configured in config using $retentionConfigKey, and can be overridden by the command line tool option --retention-period=xx(days)
-     *
-     * cache and store the retention period for this strategy,
-     * so we don't have to keep looking it up from the config for every chunk,
-     * and so we can override it with setRetentionPeriod if needed
-     *
-     * This should be in database format, e.g. '2024-01-01 00:00:00'
-     */
-
-    /**
      * A hash lookup of cached prepared statements and how often they were reused.
      *
      * @var array<string, array{statement: \PDOStatement, count: int}>
