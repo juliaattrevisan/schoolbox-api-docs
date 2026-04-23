@@ -46,7 +46,7 @@ function onSubmit(): void {
         id: Date.now(),
         title: `Diploma Program Year 2 [DIPLOMA] - ${examinationSession.value} ${academicYear.value.trim()}`,
         academicYear: academicYear.value.trim(),
-        examinationSession: examinationSession.value as "May" | "November",
+        examSession: examinationSession.value as "May" | "November",
         createdAt: new Date().toISOString(),
         createdBy: "current user", // TODO(SA-22225): Replace with actual user from backend response
     };
