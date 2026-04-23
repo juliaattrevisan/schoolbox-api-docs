@@ -221,18 +221,16 @@ button.submit {
 
     a {
         color: $anchor-font-color;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
         padding: 0.75rem 1rem;
-        text-align: center;
         flex-basis: 0;
         flex-grow: 1;
         line-height: 1.4;
 
-        &:before {
-            font-size: 2rem;
-            float: none;
-            padding: 0;
-        }
-
+        sbx-icon,
         span {
             display: block;
         }
@@ -243,40 +241,40 @@ button.submit {
     }
 
     .learning {
-        &:before {
+        sbx-icon {
             color: $electric;
         }
         &:hover {
             background-color: $electric;
             color: $white;
 
-            &:before {
+            sbx-icon {
                 color: $white;
             }
         }
     }
     .goals {
-        &:before {
+        sbx-icon {
             color: $cheddar;
         }
         &:hover {
             background-color: $cheddar;
             color: $white;
 
-            &:before {
+            sbx-icon {
                 color: $white;
             }
         }
     }
     .achievement {
-        &:before {
+        sbx-icon {
             color: var(--sbx-color-success, $success-color);
         }
         &:hover {
             background-color: var(--sbx-color-success, $success-color);
             color: $white;
 
-            &:before {
+            sbx-icon {
                 color: $white;
             }
         }

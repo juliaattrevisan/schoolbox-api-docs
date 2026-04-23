@@ -550,7 +550,7 @@ window.Vue.onMounted(async () => {
                             data-reveal-id="shareLearningMoment"
                             data-test="learning-moment-evidence-share"
                         >
-                            <sbx-icon name="share"></sbx-icon>
+                            <sbx-icon name="share" size="2rem"></sbx-icon>
                             <span>Share Learning</span>
                         </a>
                         <a
@@ -559,7 +559,7 @@ window.Vue.onMounted(async () => {
                             title="Set goals"
                             class="goals"
                         >
-                            <sbx-icon name="goal"></sbx-icon>
+                            <sbx-icon name="goal" size="2rem"></sbx-icon>
                             <span>Set Goals</span>
                         </a>
                         <a
@@ -568,7 +568,7 @@ window.Vue.onMounted(async () => {
                             title="Set goals"
                             class="goals"
                         >
-                            <sbx-icon name="goal"></sbx-icon>
+                            <sbx-icon name="goal" size="2rem"></sbx-icon>
                             <span>Set My Goals</span>
                         </a>
                         <a
@@ -577,7 +577,7 @@ window.Vue.onMounted(async () => {
                             title="Award achievement"
                             class="achievement"
                         >
-                            <sbx-icon name="achievement"></sbx-icon>
+                            <sbx-icon name="achievement" size="2rem"></sbx-icon>
                             <span>Award Achievement</span>
                         </a>
                     </div>
