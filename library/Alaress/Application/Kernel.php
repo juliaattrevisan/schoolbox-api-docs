@@ -2473,6 +2473,20 @@ abstract class Kernel
             )
         );
 
+        // Tools daemon client
+        $di->set(
+            'toolsDaemon.client',
+            $di->lazy(
+                function () use ($di) {
+                    $factory = new \Schoolbox\ToolsDaemon\ClientFactory(
+                        $di->get('httpClient'),
+                        $di->get('config')
+                    );
+                    return $factory->build();
+                },
+            ),
+        );
+
         return $di;
     }
 

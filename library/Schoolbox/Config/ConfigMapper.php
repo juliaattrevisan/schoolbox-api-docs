@@ -468,6 +468,8 @@ class ConfigMapper extends Mapper
     public const string NAME_PRESIDIO_ANALYSIS_HOST = 'presidio_analysis_host';
     public const string NAME_PRESIDIO_ANONYMISATION_HOST = 'presidio_anonymisation_host';
 
+    // Tools daemon
+    public const string NAME_TOOLSD_HOST = 'toolsd_host';
 
     /* Differentiation profiles
      */
