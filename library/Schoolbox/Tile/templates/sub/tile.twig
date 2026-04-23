@@ -77,7 +77,7 @@ $(function () {
         {# Hidden form input for this tile - used in sorting #}
         <input type="hidden" name="tile[]" value="{{ tile.id|e('html_attr') }}" />
           <a href="{{ routeLookup('tile.delete:post', {id: tile.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}"
-              class="button right sbx-icon-only-button no-text"
+              class="button right sbx-icon-only-button"
               data-role="delete"
               title="Delete"
               aria-label="Delete"><sbx-icon name="delete"></sbx-icon></a>
