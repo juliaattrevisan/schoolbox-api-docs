@@ -90,22 +90,4 @@ class Mapper extends Schoolbox\Mapper
     {
         return ['sequence' => 'ASC'];
     }
-
-    /**
-     * This function performs the same operation as WorkType\Model::getVisibility(), but does not require a model
-     * instance to be passed in.  Use this when a model instance is not available.
-     *
-     * @param bool $isVisibleToParents
-     * @param bool $isVisibleToLearners
-     * @return string
-     */
-    public static function getVisibilityFromBooleans(bool $isVisibleToParents, bool $isVisibleToLearners): string
-    {
-        return match ([$isVisibleToParents, $isVisibleToLearners]) {
-            [false, false] => self::VISIBILITY_STAFF_INSTRUCTORS,
-            [false, true ] => self::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS,
-            [true , false] => self::VISIBILITY_STAFF_INSTRUCTORS_PARENTS,
-            [true , true ] => self::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS_PARENTS,
-        };
-    }
 }

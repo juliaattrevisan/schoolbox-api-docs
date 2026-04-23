@@ -7,6 +7,7 @@
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Learning\Assessment\WorkType\Helper as WorkTypeHelper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Permission\Access\Access;
 
@@ -285,7 +286,7 @@ class Feed
                     // Filter out rows that should not be visible due to lwt.is_visible_to_parents/lwt.is_visible_to_learners.
                     // When work_type_id is null, no visibility restriction applies (consistent with Assessment\Visibility->isVisibleToUser()).
                     switch (
-                        WorkTypeMapper::getVisibilityFromBooleans(
+                        WorkTypeHelper::getVisibilityFromBooleans(
                             $row['is_visible_to_parents'] !== '0',
                             $row['is_visible_to_learners'] !== '0'
                         )
