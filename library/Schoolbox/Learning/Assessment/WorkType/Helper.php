@@ -12,6 +12,9 @@ namespace Schoolbox\Learning\Assessment\WorkType;
 class Helper
 {
     /**
+     * This function performs the same operation as WorkType\Model::getVisibility(), but does not require a model
+     * instance to be provided.  Use this when a model instance is not available.
+     *
      * @param bool $isVisibleToParents
      * @param bool $isVisibleToLearners
      * @return string
