@@ -20,14 +20,16 @@ interface IClient
     /**
      * Send a request to run a tool.
      *
-     * @param string        $tool        The tool to run: must match the name of a tool defined in the tools daemon's
-     *                                   configuration file.
-     * @param array<string> $options     A list of options to pass to the tool: these will be passed as additional
-     *                                   command-line parameters to the tool.
-     * @param string|null   $instanceId  If provided: run the tool in the context of this instance.
-     *                                   A tool's definition will either mandate an instance ID, or prohibit one.
-     * @param array|null    $environment Any environment variables to pass to the tool.
-     *                                   A tool's definition will define its required and allowed environment variables.
+     * @param string                     $tool        The tool to run: must match the name of a tool defined in the
+     *                                                tools daemon's configuration file.
+     * @param array<string>              $options     A list of options to pass to the tool: these will be passed as
+     *                                                additional command-line parameters to the tool.
+     * @param string|null                $instanceId  If provided: run the tool in the context of this instance.
+     *                                                A tool's definition will either mandate an instance ID, or
+     *                                                prohibit one.
+     * @param array{string, string}|null $environment Any environment variables to pass to the tool.
+     *                                                A tool's definition will define its required and allowed
+     *                                                environment variables.
      * @return string The job ID received from the tools daemon: this may then be used to fetch the job's completion
      *                status and its output.
      * @throws ClientException if request was rejected, not received, etc.
