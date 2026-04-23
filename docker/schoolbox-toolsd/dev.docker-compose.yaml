@@ -1,6 +1,8 @@
 # This toolsd container references a code base somewhere on the file system,
 # thus changes made to that container are made available immediately.
 # This container is intended for development of toolsd.
+# Note that the container will need to mount Schoolbox's code base as well,
+# and be able to run PHP, in addition to Celery's content.
 services:
   # HTTP API for posting jobs to, and querying their status.
   schoolbox-toolsd-api:
@@ -8,7 +10,8 @@ services:
       redis-storage:
         condition: service_healthy
     build:
-      context: ../../toolsd/server
+      context: ./schoolbox-toolsd
+      dockerfile: dev.Dockerfile
     # TODO migrate this to an arg
     environment:
       TOOLSD_TOOLS_CONFIG: /conf/tools.yaml
@@ -32,7 +35,8 @@ services:
       redis-storage:
         condition: service_healthy
     build:
-      context: ../../toolsd/server
+      context: ./schoolbox-toolsd
+      dockerfile: dev.Dockerfile
     env_file:
       - path: ./schoolbox-toolsd/default.env
         required: true
@@ -40,6 +44,7 @@ services:
         required: false
     command: [src/main.py, worker, -Q, default, --tools-config, /conf/tools.yaml, --pools-config, /conf/pools.yaml, -vv]
     volumes:
+      - code:/usr/share/schoolbox
       - toolsd-code:/usr/src/app
     configs:
       - source: toolsd
@@ -51,7 +56,8 @@ services:
       redis-storage:
         condition: service_healthy
     build:
-      context: ../../toolsd/server
+      context: ./schoolbox-toolsd
+      dockerfile: dev.Dockerfile
     env_file:
       - path: ./schoolbox-toolsd/default.env
         required: true
@@ -59,6 +65,7 @@ services:
         required: false
     command: [src/main.py, worker, -Q, ups, --tools-config, /conf/tools.yaml, --pools-config, /conf/pools.yaml, -vv]
     volumes:
+      - code:/usr/share/schoolbox
       - toolsd-code:/usr/src/app
     configs:
       - source: toolsd
@@ -70,7 +77,8 @@ services:
       redis-storage:
         condition: service_healthy
     build:
-      context: ../../toolsd/server
+      context: ./schoolbox-toolsd
+      dockerfile: dev.Dockerfile
     env_file:
       - path: ./schoolbox-toolsd/default.env
         required: true
