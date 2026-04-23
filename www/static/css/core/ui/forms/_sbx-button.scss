@@ -175,20 +175,30 @@ body.sbx-body {
      * When a button sits next to an input (e.g. search bars)
      * We need to tweak the rounding of the corners so they align properly
      */
-    .input-group > .button,
-    .input-group > a,
-    .input-group > button,
-    .input-group > button[class*="icon-"]:empty,
-    .input-group > a[class*="icon-"]:empty,
-    .input-group > button[class^="icon-"]:empty {
-        border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
-        border-left: none;
-        border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
-        line-height: 1;
-        // this is the same as $small-only, which we can't currently import in this context
-        @media only print, screen and (max-width: 40em) {
-            border-left: var(--sbx-border-width-normal);
-            border-radius: var(--sbx-config-field-roundness);
+    .input-group {
+        .button,
+        a,
+        button,
+        button[class*="icon-"]:empty,
+        a[class*="icon-"]:empty,
+        button[class^="icon-"]:empty {
+            border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
+            border-left: none;
+            border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
+            line-height: 1;
+            // this is the same as $small-only, which we can't currently import in this context
+            @media only print, screen and (max-width: 40em) {
+                border-left: var(--sbx-border-width-normal);
+                border-radius: var(--sbx-config-field-roundness);
+            }
+        }
+        // Additional styles for button in input group
+        button.button.icon-search {
+            align-items: center;
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
         }
     }
 
@@ -208,17 +218,6 @@ body.sbx-body {
      */
     .c-chips li > input[type="checkbox"] {
         display: none;
-    }
-
-    /**
-     * Small action buttons with icons
-     * These need a border radius on hover to match design
-     */
-    nav a[class*="icon-"]:hover,
-    nav a[class^="icon-"]:hover,
-    .sbx-icon-only-button,
-    .sbx-icon-only-button:hover {
-        border-radius: var(--sbx-config-field-roundness) !important;
     }
 
     /**
