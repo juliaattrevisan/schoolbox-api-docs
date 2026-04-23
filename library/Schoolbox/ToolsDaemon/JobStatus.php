@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2026, Schoolbox Pty Ltd
  * @link      https://schoolbox.education/
@@ -9,57 +10,23 @@ declare(strict_types=1);
 namespace Schoolbox\ToolsDaemon;
 
 /**
- * Possible statuses for a job request.
- *
- * Maps to Celery's task states:
- * @see https://docs.celeryq.dev/en/stable/userguide/tasks.html#built-in-states
+ * Struct for a job's status, as returned by `IClient::getJobStatus`.
  */
-enum JobStatus : string
+readonly class JobStatus
 {
     /**
-     * The job is waiting to be executed, or is unknown because it doesn't
-     * exist.
+     * Constructor
      *
-     * @see https://docs.celeryq.dev/en/stable/userguide/tasks.html#pending
+     * @param string      $jobId
+     * @param State       $state
+     * @param string|null $result
+     * @param string|null $error
      */
-    case PENDING = 'PENDING';
-
-    /**
-     * The job has been started.
-     *
-     * Note this is not tracked by default, but is within the tools daemon.
-     *
-     * @see https://docs.celeryq.dev/en/stable/userguide/tasks.html#started
-     */
-    case STARTED = 'STARTED';
-
-    /**
-     * The job has completed successfully.
-     *
-     * @see https://docs.celeryq.dev/en/stable/userguide/tasks.html#success
-     */
-    case SUCCESS = 'SUCCESS';
-
-    /**
-     * The job has failed to complete successfully.
-     *
-     * @see https://docs.celeryq.dev/en/stable/userguide/tasks.html#failure
-     */
-    case FAILURE = 'FAILURE';
-
-    /**
-     * The job is currently being retried.
-     *
-     * @see https://docs.celeryq.dev/en/stable/userguide/tasks.html#retry
-     */
-    case RETRY = 'RETRY';
-
-    /**
-     * The job was requested, but has been revoked.
-     *
-     * Currently not possible within the tools daemon?
-     *
-     * @see https://docs.celeryq.dev/en/stable/userguide/tasks.html#revoked
-     */
-    case REVOKED = 'REVOKED';
+    public function __construct(
+        public string $jobId,
+        public State $state,
+        public ?string $result = null,
+        public ?string $error = null,
+    ) {
+    }
 }
