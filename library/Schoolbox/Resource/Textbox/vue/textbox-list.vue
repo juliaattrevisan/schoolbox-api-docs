@@ -521,7 +521,12 @@ export default {
                                     </div>
                                 </div>
                                 <nav>
-                                    <a href="#" @click.prevent="attemptToDeleteTextbox(index)" title="Delete"
+                                    <a
+                                        href="#"
+                                        @click.prevent="attemptToDeleteTextbox(index)"
+                                        class="sbx-icon-only-button"
+                                        title="Delete"
+                                        aria-label="Delete"
                                         ><sbx-icon name="delete"></sbx-icon
                                     ></a>
                                 </nav>

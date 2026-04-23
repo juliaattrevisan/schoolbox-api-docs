@@ -13,7 +13,7 @@ import { updateRemovedComponent } from "./removeComponents";
 
 const ANIMATE_CLOSED_POSITION = 0;
 const ANIMATE_OPEN_POSITION = 90;
-const ANIMATE_ORIGIN = "20px 20px";
+const ANIMATE_ORIGIN = "center center";
 const ANIMATE_SPEED = 0.3;
 
 const BUTTON_SELECTOR = '[data-target="settings"]';

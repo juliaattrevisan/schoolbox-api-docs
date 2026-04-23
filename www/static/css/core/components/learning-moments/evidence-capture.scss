@@ -2,18 +2,25 @@
     a {
         display: flex;
         align-items: center;
+        gap: 0.875rem;
         height: rem-calc(58);
         padding: 0 0.875rem;
         margin-bottom: 1rem;
         color: $anchor-font-color;
 
         &:before {
-            font-size: 2rem;
-            padding-right: 0.875rem;
+            font-size: 1.5rem;
+            padding-right: 0;
         }
         sbx-icon {
-            font-size: 2rem;
-            padding-right: 0.875rem;
+            align-items: center;
+            display: inline-flex;
+            flex: 0 0 1.5rem;
+            font-size: 1.5rem;
+            height: 1.5rem;
+            justify-content: center;
+            padding-right: 0;
+            width: 1.5rem;
         }
         &:hover {
             color: $white;
@@ -28,7 +35,7 @@
     .share-photo {
         border: 1px solid $icon-color-image;
         background-color: rgba($icon-color-image, 0.03);
-        &:before {
+        sbx-icon {
             color: $icon-color-image;
         }
         &:hover {
@@ -38,7 +45,7 @@
     .share-video {
         border: 1px solid $icon-color-video-player;
         background-color: rgba($icon-color-video-player, 0.03);
-        &:before {
+        sbx-icon {
             color: $icon-color-video-player;
         }
         &:hover {
@@ -48,9 +55,6 @@
     .share-audio {
         border: 1px solid $icon-color-audio;
         background-color: rgba($icon-color-audio, 0.03);
-        &:before {
-            color: $icon-color-audio;
-        }
         sbx-icon {
             color: $icon-color-audio;
         }
@@ -61,7 +65,7 @@
     .share-file {
         border: 1px solid $icon-color-files;
         background-color: rgba($icon-color-files, 0.03);
-        &:before {
+        sbx-icon {
             color: $icon-color-files;
         }
         &:hover {
@@ -71,7 +75,7 @@
     .share-text {
         border: 1px solid $emotion;
         background-color: rgba($emotion, 0.03);
-        &:before {
+        sbx-icon {
             color: $emotion;
         }
         &:hover {

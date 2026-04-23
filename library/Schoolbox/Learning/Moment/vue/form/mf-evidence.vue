@@ -327,7 +327,7 @@ window.Vue.watch(
             :disabled="(MediaType.PHOTO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.PHOTO)"
         >
-            <sbx-icon name="camera"></sbx-icon>
+            <sbx-icon name="camera" size="1.5rem"></sbx-icon>
             Take a photo
         </a>
         <a
@@ -337,7 +337,7 @@ window.Vue.watch(
             :disabled="(MediaType.VIDEO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.VIDEO)"
         >
-            <sbx-icon name="video"></sbx-icon>Record a video
+            <sbx-icon name="video" size="1.5rem"></sbx-icon>Record a video
         </a>
         <a
             class="share-audio sbx-button--has-icon"
@@ -346,7 +346,7 @@ window.Vue.watch(
             :disabled="(MediaType.AUDIO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.AUDIO)"
         >
-            <sbx-icon name="audio"></sbx-icon>
+            <sbx-icon name="audio" size="1.5rem"></sbx-icon>
             Record audio
         </a>
         <a
@@ -356,7 +356,7 @@ window.Vue.watch(
             :disabled="MediaType.UPLOAD === mediaType || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.UPLOAD)"
         >
-            <sbx-icon name="upload"></sbx-icon>Upload file
+            <sbx-icon name="upload" size="1.5rem"></sbx-icon>Upload file
         </a>
         <a
             v-if="!(showDescriptionEditor || MediaType.TEXT === mediaType)"
@@ -365,7 +365,7 @@ window.Vue.watch(
             title="Write something"
             @click.prevent="changeMediaType(MediaType.TEXT, true)"
         >
-            <sbx-icon name="textbox"></sbx-icon>Write something
+            <sbx-icon name="textbox" size="1.5rem"></sbx-icon>Write something
         </a>
     </div>
 

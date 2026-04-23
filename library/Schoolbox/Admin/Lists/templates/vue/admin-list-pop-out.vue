@@ -224,7 +224,8 @@ export default {
                 return;
             }
             const container = this.$refs.innerContainer;
-            if (container && !container.contains(event.target) && !event.target.classList.contains("update-button")) {
+            const clickedUpdateButton = event.target.closest?.(".update-button");
+            if (container && !container.contains(event.target) && !clickedUpdateButton) {
                 // Clicked outside the "outer-container", discard changes and close the pop out
                 this.onDiscardChangesSelected();
             }

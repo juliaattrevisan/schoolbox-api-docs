@@ -1,7 +1,7 @@
 {% if hasAssessmentRoutes or hasCourseRoutes or isParticipant %}
     <nav>
         {% if customisedAssessments is not empty and canWrite %}
-        <a class="expand-link icon-down-arrow" data-test="course-outline-expand-activity-{{ assessment.title }}" data-interaction-has-customised></a>
+        <a class="expand-link sbx-icon-only-button" data-test="course-outline-expand-activity-{{ assessment.title }}" data-interaction-has-customised aria-label="Expand customised activities"><sbx-icon name="down-arrow"></sbx-icon></a>
         {% endif %}
         {% if hasAssessmentRoutes or hasCourseRoutes %}
             <sbx-pop-out content-id="component{{ componentInstance.id }}-options-task{{ assessment.id }}"></sbx-pop-out>

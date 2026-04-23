@@ -12,7 +12,7 @@ import UpdateMasonryEvents from "../updateMasonryEvents";
 
 const ANIMATE_CLOSED_POSITION = 0;
 const ANIMATE_OPEN_POSITION = 180;
-const ANIMATE_ORIGIN = "20px 20px";
+const ANIMATE_ORIGIN = "center center";
 const ANIMATE_SPEED = 0.3;
 
 const BUTTON_SELECTOR = '[data-target="delete"]';

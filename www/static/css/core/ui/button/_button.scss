@@ -221,18 +221,16 @@ button.submit {
 
     a {
         color: $anchor-font-color;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
         padding: 0.75rem 1rem;
-        text-align: center;
         flex-basis: 0;
         flex-grow: 1;
         line-height: 1.4;
 
-        &:before {
-            font-size: 2rem;
-            float: none;
-            padding: 0;
-        }
-
+        sbx-icon,
         span {
             display: block;
         }
@@ -243,40 +241,40 @@ button.submit {
     }
 
     .learning {
-        &:before {
+        sbx-icon {
             color: $electric;
         }
         &:hover {
             background-color: $electric;
             color: $white;
 
-            &:before {
+            sbx-icon {
                 color: $white;
             }
         }
     }
     .goals {
-        &:before {
+        sbx-icon {
             color: $cheddar;
         }
         &:hover {
             background-color: $cheddar;
             color: $white;
 
-            &:before {
+            sbx-icon {
                 color: $white;
             }
         }
     }
     .achievement {
-        &:before {
+        sbx-icon {
             color: var(--sbx-color-success, $success-color);
         }
         &:hover {
             background-color: var(--sbx-color-success, $success-color);
             color: $white;
 
-            &:before {
+            sbx-icon {
                 color: $white;
             }
         }
@@ -340,8 +338,9 @@ button.submit {
 
 .sbx-icon-only-button {
     align-items: center;
-    background: none;
+    border-radius: var(--sbx-config-field-roundness, 0);
     display: inline-flex;
+    font-size: 0; // hide any text content, but keep the button dimensions
     justify-content: center;
     min-height: 40px;
     min-width: 40px;
@@ -378,13 +377,14 @@ button.submit {
 }
 
 // a button with only SVG icons that displays inline with text
-.f-dropdown a.sbx-button--has-icon {
+.f-dropdown :is(a, button).sbx-button--has-icon {
     display: flex;
     align-items: flex-start;
     gap: var(--spacing-s);
+    justify-content: left;
 }
 
-.f-dropdown a.sbx-button--has-icon sbx-icon {
+.f-dropdown :is(a, button).sbx-button--has-icon sbx-icon {
     line-height: 1;
 }
 .sbx-button--has-icon {

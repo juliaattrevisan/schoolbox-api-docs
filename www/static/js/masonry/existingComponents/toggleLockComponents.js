@@ -35,7 +35,7 @@ export function initToggleLockComponents() {
  */
 function updateComponentDisplay(component) {
     component.querySelectorAll("a[data-component-settings], [data-component-handle]").forEach((element) => {
-        isToggleUnlocked() ? (element.style.display = "inline-block") : (element.style.display = "none");
+        isToggleUnlocked() ? (element.style.display = "inline-flex") : (element.style.display = "none");
     });
 }
 

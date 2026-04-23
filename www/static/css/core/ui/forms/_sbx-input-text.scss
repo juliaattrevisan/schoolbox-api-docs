@@ -71,15 +71,6 @@ body.sbx-body {
         }
     }
 
-    // Additional styles for button in input group
-    .input-group button.button.icon-search {
-        align-items: center;
-        display: flex;
-        justify-content: center;
-        margin: 0;
-        padding: 0;
-    }
-
     // States
     .c-filter-search-term input[type="text"].c-filter-search-term__field {
         border-radius: var(--sbx-config-field-roundness) 0 0 var(--sbx-config-field-roundness);

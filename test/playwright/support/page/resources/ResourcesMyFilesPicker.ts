@@ -9,6 +9,14 @@ export default class ResourcesMyFilesPicker {
 
     static readonly URL = "/resources/";
 
+    static readonly DATA_TEST_AUDIO_BUTTON = "record-media-modal-audio-button";
+
+    static readonly DATA_TEST_PHOTO_BUTTON = "record-media-modal-photo-button";
+
+    static readonly DATA_TEST_VIDEO_BUTTON = "record-media-modal-video-button";
+
+    static readonly DATA_TEST_SCREEN_BUTTON = "record-media-modal-screen-button";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -84,7 +92,7 @@ export default class ResourcesMyFilesPicker {
      * Clicks the Audio option
      */
     async clickAudio(): Promise<void> {
-        const audioIcon = this.page.locator('sbx-icon[name="mic"]');
+        const audioIcon = this.page.getByTestId(ResourcesMyFilesPicker.DATA_TEST_AUDIO_BUTTON);
         await audioIcon.click();
     }
 
@@ -92,7 +100,7 @@ export default class ResourcesMyFilesPicker {
      * Clicks the Photo option
      */
     async clickPhoto(): Promise<void> {
-        const photoIcon = this.page.locator('sbx-icon[name="camera"]');
+        const photoIcon = this.page.getByTestId(ResourcesMyFilesPicker.DATA_TEST_PHOTO_BUTTON);
         await photoIcon.click();
     }
 
@@ -100,7 +108,7 @@ export default class ResourcesMyFilesPicker {
      * Clicks the Video option
      */
     async clickVideo(): Promise<void> {
-        const videoIcon = this.page.locator('sbx-icon[name="video"]');
+        const videoIcon = this.page.getByTestId(ResourcesMyFilesPicker.DATA_TEST_VIDEO_BUTTON);
         await videoIcon.click();
     }
 
@@ -108,7 +116,7 @@ export default class ResourcesMyFilesPicker {
      * Clicks the Screen Capture option
      */
     async clickScreen(): Promise<void> {
-        const screenIcon = this.page.locator('sbx-icon[name="screen-capture"]');
+        const screenIcon = this.page.getByTestId(ResourcesMyFilesPicker.DATA_TEST_SCREEN_BUTTON);
         await screenIcon.click();
     }
 

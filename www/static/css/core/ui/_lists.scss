@@ -187,7 +187,7 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
         margin: 0;
     }
     nav a:not(.progress-tick):hover {
-        background-color: var(--sbx-color-foreground-primary, $row-action-hover-background);
+        background-color: var(--sbx-config-color-active, var(--content-ui-hover));
     }
     .card {
         flex: 1 100%;

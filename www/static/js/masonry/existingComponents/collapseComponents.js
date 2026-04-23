@@ -9,7 +9,7 @@ import UpdateMasonryEvents from "../updateMasonryEvents";
 
 const ANIMATE_CLOSED_POSITION = 180;
 const ANIMATE_OPEN_POSITION = 0;
-const ANIMATE_ORIGIN = "20px 20px";
+const ANIMATE_ORIGIN = "center center";
 const ANIMATE_SPEED = 0.4;
 
 const PANEL_SELECTOR = '[data-collapsable="true"]';
@@ -58,18 +58,13 @@ export function isOpen(component) {
 }
 
 /**
- * Uncollapse a component, sliding the content within down
+ * Un-collapse a component, sliding the content within down
  *
  * @params { Element }
  */
 export async function open(component) {
     const collapseButton = component.querySelector(BUTTON_SELECTOR);
-    animateRotation(
-        collapseButton,
-        collapseButton.classList.contains("icon-up-arrow") ? ANIMATE_OPEN_POSITION : ANIMATE_CLOSED_POSITION,
-        ANIMATE_ORIGIN,
-        ANIMATE_SPEED,
-    );
+    animateRotation(collapseButton, ANIMATE_OPEN_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute("data-collapse-state", "uncollapsed");
     collapsePanel.dispatchEvent(new CustomEvent("expandStart.collapsable"));
@@ -84,12 +79,7 @@ export async function open(component) {
  */
 export async function close(component) {
     const collapseButton = component.querySelector(BUTTON_SELECTOR);
-    animateRotation(
-        collapseButton,
-        collapseButton.classList.contains("icon-up-arrow") ? ANIMATE_CLOSED_POSITION : ANIMATE_OPEN_POSITION,
-        ANIMATE_ORIGIN,
-        ANIMATE_SPEED,
-    );
+    animateRotation(collapseButton, ANIMATE_CLOSED_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute("data-collapse-state", "collapsed");
     collapsePanel.dispatchEvent(new CustomEvent("collapseStart.collapsable"));

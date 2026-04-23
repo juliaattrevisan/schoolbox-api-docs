@@ -206,16 +206,18 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
     {
         if ($this->getConfig('collapse') == 1) {
             return array(
-                'icon'  => 'icon-down-arrow',
-                'class' => 'hide',
-                'data'  => 'collapsed'
+                'icon'     => 'icon-down-arrow',
+                'sbxIcon'  => 'down-arrow',
+                'class'    => 'hide',
+                'data'     => 'collapsed'
             );
         }
 
         return array(
-            'icon'  => 'icon-up-arrow',
-            'class' => '',
-            'data'  => 'uncollapsed'
+            'icon'     => 'icon-up-arrow',
+            'sbxIcon'  => 'up-arrow',
+            'class'    => '',
+            'data'     => 'uncollapsed'
         );
     }
 
@@ -228,9 +230,10 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
 
         $this->setVar(
             array(
-                'CONFIG_COLLAPSED_ICON'  => $state['icon'],
-                'CONFIG_COLLAPSED_CLASS' => $state['class'],
-                'CONFIG_COLLAPSED_STATE' => $state['data'],
+                'CONFIG_COLLAPSED_ICON'      => $state['icon'],
+                'CONFIG_COLLAPSED_SBX_ICON'  => $state['sbxIcon'],
+                'CONFIG_COLLAPSED_CLASS'     => $state['class'],
+                'CONFIG_COLLAPSED_STATE'     => $state['data'],
             )
         );
     }

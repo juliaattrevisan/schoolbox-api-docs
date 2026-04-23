@@ -73,8 +73,9 @@ function onGenerateSelected(): void {
             <a
                 v-if="props.profile._routes?.customisations"
                 :href="props.profile._routes.customisations"
-                class="button icon-group f-no-margins"
+                class="button f-no-margins sbx-button--has-icon"
             >
+                <sbx-icon name="group"></sbx-icon>
                 View Customisations
             </a>
             <button

@@ -42,10 +42,10 @@ function onDeleteUnit(): void {
             <ul :id="`dropdown-unit-${props.unit.id}-modify`" class="f-dropdown" data-dropdown-content>
                 <li v-if="props.unit._routes.courseMarkbook">
                     <a
-                        class="icon-curriculum"
+                        class="sbx-button--has-icon"
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-course-link`"
                         :href="getReturnUrl(props.unit._routes.courseMarkbook!)"
-                        >Course Markbook
+                        ><sbx-icon name="curriculum"></sbx-icon>Course Markbook
                     </a>
                 </li>
                 <li v-if="props.unit._routes.importIntoClasses">

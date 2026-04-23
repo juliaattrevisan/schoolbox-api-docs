@@ -11,17 +11,24 @@
 
         li {
             a {
+                align-items: center;
+                display: inline-flex;
+                gap: 0.5rem;
+
+                sbx-icon {
+                    flex: 0 0 auto;
+                }
+
                 @media #{$medium-down} {
                     padding: 0.5rem !important;
                     max-width: rem-calc(124);
                     text-align: center;
+                    align-items: center;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.25rem;
                     // Accommodate the Microsoft Teams Meetings tab
                     word-wrap: break-word;
-
-                    &::before {
-                        display: block;
-                        padding-right: 0;
-                    }
                 }
             }
 

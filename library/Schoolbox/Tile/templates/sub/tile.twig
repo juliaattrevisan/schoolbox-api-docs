@@ -26,6 +26,10 @@
 }
 {% endif %}
 
+.tile#{{ componentId }}-tile-{{ tile.id|e('css') }} .edit a.sbx-icon-only-button {
+    border: none;
+}
+
 .tile#{{ componentId }}-tile-{{ tile.id|e('css') }} .title {
     color: rgba(
         {{ tile.titleColor.red|e('css') }},
@@ -73,9 +77,10 @@ $(function () {
         {# Hidden form input for this tile - used in sorting #}
         <input type="hidden" name="tile[]" value="{{ tile.id|e('html_attr') }}" />
           <a href="{{ routeLookup('tile.delete:post', {id: tile.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}"
-              class="button right sbx-button--has-icon"
+              class="button right sbx-icon-only-button"
               data-role="delete"
-              title="Delete"><sbx-icon name="delete"></sbx-icon>Delete</a>
+              title="Delete"
+              aria-label="Delete"><sbx-icon name="delete"></sbx-icon></a>
         <a href="{{ routeLookup('tile.edit', {id: tile.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}"
               class="button right sbx-icon-only-button"
               title="Modify"><sbx-icon name="modify"></sbx-icon></a>

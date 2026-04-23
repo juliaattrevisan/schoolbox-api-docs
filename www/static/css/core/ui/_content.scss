@@ -678,7 +678,7 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
 $train-line-segment-maxlength: 15rem;
 $train-line-stop-size: 2rem;
 $train-line-segment-width: 0.25rem;
-$train-line-visited-color: var(--sbx-config-color-accent, $content-ui-foreground);
+$train-line-visited-color: var(--sbx-config-color-active, $content-ui-foreground);
 $train-line-visited-glow-blur: 0.5rem;
 $train-line-unvisited-color: $content-ui-background;
 .train-line {
@@ -705,7 +705,7 @@ $train-line-unvisited-color: $content-ui-background;
             width: 50%;
             position: absolute;
             top: 0;
-            background: var(--sbx-config-color-accent, $content-ui-foreground);
+            background: var(--sbx-config-color-active, $content-ui-foreground);
         }
         &:before {
             left: 0;
@@ -719,20 +719,20 @@ $train-line-unvisited-color: $content-ui-background;
         }
         &.current-stop {
             &:after {
-                background: var(--sbx-config-color-active, $content-ui-background);
+                background: var(--sbx-color-foreground-primary, $content-ui-background);
             }
             ~ li {
                 &:before,
                 &:after {
-                    background: var(--sbx-config-color-active, $content-ui-background);
+                    background: var(--sbx-color-foreground-primary, $content-ui-background);
                 }
-                a span {
-                    background: var(--sbx-config-color-active, $content-ui-background);
+                a :is(span, sbx-icon) {
+                    background: var(--sbx-color-foreground-primary, $content-ui-background);
                 }
             }
-            a span {
-                box-shadow: 0 0 $train-line-visited-glow-blur var(--sbx-config-color-accent, $content-ui-foreground);
-                color: var(--sbx-config-color-accent-text, $content-ui-foreground-contrast);
+            a :is(span, sbx-icon) {
+                box-shadow: 0 0 $train-line-visited-glow-blur var(--sbx-config-color-active, $content-ui-foreground);
+                color: var(--sbx-color-text-primary, $content-ui-foreground-contrast);
             }
         }
         a {
@@ -741,8 +741,8 @@ $train-line-unvisited-color: $content-ui-background;
             // Smaller stops that have no icons (Nub)
             // The 0.4 multiplier and offset is empirical - I don't know what the math is
             // to derive it from the stop size or segment width
-            span {
-                background: var(--sbx-config-color-accent, $content-ui-foreground);
+            :is(span, sbx-icon) {
+                background: var(--sbx-config-color-active, $content-ui-foreground);
                 border-radius: calc($train-line-stop-size / 2);
                 // DONE use contrasting color
                 color: var(--sbx-color-text-primary, $content-ui-foreground-contrast);
@@ -763,6 +763,13 @@ $train-line-unvisited-color: $content-ui-background;
                     top: -1 * (calc(($train-line-stop-size - $train-line-segment-width) / 2));
                     width: $train-line-stop-size;
                 }
+            }
+
+            sbx-icon {
+                height: $train-line-stop-size;
+                left: calc(50% - (#{calc($train-line-stop-size / 2)}));
+                top: -1 * (calc(($train-line-stop-size - $train-line-segment-width) / 2));
+                width: $train-line-stop-size;
             }
         }
     }
