@@ -20,8 +20,16 @@ class MyFilesStrategyTest extends TestCase
      *
      * @param array<int, list<int>> $folderChildren
      * @param array<int, list<int>> $fileChildren
+     * @return array{
+     *     strategy: MyFiles,
+     *     state: object{
+     *         deletedFiles: list<int>,
+     *         deletedFolders: list<int>,
+     *         deletedEportfolioFileIds: list<int>
+     *     }
+     * }
      */
-    private function strategy(array $folderChildren, array $fileChildren): MyFiles
+    private function strategy(array $folderChildren, array $fileChildren): array
     {
         $logger = $this->createMock(LoggerInterface::class);
         $database = $this->createMock(IConnector::class);
@@ -32,7 +40,18 @@ class MyFilesStrategyTest extends TestCase
         $logger->method('notice');
         $logger->method('info');
 
-        return new class (
+        $state = new class {
+            /** @var list<int> */
+            public array $deletedFiles = [];
+
+            /** @var list<int> */
+            public array $deletedFolders = [];
+
+            /** @var list<int> */
+            public array $deletedEportfolioFileIds = [];
+        };
+
+        $strategy = new class (
             $logger,
             true,
             $database,
@@ -42,6 +61,7 @@ class MyFilesStrategyTest extends TestCase
             new RetentionPeriod(30),
             $folderChildren,
             $fileChildren,
+            $state,
         ) extends MyFiles {
             /** @var array<int, list<int>> */
             private array $folderChildren;
@@ -49,15 +69,12 @@ class MyFilesStrategyTest extends TestCase
             /** @var array<int, list<int>> */
             private array $fileChildren;
 
-            /** @var list<int> */
-            public array $deletedFiles = [];
+            private object $state;
 
-            /** @var list<int> */
-            public array $deletedFolders = [];
-
-            /** @var list<int> */
-            public array $deletedEportfolioFileIds = [];
-
+            /**
+             * @param array<int, list<int>> $folderChildren
+             * @param array<int, list<int>> $fileChildren
+             */
             public function __construct(
                 LoggerInterface $logger,
                 bool $perform,
@@ -68,15 +85,12 @@ class MyFilesStrategyTest extends TestCase
                 RetentionPeriod $retentionPeriod,
                 array $folderChildren,
                 array $fileChildren,
+                object $state,
             ) {
                 parent::__construct($logger, $perform, $database, $lock, $config, $stoppingTime, $retentionPeriod);
                 $this->folderChildren = $folderChildren;
                 $this->fileChildren = $fileChildren;
-            }
-
-            public function delete(array $chunk): void
-            {
-                $this->deleteChunk($chunk);
+                $this->state = $state;
             }
 
             protected function findChildFolderIds(array $parentIds): array
@@ -105,25 +119,49 @@ class MyFilesStrategyTest extends TestCase
 
             protected function deleteFiles(array $fileIds): int
             {
-                $this->deletedFiles = $fileIds;
+                $this->state->deletedFiles = $fileIds;
 
                 return count($fileIds);
             }
 
             protected function deleteFolders(array $folderIds): int
             {
-                $this->deletedFolders = $folderIds;
+                $this->state->deletedFolders = $folderIds;
 
                 return count($folderIds);
             }
 
             protected function deleteEportfolioFileJoin(array $fileIds): int
             {
-                $this->deletedEportfolioFileIds = $fileIds;
+                $this->state->deletedEportfolioFileIds = $fileIds;
 
                 return count($fileIds);
             }
         };
+
+        return [
+            'strategy' => $strategy,
+            'state' => $state,
+        ];
+    }
+
+    /**
+     * Keeps `deleteChunk()` covered through the public test surface without
+     * changing the production strategy API.
+     *
+     * @param array<int, array{id: int, table: string}> $chunk
+     */
+    private function delete(MyFiles $strategy, array $chunk): void
+    {
+        $delete = \Closure::bind(
+            function (array $chunk): void {
+                $this->deleteChunk($chunk);
+            },
+            $strategy,
+            MyFiles::class,
+        );
+
+        $delete($chunk);
     }
 
     /**
@@ -132,7 +170,7 @@ class MyFilesStrategyTest extends TestCase
      */
     public function testDeletesDescendants(): void
     {
-        $strategy = $this->strategy(
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
             [
                 10 => [11, 12],
                 11 => [13],
@@ -147,13 +185,13 @@ class MyFilesStrategyTest extends TestCase
             ],
         );
 
-        $strategy->delete([
+        $this->delete($strategy, [
             ['id' => 10, 'table' => 'my_folder'],
         ]);
 
-        $this->assertSame([101, 102, 103, 104, 105], $strategy->deletedFiles);
-        $this->assertSame([101, 102, 103, 104, 105], $strategy->deletedEportfolioFileIds);
-        $this->assertSame([13, 11, 12, 10], $strategy->deletedFolders);
+        $this->assertSame([101, 102, 103, 104, 105], $state->deletedFiles);
+        $this->assertSame([101, 102, 103, 104, 105], $state->deletedEportfolioFileIds);
+        $this->assertSame([13, 11, 12, 10], $state->deletedFolders);
     }
 
     /**
@@ -162,7 +200,7 @@ class MyFilesStrategyTest extends TestCase
      */
     public function testMergesDirectFiles(): void
     {
-        $strategy = $this->strategy(
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
             [
                 20 => [21],
                 21 => [],
@@ -173,14 +211,14 @@ class MyFilesStrategyTest extends TestCase
             ],
         );
 
-        $strategy->delete([
+        $this->delete($strategy, [
             ['id' => 20, 'table' => 'my_folder'],
             ['id' => 202, 'table' => 'my_file'],
             ['id' => 203, 'table' => 'my_file'],
         ]);
 
-        $this->assertSame([201, 202, 203], $strategy->deletedFiles);
-        $this->assertSame([21, 20], $strategy->deletedFolders);
+        $this->assertSame([201, 202, 203], $state->deletedFiles);
+        $this->assertSame([21, 20], $state->deletedFolders);
     }
 
     /**
@@ -189,7 +227,7 @@ class MyFilesStrategyTest extends TestCase
      */
     public function testDeduplicatesNestedFolders(): void
     {
-        $strategy = $this->strategy(
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
             [
                 30 => [31],
                 31 => [32],
@@ -202,13 +240,13 @@ class MyFilesStrategyTest extends TestCase
             ],
         );
 
-        $strategy->delete([
+        $this->delete($strategy, [
             ['id' => 30, 'table' => 'my_folder'],
             ['id' => 31, 'table' => 'my_folder'],
         ]);
 
-        $this->assertSame([301, 302, 303], $strategy->deletedFiles);
-        $this->assertSame([32, 31, 30], $strategy->deletedFolders);
+        $this->assertSame([301, 302, 303], $state->deletedFiles);
+        $this->assertSame([32, 31, 30], $state->deletedFolders);
     }
 
     /**
@@ -217,7 +255,7 @@ class MyFilesStrategyTest extends TestCase
      */
     public function testDeletesSiblingBranchesLeafFirst(): void
     {
-        $strategy = $this->strategy(
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
             [
                 1 => [2, 3],
                 2 => [],
@@ -230,11 +268,11 @@ class MyFilesStrategyTest extends TestCase
             ],
         );
 
-        $strategy->delete([
+        $this->delete($strategy, [
             ['id' => 1, 'table' => 'my_folder'],
         ]);
 
-        $this->assertSame([11, 12, 13], $strategy->deletedFiles);
-        $this->assertSame([2, 3, 1], $strategy->deletedFolders);
+        $this->assertSame([11, 12, 13], $state->deletedFiles);
+        $this->assertSame([2, 3, 1], $state->deletedFolders);
     }
 }
