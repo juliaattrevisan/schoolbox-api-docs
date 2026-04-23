@@ -35,7 +35,9 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
 use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\LTI\Provider\Model as ToolModel;
+use Schoolbox\LTI\Util\LogHelper;
 use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
+use Throwable;
 
 /**
  * Controller for LTI platform stuff.
@@ -73,6 +75,7 @@ class Controller extends Base
      */
     public function getOidcAuthenticationRequest(): void
     {
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
         // Do something with the OIDC request when I receive it
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#3-platform-side-oidc-authentication
         try {
@@ -81,22 +84,17 @@ class Controller extends Base
                 $this->userAuthenticator,
                 $this->toolMapper,
             )->build($this->request);
-        } catch (LtiExceptionInterface $e) {
-            $this->logger->error(
-                __METHOD__ . ': error',
-                [
-                    'message' => $e->getMessage(),
-                ],
+
+            $this->setAllowBackToTheFuture(false);
+
+            $this->response = $this->responseFromTemplateUnthemed(
+                '@ltiPlatform/messageForm.twig',
+                ['message' => $message,]
             );
+        } catch (Throwable $e) {
+            LogHelper::logControllerError($this->logger, __METHOD__, $this->request, $e);
             throw $e;
         }
-
-        $this->setAllowBackToTheFuture(false);
-
-        $this->response = $this->responseFromTemplateUnthemed(
-            '@ltiPlatform/messageForm.twig',
-            ['message' => $message,]
-        );
     }
 
     /**
@@ -122,37 +120,33 @@ class Controller extends Base
      */
     public function getOauthAccessTokenRequest(): void
     {
-        $clientRepository = new ClientRepository($this->registrations, null, $this->logger);
-        $factory          = new AuthorizationServerFactory(
-            $clientRepository,
-            new AccessTokenRepository($this->accessTokenCache, $this->logger),
-            new ScopeRepository([
-                new Scope(ScoreServiceInterface::AUTHORIZATION_SCOPE_SCORE),
-                new Scope(LineItemServiceInterface::AUTHORIZATION_SCOPE_LINE_ITEM),
-                new Scope(LineItemServiceInterface::AUTHORIZATION_SCOPE_LINE_ITEM_READ_ONLY),
-                new Scope(MembershipServiceInterface::AUTHORIZATION_SCOPE_MEMBERSHIP),
-            ]),
-            // Currently, the auth token gets verified in:
-            // `\Schoolbox\Learning\Assessment\Lti\Controller::postScorePublish`
-            // OAT-SA docs make no mention of how to actually verify the token.
-            $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
-        );
-
-        // Build the access token response
-        $generator = new AccessTokenResponseGenerator($this->keyChains, $factory);
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
         try {
+            $clientRepository = new ClientRepository($this->registrations, null, $this->logger);
+            $factory          = new AuthorizationServerFactory(
+                $clientRepository,
+                new AccessTokenRepository($this->accessTokenCache, $this->logger),
+                new ScopeRepository([
+                    new Scope(ScoreServiceInterface::AUTHORIZATION_SCOPE_SCORE),
+                    new Scope(LineItemServiceInterface::AUTHORIZATION_SCOPE_LINE_ITEM),
+                    new Scope(LineItemServiceInterface::AUTHORIZATION_SCOPE_LINE_ITEM_READ_ONLY),
+                    new Scope(MembershipServiceInterface::AUTHORIZATION_SCOPE_MEMBERSHIP),
+                ]),
+                // Currently, the auth token gets verified in:
+                // `\Schoolbox\Learning\Assessment\Lti\Controller::postScorePublish`
+                // OAT-SA docs make no mention of how to actually verify the token.
+                $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
+            );
+
+            // Build the access token response
+            $generator = new AccessTokenResponseGenerator($this->keyChains, $factory);
             $this->response = $generator->generate(
                 $this->request,
                 new HttpFactory()->createResponse(),
                 KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER,
             );
-        } catch (OAuthServerException $e) {
-            $this->logger->error(
-                __METHOD__ . ': error',
-                [
-                    'message' => $e->getMessage(),
-                ],
-            );
+        } catch (Throwable $e) {
+            LogHelper::logControllerError($this->logger, __METHOD__, $this->request, $e);
             throw $e;
         }
     }
@@ -178,8 +172,14 @@ class Controller extends Base
      */
     public function getJsonWebKeySet(): void
     {
-        $jwksExporter   = new JwksExporter($this->keyChains);
-        $this->response = $this->responseAsJson($jwksExporter->export(KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_KEY_SET_NAME));
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
+        try {
+            $jwksExporter   = new JwksExporter($this->keyChains);
+            $this->response = $this->responseAsJson($jwksExporter->export(KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_KEY_SET_NAME));
+        } catch (Throwable $e) {
+            LogHelper::logControllerError($this->logger, __METHOD__, $this->request, $e);
+            throw $e;
+        }
     }
 
     /**
@@ -196,45 +196,35 @@ class Controller extends Base
      */
     public function getReceiveDeepLinkingResponse(ToolModel $tool): void
     {
-        // Validate launch
-        // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
-        $result = new ToolOriginatingLaunchFactory($this->registrations)->build($this->request);
-        if ($result->hasError()) {
-            $this->logger->error(
-                __METHOD__ . ': result error',
-                [
-                    'message' => $result->getError(),
-                ],
-            );
-            throw new LtiException($result->getError());
-        }
-
-        // Each content item should be a link, which may be launched as a
-        // resource link launch request.
-        $contentItems = $result->getPayload()->getDeepLinkingContentItems();
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
         try {
+            // Validate launch
+            // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
+            $result = new ToolOriginatingLaunchFactory($this->registrations)->build($this->request);
+            if ($result->hasError()) {
+                throw new LtiException($result->getError());
+            }
+
+            // Each content item should be a link, which may be launched as a
+            // resource link launch request.
+            $contentItems = $result->getPayload()->getDeepLinkingContentItems();
             $resourceLinks = new ResourceCollectionFactory()->createFromClaim($contentItems)->normalize();
-        } catch (LtiExceptionInterface $e) {
-            $this->logger->error(
-                __METHOD__ . ': result error',
+
+            // The end recipient of the resource link will need to know about the
+            // tool which created the link, so it can launch the link later.
+            $this->response = $this->responseFromTemplateUnthemed(
+                '@ltiPlatform/receiveDeepLinkingResponse.twig',
                 [
-                    'message' => $result->getError(),
+                    'context'       => $this->requestQuery->get('context'),
+                    'messageType'   => LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
+                    'tool'          => $tool,
+                    'resourceLinks' => $resourceLinks,
                 ],
             );
+        } catch (Throwable $e) {
+            LogHelper::logControllerError($this->logger, __METHOD__, $this->request, $e);
             throw $e;
         }
-
-        // The end recipient of the resource link will need to know about the
-        // tool which created the link, so it can launch the link later.
-        $this->response = $this->responseFromTemplateUnthemed(
-            '@ltiPlatform/receiveDeepLinkingResponse.twig',
-            [
-                'context'       => $this->requestQuery->get('context'),
-                'messageType'   => LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
-                'tool'          => $tool,
-                'resourceLinks' => $resourceLinks,
-            ],
-        );
     }
 
     /**

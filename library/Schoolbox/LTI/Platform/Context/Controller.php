@@ -44,12 +44,14 @@ use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\ResourceLink\LaunchFactory;
 use Schoolbox\LTI\Role\ClaimFactory as RoleClaimFactory;
 use Schoolbox\LTI\User\Codec as UserCodec;
+use Schoolbox\LTI\Util\LogHelper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
+use Throwable;
 
 /**
  * LTI platform controller for context requests.
@@ -106,64 +108,70 @@ class Controller extends BaseController
         Component_ControllerAbstract $component,
         ToolModel $tool
     ): void {
-        // Build a resource link
-        $resourceLink = new LtiResourceLink(
-            'component-' . $component->getInstance()->getId(),
-            [
-                'url'   => $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL),
-                'title' => $component->getConfig(LtiComponent::COMPONENT_CONFIG_TITLE),
-            ]
-        );
-
-        // Handle custom claims
-        $componentCustomClaims = [];
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
         try {
-            $componentCustomClaims = json_decode(
-                $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS),
-                true,
-                512,
-                JSON_THROW_ON_ERROR
+            // Build a resource link
+            $resourceLink = new LtiResourceLink(
+                'component-' . $component->getInstance()->getId(),
+                [
+                    'url'   => $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL),
+                    'title' => $component->getConfig(LtiComponent::COMPONENT_CONFIG_TITLE),
+                ]
             );
-        } catch (JsonException $e) {
-            // noop
-        }
-        if (!is_array($componentCustomClaims)) {
+
+            // Handle custom claims
             $componentCustomClaims = [];
+            try {
+                $componentCustomClaims = json_decode(
+                    $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS),
+                    true,
+                    512,
+                    JSON_THROW_ON_ERROR
+                );
+            } catch (JsonException) {
+                // noop: maybe there's no custom claims
+            }
+            if (!is_array($componentCustomClaims)) {
+                $componentCustomClaims = [];
+            }
+
+            /* If the custom claims are empty, set it to null so not to send to the LTI tool
+             * this claim is optional (well should be) so we can safely remove it
+             */
+            if (empty($componentCustomClaims)) {
+                $componentCustomClaims = null;
+            }
+
+            // Build the launch request for the resource link
+            $repository       = $this->registrations->find($tool->getDeploymentId());
+            $messageBuilder   = new LtiResourceLinkLaunchRequestBuilder();
+            $additionalClaims = $this->buildAdditionalClaims(
+                $folder,
+                $componentCustomClaims,
+                $this->getUser(),
+                null,
+            );
+            $additionalClaims[] = $this->buildLaunchPresentationClaim($tool, $component);
+            $message            = $messageBuilder->buildLtiResourceLinkLaunchRequest(
+                $resourceLink,
+                $repository,
+                $this->userCodec->encode($this->getUser()),
+                null,
+                $this->buildRoles($folder),
+                $additionalClaims,
+            );
+
+            $this->setAllowBackToTheFuture(false);
+
+            // Send the request
+            $this->response = $this->responseFromTemplateUnthemed(
+                '@ltiPlatform/messageForm.twig',
+                ['message' => $message],
+            );
+        } catch (Throwable $e) {
+            LogHelper::logControllerError($this->logger, __METHOD__, $this->request, $e);
+            throw $e;
         }
-
-        /* If the custom claims are empty, set it to null so not to send to the LTI tool
-         * this claim is optional (well should be) so we can safely remove it
-         */
-        if (empty($componentCustomClaims)) {
-            $componentCustomClaims = null;
-        }
-
-        // Build the launch request for the resource link
-        $repository       = $this->registrations->find($tool->getDeploymentId());
-        $messageBuilder   = new LtiResourceLinkLaunchRequestBuilder();
-        $additionalClaims = $this->buildAdditionalClaims(
-            $folder,
-            $componentCustomClaims,
-            $this->getUser(),
-            null,
-        );
-        $additionalClaims[] = $this->buildLaunchPresentationClaim($tool, $component);
-        $message            = $messageBuilder->buildLtiResourceLinkLaunchRequest(
-            $resourceLink,
-            $repository,
-            $this->userCodec->encode($this->getUser()),
-            null,
-            $this->buildRoles($folder),
-            $additionalClaims,
-        );
-
-        $this->setAllowBackToTheFuture(false);
-
-        // Send the request
-        $this->response = $this->responseFromTemplateUnthemed(
-            '@ltiPlatform/messageForm.twig',
-            ['message' => $message],
-        );
     }
 
     /**
@@ -177,51 +185,57 @@ class Controller extends BaseController
      */
     public function getGenerateDeepLinkingRequestForFolder(Folder $folder, ToolModel $tool): void
     {
-        // Find the tool in the list of registrations
-        $repository = $this->registrations->find($tool->getDeploymentId());
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
+        try {
+            // Find the tool in the list of registrations
+            $repository = $this->registrations->find($tool->getDeploymentId());
 
-        // Return URL:
-        // this is somewhere else
-        $baseUrl   = new Factory($this->getConfigLoader())->buildFullyQualified()->withScheme('https');
-        $returnUrl = (clone $baseUrl)
-            ->withPath(
-                $this->routeGenerator->generate('ltiPlatform.getReceiveDeepLinkingResponse', ['toolId' => $tool->getId()])
-            )
-            // If a context was passed in the query string:
-            // add it to the return URL
-            ->appendQueryParameters(['context' => $this->requestQuery->get('context')]);
+            // Return URL:
+            // this is somewhere else
+            $baseUrl   = new Factory($this->getConfigLoader())->buildFullyQualified()->withScheme('https');
+            $returnUrl = (clone $baseUrl)
+                ->withPath(
+                    $this->routeGenerator->generate('ltiPlatform.getReceiveDeepLinkingResponse', ['toolId' => $tool->getId()])
+                )
+                // If a context was passed in the query string:
+                // add it to the return URL
+                ->appendQueryParameters(['context' => $this->requestQuery->get('context')]);
 
-        // Standard deep linking settings
-        $deepLinkingSettings = new DeepLinkingSettings(
-            (string)$returnUrl,
-            [LtiResourceLinkInterface::TYPE,],
-            [$tool->getTarget(),],
-            null,
-            false,
-            false,
-        );
+            // Standard deep linking settings
+            $deepLinkingSettings = new DeepLinkingSettings(
+                (string)$returnUrl,
+                [LtiResourceLinkInterface::TYPE,],
+                [$tool->getTarget(),],
+                null,
+                false,
+                false,
+            );
 
-        $builder = new DeepLinkingLaunchRequestBuilder(
-            new MessagePayloadBuilder(null, new JwtBuilder(new ConfigurationFactory()))
-        );
+            $builder = new DeepLinkingLaunchRequestBuilder(
+                new MessagePayloadBuilder(null, new JwtBuilder(new ConfigurationFactory()))
+            );
 
-        $message = $builder->buildDeepLinkingLaunchRequest(
-            $deepLinkingSettings,
-            $repository,
-            $this->userCodec->encode($this->getUser()),
-            null,
-            null,
-            $this->buildRoles($folder),
-            $this->buildAdditionalClaims($folder, null, null, $this->requestQuery->get('lineItemGuid')),
-        );
+            $message = $builder->buildDeepLinkingLaunchRequest(
+                $deepLinkingSettings,
+                $repository,
+                $this->userCodec->encode($this->getUser()),
+                null,
+                null,
+                $this->buildRoles($folder),
+                $this->buildAdditionalClaims($folder, null, null, $this->requestQuery->get('lineItemGuid')),
+            );
 
-        $this->setAllowBackToTheFuture(false);
+            $this->setAllowBackToTheFuture(false);
 
-        // Build a DL request to this tool
-        $this->response = $this->responseFromTemplateUnthemed(
-            '@ltiPlatform/messageForm.twig',
-            ['message' => $message],
-        );
+            // Build a DL request to this tool
+            $this->response = $this->responseFromTemplateUnthemed(
+                '@ltiPlatform/messageForm.twig',
+                ['message' => $message],
+            );
+        } catch (Throwable $e) {
+            LogHelper::logControllerError($this->logger, __METHOD__, $this->request, $e);
+            throw $e;
+        }
     }
 
     /**
@@ -238,40 +252,46 @@ class Controller extends BaseController
      */
     public function getMembershipsForFolder(Folder $folder): void
     {
-        // Build and validate membership request
-        // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-nrps/doc/platform/
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
+        try {
+            // Build and validate membership request
+            // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-nrps/doc/platform/
 
-        // Access token sanity checker:
-        // validates the request token was created by a tool
-        $validator = new RequestAccessTokenValidator($this->registrations, $this->logger);
+            // Access token sanity checker:
+            // validates the request token was created by a tool
+            $validator = new RequestAccessTokenValidator($this->registrations, $this->logger);
 
-        // Access token validity checker:
-        // validate the access token hasn't expired
-        $resourceServerValidator = new ResourceServer(
-            new AccessTokenRepository($this->accessTokenCache, $this->logger),
-            $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
-        );
-        $request = $resourceServerValidator->validateAuthenticatedRequest($this->request);
+            // Access token validity checker:
+            // validate the access token hasn't expired
+            $resourceServerValidator = new ResourceServer(
+                new AccessTokenRepository($this->accessTokenCache, $this->logger),
+                $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
+            );
+            $request = $resourceServerValidator->validateAuthenticatedRequest($this->request);
 
-        // Handle the request
-        $builder = new Builder(
-            $folder,
-            $this->userAccessMapper,
-            $this->assessmentDataSource,
-            $this->getConfigLoader(),
-            $this->userCodec,
-            new LaunchFactory(
-                $this->registrations,
-                $this->access,
-                $this->routeGenerator,
-                $this->instance,
+            // Handle the request
+            $builder = new Builder(
+                $folder,
+                $this->userAccessMapper,
+                $this->assessmentDataSource,
                 $this->getConfigLoader(),
                 $this->userCodec,
-            ),
-        );
-        $handler            = new MembershipServiceServerRequestHandler($builder);
-        $server             = new ServiceServer($validator, $handler, logger: $this->logger);
-        $this->response = $server->handle($request);
+                new LaunchFactory(
+                    $this->registrations,
+                    $this->access,
+                    $this->routeGenerator,
+                    $this->instance,
+                    $this->getConfigLoader(),
+                    $this->userCodec,
+                ),
+            );
+            $handler            = new MembershipServiceServerRequestHandler($builder);
+            $server             = new ServiceServer($validator, $handler, logger: $this->logger);
+            $this->response = $server->handle($request);
+        } catch (Throwable $e) {
+            LogHelper::logControllerError($this->logger, __METHOD__, $this->request, $e);
+            throw $e;
+        }
     }
 
     /**

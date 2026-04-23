@@ -20,13 +20,16 @@ use Component_ConfigMapper;
 use Component_ControllerAbstract;
 use DateTime;
 use Exception;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\LTI\Component\Homepage\Controller as LtiComponent;
 use Schoolbox\LTI\Provider\Model as Provider;
+use Schoolbox\LTI\Util\LogHelper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
+use Throwable;
 
 class Controller extends Base
 {
@@ -129,9 +132,11 @@ class Controller extends Base
     private $baseUrl;
 
     /**
-     * Controller constructor
+     * Constructor
+     *
+     * @param LoggerInterface $logger Logger, for logging at least method calls.
      */
-    public function __construct()
+    public function __construct(private LoggerInterface $logger)
     {
         $this->componentConfigMapper           = Component_ConfigMapper::getInstance();
         $this->componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
@@ -155,39 +160,45 @@ class Controller extends Base
      */
     public function postComponentProvider($provider, $component)
     {
-        $post = $this->requestPost;
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
+        try {
+            $post = $this->requestPost;
 
-        $this->updateComponentValue(
-            $component,
-            LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER,
-            $provider->getId(),
-        );
-        $this->updateComponentValue(
-            $component,
-            LtiComponent::COMPONENT_CONFIG_TITLE,
-            $post[LtiComponent::COMPONENT_CONFIG_TITLE] ?? $provider->getName(),
-        );
-
-        if (isset($post[LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL])) {
             $this->updateComponentValue(
                 $component,
-                LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL,
-                $post[LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL],
+                LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER,
+                $provider->getId(),
             );
-        }
-        if (isset($post[LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS])) {
             $this->updateComponentValue(
                 $component,
-                LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS,
-                $post[LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS],
+                LtiComponent::COMPONENT_CONFIG_TITLE,
+                $post[LtiComponent::COMPONENT_CONFIG_TITLE] ?? $provider->getName(),
             );
-        }
 
-        $this->response = $this->responseAsJson([
-            'result'       => 'OK',
-            'providerName' => $provider->getName(),
-            'url'          => $post['url'] ?? null,
-        ]);
+            if (isset($post[LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL])) {
+                $this->updateComponentValue(
+                    $component,
+                    LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL,
+                    $post[LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL],
+                );
+            }
+            if (isset($post[LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS])) {
+                $this->updateComponentValue(
+                    $component,
+                    LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS,
+                    $post[LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS],
+                );
+            }
+
+            $this->response = $this->responseAsJson([
+                'result'       => 'OK',
+                'providerName' => $provider->getName(),
+                'url'          => $post['url'] ?? null,
+            ]);
+        } catch (Throwable $e) {
+            LogHelper::logControllerError($this->logger, __METHOD__, $this->request, $e);
+            throw $e;
+        }
     }
 
     /**
@@ -200,154 +211,160 @@ class Controller extends Base
      */
     public function postComponentPicker($component)
     {
-        $post = $this->requestPost;
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
+        try {
+            $post = $this->requestPost;
 
-        // Make sure we got content items back from the provider
+            // Make sure we got content items back from the provider
 
-        if (!isset($post['content_items'])) {
-            throw new Exception("No content items returned");
-        }
-
-        // Try to decode the content items
-
-        $contentItemsArray = json_decode($post['content_items'], true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception("Error decoding content items array");
-        }
-
-        // Check the context is correct
-
-        if ($contentItemsArray['@context'] !== self::LTI_CONTEXT_CONTENT_ITEM) {
-            throw new Exception("Unexpected context received");
-        }
-
-        // Check we received a content graph
-
-        if (!isset($contentItemsArray['@graph'])) {
-            throw new Exception("Content graph not found");
-        }
-
-        // Go through each item in the graph
-
-        foreach ($contentItemsArray['@graph'] as $item) {
-            // Grab the title if there is one
-
-            if (isset($item['title'])) {
-                $title = $item['title'];
+            if (!isset($post['content_items'])) {
+                throw new Exception("No content items returned");
             }
 
-            // The great thing about the LTI standard is that it seems kinda half finished so each vendor
-            // has hacked int heir own way of passing back the required information- so we have to manually parse
-            // each vendors specific data to find something we can actually use. Yay for "standards"!
+            // Try to decode the content items
 
-            // ---------------------------------------------------------------------------------------------------
-            // Education Perfect picker result
-            // ---------------------------------------------------------------------------------------------------
+            $contentItemsArray = json_decode($post['content_items'], true);
 
-            // The target URL we need is in the syntax:
-            // {contentUrl}#/{activity}/{module}/activity-starter
-            //
-            // {
-            //   "@context": "http://purl.imsglobal.org/ctx/lti/v1/ContentItem",
-            //   "@graph": [
-            //     {
-            //       "@type": "LtiLinkItem",
-            //       "mediaType": "application/vnd.ims.lti.v1.ltilink",
-            //       "placementAdvice": {
-            //         "presentationDocumentTarget": "frame"
-            //       },
-            //       "text": "Happy Pi Day! (Year 5-10) (Education Perfect)",
-            //       "title": "Happy Pi Day! (Year 5-10) (Education Perfect)",    <--- Component heading
-            //       "custom": {
-            //         "contentUrl": "https://www.educationperfect.com:443/app/", <--- Target URL
-            //         "activity": "2551018",                                     <--- Target URL parameter
-            //         "module": "1719905"                                        <--- Target URL parameter
-            //       }
-            //     }
-            //   ]
-            // }
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception("Error decoding content items array");
+            }
 
-            if (isset($item['@type']) && isset($item['mediaType'])) {
-                if ($item['@type'] === 'LtiLinkItem' && $item['mediaType'] === self::LTI_MEDIA_TYPE_LINK) {
-                    // Handle the EducationPerfect special case
-                    if (isset($item['custom'])) {
-                        if (
-                            isset($item['custom']['contentUrl']) &&
-                            isset($item['custom']['activity']) &&
-                            isset($item['custom']['module'])
-                        ) {
-                            // Construct the URL
+            // Check the context is correct
 
-                            $embedUrl = $item['custom']['contentUrl'] . "#/";
-                            $embedUrl .= $item['custom']['activity'] . "/";
-                            $embedUrl .= $item['custom']['module'] . "/activity-starter";
+            if ($contentItemsArray['@context'] !== self::LTI_CONTEXT_CONTENT_ITEM) {
+                throw new Exception("Unexpected context received");
+            }
 
-                            // Found everything we need, get outta here and use it
+            // Check we received a content graph
 
+            if (!isset($contentItemsArray['@graph'])) {
+                throw new Exception("Content graph not found");
+            }
+
+            // Go through each item in the graph
+
+            foreach ($contentItemsArray['@graph'] as $item) {
+                // Grab the title if there is one
+
+                if (isset($item['title'])) {
+                    $title = $item['title'];
+                }
+
+                // The great thing about the LTI standard is that it seems kinda half finished so each vendor
+                // has hacked int heir own way of passing back the required information- so we have to manually parse
+                // each vendors specific data to find something we can actually use. Yay for "standards"!
+
+                // ---------------------------------------------------------------------------------------------------
+                // Education Perfect picker result
+                // ---------------------------------------------------------------------------------------------------
+
+                // The target URL we need is in the syntax:
+                // {contentUrl}#/{activity}/{module}/activity-starter
+                //
+                // {
+                //   "@context": "http://purl.imsglobal.org/ctx/lti/v1/ContentItem",
+                //   "@graph": [
+                //     {
+                //       "@type": "LtiLinkItem",
+                //       "mediaType": "application/vnd.ims.lti.v1.ltilink",
+                //       "placementAdvice": {
+                //         "presentationDocumentTarget": "frame"
+                //       },
+                //       "text": "Happy Pi Day! (Year 5-10) (Education Perfect)",
+                //       "title": "Happy Pi Day! (Year 5-10) (Education Perfect)",    <--- Component heading
+                //       "custom": {
+                //         "contentUrl": "https://www.educationperfect.com:443/app/", <--- Target URL
+                //         "activity": "2551018",                                     <--- Target URL parameter
+                //         "module": "1719905"                                        <--- Target URL parameter
+                //       }
+                //     }
+                //   ]
+                // }
+
+                if (isset($item['@type']) && isset($item['mediaType'])) {
+                    if ($item['@type'] === 'LtiLinkItem' && $item['mediaType'] === self::LTI_MEDIA_TYPE_LINK) {
+                        // Handle the EducationPerfect special case
+                        if (isset($item['custom'])) {
+                            if (
+                                isset($item['custom']['contentUrl']) &&
+                                isset($item['custom']['activity']) &&
+                                isset($item['custom']['module'])
+                            ) {
+                                // Construct the URL
+
+                                $embedUrl = $item['custom']['contentUrl'] . "#/";
+                                $embedUrl .= $item['custom']['activity'] . "/";
+                                $embedUrl .= $item['custom']['module'] . "/activity-starter";
+
+                                // Found everything we need, get outta here and use it
+
+                                break;
+                            }
+                        }
+
+                        // Handle the standard case
+                        // (as returned by Google Assignments and probably others)
+                        if (isset($item['url'])) {
+                            $embedUrl = $item['url'];
                             break;
                         }
                     }
-
-                    // Handle the standard case
-                    // (as returned by Google Assignments and probably others)
-                    if (isset($item['url'])) {
-                        $embedUrl = $item['url'];
-                        break;
-                    }
                 }
+
+                // Check other provider responses... (none yet)
             }
 
-            // Check other provider responses... (none yet)
-        }
+            // If we got here without finding and URL, throw an exception because there is nothing else we can do
 
-        // If we got here without finding and URL, throw an exception because there is nothing else we can do
-
-        if (!isset($embedUrl) || strlen(trim($embedUrl)) === 0) {
-            throw new Exception("No content location header could be found, cannot proceed.");
-        }
-
-        // Update the component with the target URL
-
-        $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL, $embedUrl);
-
-        // Update the component with the title (assuming we found one)
-
-        if (isset($title)) {
-            if (strlen(trim($title)) > 0) {
-                $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_TITLE, $title);
+            if (!isset($embedUrl) || strlen(trim($embedUrl)) === 0) {
+                throw new Exception("No content location header could be found, cannot proceed.");
             }
-        } else {
-            $title = $component->getConfig(LtiComponent::COMPONENT_CONFIG_TITLE);
+
+            // Update the component with the target URL
+
+            $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL, $embedUrl);
+
+            // Update the component with the title (assuming we found one)
+
+            if (isset($title)) {
+                if (strlen(trim($title)) > 0) {
+                    $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_TITLE, $title);
+                }
+            } else {
+                $title = $component->getConfig(LtiComponent::COMPONENT_CONFIG_TITLE);
+            }
+
+            // Redirect to the target URL
+
+            // Rather than just redirecting the iframe directly to the requested resource we need to do a bit
+            // of javascript shenanigans.
+            //
+            // Because this code is operating inside the LTI iframe, the component on the homepage will not have
+            // has its title or iframe height adjusted to the new parameters until the page is reloaded. The
+            // javascript inside this template updates these in the DOM.
+
+            // The launch URL generates a POST request to the embed URL.
+            $launchUrl = $this->routeGenerator->generate('ltiConsumer.getLaunch', [
+                'providerId'  => $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER),
+                'componentId' => $component->getInstance()->getId(),
+                'folderId'    => $component->getContext()->getId(),
+            ]);
+
+            $this->response = $this->responseFromTemplateUnthemed(
+                '@ltiConsumer/redirect.twig',
+                [
+                    'componentId'    => $component->getInstance()->getId(),
+                    'componentTitle' => $title,
+                    'embedUrl'       => $embedUrl,
+                    'launchUrl'      => $launchUrl,
+                    'height'         => $component->getConfig(LtiComponent::COMPONENT_CONFIG_HEIGHT),
+                    'version'        => $this->getConfigLoader()->get('site_version'),
+                ],
+            );
+        } catch (Throwable $e) {
+            LogHelper::logControllerError($this->logger, __METHOD__, $this->request, $e);
+            throw $e;
         }
-
-        // Redirect to the target URL
-
-        // Rather than just redirecting the iframe directly to the requested resource we need to do a bit
-        // of javascript shenanigans.
-        //
-        // Because this code is operating inside the LTI iframe, the component on the homepage will not have
-        // has its title or iframe height adjusted to the new parameters until the page is reloaded. The
-        // javascript inside this template updates these in the DOM.
-
-        // The launch URL generates a POST request to the embed URL.
-        $launchUrl = $this->routeGenerator->generate('ltiConsumer.getLaunch', [
-            'providerId'  => $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER),
-            'componentId' => $component->getInstance()->getId(),
-            'folderId'    => $component->getContext()->getId(),
-        ]);
-
-        $this->response = $this->responseFromTemplateUnthemed(
-            '@ltiConsumer/redirect.twig',
-            [
-                'componentId'    => $component->getInstance()->getId(),
-                'componentTitle' => $title,
-                'embedUrl'       => $embedUrl,
-                'launchUrl'      => $launchUrl,
-                'height'         => $component->getConfig(LtiComponent::COMPONENT_CONFIG_HEIGHT),
-                'version'        => $this->getConfigLoader()->get('site_version'),
-            ],
-        );
     }
 
     /**
@@ -361,184 +378,189 @@ class Controller extends Base
      */
     public function getLaunch(Provider $provider, Component_ControllerAbstract $component, Folder $folder)
     {
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
+        try {
+            /* Provider might have been deleted, despite existing here
+             * despite being specified - this means it's been deleted one way or another
+             * so return a generic error template instead
+             */
+            if ($provider->isDeleted()) {
+                $this->response = $this->responseFromTemplateUnthemed(
+                    '@ltiConsumer/unavailable.twig',
+                    [
+                        'provider'  => $provider,
+                    ],
+                );
 
-        /* Provider might have been deleted, despite existing here
-         * despite being specified - this means it's been deleted one way or another
-         * so return a generic error template instead
-         */
-        if ($provider->isDeleted()) {
-            $this->response = $this->responseFromTemplateUnthemed(
-                '@ltiConsumer/unavailable.twig',
-                [
-                    'provider'  => $provider,
-                ],
-            );
+                return;
+            }
 
-            return;
-        }
+            switch ($provider->getLaunchType()) {
+                case Provider::LAUNCH_TYPE_PICKER:
+                    $ltiRequestType = self::LTI_LAUNCH_TYPE_PICKER;
+                    break;
 
-        switch ($provider->getLaunchType()) {
-            case Provider::LAUNCH_TYPE_PICKER:
-                $ltiRequestType = self::LTI_LAUNCH_TYPE_PICKER;
-                break;
+                default:
+                    $ltiRequestType = self::LTI_LAUNCH_TYPE_BASIC;
+                    break;
+            }
 
-            default:
-                $ltiRequestType = self::LTI_LAUNCH_TYPE_BASIC;
-                break;
-        }
+            // Disable history tracking so the LTI iframe doesn't cause unexpected page navigation in the main
+            // Schoolbox window
 
-        // Disable history tracking so the LTI iframe doesn't cause unexpected page navigation in the main
-        // Schoolbox window
+            $this->setAllowBackToTheFuture(false);
 
-        $this->setAllowBackToTheFuture(false);
+            // Define LTI return URL
 
-        // Define LTI return URL
+            $extContentReturnUrl = $this->baseUrl .
+                $this->getRouteIfAuthorized('ltiConsumer.getComponentCallback', [
+                    'componentId' => $component->getInstance()->getId(),
+                ]);
 
-        $extContentReturnUrl = $this->baseUrl .
-            $this->getRouteIfAuthorized('ltiConsumer.getComponentCallback', [
-                'componentId' => $component->getInstance()->getId(),
-            ]);
+            // Launch presentation return URL is the same as the standard return URL
+            // (except for Education Perfect, which is different for some reason)
+            $launchPresentationReturnUrl = $extContentReturnUrl;
 
-        // Launch presentation return URL is the same as the standard return URL
-        // (except for Education Perfect, which is different for some reason)
-        $launchPresentationReturnUrl = $extContentReturnUrl;
+            // Check if the LTI component is a picker and already has a resource URL specified
 
-        // Check if the LTI component is a picker and already has a resource URL specified
+            $embedUrl = trim($component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL));
 
-        $embedUrl = trim($component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL));
+            // ---------------------------------------------------------------------------------------------------
+            // Create array to hold launch data
+            // ---------------------------------------------------------------------------------------------------
 
-        // ---------------------------------------------------------------------------------------------------
-        // Create array to hold launch data
-        // ---------------------------------------------------------------------------------------------------
+            $launch_data = [];
 
-        $launch_data = [];
+            // ---------------------------------------------------------------------------------------------------
+            // Education perfect URL mangling
+            // ---------------------------------------------------------------------------------------------------
 
-        // ---------------------------------------------------------------------------------------------------
-        // Education perfect URL mangling
-        // ---------------------------------------------------------------------------------------------------
-
-        if (strlen($embedUrl) > 0) {
-            if (stristr($embedUrl, 'educationperfect') !== false) {
-                // EducationPerfect is a special snowflake:
-                // it expects the homepage as the return URL?
-                $launchPresentationReturnUrl = "{$this->baseUrl}/homepage/{$folder->getId()}";
-                if ($ltiRequestType == self::LTI_LAUNCH_TYPE_PICKER) {
-                    // I have picked something: just go there
+            if (strlen($embedUrl) > 0) {
+                if (stristr($embedUrl, 'educationperfect') !== false) {
+                    // EducationPerfect is a special snowflake:
+                    // it expects the homepage as the return URL?
+                    $launchPresentationReturnUrl = "{$this->baseUrl}/homepage/{$folder->getId()}";
+                    if ($ltiRequestType == self::LTI_LAUNCH_TYPE_PICKER) {
+                        // I have picked something: just go there
+                        $this->response = $this->redirectFound($embedUrl);
+                        return;
+                    }
+                } elseif ($ltiRequestType === self::LTI_LAUNCH_TYPE_BASIC) {
+                    // Is this content which has actually been picked?
+                    // Maintain current behaviour (for fear of breaking any existing integrations)
                     $this->response = $this->redirectFound($embedUrl);
                     return;
+                } else {
+                    // This component is a picker, and content has been selected:
+                    // now launch it.
+                    $ltiRequestType = self::LTI_LAUNCH_TYPE_BASIC;
                 }
-            } elseif ($ltiRequestType === self::LTI_LAUNCH_TYPE_BASIC) {
-                // Is this content which has actually been picked?
-                // Maintain current behaviour (for fear of breaking any existing integrations)
-                $this->response = $this->redirectFound($embedUrl);
-                return;
             } else {
-                // This component is a picker, and content has been selected:
-                // now launch it.
-                $ltiRequestType = self::LTI_LAUNCH_TYPE_BASIC;
+                $embedUrl = null;
             }
-        } else {
-            $embedUrl = null;
-        }
 
-        // Define allowed return types from LTI providers
+            // Define allowed return types from LTI providers
 
-        $returnTypes = implode(',', [
-            self::LTI_RETURN_TYPE_IFRAME,
-            self::LTI_RETURN_TYPE_URL,
-            self::LTI_RETURN_TYPE_FILE,
-            self::LTI_RETURN_TYPE_IMAGE,
-            self::LTI_RETURN_TYPE_LAUNCH,
-        ]);
-
-        $now = new DateTime();
-
-        $launch_data = array_merge($launch_data, [
-            'resource_link_id'                       => $folder->getId() . '_' . $component->getInstance()->getId(),
-            'resource_link_title'                    => $component->getConfig(LtiComponent::COMPONENT_CONFIG_TITLE),
-            'resource_link_description'              => '',
-            'user_id'                                => $this->user->getId(),
-            'user_image'                             => $this->getUserPortraitUrl($this->user),
-            'roles'                                  => $this->getLTIRole($this->user),
-            'lis_person_name_given'                  => $this->user->getFirstname(),
-            'lis_person_name_family'                 => $this->user->getLastname(),
-            'lis_person_name_full'                   => $this->user->getFullName(),
-            'lis_person_contact_email_primary'       => $this->user->getEmail(),
-            'context_id'                             => $folder->getId(),
-            'context_type'                           => 'CourseSection',
-            'context_title'                          => $folder->getName(),
-            'context_label'                          => $folder->getCodeString(),
-            'launch_presentation_locale'             => 'en-US',
-            'launch_presentation_document_target'    => $provider->getTarget(),
-            'launch_presentation_return_url'         => $launchPresentationReturnUrl,
-            'ext_content_return_types'               => $returnTypes,
-            'ext_content_return_url'                 => $extContentReturnUrl,
-            'tool_consumer_instance_guid'            => $this->getConfigLoader()->get('site_school_code'),
-            'tool_consumer_instance_name'            => $this->getConfigLoader()->get('school_name'),
-            'tool_consumer_instance_description'     => 'Schoolbox LMS',
-            'tool_consumer_instance_url'             => $this->baseUrl,
-            'tool_consumer_instance_contact_email'   => $this->getConfigLoader()->get(ConfigMapper::NAME_MAIL_FROM_ADDRESS),
-            'tool_consumer_info_product_family_code' => 'schoolbox',
-            'tool_consumer_info_version'             => $this->getConfigLoader()->get('site_version'),
-            'ext_lms'                                => 'schoolbox-' . $this->getConfigLoader()->get('site_version'),
-            'lti_version'                            => self::LTI_VERSION_1,
-            'lti_message_type'                       => $ltiRequestType,
-            'oauth_callback'                         => 'about:blank',
-            'oauth_consumer_key'                     => $provider->getKey(),
-            'oauth_version'                          => '1.0',
-            'oauth_nonce'                            => uniqid('', true),
-            'oauth_timestamp'                        => $now->getTimestamp(),
-            'oauth_signature_method'                 => 'HMAC-SHA1',
-            'custom_canvas_user_id'                  => $this->user->getExternalId(),
-            'custom_canvas_user_login_id'            => $this->user->getUsername(),
+            $returnTypes = implode(',', [
+                self::LTI_RETURN_TYPE_IFRAME,
+                self::LTI_RETURN_TYPE_URL,
+                self::LTI_RETURN_TYPE_FILE,
+                self::LTI_RETURN_TYPE_IMAGE,
+                self::LTI_RETURN_TYPE_LAUNCH,
             ]);
 
-        // Add picker specific option
+            $now = new DateTime();
 
-        if ($ltiRequestType === self::LTI_LAUNCH_TYPE_PICKER) {
             $launch_data = array_merge($launch_data, [
-                'request_type'                         => 'content',
-                'accept_presentation_document_targets' => 'embed,frame,iframe,window',
-                'accept_media_types'                   => '*/*',
-                'accept_unsigned'                      => 'true',
-                'accept_multiple'                      => 'false',
-                'content_item_return_url'              => $this->baseUrl .
-                    $this->getRouteIfAuthorized('ltiConsumer.postComponentPicker', [
-                        'componentId' => $component->getInstance()->getId(),
-                        'providerId'  => $provider->getId(),
-                    ]),
+                'resource_link_id'                       => $folder->getId() . '_' . $component->getInstance()->getId(),
+                'resource_link_title'                    => $component->getConfig(LtiComponent::COMPONENT_CONFIG_TITLE),
+                'resource_link_description'              => '',
+                'user_id'                                => $this->user->getId(),
+                'user_image'                             => $this->getUserPortraitUrl($this->user),
+                'roles'                                  => $this->getLTIRole($this->user),
+                'lis_person_name_given'                  => $this->user->getFirstname(),
+                'lis_person_name_family'                 => $this->user->getLastname(),
+                'lis_person_name_full'                   => $this->user->getFullName(),
+                'lis_person_contact_email_primary'       => $this->user->getEmail(),
+                'context_id'                             => $folder->getId(),
+                'context_type'                           => 'CourseSection',
+                'context_title'                          => $folder->getName(),
+                'context_label'                          => $folder->getCodeString(),
+                'launch_presentation_locale'             => 'en-US',
+                'launch_presentation_document_target'    => $provider->getTarget(),
+                'launch_presentation_return_url'         => $launchPresentationReturnUrl,
+                'ext_content_return_types'               => $returnTypes,
+                'ext_content_return_url'                 => $extContentReturnUrl,
+                'tool_consumer_instance_guid'            => $this->getConfigLoader()->get('site_school_code'),
+                'tool_consumer_instance_name'            => $this->getConfigLoader()->get('school_name'),
+                'tool_consumer_instance_description'     => 'Schoolbox LMS',
+                'tool_consumer_instance_url'             => $this->baseUrl,
+                'tool_consumer_instance_contact_email'   => $this->getConfigLoader()->get(ConfigMapper::NAME_MAIL_FROM_ADDRESS),
+                'tool_consumer_info_product_family_code' => 'schoolbox',
+                'tool_consumer_info_version'             => $this->getConfigLoader()->get('site_version'),
+                'ext_lms'                                => 'schoolbox-' . $this->getConfigLoader()->get('site_version'),
+                'lti_version'                            => self::LTI_VERSION_1,
+                'lti_message_type'                       => $ltiRequestType,
+                'oauth_callback'                         => 'about:blank',
+                'oauth_consumer_key'                     => $provider->getKey(),
+                'oauth_version'                          => '1.0',
+                'oauth_nonce'                            => uniqid('', true),
+                'oauth_timestamp'                        => $now->getTimestamp(),
+                'oauth_signature_method'                 => 'HMAC-SHA1',
+                'custom_canvas_user_id'                  => $this->user->getExternalId(),
+                'custom_canvas_user_login_id'            => $this->user->getUsername(),
             ]);
+
+            // Add picker specific option
+
+            if ($ltiRequestType === self::LTI_LAUNCH_TYPE_PICKER) {
+                $launch_data = array_merge($launch_data, [
+                    'request_type'                         => 'content',
+                    'accept_presentation_document_targets' => 'embed,frame,iframe,window',
+                    'accept_media_types'                   => '*/*',
+                    'accept_unsigned'                      => 'true',
+                    'accept_multiple'                      => 'false',
+                    'content_item_return_url'              => $this->baseUrl .
+                        $this->getRouteIfAuthorized('ltiConsumer.postComponentPicker', [
+                            'componentId' => $component->getInstance()->getId(),
+                            'providerId'  => $provider->getId(),
+                        ]),
+                ]);
+            }
+
+            // ---------------------------------------------------------------------------------------------------
+            // Sign the request
+            // ---------------------------------------------------------------------------------------------------
+
+            // OAuth requires that all passed keys be sorted alphabetically
+
+            $launch_data_keys = array_keys($launch_data);
+            sort($launch_data_keys);
+            $launch_params = [];
+
+            foreach ($launch_data_keys as $key) {
+                $launch_params[] = $key . "=" . rawurlencode($launch_data[$key] ?? "");
+            }
+
+            $base_string = "POST&" . urlencode($embedUrl ?? $provider->getUrl()) . "&" . rawurlencode(implode("&", $launch_params));
+            $secret      = urlencode($provider->getSecret()) . "&";
+            $signature   = base64_encode(hash_hmac("sha1", $base_string, $secret, true));
+
+            // Render form that will automatically submit LTI request
+
+            $this->response = $this->responseFromTemplateUnthemed(
+                '@ltiConsumer/form.twig',
+                [
+                    'params'    => $launch_data,
+                    'provider'  => $provider,
+                    'signature' => $signature,
+                    'embedUrl'  => $embedUrl,
+                ],
+            );
+        } catch (Throwable $e) {
+            LogHelper::logControllerError($this->logger, __METHOD__, $this->request, $e);
+            throw $e;
         }
-
-        // ---------------------------------------------------------------------------------------------------
-        // Sign the request
-        // ---------------------------------------------------------------------------------------------------
-
-        // OAuth requires that all passed keys be sorted alphabetically
-
-        $launch_data_keys = array_keys($launch_data);
-        sort($launch_data_keys);
-        $launch_params = [];
-
-        foreach ($launch_data_keys as $key) {
-            $launch_params[] = $key . "=" . rawurlencode($launch_data[$key] ?? "");
-        }
-
-        $base_string = "POST&" . urlencode($embedUrl ?? $provider->getUrl()) . "&" . rawurlencode(implode("&", $launch_params));
-        $secret      = urlencode($provider->getSecret()) . "&";
-        $signature   = base64_encode(hash_hmac("sha1", $base_string, $secret, true));
-
-        // Render form that will automatically submit LTI request
-
-        $this->response = $this->responseFromTemplateUnthemed(
-            '@ltiConsumer/form.twig',
-            [
-                'params'    => $launch_data,
-                'provider'  => $provider,
-                'signature' => $signature,
-                'embedUrl'  => $embedUrl,
-            ],
-        );
     }
 
     /**
@@ -550,89 +572,93 @@ class Controller extends Base
      */
     public function getComponentCallback($component)
     {
-        $get = $this->requestQuery;
+        LogHelper::logControllerAction($this->logger, __METHOD__, $this->request);
+        try {
+            $get = $this->requestQuery;
 
-        //null coalesce as if this does not match any 'valid' response, it will throw an exception
-        $return_type = $get['return_type'] ?? null;
+            //null coalesce as if this does not match any 'valid' response, it will throw an exception
+            $return_type = $get['return_type'] ?? null;
 
-        // Ultimately all return types will be treated in the same way by our LTI component
-        // and it will just redirect to the target URL. The only real difference at this point
-        // is that the return parameter names differ slightly.
+            // Ultimately all return types will be treated in the same way by our LTI component
+            // and it will just redirect to the target URL. The only real difference at this point
+            // is that the return parameter names differ slightly.
 
-        $height = null;
-        switch ($return_type) {
-            case self::LTI_RETURN_TYPE_IFRAME:
-                $embedUrl  = $get['url'];
-                $launchUrl = $embedUrl;
-                $title     = $get['title'];
-                $height    = $get['height'];
-                break;
+            $height = null;
+            switch ($return_type) {
+                case self::LTI_RETURN_TYPE_IFRAME:
+                    $embedUrl  = $get['url'];
+                    $launchUrl = $embedUrl;
+                    $title     = $get['title'];
+                    $height    = $get['height'];
+                    break;
 
-            case self::LTI_RETURN_TYPE_URL:
-            case self::LTI_RETURN_TYPE_FILE:
-                $embedUrl  = $get['url'];
-                $launchUrl = $embedUrl;
-                $title     = $get['text'];
-                break;
+                case self::LTI_RETURN_TYPE_URL:
+                case self::LTI_RETURN_TYPE_FILE:
+                    $embedUrl  = $get['url'];
+                    $launchUrl = $embedUrl;
+                    $title     = $get['text'];
+                    break;
 
-            case self::LTI_RETURN_TYPE_IMAGE:
-                $embedUrl  = $get['url'];
-                $launchUrl = $embedUrl;
-                $title     = $get['text'];
-                $height    = $get['height'];
-                break;
+                case self::LTI_RETURN_TYPE_IMAGE:
+                    $embedUrl  = $get['url'];
+                    $launchUrl = $embedUrl;
+                    $title     = $get['text'];
+                    $height    = $get['height'];
+                    break;
 
-            case self::LTI_RETURN_TYPE_LAUNCH:
-                // For launches:
-                // the launch URL generates a POST request to the embed URL
-                $embedUrl  = $get['url'];
-                $launchUrl = $this->routeGenerator->generate('ltiConsumer.getLaunch', [
-                    'providerId'   => $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER),
-                    'componentId'  => $component->getInstance()->getId(),
-                    'folderId'     => $component->getContext()->getId(),
-                ]);
-                $title     = $get['text'];
-                break;
+                case self::LTI_RETURN_TYPE_LAUNCH:
+                    // For launches:
+                    // the launch URL generates a POST request to the embed URL
+                    $embedUrl  = $get['url'];
+                    $launchUrl = $this->routeGenerator->generate('ltiConsumer.getLaunch', [
+                        'providerId'   => $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER),
+                        'componentId'  => $component->getInstance()->getId(),
+                        'folderId'     => $component->getContext()->getId(),
+                    ]);
+                    $title     = $get['text'];
+                    break;
 
-            // Throw an exception error if we receive an unknown
-            default:
-                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                // Throw an exception error if we receive an unknown
+                default:
+                    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+            }
+
+            // Update the component configuration with any details we are able to retrieve
+
+            if (!empty($title)) {
+                $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_TITLE, $title);
+            }
+
+            if (!empty($embedUrl)) {
+                $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL, $embedUrl);
+            }
+
+            if (!empty($height)) {
+                $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_HEIGHT, $height);
+            }
+
+            // Rather than just redirecting the iframe directly to the requested resource we need to do a bit
+            // of javascript shenanigans.
+            //
+            // Because this code is operating inside the LTI iframe, the component on the homepage will not have
+            // has its title or iframe height adjusted to the new parameters until the page is reloaded. The
+            // javascript inside this template updates these in the DOM.
+
+            $this->response = $this->responseFromTemplateUnthemed(
+                '@ltiConsumer/redirect.twig',
+                [
+                    'componentId'    => $component->getInstance()->getId(),
+                    'componentTitle' => $title,
+                    'embedUrl'       => $embedUrl,
+                    'launchUrl'      => $launchUrl,
+                    'height'         => $height,
+                    'version'        => $this->getConfigLoader()->get('site_version'),
+                ],
+            );
+        } catch (Throwable $e) {
+            LogHelper::logControllerError($this->logger, __METHOD__, $this->request, $e);
+            throw $e;
         }
-
-        // Update the component configuration with any details we are able to retrieve
-
-        if (!empty($title)) {
-            $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_TITLE, $title);
-        }
-
-        if (!empty($embedUrl)) {
-            $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL, $embedUrl);
-        }
-
-        if (!empty($height)) {
-            $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_HEIGHT, $height);
-        }
-
-        // Rather than just redirecting the iframe directly to the requested resource we need to do a bit
-        // of javascript shenanigans.
-        //
-        // Because this code is operating inside the LTI iframe, the component on the homepage will not have
-        // has its title or iframe height adjusted to the new parameters until the page is reloaded. The
-        // javascript inside this template updates these in the DOM.
-
-        $this->response = $this->responseFromTemplateUnthemed(
-            '@ltiConsumer/redirect.twig',
-            [
-                'componentId'    => $component->getInstance()->getId(),
-                'componentTitle' => $title,
-                'embedUrl'       => $embedUrl,
-                'launchUrl'      => $launchUrl,
-                'height'         => $height,
-                'version'        => $this->getConfigLoader()->get('site_version'),
-            ],
-        );
-
-        return;
     }
 
     /**
