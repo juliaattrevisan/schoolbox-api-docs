@@ -97,24 +97,33 @@ class Student extends IteratorIterator
 
         $student->getCampus()->add($campus);
 
-        /* Nationality
-         */
-        $nationality = new User\Student\Nationality();
-        $nationality->setName($currentResult['student_nationality'] ?? '');
-        $nationality->setCode($currentResult['student_nationality_code'] ?? '');
-        $student->getNationality()->add($nationality);
+        $this->addNationality(
+            $student,
+            (string)($currentResult['student_nationality'] ?? ''),
+            (string)($currentResult['student_nationality_code'] ?? '')
+        );
 
-        $nationality2 = new User\Student\Nationality();
-        $nationality2->setName($currentResult['student_nationality2'] ?? '');
-        $nationality2->setCode($currentResult['student_nationality2_code'] ?? '');
-        $student->getNationality()->add($nationality2);
-
-        /* Language
+        /* Some sources have nationality stored in separate columns (ie synergetic)
          */
-        $language = new User\Student\Language();
-        $language->setName($currentResult['student_language'] ?? '');
-        $language->setCode($currentResult['student_language_code'] ?? '');
-        $student->getLanguage()->add($language);
+        $this->addNationality(
+            $student,
+            (string)($currentResult['student_nationality2'] ?? ''),
+            (string)($currentResult['student_nationality2_code'] ?? '')
+        );
+
+        foreach ($this->explodeCsvValues($currentResult['student_nationalities'] ?? null) as $nationalityName) {
+            $this->addNationality($student, $nationalityName);
+        }
+
+        $this->addLanguage(
+            $student,
+            (string)($currentResult['student_language'] ?? ''),
+            (string)($currentResult['student_language_code'] ?? '')
+        );
+
+        foreach ($this->explodeCsvValues($currentResult['student_languages'] ?? null) as $languageName) {
+            $this->addLanguage($student, $languageName);
+        }
 
         $student->setCustomField1((string)($currentResult['custom_field1'] ?? null));
         $student->setCustomField2((string)($currentResult['custom_field2'] ?? null));
@@ -123,5 +132,79 @@ class Student extends IteratorIterator
         $student->setCustomField5((string)($currentResult['custom_field5'] ?? null));
 
         return $student;
+    }
+
+    /**
+     * To aggregate the nationality stack for the students
+     *
+     * @param User\Student $student
+     * @param string       $name
+     * @param string       $code
+     * @return void
+     */
+    private function addNationality(User\Student $student, string $name = '', string $code = ''): void
+    {
+        $name = trim($name);
+        $code = trim($code);
+
+        if ('' === $name && '' === $code) {
+            return;
+        }
+
+        foreach ($student->getNationality() as $existingNationality) {
+            if ($existingNationality->getName() === $name && $existingNationality->getCode() === $code) {
+                return;
+            }
+        }
+
+        $nationality = new User\Student\Nationality();
+        $nationality->setName($name);
+        $nationality->setCode($code);
+        $student->getNationality()->add($nationality);
+    }
+
+    /**
+     * To aggregate the language stack for the students
+     *
+     * @param User\Student $student
+     * @param string       $name
+     * @param string       $code
+     * @return void
+     */
+    private function addLanguage(User\Student $student, string $name = '', string $code = ''): void
+    {
+        $name = trim($name);
+        $code = trim($code);
+
+        if ('' === $name && '' === $code) {
+            return;
+        }
+
+        foreach ($student->getLanguage() as $existingLanguage) {
+            if ($existingLanguage->getName() === $name && $existingLanguage->getCode() === $code) {
+                return;
+            }
+        }
+
+        $language = new User\Student\Language();
+        $language->setName($name);
+        $language->setCode($code);
+        $student->getLanguage()->add($language);
+    }
+
+    private function explodeCsvValues(mixed $value): array
+    {
+        $value = trim((string)$value);
+
+        if ('' === $value) {
+            return [];
+        }
+
+        return array_values(
+            array_filter(
+                array_map('trim', explode(',', $value)),
+                static fn (string $item): bool => '' !== $item
+            )
+        );
     }
 }
