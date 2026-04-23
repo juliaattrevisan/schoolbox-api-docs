@@ -340,6 +340,7 @@ button.submit {
     align-items: center;
     border-radius: var(--sbx-config-field-roundness, 0);
     display: inline-flex;
+    font-size: 0; // hide any text content, but keep the button dimensions
     justify-content: center;
     min-height: 40px;
     min-width: 40px;
