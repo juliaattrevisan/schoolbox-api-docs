@@ -30,6 +30,7 @@ interface IClient
      *                                   A tool's definition will define its required and allowed environment variables.
      * @return string The job ID received from the tools daemon: this may then be used to fetch the job's completion
      *                status and its output.
+     * @throws ClientException if request was rejected, not received, etc.
      */
     public function run(string $tool, array $options, ?string $instanceId = null, ?array $environment = null): string;
 
@@ -38,6 +39,7 @@ interface IClient
      *
      * @param string $jobId
      * @return JobStatus
+     * @throws ClientException if request was rejected
      */
     public function getJobStatus(string $jobId): JobStatus;
 
@@ -46,6 +48,7 @@ interface IClient
      *
      * @param string $jobId
      * @return JobOutput
+     * @throws ClientException if request was rejected
      */
     public function getJobOutput(string $jobId): JobOutput;
 }
