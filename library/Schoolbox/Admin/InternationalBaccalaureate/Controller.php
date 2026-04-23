@@ -373,7 +373,12 @@ class Controller extends ConfigController
 
             $this->response = $this->responseAsJson($sessionsBySystemPurpose);
         } catch (Exception $e) {
-            $this->response = $this->responseAsJson(['error' => $e->getMessage()])->withStatus(500);
+            $this->response = $this->responseAsJson(
+                [
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ]
+            )->withStatus(500);
         }
     }
 

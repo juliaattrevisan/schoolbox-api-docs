@@ -78,7 +78,7 @@ class Mapper extends BaseMapper
             FROM      {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('systemPurpose', '', 'sp')}
             LEFT JOIN {$this->getJoinSql('systemPurpose.category', 'sp', 'c')}
-            INNER JOIN {$this->getJoinSql('createdBy', '', 'uc')}
+            LEFT JOIN {$this->getJoinSql('createdBy', '', 'uc')}
             LEFT JOIN {$this->getJoinSql('updatedBy', '', 'uu')}
             LEFT JOIN {$this->getJoinSql('deletedBy', '', 'ud')}
         ";
