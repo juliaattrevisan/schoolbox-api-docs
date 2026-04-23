@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { RegistrationSession } from "../../js/types/ibRegistrationTypes";
 
-// TODO(SA-22225): Remove createEndpoint prop and restore API call when backend is ready.
 interface Props {
     createEndpoint: string;
+    systemPurposeId: number;
 }
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
     sessionCreated: [session: RegistrationSession];
@@ -15,18 +16,20 @@ const emit = defineEmits<{
 const isOpen = defineModel<boolean>("is-open", { default: false });
 
 const academicYear = window.Vue.ref<string>("");
-const examinationSession = window.Vue.ref<"May" | "November" | null>(null);
+const examSession = window.Vue.ref<"May" | "November" | null>(null);
 const academicYearError = window.Vue.ref<string | null>(null);
-const examinationSessionError = window.Vue.ref<string | null>(null);
+const examSessionError = window.Vue.ref<string | null>(null);
+const isSubmitting = window.Vue.ref<boolean>(false);
+const submitError = window.Vue.ref<string | null>(null);
 
-/**
- * Resets form fields and validation errors to their initial state.
- */
+/** Resets form fields and validation errors to their initial state. */
 function resetForm(): void {
     academicYear.value = "";
-    examinationSession.value = null;
+    examSession.value = null;
     academicYearError.value = null;
-    examinationSessionError.value = null;
+    examSessionError.value = null;
+    isSubmitting.value = false;
+    submitError.value = null;
 }
 
 window.Vue.watch(isOpen, (newVal) => {
@@ -35,13 +38,11 @@ window.Vue.watch(isOpen, (newVal) => {
     }
 });
 
-/**
- * Creates a temporary local session from form data.
- * TODO(SA-22225): Replace with real POST to createEndpoint when backend is ready.
- */
-function onSubmit(): void {
+/** Validates the form and POSTs the new session to the backend. */
+async function onSubmit(): Promise<void> {
     academicYearError.value = null;
-    examinationSessionError.value = null;
+    examSessionError.value = null;
+    submitError.value = null;
 
     let isValid = true;
 
@@ -50,8 +51,8 @@ function onSubmit(): void {
         isValid = false;
     }
 
-    if (examinationSession.value === null) {
-        examinationSessionError.value = "Please select an examination session.";
+    if (examSession.value === null) {
+        examSessionError.value = "Please select an examination session.";
         isValid = false;
     }
 
@@ -59,17 +60,26 @@ function onSubmit(): void {
         return;
     }
 
-    const session: RegistrationSession = {
-        id: Date.now(),
-        title: `Diploma Program Year 2 [DIPLOMA] - ${examinationSession.value} ${academicYear.value.trim()}`,
-        qualificationType: "DIPLOMA",
-        academicYear: academicYear.value.trim(),
-        examSession: examinationSession.value as "May" | "November",
-        createdAt: new Date().toISOString(),
-        createdBy: "current user", // TODO(SA-22225): Replace with actual user from backend response
-    };
+    isSubmitting.value = true;
 
-    emit("sessionCreated", session);
+    const response = await apiRequest<RegistrationSession, Record<string, unknown>>({
+        url: props.createEndpoint,
+        method: "POST",
+        body: {
+            systemPurposeId: props.systemPurposeId,
+            academicYear: academicYear.value.trim(),
+            examSession: examSession.value,
+        },
+    });
+
+    isSubmitting.value = false;
+
+    if (!response.success) {
+        submitError.value = response.message ?? "An error occurred. Please try again.";
+        return;
+    }
+
+    emit("sessionCreated", response.data);
     isOpen.value = false;
 }
 </script>
@@ -82,6 +92,10 @@ function onSubmit(): void {
 
             <div class="alert-box" role="alert">
                 If incorrect students appear on the following report, please update the students' qualification.
+            </div>
+
+            <div v-if="submitError" class="sbx-alert sbx-alert--error" role="alert">
+                {{ submitError }}
             </div>
 
             <div class="l-flex-col l-gap-xs">
@@ -102,7 +116,7 @@ function onSubmit(): void {
                     <li>
                         <input
                             id="may"
-                            v-model="examinationSession"
+                            v-model="examSession"
                             type="radio"
                             name="examination-session"
                             value="May"
@@ -111,20 +125,24 @@ function onSubmit(): void {
                     <li>
                         <input
                             id="november"
-                            v-model="examinationSession"
+                            v-model="examSession"
                             type="radio"
                             name="examination-session"
                             value="November"
                         /><label for="november">November</label>
                     </li>
                 </ul>
-                <label v-if="examinationSessionError" class="error">{{ examinationSessionError }}</label>
+                <label v-if="examSessionError" class="error">{{ examSessionError }}</label>
             </fieldset>
 
             <div class="l-flex l-gap-xs f-no-margins">
                 <button type="button" class="button l-flex__item--1" @click.prevent="isOpen = false">Cancel</button>
-                <button class="button submit l-flex__item--1" data-test="ib-registration-create-session-submit">
-                    Create Session
+                <button
+                    class="button submit l-flex__item--1"
+                    :disabled="isSubmitting"
+                    data-test="ib-registration-create-session-submit"
+                >
+                    {{ isSubmitting ? "Creating..." : "Create Session" }}
                 </button>
             </div>
         </form>
