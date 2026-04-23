@@ -131,35 +131,47 @@ class MyFiles extends Base
     }
 
     /**
-     * @inheritDoc
+     * Hard-delete the current chunk of MyFiles/MyFolders.
+     *
+     * Business rule for this strategy:
+     * if a retained my_folder is being hard-deleted, every descendant my_folder
+     * and my_file beneath that folder is also hard-deleted, regardless of the
+     * descendant row's own deleted_at value.
+     *
+     * Files are always deleted before folders, and folders are deleted in
+     * leaf-first order so self-referential foreign keys remain valid.
+     *
+     * @param array<int, array{id: int|string, table: string}> $chunk
      */
     protected function deleteChunk(array $chunk): void
     {
-        /** from the chunk, extract the ids for files and folders, then delete them separately, to avoid issues with foreign key constraints
-         */
-        $fileIds = array_column(array_filter($chunk, fn($item) => $item['table'] === self::TABLE_NAME_FILE), 'id');
-        $folderIds = array_column(array_filter($chunk, fn($item) => $item['table'] === self::TABLE_NAME_FOLDER), 'id');
+        $directFileIds = $this->normalizeIds(
+            array_column(
+                array_filter($chunk, fn(array $item): bool => $item['table'] === self::TABLE_NAME_FILE),
+                'id'
+            )
+        );
+        $requestedFolderIds = $this->normalizeIds(
+            array_column(
+                array_filter($chunk, fn(array $item): bool => $item['table'] === self::TABLE_NAME_FOLDER),
+                'id'
+            )
+        );
 
-        // debug log the ids we are deleting in this chunk
-        $this->log->debug(sprintf("Deleting %s ids: %s", self::TABLE_NAME_FILE, implode(', ', $fileIds)));
+        $cascade = $this->expandFolderCascade($requestedFolderIds);
+        $allFileIds = array_values(array_unique(array_merge($directFileIds, $cascade['fileIds'])));
+        sort($allFileIds);
 
-        // clean up the folders if any exist...
-        if (!empty($folderIds)) {
-            $this->log->debug(sprintf("Deleting %s ids: %s", self::TABLE_NAME_FOLDER, implode(', ', $folderIds)));
+        $this->log->debug(sprintf("Deleting %s ids: %s", self::TABLE_NAME_FILE, implode(', ', $allFileIds)));
+
+        if ($cascade['folderIds'] !== []) {
+            $this->log->debug(sprintf("Deleting %s ids: %s", self::TABLE_NAME_FOLDER, implode(', ', $cascade['folderIds'])));
         }
 
-        // Delete files and folders using the padded chunk approach to work with Builder placeholders
+        $eportfolioDeleted = $this->deleteEportfolioFileJoin($allFileIds);
+        $filesDeleted = $this->deleteFiles($allFileIds);
+        $foldersDeleted = $this->deleteFolders($cascade['folderIds']);
 
-        // remove any eportfolio file component links that point to these myFile rows (remove the link, leave the component (ePortfolio components using this table Image, MyFiles, Image Gallery))
-        $eportfolioDeleted = $this->deleteEportfolioFileJoin($fileIds);
-
-        // Delete files before folders so folder deletions don't fail due to my_file rows referencing them
-        $filesDeleted = $this->deleteFiles($fileIds);
-
-        // Delete folders
-        $foldersDeleted = $this->deleteFolders($folderIds);
-
-        // note: transaction commit/rollback is handled by Base::process(), do not commit here
         if ($this->perform) {
             $this->log->notice(
                 sprintf(
@@ -182,12 +194,121 @@ class MyFiles extends Base
     }
 
     /**
+     * @param array<int, int|string> $folderIds
+     * @return array<int, int>
+     */
+    private function normalizeIds(array $folderIds): array
+    {
+        $normalized = array_map(static fn(int|string $id): int => (int) $id, $folderIds);
+        $normalized = array_values(array_unique(array_filter($normalized, static fn(int $id): bool => $id > 0)));
+
+        sort($normalized);
+
+        return $normalized;
+    }
+
+    /**
+     * Expand one or more requested root folders into a full delete plan.
+     *
+     * The returned folder ids are ordered deepest-first so callers can hard-delete
+     * folders without violating my_folder.parent foreign keys.
+     *
+     * @param array<int, int> $rootFolderIds
+     * @return array{folderIds: array<int, int>, fileIds: array<int, int>}
+     */
+    protected function expandFolderCascade(array $rootFolderIds): array
+    {
+        $pending = array_map(
+            static fn(int $folderId): array => ['id' => $folderId, 'expanded' => false],
+            array_reverse($this->normalizeIds($rootFolderIds))
+        );
+        $visitedFolders = [];
+        $folderIds = [];
+        $fileIds = [];
+
+        while ($pending !== []) {
+            ['id' => $folderId, 'expanded' => $expanded] = array_pop($pending);
+
+            if ($expanded) {
+                $folderIds[] = $folderId;
+                continue;
+            }
+
+            if (isset($visitedFolders[$folderId])) {
+                continue;
+            }
+
+            $visitedFolders[$folderId] = true;
+            $fileIds = array_merge($fileIds, $this->findChildFileIds([$folderId]));
+            $pending[] = ['id' => $folderId, 'expanded' => true];
+
+            $childFolderIds = array_reverse($this->findChildFolderIds([$folderId]));
+            foreach ($childFolderIds as $childFolderId) {
+                if (isset($visitedFolders[$childFolderId])) {
+                    continue;
+                }
+
+                $pending[] = ['id' => $childFolderId, 'expanded' => false];
+            }
+        }
+
+        return [
+            'folderIds' => array_values($folderIds),
+            'fileIds' => array_values(array_unique(array_map('intval', $fileIds))),
+        ];
+    }
+
+    /**
+     * @param array<int, int> $parentIds
+     * @return array<int, int>
+     */
+    protected function findChildFolderIds(array $parentIds): array
+    {
+        if ($parentIds === []) {
+            return [];
+        }
+
+        $placeholders = Builder::getArrayPlaceholders($parentIds, 'parent');
+        $statement = $this->getPreparedStatement(
+            "SELECT id FROM " . self::TABLE_NAME_FOLDER . " WHERE parent IN {$placeholders}"
+        );
+        $statement->execute(Builder::getArrayParameters($parentIds, 'parent'));
+
+        return array_map(
+            static fn(array $row): int => (int) $row['id'],
+            $statement->fetchAll(\PDO::FETCH_ASSOC)
+        );
+    }
+
+    /**
+     * @param array<int, int> $parentIds
+     * @return array<int, int>
+     */
+    protected function findChildFileIds(array $parentIds): array
+    {
+        if ($parentIds === []) {
+            return [];
+        }
+
+        $placeholders = Builder::getArrayPlaceholders($parentIds, 'parent');
+        $statement = $this->getPreparedStatement(
+            "SELECT id FROM " . self::TABLE_NAME_FILE . " WHERE parent IN {$placeholders}"
+        );
+        $statement->execute(Builder::getArrayParameters($parentIds, 'parent'));
+
+        return array_map(
+            static fn(array $row): int => (int) $row['id'],
+            $statement->fetchAll(\PDO::FETCH_ASSOC)
+        );
+    }
+
+    /**
      * delete files by id, returns the number of rows deleted
      *
      * @param array $fileIds
      * @return int
      */
-    private function deleteFiles(array $fileIds): int
+    protected function deleteFiles(array $fileIds): int
     {
         if (empty($fileIds)) {
             return 0;
@@ -208,7 +329,7 @@ class MyFiles extends Base
      * @param array $folderIds
      * @return int
      */
-    private function deleteFolders(array $folderIds): int
+    protected function deleteFolders(array $folderIds): int
     {
         if (empty($folderIds)) {
             return 0;
@@ -229,7 +350,7 @@ class MyFiles extends Base
      * @param array $fileIds
      * @return int
      */
-    private function deleteEportfolioFileJoin(array $fileIds): int
+    protected function deleteEportfolioFileJoin(array $fileIds): int
     {
         if (empty($fileIds)) {
             return 0;
