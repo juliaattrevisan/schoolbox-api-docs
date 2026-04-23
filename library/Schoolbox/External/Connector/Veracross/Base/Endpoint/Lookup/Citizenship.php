@@ -48,7 +48,7 @@ class Citizenship
                         continue;
                     }
 
-                    $citizenship = $valueLists['citizenship'][$record['citizenship']] ?? self::UNKNOWN_DESCRIPTION;
+                    $citizenship = $valueLists['country'][$record['country']] ?? self::UNKNOWN_DESCRIPTION;
 
                     if (!isset($this->lookup[$externalId])) {
                         $this->lookup[$externalId] = [
