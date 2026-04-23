@@ -357,41 +357,44 @@ export default {
                                 <button
                                     v-if="!isRequestToJoin && !(isPrivate || isAdmin)"
                                     title="Join"
-                                    class="group-action sbx-button--has-icon"
+                                    class="group-action sbx-icon-only-button"
                                     @click="join"
                                 >
-                                    <sbx-icon name="add"></sbx-icon>
+                                    <sbx-icon name="add" size="1.5rem"></sbx-icon>
                                     Join
                                 </button>
                                 <button
                                     v-else-if="!(isPrivate || isAdmin)"
                                     title="Request to join"
-                                    class="group-action sbx-button--has-icon"
+                                    class="group-action sbx-icon-only-button"
                                     @click="join"
                                 >
-                                    <sbx-icon name="add"></sbx-icon>
+                                    <sbx-icon name="add" size="1.5rem"></sbx-icon>
                                     Request to join
                                 </button>
                             </template>
                             <button
                                 v-if="isEnrolled || isPrivate"
                                 title="Toggle Favourites"
-                                class="group-action sbx-button--has-icon"
+                                class="group-action sbx-icon-only-button"
                                 aria-label="Toggle Favourites"
                                 :disabled="isProcessing"
                                 @click="toggleFavourites"
                             >
-                                <sbx-icon :name="isFavourite ? 'favourite' : 'favourite-hollow'" />
+                                <sbx-icon :name="isFavourite ? 'favourite' : 'favourite-hollow'" size="1.5rem" />
                                 Toggle Favourites
                             </button>
                             <button
                                 v-if="!group.isForceFollow && !group.isMsgDisabled && (isEnrolled || isPrivate)"
                                 title="Toggle Notifications"
-                                class="group-action sbx-button--has-icon"
+                                class="group-action sbx-icon-only-button"
                                 :disabled="isProcessing"
                                 @click="toggleNotifications"
                             >
-                                <sbx-icon :name="isNotificationsOn ? 'notifications' : 'notifications-hollow'" />
+                                <sbx-icon
+                                    :name="isNotificationsOn ? 'notifications' : 'notifications-hollow'"
+                                    size="1.5rem"
+                                />
                                 Toggle Notifications
                             </button>
                             <button
@@ -400,7 +403,10 @@ export default {
                                 class="group-action sbx-icon-only-button"
                                 :disabled="true"
                             >
-                                <sbx-icon :name="group.isForceFollow ? 'notifications' : 'notifications-hollow'" />
+                                <sbx-icon
+                                    :name="group.isForceFollow ? 'notifications' : 'notifications-hollow'"
+                                    size="1.5rem"
+                                />
                             </button>
                         </div>
                     </transition>
@@ -478,6 +484,7 @@ export default {
 .group-actions {
     //to put them in the top right corner
     background: var(--sbx-config-color-active, var(--accent-foreground));
+    border-radius: var(--sbx-config-field-roundness, 0);
     position: absolute;
     right: 0.5rem;
     top: 0.5rem;
@@ -496,12 +503,6 @@ export default {
     .sbx-icon {
         color: var(--sbx-config-color-active, var(--accent-foreground));
         display: inline-flex;
-    }
-
-    :deep(.sbx-icon__svg) {
-        height: 1.5rem;
-        padding: 0;
-        width: 1.5rem;
     }
 
     &:hover {
