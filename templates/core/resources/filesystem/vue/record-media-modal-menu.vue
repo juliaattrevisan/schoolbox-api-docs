@@ -184,28 +184,48 @@ export default {
 
 <template>
     <div v-if="hasChecked" class="pseudo-video" ref="pseudoVideo">
-        <button v-if="isAudioSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)">
+        <button
+            v-if="isAudioSupported"
+            class="menu-item"
+            @click="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)"
+            data-test="record-media-modal-audio-button"
+        >
             <div>
                 <sbx-icon name="mic" size="var(--sbx-icon-size)"></sbx-icon>
                 <span>Audio</span>
                 <aside>Say something with an audio only recording.</aside>
             </div>
         </button>
-        <button v-if="isVideoSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.PHOTO)">
+        <button
+            v-if="isVideoSupported"
+            class="menu-item"
+            @click="recordMediaTypeSelected(recordMediaTypes.PHOTO)"
+            data-test="record-media-modal-photo-button"
+        >
             <div>
                 <sbx-icon name="camera" size="var(--sbx-icon-size)"></sbx-icon>
                 <span>Photo</span>
                 <aside>Use a computer camera to take a photo.</aside>
             </div>
         </button>
-        <button v-if="isVideoSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.CAMERA)">
+        <button
+            v-if="isVideoSupported"
+            class="menu-item"
+            @click="recordMediaTypeSelected(recordMediaTypes.CAMERA)"
+            data-test="record-media-modal-video-button"
+        >
             <div>
                 <sbx-icon name="video" size="var(--sbx-icon-size)"></sbx-icon>
                 <span>Video</span>
                 <aside>Use a computer camera to create a video recording.</aside>
             </div>
         </button>
-        <button v-if="!hasDeviceCapture" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.SCREEN)">
+        <button
+            v-if="!hasDeviceCapture"
+            class="menu-item"
+            @click="recordMediaTypeSelected(recordMediaTypes.SCREEN)"
+            data-test="record-media-modal-screen-button"
+        >
             <div>
                 <sbx-icon name="screen-capture" size="var(--sbx-icon-size)"></sbx-icon>
                 <span>Screen</span>
