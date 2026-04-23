@@ -8,7 +8,6 @@
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
-use Schoolbox\Resource\Folder;
 use Schoolbox\Permission\Access\Access;
 
 /**
