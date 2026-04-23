@@ -165,30 +165,13 @@ function onMouseOut(event: MouseEvent): void {
 
     &__button {
         align-items: center;
-        background-color: var(--content-ui-submit-background);
-        color: var(--content-ui-submit-foreground);
+        background-color: var(--sbx-config-color-accent, var(--content-ui-submit-background));
+        border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
+        color: var(--sbx-config-color-accent-text, var(--content-ui-submit-foreground));
         display: flex;
-        height: var(--tabbar-height);
         justify-content: center;
         margin: 0;
         padding: 0;
-
-        sbx-icon {
-            color: inherit;
-        }
-
-        &:before {
-            transition: all 0.2s ease-in;
-            color: var(--content-ui-submit-foreground);
-        }
-        &:hover {
-            background-color: rgba(
-                calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
-                calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
-                calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
-                var(--content-ui-submit-background-a)
-            );
-        }
     }
 }
 </style>

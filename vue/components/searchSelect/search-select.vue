@@ -208,7 +208,11 @@ function onButtonSelected(): void {
             @select="onSelect"
             @remove="onRemove"
         />
-        <div v-if="props.showInput" class="input-group f-no-margins" data-test="search-select-input-group">
+        <div
+            v-if="props.showInput"
+            :class="`${props.hasButton ? 'input-group' : ''} f-no-margins`"
+            data-test="search-select-input-group"
+        >
             <ss-query-input
                 v-if="!props.isReadOnly"
                 v-model:query="query"

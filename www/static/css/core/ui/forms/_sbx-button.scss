@@ -203,16 +203,6 @@ body.sbx-body {
     }
 
     /**
-     * Specific style for the search button to match design
-     */
-    .c-filter-search-term__button {
-        background-color: var(--sbx-config-color-accent);
-        color: var(--sbx-config-color-accent-text);
-        border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
-        height: auto;
-    }
-
-    /**
      * Chips component buttons
      * These need to hide the checkbox input to match design
      */
