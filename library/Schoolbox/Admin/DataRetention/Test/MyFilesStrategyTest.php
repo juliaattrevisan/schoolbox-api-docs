@@ -12,83 +12,9 @@ use Schoolbox\Admin\DataRetention\Strategy\MyFiles;
 use Schoolbox\IConfigLoader;
 use Symfony\Component\Lock\LockInterface;
 
-class TestableMyFilesStrategy extends MyFiles
-{
-    /** @var array<int, list<int>> */
-    private array $folderChildren = [];
-
-    /** @var array<int, list<int>> */
-    private array $fileChildren = [];
-
-    /** @var list<int> */
-    public array $deletedFiles = [];
-
-    /** @var list<int> */
-    public array $deletedFolders = [];
-
-    /** @var list<int> */
-    public array $deletedEportfolioFileIds = [];
-
-    public function setTree(array $folderChildren, array $fileChildren): void
-    {
-        $this->folderChildren = $folderChildren;
-        $this->fileChildren = $fileChildren;
-    }
-
-    public function runDeleteChunk(array $chunk): void
-    {
-        $this->deleteChunk($chunk);
-    }
-
-    protected function findChildFolderIds(array $parentIds): array
-    {
-        $children = [];
-        foreach ($parentIds as $parentId) {
-            foreach ($this->folderChildren[$parentId] ?? [] as $childId) {
-                $children[] = $childId;
-            }
-        }
-
-        return $children;
-    }
-
-    protected function findChildFileIds(array $parentIds): array
-    {
-        $children = [];
-        foreach ($parentIds as $parentId) {
-            foreach ($this->fileChildren[$parentId] ?? [] as $childId) {
-                $children[] = $childId;
-            }
-        }
-
-        return $children;
-    }
-
-    protected function deleteFiles(array $fileIds): int
-    {
-        $this->deletedFiles = $fileIds;
-
-        return count($fileIds);
-    }
-
-    protected function deleteFolders(array $folderIds): int
-    {
-        $this->deletedFolders = $folderIds;
-
-        return count($folderIds);
-    }
-
-    protected function deleteEportfolioFileJoin(array $fileIds): int
-    {
-        $this->deletedEportfolioFileIds = $fileIds;
-
-        return count($fileIds);
-    }
-}
-
 class MyFilesStrategyTest extends TestCase
 {
-    private function makeStrategy(): TestableMyFilesStrategy
+    private function strategy(array $folderChildren, array $fileChildren): MyFiles
     {
         $logger = $this->createMock(LoggerInterface::class);
         $database = $this->createMock(IConnector::class);
@@ -99,7 +25,7 @@ class MyFilesStrategyTest extends TestCase
         $logger->method('notice');
         $logger->method('info');
 
-        return new TestableMyFilesStrategy(
+        return new class (
             $logger,
             true,
             $database,
@@ -107,13 +33,95 @@ class MyFilesStrategyTest extends TestCase
             $config,
             time() + 3600,
             new RetentionPeriod(30),
-        );
+            $folderChildren,
+            $fileChildren,
+        ) extends MyFiles {
+            /** @var array<int, list<int>> */
+            private array $folderChildren;
+
+            /** @var array<int, list<int>> */
+            private array $fileChildren;
+
+            /** @var list<int> */
+            public array $deletedFiles = [];
+
+            /** @var list<int> */
+            public array $deletedFolders = [];
+
+            /** @var list<int> */
+            public array $deletedEportfolioFileIds = [];
+
+            public function __construct(
+                LoggerInterface $logger,
+                bool $perform,
+                IConnector $database,
+                LockInterface $lock,
+                IConfigLoader $config,
+                int $stoppingTime,
+                RetentionPeriod $retentionPeriod,
+                array $folderChildren,
+                array $fileChildren,
+            ) {
+                parent::__construct($logger, $perform, $database, $lock, $config, $stoppingTime, $retentionPeriod);
+                $this->folderChildren = $folderChildren;
+                $this->fileChildren = $fileChildren;
+            }
+
+            public function delete(array $chunk): void
+            {
+                $this->deleteChunk($chunk);
+            }
+
+            protected function findChildFolderIds(array $parentIds): array
+            {
+                $children = [];
+                foreach ($parentIds as $parentId) {
+                    foreach ($this->folderChildren[$parentId] ?? [] as $childId) {
+                        $children[] = $childId;
+                    }
+                }
+
+                return $children;
+            }
+
+            protected function findChildFileIds(array $parentIds): array
+            {
+                $children = [];
+                foreach ($parentIds as $parentId) {
+                    foreach ($this->fileChildren[$parentId] ?? [] as $childId) {
+                        $children[] = $childId;
+                    }
+                }
+
+                return $children;
+            }
+
+            protected function deleteFiles(array $fileIds): int
+            {
+                $this->deletedFiles = $fileIds;
+
+                return count($fileIds);
+            }
+
+            protected function deleteFolders(array $folderIds): int
+            {
+                $this->deletedFolders = $folderIds;
+
+                return count($folderIds);
+            }
+
+            protected function deleteEportfolioFileJoin(array $fileIds): int
+            {
+                $this->deletedEportfolioFileIds = $fileIds;
+
+                return count($fileIds);
+            }
+        };
     }
 
-    public function testDeleteChunkDeletesDescendantFilesBeforeFoldersAndParentsLast(): void
+    public function testDeletesDescendants(): void
     {
-        $strategy = $this->makeStrategy();
-        $strategy->setTree(
+        $strategy = $this->strategy(
             [
                 10 => [11, 12],
                 11 => [13],
@@ -128,7 +136,7 @@ class MyFilesStrategyTest extends TestCase
             ],
         );
 
-        $strategy->runDeleteChunk([
+        $strategy->delete([
             ['id' => 10, 'table' => 'my_folder'],
         ]);
 
@@ -137,10 +145,9 @@ class MyFilesStrategyTest extends TestCase
         $this->assertSame([13, 11, 12, 10], $strategy->deletedFolders);
     }
 
-    public function testDeleteChunkMergesDirectFileIdsWithCascadeFileIdsWithoutDuplicates(): void
+    public function testMergesDirectFiles(): void
     {
-        $strategy = $this->makeStrategy();
-        $strategy->setTree(
+        $strategy = $this->strategy(
             [
                 20 => [21],
                 21 => [],
@@ -151,7 +158,7 @@ class MyFilesStrategyTest extends TestCase
             ],
         );
 
-        $strategy->runDeleteChunk([
+        $strategy->delete([
             ['id' => 20, 'table' => 'my_folder'],
             ['id' => 202, 'table' => 'my_file'],
             ['id' => 203, 'table' => 'my_file'],
@@ -161,10 +168,9 @@ class MyFilesStrategyTest extends TestCase
         $this->assertSame([21, 20], $strategy->deletedFolders);
     }
 
-    public function testDeleteChunkHandlesNestedRequestedFoldersOnlyOnce(): void
+    public function testDeduplicatesNestedFolders(): void
     {
-        $strategy = $this->makeStrategy();
-        $strategy->setTree(
+        $strategy = $this->strategy(
             [
                 30 => [31],
                 31 => [32],
@@ -177,7 +183,7 @@ class MyFilesStrategyTest extends TestCase
             ],
         );
 
-        $strategy->runDeleteChunk([
+        $strategy->delete([
             ['id' => 30, 'table' => 'my_folder'],
             ['id' => 31, 'table' => 'my_folder'],
         ]);
@@ -186,10 +192,9 @@ class MyFilesStrategyTest extends TestCase
         $this->assertSame([32, 31, 30], $strategy->deletedFolders);
     }
 
-    public function testDeleteChunkDeletesSiblingBranchesLeafFirstBeforeSharedParent(): void
+    public function testDeletesSiblingBranchesLeafFirst(): void
     {
-        $strategy = $this->makeStrategy();
-        $strategy->setTree(
+        $strategy = $this->strategy(
             [
                 1 => [2, 3],
                 2 => [],
@@ -202,7 +207,7 @@ class MyFilesStrategyTest extends TestCase
             ],
         );
 
-        $strategy->runDeleteChunk([
+        $strategy->delete([
             ['id' => 1, 'table' => 'my_folder'],
         ]);
 
