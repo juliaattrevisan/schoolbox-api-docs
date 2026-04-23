@@ -205,6 +205,7 @@ module.exports = {
         profileEditor: "./library/Schoolbox/Admin/Profile/Editor/templates/vue/profileEditor.ts",
         editorTemplates: "./library/Schoolbox/Admin/Editor/Templates/templates/vue/editorTemplates.ts",
         ibConfiguration: "./library/Schoolbox/Admin/InternationalBaccalaureate/templates/vue/ibConfiguration.ts",
+        ibRegistration: "./library/Schoolbox/Admin/InternationalBaccalaureate/templates/vue/ibRegistration.ts",
         aiUsageLog: "./library/Schoolbox/Admin/OpenAI/Usage/templates/aiUsageLog.ts",
         adminDifferentiationProfiles:
             "./library/Schoolbox/Admin/DifferentiationProfiles/templates/vue/adminDifferentiationProfiles.ts",

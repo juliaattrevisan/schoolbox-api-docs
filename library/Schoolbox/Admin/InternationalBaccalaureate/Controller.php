@@ -21,25 +21,32 @@ use Exception;
 use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
-use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IB\Group\Subject\Language\Mapper as GroupSubjectLanguageMapper;
+use Schoolbox\IB\Group\Subject\Language\Model as GroupSubjectLanguageModel;
+use Schoolbox\IB\Group\Subject\Mapper as IBGroupSubjectMapper;
+use Schoolbox\IB\Group\Subject\Model as IBGroupSubjectModel;
 use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\IB\Group\Model as IBGroupModel;
-use Schoolbox\IB\GroupSubject\Mapper as IBGroupSubjectMapper;
-use Schoolbox\IB\GroupSubject\Model as IBGroupSubjectModel;
-use Schoolbox\IB\GroupSubject\Language\Mapper as GroupSubjectLanguageMapper;
-use Schoolbox\IB\GroupSubject\Language\Model as GroupSubjectLanguageModel;
+use Schoolbox\IB\Registrations\Sessions\Mapper as RegistrationSessionMapper;
+use Schoolbox\IB\Registrations\Sessions\Model as RegistrationSessionModel;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Language\Model as LanguageModel;
+use Schoolbox\Mapper\Exception\NotFound as MapperNotFound;
 
 class Controller extends ConfigController
 {
+    /* General Configuration ID
+     */
+    private const int GENERAL_CATEGORY_ID = 0;
+
     public function __construct(
         ConfigMapper $configMapper,
         private IBGroupMapper $groupMapper,
         private IBGroupSubjectMapper $groupSubjectMapper,
         private GroupSubjectLanguageMapper $groupSubjectLanguageMapper,
         private LanguageMapper $languageMapper,
+        private RegistrationSessionMapper $registrationSessionMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
         CacheInterface $oidcCache
@@ -60,7 +67,7 @@ class Controller extends ConfigController
         // Add General Configuration tab manually
         $categories = [
             [
-                'id' => 0,
+                'id' => self::GENERAL_CATEGORY_ID,
                 'name' => 'general',
                 'title' => 'General Configuration',
             ],
@@ -154,12 +161,12 @@ class Controller extends ConfigController
     {
         $configurations = [];
 
-        if ($categoryId === 0) { // General tab - load from preloaded config
+        if ($categoryId === self::GENERAL_CATEGORY_ID) { // General tab - load from preloaded config
             $configLoader = $this->getConfigLoader();
 
             $configurations = [
                 [
-                    'categoryId' => 0,
+                    'categoryId' => self::GENERAL_CATEGORY_ID,
                     'key' => ConfigMapper::NAME_IB_SCHOOL_NAME,
                     'value' => $configLoader->get(ConfigMapper::NAME_IB_SCHOOL_NAME) ?? '',
                     'description' => 'Enter the school\'s name as registered with the IB.',
@@ -167,7 +174,7 @@ class Controller extends ConfigController
                     'label' => 'School Name',
                 ],
                 [
-                    'categoryId' => 0,
+                    'categoryId' => self::GENERAL_CATEGORY_ID,
                     'key' => ConfigMapper::NAME_IB_SCHOOL_CODE,
                     'value' => $configLoader->get(ConfigMapper::NAME_IB_SCHOOL_CODE) ?? '',
                     'description' => 'Enter the school\'s code as provided by the IB.',
@@ -319,6 +326,7 @@ class Controller extends ConfigController
     /**
      * Registration Reports page
      *
+     * @throws RouteNotFound|\Twig\Error\Error
      * @api GET /adminv2/international-baccalaureate/registrations
      */
     public function getRegistrations(): void
@@ -329,7 +337,133 @@ class Controller extends ConfigController
             [
                 'pageCurrent' => $pageCurrent,
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
+                '_routes' => [
+                    'sessions' => [
+                        'list' => $this->getRouteIfAuthorized('internationalBaccalaureate.getRegistrationSessions'),
+                        'create' => $this->getRouteIfAuthorized('internationalBaccalaureate.createRegistrationSession')
+                    ]
+                ]
             ]
         );
+    }
+
+    /**
+     * Get the list of all the registration sessions
+     *
+     * @return void
+     * @api GET /adminv2/international-baccalaureate/registrations/sessions
+     *
+     */
+    public function getRegistrationSessions(): void
+    {
+        try {
+            $sessions = $this->registrationSessionMapper->findAll();
+            $sessionsBySystemPurpose = [];
+
+            /** @var RegistrationSessionModel $session */
+            foreach ($sessions as $session) {
+                $systemPurpose = $session->getSystemPurpose();
+
+                if (!$systemPurpose) {
+                    continue;
+                }
+
+                $sessionsBySystemPurpose[$systemPurpose->getId()][] = $session->jsonSerialize();
+            }
+
+            $this->response = $this->responseAsJson($sessionsBySystemPurpose);
+        } catch (Exception $e) {
+            $this->response = $this->responseAsJson(
+                [
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ]
+            )->withStatus(500);
+        }
+    }
+
+    /**
+     * Create registration sessions
+     *
+     * @return void
+     * @api POST /adminv2/international-baccalaureate/registrations/sessions
+     *
+     */
+    public function createRegistrationSession(): void
+    {
+        $post = $this->requestPost;
+
+        $systemPurposeId = $post->getInt('systemPurposeId');
+        $academicYear = trim((string)$post->get('academicYear'));
+        $examSession = trim((string)$post->get('examSession'));
+
+        if (
+            null === $systemPurposeId ||
+            '' === $academicYear ||
+            !in_array(
+                $examSession,
+                RegistrationSessionMapper::EXAM_SESSIONS,
+                true
+            )
+        ) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => 'Invalid registration session request data',
+            ])->withStatus(400);
+            return;
+        }
+
+        /* Validate system purpose ID and load the system purpose model, as it's needed for creating the registration session.
+         * If the ID is invalid, return an error.
+         */
+        try {
+            $systemPurpose = $this->registrationSessionMapper
+                ->getJoinMapper('systemPurpose')
+                ->findOneByColumn('id', $systemPurposeId);
+        } catch (MapperNotFound) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => 'Invalid registration session request data: systemPurposeId is incorrect',
+            ])->withStatus(400);
+            return;
+        } catch (Exception $e) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ])->withStatus(500);
+            return;
+        }
+
+        try {
+            $session = $this->registrationSessionMapper
+                ->createModel()
+                ->setSystemPurpose($systemPurpose)
+                ->setAcademicYear($academicYear)
+                ->setExamSession($examSession)
+                ->setCreatedBy($this->getUser())
+                ->setUpdatedBy($this->getUser());
+
+            $this->registrationSessionMapper->save($session);
+
+            /** @var RegistrationSessionModel|null $createdSession */
+            $createdSession = $this->registrationSessionMapper->findById($session->getId());
+
+            if (!$createdSession || !$createdSession->getSystemPurpose()) {
+                $this->response = $this->responseAsJson([
+                    'success' => false,
+                    'message' => 'Registration session was created but could not be loaded',
+                ])->withStatus(500);
+                return;
+            }
+
+            $this->response = $this
+                ->responseAsJson($createdSession->jsonSerialize())
+                ->withStatus(201);
+        } catch (Exception $e) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ])->withStatus(500);
+        }
     }
 }

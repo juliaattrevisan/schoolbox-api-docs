@@ -7,10 +7,11 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-
-        <div class="content-body">
-            Pending
-        </div>
-
+        <div
+            id="ib-registration-app"
+            data-sessions-endpoint="/adminv2/international-baccalaureate/registrations/api/sessions/diploma"
+            data-create-endpoint="/adminv2/international-baccalaureate/registrations/api/sessions"
+        ></div>
+        <script src="{{ CDN_PREFIX }}/js/bundle/ibRegistration.js?v={{ config.site_version }}"></script>
     </div>
 </div>

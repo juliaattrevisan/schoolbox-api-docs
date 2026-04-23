@@ -7,12 +7,12 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\IB\GroupSubject\Language;
+namespace Schoolbox\IB\Group\Subject\Language;
 
 use PDO;
 use PDOStatement;
 use Schoolbox\GenericCollection;
-use Schoolbox\IB\GroupSubject\Mapper as GroupSubjectMapper;
+use Schoolbox\IB\Group\Subject\Mapper as GroupSubjectMapper;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Mapper as BaseMapper;
 

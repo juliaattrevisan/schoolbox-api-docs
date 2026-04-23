@@ -27,6 +27,7 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
+use Schoolbox\IB\SystemPurpose\Mapper as SystemPurposeMapper;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
@@ -752,6 +753,17 @@ class Controller extends Base
                 'key'     => $campus->getId(),
                 'value'   => $campus->getName(),
                 'deleted' => $campus->isDeleted(),
+            ];
+        }
+
+        $luSystemPurpose = [];
+        $systemPurposes = SystemPurposeMapper::getInstance()->findAll();
+        foreach ($systemPurposes as $systemPurpose) {
+            $category = $systemPurpose->getCategory();
+
+            $luSystemPurpose[] = [
+                'key'   => $systemPurpose->getId(),
+                'value' => $systemPurpose->getName() . ' [' . $category->getName() . ']',
             ];
         }
 
@@ -1841,11 +1853,7 @@ class Controller extends Base
                     'mandatory' => false,
                     'nullable'  => true,
                     'nullable_label' => 'Not Selected',
-                    'lookup'    => [
-                        ['key' => QualificationModel::SYSTEM_PURPOSE_DIPLOMA, 'value' => 'Diploma Programme Year 2 [DIPLOMA]'],
-                        ['key' => QualificationModel::SYSTEM_PURPOSE_ANTICIPATED, 'value' => 'Diploma Programme Year 1 [ANTICIPATED]'],
-                        ['key' => QualificationModel::SYSTEM_PURPOSE_COURSE, 'value' => 'Diploma Course [COURSE]'],
-                    ],
+                    'lookup'    => $luSystemPurpose,
                 ],
             ]
         ];

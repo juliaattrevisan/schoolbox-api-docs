@@ -7,10 +7,9 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\IB\GroupSubject\Language;
+namespace Schoolbox\IB\Group\Subject\Language;
 
-use JsonSerializable;
-use Schoolbox\IB\GroupSubject\Model as GroupSubjectModel;
+use Schoolbox\IB\Group\Subject\Model as GroupSubjectModel;
 use Schoolbox\Language\Model as LanguageModel;
 use Schoolbox\Mapper\Traits\Model\Id;
 

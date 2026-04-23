@@ -14,35 +14,20 @@ use JsonSerializable;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTraits;
 use Schoolbox\Sequential;
+use Schoolbox\IB\SystemPurpose\Model as SystemPurposeModel;
 
 /**
  * Class Model
  *
  * @package Schoolbox\IB\Qualification
  */
-class Model implements ISoftDeletable, Sequential, JsonSerializable
+class Model implements ISoftDeletable, Sequential
 {
     use ModelTraits\Id;
     use ModelTraits\CreatedAtDate;
     use ModelTraits\UpdatedAtDate;
     use ModelTraits\DeletedAtDate;
     use ModelTraits\HasSequence;
-
-    /**
-     * System Purpose Constants
-     */
-    public const string SYSTEM_PURPOSE_DIPLOMA = 'DIPLOMA';
-    public const string SYSTEM_PURPOSE_ANTICIPATED = 'ANTICIPATED';
-    public const string SYSTEM_PURPOSE_COURSE = 'COURSE';
-
-    /**
-     * Available system purposes
-     */
-    public const array VALID_SYSTEM_PURPOSES = [
-        self::SYSTEM_PURPOSE_DIPLOMA,
-        self::SYSTEM_PURPOSE_ANTICIPATED,
-        self::SYSTEM_PURPOSE_COURSE,
-    ];
 
     /**
      * Qualification Name
@@ -52,9 +37,9 @@ class Model implements ISoftDeletable, Sequential, JsonSerializable
 
     /**
      * System Purpose for this qualification
-     * @var string|null
+     * @var SystemPurposeModel|null
      */
-    private ?string $systemPurpose = null;
+    private ?SystemPurposeModel $systemPurpose = null;
 
     /**
      * @return string|null
@@ -75,36 +60,20 @@ class Model implements ISoftDeletable, Sequential, JsonSerializable
     }
 
     /**
-     * @return string|null
+     * @return SystemPurposeModel|null
      */
-    public function getSystemPurpose(): ?string
+    public function getSystemPurpose(): ?SystemPurposeModel
     {
         return $this->systemPurpose;
     }
 
     /**
-     * @param string|null $systemPurpose
+     * @param SystemPurposeModel|null $systemPurpose
      * @return self
      */
-    public function setSystemPurpose(?string $systemPurpose): self
+    public function setSystemPurpose(?SystemPurposeModel $systemPurpose): self
     {
         $this->systemPurpose = $systemPurpose;
         return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'id' => $this->getId(),
-            'name' => $this->getName(),
-            'systemPurpose' => $this->getSystemPurpose(),
-            'sequence' => $this->getSequence(),
-            'createdAt' => $this->getCreatedAt(),
-            'updatedAt' => $this->getUpdatedAt(),
-            'deletedAt' => $this->getDeletedAt(),
-        ];
     }
 }
