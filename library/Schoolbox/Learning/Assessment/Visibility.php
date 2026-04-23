@@ -33,14 +33,12 @@ class Visibility
     /**
      * Determines if the specified user can see an IAssessable (but not necessarily its details or participant interactions)
      *
-     * Does not consider whether a parent can see the assessment because one of their children can. This is to ensure the caller
-     * can distinguish the case where a parent can view the assessment themselves, vs seeing it due to their child's visibility.
-     *
      * The below rules summarise the authoritative descriptions in Assessment\WorkType\Mapper.
      *  - Instructor               - can see anytime (so long as not past close and we are hiding closed)
      *  - Learner                  - excluded if the work type hides learners; otherwise same as staff/participant rules
      *  - Staff (non-learner)      - can see anytime (so long as not past close and we are hiding closed)
      *  - NonStaff + NonInstructor - can only see if a participant, and after publish date, and not pure staff/instructor only
+     *                               (note parents of learners are handled in this category of user)
      *
      * Staff      - is any user with role-type of 'staff'
      * Instructor - is any user with WRITE+ perm to folder
