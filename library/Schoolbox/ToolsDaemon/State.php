@@ -67,4 +67,14 @@ enum State : string
      * Any unexpected state, not covered by any of the above.
      */
     case UNKNOWN = 'UNKNOWN';
+
+    /**
+     * Has the task finished running?
+     *
+     * @return bool
+     */
+    public function isFinished(): bool
+    {
+        return in_array($this, [self::SUCCESS, self::FAILURE, self::REVOKED]);
+    }
 }
