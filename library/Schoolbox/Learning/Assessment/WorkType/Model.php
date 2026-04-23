@@ -230,6 +230,8 @@ class Model implements ISoftDeletable, Sequential
 
     /**
      * Return the visibility of the work type as a string constant, derived from the visibility booleans.
+     * If you do not have a model instance available, use WorkType\Mapper->getVisibilityFromBooleans() instead.
+     *
      * @throws InsufficientHydrationException
      * @return string
      */
