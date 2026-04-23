@@ -32,6 +32,7 @@ use Schoolbox\IB\Registrations\Sessions\Mapper as RegistrationSessionMapper;
 use Schoolbox\IB\Registrations\Sessions\Model as RegistrationSessionModel;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Language\Model as LanguageModel;
+use Schoolbox\Mapper\Exception\NotFound as MapperNotFound;
 
 class Controller extends ConfigController
 {
@@ -407,15 +408,31 @@ class Controller extends ConfigController
             return;
         }
 
+        /* Validate system purpose ID and load the system purpose model, as it's needed for creating the registration session.
+         * If the ID is invalid, return an error.
+         */
+        try {
+            $systemPurpose = $this->registrationSessionMapper
+                ->getJoinMapper('systemPurpose')
+                ->findOneByColumn('id', $systemPurposeId);
+        } catch (MapperNotFound) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => 'Invalid registration session request data: systemPurposeId is incorrect',
+            ])->withStatus(400);
+            return;
+        } catch (Exception $e) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ])->withStatus(500);
+            return;
+        }
+
         try {
             $session = $this->registrationSessionMapper
                 ->createModel()
-                ->setSystemPurpose(
-                    $this->registrationSessionMapper
-                        ->getJoinMapper('systemPurpose')
-                        ->createModel()
-                        ->setId($systemPurposeId)
-                )
+                ->setSystemPurpose($systemPurpose)
                 ->setAcademicYear($academicYear)
                 ->setExamSession($examSession)
                 ->setCreatedBy($this->getUser())
