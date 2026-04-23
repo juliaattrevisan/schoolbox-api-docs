@@ -378,7 +378,6 @@ export default {
                                 title="Toggle Favourites"
                                 class="group-action sbx-icon-only-button"
                                 aria-label="Toggle Favourites"
-                                :disabled="isProcessing"
                                 @click="toggleFavourites"
                             >
                                 <sbx-icon :name="isFavourite ? 'favourite' : 'favourite-hollow'" size="1.5rem" />
@@ -478,33 +477,21 @@ export default {
 
 <style lang="scss" scoped>
 .group-image-container {
-    overflow: hidden; //so can slide the .group-actions in and out
+    overflow: hidden; // so can slide the .group-actions in and out
     position: relative;
 }
 .group-actions {
-    //to put them in the top right corner
-    background: var(--sbx-config-color-active, var(--accent-foreground));
+    // to put them in the top right corner
+    background: var(--sbx-color-foreground-primary, white);
     border-radius: var(--sbx-config-field-roundness, 0);
     position: absolute;
     right: 0.5rem;
     top: 0.5rem;
 }
 
-@mixin disabled-button {
-    //both .group-action and .membership share the same disabled styling
-    &:disabled {
-        color: var(--sbx-config-color-active, var(--accent-foreground));
-    }
-}
 .group-action {
-    @include disabled-button;
     background: none;
     font-size: 0;
-    .sbx-icon {
-        color: var(--sbx-config-color-active, var(--accent-foreground));
-        display: inline-flex;
-    }
-
     &:hover {
         opacity: 0.8;
     }
