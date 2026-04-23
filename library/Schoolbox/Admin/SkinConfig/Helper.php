@@ -32,7 +32,7 @@ class Helper
      * Build the Twig payload used by the preview stylesheet response.
      *
      * @param array<array-key, mixed> $configs
-      * @return array{colors: array<string, array<string, mixed>>, cssVariables: array<string, string>, customCss: string}
+     * @return array{colors: array<string, array<string, mixed>>, cssVariables: array<string, string>, customCss: string}
      */
     public function buildPreviewData(array $configs): array
     {
@@ -47,7 +47,7 @@ class Helper
     /**
      * Build the Twig payload used by the persisted skin stylesheet response.
      *
-      * @return array{colors: array<string, array<string, mixed>>, cssVariables: array<string, string>, customCss: string}
+     * @return array{colors: array<string, array<string, mixed>>, cssVariables: array<string, string>, customCss: string}
      */
     public function buildPersistedData(): array
     {
