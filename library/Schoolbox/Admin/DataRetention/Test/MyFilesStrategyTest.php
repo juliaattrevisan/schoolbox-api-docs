@@ -14,6 +14,13 @@ use Symfony\Component\Lock\LockInterface;
 
 class MyFilesStrategyTest extends TestCase
 {
+    /**
+     * Keeps the strategy test-specific and self-contained so the file reads as
+     * a set of behaviours rather than as test harness plumbing.
+     *
+     * @param array<int, list<int>> $folderChildren
+     * @param array<int, list<int>> $fileChildren
+     */
     private function strategy(array $folderChildren, array $fileChildren): MyFiles
     {
         $logger = $this->createMock(LoggerInterface::class);
@@ -119,6 +126,10 @@ class MyFilesStrategyTest extends TestCase
         };
     }
 
+    /**
+     * A deleted folder should expand to the full subtree so file cleanup runs
+     * before folder hard deletes and the root folder is removed last.
+     */
     public function testDeletesDescendants(): void
     {
         $strategy = $this->strategy(
@@ -145,6 +156,10 @@ class MyFilesStrategyTest extends TestCase
         $this->assertSame([13, 11, 12, 10], $strategy->deletedFolders);
     }
 
+    /**
+     * Directly requested files can share a chunk with a deleted folder, so the
+     * combined file delete set should stay unique and deterministic.
+     */
     public function testMergesDirectFiles(): void
     {
         $strategy = $this->strategy(
@@ -168,6 +183,10 @@ class MyFilesStrategyTest extends TestCase
         $this->assertSame([21, 20], $strategy->deletedFolders);
     }
 
+    /**
+     * Nested requested folders should only be processed once so the strategy
+     * does not try to delete the same branch multiple times.
+     */
     public function testDeduplicatesNestedFolders(): void
     {
         $strategy = $this->strategy(
@@ -192,6 +211,10 @@ class MyFilesStrategyTest extends TestCase
         $this->assertSame([32, 31, 30], $strategy->deletedFolders);
     }
 
+    /**
+     * Sibling branches must be removed before the shared parent so the folder
+     * delete order remains safe for the self-referential foreign key.
+     */
     public function testDeletesSiblingBranchesLeafFirst(): void
     {
         $strategy = $this->strategy(
