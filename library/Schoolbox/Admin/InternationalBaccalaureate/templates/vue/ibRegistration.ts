@@ -6,5 +6,6 @@ if (mountEl) {
     window.Vue.createApp(IBRegistration, {
         sessionsEndpoint: mountEl.dataset.sessionsEndpoint ?? "",
         createEndpoint: mountEl.dataset.createEndpoint ?? "",
+        reportBaseUrl: mountEl.dataset.reportBaseUrl ?? "",
     }).mount(mountEl);
 }

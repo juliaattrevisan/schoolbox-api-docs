@@ -7,6 +7,7 @@ import type { RegistrationSession } from "../js/types/ibRegistrationTypes";
 interface Props {
     sessionsEndpoint: string;
     createEndpoint: string;
+    reportBaseUrl: string;
 }
 const props = defineProps<Props>();
 
@@ -115,7 +116,7 @@ window.Vue.onMounted((): void => {
                             >
                                 <div class="l-flex l-flex--align-center l-flex--justify-space l-gap-xs">
                                     <div class="l-flex-col">
-                                        <a href="#">{{ session.title }}</a>
+                                        <a :href="`${props.reportBaseUrl}/${session.id}`">{{ session.title }}</a>
                                         <small
                                             >Session created by {{ session.createdBy }} on
                                             {{ new Date(session.createdAt).toLocaleDateString() }},

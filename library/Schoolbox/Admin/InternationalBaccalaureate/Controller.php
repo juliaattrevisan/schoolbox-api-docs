@@ -556,6 +556,7 @@ class Controller extends ConfigController
     public function getRegistrations(): void
     {
         $pageCurrent = '/adminv2/international-baccalaureate/registrations';
+        $reportRoute = $this->getRouteIfAuthorized('internationalBaccalaureate.getReport', ['id' => 0]);
         $this->response = $this->responseDependentOnRequest(
             '@internationalBaccalaureate/registrations.twig',
             [
@@ -568,8 +569,30 @@ class Controller extends ConfigController
                         'delete' => $this->getRouteIfAuthorized('internationalBaccalaureate.deleteRegistrationSession', [
                             'sessionId' => 0,
                         ]),
+                        'reportBase' => $reportRoute !== null ? \dirname($reportRoute) : null,
                     ]
                 ]
+            ]
+        );
+    }
+
+    /**
+     * Diploma Programme Year 2 Registration Report page
+     *
+     * @api GET /adminv2/international-baccalaureate/registrations/sessions/{id}
+     */
+    public function getReport(int $id): void
+    {
+        $pageCurrent = '/adminv2/international-baccalaureate/registrations';
+        $this->response = $this->responseDependentOnRequest(
+            '@internationalBaccalaureate/registrations/report.twig',
+            [
+                'pageCurrent' => $pageCurrent,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
+                '_routes' => [
+                    // TODO SA-22226: replace with getRouteIfAuthorized once backend registers the candidates route
+                    'candidatesEndpoint' => "/adminv2/international-baccalaureate/registrations/sessions/{$id}/candidates",
+                ],
             ]
         );
     }

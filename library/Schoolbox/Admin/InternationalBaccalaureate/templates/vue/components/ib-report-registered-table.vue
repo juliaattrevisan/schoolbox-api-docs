@@ -1,0 +1,58 @@
+<script setup lang="ts">
+import IbReportSubjectChips from "./ib-report-subject-chips.vue";
+import type { RegisteredRow } from "../../js/types/ibReportTypes";
+
+interface Props {
+    students: RegisteredRow[];
+}
+defineProps<Props>();
+</script>
+
+<template>
+    <table class="tiger-stripe">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Candidate Details</th>
+                <th>HL</th>
+                <th>SL</th>
+                <th>Core</th>
+                <th>IB Candidate Number</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr
+                v-for="student in students"
+                :key="student.id"
+            >
+                <td>{{ student.name }}</td>
+                <td>
+                    <sbx-icon
+                        v-if="student.candidateDetailsStatus === 'confirmed'"
+                        name="approve"
+                        class="ib-report-icon--confirmed"
+                        aria-label="Candidate details confirmed"
+                    ></sbx-icon>
+                    <sbx-icon
+                        v-else
+                        name="alert"
+                        class="ib-report-icon--unconfirmed"
+                        aria-label="Candidate details unconfirmed"
+                    ></sbx-icon>
+                </td>
+                <td colspan="3"><ib-report-subject-chips :subjects="student.subjects" /></td>
+                <td>{{ student.ibCandidateNumber }}</td>
+            </tr>
+        </tbody>
+    </table>
+</template>
+
+<style scoped>
+.ib-report-icon--confirmed {
+    color: var(--sbx-color-success, #27ae60);
+}
+
+.ib-report-icon--unconfirmed {
+    color: var(--sbx-color-warning, #e67e22);
+}
+</style>

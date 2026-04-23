@@ -1,0 +1,16 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div
+            id="ib-report-app"
+            data-candidates-endpoint="{{ _routes.candidatesEndpoint }}"
+        ></div>
+        <script src="{{ CDN_PREFIX }}/js/bundle/ibReport.js?v={{ config.site_version }}"></script>
+    </div>
+</div>
