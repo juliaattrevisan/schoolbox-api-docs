@@ -13,7 +13,6 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use JsonException;
-use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -21,11 +20,15 @@ use Psr\Http\Message\UriInterface;
  */
 class Client implements IClient
 {
+    /**
+     * Constructor
+     *
+     * @param ClientInterface $httpClient The HTTP client to send requests to.
+     * @param UriInterface    $baseUri    The base URI of the client.
+     */
     public function __construct(
         private ClientInterface $httpClient,
-        private UriFactoryInterface $uriFactory,
-        private string $host,
-        private int $port,
+        private UriInterface $baseUri,
     ) {
     }
 
@@ -34,7 +37,7 @@ class Client implements IClient
         try {
             $response = $this->httpClient->request(
                 'GET',
-                $this->buildBaseUrl()->withPath('/run'),
+                $this->baseUri->withPath('/run'),
                 [
                     RequestOptions::JSON => [
                         'tool'        => $tool,
@@ -65,7 +68,7 @@ class Client implements IClient
         try {
             $response = $this->httpClient->request(
                 'GET',
-                $this->buildBaseUrl()->withPath("jobs/$jobId"),
+                $this->baseUri->withPath("jobs/$jobId"),
             );
         } catch (GuzzleException $e) {
             throw new ClientException('Tools daemon returned an error: ' . $e->getMessage(), $e->getCode(), $e);
@@ -90,7 +93,7 @@ class Client implements IClient
         try {
             $response = $this->httpClient->request(
                 'GET',
-                $this->buildBaseUrl()->withPath("jobs/$jobId/status"),
+                $this->baseUri->withPath("jobs/$jobId/status"),
             );
         } catch (GuzzleException $e) {
             throw new ClientException('Tools daemon returned an error: ' . $e->getMessage(), $e->getCode(), $e);
@@ -107,12 +110,5 @@ class Client implements IClient
             isset($responseBody['stdout']) ? (array)$responseBody['stdout'] : [],
             isset($responseBody['stderr']) ? (array)$responseBody['stderr'] : [],
         );
-    }
-
-    private function buildBaseUrl(): UriInterface
-    {
-        return $this->uriFactory->createUri()
-            ->withHost($this->host)
-            ->withPort($this->port);
     }
 }
