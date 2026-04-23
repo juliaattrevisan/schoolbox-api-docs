@@ -72,8 +72,16 @@ class MyFilesStrategyTest extends TestCase
             private object $state;
 
             /**
+             * @param LoggerInterface $logger
+             * @param bool $perform
+             * @param IConnector $database
+             * @param LockInterface $lock
+             * @param IConfigLoader $config
+             * @param int $stoppingTime
+             * @param RetentionPeriod $retentionPeriod
              * @param array<int, list<int>> $folderChildren
              * @param array<int, list<int>> $fileChildren
+             * @param object $state
              */
             public function __construct(
                 LoggerInterface $logger,
@@ -93,6 +101,10 @@ class MyFilesStrategyTest extends TestCase
                 $this->state = $state;
             }
 
+            /**
+             * @param array<int, int> $parentIds
+             * @return array<int, int>
+             */
             protected function findChildFolderIds(array $parentIds): array
             {
                 $children = [];
@@ -105,6 +117,10 @@ class MyFilesStrategyTest extends TestCase
                 return $children;
             }
 
+            /**
+             * @param array<int, int> $parentIds
+             * @return array<int, int>
+             */
             protected function findChildFileIds(array $parentIds): array
             {
                 $children = [];
@@ -117,6 +133,10 @@ class MyFilesStrategyTest extends TestCase
                 return $children;
             }
 
+            /**
+             * @param array<int, int> $fileIds
+             * @return int
+             */
             protected function deleteFiles(array $fileIds): int
             {
                 $this->state->deletedFiles = $fileIds;
@@ -124,6 +144,10 @@ class MyFilesStrategyTest extends TestCase
                 return count($fileIds);
             }
 
+            /**
+             * @param array<int, int> $folderIds
+             * @return int
+             */
             protected function deleteFolders(array $folderIds): int
             {
                 $this->state->deletedFolders = $folderIds;
@@ -131,6 +155,10 @@ class MyFilesStrategyTest extends TestCase
                 return count($folderIds);
             }
 
+            /**
+             * @param array<int, int> $fileIds
+             * @return int
+             */
             protected function deleteEportfolioFileJoin(array $fileIds): int
             {
                 $this->state->deletedEportfolioFileIds = $fileIds;
@@ -149,6 +177,7 @@ class MyFilesStrategyTest extends TestCase
      * Keeps `deleteChunk()` covered through the public test surface without
      * changing the production strategy API.
      *
+     * @param MyFiles $strategy
      * @param array<int, array{id: int, table: string}> $chunk
      */
     private function delete(MyFiles $strategy, array $chunk): void

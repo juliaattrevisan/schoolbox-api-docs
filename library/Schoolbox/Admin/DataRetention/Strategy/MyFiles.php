@@ -305,7 +305,7 @@ class MyFiles extends Base
     /**
      * delete files by id, returns the number of rows deleted
      *
-     * @param array $fileIds
+     * @param array<int, int> $fileIds
      * @return int
      */
     protected function deleteFiles(array $fileIds): int
@@ -326,7 +326,7 @@ class MyFiles extends Base
     /**
      * delete Folders by id, returns the number of rows deleted
      *
-     * @param array $folderIds
+     * @param array<int, int> $folderIds
      * @return int
      */
     protected function deleteFolders(array $folderIds): int
@@ -354,7 +354,8 @@ class MyFiles extends Base
      * Delete eportfolio component file links for the given file ids, returns the number of rows deleted
      * This removes the link but leaves the component (empty) as requested.
      * ePortfolio components using this table Image, MyFiles, Image Gallery
-     * @param array $fileIds
+     *
+     * @param array<int, int> $fileIds
      * @return int
      */
     protected function deleteEportfolioFileJoin(array $fileIds): int
