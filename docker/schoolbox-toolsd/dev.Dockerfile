@@ -14,13 +14,14 @@ FROM ${BASE_PHP_IMAGE}
 RUN groupadd user && useradd --create-home --home-dir /home/user -g user user
 WORKDIR /home/user
 
-RUN pip install redis~="7.2" && \
-    pip install celery~="5.6" && \
-    pip install flower~="2.0" && \
-    pip install jsonschema~="4.26" && \
-    pip install PyYAML~="6.0" && \
-    pip install Flask~="3.1" && \
-    pip install waitress~="3.0"
+RUN apt-get update && apt-get install -y python3 python3-pip && \
+    pip install --break-system-packages redis~="7.2" && \
+    pip install --break-system-packages celery~="5.6" && \
+    pip install --break-system-packages flower~="2.0" && \
+    pip install --break-system-packages jsonschema~="4.26" && \
+    pip install --break-system-packages PyYAML~="6.0" && \
+    pip install --break-system-packages Flask~="3.1" && \
+    pip install --break-system-packages waitress~="3.0"
 
 # Install Pylint in dev only
 RUN apt-get update && \
