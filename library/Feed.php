@@ -7,6 +7,7 @@
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Permission\Access\Access;
 
@@ -284,8 +285,13 @@ class Feed
                 if ($row['work_type_id'] !== null) {
                     // Filter out rows that should not be visible due to lwt.is_visible_to_parents/lwt.is_visible_to_learners.
                     // When work_type_id is null, no visibility restriction applies (consistent with Assessment\Visibility->isVisibleToUser()).
-                    switch ($row['is_visible_to_parents'] . '-' . $row['is_visible_to_learners']) {
-                        case '0-0':
+                    switch (
+                        WorkTypeMapper::getVisibilityFromBooleans(
+                            $row['is_visible_to_parents'] !== '0',
+                            $row['is_visible_to_learners'] !== '0'
+                        )
+                    ) {
+                        case WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS:
                             // Staff and instructors only (conditions here copied from Assessment\WorkType\Mapper)
                             //  - instructors - always included
                             //  - learners - always excluded
@@ -301,7 +307,7 @@ class Feed
                                 }
                             }
                             break;
-                        case '0-1':
+                        case WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS:
                             // Staff and instructors and learners (conditions here copied from Assessment\WorkType\Mapper)
                             //  - instructors - always included
                             //  - learners - always included
@@ -316,7 +322,7 @@ class Feed
                                 continue 2; // Skip row.
                             }
                             break;
-                        case '1-0':
+                        case WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS_PARENTS:
                             // Staff and instructors and parents (conditions here copied from Assessment\WorkType\Mapper)
                             //  - Instructors - always included
                             //  - learners - always excluded
@@ -335,7 +341,7 @@ class Feed
                                 }
                             }
                             break;
-                        case '1-1':
+                        case WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS_PARENTS:
                             // Staff and instructors and learners and parents (conditions here copied from Assessment\WorkType\Mapper)
                             //  - instructors - always included
                             //  - learners - always included
