@@ -13,29 +13,13 @@ import { updateRemovedComponent } from "./removeComponents";
 
 const ANIMATE_CLOSED_POSITION = 0;
 const ANIMATE_OPEN_POSITION = 90;
-const ANIMATE_ORIGIN = "20px 20px";
+const ANIMATE_ORIGIN = "center center";
 const ANIMATE_SPEED = 0.3;
 
 const BUTTON_SELECTOR = '[data-target="settings"]';
 const PANEL_SELECTOR = '[data-component-panel="settings"]';
 const STATE_ATTRIBUTE = "data-state"; //can be 'opened' or 'closed'
 const QUERY_STRING_ATTRIBUTE = "data-query-string"; //to store the current settings to be sent to the DB on update
-
-function getAnimationTarget(button) {
-    const icon = button?.querySelector("sbx-icon");
-
-    if (icon) {
-        return {
-            element: icon,
-            transformOrigin: "center center",
-        };
-    }
-
-    return {
-        element: button,
-        transformOrigin: ANIMATE_ORIGIN,
-    };
-}
 
 /**
  * Initiate the settings toggle and form for each component and when a
@@ -106,8 +90,7 @@ function open(component) {
     if (!toggleButton) return;
     toggleButton.setAttribute(STATE_ATTRIBUTE, "opened");
     toggleButton.setAttribute(QUERY_STRING_ATTRIBUTE, getQueryString(component));
-    const { element, transformOrigin } = getAnimationTarget(toggleButton);
-    animateRotation(element, ANIMATE_OPEN_POSITION, transformOrigin, ANIMATE_SPEED);
+    animateRotation(toggleButton, ANIMATE_OPEN_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
     const panel = component.querySelector(PANEL_SELECTOR);
     slideDown(panel, ANIMATE_SPEED);
     if (isRemoveOpen(component)) {
@@ -136,8 +119,7 @@ export async function close(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     if (!toggleButton) return;
     toggleButton.setAttribute(STATE_ATTRIBUTE, "closed");
-    const { element, transformOrigin } = getAnimationTarget(toggleButton);
-    animateRotation(element, ANIMATE_CLOSED_POSITION, transformOrigin, ANIMATE_SPEED);
+    animateRotation(toggleButton, ANIMATE_CLOSED_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
     const panel = component.querySelector(PANEL_SELECTOR);
     await slideUp(panel, ANIMATE_SPEED);
 }
