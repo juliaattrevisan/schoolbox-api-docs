@@ -78,7 +78,7 @@ tools:
 
   # A simple tool which actually ties into Schoolbox.
   refreshBindingCache:
-    command: [/usr/local/bin/php, /usr/share/schoolbox/tools/notif/route/refresh-binding-cache.php]
+    command: /usr/share/schoolbox/tools/notif/route/refresh-binding-cache.php
     options:
       allowed: [-v]
     requiresInstanceId: true
