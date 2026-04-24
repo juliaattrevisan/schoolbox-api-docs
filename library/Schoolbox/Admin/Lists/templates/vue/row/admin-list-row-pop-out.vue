@@ -185,6 +185,7 @@ export default {
     align-items: stretch;
     width: 100%;
     border: 1px solid $form-border-color;
+    border-radius: var(--sbx-config-field-roundness, 0);
 }
 
 .list {
@@ -208,18 +209,17 @@ export default {
     min-height: auto;
     margin: 2px;
     padding: 5px 10px;
-    color: #000;
+    border-radius: var(--sbx-config-field-roundness, 0);
+    color: var(--sbx-config-color-accent, #000);
     font-size: 0.7rem;
     text-align: center;
-    background: $body-bg;
+    background: var(--sbx-config-color-active, $body-bg);
     transition: all 0.3s;
-    &:hover {
-        opacity: 0.8;
-    }
+    opacity: 0.8;
 }
 
 .item-active {
-    background: $content-ui-background;
+    opacity: 1;
 }
 
 .update-button {

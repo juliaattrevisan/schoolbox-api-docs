@@ -223,9 +223,16 @@ export default {
             if (this.saveRows_isProcessing || !this.isActive || !this.isOpen) {
                 return;
             }
+
+            if (!(event.target instanceof Element)) {
+                return;
+            }
+
             const container = this.$refs.innerContainer;
-            const clickedUpdateButton = event.target.closest?.(".update-button");
-            if (container && !container.contains(event.target) && !clickedUpdateButton) {
+            const clickedUpdateButton = event.target.classList.contains("update-button");
+            const clickedIcon = event.target.closest("sbx-icon") !== null;
+
+            if (container && !container.contains(event.target) && !clickedUpdateButton && !clickedIcon) {
                 // Clicked outside the "outer-container", discard changes and close the pop out
                 this.onDiscardChangesSelected();
             }
@@ -305,6 +312,7 @@ export default {
     top: 0px;
     width: 100%;
     border: 2px solid $form-border-color;
+    border-radius: var(--sbx-config-box-roundness, 0);
     padding: 1rem;
     background: var(--sbx-color-foreground-primary, #fff);
 }

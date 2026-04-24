@@ -13,6 +13,12 @@ body.sbx-body {
             margin: 0;
         }
 
+        //bar /top menu
+        .tab-bar {
+            border-radius: var(--sbx-config-box-roundness);
+            box-shadow: var(--sbx-config-box-drop-shadow);
+        }
+
         // make the width of the menu items dynamic to better allow for varying text lengths
         .top-menu {
             display: flex;

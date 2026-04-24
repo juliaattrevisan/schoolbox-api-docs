@@ -1,7 +1,7 @@
 /**
  * Box roundness config
  * Applied to UI "boxes" in Advanced UI
- * Box = surface on page background (not inside an island)
+ * Box = element on page background that typically has the --sbx-color-foreground-primary background color, such as islands, empty states, components, etc.
  */
 
 :root {
@@ -37,7 +37,9 @@ body.sbx-body {
     .row:has(> #filter_panel),
     .c-header-search__results,
     .side-nav,
-    .side-nav .flyout {
+    .side-nav .flyout,
+    .cover-photo,
+    .cr-results-grid {
         border-radius: var(--sbx-config-box-roundness);
     }
 
@@ -69,11 +71,6 @@ body.sbx-body {
     #component-layout .component-container .row > .island section:last-child {
         border-top-left-radius: 0;
         border-top-right-radius: 0;
-    }
-
-    // Hybrid bar /top menu
-    #hybrid-bar .tab-bar {
-        border-radius: var(--sbx-config-box-roundness);
     }
 
     // tables need to be rounded uniquely
