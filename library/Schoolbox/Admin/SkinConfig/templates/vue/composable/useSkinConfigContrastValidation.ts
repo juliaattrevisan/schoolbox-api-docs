@@ -106,13 +106,14 @@ export function useSkinConfigContrastValidation(configs: Ref<SkinConfigData>): {
                 return;
             }
 
-            const contrastTarget = option.contrast in configs.value.contrastTokens
-                ? getFixedContrastTarget(configs.value.contrastTokens[option.contrast])
-                : (() => {
-                    const contrastOption = optionsByCustomProperty.get(option.contrast);
+            const contrastTarget =
+                option.contrast in configs.value.contrastTokens
+                    ? getFixedContrastTarget(configs.value.contrastTokens[option.contrast])
+                    : (() => {
+                          const contrastOption = optionsByCustomProperty.get(option.contrast);
 
-                    return contrastOption === undefined ? null : getOptionContrastTarget(contrastOption);
-                })();
+                          return contrastOption === undefined ? null : getOptionContrastTarget(contrastOption);
+                      })();
 
             if (contrastTarget === null) {
                 return;
