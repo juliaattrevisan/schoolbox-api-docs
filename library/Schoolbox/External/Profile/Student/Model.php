@@ -43,7 +43,14 @@ class Model
      */
     private ?string $campusName = null;
 
+    /**
+     * @var string|null
+     */
     private ?string $nationalities = null;
+
+    /**
+     * @var string|null
+     */
     private ?string $languages = null;
 
     /**
