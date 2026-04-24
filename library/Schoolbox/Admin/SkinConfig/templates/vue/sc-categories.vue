@@ -122,7 +122,6 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                                 :disabled="!option.editable"
                                 @change="onPreviewRefresh"
                             >
-                                <option value="">Select an option</option>
                                 <option
                                     v-for="selectOption in getSelectOptions(option)"
                                     :key="`${option.id}-${selectOption.value}`"
