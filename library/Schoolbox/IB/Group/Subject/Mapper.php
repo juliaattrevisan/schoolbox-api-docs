@@ -102,16 +102,20 @@ class Mapper extends BaseMapper
         $languageMapper   = $this->getJoinMapper('languages');
         $collection    = $this->createCollection();
 
+        $language = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $groupSubject = $this->hydrate($row);
             $groupSubject->setSubject($subjectMapper->hydrate($row, 's'));
             $groupSubject->setGroup($groupMapper->hydrate($row, 'g'));
+            $language[] = $groupSubject->getId();
             $collection[$groupSubject->getId()] = $groupSubject;
         }
 
         /* Hydrates the languages
          */
-        $languages = $languageMapper->findForOtherMapper($this, 'languages', $collection->getPropertyValues('id'));
+        $languages = $languageMapper
+            ->findByColumn('language_id', $language)
+            ->groupByCallback(fn ($l) => $l->getGroupSubject()->getId());
         /** @var Model $groupSubject */
         foreach ($collection as $id => $groupSubject) {
             $groupSubject->setLanguages($languages[$id] ?? $languageMapper->createCollection());

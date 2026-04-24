@@ -209,26 +209,6 @@ class Controller extends ConfigController
                 ]
             );
 
-            $languageIds = [];
-            /** @var IBGroupSubjectModel $groupSubject */
-            foreach ($groupSubjects as $groupSubject) {
-                /** @var GroupSubjectLanguageModel $language */
-                foreach ($groupSubject->getLanguages() as $language) {
-                    $languageId = $language->getLanguage()?->getId();
-
-                    if ($languageId) {
-                        $languageIds[$languageId] = true;
-                    }
-                }
-            }
-
-            $languageNamesById = $languageIds
-                ? array_combine(
-                    ($languages = $this->languageMapper->findByColumn('id', array_keys($languageIds)))->getPropertyValues('id'),
-                    $languages->getPropertyValues('name')
-                ) ?: []
-                : [];
-
             $subjects = [];
             /** @var IBGroupSubjectModel $groupSubject */
             foreach ($groupSubjects as $groupSubject) {
@@ -240,9 +220,7 @@ class Controller extends ConfigController
                         ->map(
                             fn(GroupSubjectLanguageModel $language) => [
                                 'languageId' => $language->getLanguage()?->getId(),
-                                'languageName' => ($id = $language->getLanguage()?->getId())
-                                    ? ($languageNamesById[$id] ?? null)
-                                    : null,
+                                'languageName' => $language->getLanguage()?->getName(),
                                 'classCode' => $language->getClassCode() ?? '',
                             ]
                         )
@@ -257,6 +235,10 @@ class Controller extends ConfigController
         }
     }
 
+    /**
+     * Get default language
+     * @return LanguageModel|null
+     */
     private function getDefaultLanguage(): ?LanguageModel
     {
         $englishLanguage = $this->languageMapper->findByColumn('code', 'ENG')->first();
