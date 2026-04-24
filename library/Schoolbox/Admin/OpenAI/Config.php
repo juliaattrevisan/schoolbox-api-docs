@@ -67,6 +67,7 @@ class Config
         "gpt-image-1",
         "gpt-image-1-mini",
         "gpt-image-1.5",
+        "gpt-image-2",
     ];
 
     public const string OUTPUT_QUALITY_DEFAULT = 'low';
