@@ -410,9 +410,8 @@ class Controller extends BaseController
             return;
         }
 
-        // TODO: multi-rubrics support
-        $assessmentId = key($post);
-
+        // TODO: multi rubrics; this whole route should really be against an assessment id in the params and then figure out if *any rubric* changed
+        $assessmentId = $this->requestPost->getInt('id');
 
         // Load the current assessment and grid
         try {
@@ -437,7 +436,8 @@ class Controller extends BaseController
         // the current assessment state is the same as the proposed state.
         $proposedAssessment = (clone $currentAssessment);
 
-        $rubricData = json_decode($post[$assessmentId], true);
+        // TODO: multi-rubrics support
+        $rubricData = json_decode($post[array_key_first($post)] ?? '[]', true);
 
         // TODO: capabilityMarkType & useMarkRange come from the rubric data itself now, they shouldn't be against the assessment anymore
         $capabilityMarkTypeSlug = $rubricData['capabilityMarkType'] ?? MarkType::SLUG_NONE;

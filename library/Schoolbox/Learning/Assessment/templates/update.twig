@@ -38,6 +38,7 @@
 
             // If no rubric objects are in the serialized form data, we're probably not on a due work page
             if (rubricObjects.length > 0) {
+                // TODO once multi rubrics exist properly, this logic probably isn't right. Should deleting the only rubric trigger this check/warning?
 
                 return new Promise(function(resolve, reject) {
 
