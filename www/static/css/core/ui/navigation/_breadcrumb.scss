@@ -138,7 +138,7 @@ $crumb-slash-position: 1px !default;
 }
 
 $breadcrumb-color: var(--sbx-config-color-accent, $content-ui-foreground);
-$breadcrumb-noclick-color: $oil;
+$breadcrumb-noclick-color: var(--sbx-color-text-primary, $oil);
 $breadcrumb-bg-color: $content-ui-background;
 $breadcrumb-hover-bg-color: $content-ui-hover;
 $breadcrumb-active-bg-color: $content-ui-selected;
