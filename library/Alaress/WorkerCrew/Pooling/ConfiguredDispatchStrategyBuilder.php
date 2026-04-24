@@ -74,11 +74,15 @@ class ConfiguredDispatchStrategyBuilder
      */
     protected int $maxRequestsPerWorker = DispatchStrategy::MAX_REQUESTS_PER_WORKER;
 
-    /** @var int */
-    protected $workerWriteTimeout = DefaultDispatchStrategy::WORKER_WRITE_TIMEOUT;
+    /**
+     * @see DispatchStrategyInterface::getWorkerWriteTimeout()
+     */
+    protected int $workerWriteTimeout = DispatchStrategy::WORKER_WRITE_TIMEOUT;
 
-    /** @var int */
-    protected $metricInterval = DefaultDispatchStrategy::METRIC_INTERVAL;
+    /**
+     * @see DispatchStrategyInterface::getMetricInterval()
+     */
+    protected int $metricInterval = DispatchStrategy::METRIC_INTERVAL;
 
     /**
      * @see DispatchStrategyInterface::getMaxFutureTriggerTime()
@@ -122,9 +126,9 @@ class ConfiguredDispatchStrategyBuilder
             $this->workerTimeoutHard,
             $flags,
             $this->maxRequestsPerWorker,
+            $this->maxFutureTriggerTime,
             $this->workerWriteTimeout,
             $this->metricInterval,
-            $this->maxFutureTriggerTime,
         );
     }
 

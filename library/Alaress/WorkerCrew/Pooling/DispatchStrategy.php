@@ -38,14 +38,17 @@ class DispatchStrategy implements DispatchStrategyInterface
 
     public const int MAX_FUTURE_TRIGGER_TIME = 0; // 0 = unlimited
 
-    public const int WORKER_SOFT_TIMEOUT = 300000; // 5 minutes
-    public const int WORKER_HARD_TIMEOUT = 1200000; // 20 minutes
+    public const int WORKER_SOFT_TIMEOUT  = 300000; // 5 minutes
+    public const int WORKER_HARD_TIMEOUT  = 1200000; // 20 minutes
+    public const int WORKER_WRITE_TIMEOUT = 5000; // 5 seconds
 
     public const string TASK_FETCH     = 'fetch';
     public const string TASK_PUBLISH   = 'publish';
     public const string TASK_DIGEST    = 'digest';
     public const string TASK_TIMETABLE = 'timetable';
     public const string TASK_MOBILE    = 'mobile';
+
+    public const int METRIC_INTERVAL = 60000;
 
     protected int $flywheelSpins;
 
@@ -82,6 +85,8 @@ class DispatchStrategy implements DispatchStrategyInterface
         private string $flags = '',
         private int $maxRequestsPerWorker = DispatchStrategy::MAX_REQUESTS_PER_WORKER,
         private int $maxFutureTriggerTime = DispatchStrategy::MAX_FUTURE_TRIGGER_TIME,
+        private int $workerWriteTimeout = DispatchStrategy::WORKER_WRITE_TIMEOUT,
+        private int $metricInterval = DispatchStrategy::METRIC_INTERVAL,
     ) {
         $this->flywheelSpins = $maxFlywheel;
         $this->protocol      = new AlaressIPCProtocol();
@@ -393,5 +398,23 @@ class DispatchStrategy implements DispatchStrategyInterface
     public function getMaxFutureTriggerTime(): int
     {
         return $this->maxFutureTriggerTime;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getWorkerWriteTimeout(): int
+    {
+        return $this->workerWriteTimeout;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getMetricInterval(): int
+    {
+        return $this->metricInterval;
     }
 }
