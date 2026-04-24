@@ -28,6 +28,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as Grad
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\IB\SystemPurpose\Mapper as SystemPurposeMapper;
+use Schoolbox\IB\SystemPurpose\Model as SystemPurposeModel;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
@@ -588,6 +589,9 @@ class Controller extends Base
                     // Some setters expect objects as parameters.  For those cases we need to create objects.
                     $valueToSet = match ($setter) {
                         'setPastoralType' => (new PastoralTypeModel())->setId($value[$currentIndex]),
+                        'setSystemPurpose' => null === $value[$currentIndex]
+                            ? null
+                            : new SystemPurposeModel()->setId((int) $value[$currentIndex]),
                         'setDocumentClassification',
                         'setDocumentClassificationConfidential' => (
                             (new PastoralDocumentClassificationModel())->setId($value[$currentIndex])
