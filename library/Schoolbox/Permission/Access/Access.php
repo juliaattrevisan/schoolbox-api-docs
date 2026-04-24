@@ -12,6 +12,7 @@ namespace Schoolbox\Permission\Access;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Config;
+use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -330,33 +331,31 @@ class Access
 
 
     /**
-     * Return the first child of $parent who is found to be a learner in the specified folder.
-     * Use this only in situations where you do not care which of possibly multiple child learners is returned.
+     * Return the children of $parent who are learners in $folder.
+     * Note all learners in $folder have the same level of access, due to the definition of 'learner'.
      *
      * @param User         $parent
      * @param Folder\Model $folder
-     * @return ?User
-     * @throws InvalidArgumentException Due to getFolderAccess() call.
-     * @throws MapperException          Due to getFolderAccess() call.
-     * @throws LogicException           Due to getFolderAccess() call.
-     * @throws UnexpectedValueException Due to getFolderAccess() call.
+     * @return GenericCollection<User>
+     * @throws InvalidArgumentException Due to isLearner() call.
+     * @throws Mapper\Exception         Due to isLearner() call.
+     * @throws LogicException           Due to isLearner() call.
+     *
      * @see isParentOfLearner()
      */
-    public function getChildLearnerOfParent(User $parent, Folder\Model $folder): ?User
+    public function getChildLearnersOfParent(User $parent, Folder\Model $folder): GenericCollection
     {
         $children = $parent->getChildren();
 
         if (null === $children) {
-            return null;
+            return new GenericCollection(User::class);
         }
 
-        foreach ($children as $child) {
-            if ($this->getFolderAccess($child, $folder->getId()) === UserAccess::ACCESS_READ) {
-                return $child;
+        return $children->filter(
+            function (User $child) use ($folder) {
+                return $this->isLearner($child, $folder);
             }
-        }
-
-        return null;
+        );
     }
 
 

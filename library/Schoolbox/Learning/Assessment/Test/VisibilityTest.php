@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Assessment\Test;
 use PHPUnit\Framework\TestCase;
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
@@ -1332,13 +1333,14 @@ class VisibilityTest extends TestCase
             });
         $mockAccess
             ->expects($this->any())
-            ->method('getChildLearnerOfParent')
+            ->method('getChildLearnersOfParent')
             ->willReturnCallback(function (User $user, Folder\Model $folder) {
                 if ($user->getId() !== 4) {
-                    return null;
+                    return new GenericCollection(User::class);
                 }
                 $users = $this->buildUsers();
-                return $users[2]; // Return learner user 'Cath'.
+                // TODO: Test case where multiple children are returned.
+                return new GenericCollection(User::class, [$users[2]]); // Return a collection containing only learner user 'Cath'.
             });
         return $mockAccess;
     }

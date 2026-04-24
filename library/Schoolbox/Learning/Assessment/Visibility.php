@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\Access;
@@ -171,20 +172,18 @@ class Visibility
         $workType = $assessable->getWorkType();
 
         try {
-            // There is an edge-case here where a parent has multiple children who are learners in the same class, and
-            // they have different participation plans.  Since that edge-case is so unlikely, we'll just ignore it for now.
-            $childLearner = $this->access->getChildLearnerOfParent(
+            $childLearners = $this->access->getChildLearnersOfParent(
                 $nonInstructorNonLearner,
                 $assessable->getBaseContext()->getFolder()
             );
         } catch (MapperException | \LogicException | \UnexpectedValueException) {
-            $childLearner = null; // In case of exception, assume no child learner exists.
+            $childLearners = new GenericCollection(User::class); // In case of exception, assume no child learner exists.
         }
 
-        // Handle the case where the user is a parent of a learner.
+        // Handle the case where the user is a parent of one or more learners.
         if (
             $respectWorkTypeVisibility && $workType !== null
-            && $childLearner !== null && $workType->isVisibleToParents()
+            && $childLearners->count() > 0 && $workType->isVisibleToParents()
         ) {
             // Apply special lesson plan visibility logic.
             // (If lesson plan is hidden from students, it should be hidden from parents also).
@@ -192,17 +191,25 @@ class Visibility
                 return false;
             }
 
-            // If learner (child of parent of learner) is also a participant, respect their custom close date.
-            // Also, parents should only see published assessments - similar to learners and non-learner participants.
-            $childLearnerParticipant = $assessable->getParticipantIfExtant($childLearner);
-            if ($childLearnerParticipant) {
-                $closeDate   = $childLearnerParticipant->getCloseDate();
-                $isPublished = $now->gte($childLearnerParticipant->getPublishDate());
-            } else {
-                $closeDate   = $assessable->getCloseAt();
-                $isPublished = $assessable->isPublished($childLearner, $now);
+            // Return true if the assessment is visible to any child learner.
+            foreach ($childLearners as $childLearner) {
+                if (!$assessable->isPublished($childLearner, $now)) {
+                    // The assessment is not published for this child learner, so is not visible.
+                    // Move on to the next child learner.
+                    continue;
+                }
+
+                $participant = $assessable->getParticipantIfExtant($childLearner);
+                $closeDate = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
+
+                if (null === $closeDate || $now->lt($closeDate)) {
+                    // The assessment is published and either will never close or is not yet closed.
+                    // Therefore, the assessment is visible to this child learner and hence the parent.
+                    return true;
+                }
             }
-            return $isPublished && ($showClosed || $now->lt($closeDate));
+
+            return false;
         }
 
         if (
