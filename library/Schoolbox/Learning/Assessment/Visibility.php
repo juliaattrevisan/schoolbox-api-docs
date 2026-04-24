@@ -199,11 +199,17 @@ class Visibility
                     continue;
                 }
 
+                if ($showClosed) {
+                    // The assessment is published for this child learner, and $showClosed is true.
+                    // Therefore, there is no need to check the close date.
+                    return true;
+                }
+
                 $participant = $assessable->getParticipantIfExtant($childLearner);
                 $closeDate = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
 
                 if (null === $closeDate || $now->lt($closeDate)) {
-                    // The assessment is published and either will never close or is not yet closed.
+                    // The assessment is published and either will never close or has not yet closed.
                     // Therefore, the assessment is visible to this child learner and hence the parent.
                     return true;
                 }
