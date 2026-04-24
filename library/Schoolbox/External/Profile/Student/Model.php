@@ -1008,7 +1008,7 @@ class Model
      */
     public function getNationalities(): ?string
     {
-        return  $this->nationalities;
+        return $this->nationalities;
     }
 
     /**
