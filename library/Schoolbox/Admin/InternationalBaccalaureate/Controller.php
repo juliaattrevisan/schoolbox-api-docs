@@ -222,15 +222,12 @@ class Controller extends ConfigController
                 }
             }
 
-            $languageNamesById = [];
-
-            if (!empty($languageIds)) {
-                $languages = $this->languageMapper->findByColumn('id', array_keys($languageIds));
-                $languageNamesById = array_combine(
-                    $languages->getPropertyValues('id'),
+            $languageNamesById = $languageIds
+                ? array_combine(
+                    ($languages = $this->languageMapper->findByColumn('id', array_keys($languageIds)))->getPropertyValues('id'),
                     $languages->getPropertyValues('name')
-                ) ?: [];
-            }
+                ) ?: []
+                : [];
 
             $subjects = [];
             /** @var IBGroupSubjectModel $groupSubject */
@@ -243,8 +240,8 @@ class Controller extends ConfigController
                         ->map(
                             fn(GroupSubjectLanguageModel $language) => [
                                 'languageId' => $language->getLanguage()?->getId(),
-                                'languageName' => ($languageId = $language->getLanguage()?->getId())
-                                    ? ($languageNamesById[$languageId] ?? null)
+                                'languageName' => ($id = $language->getLanguage()?->getId())
+                                    ? ($languageNamesById[$id] ?? null)
                                     : null,
                                 'classCode' => $language->getClassCode() ?? '',
                             ]
@@ -268,7 +265,7 @@ class Controller extends ConfigController
             return $englishLanguage;
         }
 
-        $firstLanguage = $this->languageMapper->findAll()->first();
+        $firstLanguage = $this->languageMapper->findAll(['limit' => 1])->first();
 
         return $firstLanguage instanceof LanguageModel ? $firstLanguage : null;
     }
@@ -326,28 +323,11 @@ class Controller extends ConfigController
             }
 
             $allowedGroupSubjectIds = array_fill_keys($groupSubjectIds, true);
-            $requestedLanguageIds = [];
 
-            foreach ($subjectLanguages as $subjectLanguage) {
-                if (!is_array($subjectLanguage)) {
-                    continue;
-                }
-
-                $languageId = (int) ($subjectLanguage['languageId'] ?? 0);
-
-                if ($languageId > 0) {
-                    $requestedLanguageIds[$languageId] = true;
-                }
-            }
-
-            $languagesById = [];
-
-            if (!empty($requestedLanguageIds)) {
-                $languagesById = $this->languageMapper
-                    ->findByColumn('id', array_keys($requestedLanguageIds))
-                    ->indexBy('id')
-                    ->getAll();
-            }
+            $requestedLanguageIds = array_filter(array_column($subjectLanguages, 'languageId'));
+            $languagesById = $requestedLanguageIds
+                ? $this->languageMapper->findByColumn('id', $requestedLanguageIds)->indexBy('id')->getAll()
+                : [];
 
             $modelsToSave = [];
 

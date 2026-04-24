@@ -3,7 +3,7 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import SearchSelectModal from "@schoolboxVue/components/searchSelect/modal/search-select-modal.vue";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
-import type { IBLanguage, IBLanguageListResponse, IBSubject } from "../../js/types/ibConfigurationTypes";
+import type { IBLanguage, IBLanguageListResponse, IBSubject, IBSubjectLanguage } from "../../js/types/ibConfigurationTypes";
 
 /**
  * A single row in the table
@@ -31,14 +31,6 @@ type SubjectSavePayload = {
     classCode: string;
 };
 
-/**
- * The shape of the configured languages for a subject as returned by the server, used to build the table rows
- */
-type ConfiguredLanguage = {
-    languageId: number;
-    languageName: string | null;
-    classCode: string;
-};
 
 const props = defineProps<{
     categoryName: string;
@@ -87,7 +79,7 @@ function getDefaultLanguageNameMap(): Record<number, string> {
  * @param configurations The configured subject-language entries.
  * @returns A language-name lookup keyed by language id.
  */
-function createLanguageNameMapFromSubjectLanguages(configurations: ConfiguredLanguage[]): Record<number, string> {
+function createLanguageNameMapFromSubjectLanguages(configurations: IBSubjectLanguage[]): Record<number, string> {
     return configurations.reduce<Record<number, string>>((languageNames, configuration) => {
         const languageName = configuration.languageName;
 
@@ -149,7 +141,7 @@ function getDefaultLanguages(): number[] {
  * @returns The main subject row and any child language rows.
  */
 function buildRowsForSubject(subjectData: IBSubject, index: number, tableType?: string): SubjectRow[] {
-    const configurations = subjectData.languages as ConfiguredLanguage[];
+    const configurations = subjectData.languages as IBSubjectLanguage[];
     const rowId = tableType ? `${tableType}_${subjectData.id}_${index}` : `group_subject_${subjectData.id}`;
     const selectedLanguages = configurations.map((configuration) => configuration.languageId);
     const configuredLanguageNames = createLanguageNameMapFromSubjectLanguages(configurations);
