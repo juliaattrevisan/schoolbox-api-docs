@@ -1,12 +1,4 @@
 <script setup lang="ts">
-/**
- * IB Registration Reports page.
- *
- * Renders a hardcoded section per qualification scope. Currently only
- * Diploma Program Year 2 [DIPLOMA] is in scope. Future sections (e.g.
- * DP Year 1, VCE) are added as additional hardcoded blocks below the
- * existing one — each with its own reactive state.
- */
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import CreateSessionModal from "./components/create-session-modal.vue";
@@ -18,40 +10,37 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-// ── DIPLOMA section state ─────────────────────────────────────────────────
-// Future sections: add separate refs below this block (e.g. diplomaYear1Sessions, etc.)
+// ── DIPLOMA section state (systemPurposeId: 1) ───────────────────────────
+// Future sections: add separate refs below this block, each with its own systemPurposeId.
+
+const DIPLOMA_SYSTEM_PURPOSE_ID = 1;
 
 const diplomaSessions = window.Vue.ref<RegistrationSession[]>([]);
 const isDiplomaLoading = window.Vue.ref<boolean>(true);
 const isDiplomaModalOpen = window.Vue.ref<boolean>(false);
-// IDs of sessions added locally via modal (not persisted — cleared on page refresh)
 const localDiplomaSessionIds = window.Vue.ref<number[]>([]);
 
-/**
- * Fetches registration sessions for the Diploma Program Year 2 section.
- * On failure, leaves the sessions list empty (shows empty state).
- */
+/** Fetches sessions from the API and populates the DIPLOMA section. On failure, leaves the list empty (shows empty state). */
 async function loadDiplomaSessions(): Promise<void> {
     isDiplomaLoading.value = true;
 
-    const response = await apiRequest<RegistrationSession[]>({
+    const response = await apiRequest<Record<string, RegistrationSession[]>>({
         url: props.sessionsEndpoint,
         method: "GET",
     });
 
     isDiplomaLoading.value = false;
 
-    if (!response.success || !Array.isArray(response.data)) {
+    if (!response.success || typeof response.data !== "object" || Array.isArray(response.data)) {
         return;
     }
 
-    diplomaSessions.value = response.data;
+    diplomaSessions.value = response.data[String(DIPLOMA_SYSTEM_PURPOSE_ID)] ?? [];
 }
 
 /**
- * Appends a newly created session to the Diploma section list without reloading.
- * Tracks the session ID as local-only so a delete icon is shown.
- * @param session - The newly created registration session to append
+ * Appends a newly created session to the DIPLOMA list and tracks it as local-only for the delete button.
+ * @param session - The newly created registration session returned by the API
  */
 function onDiplomaSessionCreated(session: RegistrationSession): void {
     diplomaSessions.value = [...diplomaSessions.value, session];
@@ -59,7 +48,7 @@ function onDiplomaSessionCreated(session: RegistrationSession): void {
 }
 
 /**
- * Removes a locally-created session from the list (client-side only).
+ * Removes a locally-created session from the DIPLOMA list (client-side only).
  * @param sessionId - The ID of the session to remove
  */
 function removeDiplomaSession(sessionId: number): void {
@@ -128,9 +117,8 @@ window.Vue.onMounted((): void => {
                                     <div class="l-flex-col">
                                         <a href="#">{{ session.title }}</a>
                                         <small
-                                            >Session created on
-                                            {{ new Date(session.createdAt).toLocaleDateString() }} by
-                                            {{ session.createdBy }},
+                                            >Session created by {{ session.createdBy }} on
+                                            {{ new Date(session.createdAt).toLocaleDateString() }},
                                             {{ new Date(session.createdAt).toLocaleTimeString() }}</small
                                         >
                                     </div>
@@ -154,6 +142,7 @@ window.Vue.onMounted((): void => {
         <CreateSessionModal
             v-model:is-open="isDiplomaModalOpen"
             :create-endpoint="createEndpoint"
+            :system-purpose-id="DIPLOMA_SYSTEM_PURPOSE_ID"
             @session-created="onDiplomaSessionCreated"
         />
     </div>

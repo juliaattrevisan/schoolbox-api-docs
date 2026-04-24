@@ -9,8 +9,8 @@
     <div class="admin-content">
         <div
             id="ib-registration-app"
-            data-sessions-endpoint="/adminv2/international-baccalaureate/registrations/api/sessions/diploma"
-            data-create-endpoint="/adminv2/international-baccalaureate/registrations/api/sessions"
+            data-sessions-endpoint="{{ _routes.sessions.list }}"
+            data-create-endpoint="{{ _routes.sessions.create }}"
         ></div>
         <script src="{{ CDN_PREFIX }}/js/bundle/ibRegistration.js?v={{ config.site_version }}"></script>
     </div>
