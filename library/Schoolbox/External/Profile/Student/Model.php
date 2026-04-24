@@ -1021,11 +1021,18 @@ class Model
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getLanguages(): ?string
     {
         return $this->languages;
     }
 
+    /**
+     * @param string|null $languages
+     * @return $this
+     */
     public function setLanguages(?string $languages): self
     {
         $this->languages = $languages;
