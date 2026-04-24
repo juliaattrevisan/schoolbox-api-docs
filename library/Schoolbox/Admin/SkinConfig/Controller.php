@@ -26,6 +26,22 @@ use Twig\Environment;
 
 class Controller extends ConfigController
 {
+    /**
+     * Fixed design-token colours that Skin Config options may need to contrast against.
+     *
+     * @var array<string, array{label: string, value: string}>
+     */
+    private const FIXED_CONTRAST_TOKENS = [
+        '--sbx-color-text-primary' => [
+            'label' => 'the colour black',
+            'value' => '#000000',
+        ],
+        '--sbx-color-foreground-primary' => [
+            'label' => 'the colour white',
+            'value' => '#ffffff',
+        ],
+    ];
+
     public function __construct(
         ConfigMapper $configMapper,
         readonly private FieldMapper $fieldMapper,
@@ -106,6 +122,7 @@ class Controller extends ConfigController
                 $categoryName  = $config->getSkinSubcategory()->getCategory()->getName();
                 $subcategoryId = $config->getSkinSubcategory()->getId();
                 $type          = $config->getType()->getId() === ConfigMapper::TYPE_SONAR_SKIN_CONFIG ? 'sonar' : 'existing';
+                $decodedOptions = $this->getDecodedOptions($config);
 
                 // Create subcategory bucket once
                 $carry[$type][$categoryName][$subcategoryId] ??= [
@@ -119,9 +136,10 @@ class Controller extends ConfigController
                     'value'          => $config->getValue(),
                     'title'          => $config->getTitle(),
                     'description'    => $config->getDescription(),
-                    'customProperty' => $this->getCustomProperty($config),
-                    'contrast'       => $this->getContrastProperty($config),
+                    'customProperty' => $this->getCustomProperty($decodedOptions),
+                    'contrast'       => $this->getContrastProperty($decodedOptions),
                     'type'           => $this->getOptionType($config, $fieldMap),
+                    'selectOptions'  => $this->getSelectOptions($config, $decodedOptions),
                     'editable'       => $config->getEditable(),
                     'hidden'         => $config->getHidden(),
                 ];
@@ -130,16 +148,55 @@ class Controller extends ConfigController
             return $carry;
         }, []);
 
-        // Convert subcategory maps to indexed arrays for JSON output
-        foreach ($data as $type => $categories) {
-            foreach ($categories as $category => $subcategoryMap) {
+        $data['contrastTokens'] = self::FIXED_CONTRAST_TOKENS;
+
+        // Convert only section subcategory maps to indexed arrays for JSON output.
+        foreach (['existing', 'sonar'] as $type) {
+            if (!isset($data[$type]) || !is_array($data[$type])) {
+                continue;
+            }
+
+            foreach ($data[$type] as $category => $subcategoryMap) {
                 if (is_array($subcategoryMap)) {
                     $data[$type][$category] = array_values($subcategoryMap);
                 }
             }
+
+            $data[$type] = $this->orderCategories($data[$type]);
         }
 
         return $data;
+    }
+
+    /**
+     * Reorder category groups so the primary admin display order is stable.
+     *
+     * @param array<string, array<int, array<string, mixed>>> $categories
+     * @return array<string, array<int, array<string, mixed>>>
+     */
+    private function orderCategories(array $categories): array
+    {
+        $preferredOrder = [
+            ConfigMapper::NAME_SKIN_CATEGORY_COLOURS,
+            ConfigMapper::NAME_SKIN_CATEGORY_ROUNDNESS,
+            ConfigMapper::NAME_SKIN_CATEGORY_DROP_SHADOW,
+            ConfigMapper::NAME_SKIN_CATEGORY_CSS,
+        ];
+
+        $orderedCategories = [];
+
+        foreach ($preferredOrder as $categoryName) {
+            foreach ($categories as $displayName => $subcategoryMap) {
+                if (strtolower($displayName) !== $categoryName) {
+                    continue;
+                }
+
+                $orderedCategories[$displayName] = $subcategoryMap;
+                unset($categories[$displayName]);
+            }
+        }
+
+        return $orderedCategories + $categories;
     }
 
     /**
@@ -204,26 +261,102 @@ class Controller extends ConfigController
 
     /**
      * Extract the raw CSS custom property mapping from config options metadata.
+     *
+     * @param array<string, mixed> $decodedOptions
      */
-    private function getCustomProperty(Config $config): ?string
+    private function getCustomProperty(array $decodedOptions): ?string
     {
-        return $this->getStringOptionValue($config, 'customProperty');
+        return $this->getStringOptionValue($decodedOptions, 'customProperty');
     }
 
     /**
      * Extract the raw contrast mapping from config options metadata.
+     *
+     * @param array<string, mixed> $decodedOptions
      */
-    private function getContrastProperty(Config $config): ?string
+    private function getContrastProperty(array $decodedOptions): ?string
     {
-        return $this->getStringOptionValue($config, 'contrast');
+        return $this->getStringOptionValue($decodedOptions, 'contrast');
+    }
+
+    /**
+     * Extract available select options from the JSON-encoded config metadata.
+     *
+     * @return array<int, array{name: string, value: string}>
+     * @param array<string, mixed> $decodedOptions
+     */
+    private function getSelectOptions(Config $config, array $decodedOptions): array
+    {
+        $selectOptions = $decodedOptions['select'] ?? null;
+
+        if (is_array($selectOptions)) {
+            $parsedOptions = [];
+            foreach ($selectOptions as $selectOption) {
+                if (!is_array($selectOption)) {
+                    continue;
+                }
+
+                $name = $selectOption['name'] ?? null;
+                $value = $selectOption['value'] ?? null;
+                if (!is_string($name) || !is_string($value) || $name === '' || $value === '') {
+                    continue;
+                }
+
+                $parsedOptions[] = [
+                    'name' => $name,
+                    'value' => $value,
+                ];
+            }
+
+            return $parsedOptions;
+        }
+
+        if (!is_string($selectOptions) || trim($selectOptions) === '') {
+            return [];
+        }
+
+        $parsedOptions = [];
+        foreach (explode(':', $selectOptions) as $selectOption) {
+            $value = trim($selectOption);
+            if ($value === '') {
+                continue;
+            }
+
+            $parsedOptions[] = [
+                'name' => $value === 'none' ? 'None' : ucfirst($value),
+                'value' => $this->getLegacySelectOptionValue($config, $value),
+            ];
+        }
+
+        return $parsedOptions;
+    }
+
+    /**
+     * Map legacy select option labels to persisted values where Skin Config needs explicit CSS values.
+     */
+    private function getLegacySelectOptionValue(Config $config, string $value): string
+    {
+        if (!in_array($config->getName(), ['skin_field_roundness', 'skin_box_roundness'], true)) {
+            return $value;
+        }
+
+        return match ($value) {
+            'none' => '0',
+            'small' => '0.25rem',
+            'medium' => '0.5rem',
+            'large' => '0.75rem',
+            default => $value,
+        };
     }
 
     /**
      * Extract a string config option from the JSON-encoded options payload.
+     *
+     * @param array<string, mixed> $decodedOptions
      */
-    private function getStringOptionValue(Config $config, string $key): ?string
+    private function getStringOptionValue(array $decodedOptions, string $key): ?string
     {
-        $optionValue = $this->getDecodedOptions($config)[$key] ?? null;
+        $optionValue = $decodedOptions[$key] ?? null;
 
         return is_string($optionValue) && $optionValue !== '' ? $optionValue : null;
     }

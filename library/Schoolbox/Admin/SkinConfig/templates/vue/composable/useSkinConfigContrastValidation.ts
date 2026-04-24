@@ -5,17 +5,50 @@
  */
 import tinycolor from "tinycolor2";
 import type { ComputedRef, Ref } from "vue";
-import type { SkinConfigData, SkinConfigOption, SkinConfigOptionErrorMap } from "../../js/types/skinConfigTypes";
+import type {
+    SkinConfigContrastToken,
+    SkinConfigData,
+    SkinConfigOption,
+    SkinConfigOptionErrorMap,
+} from "../../js/types/skinConfigTypes";
 
 const INVALID_COLOUR_ERROR = "Enter a valid colour.";
+type ContrastTarget = {
+    label: string;
+    value: string | null;
+};
 
 /**
  * Build the low contrast validation message for a colour option.
- * @param contrastOption The option that the edited colour must contrast against.
+ * @param contrastTarget The option or design token that the edited colour must contrast against.
  * @returns The user-facing validation message.
  */
-function getLowContrastError(contrastOption: SkinConfigOption): string {
-    return `Must contrast sufficiently against ${contrastOption.title ?? contrastOption.name}`;
+function getLowContrastError(contrastTarget: ContrastTarget): string {
+    return `Must contrast sufficiently against ${contrastTarget.label}`;
+}
+
+/**
+ * Normalise a configurable option into a contrast target.
+ * @param option The option that the edited colour must contrast against.
+ * @returns The resolved contrast target.
+ */
+function getOptionContrastTarget(option: SkinConfigOption): ContrastTarget {
+    return {
+        label: option.title ?? option.name,
+        value: option.value,
+    };
+}
+
+/**
+ * Normalise a fixed design token into a contrast target.
+ * @param contrastToken The fixed design token metadata.
+ * @returns The resolved contrast target.
+ */
+function getFixedContrastTarget(contrastToken: SkinConfigContrastToken): ContrastTarget {
+    return {
+        label: contrastToken.label,
+        value: contrastToken.value,
+    };
 }
 
 /**
@@ -73,18 +106,26 @@ export function useSkinConfigContrastValidation(configs: Ref<SkinConfigData>): {
                 return;
             }
 
-            const contrastOption = optionsByCustomProperty.get(option.contrast);
-            if (contrastOption === undefined) {
+            const contrastTarget =
+                option.contrast in configs.value.contrastTokens
+                    ? getFixedContrastTarget(configs.value.contrastTokens[option.contrast])
+                    : (() => {
+                          const contrastOption = optionsByCustomProperty.get(option.contrast);
+
+                          return contrastOption === undefined ? null : getOptionContrastTarget(contrastOption);
+                      })();
+
+            if (contrastTarget === null) {
                 return;
             }
 
-            if (!isValidColour(contrastOption.value)) {
+            if (!isValidColour(contrastTarget.value)) {
                 errors[option.id] = INVALID_COLOUR_ERROR;
                 return;
             }
 
-            if (!tinycolor.isReadable(option.value, contrastOption.value, { level: "AA", size: "small" })) {
-                errors[option.id] = getLowContrastError(contrastOption);
+            if (!tinycolor.isReadable(option.value, contrastTarget.value, { level: "AA", size: "small" })) {
+                errors[option.id] = getLowContrastError(contrastTarget);
             }
         });
 

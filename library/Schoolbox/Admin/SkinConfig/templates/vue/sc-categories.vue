@@ -3,7 +3,12 @@
  * Child component for rendering visible Skin Config categories.
  */
 
-import type { SkinConfigData, SkinConfigOptionErrorMap } from "../js/types/skinConfigTypes";
+import type {
+    SkinConfigData,
+    SkinConfigOption,
+    SkinConfigOptionErrorMap,
+    SkinConfigSelectOption,
+} from "../js/types/skinConfigTypes";
 
 const props = defineProps<{
     configs: SkinConfigData;
@@ -27,13 +32,9 @@ const activeConfigs = window.Vue.computed(() =>
     configs.value.toggle.enabled ? configs.value.sonar : configs.value.existing,
 );
 
-// Temporarily hide roundness and drop shadow until their controls are implemented.
+// Temporarily hide drop shadow until its control is implemented.
 const visibleConfigs = window.Vue.computed(() =>
-    Object.fromEntries(
-        Object.entries(activeConfigs.value).filter(
-            ([categoryKey]) => categoryKey !== "Roundness" && categoryKey !== "Drop Shadow",
-        ),
-    ),
+    Object.fromEntries(Object.entries(activeConfigs.value).filter(([categoryKey]) => categoryKey !== "Drop Shadow")),
 );
 
 /**
@@ -41,6 +42,15 @@ const visibleConfigs = window.Vue.computed(() =>
  */
 function onPreviewRefresh(): void {
     emit("preview-refresh");
+}
+
+/**
+ * Return the configured select choices for a Skin Config option.
+ * @param option Skin Config option payload.
+ * @returns Select choices supplied by the backend payload.
+ */
+function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
+    return option.selectOptions ?? [];
 }
 </script>
 
@@ -103,6 +113,23 @@ function onPreviewRefresh(): void {
                                 @input="onPreviewRefresh"
                                 @change="onPreviewRefresh"
                             />
+                        </div>
+                        <div v-else-if="option.type === 'select'">
+                            <select
+                                :id="`${option.name}-field`"
+                                v-model="option.value"
+                                :name="option.name"
+                                :disabled="!option.editable"
+                                @change="onPreviewRefresh"
+                            >
+                                <option
+                                    v-for="selectOption in getSelectOptions(option)"
+                                    :key="`${option.id}-${selectOption.value}`"
+                                    :value="selectOption.value"
+                                >
+                                    {{ selectOption.name }}
+                                </option>
+                            </select>
                         </div>
                     </div>
                 </div>
