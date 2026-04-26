@@ -44,6 +44,7 @@ const isSelfGrading = false; // TODO: selfAssessmentFeedback.isSelfGrading
                     v-if="props.selfAssessmentDescriptorMark?.selected && props.participantId !== null"
                     :user-id="props.participantId"
                     class="rb-self-reflection-choice"
+                    render="tiny"
                     :description="
                         isSelfGrading
                             ? `(${props.selfAssessmentDescriptorMark.value}) ${locale.selfAssessment.proper()} choice`
