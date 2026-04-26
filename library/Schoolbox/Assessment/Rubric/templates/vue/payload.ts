@@ -84,9 +84,9 @@ export function translateGridToFormPayload(grid: RubricGrid): RubricGridFormPayl
             };
 
             gridData.descriptor[indicator.id] = indicator.descriptors.map((descriptor) => ({
-                id: descriptor.id >= 0 ? descriptor.id : "", // the backend expects empty IDs for new descriptors
-                text: descriptor.description.trim(),
-                points: (descriptor.maxValue ?? "").toString(),
+                id: descriptor && descriptor.id >= 0 ? descriptor.id : "", // the backend expects empty IDs for new descriptors
+                text: descriptor?.description.trim() ?? "",
+                points: (descriptor?.maxValue ?? "").toString(),
             }));
         }
     }

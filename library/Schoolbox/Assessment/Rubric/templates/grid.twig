@@ -16,7 +16,7 @@
 
 <div data-vue-app="rubric-grid">
     <rubric-grid
-        :rubric="{{ rubricGrid|json_encode }}"
+        :rubric="{{ rubricGrid.toArray(false)|json_encode }}"
         :rubric-marked-grid="{{ (rubricMarkedGrid ?? null)|json_encode }}"
         :self-assessment-feedback="{{ (selfAssessmentFeedback.rubricMarkedGrid ?? null)|json_encode }}"
         :assessment-mark-scheme="{

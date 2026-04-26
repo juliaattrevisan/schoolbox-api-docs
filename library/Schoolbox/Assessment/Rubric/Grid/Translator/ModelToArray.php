@@ -10,7 +10,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid\Translator;
 
+use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\Assessment\Rubric\Grid\Level;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\RowSet\Indicator;
@@ -24,6 +26,14 @@ use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 class ModelToArray
 {
     /**
+     * @param boolean $includeUnused Include ALL capabilities/indicators whether this grid uses them or not.
+     */
+    public function __construct(
+        private bool $includeUnused = true,
+    ) {
+    }
+
+    /**
      * @param Grid $rubricGrid
      * @return array
      */
@@ -31,8 +41,19 @@ class ModelToArray
     {
         $capabilities = [];
 
-        foreach ($rubricGrid->iterateCapabilities() as $capability) {
-            $capabilities[] = $this->translateCapability($rubricGrid, $capability);
+        if ($this->includeUnused) {
+            foreach ($rubricGrid->iterateCapabilities() as $capability) {
+                $capabilities[] = $this->translateCapability($rubricGrid, $capability);
+            }
+        }
+        else {
+            foreach ($rubricGrid->getCapabilityUsages() as $capabilityUsage) {
+                $capabilities[] = $this->translateCapability(
+                    $rubricGrid,
+                    $capabilityUsage->getCapability(),
+                    $capabilityUsage,
+                );
+            }
         }
 
         return [
@@ -57,13 +78,21 @@ class ModelToArray
      *
      * @param Grid $rubricGrid
      * @param Capability $capability
+     * @param ?CapabilityUsage $capabilityUsage
      * @return array
      */
-    public function translateCapability(Grid $rubricGrid, Capability $capability): array
+    public function translateCapability(Grid $rubricGrid, Capability $capability, ?CapabilityUsage $capabilityUsage = null): array
     {
         $indicators = [];
-        foreach ($rubricGrid->iterateIndicators($capability) as $indicator) {
-            $indicators[] = $this->translateIndicator($rubricGrid, $indicator);
+        if ($this->includeUnused || $capabilityUsage === null) {
+            foreach ($rubricGrid->iterateIndicators($capability) as $indicator) {
+                $indicatorUsage = $rubricGrid->retrieveIndicatorUsage($indicator);
+                $indicators[] = $this->translateIndicator($rubricGrid, $indicator, $indicatorUsage);
+            }
+        } else {
+            foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
+                $indicators[] = $this->translateIndicator($rubricGrid, $indicatorUsage->getIndicator(), $indicatorUsage);
+            }
         }
 
         return [
@@ -83,15 +112,20 @@ class ModelToArray
      *
      * @param Grid $rubricGrid
      * @param Indicator $indicator
+     * @param ?IndicatorUsage $indicatorUsage
      * @return array
      */
-    public function translateIndicator(Grid $rubricGrid, Indicator $indicator): array
+    public function translateIndicator(Grid $rubricGrid, Indicator $indicator, ?IndicatorUsage $indicatorUsage): array
     {
-        $indicatorUsage = $rubricGrid->retrieveIndicatorUsage($indicator);
-
         $descriptors = [];
         foreach ($rubricGrid->getLevels() as $levelIndex => $level) {
             $descriptor = $indicatorUsage?->retrieveDescriptor($levelIndex);
+
+            if ($descriptor === null && !$this->includeUnused) {
+                // descriptors are always indexed by labelIndex, must preserve them even if they don't exist
+                $descriptors[] = null;
+                continue;
+            }
 
             $descriptors[] = [
                 // fake negative ID to identify non existent descriptors in the frontend
