@@ -35,11 +35,13 @@ class Visibility
      * Determines if the specified user can see an IAssessable (but not necessarily its details or participant interactions)
      *
      * The below rules summarise the authoritative descriptions in Assessment\WorkType\Mapper.
-     *  - Instructor               - can see anytime (so long as not past close and we are hiding closed)
-     *  - Learner                  - excluded if the work type hides learners; otherwise same as staff/participant rules
-     *  - Staff (non-learner)      - can see anytime (so long as not past close and we are hiding closed)
-     *  - NonStaff + NonInstructor - can only see if a participant, and after publish date, and not pure staff/instructor only
-     *                               (note parents of learners are handled in this category of user)
+     *  - Instructor                  - can see anytime (*)
+     *  - Learner                     - can only see if a participant, and after publish date, and not excluded by work type (*)
+     *  - Non-instructor, non-learner - if staff, can see anytime (*)
+     *                                  if parent of learner, can see if child learner can see
+     *                                  otherwise can only see if a participant, and after publish date, and not excluded by work type (*)
+     *
+     * (*) For all user types do not show if closed assessments are hidden and close date has passed.
      *
      * Staff      - is any user with role-type of 'staff'
      * Instructor - is any user with WRITE+ perm to folder
@@ -129,11 +131,15 @@ class Visibility
         bool $respectWorkTypeVisibility
     ): bool {
         $workType = $assessable->getWorkType();
-        if ($respectWorkTypeVisibility && $workType !== null && !$workType->isVisibleToLearners()) {
-            return false;
-        }
-        // Aside from the check above, visibility for learners is the same as for non-learners, so defer to below function.
-        return $this->isVisibleToNonInstructorNonLearner($assessable, $learner, $showClosed, $now, $respectWorkTypeVisibility);
+        $participant = $assessable->getParticipantIfExtant($learner);
+        $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
+
+        return (
+            ($workType === null || !$respectWorkTypeVisibility || $workType->isVisibleToLearners()) &&
+            $participant !== null &&
+            $assessable->isPublished($learner, $now) &&
+            ($showClosed || $now->lt($closeDate))
+        );
     }
 
 
@@ -191,26 +197,37 @@ class Visibility
                 return false;
             }
 
-            // Return true if the assessment is visible to any child learner.
+            $childParticipants = new GenericCollection(Participant::class);
+
             foreach ($childLearners as $childLearner) {
-                if (!$assessable->isPublished($childLearner, $now)) {
-                    // The assessment is not published for this child learner, so is not visible.
-                    // Move on to the next child learner.
+                $participant = $assessable->getParticipantIfExtant($childLearner);
+
+                if ($participant === null) {
+                    continue;
+                }
+
+                $childParticipants->add($participant);
+            }
+
+            // Return true if the parent has any child participant for whom the assessment is visible.
+            foreach ($childParticipants as $childParticipant) {
+                $publishDate = $childParticipant->getPublishDate();
+
+                if (null === $publishDate || $now->lt($publishDate)) {
                     continue;
                 }
 
                 if ($showClosed) {
-                    // The assessment is published for this child learner, and $showClosed is true.
+                    // The assessment is published for this child participant, and $showClosed is true.
                     // Therefore, there is no need to check the close date.
                     return true;
                 }
 
-                $participant = $assessable->getParticipantIfExtant($childLearner);
-                $closeDate = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
+                $closeDate = $childParticipant->getCloseDate();
 
                 if (null === $closeDate || $now->lt($closeDate)) {
                     // The assessment is published and either will never close or has not yet closed.
-                    // Therefore, the assessment is visible to this child learner and hence the parent.
+                    // Therefore, the assessment is visible to this child participant and hence the parent.
                     return true;
                 }
             }
