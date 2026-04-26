@@ -98,21 +98,32 @@ class Language
                      */
                     $language = $valueLists['language'][$record['language']] ?? self::UNKNOWN_DESCRIPTION;
 
-                    /* Everyone is a native speaker until otherwise decided
-                     */
-                    $eal = false;
+                    if (!isset($this->lookup[$externalId])) {
+                        $this->lookup[$externalId] = [
+                            /* Assuming every one is native english speaker by default
+                             */
+                            'esl' => false,
+                            'languages' => [],
+                        ];
+                    }
+
+                    if (!\in_array($language, $this->lookup[$externalId]['languages'], true)) {
+                        $this->lookup[$externalId]['languages'][] = $language;
+                    }
 
                     /* Analyse the node to decide nativeness
                      */
                     if ($record['is_primary'] && (self::ENGLISH_DESCRIPTION !== strtolower($language))) {
-                        $eal = true;
+                        $this->lookup[$externalId]['esl'] = true;
                     }
-
-                    /* Simplify usage since we only care if English was is_primary
-                     */
-                    $this->lookup[$externalId] = $eal;
                 }
             }
+
+            foreach ($this->lookup as &$languageData) {
+                $languageData['languages'] = implode(',', $languageData['languages']);
+            }
+
+            unset($languageData);
         }
 
         return $this->lookup;

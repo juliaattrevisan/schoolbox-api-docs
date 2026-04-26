@@ -68,6 +68,12 @@ class Specification
                 }
             ],
             [
+                'name' => 'Student Profiles: Citizenships Lookup (admission/citizenships)',
+                'func' => function () {
+                    return $this->trial('admission/citizenships');
+                }
+            ],
+            [
                 'name' => 'Student Profiles: Languages Lookup (admission/languages)',
                 'func' => function () {
                     return $this->trial('admission/languages');
