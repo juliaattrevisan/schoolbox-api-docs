@@ -65,8 +65,7 @@ function addLevel(levelName: RubricGridLevel["name"], levelValue: RubricGridDesc
     // add corresponding descriptors
     for (const capability of rubricGridCapabilities.value) {
         for (const indicator of capability.indicators) {
-            const validDescriptors = indicator.descriptors.filter((d) => d !== null);
-            const lowestDescriptorId = Math.min(...validDescriptors.map((d) => d.id), 0);
+            const lowestDescriptorId = Math.min(...indicator.descriptors.map((d) => d.id), 0);
             indicator.descriptors.push({
                 id: lowestDescriptorId - 1, // negative IDs are unsaved
                 description: "",

@@ -153,11 +153,11 @@ window.Vue.onMounted(() => {
 
         <rb-grid-descriptor
             v-for="(descriptor, levelIndex) in props.indicator.descriptors"
-            :key="descriptor!.id"
+            :key="descriptor.id"
             :ref="descriptorRefs.set"
             v-model:indicator-enabled="hasUsage"
-            v-model:description="descriptor!.description"
-            v-model:max-value="descriptor!.maxValue"
+            v-model:description="descriptor.description"
+            v-model:max-value="descriptor.maxValue"
             :descriptor-index="levelIndex"
             :level-name="props.levels[levelIndex].name"
             :indicator-name="props.indicator.name"

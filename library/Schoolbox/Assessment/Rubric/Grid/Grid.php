@@ -34,7 +34,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
  *
  * The grid's descriptors are able to be inferred from the grid's level set and capability usage set.
  */
-class Grid
+class Grid implements JsonSerializable
 {
     /**
      * The capabilities that are actually in use on the rubric grid.
@@ -443,11 +443,10 @@ class Grid
     }
 
     /**
-     * @param bool $includeUnused Include ALL capabilities/indicators whether this grid uses them or not.
      * @return array
      * @see /library/Schoolbox/Assessment/Rubric/templates/vue/types.ts RubricGrid
      */
-    public function toArray(bool $includeUnused = true): array
+    public function jsonSerialize(): array
     {
         // TODO: this shouldn't be the same as Translator/ModelToArray.
         // figure out what's actually needed then narrow it down and figure out the best payload structure
@@ -457,7 +456,7 @@ class Grid
 
         // TODO: also check access to various things matches what we expect (particularly whether students can see mark info assuming there's cases when they shouldn't?)
 
-        $rubricGridTranslator = new Translator\ModelToArray($includeUnused);
+        $rubricGridTranslator = new Translator\ModelToArray();
         return $rubricGridTranslator($this);
     }
 }

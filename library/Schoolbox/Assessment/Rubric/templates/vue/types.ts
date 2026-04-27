@@ -40,14 +40,7 @@ export type RubricGridIndicator = {
      */
     inUseExcludingAssessment: boolean;
     hasUsage: boolean;
-    /**
-     * on the rubric builder, descriptors won't be null as missing ones prefill with empty values,
-     * but when loading a rubric grid for marking/viewing, null is used to identify missing descriptors instead.
-     *
-     * TODO: we could consider letting the rubric builder mutate the input data after loading so that it recieves null
-     * but still handles reactivity correctly, but for until we refine these structs this is simpler for now.
-     */
-    descriptors: (RubricGridDescriptor | null)[];
+    descriptors: RubricGridDescriptor[];
 };
 
 export type RubricGridDescriptor = {

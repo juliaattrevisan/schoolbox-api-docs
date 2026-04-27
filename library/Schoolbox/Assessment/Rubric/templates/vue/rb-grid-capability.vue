@@ -89,7 +89,7 @@ const derivedMaxValue = window.Vue.computed(() => {
         // Find the highest valued descriptor for this indicator
         let indicatorMax = 0;
         for (const descriptor of indicator.descriptors) {
-            const value = descriptor?.maxValue ?? 0;
+            const value = descriptor.maxValue ?? 0;
             if (value > indicatorMax) {
                 indicatorMax = value;
             }
