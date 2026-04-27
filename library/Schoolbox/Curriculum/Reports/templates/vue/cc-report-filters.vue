@@ -14,7 +14,7 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
 </script>
 
 <template>
-    <div class="c-island l-flex-row l-gap-l">
+    <div class="l-flex-row l-gap-l">
         <div class="l-flex-col l-flex__item--1 l-gap-l">
             <div class="checklist">
                 <label>Report on</label>
