@@ -1289,20 +1289,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
          */
         $customisedAssessments = $this->getAssessmentMapper()->findAllCustomisedAssessment($assessment);
 
-        /* Pre-fetching all the existing customistions for the participants
-         * to avoid n+1 query problem when translating plans for each participant
+        /* Pre-fetch all existing customisations for the participants so participant
+         * translation can determine whether to expose the customisationRecord link
+         * without issuing per-participant queries.
          */
         $existingCustomisation =
             \Schoolbox\CustomisationRecord\Mapper::getInstance()
-                                                 ->findByColumn(
-                                                     'user_id',
-                                                     $assessment
-                                                         ->getAllParticipants()
-                                                         ->map(fn(Participant $participant) => $participant->getUser()->getId())->getAll()
-                                                 )
-                                                 ->groupByCallback(
-                                                     fn(Model $record) => $record->getUser()->getId()
-                                                 );
+                ->findByStudentIdsGrouped(
+                    $assessment
+                        ->getAllParticipants()
+                        ->map(fn(Participant $participant) => $participant->getUser()->getId())->getAll()
+                );
 
         /* Cache interface for AI generated content (ie suggested customisation)
          * Injecting here rather than in the module to avoid inheritance complications

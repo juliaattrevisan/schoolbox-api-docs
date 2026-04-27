@@ -34,6 +34,7 @@ class Participations
      * @param Authorizer         $authorizer
      * @param User               $currentUser
      * @param ParticipationPlans $planTranslator
+     * @param Collection         $existingCustomisation
      * @param ?Collection        $customisedAssessments
      * @param ?CacheInterface    $aiCache
      */

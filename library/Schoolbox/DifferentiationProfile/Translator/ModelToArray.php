@@ -37,9 +37,10 @@ class ModelToArray
     public function __invoke(Model $model): array
     {
         $student = $model->getStudent();
-        /* If the customisations collection is already prefetched then we can skip the query in the controller
-         * and just get the customisations for the student from the collection, if not then just return null
-         * and let the controller handle it as it currently does
+        /* If the customisations collection is already prefetched then we can get the student's
+         * customisations from that collection and pass them through to the CustomisationRecord
+         * route authorizer, bypassing the query that authorizer callback would normally perform.
+         * If not, return null so the existing authorizer flow can do its usual lookup.
          */
         $customisations = null;
         if ($this->customisationsByStudent !== null) {
