@@ -23,11 +23,12 @@ class Mapper extends Schoolbox\Mapper
      * The docblocks in this file define how work type visibility should work in Schoolbox.
      *
      * Glossary:
-     *  - Instructor: a user with WRITE+ access to the assessment folder.
-     *  - Learner: a user with READ access to the assessment folder.  (Note this is a folder-level concept.)
-     *  - Participant: a user for whom getParticipantIfExtant() returns a non-null participant.  (Note this is an assessment-level concept.)
-     *  - Learner participant: a learner who is also a participant.
-     *  - Parent of learner participant: a parent whose child is a learner participant.
+     *  - Instructor: A user with WRITE+ access to the assessment folder.
+     *  - Learner: A user with READ access to the assessment folder.  (Note this is a folder-level concept.)
+     *  - Participant: A user for whom IAssessment->getParticipantIfExtant() returns a non-null participant.
+     *                 (Note this is an assessment-level concept.)
+     *  - Learner participant: A learner who is also a participant.
+     *  - Parent of learner participant: A parent whose child is a learner participant.
      *
      * Visibility of assessments also depends on:
      *  - Whether they are published (only instructors and staff should see unpublished assessments)
