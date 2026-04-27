@@ -24,10 +24,6 @@ use Schoolbox\Socs\Log\Mapper as SocsLogMapper;
 class ImporterTool extends CliTool\App
 {
     public const string LOCK_NAME = 'socs_importer';
-
-    // this may be unique to each school, but we don't know yet... so hard coding it here for now...
-    private const string SOCS_SCHOOL_ID = '2460';
-
     private const string OPT_LONG_HELP = 'help';
     private const string OPT_LONG_INSTANCE = 'instance:';
     private const string OPT_LONG_FIXTURES = 'fixtures';
@@ -89,7 +85,7 @@ class ImporterTool extends CliTool\App
 
         $host = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_HOST);
         $token = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN);
-        $schoolId = self::SOCS_SCHOOL_ID; // this is currently hardcoded, but may change later...
+        $schoolId = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_ID);
 
         $runId = (new SocsLogGuid())->generate();
         $importLogMapper = SocsLogMapper::getInstance();
