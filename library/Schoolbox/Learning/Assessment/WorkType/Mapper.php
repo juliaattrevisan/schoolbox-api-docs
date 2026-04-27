@@ -25,12 +25,13 @@ class Mapper extends Schoolbox\Mapper
      * Glossary:
      *  - Instructor: A user with WRITE+ access to the assessment folder.
      *  - Learner: A user with READ access to the assessment folder.  (Note this is a folder-level concept.)
-     *  - Participant: A user for whom IAssessment->getParticipantIfExtant() returns a non-null participant.
+     *  - Participant: A user for whom $assessment->getParticipantIfExtant($user) returns a non-null participant.
      *                 (Note this is an assessment-level concept.)
      *  - Learner participant: A learner who is also a participant.
      *  - Parent of learner participant: A parent whose child is a learner participant.
      *
      * Notes:
+     *  - Being a learner without being a participant has no effect on assessment visibility.
      *  - Granting a user read-level access to a class via their role type does not cause that user to be a
      *    participant in assessments in that class.
      *  - Granting a user read-level access to a class individually via group membership does cause that user to be a

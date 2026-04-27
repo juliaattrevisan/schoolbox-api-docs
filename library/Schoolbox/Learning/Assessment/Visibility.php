@@ -19,7 +19,7 @@ class Visibility
     /**
      * @var Access
      */
-    private $access;
+    private Access $access;
 
 
     /**
@@ -34,18 +34,17 @@ class Visibility
     /**
      * Determines if the specified user can see an IAssessable (but not necessarily its details or participant interactions)
      *
-     * The below rules summarise the authoritative descriptions in Assessment\WorkType\Mapper.
-     *  - Instructor                  - can see anytime (*)
-     *  - Learner                     - can only see if a participant, and after publish date, and not excluded by work type (*)
-     *  - Non-instructor, non-learner - if staff, can see anytime (*)
-     *                                  if parent of learner, can see if child learner can see
-     *                                  otherwise can only see if a participant, and after publish date, and not excluded by work type (*)
+     * The below rules summarise the authoritative descriptions in WorkType\Mapper.
+     *  - Instructor          - can see anytime (*)
+     *  - Learner participant - can only see if after publish date, and not excluded by work type (*)
+     *  - Everyone else       - if staff, can see anytime (*)
+     *                          if parent of learner participant, can see if child learner can see
+     *                          otherwise can only see if a participant, and after publish date,
+     *                          and not excluded by work type (*)
      *
-     * (*) For all user types do not show if closed assessments are hidden and close date has passed.
+     * (*) For all user types the assessment is not visible if closed assessments are hidden and the close date has passed.
      *
-     * Staff      - is any user with role-type of 'staff'
-     * Instructor - is any user with WRITE+ perm to folder
-     * Learner    - is any user with READ perm to folder (overrides staff when work type hides learners)
+     * @see WorkType\Mapper for glossary of terms used above.
      *
      * @param IAssessable              $assessment Must have plans and participants loaded if viewer is a participant
      * @param User                     $viewer
@@ -64,27 +63,36 @@ class Visibility
         $now = $now ?? Alaress_Date_Format::now();
         $folder = $assessment->getBaseContext()->getFolder();
 
+        // Handle case where user is instructor.
         try {
             $viewerIsInstructor = $this->access->isInstructor($viewer, $folder);
         } catch (MapperException | \LogicException) {
             $viewerIsInstructor = false; // In case of exception, assume non-instructor.
         }
-
         if ($viewerIsInstructor) {
             return $this->isVisibleToInstructor($assessment, $viewer, $showClosed, $now);
         }
 
+        // Handle case where user is a learner participant.
         try {
             $viewerIsLearner = $this->access->isLearner($viewer, $folder);
         } catch (MapperException | \LogicException) {
             $viewerIsLearner = false; // In case of exception, assume non-learner.
         }
-
-        if ($viewerIsLearner) {
-            return $this->isVisibleToLearner($assessment, $viewer, $showClosed, $now, $respectWorkTypeVisibility);
+        $viewerParticipant = $assessment->getParticipantIfExtant($viewer);
+        if ($viewerIsLearner && $viewerParticipant !== null) {
+            return $this->isVisibleToLearnerParticipant(
+                $assessment,
+                $viewer,
+                $viewerParticipant,
+                $showClosed,
+                $now,
+                $respectWorkTypeVisibility
+            );
         }
 
-        return $this->isVisibleToNonInstructorNonLearner($assessment, $viewer, $showClosed, $now, $respectWorkTypeVisibility);
+        // Handle all other cases (including where user is parent of learner participant).
+        return $this->isVisibleToNonInstructorNonLearnerParticipant($assessment, $viewer, $showClosed, $now, $respectWorkTypeVisibility);
     }
 
 
@@ -114,48 +122,52 @@ class Visibility
 
 
     /**
-     * Is the assessable visible to the Learner? (Assumes the user is a learner)
+     * Is the assessable visible to the learner participant? (Assumes the user is a learner participant)
      *
      * @param IAssessable         $assessable
-     * @param User                $learner
+     * @param User                $learnerParticipant The viewer who is a learner and a participant in $assessable.
+     * @param Participant         $participant The participant object for $learnerParticipant.
      * @param bool                $showClosed Should we show assessments after their closed date?
      * @param Alaress_Date_Format $now
      * @param bool                $respectWorkTypeVisibility
      * @return bool
      */
-    private function isVisibleToLearner(
+    private function isVisibleToLearnerParticipant(
         IAssessable $assessable,
-        User $learner,
+        User $learnerParticipant,
+        Participant $participant,
         bool $showClosed,
         Alaress_Date_Format $now,
         bool $respectWorkTypeVisibility
     ): bool {
         $workType = $assessable->getWorkType();
-        $participant = $assessable->getParticipantIfExtant($learner);
-        $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
+        $closeDate = $participant->getCloseDate();
+
+        if ($learnerParticipant->getId() !== $participant->getUser()->getId()) {
+            throw new \UnexpectedValueException('');
+        }
 
         return (
             ($workType === null || !$respectWorkTypeVisibility || $workType->isVisibleToLearners()) &&
-            $participant !== null &&
-            $assessable->isPublished($learner, $now) &&
+            $assessable->isPublished($learnerParticipant, $now) &&
             ($showClosed || $now->lt($closeDate))
         );
     }
 
 
     /**
-     * Is the assessable visible to a non-instructor non-learner? (Assumes the user is neither instructor nor learner)
+     * Is the assessable visible to a user who is not an instructor and not a learner participant?
      *
      * @param IAssessable         $assessable
-     * @param User                $nonInstructorNonLearner
+     * @param User                $nonInstructorNonLearnerParticipant
      * @param bool                $showClosed Should we show assessments after their closed date?
      * @param Alaress_Date_Format $now
      * @param bool                $respectWorkTypeVisibility
      * @return bool
      */
-    private function isVisibleToNonInstructorNonLearner(
+    private function isVisibleToNonInstructorNonLearnerParticipant(
         IAssessable $assessable,
-        User $nonInstructorNonLearner,
+        User $nonInstructorNonLearnerParticipant,
         bool $showClosed,
         Alaress_Date_Format $now,
         bool $respectWorkTypeVisibility
@@ -165,12 +177,12 @@ class Visibility
         // because although it is possible to define such a user in the sis_... tables, Schoolbox's user provisioning
         // process will create two users in that situation. One with role type 'staff', the other with role type
         // 'parent'.
-        if ($nonInstructorNonLearner->getRole()->isStaff()) {
+        if ($nonInstructorNonLearnerParticipant->getRole()->isStaff()) {
             if ($showClosed) {
                 return true;
             }
             // If staff member is also a participant, respect their custom close date.
-            $participant = $assessable->getParticipantIfExtant($nonInstructorNonLearner);
+            $participant = $assessable->getParticipantIfExtant($nonInstructorNonLearnerParticipant);
             $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
             return $now->lt($closeDate);
         }
@@ -179,14 +191,14 @@ class Visibility
 
         try {
             $childLearners = $this->access->getChildLearnersOfParent(
-                $nonInstructorNonLearner,
+                $nonInstructorNonLearnerParticipant,
                 $assessable->getBaseContext()->getFolder()
             );
         } catch (MapperException | \LogicException | \UnexpectedValueException) {
             $childLearners = new GenericCollection(User::class); // In case of exception, assume no child learner exists.
         }
 
-        // Handle the case where the user is a parent of one or more learners.
+        // Handle the case where the user is a parent of one or more learner participants.
         if (
             $respectWorkTypeVisibility && $workType !== null
             && $childLearners->count() > 0 && $workType->isVisibleToParents()
@@ -244,7 +256,8 @@ class Visibility
             return false;
         }
 
-        $participant = $assessable->getParticipantIfExtant($nonInstructorNonLearner);
+        // A non-learner-participant might still be a participant.
+        $participant = $assessable->getParticipantIfExtant($nonInstructorNonLearnerParticipant);
         if (!$participant) {
             return false;
         }
@@ -253,9 +266,9 @@ class Visibility
          * Lesson Plans have some specific logic for visibility:
          * - Lesson Plans can be hidden from students via a Visibility switch
          * If you're a student, hide any lesson plans that were hidden from you
-         * - Lesson Plans that are not hidden from students, should be visible to all students
+         * - Lesson Plans that are not hidden from students should be visible to all students
          */
-        if ($assessable instanceof LessonPlan\Model && \Schoolbox\Role::STUDENT !== $assessable->getVisibility()) {
+        if ($assessable instanceof LessonPlan\Model && \Schoolbox\Role::STUDENT !== $assessable->getWorkType()->getVisibility()) {
             return false;
         }
 
