@@ -46,12 +46,12 @@ function onUpdateToggleSelected(): void {
     <a
         v-if="node._links?.getExport && node.children?.length"
         :href="node._links.getExport"
-        class="button-action-option sbx-button--has-icon"
+        class="sbx-icon-only-button"
+        :aria-label="`Export ${props.title}`"
         :title="`Export ${props.title}`"
         data-test-export
     >
         <sbx-icon name="export"></sbx-icon>
-        Export {{ props.title }}
     </a>
     <button
         class="sbx-icon-only-button"
@@ -77,14 +77,4 @@ function onUpdateToggleSelected(): void {
 
 <style lang="scss" scoped>
 @import "./style/mcViewNode";
-.button-action-option {
-    @extend .button;
-    color: var(--sbx-config-color-accent, var(--content-ui-foreground));
-    font-size: 0rem;
-    opacity: 0.7;
-    padding: 0px 2px 0px 12px;
-    &:hover {
-        opacity: 1;
-    }
-}
 </style>
