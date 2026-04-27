@@ -20,39 +20,56 @@ use Schoolbox;
 class Mapper extends Schoolbox\Mapper
 {
     /**
-     * Staff and instructors only
-     *  - instructors - always included
-     *  - learners - always excluded
-     *  - parents of learners - included only if instructors
-     *  - users of role type 'staff' - included unless they are learners
-     *  - other users of any role type - included only if instructors
+     * The docblocks in this file define how work type visibility should work in Schoolbox.
+     *
+     * Glossary:
+     *  - Instructor: a user with WRITE+ access to the assessment folder.
+     *  - Learner: a user with READ access to the assessment folder.
+     *  - Participant: a user for whom getParticipantIfExtant() returns a non-null participant.
+     *  - Learner participant: a learner who is also a participant.
+     *  - Parent of learner participant: a parent whose child is a learner participant.
+     *
+     * Visibility of assessments also depends on:
+     *  - Whether they are published (only instructors and staff should see unpublished assessments)
+     *  - Whether they are closed and whether closed assessments should be visible.
+     *
+     * @see implementation in the Learning\Assessment\Visibility class.
+     */
+
+    /**
+     * Visibility 'Staff and instructors only'
+     *  - Instructors - always included
+     *  - Learner participants - always excluded
+     *  - Parents of learner participants - included only if instructors
+     *  - Users of role type 'staff' - included unless they are learner participants
+     *  - Other users of any role type - included only if instructors
      */
     public const string VISIBILITY_STAFF_INSTRUCTORS = 'staffAndInstructorsOnly';
     /**
-     * Staff and instructors and learners
-     *  - instructors - always included
-     *  - learners - always included
-     *  - parents of learners - included only if instructors or learners
-     *  - users of role type 'staff' - always included
-     *  - other users of any role type - included only if instructors or learners
+     * Visibility 'Staff and instructors and learners'
+     *  - Instructors - always included
+     *  - Learner participants - always included
+     *  - Parents of learner participants - included only if instructors or learner participants
+     *  - Users of role type 'staff' - always included
+     *  - Other users of any role type - included only if instructors or learner participants
      */
     public const string VISIBILITY_STAFF_INSTRUCTORS_LEARNERS = 'staffAndInstructorsAndLearners';
     /**
-     * Staff and instructors and parents
+     * Visibility 'Staff and instructors and parents'
      *  - Instructors - always included
-     *  - learners - always excluded
-     *  - parents of learners - included unless they are learners
-     *  - users of role type 'staff' - included unless they are learners
-     *  - other users of any role type - included only if instructors
+     *  - Learner participants - always excluded
+     *  - Parents of learner participants - included unless they are learner participants
+     *  - Users of role type 'staff' - included unless they are learner participants
+     *  - Other users of any role type - included only if instructors
      */
     public const string VISIBILITY_STAFF_INSTRUCTORS_PARENTS = 'staffAndInstructorsAndParents';
     /**
-     * Staff and instructors and learners and parents
-     *  - instructors - always included
-     *  - learners - always included
-     *  - parents of learners - always included
-     *  - users of role type 'staff' - always included
-     *  - other users of any role type - included only if instructors or learners
+     * Visibility 'Staff and instructors and learners and parents'
+     *  - Instructors - always included
+     *  - Learner participants - always included
+     *  - Parents of learner participants - always included
+     *  - Users of role type 'staff' - always included
+     *  - Other users of any role type - included only if instructors or learner participants
      */
     public const string VISIBILITY_STAFF_INSTRUCTORS_LEARNERS_PARENTS = 'staffAndInstructorsAndLearnersAndParents';
 
