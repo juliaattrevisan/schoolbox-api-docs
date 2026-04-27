@@ -32,6 +32,7 @@ class Mapper extends Schoolbox\Mapper
      *
      * Notes:
      *  - Being a learner without being a participant has no effect on assessment visibility.
+     *  - Being a participant without being a learner has no effect on assessment visibility.
      *  - Granting a user read-level access to a class via their role type does not cause that user to be a
      *    participant in assessments in that class.
      *  - Granting a user read-level access to a class individually via group membership does cause that user to be a
