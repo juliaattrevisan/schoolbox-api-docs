@@ -1007,6 +1007,16 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Setup the school pastoral houses.',
                     ],
+                    '/adminv2/lists/language' => [
+                        'name'        => 'Lists - Languages',
+                        'visible'     => $userIsSuperuser,
+                        'description' => 'Enable and configure the list of languages available for users.',
+                    ],
+                    '/adminv2/lists/nationality' => [
+                        'name'        => 'Lists - Nationalities',
+                        'visible'     => $userIsSuperuser,
+                        'description' => 'Enable and configure the list of nationalities available for users.',
+                    ],
                     '/adminv2/lists/qualification' => [
                         'name'        => 'Lists - Qualifications',
                         'visible'     =>  $userIsSuperuser,

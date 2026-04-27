@@ -11,6 +11,25 @@ class Model implements ValueLabelInterface
     use ModelTraits\CreateCollection;
 
     private string $name;
+    private string $code;
+
+    /**
+     * @return string
+     */
+    public function getCode(): string
+    {
+        return $this->code;
+    }
+
+    /**
+     * @param string $code
+     * @return $this
+     */
+    public function setCode(string $code): self
+    {
+        $this->code = $code;
+        return $this;
+    }
 
     /**
      * Get nationality
