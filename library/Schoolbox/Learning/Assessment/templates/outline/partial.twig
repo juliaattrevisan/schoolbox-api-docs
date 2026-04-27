@@ -37,7 +37,7 @@
                     assessment: assessment,
                 }) %}
                 {% if viewGradeRoute %}
-                    <li><a class="icon-task" data-test="course-outline-view-grade-submissions-{{ assessment.id }}" href="{{ viewGradeRoute }}">Provide feedback</a></li>
+                    <li><a data-test="course-outline-view-grade-submissions-{{ assessment.id }}" href="{{ viewGradeRoute }}" class="sbx-button--has-icon"><sbx-icon name="task"></sbx-icon>Provide feedback</a></li>
                 {% endif %}
             {% endif %}
 
