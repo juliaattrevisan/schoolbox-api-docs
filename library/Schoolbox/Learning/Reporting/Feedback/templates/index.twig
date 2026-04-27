@@ -1,0 +1,203 @@
+{##
+ # Feedback for Reporting Activities
+ #
+ # This is a similar implementation to the inline grader except that there are never any submissions to a
+ # Reporting activity: you're generating floating feedback each time for a particular student.
+ #
+ # @param \Schoolbox\User $learner            The learner currently being shown
+ # @param IAssessable $assessment             The reporting activity we're looking at
+ # @param Collection|string[][] $breadcrumbs  An array of label + URL pairs
+ # @param Reporting\Feedback\Model $feedback  A feedback instance (can be null)
+ # $param StudentCarousel $carousel           A ui element that lets you cycle between each participating student
+ # @param Participant $participant
+ # @param bool $interactionLocked             Is the assessment due in an archived term?
+ # @param string $reviewRoute                 The mechanism by which feedback is being given
+ # @param array $errors                       A list of Submission States to choose (despite its naming...)
+ #}
+
+{# Don't remove this; it'll cause javascript Undefined errors #}
+{% block nextUrl %}
+    <script>
+        var nextUrl = '';
+    </script>
+{% endblock %}
+
+{# Vars required in both contexts
+ # These vars exist regardless of who is looking
+#}
+{% set readonly = interactionLocked and not USER.superUser %}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+{# Participant Carousel #}
+{% block participantCarousel %}
+    {% include '@learningReportingFeedback/participantCarousel.twig' with {
+        assessment: assessment,
+        students: participantCarousel,
+        selectedStudentId: learner.id
+    } only %}
+{% endblock %}
+
+{# These includes vary depending on who is viewing this page:
+ # * Teachers doing their usual grading
+ #}
+{% block meta %}
+    {% include '@learningReportingFeedback/meta.twig' with {
+        title: locale.grading.proper,
+        assessment: assessment,
+        participant: participant,
+        readonly: readonly,
+        statusRoute: routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id, studentId: learner.id}),
+    } only %}
+{% endblock %}
+
+{# Javascript that powers the feedback form #}
+{% block dynamicFeedback %}
+    {% include '@learningReportingFeedback/dynamicFeedback.twig' with {
+        publishText: 'Publish And Continue',
+        publishingText: 'Publishing...',
+        publishedText: 'Feedback published'
+    } only %}
+{% endblock %}
+
+<div class="row">
+    <div class="small-12 columns">
+        {% block subheading %}
+            <div class="row">
+                <div class="small-12 island">
+                    <h2 class="subheader">Feedback</h2>
+                </div>
+            </div>
+        {% endblock %}
+
+        {# Grading logic and structure #}
+        <div class="row mark-scheme" data-assessment-status data-participant="{{ participant.user.id }}">
+            <div class="small-12 island">
+                <form method="post" data-feedback-form="{{ participant.user.id }}" action="{{ routeLookupIfAuthorized('learningReportingFeedback.postParticularFeedback', {
+                    assessmentId: assessment.id,
+                    assessment:   assessment,
+                    learnerId:    learner.id,
+                    learner:      learner,
+                    feedbackId:   feedback.id ?? null
+                }) }}">
+                    <section>
+                        <input type="hidden" name="feedbackId" value="" />
+                        {# Required so that this form is recognised as containing a rubric and files #}
+                        <input name="fromInlineGrader" value="true" type="hidden"/>
+
+{#                        #}{# Settings for the rubric grid #}
+{#                        {% set showDescriptorValue = true %}#}
+{#                        {% set showGroupTotal = assessment.isMarkPerCapability %}#}
+{#                        {% set showRubricTotal = true %}#}
+{#                        {% set self = 'none' %}#}
+
+{#                        {% block rubricGrid %}#}
+{#                            {% if assessment.useRubric %}#}
+{#                                <fieldset class="content">#}
+{#                                    {% set rubricTemplate = readonly#}
+{#                                        ? 'grid.twig'#}
+{#                                        : 'grid-markable.twig'#}
+{#                                    %}#}
+{#                                    {% set rubricMarkedGrid = feedback is not null ? feedback.rubricMarkedGrid : null %}#}
+
+{#                                    {% include '@rubric/' ~ rubricTemplate with {#}
+{#                                        rubricGrid: assessment.rubricGrid,#}
+{#                                        rubricMarkedGrid: rubricMarkedGrid,#}
+{#                                        selfAssessmentFeedback: selfAssessmentFeedback ?? null,#}
+{#                                        learner: participant.user,#}
+{#                                        markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),#}
+{#                                        showDescriptorValue: showDescriptorValue,#}
+{#                                        showGroupTotal: showGroupTotal,#}
+{#                                        showRubricTotal: showRubricTotal,#}
+{#                                        self: self,#}
+{#                                        studentView: studentView,#}
+{#                                        selfAssess: selfAssess,#}
+{#                                        selfReflect: selfReflect,#}
+{#                                        blindMode: blindMode ?? false#}
+{#                                    } only %}#}
+{#                                </fieldset>#}
+{#                            {% endif %}#}
+{#                        {% endblock %}#}
+
+                        {# The little grades input combobox #}
+                        <fieldset class="content">
+                            {% block gradeValue %}
+                                {% if '' != assessment.instructorMarkScheme.template %}
+                                    <div class="small-12 medium-3 column">
+                                        <label>{{ locale.grades.proper }}
+                                            {% include '@learningMarkScheme/'~assessment.instructorMarkScheme.template~'.twig' with {
+                                                participant: participant,
+                                                feedback: feedback,
+                                                markScheme: assessment.instructorMarkScheme,
+                                                useInstructorMark: true,
+                                                tabIndex: 1,
+                                                errors: errors,
+                                                readonly: readonly,
+                                                studentView: false
+                                            } only %}
+                                        </label>
+
+{#                                        {% if assessment.useRubric and not readonly %}#}
+{#                                            {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {#}
+{#                                                locale: locale,#}
+{#                                                rubricId: assessment.rubricGrid.id,#}
+{#                                            } only %}#}
+{#                                        {% endif %}#}
+                                    </div>
+                                {% endif %}
+                            {% endblock %}
+
+                            {# Feedback comment textarea is optional based on Reporting activity configuration #}
+                            {% if assessment.feedbackCommentsEnable %}
+                                <div class="small-12{% if '' != assessment.instructorMarkScheme.template %} medium-9{% endif %} column">
+                                    {% include '@learningAssessment/reporting/feedback/comment.twig' with {
+                                        participant: participant,
+                                        feedback: feedback,
+                                        tabIndex: 2,
+                                        readonly: readonly,
+                                        selfAssessment: false,
+                                        selfReflection: false,
+                                        blindMode: false,
+                                        isRichText: true,
+                                        editorTemplates: editorTemplates ?? [],
+                                    } only %}
+                                </div>
+                            {% endif %}
+                        </fieldset>
+
+                        {# Action Bar #}
+                        {% set isDraftFeedback     = feedback and not feedback.published %}
+                        {% set isPublishedFeedback = feedback and feedback.published %}
+
+                        {% block actionButtons %}
+                            {% apply spaceless %}
+                                {% set buttons %}
+                                    <button class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen" {% if not isDraftFeedback %}style="display:none;"{% endif %} data-test="assessment-response-info-saved-as-draft">Saved as Draft</button>
+                                    {% if not readonly %}
+                                        <a class="button" id="continue-button">Continue</a>
+                                        <a class="button"
+                                           data-draft="publish"
+                                           data-test="assessment-feedback-publish-button"
+                                           {% if isPublishedFeedback %}style="display:none;"{% endif %}
+                                        >Publish and Continue</a>
+                                    {% endif %}
+                                {% endset %}
+                            {% endapply %}
+
+                            {% include '@learningAssessment/fragments/actionBar.twig' with {
+                                actionStyle:  '',
+                                buttons: buttons,
+                                participant: participant
+                            } only %}
+                        {% endblock %}
+                    </section>
+                </form>
+            </div>
+
+            <script src="{{ CDN_PREFIX }}/js/submissions/jquery.combobox.js?v={{ config.site_version }}" type="text/javascript"></script>
+
+            <div id='toaster' class="toast" data-alert data-save-draft></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,35 @@
+{##
+ # Metadata for the person doing the marking
+ #
+ # @param string $title             A terminology for the "grading" verb
+ # @param IAssessable $assessment   A hydrated Reporting instance
+ # @param Participant $participant  The participant instance for a learner
+ # @param bool $readonly            A compound bool corresponding to "interactionLocked and not superuser"
+ # @param string $statusRoute       A url to the Status screen, if extant
+ #}
+{% import '@learning/macro/dueDate.twig' as dueDate %}
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1 data-test="assessment-response-meta-title">{{ title }} {{ assessment.title }}</h1>
+            <ul class="meta">
+                <li class="icon-calendar">{{ dueDate.forParticipant(participant) }}</li>
+                <li class="icon-reporting"><a href="/homepage/{{ assessment.context.folder.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}</li>
+                {% if readonly %}
+                    <li class="icon-archive">{{ locale.term.proper }} has been archived</li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    {% if statusRoute %}
+        <nav>
+            <sbx-pop-out content-id="header-options"></sbx-pop-out>
+        </nav>
+
+        <ul id="header-options" class="f-dropdown" data-dropdown-content>
+            <li><a class="icon-history" href="{{ statusRoute }}">View Status</a></li>
+        </ul>
+    {% endif %}
+</div>

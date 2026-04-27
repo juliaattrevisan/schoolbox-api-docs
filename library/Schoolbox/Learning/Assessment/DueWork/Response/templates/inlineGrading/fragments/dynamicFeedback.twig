@@ -2,7 +2,9 @@
  # Dynamic Feedback javascript
  # note that nextUrl is defined elsewhere, in the parent, by some other javascript
  #
- # string publishText
+ # @param string $publishText     A button in the Publish call to action...
+ # @param string $publishingText  ...which changes to this once clicked and an async request occurs
+ # @param string $publishedText   ...finally ending with this word
  #}
 <script src='{{ CDN_PREFIX }}/js/submissions/jquery.dynamic-feedback.js?v={{ config.site_version }}'></script>
 {% autoescape 'js' %}
@@ -20,8 +22,7 @@
             publishedText: '{{ publishedText }}',
 
             onPublishCallback: function () {
-                {# if we have a returnURL then lets use that, else do the default
-                #}
+                {# if we have a returnURL then lets use that, else do the default #}
                 let params = new URLSearchParams(window.location.search);
                 let returnUrl = params.get('returnUrl');
                 if (null !== returnUrl) {
