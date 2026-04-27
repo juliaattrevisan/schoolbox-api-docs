@@ -21,7 +21,6 @@ class Visibility
      */
     private Access $access;
 
-
     /**
      * @param Access $access
      */
@@ -29,7 +28,6 @@ class Visibility
     {
         $this->access = $access;
     }
-
 
     /**
      * Determines if the specified user can see an IAssessable (but not necessarily its details or participant interactions)
@@ -95,7 +93,6 @@ class Visibility
         return $this->isVisibleToNonInstructorNonLearnerParticipant($assessment, $viewer, $showClosed, $now, $respectWorkTypeVisibility);
     }
 
-
     /**
      * Is the assessable visible to the Instructor? (Assumes the user is an instructor)
      *
@@ -119,7 +116,6 @@ class Visibility
         $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
         return $now->lt($closeDate);
     }
-
 
     /**
      * Is the assessable visible to the learner participant? (Assumes the user is a learner participant)
@@ -153,7 +149,6 @@ class Visibility
             ($showClosed || $now->lt($closeDate))
         );
     }
-
 
     /**
      * Is the assessable visible to a user who is not an instructor and not a learner participant?
