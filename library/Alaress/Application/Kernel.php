@@ -63,6 +63,7 @@ use Proxy\Server as ProxyServer;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
+use Ramsey\Uuid\Uuid;
 use RuntimeException;
 use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
 use Schoolbox\API\Token\Jwt;
@@ -1362,10 +1363,7 @@ abstract class Kernel
                     $twig->addFunction(
                         new TwigFunction(
                             'getGuid',
-                            function () {
-                                mt_srand((int)microtime() * 10000);
-                                return strtoupper(md5(uniqid((string)rand(), true)));
-                            }
+                            fn () => Uuid::uuid4()->toString(),
                         )
                     );
 

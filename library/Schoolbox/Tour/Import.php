@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Tour;
 
+use Ramsey\Uuid\Uuid;
 use Schoolbox\Config\ConfigMapper;
 use Symfony\Component\Yaml\Yaml;
 use Schoolbox\Application\CliTool;
@@ -85,7 +86,7 @@ HELP
     {
         $this->getLogger()->info('Creating a new tour called: ' . $title);
 
-        $tourID = $this->generateGUID();
+        $tourID = Uuid::uuid7()->toString();
 
         if ($this->perform()) {
             $statement = $this->getDatabaseInternal()->prepareQuery(
@@ -188,7 +189,7 @@ HELP
         if ($this->perform()) {
             $statement->execute(
                 [
-                    'trigger_uuid' => $this->generateGUID(),
+                    'trigger_uuid' => Uuid::uuid7()->toString(),
                     'tour_uuid'    => $tourID,
                     'selector'     => $selector,
                     'event'        => $event,
@@ -233,7 +234,7 @@ HELP
                 )"
         );
 
-        $stepID = $this->generateGUID();
+        $stepID = Uuid::uuid7()->toString();
 
         if ($this->perform()) {
             $statement->execute(
@@ -296,7 +297,7 @@ HELP
         );
         $statement->execute(
             [
-                'uuid'           => $this->generateGUID(),
+                'uuid'           => Uuid::uuid7()->toString(),
                 'tour_step_uuid' => $stepID,
                 'title'          => trim($title),
                 'content'        => trim($body),
@@ -336,7 +337,7 @@ HELP
         );
         $statement->execute(
             [
-                'uuid'           => $this->generateGUID(),
+                'uuid'           => Uuid::uuid7()->toString(),
                 'tour_step_uuid' => $stepID,
                 'content'        => trim($body),
                 'selector'       => $selector,
@@ -379,7 +380,7 @@ HELP
         );
         $statement->execute(
             [
-                'uuid'            => $this->generateGUID(),
+                'uuid'            => Uuid::uuid7()->toString(),
                 'tour_step_uuid'  => $stepID,
                 'selector'        => $selector,
                 'event'           => $event,
@@ -387,19 +388,6 @@ HELP
                 'eventOrder'      => $order,
             ]
         );
-    }
-
-    /**
-     * @return string
-     */
-    private function generateGUID(): string
-    {
-        $uuid = md5(uniqid(mt_rand(), true));
-        return substr($uuid, 0, 8) . "-" .
-            substr($uuid, 8, 4) . "-" .
-            substr($uuid, 12, 4) . "-" .
-            substr($uuid, 16, 4) . "-" .
-            substr($uuid, 20, 12);
     }
 
     public function runAsRoot(): ?bool

@@ -42,7 +42,7 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('modified_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->uses('uuid', self::TYPE_STRING);
+        $this->uses('uuid', self::TYPE_STRING, self::COLUMN_AUTOGENERATE_UUID);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assertHeritage']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'disableOrReEnableChildren']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteChildren']);

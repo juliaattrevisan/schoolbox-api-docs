@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\Course\DataModel\Specification\Unit;
 
 use Alaress\Database\Predicate\Builder;
 use PDOStatement;
-use Ramsey\Uuid\Uuid;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;
@@ -45,7 +44,7 @@ class Mapper extends AbstractUnitMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('course_specification_id', CourseSpecificationMapper::class, 'id', null, null, 'course', 'course');
         $this->joins('folder_id', FolderMapper::class, 'id', null, null, null, 'folder');
-        $this->uses('uuid', self::TYPE_STRING);
+        $this->uses('uuid', self::TYPE_STRING, self::COLUMN_AUTOGENERATE_UUID);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -54,10 +53,6 @@ class Mapper extends AbstractUnitMapper
         // SoftDelete/Restore Assessments in UnitSpecification
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAssessments'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreFolder'));
-
-        /* Assign a uuid if it doesn't already exist
-         */
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assignUuid']);
 
         $this->registerPersistSearchIndexCallbacks();
     }
@@ -215,25 +210,6 @@ class Mapper extends AbstractUnitMapper
         $folderMapper = $this->getJoinMapper('folder');
         $folder = $folderMapper->findByColumn('id', $unitSpec->getFolder()->getId(), ['deleted' => true]);
         $folderMapper->restoreSoftDeleted($folder);
-        return true;
-    }
-
-
-    /**
-     * Asserts that every $unitSpec has a uuid prior to saving
-     *
-     * If it didn't already have one, it will be assigned one
-     * Otherwise it'll maintain what it previously knew
-     *
-     * @param Model $unitSpec
-     * @return bool
-     */
-    public function assignUuid(Model $unitSpec): bool
-    {
-        if ('' === trim((string)$unitSpec->getUuid())) {
-            $unitSpec->setUuid((string)Uuid::uuid4());
-        }
-
         return true;
     }
 }

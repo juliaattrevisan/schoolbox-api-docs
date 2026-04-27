@@ -103,6 +103,10 @@
                 window.modalInternalUsersAdded = [];
             }
 
+            if (window.userSearchTimeout === undefined) {
+                window.userSearchTimeout = [];
+            }
+
             window.modalInternalUsersAdded['{{ guid }}'] = [];
 
             {# Shut storm up with its duplicate selector bitching #}
@@ -309,9 +313,9 @@
 
                 {# Clear any previously pending AJAX request that hasn't fired #}
 
-                if (window.userSearchTimeout{{ guid }} !== undefined) {
-                    clearTimeout(window.userSearchTimeout{{ guid }});
-                    delete window.userSearchTimeout{{ guid }};
+                if (window.userSearchTimeout['{{ guid }}'] !== undefined) {
+                    clearTimeout(window.userSearchTimeout['{{ guid }}']);
+                    delete window.userSearchTimeout['{{ guid }}'];
                 }
 
                 {# If we've already retrieved this search don't bother AJAX'ing to get the result again #}
@@ -333,7 +337,7 @@
 
                     {# Because we don't want to overload the server, only do the search every 250 milliseconds #}
 
-                    window.userSearchTimeout{{ guid }} = setTimeout(function () {
+                    window.userSearchTimeout['{{ guid }}'] = setTimeout(function () {
 
                         {# Do AJAX search #}
 
