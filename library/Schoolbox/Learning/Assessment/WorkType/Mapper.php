@@ -30,9 +30,14 @@ class Mapper extends Schoolbox\Mapper
      *  - Learner participant: A learner who is also a participant.
      *  - Parent of learner participant: A parent whose child is a learner participant.
      *
-     * Visibility of assessments also depends on:
-     *  - Whether they are published (only instructors and staff should see unpublished assessments)
-     *  - Whether they are closed and whether closed assessments should be visible.
+     * Notes:
+     *  - Granting a user read-level access to a class via their role type does not cause that user to be a
+     *    participant in assessments in that class.
+     *  - Granting a user read-level access to a class individually via group membership does cause that user to be a
+     *    participant in assessments in that class.
+     *  - Visibility of assessments also depends on:
+     *     - Whether they are published (only instructors and staff should see unpublished assessments)
+     *     - Whether they are closed and whether closed assessments should be visible.
      *
      * @see implementation in the Learning\Assessment\Visibility class.
      */
