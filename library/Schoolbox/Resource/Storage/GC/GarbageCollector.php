@@ -114,6 +114,13 @@ class GarbageCollector
         if ($hash) {
             $this->log->info(sprintf('  hash: "%s"', $hash));
             $pb = $pb->equals('hash', $hash);
+        } else {
+            // Somehow, storage.hash is nullable:
+            // usage of those records cannot be viably detected.
+            // I don't know how they could even exist, unless there's an
+            // intermediary state where a storage file is saved before its hash
+            // is created?
+            $pb = $pb->notNull('hash');
         }
         if ($this->thresholdDate) {
             $thresholdDate = $this->thresholdDate->getDatabase();
