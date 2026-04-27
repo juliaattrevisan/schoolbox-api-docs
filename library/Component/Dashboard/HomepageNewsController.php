@@ -28,7 +28,11 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
      */
     public function execute()
     {
-        $feedHandler = new Feed($this->getSitePage()->getDi()->get('databaseInternal'), $this->getUser());
+        $feedHandler = new Feed(
+            $this->getSitePage()->getDi()->get('databaseInternal'),
+            $this->getUser(),
+            $this->getSitePage()->getDi()->get('assessmentDataSource')
+        );
         $groupHandler = new Group();
 
         $userAccess = $groupHandler->involvedInCategoryList(

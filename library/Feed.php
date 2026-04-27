@@ -7,6 +7,8 @@
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Helper as WorkTypeHelper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Permission\Access\Access;
@@ -25,9 +27,13 @@ class Feed
      *
      * @param IConnector     $db   A database connection
      * @param Schoolbox\User $user The user to generate the feed for
+     * @param AssessmentDataSource|null $assessmentDataSource Data source for assessment hydration
      */
-    public function __construct(private IConnector $db, private Schoolbox\User $user)
-    {
+    public function __construct(
+        private IConnector $db,
+        private Schoolbox\User $user,
+        private ?AssessmentDataSource $assessmentDataSource = null
+    ) {
     }
 
     /**
@@ -38,7 +44,6 @@ class Feed
      */
     public function getFeed($folderId, $limit)
     {
-
         if ($limit == 0 || $limit > 50) {
             $limit = 50;
         }
@@ -77,7 +82,6 @@ class Feed
             $onlineAssessments,
             $surveys
         );
-
 
         //sort them
         usort($feedList, [$this, "timecmp"]);
@@ -155,7 +159,7 @@ class Feed
                 'date'        => $row['submitted'],
                 'type'        => 'icon-files',
                 'message'     => $userHandler->formatName($row) . ' uploaded the file ' . Scrub::text($row['name']),
-                'messageHTML' => "{$this->buildUsernameHTML($row, $row['uid'], $userHandler)} uploaded the file  $url",
+                'messageHTML' => "{$this->buildUsernameHtml($row, $row['uid'], $userHandler)} uploaded the file  $url",
                 'external_id' => $row['external_id'],
                 'user_name'   => $userHandler->formatName($row),
                 'cat_name'    => $row['cat_name'],
@@ -215,7 +219,7 @@ class Feed
                 'date'        => $row['submitted'],
                 'type'        => 'icon-link',
                 'message'     => $userHandler->formatName($row) . ' submitted the link ' . Scrub::text($row['name']),
-                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' submitted the link <a href="' . $linkUrl . '" rel="' . $linkTarget . '">' . Scrub::text(
+                'messageHTML' => $this->buildUsernameHtml($row, $row['uid'], $userHandler) . ' submitted the link <a href="' . $linkUrl . '" rel="' . $linkTarget . '">' . Scrub::text(
                     $row['name']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
@@ -244,7 +248,6 @@ class Feed
     {
         [$where, $params] = $this->buildPlaceholdersAndParams($folderIds);
 
-        $userHandler = new User();
         $access = Access::getInstance();
         $onlineAssessments = [];
         $offset = 0;
@@ -255,6 +258,7 @@ class Feed
 
         $query = "
             SELECT
+                a.id AS assessment_id,
                 assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start, assess.category_id as folderId,
                 u.title, u.firstname, u.preferred_name, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
                 c.name as cat_name, c.id as cat_id,
@@ -281,10 +285,41 @@ class Feed
                 break;
             }
 
+            $assessmentsById = $this->loadAssessmentsById($rows);
+
             foreach ($rows as $row) {
                 if ($row['work_type_id'] !== null) {
                     // Filter out rows that should not be visible due to lwt.is_visible_to_parents/lwt.is_visible_to_learners.
                     // When work_type_id is null, no visibility restriction applies (consistent with Assessment\Visibility->isVisibleToUser()).
+                    // Note assessment publish/close dates are not relevant here, because we are just getting all the
+                    // assessments that have been created (according to this function's main docblock).
+                    $isInstructor = $access->isInstructorInFolderId($this->user, $row['folderId']);
+                    $isLearnerParticipant = false;
+                    $isParentOfLearnerParticipant = false;
+
+                    if (!$isInstructor) {
+                        $assessment = $assessmentsById[(int)$row['assessment_id']] ?? null;
+                        if ($assessment === null) {
+                            continue; // If this happens, the database has changed between queries. Skip the row.
+                        }
+
+                        $isLearnerParticipant = $this->isLearnerParticipant(
+                            $access,
+                            $assessment,
+                            (int)$row['folderId'],
+                            $this->user
+                        );
+
+                        if ($row['is_visible_to_parents'] !== '0') {
+                            $isParentOfLearnerParticipant = $this->isParentOfLearnerParticipant(
+                                $access,
+                                $assessment,
+                                (int)$row['folderId'],
+                                $this->user
+                            );
+                        }
+                    }
+
                     switch (
                         WorkTypeHelper::getVisibilityFromBooleans(
                             $row['is_visible_to_parents'] !== '0',
@@ -293,13 +328,13 @@ class Feed
                     ) {
                         case WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS:
                             // Staff and instructors only (conditions here copied from Assessment\WorkType\Mapper)
-                            //  - instructors - always included
-                            //  - learners - always excluded
-                            //  - parents of learners - included only if instructors
-                            //  - users of role type 'staff' - included unless they are learners
-                            //  - other users of any role type - included only if instructors
-                            if (!$access->isInstructorInFolderId($this->user, $row['folderId'])) {
-                                if ($access->isLearnerInFolderId($this->user, $row['folderId'])) {
+                            //  - Instructors - always included
+                            //  - Learner participants - always excluded
+                            //  - Parents of learner participants - included only if instructors
+                            //  - Users of role type 'staff' - included unless they are learner participants
+                            //  - Other users of any role type - included only if instructors
+                            if (!$isInstructor) {
+                                if ($isLearnerParticipant) {
                                     continue 2; // Skip row.
                                 }
                                 if (!$this->user->getRole()->isStaff()) {
@@ -309,14 +344,14 @@ class Feed
                             break;
                         case WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS:
                             // Staff and instructors and learners (conditions here copied from Assessment\WorkType\Mapper)
-                            //  - instructors - always included
-                            //  - learners - always included
-                            //  - parents of learners - included only if instructors or learners
-                            //  - users of role type 'staff' - always included
-                            //  - other users of any role type - included only if instructors or learners
+                            //  - Instructors - always included
+                            //  - Learner participants - always included
+                            //  - Parents of learner participants - included only if instructors or learner participants
+                            //  - Users of role type 'staff' - always included
+                            //  - Other users of any role type - included only if instructors or learner participants
                             if (
-                                !$access->isInstructorInFolderId($this->user, $row['folderId']) &&
-                                !$access->isLearnerInFolderId($this->user, $row['folderId']) &&
+                                !$isInstructor &&
+                                !$isLearnerParticipant &&
                                 !$this->user->getRole()->isStaff()
                             ) {
                                 continue 2; // Skip row.
@@ -325,16 +360,16 @@ class Feed
                         case WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS_PARENTS:
                             // Staff and instructors and parents (conditions here copied from Assessment\WorkType\Mapper)
                             //  - Instructors - always included
-                            //  - learners - always excluded
-                            //  - parents of learners - included unless they are learners
-                            //  - users of role type 'staff' - included unless they are learners
-                            //  - other users of any role type - included only if instructors
-                            if (!$access->isInstructorInFolderId($this->user, $row['folderId'])) {
-                                if ($access->isLearnerInFolderId($this->user, $row['folderId'])) {
+                            //  - Learner participants - always excluded
+                            //  - Parents of learner participants - included unless they are learner participants
+                            //  - Users of role type 'staff' - included unless they are learner participants
+                            //  - Other users of any role type - included only if instructors
+                            if (!$isInstructor) {
+                                if ($isLearnerParticipant) {
                                     continue 2; // Skip row.
                                 }
                                 if (
-                                    !$access->isParentOfLearnerInFolderId($this->user, $row['folderId']) &&
+                                    !$isParentOfLearnerParticipant &&
                                     !$this->user->getRole()->isStaff()
                                 ) {
                                     continue 2; // Skip row.
@@ -343,15 +378,15 @@ class Feed
                             break;
                         case WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS_LEARNERS_PARENTS:
                             // Staff and instructors and learners and parents (conditions here copied from Assessment\WorkType\Mapper)
-                            //  - instructors - always included
-                            //  - learners - always included
-                            //  - parents of learners - always included
-                            //  - users of role type 'staff' - always included
-                            //  - other users of any role type - included only if instructors or learners
+                            //  - Instructors - always included
+                            //  - Learner participants - always included
+                            //  - Parents of learner participants - always included
+                            //  - Users of role type 'staff' - always included
+                            //  - Other users of any role type - included only if instructors or learner participants
                             if (
-                                !$access->isInstructorInFolderId($this->user, $row['folderId']) &&
-                                !$access->isLearnerInFolderId($this->user, $row['folderId']) &&
-                                !$access->isParentOfLearnerInFolderId($this->user, $row['folderId']) &&
+                                !$isInstructor &&
+                                !$isLearnerParticipant &&
+                                !$isParentOfLearnerParticipant &&
                                 !$this->user->getRole()->isStaff()
                             ) {
                                 continue 2; // Skip row.
@@ -362,16 +397,22 @@ class Feed
                     }
                 }
 
+                $formattedUserName = $this->formatOnlineAssessmentUserName($row);
                 $onlineAssessments[] = [
                     'date'        => $row['start'],
                     'type'        => 'icon-quiz',
-                    'message'     => $userHandler->formatName($row)
+                    'message'     => (
+                        $formattedUserName
                         . ' opened the quiz '
-                        . Scrub::text($row['heading']),
-                    'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' opened the quiz <a href="/assess/intro/' . $row['assess_id'] . '">'
-                        . Scrub::text($row['heading']) . '</a>',
+                        . Scrub::text($row['heading'])
+                    ),
+                    'messageHTML' => (
+                        $this->buildUsernameHtmlFromName($row, $row['uid'], $formattedUserName) .
+                        ' opened the quiz <a href="/assess/intro/' . $row['assess_id'] . '">'
+                        . Scrub::text($row['heading']) . '</a>'
+                    ),
                     'external_id' => $row['external_id'],
-                    'user_name'   => $userHandler->formatName($row),
+                    'user_name'   => $formattedUserName,
                     'cat_name'    => $row['cat_name'],
                     'cat_id'      => $row['cat_id'],
                     'user_id'     => $row['uid'],
@@ -434,7 +475,7 @@ class Feed
                 'message'     => $userHandler->formatName($row)
                     . ' opened the survey '
                     . Scrub::text($row['heading']),
-                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' opened the survey <a href="/survey/intro/' . $row['assess_id'] . '">'
+                'messageHTML' => $this->buildUsernameHtml($row, $row['uid'], $userHandler) . ' opened the survey <a href="/survey/intro/' . $row['assess_id'] . '">'
                     . Scrub::text($row['heading']) . '</a>',
                 'external_id' => $row['external_id'],
                 'user_name'   => $userHandler->formatName($row),
@@ -474,7 +515,7 @@ class Feed
                 'date'        => $row['submitted'],
                 'type'        => 'icon-folder',
                 'message'     => $userHandler->formatName($row) . ' created the folder ' . Scrub::text($row['name']),
-                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' created the folder <a href="/homepage/' . $row['id'] . '">' . Scrub::text(
+                'messageHTML' => $this->buildUsernameHtml($row, $row['uid'], $userHandler) . ' created the folder <a href="/homepage/' . $row['id'] . '">' . Scrub::text(
                     $row['name']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
@@ -514,7 +555,7 @@ class Feed
                 'date'        => $row['submitted'],
                 'type'        => 'icon-forum',
                 'message'     => $userHandler->formatName($row) . ' started the thread ' . Scrub::text($row['heading']),
-                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' started the thread <a href="/forum/thread/' . $row['threadID'] . '">' . Scrub::text(
+                'messageHTML' => $this->buildUsernameHtml($row, $row['uid'], $userHandler) . ' started the thread <a href="/forum/thread/' . $row['threadID'] . '">' . Scrub::text(
                     $row['heading']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
@@ -563,7 +604,7 @@ class Feed
                 'date'        => $row['submitted'],
                 'type'        => 'icon-wiki',
                 'message'     => $userHandler->formatName($row) . ' updated the wiki ' . Scrub::text($row['heading']),
-                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' updated the wiki <a href="/wiki/' . $row['categoryID'] . '/' . $row['slug'] . '">' . Scrub::text(
+                'messageHTML' => $this->buildUsernameHtml($row, $row['uid'], $userHandler) . ' updated the wiki <a href="/wiki/' . $row['categoryID'] . '/' . $row['slug'] . '">' . Scrub::text(
                     $row['heading']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
@@ -613,7 +654,7 @@ class Feed
                 'date'        => $row['submitted'],
                 'type'        => 'icon-blog',
                 'message'     => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
-                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' updated the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text(
+                'messageHTML' => $this->buildUsernameHtml($row, $row['uid'], $userHandler) . ' updated the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text(
                     $row['heading']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
@@ -664,7 +705,7 @@ class Feed
                 'date'        => $row['submitted'],
                 'type'        => 'icon-blog',
                 'message'     => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
-                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' commented on the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text(
+                'messageHTML' => $this->buildUsernameHtml($row, $row['uid'], $userHandler) . ' commented on the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text(
                     $row['heading']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
@@ -708,11 +749,143 @@ class Feed
      * @param User  $userHandler
      * @return string
      */
-    private function buildUsernameHTML($row, $userId, User $userHandler)
+    private function buildUsernameHtml($row, $userId, User $userHandler)
     {
         return null === $row['u.deleted_at']
-            ? sprintf('<a href="/search/user/%s">%s</a>', $userId, $userHandler->formatName($row))
+            ? sprintf('<a href="/search/user/%s">%s</a>', $userId, Scrub::text($userHandler->formatName($row)))
             : $userHandler->formatName($row);
+    }
+
+    /**
+     * Builds linked username HTML from a preformatted display name.
+     *
+     * @param array  $row
+     * @param int    $userId
+     * @param string $formattedName
+     * @return string
+     */
+    private function buildUsernameHtmlFromName(array $row, int $userId, string $formattedName): string
+    {
+        return null === $row['u.deleted_at']
+            ? sprintf('<a href="/search/user/%s">%s</a>', $userId, Scrub::text($formattedName))
+            : Scrub::text($formattedName);
+    }
+
+    /**
+     * Formats the username for an online assessment feed item.
+     *
+     * @param array<string, mixed> $row
+     * @return string
+     */
+    protected function formatOnlineAssessmentUserName(array $row): string
+    {
+        return new User()->formatName($row);
+    }
+
+    /**
+     * Hydrates the assessments referenced by these feed rows, loads the participation needed for
+     * visibility checks, and returns them keyed by assessment ID.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     * @return array<int, \Schoolbox\Learning\Assessment\IAssessable>
+     */
+    private function loadAssessmentsById(array $rows): array
+    {
+        $assessmentIds = array_values(array_unique(array_map(
+            static fn (array $row): int => (int)$row['assessment_id'],
+            array_filter(
+                $rows,
+                static fn (array $row): bool => $row['work_type_id'] !== null
+            )
+        )));
+
+        if ($assessmentIds === []) {
+            return [];
+        }
+
+        if (!$this->assessmentDataSource) {
+            throw new LogicException('Assessment data source not configured.');
+        }
+
+        $assessments = $this->assessmentDataSource->findAllByIds($assessmentIds);
+        $participantUser = $this->shouldLoadAllParticipantsForRows($rows) ? null : $this->user;
+        $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments, $participantUser, true);
+        return $assessments->indexBy('id')->getAll();
+    }
+
+    /**
+     * Returns whether the supplied user is both a learner in the folder and a participant in the assessment.
+     *
+     * @param Access          $access
+     * @param IAssessable     $assessment
+     * @param int             $folderId
+     * @param \Schoolbox\User $user
+     * @return bool
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function isLearnerParticipant(
+        Access $access,
+        IAssessable $assessment,
+        int $folderId,
+        Schoolbox\User $user
+    ): bool {
+        return $access->isLearnerInFolderId($user, $folderId)
+            && $assessment->getParticipantIfExtant($user) !== null;
+    }
+
+    /**
+     * Returns whether the supplied user has at least one child who is
+     * both a learner in the folder and a participant in the assessment.
+     *
+     * @param Access          $access
+     * @param IAssessable     $assessment
+     * @param int             $folderId
+     * @param \Schoolbox\User $user
+     * @return bool
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function isParentOfLearnerParticipant(
+        Access $access,
+        IAssessable $assessment,
+        int $folderId,
+        Schoolbox\User $user
+    ): bool {
+        $children = $user->getChildren();
+
+        if ($children === null) {
+            return false;
+        }
+
+        foreach ($children as $child) {
+            if (
+                $access->isLearnerInFolderId($child, $folderId) &&
+                $assessment->getParticipantIfExtant($child) !== null
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Parent visibility checks need child participation, so the full batch must be loaded when
+     * the current user has children and any row in the batch is parent-visible.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     */
+    private function shouldLoadAllParticipantsForRows(array $rows): bool
+    {
+        $children = $this->user->getChildren();
+
+        if ($children === null || $children->count() === 0) {
+            return false;
+        }
+
+        return array_any(
+            $rows,
+            fn ($row) => $row['work_type_id'] !== null && $row['is_visible_to_parents'] !== '0'
+        );
     }
 
     /**
