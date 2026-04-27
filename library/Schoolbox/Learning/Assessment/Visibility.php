@@ -263,7 +263,7 @@ class Visibility
          * If you're a student, hide any lesson plans that were hidden from you
          * - Lesson Plans that are not hidden from students should be visible to all students
          */
-        if ($assessable instanceof LessonPlan\Model && \Schoolbox\Role::STUDENT !== $assessable->getWorkType()->getVisibility()) {
+        if ($assessable instanceof LessonPlan\Model && \Schoolbox\Role::STUDENT !== $assessable->getVisibility()) {
             return false;
         }
 
