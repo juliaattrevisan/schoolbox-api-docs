@@ -24,8 +24,8 @@ class Mapper extends Schoolbox\Mapper
      *
      * Glossary:
      *  - Instructor: a user with WRITE+ access to the assessment folder.
-     *  - Learner: a user with READ access to the assessment folder.
-     *  - Participant: a user for whom getParticipantIfExtant() returns a non-null participant.
+     *  - Learner: a user with READ access to the assessment folder.  (Note this is a folder-level concept.)
+     *  - Participant: a user for whom getParticipantIfExtant() returns a non-null participant.  (Note this is an assessment-level concept.)
      *  - Learner participant: a learner who is also a participant.
      *  - Parent of learner participant: a parent whose child is a learner participant.
      *
