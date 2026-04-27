@@ -42,6 +42,7 @@ class Participations
         protected Authorizer $authorizer,
         protected User $currentUser,
         private ParticipationPlans $planTranslator,
+        private Collection $existingCustomisation,
         private ?Collection $customisedAssessments = null,
         private ?CacheInterface $aiCache = null,
     ) {
@@ -115,12 +116,13 @@ class Participations
                         'studentId' => $participant->getId()
                     ],
                 ),
-                'customisationRecord' => $this->getRouteIfAuthorized(
+                'customisationRecord' => $this->existingCustomisation->offsetExists($participant->getId()) ? $this->getRouteIfAuthorized(
                     'customisationRecord.viewRecordByStudent',
                     [
-                        'studentId' => $participant->getId()
+                        'studentId' => $participant->getId(),
+                        'customisations' => $this->existingCustomisation->getOffset($participant->getId())
                     ],
-                ),
+                ) : null,
             ]
         ];
     }

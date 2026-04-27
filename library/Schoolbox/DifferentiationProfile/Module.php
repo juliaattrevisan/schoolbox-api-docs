@@ -220,6 +220,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Filter\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Filter\Selection\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\DifferentiationProfile\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\CustomisationRecord\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Pastoral\Mapper::class),
             new PastoralTranslator(
                 new \Schoolbox\User\Translator\Author\ModelToArray(),

@@ -15,6 +15,7 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
+use Schoolbox\Assessment\Participant\Model;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter;
 use Schoolbox\Filter\CompositeFactoryFactory;
@@ -1288,6 +1289,20 @@ abstract class Controller extends ListController implements IAssessmentControlle
          */
         $customisedAssessments = $this->getAssessmentMapper()->findAllCustomisedAssessment($assessment);
 
+        /* Pre-fetching all the existing customistions for the participants
+         * to avoid n+1 query problem when translating plans for each participant
+         */
+        $existingCustomisation =
+            \Schoolbox\CustomisationRecord\Mapper::getInstance()
+                                                 ->findByColumn(
+                                                     'user_id',
+                                                     $assessment
+                                                         ->getAllParticipants()
+                                                         ->map(fn(Participant $participant) => $participant->getUser()->getId())->getAll()
+                                                 )
+                                                 ->groupByCallback(
+                                                     fn(Model $record) => $record->getUser()->getId()
+                                                 );
 
         /* Cache interface for AI generated content (ie suggested customisation)
          * Injecting here rather than in the module to avoid inheritance complications
@@ -1304,6 +1319,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $this->getAuthorizer(),
             $this->getUser(),
             $planTranslator,
+            $existingCustomisation,
             $customisedAssessments,
             $aiCache,
         );

@@ -10,8 +10,10 @@ use Alaress\Authorizer\Authorizer;
 use Alaress_Date_Locale_Config;
 use Aura\Router\Generator;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Assessment\Participant\Model as CustomisationRecord;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\ArrayLoader;
+use Schoolbox\Collection;
 use Schoolbox\DifferentiationProfile\Model;
 use Schoolbox\DifferentiationProfile\Translator\ModelToArray;
 use Schoolbox\GenericCollection;
@@ -72,6 +74,53 @@ class DifferentiationProfileModelToArrayTest extends TestCase
         $actual = call_user_func($translator, $model);
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testInvokePassesPrefetchedCustomisationsToRouteAuthorizer(): void
+    {
+        $user = $this->createMock(User::class);
+        $student = $this->createConfiguredMock(User::class, [
+            'getId' => 100,
+            'getFullName' => 'Unknown User',
+            'getGivenName' => null,
+            'getLastName' => null,
+            'getYear' => null,
+            'getCampusCollection' => null,
+        ]);
+        $model = (new Model())->setStudent($student);
+        $customisations = new GenericCollection(CustomisationRecord::class, [new CustomisationRecord()]);
+        $customisationsByStudent = (new Collection())->setOffset($student->getId(), $customisations);
+        $capturedParams = null;
+
+        $this->authorizer
+            ->method('isPathAuthorizedForUser')
+            ->willReturnCallback(function (string $route, array $params) use (&$capturedParams) {
+                if ($route === 'customisationRecord.viewRecordByStudent') {
+                    $capturedParams = $params;
+                }
+
+                return false;
+            });
+
+        $this->routeGenerator->expects(self::never())->method('generate');
+
+        $translator = new ModelToArray(
+            $this->routeGenerator,
+            $this->authorizer,
+            $user,
+            new GenericCollection(ProfileConfig::class),
+            $customisationsByStudent,
+        );
+
+        $translator($model);
+
+        self::assertSame(
+            [
+                'studentId' => $student->getId(),
+                'customisations' => $customisations,
+            ],
+            $capturedParams
+        );
     }
 
     /**

@@ -11,6 +11,7 @@ namespace Schoolbox\CustomisationRecord;
 
 use Alaress\Database\Predicate\Builder;
 use PDOStatement;
+use Schoolbox\Collection;
 use Schoolbox\Assessment\Participant\Model;
 use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 use Schoolbox\Campus;
@@ -204,6 +205,28 @@ class Mapper extends BaseMapper
             LEFT JOIN differentiation_profiles_adjustment_level al ON FIND_IN_SET(al.id, differentiation_profiles.adjustment_level)
 
         ";
+    }
+
+    /**
+     * Load customisation records for a list of students and group them by student id.
+     *
+     * @param int[] $studentIds
+     * @return Collection
+     */
+    public function findByStudentIdsGrouped(array $studentIds): Collection
+    {
+        $studentIds = array_values(array_unique($studentIds));
+
+        if ($studentIds === []) {
+            return new Collection();
+        }
+
+        $pb = $this->getPredicateBuilder();
+        $pb->in('user_id', $studentIds);
+
+        return $this->findByPredicates($pb)->groupByCallback(
+            static fn(Model $customisation): ?int => $customisation->getUser()->getId()
+        );
     }
 
     public function findByFilters(

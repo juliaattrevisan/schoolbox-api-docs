@@ -5,11 +5,13 @@ namespace Schoolbox\DifferentiationProfile\Translator;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
+use Schoolbox\Assessment\Participant\Model as CustomisationRecord;
 use Schoolbox\Collection;
 use Schoolbox\DifferentiationProfile\Mapper;
 use Schoolbox\DifferentiationProfile\Model;
 use Schoolbox\Admin\DifferentiationProfiles\Model as Config;
 use Schoolbox\Admin\DifferentiationProfiles\Mapper as ConfigMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
 class ModelToArray
@@ -17,22 +19,33 @@ class ModelToArray
     use GetRouteIfAuthorized;
 
     /**
-     * @param Generator  $routeGenerator
-     * @param Authorizer $authorizer
-     * @param User       $currentUser
-     * @param Collection $profileConfig
+     * @param Generator       $routeGenerator
+     * @param Authorizer      $authorizer
+     * @param User            $currentUser
+     * @param Collection      $profileConfig
+     * @param Collection|null $customisationsByStudent
      */
     public function __construct(
         protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser,
         private Collection $profileConfig,
+        private ?Collection $customisationsByStudent = null,
     ) {
     }
 
     public function __invoke(Model $model): array
     {
         $student = $model->getStudent();
+        /* If the customisations collection is already prefetched then we can skip the query in the controller
+         * and just get the customisations for the student from the collection, if not then just return null
+         * and let the controller handle it as it currently does
+         */
+        $customisations = null;
+        if ($this->customisationsByStudent !== null) {
+            $customisations = $this->customisationsByStudent->getOffset($student->getId())
+                ?? new GenericCollection(CustomisationRecord::class);
+        }
 
         $configKey = Mapper::CONFIG_METHOD_MAPPING;
 
@@ -96,7 +109,10 @@ class ModelToArray
                 ),
                 'customisations' => $this->getRouteIfAuthorized(
                     'customisationRecord.viewRecordByStudent',
-                    ['studentId' => $student->getId()],
+                    [
+                        'studentId' => $student->getId(),
+                        'customisations' => $customisations,
+                    ],
                 ),
                 'create'        => $this->getRouteIfAuthorized(
                     'differentiationProfiles.createDifferentiationProfileData',

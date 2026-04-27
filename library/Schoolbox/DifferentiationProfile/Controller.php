@@ -24,6 +24,7 @@ use Schoolbox\DifferentiationProfile\AdjustmentLevels\Model as AdjustmentLevelsM
 use Schoolbox\Admin\DifferentiationProfiles\Translator\ModelToArray as AdminConfigModelToArray;
 use Schoolbox\Admin\DifferentiationProfiles\Model as AdminConfigModel;
 use Schoolbox\Admin\DifferentiationProfiles\Mapper as AdminConfigMapper;
+use Schoolbox\CustomisationRecord\Mapper as CustomisationRecordMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 use Twig\Error\Error;
@@ -45,6 +46,7 @@ class Controller extends Base
      * @param Mapper                                                    $filterMapper
      * @param Filter\Selection\Mapper                                   $filterSelectionMapper
      * @param DifferentiationProfileMapper                              $mapper
+     * @param CustomisationRecordMapper                                 $customisationRecordMapper
      * @param PastoralMapper                                            $pastoralMapper
      * @param \Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray $pastoralTranslator
      */
@@ -58,6 +60,7 @@ class Controller extends Base
         private \Schoolbox\Filter\Mapper $filterMapper,
         private \Schoolbox\Filter\Selection\Mapper $filterSelectionMapper,
         private DifferentiationProfileMapper $mapper,
+        private CustomisationRecordMapper $customisationRecordMapper,
         private PastoralMapper $pastoralMapper,
         private \Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray $pastoralTranslator,
     ) {
@@ -116,17 +119,11 @@ class Controller extends Base
     /**
      * Get all differentiation profile data with applied filters, sorting and pagination
      * @return void
+     * @throws Exception
      */
     public function getAllDifferentiationProfileData(): void
     {
         $adminConfigs         = $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1);
-
-        $profileTranslator = new ModelToArray(
-            $this->getRouter()->getGenerator(),
-            $this->getAuthorizer(),
-            $this->getUser(),
-            $adminConfigs,
-        );
 
         $request             = $this->requestQuery['filter_selection'] ?? [];
 
@@ -181,6 +178,16 @@ class Controller extends Base
         );
 
         $profiles = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
+
+        $studentIds = $profiles->map(fn(Model $profile) => $profile->getStudent()->getId())->getAll();
+
+        $profileTranslator = new ModelToArray(
+            $this->getRouter()->getGenerator(),
+            $this->getAuthorizer(),
+            $this->getUser(),
+            $adminConfigs,
+            $this->customisationRecordMapper->findByStudentIdsGrouped($studentIds),
+        );
 
         $data = $profiles->map(
             fn(Model $profile) => call_user_func($profileTranslator, $profile)
