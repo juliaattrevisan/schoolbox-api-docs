@@ -92,7 +92,9 @@ Usage:
         </div>
     </div>
     <nav>
-        <a href="#" class="icon-down-arrow" data-collapser="{{ collapsePrefix }}-{{ courseSpec.id }}" data-test="course-list-arrow-{{ courseSpec.folder.name }}"></a>
+        <a href="#" class="sbx-icon-only-button" data-collapser="{{ collapsePrefix }}-{{ courseSpec.id }}" data-test="course-list-arrow-{{ courseSpec.folder.name }}">
+            <sbx-icon name="down-arrow"></sbx-icon>
+        </a>
         {% if hasTot %}
         <sbx-pop-out content-id="courseDropdown-{{ courseSpec.id }}" data-test="sbx-pop-out-courseDropdown-{{ courseSpec.id }}"></sbx-pop-out>
         {% endif %}
