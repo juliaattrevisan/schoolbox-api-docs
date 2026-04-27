@@ -18,6 +18,7 @@ use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Authorizer\Rule\HasParticipant;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
@@ -44,6 +45,7 @@ class Module extends BaseModule
         $lmsStaff = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_GRADES, Role::STAFF),
+            new HasParticipant(),
         );
 
         $preloadAssessment = function (array $params) {
