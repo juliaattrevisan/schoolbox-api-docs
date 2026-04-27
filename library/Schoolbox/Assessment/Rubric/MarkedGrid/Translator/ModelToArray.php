@@ -92,10 +92,36 @@ class ModelToArray
         $grid = $markedGrid->getGrid();
 
         $indicatorMark = $markedGrid->retrieveIndicatorMark($indicatorUsage);
+        $indicatorMarkDescriptor = $indicatorMark?->getDescriptor();
 
         $descriptors = [];
         foreach ($grid->getLevels() as $levelIndex => $level) {
-            // TODO
+            $descriptor = $indicatorUsage->retrieveDescriptor($levelIndex);
+            if (!$descriptor) {
+                $descriptors[] = null;
+                continue;
+            }
+
+            // TODO: permissions:
+            // $isMarkDisplayed = ; // TODO: && $grid->getAssessment()->isFeedbackVisibleToUser(VIEWER);
+            $isDescriptorSelected = (
+                // $isMarkDisplayed &&
+                $indicatorMarkDescriptor &&
+                $indicatorMarkDescriptor->getId() === $descriptor->getId()
+            );
+
+            $value = null;
+            if ($descriptor->hasValue() && $grid->showDescriptorValue()) { // TODO: && ...->getConfigLoader()->get('rubric_show_points'), also arbitrary twig showDescriptorValue var
+                $value = $grid->isUseMarkRange()
+                    ? [ 'left' => $descriptor->getMinValue(), 'right' => $descriptor->getMaxValue() ]
+                    : [ 'max' => $descriptor->getMaxValue() ];
+            }
+
+            $descriptors[] = [
+                'id' => $descriptor->getId(),
+                'selected' => $isDescriptorSelected,
+                'value' => $value,
+            ];
         }
 
         return [

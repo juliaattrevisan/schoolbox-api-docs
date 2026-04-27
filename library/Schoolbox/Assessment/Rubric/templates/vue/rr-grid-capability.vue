@@ -5,14 +5,23 @@
  */
 
 import locale from "@js/terminology/rosettaStone";
-import type { RubricGridCapability, RubricGridLevel, RubricMarkedGridCapability } from "./types";
+import type { UserAuthor } from "@schoolboxLibrary/types/User";
+import type {
+    RubricGridCapability,
+    RubricGridLevel,
+    RubricMarkedGridCapability,
+    RubricMarkedGridIndicator,
+} from "./types";
+import RrGridIndicator from "./rr-grid-indicator.vue";
 
 interface Props {
     capability: RubricGridCapability;
     capabilityMark: RubricMarkedGridCapability | null;
     selfAssessmentCapabilityMark: RubricMarkedGridCapability | null;
     levels: RubricGridLevel[];
+    participantId: UserAuthor["id"];
     showSummaryCapability: boolean;
+    showDescriptorValue?: boolean;
 }
 const props = defineProps<Props>();
 
@@ -22,6 +31,22 @@ const showSummaryForThisCapability = window.Vue.computed(() => {
     }
     return props.showSummaryCapability && props.capabilityMark && props.capabilityMark.humanReadableMark !== null;
 });
+
+/**
+ * Find an indicator mark for a specific indicator in a RubricMarkedGridCapability
+ * @param indicatorId the id of the indicator to find the mark for
+ * @param markedGridCapability the RubricMarkedGridCapability to find the mark in
+ * @returns the indicator mark, or null if not found
+ */
+function findIndicatorMark(
+    indicatorId: number,
+    markedGridCapability: RubricMarkedGridCapability | null,
+): RubricMarkedGridIndicator | null {
+    if (!markedGridCapability) {
+        return null;
+    }
+    return markedGridCapability.indicators.find((indicator) => indicator.id === indicatorId) ?? null;
+}
 </script>
 
 <template>
@@ -35,20 +60,16 @@ const showSummaryForThisCapability = window.Vue.computed(() => {
         </th>
     </tr>
 
-    <!-- <rb-grid-indicator
-        v-for="(indicator, index) in indicators"
+    <rr-grid-indicator
+        v-for="indicator in props.capability.indicators"
         :key="indicator.id"
-        v-model:name="indicator.name"
-        v-model:has-usage="indicator.hasUsage"
-        :capability-id="props.capability.id"
         :indicator="indicator"
+        :indicator-mark="findIndicatorMark(indicator.id, props.capabilityMark)"
+        :self-assessment-indicator-mark="findIndicatorMark(indicator.id, props.selfAssessmentCapabilityMark)"
         :levels="props.levels"
-        :max-levels="props.maxLevels"
-        :use-mark-range="props.useMarkRange"
-        :can-move-prev="index > 0"
-        :can-move-next="index < indicators.length - 1"
-        @move="(dir) => shiftArrayItem(indicators, index, dir)"
-    /> -->
+        :participant-id="props.participantId"
+        :show-descriptor-value="props.showDescriptorValue"
+    />
 
     <!-- Capability mark: needs to be rendered in human-readable form, use the assessment's mark scheme to do so -->
     <tr v-if="showSummaryForThisCapability">

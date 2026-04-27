@@ -78,7 +78,16 @@ export type RubricMarkedGridCapability = {
 export type RubricMarkedGridIndicator = {
     id: RubricGridIndicator["id"];
     humanReadableMark: string | null;
-    // descriptors: TODO
+    /** matches grid levels, null where not applicable */
+    descriptors: (RubricMarkedGridDescriptor | null)[];
+};
+
+export type RubricMarkedGridDescriptor = {
+    id: RubricGridDescriptor["id"];
+    selected: boolean;
+    value:
+        | { left: number | null; right: number | null } // if using mark range
+        | { max: number | null };
 };
 
 /**

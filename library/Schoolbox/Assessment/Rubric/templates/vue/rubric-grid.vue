@@ -5,6 +5,7 @@
 
 import locale from "@js/terminology/rosettaStone";
 import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
+import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import type { MarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
 import RrGridCapability from "./rr-grid-capability.vue";
 import type { RubricGrid, RubricMarkedGrid, RubricMarkedGridCapability } from "./types";
@@ -14,6 +15,7 @@ interface Props {
     rubricMarkedGrid: RubricMarkedGrid | null;
     selfAssessmentFeedback: RubricMarkedGrid | null;
     assessmentMarkScheme: MarkScheme;
+    participantId: UserAuthor["id"] | null;
     /**
      * Whether to show the totals at the bottom of overall rubric
      * This is false for student views, but true for staff views
@@ -61,7 +63,7 @@ function findCapabilityMark(
 
 <template>
     <div class="scrollable">
-        <table class="rb-markable">
+        <table class="rb markable">
             <thead v-if="hasLevels">
                 <tr>
                     <th colspan="2">&nbsp;</th>
@@ -77,12 +79,14 @@ function findCapabilityMark(
                     :capability-mark="findCapabilityMark(capability.id, props.rubricMarkedGrid)"
                     :self-assessment-capability-mark="findCapabilityMark(capability.id, props.selfAssessmentFeedback)"
                     :levels="props.rubric.levels"
+                    :participant-id="props.participantId"
                     :show-summary-capability="
                         props.showGroupTotal &&
                         !!props.rubricMarkedGrid &&
                         props.rubric.capabilityMarkType !== null &&
                         props.rubric.capabilityMarkType !== MarkTypeSlug.NONE
                     "
+                    :show-descriptor-value="props.showDescriptorValue"
                 />
 
                 <!-- Overall Mark -->

@@ -23,6 +23,7 @@
             template: {{ rubricGrid.assessment.markScheme.template|json_encode }},
             context: {{ rubricGrid.assessment.markScheme.generateContext|json_encode }}
         }"
+        :participant-id="{{ learner.id ?? 'null' }}"
         {# TODO: these are signs of likely permission issues #}
         {% if showRubricTotal ?? false %}show-rubric-total{% endif %}
         {% if showGroupTotal ?? false %}show-group-total{% endif %}
@@ -30,80 +31,3 @@
     />
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricGrid.js?v={{ config.site_version }}"></script>
-
-{# TODO: nothing to see here... temporary while there are two rubrics here #}
-<div style="background: var(--sbx-config-color-body-background, var(--body-background))"><br></div>
-
-
-{% set showSummaryCapability = showGroupTotal and rubricMarkedGrid and rubricGrid.assessment.isMarkPerCapability %}
-<div class="scrollable">
-    <table class="rb markable">
-    <tbody>
-
-    {% for groupIndex, groupUsage in rubricGrid.capabilityUsages %}
-        {% for critIndex, critUsage in groupUsage.indicatorUsages %}
-            <tr>
-                <th class="rb-criterion-name markdown">{{ critUsage.indicator.name | markdown }}</th>
-
-                {% set indicatorMark = rubricMarkedGrid
-                    ? rubricMarkedGrid.retrieveIndicatorMark(critUsage)
-                    : null %}
-                {% set indicatorMarkDescriptor = indicatorMark
-                    ? indicatorMark.descriptor
-                    : null %}
-                {% set selfAssessmentIndicatorMark = selfAssessmentFeedback is defined and selfAssessmentFeedback
-                    ? selfAssessmentFeedback.rubricMarkedGrid.retrieveIndicatorMark(critUsage)
-                    : null %}
-
-                {% for levelIndex, level in rubricGrid.levels %}
-
-                    {% set descriptor = critUsage.retrieveDescriptor(levelIndex) %}
-
-                    {% if descriptor %}
-
-                        {# Self-Assessment #}
-                        {% set isDescriptorSelected = indicatorMarkDescriptor == descriptor %}
-                        {% set isMarkDisplayed      = isDescriptorSelected and rubricGrid.assessment.isFeedbackVisibleToUser(USER) %}
-
-                        <td data-header="{{ level.name }}" {% if isMarkDisplayed %}class="rb-selected"{% endif %}>
-                            <div>
-                                {# This container displays rubric levels for the mobile view. #}
-                                <div class="hide-for-large-up l-pad-m hide-on-print"></p><b>{{ level.name | markdown }}</b></p></div>
-                                <span class="rb-description markdown">
-                                    {# Self-Assessment #}
-                                    {% if selfAssessmentIndicatorMark and selfAssessmentIndicatorMark.descriptor.id == descriptor.id %}
-                                        <img class="rb-self-reflection-choice"
-                                             src="/portrait.php?id={{ learner.id }}&amp;size=square32"
-                                             title="{% if selfAssessmentFeedback.isSelfGrading %}({{ selfAssessmentIndicatorMark.value }}) {{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
-                                    {% endif %}
-                                    {{- descriptor.description | markdown -}}
-                                </span>
-                                {% if descriptor.hasValue and config.rubric_show_points and rubricGrid.showDescriptorValue and showDescriptorValue %}
-                                    <span class="rb-value used" >
-                                        {% if rubricGrid.useMarkRange and descriptor.hasRange %}
-                                            {% if isMarkDisplayed %}
-                                                <span class="range-selection-value">{{ indicatorMark.value }}</span>
-                                            {% endif %}
-                                            <span class="range {% if isMarkDisplayed %}selected{% endif %}">
-                                                {{ descriptor.retrieveLeftValue }}–{{ descriptor.retrieveRightValue }}
-                                            </span>
-                                        {% else %}
-                                            {{ descriptor.maxValue }}
-                                        {% endif %}
-                                    </span>
-                                {% endif %}
-                            </div>
-                        </td>
-
-                    {% else %}
-                        <td class="rb-blank hide-for-medium-down">&nbsp;</td>
-                    {% endif %}
-
-                {% endfor %}
-            </tr>
-        {% endfor %}
-    {% endfor %}
-    </tbody>
-
-</table>
-</div>
