@@ -56,23 +56,24 @@ const isSelfGrading = false; // TODO: selfAssessmentFeedback.isSelfGrading
                 {{ props.descriptor.description.trim() }}
             </span>
 
-            <span v-if="props.showDescriptorValue && props.descriptorMark && props.descriptorMark.value !== null">
-                <span class="rb-value used">
-                    <template v-if="'max' in props.descriptorMark.value">
-                        {{ props.descriptorMark.value.max }}
-                    </template>
-                    <template v-else>
-                        <!-- show indicator mark if available -->
-                        <span v-if="props.descriptorMark.selected && props.indicatorMark" class="range-selection-value">
-                            {{ props.indicatorMark.humanReadableMark }}
-                        </span>
+            <span
+                v-if="props.showDescriptorValue && props.descriptorMark && props.descriptorMark.value !== null"
+                class="rb-value used"
+            >
+                <template v-if="'max' in props.descriptorMark.value">
+                    {{ props.descriptorMark.value.max }}
+                </template>
+                <template v-else>
+                    <!-- show indicator mark if available -->
+                    <span v-if="props.descriptorMark.selected && props.indicatorMark" class="range-selection-value">
+                        {{ props.indicatorMark.humanReadableMark }}
+                    </span>
 
-                        <!-- mark range -->
-                        <span class="range" :class="{ selected: props.descriptorMark.selected }">
-                            {{ props.descriptorMark.value.left }}–{{ props.descriptorMark.value.right }}
-                        </span>
-                    </template>
-                </span>
+                    <!-- mark range -->
+                    <span class="range" :class="{ selected: props.descriptorMark.selected }">
+                        {{ props.descriptorMark.value.left }}–{{ props.descriptorMark.value.right }}
+                    </span>
+                </template>
             </span>
         </div>
     </td>

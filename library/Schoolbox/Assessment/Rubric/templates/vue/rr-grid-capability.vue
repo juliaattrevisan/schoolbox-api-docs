@@ -85,9 +85,9 @@ function findIndicatorMark(
 
             <!-- Self-Assessment -->
             <template v-if="props.selfAssessmentCapabilityMark?.humanReadableMark">
-                {{ props.selfAssessmentCapabilityMark.humanReadableMark }}
+                ({{ props.selfAssessmentCapabilityMark.humanReadableMark }}
                 given in
-                {{ locale.selfAssessment.singular() }}
+                {{ locale.selfAssessment.singular() }})
             </template>
         </th>
     </tr>
