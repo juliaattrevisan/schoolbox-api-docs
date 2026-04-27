@@ -18,7 +18,9 @@
         }
 
         > nav {
-            display: inline-block;
+            align-items: center;
+            display: inline-flex;
+            gap: var(--spacing-xs);
             margin: 0;
             padding: 0;
             position: absolute;

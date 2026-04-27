@@ -147,7 +147,6 @@ window.Vue.onMounted(() => {
     font-size: var(--font-size-m);
     min-height: 2.5rem;
     min-width: 2.5rem;
-    padding: var(--spacing-s) var(--spacing-m);
     text-align: center;
 }
 
@@ -167,10 +166,6 @@ window.Vue.onMounted(() => {
 
 .sbx-button:disabled:hover {
     cursor: default;
-}
-
-.sbx-button--icon-only {
-    padding: var(--spacing-s);
 }
 
 .sbx-button--block {

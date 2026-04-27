@@ -64,7 +64,12 @@ export function isOpen(component) {
  */
 export async function open(component) {
     const collapseButton = component.querySelector(BUTTON_SELECTOR);
-    animateRotation(collapseButton, ANIMATE_OPEN_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
+    animateRotation(
+        collapseButton,
+        collapseButton.querySelector("sbx-icon").name === "up-arrow" ? ANIMATE_OPEN_POSITION : ANIMATE_CLOSED_POSITION,
+        ANIMATE_ORIGIN,
+        ANIMATE_SPEED,
+    );
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute("data-collapse-state", "uncollapsed");
     collapsePanel.dispatchEvent(new CustomEvent("expandStart.collapsable"));
@@ -79,7 +84,14 @@ export async function open(component) {
  */
 export async function close(component) {
     const collapseButton = component.querySelector(BUTTON_SELECTOR);
-    animateRotation(collapseButton, ANIMATE_CLOSED_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
+    animateRotation(
+        collapseButton,
+        collapseButton.querySelector("sbx-icon").name === "down-arrow"
+            ? ANIMATE_OPEN_POSITION
+            : ANIMATE_CLOSED_POSITION,
+        ANIMATE_ORIGIN,
+        ANIMATE_SPEED,
+    );
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute("data-collapse-state", "collapsed");
     collapsePanel.dispatchEvent(new CustomEvent("collapseStart.collapsable"));

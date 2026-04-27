@@ -32,6 +32,10 @@
         flex-wrap: wrap; // always allow flex items to wrap
     }
 
+    &--inline-flex {
+        display: inline-flex !important;
+    }
+
     &--wrap-reverse {
         flex-wrap: wrap-reverse;
     }
