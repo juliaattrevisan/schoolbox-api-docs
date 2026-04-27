@@ -184,6 +184,13 @@
          */
         function isCommentsEmpty(commentBoxId) {
             commentBox = document.querySelector("#" + commentBoxId);
+
+            /* Comment box didn't exist; technically that shouldn't count toward an "empty" form submission
+             */
+            if (null === commentBox) {
+                return false;
+            }
+
             return "" === document.querySelector("#" + commentBoxId).value;
         }
 

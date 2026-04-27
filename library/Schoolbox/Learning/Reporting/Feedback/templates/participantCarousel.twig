@@ -120,6 +120,7 @@
         refreshNav(navPrev, ize.getAdjacentOption(currentOption, -1)[0] ?? null);
         refreshNav(navNext, ize.getAdjacentOption(currentOption, 1)[0] ?? null);
 
+
         /**
          * This manages the behaviour of Continue. It's a hybrid of the old duework carousel + dialog agent carousel,
          * but the latter doesn't have a Continue button afaict
@@ -128,26 +129,27 @@
             const ize = tgt[0].selectize;
             const val = ize.getOption(ize.getValue());
             const nextHref = ize.getAdjacentOption(val, 1);
-            let nextUrl;
-
-            {# Use the next human's href, otherwise go back to assessment's status screen #}
-            if (nextHref.data('value') !== undefined) {
-                nextUrl = nextHref.data('value');
-            } else {
-                nextUrl = '{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}';
-            }
 
             {# if we have a returnURL then lets use that, else do the default #}
             let params = new URLSearchParams(window.location.search);
             let returnUrl = params.get('returnUrl');
 
             if (null !== returnUrl) {
-                nextUrl = atob(returnUrl);
+                return atob(returnUrl);
             }
 
-            $('#continue-button').attr('href', nextUrl);
+            {# Use the next human's href, otherwise go back to assessment's status screen #}
+            if (nextHref.data('value') !== undefined) {
+                return nextHref.data('value');
+            }
+
+            return '{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}';
         }
 
-        actionNext($('select[name=student-select]'));
+        /* "This is pain" - snake lord
+         * We need this global var because the dynamicFeedback plugin callback needs it
+         */
+        nextUrl = actionNext($('select[name=student-select]'));
+        $('#continue-button').attr('href', nextUrl);
     });
 </script>
