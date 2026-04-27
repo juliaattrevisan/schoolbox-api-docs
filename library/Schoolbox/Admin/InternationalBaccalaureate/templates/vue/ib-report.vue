@@ -215,7 +215,7 @@ window.Vue.onMounted((): void => {
     border: none;
     cursor: pointer;
     padding: 0.25rem;
-    color: inherit;
-    opacity: 0.4;
+    color: var(--sbx-config-color-accent, #0066b0);
+    opacity: 0.85;
 }
 </style>

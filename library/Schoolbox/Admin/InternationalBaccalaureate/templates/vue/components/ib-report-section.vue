@@ -38,7 +38,7 @@ function toggle(): void {
 <style scoped>
 .ib-report-section {
     border-radius: 4px;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.4rem;
 }
 
 .ib-report-section__header {
