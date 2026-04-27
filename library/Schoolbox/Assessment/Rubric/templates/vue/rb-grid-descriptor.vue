@@ -4,8 +4,8 @@
  * The textarea will resize vertically to always fit the current content
  */
 
-import { MAX_DESCRIPTOR_LENGTH } from "./types";
-import type { RubricGridDescriptor } from "./types";
+import { MAX_DESCRIPTOR_LENGTH } from "./builderTypes";
+import type { RubricGridDescriptor } from "./builderTypes";
 
 interface Props {
     descriptorIndex: number;

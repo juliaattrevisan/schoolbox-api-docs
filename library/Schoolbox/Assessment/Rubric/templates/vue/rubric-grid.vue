@@ -38,9 +38,6 @@ interface Props {
 
 const props = defineProps<Props>();
 
-// const rubricGridLevels = defineModel<RubricGrid["levels"]>("rubricGridLevels", { required: true });
-// const rubricGridCapabilities = defineModel<RubricGrid["capabilities"]>("rubricGridCapabilities", { required: true });
-
 /** Supress level headings if none have names */
 const hasLevels = window.Vue.computed(() => props.rubric.levels.some((level) => level.name.trim().length > 0));
 

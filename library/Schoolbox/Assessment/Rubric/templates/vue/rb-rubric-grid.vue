@@ -14,8 +14,14 @@ import RbGridCapability from "./rb-grid-capability.vue";
 import RbApplyResultSet from "./rb-apply-result-set.vue";
 import { translateGridToFormPayload } from "./payload";
 import type { RubricGridCreateCapabilityResponse, RubricGridCreateIndicatorResponse } from "./payload";
-import { MAX_CAPABILITY_LENGTH } from "./types";
-import type { RubricGrid, RubricGridLevel, RubricGridCapability, RubricGridDescriptor, ResultSet } from "./types";
+import { MAX_CAPABILITY_LENGTH } from "./builderTypes";
+import type {
+    RubricGrid,
+    RubricGridLevel,
+    RubricGridCapability,
+    RubricGridDescriptor,
+    ResultSet,
+} from "./builderTypes";
 
 interface Props {
     rubric: RubricGrid;

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { downloadApiRequest } from "@js/util/sbx/apiUtils";
-import type { RubricGrid } from "./types";
+import type { RubricGrid } from "./builderTypes";
 import { translateGridToFormPayload } from "./payload";
 
 interface Props {

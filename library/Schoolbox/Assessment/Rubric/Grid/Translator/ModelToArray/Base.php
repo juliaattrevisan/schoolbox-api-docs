@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Assessment\Rubric\Grid\Translator;
+namespace Schoolbox\Assessment\Rubric\Grid\Translator\ModelToArray;
 
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Level;
@@ -19,9 +19,12 @@ use Schoolbox\Assessment\Rubric\RowSet\Indicator;
  * Translator for converting a Rubric Grid into an array representation,
  * for outputting in a JSON response.
  *
+ * Specifically only contains used capabilities/indicators/descriptors,
+ * it's intended for the rubric viewer / feedback views
+ *
  * @see /library/Schoolbox/Assessment/Rubric/templates/vue/types.ts
  */
-class ModelToArray
+class Base
 {
     /**
      * @param Grid $rubricGrid
@@ -30,20 +33,15 @@ class ModelToArray
     public function __invoke(Grid $rubricGrid): array
     {
         $capabilities = [];
-
         foreach ($rubricGrid->iterateCapabilities() as $capability) {
             $capabilities[] = $this->translateCapability($rubricGrid, $capability);
         }
 
         return [
-            'id' => $rubricGrid->getRubricInstance()->getId(),
-            'title' => $rubricGrid->getRubricInstance()->getTitle(),
-            'weight' => $rubricGrid->getRubricInstance()->getWeight(),
-            /* Ask a manufactured rubric grid about its settings, which came from its corresponding rubric_instance
-             */
-            'useMarkRange' => $rubricGrid->getRubricInstance()->getMarkedUsingRange(),
-            'capabilityMarkType' => $rubricGrid->getRubricInstance()->getCapabilityMarkType()?->getSlug(),
-            'capabilityGradeGroup' => $rubricGrid->getRubricInstance()->getCapabilityGradeGroup()?->getId(),
+            'id' => $rubricGrid->getId(),
+            'title' => '(backend unimplemented)', // TODO: rubric title, string (not null)
+            'weight' => null, // TODO: rubric weight, number|null
+            'capabilityMarkType' => $rubricGrid->getAssessment()->getCapabilityMarkType()?->getSlug(), // TODO: from the rubric, not assessment
             'levels' => $rubricGrid->getLevels()->map(fn(Level $level) => [
                 'id' => $level->getId(),
                 'name' => $level->getName(),
@@ -69,8 +67,6 @@ class ModelToArray
         return [
             'id' => $capability->getId(),
             'name' => $capability->getName(),
-            'inUseExcludingAssessment' => $capability->isInUseExcluding($rubricGrid->getAssessment()),
-            'maxValue' => $rubricGrid->retrieveCapabilityUsage($capability)?->getMaxValue(),
             'indicators' => $indicators,
         ];
     }
@@ -93,19 +89,15 @@ class ModelToArray
         foreach ($rubricGrid->getLevels() as $levelIndex => $level) {
             $descriptor = $indicatorUsage?->retrieveDescriptor($levelIndex);
 
-            $descriptors[] = [
-                // fake negative ID to identify non existent descriptors in the frontend
-                'id' => $descriptor?->getId() ?? min([0, ...array_column($descriptors, 'id')]) - 1,
-                'description' => $descriptor?->getDescription() ?? '',
-                'maxValue' => $descriptor?->getMaxValue(),
+            $descriptors[] = $descriptor === null ? null : [
+                'id' => $descriptor->getId(),
+                'description' => $descriptor->getDescription(),
             ];
         }
 
         return [
             'id' => $indicator->getId(),
             'name' => $indicator->getName(),
-            'inUseExcludingAssessment' => $indicator->isInUseExcluding($rubricGrid->getAssessment()),
-            'hasUsage' => $indicatorUsage !== null,
             'descriptors' => $descriptors,
         ];
     }

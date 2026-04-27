@@ -149,7 +149,7 @@ class Controller extends BaseController
             $rubricGrid->getLevels()->add(new Level());
         }
 
-        $rubricGridTranslator = new RubricGridTranslator();
+        $rubricGridTranslator = new RubricGridTranslator\Full();
 
         /* Asynchronously spawn a new Indicator
          */
@@ -358,7 +358,7 @@ class Controller extends BaseController
          *
          * Otherwise you have to infer the settings from what might have been visible in the grid
          */
-        $rubricGridTranslator = new RubricGridTranslator();
+        $rubricGridTranslator = new RubricGridTranslator\Full();
         $rubricGridPayload = $rubricGridTranslator($grid);
 
         $this->response = $this->responseAsJson([

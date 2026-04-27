@@ -46,15 +46,8 @@ function findDescriptorMark(
         <th class="rb-criterion-name markdown">{{ props.indicator.name }}</th>
 
         <template v-for="(level, index) in props.levels" :key="level.id">
-            <!--
-            TODO: simplify struct for props.indicator.descriptors (only the builder needs the non-null defaults,
-            probably can avoid those in the first place on the backend)
-            also can remove all the non-usages
-
-            When fixed, remove && props.indicator.descriptors[index]?.id >= 0
-            -->
             <rr-grid-descriptor
-                v-if="props.indicator.descriptors[index] !== null && props.indicator.descriptors[index]?.id >= 0"
+                v-if="props.indicator.descriptors[index] !== null"
                 :descriptor="props.indicator.descriptors[index]"
                 :indicator-mark="props.indicatorMark"
                 :descriptor-mark="findDescriptorMark(index, props.indicatorMark)"

@@ -15,8 +15,8 @@ import locale from "@js/terminology/rosettaStone";
 import { shiftArrayItem } from "@js/util/arrayUtils";
 import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import RbGridIndicator from "./rb-grid-indicator.vue";
-import { MAX_CAPABILITY_LENGTH, MAX_INDICATOR_LENGTH } from "./types";
-import type { RubricGridCapability, RubricGridLevel } from "./types";
+import { MAX_CAPABILITY_LENGTH, MAX_INDICATOR_LENGTH } from "./builderTypes";
+import type { RubricGridCapability, RubricGridLevel } from "./builderTypes";
 
 interface Props {
     capability: RubricGridCapability;

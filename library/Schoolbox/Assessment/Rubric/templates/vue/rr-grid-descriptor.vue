@@ -53,7 +53,7 @@ const isSelfGrading = false; // TODO: selfAssessmentFeedback.isSelfGrading
                 />
 
                 <!-- TODO: should be scrubbed (markdown) and output as html -->
-                {{ props.descriptor.description.trim() }}
+                {{ props.descriptor.description?.trim() }}
             </span>
 
             <span

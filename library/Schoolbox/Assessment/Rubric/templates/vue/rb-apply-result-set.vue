@@ -5,7 +5,7 @@
 
 import locale from "@js/terminology/rosettaStone";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
-import type { ResultSet } from "./types";
+import type { ResultSet } from "./builderTypes";
 
 const id = window.Vue.useId(); // there'll be multiple of these, avoid conflicts
 

@@ -448,7 +448,7 @@ class Grid implements JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        // TODO: this shouldn't be the same as Translator/ModelToArray.
+        // TODO: this shouldn't be the same as Translator/ModelToArray/Full.
         // figure out what's actually needed then narrow it down and figure out the best payload structure
         // for the builder/readonly/markable grids.
         // There's also the assessment API to consider, i'm ignoring it for now as we'll need to change it regardless to accomidate multi rubrics
@@ -456,7 +456,7 @@ class Grid implements JsonSerializable
 
         // TODO: also check access to various things matches what we expect (particularly whether students can see mark info assuming there's cases when they shouldn't?)
 
-        $rubricGridTranslator = new Translator\ModelToArray();
+        $rubricGridTranslator = new Translator\ModelToArray\Base();
         return $rubricGridTranslator($this);
     }
 }

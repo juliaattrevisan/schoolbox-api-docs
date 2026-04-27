@@ -634,7 +634,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                  */
 
                 // TODO: for now, just one grid support, in the format of multiple
-                $rubricGridTranslator = new RubricGridTranslator();
+                $rubricGridTranslator = new RubricGridTranslator\Full();
                 $data['rubricGrids'] = [$rubricGrid];
                 $data['rubricGridsPayload'] = [$rubricGridTranslator($rubricGrid)];
             }
@@ -1257,7 +1257,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         /* Converts an object to a frontend-friendly payload
          */
-        $rubricGridTranslator = new RubricGridTranslator();
+        $rubricGridTranslator = new RubricGridTranslator\Full();
 
         /* Assemble each rubric grid via its instance, separately, for now. Maybe there's a shortcut to all this that
          * is cheaper, but this will be the simplest for the time being.
