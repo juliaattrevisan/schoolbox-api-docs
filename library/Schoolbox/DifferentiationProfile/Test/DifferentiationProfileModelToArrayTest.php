@@ -10,6 +10,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress_Date_Locale_Config;
 use Aura\Router\Generator;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Schoolbox\Assessment\Participant\Model as CustomisationRecord;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\ArrayLoader;
@@ -30,7 +31,9 @@ use Schoolbox\Pastoral\Model as PastoralModel;
 #[\PHPUnit\Framework\Attributes\CoversClass(ModelToArray::class)]
 class DifferentiationProfileModelToArrayTest extends TestCase
 {
+    /** @var Generator&MockObject */
     private Generator $routeGenerator;
+    /** @var Authorizer&MockObject */
     private Authorizer $authorizer;
 
     private const string ADJUSTMENT_CATEGORY_ID_1 = "1";
@@ -60,7 +63,12 @@ class DifferentiationProfileModelToArrayTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('providerInvokeData')]
-    public function testInvokeData($model, $configs, $expected)
+    /**
+     * @param Model $model
+     * @param GenericCollection<ProfileConfig> $configs
+     * @param array<string, mixed> $expected
+     */
+    public function testInvokeData(Model $model, GenericCollection $configs, array $expected): void
     {
         $user = $this->createMock(User::class);
 
@@ -71,7 +79,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
             $configs,
         );
 
-        $actual = call_user_func($translator, $model);
+        $actual = $translator($model);
 
         $this->assertEquals($expected, $actual);
     }
@@ -90,6 +98,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
         $model = (new Model())->setStudent($student);
         $customisations = new GenericCollection(CustomisationRecord::class, [new CustomisationRecord()]);
         $customisationsByStudent = (new Collection())->setOffset($student->getId(), $customisations);
+        /** @var array<string, mixed>|null $capturedParams */
         $capturedParams = null;
 
         $this->authorizer
@@ -126,7 +135,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
     /**
      * Data provider for `testInvokeData`.
      *
-     * @return array
+     * @return array<string, array{0: Model, 1: GenericCollection<ProfileConfig>, 2: array<string, mixed>}>
      */
     public static function providerInvokeData(): array
     {
