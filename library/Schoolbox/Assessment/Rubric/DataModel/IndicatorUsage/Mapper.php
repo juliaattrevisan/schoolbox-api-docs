@@ -51,23 +51,25 @@ class Mapper extends BaseMapper
         );
     }
 
-    /**
-     * Switches off this usage's due work's rubric if there are no remaining
-     * usages of any indicator for this due work.
-     *
-     * @param Model $indicatorUsage
-     */
-    public function toggleUseRubric(Model $indicatorUsage)
-    {
-        $currentBoxId = $indicatorUsage->getSubmissionBox()->getId();
-        $indicatorUsagesForSubmissionBox = $this->findByColumn('submission_box_id', $currentBoxId);
-        if ($indicatorUsagesForSubmissionBox->count() === 0) {
-            // No more indicator usages on this box: turn off Use Rubric
-            $query = 'UPDATE submission_box SET use_rubric = 0 WHERE submission_box.id = ?';
-            $statement = $this->getDatabase()->prepare($query);
-            $statement->execute([$currentBoxId]);
-        }
-    }
+//    /**
+//     * Switches off this usage's due work's rubric if there are no remaining
+//     * usages of any indicator for this due work.
+//     *
+//     * @param Model $indicatorUsage
+//     */
+//    public function toggleUseRubric(Model $indicatorUsage)
+//    {
+        /* TODO I dont' think we'd have this toggle anymore: we'd just delete them instead?
+         */
+//        $currentBoxId = $indicatorUsage->getRubricInstance()->getId();
+//        $indicatorUsagesForSubmissionBox = $this->findByColumn('submission_box_id', $currentBoxId);
+//        if ($indicatorUsagesForSubmissionBox->count() === 0) {
+//            // No more indicator usages on this box: turn off Use Rubric
+//            $query = 'UPDATE submission_box SET use_rubric = 0 WHERE submission_box.id = ?';
+//            $statement = $this->getDatabase()->prepare($query);
+//            $statement->execute([$currentBoxId]);
+//        }
+//    }
 
     /**
      * @inheritdoc
