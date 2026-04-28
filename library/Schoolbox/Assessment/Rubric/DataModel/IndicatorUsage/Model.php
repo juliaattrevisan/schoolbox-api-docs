@@ -23,10 +23,12 @@ class Model
      */
     private $indicator;
 
+
     /**
-     * @var SubmissionBox
+     * @var null|\Schoolbox\Assessment\Rubric\Instance\Model
      */
-    private $submission_box;
+    private ?\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance;
+
 
     /**
      * This indicator usage's max value.
@@ -55,6 +57,27 @@ class Model
     {
         return $this->indicator;
     }
+
+
+    /**
+     * @return null|\Schoolbox\Assessment\Rubric\Instance\Model
+     */
+    public function getRubricInstance(): ?\Schoolbox\Assessment\Rubric\Instance\Model
+    {
+        return $this->rubricInstance;
+    }
+
+
+    /**
+     * @param null|\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance
+     * @return $this
+     */
+    public function setRubricInstance(?\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance): self
+    {
+        $this->rubricInstance = $rubricInstance;
+        return $this;
+    }
+
 
     /**
      * @param  SubmissionBox $submission_box

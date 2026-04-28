@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage;
 
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
 
 /**

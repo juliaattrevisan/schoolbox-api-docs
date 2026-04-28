@@ -32,6 +32,7 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('max_value', self::TYPE_DECIMAL);
         $this->uses('sequence', self::TYPE_INTEGER);
+
         $this->joins(
             'rubric_capability_id',
             Capability\Mapper::class,
@@ -41,6 +42,7 @@ class Mapper extends BaseMapper
             'capability',
             'capability'
         );
+
         $this->joins(
             'rubric_instance_id',
             \Schoolbox\Assessment\Rubric\Instance\Mapper::class,
@@ -98,8 +100,8 @@ class Mapper extends BaseMapper
 
             $usage
                 ->setRubricInstance($rubricInstance)
-                ->setCapability($capability)
-            ;
+                ->setCapability($capability);
+
             $collection->add($usage);
         }
         return $collection;

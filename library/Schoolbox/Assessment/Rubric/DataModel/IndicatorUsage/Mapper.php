@@ -8,8 +8,6 @@
 namespace Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage;
 
 use PDOStatement;
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator;
 use Schoolbox\GenericCollection;
@@ -21,7 +19,7 @@ use Schoolbox\Mapper as BaseMapper;
  * @package Schoolbox\Assessment\Rubric\DataModel
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model createModel($idValue = null)
- * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
+ * @method GenericCollection<Model> findByColumn($columnName, $columnValue, $options = [])
  */
 class Mapper extends BaseMapper
 {
@@ -31,8 +29,26 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('max_value', self::TYPE_DECIMAL);
         $this->uses('sequence', self::TYPE_INTEGER);
-        $this->joins('rubric_indicator_id', Indicator\Mapper::class, 'id', null, null, 'indicator', 'indicator');
-        $this->joins('submission_box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'submission_box');
+
+        $this->joins(
+            'rubric_indicator_id',
+            Indicator\Mapper::class,
+            'id',
+            null,
+            null,
+            'indicator',
+            'indicator'
+        );
+
+        $this->joins(
+            'rubric_instance_id',
+            \Schoolbox\Assessment\Rubric\Instance\Mapper::class,
+            'id',
+            null,
+            null,
+            'rubricInstance',
+            'rubricInstance'
+        );
     }
 
     /**
@@ -61,7 +77,7 @@ class Mapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('submission_box', 'sb')},
+                {$this->getJoinColumnString('rubricInstance', 'ri')},
                 {$this->getJoinColumnString('indicator', 'i')},
                 {$this->getJoinColumnString('indicator.capability', 'ic')}
         ";
@@ -75,7 +91,7 @@ class Mapper extends BaseMapper
     {
         return "
             FROM {$this->getTable()}
-            INNER JOIN {$this->getJoinSql('submission_box', '', 'sb', true)}
+            INNER JOIN {$this->getJoinSql('rubricInstance', '', 'ri', true)}
             INNER JOIN {$this->getJoinSql('indicator', '', 'i', true)}
             INNER JOIN {$this->getJoinSql('indicator.capability', 'i', 'ic', true)}
         ";
@@ -90,16 +106,20 @@ class Mapper extends BaseMapper
         $collection = $this->createCollection();
         foreach ($statement as $row) {
             $usage = $this->hydrate($row);
-            /** @var SubmissionBox $submissionBox */
-            $submissionBox = $this->hydrateJoin($row, 'submission_box', 'sb');
+
+            /** @var \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance */
+            $rubricInstance = $this->hydrateJoin($row, 'rubricInstance', 'ri');
+
             /** @var Indicator\Model $indicator */
             $indicator = $this->hydrateJoin($row, 'indicator', 'i');
+
             /** @var Capability\Model $capability */
             $capability = $this->hydrateJoin($row, 'indicator.capability', 'ic');
+
             $usage
-                ->setSubmissionBox($submissionBox)
-                ->setIndicator($indicator->setCapability($capability))
-            ;
+                ->setRubricInstance($rubricInstance)
+                ->setIndicator($indicator->setCapability($capability));
+
             $collection->add($usage);
         }
         return $collection;
