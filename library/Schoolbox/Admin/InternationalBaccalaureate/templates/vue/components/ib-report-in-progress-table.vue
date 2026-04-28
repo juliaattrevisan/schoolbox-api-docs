@@ -41,10 +41,7 @@ function formatSubmittedAt(iso: string): string {
             </tr>
         </thead>
         <tbody>
-            <tr
-                v-for="student in students"
-                :key="student.id"
-            >
+            <tr v-for="student in students" :key="student.id">
                 <td>{{ student.name }}</td>
                 <td>{{ formatSubmittedAt(student.ibisSubmittedAt) }}</td>
                 <td colspan="3"><ib-report-subject-labels :subjects="student.subjects" /></td>

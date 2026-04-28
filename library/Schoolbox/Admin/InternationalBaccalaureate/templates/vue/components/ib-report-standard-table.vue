@@ -25,10 +25,7 @@ defineProps<Props>();
             </tr>
         </thead>
         <tbody>
-            <tr
-                v-for="student in students"
-                :key="student.id"
-            >
+            <tr v-for="student in students" :key="student.id">
                 <td><input type="checkbox" disabled aria-label="Select student" /></td>
                 <td>{{ student.name }}</td>
                 <td>
