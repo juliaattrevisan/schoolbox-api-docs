@@ -66,10 +66,6 @@ class Helper
         $colors = [];
         $cssVariables = [];
         foreach ($previewConfigs as $config) {
-            if ($this->shouldOmitFromStylesheet($config)) {
-                continue;
-            }
-
             $customProperty = $this->getCustomProperty($config);
             if ($customProperty === null) {
                 continue;
@@ -252,22 +248,6 @@ class Helper
         return $typeId === ConfigMapper::TYPE_SONAR_SKIN_CONFIG
             ? self::NAME_SONAR_SKIN_CUSTOM_CSS
             : ConfigMapper::NAME_SKIN_CUSTOM_CSS;
-    }
-
-    private function shouldOmitFromStylesheet(Config $config): bool
-    {
-        $categoryName = $config->getSkinSubcategory()?->getCategory()?->getName();
-        if (!is_string($categoryName) || trim($categoryName) === '') {
-            return false;
-        }
-
-        return in_array(
-            strtolower($categoryName),
-            [
-                ConfigMapper::NAME_SKIN_CATEGORY_DROP_SHADOW,
-            ],
-            true,
-        );
     }
 
     /**

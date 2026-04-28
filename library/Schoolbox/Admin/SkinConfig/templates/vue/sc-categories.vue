@@ -32,11 +32,6 @@ const activeConfigs = window.Vue.computed(() =>
     configs.value.toggle.enabled ? configs.value.sonar : configs.value.existing,
 );
 
-// Temporarily hide drop shadow until its control is implemented.
-const visibleConfigs = window.Vue.computed(() =>
-    Object.fromEntries(Object.entries(activeConfigs.value).filter(([categoryKey]) => categoryKey !== "Drop Shadow")),
-);
-
 /**
  * Notify the parent that the preview should be refreshed.
  */
@@ -55,7 +50,7 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
 </script>
 
 <template>
-    <template v-for="(subcategories, categoryKey) in visibleConfigs" :key="categoryKey">
+    <template v-for="(subcategories, categoryKey) in activeConfigs" :key="categoryKey">
         <div class="l-flex-col l-gap-s">
             <h2 class="subheader t-lh--normal">{{ categoryKey }}</h2>
             <div
