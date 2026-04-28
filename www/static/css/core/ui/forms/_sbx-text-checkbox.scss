@@ -13,7 +13,7 @@ body.sbx-body {
         appearance: none; // remove native styles
         background-color: var(--sbx-color-foreground-primary);
         border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
-        border-radius: var(--sbx-config-field-roundness);
+        border-radius: min(var(--sbx-config-field-roundness), var(--sbx-border-radius-m));
         color: var(--sbx-config-color-accent);
         cursor: pointer;
         display: inline-grid;
