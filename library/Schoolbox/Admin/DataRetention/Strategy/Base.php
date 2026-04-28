@@ -179,7 +179,7 @@ abstract class Base implements IStrategy
         }
 
         // validate the admin config, before using it.
-        if (!new ValidRetentionPeriod()->isSatisfiedBy((int)$this->config->get($this->retentionConfigKey))) {
+        if (!new ValidRetentionPeriod()->isSatisfiedBy($this->config->get($this->retentionConfigKey))) {
             $this->log->warning(sprintf("Invalid retention period '%s' stored; cannot calculate date cutoff.. Skipping.", $this->config->get($this->retentionConfigKey)));
         }
 
