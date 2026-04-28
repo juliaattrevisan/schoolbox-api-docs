@@ -34,15 +34,6 @@ SET
     );
 
 SET
-    @config_checkbox_field_id = (
-        SELECT id
-        FROM lu_config_field
-        WHERE
-            field = 'checkbox'
-        LIMIT 1
-    );
-
-SET
     @config_textarea_field_id = (
         SELECT id
         FROM lu_config_field
@@ -81,7 +72,7 @@ SET
         SELECT id
         FROM lu_skin_config_category
         WHERE
-            name = 'Drop shadow'
+            name = 'Drop Shadow'
     );
 
 SET
@@ -446,17 +437,17 @@ VALUES (
     ),
     (
         'skin_box_drop_shadow',
-        '0',
+        'none',
         'Box Drop Shadow',
         'Add a drop shadow to primary container elements.',
-        @config_checkbox_field_id,
+        @config_select_field_id,
         @sonar_config_type_id,
         'true',
         'false',
         'false',
         'settings',
         @settings_sequence_start + 14,
-        NULL
+        '{"customProperty":"--sbx-config-box-drop-shadow","select":[{"name":"None","value":"none"},{"name":"Small","value":"var(--sbx-shadow-s)"},{"name":"Medium","value":"var(--sbx-shadow-m)"},{"name":"Large","value":"var(--sbx-shadow-l)"}]}'
     ),
     (
         'skin_sonar_custom_css',
