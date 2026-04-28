@@ -307,9 +307,7 @@ class Controller extends ConfigController
             $allowedGroupSubjectIds = array_fill_keys($groupSubjectIds, true);
 
             $requestedLanguageIds = array_filter(array_column($subjectLanguages, 'languageId'));
-            $languagesById = $requestedLanguageIds
-                ? $this->languageMapper->findByColumn('id', $requestedLanguageIds)->indexBy('id')->getAll()
-                : [];
+            $languagesById = $this->languageMapper->findByColumn('id', $requestedLanguageIds)->indexBy('id')->getAll();
 
             $modelsToSave = [];
 
