@@ -2,7 +2,7 @@ CREATE TABLE `ib_registration_sessions`
 (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
     `system_purpose_id` INT(11) NOT NULL,
-    `academic_year` VARCHAR(9) NOT NULL,
+    `academic_year` VARCHAR(4) NOT NULL,
     `exam_session` VARCHAR(10) NOT NULL,
     `created_at` DATETIME NOT NULL DEFAULT current_timestamp(),
     `created_by` INT(4) UNSIGNED NOT NULL,

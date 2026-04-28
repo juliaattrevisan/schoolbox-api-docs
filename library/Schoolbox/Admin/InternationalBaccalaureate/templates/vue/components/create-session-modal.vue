@@ -105,7 +105,7 @@ async function onSubmit(): Promise<void> {
                     v-model="academicYear"
                     type="text"
                     name="academic-year"
-                    placeholder="e.g. 2026 or 2025/2026"
+                    placeholder="e.g. 2026"
                 />
                 <label v-if="academicYearError" class="error">{{ academicYearError }}</label>
             </div>
