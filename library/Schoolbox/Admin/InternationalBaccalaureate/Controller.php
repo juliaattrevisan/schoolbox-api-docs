@@ -340,7 +340,10 @@ class Controller extends ConfigController
                 '_routes' => [
                     'sessions' => [
                         'list' => $this->getRouteIfAuthorized('internationalBaccalaureate.getRegistrationSessions'),
-                        'create' => $this->getRouteIfAuthorized('internationalBaccalaureate.createRegistrationSession')
+                        'create' => $this->getRouteIfAuthorized('internationalBaccalaureate.createRegistrationSession'),
+                        'delete' => $this->getRouteIfAuthorized('internationalBaccalaureate.deleteRegistrationSession', [
+                            'sessionId' => 0,
+                        ]),
                     ]
                 ]
             ]
@@ -459,6 +462,29 @@ class Controller extends ConfigController
             $this->response = $this
                 ->responseAsJson($createdSession->jsonSerialize())
                 ->withStatus(201);
+        } catch (Exception $e) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ])->withStatus(500);
+        }
+    }
+
+    /**
+     * Delete a registration session
+     *
+     * @api DELETE /adminv2/international-baccalaureate/registrations/sessions/{sessionId}
+     */
+    public function deleteRegistrationSession(RegistrationSessionModel $registrationSession): void
+    {
+        //TODO: might need to add conditions to prevent deletion of a session if it's already been completed (ie registered with IB)
+        try {
+            $registrationSession->setDeletedBy($this->getUser());
+
+            $this->registrationSessionMapper->save($registrationSession);
+            $this->registrationSessionMapper->delete($registrationSession);
+
+            $this->response = $this->responseEmpty()->withStatus(204);
         } catch (Exception $e) {
             $this->response = $this->responseAsJson([
                 'success' => false,
