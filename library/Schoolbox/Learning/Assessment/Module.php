@@ -199,6 +199,23 @@ class Module extends BaseModule
                     new AssessmentNotDeleted(),
                     new IsModifyUnLocked(new LockedChecker($this->getTermMapper())),
                     new Rule\Any(
+                        /* If you're not a super, then you're an instructor; you might have restricted access to the
+                         * student participation screen. Reporting Activities diverge from the original intent of
+                         * student participation: they have a strict set of requirements that preclude a lot of the
+                         * normal student participation features.
+                         *
+                         * isManageReportingActivity() checks if the assessment is a Reporting activity. If not, then we
+                         * let you get to the Student Participation screen as normal, Otherwise, it checks your role
+                         * perms, feature flags, etc to see if you can manage reporting activities: if so, we let you
+                         * through to the student participation screen. Otherwise, you're denied.
+                         *
+                         * If you can't manage reporting activities, you might be a differentiation profile person: we
+                         * check if the feature flag is enabled, that it's indeed a Reporting Activity and that you have
+                         * the diff profile service permission. If so, we let you through.
+                         *
+                         * This is a really particular combination of settings that allow, or deny, your access to the
+                         * student participation screen.
+                         */
                         new IsManageReportingActivity($this->getConfig()),
                         new Rule\All(
                             /* Differentiation Profile guys have access to Student Participation for reporting under a
