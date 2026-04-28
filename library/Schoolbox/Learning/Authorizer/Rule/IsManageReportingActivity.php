@@ -20,7 +20,6 @@ use Schoolbox\User;
 
 class IsManageReportingActivity implements IAuthorizationRule
 {
-
     /**
      * Constructor.
      *
