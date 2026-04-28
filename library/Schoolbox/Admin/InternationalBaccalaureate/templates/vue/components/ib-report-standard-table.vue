@@ -35,13 +35,13 @@ defineProps<Props>();
                     <sbx-icon
                         v-if="student.candidateDetailsStatus === 'confirmed'"
                         name="approve"
-                        class="ib-report-icon--confirmed"
+                        color="var(--sbx-color-success, #27ae60)"
                         aria-label="Candidate details confirmed"
                     ></sbx-icon>
                     <sbx-icon
                         v-else
                         name="alert"
-                        class="ib-report-icon--unconfirmed"
+                        color="var(--sbx-color-warning, #e67e22)"
                         aria-label="Candidate details unconfirmed"
                     ></sbx-icon>
                 </td>
@@ -55,13 +55,3 @@ defineProps<Props>();
         </tbody>
     </table>
 </template>
-
-<style scoped>
-.ib-report-icon--confirmed {
-    color: var(--sbx-color-success, #27ae60);
-}
-
-.ib-report-icon--unconfirmed {
-    color: var(--sbx-color-warning, #e67e22);
-}
-</style>
