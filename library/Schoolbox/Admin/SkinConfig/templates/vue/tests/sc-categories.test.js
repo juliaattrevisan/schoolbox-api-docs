@@ -58,12 +58,7 @@ test("renders the Drop Shadow select options for Sonar configs", () => {
     expect(wrapper.text()).toContain("Box Drop Shadow");
 
     const select = wrapper.get('select[name="skin_box_drop_shadow"]');
-    expect(select.findAll("option").map((option) => option.text())).toEqual([
-        "None",
-        "Small",
-        "Medium",
-        "Large",
-    ]);
+    expect(select.findAll("option").map((option) => option.text())).toEqual(["None", "Small", "Medium", "Large"]);
     expect(select.element.value).toBe("var(--sbx-shadow-m)");
 });
 
