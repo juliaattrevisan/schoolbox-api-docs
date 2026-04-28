@@ -623,6 +623,9 @@ class DataSource
         $capabilityUsageModels = $capabilityUsageMapper->createCollection();
         $descriptorModels      = $descriptorMapper->createCollection();
         $capabilitySequence    = CapabilityUsageModel::SEQUENCE_BASE;
+
+        /* TODO this $submissionBox should be replaced by the rubric instance ids insted
+         */
         $indicatorUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
         $capabilityUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
 
@@ -640,7 +643,7 @@ class DataSource
             foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
                 $indicatorModel      = $indicatorModels[$indicatorUsage->getIndicator()->getId()];
                 $indicatorUsageModel = $indicatorUsageMapper->createModel()
-                    ->setSubmissionBox($submissionBox)
+                    ->setRubricInstance($rubricInstance)
                     ->setIndicator($indicatorModel)
                     ->setMaxValue($indicatorUsage->calculateMaxValueFromDescriptors())
                     ->setSequence($indicatorSequence++);
@@ -1637,7 +1640,7 @@ class DataSource
             $dstIndicator = $dstIndicators->getOffset($srcIndicatorUsage->getIndicator()->getId());
 
             $dstIndicatorUsage->setIndicator($dstIndicator);
-            $dstIndicatorUsage->setSubmissionBox($dstBox);
+            $dstIndicatorUsage->setRubricInstance($destinationRubricInstance);
             $dstIndicatorUsages->add($dstIndicatorUsage);
         }
 
