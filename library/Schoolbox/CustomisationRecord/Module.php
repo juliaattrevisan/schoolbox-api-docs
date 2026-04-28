@@ -42,6 +42,16 @@ class Module extends BaseModule
             $staffWithViewPermission,
             new Rule\Callback(
                 function ($params) {
+                    $customisations = $params['customisations'] ?? null;
+                    /* If the customisations collection is already prefetched then we can skip the query
+                     */
+                    if ($customisations !== null) {
+                        if ($customisations->count() <= 0) {
+                            throw new Unauthorized();
+                        }
+                        return true;
+                    }
+
                     $studentId = $params['studentId'] ?? null;
                     if (!$studentId) {
                         throw new Unauthorized();

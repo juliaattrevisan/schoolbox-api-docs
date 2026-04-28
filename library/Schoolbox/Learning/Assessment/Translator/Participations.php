@@ -34,6 +34,7 @@ class Participations
      * @param Authorizer         $authorizer
      * @param User               $currentUser
      * @param ParticipationPlans $planTranslator
+     * @param Collection         $existingCustomisation
      * @param ?Collection        $customisedAssessments
      * @param ?CacheInterface    $aiCache
      */
@@ -42,6 +43,7 @@ class Participations
         protected Authorizer $authorizer,
         protected User $currentUser,
         private ParticipationPlans $planTranslator,
+        private Collection $existingCustomisation,
         private ?Collection $customisedAssessments = null,
         private ?CacheInterface $aiCache = null,
     ) {
@@ -115,12 +117,13 @@ class Participations
                         'studentId' => $participant->getId()
                     ],
                 ),
-                'customisationRecord' => $this->getRouteIfAuthorized(
+                'customisationRecord' => $this->existingCustomisation->offsetExists($participant->getId()) ? $this->getRouteIfAuthorized(
                     'customisationRecord.viewRecordByStudent',
                     [
-                        'studentId' => $participant->getId()
+                        'studentId' => $participant->getId(),
+                        'customisations' => $this->existingCustomisation->getOffset($participant->getId())
                     ],
-                ),
+                ) : null,
             ]
         ];
     }
