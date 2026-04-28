@@ -14,8 +14,7 @@ INNER JOIN submission_box sb ON rcu._submission_box_id = sb.id
 INNER JOIN rubric_instance ri ON sb.assessment_id = ri.assessment_id
 INNER JOIN assessment a ON sb.assessment_id = a.id
 SET rcu.rubric_instance_id = ri.id
-WHERE sb.use_rubric = 1
-AND a.deleted_at IS NULL;
+WHERE sb.use_rubric = 1;
 
 
 -- Rubric Indicator Usage
@@ -34,8 +33,7 @@ INNER JOIN submission_box sb ON riu._submission_box_id = sb.id
 INNER JOIN rubric_instance ri ON sb.assessment_id = ri.assessment_id
 INNER JOIN assessment a ON sb.assessment_id = a.id
 SET riu.rubric_instance_id = ri.id
-WHERE sb.use_rubric = 1
-AND a.deleted_at IS NULL;
+WHERE sb.use_rubric = 1;
 
 
 -- Rubric Level
@@ -53,8 +51,7 @@ INNER JOIN submission_box sb ON rl._box_id = sb.id
 INNER JOIN rubric_instance ri ON sb.assessment_id = ri.assessment_id
 INNER JOIN assessment a ON sb.assessment_id = a.id
 SET rl.rubric_instance_id = ri.id
-WHERE sb.use_rubric = 1
-AND a.deleted_at IS NULL;
+WHERE sb.use_rubric = 1;
 
 
 -- Foreign Keys for everything
