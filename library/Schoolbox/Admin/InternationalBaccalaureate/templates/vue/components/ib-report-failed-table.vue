@@ -16,19 +16,19 @@ defineProps<Props>();
     <table class="tiger-stripe">
         <thead>
             <tr>
-                <th></th>
-                <th>Name</th>
-                <th>Candidate Details</th>
-                <th>HL</th>
-                <th>SL</th>
-                <th>Core</th>
-                <th>Error Message</th>
-                <th></th>
+                <th scope="col"><span class="sr-only">Select</span></th>
+                <th scope="col">Name</th>
+                <th scope="col">Candidate Details</th>
+                <th scope="col">HL</th>
+                <th scope="col">SL</th>
+                <th scope="col">Core</th>
+                <th scope="col">Error Message</th>
+                <th scope="col"><span class="sr-only">Actions</span></th>
             </tr>
         </thead>
         <tbody>
             <tr v-for="student in students" :key="student.id">
-                <td><input type="checkbox" disabled aria-label="Select student" /></td>
+                <td><input type="checkbox" disabled :aria-label="`Select ${student.name}`" /></td>
                 <td>{{ student.name }}</td>
                 <td>
                     <sbx-icon
