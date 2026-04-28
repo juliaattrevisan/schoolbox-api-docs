@@ -139,7 +139,7 @@ class Controller extends ConfigController
                     'customProperty' => $this->getCustomProperty($decodedOptions),
                     'contrast'       => $this->getContrastProperty($decodedOptions),
                     'type'           => $this->getOptionType($config, $fieldMap),
-                    'selectOptions'  => $this->getSelectOptions($config, $decodedOptions),
+                    'selectOptions'  => $this->getSelectOptions($decodedOptions),
                     'editable'       => $config->getEditable(),
                     'hidden'         => $config->getHidden(),
                 ];
@@ -285,7 +285,7 @@ class Controller extends ConfigController
      * @return array<int, array{name: string, value: string}>
      * @param array<string, mixed> $decodedOptions
      */
-    private function getSelectOptions(Config $config, array $decodedOptions): array
+    private function getSelectOptions(array $decodedOptions): array
     {
         $selectOptions = $decodedOptions['select'] ?? null;
 
@@ -324,29 +324,11 @@ class Controller extends ConfigController
 
             $parsedOptions[] = [
                 'name' => $value === 'none' ? 'None' : ucfirst($value),
-                'value' => $this->getLegacySelectOptionValue($config, $value),
+                'value' => $value,
             ];
         }
 
         return $parsedOptions;
-    }
-
-    /**
-     * Map legacy select option labels to persisted values where Skin Config needs explicit CSS values.
-     */
-    private function getLegacySelectOptionValue(Config $config, string $value): string
-    {
-        if (!in_array($config->getName(), ['skin_field_roundness', 'skin_box_roundness'], true)) {
-            return $value;
-        }
-
-        return match ($value) {
-            'none' => '0',
-            'small' => '0.25rem',
-            'medium' => '0.5rem',
-            'large' => '0.75rem',
-            default => $value,
-        };
     }
 
     /**
