@@ -4,13 +4,14 @@
 -- Hard-code the ID to match ConfigMapper::TYPE_SONAR_SKIN_CONFIG.
 -- Hard-code sequence also to avoid dependence on script run order.
 SET @sonar_config_type_id = 28;
+
 INSERT INTO
     lu_config_type (id, type, sequence)
 VALUES (
-    @sonar_config_type_id,
-    'Sonar Skin Configs',
-    27
-);
+        @sonar_config_type_id,
+        'Sonar Skin Configs',
+        27
+    );
 
 -- New settings will be under Sonar Skin Configs config type
 -- Preset field types for new skin config settings
@@ -417,7 +418,7 @@ VALUES (
     ),
     (
         'skin_box_roundness',
-        '0.5rem',
+        'var(--sbx-border-radius-m)',
         'Box Roundness',
         'Add rounded corners to primary container elements.',
         @config_select_field_id,
@@ -427,11 +428,11 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 12,
-        '{"customProperty":"--sbx-config-box-roundness","select":[{"name":"none","value":"0"},{"name":"Small","value":"0.25rem"},{"name":"Medium","value":"0.5rem"},{"name":"Large","value":"0.75rem"}]}'
+        '{"customProperty":"--sbx-config-box-roundness","select":[{"name":"none","value":"var(--sbx-border-radius-none)"},{"name":"Small","value":"var(--sbx-border-radius-s)"},{"name":"Medium","value":"var(--sbx-border-radius-m)"},{"name":"Large","value":"var(--sbx-border-radius-l)"}]}'
     ),
     (
         'skin_field_roundness',
-        '0.25rem',
+        'var(--sbx-border-radius-s)',
         'Field Roundness',
         'Add rounded corners to elements like check boxes, buttons and labels.',
         @config_select_field_id,
@@ -441,7 +442,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 13,
-        '{"customProperty":"--sbx-config-field-roundness","select":[{"name":"none","value":"0"},{"name":"Small","value":"0.25rem"},{"name":"Medium","value":"0.5rem"},{"name":"Large","value":"0.75rem"}]}'
+        '{"customProperty":"--sbx-config-field-roundness","select":[{"name":"none","value":"var(--sbx-border-radius-none)"},{"name":"Small","value":"var(--sbx-border-radius-s)"},{"name":"Medium","value":"var(--sbx-border-radius-m)"},{"name":"Large","value":"var(--sbx-border-radius-l)"}]}'
     ),
     (
         'skin_box_drop_shadow',
