@@ -10,24 +10,29 @@ SET
         JSON_OBJECT(
             'select',
             JSON_ARRAY(
-                JSON_OBJECT('name', 'None', 'value', '0'),
+                JSON_OBJECT(
+                    'name',
+                    'None',
+                    'value',
+                    'var(--sbx-border-radius-none)'
+                ),
                 JSON_OBJECT(
                     'name',
                     'Small',
                     'value',
-                    '0.25rem'
+                    'var(--sbx-border-radius-s)'
                 ),
                 JSON_OBJECT(
                     'name',
                     'Medium',
                     'value',
-                    '0.5rem'
+                    'var(--sbx-border-radius-m)'
                 ),
                 JSON_OBJECT(
                     'name',
                     'Large',
                     'value',
-                    '0.75rem'
+                    'var(--sbx-border-radius-l)'
                 )
             )
         )
