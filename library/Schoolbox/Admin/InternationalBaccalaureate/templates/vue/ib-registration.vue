@@ -57,6 +57,10 @@ function removeDiplomaSession(sessionId: number): void {
     localDiplomaSessionIds.value = localDiplomaSessionIds.value.filter((id) => id !== sessionId);
 }
 
+const reportBaseUrl = window.Vue.computed<string | null>(() =>
+    props.reportBaseUrl ? props.reportBaseUrl.replace(/\/$/, "") : null,
+);
+
 window.Vue.onMounted((): void => {
     void loadDiplomaSessions();
 });
@@ -116,7 +120,10 @@ window.Vue.onMounted((): void => {
                             >
                                 <div class="l-flex l-flex--align-center l-flex--justify-space l-gap-xs">
                                     <div class="l-flex-col">
-                                        <a :href="`${props.reportBaseUrl}/${session.id}`">{{ session.title }}</a>
+                                        <a v-if="reportBaseUrl" :href="`${reportBaseUrl}/${session.id}`">{{
+                                            session.title
+                                        }}</a>
+                                        <span v-else>{{ session.title }}</span>
                                         <small
                                             >Session created by {{ session.createdBy }} on
                                             {{ new Date(session.createdAt).toLocaleDateString() }},

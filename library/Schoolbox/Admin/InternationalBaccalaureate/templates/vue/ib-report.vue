@@ -47,9 +47,15 @@ const MOCK_DATA: ReportResponse = {
             name: "Benjamin Torres",
             candidateDetailsStatus: "confirmed",
             subjects: {
-                hl: [{ subject: "Biology", language: "English" }, { subject: "Chemistry", language: "English" }],
+                hl: [
+                    { subject: "Biology", language: "English" },
+                    { subject: "Chemistry", language: "English" },
+                ],
                 sl: [{ subject: "History", language: "English" }],
-                core: [{ subject: "Extended Essay", language: "English" }, { subject: "Theory of Knowledge", language: "English" }],
+                core: [
+                    { subject: "Extended Essay", language: "English" },
+                    { subject: "Theory of Knowledge", language: "English" },
+                ],
             },
         },
     ],
@@ -71,7 +77,10 @@ const MOCK_DATA: ReportResponse = {
             name: "David Kim",
             candidateDetailsStatus: "confirmed",
             subjects: {
-                hl: [{ subject: "Economics", language: "English" }, { subject: "Geography", language: "English" }],
+                hl: [
+                    { subject: "Economics", language: "English" },
+                    { subject: "Geography", language: "English" },
+                ],
                 sl: [{ subject: "Language B: Spanish", language: "Spanish" }],
                 core: [{ subject: "Extended Essay", language: "English" }],
             },
@@ -108,9 +117,15 @@ const MOCK_DATA: ReportResponse = {
             name: "Grace Okonkwo",
             candidateDetailsStatus: "confirmed",
             subjects: {
-                hl: [{ subject: "Chemistry", language: "English" }, { subject: "Physics", language: "English" }],
+                hl: [
+                    { subject: "Chemistry", language: "English" },
+                    { subject: "Physics", language: "English" },
+                ],
                 sl: [{ subject: "Mathematics: analysis and approaches", language: "English" }],
-                core: [{ subject: "Extended Essay", language: "English" }, { subject: "CAS", language: "English" }],
+                core: [
+                    { subject: "Extended Essay", language: "English" },
+                    { subject: "CAS", language: "English" },
+                ],
             },
             ibCandidateNumber: "001234-123",
         },
@@ -167,23 +182,14 @@ window.Vue.onMounted((): void => {
     <div class="small-12">
         <div class="l-flex l-flex--align-center l-flex--justify-space f-no-margins">
             <h1 class="f-no-margins">{{ sessionTitle }}</h1>
-            <button
-                type="button"
-                class="ib-report__download-btn"
-                disabled
-                aria-label="Download"
-            >
+            <button type="button" class="ib-report__download-btn" disabled aria-label="Download">
                 <sbx-icon name="download"></sbx-icon>
             </button>
         </div>
 
         <div v-if="isLoading" class="loader"></div>
 
-        <data-load-error
-            v-else-if="loadError"
-            data-title="registration report"
-            :further-info="loadError"
-        />
+        <data-load-error v-else-if="loadError" data-title="registration report" :further-info="loadError" />
 
         <template v-else>
             <ib-report-section title="Preparation" :count="preparation.length">
