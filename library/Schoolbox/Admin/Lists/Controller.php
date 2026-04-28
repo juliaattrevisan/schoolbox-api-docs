@@ -1880,7 +1880,7 @@ class Controller extends Base
                 'code' => [
                     'caption'   => 'Code',
                     'width'     => 2,
-                    'maxLength' => 3,
+                    'maxLength' => 2,
                     'mandatory' => true,
                     'default'   => '',
                 ],
