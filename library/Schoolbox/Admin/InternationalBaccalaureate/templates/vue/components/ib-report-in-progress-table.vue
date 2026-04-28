@@ -3,7 +3,7 @@
  * Student table used in the In Progress section of the registration report.
  * Shows the IBIS submission timestamp instead of a candidate details status icon.
  */
-import IbReportSubjectChips from "./ib-report-subject-chips.vue";
+import IbReportSubjectLabels from "./ib-report-subject-labels.vue";
 import type { InProgressRow } from "../../js/types/ibReportTypes";
 
 interface Props {
@@ -47,7 +47,7 @@ function formatSubmittedAt(iso: string): string {
             >
                 <td>{{ student.name }}</td>
                 <td>{{ formatSubmittedAt(student.ibisSubmittedAt) }}</td>
-                <td colspan="3"><ib-report-subject-chips :subjects="student.subjects" /></td>
+                <td colspan="3"><ib-report-subject-labels :subjects="student.subjects" /></td>
             </tr>
         </tbody>
     </table>

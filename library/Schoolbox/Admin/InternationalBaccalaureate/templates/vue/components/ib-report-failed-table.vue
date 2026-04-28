@@ -3,7 +3,7 @@
  * Student table used in the Failed Registrations section of the registration report.
  * Extends the standard table with an error message column.
  */
-import IbReportSubjectChips from "./ib-report-subject-chips.vue";
+import IbReportSubjectLabels from "./ib-report-subject-labels.vue";
 import type { FailedRow } from "../../js/types/ibReportTypes";
 
 interface Props {
@@ -47,7 +47,7 @@ defineProps<Props>();
                         aria-label="Candidate details unconfirmed"
                     ></sbx-icon>
                 </td>
-                <td colspan="3"><ib-report-subject-chips :subjects="student.subjects" /></td>
+                <td colspan="3"><ib-report-subject-labels :subjects="student.subjects" /></td>
                 <td class="ib-report-error-message">{{ student.errorMessage }}</td>
                 <td>
                     <button type="button" disabled aria-label="More options">

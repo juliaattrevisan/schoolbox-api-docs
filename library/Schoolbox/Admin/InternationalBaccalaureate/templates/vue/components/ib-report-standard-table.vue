@@ -2,7 +2,7 @@
 /**
  * Student table used in the Preparation, Unconfirmed, and Confirmed sections of the registration report.
  */
-import IbReportSubjectChips from "./ib-report-subject-chips.vue";
+import IbReportSubjectLabels from "./ib-report-subject-labels.vue";
 import type { StudentRow } from "../../js/types/ibReportTypes";
 
 interface Props {
@@ -45,7 +45,7 @@ defineProps<Props>();
                         aria-label="Candidate details unconfirmed"
                     ></sbx-icon>
                 </td>
-                <td colspan="3"><ib-report-subject-chips :subjects="student.subjects" /></td>
+                <td colspan="3"><ib-report-subject-labels :subjects="student.subjects" /></td>
                 <td>
                     <button type="button" disabled aria-label="More options">
                         <sbx-icon name="more"></sbx-icon>
