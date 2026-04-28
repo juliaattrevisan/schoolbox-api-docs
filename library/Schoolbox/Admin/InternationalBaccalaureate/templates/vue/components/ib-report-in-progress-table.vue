@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * Student table used in the In Progress section of the registration report.
+ * Shows the IBIS submission timestamp instead of a candidate details status icon.
+ */
 import IbReportSubjectChips from "./ib-report-subject-chips.vue";
 import type { InProgressRow } from "../../js/types/ibReportTypes";
 

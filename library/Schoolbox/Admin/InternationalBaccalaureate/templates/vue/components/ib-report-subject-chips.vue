@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * Renders a student's subjects as grouped chips (HL, SL, Core).
+ * Highlights any subject with an unknown language in red.
+ */
 import type { SubjectGroup, SubjectEntry } from "../../js/types/ibReportTypes";
 
 interface Props {

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * Collapsible section wrapper used across the registration report.
+ * Displays a title, student count badge, and a chevron toggle.
+ */
 interface Props {
     title: string;
     count: number;

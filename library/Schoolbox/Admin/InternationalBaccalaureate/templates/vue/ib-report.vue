@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * Root page component for the Diploma Programme Year 2 registration report.
+ * Loads candidate data from the API and renders each registration section.
+ */
 // TODO SA-22226: restore import when real API call is re-enabled
 // import { apiRequest } from "@js/util/sbx/apiUtils";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";

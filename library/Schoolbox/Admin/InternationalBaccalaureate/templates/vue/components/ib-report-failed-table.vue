@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * Student table used in the Failed Registrations section of the registration report.
+ * Extends the standard table with an error message column.
+ */
 import IbReportSubjectChips from "./ib-report-subject-chips.vue";
 import type { FailedRow } from "../../js/types/ibReportTypes";
 

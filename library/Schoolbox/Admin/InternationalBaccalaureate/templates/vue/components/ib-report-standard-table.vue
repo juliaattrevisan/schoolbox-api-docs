@@ -1,4 +1,7 @@
 <script setup lang="ts">
+/**
+ * Student table used in the Preparation, Unconfirmed, and Confirmed sections of the registration report.
+ */
 import IbReportSubjectChips from "./ib-report-subject-chips.vue";
 import type { StudentRow } from "../../js/types/ibReportTypes";
 

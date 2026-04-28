@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * Student table used in the Registered section of the registration report.
+ * Includes the student's IB candidate number.
+ */
 import IbReportSubjectChips from "./ib-report-subject-chips.vue";
 import type { RegisteredRow } from "../../js/types/ibReportTypes";
 
