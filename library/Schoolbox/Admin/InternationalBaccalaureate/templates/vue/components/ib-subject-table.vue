@@ -3,7 +3,12 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import SearchSelectModal from "@schoolboxVue/components/searchSelect/modal/search-select-modal.vue";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
-import type { IBLanguage, IBLanguageListResponse, IBSubject, IBSubjectLanguage } from "../../js/types/ibConfigurationTypes";
+import type {
+    IBLanguage,
+    IBLanguageListResponse,
+    IBSubject,
+    IBSubjectLanguage,
+} from "../../js/types/ibConfigurationTypes";
 
 /**
  * A single row in the table
@@ -30,7 +35,6 @@ type SubjectSavePayload = {
     languageId: number;
     classCode: string;
 };
-
 
 const props = defineProps<{
     categoryName: string;
@@ -141,7 +145,7 @@ function getDefaultLanguages(): number[] {
  * @returns The main subject row and any child language rows.
  */
 function buildRowsForSubject(subjectData: IBSubject, index: number, tableType?: string): SubjectRow[] {
-    const configurations = subjectData.languages as IBSubjectLanguage[];
+    const configurations = subjectData.languages;
     const rowId = tableType ? `${tableType}_${subjectData.id}_${index}` : `group_subject_${subjectData.id}`;
     const selectedLanguages = configurations.map((configuration) => configuration.languageId);
     const configuredLanguageNames = createLanguageNameMapFromSubjectLanguages(configurations);
