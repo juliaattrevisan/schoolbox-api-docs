@@ -10,6 +10,7 @@ import { useSelected } from "@schoolboxVue/composables/selected/useSelected";
 import { useQuerySearch } from "@schoolboxVue/composables/search/useQuerySearch";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import { useOnSelectedChange } from "../composables/useOnSelectedChange";
+import SsSelected from "../ss-selected.vue";
 import SsQueryInput from "../ss-query-input.vue";
 import SsResults from "../ss-results.vue";
 import SsmFooter from "./ssm-footer.vue";
@@ -25,11 +26,13 @@ interface Props {
     allowPartialMatches?: boolean; // whether to allow partial matches, so can match part of a word
     placeholder?: string; // the query input placeholder text
     defaultResults?: SearchSelectItem[]; // show selection options when the search input is empty
+    showSelected?: boolean; // whether to show the selected items
 }
 const props = withDefaults(defineProps<Props>(), {
     placeholder: "Search...",
     defaultResults: undefined,
     queryKey: "query",
+    showSelected: false,
 });
 
 const emit = defineEmits<{
@@ -236,6 +239,14 @@ window.Vue.watch(isOpen, async (newIsOpen) => {
         <basic-modal v-model:is-open="isOpen">
             <div class="l-flex-col l-gap-m">
                 <h2 class="f-no-margins">{{ props.title }}</h2>
+                <ss-selected
+                    v-if="props.showSelected"
+                    :selected="selected"
+                    form-value-name=""
+                    :is-single-select="false"
+                    :can-select-item="false"
+                    @remove="onRemove"
+                />
                 <div ref="searchSelectEl" class="f-no-margins">
                     <label :for="props.labelId">{{ props.label }}</label>
                     <ss-query-input

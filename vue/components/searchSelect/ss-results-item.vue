@@ -135,7 +135,7 @@ const { isActive } = useActiveIndex(
 <style lang="scss" scoped>
 .search-result {
     background: var(--sbx-color-foreground-primary, var(--color-foreground-primary));
-    border-bottom: 1px solid var(--body-background);
+    border-bottom: 1px solid var(--sbx-color-border, var(--body-background));
     display: flex;
     font-size: 0.825rem;
     padding: var(--spacing-s);

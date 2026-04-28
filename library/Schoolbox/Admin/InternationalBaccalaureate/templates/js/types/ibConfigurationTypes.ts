@@ -26,6 +26,12 @@ export type IBLanguage = {
     name: string;
 };
 
+export type IBSubjectLanguage = {
+    languageId: number;
+    languageName: string | null;
+    classCode: string;
+};
+
 export type IBLanguageListResponse = {
     data: IBLanguage[];
     metadata?: {
@@ -41,10 +47,7 @@ export type IBSubject = {
     id: number;
     subject: string;
     level: string;
-    languages: {
-        languageId: number;
-        classCode: string;
-    }[];
+    languages: IBSubjectLanguage[];
 };
 
 export type IBRoutes = {

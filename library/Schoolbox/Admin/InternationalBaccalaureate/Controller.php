@@ -63,6 +63,7 @@ class Controller extends ConfigController
     public function getConfiguration(): void
     {
         $pageCurrent = '/adminv2/international-baccalaureate/configuration';
+        $defaultLanguage = $this->getDefaultLanguage();
 
         // Add General Configuration tab manually
         $categories = [
@@ -91,6 +92,11 @@ class Controller extends ConfigController
                 'pageCurrent' => $pageCurrent,
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
                 'categories' => $categories,
+                'defaultLanguage' => $defaultLanguage ? [
+                    'id' => $defaultLanguage->getId(),
+                    'code' => $defaultLanguage->getCode(),
+                    'name' => $defaultLanguage->getName(),
+                ] : null,
                 '_routes' => [
                     'searchLanguages' => $this->getRouteIfAuthorized('internationalBaccalaureate.searchLanguages'),
                 ],
@@ -211,10 +217,13 @@ class Controller extends ConfigController
                     'subject' => $groupSubject->getSubject()->getName(),
                     'level' => $groupSubject->getLevel() ?: '',
                     'languages' => $groupSubject->getLanguages()
-                        ->map(fn(GroupSubjectLanguageModel $language) => [
-                            'languageId' => $language->getLanguage()?->getId(),
-                            'classCode' => $language->getClassCode() ?? '',
-                        ])
+                        ->map(
+                            fn(GroupSubjectLanguageModel $language) => [
+                                'languageId' => $language->getLanguage()?->getId(),
+                                'languageName' => $language->getLanguage()?->getName(),
+                                'classCode' => $language->getClassCode() ?? '',
+                            ]
+                        )
                         ->reindex()
                         ->getAll(),
                 ];
@@ -224,6 +233,23 @@ class Controller extends ConfigController
         } catch (Exception $e) {
             $this->response = $this->responseAsJson(['error' => $e->getMessage()])->withStatus(500);
         }
+    }
+
+    /**
+     * Get default language
+     * @return LanguageModel|null
+     */
+    private function getDefaultLanguage(): ?LanguageModel
+    {
+        $englishLanguage = $this->languageMapper->findByColumn('code', 'ENG')->first();
+
+        if ($englishLanguage instanceof LanguageModel) {
+            return $englishLanguage;
+        }
+
+        $firstLanguage = $this->languageMapper->findAll(['limit' => 1])->first();
+
+        return $firstLanguage instanceof LanguageModel ? $firstLanguage : null;
     }
 
     /**
@@ -279,6 +305,10 @@ class Controller extends ConfigController
             }
 
             $allowedGroupSubjectIds = array_fill_keys($groupSubjectIds, true);
+
+            $requestedLanguageIds = array_filter(array_column($subjectLanguages, 'languageId'));
+            $languagesById = $this->languageMapper->findByColumn('id', $requestedLanguageIds)->indexBy('id')->getAll();
+
             $modelsToSave = [];
 
             foreach ($subjectLanguages as $subjectLanguage) {
@@ -292,7 +322,8 @@ class Controller extends ConfigController
                 if (
                     $groupSubjectId <= 0 ||
                     $languageId <= 0 ||
-                    !isset($allowedGroupSubjectIds[$groupSubjectId])
+                    !isset($allowedGroupSubjectIds[$groupSubjectId]) ||
+                    !isset($languagesById[$languageId])
                 ) {
                     continue;
                 }
@@ -300,7 +331,7 @@ class Controller extends ConfigController
                 $modelsToSave[] = $this->groupSubjectLanguageMapper
                     ->createModel()
                     ->setGroupSubject($this->groupSubjectMapper->createModel()->setId($groupSubjectId))
-                    ->setLanguage($this->languageMapper->createModel()->setId($languageId))
+                    ->setLanguage($languagesById[$languageId])
                     ->setClassCode(trim((string) ($subjectLanguage['classCode'] ?? '')));
             }
 

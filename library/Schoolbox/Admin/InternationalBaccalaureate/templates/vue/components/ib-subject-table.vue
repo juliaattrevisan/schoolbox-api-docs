@@ -1,56 +1,133 @@
 <script setup lang="ts">
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
-import LanguageSelectionModal from "./language-selection-modal.vue";
-import type { IBLanguage, IBSubject } from "../../js/types/ibConfigurationTypes";
+import SearchSelectModal from "@schoolboxVue/components/searchSelect/modal/search-select-modal.vue";
+import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
+import type {
+    IBLanguage,
+    IBLanguageListResponse,
+    IBSubject,
+    IBSubjectLanguage,
+} from "../../js/types/ibConfigurationTypes";
 
-interface SubjectRow {
+/**
+ * A single row in the table
+ */
+type SubjectRow = {
     id: string;
     groupSubjectId: number;
     subject: string;
     level: string;
     languages: number[];
+    languageNamesById: Record<number, string>;
     classCode: string;
     studentCount: number;
     isLanguageRow?: boolean;
     parentRowId?: string;
     tableType?: string;
-}
+};
 
-interface SubjectSavePayload {
+/**
+ * The payload sent to the server to save a subject's language configuration
+ */
+type SubjectSavePayload = {
     groupSubjectId: number;
     languageId: number;
     classCode: string;
-}
+};
 
-interface Props {
+const props = defineProps<{
     categoryName: string;
     categoryTitle: string;
     categoryId: number;
+    defaultLanguage: IBLanguage | null;
     saveEndpoint: string;
     ibSubjects: IBSubject[];
-    ibLanguages: IBLanguage[];
-}
-
-const props = defineProps<Props>();
+    searchLanguagesEndpoint: string | null;
+}>();
 
 const isSaving = window.Vue.ref<boolean>(false);
 const saveError = window.Vue.ref<string | null>(null);
 const subjectRows = window.Vue.ref<SubjectRow[]>([]);
 const currentEditingRow = window.Vue.ref<string | null>(null);
 const isLanguageModalOpen = window.Vue.ref<boolean>(false);
+const modalSelectedLanguages = window.Vue.ref<SearchSelectItem[]>([]);
+const modalSelectionSnapshot = window.Vue.ref<SearchSelectItem[]>([]); // to determine whether a row needs to change on modal close
+const modalDefaultResults = window.Vue.ref<SearchSelectItem[]>([]);
+const modalSearchResults = window.Vue.ref<SearchSelectItem[]>([]);
+const cachedLanguageNames = window.Vue.ref<Record<number, string>>({});
 
 const isCoreCategory = window.Vue.computed(() => {
     return props.categoryName.toLowerCase() === "core";
 });
 
-const defaultLanguageId = window.Vue.computed<number | null>(() => {
-    const englishLanguage = props.ibLanguages.find((language) => {
-        return language.name.toLowerCase() === "english";
-    });
+const canEditLanguages = window.Vue.computed<boolean>(() => Boolean(props.searchLanguagesEndpoint));
 
-    return englishLanguage?.id ?? props.ibLanguages[0]?.id ?? null;
-});
+const defaultLanguageId = window.Vue.computed<number | null>(() => props.defaultLanguage?.id ?? null);
+
+/**
+ * Build the default language-name map used before the modal has loaded.
+ * @returns A language-name lookup keyed by language id.
+ */
+function getDefaultLanguageNameMap(): Record<number, string> {
+    if (!props.defaultLanguage) {
+        return {};
+    }
+    return {
+        [props.defaultLanguage.id]: props.defaultLanguage.name,
+    };
+}
+
+/**
+ * Build a language-name lookup from configured subject languages.
+ * @param configurations The configured subject-language entries.
+ * @returns A language-name lookup keyed by language id.
+ */
+function createLanguageNameMapFromSubjectLanguages(configurations: IBSubjectLanguage[]): Record<number, string> {
+    return configurations.reduce<Record<number, string>>((languageNames, configuration) => {
+        const languageName = configuration.languageName;
+
+        if (typeof languageName === "string") {
+            languageNames[configuration.languageId] = languageName;
+        }
+
+        return languageNames;
+    }, {});
+}
+
+/**
+ * Build a language-name lookup from search-select items.
+ * @param items The selected or fetched language items.
+ * @returns A language-name lookup keyed by language id.
+ */
+function createLanguageNameMapFromItems(items: SearchSelectItem[]): Record<number, string> {
+    return items.reduce<Record<number, string>>((languageNames, item) => {
+        languageNames[item.id] = item.name;
+        return languageNames;
+    }, {});
+}
+
+/**
+ * Merge server-provided language names into the local cache.
+ */
+function refreshCachedLanguageNames(): void {
+    const nextCache = { ...cachedLanguageNames.value, ...getDefaultLanguageNameMap() };
+    props.ibSubjects.forEach((subject) => {
+        Object.assign(nextCache, createLanguageNameMapFromSubjectLanguages(subject.languages));
+    });
+    cachedLanguageNames.value = nextCache;
+}
+
+/**
+ * Merge search-select items into the local language-name cache.
+ * @param items The selected or fetched language items.
+ */
+function cacheSelectedLanguages(items: SearchSelectItem[]): void {
+    cachedLanguageNames.value = {
+        ...cachedLanguageNames.value,
+        ...createLanguageNameMapFromItems(items),
+    };
+}
 
 /**
  * Get the default language selection for a subject row.
@@ -71,12 +148,14 @@ function buildRowsForSubject(subjectData: IBSubject, index: number, tableType?: 
     const configurations = subjectData.languages;
     const rowId = tableType ? `${tableType}_${subjectData.id}_${index}` : `group_subject_${subjectData.id}`;
     const selectedLanguages = configurations.map((configuration) => configuration.languageId);
+    const configuredLanguageNames = createLanguageNameMapFromSubjectLanguages(configurations);
     const mainRow: SubjectRow = {
         id: rowId,
         groupSubjectId: subjectData.id,
         subject: subjectData.subject,
         level: subjectData.level,
         languages: selectedLanguages.length > 0 ? selectedLanguages : getDefaultLanguages(),
+        languageNamesById: selectedLanguages.length > 0 ? configuredLanguageNames : getDefaultLanguageNameMap(),
         classCode: configurations.length === 1 ? configurations[0].classCode : "",
         studentCount: 0,
         tableType,
@@ -86,37 +165,30 @@ function buildRowsForSubject(subjectData: IBSubject, index: number, tableType?: 
         return [mainRow];
     }
 
-    const languageRows = configurations.map((configuration, configIndex) => ({
-        id: `${rowId}_lang_${configIndex}`,
-        groupSubjectId: subjectData.id,
-        subject: subjectData.subject,
-        level: subjectData.level,
-        languages: [configuration.languageId],
-        classCode: configuration.classCode,
-        studentCount: 0,
-        isLanguageRow: true,
-        parentRowId: rowId,
-        tableType,
-    }));
+    const languageRows = configurations.map((configuration, configIndex) => {
+        const languageName = configuration.languageName;
+
+        return {
+            id: `${rowId}_lang_${configIndex}`,
+            groupSubjectId: subjectData.id,
+            subject: subjectData.subject,
+            level: subjectData.level,
+            languages: [configuration.languageId],
+            languageNamesById:
+                typeof languageName === "string"
+                    ? {
+                          [configuration.languageId]: languageName,
+                      }
+                    : {},
+            classCode: configuration.classCode,
+            studentCount: 0,
+            isLanguageRow: true,
+            parentRowId: rowId,
+            tableType,
+        };
+    });
 
     return [mainRow, ...languageRows];
-}
-
-/**
- * Apply the default language to rows that do not yet have one.
- */
-function populateDefaultLanguagesForEmptyRows(): void {
-    const defaultLanguages = getDefaultLanguages();
-
-    if (defaultLanguages.length === 0) {
-        return;
-    }
-
-    subjectRows.value.forEach((row) => {
-        if (row.languages.length === 0) {
-            row.languages = [...defaultLanguages];
-        }
-    });
 }
 
 /**
@@ -140,31 +212,30 @@ function initializeSubjectRows(): void {
 window.Vue.watch(
     () => props.ibSubjects,
     () => {
+        refreshCachedLanguageNames();
         initializeSubjectRows();
     },
     { deep: true, immediate: true },
 );
-
-window.Vue.watch(
-    () => props.ibLanguages,
-    (newLanguages, oldLanguages) => {
-        if (oldLanguages.length === 0 && newLanguages.length > 0) {
-            populateDefaultLanguagesForEmptyRows();
-        }
-    },
-    { deep: true },
-);
-
-window.Vue.onMounted(() => {
-    initializeSubjectRows();
-});
 
 /**
  * Open the language selection modal for a row.
  * @param rowId The row identifier to edit.
  */
 function openLanguageModal(rowId: string): void {
+    if (!props.searchLanguagesEndpoint) {
+        return;
+    }
+
+    const row = subjectRows.value.find((candidate) => candidate.id === rowId);
+    const selectedLanguageIds = row?.languages.length ? row.languages : getDefaultLanguages();
+
     currentEditingRow.value = rowId;
+    modalSelectedLanguages.value = selectedLanguageIds.map((languageId) => ({
+        id: languageId,
+        name: getLanguageName(languageId, row),
+    }));
+    modalSelectionSnapshot.value = [...modalSelectedLanguages.value];
     isLanguageModalOpen.value = true;
 }
 
@@ -173,14 +244,51 @@ function openLanguageModal(rowId: string): void {
  */
 function closeLanguageModal(): void {
     currentEditingRow.value = null;
+    modalSelectedLanguages.value = [];
+    modalSelectionSnapshot.value = [];
 }
 
 /**
- * Update the selected languages for the row being edited.
- * @param selectedLanguages The language ids selected in the modal.
+ * Compare modal selections by language id to determine whether the subject row should be updated on modal close.
+ * @param previousSelection The original modal selection.
+ * @param nextSelection The current modal selection.
+ * @returns Whether the selection has changed.
  */
-function onLanguagesSelected(selectedLanguages: number[]): void {
+function hasLanguageSelectionChanged(
+    previousSelection: SearchSelectItem[],
+    nextSelection: SearchSelectItem[],
+): boolean {
+    const previousIds = previousSelection.map((item) => item.id).sort((left, right) => left - right);
+    const nextIds = nextSelection.map((item) => item.id).sort((left, right) => left - right);
+    if (previousIds.length !== nextIds.length) {
+        return true;
+    }
+    return previousIds.some((languageId, index) => languageId !== nextIds[index]);
+}
+
+window.Vue.watch(isLanguageModalOpen, (isOpen, wasOpen) => {
+    if (isOpen || !wasOpen || !currentEditingRow.value) {
+        return;
+    }
+
+    if (hasLanguageSelectionChanged(modalSelectionSnapshot.value, modalSelectedLanguages.value)) {
+        applySelectedLanguages(modalSelectedLanguages.value);
+    }
+
+    closeLanguageModal();
+});
+
+/**
+ * Update the selected languages for the row being edited.
+ * @param selectedItems The languages selected in the modal.
+ */
+function applySelectedLanguages(selectedItems: SearchSelectItem[]): void {
     if (!currentEditingRow.value) return;
+
+    cacheSelectedLanguages(selectedItems);
+
+    const selectedLanguages = selectedItems.map((item) => item.id);
+    const selectedLanguageNames = createLanguageNameMapFromItems(selectedItems);
 
     const rowIndex = subjectRows.value.findIndex((row) => row.id === currentEditingRow.value);
     if (rowIndex === -1) return;
@@ -191,11 +299,14 @@ function onLanguagesSelected(selectedLanguages: number[]): void {
 
     if (selectedLanguages.length === 0) {
         mainRow.languages = [];
+        mainRow.languageNamesById = {};
         mainRow.classCode = "";
     } else if (selectedLanguages.length === 1) {
         mainRow.languages = selectedLanguages;
+        mainRow.languageNamesById = selectedLanguageNames;
     } else {
         mainRow.languages = selectedLanguages;
+        mainRow.languageNamesById = selectedLanguageNames;
         mainRow.classCode = "";
 
         const existingConfigurations =
@@ -210,6 +321,11 @@ function onLanguagesSelected(selectedLanguages: number[]): void {
             subject: mainRow.subject,
             level: mainRow.level,
             languages: [language],
+            languageNamesById: selectedLanguageNames[language]
+                ? {
+                      [language]: selectedLanguageNames[language],
+                  }
+                : {},
             classCode: classCodeByLanguage.get(language) ?? "",
             studentCount: 0,
             isLanguageRow: true,
@@ -247,7 +363,7 @@ function getLanguageDisplayText(row: SubjectRow): string {
     if (row.languages.length === 0) {
         return "Select languages";
     } else if (row.languages.length === 1) {
-        return getLanguageName(row.languages[0]);
+        return getLanguageName(row.languages[0], row);
     } else {
         return `${row.languages.length} selected`;
     }
@@ -256,22 +372,56 @@ function getLanguageDisplayText(row: SubjectRow): string {
 /**
  * Get the display name for a language.
  * @param languageId The language identifier.
+ * @param row The subject row being displayed.
  * @returns The display name for the language.
  */
-function getLanguageName(languageId: number): string {
-    const matchedLanguage = props.ibLanguages.find((language) => language.id === languageId);
-
-    return matchedLanguage?.name || String(languageId);
+function getLanguageName(languageId: number, row?: SubjectRow): string {
+    return row?.languageNamesById[languageId] ?? cachedLanguageNames.value[languageId] ?? String(languageId);
 }
 
 /**
- * Get the selected languages for the row currently being edited.
- * @returns The selected language ids for the active row.
+ * Update the modal results, either the search results or the default results.
+ * @param json The returned json.
+ * @param results The results collection to update.
+ * @param isMoreResults Whether these results should be appended.
  */
-function getCurrentRowLanguages(): number[] {
-    if (!currentEditingRow.value) return [];
-    const row = subjectRows.value.find((r) => r.id === currentEditingRow.value);
-    return row?.languages.length ? row.languages : getDefaultLanguages();
+function updateModalResults(json: unknown, results: typeof modalDefaultResults, isMoreResults: boolean): void {
+    if (typeof json !== "object" || json === null || !("data" in json) || !Array.isArray(json.data)) {
+        return;
+    }
+
+    const responseData = json as IBLanguageListResponse;
+    const formattedResults = responseData.data.map((language) => ({
+        id: language.id,
+        name: language.name,
+    }));
+
+    cacheSelectedLanguages(formattedResults);
+
+    if (isMoreResults) {
+        results.value = [...results.value, ...formattedResults];
+        return;
+    }
+
+    results.value = [...formattedResults];
+}
+
+/**
+ * Handle the initial modal search/default-results response.
+ * @param json The returned json.
+ * @param isActive Whether the search is active.
+ */
+function onModalSearchResponse(json: unknown, isActive: boolean): void {
+    updateModalResults(json, isActive ? modalSearchResults : modalDefaultResults, false);
+}
+
+/**
+ * Handle a paginated modal response.
+ * @param json The returned json.
+ * @param isActive Whether the search is active.
+ */
+function onModalNextSearchResponse(json: unknown, isActive: boolean): void {
+    updateModalResults(json, isActive ? modalSearchResults : modalDefaultResults, true);
 }
 
 /**
@@ -383,7 +533,7 @@ async function saveSubjectConfiguration(): Promise<void> {
 </script>
 
 <template>
-    <div class="subject-table-container">
+    <div>
         <div v-if="subjectRows.length === 0" class="alert alert-info">
             <i class="fa fa-info-circle"></i>
             No subjects configured yet for {{ categoryTitle }}. Use the table below to add subjects.
@@ -392,7 +542,7 @@ async function saveSubjectConfiguration(): Promise<void> {
         <div v-else>
             <template v-if="isCoreCategory">
                 <h3>Diploma Program Year 2 [Diploma]</h3>
-                <table class="subject-table">
+                <table class="tiger-stripe">
                     <thead>
                         <tr>
                             <th>Subject</th>
@@ -421,6 +571,7 @@ async function saveSubjectConfiguration(): Promise<void> {
                                             class="sbx-icon-only-button f-no-margins"
                                             aria-label="Edit languages"
                                             title="Edit languages"
+                                            :disabled="!canEditLanguages"
                                             :data-test="`ib-language-edit-${row.id}`"
                                             @click="openLanguageModal(row.id)"
                                         >
@@ -437,7 +588,7 @@ async function saveSubjectConfiguration(): Promise<void> {
                 </table>
 
                 <h3 style="margin-top: 2rem">Diploma Course [Course]</h3>
-                <table class="subject-table">
+                <table class="tiger-stripe">
                     <thead>
                         <tr>
                             <th>Subject</th>
@@ -466,6 +617,7 @@ async function saveSubjectConfiguration(): Promise<void> {
                                             class="sbx-icon-only-button f-no-margins"
                                             aria-label="Edit languages"
                                             title="Edit languages"
+                                            :disabled="!canEditLanguages"
                                             :data-test="`ib-language-edit-${row.id}`"
                                             @click="openLanguageModal(row.id)"
                                         >
@@ -483,7 +635,7 @@ async function saveSubjectConfiguration(): Promise<void> {
             </template>
 
             <template v-else>
-                <table class="subject-table">
+                <table class="tiger-stripe">
                     <thead>
                         <tr>
                             <th>Subject</th>
@@ -520,6 +672,7 @@ async function saveSubjectConfiguration(): Promise<void> {
                                             class="sbx-icon-only-button f-no-margins"
                                             aria-label="Edit languages"
                                             title="Edit languages"
+                                            :disabled="!canEditLanguages"
                                             :data-test="`ib-language-edit-${row.id}`"
                                             @click="openLanguageModal(row.id)"
                                         >
@@ -527,7 +680,7 @@ async function saveSubjectConfiguration(): Promise<void> {
                                         </button>
                                     </div>
                                     <span v-else class="language-display">
-                                        {{ getLanguageName(row.languages[0]) }}
+                                        {{ getLanguageName(row.languages[0], row) }}
                                     </span>
                                 </td>
                                 <td>
@@ -581,12 +734,21 @@ async function saveSubjectConfiguration(): Promise<void> {
             </div>
         </div>
 
-        <LanguageSelectionModal
+        <search-select-modal
+            v-model:selected="modalSelectedLanguages"
             v-model:is-open="isLanguageModalOpen"
-            :available-languages="props.ibLanguages"
-            :selected-languages="getCurrentRowLanguages()"
-            @close="closeLanguageModal"
-            @languages-selected="onLanguagesSelected"
+            v-model:results="modalSearchResults"
+            :default-results="modalDefaultResults"
+            show-selected
+            label="Search languages"
+            label-id="ib-language-modal-search"
+            placeholder="Search for languages..."
+            title="Select Languages"
+            :endpoint="props.searchLanguagesEndpoint ?? ''"
+            :manage-search-response="true"
+            :allow-partial-matches="true"
+            @search-response="onModalSearchResponse"
+            @next-search-response="onModalNextSearchResponse"
         />
     </div>
 </template>
