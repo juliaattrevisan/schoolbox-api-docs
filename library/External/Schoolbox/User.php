@@ -380,18 +380,25 @@ class External_Schoolbox_User implements External_UserInterface
         }
 
         //If the existing portrait has the same SHA1 hash as the one in sis_user_profile return it without updating the user
-        if (
-            $existingPortrait
-            && $hash['portrait_hash'] === $existingPortrait->getHash()
-        ) {
+
+        /* The reason for this is that a file's contents is based on its file hash - it's a property of the storage
+         * mechanism. If the hashes are the same, it means the image's binary content is the same, and is the same picture.
+         * In this circumstance, the person's picture is the same even though the sis' updated_at is newer - no changes
+         * are required to what we already knew before.
+         *
+         * This might manifest in prod via "changing someone's profile picture, then changing it back to what it
+         * originally was", or it's simply the time at which we last found out what a person's picture contained.
+         */
+        if ($existingPortrait && $hash['portrait_hash'] === $existingPortrait->getHash()) {
             return $existingPortrait;
         }
 
         //Return existing portrait if it is newer than SUDS profile
-        if (
-            $existingPortrait
-            && $existingPortrait->getCreatedAt()->gt(Alaress_Date_Format::newDatabaseDate($hash['updated_at']))
-        ) {
+
+        /* afaict this code path occurs when someone changes it in schoolbox, but not the sis: such as when you prefer
+         * a different picture than what the SIS provides.
+         */
+        if ($existingPortrait && $existingPortrait->getCreatedAt()->gt(Alaress_Date_Format::newDatabaseDate($hash['updated_at']))) {
             return $existingPortrait;
         }
 

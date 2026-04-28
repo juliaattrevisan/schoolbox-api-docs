@@ -13,6 +13,7 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\External\Connector\AllMeaningfulValues;
+use Schoolbox\UserMapper;
 
 class External_Synergetic_Smcs_User extends External_Synergetic_User
 {
@@ -205,11 +206,20 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
                  */
                 $portrait = Storage\Mapper::getInstance()->acceptStream($user->getExternalId() . '.jpg', $photo['Photo']);
 
-                /* Update user with latest version
+                /* If $portrait->getHash() is the same as $user->getPortrait()->getHash(), then they are the same
+                 * binary contents: they're the same picture. We don't need to update $user or change anything.
+                 * Otherwise, update user with latest version
+                 *
+                 * This is mainly precautionary: turns out the getCreatedAt() check in the if statement precludes this
+                 * for most normal usages. However, if the school updated their pictures to have the same binary content
+                 * BUT a different ModifiedAt, they'd end up here. It would occur when the school changes a picture to
+                 * something different, then change it back to what it originally was.
                  */
-                $user->setPortrait($portrait);
+                if ($portrait->getHash() !== $user->getPortrait()->getHash()) {
+                    $user->setPortrait($portrait);
 
-                \Schoolbox\UserMapper::getInstance()->save($user);
+                    UserMapper::getInstance()->save($user);
+                }
             }
 
             /* Then return the latest Storage\Model instance
@@ -224,7 +234,7 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
          */
         if (!empty($user->getPortrait())) {
             $user->setPortrait(null);
-            \Schoolbox\UserMapper::getInstance()->save($user);
+            UserMapper::getInstance()->save($user);
         }
 
         return null;
