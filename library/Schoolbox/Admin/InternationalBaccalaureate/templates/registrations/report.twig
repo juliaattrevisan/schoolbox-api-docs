@@ -7,10 +7,11 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-        <div
-            id="ib-report-app"
-            data-candidates-endpoint="{{ _routes.candidatesEndpoint }}"
-        ></div>
+        <div id="ib-report-app">
+            <ib-report
+                candidates-endpoint="{{ _routes.candidatesEndpoint }}"
+            />
+        </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/ibReport.js?v={{ config.site_version }}"></script>
     </div>
 </div>
