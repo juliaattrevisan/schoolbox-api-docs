@@ -41,10 +41,12 @@ use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Moment\Tag\Mapper as LearningMomentEvidenceTag;
+use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\MapperFactory;
+use Schoolbox\Nationality\Mapper as NationalityMapper;
 use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\DocumentClassification\Mapper as PastoralDocumentClassificationMapper;
 use Schoolbox\Pastoral\DocumentClassification\Model as PastoralDocumentClassificationModel;
@@ -1858,6 +1860,66 @@ class Controller extends Base
                     'nullable'  => true,
                     'nullable_label' => 'Not Selected',
                     'lookup'    => $luSystemPurpose,
+                ],
+            ]
+        ];
+
+        $return['nationality'] = [
+            'title'             => 'Nationalities',
+            'mapper'            => NationalityMapper::class,
+            'delete'            => true,
+            'showId'            => true,
+            'sort'              => 'ID',
+            'deleteFailMsg'     => 'This nationality cannot be deleted as it may be in use.',
+            'fields'            => [
+                'id' => [
+                    'caption'   => 'ID',
+                    'width'     => 1,
+                    'readonly'  => true,
+                ],
+                'code' => [
+                    'caption'   => 'Code',
+                    'width'     => 2,
+                    'maxLength' => 2,
+                    'mandatory' => true,
+                    'default'   => '',
+                ],
+                'name' => [
+                    'caption'   => 'Name',
+                    'width'     => 5,
+                    'maxLength' => 255,
+                    'mandatory' => true,
+                    'default'   => '',
+                ],
+            ]
+        ];
+
+        $return['language'] = [
+            'title'             => 'Languages',
+            'mapper'            => LanguageMapper::class,
+            'delete'            => true,
+            'showId'            => true,
+            'sort'              => 'ID',
+            'deleteFailMsg'     => 'This language cannot be deleted as it may be in use.',
+            'fields'            => [
+                'id' => [
+                    'caption'   => 'ID',
+                    'width'     => 1,
+                    'readonly'  => true,
+                ],
+                'code' => [
+                    'caption'   => 'Code',
+                    'width'     => 2,
+                    'maxLength' => 3,
+                    'mandatory' => true,
+                    'default'   => '',
+                ],
+                'name' => [
+                    'caption'   => 'Name',
+                    'width'     => 5,
+                    'maxLength' => 255,
+                    'mandatory' => true,
+                    'default'   => '',
                 ],
             ]
         ];
