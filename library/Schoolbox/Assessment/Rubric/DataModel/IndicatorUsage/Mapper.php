@@ -166,31 +166,37 @@ class Mapper extends BaseMapper
     /**
      * Retrieves a list of assessment IDs and names in which this capability is used.
      *
+     * Capability Usage is determined by the usage of Indicators, its immediate descendent, which is why this method
+     * is here instead of the Capability Usage mapper.
+     *
      * This does not include deleted assessments.
      *
      * @param  int $capabilityId
-     * @return array[] id: the assessment's ID, title: the assessment's title, 'submission_box_id': the box's id
+     * @return array[] id: the assessment's ID, title: the assessment's title
      */
-    public function findCapabilityUsage($capabilityId): array
+    public function findCapabilityUsage(int $capabilityId): array
     {
         $query = "
             SELECT DISTINCT
                 a.id,
-                a.title,
-                submission_box_id
-            FROM {$this->getTable()} ru
-            INNER JOIN {$this->getJoinSql('submission_box', 'ru', 'sb')}
-            INNER JOIN {$this->getJoinSql('submission_box.assessmentModel', 'sb', 'a')}
-            INNER JOIN {$this->getJoinSql('indicator', 'ru', 'rc')}
-            WHERE rc.rubric_capability_id = ?
-            AND sb.use_rubric IS TRUE
+                a.title
+            FROM {$this->getTable()} riu
+            INNER JOIN {$this->getJoinSql('rubricInstance', 'riu', 'ri')}
+            INNER JOIN {$this->getJoinSql('rubricInstance.assessmentModel', 'ri', 'a')}
+            INNER JOIN {$this->getJoinSql('indicator', 'riu', 'rc')}
+            WHERE rc.rubric_capability_id = :capabilityId
         ";
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute([$capabilityId]);
+        $statement->execute([
+            'capabilityId' => $capabilityId
+        ]);
+
         $result = [];
+
         foreach ($statement as $row) {
             $result[$row['id']] = $row;
         }
+
         return $result;
     }
 
