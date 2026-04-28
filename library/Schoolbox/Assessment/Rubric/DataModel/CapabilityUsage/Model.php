@@ -27,9 +27,9 @@ class Model
 
 
     /**
-     * @var SubmissionBox
+     * @var null|\Schoolbox\Assessment\Rubric\Instance\Model
      */
-    private $submissionBox;
+    private ?\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance;
 
 
     /**
@@ -65,23 +65,44 @@ class Model
 
 
     /**
-     * @return SubmissionBox
+     * @return null|\Schoolbox\Assessment\Rubric\Instance\Model
      */
-    public function getSubmissionBox(): SubmissionBox
+    public function getRubricInstance(): ?\Schoolbox\Assessment\Rubric\Instance\Model
     {
-        return $this->submissionBox;
+        return $this->rubricInstance;
     }
 
 
     /**
-     * @param SubmissionBox $submissionBox
-     * @return static
+     * @param null|\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance
+     * @return $this
      */
-    public function setSubmissionBox(SubmissionBox $submissionBox): self
+    public function setRubricInstance(?\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance): self
     {
-        $this->submissionBox = $submissionBox;
+        $this->rubricInstance = $rubricInstance;
         return $this;
     }
+
+
+// TODO remove
+//    /**
+//     * @return SubmissionBox
+//     */
+//    public function getSubmissionBox(): SubmissionBox
+//    {
+//        return $this->submissionBox;
+//    }
+//
+// TODO remove
+//    /**
+//     * @param SubmissionBox $submissionBox
+//     * @return static
+//     */
+//    public function setSubmissionBox(SubmissionBox $submissionBox): self
+//    {
+//        $this->submissionBox = $submissionBox;
+//        return $this;
+//    }
 
 
     /**
