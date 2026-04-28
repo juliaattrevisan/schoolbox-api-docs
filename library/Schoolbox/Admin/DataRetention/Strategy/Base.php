@@ -51,6 +51,7 @@ abstract class Base implements IStrategy
      * @param LockInterface        $lock       // lock to prevent multiple instances of this running at once, should be refreshed by long running processes
      * @param IConfigLoader        $config     // config loader gives the strategy ability to access its own config
      * @param int                  $endTime    // at what time should we just stop processing, to prevent the tool from running for too long, should be a unix timestamp, e.g. time() + 60*60 for 1 hour from now
+     * @param RetentionPeriod|null $retentionPeriod // the retention period helper, which may contain an override date for us to use
      * @param int                  $chunkLoops // how many times to loop through the data in chunks, default 3, set to 1 to only loop once, set to 0 for infinite looping until no more data is found
      * @param int                  $chunkSize  // how many records to process at once, default 1000
      */
@@ -61,7 +62,7 @@ abstract class Base implements IStrategy
         protected LockInterface $lock,
         protected IConfigLoader $config,
         protected int $endTime,
-        protected RetentionPeriod $retentionPeriod,
+        protected ?RetentionPeriod $retentionPeriod,
         protected int $chunkLoops = self::DEFAULT_CHUNK_LOOPS,
         protected int $chunkSize = self::DEFAULT_CHUNK_SIZE,
     ) {
@@ -192,6 +193,9 @@ abstract class Base implements IStrategy
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function setRetentionPeriod(?RetentionPeriod $retentionPeriod): self
     {
         $this->retentionPeriod = $retentionPeriod;
