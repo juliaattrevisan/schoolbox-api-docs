@@ -62,4 +62,18 @@ body.sbx-body {
             width: 100%;
         }
     }
+
+    .editPanel {
+        // add some space between each component field
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-m);
+            // and prevent margin doubling up on the gap
+            input,
+            select {
+                margin: 0;
+            }
+        }
+    }
 }
