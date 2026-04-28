@@ -134,27 +134,31 @@ class Mapper extends BaseMapper
      * This does not include deleted assessments.
      *
      * @param  int $indicatorId
-     * @return array[] id: the assessment's ID, title: the assessment's title, 'submission_box_id': the box's id
+     * @return array[] id: the assessment's ID, title: the assessment's title
      */
-    public function findIndicatorUsage($indicatorId): array
+    public function findIndicatorUsage(int $indicatorId): array
     {
         $query = "
             SELECT DISTINCT
                 a.id,
-                a.title,
-                submission_box_id
-            FROM {$this->getTable()} ru
-            INNER JOIN {$this->getJoinSql('submission_box', 'ru', 'sb')}
-            INNER JOIN {$this->getJoinSql('submission_box.assessmentModel', 'sb', 'a')}
-            WHERE ru.rubric_indicator_id = ?
-            AND sb.use_rubric IS TRUE
+                a.title
+            FROM {$this->getTable()} riu
+            INNER JOIN {$this->getJoinSql('rubricInstance', 'riu', 'ri')}
+            INNER JOIN {$this->getJoinSql('rubricInstance.assessmentModel', 'ri', 'a')}
+            WHERE riu.rubric_indicator_id = :indicatorId
         ";
+
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute([$indicatorId]);
+        $statement->execute([
+            'indicatorId' => $indicatorId
+        ]);
+
         $result = [];
+
         foreach ($statement as $row) {
             $result[$row['id']] = $row;
         }
+
         return $result;
     }
 
