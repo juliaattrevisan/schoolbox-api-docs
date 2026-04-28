@@ -21,6 +21,15 @@ class Import implements IStrategy
 {
     private const string RESULTS_PATH = 'results.ashx';
 
+    private const string EXTERNAL_ID_PREFIX = 'socs:';
+
+    /**
+     * SOCS - Standard Fixture Feed
+     * the api system defaults to, and this ensures we fetch data for the previous 30 days and next 100 days.
+     */
+    private const int FROM = -30;
+    private const int TO = 100;
+
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
@@ -36,9 +45,8 @@ class Import implements IStrategy
      */
     public function import(): void
     {
-        $now = \Alaress_Date_Format::now();
-        $startDate = (clone $now)->addDays(-30)->getUsingFormat('j M Y');
-        $endDate = (clone $now)->addDays(100)->getUsingFormat('j M Y');
+        $startDate = \Alaress_Date_Format::now()->addDays(self::FROM)->getUsingFormat('j M Y');
+        $endDate = \Alaress_Date_Format::now()->addDays(self::TO)->getUsingFormat('j M Y');
 
         $this->log->info(sprintf('Downloading SOCS results from %s to %s', $startDate, $endDate));
 
@@ -95,7 +103,7 @@ class Import implements IStrategy
                 continue;
             }
 
-            $externalId = 'socs:' . $eventId;
+            $externalId = self::EXTERNAL_ID_PREFIX . $eventId;
 
             try {
                 /** @var MatchupModel $matchup */

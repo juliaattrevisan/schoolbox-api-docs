@@ -28,6 +28,8 @@ trait RecallSupport
      */
     protected bool $perform = false;
 
+    private const int END_THRESHOLD = 2;
+
     /**
      * Find or create the shared "SOCS Fixtures" season spanning the current year and next.
      */
@@ -36,7 +38,7 @@ trait RecallSupport
         $seasonName = 'SOCS Fixtures';
 
         $start = \Alaress_Date_Format::now()->startOfYear()->startOfDay();
-        $end = \Alaress_Date_Format::now()->startOfYear()->startOfDay()->addYears(2);
+        $end = \Alaress_Date_Format::now()->startOfYear()->startOfDay()->addYears(self::END_THRESHOLD);
 
         $needsSave = false;
 

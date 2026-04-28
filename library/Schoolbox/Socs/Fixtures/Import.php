@@ -31,6 +31,15 @@ class Import implements IStrategy
 
     private const string FIXTURES_PATH = 'fixturecalendar.ashx';
 
+    private const string EXTERNAL_ID_PREFIX = 'socs:';
+
+    /**
+     * SOCS - Standard Fixture Feed
+     * the api system defaults to, and this ensures we fetch data for the previous 30 days and next 100 days.
+     */
+    private const int FROM = -30;
+    private const int TO = 100;
+
     /** @var array<string,int> */
     private array $userExternalIdLookup = [];
 
@@ -62,9 +71,8 @@ class Import implements IStrategy
     {
         $season = $this->recallSeason($this->seasonMapper, $this->log);
 
-        $now = \Alaress_Date_Format::now();
-        $startDate = (clone $now)->addDays(-30)->getUsingFormat('j M Y');
-        $endDate = (clone $now)->addDays(100)->getUsingFormat('j M Y');
+        $startDate = \Alaress_Date_Format::now()->addDays(self::FROM)->getUsingFormat('j M Y');
+        $endDate = \Alaress_Date_Format::now()->addDays(self::TO)->getUsingFormat('j M Y');
 
         $this->log->info(sprintf('Downloading SOCS fixtures from %s to %s', $startDate, $endDate));
 
@@ -73,9 +81,15 @@ class Import implements IStrategy
             'enddate'   => $endDate,
         ];
 
-        // if we are importing humans, we only get 7 days of data, so it needs to be intentional
+        // if we are importing humans, SOCS only gives us 7 days of data
         if ($this->importHumans) {
-            $this->log->info('SOCS fixtures is importing humans attached to fixtures; limiting to 7 days');
+            $this->log->info('SOCS fixtures is importing humans attached to fixtures; only fetching 7 days');
+            /**
+             * From the SOCS docs:
+             * * The standard fixture calendar can also include published team sheets by adding the “TS=1” querystring to the feed URL as follows:
+             * * Note: if team sheets are included the feed will only show fixtures for the previous and next 7 days regardless of any date ranges defined.
+             * * [feedurl]&TS=1
+             */
             $query['TS'] = 1;
         }
 
@@ -157,7 +171,7 @@ class Import implements IStrategy
                 continue;
             }
 
-            $externalId = 'socs:' . $eventId;
+            $externalId = self::EXTERNAL_ID_PREFIX . $eventId;
 
             try {
                 /** @var MatchupModel $matchup */
