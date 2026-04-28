@@ -559,7 +559,7 @@ class DataSource
             $levelModel = $levelMapper->createModel()
                 ->setId($level->getId())
                 ->setName($level->getName())
-                ->setSubmissionBox($submissionBox)
+                ->setRubricInstance($rubricInstance)
                 ->setSequence($levelSequence++);
             $levelModels->add($levelModel);
 
@@ -1477,7 +1477,7 @@ class DataSource
         foreach ($srcLevels as $srcLevel) {
             $dstLevel = clone $srcLevel;
             $dstLevel->setId(null);
-            $dstLevel->setSubmissionBox($dstBox);
+            $dstLevel->setRubricInstance($destinationRubricInstance);
             $dstLevel->setDescriptors($descriptorMapper->createCollection());
             $dstLevels->setOffset($srcLevel->getId(), $dstLevel);
         }

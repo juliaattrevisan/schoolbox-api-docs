@@ -11,9 +11,9 @@ namespace Schoolbox\Assessment\Rubric\DataModel\Level;
 
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Class LevelMapper
@@ -42,7 +42,16 @@ class Mapper extends BaseMapper
         $this->uses('name', self::TYPE_STRING);
         $this->uses('sequence', self::TYPE_INTEGER);
 
-        $this->joins('box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'box');
+        $this->joins(
+            'rubric_instance_id',
+            \Schoolbox\Assessment\Rubric\Instance\Mapper::class,
+            'id',
+            null,
+            null,
+            'rubricInstance',
+            'rubricInstance'
+        );
+
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateBoxIdNotChanged']);
@@ -68,8 +77,9 @@ class Mapper extends BaseMapper
     protected function getSelectString()
     {
         return "
-            SELECT {$this->getColumnString()},
-                   {$this->getJoinColumnString('box', 'b')}
+            SELECT 
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('rubricInstance', 'ri')},
         ";
     }
 
@@ -81,7 +91,7 @@ class Mapper extends BaseMapper
     {
         return "
             FROM {$this->getTable()}
-            INNER JOIN {$this->getJoinSql('box', null, 'b', true)}
+            INNER JOIN {$this->getJoinSql('rubricInstance', '', 'ri', true)}
         ";
     }
 
@@ -89,21 +99,24 @@ class Mapper extends BaseMapper
     /**
      * @param PDOStatement $statement
      * @return Collection
+     * @throws Exception
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $c = $this->createCollection();
+        $collection = $this->createCollection();
 
-        while ($r = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $model = $this->hydrate($r);
-            /** @var SubmissionBox $box */
-            $box = $this->hydrateJoin($r, 'box', 'b');
-            $model->setSubmissionBox($box);
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $model = $this->hydrate($row);
 
-            $c->add($model);
+            /** @var \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance */
+            $rubricInstance = $this->hydrateJoin($row, 'rubricInstance', 'ri');
+
+            $model->setRubricInstance($rubricInstance);
+
+            $collection->add($model);
         }
 
-        return $c;
+        return $collection;
     }
 
 

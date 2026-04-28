@@ -106,6 +106,7 @@ class Mapper extends BaseMapper
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
         $collection = $this->createCollection();
+
         foreach ($statement as $row) {
             $usage = $this->hydrate($row);
 

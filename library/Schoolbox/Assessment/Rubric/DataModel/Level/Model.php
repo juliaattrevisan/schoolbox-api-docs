@@ -21,8 +21,12 @@ class Model implements ISoftDeletable
     use Id;
     use DeletedAtDate;
 
-    /** @var SubmissionBox */
-    private $submissionBox;
+
+    /**
+     * @var null|\Schoolbox\Assessment\Rubric\Instance\Model
+     */
+    private ?\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance;
+
 
     /** @var string */
     private $name;
@@ -38,6 +42,26 @@ class Model implements ISoftDeletable
      * @var DescriptorModel[]|GenericCollection
      */
     private $descriptors;
+
+
+    /**
+     * @return null|\Schoolbox\Assessment\Rubric\Instance\Model
+     */
+    public function getRubricInstance(): ?\Schoolbox\Assessment\Rubric\Instance\Model
+    {
+        return $this->rubricInstance;
+    }
+
+
+    /**
+     * @param null|\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance
+     * @return $this
+     */
+    public function setRubricInstance(?\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance): self
+    {
+        $this->rubricInstance = $rubricInstance;
+        return $this;
+    }
 
 
     /**

@@ -80,25 +80,6 @@ class Model
 
 
     /**
-     * @param  SubmissionBox $submission_box
-     * @return $this
-     */
-    public function setSubmissionBox(SubmissionBox $submission_box)
-    {
-        $this->submission_box = $submission_box;
-        return $this;
-    }
-
-    /**
-     * @return SubmissionBox
-     */
-    public function getSubmissionBox()
-    {
-        return $this->submission_box;
-    }
-
-
-    /**
      * @return float|null
      */
     public function getMaxValue(): ?float
