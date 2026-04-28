@@ -385,11 +385,17 @@ class DataSource
             return $grid;
         }
 
+        /* TODO dependency inject
+         * Rubric instance ids used by $assessment
+         */
+        $rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
+        $rubricInstanceIds = $rubricInstanceMapper->findByColumn('assessment_id', $assessment->getId())->indexBy('id')->keys();
+
         // Load the levels, selected capabilities+indicators, descriptors for
         // the assessment
         $capabilityUsageModels = CapabilityUsageMapper::getInstance()->findByColumn(
-            'sb.assessment_id',
-            $assessment->getId(),
+            'rubric_instance_id',
+            $rubricInstanceIds,
             ['order' => ['sequence' => 'asc',]]
         )->indexByCallback(function (CapabilityUsageModel $gu) {
             return $gu->getCapability()->getId();
@@ -531,7 +537,20 @@ class DataSource
         $descriptorMapper = DescriptorMapper::getInstance();
         $indicatorMapper  = IndicatorMapper::getInstance();
         $capabilityMapper = CapabilityMapper::getInstance();
+        $rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
 
+        /* Find the rubric instance for the $submissionBox
+         */
+        try {
+            $rubricInstance = $rubricInstanceMapper->findOneByColumn('assessment_id', $submissionBox->getAssessmentModel()->getId());
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            /* Couldn't find one, or it's been deleted? Spawn a new one
+             */
+            $rubricInstance = $rubricInstanceMapper->createModel()
+                ->setAssessmentModel($submissionBox->getAssessmentModel());
+
+            $rubricInstanceMapper->save($rubricInstance);
+        }
 
         // First, persist the levels
         $levelModels   = $levelMapper->createCollection();
@@ -611,7 +630,7 @@ class DataSource
             $capabilityMaxValue = $capabilityUsage->getMaxValue();
 
             $capabilityUsageModel = $capabilityUsageMapper->createModel()
-                ->setSubmissionBox($submissionBox)
+                ->setRubricInstance($rubricInstance)
                 ->setCapability($capabilityModels[$capabilityUsage->getCapability()->getId()])
                 ->setMaxValue($capabilityMaxValue)
                 ->setSequence($capabilitySequence++);
@@ -1425,6 +1444,17 @@ class DataSource
 
         $dstFolder = $dstBox->getAssessmentModel()->getContextFolder();
 
+        /* TODO dependency inject
+         */
+        $rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
+
+        /* Set up a stub rubric instance for the destination submission box
+         */
+        $destinationRubricInstance = $rubricInstanceMapper->createModel()
+            ->setAssessmentModel($dstBox->getAssessmentModel());
+
+        $rubricInstanceMapper->save($destinationRubricInstance);
+
         // Cannot mutate identity of objects returned from mappers.
         // Index all these collections by source version ID, even though the object will be destination version.
         /** @var LevelModel[]|GenericCollection $dstLevels */
@@ -1595,7 +1625,7 @@ class DataSource
             $dstCapability = $dstCapabilities->getOffset($srcCapabilityUsage->getCapability()->getId());
 
             $dstCapabilityUsage->setCapability($dstCapability);
-            $dstCapabilityUsage->setSubmissionBox($dstBox);
+            $dstCapabilityUsage->setRubricInstance($destinationRubricInstance);
             $dstCapabilityUsages->add($dstCapabilityUsage);
         }
 

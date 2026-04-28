@@ -84,27 +84,6 @@ class Model
     }
 
 
-// TODO remove
-//    /**
-//     * @return SubmissionBox
-//     */
-//    public function getSubmissionBox(): SubmissionBox
-//    {
-//        return $this->submissionBox;
-//    }
-//
-// TODO remove
-//    /**
-//     * @param SubmissionBox $submissionBox
-//     * @return static
-//     */
-//    public function setSubmissionBox(SubmissionBox $submissionBox): self
-//    {
-//        $this->submissionBox = $submissionBox;
-//        return $this;
-//    }
-
-
     /**
      * @return float|null
      */
