@@ -401,15 +401,15 @@ class DataSource
             return $gu->getCapability()->getId();
         });
         $indicatorUsageModels = IndicatorUsageMapper::getInstance()->findByColumn(
-            'sb.assessment_id',
-            $assessment->getId(),
+            'rubric_instance_id',
+            $rubricInstanceIds,
             ['order' => ['sequence' => 'asc',]]
         )->indexByCallback(function (IndicatorUsageModel $cu) {
             return $cu->getIndicator()->getId();
         });
         $levelModels = LevelMapper::getInstance()->findByColumn(
-            'b.assessment_id',
-            $assessment->getId(),
+            'rubric_instance_id',
+            $rubricInstanceIds,
             ['order' => ['sequence' => 'asc',]]
         )->indexByCallback(function (LevelModel $l) {
             return $l->getId();

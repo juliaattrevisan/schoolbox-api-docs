@@ -2038,7 +2038,7 @@ class Controller extends Assessment\Controller
         $data['rubricResultSets'] = array_values($rs);
 
         // Do any students have marks for this rubric?
-        $levelIds      = RubricLevelMapper::getInstance()->findIdsByColumn('b.assessment_id', $dueWork->getId());
+        $levelIds      = RubricLevelMapper::getInstance()->findIdsByColumn('ri.assessment_id', $dueWork->getId());
         $descriptorIds = RubricDescriptorMapper::getInstance()->findIdsByColumn('level_id', $levelIds);
         $countMarkIds  = RubricIndicatorMarkMapper::getInstance()->countByColumnList(
             [

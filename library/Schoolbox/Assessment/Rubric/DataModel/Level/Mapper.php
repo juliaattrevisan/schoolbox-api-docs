@@ -10,7 +10,6 @@
 namespace Schoolbox\Assessment\Rubric\DataModel\Level;
 
 use PDOStatement;
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
@@ -79,7 +78,7 @@ class Mapper extends BaseMapper
         return "
             SELECT 
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('rubricInstance', 'ri')},
+                {$this->getJoinColumnString('rubricInstance', 'ri')}
         ";
     }
 
