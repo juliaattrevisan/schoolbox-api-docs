@@ -12,12 +12,12 @@ SET
     field_id = @config_select_field_id,
     `value` = CASE
         WHEN `value` IN (
-            'none',
+            'var(--sbx-shadow-none)',
             'var(--sbx-shadow-s)',
             'var(--sbx-shadow-m)',
             'var(--sbx-shadow-l)'
         ) THEN `value`
-        ELSE 'none'
+        ELSE 'var(--sbx-shadow-none)'
     END,
     options = JSON_MERGE_PATCH(
         CASE
@@ -31,7 +31,12 @@ SET
             '--sbx-config-box-drop-shadow',
             'select',
             JSON_ARRAY(
-                JSON_OBJECT('name', 'None', 'value', 'none'),
+                JSON_OBJECT(
+                    'name',
+                    'None',
+                    'value',
+                    'var(--sbx-shadow-none)'
+                ),
                 JSON_OBJECT(
                     'name',
                     'Small',

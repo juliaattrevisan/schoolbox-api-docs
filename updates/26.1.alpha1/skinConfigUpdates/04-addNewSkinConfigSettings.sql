@@ -437,7 +437,7 @@ VALUES (
     ),
     (
         'skin_box_drop_shadow',
-        'none',
+        'var(--sbx-shadow-none)',
         'Box Drop Shadow',
         'Add a drop shadow to primary container elements.',
         @config_select_field_id,
@@ -447,7 +447,7 @@ VALUES (
         'false',
         'settings',
         @settings_sequence_start + 14,
-        '{"customProperty":"--sbx-config-box-drop-shadow","select":[{"name":"None","value":"none"},{"name":"Small","value":"var(--sbx-shadow-s)"},{"name":"Medium","value":"var(--sbx-shadow-m)"},{"name":"Large","value":"var(--sbx-shadow-l)"}]}'
+        '{"customProperty":"--sbx-config-box-drop-shadow","select":[{"name":"None","value":"var(--sbx-shadow-none)"},{"name":"Small","value":"var(--sbx-shadow-s)"},{"name":"Medium","value":"var(--sbx-shadow-m)"},{"name":"Large","value":"var(--sbx-shadow-l)"}]}'
     ),
     (
         'skin_sonar_custom_css',
