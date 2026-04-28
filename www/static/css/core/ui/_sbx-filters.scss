@@ -71,7 +71,8 @@ body.sbx-body {
             gap: var(--spacing-m);
             // and prevent margin doubling up on the gap
             input,
-            select {
+            select,
+            .source {
                 margin: 0;
             }
         }
