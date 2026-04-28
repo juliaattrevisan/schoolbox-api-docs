@@ -477,7 +477,7 @@ class Controller extends ConfigController
      */
     public function deleteRegistrationSession(RegistrationSessionModel $registrationSession): void
     {
-        //TODO: might need to add conditions to prevent deletion of a session if it's already been completed (ie registered with IB)
+        //TODO: might need to add conditions to prevent deletion of a session if it's already been completed (ie registered with IB SA-21597/SA-21596)
         try {
             $registrationSession->setDeletedBy($this->getUser());
 
