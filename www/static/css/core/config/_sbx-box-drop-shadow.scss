@@ -5,7 +5,7 @@
  */
 
 :root {
-    --sbx-config-box-drop-shadow: none;
+    --sbx-config-box-drop-shadow: var(--sbx-shadow-none);
 }
 
 body.sbx-body {

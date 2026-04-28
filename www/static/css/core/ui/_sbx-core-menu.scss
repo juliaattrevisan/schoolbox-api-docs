@@ -357,7 +357,7 @@ body.sbx-body {
     }
 
     .side-nav {
-        border-radius: var(--sbx-border-radius-normal);
+        border-radius: var(--sbx-border-radius-m);
         overflow: hidden;
 
         & li {
@@ -386,7 +386,7 @@ body.sbx-body {
 
     // Account content styles
     #account-content {
-        border-radius: var(--sbx-border-radius-normal);
+        border-radius: var(--sbx-border-radius-m);
 
         & .separator {
             background-color: #eee !important;
@@ -410,7 +410,7 @@ body.sbx-body {
             padding-inline: 0.8rem;
 
             & img {
-                border-radius: var(--sbx-border-radius-normal);
+                border-radius: var(--sbx-border-radius-m);
             }
 
             & p {

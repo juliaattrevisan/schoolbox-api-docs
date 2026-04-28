@@ -3,6 +3,7 @@
 * All shadows used throughout Schoolbox are to be defined here.
 */
 :root {
+    --sbx-shadow-none: none;
     --sbx-shadow-s:
         0.2px 0.3px 0.4px rgba(0, 0, 0, 0.1), 0.5px 1px 1.2px -0.8px rgba(0, 0, 0, 0.1),
         1.3px 2.6px 3.2px -1.7px rgba(0, 0, 0, 0.1);
