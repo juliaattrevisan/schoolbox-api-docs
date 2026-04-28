@@ -87,7 +87,7 @@ class ImporterTool extends CliTool\App
         $token = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_TOKEN);
         $schoolId = (string)$this->getConfig()->get(ConfigMapper::NAME_SOCS_ENDPOINT_ID);
 
-        $runId = (new SocsLogGuid())->generate();
+        $runId = Uuid::uuid4()->toString();
         $importLogMapper = SocsLogMapper::getInstance();
         $importLog = null;
 
