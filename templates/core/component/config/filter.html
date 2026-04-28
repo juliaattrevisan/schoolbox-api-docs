@@ -16,18 +16,18 @@
 
 <script>
     (() => {
+        /**
+         * Prevent the wrapping parent label from toggling the checkboxes when clicking on empty space within the filter container.
+         */
         const filterContainer = document.getElementById("component{COMPONENT_INSTANCE_ID}-filter-options");
         const wrappingLabel = filterContainer ? filterContainer.closest("label:not([for])") : null;
-
         if (!wrappingLabel) {
             return;
         }
-
         wrappingLabel.addEventListener("click", (event) => {
             const target = event
                 .composedPath()
                 .find((eventTarget) => eventTarget instanceof Element);
-
             if (
                 target &&
                 filterContainer.contains(target) &&
@@ -35,7 +35,6 @@
             ) {
                 return;
             }
-
             event.preventDefault();
         });
     })();
