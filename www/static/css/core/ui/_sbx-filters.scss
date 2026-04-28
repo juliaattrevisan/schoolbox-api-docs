@@ -72,6 +72,9 @@ body.sbx-body {
             // and prevent margin doubling up on the gap
             input,
             select,
+            textarea,
+            a,
+            button,
             .source {
                 margin: 0;
             }

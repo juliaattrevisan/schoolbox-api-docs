@@ -24,13 +24,15 @@
         }
 
         wrappingLabel.addEventListener("click", (event) => {
-            const target = event.target;
+            const target = event
+                .composedPath()
+                .find((eventTarget) => eventTarget instanceof Element);
 
-            if (!(target instanceof Element)) {
-                return;
-            }
-
-            if (filterContainer.contains(target) && target.closest('input[type="checkbox"], label[for]')) {
+            if (
+                target &&
+                filterContainer.contains(target) &&
+                target.closest('input[type="checkbox"], label[for]')
+            ) {
                 return;
             }
 
