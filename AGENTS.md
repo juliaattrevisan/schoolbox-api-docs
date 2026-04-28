@@ -125,6 +125,11 @@ In order to ensure backend code quality, these commands should be run with the l
 ./vendor/bin/phpunit                   # verify all unit tests still pass, not just those changed
 ```
 
+For read-only local database queries, use:
+```bash
+mariadb -h 127.0.0.1 -u schoolboxdocker -pabc123 schoolbox -e "SELECT ..."
+```
+
 ---
 
 ## Testing
