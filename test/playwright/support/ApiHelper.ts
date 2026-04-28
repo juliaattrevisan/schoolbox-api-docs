@@ -138,7 +138,9 @@ export default class ApiHelper {
             nameList.map((name) => ({ "name LIKE": name, deleted_at: null })),
         )) as number[];
 
-        await Promise.all(folderIds.map((folderId) => this.deleteFolder(folderId)));
+        for (const folderId of folderIds) {
+            await this.deleteFolder(folderId);
+        }
 
         return folderIds;
     }

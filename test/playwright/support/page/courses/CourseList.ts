@@ -123,10 +123,10 @@ export default class CourseList {
 
     /**
      * Clicks a course down arrow
-     * @param courseId - The course ID to click
+     * @param courseName - The course name to click
      */
-    async clickCourseDownArrow(courseId: number): Promise<void> {
-        await this.page.click(`a.icon-down-arrow[data-collapser=course-${courseId}]`);
+    async clickCourseDownArrow(courseName: string): Promise<void> {
+        await this.page.getByTestId(`course-list-arrow-${courseName}`).click();
     }
 
     /**
@@ -139,11 +139,12 @@ export default class CourseList {
 
     /**
      * expands the course, count how many units are presented and check if the proper number of units is presented
+     * @param courseName - The course name to expand
      * @param courseId - The course ID to expand
      * @param expectedUnitCount - The expected number of units to be presented
      */
-    async verifyCourseUnitsCount(courseId: number, expectedUnitCount: number): Promise<void> {
-        await this.clickCourseDownArrow(courseId);
+    async verifyCourseUnitsCount(courseName: string, courseId: number, expectedUnitCount: number): Promise<void> {
+        await this.clickCourseDownArrow(courseName);
         const unitList = this.page.locator(`div[data-collapsable="course-${courseId}"]`);
         const units = unitList.locator("ul.unit-list > li").count();
         await expect(units).resolves.toBe(expectedUnitCount);

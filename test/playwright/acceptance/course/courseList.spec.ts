@@ -61,7 +61,7 @@ test.describe("Course list tests", () => {
         );
 
         tester.isGoingTo("expand the course to check the units are presented");
-        await courseList.verifyCourseUnitsCount(courseId, 3);
+        await courseList.verifyCourseUnitsCount(courseName, courseId, 3);
 
         tester.isGoingTo("impersonate a teacher and check the course 3-dot menu options");
         await tester.impersonateTeacher();
