@@ -1,0 +1,4 @@
+interface:
+  display_name: "Schoolbox Docker"
+  short_description: "Manage the Schoolbox Docker dev env."
+  default_prompt: "Use $schoolbox-docker to manage the Schoolbox Docker development environment."
