@@ -17,6 +17,7 @@ use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 use Schoolbox\Fixtures\Team\Model as TeamModel;
 use Schoolbox\Fixtures\Venue\Mapper as VenueMapper;
 use Schoolbox\Fixtures\Venue\Model as VenueModel;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Shared helper methods for recalling or creating SOCS-related fixtures entities.
@@ -32,6 +33,11 @@ trait RecallSupport
 
     /**
      * Find or create the shared "SOCS Fixtures" season spanning the current year and next.
+     *
+     * @param SeasonMapper    $seasonMapper
+     * @param LoggerInterface $logger
+     * @return SeasonModel
+     * @throws Exception
      */
     protected function recallSeason(SeasonMapper $seasonMapper, LoggerInterface $logger): SeasonModel
     {
@@ -87,6 +93,12 @@ trait RecallSupport
 
     /**
      * Find or create a SOCS sport by name.
+     *
+     * @param SportMapper     $sportMapper
+     * @param LoggerInterface $logger
+     * @param string          $sportName
+     * @return SportModel
+     * @throws Exception
      */
     protected function recallSport(SportMapper $sportMapper, LoggerInterface $logger, string $sportName): SportModel
     {
@@ -119,6 +131,14 @@ trait RecallSupport
 
     /**
      * Find or create a SOCS division for the given sport, season and name.
+     *
+     * @param DivisionMapper  $divisionMapper
+     * @param LoggerInterface $logger
+     * @param string          $divisionName
+     * @param SportModel      $sport
+     * @param SeasonModel     $season
+     * @return DivisionModel
+     * @throws Exception
      */
     protected function recallDivision(
         DivisionMapper $divisionMapper,
@@ -162,6 +182,13 @@ trait RecallSupport
 
     /**
      * Find or create a SOCS team within the given division.
+     *
+     * @param TeamMapper      $teamMapper
+     * @param LoggerInterface $logger
+     * @param string          $teamName
+     * @param DivisionModel   $division
+     * @return TeamModel
+     * @throws Exception
      */
     protected function recallTeam(TeamMapper $teamMapper, LoggerInterface $logger, string $teamName, DivisionModel $division): TeamModel
     {
@@ -198,6 +225,12 @@ trait RecallSupport
 
     /**
      * Find or create a SOCS venue by name.
+     *
+     * @param VenueMapper     $venueMapper
+     * @param LoggerInterface $logger
+     * @param string          $venueName
+     * @return VenueModel
+     * @throws Exception
      */
     protected function recallVenue(VenueMapper $venueMapper, LoggerInterface $logger, string $venueName): VenueModel
     {
@@ -230,6 +263,12 @@ trait RecallSupport
 
     /**
      * Find or create a SOCS opposition school by name.
+     *
+     * @param SchoolMapper    $schoolMapper
+     * @param LoggerInterface $logger
+     * @param string          $schoolName
+     * @return SchoolModel
+     * @throws Exception
      */
     protected function recallSchool(SchoolMapper $schoolMapper, LoggerInterface $logger, string $schoolName): SchoolModel
     {
@@ -262,6 +301,11 @@ trait RecallSupport
 
     /**
      * Parse a SOCS date and time string into an Alaress_Date_Format instance.
+     *
+     * @param string          $date
+     * @param string          $time
+     * @param LoggerInterface $logger
+     * @return \Alaress_Date_Format|null
      */
     protected function makeDateTime(string $date, string $time, LoggerInterface $logger): ?\Alaress_Date_Format
     {

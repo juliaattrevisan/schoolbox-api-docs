@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Socs\Log;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
 
 /**
  * @method Model createModel($idValue = null)
@@ -38,6 +39,11 @@ class Mapper extends \Schoolbox\Mapper
 
     /**
      * Create and persist a new log entry at the start of a run.
+     *
+     * @param string $runId
+     * @param string $scriptName
+     * @return Model
+     * @throws Exception
      */
     public function start(string $runId, string $scriptName): Model
     {
@@ -54,6 +60,10 @@ class Mapper extends \Schoolbox\Mapper
 
     /**
      * Mark a run as successfully completed.
+     *
+     * @param Model $importLog
+     * @return Model
+     * @throws Exception
      */
     public function finish(Model $importLog): Model
     {
@@ -68,6 +78,11 @@ class Mapper extends \Schoolbox\Mapper
 
     /**
      * Mark a run as errored with an error message for diagnostics.
+     *
+     * @param Model  $importLog
+     * @param string $errorMessage
+     * @return Model
+     * @throws Exception
      */
     public function error(Model $importLog, string $errorMessage): Model
     {
