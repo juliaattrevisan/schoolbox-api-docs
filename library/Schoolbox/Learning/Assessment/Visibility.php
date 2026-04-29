@@ -141,7 +141,7 @@ class Visibility
         $closeDate = $participant->getCloseDate();
 
         if ($learnerParticipant->getId() !== $participant->getUser()->getId()) {
-            throw new \UnexpectedValueException('');
+            throw new \UnexpectedValueException('Mismatched user-participant combination.');
         }
 
         // Apply special lesson plan visibility logic.
