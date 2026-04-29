@@ -39,7 +39,7 @@ class Controller extends Base
      * Number of feed items to display before prompting user
      * with Load More button
      */
-    private const FEED_ITEMS_PER_PAGE = 10;
+    private const FEED_ITEMS_PER_PAGE = 2;
 
 
     /**
@@ -132,20 +132,20 @@ class Controller extends Base
             ))->build()
         );
 
-        $data = $cursor->retrieveResults($encodedCursor);
+        $page = (new Paginator($cursor, $hydrator, self::FEED_ITEMS_PER_PAGE))->retrievePage($encodedCursor);
 
-        $mappedData = $hydrator->hydrateResults($data)
-                               ->map($translator)
-                               ->reindex();
+        $mappedData = $page->getData()
+                           ->map($translator)
+                           ->reindex();
 
         $this->response = $this->responseAsJson(
             [
                 'data'     => $mappedData,
                 'metadata' => [
-                    'count'  => $cursor->retrieveResultCount(),
+                    'count'  => $page->getCount(),
                     'cursor' => [
-                        'current' => $encodedCursor ?? $cursor->current($data),
-                        'next'    => $cursor->next($data),
+                        'current' => $page->getCurrentCursor(),
+                        'next'    => $page->getNextCursor(),
                     ],
                 ],
             ]
