@@ -782,6 +782,15 @@ class ListController extends Web\Controller\Base
              */
             throw $e;
         } catch (\Exception $e) {
+            /* TODO Technical Uplift Candidate
+             *  This \Exception catch also catches db errors, such as this (message, code) outcome described below.
+             *  It breaks the DomainException interface that expects a http status code
+             *    message: SQLSTATE[HY000]: General error: 1364 Field '_box_id' doesn't have a default value
+             *    code:    HY000
+             *
+             *  TODO (continued) This causes a type mismatch error:
+             *   Exception::__construct(): Argument #2 ($code) must be of type int, string given
+             */
             $db->rollback();
             // cast
             throw new DomainException($e->getMessage(), $e->getCode(), $e);
