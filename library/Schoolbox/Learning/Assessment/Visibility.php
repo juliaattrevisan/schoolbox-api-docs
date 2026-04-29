@@ -35,9 +35,9 @@ class Visibility
      *
      * The below rules summarise the authoritative descriptions in WorkType\Mapper.
      *  - Instructor          - can see anytime (*)
-     *  - Learner participant - can only see if after publish date, and not excluded by work type (*)
+     *  - Learner-participant - can only see if after publish date, and not excluded by work type (*)
      *  - Everyone else       - if staff, can see anytime (*)
-     *                          if parent of learner participant, can see if child learner can see
+     *                          if parent of learner-participant, can see if child learner can see
      *                          otherwise can only see if a participant, and after publish date,
      *                          and not excluded by work type (*)
      *
@@ -72,7 +72,7 @@ class Visibility
             return $this->isVisibleToInstructor($assessment, $viewer, $showClosed, $now);
         }
 
-        // Handle case where user is a learner participant.
+        // Handle case where user is a learner-participant.
         try {
             $viewerIsLearner = $this->access->isLearner($viewer, $folder);
         } catch (MapperException | \LogicException) {
@@ -90,7 +90,7 @@ class Visibility
             );
         }
 
-        // Handle all other cases (including where user is parent of learner participant).
+        // Handle all other cases (including where user is parent of learner-participant).
         return $this->isVisibleToNonInstructorNonLearnerParticipant($assessment, $viewer, $showClosed, $now, $respectWorkTypeVisibility);
     }
 
@@ -119,7 +119,7 @@ class Visibility
     }
 
     /**
-     * Is the assessable visible to the learner participant? (Assumes the user is a learner participant)
+     * Is the assessable visible to the learner-participant? (Assumes the user is a learner-participant)
      *
      * @param IAssessable         $assessable
      * @param User                $learnerParticipant The viewer who is a learner and a participant in $assessable.
@@ -145,7 +145,11 @@ class Visibility
         }
 
         // Apply special lesson plan visibility logic.
-        if ($assessable instanceof LessonPlan\Model && Role::STUDENT !== $assessable->getVisibility()) {
+        if (
+            $assessable instanceof LessonPlan\Model &&
+            Role::STUDENT !== $assessable->getVisibility() &&
+            $learnerParticipant->getRole()->isStudent()
+        ) {
             return false;
         }
 
@@ -157,7 +161,7 @@ class Visibility
     }
 
     /**
-     * Is the assessable visible to a user who is not an instructor and not a learner participant?
+     * Is the assessable visible to a user who is not an instructor and not a learner-participant?
      *
      * @param IAssessable         $assessable
      * @param User                $nonInstructorNonLearnerParticipant
@@ -197,8 +201,13 @@ class Visibility
                 return false;
             }
 
-            // Apply special lesson plan visibility logic.
-            if ($assessable instanceof LessonPlan\Model && Role::STUDENT !== $assessable->getVisibility()) {
+            // Since the user who is not a learner-participant may still have
+            // role type 'student', apply special lesson plan visibility logic.
+            if (
+                $assessable instanceof LessonPlan\Model &&
+                Role::STUDENT !== $assessable->getVisibility() &&
+                $nonInstructorNonLearnerParticipant->getRole()->isStudent()
+            ) {
                 return false;
             }
 
@@ -207,7 +216,7 @@ class Visibility
             return $isPublished && ($showClosed || $now->lt($closeDate));
         }
 
-        /** Handle case where the user is a parent of one or more learner participants. */
+        /** Handle case where the user is a parent of one or more learner-participants. */
         try {
             $childLearners = $this->access->getChildLearnersOfParent(
                 $nonInstructorNonLearnerParticipant,
@@ -217,14 +226,18 @@ class Visibility
             $childLearners = new GenericCollection(User::class); // In case of exception, assume no child learner exists.
         }
         if ($childLearners->count() > 0 && $workType->isVisibleToParents()) {
-            // Apply special lesson plan visibility logic.
-            // (If lesson plan is hidden from students, it should be hidden from parents also).
-            if ($assessable instanceof LessonPlan\Model && Role::STUDENT !== $assessable->getVisibility()) {
-                return false;
-            }
-
             $childParticipants = new GenericCollection(Participant::class);
             foreach ($childLearners as $childLearner) {
+                // Apply special lesson plan visibility logic.
+                // (If lesson plan is hidden from students, it should be hidden from parents also).
+                if (
+                    $assessable instanceof LessonPlan\Model &&
+                    Role::STUDENT !== $assessable->getVisibility() &&
+                    $childLearner->getRole()->isStudent()
+                ) {
+                    continue; // Skip student due to special lesson plan visibility logic.
+                }
+
                 $childParticipant = $assessable->getParticipantIfExtant($childLearner);
                 if ($childParticipant === null) {
                     continue;
@@ -260,9 +273,9 @@ class Visibility
 
         // If execution reaches this point, the user is not:
         //  * an instructor
-        //  * a learner participant
+        //  * a learner-participant
         //  * a staff member
-        //  * a parent of a learner participant
+        //  * a parent of a learner-participant
         return false;
     }
 }
