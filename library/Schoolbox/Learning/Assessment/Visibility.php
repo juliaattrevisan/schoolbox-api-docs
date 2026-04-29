@@ -45,7 +45,7 @@ class Visibility
      *
      * @see WorkType\Mapper for glossary of terms used above.
      *
-     * @param IAssessable              $assessment Must have plans and participants loaded if viewer is a participant
+     * @param IAssessable              $assessable Must have plans and participants loaded if viewer is a participant
      * @param User                     $viewer
      * @param bool                     $showClosed Should we exclude assessments if their close date has passed?
      * @param Alaress_Date_Format|null $now
