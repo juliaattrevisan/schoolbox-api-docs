@@ -19,7 +19,7 @@ use Schoolbox\Mapper as BaseMapper;
  *
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model createModel($idValue = null)
- * @method GenericCollection<Model>| findByColumn($columnName, $columnValue, $options = [])
+ * @method GenericCollection<Model> findByColumn($columnName, $columnValue, $options = [])
  */
 class Mapper extends BaseMapper
 {
