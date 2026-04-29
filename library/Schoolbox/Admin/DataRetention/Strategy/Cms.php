@@ -86,6 +86,13 @@ class Cms extends Base
     protected function deleteChunk(array $chunk): void
     {
         $requestedFolderIds = $this->normalizeIds(array_column($chunk, 'id'));
+
+        // log the ID's we are wanting to delete, before we start checking how valid they are
+        $this->log->debug(sprintf(
+            "Processing Resources (CMS) chunk with folder IDs: %s",
+            implode(', ', $requestedFolderIds),
+        ));
+
         $folderIds = $this->expandFolderCascade($requestedFolderIds);
         $blockedFolderIds = $this->findBlockedFolderIds($folderIds);
 
