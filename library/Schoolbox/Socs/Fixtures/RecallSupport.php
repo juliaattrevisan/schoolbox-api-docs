@@ -37,8 +37,13 @@ trait RecallSupport
     {
         $seasonName = 'SOCS Fixtures';
 
-        $start = \Alaress_Date_Format::now()->startOfYear()->startOfDay();
-        $end = \Alaress_Date_Format::now()->startOfYear()->startOfDay()->addYears(self::END_THRESHOLD);
+        /**
+         * use getStartOfSchoolYear which uses the `start_of_school_year` from admin config, to assist in northern heamisphere schools who's school year may be july/june
+         * getStartOfSchoolYear clones the current date, so rather than `::now()` for each date
+         */
+        $now = \Alaress_Date_Format::now();
+        $start = $now->getStartOfSchoolYear()->startOfDay();
+        $end = $now->getStartOfSchoolYear()->startOfDay()->addYears(self::END_THRESHOLD);
 
         $needsSave = false;
 
