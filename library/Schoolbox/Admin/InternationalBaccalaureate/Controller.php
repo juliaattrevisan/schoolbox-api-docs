@@ -31,6 +31,8 @@ use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\IB\Group\Model as IBGroupModel;
 use Schoolbox\IB\Registrations\Sessions\Mapper as RegistrationSessionMapper;
 use Schoolbox\IB\Registrations\Sessions\Model as RegistrationSessionModel;
+use Schoolbox\IB\Registrations\Sessions\Student\Mapper as RegistrationSessionStudentMapper;
+use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Language\Model as LanguageModel;
 use Schoolbox\Mapper\Exception\NotFound as MapperNotFound;
@@ -724,5 +726,14 @@ class Controller extends ConfigController
                 'message' => $e->getMessage(),
             ])->withStatus(500);
         }
+    }
+
+    public function test(): void
+    {
+        $test = RegistrationSessionStudentMapper::getInstance()->findStudentsForSession(2);
+        $this->response = $this->responseAsJson([
+            'success' => true,
+            'message' => 'Test endpoint is working',
+        ]);
     }
 }
