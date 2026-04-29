@@ -101,7 +101,7 @@ Expected: PASS.
 
 ```bash
 git add library/Schoolbox/Admin/DataRetention/ValidStrats.php library/Schoolbox/Admin/DataRetention/Test/ValidStratsTest.php
-git commit -m "Register CMS data retention strategy [SA-21886]"
+git commit -m "Register CMS data retention strategy [SA-21886]" -m "Co-Authored-By: Codex <codex@openai.com>"
 ```
 
 ---
@@ -410,7 +410,7 @@ Expected: FAIL because `Schoolbox\Admin\DataRetention\Strategy\Cms` does not exi
 
 ```bash
 git add library/Schoolbox/Admin/DataRetention/Test/CmsStrategyTest.php
-git commit -m "Add CMS data retention strategy tests [SA-21886]"
+git commit -m "Add CMS data retention strategy tests [SA-21886]" -m "Co-Authored-By: Codex <codex@openai.com>"
 ```
 
 ---
@@ -833,7 +833,7 @@ Expected: PASS.
 
 ```bash
 git add library/Schoolbox/Admin/DataRetention/Strategy/Cms.php library/Schoolbox/Admin/DataRetention/Test/CmsStrategyTest.php
-git commit -m "Add CMS data retention strategy [SA-21886]"
+git commit -m "Add CMS data retention strategy [SA-21886]" -m "Co-Authored-By: Codex <codex@openai.com>"
 ```
 
 ---
@@ -896,7 +896,7 @@ Expected: PASS.
 
 ```bash
 git add library/Schoolbox/Admin/DataRetention/CommandLineTool.php
-git commit -m "Run CMS retention from data retention CLI [SA-21886]"
+git commit -m "Run CMS retention from data retention CLI [SA-21886]" -m "Co-Authored-By: Codex <codex@openai.com>"
 ```
 
 ---
