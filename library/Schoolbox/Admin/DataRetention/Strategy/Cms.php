@@ -402,6 +402,35 @@ class Cms extends Base
      */
     protected function deleteComponentConfigInstances(array $ids): int
     {
+        if (count($ids)) {
+            // log the component types we are deleting... for extra debug info
+            $query = $this->database->prepare(
+                "
+            select
+                component_instance.id,
+                component_definition.name,
+                component_definition.class
+            from component_definition
+                join component_instance on component_definition.id = component_instance.component_definition_id
+            where component_instance.id in " . Builder::getArrayPlaceholders($ids, 'id')
+            );
+
+            // log the component info
+            $query->execute(Builder::getArrayParameters($ids, 'id'));
+            while ($row = $query->fetch(\PDO::FETCH_ASSOC)) {
+                $this->log->debug(
+                    sprintf(
+                        "Deleting component instance '%s' with name '%s' and class '%s'",
+                        $row['id'],
+                        $row['name'],
+                        $row['class'],
+                    )
+                );
+            }
+        } else {
+            $this->log->debug("no components on folder");
+        }
+
         return $this->deleteByIds('component_config_instance', 'component_instance_id', $ids);
     }
 
