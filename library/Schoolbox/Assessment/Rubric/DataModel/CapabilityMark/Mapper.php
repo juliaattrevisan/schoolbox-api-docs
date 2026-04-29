@@ -9,7 +9,6 @@ namespace Schoolbox\Assessment\Rubric\DataModel\CapabilityMark;
 
 use PDO;
 use PDOStatement;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
@@ -34,15 +33,9 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('human_readable_value', self::TYPE_STRING);
         $this->uses('value', self::TYPE_DECIMAL);
-        $this->joins(
-            'return_id',
-            ReturnedWorkMapper::class,
-            'id',
-            self::TYPE_MODEL,
-            null,
-            'submissionReturn',
-            'submission_return'
-        );
+        $this->uses('feedback_id', self::TYPE_INTEGER);
+        $this->uses('feedback_table', self::TYPE_STRING);
+
         $this->joins(
             'rubric_capability_id',
             CapabilityMapper::class,
@@ -67,8 +60,7 @@ class Mapper extends BaseMapper
     {
         return "
             SELECT
-                {$this->getColumnString()},
-                {$this->getJoinColumnString('submission_return', 'r')}
+                {$this->getColumnString()}
         ";
     }
 
@@ -80,7 +72,6 @@ class Mapper extends BaseMapper
     {
         return "
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('submission_return', '', 'r')}
         ";
     }
 
@@ -92,13 +83,18 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var ReturnedWorkMapper $submissionReturnMapper */
-        $submissionReturnMapper = $this->getJoinMapper('submission_return');
-        $marks                  = $this->createCollection();
+        $marks = $this->createCollection();
 
-        while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $mark = $this->hydrate($r);
-            $mark->setSubmissionReturn($submissionReturnMapper->hydrate($r, 'r'));
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            /* As far as I can tell, the submission_return instance (and any other feedback instances) aren't actually
+             * meaningful beyond the loading/saving of its identifier; they probably weren't even needed at all. Now
+             * that we have a somewhat-polymorphic (feedback_id, feedback_table) tuple idea we probably need to do that
+             * in business logic anyway or risk a massive mega-left-join onto every possible feedback table.
+             *
+             * Maybe you'll need to do that when we expand usages beyond due works
+             */
+            $mark = $this->hydrate($row);
+
             $marks->add($mark);
         }
 

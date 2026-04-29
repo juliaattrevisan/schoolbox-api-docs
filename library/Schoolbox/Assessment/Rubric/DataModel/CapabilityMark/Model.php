@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Assessment\Rubric\DataModel\CapabilityMark;
 
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
 use Schoolbox\Mapper\Traits\Model\Id;
 
@@ -20,51 +19,88 @@ class Model
 
 
     /**
-     * @var null|ReturnedWork
+     * The primary identifier of a row that represents a feedback from one of the learning activity feedback tables
+     * such as submission_return, reporting_feedback, etc. With the feedback_table value, this forms a tuple that tells
+     * us where a feedback is located for a particular capability.
+     *
+     * @var int|null
      */
-    private $submissionReturn;
+    private ?int $feedbackId = null;
+
+
+    /**
+     * The database schema table name for where a feedback_id can be found. Could be any of the learning activity
+     * feedback tables such as submission_return, reporting_feedback, etc.
+     *
+     * @var string|null
+     */
+    private ?string $feedbackTable = null;
 
 
     /**
      * @var CapabilityModel
      */
-    private $capability;
+    private CapabilityModel $capability;
 
 
     /**
      * @var bool
      */
-    private $valid;
+    private bool $valid;
 
 
     /**
      * The human-readable value for this capability mark.
      */
-    private ?string $humanReadableValue;
+    private ?string $humanReadableValue = null;
 
 
     /**
      * @var float|null
      */
-    private $value;
+    private ?float $value = null;
 
+
+
+    /* Getters/Setters
+     */
 
     /**
-     * @return null|ReturnedWork
+     * @return int|null
      */
-    public function getSubmissionReturn(): ?ReturnedWork
+    public function getFeedbackId(): ?int
     {
-        return $this->submissionReturn;
+        return $this->feedbackId;
     }
 
 
     /**
-     * @param null|ReturnedWork $submissionReturn
+     * @param int|null $feedbackId
+     * @return Model
+     */
+    public function setFeedbackId(?int $feedbackId): self
+    {
+        $this->feedbackId = $feedbackId;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getFeedbackTable(): ?string
+    {
+        return $this->feedbackTable;
+    }
+
+
+    /**
+     * @param string|null $feedbackTable
      * @return $this
      */
-    public function setSubmissionReturn(?ReturnedWork $submissionReturn): self
+    public function setFeedbackTable(?string $feedbackTable): self
     {
-        $this->submissionReturn = $submissionReturn;
+        $this->feedbackTable = $feedbackTable;
         return $this;
     }
 
