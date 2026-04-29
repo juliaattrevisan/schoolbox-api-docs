@@ -60,6 +60,44 @@ class ApiTest extends TestCase
         self::assertCount(0, $api->getEvents(100, 200));
     }
 
+    public function testGetEventsChecksVisibilityForConfiguredVisibilityViewer(): void
+    {
+        $student = $this->buildUser(10);
+        $viewer = $this->buildUser(20);
+        $assessment = $this->createStub(IAssessable::class);
+        $assessments = new GenericCollection(IAssessable::class, [$assessment]);
+        $filters = [];
+
+        $assessmentIdFinder = $this->createMock(IdFinder::class);
+        $assessmentIdFinder
+            ->expects($this->once())
+            ->method('findIdsByFilters')
+            ->with($filters, $student)
+            ->willReturn([123]);
+
+        $assessmentDataSource = $this->createMock(AssessmentDataSource::class);
+        $assessmentDataSource
+            ->expects($this->once())
+            ->method('findAllBetweenDates')
+            ->willReturn($assessments);
+        $assessmentDataSource
+            ->expects($this->once())
+            ->method('loadParticipantsIntoAssessmentCollection')
+            ->with($assessments, $student, true, true)
+            ->willReturn($assessments);
+
+        $visibility = $this->createMock(Visibility::class);
+        $visibility
+            ->expects($this->once())
+            ->method('isVisibleToUser')
+            ->with($assessment, $this->identicalTo($student), true)
+            ->willReturn(false);
+
+        $api = new Api($student, $viewer, $assessmentDataSource, $visibility, $assessmentIdFinder, $filters, false, $student);
+
+        self::assertCount(0, $api->getEvents(100, 200));
+    }
+
     public function testGetEventLoadsStudentParticipationAndChecksVisibilityForViewer(): void
     {
         $student = $this->buildUser(10);
@@ -100,6 +138,44 @@ class ApiTest extends TestCase
             $this->createStub(IdFinder::class),
             [],
             false
+        );
+
+        self::assertCount(0, $api->getEvent(123));
+    }
+
+    public function testGetEventChecksVisibilityForConfiguredVisibilityViewer(): void
+    {
+        $student = $this->buildUser(10);
+        $viewer = $this->buildUser(20);
+        $assessment = $this->createStub(IAssessable::class);
+
+        $assessmentDataSource = $this->createMock(AssessmentDataSource::class);
+        $assessmentDataSource
+            ->expects($this->once())
+            ->method('findById')
+            ->with(123)
+            ->willReturn($assessment);
+        $assessmentDataSource
+            ->expects($this->once())
+            ->method('loadParticipantsIntoAssessmentCollection')
+            ->willReturnArgument(0);
+
+        $visibility = $this->createMock(Visibility::class);
+        $visibility
+            ->expects($this->once())
+            ->method('isVisibleToUser')
+            ->with($assessment, $this->identicalTo($student), true)
+            ->willReturn(false);
+
+        $api = new Api(
+            $student,
+            $viewer,
+            $assessmentDataSource,
+            $visibility,
+            $this->createStub(IdFinder::class),
+            [],
+            false,
+            $student
         );
 
         self::assertCount(0, $api->getEvent(123));

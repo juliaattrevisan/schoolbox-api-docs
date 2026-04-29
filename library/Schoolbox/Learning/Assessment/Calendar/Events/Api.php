@@ -61,6 +61,17 @@ class Api implements Calendar_Api_EventType_Interface
     private $viewer;
 
     /**
+     * The user whose assessment visibility rules should decide whether events are included.
+     *
+     * This can differ from $viewer for Upcoming Due Work. Parents need parent-specific work type visibility applied,
+     * while staff viewing a student's Upcoming calendar should still see the student's due-work set rather than every
+     * staff-visible assessment for that student.
+     *
+     * @var User
+     */
+    private $visibilityViewer;
+
+    /**
      * @var bool
      */
     private $isRestrictParentLessonPlanAccess;
@@ -75,6 +86,7 @@ class Api implements Calendar_Api_EventType_Interface
      * @param IdFinder             $assessmentIdFinder
      * @param array                $filters
      * @param bool                 $isRestrictParentLessonPlanAccess
+     * @param User|null            $visibilityViewer
      */
     public function __construct(
         User $user,
@@ -83,13 +95,15 @@ class Api implements Calendar_Api_EventType_Interface
         ?Visibility $visibility,
         IdFinder $assessmentIdFinder,
         array $filters,
-        bool $isRestrictParentLessonPlanAccess
+        bool $isRestrictParentLessonPlanAccess,
+        ?User $visibilityViewer = null
     ) {
         $this->assessmentDataSource = $assessmentDataSource;
         $this->visibility           = $visibility;
         $this->assessmentIdFinder   = $assessmentIdFinder;
         $this->user                 = $user;
         $this->viewer               = $viewer;
+        $this->visibilityViewer     = $visibilityViewer ?? $viewer;
         $this->filters              = $filters;
         $this->isRestrictParentLessonPlanAccess = $isRestrictParentLessonPlanAccess;
     }
@@ -119,7 +133,7 @@ class Api implements Calendar_Api_EventType_Interface
 
         $stack = new GenericCollection(EventInterface::class);
         foreach ($assessments as $assessment) {
-            if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->viewer, true)) {
+            if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->visibilityViewer, true)) {
                 continue;
             }
 
@@ -167,7 +181,7 @@ class Api implements Calendar_Api_EventType_Interface
                 );
                 $assessment = $assessments->first();
             }
-            if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->viewer, true)) {
+            if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->visibilityViewer, true)) {
                 return $stack;
             }
             $event = $this->transformAssessmentToEvent($assessment, $this->user);

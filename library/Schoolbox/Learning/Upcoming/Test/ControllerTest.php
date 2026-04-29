@@ -26,10 +26,34 @@ use Schoolbox\UserMapper;
 
 class ControllerTest extends TestCase
 {
-    public function testPostUpcomingForStudentChecksVisibilityForViewer(): void
+    public function testPostUpcomingForStudentChecksVisibilityAsParentForParentViewer(): void
     {
+        $this->assertUpcomingWorkCountForViewer(
+            Role::PARENT,
+            true,
+            false,
+            0
+        );
+    }
+
+    public function testPostUpcomingForStudentChecksVisibilityAsStudentForStaffViewer(): void
+    {
+        $this->assertUpcomingWorkCountForViewer(
+            Role::STAFF,
+            false,
+            false,
+            0
+        );
+    }
+
+    private function assertUpcomingWorkCountForViewer(
+        string $viewerRoleType,
+        bool $isVisibleToLearners,
+        bool $isVisibleToParents,
+        int $expectedCount
+    ): void {
         $student = $this->buildUser(10, Role::STUDENT);
-        $viewer = $this->buildUser(20, Role::PARENT);
+        $viewer = $this->buildUser(20, $viewerRoleType);
         $folder = (new Folder())->setId(30);
 
         $participant = $this->createMock(Participant::class);
@@ -45,8 +69,8 @@ class ControllerTest extends TestCase
             ->willReturn(Alaress_Date_Format::now()->addDays(1));
 
         $workType = (new WorkType())
-            ->setIsVisibleToLearners(true)
-            ->setIsVisibleToParents(false);
+            ->setIsVisibleToLearners($isVisibleToLearners)
+            ->setIsVisibleToParents($isVisibleToParents);
 
         $assessment = $this->createStub(IAssessable::class);
         $assessment
@@ -63,6 +87,9 @@ class ControllerTest extends TestCase
         $assessment
             ->method('isPublished')
             ->willReturn(true);
+        $assessment
+            ->method('getCloseAt')
+            ->willReturn(Alaress_Date_Format::now()->addDays(1));
         $assessment
             ->method('getContext')
             ->willReturn($folder);
@@ -127,7 +154,7 @@ class ControllerTest extends TestCase
 
         $controller->postUpcomingForStudent($student);
 
-        self::assertCount(0, $controller->getRenderedData()['upcomingWork']);
+        self::assertCount($expectedCount, $controller->getRenderedData()['upcomingWork']);
     }
 
     private function buildUser(int $id, string $roleType): User

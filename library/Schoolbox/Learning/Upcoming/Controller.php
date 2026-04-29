@@ -110,6 +110,23 @@ class Controller extends Base
     }
 
     /**
+     * Returns the user whose assessment visibility rules should define the student's Upcoming view.
+     *
+     * Parents need parent-specific work type visibility applied, because parents may see a different set of work from
+     * the student. Staff still use the student's visibility rules here, because Upcoming Due Work is intended to show
+     * the student's due-work set rather than every staff-visible assessment for that student.
+     *
+     * @param User $student
+     * @return User
+     */
+    private function getUpcomingVisibilityViewer(User $student): User
+    {
+        $viewer = $this->getUser();
+
+        return $viewer->getRole()->isParent() ? $viewer : $student;
+    }
+
+    /**
      * Displays upcoming work for the given user.
      *
      * @param User                $student
@@ -187,12 +204,12 @@ class Controller extends Base
 
         if (count($displayGradesForFolders)) {
             $visibility = new Visibility($this->access);
-            $viewer = $this->getUser();
+            $visibilityViewer = $this->getUpcomingVisibilityViewer($student);
             // Student's work
             $workPerFolder = $this->assessmentDataSource
                 ->findAllByStudent($student, true, $term)
-                ->filter(function (IAssessable $assessable) use ($visibility, $viewer) {
-                    return $visibility->isVisibleToUser($assessable, $viewer, true);
+                ->filter(function (IAssessable $assessable) use ($visibility, $visibilityViewer) {
+                    return $visibility->isVisibleToUser($assessable, $visibilityViewer, true);
                 })
                 ->groupByCallback(function (IAssessable $assessable) {
                     return $assessable->getContext()->getFolder()->getId();
@@ -265,15 +282,15 @@ class Controller extends Base
             $allWork = $this->assessmentDataSource
                 ->findAllByStudentBetweenDates($student, true, null, null, ['ids' => $ids]);
 
-            $viewer = $this->getUser();
+            $visibilityViewer = $this->getUpcomingVisibilityViewer($student);
             $visibility = new Visibility($this->access);
             /** @var IAssessable[]|GenericCollection $upcomingWork */
             $upcomingWork = $allWork
-                ->filter(static function (IAssessable $assessable) use ($student, $viewer, $visibility) {
+                ->filter(static function (IAssessable $assessable) use ($student, $visibilityViewer, $visibility) {
                     $participation = $assessable->getParticipantIfExtant($student);
                     return $participation
                         && ($participation->isResponseRequired() || $participation->isResubmissionRequired())
-                        && $visibility->isVisibleToUser($assessable, $viewer, false);
+                        && $visibility->isVisibleToUser($assessable, $visibilityViewer, false);
                 })
                 ->sortByCallback(new DueDateSortStrategy($student))
                 ->limit(self::UPCOMING_WORK_LIMIT);
@@ -374,7 +391,8 @@ class Controller extends Base
                 $visibility,
                 $this->assessmentIdFinder,
                 $filterByClassName,
-                $this->getConfigLoader()->get('restrict_parent_lesson_plan_access')
+                $this->getConfigLoader()->get('restrict_parent_lesson_plan_access'),
+                $this->getUpcomingVisibilityViewer($student)
             ),
             $start,
             $end,
