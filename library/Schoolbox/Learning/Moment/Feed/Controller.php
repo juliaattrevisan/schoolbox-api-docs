@@ -39,7 +39,7 @@ class Controller extends Base
      * Number of feed items to display before prompting user
      * with Load More button
      */
-    private const FEED_ITEMS_PER_PAGE = 2;
+    private const FEED_ITEMS_PER_PAGE = 10;
 
 
     /**
