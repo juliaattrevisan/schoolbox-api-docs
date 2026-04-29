@@ -214,6 +214,19 @@ class CommandLineTool extends CliTool\App
                 $chunkSize,
             );
         }
+        if ($validStrats->isStratEnabled(ValidStrats::CMS)) {
+            $bus[] = new Strategy\Cms(
+                $logger,
+                $this->perform(),
+                $this->getDatabaseInternal(),
+                $lock,
+                $this->getConfig(),
+                $endTime,
+                clone $retentionPeriod,
+                $loopCount,
+                $chunkSize,
+            );
+        }
         if ($validStrats->isStratEnabled(ValidStrats::STUDENTSUBMISSIONS)) {
             $bus[] = new Strategy\StudentSubmissions(
                 $logger,
