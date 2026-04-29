@@ -8,10 +8,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Socs\Cli;
 
+use Ramsey\Uuid\Uuid;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Socs\Factory as SocsFactory;
-use Schoolbox\Socs\Log\Guid as SocsLogGuid;
 use Schoolbox\Socs\Log\Mapper as SocsLogMapper;
 
 /**
