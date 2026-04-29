@@ -135,6 +135,8 @@ class VisibilityTest extends TestCase
         );
         $lessonPlan->setPlans($lessonPlan->getPlans()->emptyClone()->add($plan));
 
+        // Note Access-getChildLearnersOfParent() from the AccessStub will
+        // return User objects that are entirely separate from $childLearner.
         $visibility = new Visibility($this->getAccessStub());
 
         $this->assertFalse($visibility->isVisibleToUser($lessonPlan, $parent, true, $now));
@@ -1270,6 +1272,7 @@ class VisibilityTest extends TestCase
     /**
      * Returns the relevant different values for the isInstructor dimension
      * Note the access level of the returned users is determined by getMockAccess().
+     * Note also no role types are set by this function.  Set them in the caller if they are important.
      *
      * @return User[]
      * @see $this->getMockAccess()
@@ -1403,8 +1406,10 @@ class VisibilityTest extends TestCase
                     return new GenericCollection(User::class);
                 }
                 $users = $this->buildUsers();
+                $childLearner = $users[2];
                 // TODO: Test case where multiple children are returned.
-                return new GenericCollection(User::class, [$users[2]]); // Return a collection containing only learner user 'Cath'.
+                $childLearner->setRole(new Role()->setType(Role::STUDENT));
+                return new GenericCollection(User::class, [$childLearner]); // Return a collection containing only learner user 'Cath'.
             });
         return $access;
     }
