@@ -26,7 +26,12 @@ INNER JOIN rubric_instance ri ON ri.assessment_id = a.id
 SET
     rubric_instance_id = ri.id,
     feedback_table = 'submission_return',
-    feedback_id = sr.id
+    feedback_id = sr.id;
 
--- TODO not exactly sure how we'd put foreign keys on this; this feedback_id is polymorphic
+-- Add a foreign key where possible
+ALTER TABLE rubric_level
+ADD CONSTRAINT fk_rcm_ri FOREIGN KEY (rubric_instance_id)
+REFERENCES rubric_instance (id);
+
+-- TODO not exactly sure how we'd put other foreign keys on this; this feedback_id is polymorphic
 --  and could be found in multiple tables, not just one.

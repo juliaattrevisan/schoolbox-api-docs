@@ -107,6 +107,9 @@ class Mapper extends BaseMapper
              */
             $mark = $this->hydrate($row);
 
+            /* We need the rubric instance to know -which grid- in (feedback_id, feedback_table) has this particular
+             * capability mark
+             */
             /** @var \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance */
             $rubricInstance = $this->hydrateJoin($row, 'rubricInstance', 'ri');
 
