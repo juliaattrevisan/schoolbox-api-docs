@@ -756,7 +756,7 @@ class Feed
     {
         return null === $row['u.deleted_at']
             ? sprintf('<a href="/search/user/%s">%s</a>', $userId, Scrub::text($userHandler->formatName($row)))
-            : $userHandler->formatName($row);
+            : Scrub::text($userHandler->formatName($row));
     }
 
     /**
