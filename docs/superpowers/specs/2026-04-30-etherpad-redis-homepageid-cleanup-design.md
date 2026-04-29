@@ -56,12 +56,13 @@ A homepage cleanup feature must therefore:
 
 ## Architecture
 
-Extend the existing `\Schoolbox\Admin\DataRetention\Strategy\Cms` strategy to support homepage-scoped Etherpad cleanup.
+Extend the existing `\Schoolbox\Admin\DataRetention\Strategy\Cms` strategy to support homepage-scoped Etherpad cleanup and add a dedicated operator CLI wrapper.
 
 ### Files
 
 | File | Change |
 |---|---|
+| `tools/etherpad-homepage-cleanup.php` | New operator-facing cleanup tool for homepage-scoped Etherpad removal |
 | `library/Schoolbox/Admin/DataRetention/Strategy/Cms.php` | Extend the CMS retention strategy to support homepage-scoped Etherpad pad cleanup and optional Redis key cleanup |
 | `library/Schoolbox/Admin/DataRetention/Test/CmsStrategyTest.php` | Add tests for homepage-scoped cleanup behavior and delete ordering |
 | `library/Schoolbox/Admin/DataRetention/CommandLineTool.php` | Register the CMS strategy and expose homepage-scoped cleanup through the DataRetention CLI flow |
@@ -75,14 +76,14 @@ No database schema changes are required.
 
 The new cleanup should behave like this:
 
-1. Accept `homepage_id` as input through the existing DataRetention strategy interface or a dedicated CMS cleanup option.
+1. Accept `homepage_id` as input through a dedicated operator tool, and optionally support the existing DataRetention strategy interface.
 2. Query `etherpad_pad` for all active pads where `homepage_id = :homepageId` and `deleted_at IS NULL`.
 3. For each pad:
    - call `EtherpadLite\Client::deletePad($padId)`
    - if the pad delete succeeds, optionally remove the local `etherpad_pad` record or set `deleted_at`
    - if the pad delete fails because the pad is missing, continue to optional Redis cleanup and log the condition
 4. Optionally clean remaining Etherpad Redis keys belonging to the pad’s group or author/session state.
-5. Report results and failures through the DataRetention strategy logging.
+5. Report results and failures through the dedicated tool and DataRetention strategy logging.
 
 ### Key design observation
 
@@ -146,11 +147,11 @@ It should avoid blanket Redis deletes unless the key patterns are well understoo
 
 ## Implementation options
 
-### Option A: Extend `Cms` strategy
+### Option A: Extend `Cms` strategy with a dedicated wrapper tool
 
 - Add homepage-scoped cleanup support to `library/Schoolbox/Admin/DataRetention/Strategy/Cms.php`.
-- Keep the DataRetention CLI flow as the primary operator interface.
-- This is the cleanest approach and keeps behavior aligned with existing retention strategy patterns.
+- Add `tools/etherpad-homepage-cleanup.php` as an operator-facing wrapper around the CMS strategy.
+- This keeps cleanup behavior aligned with existing retention framework while giving operators a simple homepage-level command.
 
 ### Option B: Add a dedicated DataRetention command option
 
@@ -160,7 +161,7 @@ It should avoid blanket Redis deletes unless the key patterns are well understoo
 
 ### Recommended approach
 
-Use Option A plus Option B: extend the CMS strategy, then expose homepage cleanup through a dedicated CLI option on the existing DataRetention tool. That keeps cleanup within the retained-data framework while maintaining operator discoverability.
+Use Option A plus Option B: implement the new `tools/etherpad-homepage-cleanup.php` wrapper and also expose the homepage cleanup through the DataRetention CLI via a `--homepage-id` option. The operator-facing wrapper can invoke the same strategy logic and provide the familiar `--dry-run`, `--delete-redis-keys`, `--soft-delete-meta`, and `--verbose` flags.
 
 ---
 
@@ -175,13 +176,21 @@ Use Option A plus Option B: extend the CMS strategy, then expose homepage cleanu
 
 ## Example usage
 
+Operator-facing usage for the new tool:
+
 ```bash
 php tools/etherpad-homepage-cleanup.php --homepage-id=123
 ```
 
-Possible extensions:
+The tool should support the following flags:
 
 - `--dry-run`
 - `--delete-redis-keys`
 - `--soft-delete-meta`
 - `--verbose`
+
+If the same behavior is exposed through the existing DataRetention CLI, the equivalent command should be:
+
+```bash
+php tools/dataRetention/process.php --strats=cms --homepage-id=123 [--dry-run] [--delete-redis-keys] [--soft-delete-meta] [--verbose]
+```
