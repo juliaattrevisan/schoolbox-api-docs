@@ -19,6 +19,12 @@ class Model
 
 
     /**
+     * @var null|\Schoolbox\Assessment\Rubric\Instance\Model
+     */
+    private ?\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance;
+
+
+    /**
      * The primary identifier of a row that represents a feedback from one of the learning activity feedback tables
      * such as submission_return, reporting_feedback, etc. With the feedback_table value, this forms a tuple that tells
      * us where a feedback is located for a particular capability.
@@ -81,6 +87,26 @@ class Model
     public function setFeedbackId(?int $feedbackId): self
     {
         $this->feedbackId = $feedbackId;
+        return $this;
+    }
+
+
+    /**
+     * @return null|\Schoolbox\Assessment\Rubric\Instance\Model
+     */
+    public function getRubricInstance(): ?\Schoolbox\Assessment\Rubric\Instance\Model
+    {
+        return $this->rubricInstance;
+    }
+
+
+    /**
+     * @param null|\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance
+     * @return $this
+     */
+    public function setRubricInstance(?\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance): self
+    {
+        $this->rubricInstance = $rubricInstance;
         return $this;
     }
 

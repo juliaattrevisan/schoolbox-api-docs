@@ -46,6 +46,16 @@ class Mapper extends BaseMapper
             'capability'
         );
 
+        $this->joins(
+            'rubric_instance_id',
+            \Schoolbox\Assessment\Rubric\Instance\Mapper::class,
+            'id',
+            null,
+            null,
+            'rubricInstance',
+            'rubricInstance'
+        );
+
         // This is NOT a soft-delete column, but effectively has the same
         // behavior as one, as when it's set (by the teacher altering a rubric
         // grid's structure) the marks given for that rubric no longer show.
@@ -60,7 +70,8 @@ class Mapper extends BaseMapper
     {
         return "
             SELECT
-                {$this->getColumnString()}
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('rubricInstance', 'ri')}
         ";
     }
 
@@ -72,6 +83,7 @@ class Mapper extends BaseMapper
     {
         return "
             FROM {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('rubricInstance', '', 'ri', true)}
         ";
     }
 
@@ -94,6 +106,11 @@ class Mapper extends BaseMapper
              * Maybe you'll need to do that when we expand usages beyond due works
              */
             $mark = $this->hydrate($row);
+
+            /** @var \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance */
+            $rubricInstance = $this->hydrateJoin($row, 'rubricInstance', 'ri');
+
+            $mark->setRubricInstance($rubricInstance);
 
             $marks->add($mark);
         }
