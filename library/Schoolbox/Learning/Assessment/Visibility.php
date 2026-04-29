@@ -145,11 +145,7 @@ class Visibility
         }
 
         // Apply special lesson plan visibility logic.
-        if (
-            $assessable instanceof LessonPlan\Model &&
-            Role::STUDENT !== $assessable->getVisibility() &&
-            $learnerParticipant->getRole()->isStudent()
-        ) {
+        if ($this->specialLessonPlanVisibilityRuleApplies($assessable, $learnerParticipant)) {
             return false;
         }
 
@@ -203,11 +199,7 @@ class Visibility
 
             // Since the user who is not a learner-participant may still have
             // role type 'student', apply special lesson plan visibility logic.
-            if (
-                $assessable instanceof LessonPlan\Model &&
-                Role::STUDENT !== $assessable->getVisibility() &&
-                $nonInstructorNonLearnerParticipant->getRole()->isStudent()
-            ) {
+            if ($this->specialLessonPlanVisibilityRuleApplies($assessable, $nonInstructorNonLearnerParticipant)) {
                 return false;
             }
 
@@ -230,11 +222,7 @@ class Visibility
             foreach ($childLearners as $childLearner) {
                 // Apply special lesson plan visibility logic.
                 // (If lesson plan is hidden from students, it should be hidden from parents also).
-                if (
-                    $assessable instanceof LessonPlan\Model &&
-                    Role::STUDENT !== $assessable->getVisibility() &&
-                    $childLearner->getRole()->isStudent()
-                ) {
+                if ($this->specialLessonPlanVisibilityRuleApplies($assessable, $nonInstructorNonLearnerParticipant)) {
                     continue; // Skip student due to special lesson plan visibility logic.
                 }
 
@@ -277,5 +265,20 @@ class Visibility
         //  * a staff member
         //  * a parent of a learner-participant
         return false;
+    }
+
+    /**
+     * Lesson Plans have some specific logic for visibility:
+     * - Lesson Plans can be hidden from students via a Visibility switch
+     * If you're a student, hide any lesson plans that were hidden from you
+     * - Lesson Plans that are not hidden from students should be visible to all students
+     */
+    private function specialLessonPlanVisibilityRuleApplies(IAssessable $assessable, User $viewer): bool
+    {
+        return (
+            $assessable instanceof LessonPlan\Model &&
+            Role::STUDENT !== $assessable->getVisibility() &&
+            $viewer->getRole()->isStudent()
+        );
     }
 }
