@@ -187,11 +187,12 @@ class Controller extends Base
 
         if (count($displayGradesForFolders)) {
             $visibility = new Visibility($this->access);
+            $viewer = $this->getUser();
             // Student's work
             $workPerFolder = $this->assessmentDataSource
                 ->findAllByStudent($student, true, $term)
-                ->filter(function (IAssessable $assessable) use ($visibility, $student) {
-                    return $visibility->isVisibleToUser($assessable, $student, true);
+                ->filter(function (IAssessable $assessable) use ($visibility, $viewer) {
+                    return $visibility->isVisibleToUser($assessable, $viewer, true);
                 })
                 ->groupByCallback(function (IAssessable $assessable) {
                     return $assessable->getContext()->getFolder()->getId();
