@@ -213,6 +213,7 @@ class Access
      * @throws InvalidArgumentException Due to getFolderAccess() call.
      * @throws Mapper\Exception         Due to getFolderAccess() call.
      * @throws LogicException           Due to getFolderAccess() call.
+     * @throws UnexpectedValueException Due to getFolderAccess() call.
      */
     public function isInstructor(User $user, Folder\Model $folder): bool
     {
@@ -246,6 +247,7 @@ class Access
      * @throws InvalidArgumentException Due to getFolderAccess() call.
      * @throws Mapper\Exception         Due to getFolderAccess() call.
      * @throws LogicException           Due to getFolderAccess() call.
+     * @throws UnexpectedValueException Due to getFolderAccess() call.
      */
     public function isLearner(User $user, Folder\Model $folder): bool
     {

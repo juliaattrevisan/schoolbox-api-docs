@@ -185,6 +185,64 @@ class VisibilityTest extends TestCase
 
 
     /**
+     * Tests that access lookup failures do not grant visibility or bubble from visibility checks.
+     *
+     * @param string $exceptionSource
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerAccessUnexpectedValueExceptionSource')]
+    public function testAccessUnexpectedValueExceptionsFailClosed(string $exceptionSource): void
+    {
+        $now = new Alaress_Date_Format(self::NOW_DATABASE, Alaress_Date_Format::DATABASE_FORMAT);
+        [, , $viewer] = self::buildUsers();
+        $viewer->setRole((new Role())->setType(Role::STUDENT));
+
+        [, , $assessable] = self::buildAssessments($now);
+        $assessable->setPlans($assessable->getPlans()->emptyClone()->add(
+            (new Plan($assessable))->setIsDynamic(PlanMapper::PLAN_TYPE_DYNAMIC)
+        ));
+
+        /** @var Access&Stub $access */
+        $access = $this->createStub(Access::class);
+        $access
+            ->method('isInstructor')
+            ->willReturnCallback(function () use ($exceptionSource): bool {
+                if ($exceptionSource === 'instructor') {
+                    throw new \UnexpectedValueException('Unable to resolve folder access');
+                }
+
+                return false;
+            });
+        $access
+            ->method('isLearner')
+            ->willReturnCallback(function () use ($exceptionSource): bool {
+                if ($exceptionSource === 'learner') {
+                    throw new \UnexpectedValueException('Unable to resolve folder access');
+                }
+
+                return false;
+            });
+
+        $visibility = new Visibility($access);
+
+        $this->assertFalse($visibility->isVisibleToUser($assessable, $viewer, true, $now));
+    }
+
+
+    /**
+     * Provides access lookup methods that can raise UnexpectedValueException during visibility checks.
+     *
+     * @return array<string, array{string}>
+     */
+    public static function providerAccessUnexpectedValueExceptionSource(): array
+    {
+        return [
+            'instructor access' => ['instructor'],
+            'learner access' => ['learner'],
+        ];
+    }
+
+
+    /**
      * @return array
      */
     public static function providerNullCloseDateVisibility(): array

@@ -65,7 +65,7 @@ class Visibility
         // Handle case where user is instructor.
         try {
             $viewerIsInstructor = $this->access->isInstructor($viewer, $folder);
-        } catch (MapperException | \LogicException) {
+        } catch (MapperException | \LogicException | \UnexpectedValueException) {
             $viewerIsInstructor = false; // In case of exception, assume non-instructor.
         }
         if ($viewerIsInstructor) {
@@ -75,7 +75,7 @@ class Visibility
         // Handle case where user is a learner-participant.
         try {
             $viewerIsLearner = $this->access->isLearner($viewer, $folder);
-        } catch (MapperException | \LogicException) {
+        } catch (MapperException | \LogicException | \UnexpectedValueException) {
             $viewerIsLearner = false; // In case of exception, assume non-learner.
         }
         $viewerParticipant = $assessable->getParticipantIfExtant($viewer);
