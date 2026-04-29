@@ -1355,8 +1355,7 @@ class MapperProxy
         if ($subObject instanceof Task) {
             $taskMapper = TaskMapper::getInstance();
 
-            /* Save the Task before the files, because you need the primary key
-             * in the relational table
+            /* Save the Task before the files, because you need the primary key in the relational table
              */
             $taskMapper->save($subObject);
             $taskMapper->saveFiles($subObject);
@@ -1365,32 +1364,46 @@ class MapperProxy
 
             /** @var DueWorkObject $dueWork */
             $dueWork = $assessable;
-            if ($dueWork->getUseRubric()) {
-                // Rubric involved? Save the due work, and then persist rubric
-                $rubricMapper = RubricDataSource::getInstance();
 
-                // Need to compare the previously existing grid with the newly
-                // saved one, for invalidation purposes
-                $originalGrid = null;
-                if (!$isCreate) {
-                    $originalGrid = $rubricMapper->retrieveGrid($assessable, false);
-                }
 
-                $boxMapper->save($subObject);
+            /* TODO Save each rubric instance separately, but it has to be pre-decorated into $assessment:
+             *  we don't have access to $_POST payloads here.
+             *
+             * We get a set of rubric grids from the frontend payload, in a mix of two formats:
+             *   Existing grid:        rubric[39]
+             *   New grid:             rubric[-1], rubric[-2], ...rubric[-n]
+             *
+             * Persist each grid with the due work iteratively
+             */
+//
+//
+//            if ($dueWork->getUseRubric()) {
+//                // Rubric involved? Save the due work, and then persist rubric
+//                $rubricMapper = RubricDataSource::getInstance();
+//
+//                // Need to compare the previously existing grid with the newly
+//                // saved one, for invalidation purposes
+//                $originalGrid = null;
+//                if (!$isCreate) {
+//                    $originalGrid = $rubricMapper->retrieveGrid($assessable, false);
+//                }
+//
+//                $boxMapper->save($subObject);
+//
+//                if ($dueWork->getRubricGrid()) {
+//                    /* Disregard grid changes if CourseManaged is on
+//                     */
+//                    $courseManagedFields = new CourseManagedFields($currentUser, $assessable);
+//
+//                    if (!$courseManagedFields->isReadonly()) {
+//                        $rubricMapper->persistGrid($dueWork->getRubricGrid(), $originalGrid, $subObject);
+//                    }
+//                }
+//            }
 
-                if ($dueWork->getRubricGrid()) {
-                    /* Disregard grid changes if CourseManaged is on
-                     */
-                    $courseManagedFields = new CourseManagedFields($currentUser, $assessable);
-
-                    if (!$courseManagedFields->isReadonly()) {
-                        $rubricMapper->persistGrid($dueWork->getRubricGrid(), $originalGrid, $subObject);
-                    }
-                }
-            } else {
-                // No rubric? Just save the due work
-                $boxMapper->save($subObject);
-            }
+            /* Save the Due Work before the files, because you need the primary key in the relational table
+             */
+            $boxMapper->save($subObject);
 
             $boxMapper->saveFiles($subObject);
         } elseif ($subObject instanceof Quiz) {
