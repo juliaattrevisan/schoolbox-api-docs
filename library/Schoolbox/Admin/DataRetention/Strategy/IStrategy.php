@@ -40,8 +40,8 @@ interface IStrategy
 
     /**
      * Override the retention period for this strategy, do NOT use the date range from the config
-     * @param ?RetentionPeriod $retentionPeriod
+     * @param RetentionPeriod $retentionPeriod
      * @return self
      */
-    public function setRetentionPeriod(?RetentionPeriod $retentionPeriod): self;
+    public function setRetentionPeriod(RetentionPeriod $retentionPeriod): self;
 }
