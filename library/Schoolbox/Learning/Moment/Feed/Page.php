@@ -43,7 +43,7 @@ class Page
     }
 
     /**
-     * Returns the total number of visible feed items.
+     * Returns the number of visible feed items in this page.
      *
      * @return int
      */

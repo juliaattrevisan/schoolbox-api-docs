@@ -47,9 +47,45 @@ class PaginatorTest extends TestCase
         $page = (new Paginator($cursor, $hydrator, 2))->retrievePage(null);
 
         self::assertSame([3, 4], self::resultIds($page->getData()));
-        self::assertSame(3, $page->getCount());
+        self::assertSame(2, $page->getCount());
         self::assertNull($page->getCurrentCursor());
         self::assertSame('cursor-4', $page->getNextCursor());
+    }
+
+    /**
+     * Retrieving a page should not perform a second full scan just to calculate an exact visible total.
+     *
+     * @return void
+     */
+    public function testRetrievingPageDoesNotScanAllResultsToCountVisibleResults(): void
+    {
+        $retrievedCursors = [];
+        $cursor = self::buildCursor(
+            [
+                null => [
+                    self::rawResult(1),
+                    self::rawResult(2),
+                ],
+                'cursor-2' => [
+                    self::rawResult(3),
+                    self::rawResult(4),
+                ],
+                'cursor-4' => [
+                    self::rawResult(5),
+                ],
+                'cursor-5' => [],
+            ],
+            static function (?string $cursor) use (&$retrievedCursors): void {
+                $retrievedCursors[] = $cursor;
+            }
+        );
+        $hydrator = self::buildHydrator([1, 2, 3, 4, 5]);
+
+        $page = (new Paginator($cursor, $hydrator, 2))->retrievePage(null);
+
+        self::assertSame([1, 2], self::resultIds($page->getData()));
+        self::assertSame(2, $page->getCount());
+        self::assertSame([null, 'cursor-2'], $retrievedCursors);
     }
 
     /**
@@ -111,18 +147,22 @@ class PaginatorTest extends TestCase
      * Builds a cursor test double with fixed pages keyed by cursor value.
      *
      * @param array<string|null, array<int, array{id: int, cursor: string}>> $pages
+     * @param \Closure|null $onRetrieve
      * @return ICursor
      */
-    private static function buildCursor(array $pages): ICursor
+    private static function buildCursor(array $pages, ?\Closure $onRetrieve = null): ICursor
     {
-        return new class ($pages) implements ICursor {
+        return new class ($pages, $onRetrieve) implements ICursor {
             /**
              * Constructor.
              *
              * @param array<string|null, array<int, array{id: int, cursor: string}>> $pages
+             * @param \Closure|null $onRetrieve
              */
-            public function __construct(private array $pages)
-            {
+            public function __construct(
+                private array $pages,
+                private ?\Closure $onRetrieve
+            ) {
             }
 
             /**
@@ -169,6 +209,10 @@ class PaginatorTest extends TestCase
              */
             public function retrieveResults(?string $encodedCursor): Collection
             {
+                if ($this->onRetrieve !== null) {
+                    ($this->onRetrieve)($encodedCursor);
+                }
+
                 return new Collection($this->pages[$encodedCursor] ?? []);
             }
         };

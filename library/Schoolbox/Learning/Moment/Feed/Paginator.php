@@ -47,7 +47,7 @@ class Paginator
 
         return new Page(
             $data,
-            $this->retrieveVisibleResultCount(),
+            $data->count(),
             $encodedCursor,
             $nextCursor
         );
@@ -85,33 +85,6 @@ class Paginator
             $nextBatchCursor = $this->cursor->next($rawResults);
             if ($nextBatchCursor === null || $nextBatchCursor === $batchCursor) {
                 return [$visibleResults, null];
-            }
-
-            $batchCursor = $nextBatchCursor;
-        }
-    }
-
-    /**
-     * Counts feed rows that remain visible after hydration.
-     *
-     * @return int
-     */
-    private function retrieveVisibleResultCount(): int
-    {
-        $count = 0;
-        $batchCursor = null;
-
-        while (true) {
-            $rawResults = $this->cursor->retrieveResults($batchCursor);
-            if ($rawResults->count() === 0) {
-                return $count;
-            }
-
-            $count += $this->hydrator->hydrateResults($rawResults)->count();
-
-            $nextBatchCursor = $this->cursor->next($rawResults);
-            if ($nextBatchCursor === null || $nextBatchCursor === $batchCursor) {
-                return $count;
             }
 
             $batchCursor = $nextBatchCursor;
