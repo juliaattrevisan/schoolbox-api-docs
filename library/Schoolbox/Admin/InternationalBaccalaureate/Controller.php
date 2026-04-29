@@ -39,8 +39,9 @@ class Controller extends ConfigController
     /* General Configuration ID
      */
     private const int GENERAL_CATEGORY_ID = 0;
+    /* Maximum academic year length
+     */
     private const int REGISTRATION_SESSION_ACADEMIC_YEAR_MAX_LENGTH = 4;
-    private const string REGISTRATION_SESSION_ACADEMIC_YEAR_PATTERN = '/^\d{4}?$/';
 
     public function __construct(
         ConfigMapper $configMapper,
@@ -447,14 +448,8 @@ class Controller extends ConfigController
             return;
         }
 
-        if (!preg_match(self::REGISTRATION_SESSION_ACADEMIC_YEAR_PATTERN, $academicYear)) {
-            $this->response = $this->responseAsJson([
-                'success' => false,
-                'message' => 'Academic year must be in the format YYYY, for example 2026.',
-            ])->withStatus(400);
-            return;
-        }
-
+        /* Validation for academic year length - to prevent excessively long values being entered which could cause issues with display and storage.
+         */
         if (mb_strlen($academicYear) > self::REGISTRATION_SESSION_ACADEMIC_YEAR_MAX_LENGTH) {
             $this->response = $this->responseAsJson([
                 'success' => false,
