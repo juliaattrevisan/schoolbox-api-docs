@@ -21,7 +21,6 @@ use Schoolbox\Assessment\Participant\Mapper as ParticipantMapper;
 use Schoolbox\Collection;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\GenericCollection;
-use Schoolbox\External\User as ExternalUser;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -466,7 +465,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $mutator = new Participant\AssessmentListMutator(
             $user,
             new Visibility($access),
-            new ExternalUser(),
             $now,
             true
         );

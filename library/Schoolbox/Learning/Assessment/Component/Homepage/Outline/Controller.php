@@ -18,7 +18,6 @@ use Component_Instance;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\External\User as ExternalUser;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -199,7 +198,6 @@ class Controller extends Component_Homepage_ControllerAbstract
                 $mutator     = new AssessmentListMutator(
                     $this->getUser(),
                     new Visibility($this->getAccess()),
-                    new ExternalUser(),
                     $now,
                     true
                 );

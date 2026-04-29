@@ -14,7 +14,6 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Psr\Http\Message\ServerRequestInterface;
-use Schoolbox\External\User as ExternalUser;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
@@ -108,7 +107,6 @@ class Hydrator extends BaseHydrator
         $mutator = new AssessmentListMutator(
             $viewer,
             new Visibility($this->access),
-            new ExternalUser(),
             Alaress_Date_Format::now(),
             true
         );
