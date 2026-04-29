@@ -27,8 +27,8 @@ class Mapper extends Schoolbox\Mapper
      *  - Learner: A user with READ access to the assessment folder.  (Note this is a folder-level concept.)
      *  - Participant: A user for whom $assessment->getParticipantIfExtant($user) returns a non-null participant.
      *                 (Note this is an assessment-level concept.)
-     *  - Learner participant: A learner who is also a participant.
-     *  - Parent of learner participant: A parent whose child is a learner participant.
+     *  - Learner-participant: A learner who is also a participant.
+     *  - Parent of learner-participant: A parent whose child is a learner-participant.
      *
      * Notes:
      *  - Being a learner without being a participant has no effect on assessment visibility.
@@ -41,6 +41,8 @@ class Mapper extends Schoolbox\Mapper
      *    participant in assessments in that class.
      *  - Visibility of assessments also depends on:
      *     - Whether they are published (only instructors and staff should see unpublished assessments)
+     *       (Note a user who is both staff and a learner-participant should be treated as a learner-participant, and
+     *        so not see unpublished assessments)
      *     - Whether they are closed and whether closed assessments should be visible.
      *
      * @see implementation in the Learning\Assessment\Visibility class.
@@ -49,37 +51,37 @@ class Mapper extends Schoolbox\Mapper
     /**
      * Visibility 'Staff and instructors only'
      *  - Instructors - always included
-     *  - Learner participants - always excluded
-     *  - Parents of learner participants - included only if instructors
-     *  - Users of role type 'staff' - included unless they are learner participants
+     *  - Learner-participants - always excluded
+     *  - Parents of learner-participants - included only if instructors
+     *  - Users of role type 'staff' - included unless they are learner-participants
      *  - Other users of any role type - included only if instructors
      */
     public const string VISIBILITY_STAFF_INSTRUCTORS = 'staffAndInstructorsOnly';
     /**
      * Visibility 'Staff and instructors and learners'
      *  - Instructors - always included
-     *  - Learner participants - always included
-     *  - Parents of learner participants - included only if instructors or learner participants
+     *  - Learner-participants - always included
+     *  - Parents of learner-participants - included only if instructors or learner-participants
      *  - Users of role type 'staff' - always included
-     *  - Other users of any role type - included only if instructors or learner participants
+     *  - Other users of any role type - included only if instructors or learner-participants
      */
     public const string VISIBILITY_STAFF_INSTRUCTORS_LEARNERS = 'staffAndInstructorsAndLearners';
     /**
      * Visibility 'Staff and instructors and parents'
      *  - Instructors - always included
-     *  - Learner participants - always excluded
-     *  - Parents of learner participants - included unless they are learner participants
-     *  - Users of role type 'staff' - included unless they are learner participants
+     *  - Learner-participants - always excluded
+     *  - Parents of learner-participants - included unless they are learner-participants
+     *  - Users of role type 'staff' - included unless they are learner-participants
      *  - Other users of any role type - included only if instructors
      */
     public const string VISIBILITY_STAFF_INSTRUCTORS_PARENTS = 'staffAndInstructorsAndParents';
     /**
      * Visibility 'Staff and instructors and learners and parents'
      *  - Instructors - always included
-     *  - Learner participants - always included
-     *  - Parents of learner participants - always included
+     *  - Learner-participants - always included
+     *  - Parents of learner-participants - always included
      *  - Users of role type 'staff' - always included
-     *  - Other users of any role type - included only if instructors or learner participants
+     *  - Other users of any role type - included only if instructors or learner-participants
      */
     public const string VISIBILITY_STAFF_INSTRUCTORS_LEARNERS_PARENTS = 'staffAndInstructorsAndLearnersAndParents';
 
