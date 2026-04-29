@@ -4,23 +4,21 @@
  * Learning Moments, retain soft deleted data for a certain time
  *
  * Justin Clarke <justin.clarke@schoolbox.education>
- * @copyright Copyright 2025, Schoolbox Pty Ltd
+ * @copyright Copyright 2026, Schoolbox Pty Ltd
  * @link      https://schoolbox.education/
  */
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\DataRetention;
+namespace Schoolbox\Admin\DataRetention\Strategy;
 
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Admin\DataRetention\ValidStrats;
 use Schoolbox\Config\ConfigMapper;
 
-class MomentsRetention extends StrategyBase
+class Moments extends Base
 {
-    public string $retentionConfigKey = ConfigMapper::NAME_DATA_RETENTION_LEARNINGMOMENTS;
-    /**
-     * @inheritDoc
-     */
+    protected string $retentionConfigKey = ConfigMapper::NAME_DATA_RETENTION_LEARNINGMOMENTS;
 
     /**
      * @inheritDoc
@@ -32,7 +30,7 @@ class MomentsRetention extends StrategyBase
 
     public function getStrategyName(): string
     {
-        return 'moments';
+        return ValidStrats::MOMENTS;
     }
 
     /**
@@ -61,13 +59,14 @@ class MomentsRetention extends StrategyBase
 
         $statement = $this->database->prepare($query);
         $statement->execute([
-            'old'   => $this->getRetentionPeriod(),
+            'old'   => $this->calculateDate(),
         ]);
 
         $toDelete = $statement->fetch();
 
         // if no entries exit early
         if (empty($toDelete['moments'])) {
+            $this->log->info("Found '0' moments to delete");
             return false;
         }
 
@@ -88,29 +87,21 @@ class MomentsRetention extends StrategyBase
      */
     protected function getIdsToDelete(): array
     {
-        $this->log->info('Deleting learning moments older than ' . $this->getRetentionPeriod());
+        $this->log->info('Deleting learning moments older than ' . $this->calculateDate());
         $query = "
-        SELECT
-            id,
-            discussion_thread_id
-        FROM moment
-        WHERE moment.deleted_at IS NOT NULL AND moment.deleted_at < :old
-    ";
+            SELECT
+                id,
+                discussion_thread_id
+            FROM moment
+            WHERE moment.deleted_at IS NOT NULL AND moment.deleted_at < :old
+        ";
 
         $statement = $this->database->prepare($query);
         $statement->execute([
-                                'old'   => $this->getRetentionPeriod(),
-                            ]);
+            'old'   => $this->calculateDate(),
+        ]);
 
-        // collate ids to delete
-        $deleteIds = [];
-        while ($row = $statement->fetch()) {
-            $deleteIds[] = [
-                'id' => $row['id'],
-                'discussion_thread_id' => $row['discussion_thread_id'] // may exist, may be null, we need this to delete the discussion thread and comments if it exists
-            ];
-        }
-        return $deleteIds;
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
@@ -135,21 +126,15 @@ class MomentsRetention extends StrategyBase
             $this->log->debug(sprintf("Deleting discussion_thread ids: %s", implode(', ', $discussionThreadIds)));
         }
 
-        // some value which will never be an ID
-        $nonExistentId = -1;
-
-        // fill $chunkIds up to $this->chunkSize with $nonExistentId
-        $chunkIds  = array_merge($chunkIds, array_fill(0, $this->chunkSize - count($chunkIds), $nonExistentId));
-
         $delPlaceholders = Builder::getArrayPlaceholders($chunkIds, 'moment_id');
-        $statementEvidence = $this->database->prepare($this->deleteStatement() . " FROM moment_evidence WHERE moment_id IN {$delPlaceholders}");
-        $statementFolder = $this->database->prepare($this->deleteStatement() . " FROM moment_folder WHERE moment_id IN {$delPlaceholders}");
-        $statementTag = $this->database->prepare($this->deleteStatement() . " FROM moment_tag WHERE moment_id IN {$delPlaceholders}");
-        $statementCurriculum = $this->database->prepare($this->deleteStatement() . " FROM curriculum_moment WHERE moment_id IN {$delPlaceholders}");
-        $statementMoment = $this->database->prepare($this->deleteStatement() . " FROM moment WHERE id IN {$delPlaceholders}");
+        $statementEvidence = $this->getPreparedStatement($this->deleteStatement('moment_evidence') . " FROM moment_evidence WHERE moment_id IN {$delPlaceholders}");
+        $statementFolder = $this->getPreparedStatement($this->deleteStatement('moment_folder') . " FROM moment_folder WHERE moment_id IN {$delPlaceholders}");
+        $statementTag = $this->getPreparedStatement($this->deleteStatement('moment_tag') . " FROM moment_tag WHERE moment_id IN {$delPlaceholders}");
+        $statementCurriculum = $this->getPreparedStatement($this->deleteStatement('curriculum_moment') . " FROM curriculum_moment WHERE moment_id IN {$delPlaceholders}");
+        $statementMoment = $this->getPreparedStatement($this->deleteStatement('moment') . " FROM moment WHERE id IN {$delPlaceholders}");
 
         // build params
-        $delParams       = Builder::getArrayParameters($chunkIds, 'moment_id');
+        $delParams = Builder::getArrayParameters($chunkIds, 'moment_id');
 
         // unlink evidence // the Garbage Collector will take care of the actual files, we just need to remove the database records
         $statementEvidence->execute($delParams);
@@ -167,21 +152,14 @@ class MomentsRetention extends StrategyBase
         $statementMoment->execute($delParams);
 
         if (!empty($discussionThreadIds)) { // if there are discussion threads to delete, delete the threads and comments
-            // fill $discussionThreadIds up to $this->chunkSize with $nonExistentId
-            $discussionThreadIds  = array_merge($discussionThreadIds, array_fill(0, $this->chunkSize - count($discussionThreadIds), $nonExistentId));
             $discussionPlaceholders = Builder::getArrayPlaceholders($discussionThreadIds, 'moment_id');
 
             // delete the discussion thread comments // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads comments that were not... but they do match to the moment...
-            $statementComment = $this->database->prepare($this->deleteStatement() . " FROM discussion_thread_comment WHERE discussion_thread_id IN {$discussionPlaceholders}");
-            // delete the discussion threads // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads that were not... but they do match to the moment...
-            $statementThread = $this->database->prepare($this->deleteStatement() . " FROM discussion_thread WHERE id IN {$discussionPlaceholders}");
+            $statementComment = $this->getPreparedStatement($this->deleteStatement('discussion_thread_comment') . " FROM discussion_thread_comment WHERE discussion_thread_id IN {$discussionPlaceholders}");
+            $statementThread = $this->getPreparedStatement($this->deleteStatement('discussion_thread') . " FROM discussion_thread WHERE id IN {$discussionPlaceholders}");
+            $discussionParams = Builder::getArrayParameters($discussionThreadIds, 'moment_id');
 
-            $discussionParams       = Builder::getArrayParameters($discussionThreadIds, 'moment_id');
-
-            // delete the discussion thread comments // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads comments that were not... but they do match to the moment...
             $statementComment->execute($discussionParams);
-
-            // delete the discussion threads // there may be a weird d-sync here... I have found in demo moments that were deleted, but threads that were not... but they do match to the moment...
             $statementThread->execute($discussionParams);
         } else { // if there are no discussion threads to delete, set the statement variables to null so we can log them as 0
             $statementComment = null;

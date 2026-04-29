@@ -4,40 +4,45 @@
  * Strategy Base, retain soft deleted data for a certain time
  *
  * Justin Clarke <justin.clarke@schoolbox.education>
- * @copyright Copyright 2025, Schoolbox Pty Ltd
+ * @copyright Copyright 2026, Schoolbox Pty Ltd
  * @link      https://schoolbox.education/
  */
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\DataRetention;
+namespace Schoolbox\Admin\DataRetention\Strategy;
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Exception;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Admin\DataRetention\RetentionPeriod;
+use Schoolbox\Admin\DataRetention\ValidRetentionPeriod;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\IConfigLoader;
 use Symfony\Component\Lock\LockInterface;
 
-abstract class StrategyBase implements IStrategy
+abstract class Base implements IStrategy
 {
-    public const DEFAULT_CHUNK_LOOPS = 3; // how many times do we loop through the data in chunks
+    public const int DEFAULT_CHUNK_LOOPS = 3; // how many times do we loop through the data in chunks
 
-    public const DEFAULT_CHUNK_SIZE = 1000; // how many things to delete at once
+    public const int DEFAULT_CHUNK_SIZE = 1000; // how many things to delete at once
 
-    /* the config key to look up the retention period for this strategy, e.g. 'ConfigMapper::NAME_DATA_RETENTION_*'
+    public const int MAX_CHUNK_SIZE = 10000; // sane limit of how many things to delete at once
+
+    /* This is how we work out how long to retain soft deleted data for. Or if we should hard delete it at all. This is configured config, and can be overridden by the command line tool option --retention-period=xx(days)
+     *
+     * the config key to look up the retention period for this strategy, e.g. 'ConfigMapper::NAME_DATA_RETENTION_*'
      * planned options 1;1 Day:30;30 Days:365;365 Days and <null> (null is do NOT hard delete this)
+     *
+     * @var string
      */
-    public string $retentionConfigKey = '';
+    protected string $retentionConfigKey = '';
 
     /**
-     * cache and store the retention period for this strategy,
-     * so we don't have to keep looking it up from the config for every chunk,
-     * and so we can override it with setRetentionPeriod if needed
+     * A hash lookup of cached prepared statements and how often they were reused.
      *
-     * This should be in database format, e.g. '2024-01-01 00:00:00'
-     * @var null|string
+     * @var array<string, array{statement: \PDOStatement, count: int}>
      */
-    private ?string $retentionPeriod = null;
+    protected array $preparedStatements = [];
 
     /**
      * @param null|LoggerInterface $log        // log to STDERR
@@ -46,6 +51,7 @@ abstract class StrategyBase implements IStrategy
      * @param LockInterface        $lock       // lock to prevent multiple instances of this running at once, should be refreshed by long running processes
      * @param IConfigLoader        $config     // config loader gives the strategy ability to access its own config
      * @param int                  $endTime    // at what time should we just stop processing, to prevent the tool from running for too long, should be a unix timestamp, e.g. time() + 60*60 for 1 hour from now
+     * @param RetentionPeriod $retentionPeriod // the retention period helper, which may contain an override date for us to use
      * @param int                  $chunkLoops // how many times to loop through the data in chunks, default 3, set to 1 to only loop once, set to 0 for infinite looping until no more data is found
      * @param int                  $chunkSize  // how many records to process at once, default 1000
      */
@@ -56,6 +62,7 @@ abstract class StrategyBase implements IStrategy
         protected LockInterface $lock,
         protected IConfigLoader $config,
         protected int $endTime,
+        protected RetentionPeriod $retentionPeriod,
         protected int $chunkLoops = self::DEFAULT_CHUNK_LOOPS,
         protected int $chunkSize = self::DEFAULT_CHUNK_SIZE,
     ) {
@@ -66,7 +73,7 @@ abstract class StrategyBase implements IStrategy
      */
     public function process(): void
     {
-        $deleteOlderThan = $this->getRetentionPeriod();
+        $deleteOlderThan = $this->calculateDate();
         if ($deleteOlderThan === null) {
             return;
         }
@@ -78,11 +85,11 @@ abstract class StrategyBase implements IStrategy
         if (!$this->hasDataToDelete()) {
             // if there is no data to delete, log and return early to avoid unnecessary processing
             $this->log->notice('No entries to delete');
+            return;
         }
 
         // fetch ids to delete
         $deleteIds = $this->getIdsToDelete();
-
 
         // log how many chunks we will delete
         $chunkCount = ceil(count($deleteIds) / $this->chunkSize);
@@ -90,6 +97,9 @@ abstract class StrategyBase implements IStrategy
 
         // chunk things into $this->chunkSize
         foreach (array_chunk($deleteIds, $this->chunkSize) as $chunkNum => $chunk) {
+            // refresh the lock to start the chunk with a fresh time period
+            $this->lock->refresh();
+
             // capture time, so we know how long a chunk took
             $start = microtime(true);
             // begin transaction for the chunk
@@ -136,9 +146,10 @@ abstract class StrategyBase implements IStrategy
                     return;
                 }
                 $chunkLoop++;
-                $this->lock->refresh();
             }
         }
+
+        $this->clearPreparedStatements();
     }
 
     /**
@@ -150,31 +161,45 @@ abstract class StrategyBase implements IStrategy
      * Get the retention period for this strategy, in database format
      * e.g. '2024-01-01 00:00:00'
      * null if no retention period is set (i.e. do not hard delete this data)
+     *
+     * Either uses the cached retentionPeriod from the cli option --retention-period=xx(days),
+     * or looks up the retention period from config using $retentionConfigKey
      * @return string|null
      */
-    protected function getRetentionPeriod()
+    protected function calculateDate(): ?string
     {
-        if (null === $this->retentionPeriod) {
-            $retentionPeriod = (string)$this->config->get($this->retentionConfigKey); // configured by admin with planned options 1 Day, 30 Days, 365 Days, <null> (null is do NOT hard delete this)
-            if ('' === $retentionPeriod) {
-                $this->log->notice('No retention period set, skipping');
-                return null;
-            }
-            $retentionDate = \Alaress_Date_Format::newNaturalDate(sprintf("-%s days", $retentionPeriod));
-
-            // if in the future for some reason, log and return null to avoid deleting everything
-            if ($retentionDate->isFuture()) {
-                $this->log->notice('Negative retention period, skipping');
-                return null;
-            }
-            $this->retentionPeriod = $retentionDate->getDatabase();
+        // if we are using an override date, then return that
+        if ($this->retentionPeriod->getRetentionDays() !== null) {
+            return $this->retentionPeriod->calculateDate(0);
         }
-        return $this->retentionPeriod;
+
+        // if retention period is not set, return null
+        if ($this->config->get($this->retentionConfigKey) === null || '' === $this->config->get($this->retentionConfigKey)) {
+            $this->log->warning(sprintf("Retention period not set for '%s'. Skipping.", $this->getStrategyName()));
+            return null;
+        }
+
+        // validate the admin config, before using it.
+        if (!new ValidRetentionPeriod()->isSatisfiedBy($this->config->get($this->retentionConfigKey))) {
+            $this->log->warning(sprintf("Invalid retention period '%s' stored; cannot calculate date cutoff.. Skipping.", $this->config->get($this->retentionConfigKey)));
+        }
+
+        // return the admin config for this strat
+        try {
+            return $this->retentionPeriod->calculateDate((int)$this->config->get($this->retentionConfigKey));
+        } catch (SchoolboxException $e) {
+            $this->log->warning(sprintf("Invalid retention period '%s': %s. Skipping.", $this->config->get($this->retentionConfigKey), $e->getMessage()));
+            return null;
+        }
     }
 
-    public function setRetentionPeriod(?int $retentionPeriod): void
+    /**
+     * @inheritDoc
+     */
+    public function setRetentionPeriod(RetentionPeriod $retentionPeriod): self
     {
-        $this->retentionPeriod = (\Alaress_Date_Format::newNaturalDate(sprintf("-%s days", $retentionPeriod)))->getDatabase();
+        $this->retentionPeriod = $retentionPeriod;
+        return $this;
     }
 
     /**
@@ -207,13 +232,46 @@ abstract class StrategyBase implements IStrategy
 
     /**
      * Get the delete statement to use, rather than rely exclusively on rollback
+     * @param string $table
      * @return string
      */
-    protected function deleteStatement(): string
+    protected function deleteStatement(string $table): string
     {
         if (!$this->perform) {
-            return 'SELECT * ';
+            return sprintf('SELECT %s.*', $table);
         }
-        return 'DELETE ';
+        return sprintf('DELETE %s ', $table);
+    }
+
+    /**
+     * reset the prepared statements cache, so we can re-use them
+     * @return void
+     */
+    private function clearPreparedStatements(): void
+    {
+        $this->log->info(sprintf("Clearing '%d' prepared statements from the cache", count($this->preparedStatements)));
+
+        foreach ($this->preparedStatements as $sql => $prepare) {
+            $this->log->debug(sprintf("Used times: '%d', sql: '%s'", $prepare['count'], $sql));
+        }
+        $this->preparedStatements = [];
+    }
+
+    /**
+     * Get the cached prepared statement for a query, or create a new one if it doesn't exist
+     * @param string $query
+     * @return \PDOStatement
+     */
+    protected function getPreparedStatement(string $query): \PDOStatement
+    {
+        if (!isset($this->preparedStatements[$query])) {
+            $this->preparedStatements[$query] = [
+                'statement' => $this->database->prepare($query),
+                'count' => 0
+            ];
+        }
+        // log that fetched the prepared statement
+        $this->preparedStatements[$query]['count']++;
+        return $this->preparedStatements[$query]['statement'];
     }
 }

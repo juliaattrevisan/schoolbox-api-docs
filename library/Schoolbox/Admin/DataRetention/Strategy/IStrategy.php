@@ -2,18 +2,15 @@
 
 /**
  * Justin Clarke <justin.clarke@schoolbox.education>
- * @copyright Copyright 2025, Schoolbox Pty Ltd
+ * @copyright Copyright 2026, Schoolbox Pty Ltd
  * @link      https://schoolbox.education/
  */
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\DataRetention;
+namespace Schoolbox\Admin\DataRetention\Strategy;
 
-use Alaress\Database\Connector\IConnector;
-use Psr\Log\LoggerInterface;
-use Schoolbox\IConfigLoader;
-use Symfony\Component\Lock\LockInterface;
+use Schoolbox\Admin\DataRetention\RetentionPeriod;
 
 /**
  * Interface IStrategy
@@ -43,8 +40,8 @@ interface IStrategy
 
     /**
      * Override the retention period for this strategy, do NOT use the date range from the config
-     * @param null|int $retentionPeriod
-     * @return void
+     * @param RetentionPeriod $retentionPeriod
+     * @return self
      */
-    public function setRetentionPeriod(?int $retentionPeriod): void;
+    public function setRetentionPeriod(RetentionPeriod $retentionPeriod): self;
 }
