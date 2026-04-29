@@ -115,7 +115,7 @@ class Visibility
         // If instructor is also a participant, respect their custom close date.
         $participant = $assessable->getParticipantIfExtant($instructor);
         $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
-        return $now->lt($closeDate);
+        return null === $closeDate || $now->lt($closeDate);
     }
 
     /**
@@ -152,7 +152,7 @@ class Visibility
         return (
             ($workType === null || !$respectWorkTypeVisibility || $workType->isVisibleToLearners()) &&
             $assessable->isPublished($learnerParticipant, $now) &&
-            ($showClosed || $now->lt($closeDate))
+            ($showClosed || null === $closeDate || $now->lt($closeDate))
         );
     }
 
@@ -185,7 +185,7 @@ class Visibility
             // If staff member is also a participant, respect their custom close date.
             $participant = $assessable->getParticipantIfExtant($nonInstructorNonLearnerParticipant);
             $closeDate   = $participant ? $participant->getCloseDate() : $assessable->getCloseAt();
-            return $now->lt($closeDate);
+            return null === $closeDate || $now->lt($closeDate);
         }
 
         $workType = $assessable->getWorkType();
@@ -204,8 +204,9 @@ class Visibility
             }
 
             $closeDate   = $participant->getCloseDate();
-            $isPublished = $now->gte($participant->getPublishDate());
-            return $isPublished && ($showClosed || $now->lt($closeDate));
+            $publishDate = $participant->getPublishDate();
+            $isPublished = null !== $publishDate && $now->gte($publishDate);
+            return $isPublished && ($showClosed || null === $closeDate || $now->lt($closeDate));
         }
 
         /** Handle case where the user is a parent of one or more learner-participants. */

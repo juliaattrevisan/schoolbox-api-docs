@@ -144,6 +144,68 @@ class VisibilityTest extends TestCase
 
 
     /**
+     * @param null|WorkType\Model $workType
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNullCloseDateVisibility')]
+    public function testNullCloseDateDoesNotHideVisibleAssessments(
+        int $userOffset,
+        string $roleType,
+        bool $isParticipant,
+        ?WorkType\Model $workType
+    ): void {
+        $now = new Alaress_Date_Format(self::NOW_DATABASE, Alaress_Date_Format::DATABASE_FORMAT);
+        $assessable = (new DueWork\Model())
+            ->setId(1)
+            ->setTitle('A DueWork - no close date')
+            ->setContext((new Folder\Model())->setId(1))
+            ->setAcceptsMultiple()
+            ->setPublishAt((clone $now)->addDays(-1))
+            ->setOpenAt((clone $now)->addDays(-1))
+            ->setDueAt((clone $now)->addDays(1))
+            ->setCloseAt(null)
+            ->setWorkType($workType);
+
+        $user = self::buildUsers()[$userOffset];
+        $user->setRole((new Role())->setType($roleType));
+
+        $plan = (new Plan($assessable))->setIsDynamic(PlanMapper::PLAN_TYPE_DYNAMIC);
+        if ($isParticipant) {
+            $plan->getParticipants()[$user->getId()] = new Participant(
+                $user,
+                $plan,
+                ResultCache\Mapper::getInstance()
+            );
+        }
+        $assessable->setPlans($assessable->getPlans()->emptyClone()->add($plan));
+
+        $visibility = new Visibility($this->getAccessStub());
+
+        $this->assertTrue($visibility->isVisibleToUser($assessable, $user, false, $now));
+    }
+
+
+    /**
+     * @return array
+     */
+    public static function providerNullCloseDateVisibility(): array
+    {
+        return [
+            'instructor participant' => [1, Role::STAFF, true, null],
+            'instructor non-participant' => [1, Role::STAFF, false, null],
+            'learner participant' => [
+                2,
+                Role::STUDENT,
+                true,
+                (new WorkType\Model())->setIsVisibleToLearners(true),
+            ],
+            'staff participant' => [0, Role::STAFF, true, null],
+            'staff non-participant' => [0, Role::STAFF, false, null],
+            'non-instructor non-learner participant' => [0, Role::STUDENT, true, null],
+        ];
+    }
+
+
+    /**
      * @return array
      * @throws InvalidArgumentException
      */
