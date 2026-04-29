@@ -53,14 +53,14 @@ class Visibility
      * @return bool
      */
     public function isVisibleToUser(
-        IAssessable $assessment,
+        IAssessable $assessable,
         User $viewer,
         bool $showClosed,
         ?Alaress_Date_Format $now = null,
         bool $respectWorkTypeVisibility = true
     ): bool {
         $now = $now ?? Alaress_Date_Format::now();
-        $folder = $assessment->getBaseContext()->getFolder();
+        $folder = $assessable->getBaseContext()->getFolder();
 
         // Handle case where user is instructor.
         try {
@@ -69,7 +69,7 @@ class Visibility
             $viewerIsInstructor = false; // In case of exception, assume non-instructor.
         }
         if ($viewerIsInstructor) {
-            return $this->isVisibleToInstructor($assessment, $viewer, $showClosed, $now);
+            return $this->isVisibleToInstructor($assessable, $viewer, $showClosed, $now);
         }
 
         // Handle case where user is a learner-participant.
@@ -78,10 +78,10 @@ class Visibility
         } catch (MapperException | \LogicException) {
             $viewerIsLearner = false; // In case of exception, assume non-learner.
         }
-        $viewerParticipant = $assessment->getParticipantIfExtant($viewer);
+        $viewerParticipant = $assessable->getParticipantIfExtant($viewer);
         if ($viewerIsLearner && $viewerParticipant !== null) {
             return $this->isVisibleToLearnerParticipant(
-                $assessment,
+                $assessable,
                 $viewer,
                 $viewerParticipant,
                 $showClosed,
@@ -91,7 +91,7 @@ class Visibility
         }
 
         // Handle all other cases (including where user is parent of learner-participant).
-        return $this->isVisibleToNonInstructorNonLearnerParticipant($assessment, $viewer, $showClosed, $now, $respectWorkTypeVisibility);
+        return $this->isVisibleToNonInstructorNonLearnerParticipant($assessable, $viewer, $showClosed, $now, $respectWorkTypeVisibility);
     }
 
     /**
