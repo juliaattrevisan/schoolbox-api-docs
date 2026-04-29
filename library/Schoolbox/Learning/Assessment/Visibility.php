@@ -222,7 +222,7 @@ class Visibility
             foreach ($childLearners as $childLearner) {
                 // Apply special lesson plan visibility logic.
                 // (If lesson plan is hidden from students, it should be hidden from parents also).
-                if ($this->hideAssessmentDueToLessonPlanVisibility($assessable, $nonInstructorNonLearnerParticipant)) {
+                if ($this->hideAssessmentDueToLessonPlanVisibility($assessable, $childLearner)) {
                     continue; // Skip student due to special lesson plan visibility logic.
                 }
 
