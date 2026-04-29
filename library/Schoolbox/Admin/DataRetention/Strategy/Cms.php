@@ -260,6 +260,8 @@ class Cms extends Base
             return [];
         }
 
+        $componentInstanceHomepage = \Component_Instance::MODULE_HOMEPAGE;
+
         $placeholders = Builder::getArrayPlaceholders($folderIds, 'folder');
         $statement = $this->getPreparedStatement(
             sprintf(
@@ -268,7 +270,7 @@ class Cms extends Base
                 $table,
                 $folderColumn,
                 $placeholders,
-                $table === 'component_instance' ? " AND module = 'homepage'" : '',
+                $table === 'component_instance' ? " AND module = '$componentInstanceHomepage'" : '',
             )
         );
         $statement->execute(Builder::getArrayParameters($folderIds, 'folder'));
