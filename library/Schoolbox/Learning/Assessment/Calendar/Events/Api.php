@@ -119,7 +119,7 @@ class Api implements Calendar_Api_EventType_Interface
 
         $stack = new GenericCollection(EventInterface::class);
         foreach ($assessments as $assessment) {
-            if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->user, true)) {
+            if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->viewer, true)) {
                 continue;
             }
 
@@ -157,10 +157,20 @@ class Api implements Calendar_Api_EventType_Interface
 
         try {
             $assessment = $this->assessmentDataSource->findById($eventId);
-            if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->user, true)) {
+            if ($this->visibility) {
+                $assessments = new GenericCollection(IAssessable::class, [$assessment]);
+                $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection(
+                    $assessments,
+                    $this->user,
+                    true,
+                    true
+                );
+                $assessment = $assessments->first();
+            }
+            if ($this->visibility && !$this->visibility->isVisibleToUser($assessment, $this->viewer, true)) {
                 return $stack;
             }
-            $event      = $this->transformAssessmentToEvent($assessment, $this->user);
+            $event = $this->transformAssessmentToEvent($assessment, $this->user);
             if ($event) {
                 $stack->add($event);
             }
