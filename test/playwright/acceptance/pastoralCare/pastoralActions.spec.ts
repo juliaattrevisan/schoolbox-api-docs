@@ -140,7 +140,7 @@ test.describe.serial("Pastoral Actions", () => {
         db,
     }) => {
         const pastoralProfile = new PastoralProfile(page, tester);
-        const pastoralRecord = new PastoralRecord(page, tester);
+        const pastoralRecord = new PastoralRecord(page);
         const subtypeRecordId = Number(
             (await db.grabFromDatabase("pastoral", "id", {
                 deleted_at: null,

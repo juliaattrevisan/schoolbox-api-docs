@@ -10,12 +10,12 @@
                                 <div class="pastoral-action-checkbox-and-label">
                                     <input id="action-{{ recordAction.action.id }}" name="actions[]" type="checkbox"
                                             {{ recordAction.completed ? 'checked="checked"' : '' }}
-                                        data-pastoral-action="{{ recordAction.id }}" data-test="pastoral-record-input-action-{{ recordAction.action.id }}/>
+                                        data-pastoral-action="{{ recordAction.id }}" data-test="pastoral-record-input-action-{{ recordAction.action.id }}"/>
                                     <label for="action-{{ recordAction.action.id }}"
-                                            {{ recordAction.completed ? 'class="strike"' : '' }} data-test="pastoral-record-action-label-{{ recordAction.action.id }}"">{{ recordAction.action.name }}</label>
+                                            {{ recordAction.completed ? 'class="strike"' : '' }} data-test="pastoral-record-action-label-{{ recordAction.action.id }}">{{ recordAction.action.name }}</label>
                                 </div>
                                 {% if recordAction.completed %}
-                                <div data-action-status-{{ recordAction.action.id }} class="pastoral-action-date-and-user" data-test="pastoral-record-action-status-{{ recordAction.action.id }}>
+                                <div data-action-status-{{ recordAction.action.id }} class="pastoral-action-date-and-user" data-test="pastoral-record-action-status-{{ recordAction.action.id }}">
                                     <span class="meta" title="{{ recordAction.updatedAt.long }}">
                                         Completed <time>{{ recordAction.updatedAt.getRelativeTime }}</time>
                                     </span>

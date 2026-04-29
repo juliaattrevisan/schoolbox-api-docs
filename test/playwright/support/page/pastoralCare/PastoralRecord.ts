@@ -1,13 +1,9 @@
 import type { Page, Locator } from "@playwright/test";
-import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import { expect } from "@playwright/test";
 
 export default class PastoralRecord {
     // Playwright page instance used to interact with the pastoral record UI.
     private page: Page;
-
-    // Shared acceptance test helpers for common cross-page interactions.
-    private tester: AcceptanceTester;
 
     // Route template for a specific pastoral record page.
     static readonly URL = "/pastoral/student/{studentId}/record/{recordId}";
@@ -33,9 +29,8 @@ export default class PastoralRecord {
     // Test id template for the status element of a pastoral action on the pastoral record page.
     static readonly DATA_TEST_PASTORAL_ACTION_STATUS = "pastoral-record-action-status-{actionId}";
 
-    constructor(page: Page, tester: AcceptanceTester) {
+    constructor(page: Page) {
         this.page = page;
-        this.tester = tester;
     }
 
     /**

@@ -31,7 +31,7 @@ test.describe("Pastoral Care - Management Settings", () => {
     test.beforeEach(async ({ page, tester }) => {
         pastoralProfile = new PastoralProfile(page, tester);
         createPastoralRecord = new CreatePastoralRecord(page);
-        pastoralRecord = new PastoralRecord(page, tester);
+        pastoralRecord = new PastoralRecord(page);
         // login as admin
         await tester.loginAsAdmin();
     });

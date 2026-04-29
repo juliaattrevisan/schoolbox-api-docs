@@ -14,9 +14,6 @@ export default class PastoralExpiry {
     // Shared acceptance test helpers for common UI interactions and CKEditor input.
     private tester: AcceptanceTester;
 
-    // Helper page object for reusing pastoral record action selectors.
-    private createPastoralRecordPage: CreatePastoralRecord;
-
     // Route for the Award/Achievement subtype settings page.
     static readonly URL_AWARD_ACHIEVEMENT = "/pastoral/management/audience/subtype/1/modify";
 
@@ -78,7 +75,6 @@ export default class PastoralExpiry {
     constructor(page: Page, tester: AcceptanceTester) {
         this.page = page;
         this.tester = tester;
-        this.createPastoralRecordPage = new CreatePastoralRecord(page);
     }
 
     /**
