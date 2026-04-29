@@ -26,6 +26,7 @@ use InvalidArgumentException;
 use PHPUnit;
 use PHPUnit\Framework\MockObject\Stub;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Resource\Folder;
 
 /**
@@ -86,6 +87,60 @@ class VisibilityTest extends TestCase
     }
 
 
+    public function testLearnerParticipantCannotSeeLessonPlanHiddenFromStudents(): void
+    {
+        $now = new Alaress_Date_Format(self::NOW_DATABASE, Alaress_Date_Format::DATABASE_FORMAT);
+        [, , $learner] = self::buildUsers();
+        $learner->setRole((new Role())->setType(Role::STUDENT));
+
+        $lessonPlan = self::buildLessonPlan($now, Role::STAFF);
+        $lessonPlan->setWorkType(
+            (new WorkType\Model())
+                ->setIsVisibleToParents(true)
+                ->setIsVisibleToLearners(true)
+        );
+
+        $plan = (new Plan($lessonPlan))->setIsDynamic(PlanMapper::PLAN_TYPE_DYNAMIC);
+        $plan->getParticipants()[$learner->getId()] = new Participant(
+            $learner,
+            $plan,
+            ResultCache\Mapper::getInstance()
+        );
+        $lessonPlan->setPlans($lessonPlan->getPlans()->emptyClone()->add($plan));
+
+        $visibility = new Visibility($this->getAccessStub());
+
+        $this->assertFalse($visibility->isVisibleToUser($lessonPlan, $learner, true, $now));
+    }
+
+
+    public function testParentCannotSeeLessonPlanHiddenFromStudents(): void
+    {
+        $now = new Alaress_Date_Format(self::NOW_DATABASE, Alaress_Date_Format::DATABASE_FORMAT);
+        [, , $childLearner, $parent] = self::buildUsers();
+        $parent->setRole((new Role())->setType(Role::PARENT));
+
+        $lessonPlan = self::buildLessonPlan($now, Role::STAFF);
+        $lessonPlan->setWorkType(
+            (new WorkType\Model())
+                ->setIsVisibleToParents(true)
+                ->setIsVisibleToLearners(true)
+        );
+
+        $plan = (new Plan($lessonPlan))->setIsDynamic(PlanMapper::PLAN_TYPE_DYNAMIC);
+        $plan->getParticipants()[$childLearner->getId()] = new Participant(
+            $childLearner,
+            $plan,
+            ResultCache\Mapper::getInstance()
+        );
+        $lessonPlan->setPlans($lessonPlan->getPlans()->emptyClone()->add($plan));
+
+        $visibility = new Visibility($this->getAccessStub());
+
+        $this->assertFalse($visibility->isVisibleToUser($lessonPlan, $parent, true, $now));
+    }
+
+
     /**
      * @return array
      * @throws InvalidArgumentException
@@ -137,42 +192,42 @@ class VisibilityTest extends TestCase
             [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeNone, $closed, $hideClosed, $now, false],
 
             // Participating student non-instructor-non-learner, work type: Staff-Instructors-Learners-Parents.
-            // I see if it's published, unless it's closed and hideClosed is on
+            // I never see it (participants who are not learners are not included by work type visibility)
             [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSILP, $unpublished, $showClosed, $now, false],
             [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSILP, $unpublished, $hideClosed, $now, false],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSILP, $upcoming, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSILP, $upcoming, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSILP, $open, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSILP, $open, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSILP, $overdue, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSILP, $overdue, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSILP, $closed, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSILP, $upcoming, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSILP, $upcoming, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSILP, $open, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSILP, $open, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSILP, $overdue, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSILP, $overdue, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSILP, $closed, $showClosed, $now, false],
             [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSILP, $closed, $hideClosed, $now, false],
 
             // Participating student non-instructor-non-learner, work type: Staff-Instructors-Parents.
-            // I see if it's published, unless it's closed and hideClosed is on
+            // I never see it (participants who are not learners are not included by work type visibility)
             [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIP, $unpublished, $showClosed, $now, false],
             [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIP, $unpublished, $hideClosed, $now, false],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIP, $upcoming, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIP, $upcoming, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIP, $open, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIP, $open, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIP, $overdue, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIP, $overdue, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIP, $closed, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIP, $upcoming, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIP, $upcoming, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIP, $open, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIP, $open, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIP, $overdue, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIP, $overdue, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIP, $closed, $showClosed, $now, false],
             [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIP, $closed, $hideClosed, $now, false],
 
             // Participating student non-instructor-non-learner, work type: Staff-Instructors-Learners.
-            // I see if it's published, unless it's closed and hideClosed is on
+            // I never see it (participants who are not learners are not included by work type visibility)
             [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIL, $unpublished, $showClosed, $now, false],
             [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIL, $unpublished, $hideClosed, $now, false],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIL, $upcoming, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIL, $upcoming, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIL, $open, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIL, $open, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIL, $overdue, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIL, $overdue, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIL, $closed, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIL, $upcoming, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIL, $upcoming, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIL, $open, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIL, $open, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIL, $overdue, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIL, $overdue, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIL, $closed, $showClosed, $now, false],
             [$isParticipant, $studentRole, $nonInstructorNonLearner, $workTypeSIL, $closed, $hideClosed, $now, false],
 
             // Participating student non-instructor-non-learner, work type: Staff-Instructors.
@@ -364,16 +419,16 @@ class VisibilityTest extends TestCase
             [$isParticipant, $studentRole, $isParentOfLearner, $workTypeSIP, $closed, $hideClosed, $now, false],
 
             // Participating student parent-of-learner, work type: Staff-Instructors-Learners.
-            // I see if it's published as a participant (parent path not taken: not visible to parents), unless it's closed and hideClosed is on
+            // I never see it (parent path not taken: not visible to parents; own participant access is not enough)
             [$isParticipant, $studentRole, $isParentOfLearner, $workTypeSIL, $unpublished, $showClosed, $now, false],
             [$isParticipant, $studentRole, $isParentOfLearner, $workTypeSIL, $unpublished, $hideClosed, $now, false],
-            [$isParticipant, $studentRole, $isParentOfLearner, $workTypeSIL, $upcoming, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $isParentOfLearner, $workTypeSIL, $upcoming, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $isParentOfLearner, $workTypeSIL, $open, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $isParentOfLearner, $workTypeSIL, $open, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $isParentOfLearner, $workTypeSIL, $overdue, $showClosed, $now, true],
-            [$isParticipant, $studentRole, $isParentOfLearner, $workTypeSIL, $overdue, $hideClosed, $now, true],
-            [$isParticipant, $studentRole, $isParentOfLearner, $workTypeSIL, $closed, $showClosed, $now, true],
+            [$isParticipant, $studentRole, $isParentOfLearner, $workTypeSIL, $upcoming, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $isParentOfLearner, $workTypeSIL, $upcoming, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $isParentOfLearner, $workTypeSIL, $open, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $isParentOfLearner, $workTypeSIL, $open, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $isParentOfLearner, $workTypeSIL, $overdue, $showClosed, $now, false],
+            [$isParticipant, $studentRole, $isParentOfLearner, $workTypeSIL, $overdue, $hideClosed, $now, false],
+            [$isParticipant, $studentRole, $isParentOfLearner, $workTypeSIL, $closed, $showClosed, $now, false],
             [$isParticipant, $studentRole, $isParentOfLearner, $workTypeSIL, $closed, $hideClosed, $now, false],
 
             // Participating student parent-of-learner, work type: Staff-Instructors.
@@ -1291,6 +1346,20 @@ class VisibilityTest extends TestCase
             ->setCloseAt((clone $now)->addDays(-1));
 
         return [$unpublished, $upcoming, $open, $overdue, $closed];
+    }
+
+
+    private static function buildLessonPlan(Alaress_Date_Format $now, string $visibility): LessonPlan\Model
+    {
+        return (new LessonPlan\Model())
+            ->setId(1)
+            ->setTitle('A Lesson Plan')
+            ->setContext((new Folder\Model())->setId(1))
+            ->setPublishAt((clone $now)->addDays(-1))
+            ->setOpenAt((clone $now)->addDays(-1))
+            ->setDueAt((clone $now)->addDays(1))
+            ->setCloseAt((clone $now)->addDays(1))
+            ->setVisibility($visibility);
     }
 
 
