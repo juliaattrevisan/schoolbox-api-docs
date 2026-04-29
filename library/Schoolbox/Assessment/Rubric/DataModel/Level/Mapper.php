@@ -53,19 +53,23 @@ class Mapper extends BaseMapper
 
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateBoxIdNotChanged']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateRubricInstanceNotChanged']);
     }
 
 
     /**
-     * Verify this level belongs to the same box it always belonged to.
+     * Verify this level belongs to the same rubric instance it always belonged to.
+     *
+     * TODO I'm not really sure what was meant by this, there's no documentation as to why this is illegal/undesirable
+     *  but according to SA-7670 something went awry when importing a rubric csv, causing data loss; no associated PR.
+     *  Anyway I'm going to assume that submission box can be replaced conceptually by a rubric instance as usual.
      *
      * @param Model $level
      * @return bool
      */
-    public function validateBoxIdNotChanged(Model $level): bool
+    public function validateRubricInstanceNotChanged(Model $level): bool
     {
-        $this->assertJoinedModelNotChanged($level, 'box', 'Rubric levels may not be transferred between due works');
+        $this->assertJoinedModelNotChanged($level, 'rubricInstance', 'Rubric levels may not be transferred between rubric instances');
         return true;
     }
 
