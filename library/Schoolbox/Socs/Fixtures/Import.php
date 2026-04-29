@@ -346,9 +346,7 @@ class Import implements IStrategy
             }
 
             try {
-                $coach = $this->coachMapper->findOneByColumnList([
-                    'user_id' => $user->getId(),
-                ]);
+                $coach = $this->coachMapper->findOneByColumn('user_id', $user->getId());
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $coach = $this->coachMapper->createModel()
                     ->setName($coachName)
