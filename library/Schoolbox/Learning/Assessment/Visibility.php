@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\Access;
 use Alaress_Date_Format;
@@ -143,6 +144,11 @@ class Visibility
             throw new \UnexpectedValueException('');
         }
 
+        // Apply special lesson plan visibility logic.
+        if ($assessable instanceof LessonPlan\Model && Role::STUDENT !== $assessable->getVisibility()) {
+            return false;
+        }
+
         return (
             ($workType === null || !$respectWorkTypeVisibility || $workType->isVisibleToLearners()) &&
             $assessable->isPublished($learnerParticipant, $now) &&
@@ -167,7 +173,7 @@ class Visibility
         Alaress_Date_Format $now,
         bool $respectWorkTypeVisibility
     ): bool {
-        // Handle the case where the user is a staff member.
+        /** Handle case where the user is a staff member. */
         // Note we do not have to consider the case of a staff member who is also a parent of a learner.  That is
         // because although it is possible to define such a user in the sis_... tables, Schoolbox's user provisioning
         // process will create two users in that situation. One with role type 'staff', the other with role type
@@ -183,7 +189,25 @@ class Visibility
         }
 
         $workType = $assessable->getWorkType();
+        $participant = $assessable->getParticipantIfExtant($nonInstructorNonLearnerParticipant);
 
+        /** Handle case where work type visibility should be ignored or cannot be determined. */
+        if (!$respectWorkTypeVisibility || $workType === null) {
+            if (!$participant) {
+                return false;
+            }
+
+            // Apply special lesson plan visibility logic.
+            if ($assessable instanceof LessonPlan\Model && Role::STUDENT !== $assessable->getVisibility()) {
+                return false;
+            }
+
+            $closeDate   = $participant->getCloseDate();
+            $isPublished = $now->gte($participant->getPublishDate());
+            return $isPublished && ($showClosed || $now->lt($closeDate));
+        }
+
+        /** Handle case where the user is a parent of one or more learner participants. */
         try {
             $childLearners = $this->access->getChildLearnersOfParent(
                 $nonInstructorNonLearnerParticipant,
@@ -192,28 +216,23 @@ class Visibility
         } catch (MapperException | \LogicException | \UnexpectedValueException) {
             $childLearners = new GenericCollection(User::class); // In case of exception, assume no child learner exists.
         }
-
-        // Handle the case where the user is a parent of one or more learner participants.
         if (
             $respectWorkTypeVisibility && $workType !== null
             && $childLearners->count() > 0 && $workType->isVisibleToParents()
         ) {
             // Apply special lesson plan visibility logic.
             // (If lesson plan is hidden from students, it should be hidden from parents also).
-            if ($assessable instanceof LessonPlan\Model && \Schoolbox\Role::STUDENT !== $assessable->getVisibility()) {
+            if ($assessable instanceof LessonPlan\Model && Role::STUDENT !== $assessable->getVisibility()) {
                 return false;
             }
 
             $childParticipants = new GenericCollection(Participant::class);
-
             foreach ($childLearners as $childLearner) {
-                $participant = $assessable->getParticipantIfExtant($childLearner);
-
-                if ($participant === null) {
+                $childParticipant = $assessable->getParticipantIfExtant($childLearner);
+                if ($childParticipant === null) {
                     continue;
                 }
-
-                $childParticipants->add($participant);
+                $childParticipants->add($childParticipant);
             }
 
             // Return true if the parent has any child participant for whom the assessment is visible.
@@ -242,33 +261,11 @@ class Visibility
             return false;
         }
 
-        if (
-            $respectWorkTypeVisibility && $workType !== null
-            && !$workType->isVisibleToLearners() && !$workType->isVisibleToParents()
-        ) {
-            // This work type is visible only to staff and instructors.  Since the user is a non-instructor and not
-            // staff (since the staff case was handled above), the assessment should not be visible to the user.
-            return false;
-        }
-
-        // A non-learner-participant might still be a participant.
-        $participant = $assessable->getParticipantIfExtant($nonInstructorNonLearnerParticipant);
-        if (!$participant) {
-            return false;
-        }
-
-        /**
-         * Lesson Plans have some specific logic for visibility:
-         * - Lesson Plans can be hidden from students via a Visibility switch
-         * If you're a student, hide any lesson plans that were hidden from you
-         * - Lesson Plans that are not hidden from students should be visible to all students
-         */
-        if ($assessable instanceof LessonPlan\Model && \Schoolbox\Role::STUDENT !== $assessable->getVisibility()) {
-            return false;
-        }
-
-        $closeDate   = $participant->getCloseDate();
-        $isPublished = $now->gte($participant->getPublishDate());
-        return $isPublished && ($showClosed || $now->lt($closeDate));
+        // If execution reaches this point, the user is not:
+        //  * an instructor
+        //  * a learner participant
+        //  * a staff member
+        //  * a parent of a learner participant
+        return false;
     }
 }
