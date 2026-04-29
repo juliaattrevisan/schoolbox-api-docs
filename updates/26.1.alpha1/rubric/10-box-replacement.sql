@@ -98,3 +98,17 @@ REFERENCES rubric_instance (id);
 --
 -- Alternatively, seed the rubric_instance table even for deleted assessments under the assumption that one day they
 -- could be restored for a raft of reasons (we don't know why they were deleted in the first place)
+
+
+-- This was previously mandatory (non-null) but it's been discontinued. Saving rows to the db causes crashes because it
+-- expects there to be a value here
+ALTER TABLE rubric_capability_usage
+MODIFY _submission_box_id INT UNSIGNED NULL;
+
+ALTER TABLE rubric_indicator_usage
+MODIFY _submission_box_id INT UNSIGNED NULL;
+
+ALTER TABLE rubric_level
+MODIFY _box_id INT UNSIGNED NULL;
+
+
