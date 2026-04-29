@@ -108,6 +108,8 @@ class Factory extends Filter\AbstractFactory
             //  * A parent viewing a child’s due work
             //  * A student viewing their own work
             //  * A staff member viewing a student’s due-work
+            // Note that this page will only show work types that are visible to the learner or parent.
+            // So even for staff users we want learner/parent visible work types in the filter.
             return $this->getLearnerOrParentVisibleWorkTypes($user);
         }
 
