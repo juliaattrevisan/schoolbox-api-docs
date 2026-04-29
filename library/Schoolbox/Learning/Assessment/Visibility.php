@@ -145,7 +145,7 @@ class Visibility
         }
 
         // Apply special lesson plan visibility logic.
-        if ($this->specialLessonPlanVisibilityRuleApplies($assessable, $learnerParticipant)) {
+        if ($this->hideAssessmentDueToLessonPlanVisibility($assessable, $learnerParticipant)) {
             return false;
         }
 
@@ -199,7 +199,7 @@ class Visibility
 
             // Since the user who is not a learner-participant may still have
             // role type 'student', apply special lesson plan visibility logic.
-            if ($this->specialLessonPlanVisibilityRuleApplies($assessable, $nonInstructorNonLearnerParticipant)) {
+            if ($this->hideAssessmentDueToLessonPlanVisibility($assessable, $nonInstructorNonLearnerParticipant)) {
                 return false;
             }
 
@@ -222,7 +222,7 @@ class Visibility
             foreach ($childLearners as $childLearner) {
                 // Apply special lesson plan visibility logic.
                 // (If lesson plan is hidden from students, it should be hidden from parents also).
-                if ($this->specialLessonPlanVisibilityRuleApplies($assessable, $nonInstructorNonLearnerParticipant)) {
+                if ($this->hideAssessmentDueToLessonPlanVisibility($assessable, $nonInstructorNonLearnerParticipant)) {
                     continue; // Skip student due to special lesson plan visibility logic.
                 }
 
@@ -273,7 +273,7 @@ class Visibility
      * If you're a student, hide any lesson plans that were hidden from you
      * - Lesson Plans that are not hidden from students should be visible to all students
      */
-    private function specialLessonPlanVisibilityRuleApplies(IAssessable $assessable, User $viewer): bool
+    private function hideAssessmentDueToLessonPlanVisibility(IAssessable $assessable, User $viewer): bool
     {
         return (
             $assessable instanceof LessonPlan\Model &&
