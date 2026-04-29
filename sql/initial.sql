@@ -1,4 +1,4 @@
-/*M!999999\- enable the sandbox mode */ 
+/*M!999999\- enable the sandbox mode */
 -- MariaDB dump 10.19-11.8.6-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: mariadb    Database: schoolbox
@@ -3938,9 +3938,9 @@ CREATE TABLE `lu_work_type` (
   `name` varchar(40) DEFAULT NULL,
   `external_result_type` varchar(50) DEFAULT NULL,
   `show_on_grades_page` tinyint(1) DEFAULT NULL,
-  `staff_or_instructor_visible_only` tinyint(1) NOT NULL,
+  `_staff_or_instructor_visible_only` tinyint(1) NOT NULL DEFAULT 1,
   `is_visible_to_parents` tinyint(1) unsigned NOT NULL DEFAULT 0,
-  `is_visible_to_students` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `is_visible_to_learners` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `permitted_project` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `permitted_due_work` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `permitted_task` tinyint(1) unsigned NOT NULL DEFAULT 0,
@@ -3948,6 +3948,7 @@ CREATE TABLE `lu_work_type` (
   `permitted_lti` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `permitted_lesson_plan` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `permitted_dialog_agent` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `permitted_reporting_activity` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `sequence` int(11) unsigned NOT NULL,
   `updated_by` int(11) unsigned NOT NULL,
   `created_at` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
