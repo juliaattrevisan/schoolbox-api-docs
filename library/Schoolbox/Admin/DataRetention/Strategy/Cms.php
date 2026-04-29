@@ -226,12 +226,14 @@ class Cms extends Base
         $placeholders = Builder::getArrayPlaceholders($folderIds, 'folder');
         $params = Builder::getArrayParameters($folderIds, 'folder');
 
-        foreach ([
-            'assessment_folder' => 'folder_id',
-            'course_implementation' => 'folder_id',
-            'course_specification' => 'folder_id',
-            'mv_assessment_relation' => 'folder_id',
-        ] as $table => $column) {
+        foreach (
+            [
+                'assessment_folder' => 'folder_id',
+                'course_implementation' => 'folder_id',
+                'course_specification' => 'folder_id',
+                'mv_assessment_relation' => 'folder_id',
+            ] as $table => $column
+        ) {
             $statement = $this->getPreparedStatement(
                 "SELECT DISTINCT {$column} AS folder_id FROM {$table} WHERE {$column} IN {$placeholders}"
             );
@@ -241,7 +243,7 @@ class Cms extends Base
                 array_map(
                     static fn(array $row): int => (int) $row['folder_id'],
                     $statement->fetchAll(\PDO::FETCH_ASSOC),
-                ),
+                )
             );
         }
 

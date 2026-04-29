@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\DataRetention\Test;
 
 use Alaress\Database\Connector\IConnector;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\DataRetention\RetentionPeriod;
@@ -12,6 +13,7 @@ use Schoolbox\Admin\DataRetention\Strategy\Cms;
 use Schoolbox\IConfigLoader;
 use Symfony\Component\Lock\LockInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 class CmsStrategyTest extends TestCase
 {
     /**
@@ -43,7 +45,7 @@ class CmsStrategyTest extends TestCase
             public array $deletedFolders = [];
         };
 
-        $strategy = new class(
+        $strategy = new class (
             $logger,
             true,
             $database,

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\DataRetention\Test;
 
 use Alaress\Database\Connector\IConnector;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\DataRetention\RetentionPeriod;
@@ -12,6 +13,7 @@ use Schoolbox\Admin\DataRetention\Strategy\MyFiles;
 use Schoolbox\IConfigLoader;
 use Symfony\Component\Lock\LockInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 class MyFilesStrategyTest extends TestCase
 {
     /**
