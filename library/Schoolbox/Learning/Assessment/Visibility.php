@@ -216,10 +216,7 @@ class Visibility
         } catch (MapperException | \LogicException | \UnexpectedValueException) {
             $childLearners = new GenericCollection(User::class); // In case of exception, assume no child learner exists.
         }
-        if (
-            $respectWorkTypeVisibility && $workType !== null
-            && $childLearners->count() > 0 && $workType->isVisibleToParents()
-        ) {
+        if ($childLearners->count() > 0 && $workType->isVisibleToParents()) {
             // Apply special lesson plan visibility logic.
             // (If lesson plan is hidden from students, it should be hidden from parents also).
             if ($assessable instanceof LessonPlan\Model && Role::STUDENT !== $assessable->getVisibility()) {
