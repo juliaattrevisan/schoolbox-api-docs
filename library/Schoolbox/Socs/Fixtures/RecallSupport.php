@@ -302,6 +302,11 @@ trait RecallSupport
     /**
      * Parse a SOCS date and time string into an Alaress_Date_Format instance.
      *
+     * SOCS documents fixture/result date fields as DATE and time fields as
+     * STRING, but does not publish an exact feed date format. The accepted
+     * formats below document which formats come from SOCS examples, existing
+     * Schoolbox fixture import conventions, and defensive internal fallbacks.
+     *
      * @param string          $date
      * @param string          $time
      * @param LoggerInterface $logger
@@ -314,25 +319,57 @@ trait RecallSupport
         }
 
         $time = strtolower($time);
-        if ($time === '' || $time === 'tbc' || $time === 'n\\a' || $time === 'n/a') {
+        // SOCS documents unset time values as "tbc" or "N\A"; empty and
+        // "N/A" are accepted as common variants so the fixture date survives.
+        $timeIsUnset = $time === '' || $time === 'tbc' || $time === 'n\\a' || $time === 'n/a';
+        if ($timeIsUnset) {
             $time = '00:00';
         }
 
         $raw = sprintf('%s %s', $date, $time);
 
-        try {
-            return new \Alaress_Date_Format($raw, [
-                'j M Y H:i',
-                'j M Y H:i:s',
-                'd/m/Y H:i',
-                'd/m/Y H:i:s',
-                'd/m/Y',
-                'Y-m-d H:i:s',
-                'Y-m-d',
-            ]);
-        } catch (\Exception $e) {
-            $logger->debug(sprintf('Unable to parse SOCS date/time "%s": %s', $raw, $e->getMessage()));
-            return null;
+        $dateTimeFormats = [
+            // SOCS date range examples use "1 Sep 2025":
+            // https://help.socscms.com/Page.asp?CatID=13&ID=276
+            'j M Y H:i',
+            // Same SOCS example date shape when the time includes seconds.
+            'j M Y H:i:s',
+            // Compatibility with the existing Schoolbox fixture CSV import.
+            // Also seen in the SOCS xml using our test creds
+            'd/m/Y H:i',
+            // Same Schoolbox CSV date shape when the time includes seconds.
+            'd/m/Y H:i:s',
+            // Schoolbox internal database/API datetime fallback.
+            \Alaress_Date_Format::DATABASE_FORMAT,
+        ];
+
+        $dateOnlyFormats = [
+            // Date-only Schoolbox CSV compatibility fallback; "|" resets time to 00:00:00.
+            'd/m/Y|',
+            // Schoolbox internal database/API date-only fallback; "|" resets time to 00:00:00.
+            \Alaress_Date_Format::DATABASE_DATE_FORMAT . '|',
+        ];
+
+        $attempts = [[$raw, $dateTimeFormats]];
+        if ($timeIsUnset) {
+            $attempts[] = [$date, $dateOnlyFormats];
         }
+
+        $lastException = null;
+        foreach ($attempts as [$value, $formats]) {
+            try {
+                return new \Alaress_Date_Format($value, $formats);
+            } catch (\Exception $e) {
+                $lastException = $e;
+            }
+        }
+
+        if ($lastException instanceof \Exception) {
+            $logger->debug(sprintf('Unable to parse SOCS date/time "%s": %s', $raw, $lastException->getMessage()));
+        } else {
+            $logger->debug(sprintf('Unable to parse SOCS date/time "%s"', $raw));
+        }
+
+        return null;
     }
 }

@@ -165,6 +165,12 @@ class Import implements IStrategy
                 $awaySchool = $this->recallSchool($this->schoolMapper, $this->log, $oppositionSchoolName);
             }
 
+            /**
+             * use the helper to translate SOCS documented date/time fields to a standard Alaress_Date_Format
+             * SOCS does have an undocumented `startdatefull`/`enddatefull`
+             * which would be nice to use as it contains either empty or `2026-03-30T14:30:00` a nice standard format...
+             * But this is undocumented, so I won't use it just yet... it may change or go away...
+             */
             $startAt = $this->makeDateTime($date, $time, $this->log);
             if (null === $startAt) {
                 $this->log->debug(sprintf('Skipping SOCS fixture %s due to invalid date/time', $eventId));
