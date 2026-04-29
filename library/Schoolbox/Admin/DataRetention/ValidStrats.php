@@ -26,6 +26,9 @@ class ValidStrats
     // Strategy for hard-deleting files uploaded by users in the My Files area.
     public const string MYFILES = 'myFiles';
 
+    // retain soft-deleted Resources (CMS) folders and related folder-owned content
+    public const string CMS = 'cms';
+
     // Student submission cleanup must be explicitly selectable because it removes assessment evidence.
     public const string STUDENTSUBMISSIONS = 'studentSubmissions';
 
@@ -41,6 +44,7 @@ class ValidStrats
     public const array STRATS_WHITELIST = [
         self::MOMENTS,
         self::MYFILES,
+        self::CMS,
         self::STUDENTSUBMISSIONS,
         self::EPORTFOLIO,
     ];
