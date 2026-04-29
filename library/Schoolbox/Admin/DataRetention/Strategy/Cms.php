@@ -124,10 +124,6 @@ class Cms extends Base
         $counts['wikiRevision'] = $this->deleteWikiRevisions($wikiIds);
         $counts['wiki'] = $this->deleteWikis($wikiIds);
         $counts['component_config_instance'] = $this->deleteComponentConfigInstances($componentInstanceIds);
-        $counts['eportfolio_component_advancedlist_item'] = $this->deleteEportfolioComponentAdvancedlistItems($componentInstanceIds);
-        $counts['eportfolio_component_basiclist_item'] = $this->deleteEportfolioComponentBasiclistItems($componentInstanceIds);
-        $counts['eportfolio_component_linklist_item'] = $this->deleteEportfolioComponentLinklistItems($componentInstanceIds);
-        $counts['eportfolio_component_textbox_item'] = $this->deleteEportfolioComponentTextboxItems($componentInstanceIds);
         $counts['component_instance'] = $this->deleteComponentInstances($componentInstanceIds);
         $counts['folder_owned_rows'] = $this->deleteFolderOwnedRows($folderIds);
         $counts['folder'] = $this->deleteFolders($folderIds);
@@ -432,38 +428,6 @@ class Cms extends Base
         }
 
         return $this->deleteByIds('component_config_instance', 'component_instance_id', $ids);
-    }
-
-    /**
-     * @param array<int, int> $ids
-     */
-    protected function deleteEportfolioComponentAdvancedlistItems(array $ids): int
-    {
-        return $this->deleteByIds('eportfolio_component_advancedlist_item', 'component_instance_id', $ids);
-    }
-
-    /**
-     * @param array<int, int> $ids
-     */
-    protected function deleteEportfolioComponentBasiclistItems(array $ids): int
-    {
-        return $this->deleteByIds('eportfolio_component_basiclist_item', 'component_instance_id', $ids);
-    }
-
-    /**
-     * @param array<int, int> $ids
-     */
-    protected function deleteEportfolioComponentLinklistItems(array $ids): int
-    {
-        return $this->deleteByIds('eportfolio_component_linklist_item', 'component_instance_id', $ids);
-    }
-
-    /**
-     * @param array<int, int> $ids
-     */
-    protected function deleteEportfolioComponentTextboxItems(array $ids): int
-    {
-        return $this->deleteByIds('eportfolio_component_textbox_item', 'component_instance_id', $ids);
     }
 
     /**
