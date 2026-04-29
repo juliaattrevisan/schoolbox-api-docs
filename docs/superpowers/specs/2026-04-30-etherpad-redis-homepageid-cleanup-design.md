@@ -38,12 +38,12 @@ A homepage cleanup feature must therefore:
 
 ## Goals
 
-- Add a homepage-scoped Etherpad cleanup flow.
+- Extend `\Schoolbox\Admin\DataRetention\Strategy\Cms` to support homepage-scoped Etherpad cleanup.
 - Ensure all pads attached to a specific `homepage_id` are removed from Etherpad and Redis.
 - Keep the homepage-level cleanup safe and reversible in dry-run mode when possible.
 - Avoid attempting a Redis-only delete by `homepage_id`.
 - Reuse existing local metadata and Etherpad API flows.
-- Provide a CLI entry point for operators and a reproducible cleanup path.
+- Expose cleanup via the existing DataRetention CLI framework rather than a separate operator-only tool.
 
 ## Non-goals
 
@@ -56,14 +56,16 @@ A homepage cleanup feature must therefore:
 
 ## Architecture
 
-Introduce a new CLI tool and helper service for homepage-scoped Etherpad cleanup.
+Extend the existing `\Schoolbox\Admin\DataRetention\Strategy\Cms` strategy to support homepage-scoped Etherpad cleanup.
 
 ### Files
 
 | File | Change |
 |---|---|
-| `tools/etherpad-homepage-cleanup.php` | New CLI entry point for homepage-scoped Etherpad cleanup |
-| `library/Etherpad/HomepageCleanup.php` | New helper for homepage-scoped pad lookup, API delete, and optional Redis key cleanup |
+| `library/Schoolbox/Admin/DataRetention/Strategy/Cms.php` | Extend the CMS retention strategy to support homepage-scoped Etherpad pad cleanup and optional Redis key cleanup |
+| `library/Schoolbox/Admin/DataRetention/Test/CmsStrategyTest.php` | Add tests for homepage-scoped cleanup behavior and delete ordering |
+| `library/Schoolbox/Admin/DataRetention/CommandLineTool.php` | Register the CMS strategy and expose homepage-scoped cleanup through the DataRetention CLI flow |
+| `library/Schoolbox/Admin/DataRetention/ValidStrats.php` | Ensure `cms` is available as a valid strategy name |
 | `library/Etherpad/PadMapper.php` | No change; existing metadata lookup remains the source of truth |
 | `tools/redis/removeEtherpadSession.php` | Optional extension to expose a Redis cleanup helper if direct key deletion is needed |
 
@@ -73,14 +75,14 @@ No database schema changes are required.
 
 The new cleanup should behave like this:
 
-1. Accept `homepage_id` as input.
+1. Accept `homepage_id` as input through the existing DataRetention strategy interface or a dedicated CMS cleanup option.
 2. Query `etherpad_pad` for all active pads where `homepage_id = :homepageId` and `deleted_at IS NULL`.
 3. For each pad:
    - call `EtherpadLite\Client::deletePad($padId)`
    - if the pad delete succeeds, optionally remove the local `etherpad_pad` record or set `deleted_at`
-   - if the pad delete fails because the pad is missing, continue to Redis cleanup and log the condition
+   - if the pad delete fails because the pad is missing, continue to optional Redis cleanup and log the condition
 4. Optionally clean remaining Etherpad Redis keys belonging to the pad’s group or author/session state.
-5. Report results and failures.
+5. Report results and failures through the DataRetention strategy logging.
 
 ### Key design observation
 
@@ -144,21 +146,21 @@ It should avoid blanket Redis deletes unless the key patterns are well understoo
 
 ## Implementation options
 
-### Option A: CLI tool + helper service
+### Option A: Extend `Cms` strategy
 
-- `tools/etherpad-homepage-cleanup.php` is the operator-facing entry point.
-- `library/Etherpad/HomepageCleanup.php` contains the logic and can be reused elsewhere.
-- This is the cleanest separation of responsibilities.
+- Add homepage-scoped cleanup support to `library/Schoolbox/Admin/DataRetention/Strategy/Cms.php`.
+- Keep the DataRetention CLI flow as the primary operator interface.
+- This is the cleanest approach and keeps behavior aligned with existing retention strategy patterns.
 
-### Option B: Extend existing Redis cleanup tool
+### Option B: Add a dedicated DataRetention command option
 
-- Add a homepage-mode to `tools/redis/removeEtherpadSession.php`.
-- The tool would still need to resolve `homepage_id` via `etherpad_pad`.
-- This is lower-impact but mixes two concerns in one script.
+- Add a `--homepage-id` or `--cms-homepage-id` option to the existing DataRetention CLI tool.
+- The CMS strategy handles the cleanup when this option is present.
+- This keeps the logic inside the DataRetention framework, without introducing a completely separate CLI script.
 
 ### Recommended approach
 
-Use Option A. The new helper can reuse the existing Redis cleanup logic as a fallback, while keeping homepage-scoped cleanup conceptually separate.
+Use Option A plus Option B: extend the CMS strategy, then expose homepage cleanup through a dedicated CLI option on the existing DataRetention tool. That keeps cleanup within the retained-data framework while maintaining operator discoverability.
 
 ---
 
