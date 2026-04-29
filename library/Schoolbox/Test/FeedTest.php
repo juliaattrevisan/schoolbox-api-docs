@@ -194,6 +194,30 @@ class FeedTest extends TestCase
     }
 
     /**
+     * Ensures raw integer zero visibility values are treated as hidden.
+     */
+    public function testParentOfLearnerParticipantCannotSeeStaffInstructorOnlyQuizWhenDbReturnsIntegerZero(): void
+    {
+        $child = $this->newUser(200, Role::STUDENT);
+        $user = $this->newUser(100, Role::PARENT, [$child]);
+        $this->setAccessSingletonInstance($this->newAccess([], [200]));
+
+        $assessment = $this->newAssessment(9001, [200]);
+        $assessmentDataSource = $this->newAssessmentDataSource([$assessment], $user);
+        $feed = $this->newFeed(
+            $this->newDbReturningRows([[
+                $this->newAssessmentRowWithRawVisibility(0, 0),
+            ], []]),
+            $user,
+            $assessmentDataSource
+        );
+
+        $result = $feed->getOnlineAssessments([22], 1);
+
+        self::assertSame([], $result);
+    }
+
+    /**
      * Creates a feed instance that uses the supplied assessment data source.
      */
     private function newFeed(
@@ -324,6 +348,24 @@ class FeedTest extends TestCase
             'is_visible_to_parents' => $isVisibleToParents ? '1' : '0',
             'is_visible_to_learners' => $isVisibleToLearners ? '1' : '0',
             'work_type_id' => 5,
+        ];
+    }
+
+    /**
+     * Creates an online assessment feed row with un-hydrated database visibility values.
+     *
+     * @param mixed $isVisibleToParents
+     * @param mixed $isVisibleToLearners
+     * @return array<string, mixed>
+     */
+    private function newAssessmentRowWithRawVisibility(
+        mixed $isVisibleToParents,
+        mixed $isVisibleToLearners
+    ): array {
+        return [
+            ...$this->newAssessmentRow(),
+            'is_visible_to_parents' => $isVisibleToParents,
+            'is_visible_to_learners' => $isVisibleToLearners,
         ];
     }
 

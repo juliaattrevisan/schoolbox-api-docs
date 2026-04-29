@@ -289,6 +289,9 @@ class Feed
 
             foreach ($rows as $row) {
                 if ($row['work_type_id'] !== null) {
+                    $isVisibleToParents = self::isDbBooleanEnabled($row['is_visible_to_parents']);
+                    $isVisibleToLearners = self::isDbBooleanEnabled($row['is_visible_to_learners']);
+
                     // Filter out rows that should not be visible due to lwt.is_visible_to_parents/lwt.is_visible_to_learners.
                     // When work_type_id is null, no visibility restriction applies (consistent with Assessment\Visibility->isVisibleToUser()).
                     // Note assessment publish/close dates are not relevant here, because we are just getting all the
@@ -310,7 +313,7 @@ class Feed
                             $this->user
                         );
 
-                        if ($row['is_visible_to_parents'] !== '0') {
+                        if ($isVisibleToParents) {
                             $isParentOfLearnerParticipant = $this->isParentOfLearnerParticipant(
                                 $access,
                                 $assessment,
@@ -322,8 +325,8 @@ class Feed
 
                     switch (
                         WorkTypeHelper::getVisibilityFromBooleans(
-                            $row['is_visible_to_parents'] !== '0',
-                            $row['is_visible_to_learners'] !== '0'
+                            $isVisibleToParents,
+                            $isVisibleToLearners
                         )
                     ) {
                         case WorkTypeMapper::VISIBILITY_STAFF_INSTRUCTORS:
@@ -783,6 +786,17 @@ class Feed
     }
 
     /**
+     * Returns whether an un-hydrated numeric database boolean is enabled.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    private static function isDbBooleanEnabled(mixed $value): bool
+    {
+        return (int)$value === 1;
+    }
+
+    /**
      * Hydrates the assessments referenced by these feed rows, loads the participation needed for
      * visibility checks, and returns them keyed by assessment ID.
      *
@@ -884,7 +898,7 @@ class Feed
 
         return array_any(
             $rows,
-            fn ($row) => $row['work_type_id'] !== null && $row['is_visible_to_parents'] !== '0'
+            fn ($row) => $row['work_type_id'] !== null && self::isDbBooleanEnabled($row['is_visible_to_parents'])
         );
     }
 
