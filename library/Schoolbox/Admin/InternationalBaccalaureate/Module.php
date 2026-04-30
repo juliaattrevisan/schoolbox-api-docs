@@ -22,6 +22,7 @@ use Schoolbox\IB\Group\Subject\Language\Mapper as IBGroupSubjectLanguageMapper;
 use Schoolbox\IB\Group\Subject\Mapper as IBGroupSubjectMapper;
 use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\Language\Mapper as LanguageMapper;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\IB\Registrations\Sessions\Mapper as RegistrationSessionMapper;
@@ -42,6 +43,9 @@ class Module extends BaseModule
                 new Rule\HasServicePermission(UserAccess::SERVICE_IB_COORDINATOR, UserAccess::ACCESS_FULL)
             )
         );
+        $preloadRegistrationSession = function ($params) {
+            return $this->preloadRegistrationSession($params);
+        };
 
         $this->register('GET', '/configuration', 'getConfiguration', $ruleIBCoordinatorAccess);
         $this->register('GET', '/configuration/api/subjects/{groupId:\\d+}', 'getCategorySubjects', $ruleIBCoordinatorAccess);
@@ -50,8 +54,11 @@ class Module extends BaseModule
         $this->register('POST', '/configuration/api/save', 'saveConfiguration', $ruleIBCoordinatorAccess);
         $this->register('GET', '/registrations', 'getRegistrations', $ruleIBCoordinatorAccess);
 
+        /* Registration Sessions
+         */
         $this->register('GET', '/registrations/sessions', 'getRegistrationSessions', $ruleIBCoordinatorAccess);
         $this->register('POST', '/registrations/sessions', 'createRegistrationSession', $ruleIBCoordinatorAccess);
+        $this->register('DELETE', '/registrations/sessions/{sessionId:\d+}', 'deleteRegistrationSession', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
     }
 
     /**
@@ -78,5 +85,32 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
+
+    /**
+     * Preload an existing registration session
+     *
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception\NotFound
+     */
+    private function preloadRegistrationSession(array $params): array
+    {
+        if (\array_key_exists('registrationSession', $params)) {
+            $registrationSession = $params['registrationSession'];
+        } else {
+            try {
+                $registrationSession = $this->getMapperFactory()
+                    ->get(RegistrationSessionMapper::class)
+                    ->findById($params['sessionId']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                throw new NotFound('Unknown registration session id submitted.', 0, $e);
+            }
+        }
+
+        return [
+            'registrationSession' => $registrationSession,
+        ];
     }
 }
