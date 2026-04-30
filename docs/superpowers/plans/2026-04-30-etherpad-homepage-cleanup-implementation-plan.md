@@ -33,33 +33,33 @@
 - `library/Schoolbox/Admin/DataRetention/Test/ValidStratsTest.php`
 - `library/Schoolbox/Admin/DataRetention/CommandLineTool.php`
 
-- [ ] **Step 1: Ensure `cms` is a valid retention strategy**
+- [x] **Step 1: Ensure `cms` is a valid retention strategy**
   - Add `public const string CMS = 'cms';` to `ValidStrats` if not already present.
   - Add `self::CMS` to `STRATS_WHITELIST`.
   - Add focused tests in `ValidStratsTest.php` covering `cms` acceptance and enablement.
 
-- [ ] **Step 2: Add homepage-scoped cleanup entry points to `Cms.php`**
+- [x] **Step 2: Add homepage-scoped cleanup entry points to `Cms.php`**
   - Add a protected method to load all pads for a given `homepage_id` from `etherpad_pad`.
   - Add a method to delete a pad via `EtherpadLite\Client::deletePad($padId)`.
   - Add optional support for `--dry-run`, `--delete-redis-keys`, `--soft-delete-meta`, and `--verbose` via flags passed down from the CLI.
 
-- [ ] **Step 3: Implement pad cleanup logic**
+- [x] **Step 3: Implement pad cleanup logic**
   - For a homepage cleanup run, query active `etherpad_pad` records where `homepage_id = :homepageId` and `deleted_at IS NULL`.
   - For each pad, attempt an Etherpad API delete.
   - If the pad delete succeeds, optionally soft-delete the local metadata row or remove it depending on the requested behavior.
   - If the pad is missing in Etherpad, continue to optional Redis cleanup and log a warning.
 
-- [ ] **Step 4: Add optional Redis cleanup support**
+- [x] **Step 4: Add optional Redis cleanup support**
   - Add a helper to delete any remaining Etherpad-related Redis keys when `--delete-redis-keys` is enabled.
   - Restrict Redis key deletion to known Etherpad patterns, and only if they can be safely derived from the pad’s `pad_id` or returned metadata.
   - Ensure this is optional and guarded behind an explicit CLI flag.
 
-- [ ] **Step 5: Add focused strategy tests**
+- [x] **Step 5: Add focused strategy tests**
   - Create `CmsStrategyTest.php` with a lightweight test subclass of `Cms`.
   - Cover homepage pad lookup, API delete attempts, missing-pad logging, and dry-run behavior.
   - Cover `soft-delete-meta` semantics and conditional Redis cleanup invocation.
 
-- [ ] **Step 6: Run strategy and unit tests**
+- [x] **Step 6: Run strategy and unit tests**
   - Run `./vendor/bin/phpunit library/Schoolbox/Admin/DataRetention/Test/CmsStrategyTest.php`
   - Run `./vendor/bin/phpunit library/Schoolbox/Admin/DataRetention/Test/ValidStratsTest.php`
 

@@ -22,7 +22,7 @@ class CmsStrategyTest extends TestCase
      * @param array<string, array<int, list<int>>> $lookupIds
      * @return array{strategy: Cms, state: object{calls: list<string>, deletedFolderOwnedRowIds: list<int>, deletedFolders: list<int>}}
      */
-    private function strategy(array $folderChildren = [], array $blockedFolderIds = [], array $lookupIds = []): array
+    private function strategy(array $folderChildren = [], array $blockedFolderIds = [], array $lookupIds = [], array $homepagePadRecords = [], array $padDeleteResults = [], array $redisDeleteCounts = []): array
     {
         $logger = $this->createMock(LoggerInterface::class);
         $database = $this->createMock(IConnector::class);
@@ -56,6 +56,9 @@ class CmsStrategyTest extends TestCase
             $folderChildren,
             $blockedFolderIds,
             $lookupIds,
+            $homepagePadRecords,
+            $padDeleteResults,
+            $redisDeleteCounts,
             $state,
         ) extends Cms {
             /** @var array<int, list<int>> */
@@ -66,6 +69,15 @@ class CmsStrategyTest extends TestCase
 
             /** @var array<string, array<int, list<int>>> */
             private array $lookupIds;
+
+            /** @var array<int, array<int, array<string, mixed>>> */
+            private array $homepagePadRecords;
+
+            /** @var array<string, bool> */
+            private array $padDeleteResults;
+
+            /** @var array<string, int> */
+            private array $redisDeleteCounts;
 
             private object $state;
 
@@ -80,15 +92,20 @@ class CmsStrategyTest extends TestCase
                 array $folderChildren,
                 array $blockedFolderIds,
                 array $lookupIds,
+                array $homepagePadRecords,
+                array $padDeleteResults,
+                array $redisDeleteCounts,
                 object $state,
             ) {
                 parent::__construct($logger, $perform, $database, $lock, $config, $endTime, $retentionPeriod);
                 $this->folderChildren = $folderChildren;
                 $this->blockedFolderIds = $blockedFolderIds;
                 $this->lookupIds = $lookupIds;
+                $this->homepagePadRecords = $homepagePadRecords;
+                $this->padDeleteResults = $padDeleteResults;
+                $this->redisDeleteCounts = $redisDeleteCounts;
                 $this->state = $state;
             }
-
             /**
              * @param array<int, int> $parentIds
              * @return array<int, int>
@@ -128,6 +145,42 @@ class CmsStrategyTest extends TestCase
                 }
 
                 return $ids;
+            }
+
+            /**
+             * @param int $homepageId
+             * @return array<int, array<string, mixed>>
+             */
+            protected function getHomepagePadRecords(int $homepageId): array
+            {
+                return $this->homepagePadRecords[$homepageId] ?? [];
+            }
+
+            protected function deletePadFromEtherpad(string $padId): bool
+            {
+                $this->state->calls[] = 'deletePadFromEtherpad:' . $padId;
+                return $this->padDeleteResults[$padId] ?? false;
+            }
+
+            protected function softDeleteEtherpadPad(int $id): int
+            {
+                $this->state->calls[] = 'softDeleteEtherpadPad';
+
+                return 1;
+            }
+
+            protected function hardDeleteEtherpadPad(int $id): int
+            {
+                $this->state->calls[] = 'hardDeleteEtherpadPad';
+
+                return 1;
+            }
+
+            protected function deleteEtherpadRedisKeys(string $padId, int $homepageId, bool $dryRun): int
+            {
+                $this->state->calls[] = 'deleteEtherpadRedisKeys:' . $padId;
+
+                return $this->redisDeleteCounts[$padId] ?? 0;
             }
 
             /**
@@ -356,5 +409,76 @@ class CmsStrategyTest extends TestCase
 
         $this->assertSame([], $state->deletedFolders);
         $this->assertSame([], $state->calls);
+    }
+
+    public function testHomepageCleanupDryRunDoesNotDeletePadsOrMetadata(): void
+    {
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
+            [],
+            [],
+            [],
+            [
+                123 => [
+                    ['id' => 1, 'pad_id' => 'g.test123'],
+                ],
+            ],
+            ['g.test123' => true],
+            ['g.test123' => 1],
+        );
+
+        $summary = $strategy->cleanupHomepagePads(123, true, false, true, true);
+
+        $this->assertSame(1, $summary['padsFound']);
+        $this->assertSame(0, $summary['padsDeleted']);
+        $this->assertSame(0, $summary['metaRowsHardDeleted']);
+        $this->assertSame(1, $summary['redisKeysDeleted']);
+        $this->assertSame(['deleteEtherpadRedisKeys:g.test123'], $state->calls);
+    }
+
+    public function testHomepageCleanupSoftDeletesMetadataWhenPadDeleted(): void
+    {
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
+            [],
+            [],
+            [],
+            [
+                123 => [
+                    ['id' => 2, 'pad_id' => 'g.softdelete'],
+                ],
+            ],
+            ['g.softdelete' => true],
+        );
+
+        $summary = $strategy->cleanupHomepagePads(123, false, true, false, false);
+
+        $this->assertSame(1, $summary['padsFound']);
+        $this->assertSame(1, $summary['padsDeleted']);
+        $this->assertSame(1, $summary['metaRowsSoftDeleted']);
+        $this->assertSame(0, $summary['redisKeysDeleted']);
+        $this->assertContains('deletePadFromEtherpad:g.softdelete', $state->calls);
+        $this->assertContains('softDeleteEtherpadPad', $state->calls);
+    }
+
+    public function testHomepageCleanupTriggersRedisCleanupWhenEnabled(): void
+    {
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
+            [],
+            [],
+            [],
+            [
+                123 => [
+                    ['id' => 3, 'pad_id' => 'g.redisclean'],
+                ],
+            ],
+            ['g.redisclean' => false],
+            ['g.redisclean' => 2],
+        );
+
+        $summary = $strategy->cleanupHomepagePads(123, true, false, false, false);
+
+        $this->assertSame(1, $summary['padsFound']);
+        $this->assertSame(0, $summary['padsDeleted']);
+        $this->assertSame(2, $summary['redisKeysDeleted']);
+        $this->assertContains('deleteEtherpadRedisKeys:g.redisclean', $state->calls);
     }
 }

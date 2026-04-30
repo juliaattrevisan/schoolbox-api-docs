@@ -14,6 +14,10 @@ namespace Schoolbox\Admin\DataRetention\Strategy;
 
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Connector\IConnector;
+use Alaress\Redis;
+use EtherpadLite\Client as EtherpadClient;
+use Predis\ClientInterface;
+use Predis\Collection\Iterator\Keyspace;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\DataRetention\RetentionPeriod;
 use Schoolbox\Admin\DataRetention\ValidStrats;
@@ -35,6 +39,205 @@ class Cms extends Base
     public function getStrategyName(): string
     {
         return ValidStrats::CMS;
+    }
+
+    /**
+     * Load all active Etherpad pads for a homepage.
+     *
+     * @param int $homepageId
+     * @return array<int, array<string, mixed>>
+     */
+    protected function getHomepagePadRecords(int $homepageId): array
+    {
+        $query = "
+            SELECT id, pad_id
+            FROM etherpad_pad
+            WHERE homepage_id = :homepageId AND deleted_at IS NULL
+        ";
+
+        $statement = $this->getPreparedStatement($query);
+        $statement->execute(['homepageId' => $homepageId]);
+
+        return $statement->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+    }
+
+    /**
+     * Perform homepage-scoped Etherpad pad cleanup.
+     *
+     * @param int  $homepageId
+     * @param bool $deleteRedisKeys
+     * @param bool $softDeleteMeta
+     * @param bool $dryRun
+     * @param bool $verbose
+     * @return array<string, int|bool>
+     */
+    public function cleanupHomepagePads(int $homepageId, bool $deleteRedisKeys = false, bool $softDeleteMeta = false, bool $dryRun = true, bool $verbose = false): array
+    {
+        $padRows = $this->getHomepagePadRecords($homepageId);
+        $this->log->info(sprintf("Found '%s' Etherpad pads for homepage %s", count($padRows), $homepageId));
+
+        $summary = [
+            'homepageId' => $homepageId,
+            'padsFound' => count($padRows),
+            'padsDeleted' => 0,
+            'metaRowsSoftDeleted' => 0,
+            'metaRowsHardDeleted' => 0,
+            'redisKeysDeleted' => 0,
+            'dryRun' => $dryRun,
+        ];
+
+        foreach ($padRows as $padRow) {
+            $padId = (string)($padRow['pad_id'] ?? '');
+            $padRecordId = isset($padRow['id']) ? (int)$padRow['id'] : 0;
+
+            if ($padId === '' || $padRecordId <= 0) {
+                $this->log->warning(sprintf('Skipping malformed Etherpad pad record for homepage %s: %s', $homepageId, json_encode($padRow)));
+                continue;
+            }
+
+            if ($verbose) {
+                $this->log->debug(sprintf('Processing Etherpad pad %s for homepage %s', $padId, $homepageId));
+            }
+
+            if ($dryRun) {
+                $this->log->notice(sprintf("Dry-run: would delete Etherpad pad '%s' for homepage %s", $padId, $homepageId));
+            } else {
+                $padDeleted = $this->deletePadFromEtherpad($padId);
+                if ($padDeleted) {
+                    $summary['padsDeleted']++;
+                    if ($softDeleteMeta) {
+                        $summary['metaRowsSoftDeleted'] += $this->softDeleteEtherpadPad($padRecordId);
+                    } else {
+                        $summary['metaRowsHardDeleted'] += $this->hardDeleteEtherpadPad($padRecordId);
+                    }
+                } else {
+                    $this->log->warning(sprintf("Etherpad pad '%s' could not be deleted; continuing with optional redis cleanup", $padId));
+                }
+            }
+
+            if ($deleteRedisKeys) {
+                $deletedKeys = $this->deleteEtherpadRedisKeys($padId, $homepageId, $dryRun);
+                $summary['redisKeysDeleted'] += $deletedKeys;
+            }
+        }
+
+        $this->log->notice(sprintf("Finished homepage Etherpad cleanup for %s pads on homepage %s", $summary['padsFound'], $homepageId));
+
+        return $summary;
+    }
+
+    /**
+     * Delete an Etherpad pad via the EtherpadLite API.
+     */
+    protected function deletePadFromEtherpad(string $padId): bool
+    {
+        $apiToken = (string)$this->config->get('etherpad_api_token');
+        $etherpadHost = (string)$this->config->get(ConfigMapper::NAME_ETHERPAD_HOST);
+
+        if ($apiToken === '' || $etherpadHost === '') {
+            $this->log->warning('Etherpad API credentials are not configured; cannot delete pad ' . $padId);
+            return false;
+        }
+
+        try {
+            $client = new EtherpadClient($apiToken, $etherpadHost);
+            $response = $client->deletePad($padId);
+            $code = $response->getCode();
+            if ($code !== null && (string)$code === '0') {
+                $this->log->notice(sprintf("Deleted Etherpad pad '%s'", $padId));
+                return true;
+            }
+
+            $this->log->warning(sprintf("Etherpad API returned unexpected code '%s' for pad '%s': %s", $code, $padId, $response->getMessage()));
+            return false;
+        } catch (\Throwable $e) {
+            $this->log->warning(sprintf("Failed to delete Etherpad pad '%s': %s", $padId, $e->getMessage()));
+            return false;
+        }
+    }
+
+    /**
+     * Soft-delete a local Etherpad metadata row.
+     */
+    protected function softDeleteEtherpadPad(int $id): int
+    {
+        $statement = $this->getPreparedStatement(
+            "UPDATE etherpad_pad SET deleted_at = :deletedAt WHERE id = :id"
+        );
+        $statement->execute([
+            'deletedAt' => (new \DateTimeImmutable())->format('Y-m-d H:i:s'),
+            'id' => $id,
+        ]);
+
+        return $statement->rowCount();
+    }
+
+    /**
+     * Hard-delete a local Etherpad metadata row.
+     */
+    protected function hardDeleteEtherpadPad(int $id): int
+    {
+        $statement = $this->getPreparedStatement(
+            "DELETE FROM etherpad_pad WHERE id = :id"
+        );
+        $statement->execute(['id' => $id]);
+
+        return $statement->rowCount();
+    }
+
+    /**
+     * Delete remaining Redis keys related to a pad.
+     */
+    protected function deleteEtherpadRedisKeys(string $padId, int $homepageId, bool $dryRun): int
+    {
+        $redis = $this->getStorageRedisClient();
+        if ($redis === null) {
+            $this->log->warning(sprintf('Unable to resolve Redis storage client while cleaning up Etherpad pad %s', $padId));
+            return 0;
+        }
+
+        $patterns = [
+            sprintf('pad:%s', $padId),
+            sprintf('pad:%s:*', $padId),
+            sprintf('sessionstorage:%s', $padId),
+        ];
+
+        $deletedKeys = 0;
+        foreach ($patterns as $pattern) {
+            foreach (new Keyspace($redis, $pattern) as $key) {
+                $this->log->debug(sprintf('Found Etherpad Redis key for deletion: %s', $key));
+                $deletedKeys++;
+                if (!$dryRun) {
+                    $redis->del([$key]);
+                }
+            }
+        }
+
+        if ($deletedKeys && $dryRun) {
+            $this->log->notice(sprintf('Dry-run: would remove %s Etherpad Redis keys for pad %s', $deletedKeys, $padId));
+        }
+
+        return $deletedKeys;
+    }
+
+    /**
+     * Get a Redis storage client for optional Etherpad cleanup.
+     */
+    protected function getStorageRedisClient(): ?ClientInterface
+    {
+        $client = Redis::getStorageClientInstance();
+        if ($client !== null) {
+            return $client;
+        }
+
+        $redisUrl = (string)$this->config->get(ConfigMapper::NAME_REDIS_URL);
+        if ($redisUrl === '') {
+            return null;
+        }
+
+        Redis::getStorageInstance()->connect($redisUrl, null, '');
+
+        return Redis::getStorageClientInstance();
     }
 
     protected function hasDataToDelete(): bool
