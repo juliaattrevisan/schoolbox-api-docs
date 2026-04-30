@@ -18,8 +18,8 @@ use Schoolbox\Mapper as BaseMapper;
  *
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model createModel($idValue = null)
- * @method GenericCollection|Model[] createCollection($contents = [])
- * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
+ * @method GenericCollection<Model> createCollection($contents = [])
+ * @method GenericCollection<Model> findByColumnList($columnList, $options = [])
  */
 class Mapper extends BaseMapper
 {
@@ -90,7 +90,7 @@ class Mapper extends BaseMapper
 
     /**
      * @param PDOStatement $statement
-     * @return Model[]|GenericCollection
+     * @return GenericCollection<Model>
      * @throws BaseMapper\Exception
      */
     protected function hydrateSelect(PDOStatement $statement)
@@ -128,7 +128,7 @@ class Mapper extends BaseMapper
      * @param int $returnId
      * @return int
      */
-    public function deleteFeedbackMarks($returnId): int
+    public function deleteFeedbackMarks(int $returnId): int
     {
         $query = "DELETE FROM rubric_capability_mark WHERE return_id = :return_id";
 

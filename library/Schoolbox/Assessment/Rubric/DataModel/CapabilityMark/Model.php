@@ -174,7 +174,7 @@ class Model
      * @param boolean $valid
      * @return static
      */
-    public function setValid($valid): self
+    public function setValid(bool $valid): self
     {
         $this->valid = $valid;
         return $this;
