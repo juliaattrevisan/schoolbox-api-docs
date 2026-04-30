@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Unit tests for Schoolbox\Assessment\Component\SubmissionBox class.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
 namespace Schoolbox\Assessment\Component\Test;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -8,6 +16,11 @@ use Schoolbox\Test\TestCase;
 
 class SubmissionBoxTest extends TestCase
 {
+    /**
+     * @var SubmissionBox
+     */
+    protected $object;
+
     public function setUp(): void
     {
         parent::setUp();
