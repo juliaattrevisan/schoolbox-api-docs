@@ -15,6 +15,7 @@ use Ramsey\Uuid\Uuid;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\Learning\AssessmentContext;
@@ -99,6 +100,33 @@ class Importer
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper
     ) {
         $this->associateStatement = $this->databaseInternal->prepare(self::QUERY_ASSOCIATE_LEARNOSITY);
+    }
+
+
+    /**
+     * Resolves a markVisibility value from either the current string format or the legacy
+     * integer format used in JSON exports prior to version 26.1.
+     *
+     * TODO: If more changes are made to the export format, we may want to implement a system similar to that which
+     *       already exists for importing legacy XML quiz exports.
+     * @see e.g. library/Assess/Import/Parser/V160.php
+     *
+     * Legacy integer mapping
+     *   0 => staffOnly, 1 => staffAndStudent, 2 => staffStudentAndParent
+     */
+    public static function resolveMarkVisibility(int|string $value): string
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+
+        // Integer values were used in versions <26.1.
+        return match ($value) {
+            0 => IAssessable::MARK_VISIBILITY_PRIVATE,
+            1 => IAssessable::MARK_VISIBILITY_STUDENT,
+            2 => IAssessable::MARK_VISIBILITY_PARENT_STUDENT,
+            default => throw new \UnexpectedValueException("Unknown legacy mark visibility value: $value"),
+        };
     }
 
 
@@ -292,7 +320,7 @@ class Importer
             ->setWeight($settings['weight'])
             ->setDefaultOpenSpan($settings['defaultOpenSpan'])
             ->setMaxAttempts($settings['maxAttempts'])
-            ->setMarkVisibility($settings['markVisibility'])
+            ->setMarkVisibility(self::resolveMarkVisibility($settings['markVisibility']))
             ->setReadingTimeDuration($settings['readingTimeDuration'])
             /* Learnosity-era unlimited durations are represented by zero, not -1
              */
