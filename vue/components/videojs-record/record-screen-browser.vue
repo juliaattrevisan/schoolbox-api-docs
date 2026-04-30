@@ -9,12 +9,12 @@
  */
 
 import "video.js/dist/video-js.css";
-import "videojs-record/dist/css/videojs.record.css";
+import "videojs-record-change-image-input/dist/css/videojs.record.css";
 import videojs from "video.js";
 import "webrtc-adapter";
 import RecordRTC from "recordrtc";
-import Record from "videojs-record/dist/videojs.record.js";
-import TsEBMLEngine from "videojs-record/dist/plugins/videojs.record.ts-ebml.js";
+import Record from "videojs-record-change-image-input/dist/videojs.record.js";
+import TsEBMLEngine from "videojs-record-change-image-input/dist/plugins/videojs.record.ts-ebml.js";
 import RecordedMedia from "@schoolboxVue/components/videojs-record/recorded-media";
 import OverMediaModal from "@schoolboxVue/components/videojs-record/over-media-modal";
 import { getRecordScreenOptions } from "@js/videojs/videojsOptions";
