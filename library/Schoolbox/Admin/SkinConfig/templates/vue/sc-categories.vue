@@ -32,11 +32,6 @@ const activeConfigs = window.Vue.computed(() =>
     configs.value.toggle.enabled ? configs.value.sonar : configs.value.existing,
 );
 
-// Temporarily hide drop shadow until its control is implemented.
-const visibleConfigs = window.Vue.computed(() =>
-    Object.fromEntries(Object.entries(activeConfigs.value).filter(([categoryKey]) => categoryKey !== "Drop Shadow")),
-);
-
 /**
  * Notify the parent that the preview should be refreshed.
  */
@@ -55,7 +50,7 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
 </script>
 
 <template>
-    <template v-for="(subcategories, categoryKey) in visibleConfigs" :key="categoryKey">
+    <template v-for="(subcategories, categoryKey) in activeConfigs" :key="categoryKey">
         <div class="l-flex-col l-gap-s">
             <h2 class="subheader t-lh--normal">{{ categoryKey }}</h2>
             <div
@@ -148,19 +143,19 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                                         </h2>
                                     </div>
                                     <nav>
-                                        <a
-                                            href="#"
-                                            class="icon-settings settings edit"
-                                            title="Settings"
-                                            @click.prevent
+                                        <a href="#" class="sbx-icon-only-button" title="Settings" @click.prevent
+                                            ><sbx-icon name="settings"></sbx-icon
                                         ></a>
                                         <a
                                             href="#"
-                                            class="icon-up-arrow collapse"
+                                            class="sbx-icon-only-button"
                                             title="Expand/collapse content"
                                             @click.prevent
+                                            ><sbx-icon name="up-arrow"></sbx-icon
                                         ></a>
-                                        <a href="#" class="icon-close" title="Close" @click.prevent></a>
+                                        <a href="#" class="sbx-icon-only-button" title="Close" @click.prevent
+                                            ><sbx-icon name="close"></sbx-icon
+                                        ></a>
                                     </nav>
                                 </div>
                             </div>
@@ -204,25 +199,52 @@ function getSelectOptions(option: SkinConfigOption): SkinConfigSelectOption[] {
                             <sbx-pop-out content-id="pop-out-1" button-text="Create Activity"></sbx-pop-out>
                             <ul id="pop-out-1" class="f-dropdown" data-dropdown-content>
                                 <li>
-                                    <a class="icon-project" href="#" @click.prevent>Project</a>
+                                    <a class="sbx-button--has-icon" href="#" @click.prevent>
+                                        <sbx-icon name="project"></sbx-icon>
+                                        Project
+                                    </a>
                                 </li>
                                 <li>
-                                    <a class="icon-due-work" href="#" @click.prevent>Due Work</a>
+                                    <a class="sbx-button--has-icon" href="#" @click.prevent>
+                                        <sbx-icon name="due-work"></sbx-icon>
+                                        Due Work
+                                    </a>
                                 </li>
                                 <li>
-                                    <a class="icon-task" href="#" @click.prevent>Task</a>
+                                    <a class="sbx-button--has-icon" href="#" @click.prevent>
+                                        <sbx-icon name="task"></sbx-icon>
+                                        Task
+                                    </a>
                                 </li>
                                 <li>
-                                    <a class="icon-quiz" href="#" @click.prevent>Quiz</a>
+                                    <a class="sbx-button--has-icon" href="#" @click.prevent>
+                                        <sbx-icon name="quiz"></sbx-icon>
+                                        Quiz
+                                    </a>
                                 </li>
                                 <li>
-                                    <a class="icon-lti" href="#" @click.prevent>3rd Party Assessment</a>
+                                    <a class="sbx-button--has-icon" href="#" @click.prevent>
+                                        <sbx-icon name="lti"></sbx-icon>
+                                        3rd Party Assessment
+                                    </a>
                                 </li>
                                 <li>
-                                    <a class="icon-lesson-plan" href="#" @click.prevent>Lesson Plan</a>
+                                    <a class="sbx-button--has-icon" href="#" @click.prevent>
+                                        <sbx-icon name="lesson-plan"></sbx-icon>
+                                        Lesson Plan
+                                    </a>
                                 </li>
                                 <li>
-                                    <a class="icon-dialog-agent" href="#" @click.prevent>Discussion</a>
+                                    <a class="sbx-button--has-icon" href="#" @click.prevent>
+                                        <sbx-icon name="dialog-agent"></sbx-icon>
+                                        Discussion
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="sbx-button--has-icon" href="#" @click.prevent>
+                                        <sbx-icon name="reporting"></sbx-icon>
+                                        Reporting Activity
+                                    </a>
                                 </li>
                             </ul>
                         </div>
