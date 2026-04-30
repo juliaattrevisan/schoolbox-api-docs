@@ -740,7 +740,7 @@ async function saveSubjectConfiguration(): Promise<void> {
             v-model:results="modalSearchResults"
             :default-results="modalDefaultResults"
             show-selected
-            label="Search languages"
+            label="Search"
             label-id="ib-language-modal-search"
             placeholder="Search for languages..."
             title="Select Languages"
