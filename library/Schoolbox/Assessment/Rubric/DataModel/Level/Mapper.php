@@ -10,7 +10,7 @@
 namespace Schoolbox\Assessment\Rubric\DataModel\Level;
 
 use PDOStatement;
-use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 
@@ -21,8 +21,8 @@ use Schoolbox\Mapper\Exception;
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model createModel($idValue = null)
  * @method Model findById($id)
- * @method Collection|Model[] findByColumn($columnName, $columnValue, $options = array())
- * @method Collection|Model[] findByColumnList($columnList, $options = array())
+ * @method GenericCollection<Model> findByColumn($columnName, $columnValue, $options = array())
+ * @method GenericCollection<Model> findByColumnList($columnList, $options = array())
  */
 class Mapper extends BaseMapper
 {
@@ -34,9 +34,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasModel(Model::class);
-
         $this->hasTable('rubric_level');
-
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('sequence', self::TYPE_INTEGER);
@@ -101,7 +99,7 @@ class Mapper extends BaseMapper
 
     /**
      * @param PDOStatement $statement
-     * @return Collection
+     * @return GenericCollection
      * @throws Exception
      */
     protected function hydrateSelect(PDOStatement $statement)
@@ -131,7 +129,7 @@ class Mapper extends BaseMapper
      * @param object $previous
      * @return bool
      */
-    protected function raiseNotification($object, $verb, $previous = null)
+    protected function raiseNotification($object, $verb, $previous = null): bool
     {
         return true;
     }

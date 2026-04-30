@@ -28,20 +28,26 @@ class Model implements ISoftDeletable
     private ?\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance;
 
 
-    /** @var string */
-    private $name;
+    /**
+     * @var string
+     */
+    private string $name;
+
 
     /**
      * 0-indexed
      *
+     * (I wonder why this is zero indexed but capabilityUsages are 1-indexed...)
+     *
      * @var int
      */
-    private $sequence;
+    private int $sequence;
+
 
     /**
-     * @var DescriptorModel[]|GenericCollection
+     * @var GenericCollection<DescriptorModel>
      */
-    private $descriptors;
+    private GenericCollection $descriptors;
 
 
     /**
@@ -87,7 +93,7 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -97,7 +103,7 @@ class Model implements ISoftDeletable
      * @param string $name
      * @return static
      */
-    public function setName($name)
+    public function setName(string $name): self
     {
         $this->name = $name;
         return $this;
@@ -107,7 +113,7 @@ class Model implements ISoftDeletable
     /**
      * @return int
      */
-    public function getSequence()
+    public function getSequence(): int
     {
         return $this->sequence;
     }
@@ -117,28 +123,31 @@ class Model implements ISoftDeletable
      * @param int $sequence
      * @return static
      */
-    public function setSequence($sequence)
+    public function setSequence(int $sequence): self
     {
         $this->sequence = $sequence;
         return $this;
     }
 
+
     /**
-     * @return DescriptorModel[]|GenericCollection
+     * @return GenericCollection<DescriptorModel>
      */
-    public function getDescriptors()
+    public function getDescriptors(): GenericCollection
     {
         return $this->descriptors;
     }
 
+
     /**
-     * @param DescriptorModel[]|GenericCollection $descriptors
+     * @param GenericCollection<DescriptorModel> $descriptors
      * @return static
      */
-    public function setDescriptors(GenericCollection $descriptors)
+    public function setDescriptors(GenericCollection $descriptors): self
     {
         $descriptors->assertCollectionOf(DescriptorModel::class);
         $this->descriptors = $descriptors;
+
         return $this;
     }
 }
