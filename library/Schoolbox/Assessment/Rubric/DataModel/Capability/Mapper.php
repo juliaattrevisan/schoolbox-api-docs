@@ -67,8 +67,6 @@ class Mapper extends BaseMapper
         );
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueness']);
-
-//        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteIndicators']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteUsages']);
     }
 
@@ -81,8 +79,8 @@ class Mapper extends BaseMapper
         /** @var NodeMapper $curriculumNodeMapper */
         $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_capability');
         $collection           = $this->createCollection();
+
         foreach ($statement as $row) {
-            /** @var Model $capability */
             $capability                       = $this->hydrate($row);
             $collection[$capability->getId()] = $capability;
         }
@@ -93,6 +91,7 @@ class Mapper extends BaseMapper
             'curriculum_node_for_rubric_capability',
             $collection->keys()
         );
+
         foreach ($collection as $capability) {
             if (isset($capabilityNodes[$capability->getId()])) {
                 $capability->setCurriculumNodes($capabilityNodes[$capability->getId()]);
@@ -124,8 +123,8 @@ class Mapper extends BaseMapper
     public function verifyUniqueness(Model $object): bool
     {
         $pb = $this->getPredicateBuilder()
-                   ->equals('parent_id', $object->getParentId())
-                   ->equals('parent_type', $object->getParentType());
+            ->equals('parent_id', $object->getParentId())
+            ->equals('parent_type', $object->getParentType());
 
         // Don't compare this object with itself
         if ($object->getId()) {
@@ -135,6 +134,7 @@ class Mapper extends BaseMapper
         // Check this name isn't in use
         $existingNames  = $this->findScalarByPredicates('name', $pb);
         $normalizedName = Util::normalizeName($object->getName());
+
         foreach ($existingNames as $existingName) {
             if (Util::normalizeName($existingName) === $normalizedName) {
                 throw new MapperException(
@@ -153,6 +153,7 @@ class Mapper extends BaseMapper
      * Soft-deleting a capability (hard) deletes all of its usages.
      *
      * @param Model $capability
+     * @throws MapperException
      */
     public function deleteUsages(Model $capability): void
     {
@@ -167,7 +168,6 @@ class Mapper extends BaseMapper
      * @param string    $parentType One of the `Model::PARENT_TYPE_*` constants
      * @param bool      $cache      If false, bypass result cache
      * @return GenericCollection<Model>
-     * @throws MapperException
      */
     public function findForParent($parentId, string $parentType, bool $cache = true): GenericCollection
     {
@@ -189,8 +189,7 @@ class Mapper extends BaseMapper
      *
      * @param int|int[] $folderId The folder ID (or list thereof) to find for
      * @param bool      $cache    If false, bypass result cache
-     * @return GenericCollection|Model[]
-     * @throws MapperException
+     * @return GenericCollection<Model>
      */
     public function findForFolder($folderId, bool $cache = true): GenericCollection
     {
@@ -213,14 +212,16 @@ class Mapper extends BaseMapper
         string $name,
         bool $cache = true
     ): ?Model {
-        $capabilities   = $this->findByColumnList(
+        $capabilities = $this->findByColumnList(
             [
                 'parent_id'   => $parentId,
                 'parent_type' => $parentType,
             ],
             ['cache' => $cache,]
         );
+
         $normalizedName = Util::normalizeName($name);
+
         foreach ($capabilities as $capability) {
             /** @var Model $capability */
             if ($normalizedName === Util::normalizeName($capability->getName())) {
@@ -269,6 +270,7 @@ class Mapper extends BaseMapper
     ): Model {
         // Try to find a capability with this name
         $existing = $this->findOneForParentByName($parentId, $parentType, $name, $cache);
+
         if ($existing) {
             // Found
             return $existing;
@@ -287,7 +289,9 @@ class Mapper extends BaseMapper
                      ->setParentType($parentType)
                      ->setName($name)
                      ->setCurriculumNodes($curriculumNodes);
+
         $this->save($item);
+
         return $item;
     }
 
