@@ -16,13 +16,15 @@ use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
  */
 class Model
 {
-    /** @var int */
-    public const SEQUENCE_BASE = 1; // Capability sequence is 1-based, not 0-based
+    /**
+     * Capability sequence is 1-based, not 0-based
+     */
+    public const int SEQUENCE_BASE = 1;
 
     /**
      * @var CapabilityModel
      */
-    private $capability;
+    private CapabilityModel $capability;
 
 
     /**
@@ -34,13 +36,13 @@ class Model
     /**
      * @var float|null
      */
-    private $maxValue;
+    private ?float $maxValue;
 
 
     /**
      * @var int
      */
-    private $sequence;
+    private int $sequence;
 
 
     /**
