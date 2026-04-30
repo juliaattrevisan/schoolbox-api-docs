@@ -763,8 +763,7 @@ class Controller extends ConfigController
 
             $this->response = $this->responseAsJson([
                 'success' => true,
-                'students' => $studentPayloads,
-                'studentsByStatus' => $payloadBuilder->groupByStatus($studentPayloads),
+                'students' => $payloadBuilder->groupByStatus($studentPayloads),
                 'statuses' => $payloadBuilder->getStatuses(),
             ]);
         } catch (MapperNotFound) {

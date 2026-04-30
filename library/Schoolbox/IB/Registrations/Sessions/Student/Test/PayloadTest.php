@@ -36,19 +36,20 @@ class PayloadTest extends TestCase
         $this->assertSame(456, $payload['registrationSessionStudentId']);
         $this->assertSame(RegistrationSessionStudentModel::STATUS_CONFIRMED, $payload['status']);
         $this->assertSame('Alex, Nguyen', $payload['userName']);
-        $this->assertSame('Alex', $payload['firstName']);
-        $this->assertSame('Nguyen', $payload['lastName']);
-        $this->assertSame('2009-04-12', $payload['dateOfBirth']);
-        $this->assertSame('alex.nguyen@example.edu', $payload['email']);
-        $this->assertSame('F', $payload['gender']);
-        $this->assertSame('ENG', $payload['language1']);
-        $this->assertSame('FRA', $payload['language2']);
-        $this->assertSame('AUS', $payload['nationality1']);
-        $this->assertSame('NZL', $payload['nationality2']);
-        $this->assertSame('Example School', $payload['schoolName']);
-        $this->assertSame('', $payload['reference']);
-        $this->assertTrue($payload['isComplete']);
-        $this->assertSame([], $payload['missingFields']);
+        $this->assertFalse($payload['hasMissingDetails']);
+        $this->assertArrayNotHasKey('firstName', $payload);
+        $this->assertArrayNotHasKey('lastName', $payload);
+        $this->assertArrayNotHasKey('dateOfBirth', $payload);
+        $this->assertArrayNotHasKey('email', $payload);
+        $this->assertArrayNotHasKey('gender', $payload);
+        $this->assertArrayNotHasKey('language1', $payload);
+        $this->assertArrayNotHasKey('language2', $payload);
+        $this->assertArrayNotHasKey('nationality1', $payload);
+        $this->assertArrayNotHasKey('nationality2', $payload);
+        $this->assertArrayNotHasKey('schoolName', $payload);
+        $this->assertArrayNotHasKey('reference', $payload);
+        $this->assertArrayNotHasKey('isComplete', $payload);
+        $this->assertArrayNotHasKey('missingFields', $payload);
     }
 
     public function testBuildsMissingFieldsForIncompletePayload(): void
@@ -68,22 +69,8 @@ class PayloadTest extends TestCase
         $payload = (new Payload())->build($student, [], '');
 
         $this->assertSame('', $payload['userName']);
-        $this->assertSame('', $payload['language2']);
-        $this->assertSame('', $payload['nationality2']);
-        $this->assertFalse($payload['isComplete']);
-        $this->assertSame(
-            [
-                'userName',
-                'firstName',
-                'dateOfBirth',
-                'email',
-                'gender',
-                'language1',
-                'nationality1',
-                'schoolName',
-            ],
-            $payload['missingFields']
-        );
+        $this->assertTrue($payload['hasMissingDetails']);
+        $this->assertArrayNotHasKey('missingFields', $payload);
     }
 
     public function testGroupsStudentsByStatus(): void

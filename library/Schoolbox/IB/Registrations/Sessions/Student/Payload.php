@@ -40,30 +40,28 @@ class Payload
         $lastName = $this->normalise($user?->getLastname());
         $languageCodes = $this->extractCodes($user?->getLanguageCollection());
         $nationalityCodes = $this->extractCodes($user?->getNationalityCollection());
+        $dateOfBirth = $this->formatDateOfBirth($externalStudent['StudentBirthDate'] ?? null);
+        $userName = $this->buildUserName($firstName, $lastName);
 
-        $payload = [
-            'userId' => $user?->getId(),
-            'registrationSessionStudentId' => $student->getId(),
-            'status' => $student->getStatus(),
-            'userName' => $this->buildUserName($firstName, $lastName),
+        $requiredDetails = [
+            'userName' => $userName,
             'firstName' => $firstName,
             'lastName' => $lastName,
-            'dateOfBirth' => $this->formatDateOfBirth($externalStudent['StudentBirthDate'] ?? null),
+            'dateOfBirth' => $dateOfBirth,
             'email' => $this->normalise($user?->getEmail()),
             'gender' => $this->normalise($externalStudent['StudentGender'] ?? null),
             'language1' => $languageCodes[0] ?? '',
-            'language2' => $languageCodes[1] ?? '',
             'nationality1' => $nationalityCodes[0] ?? '',
-            'nationality2' => $nationalityCodes[1] ?? '',
             'schoolName' => $this->normalise($schoolName),
-            'reference' => '',
         ];
 
-        $missingFields = $this->findMissingFields($payload);
-        $payload['isComplete'] = empty($missingFields);
-        $payload['missingFields'] = $missingFields;
-
-        return $payload;
+        return [
+            'userId' => $user?->getId(),
+            'registrationSessionStudentId' => $student->getId(),
+            'status' => $student->getStatus(),
+            'userName' => $userName,
+            'hasMissingDetails' => $this->hasMissingDetails($requiredDetails),
+        ];
     }
 
     /**
@@ -153,16 +151,10 @@ class Payload
     }
 
     /**
-     * @param array<string, mixed> $payload
-     * @return string[]
+     * @param array<string, mixed> $details
      */
-    private function findMissingFields(array $payload): array
+    private function hasMissingDetails(array $details): bool
     {
-        return array_values(
-            array_filter(
-                self::REQUIRED_FIELDS,
-                fn(string $field): bool => $this->normalise($payload[$field] ?? '') === ''
-            )
-        );
+        return array_any(self::REQUIRED_FIELDS, fn($field) => $this->normalise($details[$field] ?? '') === '');
     }
 }
