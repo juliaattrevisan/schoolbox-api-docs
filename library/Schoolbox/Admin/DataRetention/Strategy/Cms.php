@@ -14,7 +14,6 @@ namespace Schoolbox\Admin\DataRetention\Strategy;
 
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Connector\IConnector;
-use Alaress\Redis;
 use EtherpadLite\Client as EtherpadClient;
 use Predis\ClientInterface;
 use Predis\Collection\Iterator\Keyspace;
@@ -30,6 +29,24 @@ class Cms extends Base
     protected string $retentionConfigKey = ConfigMapper::NAME_DATA_RETENTION_CMS;
 
     private const string TABLE_FOLDER = 'folder';
+
+    private ?ClientInterface $redisClient = null;
+
+    public function __construct(
+        LoggerInterface $log,
+        bool $perform,
+        IConnector $database,
+        LockInterface $lock,
+        IConfigLoader $config,
+        int $endTime,
+        RetentionPeriod $retentionPeriod,
+        int $chunkLoops = self::DEFAULT_CHUNK_LOOPS,
+        int $chunkSize = self::DEFAULT_CHUNK_SIZE,
+        ?ClientInterface $redisClient = null,
+    ) {
+        parent::__construct($log, $perform, $database, $lock, $config, $endTime, $retentionPeriod, $chunkLoops, $chunkSize);
+        $this->redisClient = $redisClient;
+    }
 
     public function getRetentionLabel(): string
     {
@@ -190,9 +207,8 @@ class Cms extends Base
      */
     protected function deleteEtherpadRedisKeys(string $padId, int $homepageId, bool $dryRun): int
     {
-        $redis = $this->getStorageRedisClient();
-        if ($redis === null) {
-            $this->log->warning(sprintf('Unable to resolve Redis storage client while cleaning up Etherpad pad %s', $padId));
+        if ($this->redisClient === null) {
+            $this->log->warning(sprintf('Redis storage client not injected; cannot clean up Etherpad pad %s', $padId));
             return 0;
         }
 
@@ -223,23 +239,6 @@ class Cms extends Base
     /**
      * Get a Redis storage client for optional Etherpad cleanup.
      */
-    protected function getStorageRedisClient(): ?ClientInterface
-    {
-        $client = Redis::getStorageClientInstance();
-        if ($client !== null) {
-            return $client;
-        }
-
-        $redisUrl = (string)$this->config->get(ConfigMapper::NAME_REDIS_URL);
-        if ($redisUrl === '') {
-            return null;
-        }
-
-        Redis::getStorageInstance()->connect($redisUrl, null, '');
-
-        return Redis::getStorageClientInstance();
-    }
-
     protected function hasDataToDelete(): bool
     {
         $query = "

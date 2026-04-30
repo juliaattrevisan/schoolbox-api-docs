@@ -225,6 +225,7 @@ class CommandLineTool extends CliTool\App
                 clone $retentionPeriod,
                 $loopCount,
                 $chunkSize,
+                $this->getDi()->get('redis.storage'),
             );
         }
         if ($validStrats->isStratEnabled(ValidStrats::STUDENTSUBMISSIONS)) {
