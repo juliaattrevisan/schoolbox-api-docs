@@ -90,6 +90,18 @@ class DataSource
 
 
     /**
+     * @var UnitSpecificationMapper
+     */
+    private UnitSpecificationMapper $unitSpecificationMapper;
+
+
+    /**
+     * @var \Schoolbox\Assessment\Rubric\Instance\Mapper
+     */
+    private \Schoolbox\Assessment\Rubric\Instance\Mapper $rubricInstanceMapper;
+
+
+    /**
      * @var CapabilityMapper
      */
     private CapabilityMapper $capabilityMapper;
@@ -102,9 +114,47 @@ class DataSource
 
 
     /**
-     * @var \Schoolbox\Assessment\Rubric\Instance\Mapper
+     * @var CapabilityUsageMapper
      */
-    private \Schoolbox\Assessment\Rubric\Instance\Mapper $rubricInstanceMapper;
+    private CapabilityUsageMapper $capabilityUsageMapper;
+
+
+    /**
+     * @var IndicatorUsageMapper
+     */
+    private IndicatorUsageMapper $indicatorUsageMapper;
+
+
+    /**
+     * @var DescriptorMapper
+     */
+    private DescriptorMapper $descriptorMapper;
+
+
+    /**
+     * @var LevelMapper
+     */
+    private LevelMapper $levelMapper;
+
+
+    /**
+     * @var CapabilityMarkMapper
+     */
+    private CapabilityMarkMapper $capabilityMarkMapper;
+
+
+    /**
+     * @var IndicatorMarkMapper
+     */
+    private IndicatorMarkMapper $indicatorMarkMapper;
+
+
+    /**
+     * Despite the namespace, MarkType is a universal idea, not specific to submission boxes (aka Due Work)
+     *
+     * @var SubmissionBox\MarkTypeMapper
+     */
+    private SubmissionBox\MarkTypeMapper $markTypeMapper;
 
 
     /**
@@ -116,9 +166,17 @@ class DataSource
 
         /* We spawn singletons out of nowhere so we probably can't dependency inject these like we normally would
          */
+        $this->unitSpecificationMapper = UnitSpecificationMapper::getInstance();
+        $this->rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
         $this->capabilityMapper = CapabilityMapper::getInstance();
         $this->indicatorMapper = IndicatorMapper::getInstance();
-        $this->rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
+        $this->capabilityUsageMapper = CapabilityUsageMapper::getInstance();
+        $this->indicatorUsageMapper = IndicatorUsageMapper::getInstance();
+        $this->descriptorMapper = DescriptorMapper::getInstance();
+        $this->levelMapper = LevelMapper::getInstance();
+        $this->capabilityMarkMapper = CapabilityMarkMapper::getInstance();
+        $this->indicatorMarkMapper = IndicatorMarkMapper::getInstance();
+        $this->markTypeMapper = SubmissionBox\MarkTypeMapper::getInstance();
     }
 
 
@@ -146,8 +204,7 @@ class DataSource
      *
      * @param AssessmentContext $context
      * @param bool              $getUsages
-     * @param bool              $useCache If false, bypass cache for fetch of
-     *                                    capabilities+indicators
+     * @param bool              $useCache If false, bypass cache for fetch of capabilities+indicators
      * @return RowSet
      * @throws MapperException
      */
@@ -190,7 +247,7 @@ class DataSource
                     ->setCurriculumNodes($capabilityModel->getCurriculumNodes()->reindex());
 
                 if ($getUsages) {
-                    foreach (IndicatorUsageMapper::getInstance()->findCapabilityUsage($capabilityId) as $capabilityUsage) {
+                    foreach ($this->indicatorUsageMapper->findCapabilityUsage($capabilityId) as $capabilityUsage) {
                         $capabilities[$capabilityId]->getUsage()[$capabilityUsage['id']] = (new DueWorkModel())
                             ->setId($capabilityUsage['id'])
                             ->setTitle($capabilityUsage['title']);
@@ -212,7 +269,7 @@ class DataSource
                 ->setCurriculumNodes($indicatorModel->getCurriculumNodes()->reindex());
 
             if ($getUsages) {
-                foreach (IndicatorUsageMapper::getInstance()->findIndicatorUsage($indicatorId) as $indicatorUsage) {
+                foreach ($this->indicatorUsageMapper->findIndicatorUsage($indicatorId) as $indicatorUsage) {
                     $capabilities[$capabilityId]->getIndicators()[$indicatorId]->getUsage()[$indicatorUsage['id']]
                         = (new DueWorkModel())
                             ->setId($indicatorUsage['id'])
@@ -360,7 +417,7 @@ class DataSource
 
         $spec = new ValidRowSet(
             $l10n,
-            UnitSpecificationMapper::getInstance(),
+            $this->unitSpecificationMapper,
             $this,
             $existingRowSet,
             $allowModifyUsed,
@@ -429,7 +486,7 @@ class DataSource
 
         // Load the levels, selected capabilities+indicators, descriptors for
         // the assessment
-        $capabilityUsageModels = CapabilityUsageMapper::getInstance()->findByColumn(
+        $capabilityUsageModels = $this->capabilityUsageMapper->findByColumn(
             'rubric_instance_id',
             $rubricInstanceIds,
             ['order' => ['sequence' => 'asc',]]
@@ -437,7 +494,7 @@ class DataSource
             return $gu->getCapability()->getId();
         });
 
-        $indicatorUsageModels = IndicatorUsageMapper::getInstance()->findByColumn(
+        $indicatorUsageModels = $this->indicatorUsageMapper->findByColumn(
             'rubric_instance_id',
             $rubricInstanceIds,
             ['order' => ['sequence' => 'asc',]]
@@ -445,7 +502,7 @@ class DataSource
             return $cu->getIndicator()->getId();
         });
 
-        $levelModels = LevelMapper::getInstance()->findByColumn(
+        $levelModels = $this->levelMapper->findByColumn(
             'rubric_instance_id',
             $rubricInstanceIds,
             ['order' => ['sequence' => 'asc',]]
@@ -453,7 +510,7 @@ class DataSource
             return $l->getId();
         });
 
-        $descriptorModels = DescriptorMapper::getInstance()->findByColumnList([
+        $descriptorModels = $this->descriptorMapper->findByColumnList([
             'rubric_indicator_id' => $indicatorUsageModels->keys(),
             'level_id'            => $levelModels->keys(),
         ]);
@@ -581,8 +638,6 @@ class DataSource
     {
         // TODO some way to wrap all this in a transaction would be nice... -_-;
         // (The answer exists: merge SA-6405)
-        $levelMapper      = LevelMapper::getInstance();
-        $descriptorMapper = DescriptorMapper::getInstance();
 
         /* Find the rubric instance for the $submissionBox
          */
@@ -598,11 +653,11 @@ class DataSource
         }
 
         // First, persist the levels
-        $levelModels   = $levelMapper->createCollection();
+        $levelModels   = $this->levelMapper->createCollection();
         $levelSequence = 1;
 
         foreach ($grid->getLevels() as $level) {
-            $levelModel = $levelMapper->createModel()
+            $levelModel = $this->levelMapper->createModel()
                 ->setId($level->getId())
                 ->setName($level->getName())
                 ->setRubricInstance($rubricInstance)
@@ -612,7 +667,7 @@ class DataSource
 
             // Need to save NOW so that I have an ID which can then be assoc'd
             // with a descriptor
-            $levelMapper->save($levelModel);
+            $this->levelMapper->save($levelModel);
 
             $level->setId($levelModel->getId());
         }
@@ -655,7 +710,7 @@ class DataSource
         $l10n = \Schoolbox\Mapper::getDi()->get('l10n');
         $spec = new ValidRowSet(
             $l10n,
-            UnitSpecificationMapper::getInstance(),
+            $this->unitSpecificationMapper,
             $this,
             $originalGrid ? $originalGrid->getRowSet() : null,
             false,
@@ -672,22 +727,20 @@ class DataSource
 
 
         // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
-        $indicatorUsageMapper  = IndicatorUsageMapper::getInstance();
-        $capabilityUsageMapper = CapabilityUsageMapper::getInstance();
-        $indicatorUsageModels  = $indicatorUsageMapper->createCollection();
-        $capabilityUsageModels = $capabilityUsageMapper->createCollection();
-        $descriptorModels      = $descriptorMapper->createCollection();
+        $indicatorUsageModels  = $this->indicatorUsageMapper->createCollection();
+        $capabilityUsageModels = $this->capabilityUsageMapper->createCollection();
+        $descriptorModels      = $this->descriptorMapper->createCollection();
         $capabilitySequence    = CapabilityUsageModel::SEQUENCE_BASE;
 
         /* TODO this $submissionBox should be replaced by the rubric instance ids insted
          */
-        $indicatorUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
-        $capabilityUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
+        $this->indicatorUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
+        $this->capabilityUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
 
         foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
             $capabilityMaxValue = $capabilityUsage->getMaxValue();
 
-            $capabilityUsageModel = $capabilityUsageMapper->createModel()
+            $capabilityUsageModel = $this->capabilityUsageMapper->createModel()
                 ->setRubricInstance($rubricInstance)
                 ->setCapability($capabilityModels[$capabilityUsage->getCapability()->getId()])
                 ->setMaxValue($capabilityMaxValue)
@@ -702,7 +755,7 @@ class DataSource
             foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
                 $indicatorModel = $indicatorModels[$indicatorUsage->getIndicator()->getId()];
 
-                $indicatorUsageModel = $indicatorUsageMapper->createModel()
+                $indicatorUsageModel = $this->indicatorUsageMapper->createModel()
                     ->setRubricInstance($rubricInstance)
                     ->setIndicator($indicatorModel)
                     ->setMaxValue($indicatorUsage->calculateMaxValueFromDescriptors())
@@ -715,10 +768,10 @@ class DataSource
                     $descriptor = $indicatorUsage->retrieveDescriptor($levelIndex);
 
                     if ($descriptor) {
-                        $descriptorModel = $descriptorMapper->createModel()
+                        $descriptorModel = $this->descriptorMapper->createModel()
                             ->setId($descriptor->getId())
                             ->setIndicator($indicatorModel)
-                            ->setLevel($levelMapper->createModel($level->getId()))
+                            ->setLevel($this->levelMapper->createModel($level->getId()))
                             // One day: set min value here
                             ->setMaxValue($descriptor->getMaxValue())
                             ->setDescription($descriptor->getDescription());
@@ -731,9 +784,9 @@ class DataSource
 
         $this->capabilityMapper->save($capabilityModels);
         $this->indicatorMapper->save($indicatorModels);
-        $capabilityUsageMapper->save($capabilityUsageModels);
-        $indicatorUsageMapper->save($indicatorUsageModels);
-        $descriptorMapper->save($descriptorModels);
+        $this->capabilityUsageMapper->save($capabilityUsageModels);
+        $this->indicatorUsageMapper->save($indicatorUsageModels);
+        $this->descriptorMapper->save($descriptorModels);
 
 
         // wash up before dinner, kids
@@ -754,14 +807,14 @@ class DataSource
 
         $seenLevels = array_keys($seenLevels);
 
-        $this->tidyUp($levelMapper, ['box_id' => $submissionBox->getId()], $seenLevels);
+        $this->tidyUp($this->levelMapper, ['box_id' => $submissionBox->getId()], $seenLevels);
 
         // remove all descriptors that are on this box, but are not among the descriptors we just saved (it indicates blankness / unused-ness)
         /* This ^^^ probably means: manage the diff between descriptors that -were- here previously, but no longer;
          * this suggests the user deselected them in the user interface
          */
-        $levelIds = $levelMapper->findIdsByColumn('box_id', $submissionBox->getId(), ['deleted' => true]);
-        $this->tidyUp($descriptorMapper, ['level_id' => $levelIds], $descriptorModels->getPropertyValues('id'));
+        $levelIds = $this->levelMapper->findIdsByColumn('box_id', $submissionBox->getId(), ['deleted' => true]);
+        $this->tidyUp($this->descriptorMapper, ['level_id' => $levelIds], $descriptorModels->getPropertyValues('id'));
     }
 
 
@@ -797,13 +850,13 @@ class DataSource
         // * Descriptor marks
         // ** more correctly known as indicator marks, which reference a descriptor
         /** @var GenericCollection<CapabilityMarkModel> $capabilityMarkModels */
-        $capabilityMarkModels = CapabilityMarkMapper::getInstance()->findByColumnList([
+        $capabilityMarkModels = $this->capabilityMarkMapper->findByColumnList([
             'return_id' => $feedback->getId(),
             'valid' => true,
         ]);
 
         /** @var GenericCollection<IndicatorMarkModel> $indicatorMarkModelsByCapability */
-        $indicatorMarkModelsByCapability = IndicatorMarkMapper::getInstance()->findByColumnList([
+        $indicatorMarkModelsByCapability = $this->indicatorMarkMapper->findByColumnList([
             'rubric_capability_mark_id' => $capabilityMarkModels->getPropertyValues('id'),
             'valid' => true,
         ])->filter(function (IndicatorMarkModel $indicatorMark) {
@@ -905,29 +958,26 @@ class DataSource
     public function persistMarkedGrid(MarkedGrid $markedGrid): void
     {
         // Required mappers
-        $descriptorMapper     = DescriptorMapper::getInstance();
-        $indicatorMarkMapper  = IndicatorMarkMapper::getInstance();
-        $capabilityMarkMapper = CapabilityMarkMapper::getInstance();
-        $returnedWorkMapper   = SubmissionBox\ReturnedWorkMapper::getInstance();
+        $returnedWorkMapper = SubmissionBox\ReturnedWorkMapper::getInstance();
 
         // Blow away any previous cap/ind marks for this feedback
         $returnId = $markedGrid->getFeedback()->getId();
-        $indicatorMarkMapper->deleteFeedbackMarks($returnId);
-        $capabilityMarkMapper->deleteFeedbackMarks($returnId);
+        $this->indicatorMarkMapper->deleteFeedbackMarks($returnId);
+        $this->capabilityMarkMapper->deleteFeedbackMarks($returnId);
 
         // What am I saving marks for?
         $returnedWork = $returnedWorkMapper->findById($returnId);
 
         // Create list of cap/ind marks that will be saved
-        $capabilityMarksToSave = $capabilityMarkMapper->createCollection();
-        $indicatorMarksToSave  = $indicatorMarkMapper->createCollection();
+        $capabilityMarksToSave = $this->capabilityMarkMapper->createCollection();
+        $indicatorMarksToSave  = $this->indicatorMarkMapper->createCollection();
 
         foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
             // Create cap mark
             $capabilityId = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
             $capabilityModel = $this->capabilityMapper->findById($capabilityId);
 
-            $capabilityMarksToSave[$capabilityId] = $capabilityMarkModel = $capabilityMarkMapper->createModel()
+            $capabilityMarksToSave[$capabilityId] = $capabilityMarkModel = $this->capabilityMarkMapper->createModel()
                 ->setSubmissionReturn($returnedWork)
                 ->setCapability($capabilityModel)
                 ->setValue($capabilityMark->getValue())
@@ -940,7 +990,7 @@ class DataSource
                 $descriptorModel = null;
 
                 if ($indicatorMark->getDescriptor()) {
-                    $descriptorModel = $descriptorMapper->findById($indicatorMark->getDescriptor()->getId());
+                    $descriptorModel = $this->descriptorMapper->findById($indicatorMark->getDescriptor()->getId());
                 }
 
                 if ($descriptorModel === null) {
@@ -948,7 +998,7 @@ class DataSource
                     continue;
                 }
 
-                $indicatorMarksToSave[$indicatorId] = $indicatorMarkMapper->createModel()
+                $indicatorMarksToSave[$indicatorId] = $this->indicatorMarkMapper->createModel()
                     ->setCapabilityMark($capabilityMarkModel)
                     ->setDescriptor($descriptorModel)
                     ->setValue($indicatorMark->getValue())
@@ -957,8 +1007,8 @@ class DataSource
         }
 
         // And save cap/ind marks
-        $capabilityMarkMapper->save($capabilityMarksToSave);
-        $indicatorMarkMapper->save($indicatorMarksToSave);
+        $this->capabilityMarkMapper->save($capabilityMarksToSave);
+        $this->indicatorMarkMapper->save($indicatorMarksToSave);
     }
 
 
@@ -1023,7 +1073,7 @@ class DataSource
         // Determine if there's valid capability marks for this participant.
         // Don't need to check descriptor marks separately, because they cannot
         // exist without capability marks.
-        $validCapMarkCount = IndicatorMarkMapper::getInstance()->countByColumnList([
+        $validCapMarkCount = $this->indicatorMarkMapper->countByColumnList([
             'r.id'  => $feedbackIds,
             'valid' => true,
         ]);
@@ -1057,8 +1107,7 @@ class DataSource
 
 
         // Create the factory
-        $markTypeMapper  = SubmissionBox\MarkTypeMapper::getInstance();
-        $importerFactory = new CsvImporterFactory($markTypeMapper);
+        $importerFactory = new CsvImporterFactory($this->markTypeMapper);
         // TODO inject (like every other mapper here)
         $filesystemProxy = StorageMapper::getInstance()->getStorageFilesystemProxy();
         $importer        = $importerFactory->build($filesystemProxy->readStream($file), $maxLevels, $dueWork);
@@ -1074,8 +1123,6 @@ class DataSource
      */
     public function importGrid(DueWorkModel $dueWork, IImporter $importer): void
     {
-        $markTypeMapper  = SubmissionBox\MarkTypeMapper::getInstance();
-
         // Add to the rowset as necessary
         $rowSet        = $this->retrieveRowSet($dueWork->getContext(), false);
         $rowsetChanged = false;
@@ -1124,7 +1171,7 @@ class DataSource
 
 
         // Now start building the grid
-        $capabilityMarkType   = $markTypeMapper->createModel()->setId($importer->getCapabilityMarkType());
+        $capabilityMarkType   = $this->markTypeMapper->createModel()->setId($importer->getCapabilityMarkType());
         $capabilityGradeGroup = Group\Mapper::getInstance()->createModel()->setId($importer->getCapabilityGradeGroup());
 
         $dueWork
@@ -1203,18 +1250,18 @@ class DataSource
      * @param int $destinationReturnId
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function copySelections($sourceReturnId, $destinationReturnId)
+    public function copySelections(int $sourceReturnId, int $destinationReturnId)
     {
         // Don't do anything if the source and dest are the same
         if ($sourceReturnId === $destinationReturnId) {
             return;
         }
 
-        $capabilityMarkMapper       = CapabilityMarkMapper::getInstance();
-        $descriptorMarkMapper       = IndicatorMarkMapper::getInstance();
-        $sourceDescriptorMarks      = $descriptorMarkMapper->findByColumn('g.return_id', $sourceReturnId);
-        $destinationCapabilityMarks = $capabilityMarkMapper->createCollection();
-        $destinationDescriptorMarks = $descriptorMarkMapper->createCollection();
+        $sourceDescriptorMarks = $this->indicatorMarkMapper->findByColumn('c.return_id', $sourceReturnId);
+
+        $destinationCapabilityMarks = $this->capabilityMarkMapper->createCollection();
+        $destinationDescriptorMarks = $this->indicatorMarkMapper->createCollection();
+
         $destinationReturn          = SubmissionBox\ReturnedWorkMapper::getInstance()->createModel($destinationReturnId);
 
         foreach ($sourceDescriptorMarks as $sourceDescriptor) {
@@ -1224,7 +1271,7 @@ class DataSource
             $capabilityId         = $capability->getId();
 
             if (!$destinationCapabilityMarks[$capabilityId]) {
-                $destinationCapabilityMarks[$capabilityId] = $capabilityMarkMapper->createModel()
+                $destinationCapabilityMarks[$capabilityId] = $this->capabilityMarkMapper->createModel()
                     ->setCapability($capability)
                     ->setSubmissionReturn($destinationReturn)
                     ->setValue($sourceCapabilityMark->getValue())
@@ -1233,7 +1280,7 @@ class DataSource
             }
 
             $destinationDescriptorMarks->add(
-                $descriptorMarkMapper->createModel()
+                $this->indicatorMarkMapper->createModel()
                     ->setCapabilityMark($destinationCapabilityMarks[$capabilityId])
                     ->setDescriptor($sourceDescriptor->getDescriptor())
                 //                    ->setSubmissionReturn($destinationReturn)
@@ -1242,8 +1289,8 @@ class DataSource
             );
         }
 
-        $capabilityMarkMapper->save($destinationCapabilityMarks);
-        $descriptorMarkMapper->save($destinationDescriptorMarks);
+        $this->capabilityMarkMapper->save($destinationCapabilityMarks);
+        $this->indicatorMarkMapper->save($destinationDescriptorMarks);
     }
 
 
@@ -1534,17 +1581,12 @@ class DataSource
         // TODO extract this entire monstrosity elsewhere
 
         // Get required mappers
-        $boxMapper             = SubmissionBoxMapper::getInstance();
-        $levelMapper           = LevelMapper::getInstance();
-        $descriptorMapper      = DescriptorMapper::getInstance();
-        $capabilityUsageMapper = CapabilityUsageMapper::getInstance();
-        $indicatorUsageMapper  = IndicatorUsageMapper::getInstance();
-        $unitSpecMapper        = UnitSpecificationMapper::getInstance();
+        $boxMapper = SubmissionBoxMapper::getInstance();
 
         $sourceBox = $boxMapper->findOneByColumn('assessment_id', $sourceAssessmentId);
 
-        /** @var LevelModel[]|GenericCollection $srcLevels */
-        $srcLevels = $levelMapper->findByColumn('box_id', $sourceBox->getId())->indexBy('id');
+        /** @var GenericCollection<LevelModel> $srcLevels */
+        $srcLevels = $this->levelMapper->findByColumn('box_id', $sourceBox->getId())->indexBy('id');
 
         if (! $sourceBox->getUseRubric()) {
             // No rubric? Can't work with that - die.
@@ -1566,10 +1608,10 @@ class DataSource
         // Cannot mutate identity of objects returned from mappers.
         // Index all these collections by source version ID, even though the object will be destination version.
         /** @var GenericCollection<LevelModel> $dstLevels */
-        $dstLevels = $levelMapper->createCollection();
+        $dstLevels = $this->levelMapper->createCollection();
 
         /** @var GenericCollection<DescriptorModel> $dstDescriptors */
-        $dstDescriptors = $descriptorMapper->createCollection();
+        $dstDescriptors = $this->descriptorMapper->createCollection();
 
         /** @var GenericCollection<CapabilityModel> $dstCapabilities */
         $dstCapabilities = $this->capabilityMapper->createCollection();
@@ -1578,23 +1620,23 @@ class DataSource
         $dstIndicators = $this->indicatorMapper->createCollection();
 
         /** @var GenericCollection<CapabilityUsageModel> $dstCapabilityUsages */
-        $dstCapabilityUsages = $capabilityUsageMapper->createCollection();
+        $dstCapabilityUsages = $this->capabilityUsageMapper->createCollection();
 
         /** @var GenericCollection<IndicatorUsageModel> $dstIndicatorUsages */
-        $dstIndicatorUsages = $indicatorUsageMapper->createCollection();
+        $dstIndicatorUsages = $this->indicatorUsageMapper->createCollection();
 
         // Copy Levels
         foreach ($srcLevels as $srcLevel) {
             $dstLevel = clone $srcLevel;
             $dstLevel->setId(null);
             $dstLevel->setRubricInstance($destinationRubricInstance);
-            $dstLevel->setDescriptors($descriptorMapper->createCollection());
+            $dstLevel->setDescriptors($this->descriptorMapper->createCollection());
             $dstLevels->setOffset($srcLevel->getId(), $dstLevel);
         }
 
         // Get Source Descriptors
         /** @var GenericCollection<DescriptorModel> $srcDescriptors */
-        $srcDescriptors  = $descriptorMapper->findByColumn('level_id', $srcLevels->getPropertyValues('id'))->indexBy('id');
+        $srcDescriptors = $this->descriptorMapper->findByColumn('level_id', $srcLevels->getPropertyValues('id'))->indexBy('id');
 
         if ($srcDescriptors->count() === 0) {
             // no descriptors are set for source assessment
@@ -1620,7 +1662,7 @@ class DataSource
 
         // If the rubric is being duped into a unit spec:
         // also fetch the list of course-level capabilities and indicators
-        $unitSpecs = $unitSpecMapper->findByColumn('folder_id', $dstFolder->getId());
+        $unitSpecs = $this->descriptorMapper->findByColumn('folder_id', $dstFolder->getId());
 
         /** @var UnitSpecification|null $unitSpec */
         $unitSpec = $unitSpecs->first();
@@ -1674,6 +1716,7 @@ class DataSource
 
             if (array_key_exists($capabilityName, $existingCapabilityMap)) {
                 $duplicateCapability = true;
+
                 if (array_key_exists($indicatorName, $existingIndicatorMap[$capabilityName])) {
                     $duplicateIndicator = true;
                 }
@@ -1685,9 +1728,11 @@ class DataSource
             } else {
                 // hydrate to get curriculum nodes
                 $srcCapability = $this->capabilityMapper->findById($srcDescriptor->getIndicator()->getCapability()->getId());
+
                 $dstCapability = clone $srcCapability;
                 $dstCapability->setId(null);
                 $dstCapability->setParentId($dstFolder->getId());
+
                 $existingCapabilityMap[$capabilityName] = $dstCapability;
             }
 
@@ -1699,9 +1744,11 @@ class DataSource
             } else {
                 // hydrate to get curriculum nodes
                 $srcIndicator = $this->indicatorMapper->findById($srcDescriptor->getIndicator()->getId());
+
                 $dstIndicator = clone $srcIndicator;
                 $dstIndicator->setId(null);
                 $dstIndicator->setCapability($dstCapability);
+
                 $existingIndicatorMap[$capabilityName][$indicatorName] = $dstIndicator;
             }
 
@@ -1724,13 +1771,13 @@ class DataSource
 
         // Get Source Usages
         /** @var GenericCollection<CapabilityUsageModel> $srcCapabilityUsages */
-        $srcCapabilityUsages = $capabilityUsageMapper->findByColumnList([
+        $srcCapabilityUsages = $this->capabilityUsageMapper->findByColumnList([
             'rubric_capability_id' => $srcCapabilities->getPropertyValues('id'),
             'submission_box_id'    => $sourceBox->getId(),
         ]);
 
         /** @var GenericCollection<IndicatorUsageModel> $srcIndicatorUsages */
-        $srcIndicatorUsages = $indicatorUsageMapper->findByColumnList([
+        $srcIndicatorUsages = $this->indicatorUsageMapper->findByColumnList([
             'rubric_indicator_id' => $srcIndicators->getPropertyValues('id'),
             'submission_box_id'   => $sourceBox->getId(),
         ]);
@@ -1760,12 +1807,12 @@ class DataSource
         }
 
         // Save (order is important to ensure IDs are assigned to parents b4 saving children)
-        $levelMapper->save($dstLevels);
+        $this->levelMapper->save($dstLevels);
         $this->capabilityMapper->save($dstCapabilities);
         $this->indicatorMapper->save($dstIndicators);
-        $descriptorMapper->save($dstDescriptors);
-        $capabilityUsageMapper->save($dstCapabilityUsages);
-        $indicatorUsageMapper->save($dstIndicatorUsages);
+        $this->descriptorMapper->save($dstDescriptors);
+        $this->capabilityUsageMapper->save($dstCapabilityUsages);
+        $this->indicatorUsageMapper->save($dstIndicatorUsages);
 
         return true;
     }
@@ -1786,20 +1833,15 @@ class DataSource
     public function deleteRubric(int $assessmentId): void
     {
         $boxMapper = SubmissionBoxMapper::getInstance();
-        $box       = $boxMapper->findOneByColumn('assessment_id', $assessmentId);
+        $box = $boxMapper->findOneByColumn('assessment_id', $assessmentId);
 
-        $capabilityUsageMapper = CapabilityUsageMapper::getInstance();
-        $capabilityUsageMapper->deleteByColumn('submission_box_id', $box->getId());
+        $this->capabilityUsageMapper->deleteByColumn('submission_box_id', $box->getId());
+        $this->indicatorUsageMapper->deleteByColumn('submission_box_id', $box->getId());
 
-        $indicatorUsageMapper = IndicatorUsageMapper::getInstance();
-        $indicatorUsageMapper->deleteByColumn('submission_box_id', $box->getId());
+        $levels = $this->levelMapper->findByColumn('box_id', $box->getId());
+        $this->levelMapper->delete($levels);
 
-        $levelMapper = LevelMapper::getInstance();
-        $levels      = $levelMapper->findByColumn('box_id', $box->getId());
-        $levelMapper->delete($levels);
-
-        $descriptorMapper = DescriptorMapper::getInstance();
-        $descriptorMapper->deleteByColumn('level_id', $levels->getPropertyValues('id'));
+        $this->descriptorMapper->deleteByColumn('level_id', $levels->getPropertyValues('id'));
     }
 
 
@@ -1844,11 +1886,13 @@ class DataSource
            ->isNull('u.deleted_at');
 
         $finish = $term->getActualFinish();
+
         if (null !== $finish) {
             $pb->lessThan('a.due_date', $finish->getDatabase());
         }
 
         $where = implode(' AND ', $pb->getWhere());
+
         $assessmentStatement = $this->database->prepare("
             SELECT
                 sr.owner AS studentId,
@@ -1889,6 +1933,7 @@ class DataSource
 
         // Step 2: Get max mark per indicator and dueWork for each due work
         $results = [];
+
         $pb = new Builder($this->database->getQuoter(), '');
         $pb->in('rc.parent_id', $folderIds)
            ->equals('rc.parent_type', CapabilityModel::PARENT_TYPE_CATEGORY)
@@ -1896,6 +1941,7 @@ class DataSource
            ->greaterThan('riu.max_value', 0.0);
 
         $where = implode(' AND ', $pb->getWhere());
+
         $maxMarksStatement = $this->database->prepare("
             SELECT
                 a.id,
@@ -1929,7 +1975,8 @@ class DataSource
         $pb = new Builder($this->database->getQuoter(), '');
         $pb->in('sr.id', $feedbackIds);
 
-        $where               = implode(' AND ', $pb->getWhere());
+        $where = implode(' AND ', $pb->getWhere());
+
         $descriptorStatement = $this->database->prepare("
             SELECT
                 sr.owner AS studentId,
