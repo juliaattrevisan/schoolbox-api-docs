@@ -14,7 +14,7 @@ use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
- * Class DescriptorMark
+ * Class IndicatorMark
  *
  * Semantically, this class should really be named Selection or similar, but for the sake of matching the db table,
  * mark it is...
@@ -29,25 +29,25 @@ class Model
     /**
      * @var null|CapabilityMarkModel
      */
-    private $capabilityMark;
+    private ?CapabilityMarkModel $capabilityMark;
 
 
     /**
      * @var null|DescriptorModel
      */
-    private $descriptor;
+    private ?DescriptorModel $descriptor;
 
 
     /**
      * @var bool
      */
-    private $valid;
+    private bool $valid;
 
 
     /**
      * @var float|null
      */
-    private $value;
+    private ?float $value;
 
 
     /**
@@ -93,7 +93,7 @@ class Model
      * @param boolean $valid
      * @return static
      */
-    public function setValid($valid): self
+    public function setValid(bool $valid): self
     {
         $this->valid = $valid;
         return $this;

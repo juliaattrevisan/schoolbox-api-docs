@@ -19,9 +19,10 @@ use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception;
 
 /**
- * Class DescriptorMarkMapper
+ * Class IndicatorMarkMapper
  *
  * @package Schoolbox\Assessment\Rubric\DataModel
  * @method Model hydrate(array $row, $alias = '', $callback = null)
@@ -102,7 +103,8 @@ class Mapper extends BaseMapper
 
     /**
      * @param PDOStatement $statement
-     * @return Collection|Model[]
+     * @return Collection<Model>
+     * @throws Exception
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
