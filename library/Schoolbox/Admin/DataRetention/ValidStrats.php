@@ -42,6 +42,7 @@ class ValidStrats
         self::MOMENTS,
         self::MYFILES,
         self::STUDENTSUBMISSIONS,
+        self::EPORTFOLIO,
     ];
 
     /**
