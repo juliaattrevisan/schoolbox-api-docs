@@ -47,7 +47,7 @@ class Mapper extends BaseMapper
 
         // Parent Type can reference any of:
         // submission, category, curriculum
-        // as far as I can tell, it's never not "category"
+        // as far as I can tell, it's always "category"
         $this->uses('parent_type', self::TYPE_STRING);
         $this->uses('parent_id', self::TYPE_INTEGER);
 
