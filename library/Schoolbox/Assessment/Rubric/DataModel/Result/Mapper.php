@@ -30,6 +30,11 @@ class Mapper extends BaseMapper
          * ends up being used in a shortcut to mass-produce descriptors from a predefined set, saving users manually
          * crafting them. It's an identifier in the sense that descriptors in a set are united by this resultSetId, but
          * it's not an autoincrement id like you might have naturally assumed.
+         *
+         * As an aside,
+         * Since these represent a set of possible outcomes that can be chosen by users, it's probably better named as
+         * "descriptorSet" rather than resultSet. A resultSet would be closer to the *chosen descriptors* in a rubric
+         * grid but that relationship is assembled elsewhere.
          */
         $this->uses('resultset_id', self::TYPE_INTEGER, null, 'resultSetId');
 
