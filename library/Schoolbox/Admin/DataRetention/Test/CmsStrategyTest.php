@@ -188,16 +188,12 @@ class CmsStrategyTest extends TestCase
 
             /**
              * @param int $homepageId
-             * @param bool $deleteRedisKeys
-             * @param bool $softDeleteMeta
-             * @param bool $dryRun
-             * @param bool $verbose
              */
-            public function cleanupHomepagePads(int $homepageId, bool $deleteRedisKeys = false, bool $softDeleteMeta = false, bool $dryRun = true, bool $verbose = false): array
+            public function cleanupHomepagePads(int $homepageId): array
             {
-                $this->state->calls[] = 'cleanupHomepagePads:' . $homepageId . ':' . ($dryRun ? 'dry' : 'do');
+                $this->state->calls[] = 'cleanupHomepagePads:' . $homepageId . ':' . ($this->perform ? 'do' : 'dry');
 
-                return parent::cleanupHomepagePads($homepageId, $deleteRedisKeys, $softDeleteMeta, $dryRun, $verbose);
+                return parent::cleanupHomepagePads($homepageId);
             }
 
             /**
@@ -460,6 +456,7 @@ class CmsStrategyTest extends TestCase
             'deletePadFromEtherpad:g.test1',
             'hardDeleteEtherpadPad',
             'deletePadFromEtherpad:g.test2',
+            'hardDeleteEtherpadPad',
         ], $state->calls);
     }
 
@@ -595,16 +592,16 @@ class CmsStrategyTest extends TestCase
                 ],
             ],
             ['g.test123' => true],
-            ['g.test123' => 1],
+            [],
+            false,
         );
 
-        $summary = $strategy->cleanupHomepagePads(123, true, false, true, true);
+        $summary = $strategy->cleanupHomepagePads(123);
 
         $this->assertSame(1, $summary['padsFound']);
         $this->assertSame(0, $summary['padsDeleted']);
-        $this->assertSame(0, $summary['metaRowsHardDeleted']);
-        $this->assertSame(1, $summary['redisKeysDeleted']);
-        $this->assertSame(['cleanupHomepagePads:123:dry', 'deleteEtherpadRedisKeys:g.test123'], $state->calls);
+        $this->assertSame(1, $summary['dbRowsDeleted']);
+        $this->assertSame(['cleanupHomepagePads:123:dry', 'hardDeleteEtherpadPad'], $state->calls);
     }
 
     public function testHomepageCleanupSoftDeletesMetadataWhenPadDeleted(): void
@@ -621,13 +618,12 @@ class CmsStrategyTest extends TestCase
             ['g.softdelete' => true],
         );
 
-        $summary = $strategy->cleanupHomepagePads(123, false, true, false, false);
+        $summary = $strategy->cleanupHomepagePads(123);
 
         $this->assertSame(1, $summary['padsFound']);
         $this->assertSame(1, $summary['padsDeleted']);
-        $this->assertSame(1, $summary['metaRowsSoftDeleted']);
-        $this->assertSame(0, $summary['redisKeysDeleted']);
-        $this->assertSame(['cleanupHomepagePads:123:do', 'deletePadFromEtherpad:g.softdelete', 'softDeleteEtherpadPad'], $state->calls);
+        $this->assertSame(1, $summary['dbRowsDeleted']);
+        $this->assertSame(['cleanupHomepagePads:123:do', 'deletePadFromEtherpad:g.softdelete', 'hardDeleteEtherpadPad'], $state->calls);
     }
 
     public function testHomepageCleanupTriggersRedisCleanupWhenEnabled(): void
@@ -642,14 +638,13 @@ class CmsStrategyTest extends TestCase
                 ],
             ],
             ['g.redisclean' => false],
-            ['g.redisclean' => 2],
         );
 
-        $summary = $strategy->cleanupHomepagePads(123, true, false, false, false);
+        $summary = $strategy->cleanupHomepagePads(123);
 
         $this->assertSame(1, $summary['padsFound']);
         $this->assertSame(0, $summary['padsDeleted']);
-        $this->assertSame(2, $summary['redisKeysDeleted']);
-        $this->assertSame(['cleanupHomepagePads:123:do', 'deletePadFromEtherpad:g.redisclean', 'deleteEtherpadRedisKeys:g.redisclean'], $state->calls);
+        $this->assertSame(1, $summary['dbRowsDeleted']);
+        $this->assertSame(['cleanupHomepagePads:123:do', 'deletePadFromEtherpad:g.redisclean', 'hardDeleteEtherpadPad'], $state->calls);
     }
 }
