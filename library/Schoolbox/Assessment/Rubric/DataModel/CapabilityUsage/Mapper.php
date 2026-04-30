@@ -15,7 +15,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
- * Mapper for usage of a rubric capability on a due work.
+ * Mapper for usage of a rubric capability
  *
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model createModel($idValue = null)

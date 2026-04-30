@@ -10,18 +10,18 @@
 
 namespace Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage;
 
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as IndicatorModel;
 
 class Model
 {
     /** @var int */
-    public const SEQUENCE_BASE = 1; // Indicator sequence is 1-based, not 0-based
+    public const int SEQUENCE_BASE = 1; // Indicator sequence is 1-based, not 0-based
+
 
     /**
      * @var IndicatorModel
      */
-    private $indicator;
+    private IndicatorModel $indicator;
 
 
     /**
@@ -35,16 +35,18 @@ class Model
      */
     private ?float $maxValue = null;
 
+
     /**
      * @var int
      */
-    private $sequence;
+    private int $sequence;
+
 
     /**
      * @param IndicatorModel $indicator
      * @return $this
      */
-    public function setIndicator(IndicatorModel $indicator)
+    public function setIndicator(IndicatorModel $indicator): self
     {
         $this->indicator = $indicator;
         return $this;
@@ -53,7 +55,7 @@ class Model
     /**
      * @return IndicatorModel
      */
-    public function getIndicator()
+    public function getIndicator(): IndicatorModel
     {
         return $this->indicator;
     }

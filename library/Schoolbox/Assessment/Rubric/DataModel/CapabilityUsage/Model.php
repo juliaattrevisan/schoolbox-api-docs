@@ -12,7 +12,7 @@ namespace Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
 
 /**
- * Model for usage of a rubric capability on a due work.
+ * Model for usage of a rubric capability
  */
 class Model
 {
