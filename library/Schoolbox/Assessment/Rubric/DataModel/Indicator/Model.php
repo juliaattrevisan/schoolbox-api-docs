@@ -26,32 +26,34 @@ class Model implements ISoftDeletable
     /**
      * @var string
      */
-    private $name;
+    private string $name;
 
 
     /**
      * @var CapabilityModel
      */
-    private $capability;
+    private CapabilityModel $capability;
+
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
 
 
     /**
      * @param  string $name
      * @return $this
      */
-    public function setName($name)
+    public function setName(string $name): self
     {
         $this->name = $name;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
 
     /**
      * @return CapabilityModel
@@ -61,11 +63,12 @@ class Model implements ISoftDeletable
         return $this->capability;
     }
 
+
     /**
      * @param CapabilityModel $capability
-     * @return static
+     * @return $this
      */
-    public function setCapability(CapabilityModel $capability)
+    public function setCapability(CapabilityModel $capability): self
     {
         $this->capability = $capability;
         return $this;
