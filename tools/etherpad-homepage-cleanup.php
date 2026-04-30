@@ -6,18 +6,15 @@
  *
  * This tool is intentionally independent of the DataRetention system.
  * It queries the local etherpad_pad table for a homepage, deletes the pads
- * through the Etherpad API, optionally clears Redis state, and optionally
- * soft-deletes or hard-deletes the local metadata rows.
+ * through the Etherpad API, and hard-deletes the local metadata rows.
  *
  * Usage:
- *   php tools/etherpad-homepage-cleanup.php --homepage-id=123 [--perform] [--delete-redis-keys] [--soft-delete-meta] [--verbose]
+ *   php tools/etherpad-homepage-cleanup.php --homepage-id=123 [--perform] [--verbose]
  */
 
 declare(strict_types=1);
 
 use EtherpadLite\Client as EtherpadClient;
-use Predis\ClientInterface;
-use Predis\Collection\Iterator\Keyspace;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
@@ -53,19 +50,18 @@ $app = new class extends CliTool\App
         $logger = $this->getLogger();
 
         if ($this->getOpt(self::OPT_LONG_HELP)) {
-            $logger->info(<<<HELP
-Usage: php tools/etherpad-homepage-cleanup.php --homepage-id=123 [--perform] [--delete-redis-keys] [--soft-delete-meta] [--verbose]
+            echo
+            <<<HELP
+Usage: php tools/etherpad-homepage-cleanup.php --homepage-id=123 [--perform] [--verbose]
 
 Options:
   --homepage-id=ID         Required homepage id to target for Etherpad cleanup
   --perform                Persist changes instead of dry-run
-  --delete-redis-keys      Remove known Etherpad Redis keys for each pad
-  --soft-delete-meta       Soft-delete matched etherpad_pad metadata rows instead of hard-delete
   --verbose                Print additional progress output
   --help                   Show this help message
 
-HELP
-            );
+HELP;
+            
             exit(0);
         }
 
@@ -79,26 +75,24 @@ HELP
 
         if ($homepageId === null || $homepageId <= 0) {
             $logger->error('Missing required --homepage-id');
-            $logger->error('Missing required --homepage-id.');
             exit(1);
         }
 
         $verbose = (bool)$this->getOpt(self::OPT_LONG_VERBOSE);
         $dryRun = !$this->perform();
 
-        $this->printLine($logger, sprintf('Starting Etherpad homepage cleanup for homepage %d', $homepageId), $verbose);
-        $this->printLine($logger, sprintf('Mode: %s', $dryRun ? 'dry-run' : 'perform'), $verbose);
+        $logger->info(sprintf('Starting Etherpad homepage cleanup for homepage %d', $homepageId));
+        $logger->info(sprintf('Mode: %s', $dryRun ? 'dry-run' : 'perform'));
 
         $etherpadClient = $this->createEtherpadClient($logger, $dryRun);
         if (!$dryRun && $etherpadClient === null) {
             $logger->error('Etherpad API is not configured; cannot perform deletions.');
-            $logger->error('Missing Etherpad API configuration; cannot perform deletions.');
             exit(1);
         }
 
         $pads = $this->loadHomepagePads($homepageId);
         $padCount = count($pads);
-        $this->printLine($logger, sprintf('Found %d active Etherpad pad(s) for homepage %d', $padCount, $homepageId), $verbose);
+        $logger->info(sprintf('Found %d active Etherpad pad(s) for homepage %d', $padCount, $homepageId));
 
         if ($padCount === 0) {
             $logger->notice(sprintf('No active Etherpad pads found for homepage %d.', $homepageId));
@@ -121,7 +115,7 @@ HELP
                 continue;
             }
 
-            $this->printLine($logger, sprintf('[%d/%d] Processing pad %s', $index + 1, $padCount, $padId), $verbose);
+            $logger->info(sprintf('[%d/%d] Processing pad %s', $index + 1, $padCount, $padId));
 
             if ($dryRun) {
                 $logger->notice(sprintf("Dry-run: would delete Etherpad pad '%s'", $padId));
@@ -163,10 +157,9 @@ HELP
      * Build and return an Etherpad API client if configuration exists.
      *
      * @param LoggerInterface $logger
-     * @param bool $dryRun
      * @return EtherpadClient|null
      */
-    private function createEtherpadClient(LoggerInterface $logger, bool $dryRun): ?EtherpadClient
+    private function createEtherpadClient(LoggerInterface $logger): ?EtherpadClient
     {
         $apiToken = (string)$this->getConfig()->get('etherpad_api_token');
         $etherpadHost = (string)$this->getConfig()->get(ConfigMapper::NAME_ETHERPAD_HOST);
@@ -183,7 +176,6 @@ HELP
             return null;
         }
     }
-
 
     /**
      * Delete a pad from Etherpad using the EtherpadLite API.
@@ -226,22 +218,6 @@ HELP
         $statement->execute(['id' => $id]);
 
         return $statement->rowCount();
-    }
-
-    /**
-     * Print a message when verbose mode is enabled and always log debug output.
-     *
-     * @param LoggerInterface $logger
-     * @param string $message
-     * @param bool $verbose
-     */
-    private function printLine(LoggerInterface $logger, string $message, bool $verbose): void
-    {
-        if ($verbose) {
-            $logger->info($message);
-        } else {
-            $logger->debug($message);
-        }
     }
 };
 
