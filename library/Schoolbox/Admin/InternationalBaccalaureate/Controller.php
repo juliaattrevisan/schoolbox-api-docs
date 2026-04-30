@@ -39,6 +39,9 @@ class Controller extends ConfigController
     /* General Configuration ID
      */
     private const int GENERAL_CATEGORY_ID = 0;
+    /* Maximum academic year length
+     */
+    private const int REGISTRATION_SESSION_ACADEMIC_YEAR_MAX_LENGTH = 4;
 
     public function __construct(
         ConfigMapper $configMapper,
@@ -428,11 +431,12 @@ class Controller extends ConfigController
         $post = $this->requestPost;
 
         $systemPurposeId = $post->getInt('systemPurposeId');
-        $academicYear = trim((string)$post->get('academicYear'));
-        $examSession = trim((string)$post->get('examSession'));
+        $academicYear = trim((string) $post->get('academicYear'));
+        $examSession = trim((string) $post->get('examSession'));
 
         if (
             null === $systemPurposeId ||
+            $systemPurposeId <= 0 ||
             '' === $academicYear ||
             !in_array(
                 $examSession,
@@ -443,6 +447,19 @@ class Controller extends ConfigController
             $this->response = $this->responseAsJson([
                 'success' => false,
                 'message' => 'Invalid registration session request data',
+            ])->withStatus(400);
+            return;
+        }
+
+        /* Validation for academic year length - to prevent excessively long values being entered which could cause issues with display and storage.
+         */
+        if (mb_strlen($academicYear) > self::REGISTRATION_SESSION_ACADEMIC_YEAR_MAX_LENGTH) {
+            $this->response = $this->responseAsJson([
+                'success' => false,
+                'message' => sprintf(
+                    'Academic year must be %d characters or fewer, for example 2026.',
+                    self::REGISTRATION_SESSION_ACADEMIC_YEAR_MAX_LENGTH
+                ),
             ])->withStatus(400);
             return;
         }
