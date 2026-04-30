@@ -305,7 +305,7 @@ class Cms extends Base
             return;
         }
 
-        $this->cleanupHomepagePadsForFolders($folderIds);
+        $counts['etherpad_pads'] = $this->cleanupHomepagePadsForFolders($folderIds);
 
         $blogIds = $this->findIdsByFolder('blog', 'id', 'folder_id', $folderIds);
         $forumThreadIds = $this->findIdsByFolder('forumThread', 'threadID', 'categoryID', $folderIds);
@@ -397,9 +397,10 @@ class Cms extends Base
     /**
      * @param array<int, int> $folderIds
      */
-    protected function cleanupHomepagePadsForFolders(array $folderIds): void
+    protected function cleanupHomepagePadsForFolders(array $folderIds): int
     {
         $dryRun = !$this->perform;
+        $totalPads = 0;
 
         foreach ($folderIds as $folderId) {
             $this->log->notice(sprintf(
@@ -408,8 +409,11 @@ class Cms extends Base
                 $folderId,
             ));
 
-            $this->cleanupHomepagePads($folderId, false, false, $dryRun, false);
+            $summary = $this->cleanupHomepagePads($folderId, false, false, $dryRun, false);
+            $totalPads += (int)$summary['padsFound'];
         }
+
+        return $totalPads;
     }
 
     /**

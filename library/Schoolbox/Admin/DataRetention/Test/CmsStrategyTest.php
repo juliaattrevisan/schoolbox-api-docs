@@ -418,6 +418,49 @@ class CmsStrategyTest extends TestCase
         $delete($chunk);
     }
 
+    /**
+     * @param Cms $strategy
+     * @param array<int, int> $folderIds
+     */
+    private function cleanupHomepagePadsForFolders(Cms $strategy, array $folderIds): int
+    {
+        $call = \Closure::bind(
+            function (array $folderIds): int {
+                return $this->cleanupHomepagePadsForFolders($folderIds);
+            },
+            $strategy,
+            Cms::class,
+        );
+
+        return $call($folderIds);
+    }
+
+    public function testCleanupHomepagePadsForFoldersCountsPadsFound(): void
+    {
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
+            [],
+            [],
+            [],
+            [
+                10 => [
+                    ['id' => 1, 'pad_id' => 'g.test1'],
+                    ['id' => 2, 'pad_id' => 'g.test2'],
+                ],
+            ],
+            ['g.test1' => true, 'g.test2' => false],
+        );
+
+        $count = $this->cleanupHomepagePadsForFolders($strategy, [10]);
+
+        $this->assertSame(2, $count);
+        $this->assertSame([
+            'cleanupHomepagePads:10:do',
+            'deletePadFromEtherpad:g.test1',
+            'hardDeleteEtherpadPad',
+            'deletePadFromEtherpad:g.test2',
+        ], $state->calls);
+    }
+
     public function testUsesCmsStrategyNameAndLabel(): void
     {
         $strategy = new Cms(
