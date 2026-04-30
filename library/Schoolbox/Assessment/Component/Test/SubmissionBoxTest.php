@@ -47,6 +47,9 @@ class SubmissionBoxTest extends TestCase
         $this->markTestIncomplete('Mark type model hasn\'t been added yet');
     }
 
+    /**
+     * Tests that the MARK_VISIBILITY_STRINGS map contains the correct human-readable labels for each visibility constant.
+     */
     public function testMarkVisibilityStringsMapCorrectly(): void
     {
         $strings = IAssessable::MARK_VISIBILITY_STRINGS;
@@ -58,6 +61,9 @@ class SubmissionBoxTest extends TestCase
         $this->assertSame('Staff, Student & Parent', $strings[IAssessable::MARK_VISIBILITY_PARENT_STUDENT]);
     }
 
+    /**
+     * Tests that isMarkShownToStudents() returns true only for visibility settings that include students.
+     */
     public function testIsMarkShownToStudents(): void
     {
         $box = new SubmissionBox();
@@ -75,6 +81,9 @@ class SubmissionBoxTest extends TestCase
         $this->assertTrue($box->isMarkShownToStudents());
     }
 
+    /**
+     * Tests that isMarkShownToParents() returns true only for visibility settings that include parents.
+     */
     public function testIsMarkShownToParents(): void
     {
         $box = new SubmissionBox();
@@ -92,6 +101,9 @@ class SubmissionBoxTest extends TestCase
         $this->assertTrue($box->isMarkShownToParents());
     }
 
+    /**
+     * Tests that getMarkVisibilityDescription() returns the correct human-readable description for each visibility setting.
+     */
     public function testGetMarkVisibilityDescription(): void
     {
         $box = new SubmissionBox();
