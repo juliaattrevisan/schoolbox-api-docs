@@ -30,8 +30,6 @@ class Cms extends Base
 
     private const string TABLE_FOLDER = 'folder';
 
-    private ?ClientInterface $redisClient = null;
-
     public function __construct(
         LoggerInterface $log,
         bool $perform,
@@ -42,10 +40,9 @@ class Cms extends Base
         RetentionPeriod $retentionPeriod,
         int $chunkLoops = self::DEFAULT_CHUNK_LOOPS,
         int $chunkSize = self::DEFAULT_CHUNK_SIZE,
-        ?ClientInterface $redisClient = null,
+        private ?ClientInterface $redisClient = null,
     ) {
         parent::__construct($log, $perform, $database, $lock, $config, $endTime, $retentionPeriod, $chunkLoops, $chunkSize);
-        $this->redisClient = $redisClient;
     }
 
     public function getRetentionLabel(): string
@@ -220,11 +217,11 @@ class Cms extends Base
 
         $deletedKeys = 0;
         foreach ($patterns as $pattern) {
-            foreach (new Keyspace($redis, $pattern) as $key) {
+            foreach (new Keyspace($this->redisClient, $pattern) as $key) {
                 $this->log->debug(sprintf('Found Etherpad Redis key for deletion: %s', $key));
                 $deletedKeys++;
                 if (!$dryRun) {
-                    $redis->del([$key]);
+                    $this->redisClient->del([$key]);
                 }
             }
         }
