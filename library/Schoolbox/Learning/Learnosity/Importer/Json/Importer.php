@@ -318,7 +318,7 @@ class Importer
             ->setDueAt($inUnitSpec ? null : new \Alaress_Date_Format(new \DateTime('+1 day 23:59:59')))
             ->setCloseAt($inUnitSpec ? null : new \Alaress_Date_Format(new \DateTime('+2 day 23:59:59')))
             ->setWeight($settings['weight'])
-            ->setDefaultOpenSpan($settings['defaultOpenSpan'])
+            ->setDefaultOpenSpan($settings['defaultOpenSpan'] ?? null) // This key was not included in exports <25.1.
             ->setMaxAttempts($settings['maxAttempts'])
             ->setMarkVisibility(self::resolveMarkVisibility($settings['markVisibility']))
             ->setReadingTimeDuration($settings['readingTimeDuration'])
