@@ -54,7 +54,6 @@
     "tinycolor2": "~1.6.0",
     "ts-ebml": "~3.0.2",
     "v-tables-3-select-rows": "~0.4.9",
-    "videojs-record": "~4.8.0",
     "vue": "~3.5.28",
     "vuejs-paginate-next": "~1.0.2"
   },
