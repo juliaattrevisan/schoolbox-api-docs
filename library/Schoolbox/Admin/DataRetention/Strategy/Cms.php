@@ -22,6 +22,7 @@ use Schoolbox\Admin\DataRetention\RetentionPeriod;
 use Schoolbox\Admin\DataRetention\ValidStrats;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Permission\Access\UserAccess;
 use Symfony\Component\Lock\LockInterface;
 
 class Cms extends Base
@@ -598,6 +599,27 @@ class Cms extends Base
             $this->deleteStatement($table) . " FROM {$table} WHERE {$column} IN {$placeholders}"
         );
         $statement->execute(Builder::getArrayParameters($folderIds, 'folder'));
+
+        return $statement->rowCount();
+    }
+
+    /**
+     * @param array<int, int> $folderIds
+     */
+    protected function deleteHomepageUserAccess(array $folderIds): int
+    {
+        if ($folderIds === []) {
+            return 0;
+        }
+
+        $placeholders = Builder::getArrayPlaceholders($folderIds, 'folder');
+        $statement = $this->getPreparedStatement(
+            $this->deleteStatement('userAccess')
+            . " FROM userAccess WHERE service = :service AND sid IN {$placeholders}"
+        );
+        $params = Builder::getArrayParameters($folderIds, 'folder');
+        $params['service'] = UserAccess::SERVICE_HOMEPAGE;
+        $statement->execute($params);
 
         return $statement->rowCount();
     }
