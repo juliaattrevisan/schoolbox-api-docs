@@ -248,9 +248,6 @@ class ConfigMapper extends Mapper
     public const string NAME_MOBILE_DAEMON_ENABLED = 'mobile_daemon_enabled';
     public const string NAME_LMS_ENABLED = 'lms_enabled';
     public const string NAME_RESTRICT_STUDENT_SUBMISSIONS = 'restrict_student_submissions';
-
-    /** @deprecated Use NAME_MARK_VISIBILITY_ALLOW_STUDENTS and NAME_MARK_VISIBILITY_ALLOW_PARENTS instead */
-    public const string NAME_SUBMISSION_VISIBILITY_MAX      = 'submission_visibility_max';
     public const string NAME_MARK_VISIBILITY_ALLOW_STUDENTS = 'mark_visibility_allow_students';
     public const string NAME_MARK_VISIBILITY_ALLOW_PARENTS  = 'mark_visibility_allow_parents';
     public const string NAME_LTI_ASSESSMENTS_ENABLE = 'lti_assessments_enable';

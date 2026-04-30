@@ -73,4 +73,4 @@ VALUES (
 );
 
 # Deprecate old setting.
-UPDATE config SET name = '_submission_visibility_max', hidden = 'true', title = CONCAT(title, ' (deprecated)') WHERE name = 'submission_visibility_max';
+DELETE FROM config WHERE name = 'submission_visibility_max';
