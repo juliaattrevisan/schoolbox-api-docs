@@ -163,6 +163,8 @@ class Mapper extends BaseMapper
             return $this->createCollection();
         }
 
+        // Start from qualified student users so students without an existing session-student row are included.
+        // Exclude users who already have an IB candidate number or are registered in another session for this system purpose.
         $statement = $this->getDatabase()->executeQuery("
             SELECT DISTINCT
                 {$this->getColumnString('ss')},
@@ -178,8 +180,19 @@ class Mapper extends BaseMapper
                 ON ss.registration_session_id = :registrationSessionId
                 AND ss.user_id = u.id
             WHERE u.deleted_at IS NULL
+              AND (u.ib_candidate_number IS NULL OR u.ib_candidate_number = '')
               AND g.group_type = :studentRoleType
               AND q.system_purpose_id = :systemPurposeId
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM {$this->getTable()} other_ss
+                  INNER JOIN {$sessionMapper->getTable()} other_rs
+                      ON other_rs.id = other_ss.registration_session_id
+                  WHERE other_ss.user_id = u.id
+                    AND other_rs.id != :registrationSessionId
+                    AND other_rs.deleted_at IS NULL
+                    AND other_rs.system_purpose_id = :systemPurposeId
+              )
             ORDER BY u.lastname ASC, u.preferred_name ASC, u.firstname ASC, u.id ASC
         ", [
             'registrationSessionId' => $registrationSessionId,
