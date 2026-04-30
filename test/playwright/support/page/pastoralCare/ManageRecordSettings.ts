@@ -5,47 +5,71 @@
 import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import CreatePastoralRecord from "@schoolboxTest/playwright/support/page/pastoralCare/CreatePastoralRecord";
 
 export default class PastoralExpiry {
+    // Playwright page instance used to interact with the manage record settings UI.
     private page: Page;
 
+    // Shared acceptance test helpers for common UI interactions and CKEditor input.
     private tester: AcceptanceTester;
 
+    // Route for the Award/Achievement subtype settings page.
     static readonly URL_AWARD_ACHIEVEMENT = "/pastoral/management/audience/subtype/1/modify";
 
+    // Route for the Learning Difficulties subtype settings page.
     static readonly URL_LEARNING_DIFFICULTIES = "/pastoral/management/audience/subtype/2/modify";
 
+    // Route for the Attendance type settings page.
     static readonly URL_ATTENDANCE = "/pastoral/management/audience/type/2/modify";
 
+    // Route for the Bullying type settings page.
     static readonly URL_BULLYING = "/pastoral/management/audience/type/4/modify";
 
+    // Test id for the pastoral flag dropdown.
     static readonly DATA_TEST_FLAG_SELECT = "audiences-modify-pastoral-flag-select";
 
+    // Test id for the pastoral flag colour picker input.
     static readonly DATA_TEST_FLAG_COLOR_INPUT = "audiences-modify-pastoral-flag-color-input";
 
+    // Test id for the default expiry dropdown.
     static readonly DATA_TEST_DEFAULT_EXPIRY_SELECT = "audiences-modify-pastoral-default-expiry-select";
 
+    // Test id for the apply default expiry checkbox.
     static readonly DATA_TEST_APPLY_DEFAULT_EXPIRY_CHECKBOX = "audiences-modify-apply-default-expiry";
 
+    // Test id for the contribute to differentiation profile checkbox.
     static readonly DATA_TEST_CONTRIBUTE_DIFFERENTIATION_PROFILE_CHECKBOX =
         "audiences-modify-contribute-differentiation-profile";
 
+    // Test id for the save button on the manage settings page.
     static readonly DATA_TEST_MANAGE_SAVE_BUTTON = "audiences-modify-pastoral-save-button";
 
+    // Selector for the visibility role link that opens the add role modal.
     static readonly SELECTOR_VISIBILITY_ROLE_LINK = 'a[title="Add Role"]';
 
+    // Test id for the lock visibility toggle.
     static readonly DATA_TEST_LOCK_VISIBILITY_TOGGLE = "pastoral-settings-lock-visibility-toggle";
 
+    // Selector for the selectized input used to assign default actions.
+    static readonly SELECTOR_DEFAULT_ACTIONS_INPUT = "input#pastoral-default-actions-selectized";
+
+    // Selector for the deny parent visibility checkbox label.
     static readonly SELECTOR_DENY_PARENT = 'label[for="roleDenyrole-type-parent"]';
 
+    // Selector template for confidential comment role checkboxes.
     static readonly SELECTOR_CONFIDENTIAL_COMMENT = 'label[for="rolePrivate{id}"]';
 
+    // Selector for the sentiment dropdown.
     static readonly SELECTOR_SENTIMENT_DROPDOWN = "#sentiment";
 
+    // CKEditor id for the entry tip field.
     static readonly SELECTOR_ENTRY_TIP_ID = "entryTip";
 
+    // CKEditor id for the general template field.
     static readonly SELECTOR_GENERAL_TEMPLATE_ID = "template";
 
+    // CKEditor id for the private template field.
     static readonly SELECTOR_PRIVATE_TEMPLATE_ID = "templatePrivate";
 
     constructor(page: Page, tester: AcceptanceTester) {
@@ -137,6 +161,38 @@ export default class PastoralExpiry {
     }
 
     /**
+     * Add one or more available actions
+     * @param actionNames - The action names to add
+     */
+    async addAvailableActions(actionNames: string[]): Promise<void> {
+        await this.addActions(CreatePastoralRecord.SELECTOR_ACTIONS_INPUT, actionNames);
+    }
+
+    /**
+     * Add one or more default actions
+     * @param actionNames - The action names to add
+     */
+    async addDefaultActions(actionNames: string[]): Promise<void> {
+        await this.addActions(PastoralExpiry.SELECTOR_DEFAULT_ACTIONS_INPUT, actionNames);
+    }
+
+    /**
+     * Check the available actions selectize contains the expected action names
+     * @param actionNames - The action names to check
+     */
+    async expectAvailableActions(actionNames: string[]): Promise<void> {
+        await this.expectActions(CreatePastoralRecord.SELECTOR_ACTIONS_INPUT, actionNames);
+    }
+
+    /**
+     * Check the default actions selectize contains the expected action names
+     * @param actionNames - The action names to check
+     */
+    async expectDefaultActions(actionNames: string[]): Promise<void> {
+        await this.expectActions(PastoralExpiry.SELECTOR_DEFAULT_ACTIONS_INPUT, actionNames);
+    }
+
+    /**
      * Click the visibility role link to open the modal
      */
     async clickVisibilityRoleLink(): Promise<void> {
@@ -208,5 +264,33 @@ export default class PastoralExpiry {
      */
     async fillPrivateTemplate(template: string): Promise<void> {
         await this.tester.fillCKEditorById(PastoralExpiry.SELECTOR_PRIVATE_TEMPLATE_ID, template);
+    }
+
+    /**
+     * Add one or more actions to a selectize field
+     * @param inputSelector - The selectize input selector
+     * @param values - The values to add
+     */
+    private async addActions(inputSelector: string, values: string[]): Promise<void> {
+        for (const value of values) {
+            await this.page.keyboard.press("Escape");
+            await this.page.locator(inputSelector).click();
+            await this.page.locator(".selectize-dropdown-content:visible").getByText(value, { exact: true }).click();
+            await this.page.keyboard.press("Escape");
+        }
+    }
+
+    /**
+     * Check a selectize field contains the expected actions
+     * @param inputSelector - The selectize input selector
+     * @param values - The values to check
+     */
+    private async expectActions(inputSelector: string, values: string[]): Promise<void> {
+        const input = this.page.locator(inputSelector);
+        const container = input.locator("xpath=ancestor::div[contains(@class,'selectize-input')]");
+
+        for (const value of values) {
+            await expect(container).toContainText(value);
+        }
     }
 }

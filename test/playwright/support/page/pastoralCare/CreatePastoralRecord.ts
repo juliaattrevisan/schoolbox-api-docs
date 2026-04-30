@@ -2,23 +2,35 @@ import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
 export default class CreatePastoralRecord {
+    // Playwright page instance used to interact with the pastoral record form.
     private page: Page;
 
+    // Route template for creating a new pastoral record for a student.
     static readonly URL = "/pastoral/student/{studentId}/record/insert";
 
+    // Route template for editing an existing pastoral record.
     static readonly URL_EXISTING = "pastoral/student/{studentId}/record/{recordId}/update";
 
+    // Selector for the pastoral record title input field.
     static readonly PASTORAL_TITLE = "input#heading";
 
+    // Selector for the pastoral record type dropdown.
     static readonly PASTORAL_TYPE = "select#typeId";
 
+    // Selector for the pastoral record subtype dropdown.
     static readonly PASTORAL_SUB_TYPE = "select#subtypeId";
 
+    // Selector for the save button.
     static readonly SAVE_BUTTON = "input.submit";
 
+    // Test id for the expires-at date input field.
     static readonly DATA_TEST_EXPIRES_AT_INPUT = "modify-section-general-pastoral-expires-at-input";
 
+    // Selector for the entry tip input field.
     static readonly SELECTOR_ENTRY_TIP = "#entry-tip-input";
+
+    // Selector for the selectized pastoral actions input.
+    static readonly SELECTOR_ACTIONS_INPUT = "input#pastoral-actions-selectized";
 
     constructor(page: Page) {
         this.page = page;
@@ -136,6 +148,23 @@ export default class CreatePastoralRecord {
     async verifyEntryTip(tip: string): Promise<void> {
         await expect(this.page.locator(CreatePastoralRecord.SELECTOR_ENTRY_TIP)).toBeVisible();
         await expect(this.page.locator(CreatePastoralRecord.SELECTOR_ENTRY_TIP)).toContainText(tip);
+    }
+
+    /**
+     * Check which pastoral actions are currently selected in the form
+     * @param expectedTexts - The action names that should be selected
+     * @param notExpectedTexts - The action names that should not be selected
+     */
+    async expectSelectedActions(expectedTexts: string[], notExpectedTexts: string[] = []): Promise<void> {
+        const container = this.page
+            .locator(CreatePastoralRecord.SELECTOR_ACTIONS_INPUT)
+            .locator("xpath=ancestor::div[contains(@class,'selectize-input')]");
+        for (const expectedText of expectedTexts) {
+            await expect(container).toContainText(expectedText);
+        }
+        for (const notExpectedText of notExpectedTexts) {
+            await expect(container).not.toContainText(notExpectedText);
+        }
     }
 
     /**

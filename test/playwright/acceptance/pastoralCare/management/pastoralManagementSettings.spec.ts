@@ -6,6 +6,7 @@ import Common from "@schoolboxTest/playwright/support/page/Common";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
 import ClassList from "@schoolboxTest/playwright/support/page/homepage/pages/ClassList";
 import StudentParticipation from "@schoolboxTest/playwright/support/page/studentParticipation/StudentParticipation";
+import PastoralRecord from "@schoolboxTest/playwright/support/page/pastoralCare/PastoralRecord";
 
 /**
  * navigate to pastoral care management settings
@@ -25,10 +26,12 @@ test.describe("Pastoral Care - Management Settings", () => {
     let profilePage: ProfilePage;
     let classList: ClassList;
     let studentParticipation: StudentParticipation;
+    let pastoralRecord: PastoralRecord;
 
     test.beforeEach(async ({ page, tester }) => {
         pastoralProfile = new PastoralProfile(page, tester);
         createPastoralRecord = new CreatePastoralRecord(page);
+        pastoralRecord = new PastoralRecord(page);
         // login as admin
         await tester.loginAsAdmin();
     });
@@ -193,9 +196,9 @@ test.describe("Pastoral Care - Management Settings", () => {
         await pastoralProfile.clickPastoralRecord(studentId, recordId);
         await pastoralProfile.seeInProfileContent("Academic");
         await pastoralProfile.seeInProfileContent("Award/Achievement");
-        await pastoralProfile.seeInGeneralPanel(generalTemplateAcademic);
-        await pastoralProfile.clickConfidentialPanelLink();
-        await pastoralProfile.seeInConfidentialPanel(confidentialTemplateAcademic);
+        await pastoralRecord.seeInGeneralPanel(generalTemplateAcademic);
+        await pastoralRecord.clickConfidentialPanelLink();
+        await pastoralRecord.seeInConfidentialPanel(confidentialTemplateAcademic);
     });
 
     // checks if the flags set in the management settings are presented in the pastoral profile and class list pages
