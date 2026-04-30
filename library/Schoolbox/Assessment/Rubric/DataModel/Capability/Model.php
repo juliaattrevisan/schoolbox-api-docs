@@ -29,54 +29,57 @@ class Model implements ISoftDeletable
      * `$this->parentId` references a folder ID.
      *
      * All known rubric capabilities have this parent type.
-     *
-     * @var string
      */
-    public const PARENT_TYPE_CATEGORY = 'category';
+    public const string PARENT_TYPE_CATEGORY = 'category';
 
-    /**
-     * Constant for the 'submission' parent type; this indicates that
-     * `$this->parentId` references a submission box's ID.
-     *
-     * No known rubric capabilities have or have ever had this parent type; it
-     * may have been added for future use for rubric indicators unique to a due
-     * work, but this was never implemented.
-     *
-     * @deprecated this has never been used
-     * @var string
-     */
-    public const PARENT_TYPE_SUBMISSION = 'submission';
+//    /**
+//     * Constant for the 'submission' parent type; this indicates that
+//     * `$this->parentId` references a submission box's ID.
+//     *
+//     * No known rubric capabilities have or have ever had this parent type; it
+//     * may have been added for future use for rubric indicators unique to a due
+//     * work, but this was never implemented.
+//     *
+//     * @deprecated this has never been used
+//     */
+//    public const string PARENT_TYPE_SUBMISSION = 'submission';
+//
+//    /**
+//     * Constant for the 'curriculum' parent type; this indicates that
+//     * `$this->parentId` references a curriculum ID.
+//     *
+//     * No known rubric capabilities have or have ever had this parent type; it
+//     * may have been added for future use for rubric indicators unique to a
+//     * curriculum, but this was never implemented.
+//     *
+//     * @deprecated this has never been used
+//     */
+//    public const string PARENT_TYPE_CURRICULUM = 'curriculum';
 
-    /**
-     * Constant for the 'curriculum' parent type; this indicates that
-     * `$this->parentId` references a curriculum ID.
-     *
-     * No known rubric capabilities have or have ever had this parent type; it
-     * may have been added for future use for rubric indicators unique to a
-     * curriculum, but this was never implemented.
-     *
-     * @deprecated this has never been used
-     * @var string
-     */
-    public const PARENT_TYPE_CURRICULUM = 'curriculum';
 
     /**
      * @var string
      */
-    private $name;
+    private string $parentType = self::PARENT_TYPE_CATEGORY;
+
+
+    /**
+     * @var string
+     */
+    private string $name;
+
 
     /**
      * @var int
      */
-    private $parentId;
+    private int $parentId;
+
 
     /**
-     * @var string
+     * @var GenericCollection<IndicatorModel>
      */
-    private $parentType = self::PARENT_TYPE_CATEGORY;
+    private GenericCollection $indicators;
 
-    /** @var GenericCollection|IndicatorModel[] */
-    private $indicators;
 
     /**
      * @return string
@@ -86,15 +89,17 @@ class Model implements ISoftDeletable
         return $this->name;
     }
 
+
     /**
      * @param string $name
      * @return static
      */
-    public function setName(string $name)
+    public function setName(string $name): self
     {
         $this->name = $name;
         return $this;
     }
+
 
     /**
      * @return int
@@ -104,15 +109,17 @@ class Model implements ISoftDeletable
         return $this->parentId;
     }
 
+
     /**
      * @param int $parentId
      * @return static
      */
-    public function setParentId(int $parentId)
+    public function setParentId(int $parentId): self
     {
         $this->parentId = $parentId;
         return $this;
     }
+
 
     /**
      * @return string
@@ -122,11 +129,12 @@ class Model implements ISoftDeletable
         return $this->parentType;
     }
 
+
     /**
      * @param string $parentType
      * @return static
      */
-    public function setParentType(string $parentType)
+    public function setParentType(string $parentType): self
     {
         $this->parentType = $parentType;
         return $this;
@@ -143,7 +151,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param IndicatorModel[]|GenericCollection $indicators
+     * @param GenericCollection<IndicatorModel> $indicators
      * @return $this
      * @throws TypeError
      */

@@ -23,7 +23,7 @@ use Schoolbox\Mapper\Exception as MapperException;
  * @method Model createModel($idValue = null)
  * @method Model findById($id)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
- * @method Model[] findByColumnList($columnList, $options = [])
+ * @method GenericCollection<Model> findByColumnList($columnList, $options = [])
  * @method Model findOneByColumnList($columnList, array $options = [])
  */
 class Mapper extends BaseMapper
@@ -33,7 +33,7 @@ class Mapper extends BaseMapper
      * @see expanded reason in /library/Schoolbox/Assessment/Rubric/templates/vue/types.ts
      * @see also SA-13689.
      */
-    public const CAPABILITY_NAME_MAX_CHARS_TO_STORE = 900;
+    public const int CAPABILITY_NAME_MAX_CHARS_TO_STORE = 900;
 
     /**
      * @inheritdoc
@@ -42,16 +42,15 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('rubric_capability');
         $this->hasModel(Model::class);
-
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-
         $this->uses('name', self::TYPE_STRING);
-        $this->uses('parent_type', self::TYPE_STRING);
 
-        // Parent ID can reference any of:
+        // Parent Type can reference any of:
         // submission, category, curriculum
         // as far as I can tell, it's never not "category"
+        $this->uses('parent_type', self::TYPE_STRING);
         $this->uses('parent_id', self::TYPE_INTEGER);
+
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         // Add curriculum codes
@@ -167,7 +166,7 @@ class Mapper extends BaseMapper
      * @param int|int[] $parentId   The parent ID (or list thereof) to find for
      * @param string    $parentType One of the `Model::PARENT_TYPE_*` constants
      * @param bool      $cache      If false, bypass result cache
-     * @return GenericCollection|Model[]
+     * @return GenericCollection<Model>
      * @throws MapperException
      */
     public function findForParent($parentId, string $parentType, bool $cache = true): GenericCollection
