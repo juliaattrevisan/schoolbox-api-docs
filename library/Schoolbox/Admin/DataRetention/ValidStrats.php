@@ -29,6 +29,9 @@ class ValidStrats
     // Student submission cleanup must be explicitly selectable because it removes assessment evidence.
     public const string STUDENTSUBMISSIONS = 'studentSubmissions';
 
+    // retain data in the ePortfolio area
+    public const string EPORTFOLIO = 'ePortfolio';
+
     /**
      * These names are intentionally whitelisted so typos or future strategies
      * cannot silently change what the retention CLI is allowed to run.
