@@ -254,6 +254,7 @@ class Cms extends Base
         $counts['component_config_instance'] = $this->deleteComponentConfigInstances($componentInstanceIds);
         $counts['component_instance'] = $this->deleteComponentInstances($componentInstanceIds);
         $counts['folder_owned_rows'] = $this->deleteFolderOwnedRows($folderIds);
+        $counts['userAccess'] = $this->deleteHomepageUserAccess($folderIds);
         $counts['folder'] = $this->deleteFolders($folderIds);
 
         $prefix = $this->perform ? 'Deleted' : 'Would have deleted';
