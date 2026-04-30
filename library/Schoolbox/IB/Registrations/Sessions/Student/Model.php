@@ -25,11 +25,51 @@ class Model
     use ModelTraits\CreatedAtDate;
     use ModelTraits\UpdatedAtDate;
 
+    public const int STATUS_PREPARATION = 0;
+    public const int STATUS_UNCONFIRMED = 1;
+    public const int STATUS_CONFIRMED = 2;
+    public const int STATUS_IN_PROGRESS = 3;
+    public const int STATUS_FAILED = 4;
+    public const int STATUS_REGISTERED = 5;
+
+    public const array STATUSES = [
+        [
+            'value' => self::STATUS_PREPARATION,
+            'key' => 'preparation',
+            'label' => 'Preparation',
+        ],
+        [
+            'value' => self::STATUS_UNCONFIRMED,
+            'key' => 'unconfirmed',
+            'label' => 'Unconfirmed',
+        ],
+        [
+            'value' => self::STATUS_CONFIRMED,
+            'key' => 'confirmed',
+            'label' => 'Confirmed',
+        ],
+        [
+            'value' => self::STATUS_IN_PROGRESS,
+            'key' => 'inProgress',
+            'label' => 'In Progress',
+        ],
+        [
+            'value' => self::STATUS_FAILED,
+            'key' => 'failed',
+            'label' => 'Failed',
+        ],
+        [
+            'value' => self::STATUS_REGISTERED,
+            'key' => 'registered',
+            'label' => 'Registered',
+        ],
+    ];
+
     /**
      * Registration status
      * @var int
      */
-    private int $status = 0;
+    private int $status = self::STATUS_PREPARATION;
 
     /**
      * Registration session this student belongs to
