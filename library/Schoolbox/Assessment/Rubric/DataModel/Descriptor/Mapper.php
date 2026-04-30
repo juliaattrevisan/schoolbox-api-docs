@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Rubric\DataModel\Indicator;
 use Schoolbox\Assessment\Rubric\DataModel\Level;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Class DescriptorMapper
@@ -52,7 +53,7 @@ class Mapper extends Schoolbox\Mapper
      * @param Model $descriptor
      * @throws Schoolbox\Mapper\DefinitionException
      */
-    public function deleteEmptyLevel(Model $descriptor)
+    public function deleteEmptyLevel(Model $descriptor): void
     {
         /** @var Level\Mapper $levelMapper */
         $levelMapper = $this->getJoinMapper('level');
@@ -85,8 +86,9 @@ class Mapper extends Schoolbox\Mapper
      * @param Model $descriptor
      * @return bool
      * @throws Schoolbox\Mapper\DefinitionException
+     * @throws Exception
      */
-    public function restoreRubricLevel(Model $descriptor)
+    public function restoreRubricLevel(Model $descriptor): bool
     {
         /** @var Level\Mapper $levelMapper */
         $levelMapper = $this->getJoinMapper('level');
@@ -115,12 +117,12 @@ class Mapper extends Schoolbox\Mapper
             SELECT  
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('level', 'l')},
-                {$this->getJoinColumnString('indicator', 'c')},
-                {$this->getJoinColumnString('indicator.capability', 'g')}
+                {$this->getJoinColumnString('indicator', 'i')},
+                {$this->getJoinColumnString('indicator.capability', 'c')}
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('level', '', 'l', true)}
-            INNER JOIN {$this->getJoinSql('indicator', '', 'c', true)}
-            INNER JOIN {$this->getJoinSql('indicator.capability', 'c', 'g', true)}
+            INNER JOIN {$this->getJoinSql('indicator', '', 'i', true)}
+            INNER JOIN {$this->getJoinSql('indicator.capability', 'i', 'c', true)}
         ";
     }
 
@@ -144,49 +146,44 @@ class Mapper extends Schoolbox\Mapper
 
         // Row keys for de-duplication
         $levelKey         = "l.{$levelMapper->getIdentifierColumn()}";
-        $indicatorKey     = "c.{$indicatorMapper->getIdentifierColumn()}";
-        $capabilityKey    = "g.{$capabilityMapper->getIdentifierColumn()}";
+        $indicatorKey     = "i.{$indicatorMapper->getIdentifierColumn()}";
+        $capabilityKey    = "c.{$capabilityMapper->getIdentifierColumn()}";
 
-        /** @var Level\Model $level */
-        $level = null;
-
-        /** @var Indicator\Model $indicator */
-        $indicator = null;
-
-        /** @var Capability\Model $capability */
-        $capability = null;
-
-        while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $levelId      = $r[$levelKey];
-            $indicatorId  = $r[$indicatorKey];
-            $capabilityId = $r[$capabilityKey];
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $levelId      = $row[$levelKey];
+            $indicatorId  = $row[$indicatorKey];
+            $capabilityId = $row[$capabilityKey];
 
             // First time we've encountered this Level ?
             if (!$levels->getOffset($levelId)) {
-                $levels->setOffset($levelId, $levelMapper->hydrate($r, 'l')->setDescriptors($this->createCollection()));
+                $levels->setOffset($levelId, $levelMapper->hydrate($row, 'l')
+                    ->setDescriptors($this->createCollection()));
             }
 
+            /** @var Level\Model $level */
             $level = $levels->getOffset($levelId);
 
             // First time we've encountered this indicator?
             if (!$indicators->getOffset($indicatorId)) {
                 // First time we've encountered this capability?
                 if (!$capabilities->getOffset($capabilityId)) {
-                    $capabilities->setOffset($capabilityId, $this->hydrateJoin($r, 'indicator.capability', 'g'));
+                    $capabilities->setOffset($capabilityId, $this->hydrateJoin($row, 'indicator.capability', 'c'));
                 }
 
                 // Set the capability as well
                 /** @var Capability\Model $capability */
+                $capability = $capabilities->getOffset($capabilityId);
+
                 /** @var Indicator\Model $indicator */
-                $capability     = $capabilities->getOffset($capabilityId);
-                $indicator = $this->hydrateJoin($r, 'indicator', 'c');
+                $indicator = $this->hydrateJoin($row, 'indicator', 'i');
+
                 $indicator->setCapability($capability);
                 $indicators->setOffset($indicatorId, $indicator);
             }
 
             $indicator = $indicators->getOffset($indicatorId);
 
-            $descriptor = $this->hydrate($r);
+            $descriptor = $this->hydrate($row);
             $descriptors->setOffset($descriptor->getId(), $descriptor);
 
             // Link to Level
