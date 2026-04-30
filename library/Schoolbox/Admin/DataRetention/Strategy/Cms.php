@@ -196,6 +196,12 @@ class Cms extends Base
             SELECT id
             FROM " . self::TABLE_FOLDER . "
             WHERE deleted_at IS NOT NULL AND deleted_at < :old
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM " . self::TABLE_FOLDER . " child
+                    WHERE child.parent = " . self::TABLE_FOLDER . ".id
+                        AND child.deleted_at IS NULL
+                )
         ";
 
         $statement = $this->database->prepare($query);
@@ -311,7 +317,7 @@ class Cms extends Base
             $visited[$folderId] = true;
             $pending[] = ['id' => $folderId, 'expanded' => true];
 
-            $childFolderIds = array_reverse($this->findChildFolderIds([$folderId]));
+            $childFolderIds = array_reverse($this->findSoftDeletedChildFolderIds([$folderId]));
             foreach ($childFolderIds as $childFolderId) {
                 if (!isset($visited[$childFolderId])) {
                     $pending[] = ['id' => $childFolderId, 'expanded' => false];
@@ -354,6 +360,28 @@ class Cms extends Base
         $placeholders = Builder::getArrayPlaceholders($parentIds, 'parent');
         $statement = $this->getPreparedStatement(
             "SELECT id FROM " . self::TABLE_FOLDER . " WHERE parent IN {$placeholders}"
+        );
+        $statement->execute(Builder::getArrayParameters($parentIds, 'parent'));
+
+        return array_map(
+            static fn(array $row): int => (int) $row['id'],
+            $statement->fetchAll(\PDO::FETCH_ASSOC),
+        );
+    }
+
+    /**
+     * @param array<int, int> $parentIds
+     * @return array<int, int>
+     */
+    protected function findSoftDeletedChildFolderIds(array $parentIds): array
+    {
+        if ($parentIds === []) {
+            return [];
+        }
+
+        $placeholders = Builder::getArrayPlaceholders($parentIds, 'parent');
+        $statement = $this->getPreparedStatement(
+            "SELECT id FROM " . self::TABLE_FOLDER . " WHERE parent IN {$placeholders} AND deleted_at IS NOT NULL"
         );
         $statement->execute(Builder::getArrayParameters($parentIds, 'parent'));
 
