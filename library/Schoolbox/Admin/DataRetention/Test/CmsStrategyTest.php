@@ -22,9 +22,11 @@ class CmsStrategyTest extends TestCase
      * @param array<string, array<int, list<int>>> $lookupIds
      * @return array{strategy: Cms, state: object{calls: list<string>, deletedFolderOwnedRowIds: list<int>, deletedFolders: list<int>}}
      */
-    private function strategy(array $folderChildren = [], array $blockedFolderIds = [], array $lookupIds = [], array $homepagePadRecords = [], array $padDeleteResults = [], array $redisDeleteCounts = [], bool $perform = true): array
+    private function strategy(array $folderChildren = [], array $blockedFolderIds = [], array $lookupIds = [], array $homepagePadRecords = [], array $padDeleteResults = [], array $redisDeleteCounts = [], bool $perform = true, ?LoggerInterface $logger = null): array
     {
-        $logger = $this->createMock(LoggerInterface::class);
+        if ($logger === null) {
+            $logger = $this->createMock(LoggerInterface::class);
+        }
         $database = $this->createMock(IConnector::class);
         $lock = $this->createMock(LockInterface::class);
         $config = $this->createMock(IConfigLoader::class);
@@ -459,6 +461,45 @@ class CmsStrategyTest extends TestCase
             'hardDeleteEtherpadPad',
             'deletePadFromEtherpad:g.test2',
         ], $state->calls);
+    }
+
+    public function testDeleteChunkIncludesEtherpadPadsCountInNotice(): void
+    {
+        $state = new class {
+            public array $notices = [];
+        };
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->method('debug');
+        $logger->method('info');
+        $logger->method('warning');
+        $logger->method('notice')->willReturnCallback(
+            function (string $message) use ($state): void {
+                $state->notices[] = $message;
+            }
+        );
+
+        ['strategy' => $strategy] = $this->strategy(
+            [],
+            [],
+            [],
+            [
+                10 => [
+                    ['id' => 1, 'pad_id' => 'g.test1'],
+                    ['id' => 2, 'pad_id' => 'g.test2'],
+                ],
+            ],
+            ['g.test1' => true, 'g.test2' => false],
+            [],
+            true,
+            $logger,
+        );
+
+        $this->delete($strategy, [
+            ['id' => 10, 'table' => 'folder'],
+        ]);
+
+        $this->assertStringContainsString('etherpad_pads=2', implode(' | ', $state->notices));
     }
 
     public function testUsesCmsStrategyNameAndLabel(): void
