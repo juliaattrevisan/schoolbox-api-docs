@@ -580,7 +580,7 @@ class Importer
 
             /* Update widgets too
              */
-            foreach ($item['definition']['widgets'] as &$widget) {
+            foreach ($item['definition']['widgets'] ?? [] as &$widget) {
                 if (Exporter::WIDGET_FEATURE === $widget['widget_type']) {
                     $widget['reference'] = $featureMapping[$widget['reference']];
                 } else {
@@ -601,7 +601,7 @@ class Importer
          * rewrite its old identifier and send 50 items at a time
          */
         foreach ($learnosityContent['activities'] as &$activity) {
-            foreach ($activity['data']['items'] as &$item) {
+            foreach ($activity['data']['items'] ?? [] as &$item) {
                 /* These two fields are the same, due to a bug in learnosity they need to co-exist
                  * since learnosity let you make content in an obsolete format without telling you
                  */
