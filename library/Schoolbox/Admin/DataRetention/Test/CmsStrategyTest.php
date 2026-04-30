@@ -43,6 +43,7 @@ class CmsStrategyTest extends TestCase
         bool $perform = true,
         ?LoggerInterface $logger = null,
         int $homepageUserAccessDeleteCount = 0,
+        ?array $softDeletedFolderIds = null,
     ): array {
         if ($logger === null) {
             $logger = $this->createMock(LoggerInterface::class);
@@ -86,6 +87,7 @@ class CmsStrategyTest extends TestCase
             $redisDeleteCounts,
             $state,
             $homepageUserAccessDeleteCount,
+            $softDeletedFolderIds,
         ) extends Cms {
             /** @var array<int, list<int>> */
             private array $folderChildren;
@@ -109,6 +111,9 @@ class CmsStrategyTest extends TestCase
 
             private int $homepageUserAccessDeleteCount;
 
+            /** @var null|array<int, true> */
+            private ?array $softDeletedFolderIds;
+
             public function __construct(
                 LoggerInterface $logger,
                 bool $perform,
@@ -125,6 +130,7 @@ class CmsStrategyTest extends TestCase
                 array $redisDeleteCounts,
                 object $state,
                 int $homepageUserAccessDeleteCount,
+                ?array $softDeletedFolderIds,
             ) {
                 parent::__construct($logger, $perform, $database, $lock, $config, $endTime, $retentionPeriod);
                 $this->folderChildren = $folderChildren;
@@ -135,6 +141,9 @@ class CmsStrategyTest extends TestCase
                 $this->redisDeleteCounts = $redisDeleteCounts;
                 $this->state = $state;
                 $this->homepageUserAccessDeleteCount = $homepageUserAccessDeleteCount;
+                $this->softDeletedFolderIds = $softDeletedFolderIds === null
+                    ? null
+                    : array_fill_keys($softDeletedFolderIds, true);
             }
 
             /**
@@ -151,6 +160,22 @@ class CmsStrategyTest extends TestCase
                 }
 
                 return $children;
+            }
+
+            /**
+             * @param array<int, int> $parentIds
+             * @return array<int, int>
+             */
+            protected function findSoftDeletedChildFolderIds(array $parentIds): array
+            {
+                if ($this->softDeletedFolderIds === null) {
+                    return $this->findChildFolderIds($parentIds);
+                }
+
+                return array_values(array_filter(
+                    $this->findChildFolderIds($parentIds),
+                    fn(int $folderId): bool => isset($this->softDeletedFolderIds[$folderId]),
+                ));
             }
 
             /**
@@ -493,6 +518,22 @@ class CmsStrategyTest extends TestCase
         return $call($folderIds);
     }
 
+    /**
+     * @return array<int, array{id: int}>
+     */
+    private function getIdsToDelete(Cms $strategy): array
+    {
+        $call = \Closure::bind(
+            function (): array {
+                return $this->getIdsToDelete();
+            },
+            $strategy,
+            Cms::class,
+        );
+
+        return $call();
+    }
+
     public function testCleanupHomepagePadsForFoldersCountsPadsFound(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
@@ -710,6 +751,86 @@ class CmsStrategyTest extends TestCase
             'deleteHomepageUserAccess',
             'deleteFolders',
         ], $state->calls);
+    }
+
+    public function testDeleteChunkDoesNotDeleteActiveChildFolders(): void
+    {
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
+            [
+                10 => [11, 12],
+                11 => [],
+                12 => [],
+            ],
+            softDeletedFolderIds: [10, 11],
+        );
+
+        $this->delete($strategy, [
+            ['id' => 10, 'table' => 'folder'],
+        ]);
+
+        $this->assertSame([11, 10], $state->deletedFolders);
+        $this->assertNotContains(12, $state->deletedFolders);
+    }
+
+    public function testGetIdsToDeleteSkipsFoldersWithActiveChildren(): void
+    {
+        $state = new class {
+            public string $preparedSql = '';
+
+            /** @var array<string, string|null>|null */
+            public ?array $executeParams = null;
+        };
+
+        $statement = new class ($state) extends \PDOStatement {
+            public function __construct(private object $state)
+            {
+            }
+
+            public function execute(?array $params = null): bool
+            {
+                $this->state->executeParams = $params;
+
+                return true;
+            }
+
+            /**
+             * @return array<int, array{id: int}>
+             */
+            public function fetchAll(int $mode = \PDO::FETCH_DEFAULT, mixed ...$args): array
+            {
+                unset($mode, $args);
+
+                return [['id' => 10]];
+            }
+        };
+
+        $database = $this->createMock(IConnector::class);
+        $database->expects($this->once())->method('prepare')->willReturnCallback(
+            function (string $sql) use ($state, $statement): \PDOStatement {
+                $state->preparedSql = $sql;
+
+                return $statement;
+            }
+        );
+
+        $strategy = new Cms(
+            $this->createMock(LoggerInterface::class),
+            false,
+            $database,
+            $this->createMock(LockInterface::class),
+            $this->createMock(IConfigLoader::class),
+            time() + 3600,
+            new RetentionPeriod(30),
+        );
+
+        $ids = $this->getIdsToDelete($strategy);
+
+        $this->assertSame([['id' => 10]], $ids);
+        $this->assertStringContainsString('NOT EXISTS', $state->preparedSql);
+        $this->assertStringContainsString('child.parent = folder.id', $state->preparedSql);
+        $this->assertStringContainsString('child.deleted_at IS NULL', $state->preparedSql);
+        $this->assertArrayHasKey('old', $state->executeParams);
+        $this->assertNotEmpty($state->executeParams['old']);
     }
 
     public function testSkipsBlockedCmsFolderChunks(): void
