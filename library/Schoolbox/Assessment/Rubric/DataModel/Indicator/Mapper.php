@@ -455,7 +455,7 @@ class Mapper extends BaseMapper
      * @param object $previous
      * @return bool
      */
-    protected function raiseNotification($object, $verb, $previous = null)
+    protected function raiseNotification($object, $verb, $previous = null): bool
     {
         return true;
     }

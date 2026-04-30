@@ -24,92 +24,103 @@ class Model implements ISoftDeletable
     /**
      * @var IndicatorModel
      */
-    private $indicator;
+    private IndicatorModel $indicator;
+
 
     /**
      * @var LevelModel
      */
-    private $level;
+    private LevelModel $level;
+
 
     /**
      * @var float
      */
-    private $maxValue;
+    private float $maxValue;
+
 
     /**
      * @var string
      */
-    private $description;
+    private string $description;
+
+
+    /**
+     * @return IndicatorModel
+     */
+    public function getIndicator(): IndicatorModel
+    {
+        return $this->indicator;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
 
     /**
      * @param IndicatorModel $indicator
      * @return $this
      */
-    public function setIndicator(IndicatorModel $indicator)
+    public function setIndicator(IndicatorModel $indicator): self
     {
         $this->indicator = $indicator;
         return $this;
     }
 
-    /**
-     * @return IndicatorModel
-     */
-    public function getIndicator()
-    {
-        return $this->indicator;
-    }
 
     /**
      * @param  string $description
      * @return $this
      */
-    public function setDescription($description)
+    public function setDescription(string $description): self
     {
         $this->description = $description;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
 
     /**
      * @return LevelModel
      */
-    public function getLevel()
+    public function getLevel(): LevelModel
     {
         return $this->level;
     }
+
 
     /**
      * @param LevelModel $level
      * @return static
      */
-    public function setLevel(LevelModel $level)
+    public function setLevel(LevelModel $level): self
     {
         $this->level = $level;
         return $this;
     }
 
-    /**
-     * @param  float|null $maxValue
-     * @return $this
-     */
-    public function setMaxValue($maxValue)
-    {
-        $this->maxValue = $maxValue;
-        return $this;
-    }
 
     /**
      * @return float|null
      */
-    public function getMaxValue()
+    public function getMaxValue(): ?float
     {
         return $this->maxValue;
+    }
+
+
+    /**
+     * @param  float|null $maxValue
+     * @return $this
+     */
+    public function setMaxValue(?float $maxValue): self
+    {
+        $this->maxValue = $maxValue;
+        return $this;
     }
 }

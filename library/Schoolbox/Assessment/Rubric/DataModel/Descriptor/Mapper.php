@@ -25,8 +25,8 @@ use Schoolbox\GenericCollection;
  * @package Schoolbox\Assessment\Rubric\DataModel
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
- * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
- * @method Model[]|GenericCollection findByColumnList($columnList, $options = [])
+ * @method GenericCollection<Model> findByColumn($columnName, $columnValue, $options = array())
+ * @method GenericCollection<Model> findByColumnList($columnList, $options = [])
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
@@ -97,9 +97,11 @@ class Mapper extends Schoolbox\Mapper
         } catch (Schoolbox\Mapper\Exception\Deleted $e) {
             $level = $e->getDeletedObject();
         }
+
         if ($level->isDeleted()) {
             $this->getJoinMapper('level')->restoreSoftDeleted($level);
         }
+
         return true;
     }
 
@@ -110,10 +112,11 @@ class Mapper extends Schoolbox\Mapper
     protected function getSelectString()
     {
         return "
-            SELECT  {$this->getColumnString()},
-                    {$this->getJoinColumnString('level', 'l')},
-                    {$this->getJoinColumnString('indicator', 'c')},
-                    {$this->getJoinColumnString('indicator.capability', 'g')}
+            SELECT  
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('level', 'l')},
+                {$this->getJoinColumnString('indicator', 'c')},
+                {$this->getJoinColumnString('indicator.capability', 'g')}
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('level', '', 'l', true)}
             INNER JOIN {$this->getJoinSql('indicator', '', 'c', true)}
@@ -162,6 +165,7 @@ class Mapper extends Schoolbox\Mapper
             if (!$levels->getOffset($levelId)) {
                 $levels->setOffset($levelId, $levelMapper->hydrate($r, 'l')->setDescriptors($this->createCollection()));
             }
+
             $level = $levels->getOffset($levelId);
 
             // First time we've encountered this indicator?
@@ -179,6 +183,7 @@ class Mapper extends Schoolbox\Mapper
                 $indicator->setCapability($capability);
                 $indicators->setOffset($indicatorId, $indicator);
             }
+
             $indicator = $indicators->getOffset($indicatorId);
 
             $descriptor = $this->hydrate($r);
@@ -204,7 +209,7 @@ class Mapper extends Schoolbox\Mapper
      * @param object $previous
      * @return bool
      */
-    protected function raiseNotification($object, $verb, $previous = null)
+    protected function raiseNotification($object, $verb, $previous = null): bool
     {
         return true;
     }

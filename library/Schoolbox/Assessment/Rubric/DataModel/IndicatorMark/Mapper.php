@@ -191,7 +191,7 @@ class Mapper extends BaseMapper
      * @return bool[]
      * @throws PDOException
      */
-    public function findMarkedByAssessment($assessment_id): array
+    public function findMarkedByAssessment(int $assessment_id): array
     {
         $query = "
             SELECT sr.owner AS student_id
@@ -240,7 +240,7 @@ class Mapper extends BaseMapper
      * @param object $previous
      * @return bool
      */
-    protected function raiseNotification($object, $verb, $previous = null)
+    protected function raiseNotification($object, $verb, $previous = null): bool
     {
         return true;
     }
