@@ -79,13 +79,9 @@ class Cms extends Base
      * Perform homepage-scoped Etherpad pad cleanup.
      *
      * @param int  $homepageId
-     * @param bool $deleteRedisKeys
-     * @param bool $softDeleteMeta
-     * @param bool $dryRun
-     * @param bool $verbose
      * @return array<string, int|bool>
      */
-    public function cleanupHomepagePads(int $homepageId, bool $deleteRedisKeys = false, bool $softDeleteMeta = false, bool $dryRun = true, bool $verbose = false): array
+    public function cleanupHomepagePads(int $homepageId): array
     {
         $padRows = $this->getHomepagePadRecords($homepageId);
         $this->log->info(sprintf("Found '%s' Etherpad pads for homepage %s", count($padRows), $homepageId));
@@ -94,14 +90,12 @@ class Cms extends Base
             'homepageId' => $homepageId,
             'padsFound' => count($padRows),
             'padsDeleted' => 0,
-            'metaRowsSoftDeleted' => 0,
-            'metaRowsHardDeleted' => 0,
             'redisKeysDeleted' => 0,
-            'dryRun' => $dryRun,
+            'dbRowsDeleted' => 0,
         ];
 
         foreach ($padRows as $padRow) {
-            $padId = (string)($padRow['pad_id'] ?? '');
+            $padId       = (string)($padRow['pad_id'] ?? '');
             $padRecordId = isset($padRow['id']) ? (int)$padRow['id'] : 0;
 
             if ($padId === '' || $padRecordId <= 0) {
@@ -109,33 +103,15 @@ class Cms extends Base
                 continue;
             }
 
-            if ($verbose) {
-                $this->log->debug(sprintf('Processing Etherpad pad %s for homepage %s', $padId, $homepageId));
-            }
-
-            if ($dryRun) {
-                $this->log->notice(sprintf("Dry-run: would delete Etherpad pad '%s' for homepage %s", $padId, $homepageId));
-            } else {
+            if ($this->perform) {
                 $padDeleted = $this->deletePadFromEtherpad($padId);
                 if ($padDeleted) {
                     $summary['padsDeleted']++;
-                    if ($softDeleteMeta) {
-                        $summary['metaRowsSoftDeleted'] += $this->softDeleteEtherpadPad($padRecordId);
-                    } else {
-                        $summary['metaRowsHardDeleted'] += $this->hardDeleteEtherpadPad($padRecordId);
-                    }
-                } else {
-                    $this->log->warning(sprintf("Etherpad pad '%s' could not be deleted; continuing with optional redis cleanup", $padId));
                 }
             }
 
-            if ($deleteRedisKeys) {
-                $deletedKeys = $this->deleteEtherpadRedisKeys($padId, $homepageId, $dryRun);
-                $summary['redisKeysDeleted'] += $deletedKeys;
-            }
+            $summary['dbRowsDeleted'] += $this->hardDeleteEtherpadPad($padRecordId);
         }
-
-        $this->log->notice(sprintf("Finished homepage Etherpad cleanup for %s pads on homepage %s", $summary['padsFound'], $homepageId));
 
         return $summary;
     }
@@ -171,66 +147,16 @@ class Cms extends Base
     }
 
     /**
-     * Soft-delete a local Etherpad metadata row.
-     */
-    protected function softDeleteEtherpadPad(int $id): int
-    {
-        $statement = $this->getPreparedStatement(
-            "UPDATE etherpad_pad SET deleted_at = :deletedAt WHERE id = :id"
-        );
-        $statement->execute([
-            'deletedAt' => (new \DateTimeImmutable())->format('Y-m-d H:i:s'),
-            'id' => $id,
-        ]);
-
-        return $statement->rowCount();
-    }
-
-    /**
      * Hard-delete a local Etherpad metadata row.
      */
     protected function hardDeleteEtherpadPad(int $id): int
     {
         $statement = $this->getPreparedStatement(
-            "DELETE FROM etherpad_pad WHERE id = :id"
+             $this->deleteStatement('etherpad_pad'). " FROM etherpad_pad WHERE id = :id"
         );
         $statement->execute(['id' => $id]);
 
         return $statement->rowCount();
-    }
-
-    /**
-     * Delete remaining Redis keys related to a pad.
-     */
-    protected function deleteEtherpadRedisKeys(string $padId, int $homepageId, bool $dryRun): int
-    {
-        if ($this->redisClient === null) {
-            $this->log->warning(sprintf('Redis storage client not injected; cannot clean up Etherpad pad %s', $padId));
-            return 0;
-        }
-
-        $patterns = [
-            sprintf('pad:%s', $padId),
-            sprintf('pad:%s:*', $padId),
-            sprintf('sessionstorage:%s', $padId),
-        ];
-
-        $deletedKeys = 0;
-        foreach ($patterns as $pattern) {
-            foreach (new Keyspace($this->redisClient, $pattern) as $key) {
-                $this->log->debug(sprintf('Found Etherpad Redis key for deletion: %s', $key));
-                $deletedKeys++;
-                if (!$dryRun) {
-                    $this->redisClient->del([$key]);
-                }
-            }
-        }
-
-        if ($deletedKeys && $dryRun) {
-            $this->log->notice(sprintf('Dry-run: would remove %s Etherpad Redis keys for pad %s', $deletedKeys, $padId));
-        }
-
-        return $deletedKeys;
     }
 
     /**
@@ -305,6 +231,7 @@ class Cms extends Base
             return;
         }
 
+        $counts = [];
         $counts['etherpad_pads'] = $this->cleanupHomepagePadsForFolders($folderIds);
 
         $blogIds = $this->findIdsByFolder('blog', 'id', 'folder_id', $folderIds);
@@ -313,7 +240,6 @@ class Cms extends Base
         $wikiIds = $this->findIdsByFolder('wiki', 'wikiID', 'categoryID', $folderIds);
         $componentInstanceIds = $this->findIdsByFolder('component_instance', 'id', 'identifier', $folderIds);
 
-        $counts = [];
         $counts['blog_comment'] = $this->deleteBlogComments($blogIds);
         $counts['blog_image'] = $this->deleteBlogImages($blogIds);
         $counts['blog'] = $this->deleteBlog($blogIds);
@@ -399,20 +325,17 @@ class Cms extends Base
      */
     protected function cleanupHomepagePadsForFolders(array $folderIds): int
     {
-        $dryRun = !$this->perform;
         $totalPads = 0;
 
         foreach ($folderIds as $folderId) {
             $this->log->notice(sprintf(
-                "%s homepage Etherpad cleanup for homepage %s",
-                $dryRun ? 'Dry-run: would run' : 'Running',
+                "Homepage Etherpad cleanup for homepage %s",
                 $folderId,
             ));
 
-            $summary = $this->cleanupHomepagePads($folderId, false, false, $dryRun, false);
+            $summary = $this->cleanupHomepagePads($folderId);
             $totalPads += (int)$summary['padsFound'];
         }
-
         return $totalPads;
     }
 
