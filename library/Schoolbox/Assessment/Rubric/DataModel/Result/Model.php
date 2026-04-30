@@ -61,9 +61,9 @@ class Model
 
 
     /**
-     * @return int
+     * @return string
      */
-    public function getLabel(): int
+    public function getLabel(): string
     {
         return $this->label;
     }

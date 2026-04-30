@@ -34,9 +34,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @var float
+     * @var null|float
      */
-    private float $maxValue;
+    private ?float $maxValue;
 
 
     /**

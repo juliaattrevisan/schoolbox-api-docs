@@ -78,9 +78,9 @@ class DataSource
     /**
      * Stores the singleton instance of the mapper
      *
-     * @var self
+     * @var self[]
      */
-    protected static DataSource $instance;
+    protected static array $instance;
 
 
     /**
