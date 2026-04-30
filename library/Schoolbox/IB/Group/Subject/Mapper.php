@@ -114,7 +114,7 @@ class Mapper extends BaseMapper
         /* Hydrates the languages
          */
         $languages = $languageMapper
-            ->findByColumn('group_subject_id', $groupSubjectIds)
+            ->findByColumn('group_subject_id', array_unique($groupSubjectIds))
             ->groupByCallback(fn ($l) => $l->getGroupSubject()->getId());
         /** @var Model $groupSubject */
         foreach ($collection as $id => $groupSubject) {
