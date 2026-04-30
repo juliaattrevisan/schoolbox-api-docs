@@ -305,6 +305,8 @@ class Cms extends Base
             return;
         }
 
+        $this->cleanupHomepagePadsForFolders($folderIds);
+
         $blogIds = $this->findIdsByFolder('blog', 'id', 'folder_id', $folderIds);
         $forumThreadIds = $this->findIdsByFolder('forumThread', 'threadID', 'categoryID', $folderIds);
         $pollIds = $this->findIdsByFolder('poll', 'id', 'folder_id', $folderIds);
@@ -390,6 +392,24 @@ class Cms extends Base
         }
 
         return array_values($folderIds);
+    }
+
+    /**
+     * @param array<int, int> $folderIds
+     */
+    protected function cleanupHomepagePadsForFolders(array $folderIds): void
+    {
+        $dryRun = !$this->perform;
+
+        foreach ($folderIds as $folderId) {
+            $this->log->notice(sprintf(
+                "%s homepage Etherpad cleanup for homepage %s",
+                $dryRun ? 'Dry-run: would run' : 'Running',
+                $folderId,
+            ));
+
+            $this->cleanupHomepagePads($folderId, false, false, $dryRun, false);
+        }
     }
 
     /**

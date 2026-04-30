@@ -22,7 +22,7 @@ class CmsStrategyTest extends TestCase
      * @param array<string, array<int, list<int>>> $lookupIds
      * @return array{strategy: Cms, state: object{calls: list<string>, deletedFolderOwnedRowIds: list<int>, deletedFolders: list<int>}}
      */
-    private function strategy(array $folderChildren = [], array $blockedFolderIds = [], array $lookupIds = [], array $homepagePadRecords = [], array $padDeleteResults = [], array $redisDeleteCounts = []): array
+    private function strategy(array $folderChildren = [], array $blockedFolderIds = [], array $lookupIds = [], array $homepagePadRecords = [], array $padDeleteResults = [], array $redisDeleteCounts = [], bool $perform = true): array
     {
         $logger = $this->createMock(LoggerInterface::class);
         $database = $this->createMock(IConnector::class);
@@ -47,7 +47,7 @@ class CmsStrategyTest extends TestCase
 
         $strategy = new class (
             $logger,
-            true,
+            $perform,
             $database,
             $lock,
             $config,
@@ -106,6 +106,7 @@ class CmsStrategyTest extends TestCase
                 $this->redisDeleteCounts = $redisDeleteCounts;
                 $this->state = $state;
             }
+
             /**
              * @param array<int, int> $parentIds
              * @return array<int, int>
@@ -181,6 +182,20 @@ class CmsStrategyTest extends TestCase
                 $this->state->calls[] = 'deleteEtherpadRedisKeys:' . $padId;
 
                 return $this->redisDeleteCounts[$padId] ?? 0;
+            }
+
+            /**
+             * @param int $homepageId
+             * @param bool $deleteRedisKeys
+             * @param bool $softDeleteMeta
+             * @param bool $dryRun
+             * @param bool $verbose
+             */
+            public function cleanupHomepagePads(int $homepageId, bool $deleteRedisKeys = false, bool $softDeleteMeta = false, bool $dryRun = true, bool $verbose = false): array
+            {
+                $this->state->calls[] = 'cleanupHomepagePads:' . $homepageId . ':' . ($dryRun ? 'dry' : 'do');
+
+                return parent::cleanupHomepagePads($homepageId, $deleteRedisKeys, $softDeleteMeta, $dryRun, $verbose);
             }
 
             /**
@@ -332,6 +347,60 @@ class CmsStrategyTest extends TestCase
         ];
     }
 
+    public function testDeleteChunkRunsHomepageCleanupInPerformMode(): void
+    {
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy([], [], [], [], [], [], true);
+
+        $this->delete($strategy, [
+            ['id' => 10, 'table' => 'folder'],
+        ]);
+
+        $this->assertSame([
+            'cleanupHomepagePads:10:do',
+            'deleteBlogComments',
+            'deleteBlogImages',
+            'deleteBlog',
+            'deleteForumPosts',
+            'deleteForumThreads',
+            'deletePollLogs',
+            'deletePolls',
+            'setWikiLatestRevisionNull',
+            'deleteWikiRevisions',
+            'deleteWikis',
+            'deleteComponentConfigInstances',
+            'deleteComponentInstances',
+            'deleteFolderOwnedRows',
+            'deleteFolders',
+        ], $state->calls);
+    }
+
+    public function testDeleteChunkRunsHomepageCleanupInDryRunMode(): void
+    {
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy([], [], [], [], [], [], false);
+
+        $this->delete($strategy, [
+            ['id' => 10, 'table' => 'folder'],
+        ]);
+
+        $this->assertSame([
+            'cleanupHomepagePads:10:dry',
+            'deleteBlogComments',
+            'deleteBlogImages',
+            'deleteBlog',
+            'deleteForumPosts',
+            'deleteForumThreads',
+            'deletePollLogs',
+            'deletePolls',
+            'setWikiLatestRevisionNull',
+            'deleteWikiRevisions',
+            'deleteWikis',
+            'deleteComponentConfigInstances',
+            'deleteComponentInstances',
+            'deleteFolderOwnedRows',
+            'deleteFolders',
+        ], $state->calls);
+    }
+
     /**
      * @param Cms $strategy
      * @param array<int, array{id: int, table: string}> $chunk
@@ -390,7 +459,26 @@ class CmsStrategyTest extends TestCase
         ]);
 
         $this->assertSame([13, 11, 12, 10], $state->deletedFolders);
-        $this->assertSame(['deleteBlogComments', 'deleteBlogImages', 'deleteBlog', 'deleteForumPosts', 'deleteForumThreads', 'deletePollLogs', 'deletePolls', 'setWikiLatestRevisionNull', 'deleteWikiRevisions', 'deleteWikis', 'deleteComponentConfigInstances', 'deleteComponentInstances', 'deleteFolderOwnedRows', 'deleteFolders'], $state->calls);
+        $this->assertSame([
+            'cleanupHomepagePads:13:do',
+            'cleanupHomepagePads:11:do',
+            'cleanupHomepagePads:12:do',
+            'cleanupHomepagePads:10:do',
+            'deleteBlogComments',
+            'deleteBlogImages',
+            'deleteBlog',
+            'deleteForumPosts',
+            'deleteForumThreads',
+            'deletePollLogs',
+            'deletePolls',
+            'setWikiLatestRevisionNull',
+            'deleteWikiRevisions',
+            'deleteWikis',
+            'deleteComponentConfigInstances',
+            'deleteComponentInstances',
+            'deleteFolderOwnedRows',
+            'deleteFolders',
+        ], $state->calls);
     }
 
     public function testSkipsBlockedCmsFolderChunks(): void
@@ -432,7 +520,7 @@ class CmsStrategyTest extends TestCase
         $this->assertSame(0, $summary['padsDeleted']);
         $this->assertSame(0, $summary['metaRowsHardDeleted']);
         $this->assertSame(1, $summary['redisKeysDeleted']);
-        $this->assertSame(['deleteEtherpadRedisKeys:g.test123'], $state->calls);
+        $this->assertSame(['cleanupHomepagePads:123:dry', 'deleteEtherpadRedisKeys:g.test123'], $state->calls);
     }
 
     public function testHomepageCleanupSoftDeletesMetadataWhenPadDeleted(): void
@@ -455,8 +543,7 @@ class CmsStrategyTest extends TestCase
         $this->assertSame(1, $summary['padsDeleted']);
         $this->assertSame(1, $summary['metaRowsSoftDeleted']);
         $this->assertSame(0, $summary['redisKeysDeleted']);
-        $this->assertContains('deletePadFromEtherpad:g.softdelete', $state->calls);
-        $this->assertContains('softDeleteEtherpadPad', $state->calls);
+        $this->assertSame(['cleanupHomepagePads:123:do', 'deletePadFromEtherpad:g.softdelete', 'softDeleteEtherpadPad'], $state->calls);
     }
 
     public function testHomepageCleanupTriggersRedisCleanupWhenEnabled(): void
@@ -479,6 +566,6 @@ class CmsStrategyTest extends TestCase
         $this->assertSame(1, $summary['padsFound']);
         $this->assertSame(0, $summary['padsDeleted']);
         $this->assertSame(2, $summary['redisKeysDeleted']);
-        $this->assertContains('deleteEtherpadRedisKeys:g.redisclean', $state->calls);
+        $this->assertSame(['cleanupHomepagePads:123:do', 'deletePadFromEtherpad:g.redisclean', 'deleteEtherpadRedisKeys:g.redisclean'], $state->calls);
     }
 }
