@@ -1886,7 +1886,7 @@ class Controller extends Base
                 ],
                 'name' => [
                     'caption'   => 'Name',
-                    'width'     => 5,
+                    'width'     => 9,
                     'maxLength' => 255,
                     'mandatory' => true,
                     'default'   => '',
@@ -1916,7 +1916,7 @@ class Controller extends Base
                 ],
                 'name' => [
                     'caption'   => 'Name',
-                    'width'     => 5,
+                    'width'     => 9,
                     'maxLength' => 255,
                     'mandatory' => true,
                     'default'   => '',
