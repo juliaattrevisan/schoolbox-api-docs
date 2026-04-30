@@ -23,13 +23,13 @@ eportfolio_page.page_id
 |-- eportfolio_component_blog.page_id
 |   |-- eportfolio_component_blog_comment.blog_id
 |   `-- eportfolio_component_blog_image.blog_id
-|       `-- storage.hash
+|       `-- storage.hash (referenced only; not deleted by this strategy)
 |-- eportfolio_component_filelist_item.page_id
 |   `-- my_file.id
 `-- component_instance.identifier
     |-- component_config_instance.component_instance_id
     |-- eportfolio_component_advancedlist_item.component_instance_id
-    |   `-- storage.hash
+    |   `-- storage.hash (referenced only; not deleted by this strategy)
     |-- eportfolio_component_basiclist_item.component_instance_id
     |-- eportfolio_component_linklist_item.component_instance_id
     `-- eportfolio_component_textbox_item.component_instance_id
