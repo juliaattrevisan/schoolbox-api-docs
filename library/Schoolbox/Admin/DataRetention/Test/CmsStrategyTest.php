@@ -6,11 +6,13 @@ namespace Schoolbox\Admin\DataRetention\Test;
 
 use Alaress\Database\Connector\IConnector;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\DataRetention\RetentionPeriod;
 use Schoolbox\Admin\DataRetention\Strategy\Cms;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Permission\Access\UserAccess;
 use Symfony\Component\Lock\LockInterface;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -20,10 +22,28 @@ class CmsStrategyTest extends TestCase
      * @param array<int, list<int>> $folderChildren
      * @param list<int> $blockedFolderIds
      * @param array<string, array<int, list<int>>> $lookupIds
-     * @return array{strategy: Cms, state: object{calls: list<string>, deletedFolderOwnedRowIds: list<int>, deletedFolders: list<int>}}
+     * @param array<int, array<int, array<string, mixed>>> $homepagePadRecords
+     * @param array<string, bool> $padDeleteResults
+     * @param array<string, int> $redisDeleteCounts
+     * @param null|(LoggerInterface&MockObject) $logger
+     * @return array{strategy: Cms, state: object{
+     *     calls: list<string>,
+     *     deletedFolderOwnedRowIds: list<int>,
+     *     deletedHomepageUserAccessFolderIds: list<int>,
+     *     deletedFolders: list<int>
+     * }}
      */
-    private function strategy(array $folderChildren = [], array $blockedFolderIds = [], array $lookupIds = [], array $homepagePadRecords = [], array $padDeleteResults = [], array $redisDeleteCounts = [], bool $perform = true, ?LoggerInterface $logger = null): array
-    {
+    private function strategy(
+        array $folderChildren = [],
+        array $blockedFolderIds = [],
+        array $lookupIds = [],
+        array $homepagePadRecords = [],
+        array $padDeleteResults = [],
+        array $redisDeleteCounts = [],
+        bool $perform = true,
+        ?LoggerInterface $logger = null,
+        int $homepageUserAccessDeleteCount = 0,
+    ): array {
         if ($logger === null) {
             $logger = $this->createMock(LoggerInterface::class);
         }
@@ -44,6 +64,9 @@ class CmsStrategyTest extends TestCase
             public array $deletedFolderOwnedRowIds = [];
 
             /** @var list<int> */
+            public array $deletedHomepageUserAccessFolderIds = [];
+
+            /** @var list<int> */
             public array $deletedFolders = [];
         };
 
@@ -62,6 +85,7 @@ class CmsStrategyTest extends TestCase
             $padDeleteResults,
             $redisDeleteCounts,
             $state,
+            $homepageUserAccessDeleteCount,
         ) extends Cms {
             /** @var array<int, list<int>> */
             private array $folderChildren;
@@ -83,6 +107,8 @@ class CmsStrategyTest extends TestCase
 
             private object $state;
 
+            private int $homepageUserAccessDeleteCount;
+
             public function __construct(
                 LoggerInterface $logger,
                 bool $perform,
@@ -98,6 +124,7 @@ class CmsStrategyTest extends TestCase
                 array $padDeleteResults,
                 array $redisDeleteCounts,
                 object $state,
+                int $homepageUserAccessDeleteCount,
             ) {
                 parent::__construct($logger, $perform, $database, $lock, $config, $endTime, $retentionPeriod);
                 $this->folderChildren = $folderChildren;
@@ -107,6 +134,7 @@ class CmsStrategyTest extends TestCase
                 $this->padDeleteResults = $padDeleteResults;
                 $this->redisDeleteCounts = $redisDeleteCounts;
                 $this->state = $state;
+                $this->homepageUserAccessDeleteCount = $homepageUserAccessDeleteCount;
             }
 
             /**
@@ -330,6 +358,17 @@ class CmsStrategyTest extends TestCase
             /**
              * @param array<int, int> $folderIds
              */
+            protected function deleteHomepageUserAccess(array $folderIds): int
+            {
+                $this->state->deletedHomepageUserAccessFolderIds = $folderIds;
+                $this->state->calls[] = 'deleteHomepageUserAccess';
+
+                return $this->homepageUserAccessDeleteCount;
+            }
+
+            /**
+             * @param array<int, int> $folderIds
+             */
             protected function deleteFolders(array $folderIds): int
             {
                 $this->state->deletedFolders = $folderIds;
@@ -368,8 +407,10 @@ class CmsStrategyTest extends TestCase
             'deleteComponentConfigInstances',
             'deleteComponentInstances',
             'deleteFolderOwnedRows',
+            'deleteHomepageUserAccess',
             'deleteFolders',
         ], $state->calls);
+        $this->assertSame([10], $state->deletedHomepageUserAccessFolderIds);
     }
 
     public function testDeleteChunkRunsHomepageCleanupInDryRunMode(): void
@@ -395,8 +436,10 @@ class CmsStrategyTest extends TestCase
             'deleteComponentConfigInstances',
             'deleteComponentInstances',
             'deleteFolderOwnedRows',
+            'deleteHomepageUserAccess',
             'deleteFolders',
         ], $state->calls);
+        $this->assertSame([10], $state->deletedHomepageUserAccessFolderIds);
     }
 
     /**
@@ -425,6 +468,23 @@ class CmsStrategyTest extends TestCase
         $call = \Closure::bind(
             function (array $folderIds): int {
                 return $this->cleanupHomepagePadsForFolders($folderIds);
+            },
+            $strategy,
+            Cms::class,
+        );
+
+        return $call($folderIds);
+    }
+
+    /**
+     * @param Cms $strategy
+     * @param array<int, int> $folderIds
+     */
+    private function deleteHomepageUserAccess(Cms $strategy, array $folderIds): int
+    {
+        $call = \Closure::bind(
+            function (array $folderIds): int {
+                return $this->deleteHomepageUserAccess($folderIds);
             },
             $strategy,
             Cms::class,
@@ -499,6 +559,94 @@ class CmsStrategyTest extends TestCase
         $this->assertStringContainsString('etherpad_pads=2', implode(' | ', $state->notices));
     }
 
+    public function testDeleteChunkIncludesHomepageUserAccessCountInNotice(): void
+    {
+        $state = new class {
+            public array $notices = [];
+        };
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->method('debug');
+        $logger->method('info');
+        $logger->method('warning');
+        $logger->method('notice')->willReturnCallback(
+            function (string $message) use ($state): void {
+                $state->notices[] = $message;
+            }
+        );
+
+        ['strategy' => $strategy] = $this->strategy(
+            logger: $logger,
+            homepageUserAccessDeleteCount: 3,
+        );
+
+        $this->delete($strategy, [
+            ['id' => 10, 'table' => 'folder'],
+        ]);
+
+        $this->assertStringContainsString('userAccess=3', implode(' | ', $state->notices));
+    }
+
+    public function testDeleteHomepageUserAccessUsesDryRunSelectAndHomepageService(): void
+    {
+        $state = new class {
+            public string $preparedSql = '';
+
+            /** @var array<string, int>|null */
+            public ?array $executeParams = null;
+        };
+
+        $statement = new class ($state) extends \PDOStatement {
+            public function __construct(private object $state)
+            {
+            }
+
+            public function execute(?array $params = null): bool
+            {
+                $this->state->executeParams = $params;
+
+                return true;
+            }
+
+            public function rowCount(): int
+            {
+                return 3;
+            }
+        };
+
+        $database = $this->createMock(IConnector::class);
+        $database->expects($this->once())->method('prepare')->willReturnCallback(
+            function (string $sql) use ($state, $statement): \PDOStatement {
+                $state->preparedSql = $sql;
+
+                return $statement;
+            }
+        );
+
+        $strategy = new Cms(
+            $this->createMock(LoggerInterface::class),
+            false,
+            $database,
+            $this->createMock(LockInterface::class),
+            $this->createMock(IConfigLoader::class),
+            time() + 3600,
+            new RetentionPeriod(30),
+        );
+
+        $count = $this->deleteHomepageUserAccess($strategy, [10, 12]);
+
+        $this->assertSame(3, $count);
+        $this->assertStringStartsWith(
+            'SELECT userAccess.* FROM userAccess WHERE service = :service AND sid IN',
+            $state->preparedSql,
+        );
+        $this->assertSame([
+            'folder_0' => 10,
+            'folder_1' => 12,
+            'service' => UserAccess::SERVICE_HOMEPAGE,
+        ], $state->executeParams);
+    }
+
     public function testUsesCmsStrategyNameAndLabel(): void
     {
         $strategy = new Cms(
@@ -540,6 +688,7 @@ class CmsStrategyTest extends TestCase
         ]);
 
         $this->assertSame([13, 11, 12, 10], $state->deletedFolders);
+        $this->assertSame([13, 11, 12, 10], $state->deletedHomepageUserAccessFolderIds);
         $this->assertSame([
             'cleanupHomepagePads:13:do',
             'cleanupHomepagePads:11:do',
@@ -558,6 +707,7 @@ class CmsStrategyTest extends TestCase
             'deleteComponentConfigInstances',
             'deleteComponentInstances',
             'deleteFolderOwnedRows',
+            'deleteHomepageUserAccess',
             'deleteFolders',
         ], $state->calls);
     }
@@ -577,6 +727,7 @@ class CmsStrategyTest extends TestCase
         ]);
 
         $this->assertSame([], $state->deletedFolders);
+        $this->assertSame([], $state->deletedHomepageUserAccessFolderIds);
         $this->assertSame([], $state->calls);
     }
 

@@ -16,7 +16,6 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Connector\IConnector;
 use EtherpadLite\Client as EtherpadClient;
 use Predis\ClientInterface;
-use Predis\Collection\Iterator\Keyspace;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\DataRetention\RetentionPeriod;
 use Schoolbox\Admin\DataRetention\ValidStrats;
@@ -41,9 +40,10 @@ class Cms extends Base
         RetentionPeriod $retentionPeriod,
         int $chunkLoops = self::DEFAULT_CHUNK_LOOPS,
         int $chunkSize = self::DEFAULT_CHUNK_SIZE,
-        private ?ClientInterface $redisClient = null,
+        ?ClientInterface $redisClient = null,
     ) {
         parent::__construct($log, $perform, $database, $lock, $config, $endTime, $retentionPeriod, $chunkLoops, $chunkSize);
+        unset($redisClient);
     }
 
     public function getRetentionLabel(): string
@@ -153,7 +153,7 @@ class Cms extends Base
     protected function hardDeleteEtherpadPad(int $id): int
     {
         $statement = $this->getPreparedStatement(
-             $this->deleteStatement('etherpad_pad'). " FROM etherpad_pad WHERE id = :id"
+            $this->deleteStatement('etherpad_pad') . " FROM etherpad_pad WHERE id = :id"
         );
         $statement->execute(['id' => $id]);
 
