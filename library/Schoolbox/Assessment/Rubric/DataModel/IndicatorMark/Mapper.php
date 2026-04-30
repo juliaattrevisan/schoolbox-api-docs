@@ -13,7 +13,6 @@ use PDO;
 use PDOException;
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Mapper as CapabilityMarkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as DescriptorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;
@@ -80,8 +79,8 @@ class Mapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('capability_mark', 'g')},
-                {$this->getJoinColumnString('capability_mark.submission_return', 'r')},
+                {$this->getJoinColumnString('capability_mark', 'cm')},
+                {$this->getJoinColumnString('capability_mark.rubricInstance', 'ri')},
                 {$this->getJoinColumnString('descriptor', 'd')}
         ";
     }
@@ -94,8 +93,8 @@ class Mapper extends BaseMapper
     {
         return "
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('capability_mark', '', 'g')}
-            LEFT JOIN {$this->getJoinSql('capability_mark.submission_return', 'g', 'r')}
+            LEFT JOIN {$this->getJoinSql('capability_mark', '', 'cm')}
+            LEFT JOIN {$this->getJoinSql('capability_mark.rubricInstance', 'cm', 'ri')}
             LEFT JOIN {$this->getJoinSql('descriptor', '', 'd')}
         ";
     }
@@ -109,31 +108,48 @@ class Mapper extends BaseMapper
     {
         /** @var CapabilityMarkMapper $capabilityMarkMapper */
         $capabilityMarkMapper = $this->getJoinMapper('capability_mark');
-        /** @var ReturnedWorkMapper $submissionReturnMapper */
-        $submissionReturnMapper = $this->getJoinMapper('capability_mark.submission_return');
+
+        /** @var \Schoolbox\Assessment\Rubric\Instance\Mapper $rubricInstanceMapper */
+        $rubricInstanceMapper = $this->getJoinMapper('capability_mark.rubricInstance');
+
         $marks = $this->createCollection();
         $descriptors = $this->getJoinMapper('descriptor')->createCollection();
 
         $descriptorKey = "d.{$this->getJoinMapper('descriptor')->getIdentifierColumn()}";
 
-        while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $descriptorId = $r[$descriptorKey];
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            /* Set up a capability mark instance along with its rubric instance...instance (ugh)
+             */
+            $capabilityMark = $capabilityMarkMapper->hydrate($row, 'cm');
+            $rubricInstance = $rubricInstanceMapper->hydrate($row, 'ri');
+
+            $capabilityMark->setRubricInstance($rubricInstance);
+
+            /* Hydrate descriptor if it wasn't previously discovered
+             */
+            $descriptorId = $row[$descriptorKey];
+
             if (!$descriptors->offsetExists($descriptorId)) {
                 // Descriptor can be null?
-                $descriptor = $this->hydrateJoin($r, 'descriptor', 'd');
+                /* Potentially occurs in old/broken data somewhere, maybe
+                 */
+                $descriptor = $this->hydrateJoin($row, 'descriptor', 'd');
+
                 if ($descriptor) {
                     $descriptors->setOffset($descriptorId, $descriptor);
                 }
             }
+
             /** @var DescriptorModel $descriptor */
             $descriptor = $descriptors->getOffset($descriptorId);
 
-            $capabilityMark = $capabilityMarkMapper->hydrate($r, 'g');
-            $capabilityMark->setSubmissionReturn($submissionReturnMapper->hydrate($r, 'r'));
+            /* Set up an indicator mark instance and assemble all its constituents
+             * Note that in some undocumented circumstance, $descriptor might actually be null
+             */
+            $mark = $this->hydrate($row)
+                ->setCapabilityMark($capabilityMark)
+                ->setDescriptor($descriptor);
 
-            $mark = $this->hydrate($r);
-            $mark->setCapabilityMark($capabilityMark);
-            $mark->setDescriptor($descriptor);
             $marks->add($mark);
         }
 
