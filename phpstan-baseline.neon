@@ -1945,12 +1945,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Participant/Plan/Mapper.php
 
 		-
-			message: '#^Method Schoolbox\\Assessment\\Rubric\\DataModel\\Capability\\Mapper\:\:findForParent\(\) should return iterable\<Schoolbox\\Assessment\\Rubric\\DataModel\\Capability\\Model\>&Schoolbox\\GenericCollection but returns array\<Schoolbox\\Assessment\\Rubric\\DataModel\\Capability\\Model\>\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Capability/Mapper.php
-
-		-
 			message: '#^Method Schoolbox\\Assessment\\Rubric\\DataModel\\DataSource\:\:getInstance\(\) should return static\(Schoolbox\\Assessment\\Rubric\\DataModel\\DataSource\) but returns Schoolbox\\Assessment\\Rubric\\DataModel\\DataSource\.$#'
 			identifier: return.type
 			count: 1
@@ -1967,30 +1961,6 @@ parameters:
 			identifier: new.static
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Assessment\\Rubric\\DataModel\\Capability\\Model is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Descriptor/Mapper.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Assessment\\Rubric\\DataModel\\Indicator\\Model is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Descriptor/Mapper.php
-
-		-
-			message: '#^PHPDoc tag @var with type Schoolbox\\Assessment\\Rubric\\DataModel\\Level\\Model is not subtype of native type null\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Descriptor/Mapper.php
-
-		-
-			message: '#^Method Schoolbox\\Assessment\\Rubric\\DataModel\\Indicator\\Mapper\:\:findForParent\(\) should return iterable\<Schoolbox\\Assessment\\Rubric\\DataModel\\Indicator\\Model\>&Schoolbox\\GenericCollection but returns array\<Schoolbox\\Assessment\\Rubric\\DataModel\\Indicator\\Model\>\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Indicator/Mapper.php
 
 		-
 			message: '#^Method Schoolbox\\Assessment\\Rubric\\DataModel\\Result\\Model\:\:getLabel\(\) should return int but returns string\.$#'
