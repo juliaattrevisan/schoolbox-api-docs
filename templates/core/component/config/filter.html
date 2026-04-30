@@ -1,25 +1,41 @@
-<ul class="c-chips" id="component{COMPONENT_INSTANCE_ID}-filter-chips-container">
-    <!-- BEGIN filters -->
-    <li>
-        <input type="hidden" name="filter[{COMPONENT_CONFIG_FILTER_VALUE}]" value="0" />
-        <input id="component{COMPONENT_INSTANCE_ID}-filter-{COMPONENT_CONFIG_FILTER_VALUE}" type="checkbox" name="filter[{COMPONENT_CONFIG_FILTER_VALUE}]" value="1" {COMPONENT_CONFIG_FILTER_SELECTED} />
-        <label for="component{COMPONENT_INSTANCE_ID}-filter-{COMPONENT_CONFIG_FILTER_VALUE}">
-            {COMPONENT_CONFIG_FILTER_NAME}<span class="c-chip__icon icon-tick"></span>
-        </label>
-    </li>
-    <!-- END filters -->
-</ul>
+<div class="filters" id="component{COMPONENT_INSTANCE_ID}-filter-options">
+    <div class="checklist l-flex-col l-gap-s">
+        <ul class="option-list l-flex-row l-gap-s">
+            <!-- BEGIN filters -->
+            <li>
+                <input type="hidden" name="filter[{COMPONENT_CONFIG_FILTER_VALUE}]" value="0" />
+                <input id="component{COMPONENT_INSTANCE_ID}-filter-{COMPONENT_CONFIG_FILTER_VALUE}" type="checkbox" name="filter[{COMPONENT_CONFIG_FILTER_VALUE}]" value="1" {COMPONENT_CONFIG_FILTER_SELECTED} />
+                <label for="component{COMPONENT_INSTANCE_ID}-filter-{COMPONENT_CONFIG_FILTER_VALUE}">
+                    {COMPONENT_CONFIG_FILTER_NAME}
+                </label>
+            </li>
+            <!-- END filters -->
+        </ul>
+    </div>
+</div>
 
 <script>
-    // Avoid toggling the first checkbox when clicking on the label or outside the checkbox
-    document.getElementById('component{COMPONENT_INSTANCE_ID}-filter-chips-container')
-        .closest("label:not([for])")
-        .addEventListener("click", (e) => {
-            if (e.target.tagName === "LABEL" && e.target.getAttribute("for") === null) {
-                e.preventDefault();
-            } else if (e.target.tagName === "UL") {
-                e.preventDefault();
-            }
+    (() => {
+        /**
+         * Prevent the wrapping parent label from toggling the checkboxes when clicking on empty space within the filter container.
+         */
+        const filterContainer = document.getElementById("component{COMPONENT_INSTANCE_ID}-filter-options");
+        const wrappingLabel = filterContainer ? filterContainer.closest("label:not([for])") : null;
+        if (!wrappingLabel) {
+            return;
         }
-    );
+        wrappingLabel.addEventListener("click", (event) => {
+            const target = event
+                .composedPath()
+                .find((eventTarget) => eventTarget instanceof Element);
+            if (
+                target &&
+                filterContainer.contains(target) &&
+                target.closest('input[type="checkbox"], label[for]')
+            ) {
+                return;
+            }
+            event.preventDefault();
+        });
+    })();
 </script>

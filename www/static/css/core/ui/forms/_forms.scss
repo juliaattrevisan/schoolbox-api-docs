@@ -1026,10 +1026,10 @@ select.visibility {
 .editPanel {
     // Socialstreams-specific colouring
     &.socialstream-new-post {
-        background-color: $asgard;
+        background-color: var(--sbx-color-foreground-primary-alt, $asgard);
         display: block;
     }
-    background-color: $gainsboro;
+    background-color: var(--sbx-color-foreground-secondary, $gainsboro);
     display: none;
     padding: rem-calc(($base-font-size));
 

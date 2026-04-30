@@ -203,14 +203,6 @@ body.sbx-body {
     }
 
     /**
-     * Chips component buttons
-     * These need to hide the checkbox input to match design
-     */
-    .c-chips li > input[type="checkbox"] {
-        display: none;
-    }
-
-    /**
      *  Dropdown separators
      */
     #tab-control .separator,
