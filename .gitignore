@@ -71,4 +71,5 @@ docker/schoolbox/config/config.ini
 # Provisioning creates this .env file
 docker/devkit-lti1p3-phpfpm/.env
 
+# To prevent adding empty .codex file to git, can remove if we add configuration within it in the future
 .codex
