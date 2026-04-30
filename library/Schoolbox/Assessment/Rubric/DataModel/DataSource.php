@@ -158,6 +158,18 @@ class DataSource
 
 
     /**
+     * @var Group\Mapper
+     */
+    private Group\Mapper $gradeGroupMapper;
+
+
+    /**
+     * @var StorageMapper
+     */
+    private StorageMapper $storageMapper;
+
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -177,6 +189,8 @@ class DataSource
         $this->capabilityMarkMapper = CapabilityMarkMapper::getInstance();
         $this->indicatorMarkMapper = IndicatorMarkMapper::getInstance();
         $this->markTypeMapper = SubmissionBox\MarkTypeMapper::getInstance();
+        $this->gradeGroupMapper = Group\Mapper::getInstance();
+        $this->storageMapper = StorageMapper::getInstance();
     }
 
 
@@ -484,8 +498,7 @@ class DataSource
          */
         $rubricInstanceIds = $this->rubricInstanceMapper->findByColumn('assessment_id', $assessment->getId())->indexBy('id')->keys();
 
-        // Load the levels, selected capabilities+indicators, descriptors for
-        // the assessment
+        // Load the levels, selected capabilities+indicators, descriptors for the assessment
         $capabilityUsageModels = $this->capabilityUsageMapper->findByColumn(
             'rubric_instance_id',
             $rubricInstanceIds,
@@ -684,6 +697,11 @@ class DataSource
                 continue;
             }
 
+            /* Update the name of an already-existing capability
+             *
+             * TODO This can probably be shortcutted by using findByColumn() and a hashtable lookup idea instead,
+             *  minimising the number of db queries being performed here
+             */
             $capabilityModel = $this->capabilityMapper->findById($capabilityId)
                 ->setName($capability->getName());
 
@@ -696,6 +714,11 @@ class DataSource
                     continue;
                 }
 
+                /* Update the name of an already-existing indicator
+                 *
+                 * TODO This can probably be shortcutted by using findByColumn() and a hashtable lookup idea instead
+                 *  minimising the number of db queries being performed here
+                 */
                 $indicatorModel = $this->indicatorMapper->findById($indicatorId)
                     ->setName($indicator->getName());
 
@@ -902,6 +925,9 @@ class DataSource
                 $capabilityUsage->getMaxValue()
             );
 
+            /* This is actually a MarkedGrid/CapabilityMark instance despite how it might read; don't confuse it with a
+             * DataModel/CapabilityMark instance
+             */
             $capabilityMark = (new CapabilityMark($capabilityUsage, $capabilityMarkScheme))
                 ->setHumanReadableValue($capabilityMarkModel->getHumanReadableValue())
                 ->setValue($capabilityMarkModel->getValue());
@@ -921,6 +947,7 @@ class DataSource
 
                 // Load descriptor model
                 $descriptorModel = $indicatorMarkModel->getDescriptor();
+
                 if (!$descriptorModel) {
                     continue;
                 }
@@ -928,6 +955,9 @@ class DataSource
                 $descriptorId = $descriptorModel->getId();
 
                 // Create the ind mark
+                /* This is actually a MarkedGrid/IndicatorMark instance despite how it might read; don't confuse it with
+                 * a DataModel/IndicatorMark instance
+                 */
                 $indicatorMark = (new IndicatorMark($indicatorUsage))
                     ->setValue($indicatorMarkModel->getValue());
 
@@ -962,6 +992,7 @@ class DataSource
 
         // Blow away any previous cap/ind marks for this feedback
         $returnId = $markedGrid->getFeedback()->getId();
+
         $this->indicatorMarkMapper->deleteFeedbackMarks($returnId);
         $this->capabilityMarkMapper->deleteFeedbackMarks($returnId);
 
@@ -1105,12 +1136,11 @@ class DataSource
             throw new UnexpectedValueException('Only CSV files may be uploaded');
         }
 
-
         // Create the factory
-        $importerFactory = new CsvImporterFactory($this->markTypeMapper);
-        // TODO inject (like every other mapper here)
-        $filesystemProxy = StorageMapper::getInstance()->getStorageFilesystemProxy();
-        $importer        = $importerFactory->build($filesystemProxy->readStream($file), $maxLevels, $dueWork);
+        $filesystemProxy = $this->storageMapper->getStorageFilesystemProxy();
+
+        $importer = (new CsvImporterFactory($this->markTypeMapper))->build($filesystemProxy->readStream($file), $maxLevels, $dueWork);
+
         $this->importGrid($dueWork, $importer);
     }
 
@@ -1172,7 +1202,7 @@ class DataSource
 
         // Now start building the grid
         $capabilityMarkType   = $this->markTypeMapper->createModel()->setId($importer->getCapabilityMarkType());
-        $capabilityGradeGroup = Group\Mapper::getInstance()->createModel()->setId($importer->getCapabilityGradeGroup());
+        $capabilityGradeGroup = $this->gradeGroupMapper->createModel()->setId($importer->getCapabilityGradeGroup());
 
         $dueWork
             ->setCapabilityMarkType($capabilityMarkType)
@@ -1219,7 +1249,7 @@ class DataSource
 
                 foreach ($indicator['descriptors'] as $level => $descriptor) {
                     if ($descriptor !== null) {
-                        $capInUse         = true;
+                        $capInUse = true;
                         $indicatorUsage->getDescriptors()[$level] = (new \Schoolbox\Assessment\Rubric\Grid\Descriptor())
                             ->setDescription($descriptor['name'])
                             ->setMaxValue($descriptor['value']);
@@ -1503,7 +1533,7 @@ class DataSource
             $pb = new Builder($this->database->getQuoter(), '');
             $pb->in('sr.id', $allFeedbackIds);
 
-            $where            = implode(' AND ', $pb->getWhere());
+            $where = implode(' AND ', $pb->getWhere());
             $averageStatement = $this->database->prepare("
                 SELECT
                     rc.id AS capability_id,
@@ -1588,10 +1618,14 @@ class DataSource
         /** @var GenericCollection<LevelModel> $srcLevels */
         $srcLevels = $this->levelMapper->findByColumn('box_id', $sourceBox->getId())->indexBy('id');
 
-        if (! $sourceBox->getUseRubric()) {
-            // No rubric? Can't work with that - die.
-            return false;
-        }
+        /* TODO Iterate through a set of assocaited grids
+         *  An assessment can have multiple grids associated with it; you'll have to clone each one-by-one, making
+         *  this into a gigantic loop
+         */
+//        if (! $sourceBox->getUseRubric()) {
+//            // No rubric? Can't work with that - die.
+//            return false;
+//        }
 
         $dstBox = $boxMapper->findOneByColumn('assessment_id', $destinationAssessmentId);
         $dstBox->getAssessmentModel()->setContextFolder($destinationContext->getFolder());
@@ -1628,9 +1662,11 @@ class DataSource
         // Copy Levels
         foreach ($srcLevels as $srcLevel) {
             $dstLevel = clone $srcLevel;
-            $dstLevel->setId(null);
-            $dstLevel->setRubricInstance($destinationRubricInstance);
-            $dstLevel->setDescriptors($this->descriptorMapper->createCollection());
+
+            $dstLevel->setId(null)
+                ->setRubricInstance($destinationRubricInstance)
+                ->setDescriptors($this->descriptorMapper->createCollection());
+
             $dstLevels->setOffset($srcLevel->getId(), $dstLevel);
         }
 
@@ -1730,8 +1766,9 @@ class DataSource
                 $srcCapability = $this->capabilityMapper->findById($srcDescriptor->getIndicator()->getCapability()->getId());
 
                 $dstCapability = clone $srcCapability;
-                $dstCapability->setId(null);
-                $dstCapability->setParentId($dstFolder->getId());
+
+                $dstCapability->setId(null)
+                    ->setParentId($dstFolder->getId());
 
                 $existingCapabilityMap[$capabilityName] = $dstCapability;
             }
@@ -1746,8 +1783,9 @@ class DataSource
                 $srcIndicator = $this->indicatorMapper->findById($srcDescriptor->getIndicator()->getId());
 
                 $dstIndicator = clone $srcIndicator;
-                $dstIndicator->setId(null);
-                $dstIndicator->setCapability($dstCapability);
+
+                $dstIndicator->setId(null)
+                    ->setCapability($dstCapability);
 
                 $existingIndicatorMap[$capabilityName][$indicatorName] = $dstIndicator;
             }
@@ -1756,13 +1794,15 @@ class DataSource
 
             // Descriptor
             $dstDescriptor = clone $srcDescriptor;
-            $dstDescriptor->setId(null);
-            $dstDescriptors->setOffset($srcDescriptor->getId(), $dstDescriptor);
+
+            $dstDescriptor->setId(null)
+                ->setOffset($srcDescriptor->getId(), $dstDescriptor);
 
             // Link Descriptor + Level
             /** @var LevelModel $dstLevel */
             $dstLevel = $dstLevels->getOffset($srcDescriptor->getLevel()->getId());
             $dstDescriptor->setLevel($dstLevel);
+
             $dstLevel->getDescriptors()->setOffset($srcDescriptor->getId(), $dstDescriptor);
 
             // Link Descriptor + indicator
@@ -1784,25 +1824,27 @@ class DataSource
 
         // Copy capability Usages
         foreach ($srcCapabilityUsages as $srcCapabilityUsage) {
-            $dstCapabilityUsage = clone $srcCapabilityUsage;
-
             /** @var CapabilityModel $dstCapability */
             $dstCapability = $dstCapabilities->getOffset($srcCapabilityUsage->getCapability()->getId());
 
-            $dstCapabilityUsage->setCapability($dstCapability);
-            $dstCapabilityUsage->setRubricInstance($destinationRubricInstance);
+            $dstCapabilityUsage = clone $srcCapabilityUsage;
+
+            $dstCapabilityUsage->setCapability($dstCapability)
+                ->setRubricInstance($destinationRubricInstance);
+
             $dstCapabilityUsages->add($dstCapabilityUsage);
         }
 
         // Copy indicator usages
         foreach ($srcIndicatorUsages as $srcIndicatorUsage) {
-            $dstIndicatorUsage = clone $srcIndicatorUsage;
-
             /** @var IndicatorModel $dstIndicator */
             $dstIndicator = $dstIndicators->getOffset($srcIndicatorUsage->getIndicator()->getId());
 
-            $dstIndicatorUsage->setIndicator($dstIndicator);
-            $dstIndicatorUsage->setRubricInstance($destinationRubricInstance);
+            $dstIndicatorUsage = clone $srcIndicatorUsage;
+
+            $dstIndicatorUsage->setIndicator($dstIndicator)
+                ->setRubricInstance($destinationRubricInstance);
+
             $dstIndicatorUsages->add($dstIndicatorUsage);
         }
 
@@ -1876,8 +1918,8 @@ class DataSource
 
         // Step 1: figure out the due works in the term for the given folders
         $pb = new Builder($this->database->getQuoter(), '');
-        $pb->in('rg.parent_id', $folderIds)
-           ->equals('rg.parent_type', CapabilityModel::PARENT_TYPE_CATEGORY)
+        $pb->in('rc.parent_id', $folderIds)
+           ->equals('rc.parent_type', CapabilityModel::PARENT_TYPE_CATEGORY)
            ->greaterThanOrEqualTo('a.due_date', $term->getStart()->getDatabase())
            ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
            ->isNull('a.deleted_at')
@@ -1901,8 +1943,8 @@ class DataSource
             FROM submission_return sr
             INNER JOIN user                      u ON sr.owner = u.id
             INNER JOIN submission_box           sb ON sr.box_id = sb.id
-            INNER JOIN rubric_capability_usage rgu ON sb.id = rgu.submission_box_id
-            INNER JOIN rubric_capability        rg ON rgu.rubric_capability_id = rg.id
+            INNER JOIN rubric_capability_usage rcu ON sb.id = rcu.submission_box_id
+            INNER JOIN rubric_capability        rc ON rgu.rubric_capability_id = rc.id
             INNER JOIN assessment                a ON sb.assessment_id = a.id
             WHERE {$where}
             ORDER BY sr.published_at ASC
@@ -1945,8 +1987,8 @@ class DataSource
         $maxMarksStatement = $this->database->prepare("
             SELECT
                 a.id,
-                ri.id         AS criterionId,
-                rc.name       AS grouping,
+                ri.id AS criterionId,
+                rc.name AS grouping,
                 ri.name,
                 riu.max_value AS maxMark
             FROM rubric_indicator        ri
@@ -1963,6 +2005,7 @@ class DataSource
         foreach ($maxMarksStatement as $row) {
             $boxId       = $row['id'];
             $indicatorId = $row['criterionId'];
+
             $results[$boxId][$indicatorId] = [
                 'grouping' => $row['grouping'],
                 'name'     => $row['name'],
@@ -1977,26 +2020,29 @@ class DataSource
 
         $where = implode(' AND ', $pb->getWhere());
 
+        /* Note that the old aliases still exist here: conceptually, grouping === capability
+         * ...but it doesn't even get used, so it seems to be a diagnostic thing
+         */
         $descriptorStatement = $this->database->prepare("
             SELECT
                 sr.owner AS studentId,
-                rc.id    AS criterionId,
-                rg.name  AS grouping,
-                rc.name,
+                ri.id    AS indicatorId,
+                rc.name  AS grouping,
+                ri.name,
                 a.id,
                 a.title,
                 rd.description,
-                rdm.value
-            FROM       rubric_indicator_mark  rdm
-            INNER JOIN rubric_capability_mark rgm ON rdm.rubric_capability_mark_id = rgm.id
-            INNER JOIN rubric_capability       rg ON rgm.rubric_capability_id = rg.id
-            INNER JOIN rubric_descriptor       rd ON rdm.descriptor_id = rd.id
-            INNER JOIN rubric_indicator        rc ON rd.rubric_indicator_id = rc.id
-            INNER JOIN submission_return       sr ON rgm.return_id = sr.id
+                rim.value
+            FROM       rubric_indicator_mark  rim
+            INNER JOIN rubric_capability_mark rcm ON rim.rubric_capability_mark_id = rcm.id
+            INNER JOIN rubric_capability       rc ON rcm.rubric_capability_id = rc.id
+            INNER JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
+            INNER JOIN rubric_indicator        ri ON rd.rubric_indicator_id = ri.id
+            INNER JOIN submission_return       sr ON rcm.return_id = sr.id
             INNER JOIN submission_box          sb ON sr.box_id = sb.id
             INNER JOIN assessment               a ON sb.assessment_id = a.id
             WHERE {$where}
-            ORDER BY rg.name ASC, rc.name ASC, a.due_date DESC;
+            ORDER BY rc.name, ri.name, a.due_date DESC;
         ");
 
         $descriptorStatement->execute($pb->getParams());
@@ -2004,7 +2050,7 @@ class DataSource
         // Step 4: smoosh them all together
         foreach ($descriptorStatement as $row) {
             $boxId       = $row['id'];
-            $indicatorId = $row['criterionId'];
+            $indicatorId = $row['indicatorId'];
             $mark        = $row['value'];
             $maxMark     = $results[$boxId][$indicatorId]['maxMark'] ?? 0;
 
@@ -2045,19 +2091,23 @@ class DataSource
         $whereClause = implode(' AND ', $pb->getWhere());
 
         $stmt = $this->database->prepare("
-            SELECT rg.name AS grouping, rc.id, rc.name
-            FROM rubric_indicator  rc
-            JOIN rubric_capability rg ON rg.id = rc.rubric_capability_id AND rg.deleted_at IS NULL
+            SELECT 
+                rc.name AS grouping, 
+                ri.id, ri.name
+            FROM rubric_indicator ri
+            JOIN rubric_capability rc ON rc.id = ri.rubric_capability_id AND rc.deleted_at IS NULL
             WHERE {$whereClause}
+            AND ri.deleted_at IS NULL
             AND rc.deleted_at IS NULL
-            AND rg.deleted_at IS NULL
-            ORDER BY rg.name ASC, rc.name ASC
+            ORDER BY rc.name, ri.name
         ");
 
         $stmt->execute($pb->getParams());
 
         $indicators = [];
 
+        /* Index indicators by their (indicatorId, [indicator data]) tuple
+         */
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $indicators[$row['id']] = [
