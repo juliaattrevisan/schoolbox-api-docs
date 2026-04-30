@@ -10,6 +10,24 @@
 
 ---
 
+## 2026-04-30 Revision: Leaf-Safe CMS Folder Deletion
+
+**Clarified behavior:** CMS retention must not hard-delete child folders that are still active. In this plan, an active child folder means `folder.deleted_at IS NULL`.
+
+**Implementation adjustment:**
+
+- Candidate selection in `Cms::getIdsToDelete()` must skip any retained soft-deleted folder with an active direct child.
+- Cascade expansion in `Cms::expandFolderCascade()` must only traverse soft-deleted child folders.
+- Folder deletion remains leaf-first for the resulting soft-deleted folder set.
+- A soft-deleted parent with active children is left for a later run, after those children have been soft-deleted and hard-deleted.
+
+**Verification adjustment:**
+
+- Add a regression test proving an active child folder is not included in `deleteFolders()`.
+- Add a query-level test proving `getIdsToDelete()` includes a `NOT EXISTS` guard against active child folders.
+
+---
+
 ## File Map
 
 | Action | Path |
@@ -102,6 +120,86 @@ Expected: PASS.
 ```bash
 git add library/Schoolbox/Admin/DataRetention/ValidStrats.php library/Schoolbox/Admin/DataRetention/Test/ValidStratsTest.php
 git commit -m "Register CMS data retention strategy [SA-21886]" -m "Co-Authored-By: Codex <codex@openai.com>"
+```
+
+---
+
+## Task 6: Prevent CMS Retention Deleting Active Child Folders
+
+**Files:**
+- Modify: `library/Schoolbox/Admin/DataRetention/Strategy/Cms.php`
+- Modify: `library/Schoolbox/Admin/DataRetention/Test/CmsStrategyTest.php`
+
+- [ ] **Step 1: Add a failing regression test for active child folders**
+
+In `library/Schoolbox/Admin/DataRetention/Test/CmsStrategyTest.php`, extend the test subclass so `findChildFolderIds()` can distinguish all children from soft-deleted children. Add a test where folder `10` has children `11` and `12`, only `11` is soft-deleted, and `12` is active:
+
+```php
+public function testDeleteChunkDoesNotDeleteActiveChildFolders(): void
+{
+    ['strategy' => $strategy, 'state' => $state] = $this->strategy(
+        [
+            10 => [11, 12],
+            11 => [],
+            12 => [],
+        ],
+        [],
+        [],
+        softDeletedFolderIds: [10, 11],
+    );
+
+    $this->delete($strategy, [
+        ['id' => 10, 'table' => 'folder'],
+    ]);
+
+    $this->assertSame([11, 10], $state->deletedFolders);
+    $this->assertNotContains(12, $state->deletedFolders);
+}
+```
+
+- [ ] **Step 2: Run the regression test and verify it fails**
+
+Run:
+
+```bash
+./vendor/bin/phpunit library/Schoolbox/Admin/DataRetention/Test/CmsStrategyTest.php --filter testDeleteChunkDoesNotDeleteActiveChildFolders
+```
+
+Expected: FAIL because the current cascade includes every child folder returned by `findChildFolderIds()`.
+
+- [ ] **Step 3: Add a query-level test for candidate selection**
+
+In `library/Schoolbox/Admin/DataRetention/Test/CmsStrategyTest.php`, add a bound-call helper for `getIdsToDelete()` and a mock statement that captures prepared SQL. Assert the SQL contains:
+
+```sql
+NOT EXISTS
+child.parent = folder.id
+child.deleted_at IS NULL
+```
+
+- [ ] **Step 4: Update CMS child lookup and cascade implementation**
+
+In `library/Schoolbox/Admin/DataRetention/Strategy/Cms.php`:
+
+- Change `getIdsToDelete()` to include `NOT EXISTS` against active direct children.
+- Add a protected helper for soft-deleted child folder lookup.
+- Change `expandFolderCascade()` to call the soft-deleted child lookup, not the all-child lookup.
+
+- [ ] **Step 5: Run the focused CMS strategy tests**
+
+Run:
+
+```bash
+./vendor/bin/phpunit library/Schoolbox/Admin/DataRetention/Test/CmsStrategyTest.php
+```
+
+Expected: PASS.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add library/Schoolbox/Admin/DataRetention/Strategy/Cms.php library/Schoolbox/Admin/DataRetention/Test/CmsStrategyTest.php
+git commit -m "Prevent CMS retention deleting active child folders [SA-21886]" -m "Co-Authored-By: Codex <codex@openai.com>"
 ```
 
 ---

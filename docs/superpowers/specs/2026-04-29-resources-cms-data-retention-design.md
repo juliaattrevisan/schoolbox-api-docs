@@ -38,7 +38,8 @@ The ticket also lists assessment and course relations as excluded for now. Those
 
 - Add a CMS data retention strategy using `ConfigMapper::NAME_DATA_RETENTION_CMS`.
 - Select folders where `folder.deleted_at` is older than the configured CMS retention cutoff.
-- Expand selected folders to their descendant `folder` subtree using `folder.parent`.
+- Select only leaf-safe retained folders: a folder must not have any child folder where `deleted_at IS NULL`.
+- Expand selected folders only through soft-deleted descendant folders, never through active folders.
 - Delete content related only to the purged folders before deleting the folders.
 - Delete nested dependencies in foreign-key-safe order.
 - Delete folders leaf-first so child folders are removed before parent folders.
@@ -93,6 +94,12 @@ A folder is a retention candidate when:
 ```sql
 folder.deleted_at IS NOT NULL
 AND folder.deleted_at < :old
+AND NOT EXISTS (
+    SELECT 1
+    FROM folder child
+    WHERE child.parent = folder.id
+    AND child.deleted_at IS NULL
+)
 ```
 
 The cutoff `:old` comes from `Base::calculateDate()`, using either the CLI retention override or `ConfigMapper::NAME_DATA_RETENTION_CMS`.
@@ -101,11 +108,13 @@ If the configured retention period is empty, invalid, zero, or blocked by existi
 
 ### Folder Cascade
 
-When a candidate folder is selected, every descendant folder beneath it is included in the same purge plan.
+When a candidate folder is selected, soft-deleted descendant folders beneath it are included in the same purge plan.
 
-Descendant folders are included because the folder tree is the ownership boundary. Child content is removed as part of the parent folder hard delete even if the child row has no `deleted_at` or has a newer `deleted_at`.
+Active descendant folders are never included in the hard-delete plan. For this behavior, "active" means `folder.deleted_at IS NULL`. This prevents a retained parent folder from hard-deleting child folders that are still visible or otherwise not soft-deleted.
 
-Nested candidate folders must be deduplicated. If both folder `10` and child folder `11` are selected in the same chunk, the subtree should be processed once.
+Nested candidate folders must be deduplicated. If both folder `10` and child folder `11` are selected in the same chunk, the soft-deleted subtree should be processed once.
+
+This makes CMS retention bottom-up. A soft-deleted parent that still has active children is skipped for that run. Once those children are soft-deleted and past the retention cutoff, the child folders can be hard-deleted first, and a later run can hard-delete the parent when no active children remain.
 
 ### Excluded Relation Blockers
 
@@ -251,6 +260,8 @@ Tests should cover:
 - `ValidStrats` accepts and filters `cms`.
 - The CMS strategy label/name use the expected values.
 - A candidate folder expands to descendants and deletes folders leaf-first.
+- A soft-deleted parent with an active child does not hard-delete that active child.
+- Candidate SQL excludes folders with active child folders.
 - Nested candidate folders are deduplicated.
 - Blog, forum, poll, wiki, and component child rows are deleted before their parent rows.
 - Direct folder-owned tables are deleted before folders.
