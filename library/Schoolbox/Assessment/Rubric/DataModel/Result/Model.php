@@ -19,70 +19,83 @@ class Model
      * chars or other nonprintables take up extra bytes and can bust the limit
      * somewhat inadvertently - we give them a few extra chars as a buffer for that
      */
-    public const LABEL_MAXLENGTH = 900;
+    public const int LABEL_MAXLENGTH = 900;
 
 
     /**
      * @var int
      */
-    private $resultSetId;
+    private int $resultSetId;
+
 
     /**
      * @var string
      */
-    private $label;
+    private string $label;
+
+
     /**
      * @var int
      */
-    private $value;
+    private int $value;
+
 
     /**
      * @return int
      */
-    public function getResultSetId()
+    public function getResultSetId(): int
     {
         return $this->resultSetId;
     }
 
+
     /**
      * @param int $resultSetId
-     * @return static
+     * @return $this
      */
-    public function setResultSetId($resultSetId)
+    public function setResultSetId(int $resultSetId): self
     {
         $this->resultSetId = $resultSetId;
         return $this;
     }
 
-    /**
-     * @param string $label
-     */
-    public function setLabel($label)
-    {
-        $this->label = $label;
-    }
 
     /**
      * @return int
      */
-    public function getLabel()
+    public function getLabel(): int
     {
         return $this->label;
     }
 
+
     /**
-     * @param int $value
+     * @param string $label
+     * @return $this
      */
-    public function setValue($value)
+    public function setLabel(string $label): self
     {
-        $this->value = $value;
+        $this->label = $label;
+        return $this;
     }
+
 
     /**
      * @return string
      */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
+    }
+
+
+    /**
+     * @param int $value
+     * @return $this
+     */
+    public function setValue(int $value): self
+    {
+        $this->value = $value;
+        return $this;
     }
 }

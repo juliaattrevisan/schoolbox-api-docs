@@ -15,7 +15,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
- * @method Model[]|GenericCollection findAll($options = array())
+ * @method GenericCollection<Model> findAll($options = array())
  */
 class Mapper extends BaseMapper
 {
@@ -23,7 +23,16 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('rubric_result');
         $this->hasModel(Model::class);
-        $this->uses('resultset_id', self::TYPE_INTEGER, null, 'resultSetId'); // This is NOT an identifier
+
+        // This is NOT an identifier
+        /* This ^^^ cryptic message was trying to explain that resultSetId doesn't correspond to a primary key in any of
+         * the established rubric schema. It's an identifier that relates a set of descriptors, ordered by value, which
+         * ends up being used in a shortcut to mass-produce descriptors from a predefined set, saving users manually
+         * crafting them. It's an identifier in the sense that descriptors in a set are united by this resultSetId, but
+         * it's not an autoincrement id like you might have naturally assumed.
+         */
+        $this->uses('resultset_id', self::TYPE_INTEGER, null, 'resultSetId');
+
         $this->uses('value', self::TYPE_INTEGER);
         $this->uses('label', self::TYPE_STRING);
     }
@@ -37,7 +46,7 @@ class Mapper extends BaseMapper
      * @param object $previous
      * @return bool
      */
-    protected function raiseNotification($object, $verb, $previous = null)
+    protected function raiseNotification($object, $verb, $previous = null): bool
     {
         return true;
     }
