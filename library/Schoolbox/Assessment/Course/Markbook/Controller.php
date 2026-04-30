@@ -14,6 +14,7 @@ use Alaress\Web\Controller as WebController;
 use Alaress\HTMLPurifier\IPurifier;
 use Schoolbox\Assessment\Course\Markbook\Export\CSV;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment\AssessmentType\Definition as AssessmentTypeDefinition;
@@ -566,8 +567,8 @@ class Controller extends WebController\Base
                     ),
                 ],
                 'availableVisibilities' => Visibility::getAvailableVisibilities(
-                    (bool) $this->getConfigLoader()->get('mark_visibility_allow_students'),
-                    (bool) $this->getConfigLoader()->get('mark_visibility_allow_parents'),
+                    (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_STUDENTS),
+                    (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_PARENTS),
                 ),
                 'submissionErrorStates' => $this->stateMapper->findAll()->map(fn(State $state) => [
                     'id' => $state->getId(),

@@ -1162,8 +1162,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'assessmentType'           => AssessmentType::objectToString($assessment),
             'markVisibility'           => $assessment->getMarkVisibility(),
             'availableVisibilities'    => FeedbackVisibility::getAvailableVisibilities(
-                (bool) $this->getConfigLoader()->get('mark_visibility_allow_students'),
-                (bool) $this->getConfigLoader()->get('mark_visibility_allow_parents'),
+                (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_STUDENTS),
+                (bool) $this->getConfigLoader()->get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_PARENTS),
             ),
             'allWorkTypes'             => $this->workTypeMapper->findAll(['order' => ['sequence' => 'asc']]),
 

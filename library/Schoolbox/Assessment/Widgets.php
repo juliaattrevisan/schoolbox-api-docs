@@ -12,6 +12,7 @@
 
 namespace Schoolbox\Assessment;
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 
 class Widgets
@@ -43,8 +44,8 @@ class Widgets
      */
     public static function getAvailableOptions(): array
     {
-        $allowStudents = (bool) \Config::get('mark_visibility_allow_students');
-        $allowParents  = (bool) \Config::get('mark_visibility_allow_parents');
+        $allowStudents = (bool) \Config::get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_STUDENTS);
+        $allowParents  = (bool) \Config::get(ConfigMapper::NAME_MARK_VISIBILITY_ALLOW_PARENTS);
         $available     = \Schoolbox\Learning\Assessment\Feedback\Visibility::getAvailableVisibilities($allowStudents, $allowParents);
         return array_intersect_key(self::getOptions(), array_flip($available));
     }
