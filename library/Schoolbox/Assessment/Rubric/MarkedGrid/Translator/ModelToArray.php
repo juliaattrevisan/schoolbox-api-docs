@@ -13,6 +13,9 @@ namespace Schoolbox\Assessment\Rubric\MarkedGrid\Translator;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Learning\Assessment\ISelfAssessableFeedback;
+use Schoolbox\User;
 
 /**
  * Translator for converting a Marked Rubric Grid into an array representation,
@@ -23,6 +26,19 @@ use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 class ModelToArray
 {
     // TODO: make sure that the backend is responsible hiding marks to users that shouldn't see them, rather than the frontend hiding them...
+
+    /**
+     * @param User $viewer the user viewing this marked grid, for permissions purposes
+     * @param bool $showPoints the value of config.rubricShowPoints
+     * @param bool $showDescriptorValue whether points should be shown alongside descriptors, note there is also a
+     *                                  config setting that also controls this, false for self-reflections
+     */
+    public function __construct(
+        private User $viewer,
+        private bool $showPoints,
+        private bool $showDescriptorValue,
+    ) {
+    }
 
     /**
      * @param MarkedGrid $markedGrid
@@ -88,22 +104,60 @@ class ModelToArray
      */
     private function translateIndicatorUsage(MarkedGrid $markedGrid, IndicatorUsage $indicatorUsage): array
     {
+        $indicatorId = $indicatorUsage->getIndicator()->getId();
         $indicatorMark = $markedGrid->retrieveIndicatorMark($indicatorUsage);
 
-        // TODO: permissions, notably self assessment differs
-        $isMarkDisplayed = true; // TODO: $grid->getAssessment()->isFeedbackVisibleToUser(VIEWER);
-        if (!$isMarkDisplayed || $indicatorMark === null) {
+        if (null === $indicatorMark) {
+            // if there's no mark, then there isn't anything to show
             return [
-                'id' => $indicatorUsage->getIndicator()->getId(),
-                'humanReadableMark' => null,
+                'id' => $indicatorId,
                 'descriptorId' => null,
+                'humanReadableMark' => null,
+            ];
+        }
+
+        $humanReadableMark = $indicatorMark->getValue();
+        $descriptorId = $indicatorMark->getDescriptor()?->getId();
+
+        $feedback = $markedGrid->getFeedback();
+        if ($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment()) {
+            // Self-Assessment:
+
+            return [
+                'id' => $indicatorId,
+                // for self assessment you always know which descriptor was selected
+                'descriptorId' => $descriptorId,
+                // however, the mark is only shown for self grading
+                // TODO: remove instanceof
+                'humanReadableMark' => ($feedback instanceof DueWorkFeedback && $feedback->isSelfGrading())
+                    ? $humanReadableMark
+                    : null,
+            ];
+        }
+
+        // non self-assessment:
+
+        // need to check if the viewer is allowed to view the feedback
+        if (!$feedback->getAssessable()->isFeedbackVisibleToUser($this->viewer)) {
+            // if the mark isn't displayed, then we shouldn't show any info about it
+            return [
+                'id' => $indicatorId,
+                'descriptorId' => null,
+                'humanReadableMark' => null,
             ];
         }
 
         return [
-            'id' => $indicatorUsage->getIndicator()->getId(),
-            'humanReadableMark' => $indicatorMark->getValue(),
-            'descriptorId' => $indicatorMark->getDescriptor()?->getId(),
+            'id' => $indicatorId,
+            // at this point, you always know which descriptor was selected
+            'descriptorId' => $descriptorId,
+            // the mark is only shown if the viewer has permission (essentially the same config check in the rubric grid translator)
+            'humanReadableMark' => (
+                $indicatorMark->getDescriptor()?->hasValue() &&
+                $markedGrid->getGrid()->showDescriptorValue() &&
+                $this->showDescriptorValue &&
+                $this->showPoints
+            ) ? $humanReadableMark : null,
         ];
     }
 }

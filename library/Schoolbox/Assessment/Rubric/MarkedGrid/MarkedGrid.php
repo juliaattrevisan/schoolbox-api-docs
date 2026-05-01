@@ -9,13 +9,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
-use JsonSerializable;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\User;
 
 /**
  * A marked rubric grid.
@@ -29,7 +29,7 @@ use Schoolbox\Learning\MarkScheme\IMarkScheme;
  * * a grid
  * * a set of marked capabilities, which in turn contain marked indicators
  */
-class MarkedGrid implements JsonSerializable
+class MarkedGrid
 {
     private const PRECISION = 2;
 
@@ -253,18 +253,29 @@ class MarkedGrid implements JsonSerializable
     }
 
     /**
+     * @param User $viewer the user viewing this marked grid, for permissions purposes
+     * @param bool $showPoints
+     * @param bool $showDescriptorValue
      * @return array
      * @see /library/Schoolbox/Assessment/Rubric/templates/vue/types.ts RubricMarkedGrid
      */
-    public function jsonSerialize(): array
-    {
+    public function toArray(
+        User $viewer,
+        bool $showPoints,
+        bool $showDescriptorValue
+    ): array {
         // TODO: similar to Grid->jsonSerialize, this is not final and will be easier to figure out what needs
         // to be changed once we can see all the payloads for the builder/readonly/markable grids in action.
         // To avoid passing thru a translator down very deep twig file chains in a lot of places, we can do it here for now
 
         // TODO: also check access to various things matches what we expect (particularly whether students can see mark info assuming there's cases when they shouldn't?)
 
-        $rubricMarkedGridTranslator = new Translator\ModelToArray();
+        // TODO: injecting this stuff like this is quite unpleasant, let's review once it's at least working...
+        $rubricMarkedGridTranslator = new Translator\ModelToArray(
+            $viewer,
+            $showPoints,
+            $showDescriptorValue
+        );
         return $rubricMarkedGridTranslator($this);
     }
 }

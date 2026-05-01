@@ -28,12 +28,6 @@ interface Props {
      * TODO: this probably needs to be delt with in SelfAssessmentFeedback as otherwise we'd be sending potentially values someone shouldn't normally access
      */
     showGroupTotal?: boolean;
-    /**
-     * Whether points should be shown alongside descriptors,
-     * note there is also a config setting that also controls this, false for self-reflections.
-     * TODO: this probably needs to be delt with in SelfAssessmentFeedback as otherwise we'd be sending potentially values someone shouldn't normally access
-     */
-    showDescriptorValue?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -83,7 +77,6 @@ function findCapabilityMark(
                         props.rubric.capabilityMarkType !== null &&
                         props.rubric.capabilityMarkType !== MarkTypeSlug.NONE
                     "
-                    :show-descriptor-value="props.showDescriptorValue"
                 />
 
                 <!-- Overall Mark -->

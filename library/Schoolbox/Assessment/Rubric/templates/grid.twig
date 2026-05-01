@@ -14,11 +14,14 @@
                                 that also controls this, false for self-reflections
  #}
 
+{% set showPoints = config.rubric_show_points %}
+{% set selfAssessmentMarkedGrid = selfAssessmentFeedback ? selfAssessmentFeedback.rubricMarkedGrid : null %}
+
 <div data-vue-app="rubric-grid">
     <rubric-grid
-        :rubric="{{ rubricGrid|json_encode }}"
-        :rubric-marked-grid="{{ (rubricMarkedGrid ?? null)|json_encode }}"
-        :self-assessment-feedback="{{ (selfAssessmentFeedback.rubricMarkedGrid ?? null)|json_encode }}"
+        :rubric="{{ rubricGrid.toArray(showPoints, showDescriptorValue)|json_encode }}"
+        :rubric-marked-grid="{{ (rubricMarkedGrid ? rubricMarkedGrid.toArray(USER, showPoints, showDescriptorValue) : null)|json_encode }}"
+        :self-assessment-feedback="{{ (selfAssessmentMarkedGrid ? selfAssessmentMarkedGrid.toArray(USER, showPoints, showDescriptorValue) : null)|json_encode }}"
         :assessment-mark-scheme="{
             template: {{ rubricGrid.assessment.markScheme.template|json_encode }},
             context: {{ rubricGrid.assessment.markScheme.generateContext|json_encode }}
@@ -27,7 +30,6 @@
         {# TODO: these are signs of likely permission issues #}
         {% if showRubricTotal ?? false %}show-rubric-total{% endif %}
         {% if showGroupTotal ?? false %}show-group-total{% endif %}
-        {% if (showDescriptorValue ?? false) and rubricGrid.showDescriptorValue %}show-descriptor-value{% endif %}
     />
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricGrid.js?v={{ config.site_version }}"></script>

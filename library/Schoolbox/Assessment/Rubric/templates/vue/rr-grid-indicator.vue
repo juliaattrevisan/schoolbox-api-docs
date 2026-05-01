@@ -14,7 +14,6 @@ interface Props {
     selfAssessmentIndicatorMark: RubricMarkedGridIndicator | null;
     levels: RubricGridLevel[];
     participantId: UserAuthor["id"];
-    showDescriptorValue?: boolean;
 }
 const props = defineProps<Props>();
 </script>
@@ -32,7 +31,6 @@ const props = defineProps<Props>();
                 :self-assessment-indicator-mark="props.selfAssessmentIndicatorMark"
                 :level="level"
                 :participant-id="props.participantId"
-                :show-descriptor-value="props.showDescriptorValue"
             />
             <td v-else class="rb-blank hide-for-medium-down">&nbsp;</td>
         </template>

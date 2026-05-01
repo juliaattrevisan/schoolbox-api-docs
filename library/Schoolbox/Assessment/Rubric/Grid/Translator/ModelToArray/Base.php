@@ -27,6 +27,17 @@ use Schoolbox\Assessment\Rubric\Grid\Level;
 class Base
 {
     /**
+     * @param bool $showPoints the value of config.rubricShowPoints
+     * @param bool $showDescriptorValue whether points should be shown alongside descriptors, note there is also a
+     *                                  config setting that also controls this, false for self-reflections
+     */
+    public function __construct(
+        private bool $showPoints,
+        private bool $showDescriptorValue,
+    ) {
+    }
+
+    /**
      * @param Grid $rubricGrid
      * @return array
      */
@@ -97,9 +108,14 @@ class Base
                 continue;
             }
 
-            // TODO: permissions:
+            // include value info only if the viewer has permission to see it depending on various configs
             $value = null;
-            if ($descriptor->hasValue() && $rubricGrid->showDescriptorValue()) { // TODO: && ...->getConfigLoader()->get('rubric_show_points'), also arbitrary twig showDescriptorValue var
+            if (
+                $descriptor->hasValue() &&
+                $rubricGrid->showDescriptorValue() &&
+                $this->showDescriptorValue &&
+                $this->showPoints
+            ) {
                 $value = $rubricGrid->isUseMarkRange()
                     ? [ 'left' => $descriptor->getMinValue(), 'right' => $descriptor->getMaxValue() ]
                     : [ 'max' => $descriptor->getMaxValue() ];

@@ -14,7 +14,6 @@ interface Props {
     selfAssessmentIndicatorMark: RubricMarkedGridIndicator | null;
     level: RubricGridLevel;
     participantId: UserAuthor["id"];
-    showDescriptorValue?: boolean;
 }
 const props = defineProps<Props>();
 
@@ -58,7 +57,7 @@ const isDescriptorSelected = window.Vue.computed(
                 {{ props.descriptor.description?.trim() }}
             </span>
 
-            <span v-if="props.showDescriptorValue && props.descriptor.value !== null" class="rb-value used">
+            <span v-if="props.descriptor.value !== null" class="rb-value used">
                 <template v-if="'left' in props.descriptor.value">
                     <!-- show indicator mark if available -->
                     <span

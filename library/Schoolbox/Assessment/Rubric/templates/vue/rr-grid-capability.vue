@@ -21,7 +21,6 @@ interface Props {
     levels: RubricGridLevel[];
     participantId: UserAuthor["id"];
     showSummaryCapability: boolean;
-    showDescriptorValue?: boolean;
 }
 const props = defineProps<Props>();
 
@@ -68,7 +67,6 @@ function findIndicatorMark(
         :self-assessment-indicator-mark="findIndicatorMark(indicator.id, props.selfAssessmentCapabilityMark)"
         :levels="props.levels"
         :participant-id="props.participantId"
-        :show-descriptor-value="props.showDescriptorValue"
     />
 
     <!-- Capability mark: needs to be rendered in human-readable form, use the assessment's mark scheme to do so -->
