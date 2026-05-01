@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\DataRetention\Strategy;
 
+use Alaress\Database\Predicate\Builder;
 use PDO;
 use Schoolbox\Admin\DataRetention\ValidStrats;
 use Schoolbox\Config\ConfigMapper;
@@ -20,10 +21,19 @@ class Eportfolio extends Base
     protected string $retentionConfigKey = ConfigMapper::NAME_DATA_RETENTION_EPORTFOLIO;
 
     private const string TABLE_EPORTFOLIO_PAGE = 'eportfolio_page';
+    private const string TABLE_COMPONENT_CONFIG_INSTANCE = 'component_config_instance';
+    private const string TABLE_COMPONENT_INSTANCE = 'component_instance';
+    private const string TABLE_EPORTFOLIO_COMPONENT_ADVANCEDLIST_ITEM = 'eportfolio_component_advancedlist_item';
+    private const string TABLE_EPORTFOLIO_COMPONENT_BASICLIST_ITEM = 'eportfolio_component_basiclist_item';
+    private const string TABLE_EPORTFOLIO_COMPONENT_LINKLIST_ITEM = 'eportfolio_component_linklist_item';
+    private const string TABLE_EPORTFOLIO_COMPONENT_TEXTBOX_ITEM = 'eportfolio_component_textbox_item';
     private const string TABLE_EPORTFOLIO_COMPONENT_BLOG = 'eportfolio_component_blog';
     private const string TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT = 'eportfolio_component_blog_comment';
     private const string TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE = 'eportfolio_component_blog_image';
     private const string TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM = 'eportfolio_component_filelist_item';
+    private const string TABLE_EPORTFOLIO_PERMISSION = 'eportfolio_permission';
+
+    private const string COMPONENT_MODULE_EPORTFOLIO = 'eportfolio';
 
     /**
      * @inheritDoc
@@ -71,10 +81,233 @@ class Eportfolio extends Base
     }
 
     /**
-     *
+     * @param list<array{table: string, id: int|string}> $chunk
      */
     protected function deleteChunk(array $chunk): void
     {
+        $targetIds = $this->groupTargetIdsByTable($chunk);
+        $pageIds = $targetIds[self::TABLE_EPORTFOLIO_PAGE] ?? [];
+
+        if ($pageIds === []) {
+            return;
+        }
+
+        $componentInstanceIds = $this->findComponentInstanceIdsByPageIds($pageIds);
+        $blogIds = $this->findBlogIdsByPageIds($pageIds);
+        $deleted = [];
+
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_COMPONENT_CONFIG_INSTANCE,
+            $this->deleteRowsByForeignIds(
+                self::TABLE_COMPONENT_CONFIG_INSTANCE,
+                'component_instance_id',
+                $componentInstanceIds,
+            ),
+        );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_ADVANCEDLIST_ITEM,
+            $this->deleteRowsByForeignIds(
+                self::TABLE_EPORTFOLIO_COMPONENT_ADVANCEDLIST_ITEM,
+                'component_instance_id',
+                $componentInstanceIds,
+            ),
+        );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_BASICLIST_ITEM,
+            $this->deleteRowsByForeignIds(
+                self::TABLE_EPORTFOLIO_COMPONENT_BASICLIST_ITEM,
+                'component_instance_id',
+                $componentInstanceIds,
+            ),
+        );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_LINKLIST_ITEM,
+            $this->deleteRowsByForeignIds(
+                self::TABLE_EPORTFOLIO_COMPONENT_LINKLIST_ITEM,
+                'component_instance_id',
+                $componentInstanceIds,
+            ),
+        );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_TEXTBOX_ITEM,
+            $this->deleteRowsByForeignIds(
+                self::TABLE_EPORTFOLIO_COMPONENT_TEXTBOX_ITEM,
+                'component_instance_id',
+                $componentInstanceIds,
+            ),
+        );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
+            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'blog_id', $blogIds),
+        );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
+            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'blog_id', $blogIds),
+        );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_BLOG,
+            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG, 'page_id', $pageIds),
+        );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
+            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM, 'page_id', $pageIds),
+        );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_PERMISSION,
+            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_PERMISSION, 'page_id', $pageIds),
+        );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_COMPONENT_INSTANCE,
+            $this->deleteRowsByIds(self::TABLE_COMPONENT_INSTANCE, 'id', $componentInstanceIds),
+        );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_PAGE,
+            $this->deleteRowsByIds(self::TABLE_EPORTFOLIO_PAGE, 'page_id', $pageIds),
+        );
+
+        $this->logChunkResult($deleted);
+    }
+
+    /**
+     * @param list<array{table: string, id: int|string}> $chunk
+     * @return array<string, list<int>>
+     */
+    protected function groupTargetIdsByTable(array $chunk): array
+    {
+        $idsByTable = [];
+
+        foreach ($chunk as $target) {
+            $id = (int) $target['id'];
+            if ($id <= 0) {
+                continue;
+            }
+
+            $idsByTable[$target['table']][] = $id;
+        }
+
+        foreach ($idsByTable as $table => $ids) {
+            $idsByTable[$table] = array_values(array_unique($ids));
+        }
+
+        return $idsByTable;
+    }
+
+    /**
+     * @param list<int> $pageIds
+     * @return list<int>
+     */
+    protected function findComponentInstanceIdsByPageIds(array $pageIds): array
+    {
+        if ($pageIds === []) {
+            return [];
+        }
+
+        $placeholders = Builder::getArrayPlaceholders($pageIds, 'page_id');
+        $statement = $this->getPreparedStatement(
+            "SELECT id FROM " . self::TABLE_COMPONENT_INSTANCE . "
+            WHERE module = :module AND identifier IN {$placeholders}"
+        );
+        $statement->execute(
+            array_merge(
+                ['module' => self::COMPONENT_MODULE_EPORTFOLIO],
+                Builder::getArrayParameters($pageIds, 'page_id'),
+            ),
+        );
+
+        return array_map(
+            static fn(array $row): int => (int) $row['id'],
+            $statement->fetchAll(PDO::FETCH_ASSOC),
+        );
+    }
+
+    /**
+     * @param list<int> $pageIds
+     * @return list<int>
+     */
+    protected function findBlogIdsByPageIds(array $pageIds): array
+    {
+        if ($pageIds === []) {
+            return [];
+        }
+
+        $placeholders = Builder::getArrayPlaceholders($pageIds, 'page_id');
+        $statement = $this->getPreparedStatement(
+            "SELECT id FROM " . self::TABLE_EPORTFOLIO_COMPONENT_BLOG . " WHERE page_id IN {$placeholders}"
+        );
+        $statement->execute(Builder::getArrayParameters($pageIds, 'page_id'));
+
+        return array_map(
+            static fn(array $row): int => (int) $row['id'],
+            $statement->fetchAll(PDO::FETCH_ASSOC),
+        );
+    }
+
+    /**
+     * @param list<int> $ids
+     */
+    protected function deleteRowsByIds(string $table, string $column, array $ids): int
+    {
+        if ($ids === []) {
+            return 0;
+        }
+
+        $placeholders = Builder::getArrayPlaceholders($ids, 'id');
+        $statement = $this->getPreparedStatement(
+            $this->deleteStatement($table) . " FROM {$table} WHERE {$column} IN {$placeholders}"
+        );
+        $statement->execute(Builder::getArrayParameters($ids, 'id'));
+
+        return $statement->rowCount();
+    }
+
+    /**
+     * @param list<int> $ids
+     */
+    protected function deleteRowsByForeignIds(string $table, string $column, array $ids): int
+    {
+        if ($ids === []) {
+            return 0;
+        }
+
+        $placeholders = Builder::getArrayPlaceholders($ids, $column);
+        $statement = $this->getPreparedStatement(
+            $this->deleteStatement($table) . " FROM {$table} WHERE {$column} IN {$placeholders}"
+        );
+        $statement->execute(Builder::getArrayParameters($ids, $column));
+
+        return $statement->rowCount();
+    }
+
+    /**
+     * @param array<string, int> $deleted
+     */
+    protected function recordDeleted(array &$deleted, string $table, int $count): void
+    {
+        $deleted[$table] = ($deleted[$table] ?? 0) + $count;
+    }
+
+    /**
+     * @param array<string, int> $deleted
+     */
+    protected function logChunkResult(array $deleted): void
+    {
+        $prefix = $this->perform ? 'Deleted' : 'Would have deleted';
+
+        foreach ($deleted as $table => $count) {
+            $this->log->notice(sprintf("%s '%s' %s rows", $prefix, $count, $table));
+        }
     }
 
     /**
