@@ -54,13 +54,15 @@ class Payload
             'nationality1' => $nationalityCodes[0] ?? '',
             'schoolName' => $this->normalise($schoolName),
         ];
+        $missingFields = $this->findMissingFields($requiredDetails);
 
         return [
             'userId' => $user?->getId(),
             'registrationSessionStudentId' => $student->getId(),
             'status' => $student->getStatus(),
             'userName' => $userName,
-            'hasMissingDetails' => $this->hasMissingDetails($requiredDetails),
+            'hasMissingDetails' => $missingFields !== [],
+            'missingFields' => $missingFields,
         ];
     }
 
@@ -152,9 +154,18 @@ class Payload
 
     /**
      * @param array<string, mixed> $details
+     * @return string[]
      */
-    private function hasMissingDetails(array $details): bool
+    private function findMissingFields(array $details): array
     {
-        return array_any(self::REQUIRED_FIELDS, fn($field) => $this->normalise($details[$field] ?? '') === '');
+        $missingFields = [];
+
+        foreach (self::REQUIRED_FIELDS as $field) {
+            if ($this->normalise($details[$field] ?? '') === '') {
+                $missingFields[] = $field;
+            }
+        }
+
+        return $missingFields;
     }
 }

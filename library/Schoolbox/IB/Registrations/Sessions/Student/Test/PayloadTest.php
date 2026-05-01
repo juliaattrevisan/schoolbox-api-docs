@@ -37,6 +37,7 @@ class PayloadTest extends TestCase
         $this->assertSame(RegistrationSessionStudentModel::STATUS_CONFIRMED, $payload['status']);
         $this->assertSame('Alex, Nguyen', $payload['userName']);
         $this->assertFalse($payload['hasMissingDetails']);
+        $this->assertSame([], $payload['missingFields']);
         $this->assertArrayNotHasKey('firstName', $payload);
         $this->assertArrayNotHasKey('lastName', $payload);
         $this->assertArrayNotHasKey('dateOfBirth', $payload);
@@ -49,7 +50,6 @@ class PayloadTest extends TestCase
         $this->assertArrayNotHasKey('schoolName', $payload);
         $this->assertArrayNotHasKey('reference', $payload);
         $this->assertArrayNotHasKey('isComplete', $payload);
-        $this->assertArrayNotHasKey('missingFields', $payload);
     }
 
     public function testBuildsMissingFieldsForIncompletePayload(): void
@@ -70,7 +70,19 @@ class PayloadTest extends TestCase
 
         $this->assertSame('', $payload['userName']);
         $this->assertTrue($payload['hasMissingDetails']);
-        $this->assertArrayNotHasKey('missingFields', $payload);
+        $this->assertSame(
+            [
+                'userName',
+                'firstName',
+                'dateOfBirth',
+                'email',
+                'gender',
+                'language1',
+                'nationality1',
+                'schoolName',
+            ],
+            $payload['missingFields']
+        );
     }
 
     public function testGroupsStudentsByStatus(): void
