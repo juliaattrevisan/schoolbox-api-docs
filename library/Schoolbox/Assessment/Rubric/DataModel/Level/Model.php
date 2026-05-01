@@ -71,26 +71,6 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return SubmissionBox
-     */
-    public function getSubmissionBox()
-    {
-        return $this->submissionBox;
-    }
-
-
-    /**
-     * @param SubmissionBox $submissionBox
-     * @return static
-     */
-    public function setSubmissionBox(SubmissionBox $submissionBox)
-    {
-        $this->submissionBox = $submissionBox;
-        return $this;
-    }
-
-
-    /**
      * @return string
      */
     public function getName(): string
