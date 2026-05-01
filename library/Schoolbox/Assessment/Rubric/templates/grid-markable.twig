@@ -24,22 +24,6 @@
 
 <div class="scrollable">
     <table class="rb markable" id="{{ rubricId }}">
-
-        {# Suppress level headings if none have names #}
-        {% set hasLevels = false %}
-        {% for level in rubricGrid.levels | filter(level => level.name | trim | length )  %}
-            {% set hasLevels = true %}
-        {% endfor %}
-        {% if hasLevels  %}
-        <thead>
-            <tr>
-                <th colspan="2">&nbsp;</th>
-                {% for level in rubricGrid.levels %}
-                <th class="markdown">{{ level.name | markdown }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        {% endif %}
         <tbody>
             {% for groupIndex, groupUsage in rubricGrid.capabilityUsages %}
                 {# Use rowspans when group total is visible, otherwise don't need it
@@ -103,33 +87,6 @@
                 {% include '@rubric/group-row-markable.twig' %}
 
             {% endfor %}
-
-            {% if showRubricTotal and markType.mode != "none"  %}
-
-                {% set rubricScaledMark = rubricMarkedGrid.calculateScaledMark ?? null %}
-                {% set rubricMax        = rubricGrid.calculateMaxValueFromCapabilities %}
-
-                <tr>
-                    <th class="rb-final-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
-                        <span data-final-summary="{{ rubricId }}"
-                            data-scaled-mark="{{ rubricScaledMark }}"
-                            data-max="{{ rubricMax }}"
-                            data-mark-type="{{ markType.mode }}">
-
-                            {{ rubricMarkedGrid.retrieveHumanReadableMark ?? null }}
-                        </span>
-
-                        {# Self-Assessment: only show the mark if it's self graded, as if it's self-reflect only they never marked themselves #}
-                        {% if selfAssessmentFeedback is not null and selfAssessmentFeedback.isSelfGrading and selfAssessmentFeedback.humanReadableInstructorMark %}
-                            {# Although the student entered the mark using the display mark type, we show it here using the input mark type so that
-                            # it matches what the instructor is currently entering so it can be easily compared.
-                            #}
-                            ({{ selfAssessmentFeedback.humanReadableInstructorMark }} given in {{ locale.selfAssessment.proper }})
-                        {% endif %}
-                    </th>
-                </tr>
-            {% endif %}
-
         </tbody>
     </table>
 </div>

@@ -11,7 +11,7 @@ import locale from "@js/terminology/rosettaStone";
 import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import type { MarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
-import RrGridCapability from "./rm-grid-capability.vue";
+import RmGridCapability from "./rm-grid-capability.vue";
 import type { RubricGrid, RubricMarkedGrid, RubricMarkedGridCapability } from "./types";
 
 interface Props {
@@ -67,7 +67,7 @@ function findCapabilityMark(
                 </tr>
             </thead>
             <tbody>
-                <rr-grid-capability
+                <rm-grid-capability
                     v-for="capability in props.rubric.capabilities"
                     :key="capability.id"
                     :capability="capability"
@@ -92,10 +92,20 @@ function findCapabilityMark(
                     "
                 >
                     <th class="rb-final-summary" :colspan="props.rubric.levels.length + 2">
+                        <!-- TODO data-final-summary="{{ rubricId }}" -->
+                        <!-- TODO data-scaled-mark="{{ rubricScaledMark }}" -->
+                        <!-- TODO data-max="{{ rubricMax }}" -->
+                        <!-- TODO data-mark-type="{{ markType.mode }}" -->
                         {{ props.rubricMarkedGrid.humanReadableMark }}
 
                         <!-- Self-Assessment -->
                         <template v-if="props.selfAssessmentFeedback?.humanReadableMark">
+                            <!-- TODO: instructor mark type is used here... thanks past me -->
+                            <!--
+                            Although the student entered the mark using the display mark type,
+                            we show it here using the input mark type so that it matches what the instructor
+                            is currently entering so it can be easily compared.
+                            -->
                             {{ props.selfAssessmentFeedback.humanReadableMark }}
                             given in
                             {{ locale.selfAssessment.singular() }}

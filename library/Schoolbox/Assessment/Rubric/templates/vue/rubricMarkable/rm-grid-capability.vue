@@ -12,7 +12,7 @@ import type {
     RubricMarkedGridCapability,
     RubricMarkedGridIndicator,
 } from "./types";
-import RrGridIndicator from "./rm-grid-indicator.vue";
+import RmGridIndicator from "./rm-grid-indicator.vue";
 
 interface Props {
     capability: RubricGridCapability;
@@ -59,7 +59,7 @@ function findIndicatorMark(
         </th>
     </tr>
 
-    <rr-grid-indicator
+    <rm-grid-indicator
         v-for="indicator in props.capability.indicators"
         :key="indicator.id"
         :indicator="indicator"

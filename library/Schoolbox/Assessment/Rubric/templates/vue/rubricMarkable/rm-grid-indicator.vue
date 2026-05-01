@@ -6,7 +6,7 @@
 
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import type { RubricGridIndicator, RubricGridLevel, RubricMarkedGridIndicator } from "./types";
-import RrGridDescriptor from "./rm-grid-descriptor.vue";
+import RmGridDescriptor from "./rm-grid-descriptor.vue";
 
 interface Props {
     indicator: RubricGridIndicator;
@@ -24,7 +24,7 @@ const props = defineProps<Props>();
         <th class="rb-criterion-name markdown">{{ props.indicator.name }}</th>
 
         <template v-for="(level, index) in props.levels" :key="level.id">
-            <rr-grid-descriptor
+            <rm-grid-descriptor
                 v-if="props.indicator.descriptors[index] !== null"
                 :descriptor="props.indicator.descriptors[index]"
                 :indicator-mark="props.indicatorMark"
