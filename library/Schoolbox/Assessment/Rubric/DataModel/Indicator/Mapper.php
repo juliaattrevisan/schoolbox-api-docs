@@ -92,16 +92,16 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
-        $capabilityIds        = [];
+        $capabilityIds = [];
 
         /** @var CapabilityMapper $capabilityMapper */
-        $capabilityMapper     = $this->getJoinMapper('capability');
+        $capabilityMapper = $this->getJoinMapper('capability');
 
         /** @var NodeMapper $curriculumNodeMapper */
         $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_indicator');
 
         /** @var GenericCollection<Model> $collection */
-        $collection           = $this->createCollection();
+        $collection = $this->createCollection();
 
         foreach ($statement as $row) {
             /** @var Model $crit */
@@ -151,8 +151,9 @@ class Mapper extends BaseMapper
      *
      * @param Model $indicator
      * @return bool
+     * @throws MapperException
      */
-    public function softDeleteDescriptors(Model $indicator)
+    public function softDeleteDescriptors(Model $indicator): bool
     {
         DescriptorMapper::getInstance()->deleteByColumn('rubric_indicator_id', $indicator->getId());
         return true;
@@ -169,12 +170,14 @@ class Mapper extends BaseMapper
      * @return bool
      * @throws MapperException
      */
-    public function deleteCapability(Model $indicator)
+    public function deleteCapability(Model $indicator): bool
     {
         $remaining = $this->countByColumn('rubric_capability_id', $indicator->getCapability()->getId());
+
         if (0 === $remaining) {
             $this->getJoinMapper('capability')->delete($indicator->getCapability());
         }
+
         return true;
     }
 
@@ -187,11 +190,12 @@ class Mapper extends BaseMapper
      * @param Model $indicator
      * @return bool
      */
-    public function restoreCapability(Model $indicator)
+    public function restoreCapability(Model $indicator): bool
     {
         if ($indicator->getCapability()->isDeleted()) {
             $this->getJoinMapper('capability')->restoreSoftDeleted($indicator->getCapability());
         }
+
         return true;
     }
 
@@ -402,9 +406,9 @@ class Mapper extends BaseMapper
         // Get a capability under which this indicator should be created
         $capability = $capabilityMapper->findOrCreateOneForParentByName($parentId, $parentType, $capabilityName, $cache, $capabilityCurriculumNodes);
         $indicator  = $this->createModel()
-                           ->setCapability($capability)
-                           ->setName($name)
-                           ->setCurriculumNodes($indicatorCurriculumNodes);
+            ->setCapability($capability)
+            ->setName($name)
+            ->setCurriculumNodes($indicatorCurriculumNodes);
 
         $this->save($indicator);
 

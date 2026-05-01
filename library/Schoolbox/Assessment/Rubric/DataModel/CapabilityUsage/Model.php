@@ -18,8 +18,11 @@ class Model
 {
     /**
      * Capability sequence is 1-based, not 0-based
+     *
+     * (why does this matter tho? The machine doesn't care, so a human must - somewhere...)
      */
     public const int SEQUENCE_BASE = 1;
+
 
     /**
      * @var CapabilityModel

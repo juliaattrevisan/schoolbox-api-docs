@@ -228,6 +228,7 @@ class Mapper extends BaseMapper
                 return $capability;
             }
         }
+
         return null;
     }
 
@@ -285,10 +286,10 @@ class Mapper extends BaseMapper
 
         // Couldn't find. Create one
         $item = $this->createModel()
-                     ->setParentId($parentId)
-                     ->setParentType($parentType)
-                     ->setName($name)
-                     ->setCurriculumNodes($curriculumNodes);
+            ->setParentId($parentId)
+            ->setParentType($parentType)
+            ->setName($name)
+            ->setCurriculumNodes($curriculumNodes);
 
         $this->save($item);
 

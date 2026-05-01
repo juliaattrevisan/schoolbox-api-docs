@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Assessment\Rubric\DataModel\Level;
 
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;

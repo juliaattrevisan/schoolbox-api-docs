@@ -150,6 +150,7 @@ class Mapper extends BaseMapper
         ";
 
         $statement = $this->getDatabase()->prepare($query);
+
         $statement->execute([
             'indicatorId' => $indicatorId
         ]);
@@ -187,7 +188,9 @@ class Mapper extends BaseMapper
             INNER JOIN {$this->getJoinSql('indicator', 'riu', 'rc')}
             WHERE rc.rubric_capability_id = :capabilityId
         ";
+
         $statement = $this->getDatabase()->prepare($query);
+
         $statement->execute([
             'capabilityId' => $capabilityId
         ]);
@@ -210,7 +213,7 @@ class Mapper extends BaseMapper
      * @param object $previous
      * @return bool
      */
-    protected function raiseNotification($object, $verb, $previous = null)
+    protected function raiseNotification($object, $verb, $previous = null): bool
     {
         return true;
     }

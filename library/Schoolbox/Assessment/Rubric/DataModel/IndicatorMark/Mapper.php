@@ -166,14 +166,19 @@ class Mapper extends BaseMapper
      */
     public function deleteFeedbackMarks($returnId): int
     {
+        /* TODO replace with an iteration through all grids associated with a feedback
+         *  -- or, supply a particular rubric instance identifier to operate on instead.
+         *  I can't really tell how we'll end up (re)using this method atm
+         */
         $query = "
-            DELETE     rdm
-            FROM       rubric_indicator_mark rdm
-            INNER JOIN rubric_capability_mark rgm on rdm.rubric_capability_mark_id = rgm.id
-            WHERE      rgm.return_id = :return_id;
+            DELETE     rim
+            FROM       rubric_indicator_mark rim
+            INNER JOIN rubric_capability_mark rcm on rim.rubric_capability_mark_id = rcm.id
+            WHERE      rcm.return_id = :return_id;
         ";
 
         $statement = $this->database->prepare($query);
+
         $statement->execute([
             'return_id' => $returnId,
         ]);
@@ -217,17 +222,21 @@ class Mapper extends BaseMapper
             GROUP BY sr.owner
         ";
         $stmt  = $this->database->prepare($query);
+
         $stmt->execute([
             'assessment_id_1' => $assessment_id,
             'assessment_id_2' => $assessment_id,
             'review_route_1'  => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR,
             'review_route_2'  => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR,
         ]);
-        $rowset      = $stmt->fetchAll();
+
+        $rowset = $stmt->fetchAll();
         $rubricMarks = [];
+
         foreach ($rowset as $row) {
             $rubricMarks[$row['student_id']] = true;
         }
+
         return $rubricMarks;
     }
 

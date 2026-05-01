@@ -16,7 +16,7 @@ class Model
      * Maximum length of a rubric result set label as used in Admin > LMS > Rubrics
      *
      * The schema currently says 1024 chars, but we found that some multibyte
-     * chars or other nonprintables take up extra bytes and can bust the limit
+     * chars or other non-printable chars take up extra bytes and can bust the limit
      * somewhat inadvertently - we give them a few extra chars as a buffer for that
      */
     public const int LABEL_MAXLENGTH = 900;

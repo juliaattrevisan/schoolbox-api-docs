@@ -174,10 +174,9 @@ class DataSource
      */
     public function __construct()
     {
-        $this->database = Factory::getInstanceInternal();
-
-        /* We spawn singletons out of nowhere so we probably can't dependency inject these like we normally would
+        /* We spawn singletons out of nowhere so we probably can't dependency-inject these like we normally would
          */
+        $this->database = Factory::getInstanceInternal();
         $this->unitSpecificationMapper = UnitSpecificationMapper::getInstance();
         $this->rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
         $this->capabilityMapper = CapabilityMapper::getInstance();
@@ -544,13 +543,13 @@ class DataSource
             // TODO: check if setting to null when cloning is okay or not
             $descriptorId = $cloneNewRubric ? null : $descriptorModel->getId();
 
-            $descriptor  = (new \Schoolbox\Assessment\Rubric\Grid\Descriptor())
+            $descriptor = (new \Schoolbox\Assessment\Rubric\Grid\Descriptor())
                 ->setId($descriptorId)
                 ->setDescription($descriptorModel->getDescription())
                 ->setMaxValue($descriptorModel->getMaxValue());
 
             $descriptorsByIndicator[$indicatorId][$levelId] = $descriptor;
-            $descriptorsByLevel[$levelId][$indicatorId]     = $descriptor;
+            $descriptorsByLevel[$levelId][$indicatorId] = $descriptor;
         }
 
 
@@ -558,7 +557,7 @@ class DataSource
         foreach ($levelModels as $levelModel) {
             $levelId = $cloneNewRubric ? null : $levelModel->getId();
             // TODO: check if setting to null when cloning is okay or not
-            $level   = (new \Schoolbox\Assessment\Rubric\Grid\Level())
+            $level = (new \Schoolbox\Assessment\Rubric\Grid\Level())
                 ->setId($levelId)
                 ->setName($levelModel->getName());
 
@@ -731,6 +730,7 @@ class DataSource
         // (Forgive me too for perpetuating this)
         /** @var RosettaStone $l10n */
         $l10n = \Schoolbox\Mapper::getDi()->get('l10n');
+
         $spec = new ValidRowSet(
             $l10n,
             $this->unitSpecificationMapper,
@@ -755,7 +755,7 @@ class DataSource
         $descriptorModels      = $this->descriptorMapper->createCollection();
         $capabilitySequence    = CapabilityUsageModel::SEQUENCE_BASE;
 
-        /* TODO this $submissionBox should be replaced by the rubric instance ids insted
+        /* TODO this $submissionBox should be replaced by the rubric instance ids instead
          */
         $this->indicatorUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
         $this->capabilityUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
@@ -1287,6 +1287,8 @@ class DataSource
             return;
         }
 
+        /* TODO this has to be agnostic to submission returns and due work in general.
+         */
         $sourceDescriptorMarks = $this->indicatorMarkMapper->findByColumn('c.return_id', $sourceReturnId);
 
         $destinationCapabilityMarks = $this->capabilityMarkMapper->createCollection();
@@ -1313,6 +1315,8 @@ class DataSource
                 $this->indicatorMarkMapper->createModel()
                     ->setCapabilityMark($destinationCapabilityMarks[$capabilityId])
                     ->setDescriptor($sourceDescriptor->getDescriptor())
+                    /* TODO For some reason this was disabled when I got here, but idk why
+                     */
                 //                    ->setSubmissionReturn($destinationReturn)
                     ->setValue($sourceDescriptor->getValue())
                     ->setValid($sourceDescriptor->isValid())
@@ -1335,13 +1339,17 @@ class DataSource
      */
     private function invalidateMarks(int $assessmentId): void
     {
+        /* TODO replace this whole return_id idea when we get up to reusing this method; I suspect that a particular
+         *  grid becomes invalid once you change something important about its setup. It probably doesn't require you to
+         *  update *ALL GRIDS* for a given assessment.
+         */
         $query = "
-            UPDATE     rubric_indicator_mark rdm
-            INNER JOIN rubric_capability_mark  rgm ON rdm.rubric_capability_mark_id = rgm.id
-            INNER JOIN submission_return       sr  ON rgm.return_id                 = sr.id
+            UPDATE     rubric_indicator_mark rim
+            INNER JOIN rubric_capability_mark  rcm ON rim.rubric_capability_mark_id = rcm.id
+            INNER JOIN submission_return       sr  ON rcm.return_id                 = sr.id
             INNER JOIN submission_box          sb  ON sr.box_id                     = sb.id
-            SET        rdm.valid = FALSE,
-                       rgm.valid = FALSE
+            SET        rim.valid = FALSE,
+                       rcm.valid = FALSE
             WHERE      sb.assessment_id = :assessmentId
         ";
 
@@ -1353,7 +1361,7 @@ class DataSource
      * A polymorphic method that uses a corresponding $mapper to delete indicator mark instances (or level instances)
      * From the set of models derived by findByColumnList($search), remove all of them except the ones in $exclude
      *
-     * Therefore $exclude thus contains the ones we want to keep, and we need to delete the rest.
+     * Therefore, $exclude thus contains the ones we want to keep, and we need to delete the rest.
      *
      * Hopefully this explanation saves you from having to figure out "the deletion of things that are not in the array
      * of items that shouldn't be deleted"..............)
@@ -1365,7 +1373,7 @@ class DataSource
      * @return bool
      * @throws MapperException
      */
-    protected function tidyUp(IMapper $mapper, array $search, array $exclude)
+    protected function tidyUp(IMapper $mapper, array $search, array $exclude): bool
     {
         return $mapper->delete(
             $mapper->findByColumnList($search)->filter(
@@ -1606,7 +1614,7 @@ class DataSource
      * @throws MapperException
      * @throws Deleted
      */
-    public function copyRubric(int $sourceAssessmentId, int $destinationAssessmentId, AssessmentContext $destinationContext)
+    public function copyRubric(int $sourceAssessmentId, int $destinationAssessmentId, AssessmentContext $destinationContext): bool
     {
         // TODO extract this entire monstrosity elsewhere
 
@@ -1877,6 +1885,10 @@ class DataSource
         $boxMapper = SubmissionBoxMapper::getInstance();
         $box = $boxMapper->findOneByColumn('assessment_id', $assessmentId);
 
+        /* TODO Replace with a grid identifier (rubric instance id).
+         *  You can probably provide the instance identifier instead of $assessmentId, but it might be worthwhile to
+         *  have both, so you can check that rubric_instance_id is indeed related to $assessmentId as a safety assertion
+         */
         $this->capabilityUsageMapper->deleteByColumn('submission_box_id', $box->getId());
         $this->indicatorUsageMapper->deleteByColumn('submission_box_id', $box->getId());
 
@@ -1919,6 +1931,8 @@ class DataSource
         // Step 1: figure out the due works in the term for the given folders
         $pb = new Builder($this->database->getQuoter(), '');
         $pb->in('rc.parent_id', $folderIds)
+            /* TODO This parent_type never varies. Why did options exist for it, but were never used?
+             */
            ->equals('rc.parent_type', CapabilityModel::PARENT_TYPE_CATEGORY)
            ->greaterThanOrEqualTo('a.due_date', $term->getStart()->getDatabase())
            ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
@@ -1947,7 +1961,7 @@ class DataSource
             INNER JOIN rubric_capability        rc ON rgu.rubric_capability_id = rc.id
             INNER JOIN assessment                a ON sb.assessment_id = a.id
             WHERE {$where}
-            ORDER BY sr.published_at ASC
+            ORDER BY sr.published_at
         ");
 
         $assessmentStatement->execute($pb->getParams());
@@ -2085,8 +2099,8 @@ class DataSource
         }
 
         $pb = new Builder($this->database->getQuoter(), '');
-        $pb->in('rg.parent_id', $parentIds)
-           ->equals('rg.parent_type', $parentType);
+        $pb->in('rc.parent_id', $parentIds)
+           ->equals('rc.parent_type', $parentType);
 
         $whereClause = implode(' AND ', $pb->getWhere());
 
@@ -2143,6 +2157,8 @@ class DataSource
 
         $where = implode(' AND ', $pb->getWhere());
 
+        /* TODO tis submission_return idea must go away here
+         */
         $feedbackStatement = $this->database->prepare("
             SELECT
                 sr.id    AS feedbackId,

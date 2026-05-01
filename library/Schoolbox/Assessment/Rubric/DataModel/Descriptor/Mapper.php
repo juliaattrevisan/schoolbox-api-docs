@@ -73,7 +73,7 @@ class Mapper extends Schoolbox\Mapper
     /**
      * Ensure that if we restore a descriptor, its level does not remain deleted.
      *
-     * This is required because deletion of a indicator may have triggered deletion
+     * This is required because deletion of an indicator may have triggered deletion
      * of the last descriptor in a level. If we restore that indicator, it will restore
      * the descriptor, which should restore the level.
      *
