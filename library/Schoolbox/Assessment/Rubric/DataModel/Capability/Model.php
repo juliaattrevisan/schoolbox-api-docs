@@ -76,9 +76,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @var GenericCollection<IndicatorModel>
+     * @var null|GenericCollection<IndicatorModel>
      */
-    private GenericCollection $indicators;
+    private ?GenericCollection $indicators;
 
 
     /**
@@ -142,7 +142,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return IndicatorModel[]|GenericCollection
+     * @return null|GenericCollection<IndicatorModel>
      */
     public function getIndicators(): ?GenericCollection
     {
