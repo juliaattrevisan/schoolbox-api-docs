@@ -261,6 +261,48 @@ class EportfolioStrategyTest extends TestCase
         $this->assertStringContainsString('b.deleted_at IS NULL OR b.deleted_at >= :old_blog', $sql);
     }
 
+    public function testIndependentlyDeletedChildrenAreRemovedWithoutDeletingExternalTables(): void
+    {
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy();
+
+        $this->deleteChunk($strategy, [
+            ['table' => self::TABLE_BLOG_COMMENT, 'id' => 30],
+            ['table' => self::TABLE_BLOG_IMAGE, 'id' => 40],
+            ['table' => self::TABLE_FILELIST_ITEM, 'id' => 50],
+        ]);
+
+        $this->assertSame(
+            [
+                ['method' => 'ids', 'table' => self::TABLE_BLOG_COMMENT, 'column' => 'id', 'ids' => [30]],
+                ['method' => 'ids', 'table' => self::TABLE_BLOG_IMAGE, 'column' => 'id', 'ids' => [40]],
+                ['method' => 'ids', 'table' => self::TABLE_FILELIST_ITEM, 'column' => 'id', 'ids' => [50]],
+            ],
+            $state->operations,
+        );
+
+        $tables = array_column($state->operations, 'table');
+        $this->assertNotContains('my_file', $tables);
+        $this->assertNotContains('storage', $tables);
+    }
+
+    public function testIndependentlyDeletedBlogRemovesItsChildrenBeforeTheBlog(): void
+    {
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy();
+
+        $this->deleteChunk($strategy, [
+            ['table' => self::TABLE_BLOG, 'id' => 20],
+        ]);
+
+        $this->assertSame(
+            [
+                ['method' => 'foreign', 'table' => self::TABLE_BLOG_COMMENT, 'column' => 'blog_id', 'ids' => [20]],
+                ['method' => 'foreign', 'table' => self::TABLE_BLOG_IMAGE, 'column' => 'blog_id', 'ids' => [20]],
+                ['method' => 'ids', 'table' => self::TABLE_BLOG, 'column' => 'id', 'ids' => [20]],
+            ],
+            $state->operations,
+        );
+    }
+
     public function testEligiblePageCascadeDeletesChildrenBeforePage(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy();
@@ -345,6 +387,31 @@ class EportfolioStrategyTest extends TestCase
                     'column' => 'page_id',
                     'ids' => [10],
                 ],
+            ],
+            $state->operations,
+        );
+    }
+
+    public function testMixedChunksDeleteIndependentChildrenBeforePageCascade(): void
+    {
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy();
+
+        $this->deleteChunk($strategy, [
+            ['table' => self::TABLE_PAGE, 'id' => 10],
+            ['table' => self::TABLE_BLOG_COMMENT, 'id' => 30],
+            ['table' => self::TABLE_BLOG_IMAGE, 'id' => 40],
+            ['table' => self::TABLE_FILELIST_ITEM, 'id' => 50],
+        ]);
+
+        $this->assertSame(
+            [
+                ['method' => 'ids', 'table' => self::TABLE_BLOG_COMMENT, 'column' => 'id', 'ids' => [30]],
+                ['method' => 'ids', 'table' => self::TABLE_BLOG_IMAGE, 'column' => 'id', 'ids' => [40]],
+                ['method' => 'ids', 'table' => self::TABLE_FILELIST_ITEM, 'column' => 'id', 'ids' => [50]],
+                ['method' => 'foreign', 'table' => self::TABLE_BLOG, 'column' => 'page_id', 'ids' => [10]],
+                ['method' => 'foreign', 'table' => self::TABLE_FILELIST_ITEM, 'column' => 'page_id', 'ids' => [10]],
+                ['method' => 'foreign', 'table' => self::TABLE_PERMISSION, 'column' => 'page_id', 'ids' => [10]],
+                ['method' => 'ids', 'table' => self::TABLE_PAGE, 'column' => 'page_id', 'ids' => [10]],
             ],
             $state->operations,
         );

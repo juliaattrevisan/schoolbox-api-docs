@@ -87,15 +87,45 @@ class Eportfolio extends Base
     {
         $targetIds = $this->groupTargetIdsByTable($chunk);
         $pageIds = $targetIds[self::TABLE_EPORTFOLIO_PAGE] ?? [];
-
-        if ($pageIds === []) {
-            return;
-        }
+        $blogIds = $targetIds[self::TABLE_EPORTFOLIO_COMPONENT_BLOG] ?? [];
+        $blogCommentIds = $targetIds[self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT] ?? [];
+        $blogImageIds = $targetIds[self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE] ?? [];
+        $fileListItemIds = $targetIds[self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM] ?? [];
 
         $componentInstanceIds = $this->findComponentInstanceIdsByPageIds($pageIds);
-        $blogIds = $this->findBlogIdsByPageIds($pageIds);
+        $pageBlogIds = $this->findBlogIdsByPageIds($pageIds);
         $deleted = [];
 
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
+            $this->deleteRowsByIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'id', $blogCommentIds),
+        );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
+            $this->deleteRowsByIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'id', $blogImageIds),
+        );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
+            $this->deleteRowsByIds(self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM, 'id', $fileListItemIds),
+        );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
+            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'blog_id', $blogIds),
+        );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
+            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'blog_id', $blogIds),
+        );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_BLOG,
+            $this->deleteRowsByIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG, 'id', $blogIds),
+        );
         $this->recordDeleted(
             $deleted,
             self::TABLE_COMPONENT_CONFIG_INSTANCE,
@@ -144,12 +174,12 @@ class Eportfolio extends Base
         $this->recordDeleted(
             $deleted,
             self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
-            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'blog_id', $blogIds),
+            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'blog_id', $pageBlogIds),
         );
         $this->recordDeleted(
             $deleted,
             self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
-            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'blog_id', $blogIds),
+            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'blog_id', $pageBlogIds),
         );
         $this->recordDeleted(
             $deleted,
