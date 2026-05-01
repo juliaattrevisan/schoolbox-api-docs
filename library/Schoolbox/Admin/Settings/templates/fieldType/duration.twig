@@ -2,6 +2,10 @@
     name:          string
     value:         string
     required:      bool
+    editable:      bool
+    min:           int (optional, default: 0)
+    max:           int (optional)
+    timeUnit:      'year'|'week'|'day'|'hour'|'minute' (optional, default: 'minute')
 #}
 {% extends '@settings/fieldTypeBase.twig' %}
 
@@ -28,12 +32,17 @@
         {# Hidden field that the below script keeps in sync with the user-entered value above #}
         class="hide"
         data-duration-field-value="{{ fieldId }}"
+        data-duration-field-unit="{{ timeUnit ?? 'minute' }}"
     >
 {% endblock %}
 
 {% block extraContent %}
     <script>
     (() => {
+        const durationUserInput = document.querySelector("[data-duration-field-input='{{ fieldId }}']");
+        const durationValueInput = document.querySelector("[data-duration-field-value='{{ fieldId }}']");
+        const durationUnit = durationValueInput.dataset.durationFieldUnit;
+
         /**
          * Available time units and their equivalent value in minutes for conversion.
          * The value here particularly relates to how the backend defines each unit
@@ -51,14 +60,20 @@
             { unit: "minute", value: 1 },
         ];
 
+        const durationUnitValue = timeUnits.find(({ unit }) => unit === durationUnit)?.value;
+        if (!durationUnitValue) {
+            console.error(`Invalid duration unit "${durationUnit}" for field "${durationValueInput.name}"`);
+            return;
+        }
+
         /**
-         * Converts an arbitrary time span to a duration in minutes relative to the current time
+         * Converts an arbitrary time span to a duration relative to the current time
          * Similar to how datepickers are able to parse "in 5 days", "tomorrow", "1 month", etc via alaress-datetime-picker.js
          * @param {string} userInput - The user input to parse (representing an arbitrary time span or date)
-         * @returns {number|false} - The duration in minutes, or null if the input is invalid
+         * @returns {number|false} - The parsed duration, or null if the input is invalid
          */
-        function normaliseDurationToMinutes(userInput) {
-            // If the user input is just a number, assume it's in minutes
+        function parseDurationInput(userInput) {
+            // If the user input is just a number, assume it's already in the configured unit
             if (/^-?\d+$/.test(userInput.trim())) {
                 return Math.abs(parseFloat(userInput.trim(), 10));
             }
@@ -79,35 +94,39 @@
                     future = future.subtract(diff, unit);
                     totalMinutes += diff * value;
                 }
-                console.log(`diff in ${unit}s: ${diff}, totalMinutes: ${totalMinutes}`);
             }
 
             // If the user entered a relative date in the past, e.g. "5 minutes ago", normalise the diff to be positive
-            return Math.abs(totalMinutes);
+            totalMinutes = Math.abs(totalMinutes);
+
+            // Convert to the configured unit, rounding up I suppose
+            return Math.ceil(totalMinutes / durationUnitValue);
         }
 
         /**
-         * Convert a quantity of minutes back into a human-readable time span (e.g. "1 hour 30 minutes")
-         * @param {number} minutes - The number of minutes to convert to a human-readable time span
+         * Convert a quantity of time back into a human-readable duration. (e.g. "1 hour 30 minutes")
+         * @param {number} value - The number to convert from, in the configured unit
          * @returns {string} - A human-readable time span
          */
-        function humanReadableDuration(minutes) {
+        function humanReadableDuration(value) {
             const readable = [];
 
-            let diff = minutes;
-            for (const { unit, value } of timeUnits) {
-                if (diff >= value) {
-                    const count = Math.floor(diff / value);
+            // convert the value back into minutes (the base unit) so it can be converted into the various time units again
+            let diffMinutes = value;
+            if (durationUnit !== "minute") {
+                diffMinutes = value * durationUnitValue;
+            }
+
+            for (const { unit, value: unitValue } of timeUnits) {
+                if (diffMinutes >= unitValue) {
+                    const count = Math.floor(diffMinutes / unitValue);
                     readable.push(`${count} ${unit}${count !== 1 ? "s" : ""}`);
-                    diff %= value;
+                    diffMinutes %= unitValue;
                 }
             }
 
             return readable.join(" ");
         }
-
-        const durationUserInput = document.querySelector("[data-duration-field-input='{{ fieldId }}']");
-        const durationValueInput = document.querySelector("[data-duration-field-value='{{ fieldId }}']");
 
         /**
          * When the user changes the duration input, update the hidden input with the normalised value and ensure it's >= 0
@@ -118,8 +137,8 @@
                 return;
             }
 
-            // normalise the user input to a duration in minutes, or false if invalid
-            const normalisedDuration = normaliseDurationToMinutes(durationUserInput.value);
+            // normalise the user input to the configured unit, or false if invalid
+            const normalisedDuration = parseDurationInput(durationUserInput.value);
 
             if (normalisedDuration === false) {
                 // alaress validate will handle this
