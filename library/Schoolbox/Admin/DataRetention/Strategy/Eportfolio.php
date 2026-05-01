@@ -20,20 +20,33 @@ class Eportfolio extends Base
 {
     protected string $retentionConfigKey = ConfigMapper::NAME_DATA_RETENTION_EPORTFOLIO;
 
+    /**
+     * The name of the ePortfolio module.
+     */
+    private const string COMPONENT_MODULE_EPORTFOLIO = 'eportfolio';
+
+    /**
+     * Direct-delete tables:
+     * (These tables have `deleted_at` columns, so rows can be directly targeted for hard-deletion.)
+     */
     private const string TABLE_EPORTFOLIO_PAGE = 'eportfolio_page';
+    private const string TABLE_EPORTFOLIO_COMPONENT_BLOG = 'eportfolio_component_blog';
+    private const string TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT = 'eportfolio_component_blog_comment';
+    private const string TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE = 'eportfolio_component_blog_image';
+    private const string TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM = 'eportfolio_component_filelist_item';
+
+    /**
+     * Cascade-delete tables:
+     * (These tables do not have `deleted_at` columns, so rows will only be hard-deleted
+     *  if they are ancestors of rows in tables with `deleted_at` columns.)
+     */
     private const string TABLE_COMPONENT_CONFIG_INSTANCE = 'component_config_instance';
     private const string TABLE_COMPONENT_INSTANCE = 'component_instance';
     private const string TABLE_EPORTFOLIO_COMPONENT_ADVANCEDLIST_ITEM = 'eportfolio_component_advancedlist_item';
     private const string TABLE_EPORTFOLIO_COMPONENT_BASICLIST_ITEM = 'eportfolio_component_basiclist_item';
     private const string TABLE_EPORTFOLIO_COMPONENT_LINKLIST_ITEM = 'eportfolio_component_linklist_item';
     private const string TABLE_EPORTFOLIO_COMPONENT_TEXTBOX_ITEM = 'eportfolio_component_textbox_item';
-    private const string TABLE_EPORTFOLIO_COMPONENT_BLOG = 'eportfolio_component_blog';
-    private const string TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT = 'eportfolio_component_blog_comment';
-    private const string TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE = 'eportfolio_component_blog_image';
-    private const string TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM = 'eportfolio_component_filelist_item';
     private const string TABLE_EPORTFOLIO_PERMISSION = 'eportfolio_permission';
-
-    private const string COMPONENT_MODULE_EPORTFOLIO = 'eportfolio';
 
     /**
      * @inheritDoc
@@ -62,6 +75,7 @@ class Eportfolio extends Base
         }
 
         $counts = $this->fetchRows(
+            // Note there is one `SELECT COUNT(*)` query for each of the 'direct-delete' tables defined at the top of this class.
             "
             SELECT
                 (SELECT COUNT(*) FROM " . self::TABLE_EPORTFOLIO_PAGE . " p
