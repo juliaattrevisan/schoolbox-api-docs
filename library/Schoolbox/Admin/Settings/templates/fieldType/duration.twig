@@ -64,7 +64,7 @@
             }
 
             const now = dayjs();
-            let future = dayjs.parseNatural(userInput);
+            let future = dayjs.parseNatural(userInput, now);
 
             if (future === false) {
                 return false; // invalid input
