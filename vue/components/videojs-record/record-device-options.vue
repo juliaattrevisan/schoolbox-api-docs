@@ -65,8 +65,9 @@ export default {
                                 type="radio"
                                 name="video-device"
                                 :id="`${device.deviceId}`"
+                                :value="device.deviceId"
                                 :checked="device.deviceId === currentDeviceId"
-                                @click.prevent="onDeviceSelected(device.deviceId)"
+                                @change="onDeviceSelected(device.deviceId)"
                             /><label :for="`${device.deviceId}`">{{ device.label }}</label>
                         </li>
                     </ul>
