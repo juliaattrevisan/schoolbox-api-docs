@@ -487,4 +487,46 @@ class EportfolioStrategyTest extends TestCase
             $state->operations,
         );
     }
+
+    public function testHasDataToDeleteReturnsFalseWhenNoEligibleRowsExist(): void
+    {
+        ['strategy' => $strategy] = $this->strategy([
+            [[
+                'pages' => 0,
+                'blogs' => 0,
+                'blog_comments' => 0,
+                'blog_images' => 0,
+                'filelist_items' => 0,
+            ]],
+        ]);
+
+        $hasData = \Closure::bind(
+            fn(): bool => $this->hasDataToDelete(),
+            $strategy,
+            Eportfolio::class,
+        );
+
+        $this->assertFalse($hasData());
+    }
+
+    public function testHasDataToDeleteReturnsTrueWhenAnyEligibleRowsExist(): void
+    {
+        ['strategy' => $strategy] = $this->strategy([
+            [[
+                'pages' => 1,
+                'blogs' => 0,
+                'blog_comments' => 0,
+                'blog_images' => 0,
+                'filelist_items' => 0,
+            ]],
+        ]);
+
+        $hasData = \Closure::bind(
+            fn(): bool => $this->hasDataToDelete(),
+            $strategy,
+            Eportfolio::class,
+        );
+
+        $this->assertTrue($hasData());
+    }
 }

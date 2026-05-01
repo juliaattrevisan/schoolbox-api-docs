@@ -56,7 +56,61 @@ class Eportfolio extends Base
      */
     protected function hasDataToDelete(): bool
     {
-        return false;
+        $old = $this->calculateDate();
+        if ($old === null) {
+            return false;
+        }
+
+        $counts = $this->fetchRows(
+            "
+            SELECT
+                (SELECT COUNT(*) FROM " . self::TABLE_EPORTFOLIO_PAGE . " p
+                    WHERE p.deleted_at IS NOT NULL AND p.deleted_at < :old_page_root) AS pages,
+                (SELECT COUNT(*) FROM " . self::TABLE_EPORTFOLIO_COMPONENT_BLOG . " b
+                    INNER JOIN " . self::TABLE_EPORTFOLIO_PAGE . " p ON p.page_id = b.page_id
+                    WHERE b.deleted_at IS NOT NULL AND b.deleted_at < :old_blog
+                      AND (p.deleted_at IS NULL OR p.deleted_at >= :old_blog_page)) AS blogs,
+                (SELECT COUNT(*) FROM " . self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT . " c
+                    INNER JOIN " . self::TABLE_EPORTFOLIO_COMPONENT_BLOG . " b ON b.id = c.blog_id
+                    INNER JOIN " . self::TABLE_EPORTFOLIO_PAGE . " p ON p.page_id = b.page_id
+                    WHERE c.deleted_at IS NOT NULL AND c.deleted_at < :old_comment
+                      AND (b.deleted_at IS NULL OR b.deleted_at >= :old_comment_blog)
+                      AND (p.deleted_at IS NULL OR p.deleted_at >= :old_comment_page)) AS blog_comments,
+                (SELECT COUNT(*) FROM " . self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE . " i
+                    INNER JOIN " . self::TABLE_EPORTFOLIO_COMPONENT_BLOG . " b ON b.id = i.blog_id
+                    INNER JOIN " . self::TABLE_EPORTFOLIO_PAGE . " p ON p.page_id = b.page_id
+                    WHERE i.deleted_at IS NOT NULL AND i.deleted_at < :old_image
+                      AND (b.deleted_at IS NULL OR b.deleted_at >= :old_image_blog)
+                      AND (p.deleted_at IS NULL OR p.deleted_at >= :old_image_page)) AS blog_images,
+                (SELECT COUNT(*) FROM " . self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM . " f
+                    LEFT JOIN " . self::TABLE_EPORTFOLIO_PAGE . " p ON p.page_id = f.page_id
+                    WHERE f.deleted_at IS NOT NULL AND f.deleted_at < :old_filelist_item
+                      AND (p.page_id IS NULL OR p.deleted_at IS NULL OR p.deleted_at >= :old_filelist_page)) AS filelist_items
+        ",
+            [
+                'old_page_root' => $old,
+                'old_blog' => $old,
+                'old_blog_page' => $old,
+                'old_comment' => $old,
+                'old_comment_blog' => $old,
+                'old_comment_page' => $old,
+                'old_image' => $old,
+                'old_image_blog' => $old,
+                'old_image_page' => $old,
+                'old_filelist_item' => $old,
+                'old_filelist_page' => $old,
+            ],
+        )[0] ?? [];
+
+        $hasData = false;
+
+        foreach (['pages', 'blogs', 'blog_comments', 'blog_images', 'filelist_items'] as $key) {
+            $count = (int) ($counts[$key] ?? 0);
+            $this->log->info(sprintf("Found '%s' ePortfolio %s to delete", $count, $key));
+            $hasData = $hasData || $count > 0;
+        }
+
+        return $hasData;
     }
 
     /**
