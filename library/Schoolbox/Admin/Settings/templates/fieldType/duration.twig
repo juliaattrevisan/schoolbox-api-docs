@@ -9,6 +9,7 @@
 #}
 {% extends '@settings/fieldTypeBase.twig' %}
 
+{% set required = true %}
 {% set fieldId = name ~ '-field' %}
 
 {% block inputElement %}
@@ -151,6 +152,7 @@
             $(durationValueInput).valid(); // make alaressValidate notice the change
         }
 
+        durationUserInput.addEventListener("change", onDurationChanged);
         durationUserInput.addEventListener("blur", onDurationChanged);
         onDurationChanged(); // set the initial value
 
