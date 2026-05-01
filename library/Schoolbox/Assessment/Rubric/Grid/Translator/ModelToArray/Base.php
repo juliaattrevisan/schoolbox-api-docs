@@ -10,10 +10,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid\Translator\ModelToArray;
 
+use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\Assessment\Rubric\Grid\Level;
-use Schoolbox\Assessment\Rubric\RowSet\Capability;
-use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 
 /**
  * Translator for converting a Rubric Grid into an array representation,
@@ -33,8 +33,8 @@ class Base
     public function __invoke(Grid $rubricGrid): array
     {
         $capabilities = [];
-        foreach ($rubricGrid->iterateCapabilities() as $capability) {
-            $capabilities[] = $this->translateCapability($rubricGrid, $capability);
+        foreach ($rubricGrid->getCapabilityUsages() as $capabilityUsage) {
+            $capabilities[] = $this->translateCapabilityUsage($rubricGrid, $capabilityUsage);
         }
 
         return [
@@ -54,14 +54,16 @@ class Base
      * Translate a given capability on a rubric grid into an array, including its indicators and their descriptors.
      *
      * @param Grid $rubricGrid
-     * @param Capability $capability
+     * @param CapabilityUsage $capabilityUsage
      * @return array
      */
-    public function translateCapability(Grid $rubricGrid, Capability $capability): array
+    public function translateCapabilityUsage(Grid $rubricGrid, CapabilityUsage $capabilityUsage): array
     {
+        $capability = $capabilityUsage->getCapability();
+
         $indicators = [];
-        foreach ($rubricGrid->iterateIndicators($capability) as $indicator) {
-            $indicators[] = $this->translateIndicator($rubricGrid, $indicator);
+        foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
+            $indicators[] = $this->translateIndicatorUsage($rubricGrid, $indicatorUsage);
         }
 
         return [
@@ -78,18 +80,24 @@ class Base
      * with empty data, as the index must be preserved to link levels to descriptors in the frontend.
      *
      * @param Grid $rubricGrid
-     * @param Indicator $indicator
+     * @param IndicatorUsage $indicatorUsage
      * @return array
      */
-    public function translateIndicator(Grid $rubricGrid, Indicator $indicator): array
+    public function translateIndicatorUsage(Grid $rubricGrid, IndicatorUsage $indicatorUsage): array
     {
-        $indicatorUsage = $rubricGrid->retrieveIndicatorUsage($indicator);
+        $indicator = $indicatorUsage->getIndicator();
 
         $descriptors = [];
         foreach ($rubricGrid->getLevels() as $levelIndex => $level) {
-            $descriptor = $indicatorUsage?->retrieveDescriptor($levelIndex);
+            $descriptor = $indicatorUsage->retrieveDescriptor($levelIndex);
 
-            $descriptors[] = $descriptor === null ? null : [
+            if ($descriptor === null) {
+                // descriptors are always indexed by labelIndex, must preserve them even if they don't exist
+                $descriptors[] = null;
+                continue;
+            }
+
+            $descriptors[] = [
                 'id' => $descriptor->getId(),
                 'description' => $descriptor->getDescription(),
             ];
