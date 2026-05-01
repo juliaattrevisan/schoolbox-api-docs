@@ -404,6 +404,22 @@ class EportfolioStrategyTest extends TestCase
         );
     }
 
+    public function testCascadeFromTargetedPageDoesNotTouchSiblingPage(): void
+    {
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy();
+        $state->pageBlogIds = [10 => [301], 11 => [302]];
+        $state->pageComponentInstanceIds = [10 => [501], 11 => [502]];
+
+        $this->deleteChunk($strategy, [
+            ['table' => self::TABLE_PAGE, 'id' => 10],
+        ]);
+
+        $allIds = array_merge(...array_map(fn(array $op): array => $op['ids'], $state->operations));
+        $this->assertNotContains(11, $allIds);
+        $this->assertNotContains(302, $allIds);
+        $this->assertNotContains(502, $allIds);
+    }
+
     public function testMixedChunksDeleteIndependentChildrenBeforePageCascade(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy();
