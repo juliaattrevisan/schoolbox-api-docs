@@ -28,12 +28,9 @@ class Base
 {
     /**
      * @param bool $showPoints the value of config.rubricShowPoints
-     * @param bool $showDescriptorValue whether points should be shown alongside descriptors, note there is also a
-     *                                  config setting that also controls this, false for self-reflections
      */
     public function __construct(
         private bool $showPoints,
-        private bool $showDescriptorValue,
     ) {
     }
 
@@ -113,7 +110,6 @@ class Base
             if (
                 $descriptor->hasValue() &&
                 $rubricGrid->showDescriptorValue() &&
-                $this->showDescriptorValue &&
                 $this->showPoints
             ) {
                 $value = $rubricGrid->isUseMarkRange()

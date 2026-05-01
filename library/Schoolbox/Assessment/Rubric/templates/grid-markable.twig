@@ -18,7 +18,7 @@
 {% set rubricId = 'rb-' ~ rubricGrid.assessment.id %}
 {% set markScheme = selfAssess or studentView ? rubricGrid.assessment.markScheme : rubricGrid.assessment.instructorMarkScheme %}
 {% set markType = markScheme.generateContext %}
-{% set showDescriptorValue = showDescriptorValue ? true : false %}
+{% set showDescriptorValue = not selfReflect %}
 {% set showGroupTotal = showGroupTotal ? true : false %}
 {% set showRubricTotal = showRubricTotal ? true : false %}
 

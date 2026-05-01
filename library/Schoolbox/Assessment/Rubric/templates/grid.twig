@@ -10,8 +10,6 @@
  #                              This is false for student views, but true for staff views
  # * showGroupTotal:          ? Whether to show group totals at the bottom of each capability, can be inferred from
                                     (assessment.markPerCapability)
- # * showDescriptorValue:     ? Whether points should be shown alongside descriptors, note there is also a config setting
-                                that also controls this, false for self-reflections
  #}
 
 {% set showPoints = config.rubric_show_points %}
@@ -19,9 +17,9 @@
 
 <div data-vue-app="rubric-grid">
     <rubric-grid
-        :rubric="{{ rubricGrid.toArray(showPoints, showDescriptorValue)|json_encode }}"
-        :rubric-marked-grid="{{ (rubricMarkedGrid ? rubricMarkedGrid.toArray(USER, showPoints, showDescriptorValue) : null)|json_encode }}"
-        :self-assessment-feedback="{{ (selfAssessmentMarkedGrid ? selfAssessmentMarkedGrid.toArray(USER, showPoints, showDescriptorValue) : null)|json_encode }}"
+        :rubric="{{ rubricGrid.toArray(showPoints)|json_encode }}"
+        :rubric-marked-grid="{{ (rubricMarkedGrid ? rubricMarkedGrid.toArray(USER, showPoints) : null)|json_encode }}"
+        :self-assessment-feedback="{{ (selfAssessmentMarkedGrid ? selfAssessmentMarkedGrid.toArray(USER, showPoints) : null)|json_encode }}"
         :assessment-mark-scheme="{
             template: {{ rubricGrid.assessment.markScheme.template|json_encode }},
             context: {{ rubricGrid.assessment.markScheme.generateContext|json_encode }}

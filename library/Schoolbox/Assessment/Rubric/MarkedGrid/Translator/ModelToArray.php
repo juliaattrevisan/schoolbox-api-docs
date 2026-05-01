@@ -30,13 +30,10 @@ class ModelToArray
     /**
      * @param User $viewer the user viewing this marked grid, for permissions purposes
      * @param bool $showPoints the value of config.rubricShowPoints
-     * @param bool $showDescriptorValue whether points should be shown alongside descriptors, note there is also a
-     *                                  config setting that also controls this, false for self-reflections
      */
     public function __construct(
         private User $viewer,
         private bool $showPoints,
-        private bool $showDescriptorValue,
     ) {
     }
 
@@ -155,7 +152,6 @@ class ModelToArray
             'humanReadableMark' => (
                 $indicatorMark->getDescriptor()?->hasValue() &&
                 $markedGrid->getGrid()->showDescriptorValue() &&
-                $this->showDescriptorValue &&
                 $this->showPoints
             ) ? $humanReadableMark : null,
         ];

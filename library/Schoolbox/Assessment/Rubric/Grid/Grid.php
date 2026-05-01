@@ -444,11 +444,10 @@ class Grid
 
     /**
      * @param bool $showPoints
-     * @param bool $showDescriptorValue
      * @return array
      * @see /library/Schoolbox/Assessment/Rubric/templates/vue/types.ts RubricGrid
      */
-    public function toArray(bool $showPoints, bool $showDescriptorValue): array
+    public function toArray(bool $showPoints): array
     {
         // TODO: this shouldn't be the same as Translator/ModelToArray/Full.
         // figure out what's actually needed then narrow it down and figure out the best payload structure
@@ -459,10 +458,7 @@ class Grid
         // TODO: also check access to various things matches what we expect (particularly whether students can see mark info assuming there's cases when they shouldn't?)
 
         // TODO: injecting this stuff like this is quite unpleasant, let's review once it's at least working...
-        $rubricGridTranslator = new Translator\ModelToArray\Base(
-            $showPoints,
-            $showDescriptorValue
-        );
+        $rubricGridTranslator = new Translator\ModelToArray\Base($showPoints);
         return $rubricGridTranslator($this);
     }
 }

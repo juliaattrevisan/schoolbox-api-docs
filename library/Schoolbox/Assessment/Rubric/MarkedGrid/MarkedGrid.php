@@ -255,14 +255,12 @@ class MarkedGrid
     /**
      * @param User $viewer the user viewing this marked grid, for permissions purposes
      * @param bool $showPoints
-     * @param bool $showDescriptorValue
      * @return array
      * @see /library/Schoolbox/Assessment/Rubric/templates/vue/types.ts RubricMarkedGrid
      */
     public function toArray(
         User $viewer,
         bool $showPoints,
-        bool $showDescriptorValue
     ): array {
         // TODO: similar to Grid->jsonSerialize, this is not final and will be easier to figure out what needs
         // to be changed once we can see all the payloads for the builder/readonly/markable grids in action.
@@ -274,7 +272,6 @@ class MarkedGrid
         $rubricMarkedGridTranslator = new Translator\ModelToArray(
             $viewer,
             $showPoints,
-            $showDescriptorValue
         );
         return $rubricMarkedGridTranslator($this);
     }

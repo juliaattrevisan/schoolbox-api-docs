@@ -181,7 +181,6 @@ Usage:
                         <input name="fromInlineGrader" value="true" type="hidden"/>
 
                         {# Settings for the rubric grid #}
-                        {% set showDescriptorValue = true %}
                         {% set showGroupTotal = assessment.isMarkPerCapability %}
                         {% set showRubricTotal = true %}
                         {% set self = 'none' %}
@@ -201,7 +200,6 @@ Usage:
                                         selfAssessmentFeedback: selfAssessmentFeedback ?? null,
                                         learner: participant.user,
                                         markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
-                                        showDescriptorValue: showDescriptorValue,
                                         showGroupTotal: showGroupTotal,
                                         showRubricTotal: showRubricTotal,
                                         self: self,

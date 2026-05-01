@@ -40,8 +40,8 @@
     {% set descriptorHasMarkRange = rubricGrid.assessment.useMarkRange and descriptor.hasRange %}
 
     {# Just show a text value if the descriptor is not selected #}
-    {% if descriptor.hasValue and showDescriptorValue %}
-        <span class="rb-value {% if not descriptorHasMarkRange %}used {% elseif isDescriptorSelected %}hide{% endif %}">
+    {% if descriptor.hasValue and (showDescriptorValue ?? true) %}
+        <span class="rb-value">
             {% if descriptorHasMarkRange %}
                 {{ descriptor.retrieveLeftValue }}–{{ descriptor.retrieveRightValue }}
             {% else %}
