@@ -16,6 +16,25 @@ use PDO;
 use Schoolbox\Admin\DataRetention\ValidStrats;
 use Schoolbox\Config\ConfigMapper;
 
+/**
+ * Relationships between tables in the ePortfolio area:
+ *
+ *    eportfolio_page
+ *    ├── eportfolio_component_blog
+ *    │   ├── eportfolio_component_blog_comment
+ *    │   └── eportfolio_component_blog_image
+ *    ├── eportfolio_component_filelist_item
+ *    ├── eportfolio_permission
+ *    ├── component_instance
+ *    ├── component_config_instance
+ *    ├── eportfolio_component_advancedlist_item
+ *    ├── eportfolio_component_basiclist_item
+ *    ├── eportfolio_component_linklist_item
+ *    └── eportfolio_component_textbox_item
+ *
+ * Note there are no links from child rows back up to parents or grandparents.
+ * The tree will only ever be three levels deep.
+ */
 class Eportfolio extends Base
 {
     protected string $retentionConfigKey = ConfigMapper::NAME_DATA_RETENTION_EPORTFOLIO;
