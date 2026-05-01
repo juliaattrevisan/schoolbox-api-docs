@@ -127,6 +127,8 @@ class FieldStrategyFactory
                 return new FieldType\URI\Renderer();
             case ConfigMapper::FIELD_RANGE:
                 return new FieldType\Range\Renderer();
+            case ConfigMapper::FIELD_DURATION:
+                return new FieldType\Duration\Renderer();
         }
         throw new UnexpectedValueException("Unable to find a field renderer for config field '{$fieldId}'");
     }
@@ -160,6 +162,7 @@ class FieldStrategyFactory
             case ConfigMapper::FIELD_SELECT_DATE:
             case ConfigMapper::FIELD_JSON:
                 return new FieldValueSerializerBase();
+            case ConfigMapper::FIELD_DURATION:
             case ConfigMapper::FIELD_NUMBER: //this is only numbers, confirm int, and save (as string, as we do with all config values)
                 return new FieldType\Number\IntValueSerializer();
             case ConfigMapper::FIELD_SELECT_MULTI:

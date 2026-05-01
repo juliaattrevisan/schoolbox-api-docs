@@ -78,6 +78,7 @@ class ConfigMapper extends Mapper
     public const int FIELD_URI           = 19;
     public const int FIELD_RANGE         = 20;
     public const int FIELD_JSON          = 21;
+    public const int FIELD_DURATION      = 22;
 
     // Type enum
     public const int TYPE_SITE                        = 1;

@@ -1,0 +1,124 @@
+{#
+    name:          string
+    value:         string
+    required:      bool
+#}
+{% extends '@settings/fieldTypeBase.twig' %}
+
+{% set fieldId = name ~ '-field' %}
+
+{% block inputElement %}
+    <input
+        id="{{ fieldId }}"
+        type="text"
+        value="{{ value }}"
+        {% if not editable %}disabled="disabled"{% endif %}
+        data-duration-field-input="{{ fieldId }}"
+    />
+
+    <input
+        {{ required ? 'required ' }}
+        type="number"
+        inputmode="numeric"
+        name="{{ name }}"
+        value="{{ value }}"
+        {% if not editable %}disabled="disabled"{% endif %}
+        min="{{ min ?? 0 }}" {# enforce a minimum of 0 since negative durations don't make sense in this context #}
+        {% if max ?? false %}max="{{ max }}"{% endif %}
+        {# Hidden field that the below script keeps in sync with the user-entered value above #}
+        class="hide"
+        data-duration-field-value="{{ fieldId }}"
+    >
+{% endblock %}
+
+{% block extraContent %}
+    <script>
+    (() => {
+        /**
+         * Converts an arbitrary time span to a duration in minutes relative to the current time
+         * Similar to how datepickers are able to parse "in 5 days", "tomorrow", "1 month", etc via alaress-datetime-picker.js
+         * @param {string} userInput - The user input to parse (representing an arbitrary time span or date)
+         * @returns {number|false} - The duration in minutes, or null if the input is invalid
+         */
+        function normaliseDurationToMinutes(userInput) {
+            // If the user input is just a number, assume it's in minutes
+            if (/^-?\d+$/.test(userInput.trim())) {
+                return Math.abs(parseFloat(userInput.trim(), 10));
+            }
+
+            const now = dayjs();
+            let future = dayjs.parseNatural(userInput);
+
+            if (future === false) {
+                return false; // invalid input
+            }
+
+            // If it switches daylight savings, the diff will be off by an hour - so we need to offset that otherwise it'll keep increasing
+            const offsetDiff = future.utcOffset() - now.utcOffset();
+            future = future.add(offsetDiff, "minute");
+
+            // Get the difference in minutes between the normalised timestamp and now
+            // need to round to the nearest minute because it may be off by a fraction of a second
+            // If for some reason someone enters "5 minutes ago" or a date in the past, this will also normalise it to be positive
+            return Math.abs(Math.round(future.diff(now, "minute", true)));
+        }
+
+        /**
+         * Convert a quantity of minutes back into a human-readable time span (e.g. "1 hour 30 minutes")
+         * @param {number} minutes - The number of minutes to convert to a human-readable time span
+         * @returns {string} - A human-readable time span
+         */
+        function humanReadableDuration(minutes) {
+            const timeUnits = [
+                { unit: "week", value: 60 * 24 * 7 },
+                { unit: "day", value: 60 * 24 },
+                { unit: "hour", value: 60 },
+                { unit: "minute", value: 1 },
+            ];
+
+            let readable = [];
+            let diff = minutes;
+            for (const { unit, value } of timeUnits) {
+                if (diff >= value) {
+                    const count = Math.floor(diff / value);
+                    readable.push(`${count} ${unit}${count !== 1 ? "s" : ""}`);
+                    diff %= value;
+                }
+            }
+
+            return readable.join(" ");
+        }
+
+        const durationUserInput = document.querySelector("[data-duration-field-input='{{ fieldId }}']");
+        const durationValueInput = document.querySelector("[data-duration-field-value='{{ fieldId }}']");
+
+        /**
+         * When the user changes the duration input, update the hidden input with the normalised value and ensure it's >= 0
+         */
+        function onDurationChanged() {
+            if (durationUserInput.value === "") {
+                durationValueInput.value = "";
+                return;
+            }
+
+            // normalise the user input to a duration in minutes, or false if invalid
+            const normalisedDuration = normaliseDurationToMinutes(durationUserInput.value);
+
+            if (normalisedDuration === false) {
+                // alaress validate will handle this
+                durationValueInput.value = -1;
+            } else {
+                // update the hidden input with the normalised value
+                durationValueInput.value = normalisedDuration;
+                durationUserInput.value = humanReadableDuration(normalisedDuration);
+            }
+
+            $(durationValueInput).valid(); // make alaressValidate notice the change
+
+        }
+
+        durationUserInput.addEventListener("blur", onDurationChanged);
+        onDurationChanged(); // set the initial value
+    })();
+    </script>
+{% endblock %}
