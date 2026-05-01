@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Eportfolio - retain soft deleted data for a certain time
+ * Eportfolio - hard-delete soft deleted data older than a certain date
  *
  * @copyright Copyright 2026, Schoolbox Pty Ltd
  * @link      https://schoolbox.education/
