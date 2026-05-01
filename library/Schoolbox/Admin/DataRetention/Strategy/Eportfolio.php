@@ -195,155 +195,38 @@ class Eportfolio extends Base
         $pageCascadeBlogIds = array_values(array_diff($pageBlogIds, $blogIds));
         $deleted = [];
 
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
-            $this->deleteRowsByIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, $blogCommentIds),
-        );
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
-            $this->deleteRowsByForeignIds(
-                self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
-                'blog_id',
-                $blogIds,
-                $blogCommentIds,
-            ),
-        );
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
-            $this->deleteRowsByForeignIds(
-                self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
-                'blog_id',
-                $pageCascadeBlogIds,
-                $blogCommentIds,
-            ),
-        );
+        $this->deleteRowsByIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, $blogCommentIds);
+        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'blog_id', $blogIds, $blogCommentIds);
+        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'blog_id', $pageCascadeBlogIds, $blogCommentIds);
 
         // eportfolio_component_blog_image (grandchild of page, via blog)
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
-            $this->deleteRowsByIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, $blogImageIds),
-        );
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
-            $this->deleteRowsByForeignIds(
-                self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
-                'blog_id',
-                $blogIds,
-                $blogImageIds,
-            ),
-        );
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
-            $this->deleteRowsByForeignIds(
-                self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
-                'blog_id',
-                $pageCascadeBlogIds,
-                $blogImageIds,
-            ),
-        );
+        $this->deleteRowsByIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, $blogImageIds);
+        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'blog_id', $blogIds, $blogImageIds);
+        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'blog_id', $pageCascadeBlogIds, $blogImageIds);
 
         // eportfolio_component_blog (child of page)
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_BLOG,
-            $this->deleteRowsByIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG, $blogIds),
-        );
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_BLOG,
-            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG, 'page_id', $pageIds, $blogIds),
-        );
+        $this->deleteRowsByIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BLOG, $blogIds);
+        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BLOG, 'page_id', $pageIds, $blogIds);
 
         // eportfolio_component_filelist_item (child of page)
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
-            $this->deleteRowsByIds(self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM, $fileListItemIds),
-        );
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
-            $this->deleteRowsByForeignIds(
-                self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
-                'page_id',
-                $pageIds,
-                $fileListItemIds,
-            ),
-        );
+        $this->deleteRowsByIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM, $fileListItemIds);
+        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM, 'page_id', $pageIds, $fileListItemIds);
 
         // eportfolio_permission (child of page, cascade-delete only)
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_PERMISSION,
-            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_PERMISSION, 'page_id', $pageIds),
-        );
+        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_PERMISSION, 'page_id', $pageIds);
 
         // component_config_instance, list items (grandchildren of page, via component_instance, cascade-delete only)
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_COMPONENT_CONFIG_INSTANCE,
-            $this->deleteRowsByForeignIds(
-                self::TABLE_COMPONENT_CONFIG_INSTANCE,
-                'component_instance_id',
-                $componentInstanceIds,
-            ),
-        );
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_ADVANCEDLIST_ITEM,
-            $this->deleteRowsByForeignIds(
-                self::TABLE_EPORTFOLIO_COMPONENT_ADVANCEDLIST_ITEM,
-                'component_instance_id',
-                $componentInstanceIds,
-            ),
-        );
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_BASICLIST_ITEM,
-            $this->deleteRowsByForeignIds(
-                self::TABLE_EPORTFOLIO_COMPONENT_BASICLIST_ITEM,
-                'component_instance_id',
-                $componentInstanceIds,
-            ),
-        );
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_LINKLIST_ITEM,
-            $this->deleteRowsByForeignIds(
-                self::TABLE_EPORTFOLIO_COMPONENT_LINKLIST_ITEM,
-                'component_instance_id',
-                $componentInstanceIds,
-            ),
-        );
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_TEXTBOX_ITEM,
-            $this->deleteRowsByForeignIds(
-                self::TABLE_EPORTFOLIO_COMPONENT_TEXTBOX_ITEM,
-                'component_instance_id',
-                $componentInstanceIds,
-            ),
-        );
+        $this->deleteRowsByForeignIds($deleted, self::TABLE_COMPONENT_CONFIG_INSTANCE, 'component_instance_id', $componentInstanceIds);
+        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_ADVANCEDLIST_ITEM, 'component_instance_id', $componentInstanceIds);
+        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BASICLIST_ITEM, 'component_instance_id', $componentInstanceIds);
+        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_LINKLIST_ITEM, 'component_instance_id', $componentInstanceIds);
+        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_TEXTBOX_ITEM, 'component_instance_id', $componentInstanceIds);
 
         // component_instance (child of page, cascade-delete only)
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_COMPONENT_INSTANCE,
-            $this->deleteRowsByIds(self::TABLE_COMPONENT_INSTANCE, $componentInstanceIds),
-        );
+        $this->deleteRowsByIds($deleted, self::TABLE_COMPONENT_INSTANCE, $componentInstanceIds);
 
         // eportfolio_page (root)
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_PAGE,
-            $this->deleteRowsByIds(self::TABLE_EPORTFOLIO_PAGE, $pageIds, 'page_id'),
-        );
+        $this->deleteRowsByIds($deleted, self::TABLE_EPORTFOLIO_PAGE, $pageIds, 'page_id');
 
         $this->logChunkResult($deleted);
     }
@@ -443,14 +326,15 @@ class Eportfolio extends Base
     }
 
     /**
-     * Deletes rows from a table by primary key, returning the number of rows deleted.
+     * Deletes rows from a table by primary key and records the count.
      *
+     * @param array<string, int> $deleted
      * @param list<int> $ids
      */
-    protected function deleteRowsByIds(string $table, array $ids, string $column = 'id'): int
+    protected function deleteRowsByIds(array &$deleted, string $table, array $ids, string $column = 'id'): void
     {
         if ($ids === []) {
-            return 0;
+            return;
         }
 
         $placeholders = Builder::getArrayPlaceholders($ids, 'id');
@@ -459,19 +343,20 @@ class Eportfolio extends Base
         );
         $statement->execute(Builder::getArrayParameters($ids, 'id'));
 
-        return $statement->rowCount();
+        $this->recordDeleted($deleted, $table, $statement->rowCount());
     }
 
     /**
-     * Deletes rows from a table by foreign key, optionally excluding rows already deleted by a prior call.
+     * Deletes rows from a table by foreign key and records the count, optionally excluding rows already deleted by a prior call.
      *
+     * @param array<string, int> $deleted
      * @param list<int> $ids
      * @param list<int> $excludedIds
      */
-    protected function deleteRowsByForeignIds(string $table, string $column, array $ids, array $excludedIds = []): int
+    protected function deleteRowsByForeignIds(array &$deleted, string $table, string $column, array $ids, array $excludedIds = []): void
     {
         if ($ids === []) {
-            return 0;
+            return;
         }
 
         $placeholders = Builder::getArrayPlaceholders($ids, $column);
@@ -489,7 +374,7 @@ class Eportfolio extends Base
         );
         $statement->execute($parameters);
 
-        return $statement->rowCount();
+        $this->recordDeleted($deleted, $table, $statement->rowCount());
     }
 
     /**

@@ -125,12 +125,13 @@ class EportfolioStrategyTest extends TestCase
             }
 
             /**
+             * @param array<string, int> $deleted
              * @param list<int> $ids
              */
-            protected function deleteRowsByIds(string $table, string $column, array $ids): int
+            protected function deleteRowsByIds(array &$deleted, string $table, array $ids, string $column = 'id'): void
             {
                 if ($ids === []) {
-                    return 0;
+                    return;
                 }
 
                 $this->state->operations[] = [
@@ -139,22 +140,22 @@ class EportfolioStrategyTest extends TestCase
                     'column' => $column,
                     'ids' => $ids,
                 ];
-
-                return count($ids);
             }
 
             /**
+             * @param array<string, int> $deleted
              * @param list<int> $ids
              * @param list<int> $excludedIds
              */
             protected function deleteRowsByForeignIds(
+                array &$deleted,
                 string $table,
                 string $column,
                 array $ids,
                 array $excludedIds = [],
-            ): int {
+            ): void {
                 if ($ids === []) {
-                    return 0;
+                    return;
                 }
 
                 $operation = [
@@ -169,8 +170,6 @@ class EportfolioStrategyTest extends TestCase
                 }
 
                 $this->state->operations[] = $operation;
-
-                return count($ids);
             }
         };
 
@@ -216,9 +215,14 @@ class EportfolioStrategyTest extends TestCase
             ->method('refresh');
         $database->expects($this->never())
             ->method('beginTransaction');
-        $logger->expects($this->once())
-            ->method('notice')
-            ->with('No entries to delete');
+
+        $noticeMessages = [];
+        $logger->method('notice')
+            ->willReturnCallback(
+                static function (string|\Stringable $message) use (&$noticeMessages): void {
+                    $noticeMessages[] = (string)$message;
+                },
+            );
 
         $strategy = new Eportfolio(
             $logger,
@@ -231,6 +235,8 @@ class EportfolioStrategyTest extends TestCase
         );
 
         $strategy->process();
+
+        $this->assertContains('No entries to delete', $noticeMessages);
     }
 
     public function testCollectsRootDeleteTargetsByTable(): void
@@ -323,36 +329,6 @@ class EportfolioStrategyTest extends TestCase
             [
                 [
                     'method' => 'foreign',
-                    'table' => self::TABLE_COMPONENT_CONFIG_INSTANCE,
-                    'column' => 'component_instance_id',
-                    'ids' => [501, 502],
-                ],
-                [
-                    'method' => 'foreign',
-                    'table' => self::TABLE_ADVANCEDLIST_ITEM,
-                    'column' => 'component_instance_id',
-                    'ids' => [501, 502],
-                ],
-                [
-                    'method' => 'foreign',
-                    'table' => self::TABLE_BASICLIST_ITEM,
-                    'column' => 'component_instance_id',
-                    'ids' => [501, 502],
-                ],
-                [
-                    'method' => 'foreign',
-                    'table' => self::TABLE_LINKLIST_ITEM,
-                    'column' => 'component_instance_id',
-                    'ids' => [501, 502],
-                ],
-                [
-                    'method' => 'foreign',
-                    'table' => self::TABLE_TEXTBOX_ITEM,
-                    'column' => 'component_instance_id',
-                    'ids' => [501, 502],
-                ],
-                [
-                    'method' => 'foreign',
                     'table' => self::TABLE_BLOG_COMMENT,
                     'column' => 'blog_id',
                     'ids' => [301, 302],
@@ -380,6 +356,36 @@ class EportfolioStrategyTest extends TestCase
                     'table' => self::TABLE_PERMISSION,
                     'column' => 'page_id',
                     'ids' => [10],
+                ],
+                [
+                    'method' => 'foreign',
+                    'table' => self::TABLE_COMPONENT_CONFIG_INSTANCE,
+                    'column' => 'component_instance_id',
+                    'ids' => [501, 502],
+                ],
+                [
+                    'method' => 'foreign',
+                    'table' => self::TABLE_ADVANCEDLIST_ITEM,
+                    'column' => 'component_instance_id',
+                    'ids' => [501, 502],
+                ],
+                [
+                    'method' => 'foreign',
+                    'table' => self::TABLE_BASICLIST_ITEM,
+                    'column' => 'component_instance_id',
+                    'ids' => [501, 502],
+                ],
+                [
+                    'method' => 'foreign',
+                    'table' => self::TABLE_LINKLIST_ITEM,
+                    'column' => 'component_instance_id',
+                    'ids' => [501, 502],
+                ],
+                [
+                    'method' => 'foreign',
+                    'table' => self::TABLE_TEXTBOX_ITEM,
+                    'column' => 'component_instance_id',
+                    'ids' => [501, 502],
                 ],
                 [
                     'method' => 'ids',
@@ -413,8 +419,8 @@ class EportfolioStrategyTest extends TestCase
             [
                 ['method' => 'ids', 'table' => self::TABLE_BLOG_COMMENT, 'column' => 'id', 'ids' => [30]],
                 ['method' => 'ids', 'table' => self::TABLE_BLOG_IMAGE, 'column' => 'id', 'ids' => [40]],
-                ['method' => 'ids', 'table' => self::TABLE_FILELIST_ITEM, 'column' => 'id', 'ids' => [50]],
                 ['method' => 'foreign', 'table' => self::TABLE_BLOG, 'column' => 'page_id', 'ids' => [10]],
+                ['method' => 'ids', 'table' => self::TABLE_FILELIST_ITEM, 'column' => 'id', 'ids' => [50]],
                 [
                     'method' => 'foreign',
                     'table' => self::TABLE_FILELIST_ITEM,
@@ -445,8 +451,6 @@ class EportfolioStrategyTest extends TestCase
         $this->assertSame(
             [
                 ['method' => 'ids', 'table' => self::TABLE_BLOG_COMMENT, 'column' => 'id', 'ids' => [30]],
-                ['method' => 'ids', 'table' => self::TABLE_BLOG_IMAGE, 'column' => 'id', 'ids' => [40]],
-                ['method' => 'ids', 'table' => self::TABLE_FILELIST_ITEM, 'column' => 'id', 'ids' => [50]],
                 [
                     'method' => 'foreign',
                     'table' => self::TABLE_BLOG_COMMENT,
@@ -454,6 +458,7 @@ class EportfolioStrategyTest extends TestCase
                     'ids' => [20],
                     'excludedIds' => [30],
                 ],
+                ['method' => 'ids', 'table' => self::TABLE_BLOG_IMAGE, 'column' => 'id', 'ids' => [40]],
                 [
                     'method' => 'foreign',
                     'table' => self::TABLE_BLOG_IMAGE,
@@ -469,6 +474,7 @@ class EportfolioStrategyTest extends TestCase
                     'ids' => [10],
                     'excludedIds' => [20],
                 ],
+                ['method' => 'ids', 'table' => self::TABLE_FILELIST_ITEM, 'column' => 'id', 'ids' => [50]],
                 [
                     'method' => 'foreign',
                     'table' => self::TABLE_FILELIST_ITEM,
@@ -517,11 +523,11 @@ class EportfolioStrategyTest extends TestCase
     {
         ['strategy' => $strategy] = $this->strategy([
             [[
-                'pages' => 0,
-                'blogs' => 0,
-                'blog_comments' => 0,
-                'blog_images' => 0,
-                'filelist_items' => 0,
+                self::TABLE_PAGE => 0,
+                self::TABLE_BLOG => 0,
+                self::TABLE_BLOG_COMMENT => 0,
+                self::TABLE_BLOG_IMAGE => 0,
+                self::TABLE_FILELIST_ITEM => 0,
             ]],
         ]);
 
@@ -538,11 +544,11 @@ class EportfolioStrategyTest extends TestCase
     {
         ['strategy' => $strategy] = $this->strategy([
             [[
-                'pages' => 1,
-                'blogs' => 0,
-                'blog_comments' => 0,
-                'blog_images' => 0,
-                'filelist_items' => 0,
+                self::TABLE_PAGE => 1,
+                self::TABLE_BLOG => 0,
+                self::TABLE_BLOG_COMMENT => 0,
+                self::TABLE_BLOG_IMAGE => 0,
+                self::TABLE_FILELIST_ITEM => 0,
             ]],
         ]);
 
