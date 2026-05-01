@@ -22,7 +22,7 @@ use Schoolbox\Assessment\Rubric\Grid\Level;
  * Specifically only contains used capabilities/indicators/descriptors,
  * it's intended for the rubric viewer / feedback views
  *
- * @see /library/Schoolbox/Assessment/Rubric/templates/vue/rubricViewer/types.ts
+ * @see /library/Schoolbox/Assessment/Rubric/templates/vue/rubricMarkable/types.ts
  */
 class Base
 {
@@ -78,6 +78,7 @@ class Base
             'id' => $capability->getId(),
             'name' => $capability->getName(),
             'indicators' => $indicators,
+            'showCapabilityMark' => $rubricGrid->isCapabilityMarkShown($capability), // TODO: rubric-markable only, and check if it matters for perms
         ];
     }
 

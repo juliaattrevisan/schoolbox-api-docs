@@ -75,12 +75,7 @@ function findCapabilityMark(
                     :self-assessment-capability-mark="findCapabilityMark(capability.id, props.selfAssessmentFeedback)"
                     :levels="props.rubric.levels"
                     :participant-id="props.participantId"
-                    :show-summary-capability="
-                        props.showGroupTotal &&
-                        !!props.rubricMarkedGrid &&
-                        props.rubric.capabilityMarkType !== null &&
-                        props.rubric.capabilityMarkType !== MarkTypeSlug.NONE
-                    "
+                    :show-summary-capability="props.showGroupTotal && !!props.rubricMarkedGrid"
                 />
 
                 <!-- Overall Mark -->

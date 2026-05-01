@@ -11,6 +11,31 @@
  #                              Also depends if this is a self-reflection
  #}
 
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; background: var(--sbx-config-color-body-background, var(--body-background))"><div> {# TODO TEMP #}
+
+{% set showPoints = true %}
+{% set selfAssessmentMarkedGrid = selfAssessmentFeedback ? selfAssessmentFeedback.rubricMarkedGrid : null %}
+{% set markScheme = selfAssess or studentView ? rubricGrid.assessment.markScheme : rubricGrid.assessment.instructorMarkScheme %}
+
+<div data-vue-app="rubric-markable">
+    {# TODO: multiple rubrics, <rubric-markable> #}
+    <rubric-markable-grid
+        :rubric="{{ rubricGrid.toArray(showPoints)|json_encode }}"
+        :rubric-marked-grid="{{ (rubricMarkedGrid ? rubricMarkedGrid.toArray(USER, showPoints) : null)|json_encode }}"
+        :self-assessment-feedback="{{ (selfAssessmentMarkedGrid ? selfAssessmentMarkedGrid.toArray(USER, showPoints) : null)|json_encode }}"
+        :assessment-mark-scheme="{
+            template: {{ markScheme.template|json_encode }},
+            context: {{ markScheme.generateContext|json_encode }}
+        }"
+        :participant-id="{{ learner.id ?? 'null' }}"
+        {# TODO: these are signs of likely permission issues #}
+        {% if showRubricTotal ?? false %}show-rubric-total{% endif %}
+        {% if showGroupTotal ?? false %}show-group-total{% endif %}
+    />
+</div>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricMarkable.js?v={{ config.site_version }}"></script>
+
+</div><div> {# TODO TEMP #}
 
 {% import '@learningMarkScheme/macro/limitDecimal.twig' as limit_decimal %}
 
@@ -32,8 +57,6 @@
                  #}
                 {% set capabilityMark = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
 
-                {% set rowspan = groupUsage.indicatorUsages|length + (showGroupTotal and rubricGrid.isCapabilityMarkShown(groupUsage.capability) ? 1 : 0) %}
-
                 {% for critIndex, critUsage in groupUsage.indicatorUsages %}
                     {% set indicatorId   = critUsage.indicator.id %}
                     <tr
@@ -41,12 +64,6 @@
                         data-capability-id="{{ groupUsage.capability.id }}"
                         data-indicator-id="{{ indicatorId }}"
                     >
-                        {# yay html tables... -_-; #}
-                        {% if rowspan %}
-                            <th class="rb-group-name markdown" rowspan="{{ rowspan }}"><span>{{ groupUsage.capability.name | markdown }}</span></th>
-                            {% set rowspan = 0 %}
-                        {% endif %}
-
                         <th class="rb-criterion-name markdown">{{ critUsage.indicator.name | markdown }}</th>
 
                         {% set indicatorMark = rubricMarkedGrid
@@ -84,14 +101,14 @@
                     </tr>
                 {% endfor %}
 
-                {% include '@rubric/group-row-markable.twig' %}
-
             {% endfor %}
         </tbody>
     </table>
 </div>
 {# js specific to the rubric we just injected to...wherever we injected it #}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.dynagrade.js?v={{ config.site_version }}"></script>
+
+</div></div> {# TODO TEMP #}
 
 {% autoescape 'js' %}
 <script type="text/javascript">

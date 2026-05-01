@@ -54,8 +54,10 @@ function findIndicatorMark(
             class="rb-group-name markdown"
             :rowspan="props.capability.indicators.length + (showSummaryForThisCapability ? 2 : 1) /* header+summary */"
         >
-            <!-- TODO: should be scrubbed (markdown) and output as html -->
-            {{ props.capability.name }}
+            <span>
+                <!-- TODO: should be scrubbed (markdown) and output as html -->
+                {{ props.capability.name }}
+            </span>
         </th>
     </tr>
 

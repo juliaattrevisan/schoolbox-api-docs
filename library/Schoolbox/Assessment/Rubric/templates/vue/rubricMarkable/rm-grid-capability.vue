@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Add rows in the readonly rubric grid for a specific capability
+ * Add rows in the markable rubric grid for a specific capability
  * (also known as a "group" in the past)
  */
 
@@ -24,11 +24,10 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const componentId = window.Vue.useId();
+
 const showSummaryForThisCapability = window.Vue.computed(() => {
-    if (props.selfAssessmentCapabilityMark && props.selfAssessmentCapabilityMark.humanReadableMark !== null) {
-        return true;
-    }
-    return props.showSummaryCapability && props.capabilityMark && props.capabilityMark.humanReadableMark !== null;
+    return props.showSummaryCapability && props.capability.showCapabilityMark;
 });
 
 /**
@@ -54,8 +53,10 @@ function findIndicatorMark(
             class="rb-group-name markdown"
             :rowspan="props.capability.indicators.length + (showSummaryForThisCapability ? 2 : 1) /* header+summary */"
         >
-            <!-- TODO: should be scrubbed (markdown) and output as html -->
-            {{ props.capability.name }}
+            <span>
+                <!-- TODO: should be scrubbed (markdown) and output as html -->
+                {{ props.capability.name }}
+            </span>
         </th>
     </tr>
 
@@ -69,24 +70,49 @@ function findIndicatorMark(
         :participant-id="props.participantId"
     />
 
-    <!-- Capability mark: needs to be rendered in human-readable form, use the assessment's mark scheme to do so -->
     <tr v-if="showSummaryForThisCapability">
-        <!--
-        Capability Mark spans the following columns:
-            + N descriptors (equivalent to N levels)
-            + Indicator cell (always 1 cell)
-            = N + 1 cells colspan
-        (It does not span the capability cell itself)
-        -->
         <th class="rb-group-summary" :colspan="props.levels.length + 1 /* descriptors + indicator column */">
-            {{ props.capabilityMark?.humanReadableMark ?? "" }}
+            <!-- TODO: this span wrapper is probably unnecessary and solely for the old data attrs -->
+            <!-- TODO: data-group-summary="{{ rubricId }}-{{ capabilityId }}" -->
+            <!-- TODO: data-initial-configured-mark="{{ capabilityMark ? capabilityMark.value : null }}" -->
+            <!-- TODO: data-scaled-mark="{{ capabilityScaledMark }}" -->
+            <!-- TODO: data-max="{{ capabilityMaxValue }}" -->
+            <!-- TODO: data-row-max-sum="{{ capabilityMaxFromIndicators }}" -->
+            <!-- TODO: data-group-id="{{ capabilityId }}" -->
+            <!-- TODO: data-rubric-id="{{ rubricGrid.id }}" -->
+            <!-- TODO: data-mark-type="{{ capabilityMarkType.mode }}" -->
+            <span>
+                <label :for="`capability-${$props.capability.id}-mark-${componentId}`">
+                    {{ locale.rubricGroup.proper() }} mark
+                </label>
+
+                <!-- TODO: mark input -->
+            </span>
+
+            <!-- TODO: data-use-descriptor-values -->
+            <!-- TODO: style="display: none" conditionally & by default -->
+            <a class="fieldAssign">
+                <!-- TODO: these two spans are a v-if/v-else probably -->
+                <!-- TODO: data-descriptor-assign="has-selected-descriptor" -->
+                <span>
+                    Assign
+                    <!-- TODO: conditionally render this span instead? -->
+                    <!-- TODO: data-group-descriptor-sum -->
+                    <span class="descriptor-sum">
+                        <!-- TODO capabilityMark.indicatorMarkSumScaled -->
+                    </span>
+                    from {{ locale.rubricCriterion.plural() }}
+                </span>
+                <!-- TODO: data-descriptor-assign="no-selected-descriptor" -->
+                <span> Remove {{ locale.grades.singular() }} based on {{ locale.rubricCriterion.plural() }} </span>
+            </a>
 
             <!-- Self-Assessment -->
-            <template v-if="props.selfAssessmentCapabilityMark?.humanReadableMark">
+            <p v-if="props.selfAssessmentCapabilityMark?.humanReadableMark" class="meta">
                 ({{ props.selfAssessmentCapabilityMark.humanReadableMark }}
                 given in
                 {{ locale.selfAssessment.singular() }})
-            </template>
+            </p>
         </th>
     </tr>
 </template>

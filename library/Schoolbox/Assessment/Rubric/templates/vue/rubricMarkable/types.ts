@@ -23,6 +23,16 @@ export type RubricGridCapability = {
     id: number;
     name: string;
     indicators: RubricGridIndicator[];
+    /**
+     * Should capability marks show for the given capability usage?
+     *
+     * Marks will only show if:
+     * - this grid is on an activity which supports mark-per-capability
+     * - the max value for this grid's usage of `$capability` is > 0
+     *
+     * TODO: how required is this, especially with grid.capabilityMarkType being checkable
+     */
+    showCapabilityMark: boolean;
 };
 
 export type RubricGridIndicator = {
