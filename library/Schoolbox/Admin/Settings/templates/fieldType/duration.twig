@@ -172,14 +172,15 @@
                     return 'invalid'; // arbitrary non-numeric value to trigger the "number" validation message
                 }
 
+                // '0' is equivalent to an empty value
+                if (durationValueInput.value === "0") {
+                    return "";
+                }
+
                 // otherwise, return the normalised value from the hidden input for validation
                 return durationValueInput.value;
             },
             messages: {
-                // This is a special field controlled by duration.twig. The input this is targeting is actually
-                // hidden away from the user, and the user interacts with a dedicated input on its own.
-                // In the event the user inputs an invalid duration, the value of this is set to -1 - so the "min" message
-                // actually represents an invalid duration of some sort
                 min: `Please enter a duration of at least ${humanReadableDuration(min)}`,
                 max: `Please enter a duration of no more than ${humanReadableDuration(max)}`,
                 number: "Please enter a valid duration.",
