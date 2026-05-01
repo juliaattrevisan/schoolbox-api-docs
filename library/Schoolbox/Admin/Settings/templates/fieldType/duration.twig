@@ -74,7 +74,7 @@
         function parseDurationInput(userInput) {
             // If the user input is just a number, assume it's already in the configured unit
             if (/^-?\d+$/.test(userInput.trim())) {
-                return Math.abs(parseFloat(userInput.trim(), 10));
+                return Math.abs(parseInt(userInput.trim(), 10));
             }
 
             const now = dayjs();
