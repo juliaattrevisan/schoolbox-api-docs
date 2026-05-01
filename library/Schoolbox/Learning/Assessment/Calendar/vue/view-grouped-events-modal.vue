@@ -140,7 +140,7 @@ export default {
         <h2>{{ eventExtendedProps.title }}: {{ eventExtendedProps.dateSpan }}</h2>
 
         <meta-list>
-            <meta-item class="icon-calendar"
+            <meta-item icon="calendar"
                 >{{ eventExtendedProps.subEvents.length }}
                 {{ eventExtendedProps.subEvents.length === 1 ? "event" : "events" }}</meta-item
             >

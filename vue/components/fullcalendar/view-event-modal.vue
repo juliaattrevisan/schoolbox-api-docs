@@ -843,6 +843,22 @@ export default {
                     console.error(error);
                 });
         },
+
+        getBookingStatusIcon(status) {
+            if (status.isApproved) {
+                return "approve";
+            }
+
+            if (status.isPending) {
+                return "time-value";
+            }
+
+            if (status.isRejected) {
+                return "close";
+            }
+
+            return "";
+        },
     },
 };
 </script>
@@ -905,24 +921,24 @@ export default {
                 <div class="medium-8 small-12">
                     <meta-list>
                         <template v-if="eventExtendedProps.timetable.code && eventExtendedProps.timetable.code.length">
-                            <meta-item class="icon-info">{{ eventExtendedProps.timetable.code }}</meta-item>
+                            <meta-item icon="info">{{ eventExtendedProps.timetable.code }}</meta-item>
                         </template>
-                        <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking?.status">{{
+                        <meta-item icon="resource-booking" v-if="eventExtendedProps.booking?.status">{{
                             eventExtendedProps.booking?.status.name
                         }}</meta-item>
-                        <meta-item class="icon-calendar" v-if="eventExtendedProps.dateSpan">{{
+                        <meta-item icon="calendar" v-if="eventExtendedProps.dateSpan">{{
                             eventExtendedProps.dateSpan
                         }}</meta-item>
-                        <meta-item class="icon-location" v-if="eventExtendedProps.location">{{
+                        <meta-item icon="location" v-if="eventExtendedProps.location">{{
                             eventExtendedProps.location
                         }}</meta-item>
-                        <meta-item class="icon-staff-students" v-if="eventExtendedProps.author.id"
+                        <meta-item icon="staff-students" v-if="eventExtendedProps.author.id"
                             >Posted by
                             <a :href="'/search/user/' + String(eventExtendedProps.author.id)">{{
                                 eventExtendedProps.author.name
                             }}</a></meta-item
                         >
-                        <meta-item class="icon-staff-students" v-if="eventExtendedProps.reviewer.id"
+                        <meta-item icon="staff-students" v-if="eventExtendedProps.reviewer.id"
                             >Reviewed by
                             <a :href="'/search/user/' + String(eventExtendedProps.reviewer.id)">{{
                                 eventExtendedProps.reviewer.name
@@ -934,7 +950,7 @@ export default {
                                 Object.keys(eventExtendedProps.timetable.staff).length
                             "
                         >
-                            <meta-item class="icon-staff">
+                            <meta-item icon="staff">
                                 <template v-for="(name, id, index) in eventExtendedProps.timetable.staff" :key="id">
                                     <template v-if="id">
                                         <a :href="'/search/user/' + String(id)">{{ name }}</a>
@@ -947,7 +963,7 @@ export default {
                             </meta-item>
                         </template>
                         <meta-item
-                            class="icon-class-list"
+                            icon="class-list"
                             v-if="this.showAttendanceMeta(eventExtendedProps.attendance.payload.level)"
                         >
                             Attendance:
@@ -982,10 +998,10 @@ export default {
                         </meta-item>
 
                         <!-- EOTC metadata -->
-                        <meta-item class="icon-teacher" v-if="eventExtendedProps.eotc.isEOTC"
+                        <meta-item icon="teacher" v-if="eventExtendedProps.eotc.isEOTC"
                             >Assigned Staff: {{ eventExtendedProps.eotc.numStaff }}</meta-item
                         >
-                        <meta-item class="icon-staff-students" v-if="eventExtendedProps.eotc.isEOTC"
+                        <meta-item icon="staff-students" v-if="eventExtendedProps.eotc.isEOTC"
                             >Students: {{ eventExtendedProps.eotc.numStudents }}</meta-item
                         >
                     </meta-list>
@@ -998,11 +1014,7 @@ export default {
                             <meta-item
                                 v-for="booking in eventExtendedProps.booking?.related"
                                 :key="booking.id"
-                                :class="{
-                                    'icon-approve': booking.status.isApproved,
-                                    'icon-time-value': booking.status.isPending,
-                                    'icon-close': booking.status.isRejected,
-                                }"
+                                :icon="getBookingStatusIcon(booking.status)"
                             >
                                 <template v-if="booking.href">
                                     <a :href="booking.href">{{ booking.item.name }}</a>
@@ -1019,11 +1031,7 @@ export default {
                             <meta-item
                                 v-for="booking in eventExtendedProps.bookings"
                                 :key="booking.id"
-                                :class="{
-                                    'icon-approve': booking.status.isApproved,
-                                    'icon-time-value': booking.status.isPending,
-                                    'icon-close': booking.status.isRejected,
-                                }"
+                                :icon="getBookingStatusIcon(booking.status)"
                             >
                                 <template v-if="booking.href">
                                     <a :href="booking.href">{{ booking.item.name }}</a>
