@@ -15,6 +15,9 @@ use Symfony\Component\Lock\LockInterface;
 class EportfolioStrategyTest extends TestCase
 {
     /**
+     * Creates a test double of Eportfolio backed by in-memory state, with fetchRows and all delete
+     * operations intercepted so tests can assert on the queries and operations without a real database.
+     *
      * @param list<list<array<string, mixed>>> $fetchRows
      * @return array{strategy: Eportfolio, state: object}
      */
@@ -164,6 +167,8 @@ class EportfolioStrategyTest extends TestCase
     }
 
     /**
+     * Invokes the protected getIdsToDelete() method on the strategy under test.
+     *
      * @return list<array<string, mixed>>
      */
     private function getIdsToDelete(Eportfolio $strategy): array
@@ -178,6 +183,8 @@ class EportfolioStrategyTest extends TestCase
     }
 
     /**
+     * Invokes the protected deleteChunk() method on the strategy under test.
+     *
      * @param list<array{table: string, id: int|string}> $chunk
      */
     private function deleteChunk(Eportfolio $strategy, array $chunk): void
@@ -191,6 +198,10 @@ class EportfolioStrategyTest extends TestCase
         $deleteChunk($chunk);
     }
 
+    /**
+     * Verifies that when a retention period override is set but all table counts are zero,
+     * process() logs 'No entries to delete' and never starts a database transaction.
+     */
     public function testProcessSafelyExitsWhenRetentionIsOverridden(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
@@ -226,6 +237,10 @@ class EportfolioStrategyTest extends TestCase
         $this->assertContains('No entries to delete', $noticeMessages);
     }
 
+    /**
+     * Verifies getIdsToDelete() merges results from all five separate 'find eligible targets'
+     * queries and preserves each row's table label.
+     */
     public function testCollectsRootDeleteTargetsByTable(): void
     {
         ['strategy' => $strategy] = $this->strategy([
@@ -248,6 +263,11 @@ class EportfolioStrategyTest extends TestCase
         );
     }
 
+    /**
+     * Verifies the SQL for independently targeted children (blogs, comments, images, filelist items)
+     * guards against selecting rows whose parent or grandparent is also being deleted in the same run,
+     * preventing those rows from being double-counted as independent targets.
+     */
     public function testIndependentChildQueriesExcludeRowsCoveredByParentCascades(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy([[], [], [], [], []]);
@@ -260,6 +280,10 @@ class EportfolioStrategyTest extends TestCase
         $this->assertStringContainsString('b.deleted_at IS NULL OR b.deleted_at >= :old_blog', $sql);
     }
 
+    /**
+     * Verifies that targeting leaf rows (comments, images, filelist items) by their own deleted_at
+     * produces only primary-key deletes with no cascade, and that no unrelated tables are touched.
+     */
     public function testIndependentlyDeletedChildrenAreRemovedWithoutDeletingExternalTables(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy();
@@ -284,6 +308,10 @@ class EportfolioStrategyTest extends TestCase
         $this->assertNotContains('storage', $tables);
     }
 
+    /**
+     * Verifies that a directly targeted blog triggers foreign-key deletes for its comments and images
+     * before the blog row itself is deleted.
+     */
     public function testIndependentlyDeletedBlogRemovesItsChildrenBeforeTheBlog(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy();
@@ -302,6 +330,10 @@ class EportfolioStrategyTest extends TestCase
         );
     }
 
+    /**
+     * Verifies that a directly targeted page triggers foreign-key deletes for all descendant tables
+     * in dependency order (grandchildren before children before page).
+     */
     public function testEligiblePageCascadeDeletesChildrenBeforePage(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy();
@@ -391,6 +423,10 @@ class EportfolioStrategyTest extends TestCase
         );
     }
 
+    /**
+     * Verifies that cascading from a targeted page does not produce delete operations for rows
+     * belonging to a non-targeted sibling page that also has children configured in state.
+     */
     public function testCascadeFromTargetedPageDoesNotTouchSiblingPage(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy();
@@ -407,6 +443,11 @@ class EportfolioStrategyTest extends TestCase
         $this->assertNotContains(502, $allIds);
     }
 
+    /**
+     * Verifies that when a chunk contains both directly targeted child rows and a page,
+     * the direct-target deletes run before the page cascade, and the filelist item is excluded
+     * from the broader page cascade to avoid double-deletion.
+     */
     public function testMixedChunksDeleteIndependentChildrenBeforePageCascade(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy();
@@ -438,6 +479,10 @@ class EportfolioStrategyTest extends TestCase
         );
     }
 
+    /**
+     * Verifies that when a row is both a direct target and reachable by a broader cascade,
+     * the cascade delete explicitly excludes that row's ID to prevent double-deletion.
+     */
     public function testOverlappingMixedChunksExcludeDirectTargetsFromBroaderDryRunCounts(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy();
@@ -492,6 +537,10 @@ class EportfolioStrategyTest extends TestCase
         );
     }
 
+    /**
+     * Verifies that the IDs of each root-target table in a chunk are logged at DEBUG level
+     * at the start of deleteChunk(), before any delete operations are performed.
+     */
     public function testDeleteChunkLogsRootTargetIdsByTableAtDebugLevel(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
@@ -522,6 +571,10 @@ class EportfolioStrategyTest extends TestCase
         );
     }
 
+    /**
+     * Verifies hasDataToDelete() returns false when the count query returns zero for all five
+     * direct-delete tables.
+     */
     public function testHasDataToDeleteReturnsFalseWhenNoEligibleRowsExist(): void
     {
         ['strategy' => $strategy] = $this->strategy([
@@ -543,6 +596,10 @@ class EportfolioStrategyTest extends TestCase
         $this->assertFalse($hasData());
     }
 
+    /**
+     * Verifies hasDataToDelete() returns true when at least one of the five direct-delete tables
+     * has a non-zero count.
+     */
     public function testHasDataToDeleteReturnsTrueWhenAnyEligibleRowsExist(): void
     {
         ['strategy' => $strategy] = $this->strategy([
