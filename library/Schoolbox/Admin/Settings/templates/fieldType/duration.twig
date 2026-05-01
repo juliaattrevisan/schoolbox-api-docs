@@ -14,7 +14,9 @@
 {% block inputElement %}
     <input
         id="{{ fieldId }}"
+        {{ required ? 'required ' }}
         type="text"
+        name="{{ name }}-display" {# need a name for alaressValidate #}
         value="{{ value }}"
         {% if not editable %}disabled="disabled"{% endif %}
         data-duration-field-input="{{ fieldId }}"
@@ -23,12 +25,9 @@
     <input
         {{ required ? 'required ' }}
         type="number"
-        inputmode="numeric"
         name="{{ name }}"
         value="{{ value }}"
         {% if not editable %}disabled="disabled"{% endif %}
-        min="{{ min ?? 0 }}" {# enforce a minimum of 0 since negative durations don't make sense in this context #}
-        {% if max ?? false %}max="{{ max }}"{% endif %}
         {# Hidden field that the below script keeps in sync with the user-entered value above #}
         class="hide"
         data-duration-field-value="{{ fieldId }}"
@@ -142,7 +141,7 @@
 
             if (normalisedDuration === false) {
                 // alaress validate will handle this
-                durationValueInput.value = -1;
+                durationValueInput.value = "";
             } else {
                 // update the hidden input with the normalised value
                 durationValueInput.value = normalisedDuration;
@@ -154,6 +153,38 @@
 
         durationUserInput.addEventListener("blur", onDurationChanged);
         onDurationChanged(); // set the initial value
+
+        /**
+         * Validation Rules
+         */
+        const min = {{ min ?? 'undefined' }};
+        const max = {{ max ?? 'undefined' }};
+
+        $(durationUserInput).rules("add", {
+            required: {{ required ? 'true' : 'false' }},
+            number: true,
+            min,
+            max,
+            /** Validation for this field is based on the value of the hidden input, not the user input */
+            normalizer: (value) => {
+                // If the value is empty but the user has entered something, then the input is invalid
+                if (durationValueInput.value === "" && value.trim() !== "") {
+                    return 'invalid'; // arbitrary non-numeric value to trigger the "number" validation message
+                }
+
+                // otherwise, return the normalised value from the hidden input for validation
+                return durationValueInput.value;
+            },
+            messages: {
+                // This is a special field controlled by duration.twig. The input this is targeting is actually
+                // hidden away from the user, and the user interacts with a dedicated input on its own.
+                // In the event the user inputs an invalid duration, the value of this is set to -1 - so the "min" message
+                // actually represents an invalid duration of some sort
+                min: `Please enter a duration of at least ${humanReadableDuration(min)}`,
+                max: `Please enter a duration of no more than ${humanReadableDuration(max)}`,
+                number: "Please enter a valid duration.",
+            },
+        });
     })();
     </script>
 {% endblock %}

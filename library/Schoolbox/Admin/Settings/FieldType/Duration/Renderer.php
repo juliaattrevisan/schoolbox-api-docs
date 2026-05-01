@@ -4,12 +4,25 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings\FieldType\Duration;
 
-use Schoolbox\Admin\Settings\FieldType\Number\Renderer as NumberRenderer;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Admin\Settings\FieldType\Input;
 
-class Renderer extends NumberRenderer
+class Renderer extends Input\Renderer
 {
+    /**
+     * @var ValueSerializer
+     */
+    private ValueSerializer $valueSerializer;
+
+    /**
+     * Create a range value serializer on construct so we can use it in the renderer
+     */
+    public function __construct()
+    {
+        $this->valueSerializer = new ValueSerializer();
+    }
+
     /**
      * @inheritdoc
      */
@@ -36,13 +49,21 @@ class Renderer extends NumberRenderer
         $data = parent::getData($config);
 
         if ($config->getOptions()) {
-            $options = json_decode($config->getOptions(), true);
+            $options = $this->valueSerializer->buildOptions($config->getOptions());
 
+            if (isset($options["min"])) {
+                $data["min"] = $options["min"];
+            }
+            if (isset($options["max"])) {
+                $data["max"] = $options["max"];
+            }
             if (isset($options["timeUnit"])) {
                 $data["timeUnit"] = $options["timeUnit"];
             }
-        }
 
+            // ensure a valid value is passed in to the template
+            $data['value'] = $this->valueSerializer->serializeValue($data['value'], $config);
+        }
         return $data;
     }
 }

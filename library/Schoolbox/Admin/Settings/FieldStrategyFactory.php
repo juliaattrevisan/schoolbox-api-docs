@@ -162,7 +162,6 @@ class FieldStrategyFactory
             case ConfigMapper::FIELD_SELECT_DATE:
             case ConfigMapper::FIELD_JSON:
                 return new FieldValueSerializerBase();
-            case ConfigMapper::FIELD_DURATION:
             case ConfigMapper::FIELD_NUMBER: //this is only numbers, confirm int, and save (as string, as we do with all config values)
                 return new FieldType\Number\IntValueSerializer();
             case ConfigMapper::FIELD_SELECT_MULTI:
@@ -171,6 +170,8 @@ class FieldStrategyFactory
                 return new FieldType\URI\ValueSerializer();
             case ConfigMapper::FIELD_RANGE:
                 return new FieldType\Range\ValueSerializer();
+            case ConfigMapper::FIELD_DURATION:
+                return new FieldType\Duration\ValueSerializer();
             // Note that no default implicitly requires explicit registration to avoid logic errors.
         }
         throw new UnexpectedValueException("Unable to find a field value serializer for config field '{$fieldId}'");
