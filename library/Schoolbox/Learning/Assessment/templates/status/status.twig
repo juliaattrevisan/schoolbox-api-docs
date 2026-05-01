@@ -66,7 +66,7 @@
                 {{ markVisibilityMeta.markVisibilityMeta(assessment, true) }}
 
                 {% if readonly ?? false %}
-                    <li class="icon-archive">{{ locale.term.proper }} has been archived</li>
+                    <li class="sbx-meta-item--with-icon"><sbx-icon name="archive"></sbx-icon> {{ locale.term.proper }} has been archived</li>
                 {% endif %}
             {% endif %}
         </ul>

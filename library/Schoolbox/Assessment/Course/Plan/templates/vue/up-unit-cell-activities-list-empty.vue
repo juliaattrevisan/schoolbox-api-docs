@@ -19,7 +19,7 @@ const extraActivitiesComponents = props.unit.activities.components.filter((compo
 
 <template>
     <template v-if="extraActivitiesComponents">
-        <i class="icon-due-work"></i>
+        <sbx-icon name="due-work"></sbx-icon>
         <p>This component is incorrectly named.</p>
         <p>Update it <a :href="props.unit.homepage"> here </a></p>
     </template>

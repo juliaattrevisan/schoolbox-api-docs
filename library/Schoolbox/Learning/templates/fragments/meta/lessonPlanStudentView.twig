@@ -11,6 +11,6 @@
     {% if assessment.visibility == 'student' %}
         <li data-has-student-view-meta></li>
     {% else %}
-        <li class="icon-teacher">This {{ locale.lessonPlan }} is not visible to students.</li>
+        <li class="sbx-meta-item--with-icon"><sbx-icon name="teacher"></sbx-icon> This {{ locale.lessonPlan }} is not visible to students.</li>
     {% endif %}
 {% endif %}

@@ -14,7 +14,7 @@
 
     {# joining student name with lastView data #}
     {% if student.id != USER.id %}
-        <li class="icon-staff-students" title="{% if lastViews.student.date is defined and lastViews.student.date is not null %}{{ lastViews.student.date }}{% endif %}">
+        <li class="sbx-meta-item--with-icon" title="{% if lastViews.student.date is defined and lastViews.student.date is not null %}{{ lastViews.student.date }}{% endif %}"><sbx-icon name="staff-students"></sbx-icon>
             <a href="/search/user/{{ student.id }}">{{ student.fullname }}</a>
             {% if lastViews is not empty %}
                 {{ lastViews.student.status }}
@@ -31,13 +31,13 @@
          # needed isNull is same as(false) to test if getExcludedAt() has valid data.
          # I was not able to just test as getExcluedAt() is null, or find a better way
          #}
-        <li class="sbx-button--has-icon"><sbx-icon name="close"></sbx-icon>Excluded from {{ locale.activity }}</li>
+        <li class="sbx-meta-item--with-icon"><sbx-icon name="close"></sbx-icon> Excluded from {{ locale.activity }}</li>
     {% endif %}
 
     {% if lastViews is not empty %}
         {% for parent in lastViews.parents %}
             {% if parent.date is not null %}
-            <li class="icon-staff" title="{{ parent.date }}">
+            <li class="sbx-meta-item--with-icon" title="{{ parent.date }}"><sbx-icon name="staff"></sbx-icon>
                 <a href="/search/user/{{ parent.id }}">{{ parent.name }}</a>
                 {{ parent.status }} {% if 'assessment' is same as(parent.object) %} this {{ locale.activity }}{% else %} the feedback {% endif %}
             </li>
@@ -50,7 +50,7 @@
      # Unlimited durations don't say anything; there's nothing you needed to know.
      #}
     {% if not assessment.isDurationUnlimited %}
-        <li class="icon-time-value" title="Allowed Time">{% apply spaceless %}
+        <li class="sbx-meta-item--with-icon" title="Allowed Time"><sbx-icon name="time-value"></sbx-icon> {% apply spaceless %}
             Allowed time: <time>{{ duration.secondsToHoursAndMinutes(assessment.duration) }}</time>
         {% endapply %}</li>
     {% endif %}
