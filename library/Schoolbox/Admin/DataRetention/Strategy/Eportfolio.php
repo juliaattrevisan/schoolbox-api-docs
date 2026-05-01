@@ -200,40 +200,47 @@ class Eportfolio extends Base
         // Delete rows from all twelve tables covered by this strategy.
 
         $table = self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT;
+        // First delete directly targeted rows,
+        // then delete rows whose parent blog is a direct target,
+        // then delete rows whose grandparent page is a direct target.
         $this->deleteRowsByIds($deleted, $table, $blogCommentIds);
         $this->deleteRowsByForeignIds($deleted, $table, 'blog_id', $blogIds, $blogCommentIds);
         $this->deleteRowsByForeignIds($deleted, $table, 'blog_id', $pageCascadeBlogIds, $blogCommentIds);
 
-        // eportfolio_component_blog_image (grandchild of page, via blog)
         $table = self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE;
+        // First delete directly targeted rows,
+        // then delete rows whose parent blog is a direct target,
+        // then delete rows whose grandparent page is a direct target.
         $this->deleteRowsByIds($deleted, $table, $blogImageIds);
         $this->deleteRowsByForeignIds($deleted, $table, 'blog_id', $blogIds, $blogImageIds);
         $this->deleteRowsByForeignIds($deleted, $table, 'blog_id', $pageCascadeBlogIds, $blogImageIds);
 
-        // eportfolio_component_blog (child of page)
         $table = self::TABLE_EPORTFOLIO_COMPONENT_BLOG;
+        // First delete directly targeted rows,
+        // then delete rows whose parent page is a direct target,
         $this->deleteRowsByIds($deleted, $table, $blogIds);
         $this->deleteRowsByForeignIds($deleted, $table, 'page_id', $pageIds, $blogIds);
 
-        // eportfolio_component_filelist_item (child of page)
         $table = self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM;
+        // First delete directly targeted rows,
+        // then delete rows whose parent page is a direct target,
         $this->deleteRowsByIds($deleted, $table, $fileListItemIds);
         $this->deleteRowsByForeignIds($deleted, $table, 'page_id', $pageIds, $fileListItemIds);
 
-        // eportfolio_permission (child of page, cascade-delete only)
+        // Table eportfolio_permission (child of page, cascade-delete only)
         $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_PERMISSION, 'page_id', $pageIds);
 
-        // component_config_instance, list items (grandchildren of page, via component_instance, cascade-delete only)
+        // Tables component_config_instance and list item tables (grandchildren of page, via component_instance, cascade-delete only)
         $this->deleteRowsByForeignIds($deleted, self::TABLE_COMPONENT_CONFIG_INSTANCE, 'component_instance_id', $componentInstanceIds);
         $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_ADVANCEDLIST_ITEM, 'component_instance_id', $componentInstanceIds);
         $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BASICLIST_ITEM, 'component_instance_id', $componentInstanceIds);
         $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_LINKLIST_ITEM, 'component_instance_id', $componentInstanceIds);
         $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_TEXTBOX_ITEM, 'component_instance_id', $componentInstanceIds);
 
-        // component_instance (child of page, cascade-delete only)
+        // Table component_instance (child of page, cascade-delete only)
         $this->deleteRowsByIds($deleted, self::TABLE_COMPONENT_INSTANCE, $componentInstanceIds);
 
-        // eportfolio_page (root)
+        // Table eportfolio_page (root)
         $this->deleteRowsByIds($deleted, self::TABLE_EPORTFOLIO_PAGE, $pageIds, 'page_id');
 
         $this->logChunkResult($deleted);
