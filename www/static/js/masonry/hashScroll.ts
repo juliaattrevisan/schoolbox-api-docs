@@ -2,7 +2,7 @@ const MASONRY_LAYOUT_SELECTOR = "#component-layout";
 
 /**
  * Get the current location hash without the leading #.
- * @returns The decoded hash target id, or null when no hash is present.
+ * @returns The decoded hash target id, or null when no valid hash is present.
  */
 function getCurrentHashTargetId(): string | null {
     const { hash } = window.location;
@@ -10,7 +10,11 @@ function getCurrentHashTargetId(): string | null {
         return null;
     }
 
-    return decodeURIComponent(hash.slice(1));
+    try {
+        return decodeURIComponent(hash.slice(1));
+    } catch {
+        return null;
+    }
 }
 
 /**
