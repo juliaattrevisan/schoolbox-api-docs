@@ -15,6 +15,7 @@ import { initNewComponents } from "./newComponents/newComponents";
 import { updateAllComponentCounts } from "./newComponents/updateNewComponentButtons";
 import { initUpdatePlaceHolders } from "./updatePlaceHolders";
 import { merge } from "es-toolkit";
+import { scrollToCurrentHashTarget, scrollToCurrentHashTargetOnLoad } from "./hashScroll";
 
 document.addEventListener("MASONRY__CREATE", (e) => {
     setMasonryConfig(e.detail);
@@ -24,6 +25,8 @@ document.addEventListener("MASONRY__CREATE", (e) => {
     }
 
     initExistingComponents();
+    scrollToCurrentHashTarget();
+    scrollToCurrentHashTargetOnLoad();
 
     if (getMasonryConfig().settings.allowEditing) {
         if (getMasonryConfig().toggleLockComponents) {
