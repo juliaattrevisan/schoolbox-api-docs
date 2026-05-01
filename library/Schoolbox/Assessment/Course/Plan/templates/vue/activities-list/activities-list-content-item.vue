@@ -63,6 +63,9 @@ const hasNavLinks = window.Vue.computed(() => {
     return !validNavLinks.every((link) => link === null);
 });
 
+const activityIconName = window.Vue.computed(() => kebabCase(props.activity.assessmentType));
+const activityIconTitle = window.Vue.computed(() => startCase(props.activity.assessmentType));
+
 const draggableEl = window.Vue.ref<HTMLElement>();
 let draggableInstance: ReturnType<typeof Draggable.create> | null = null;
 
@@ -130,10 +133,7 @@ window.Vue.onUnmounted(() => {
                     :is="activityLink !== null ? 'a' : 'span'"
                     :href="activityLink !== null ? getReturnUrl(activityLink) : undefined"
                 >
-                    <span
-                        :class="'icon-' + kebabCase(props.activity.assessmentType)"
-                        :title="startCase(props.activity.assessmentType)"
-                    ></span>
+                    <sbx-icon :name="activityIconName" :title="activityIconTitle"></sbx-icon>
                     <p
                         :data-test="`unit-planner-activity-title-${props.activity.title}`"
                         :data-test-activity-id="props.activity.id"
@@ -225,11 +225,25 @@ li[data-sortable-active="true"] .sortable-holder {
     height: 2.5rem;
 }
 
-.card.compact a p {
+.card.compact a p,
+.card.compact > span p {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    flex: 1 1 auto;
+}
+
+.card.compact a,
+.card.compact > span {
+    display: flex;
+    gap: var(--spacing-s);
+}
+
+.card.compact a sbx-icon,
+.card.compact > span sbx-icon {
+    color: var(--sbx-color-text-secondary, inherit);
+    flex: 0 0 auto;
 }
 
 /* Styles for printing */
