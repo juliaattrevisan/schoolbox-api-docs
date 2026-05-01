@@ -45,8 +45,8 @@ class Eportfolio extends Base
     private const string COMPONENT_MODULE_EPORTFOLIO = 'eportfolio';
 
     /**
-     * Direct-delete tables:
-     * (These tables have `deleted_at` columns, so rows can be directly targeted for hard-deletion.)
+     * Tables with `deleted_at` columns.
+     * (Rows from these tables can be directly targeted for hard-deletion.)
      */
     public const string TABLE_EPORTFOLIO_PAGE = 'eportfolio_page';
     public const string TABLE_EPORTFOLIO_COMPONENT_BLOG = 'eportfolio_component_blog';
@@ -55,9 +55,8 @@ class Eportfolio extends Base
     public const string TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM = 'eportfolio_component_filelist_item';
 
     /**
-     * Cascade-delete tables:
-     * (These tables do not have `deleted_at` columns, so rows will only be hard-deleted
-     *  if they are ancestors of rows in tables with `deleted_at` columns.)
+     * Tables without `deleted_at` columns.
+     * (Rows from these tables will only be hard-deleted if they are ancestors of rows in tables with `deleted_at` columns.)
      */
     public const string TABLE_COMPONENT_CONFIG_INSTANCE = 'component_config_instance';
     public const string TABLE_COMPONENT_INSTANCE = 'component_instance';
