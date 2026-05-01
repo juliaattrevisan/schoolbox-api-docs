@@ -56,11 +56,11 @@ class CommandLineToolStrategyBusTest extends TestCase
 
         return $tool->exposedBuildStrategies(
             new ValidStrats($csvStrats),
-            $this->createMock(LoggerInterface::class),
+            $this->createStub(LoggerInterface::class),
             false,
-            $this->createMock(IConnector::class),
-            $this->createMock(LockInterface::class),
-            $this->createMock(IConfigLoader::class),
+            $this->createStub(IConnector::class),
+            $this->createStub(LockInterface::class),
+            $this->createStub(IConfigLoader::class),
             time() + 3600,
             new RetentionPeriod(30),
             3,
