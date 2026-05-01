@@ -110,10 +110,12 @@ export default {
          */
         initVideojsRecordRecordListeners() {
             this.player.on("deviceReady", this.onDeviceReady);
+            this.player.on("enumerateReady", this.chooseDevice_onEnumerateReady);
             this.player.on("startRecord", this.onStartRecord);
             this.player.on("finishRecord", this.onFinishRecord);
             this.player.on("error", this.onError);
             this.player.on("deviceError", this.onDeviceError);
+            this.player.on("enumerateError", this.onEnumerateError);
         },
 
         /**
@@ -174,6 +176,13 @@ export default {
             } else if (isPermissionDeniedError(errorCode)) {
                 this.hasPermissionDeniedError = true;
             }
+        },
+
+        /**
+         * onEnumerateError - try and manage as many errors as possible
+         */
+        onEnumerateError() {
+            console.warn("enumerate error: " + this.player.enumerateErrorCode);
         },
 
         /**
