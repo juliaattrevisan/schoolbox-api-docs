@@ -45,7 +45,7 @@ body.sbx-body {
     dl,
     blockquote,
     label,
-    div,
+    div:not(.vjs-control-bar):not(.video-js):not(.vjs-time-control),
     article,
     table tr th,
     legend {
