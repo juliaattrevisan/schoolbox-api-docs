@@ -48,11 +48,14 @@ class ModelToArray
             $capabilities[] = $this->translateCapabilityUsage($markedGrid, $capabilityUsage);
         }
 
+        // for a self-assessment, only show the overall mark if it's self graded, as if it's self-reflect only they never marked themselves
+        // for a non self-assessment, the mark is shown
+        $feedback = $markedGrid->getFeedback();
+        $canSeeMark = !($feedback instanceof ISelfAssessableFeedback) || ($feedback instanceof DueWorkFeedback && $feedback->isSelfGrading());
+
         return [
             'gridId' => $markedGrid->getGrid()->getId(),
-            // TODO: for self assessment, "only show the mark if it's self graded, as if it's self-reflect only they never marked themselves"
-            // ^^^^ {% if selfAssessmentFeedback and selfAssessmentFeedback.isSelfGrading and selfAssessmentFeedback.humanReadableMark %}
-            'humanReadableMark' => $markedGrid->retrieveHumanReadableMark(),
+            'humanReadableMark' => $canSeeMark ? $markedGrid->retrieveHumanReadableMark() : null,
             'capabilities' => $capabilities,
         ];
     }
@@ -71,20 +74,16 @@ class ModelToArray
             $indicators[] = $this->translateIndicatorUsage($markedGrid, $indicatorUsage);
         }
 
-        $capabilityMark = $markedGrid->retrieveCapabilityMark($capabilityUsage);
+        // for a self-assessment, only show the mark if it's self graded, as if it's self-reflect only they never marked themselves
+        // for a non self-assessment, the mark is shown
+        $feedback = $markedGrid->getFeedback();
+        $canSeeMark = !($feedback instanceof ISelfAssessableFeedback) || ($feedback instanceof DueWorkFeedback && $feedback->isSelfGrading());
 
-        // TODO: (from twig) related to self-assessment feedback
-        // /** @var DueWorkFeedback */
-        // $feedback = $markedGrid->getFeedback();
-        // $isSelfGrading = $feedback instanceof DueWorkFeedback && $feedback->isSelfGrading();
-        // if (!$isSelfGrading) {
-        //     $capabilityMark = null; // hide it, I guess?
-        // }
+        $capabilityMark = $canSeeMark ? $markedGrid->retrieveCapabilityMark($capabilityUsage) : null;
 
         return [
             'id' => $capabilityUsage->getCapability()->getId(),
-            // TODO: permissions, notably self assessment differs
-            'humanReadableMark' => $markedGrid->retrieveCapabilityMark($capabilityUsage)?->getHumanReadableValue(),
+            'humanReadableMark' => $capabilityMark?->getHumanReadableValue(),
             'indicators' => $indicators,
         ];
     }
