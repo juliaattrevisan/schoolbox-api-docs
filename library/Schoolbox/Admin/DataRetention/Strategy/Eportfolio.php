@@ -79,27 +79,27 @@ class Eportfolio extends Base
             "
             SELECT
                 (SELECT COUNT(*) FROM " . self::TABLE_EPORTFOLIO_PAGE . " p
-                    WHERE p.deleted_at IS NOT NULL AND p.deleted_at < :old_page_root) AS pages,
+                    WHERE p.deleted_at IS NOT NULL AND p.deleted_at < :old_page_root) AS " . self::TABLE_EPORTFOLIO_PAGE . ",
                 (SELECT COUNT(*) FROM " . self::TABLE_EPORTFOLIO_COMPONENT_BLOG . " b
                     INNER JOIN " . self::TABLE_EPORTFOLIO_PAGE . " p ON p.page_id = b.page_id
                     WHERE b.deleted_at IS NOT NULL AND b.deleted_at < :old_blog
-                      AND (p.deleted_at IS NULL OR p.deleted_at >= :old_blog_page)) AS blogs,
+                      AND (p.deleted_at IS NULL OR p.deleted_at >= :old_blog_page)) AS " . self::TABLE_EPORTFOLIO_COMPONENT_BLOG . ",
                 (SELECT COUNT(*) FROM " . self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT . " c
                     INNER JOIN " . self::TABLE_EPORTFOLIO_COMPONENT_BLOG . " b ON b.id = c.blog_id
                     INNER JOIN " . self::TABLE_EPORTFOLIO_PAGE . " p ON p.page_id = b.page_id
                     WHERE c.deleted_at IS NOT NULL AND c.deleted_at < :old_comment
                       AND (b.deleted_at IS NULL OR b.deleted_at >= :old_comment_blog)
-                      AND (p.deleted_at IS NULL OR p.deleted_at >= :old_comment_page)) AS blog_comments,
+                      AND (p.deleted_at IS NULL OR p.deleted_at >= :old_comment_page)) AS " . self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT . ",
                 (SELECT COUNT(*) FROM " . self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE . " i
                     INNER JOIN " . self::TABLE_EPORTFOLIO_COMPONENT_BLOG . " b ON b.id = i.blog_id
                     INNER JOIN " . self::TABLE_EPORTFOLIO_PAGE . " p ON p.page_id = b.page_id
                     WHERE i.deleted_at IS NOT NULL AND i.deleted_at < :old_image
                       AND (b.deleted_at IS NULL OR b.deleted_at >= :old_image_blog)
-                      AND (p.deleted_at IS NULL OR p.deleted_at >= :old_image_page)) AS blog_images,
+                      AND (p.deleted_at IS NULL OR p.deleted_at >= :old_image_page)) AS " . self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE . ",
                 (SELECT COUNT(*) FROM " . self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM . " f
                     LEFT JOIN " . self::TABLE_EPORTFOLIO_PAGE . " p ON p.page_id = f.page_id
                     WHERE f.deleted_at IS NOT NULL AND f.deleted_at < :old_filelist_item
-                      AND (p.page_id IS NULL OR p.deleted_at IS NULL OR p.deleted_at >= :old_filelist_page)) AS filelist_items
+                      AND (p.page_id IS NULL OR p.deleted_at IS NULL OR p.deleted_at >= :old_filelist_page)) AS " . self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM . "
         ",
             [
                 'old_page_root' => $old,
@@ -118,9 +118,15 @@ class Eportfolio extends Base
 
         $hasData = false;
 
-        foreach (['pages', 'blogs', 'blog_comments', 'blog_images', 'filelist_items'] as $key) {
-            $count = (int) ($counts[$key] ?? 0);
-            $this->log->notice(sprintf("Found '%s' ePortfolio %s to delete", $count, $key));
+        foreach ([
+            self::TABLE_EPORTFOLIO_PAGE,
+            self::TABLE_EPORTFOLIO_COMPONENT_BLOG,
+            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
+            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
+            self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
+        ] as $table) {
+            $count = (int) ($counts[$table] ?? 0);
+            $this->log->notice(sprintf("Found %s %s rows to delete", $count, $table));
             $hasData = $hasData || $count > 0;
         }
 
@@ -454,7 +460,7 @@ class Eportfolio extends Base
         $prefix = $this->perform ? 'Deleted' : 'Would have deleted';
 
         foreach ($deleted as $table => $count) {
-            $this->log->notice(sprintf("%s '%s' %s rows", $prefix, $count, $table));
+            $this->log->notice(sprintf("%s %s %s rows", $prefix, $count, $table));
         }
     }
 
