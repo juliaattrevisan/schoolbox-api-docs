@@ -5,7 +5,7 @@
  */
 
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
-import type { RubricGridIndicator, RubricGridLevel, RubricMarkedGridIndicator } from "./types";
+import type { RubricGridIndicator, RubricGridLevel, RubricMarkedGridIndicator } from "../rubricMarkable/types";
 import RrGridDescriptor from "./rr-grid-descriptor.vue";
 
 interface Props {

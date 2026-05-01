@@ -11,7 +11,7 @@ import type {
     RubricGridLevel,
     RubricMarkedGridCapability,
     RubricMarkedGridIndicator,
-} from "./types";
+} from "../rubricMarkable/types";
 import RrGridIndicator from "./rr-grid-indicator.vue";
 
 interface Props {

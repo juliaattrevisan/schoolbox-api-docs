@@ -6,7 +6,7 @@
 import locale from "@js/terminology/rosettaStone";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
-import type { RubricGridDescriptor, RubricGridLevel, RubricMarkedGridIndicator } from "./types";
+import type { RubricGridDescriptor, RubricGridLevel, RubricMarkedGridIndicator } from "../rubricMarkable/types";
 
 interface Props {
     descriptor: RubricGridDescriptor;

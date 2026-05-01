@@ -7,8 +7,8 @@ import locale from "@js/terminology/rosettaStone";
 import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import type { MarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
+import type { RubricGrid, RubricMarkedGrid, RubricMarkedGridCapability } from "../rubricMarkable/types";
 import RrGridCapability from "./rr-grid-capability.vue";
-import type { RubricGrid, RubricMarkedGrid, RubricMarkedGridCapability } from "./types";
 
 interface Props {
     rubric: RubricGrid;
