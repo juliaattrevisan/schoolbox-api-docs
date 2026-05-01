@@ -14,19 +14,6 @@ use Symfony\Component\Lock\LockInterface;
 
 class EportfolioStrategyTest extends TestCase
 {
-    private const string TABLE_PAGE = 'eportfolio_page';
-    private const string TABLE_COMPONENT_CONFIG_INSTANCE = 'component_config_instance';
-    private const string TABLE_COMPONENT_INSTANCE = 'component_instance';
-    private const string TABLE_ADVANCEDLIST_ITEM = 'eportfolio_component_advancedlist_item';
-    private const string TABLE_BASICLIST_ITEM = 'eportfolio_component_basiclist_item';
-    private const string TABLE_LINKLIST_ITEM = 'eportfolio_component_linklist_item';
-    private const string TABLE_TEXTBOX_ITEM = 'eportfolio_component_textbox_item';
-    private const string TABLE_BLOG = 'eportfolio_component_blog';
-    private const string TABLE_BLOG_COMMENT = 'eportfolio_component_blog_comment';
-    private const string TABLE_BLOG_IMAGE = 'eportfolio_component_blog_image';
-    private const string TABLE_FILELIST_ITEM = 'eportfolio_component_filelist_item';
-    private const string TABLE_PERMISSION = 'eportfolio_permission';
-
     /**
      * @param list<list<array<string, mixed>>> $fetchRows
      * @return array{strategy: Eportfolio, state: object}
@@ -242,20 +229,20 @@ class EportfolioStrategyTest extends TestCase
     public function testCollectsRootDeleteTargetsByTable(): void
     {
         ['strategy' => $strategy] = $this->strategy([
-            [['table' => self::TABLE_PAGE, 'id' => 10]],
-            [['table' => self::TABLE_BLOG, 'id' => 20]],
-            [['table' => self::TABLE_BLOG_COMMENT, 'id' => 30]],
-            [['table' => self::TABLE_BLOG_IMAGE, 'id' => 40]],
-            [['table' => self::TABLE_FILELIST_ITEM, 'id' => 50]],
+            [['table' => Eportfolio::TABLE_EPORTFOLIO_PAGE, 'id' => 10]],
+            [['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG, 'id' => 20]],
+            [['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'id' => 30]],
+            [['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'id' => 40]],
+            [['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM, 'id' => 50]],
         ]);
 
         $this->assertSame(
             [
-                ['table' => self::TABLE_PAGE, 'id' => 10],
-                ['table' => self::TABLE_BLOG, 'id' => 20],
-                ['table' => self::TABLE_BLOG_COMMENT, 'id' => 30],
-                ['table' => self::TABLE_BLOG_IMAGE, 'id' => 40],
-                ['table' => self::TABLE_FILELIST_ITEM, 'id' => 50],
+                ['table' => Eportfolio::TABLE_EPORTFOLIO_PAGE, 'id' => 10],
+                ['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG, 'id' => 20],
+                ['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'id' => 30],
+                ['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'id' => 40],
+                ['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM, 'id' => 50],
             ],
             $this->getIdsToDelete($strategy),
         );
@@ -278,16 +265,16 @@ class EportfolioStrategyTest extends TestCase
         ['strategy' => $strategy, 'state' => $state] = $this->strategy();
 
         $this->deleteChunk($strategy, [
-            ['table' => self::TABLE_BLOG_COMMENT, 'id' => 30],
-            ['table' => self::TABLE_BLOG_IMAGE, 'id' => 40],
-            ['table' => self::TABLE_FILELIST_ITEM, 'id' => 50],
+            ['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'id' => 30],
+            ['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'id' => 40],
+            ['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM, 'id' => 50],
         ]);
 
         $this->assertSame(
             [
-                ['method' => 'ids', 'table' => self::TABLE_BLOG_COMMENT, 'column' => 'id', 'ids' => [30]],
-                ['method' => 'ids', 'table' => self::TABLE_BLOG_IMAGE, 'column' => 'id', 'ids' => [40]],
-                ['method' => 'ids', 'table' => self::TABLE_FILELIST_ITEM, 'column' => 'id', 'ids' => [50]],
+                ['method' => 'ids', 'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'column' => 'id', 'ids' => [30]],
+                ['method' => 'ids', 'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'column' => 'id', 'ids' => [40]],
+                ['method' => 'ids', 'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM, 'column' => 'id', 'ids' => [50]],
             ],
             $state->operations,
         );
@@ -302,14 +289,14 @@ class EportfolioStrategyTest extends TestCase
         ['strategy' => $strategy, 'state' => $state] = $this->strategy();
 
         $this->deleteChunk($strategy, [
-            ['table' => self::TABLE_BLOG, 'id' => 20],
+            ['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG, 'id' => 20],
         ]);
 
         $this->assertSame(
             [
-                ['method' => 'foreign', 'table' => self::TABLE_BLOG_COMMENT, 'column' => 'blog_id', 'ids' => [20]],
-                ['method' => 'foreign', 'table' => self::TABLE_BLOG_IMAGE, 'column' => 'blog_id', 'ids' => [20]],
-                ['method' => 'ids', 'table' => self::TABLE_BLOG, 'column' => 'id', 'ids' => [20]],
+                ['method' => 'foreign', 'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'column' => 'blog_id', 'ids' => [20]],
+                ['method' => 'foreign', 'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'column' => 'blog_id', 'ids' => [20]],
+                ['method' => 'ids', 'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG, 'column' => 'id', 'ids' => [20]],
             ],
             $state->operations,
         );
@@ -322,80 +309,80 @@ class EportfolioStrategyTest extends TestCase
         $state->pageBlogIds = [10 => [301, 302]];
 
         $this->deleteChunk($strategy, [
-            ['table' => self::TABLE_PAGE, 'id' => 10],
+            ['table' => Eportfolio::TABLE_EPORTFOLIO_PAGE, 'id' => 10],
         ]);
 
         $this->assertSame(
             [
                 [
                     'method' => 'foreign',
-                    'table' => self::TABLE_BLOG_COMMENT,
+                    'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
                     'column' => 'blog_id',
                     'ids' => [301, 302],
                 ],
                 [
                     'method' => 'foreign',
-                    'table' => self::TABLE_BLOG_IMAGE,
+                    'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
                     'column' => 'blog_id',
                     'ids' => [301, 302],
                 ],
                 [
                     'method' => 'foreign',
-                    'table' => self::TABLE_BLOG,
+                    'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG,
                     'column' => 'page_id',
                     'ids' => [10],
                 ],
                 [
                     'method' => 'foreign',
-                    'table' => self::TABLE_FILELIST_ITEM,
+                    'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
                     'column' => 'page_id',
                     'ids' => [10],
                 ],
                 [
                     'method' => 'foreign',
-                    'table' => self::TABLE_PERMISSION,
+                    'table' => Eportfolio::TABLE_EPORTFOLIO_PERMISSION,
                     'column' => 'page_id',
                     'ids' => [10],
                 ],
                 [
                     'method' => 'foreign',
-                    'table' => self::TABLE_COMPONENT_CONFIG_INSTANCE,
+                    'table' => Eportfolio::TABLE_COMPONENT_CONFIG_INSTANCE,
                     'column' => 'component_instance_id',
                     'ids' => [501, 502],
                 ],
                 [
                     'method' => 'foreign',
-                    'table' => self::TABLE_ADVANCEDLIST_ITEM,
+                    'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_ADVANCEDLIST_ITEM,
                     'column' => 'component_instance_id',
                     'ids' => [501, 502],
                 ],
                 [
                     'method' => 'foreign',
-                    'table' => self::TABLE_BASICLIST_ITEM,
+                    'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BASICLIST_ITEM,
                     'column' => 'component_instance_id',
                     'ids' => [501, 502],
                 ],
                 [
                     'method' => 'foreign',
-                    'table' => self::TABLE_LINKLIST_ITEM,
+                    'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_LINKLIST_ITEM,
                     'column' => 'component_instance_id',
                     'ids' => [501, 502],
                 ],
                 [
                     'method' => 'foreign',
-                    'table' => self::TABLE_TEXTBOX_ITEM,
+                    'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_TEXTBOX_ITEM,
                     'column' => 'component_instance_id',
                     'ids' => [501, 502],
                 ],
                 [
                     'method' => 'ids',
-                    'table' => self::TABLE_COMPONENT_INSTANCE,
+                    'table' => Eportfolio::TABLE_COMPONENT_INSTANCE,
                     'column' => 'id',
                     'ids' => [501, 502],
                 ],
                 [
                     'method' => 'ids',
-                    'table' => self::TABLE_PAGE,
+                    'table' => Eportfolio::TABLE_EPORTFOLIO_PAGE,
                     'column' => 'page_id',
                     'ids' => [10],
                 ],
@@ -411,7 +398,7 @@ class EportfolioStrategyTest extends TestCase
         $state->pageComponentInstanceIds = [10 => [501], 11 => [502]];
 
         $this->deleteChunk($strategy, [
-            ['table' => self::TABLE_PAGE, 'id' => 10],
+            ['table' => Eportfolio::TABLE_EPORTFOLIO_PAGE, 'id' => 10],
         ]);
 
         $allIds = array_merge(...array_map(fn(array $op): array => $op['ids'], $state->operations));
@@ -425,27 +412,27 @@ class EportfolioStrategyTest extends TestCase
         ['strategy' => $strategy, 'state' => $state] = $this->strategy();
 
         $this->deleteChunk($strategy, [
-            ['table' => self::TABLE_PAGE, 'id' => 10],
-            ['table' => self::TABLE_BLOG_COMMENT, 'id' => 30],
-            ['table' => self::TABLE_BLOG_IMAGE, 'id' => 40],
-            ['table' => self::TABLE_FILELIST_ITEM, 'id' => 50],
+            ['table' => Eportfolio::TABLE_EPORTFOLIO_PAGE, 'id' => 10],
+            ['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'id' => 30],
+            ['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'id' => 40],
+            ['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM, 'id' => 50],
         ]);
 
         $this->assertSame(
             [
-                ['method' => 'ids', 'table' => self::TABLE_BLOG_COMMENT, 'column' => 'id', 'ids' => [30]],
-                ['method' => 'ids', 'table' => self::TABLE_BLOG_IMAGE, 'column' => 'id', 'ids' => [40]],
-                ['method' => 'foreign', 'table' => self::TABLE_BLOG, 'column' => 'page_id', 'ids' => [10]],
-                ['method' => 'ids', 'table' => self::TABLE_FILELIST_ITEM, 'column' => 'id', 'ids' => [50]],
+                ['method' => 'ids', 'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'column' => 'id', 'ids' => [30]],
+                ['method' => 'ids', 'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'column' => 'id', 'ids' => [40]],
+                ['method' => 'foreign', 'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG, 'column' => 'page_id', 'ids' => [10]],
+                ['method' => 'ids', 'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM, 'column' => 'id', 'ids' => [50]],
                 [
                     'method' => 'foreign',
-                    'table' => self::TABLE_FILELIST_ITEM,
+                    'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
                     'column' => 'page_id',
                     'ids' => [10],
                     'excludedIds' => [50],
                 ],
-                ['method' => 'foreign', 'table' => self::TABLE_PERMISSION, 'column' => 'page_id', 'ids' => [10]],
-                ['method' => 'ids', 'table' => self::TABLE_PAGE, 'column' => 'page_id', 'ids' => [10]],
+                ['method' => 'foreign', 'table' => Eportfolio::TABLE_EPORTFOLIO_PERMISSION, 'column' => 'page_id', 'ids' => [10]],
+                ['method' => 'ids', 'table' => Eportfolio::TABLE_EPORTFOLIO_PAGE, 'column' => 'page_id', 'ids' => [10]],
             ],
             $state->operations,
         );
@@ -457,49 +444,49 @@ class EportfolioStrategyTest extends TestCase
         $state->pageBlogIds = [10 => [20]];
 
         $this->deleteChunk($strategy, [
-            ['table' => self::TABLE_PAGE, 'id' => 10],
-            ['table' => self::TABLE_BLOG, 'id' => 20],
-            ['table' => self::TABLE_BLOG_COMMENT, 'id' => 30],
-            ['table' => self::TABLE_BLOG_IMAGE, 'id' => 40],
-            ['table' => self::TABLE_FILELIST_ITEM, 'id' => 50],
+            ['table' => Eportfolio::TABLE_EPORTFOLIO_PAGE, 'id' => 10],
+            ['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG, 'id' => 20],
+            ['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'id' => 30],
+            ['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'id' => 40],
+            ['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM, 'id' => 50],
         ]);
 
         $this->assertSame(
             [
-                ['method' => 'ids', 'table' => self::TABLE_BLOG_COMMENT, 'column' => 'id', 'ids' => [30]],
+                ['method' => 'ids', 'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'column' => 'id', 'ids' => [30]],
                 [
                     'method' => 'foreign',
-                    'table' => self::TABLE_BLOG_COMMENT,
+                    'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
                     'column' => 'blog_id',
                     'ids' => [20],
                     'excludedIds' => [30],
                 ],
-                ['method' => 'ids', 'table' => self::TABLE_BLOG_IMAGE, 'column' => 'id', 'ids' => [40]],
+                ['method' => 'ids', 'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'column' => 'id', 'ids' => [40]],
                 [
                     'method' => 'foreign',
-                    'table' => self::TABLE_BLOG_IMAGE,
+                    'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
                     'column' => 'blog_id',
                     'ids' => [20],
                     'excludedIds' => [40],
                 ],
-                ['method' => 'ids', 'table' => self::TABLE_BLOG, 'column' => 'id', 'ids' => [20]],
+                ['method' => 'ids', 'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG, 'column' => 'id', 'ids' => [20]],
                 [
                     'method' => 'foreign',
-                    'table' => self::TABLE_BLOG,
+                    'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG,
                     'column' => 'page_id',
                     'ids' => [10],
                     'excludedIds' => [20],
                 ],
-                ['method' => 'ids', 'table' => self::TABLE_FILELIST_ITEM, 'column' => 'id', 'ids' => [50]],
+                ['method' => 'ids', 'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM, 'column' => 'id', 'ids' => [50]],
                 [
                     'method' => 'foreign',
-                    'table' => self::TABLE_FILELIST_ITEM,
+                    'table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
                     'column' => 'page_id',
                     'ids' => [10],
                     'excludedIds' => [50],
                 ],
-                ['method' => 'foreign', 'table' => self::TABLE_PERMISSION, 'column' => 'page_id', 'ids' => [10]],
-                ['method' => 'ids', 'table' => self::TABLE_PAGE, 'column' => 'page_id', 'ids' => [10]],
+                ['method' => 'foreign', 'table' => Eportfolio::TABLE_EPORTFOLIO_PERMISSION, 'column' => 'page_id', 'ids' => [10]],
+                ['method' => 'ids', 'table' => Eportfolio::TABLE_EPORTFOLIO_PAGE, 'column' => 'page_id', 'ids' => [10]],
             ],
             $state->operations,
         );
@@ -521,9 +508,9 @@ class EportfolioStrategyTest extends TestCase
         ['strategy' => $strategy] = $this->strategy([], $logger);
 
         $this->deleteChunk($strategy, [
-            ['table' => self::TABLE_PAGE, 'id' => 10],
-            ['table' => self::TABLE_PAGE, 'id' => 11],
-            ['table' => self::TABLE_BLOG, 'id' => 20],
+            ['table' => Eportfolio::TABLE_EPORTFOLIO_PAGE, 'id' => 10],
+            ['table' => Eportfolio::TABLE_EPORTFOLIO_PAGE, 'id' => 11],
+            ['table' => Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG, 'id' => 20],
         ]);
 
         $this->assertSame(
@@ -539,11 +526,11 @@ class EportfolioStrategyTest extends TestCase
     {
         ['strategy' => $strategy] = $this->strategy([
             [[
-                self::TABLE_PAGE => 0,
-                self::TABLE_BLOG => 0,
-                self::TABLE_BLOG_COMMENT => 0,
-                self::TABLE_BLOG_IMAGE => 0,
-                self::TABLE_FILELIST_ITEM => 0,
+                Eportfolio::TABLE_EPORTFOLIO_PAGE => 0,
+                Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG => 0,
+                Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT => 0,
+                Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE => 0,
+                Eportfolio::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM => 0,
             ]],
         ]);
 
@@ -560,11 +547,11 @@ class EportfolioStrategyTest extends TestCase
     {
         ['strategy' => $strategy] = $this->strategy([
             [[
-                self::TABLE_PAGE => 1,
-                self::TABLE_BLOG => 0,
-                self::TABLE_BLOG_COMMENT => 0,
-                self::TABLE_BLOG_IMAGE => 0,
-                self::TABLE_FILELIST_ITEM => 0,
+                Eportfolio::TABLE_EPORTFOLIO_PAGE => 1,
+                Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG => 0,
+                Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT => 0,
+                Eportfolio::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE => 0,
+                Eportfolio::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM => 0,
             ]],
         ]);
 

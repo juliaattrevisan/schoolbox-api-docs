@@ -48,24 +48,24 @@ class Eportfolio extends Base
      * Direct-delete tables:
      * (These tables have `deleted_at` columns, so rows can be directly targeted for hard-deletion.)
      */
-    private const string TABLE_EPORTFOLIO_PAGE = 'eportfolio_page';
-    private const string TABLE_EPORTFOLIO_COMPONENT_BLOG = 'eportfolio_component_blog';
-    private const string TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT = 'eportfolio_component_blog_comment';
-    private const string TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE = 'eportfolio_component_blog_image';
-    private const string TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM = 'eportfolio_component_filelist_item';
+    public const string TABLE_EPORTFOLIO_PAGE = 'eportfolio_page';
+    public const string TABLE_EPORTFOLIO_COMPONENT_BLOG = 'eportfolio_component_blog';
+    public const string TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT = 'eportfolio_component_blog_comment';
+    public const string TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE = 'eportfolio_component_blog_image';
+    public const string TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM = 'eportfolio_component_filelist_item';
 
     /**
      * Cascade-delete tables:
      * (These tables do not have `deleted_at` columns, so rows will only be hard-deleted
      *  if they are ancestors of rows in tables with `deleted_at` columns.)
      */
-    private const string TABLE_COMPONENT_CONFIG_INSTANCE = 'component_config_instance';
-    private const string TABLE_COMPONENT_INSTANCE = 'component_instance';
-    private const string TABLE_EPORTFOLIO_COMPONENT_ADVANCEDLIST_ITEM = 'eportfolio_component_advancedlist_item';
-    private const string TABLE_EPORTFOLIO_COMPONENT_BASICLIST_ITEM = 'eportfolio_component_basiclist_item';
-    private const string TABLE_EPORTFOLIO_COMPONENT_LINKLIST_ITEM = 'eportfolio_component_linklist_item';
-    private const string TABLE_EPORTFOLIO_COMPONENT_TEXTBOX_ITEM = 'eportfolio_component_textbox_item';
-    private const string TABLE_EPORTFOLIO_PERMISSION = 'eportfolio_permission';
+    public const string TABLE_COMPONENT_CONFIG_INSTANCE = 'component_config_instance';
+    public const string TABLE_COMPONENT_INSTANCE = 'component_instance';
+    public const string TABLE_EPORTFOLIO_COMPONENT_ADVANCEDLIST_ITEM = 'eportfolio_component_advancedlist_item';
+    public const string TABLE_EPORTFOLIO_COMPONENT_BASICLIST_ITEM = 'eportfolio_component_basiclist_item';
+    public const string TABLE_EPORTFOLIO_COMPONENT_LINKLIST_ITEM = 'eportfolio_component_linklist_item';
+    public const string TABLE_EPORTFOLIO_COMPONENT_TEXTBOX_ITEM = 'eportfolio_component_textbox_item';
+    public const string TABLE_EPORTFOLIO_PERMISSION = 'eportfolio_permission';
 
     /**
      * @inheritDoc
