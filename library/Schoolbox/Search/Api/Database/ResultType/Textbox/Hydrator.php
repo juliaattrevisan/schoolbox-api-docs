@@ -269,6 +269,13 @@ class Hydrator extends BaseHydrator
         ];
     }
 
+    /**
+     * Build the fragment for the homepage URL that will link to the textbox.
+     * @return string The fragment will be in one of the following formats:
+     *  If the title is shown to read-only users and the titlebar is rendered
+     *  (ie. not in compact mode): "component-title-$componentInstanceId"
+     *  Otherwise: "textbox-$componentInstanceId-$textboxId"
+     */
     private function buildHomepageTextboxFragment(
         int $componentInstanceId,
         int $textboxId,
