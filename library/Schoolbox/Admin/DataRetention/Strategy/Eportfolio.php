@@ -120,7 +120,7 @@ class Eportfolio extends Base
 
         foreach (['pages', 'blogs', 'blog_comments', 'blog_images', 'filelist_items'] as $key) {
             $count = (int) ($counts[$key] ?? 0);
-            $this->log->info(sprintf("Found '%s' ePortfolio %s to delete", $count, $key));
+            $this->log->notice(sprintf("Found '%s' ePortfolio %s to delete", $count, $key));
             $hasData = $hasData || $count > 0;
         }
 
