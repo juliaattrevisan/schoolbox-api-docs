@@ -69,20 +69,22 @@
          * @returns {string} - A human-readable time span
          */
         function humanReadableDuration(minutes) {
-            const timeUnits = [
-                { unit: "week", value: 60 * 24 * 7 },
-                { unit: "day", value: 60 * 24 },
-                { unit: "hour", value: 60 },
-                { unit: "minute", value: 1 },
-            ];
+            const timeUnits = ["year", "week", "day", "hour", "minute"];
 
-            let readable = [];
-            let diff = minutes;
-            for (const { unit, value } of timeUnits) {
-                if (diff >= value) {
-                    const count = Math.floor(diff / value);
-                    readable.push(`${count} ${unit}${count !== 1 ? "s" : ""}`);
-                    diff %= value;
+            const readable = [];
+            const now = dayjs();
+            let future = now.add(minutes, "minute");
+
+            /**
+             * Use dayjs's diff relative to now to get the most accurate duration value which accounts for things
+             * such as leap years, otherwise entering "3 years" may get normalised to "3 years and 1 day" which
+             * isn't what the user actually wants...
+             */
+            for (const unit of timeUnits) {
+                const diff = future.diff(now, unit);
+                if (diff > 0) {
+                    readable.push(`${diff} ${unit}${diff !== 1 ? "s" : ""}`);
+                    future = future.subtract(diff, unit);
                 }
             }
 
