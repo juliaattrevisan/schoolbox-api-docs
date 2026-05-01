@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings\FieldType\Duration;
 
-use Schoolbox\Admin\Settings\FieldType\AbstractRenderer;
+use Schoolbox\Admin\Settings\FieldType\Number\Renderer as NumberRenderer;
 use Schoolbox\Config\ConfigMapper;
 
-class Renderer extends AbstractRenderer
+class Renderer extends NumberRenderer
 {
     /**
      * @inheritdoc
