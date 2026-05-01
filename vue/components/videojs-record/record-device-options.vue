@@ -90,6 +90,7 @@ export default {
     padding: 0.5rem 1rem;
     color: white;
     background: rgba(43, 51, 63, 0.85);
+    border-radius: var(--sbx-config-field-roundness, 0);
 }
 
 .legend {
