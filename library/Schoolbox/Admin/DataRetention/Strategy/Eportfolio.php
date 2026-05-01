@@ -137,13 +137,15 @@ class Eportfolio extends Base
 
         $hasData = false;
 
-        foreach ([
-            self::TABLE_EPORTFOLIO_PAGE,
-            self::TABLE_EPORTFOLIO_COMPONENT_BLOG,
-            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
-            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
-            self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
-        ] as $table) {
+        foreach (
+            [
+                self::TABLE_EPORTFOLIO_PAGE,
+                self::TABLE_EPORTFOLIO_COMPONENT_BLOG,
+                self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
+                self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
+                self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
+            ] as $table
+        ) {
             $count = (int) ($counts[$table] ?? 0);
             $this->log->notice(sprintf("Found %s %s rows to delete", $count, $table));
             $hasData = $hasData || $count > 0;
@@ -195,22 +197,28 @@ class Eportfolio extends Base
         $pageCascadeBlogIds = array_values(array_diff($pageBlogIds, $blogIds));
         $deleted = [];
 
-        $this->deleteRowsByIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, $blogCommentIds);
-        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'blog_id', $blogIds, $blogCommentIds);
-        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'blog_id', $pageCascadeBlogIds, $blogCommentIds);
+        // Delete rows from all twelve tables covered by this strategy.
+
+        $table = self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT;
+        $this->deleteRowsByIds($deleted, $table, $blogCommentIds);
+        $this->deleteRowsByForeignIds($deleted, $table, 'blog_id', $blogIds, $blogCommentIds);
+        $this->deleteRowsByForeignIds($deleted, $table, 'blog_id', $pageCascadeBlogIds, $blogCommentIds);
 
         // eportfolio_component_blog_image (grandchild of page, via blog)
-        $this->deleteRowsByIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, $blogImageIds);
-        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'blog_id', $blogIds, $blogImageIds);
-        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'blog_id', $pageCascadeBlogIds, $blogImageIds);
+        $table = self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE;
+        $this->deleteRowsByIds($deleted, $table, $blogImageIds);
+        $this->deleteRowsByForeignIds($deleted, $table, 'blog_id', $blogIds, $blogImageIds);
+        $this->deleteRowsByForeignIds($deleted, $table, 'blog_id', $pageCascadeBlogIds, $blogImageIds);
 
         // eportfolio_component_blog (child of page)
-        $this->deleteRowsByIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BLOG, $blogIds);
-        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_BLOG, 'page_id', $pageIds, $blogIds);
+        $table = self::TABLE_EPORTFOLIO_COMPONENT_BLOG;
+        $this->deleteRowsByIds($deleted, $table, $blogIds);
+        $this->deleteRowsByForeignIds($deleted, $table, 'page_id', $pageIds, $blogIds);
 
         // eportfolio_component_filelist_item (child of page)
-        $this->deleteRowsByIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM, $fileListItemIds);
-        $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM, 'page_id', $pageIds, $fileListItemIds);
+        $table = self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM;
+        $this->deleteRowsByIds($deleted, $table, $fileListItemIds);
+        $this->deleteRowsByForeignIds($deleted, $table, 'page_id', $pageIds, $fileListItemIds);
 
         // eportfolio_permission (child of page, cascade-delete only)
         $this->deleteRowsByForeignIds($deleted, self::TABLE_EPORTFOLIO_PERMISSION, 'page_id', $pageIds);
@@ -528,5 +536,4 @@ class Eportfolio extends Base
             ],
         );
     }
-
 }
