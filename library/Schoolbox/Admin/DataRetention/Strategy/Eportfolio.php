@@ -644,17 +644,4 @@ class Eportfolio extends Base
         );
     }
 
-    /**
-     * Executes a prepared query with the given parameters and returns all rows as an associative array.
-     *
-     * @param array<string, mixed> $params
-     * @return list<array<string, mixed>>
-     */
-    protected function fetchRows(string $query, array $params): array
-    {
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
-
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
-    }
 }
