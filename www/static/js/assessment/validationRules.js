@@ -330,28 +330,4 @@ var beforeAttemptingSubmit = function () {
             },
         });
     }
-
-    // Validate duration if the field is visible
-    // Note: The [data-default-open-span-input] is visible to the user and is a TEXT field
-    // This is then synced with the hidden input [data-default-open-span-value] which is the actual NUMBER value as minutes
-    document.querySelectorAll("[data-default-open-span-input]").forEach((spanInputElement) => {
-        if (!$(spanInputElement).is(":visible")) {
-            return;
-        }
-
-        // Find the corresponding hidden input
-        const spanTargetId = spanInputElement.getAttribute("data-default-open-span-input");
-        $(`[data-default-open-span-value="${spanTargetId}"]`).rules("add", {
-            required: false,
-            number: true,
-            min: 0,
-            messages: {
-                // This is a special field controlled by default_open_span.twig. The input this is targeting is actually
-                // hidden away from the user, and the user interacts with a dedicated input on its own.
-                // In the event the user inputs an invalid duration, the value of this is set to -1 - so the "min" message
-                // actually represents an invalid duration of some sort
-                min: "Please enter a valid duration.",
-            },
-        });
-    });
 };
