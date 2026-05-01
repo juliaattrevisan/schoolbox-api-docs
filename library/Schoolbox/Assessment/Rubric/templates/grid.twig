@@ -27,7 +27,7 @@
         {# TODO: these are signs of likely permission issues #}
         {% if showRubricTotal ?? false %}show-rubric-total{% endif %}
         {% if showGroupTotal ?? false %}show-group-total{% endif %}
-        {% if showDescriptorValue ?? false %}show-descriptor-value{% endif %}
+        {% if (showDescriptorValue ?? false) and rubricGrid.showDescriptorValue %}show-descriptor-value{% endif %}
     />
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricGrid.js?v={{ config.site_version }}"></script>

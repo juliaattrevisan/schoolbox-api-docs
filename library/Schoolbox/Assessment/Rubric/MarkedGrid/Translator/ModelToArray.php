@@ -13,7 +13,6 @@ namespace Schoolbox\Assessment\Rubric\MarkedGrid\Translator;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 
 /**
  * Translator for converting a Marked Rubric Grid into an array representation,
@@ -89,46 +88,22 @@ class ModelToArray
      */
     private function translateIndicatorUsage(MarkedGrid $markedGrid, IndicatorUsage $indicatorUsage): array
     {
-        $grid = $markedGrid->getGrid();
-
         $indicatorMark = $markedGrid->retrieveIndicatorMark($indicatorUsage);
-        $indicatorMarkDescriptor = $indicatorMark?->getDescriptor();
 
-        $descriptors = [];
-        foreach ($grid->getLevels() as $levelIndex => $level) {
-            $descriptor = $indicatorUsage->retrieveDescriptor($levelIndex);
-            if (!$descriptor) {
-                $descriptors[] = null;
-                continue;
-            }
-
-            // TODO: permissions:
-            // $isMarkDisplayed = ; // TODO: && $grid->getAssessment()->isFeedbackVisibleToUser(VIEWER);
-            $isDescriptorSelected = (
-                // $isMarkDisplayed &&
-                $indicatorMarkDescriptor &&
-                $indicatorMarkDescriptor->getId() === $descriptor->getId()
-            );
-
-            $value = null;
-            if ($descriptor->hasValue() && $grid->showDescriptorValue()) { // TODO: && ...->getConfigLoader()->get('rubric_show_points'), also arbitrary twig showDescriptorValue var
-                $value = $grid->isUseMarkRange()
-                    ? [ 'left' => $descriptor->getMinValue(), 'right' => $descriptor->getMaxValue() ]
-                    : [ 'max' => $descriptor->getMaxValue() ];
-            }
-
-            $descriptors[] = [
-                'id' => $descriptor->getId(),
-                'selected' => $isDescriptorSelected,
-                'value' => $value,
+        // TODO: permissions, notably self assessment differs
+        $isMarkDisplayed = true; // TODO: $grid->getAssessment()->isFeedbackVisibleToUser(VIEWER);
+        if (!$isMarkDisplayed || $indicatorMark === null) {
+            return [
+                'id' => $indicatorUsage->getIndicator()->getId(),
+                'humanReadableMark' => null,
+                'descriptorId' => null,
             ];
         }
 
         return [
             'id' => $indicatorUsage->getIndicator()->getId(),
-            // TODO: permissions, notably self assessment differs
-            'humanReadableMark' => $indicatorMark?->getValue(),
-            'descriptors' => $descriptors,
+            'humanReadableMark' => $indicatorMark->getValue(),
+            'descriptorId' => $indicatorMark->getDescriptor()?->getId(),
         ];
     }
 }

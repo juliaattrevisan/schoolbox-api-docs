@@ -34,6 +34,10 @@ export type RubricGridIndicator = {
 export type RubricGridDescriptor = {
     id: number;
     description: string | null;
+    value:
+        | { left: number | null; right: number | null } // if using mark range
+        | { max: number | null } // no mark range, just show max value
+        | null; // if no value, or if no access to see the value
 };
 
 /**
@@ -58,14 +62,6 @@ export type RubricMarkedGridCapability = {
 export type RubricMarkedGridIndicator = {
     id: RubricGridIndicator["id"];
     humanReadableMark: string | null;
-    /** matches grid levels, null where not applicable */
-    descriptors: (RubricMarkedGridDescriptor | null)[];
-};
-
-export type RubricMarkedGridDescriptor = {
-    id: RubricGridDescriptor["id"];
-    selected: boolean;
-    value:
-        | { left: number | null; right: number | null } // if using mark range
-        | { max: number | null };
+    /** The selected descriptor ID, if any */
+    descriptorId: RubricGridDescriptor["id"] | null;
 };

@@ -5,12 +5,7 @@
  */
 
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
-import type {
-    RubricGridIndicator,
-    RubricGridLevel,
-    RubricMarkedGridDescriptor,
-    RubricMarkedGridIndicator,
-} from "./types";
+import type { RubricGridIndicator, RubricGridLevel, RubricMarkedGridIndicator } from "./types";
 import RrGridDescriptor from "./rr-grid-descriptor.vue";
 
 interface Props {
@@ -22,22 +17,6 @@ interface Props {
     showDescriptorValue?: boolean;
 }
 const props = defineProps<Props>();
-
-/**
- * Find a descriptor mark for a specific descriptor in a RubricMarkedGridIndicator
- * @param descriptorIndex the index of the descriptor to find the mark for
- * @param markedGridIndicator the RubricMarkedGridIndicator to find the mark in
- * @returns the descriptor mark, or null if not found
- */
-function findDescriptorMark(
-    descriptorIndex: number,
-    markedGridIndicator: RubricMarkedGridIndicator | null,
-): RubricMarkedGridDescriptor | null {
-    if (!markedGridIndicator) {
-        return null;
-    }
-    return markedGridIndicator.descriptors[descriptorIndex] ?? null;
-}
 </script>
 
 <template>
@@ -50,8 +29,7 @@ function findDescriptorMark(
                 v-if="props.indicator.descriptors[index] !== null"
                 :descriptor="props.indicator.descriptors[index]"
                 :indicator-mark="props.indicatorMark"
-                :descriptor-mark="findDescriptorMark(index, props.indicatorMark)"
-                :self-assessment-descriptor-mark="findDescriptorMark(index, props.selfAssessmentIndicatorMark)"
+                :self-assessment-indicator-mark="props.selfAssessmentIndicatorMark"
                 :level="level"
                 :participant-id="props.participantId"
                 :show-descriptor-value="props.showDescriptorValue"

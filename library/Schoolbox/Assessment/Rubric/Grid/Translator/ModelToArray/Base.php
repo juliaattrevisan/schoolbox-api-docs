@@ -97,9 +97,18 @@ class Base
                 continue;
             }
 
+            // TODO: permissions:
+            $value = null;
+            if ($descriptor->hasValue() && $rubricGrid->showDescriptorValue()) { // TODO: && ...->getConfigLoader()->get('rubric_show_points'), also arbitrary twig showDescriptorValue var
+                $value = $rubricGrid->isUseMarkRange()
+                    ? [ 'left' => $descriptor->getMinValue(), 'right' => $descriptor->getMaxValue() ]
+                    : [ 'max' => $descriptor->getMaxValue() ];
+            }
+
             $descriptors[] = [
                 'id' => $descriptor->getId(),
                 'description' => $descriptor->getDescription(),
+                'value' => $value,
             ];
         }
 

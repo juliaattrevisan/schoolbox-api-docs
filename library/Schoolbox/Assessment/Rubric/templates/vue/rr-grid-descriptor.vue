@@ -6,18 +6,12 @@
 import locale from "@js/terminology/rosettaStone";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
-import type {
-    RubricGridDescriptor,
-    RubricGridLevel,
-    RubricMarkedGridDescriptor,
-    RubricMarkedGridIndicator,
-} from "./types";
+import type { RubricGridDescriptor, RubricGridLevel, RubricMarkedGridIndicator } from "./types";
 
 interface Props {
     descriptor: RubricGridDescriptor;
     indicatorMark: RubricMarkedGridIndicator | null;
-    descriptorMark: RubricMarkedGridDescriptor | null;
-    selfAssessmentDescriptorMark: RubricMarkedGridDescriptor | null;
+    selfAssessmentIndicatorMark: RubricMarkedGridIndicator | null;
     level: RubricGridLevel;
     participantId: UserAuthor["id"];
     showDescriptorValue?: boolean;
@@ -25,10 +19,14 @@ interface Props {
 const props = defineProps<Props>();
 
 const isSelfGrading = false; // TODO: selfAssessmentFeedback.isSelfGrading
+
+const isDescriptorSelected = window.Vue.computed(
+    () => props.indicatorMark && props.indicatorMark.descriptorId === props.descriptor.id,
+);
 </script>
 
 <template>
-    <td :class="{ 'rb-selected': descriptorMark?.selected }">
+    <td :class="{ 'rb-selected': isDescriptorSelected }">
         <div>
             <div class="hide-for-large-up l-pad-m hide-on-print">
                 <!-- display rubric levels for the mobile view. -->
@@ -41,13 +39,17 @@ const isSelfGrading = false; // TODO: selfAssessmentFeedback.isSelfGrading
             <span class="rb-description markdown">
                 <!-- Self-Assessment  -->
                 <user-photo
-                    v-if="props.selfAssessmentDescriptorMark?.selected && props.participantId !== null"
+                    v-if="
+                        props.selfAssessmentIndicatorMark &&
+                        props.selfAssessmentIndicatorMark.descriptorId === props.descriptor.id &&
+                        props.participantId !== null
+                    "
                     :user-id="props.participantId"
                     class="rb-self-reflection-choice"
                     render="tiny"
                     :description="
                         isSelfGrading
-                            ? `(${props.selfAssessmentDescriptorMark.value}) ${locale.selfAssessment.proper()} choice`
+                            ? `(${props.selfAssessmentIndicatorMark.humanReadableMark}) ${locale.selfAssessment.proper()} choice`
                             : `${locale.selfReflection.proper()} choice`
                     "
                 />
@@ -56,23 +58,27 @@ const isSelfGrading = false; // TODO: selfAssessmentFeedback.isSelfGrading
                 {{ props.descriptor.description?.trim() }}
             </span>
 
-            <span
-                v-if="props.showDescriptorValue && props.descriptorMark && props.descriptorMark.value !== null"
-                class="rb-value used"
-            >
-                <template v-if="'max' in props.descriptorMark.value">
-                    {{ props.descriptorMark.value.max }}
-                </template>
-                <template v-else>
+            <span v-if="props.showDescriptorValue && props.descriptor.value !== null" class="rb-value used">
+                <template v-if="'left' in props.descriptor.value">
                     <!-- show indicator mark if available -->
-                    <span v-if="props.descriptorMark.selected && props.indicatorMark" class="range-selection-value">
+                    <span
+                        v-if="
+                            isDescriptorSelected &&
+                            props.indicatorMark &&
+                            props.indicatorMark.humanReadableMark !== null
+                        "
+                        class="range-selection-value"
+                    >
                         {{ props.indicatorMark.humanReadableMark }}
                     </span>
 
                     <!-- mark range -->
-                    <span class="range" :class="{ selected: props.descriptorMark.selected }">
-                        {{ props.descriptorMark.value.left }}–{{ props.descriptorMark.value.right }}
+                    <span class="range" :class="{ selected: isDescriptorSelected }">
+                        {{ props.descriptor.value.left }}–{{ props.descriptor.value.right }}
                     </span>
+                </template>
+                <template v-else>
+                    {{ props.descriptor.value.max }}
                 </template>
             </span>
         </div>
