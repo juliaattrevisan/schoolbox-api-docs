@@ -20,26 +20,10 @@ class Eportfolio extends Base
     protected string $retentionConfigKey = ConfigMapper::NAME_DATA_RETENTION_EPORTFOLIO;
 
     private const string TABLE_EPORTFOLIO_PAGE = 'eportfolio_page';
-    /** @phpstan-ignore classConstant.unused (Used by later ePortfolio retention deletion tasks.) */
-    private const string TABLE_EPORTFOLIO_PERMISSION = 'eportfolio_permission';
     private const string TABLE_EPORTFOLIO_COMPONENT_BLOG = 'eportfolio_component_blog';
     private const string TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT = 'eportfolio_component_blog_comment';
     private const string TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE = 'eportfolio_component_blog_image';
     private const string TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM = 'eportfolio_component_filelist_item';
-    /** @phpstan-ignore classConstant.unused (Used by later ePortfolio retention deletion tasks.) */
-    private const string TABLE_COMPONENT_INSTANCE = 'component_instance';
-    /** @phpstan-ignore classConstant.unused (Used by later ePortfolio retention deletion tasks.) */
-    private const string TABLE_COMPONENT_CONFIG_INSTANCE = 'component_config_instance';
-    /** @phpstan-ignore classConstant.unused (Used by later ePortfolio retention deletion tasks.) */
-    private const string TABLE_EPORTFOLIO_COMPONENT_ADVANCEDLIST_ITEM = 'eportfolio_component_advancedlist_item';
-    /** @phpstan-ignore classConstant.unused (Used by later ePortfolio retention deletion tasks.) */
-    private const string TABLE_EPORTFOLIO_COMPONENT_BASICLIST_ITEM = 'eportfolio_component_basiclist_item';
-    /** @phpstan-ignore classConstant.unused (Used by later ePortfolio retention deletion tasks.) */
-    private const string TABLE_EPORTFOLIO_COMPONENT_LINKLIST_ITEM = 'eportfolio_component_linklist_item';
-    /** @phpstan-ignore classConstant.unused (Used by later ePortfolio retention deletion tasks.) */
-    private const string TABLE_EPORTFOLIO_COMPONENT_TEXTBOX_ITEM = 'eportfolio_component_textbox_item';
-    /** @phpstan-ignore classConstant.unused (Used by later ePortfolio retention deletion tasks.) */
-    private const string COMPONENT_MODULE_EPORTFOLIO = 'eportfolio';
 
     /**
      * @inheritDoc

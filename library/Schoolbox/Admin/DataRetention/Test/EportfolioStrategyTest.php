@@ -72,14 +72,6 @@ class EportfolioStrategyTest extends TestCase
             }
 
             /**
-             * @return list<array<string, mixed>>
-             */
-            public function exposedGetIdsToDelete(): array
-            {
-                return $this->getIdsToDelete();
-            }
-
-            /**
              * @param array<string, mixed> $params
              * @return list<array<string, mixed>>
              */
@@ -92,6 +84,20 @@ class EportfolioStrategyTest extends TestCase
         };
 
         return ['strategy' => $strategy, 'state' => $state];
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function getIdsToDelete(Eportfolio $strategy): array
+    {
+        $getIdsToDelete = \Closure::bind(
+            fn(): array => $this->getIdsToDelete(),
+            $strategy,
+            Eportfolio::class,
+        );
+
+        return $getIdsToDelete();
     }
 
     public function testProcessSafelyExitsWhenRetentionIsOverridden(): void
@@ -140,7 +146,7 @@ class EportfolioStrategyTest extends TestCase
                 ['table' => self::TABLE_BLOG_IMAGE, 'id' => 40],
                 ['table' => self::TABLE_FILELIST_ITEM, 'id' => 50],
             ],
-            $strategy->exposedGetIdsToDelete(),
+            $this->getIdsToDelete($strategy),
         );
     }
 
@@ -148,7 +154,7 @@ class EportfolioStrategyTest extends TestCase
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy([[], [], [], [], []]);
 
-        $strategy->exposedGetIdsToDelete();
+        $this->getIdsToDelete($strategy);
 
         $sql = implode("\n", array_column($state->queries, 'query'));
 
