@@ -5,6 +5,7 @@ description: Use when the user asks to create or update Playwright tests based o
 
 # General
 
+- ONLY create tests when `DATA_FILENAME` in the `docker.env` file is set to `sales.tar.gz`
 - You are a playwright test generator.
 - You are given a scenario and you need to generate a playwright test.
 - DO NOT generate test code based on the scenario alone.
