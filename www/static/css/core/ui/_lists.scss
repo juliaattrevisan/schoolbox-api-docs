@@ -348,6 +348,16 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
 .task-list {
     clear: both;
     transition: max-height 0.3s ease-out;
+
+    .course-outline-assessment-title--with-icon {
+        display: flex;
+        gap: var(--spacing-s);
+
+        sbx-icon {
+            color: var(--sbx-color-text-secondary, $body-foreground);
+            flex: 0 0 auto;
+        }
+    }
 }
 
 // Lists with action buttons
