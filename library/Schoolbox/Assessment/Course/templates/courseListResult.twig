@@ -53,8 +53,8 @@ Usage:
             {% if titleUrl %}
                 {# Importing a course (no Tot) or You have READ permission in the Unit Planner page
                  #}
-                <a href="{{ titleUrl }}" data-course-link data-course-id="{{ courseSpec.id }}" data-course-name="{{ courseSpec.folder.name }}" data-component-id="{{ component ? component.id : 0 }}">
-                    <div class="icon-course"></div>
+                <a href="{{ titleUrl }}" class="course-link--meta" data-course-link data-course-id="{{ courseSpec.id }}" data-course-name="{{ courseSpec.folder.name }}" data-component-id="{{ component ? component.id : 0 }}">
+                    <sbx-icon name="course"></sbx-icon>
                     <h3 data-test="course-list-{{ courseSpec.folder.name }}">{{ courseSpec.folder.name }}</h3>
                 </a>
             {% else %}
@@ -62,8 +62,10 @@ Usage:
                  # Just show a readonly representation of the course so you know it exists
                  # and hide the tot menu option
                  #}
-                <sbx-icon name="course"></sbx-icon>
-                <h3>{{ courseSpec.folder.name }}</h3>
+                <div class="course-link--meta">
+                    <sbx-icon name="course"></sbx-icon>
+                    <h3>{{ courseSpec.folder.name }}</h3>
+                </div>
             {% endif %}
 
             <p class="meta">

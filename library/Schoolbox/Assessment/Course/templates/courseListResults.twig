@@ -65,7 +65,7 @@
         <div class="row">
             <div class="small-12 columns">
                 <div class="empty-state" data-test="course-list-results-empty-state">
-                    <i class="icon-course"></i>
+                    <sbx-icon name="course"></sbx-icon>
                     {% if search is defined and search is not empty %}
                         <p>Your search for '{{ search }}' did not return any matches.<br>Please try your search again or <a href="{{ routeLookup('course.newCourse', {name: (search | url_encode)}) }}">create a new course called '{{ search }}'</a>.</p>
                     {% else %}
