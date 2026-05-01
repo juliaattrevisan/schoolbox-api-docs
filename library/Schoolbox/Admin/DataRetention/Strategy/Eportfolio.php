@@ -174,6 +174,8 @@ class Eportfolio extends Base
     }
 
     /**
+     * Deletes a chunk of root targets and their cascade-delete descendants in a single transaction.
+     *
      * @see database table tree diagram in the class docblock.
      * @param list<array{table: string, id: int|string}> $chunk
      */
@@ -347,6 +349,8 @@ class Eportfolio extends Base
     }
 
     /**
+     * Groups a flat list of deletion targets into arrays of IDs keyed by table name.
+     *
      * @param list<array{table: string, id: int|string}> $chunk
      * @return array<string, list<int>>
      */
@@ -371,6 +375,8 @@ class Eportfolio extends Base
     }
 
     /**
+     * Logs the IDs of root targets being processed in the current chunk.
+     *
      * @param array<string, list<int>> $targetIds
      */
     private function logRootTargetIds(array $targetIds): void
@@ -383,6 +389,8 @@ class Eportfolio extends Base
     }
 
     /**
+     * Returns the component_instance IDs for the given ePortfolio page IDs.
+     *
      * @param list<int> $pageIds
      * @return list<int>
      */
@@ -411,6 +419,8 @@ class Eportfolio extends Base
     }
 
     /**
+     * Returns all blog IDs belonging to the given ePortfolio page IDs.
+     *
      * @param list<int> $pageIds
      * @return list<int>
      */
@@ -433,6 +443,8 @@ class Eportfolio extends Base
     }
 
     /**
+     * Deletes rows from a table by primary key, returning the number of rows deleted.
+     *
      * @param list<int> $ids
      */
     protected function deleteRowsByIds(string $table, array $ids, string $column = 'id'): int
@@ -451,6 +463,8 @@ class Eportfolio extends Base
     }
 
     /**
+     * Deletes rows from a table by foreign key, optionally excluding rows already deleted by a prior call.
+     *
      * @param list<int> $ids
      * @param list<int> $excludedIds
      */
@@ -479,6 +493,8 @@ class Eportfolio extends Base
     }
 
     /**
+     * Accumulates a row-count into the deleted totals map for the given table.
+     *
      * @param array<string, int> $deleted
      */
     protected function recordDeleted(array &$deleted, string $table, int $count): void
@@ -487,6 +503,8 @@ class Eportfolio extends Base
     }
 
     /**
+     * Logs the number of rows deleted (or that would be deleted) per table for the current chunk.
+     *
      * @param array<string, int> $deleted
      */
     protected function logChunkResult(array $deleted): void
@@ -499,6 +517,8 @@ class Eportfolio extends Base
     }
 
     /**
+     * Returns soft-deleted ePortfolio pages old enough to be hard-deleted.
+     *
      * @return list<array{table: string, id: int|string}>
      */
     private function findEligiblePageTargets(string $old): array
@@ -516,6 +536,8 @@ class Eportfolio extends Base
     }
 
     /**
+     * Returns soft-deleted blogs old enough to be hard-deleted, whose parent page is not itself being deleted.
+     *
      * @return list<array{table: string, id: int|string}>
      */
     private function findEligibleBlogTargets(string $old): array
@@ -536,6 +558,9 @@ class Eportfolio extends Base
     }
 
     /**
+     * Returns soft-deleted blog comments old enough to be hard-deleted,
+     * whose parent blog and page are not themselves being deleted.
+     *
      * @return list<array{table: string, id: int|string}>
      */
     private function findEligibleBlogCommentTargets(string $old): array
@@ -563,6 +588,9 @@ class Eportfolio extends Base
     }
 
     /**
+     * Returns soft-deleted blog images old enough to be hard-deleted,
+     * whose parent blog and page are not themselves being deleted.
+     *
      * @return list<array{table: string, id: int|string}>
      */
     private function findEligibleBlogImageTargets(string $old): array
@@ -590,6 +618,9 @@ class Eportfolio extends Base
     }
 
     /**
+     * Returns soft-deleted file list items old enough to be hard-deleted,
+     * whose parent page (if any) is not itself being deleted.
+     *
      * @return list<array{table: string, id: int|string}>
      */
     private function findEligibleFileListItemTargets(string $old): array
@@ -614,6 +645,8 @@ class Eportfolio extends Base
     }
 
     /**
+     * Executes a prepared query with the given parameters and returns all rows as an associative array.
+     *
      * @param array<string, mixed> $params
      * @return list<array<string, mixed>>
      */
