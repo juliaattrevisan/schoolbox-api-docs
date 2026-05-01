@@ -60,7 +60,7 @@ class EportfolioStrategyTest extends TestCase
             /** @var array<int, list<int>> */
             public array $pageBlogIds = [];
 
-            /** @var list<array{method: string, table: string, column: string, ids: list<int>}> */
+            /** @var list<array{method: string, table: string, column: string, ids: list<int>, excludedIds?: list<int>}> */
             public array $operations = [];
         };
 
@@ -150,19 +150,30 @@ class EportfolioStrategyTest extends TestCase
 
             /**
              * @param list<int> $ids
+             * @param list<int> $excludedIds
              */
-            protected function deleteRowsByForeignIds(string $table, string $column, array $ids): int
-            {
+            protected function deleteRowsByForeignIds(
+                string $table,
+                string $column,
+                array $ids,
+                array $excludedIds = [],
+            ): int {
                 if ($ids === []) {
                     return 0;
                 }
 
-                $this->state->operations[] = [
+                $operation = [
                     'method' => 'foreign',
                     'table' => $table,
                     'column' => $column,
                     'ids' => $ids,
                 ];
+
+                if ($excludedIds !== []) {
+                    $operation['excludedIds'] = $excludedIds;
+                }
+
+                $this->state->operations[] = $operation;
 
                 return count($ids);
             }
@@ -409,7 +420,67 @@ class EportfolioStrategyTest extends TestCase
                 ['method' => 'ids', 'table' => self::TABLE_BLOG_IMAGE, 'column' => 'id', 'ids' => [40]],
                 ['method' => 'ids', 'table' => self::TABLE_FILELIST_ITEM, 'column' => 'id', 'ids' => [50]],
                 ['method' => 'foreign', 'table' => self::TABLE_BLOG, 'column' => 'page_id', 'ids' => [10]],
-                ['method' => 'foreign', 'table' => self::TABLE_FILELIST_ITEM, 'column' => 'page_id', 'ids' => [10]],
+                [
+                    'method' => 'foreign',
+                    'table' => self::TABLE_FILELIST_ITEM,
+                    'column' => 'page_id',
+                    'ids' => [10],
+                    'excludedIds' => [50],
+                ],
+                ['method' => 'foreign', 'table' => self::TABLE_PERMISSION, 'column' => 'page_id', 'ids' => [10]],
+                ['method' => 'ids', 'table' => self::TABLE_PAGE, 'column' => 'page_id', 'ids' => [10]],
+            ],
+            $state->operations,
+        );
+    }
+
+    public function testOverlappingMixedChunksExcludeDirectTargetsFromBroaderDryRunCounts(): void
+    {
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy();
+        $state->pageBlogIds = [10 => [20]];
+
+        $this->deleteChunk($strategy, [
+            ['table' => self::TABLE_PAGE, 'id' => 10],
+            ['table' => self::TABLE_BLOG, 'id' => 20],
+            ['table' => self::TABLE_BLOG_COMMENT, 'id' => 30],
+            ['table' => self::TABLE_BLOG_IMAGE, 'id' => 40],
+            ['table' => self::TABLE_FILELIST_ITEM, 'id' => 50],
+        ]);
+
+        $this->assertSame(
+            [
+                ['method' => 'ids', 'table' => self::TABLE_BLOG_COMMENT, 'column' => 'id', 'ids' => [30]],
+                ['method' => 'ids', 'table' => self::TABLE_BLOG_IMAGE, 'column' => 'id', 'ids' => [40]],
+                ['method' => 'ids', 'table' => self::TABLE_FILELIST_ITEM, 'column' => 'id', 'ids' => [50]],
+                [
+                    'method' => 'foreign',
+                    'table' => self::TABLE_BLOG_COMMENT,
+                    'column' => 'blog_id',
+                    'ids' => [20],
+                    'excludedIds' => [30],
+                ],
+                [
+                    'method' => 'foreign',
+                    'table' => self::TABLE_BLOG_IMAGE,
+                    'column' => 'blog_id',
+                    'ids' => [20],
+                    'excludedIds' => [40],
+                ],
+                ['method' => 'ids', 'table' => self::TABLE_BLOG, 'column' => 'id', 'ids' => [20]],
+                [
+                    'method' => 'foreign',
+                    'table' => self::TABLE_BLOG,
+                    'column' => 'page_id',
+                    'ids' => [10],
+                    'excludedIds' => [20],
+                ],
+                [
+                    'method' => 'foreign',
+                    'table' => self::TABLE_FILELIST_ITEM,
+                    'column' => 'page_id',
+                    'ids' => [10],
+                    'excludedIds' => [50],
+                ],
                 ['method' => 'foreign', 'table' => self::TABLE_PERMISSION, 'column' => 'page_id', 'ids' => [10]],
                 ['method' => 'ids', 'table' => self::TABLE_PAGE, 'column' => 'page_id', 'ids' => [10]],
             ],

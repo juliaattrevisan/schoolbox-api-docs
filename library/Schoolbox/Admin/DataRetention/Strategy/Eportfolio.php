@@ -94,6 +94,7 @@ class Eportfolio extends Base
 
         $componentInstanceIds = $this->findComponentInstanceIdsByPageIds($pageIds);
         $pageBlogIds = $this->findBlogIdsByPageIds($pageIds);
+        $pageCascadeBlogIds = array_values(array_diff($pageBlogIds, $blogIds));
         $deleted = [];
 
         $this->recordDeleted(
@@ -114,12 +115,22 @@ class Eportfolio extends Base
         $this->recordDeleted(
             $deleted,
             self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
-            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'blog_id', $blogIds),
+            $this->deleteRowsByForeignIds(
+                self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
+                'blog_id',
+                $blogIds,
+                $blogCommentIds,
+            ),
         );
         $this->recordDeleted(
             $deleted,
             self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
-            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'blog_id', $blogIds),
+            $this->deleteRowsByForeignIds(
+                self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
+                'blog_id',
+                $blogIds,
+                $blogImageIds,
+            ),
         );
         $this->recordDeleted(
             $deleted,
@@ -174,22 +185,37 @@ class Eportfolio extends Base
         $this->recordDeleted(
             $deleted,
             self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
-            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT, 'blog_id', $pageBlogIds),
+            $this->deleteRowsByForeignIds(
+                self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
+                'blog_id',
+                $pageCascadeBlogIds,
+                $blogCommentIds,
+            ),
         );
         $this->recordDeleted(
             $deleted,
             self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
-            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'blog_id', $pageBlogIds),
+            $this->deleteRowsByForeignIds(
+                self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
+                'blog_id',
+                $pageCascadeBlogIds,
+                $blogImageIds,
+            ),
         );
         $this->recordDeleted(
             $deleted,
             self::TABLE_EPORTFOLIO_COMPONENT_BLOG,
-            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG, 'page_id', $pageIds),
+            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG, 'page_id', $pageIds, $blogIds),
         );
         $this->recordDeleted(
             $deleted,
             self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
-            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM, 'page_id', $pageIds),
+            $this->deleteRowsByForeignIds(
+                self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
+                'page_id',
+                $pageIds,
+                $fileListItemIds,
+            ),
         );
         $this->recordDeleted(
             $deleted,
@@ -304,18 +330,28 @@ class Eportfolio extends Base
 
     /**
      * @param list<int> $ids
+     * @param list<int> $excludedIds
      */
-    protected function deleteRowsByForeignIds(string $table, string $column, array $ids): int
+    protected function deleteRowsByForeignIds(string $table, string $column, array $ids, array $excludedIds = []): int
     {
         if ($ids === []) {
             return 0;
         }
 
         $placeholders = Builder::getArrayPlaceholders($ids, $column);
+        $parameters = Builder::getArrayParameters($ids, $column);
+        $exclusionPredicate = '';
+
+        if ($excludedIds !== []) {
+            $excludedPlaceholders = Builder::getArrayPlaceholders($excludedIds, 'excluded_id');
+            $exclusionPredicate = " AND id NOT IN {$excludedPlaceholders}";
+            $parameters = array_merge($parameters, Builder::getArrayParameters($excludedIds, 'excluded_id'));
+        }
+
         $statement = $this->getPreparedStatement(
-            $this->deleteStatement($table) . " FROM {$table} WHERE {$column} IN {$placeholders}"
+            $this->deleteStatement($table) . " FROM {$table} WHERE {$column} IN {$placeholders}{$exclusionPredicate}"
         );
-        $statement->execute(Builder::getArrayParameters($ids, $column));
+        $statement->execute($parameters);
 
         return $statement->rowCount();
     }
