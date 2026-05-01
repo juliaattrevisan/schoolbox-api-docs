@@ -35,6 +35,23 @@
     <script>
     (() => {
         /**
+         * Available time units and their equivalent value in minutes for conversion.
+         * The value here particularly relates to how the backend defines each unit
+         * so that it can be restored back to a human-readable format and parsed back into the same value reliably.
+         *
+         * Relying on the diff from dayjs is not sufficient as that will vary based on the date (daylight savings, leap years, etc)
+         */
+        const timeUnits = [
+            // assume a year is always 365 days, leap years are ignored as this is for parsing a duration, not a specific date
+            { unit: "year", value: 365 * 24 * 60 },
+            // omit "month" since it's highly variable and can lead to confusion
+            { unit: "week", value: 7 * 24 * 60 },
+            { unit: "day", value: 24 * 60 },
+            { unit: "hour", value: 60 },
+            { unit: "minute", value: 1 },
+        ];
+
+        /**
          * Converts an arbitrary time span to a duration in minutes relative to the current time
          * Similar to how datepickers are able to parse "in 5 days", "tomorrow", "1 month", etc via alaress-datetime-picker.js
          * @param {string} userInput - The user input to parse (representing an arbitrary time span or date)
@@ -53,14 +70,20 @@
                 return false; // invalid input
             }
 
-            // If it switches daylight savings, the diff will be off by an hour - so we need to offset that otherwise it'll keep increasing
-            const offsetDiff = future.utcOffset() - now.utcOffset();
-            future = future.add(offsetDiff, "minute");
+            // Use only dayjs functions to reliably retrieve differences in each time unit
+            let totalMinutes = 0;
+            for (const { unit, value } of timeUnits) {
+                // 'true' ensures a float value is returned that we can round instead of floor (otherwise "5 minutes" becomes "4 minutes")
+                const diff = Math.round(future.diff(now, unit, true));
+                if (diff !== 0) {
+                    future = future.subtract(diff, unit);
+                    totalMinutes += diff * value;
+                }
+                console.log(`diff in ${unit}s: ${diff}, totalMinutes: ${totalMinutes}`);
+            }
 
-            // Get the difference in minutes between the normalised timestamp and now
-            // need to round to the nearest minute because it may be off by a fraction of a second
-            // If for some reason someone enters "5 minutes ago" or a date in the past, this will also normalise it to be positive
-            return Math.abs(Math.round(future.diff(now, "minute", true)));
+            // If the user entered a relative date in the past, e.g. "5 minutes ago", normalise the diff to be positive
+            return Math.abs(totalMinutes);
         }
 
         /**
@@ -69,22 +92,14 @@
          * @returns {string} - A human-readable time span
          */
         function humanReadableDuration(minutes) {
-            const timeUnits = ["year", "week", "day", "hour", "minute"];
-
             const readable = [];
-            const now = dayjs();
-            let future = now.add(minutes, "minute");
 
-            /**
-             * Use dayjs's diff relative to now to get the most accurate duration value which accounts for things
-             * such as leap years, otherwise entering "3 years" may get normalised to "3 years and 1 day" which
-             * isn't what the user actually wants...
-             */
-            for (const unit of timeUnits) {
-                const diff = future.diff(now, unit);
-                if (diff > 0) {
-                    readable.push(`${diff} ${unit}${diff !== 1 ? "s" : ""}`);
-                    future = future.subtract(diff, unit);
+            let diff = minutes;
+            for (const { unit, value } of timeUnits) {
+                if (diff >= value) {
+                    const count = Math.floor(diff / value);
+                    readable.push(`${count} ${unit}${count !== 1 ? "s" : ""}`);
+                    diff %= value;
                 }
             }
 
@@ -116,7 +131,6 @@
             }
 
             $(durationValueInput).valid(); // make alaressValidate notice the change
-
         }
 
         durationUserInput.addEventListener("blur", onDurationChanged);
