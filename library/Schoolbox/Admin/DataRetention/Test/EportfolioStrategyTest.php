@@ -31,17 +31,12 @@ class EportfolioStrategyTest extends TestCase
      * @param list<list<array<string, mixed>>> $fetchRows
      * @return array{strategy: Eportfolio, state: object}
      */
-    private function strategy(array $fetchRows = []): array
+    private function strategy(array $fetchRows = [], ?LoggerInterface $logger = null): array
     {
-        $logger = $this->createStub(LoggerInterface::class);
+        $logger ??= $this->createStub(LoggerInterface::class);
         $database = $this->createStub(IConnector::class);
         $lock = $this->createStub(LockInterface::class);
         $config = $this->createStub(IConfigLoader::class);
-
-        $logger->method('debug');
-        $logger->method('info');
-        $logger->method('notice');
-        $logger->method('warning');
 
         $state = new class ($fetchRows) {
             /**
@@ -485,6 +480,36 @@ class EportfolioStrategyTest extends TestCase
                 ['method' => 'ids', 'table' => self::TABLE_PAGE, 'column' => 'page_id', 'ids' => [10]],
             ],
             $state->operations,
+        );
+    }
+
+    public function testDeleteChunkLogsRootTargetIdsByTableAtDebugLevel(): void
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $debugMessages = [];
+
+        $logger->expects($this->exactly(2))
+            ->method('debug')
+            ->willReturnCallback(
+                static function (string|\Stringable $message, array $context = []) use (&$debugMessages): void {
+                    $debugMessages[] = (string)$message;
+                },
+            );
+
+        ['strategy' => $strategy] = $this->strategy([], $logger);
+
+        $this->deleteChunk($strategy, [
+            ['table' => self::TABLE_PAGE, 'id' => 10],
+            ['table' => self::TABLE_PAGE, 'id' => 11],
+            ['table' => self::TABLE_BLOG, 'id' => 20],
+        ]);
+
+        $this->assertSame(
+            [
+                'Processing ePortfolio root target eportfolio_page ids: 10, 11',
+                'Processing ePortfolio root target eportfolio_component_blog ids: 20',
+            ],
+            $debugMessages,
         );
     }
 
