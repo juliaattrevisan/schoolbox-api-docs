@@ -71,6 +71,30 @@ describe("dayjsnaturalTimePlugin", () => {
         expect(Math.abs(result.unix() - expected.unix())).toBeLessThanOrEqual(1);
     });
 
+    test("parses 'in 1 year' correctly", () => {
+        const now = dayjs();
+        const result = dayjs.parseNatural("in 1 year", now);
+        const expected = now.add(1, "year");
+        expect(result).not.toBeFalsy();
+        expect(Math.abs(result.unix() - expected.unix())).toBeLessThanOrEqual(1);
+    });
+
+    test("parses '3 years ago' correctly", () => {
+        const now = dayjs();
+        const result = dayjs.parseNatural("3 years ago", now);
+        const expected = now.subtract(3, "years");
+        expect(result).not.toBeFalsy();
+        expect(Math.abs(result.unix() - expected.unix())).toBeLessThanOrEqual(1);
+    });
+
+    test("parses '4 years 2 months and 7 days' correctly", () => {
+        const now = dayjs();
+        const result = dayjs.parseNatural("4 years 2 months and 7 days", now);
+        const expected = now.add(4, "years").add(2, "months").add(7, "days");
+        expect(result).not.toBeFalsy();
+        expect(Math.abs(result.unix() - expected.unix())).toBeLessThanOrEqual(1);
+    });
+
     test("returns false for an unparsable input", () => {
         const now = dayjs();
         const result = dayjs.parseNatural("snake", now);
