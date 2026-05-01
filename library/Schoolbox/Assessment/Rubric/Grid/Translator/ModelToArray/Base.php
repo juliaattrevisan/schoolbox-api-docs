@@ -22,7 +22,7 @@ use Schoolbox\Assessment\Rubric\Grid\Level;
  * Specifically only contains used capabilities/indicators/descriptors,
  * it's intended for the rubric viewer / feedback views
  *
- * @see /library/Schoolbox/Assessment/Rubric/templates/vue/types.ts
+ * @see /library/Schoolbox/Assessment/Rubric/templates/vue/rubricViewer/types.ts
  */
 class Base
 {

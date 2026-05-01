@@ -14,7 +14,7 @@ import type { MarkType } from "@schoolboxAssessment/Types/MarkType";
 import FieldsetCollapsible from "@schoolboxVue/components/fieldset-collapsible.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import type { GradeScheme } from "@schoolboxLibrary/Learning/Assessment/templates/fragments/vue/mark-type.vue";
-import type { RubricGrid, ResultSet } from "./builderTypes";
+import type { RubricGrid, ResultSet } from "./types";
 import RbRubricFields from "./rb-rubric-fields.vue";
 import RbRubricGrid from "./rb-rubric-grid.vue";
 import RbRubricDownload from "./rb-rubric-download.vue";

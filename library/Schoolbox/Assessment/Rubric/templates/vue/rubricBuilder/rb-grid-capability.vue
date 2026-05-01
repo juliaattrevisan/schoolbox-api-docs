@@ -1,7 +1,13 @@
 <script setup lang="ts">
 /**
- * Add rows in the markable rubric grid for a specific capability
+ * Add rows in the editable rubric grid for a specific capability
  * (also known as a "group" in the past)
+ *
+ * The capability itself can be edited from the leftmost column,
+ * it can have multiple indicators, each indicator has its own row inline with the capability.
+ * There are two additional rows:
+ * - A row inline with the capability name for adding a new indicator
+ * - A full width row for the maximum capability points, if the capability mark type is set
  */
 
 import type { Ref } from "vue";
@@ -89,6 +95,9 @@ const derivedMaxValue = window.Vue.computed(() => {
             }
         }
 
+        // Carefully add the numbers instead of concatenating them:
+        // https://stackoverflow.com/questions/14496531/adding-two-numbers-concatenates-them-instead-of-calculating-the-sum
+        // ^^ That stackoverflow suggests something pretty cryptic: indicatorMaxSum = +indicatorMax + +indicatorMaxSum;
         indicatorMaxSum += indicatorMax;
     }
 
@@ -124,28 +133,30 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <tr>
-        <th class="rb-group-name markdown" :rowspan="props.capability.indicators.length + ()"></th>
-    </tr>
-
     <tr class="rb-group-header">
         <th :rowspan="props.capability.indicators.length + 2 /* add 2 for the header + add new indicator row */">
             <!-- todo: can't sequence when no criteria, those should stay at the end... -->
             <span class="sequencer">
                 <a
-                    class="icon-up-arrow"
+                    class="sbx-icon-only-button no-text"
                     :class="{ disabled: !props.canMovePrev }"
                     title="Move up"
+                    aria-label="Move up"
                     :aria-disabled="!props.canMovePrev"
                     @click.prevent="props.canMovePrev && emit('move', -1)"
-                ></a>
+                >
+                    <sbx-icon name="up-arrow" />
+                </a>
                 <a
-                    class="icon-down-arrow"
+                    class="sbx-icon-only-button no-text"
                     :class="{ disabled: !props.canMoveNext }"
                     title="Move down"
+                    aria-label="Move down"
                     :aria-disabled="!props.canMoveNext"
                     @click.prevent="props.canMoveNext && emit('move', 1)"
-                ></a>
+                >
+                    <sbx-icon name="down-arrow" />
+                </a>
             </span>
 
             <label v-if="props.capability.inUseExcludingAssessment" class="rb-capability-name">

@@ -1,5 +1,5 @@
 import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
-import type { RubricGrid, RubricGridCapability, RubricGridIndicator } from "./builderTypes";
+import type { RubricGrid, RubricGridCapability, RubricGridIndicator } from "./types";
 
 export type RubricGridCreateCapabilityResponse = Omit<RubricGridCapability, "id"> & {
     id: number | null; // since it's a new capability, it won't have an ID yet

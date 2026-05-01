@@ -4,7 +4,7 @@
  */
 
 import locale from "@js/terminology/rosettaStone";
-import type { RubricGridLevel } from "./builderTypes";
+import type { RubricGridLevel } from "./types";
 
 interface Props {
     canMovePrev: boolean;

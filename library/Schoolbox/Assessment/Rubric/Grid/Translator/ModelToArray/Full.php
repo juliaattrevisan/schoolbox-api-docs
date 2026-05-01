@@ -22,7 +22,7 @@ use Schoolbox\Assessment\Rubric\RowSet\Indicator;
  * This contains all data for the rubric grid (including unused capabilities/indicators/descriptors),
  * it's intended for the rubric builder.
  *
- * @see /library/Schoolbox/Assessment/Rubric/templates/vue/builderTypes.ts
+ * @see /library/Schoolbox/Assessment/Rubric/templates/vue/rubricBuilder/types.ts
  */
 class Full
 {

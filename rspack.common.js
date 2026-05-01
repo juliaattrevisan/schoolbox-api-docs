@@ -183,8 +183,8 @@ module.exports = {
             "./library/Schoolbox/Learning/Assessment/templates/dialogAgent/vue/status/dialogAgentStatus.ts",
         dialogAgentResponse:
             "./library/Schoolbox/Learning/Assessment/templates/dialogAgent/vue/response/dialogAgentResponse.ts",
-        rubricBuilder: "./library/Schoolbox/Assessment/Rubric/templates/vue/rubricBuilder.ts",
-        rubricGrid: "./library/Schoolbox/Assessment/Rubric/templates/vue/rubricGrid.ts",
+        rubricBuilder: "./library/Schoolbox/Assessment/Rubric/templates/vue/rubricBuilder/rubricBuilder.ts",
+        rubricViewer: "./library/Schoolbox/Assessment/Rubric/templates/vue/rubricViewer/rubricViewer.ts",
 
         // Textboxes
         textboxList: "./library/Schoolbox/Resource/Textbox/vue/textboxList.ts",

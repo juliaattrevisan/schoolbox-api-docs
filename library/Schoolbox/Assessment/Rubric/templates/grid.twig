@@ -15,8 +15,8 @@
 {% set showPoints = config.rubric_show_points %}
 {% set selfAssessmentMarkedGrid = selfAssessmentFeedback ? selfAssessmentFeedback.rubricMarkedGrid : null %}
 
-<div data-vue-app="rubric-grid">
-    <rubric-grid
+<div data-vue-app="rubric-readonly">
+    <rubric-readonly
         :rubric="{{ rubricGrid.toArray(showPoints)|json_encode }}"
         :rubric-marked-grid="{{ (rubricMarkedGrid ? rubricMarkedGrid.toArray(USER, showPoints) : null)|json_encode }}"
         :self-assessment-feedback="{{ (selfAssessmentMarkedGrid ? selfAssessmentMarkedGrid.toArray(USER, showPoints) : null)|json_encode }}"
@@ -30,4 +30,4 @@
         {% if showGroupTotal ?? false %}show-group-total{% endif %}
     />
 </div>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricGrid.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricReadonly.js?v={{ config.site_version }}"></script>

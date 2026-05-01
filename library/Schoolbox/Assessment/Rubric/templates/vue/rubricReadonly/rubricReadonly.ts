@@ -1,6 +1,6 @@
-import RubricGrid from "./rubric-grid.vue";
+import RubricReadonly from "./rubric-readonly.vue";
 
-document.querySelectorAll<HTMLDivElement>('[data-vue-app="rubric-grid"]').forEach((el) => {
+document.querySelectorAll<HTMLDivElement>('[data-vue-app="rubric-readonly"]').forEach((el) => {
     if (el.dataset.initialised) {
         return; // prevent double-initialisation if this script is included multiple times
     }
@@ -9,7 +9,7 @@ document.querySelectorAll<HTMLDivElement>('[data-vue-app="rubric-grid"]').forEac
 
     window.Vue.createApp({
         components: {
-            RubricGrid,
+            RubricReadonly,
         },
     }).mount(el);
 });

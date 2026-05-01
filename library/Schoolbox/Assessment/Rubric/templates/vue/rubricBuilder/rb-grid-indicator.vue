@@ -14,8 +14,8 @@
 import { useTemplateRefsList } from "@vueuse/core";
 import locale from "@js/terminology/rosettaStone";
 import RbGridDescriptor from "./rb-grid-descriptor.vue";
-import { MAX_INDICATOR_LENGTH } from "./builderTypes";
-import type { RubricGridCapability, RubricGridIndicator, RubricGridLevel } from "./builderTypes";
+import { MAX_INDICATOR_LENGTH } from "./types";
+import type { RubricGridCapability, RubricGridIndicator, RubricGridLevel } from "./types";
 
 interface Props {
     capabilityId: RubricGridCapability["id"];
