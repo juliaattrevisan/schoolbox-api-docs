@@ -39,6 +39,7 @@ class Eportfolio extends Base
      */
     protected function hasDataToDelete(): bool
     {
+        return false;
     }
 
     /**
@@ -46,6 +47,7 @@ class Eportfolio extends Base
      */
     protected function getIdsToDelete(): array
     {
+        return [];
     }
 
     /**
