@@ -10,8 +10,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\DataRetention;
 
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\IConfigLoader;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -227,6 +230,19 @@ class CommandLineTool extends CliTool\App
             );
         }
 
+        $bus = $this->buildStrategies(
+            $validStrats,
+            $logger,
+            $this->perform(),
+            $this->getDatabaseInternal(),
+            $lock,
+            $this->getConfig(),
+            $endTime,
+            $retentionPeriod,
+            $loopCount,
+            $chunkSize,
+        );
+
         // log the settings we are running with
         $logger->notice(sprintf("Running %s:", $this->perform() ? "with perform" : "in dry-run mode"));
         $logger->notice(sprintf("Script will end at or before '%s'", $endDateTime));
@@ -273,6 +289,68 @@ class CommandLineTool extends CliTool\App
         } else {
             $logger->notice('No data retention strategies to run');
         }
+    }
+
+    /**
+     * @return Strategy\IStrategy[]
+     */
+    protected function buildStrategies(
+        ValidStrats $validStrats,
+        LoggerInterface $logger,
+        bool $perform,
+        IConnector $database,
+        LockInterface $lock,
+        IConfigLoader $config,
+        int $endTime,
+        RetentionPeriod $retentionPeriod,
+        int $loopCount,
+        int $chunkSize,
+    ): array {
+        $bus = [];
+
+        if ($validStrats->isStratEnabled(ValidStrats::MOMENTS)) {
+            $bus[] = new Strategy\Moments(
+                $logger,
+                $perform,
+                $database,
+                $lock,
+                $config,
+                $endTime,
+                clone $retentionPeriod,
+                $loopCount,
+                $chunkSize,
+            );
+        }
+
+        if ($validStrats->isStratEnabled(ValidStrats::MYFILES)) {
+            $bus[] = new Strategy\MyFiles(
+                $logger,
+                $perform,
+                $database,
+                $lock,
+                $config,
+                $endTime,
+                clone $retentionPeriod,
+                $loopCount,
+                $chunkSize,
+            );
+        }
+
+        if ($validStrats->isStratEnabled(ValidStrats::EPORTFOLIO)) {
+            $bus[] = new Strategy\Eportfolio(
+                $logger,
+                $perform,
+                $database,
+                $lock,
+                $config,
+                $endTime,
+                clone $retentionPeriod,
+                $loopCount,
+                $chunkSize,
+            );
+        }
+
+        return $bus;
     }
 
     /**
