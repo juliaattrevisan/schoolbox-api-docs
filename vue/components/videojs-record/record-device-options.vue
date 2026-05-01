@@ -61,16 +61,13 @@ export default {
                     <legend class="legend">{{ title }}</legend>
                     <ul class="option-list">
                         <li v-for="device in deviceList" :key="device.deviceId">
-                            <a
-                                href="#toggle-device"
-                                :class="`toggle-button ${
-                                    device.deviceId === currentDeviceId ? 'toggle-button-active' : ''
-                                }`"
+                            <input
+                                type="radio"
+                                name="video-device"
+                                :id="`${device.deviceId}`"
+                                :checked="device.deviceId === currentDeviceId"
                                 @click.prevent="onDeviceSelected(device.deviceId)"
-                            >
-                                <span class="toggle-button-icon vjs-icon-photo-camera"></span>
-                                <span class="toggle-button-text">{{ device.label }}</span>
-                            </a>
+                            /><label :for="`${device.deviceId}`">{{ device.label }}</label>
                         </li>
                     </ul>
                 </fieldset>
@@ -81,56 +78,34 @@ export default {
 
 <style lang="scss" scoped>
 .device-options {
-    position: absolute;
-    z-index: calc(var(--sbx-depth-default) + 1);
-    top: 10px;
+    background: rgba(43, 51, 63, 0.85);
+    border: 2px solid var(--sbx-color-foreground-primary, white);
+    border-radius: var(--sbx-config-field-roundness, 0);
+    color: var(--sbx-color-foreground-primary, white);
     left: 10px;
     max-width: 50%;
-    border: 2px solid white;
-    padding: 0.5rem 1rem;
-    color: white;
-    background: rgba(43, 51, 63, 0.85);
-    border-radius: var(--sbx-config-field-roundness, 0);
+    padding: var(--spacing-s) var(--spacing-m);
+    position: absolute;
+    top: 10px;
+    z-index: calc(var(--sbx-depth-default) + 1);
+    label {
+        color: var(--sbx-color-foreground-primary, white);
+    }
 }
 
 .legend {
     margin-bottom: 10px;
-    font-size: 0.8125rem;
 }
 
 .fieldset {
-    margin: 0;
     border: 0;
+    margin: 0;
     padding: 0;
 }
 
 .option-list {
     margin: 0;
     padding: 0;
-}
-
-.toggle-button {
-    display: block;
-    margin: 0 0 5px 0;
-    padding: 3px 0;
-    color: white;
-    background: none;
-    text-align: left;
-    font-size: 0.8125rem;
-    opacity: 0.6;
-}
-
-.toggle-button-active {
-    opacity: 1;
-}
-
-.toggle-button-icon {
-    position: absolute;
-}
-
-.toggle-button-text {
-    display: inline-block;
-    padding-left: 20px;
 }
 
 .slide-enter-active,
