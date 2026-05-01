@@ -19,18 +19,18 @@ use Schoolbox\Config\ConfigMapper;
 /**
  * Relationships between tables in the ePortfolio area:
  *
- *    eportfolio_page
- *    ├── eportfolio_component_blog
- *    │   ├── eportfolio_component_blog_comment
- *    │   └── eportfolio_component_blog_image
- *    ├── eportfolio_component_filelist_item
- *    ├── eportfolio_permission
- *    ├── component_instance
- *    ├── component_config_instance
- *    ├── eportfolio_component_advancedlist_item
- *    ├── eportfolio_component_basiclist_item
- *    ├── eportfolio_component_linklist_item
- *    └── eportfolio_component_textbox_item
+ *    eportfolio_page                                (has deleted_at)
+ *    ├── eportfolio_component_blog                  (has deleted_at)
+ *    │   ├── eportfolio_component_blog_comment      (has deleted_at)
+ *    │   └── eportfolio_component_blog_image        (has deleted_at)
+ *    ├── eportfolio_component_filelist_item         (has deleted_at)
+ *    ├── eportfolio_permission                      (has no deleted_at)
+ *    └── component_instance                         (has no deleted_at)
+ *        ├── component_config_instance              (has no deleted_at)
+ *        ├── eportfolio_component_advancedlist_item (has no deleted_at)
+ *        ├── eportfolio_component_basiclist_item    (has no deleted_at)
+ *        ├── eportfolio_component_linklist_item     (has no deleted_at)
+ *        └── eportfolio_component_textbox_item      (has no deleted_at)
  *
  * Note there are no links from child rows back up to parents or grandparents.
  * The tree will only ever be three levels deep.
@@ -174,6 +174,7 @@ class Eportfolio extends Base
     }
 
     /**
+     * @see database table tree diagram in the class docblock.
      * @param list<array{table: string, id: int|string}> $chunk
      */
     protected function deleteChunk(array $chunk): void
@@ -199,16 +200,6 @@ class Eportfolio extends Base
         );
         $this->recordDeleted(
             $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
-            $this->deleteRowsByIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'id', $blogImageIds),
-        );
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
-            $this->deleteRowsByIds(self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM, 'id', $fileListItemIds),
-        );
-        $this->recordDeleted(
-            $deleted,
             self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
             $this->deleteRowsByForeignIds(
                 self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
@@ -216,6 +207,23 @@ class Eportfolio extends Base
                 $blogIds,
                 $blogCommentIds,
             ),
+        );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
+            $this->deleteRowsByForeignIds(
+                self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
+                'blog_id',
+                $pageCascadeBlogIds,
+                $blogCommentIds,
+            ),
+        );
+
+        // eportfolio_component_blog_image (grandchild of page, via blog)
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
+            $this->deleteRowsByIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE, 'id', $blogImageIds),
         );
         $this->recordDeleted(
             $deleted,
@@ -229,9 +237,52 @@ class Eportfolio extends Base
         );
         $this->recordDeleted(
             $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
+            $this->deleteRowsByForeignIds(
+                self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
+                'blog_id',
+                $pageCascadeBlogIds,
+                $blogImageIds,
+            ),
+        );
+
+        // eportfolio_component_blog (child of page)
+        $this->recordDeleted(
+            $deleted,
             self::TABLE_EPORTFOLIO_COMPONENT_BLOG,
             $this->deleteRowsByIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG, 'id', $blogIds),
         );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_BLOG,
+            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG, 'page_id', $pageIds, $blogIds),
+        );
+
+        // eportfolio_component_filelist_item (child of page)
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
+            $this->deleteRowsByIds(self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM, 'id', $fileListItemIds),
+        );
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
+            $this->deleteRowsByForeignIds(
+                self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
+                'page_id',
+                $pageIds,
+                $fileListItemIds,
+            ),
+        );
+
+        // eportfolio_permission (child of page, cascade-delete only)
+        $this->recordDeleted(
+            $deleted,
+            self::TABLE_EPORTFOLIO_PERMISSION,
+            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_PERMISSION, 'page_id', $pageIds),
+        );
+
+        // component_config_instance, list items (grandchildren of page, via component_instance, cascade-delete only)
         $this->recordDeleted(
             $deleted,
             self::TABLE_COMPONENT_CONFIG_INSTANCE,
@@ -277,51 +328,15 @@ class Eportfolio extends Base
                 $componentInstanceIds,
             ),
         );
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
-            $this->deleteRowsByForeignIds(
-                self::TABLE_EPORTFOLIO_COMPONENT_BLOG_COMMENT,
-                'blog_id',
-                $pageCascadeBlogIds,
-                $blogCommentIds,
-            ),
-        );
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
-            $this->deleteRowsByForeignIds(
-                self::TABLE_EPORTFOLIO_COMPONENT_BLOG_IMAGE,
-                'blog_id',
-                $pageCascadeBlogIds,
-                $blogImageIds,
-            ),
-        );
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_BLOG,
-            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_COMPONENT_BLOG, 'page_id', $pageIds, $blogIds),
-        );
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
-            $this->deleteRowsByForeignIds(
-                self::TABLE_EPORTFOLIO_COMPONENT_FILELIST_ITEM,
-                'page_id',
-                $pageIds,
-                $fileListItemIds,
-            ),
-        );
-        $this->recordDeleted(
-            $deleted,
-            self::TABLE_EPORTFOLIO_PERMISSION,
-            $this->deleteRowsByForeignIds(self::TABLE_EPORTFOLIO_PERMISSION, 'page_id', $pageIds),
-        );
+
+        // component_instance (child of page, cascade-delete only)
         $this->recordDeleted(
             $deleted,
             self::TABLE_COMPONENT_INSTANCE,
             $this->deleteRowsByIds(self::TABLE_COMPONENT_INSTANCE, 'id', $componentInstanceIds),
         );
+
+        // eportfolio_page (root)
         $this->recordDeleted(
             $deleted,
             self::TABLE_EPORTFOLIO_PAGE,
