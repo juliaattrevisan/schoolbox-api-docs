@@ -13,4 +13,8 @@ use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-(new CliTool\Kernel(new Export(), [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]))->runApp();
+(new CliTool\Kernel(
+    new Export(),
+    [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO],
+    bypassMaintenanceModeCheck: true,
+))->runApp();
