@@ -104,8 +104,11 @@ window.Vue.onMounted(() => {
                     :limit="capability.maxValue ?? undefined"
                     class="rb-value-input groupMark"
                 />
-                <!-- TODO: temp-->
-                TEMP: "{{ capabilityMarkValue }}"
+
+                <template v-if="props.capabilityMarkScheme.template === 'Percentage'"> % </template>
+                <template v-else-if="props.capabilityMarkScheme.template === 'TotalMarkFractional'">
+                    / {{ capability.maxValue }}
+                </template>
             </span>
 
             <!-- TODO: data-use-descriptor-values -->
