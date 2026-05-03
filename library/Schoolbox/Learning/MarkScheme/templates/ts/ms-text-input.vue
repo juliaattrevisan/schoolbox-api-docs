@@ -106,6 +106,7 @@ window.Vue.onMounted(() => {
         // Remove any existing validator, otherwise this will never re-initialise
         // with the new values... this might be bad if you try to use the element in
         // a form with other inputs... i'm not sure yet.
+        // TODO: ok yeah, this causes some chaos it seems in a larger form :/
         $.removeData(validateTarget, "validator");
 
         $(validateTarget).alaressValidate(props.alaressValidateOptions);
