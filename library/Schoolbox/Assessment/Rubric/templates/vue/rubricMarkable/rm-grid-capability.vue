@@ -5,6 +5,8 @@
  */
 
 import locale from "@js/terminology/rosettaStone";
+import MarkScheme from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/mark-scheme.vue";
+import type { MarkScheme as CapabilityMarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import type {
     RubricGridCapability,
@@ -18,6 +20,7 @@ interface Props {
     capability: RubricGridCapability;
     capabilityMark: RubricMarkedGridCapability | null;
     selfAssessmentCapabilityMark: RubricMarkedGridCapability | null;
+    capabilityMarkScheme: CapabilityMarkScheme;
     levels: RubricGridLevel[];
     participantId: UserAuthor["id"];
     showSummaryCapability: boolean;
@@ -25,6 +28,8 @@ interface Props {
 const props = defineProps<Props>();
 
 const componentId = window.Vue.useId();
+
+const capabilityMarkValue = window.Vue.ref<string | null>(null);
 
 const showSummaryForThisCapability = window.Vue.computed(() => {
     return props.showSummaryCapability && props.capability.showCapabilityMark;
@@ -45,6 +50,10 @@ function findIndicatorMark(
     }
     return markedGridCapability.indicators.find((indicator) => indicator.id === indicatorId) ?? null;
 }
+
+window.Vue.onMounted(() => {
+    capabilityMarkValue.value = props.capabilityMark?.value ?? null;
+});
 </script>
 
 <template>
@@ -82,11 +91,21 @@ function findIndicatorMark(
             <!-- TODO: data-rubric-id="{{ rubricGrid.id }}" -->
             <!-- TODO: data-mark-type="{{ capabilityMarkType.mode }}" -->
             <span>
-                <label :for="`capability-${$props.capability.id}-mark-${componentId}`">
+                <label>
                     {{ locale.rubricGroup.proper() }} mark
-                </label>
 
-                <!-- TODO: mark input -->
+                    <!-- TODO: temp-->
+                    TEMP: "{{ capabilityMarkValue }}"
+
+                    <!-- TODO: data-group-mark -->
+                    <mark-scheme
+                        :id="`capability-${props.capability.id}-mark-${componentId}`"
+                        v-model:mark="capabilityMarkValue"
+                        :mark-scheme="props.capabilityMarkScheme"
+                        :submission-error-states="[] /** no error states here */"
+                        :limit="capability.maxValue ?? undefined"
+                    />
+                </label>
             </span>
 
             <!-- TODO: data-use-descriptor-values -->

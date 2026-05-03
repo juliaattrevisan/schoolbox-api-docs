@@ -7,11 +7,7 @@
 import type { SubmissionErrorStates } from "./markScheme";
 
 interface Props {
-    participant: {
-        user: {
-            id: number;
-        };
-    };
+    id: string | number;
     submissionErrorStates: SubmissionErrorStates;
     tabIndex?: number;
     /**
@@ -94,7 +90,9 @@ window.Vue.onMounted(() => {
     }
 
     if (!props.readonly) {
-        $(markInputEl.value).combobox(props.submissionErrorStates.map((state) => state.name));
+        if (props.submissionErrorStates.length > 0) {
+            $(markInputEl.value).combobox(props.submissionErrorStates.map((state) => state.name));
+        }
 
         const validateTarget =
             (props.alaressValidateTarget ? document.querySelector(props.alaressValidateTarget) : null) ||
@@ -132,7 +130,7 @@ window.Vue.onMounted(() => {
 
 <template>
     <input
-        :id="`mark-${props.participant.user.id}`"
+        :id="`mark-${props.id}`"
         ref="markInputRef"
         :value="mark"
         class="no-margin"
@@ -143,7 +141,7 @@ window.Vue.onMounted(() => {
         :data-validation-limit="props.limit"
         :maxlength="props.maxLength"
         :title="props.inputTitle"
-        :data-test="`assessment-feedback-mark-input-${props.participant.user.id}`"
+        :data-test="`assessment-feedback-mark-input-${props.id}`"
         data-mark-input
         data-combobox
         :readonly="props.readonly"

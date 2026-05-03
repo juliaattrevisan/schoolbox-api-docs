@@ -49,7 +49,11 @@ class Base
             'id' => $rubricGrid->getId(),
             'title' => '(backend unimplemented)', // TODO: rubric title, string (not null)
             'weight' => null, // TODO: rubric weight, number|null
-            'capabilityMarkType' => $rubricGrid->getAssessment()->getCapabilityMarkType()?->getSlug(), // TODO: from the rubric, not assessment
+            'capabilityMarkScheme' => [
+                // TODO: this array format has been used at least 4 times now... (here, grid-markable.twig, and course/class markbooks)
+                'template' => $rubricGrid->getCapabilityMarkScheme()->getTemplate(),
+                'context' => $rubricGrid->getCapabilityMarkScheme()->generateContext(),
+            ],
             'levels' => $rubricGrid->getLevels()->map(fn(Level $level) => [
                 'id' => $level->getId(),
                 'name' => $level->getName(),
@@ -77,8 +81,9 @@ class Base
         return [
             'id' => $capability->getId(),
             'name' => $capability->getName(),
-            'indicators' => $indicators,
+            'maxValue' => $capabilityUsage->getMaxValue(), // TODO: rubric-markable only, and check if it matters for perms
             'showCapabilityMark' => $rubricGrid->isCapabilityMarkShown($capability), // TODO: rubric-markable only, and check if it matters for perms
+            'indicators' => $indicators,
         ];
     }
 

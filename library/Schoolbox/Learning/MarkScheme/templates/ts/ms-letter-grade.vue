@@ -10,13 +10,9 @@ import type { MarkSchemeLetterGrade, SubmissionErrorStates } from "./markScheme"
 const LIMIT = 100;
 
 interface Props {
+    id: string | number;
     markScheme: MarkSchemeLetterGrade;
     submissionErrorStates: SubmissionErrorStates;
-    participant: {
-        user: {
-            id: number;
-        };
-    };
     tabIndex?: number;
     studentView?: boolean;
     /**
@@ -36,8 +32,8 @@ const mark = defineModel<string | null>("mark", { required: true });
 <template>
     <ms-text-input
         v-if="props.readonly"
+        :id="props.id"
         v-model:mark="mark"
-        :participant="props.participant"
         :submission-error-states="props.submissionErrorStates"
         :tab-index="props.tabIndex"
         :placeholder="props.readonly ? '(no mark given)' : '(no grade)'"
@@ -63,7 +59,7 @@ const mark = defineModel<string | null>("mark", { required: true });
     <select
         v-else
         class="letter-grade-select"
-        :data-test="`assessment-feedback-mark-select-${props.participant.user.id}`"
+        :data-test="`assessment-feedback-mark-select-${props.id}`"
         data-mark-input
         name="mark"
         :tabindex="props.tabIndex"

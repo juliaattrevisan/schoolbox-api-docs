@@ -16,13 +16,9 @@ import type { MarkSchemeTotalMarkFractional, SubmissionErrorStates } from "./mar
 const PRECISION = 2;
 
 interface Props {
+    id: string | number;
     markScheme: MarkSchemeTotalMarkFractional;
     submissionErrorStates: SubmissionErrorStates;
-    participant: {
-        user: {
-            id: number;
-        };
-    };
     tabIndex?: number;
     /**
      * Should this form input be rendered as readonly?
@@ -33,7 +29,7 @@ interface Props {
      */
     alaressValidateTarget?: string;
     /**
-     * Optional precedence: used for quiz only
+     * Optional precedence: used for quiz & capability marks only
      * Maximum marks available per attempt, indexed by user id
      */
     limit?: number;
@@ -63,8 +59,8 @@ const limit = window.Vue.computed(() => {
 
 <template>
     <ms-text-input
+        :id="props.id"
         v-model:mark="mark"
-        :participant="props.participant"
         :submission-error-states="props.submissionErrorStates"
         :tab-index="props.tabIndex"
         :placeholder="props.readonly ? '(no mark given)' : `Mark out of ${limit}`"

@@ -84,6 +84,7 @@ class ModelToArray
         return [
             'id' => $capabilityUsage->getCapability()->getId(),
             'humanReadableMark' => $capabilityMark?->getHumanReadableValue(),
+            'value' => $capabilityMark?->retrieveHumanReadableValueAsFormInput(),
             'indicators' => $indicators,
         ];
     }

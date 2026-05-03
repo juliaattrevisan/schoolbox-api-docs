@@ -1,4 +1,4 @@
-import type { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
+import type { MarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
 
 // TODO: refine these along with builderTypes.ts, the assessment API, etc
 
@@ -11,7 +11,7 @@ export type RubricGrid = {
     weight: number | null;
     levels: RubricGridLevel[];
     capabilities: RubricGridCapability[];
-    capabilityMarkType: MarkTypeSlug | null;
+    capabilityMarkScheme: MarkScheme;
 };
 
 export type RubricGridLevel = {
@@ -22,7 +22,7 @@ export type RubricGridLevel = {
 export type RubricGridCapability = {
     id: number;
     name: string;
-    indicators: RubricGridIndicator[];
+    maxValue: number | null;
     /**
      * Should capability marks show for the given capability usage?
      *
@@ -33,6 +33,7 @@ export type RubricGridCapability = {
      * TODO: how required is this, especially with grid.capabilityMarkType being checkable
      */
     showCapabilityMark: boolean;
+    indicators: RubricGridIndicator[];
 };
 
 export type RubricGridIndicator = {
@@ -66,6 +67,7 @@ export type RubricMarkedGrid = {
 export type RubricMarkedGridCapability = {
     id: RubricGridCapability["id"];
     humanReadableMark: string | null;
+    value: string | null; // Form value (capabilityMark.retrieveHumanReadableValueAsFormInput)
     indicators: RubricMarkedGridIndicator[];
 };
 

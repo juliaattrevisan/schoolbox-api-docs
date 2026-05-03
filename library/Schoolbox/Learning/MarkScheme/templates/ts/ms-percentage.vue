@@ -9,12 +9,8 @@ import type { SubmissionErrorStates } from "./markScheme";
 const LIMIT = 100;
 
 interface Props {
+    id: string | number;
     submissionErrorStates: SubmissionErrorStates;
-    participant: {
-        user: {
-            id: number;
-        };
-    };
     tabIndex?: number;
     /**
      * Should this form input be rendered as readonly?
@@ -32,8 +28,8 @@ const mark = defineModel<string | null>("mark", { required: true });
 
 <template>
     <ms-text-input
+        :id="props.id"
         v-model:mark="mark"
-        :participant="props.participant"
         :submission-error-states="props.submissionErrorStates"
         :tab-index="props.tabIndex"
         :placeholder="props.readonly ? '(no mark given)' : 'Percentage mark'"

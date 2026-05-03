@@ -74,8 +74,7 @@ function findCapabilityMark(
                     :show-summary-capability="
                         props.showGroupTotal &&
                         !!props.rubricMarkedGrid &&
-                        props.rubric.capabilityMarkType !== null &&
-                        props.rubric.capabilityMarkType !== MarkTypeSlug.NONE
+                        props.rubric.capabilityMarkScheme.context.mode !== MarkTypeSlug.NONE
                     "
                 />
 

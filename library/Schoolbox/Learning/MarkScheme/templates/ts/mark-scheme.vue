@@ -12,13 +12,10 @@ import MsPercentage from "./ms-percentage.vue";
 import MsTotalMarkFractional from "./ms-total-mark-fractional.vue";
 
 interface Props {
+    /** A unique identifier for this mark scheme input */
+    id: string | number;
     markScheme: MarkScheme;
     submissionErrorStates: SubmissionErrorStates;
-    participant: {
-        user: {
-            id: number;
-        };
-    };
     tabIndex?: number;
     /**
      * Should this form input be rendered as readonly?
@@ -39,27 +36,27 @@ const mark = defineModel<string | null>("mark", { required: true });
 <template>
     <ms-letter-grade
         v-if="props.markScheme.template === 'LetterGrade'"
+        :id="props.id"
         v-model:mark="mark"
         :mark-scheme="props.markScheme"
         :submission-error-states="props.submissionErrorStates"
-        :participant="props.participant"
         :tab-index="props.tabIndex"
         :readonly="props.readonly"
     />
     <ms-percentage
         v-else-if="props.markScheme.template === 'Percentage'"
+        :id="props.id"
         v-model:mark="mark"
         :submission-error-states="props.submissionErrorStates"
-        :participant="props.participant"
         :tab-index="props.tabIndex"
         :readonly="props.readonly"
     />
     <ms-total-mark-fractional
         v-else-if="props.markScheme.template === 'TotalMarkFractional'"
+        :id="props.id"
         v-model:mark="mark"
         :mark-scheme="props.markScheme"
         :submission-error-states="props.submissionErrorStates"
-        :participant="props.participant"
         :tab-index="props.tabIndex"
         :readonly="props.readonly"
         :limit="props.limit"
