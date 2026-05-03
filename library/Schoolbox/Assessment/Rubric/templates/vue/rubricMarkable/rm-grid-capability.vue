@@ -91,21 +91,21 @@ window.Vue.onMounted(() => {
             <!-- TODO: data-rubric-id="{{ rubricGrid.id }}" -->
             <!-- TODO: data-mark-type="{{ capabilityMarkType.mode }}" -->
             <span>
-                <label>
+                <label :for="`capability-${props.capability.id}-mark-${componentId}`">
                     {{ locale.rubricGroup.proper() }} mark
-
-                    <!-- TODO: temp-->
-                    TEMP: "{{ capabilityMarkValue }}"
-
-                    <!-- TODO: data-group-mark -->
-                    <mark-scheme
-                        :id="`capability-${props.capability.id}-mark-${componentId}`"
-                        v-model:mark="capabilityMarkValue"
-                        :mark-scheme="props.capabilityMarkScheme"
-                        :submission-error-states="[] /** no error states here */"
-                        :limit="capability.maxValue ?? undefined"
-                    />
                 </label>
+
+                <!-- TODO: data-group-mark -->
+                <mark-scheme
+                    :id="`capability-${props.capability.id}-mark-${componentId}`"
+                    v-model:mark="capabilityMarkValue"
+                    :mark-scheme="props.capabilityMarkScheme"
+                    :submission-error-states="[] /** no error states here */"
+                    :limit="capability.maxValue ?? undefined"
+                    class="rb-value-input groupMark"
+                />
+                <!-- TODO: temp-->
+                TEMP: "{{ capabilityMarkValue }}"
             </span>
 
             <!-- TODO: data-use-descriptor-values -->
@@ -128,9 +128,9 @@ window.Vue.onMounted(() => {
 
             <!-- Self-Assessment -->
             <p v-if="props.selfAssessmentCapabilityMark?.humanReadableMark" class="meta">
-                ({{ props.selfAssessmentCapabilityMark.humanReadableMark }}
+                {{ props.selfAssessmentCapabilityMark.humanReadableMark }}
                 given in
-                {{ locale.selfAssessment.singular() }})
+                {{ locale.selfAssessment.singular() }}
             </p>
         </th>
     </tr>

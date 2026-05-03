@@ -9,6 +9,7 @@ import type { SubmissionErrorStates } from "./markScheme";
 interface Props {
     id: string | number;
     submissionErrorStates: SubmissionErrorStates;
+    class?: string;
     tabIndex?: number;
     /**
      * the placeholder text
@@ -130,10 +131,11 @@ window.Vue.onMounted(() => {
 
 <template>
     <input
-        :id="`mark-${props.id}`"
+        :id="props.id?.toString() ?? undefined"
         ref="markInputRef"
         :value="mark"
         class="no-margin"
+        :class="props.class"
         name="mark"
         type="text"
         :tabindex="props.tabIndex"

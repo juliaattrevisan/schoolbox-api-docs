@@ -16,6 +16,7 @@ interface Props {
     id: string | number;
     markScheme: MarkScheme;
     submissionErrorStates: SubmissionErrorStates;
+    class?: string;
     tabIndex?: number;
     /**
      * Should this form input be rendered as readonly?
@@ -40,6 +41,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         v-model:mark="mark"
         :mark-scheme="props.markScheme"
         :submission-error-states="props.submissionErrorStates"
+        :class="props.class"
         :tab-index="props.tabIndex"
         :readonly="props.readonly"
     />
@@ -48,6 +50,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         :id="props.id"
         v-model:mark="mark"
         :submission-error-states="props.submissionErrorStates"
+        :class="props.class"
         :tab-index="props.tabIndex"
         :readonly="props.readonly"
     />
@@ -57,6 +60,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         v-model:mark="mark"
         :mark-scheme="props.markScheme"
         :submission-error-states="props.submissionErrorStates"
+        :class="props.class"
         :tab-index="props.tabIndex"
         :readonly="props.readonly"
         :limit="props.limit"

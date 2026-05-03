@@ -16,6 +16,7 @@ interface Props {
      * Should this form input be rendered as readonly?
      */
     readonly?: boolean;
+    class?: string;
     /**
      * The target for alaressValidate, if left blank then it will use the input itself
      */
@@ -31,6 +32,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         :id="props.id"
         v-model:mark="mark"
         :submission-error-states="props.submissionErrorStates"
+        :class="props.class"
         :tab-index="props.tabIndex"
         :placeholder="props.readonly ? '(no mark given)' : 'Percentage mark'"
         :limit="LIMIT"

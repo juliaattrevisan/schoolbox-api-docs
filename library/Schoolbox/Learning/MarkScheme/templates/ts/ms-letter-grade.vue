@@ -15,6 +15,7 @@ interface Props {
     submissionErrorStates: SubmissionErrorStates;
     tabIndex?: number;
     studentView?: boolean;
+    class?: string;
     /**
      * Should this form input be rendered as readonly?
      */
@@ -35,6 +36,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         :id="props.id"
         v-model:mark="mark"
         :submission-error-states="props.submissionErrorStates"
+        :class="props.class"
         :tab-index="props.tabIndex"
         :placeholder="props.readonly ? '(no mark given)' : '(no grade)'"
         :limit="LIMIT"
@@ -58,7 +60,9 @@ const mark = defineModel<string | null>("mark", { required: true });
 
     <select
         v-else
+        :id="props.id?.toString() ?? undefined"
         class="letter-grade-select"
+        :class="props.class"
         :data-test="`assessment-feedback-mark-select-${props.id}`"
         data-mark-input
         name="mark"

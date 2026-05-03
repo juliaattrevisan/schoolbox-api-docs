@@ -241,7 +241,7 @@ async function onFeedbackPublish(): Promise<void> {
                 <label>
                     {{ locale.grades.proper() }}
                     <mark-scheme
-                        :id="cellInfo.student.id"
+                        :id="`mark-${cellInfo.student.id}`"
                         v-model:mark="cellInfo.feedback.data.hrMarkInstructor"
                         :mark-scheme="cellInfo.instructorMarkScheme"
                         :submission-error-states="mbStore.data.submissionErrorStates"

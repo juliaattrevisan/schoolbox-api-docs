@@ -24,6 +24,7 @@ interface Props {
      * Should this form input be rendered as readonly?
      */
     readonly?: boolean;
+    class?: string;
     /**
      * The target for alaressValidate, if left blank then it will use the input itself
      */
@@ -62,6 +63,7 @@ const limit = window.Vue.computed(() => {
         :id="props.id"
         v-model:mark="mark"
         :submission-error-states="props.submissionErrorStates"
+        :class="props.class"
         :tab-index="props.tabIndex"
         :placeholder="props.readonly ? '(no mark given)' : `Mark out of ${limit}`"
         :limit="limit"
