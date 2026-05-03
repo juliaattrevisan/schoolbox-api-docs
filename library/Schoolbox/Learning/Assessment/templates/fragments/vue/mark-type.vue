@@ -106,6 +106,17 @@ const selectedGradeGroup = window.Vue.computed(() => {
     };
 });
 
+// When the mark type changes to letter grade, ensure the grade group is set
+window.Vue.watch(
+    () => selectedMarkType.value,
+    (newMarkType) => {
+        if (newMarkType === MarkTypeSlug.LETTER && selectedGradeGroupId.value === null) {
+            selectedGradeGroupId.value = props.defaultGradeGroup;
+        }
+    },
+    { immediate: true },
+);
+
 const isGradeScaleModalOpen = window.Vue.ref(false);
 
 window.Vue.onMounted(() => {
