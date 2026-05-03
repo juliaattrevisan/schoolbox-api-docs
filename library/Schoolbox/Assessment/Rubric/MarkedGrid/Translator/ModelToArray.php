@@ -51,7 +51,7 @@ class ModelToArray
         // for a self-assessment, only show the overall mark if it's self graded, as if it's self-reflect only they never marked themselves
         // for a non self-assessment, the mark is shown
         $feedback = $markedGrid->getFeedback();
-        $canSeeMark = !($feedback instanceof ISelfAssessableFeedback) || ($feedback instanceof DueWorkFeedback && $feedback->isSelfGrading());
+        $canSeeMark = !($feedback->getAssessable() instanceof ISelfAssessableFeedback) || ($feedback instanceof DueWorkFeedback && $feedback->isSelfGrading());
 
         return [
             'gridId' => $markedGrid->getGrid()->getId(),
@@ -77,7 +77,7 @@ class ModelToArray
         // for a self-assessment, only show the mark if it's self graded, as if it's self-reflect only they never marked themselves
         // for a non self-assessment, the mark is shown
         $feedback = $markedGrid->getFeedback();
-        $canSeeMark = !($feedback instanceof ISelfAssessableFeedback) || ($feedback instanceof DueWorkFeedback && $feedback->isSelfGrading());
+        $canSeeMark = !($feedback->getAssessable() instanceof ISelfAssessableFeedback) || ($feedback instanceof DueWorkFeedback && $feedback->isSelfGrading());
 
         $capabilityMark = $canSeeMark ? $markedGrid->retrieveCapabilityMark($capabilityUsage) : null;
 
@@ -117,7 +117,8 @@ class ModelToArray
         $descriptorId = $indicatorMark->getDescriptor()?->getId();
 
         $feedback = $markedGrid->getFeedback();
-        if ($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment()) {
+        $feedbackAssessable = $feedback->getAssessable();
+        if ($feedbackAssessable instanceof ISelfAssessableFeedback && $feedbackAssessable->isSelfAssessment()) {
             // Self-Assessment:
 
             return [
