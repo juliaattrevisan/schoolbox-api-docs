@@ -99,7 +99,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         <!-- If it didn't exist in the Grade Group, it might have been one of the Submission States
          like Submitted/Absent/Pending etc. so look there as well
          -->
-        <optgroup v-if="!props.studentView" label="States">
+        <optgroup v-if="!props.studentView && props.submissionErrorStates.length" label="States">
             <option
                 v-for="state in props.submissionErrorStates"
                 :key="state.id"
