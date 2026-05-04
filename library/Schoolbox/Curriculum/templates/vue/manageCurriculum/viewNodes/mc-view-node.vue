@@ -273,7 +273,7 @@ const showUsage = window.Vue.computed(() => props.node.id !== UNSET_ID);
 <style lang="scss" scoped>
 .container {
     align-items: center;
-    border-bottom: 1px solid var(--body-background);
+    border-bottom: 1px solid var(--sbx-color-border, var(--body-background));
     display: flex;
     margin: 0 0 0 v-bind(marginLeft);
     min-height: 52px;
