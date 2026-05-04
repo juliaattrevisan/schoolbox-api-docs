@@ -32,7 +32,7 @@ class ValueSerializer extends IntValueSerializer
      * - timeUnit: 'year'|'week'|'day'|'hour'|'minute' - The time unit the duration is stored in
      *
      * @param string $optionsString
-     * @return ?array{min:?int,max:?int,timeUnit:?'year'|'week'|'day'|'hour'|'minute'}
+     * @return ?array{min:?int,max:?int,timeUnit:?string}
      */
     public function buildOptions(string $optionsString): ?array
     {
