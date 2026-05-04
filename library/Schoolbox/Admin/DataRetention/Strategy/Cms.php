@@ -15,6 +15,7 @@ namespace Schoolbox\Admin\DataRetention\Strategy;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Connector\IConnector;
 use EtherpadLite\Client as EtherpadClient;
+use EtherpadLite\Response as EtherpadResponse;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\DataRetention\RetentionPeriod;
 use Schoolbox\Admin\DataRetention\ValidStrats;
@@ -113,11 +114,9 @@ class Cms extends Base
                 continue;
             }
 
-            if ($this->perform) {
-                $padDeleted = $this->deletePadFromEtherpad($padId);
-                if ($padDeleted) {
-                    $summary['padsDeleted']++;
-                }
+            $padDeleted = $this->deletePadFromEtherpad($padId);
+            if ($padDeleted) {
+                $summary['padsDeleted']++;
             }
 
             $summary['dbRowsDeleted'] += $this->hardDeleteEtherpadPad($padRecordId);
@@ -128,14 +127,22 @@ class Cms extends Base
 
     /**
      * Delete an Etherpad pad via the EtherpadLite API.
+     *
+     * @param string $padId
+     * @return bool True if the pad was successfully deleted or did not exist, false if an error occurred during deletion
      */
     protected function deletePadFromEtherpad(string $padId): bool
     {
         try {
             $client = $this->getEtherpadClient();
-            $response = $client->deletePad($padId);
+            if ($this->perform) {
+                $response = $client->deletePad($padId);
+            } else {
+                $response = $client->getRevisionsCount($padId);
+            }
+
             $code = $response->getCode();
-            if ($code !== null && (string)$code === '0') {
+            if ($code !== null && (string)$code === (string)EtherpadResponse::CODE_OK) {
                 $this->log->notice(sprintf("Deleted Etherpad pad '%s'", $padId));
                 return true;
             }
@@ -150,6 +157,8 @@ class Cms extends Base
 
     /**
      * Hard-delete a local Etherpad metadata row.
+     * @param int $id
+     * @return int Number of rows deleted
      */
     protected function hardDeleteEtherpadPad(int $id): int
     {
