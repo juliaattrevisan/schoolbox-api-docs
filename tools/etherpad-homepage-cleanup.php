@@ -222,6 +222,14 @@ HELP;
 
         return $statement->rowCount();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function runAsRoot(): ?bool
+    {
+        return null; // we don't need to worry about root or not
+    }
 };
 
 $kernel = new CliTool\Kernel($app, [CliKernelAbstract::OPTION_ERRORS => E_ALL]);
