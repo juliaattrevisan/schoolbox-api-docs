@@ -6,6 +6,7 @@ namespace Schoolbox\Admin\DataRetention\Test;
 
 use Alaress\Database\Connector\IConnector;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -615,79 +616,81 @@ class CmsStrategyTest extends TestCase
     }
 
     /**
-     * Homepage pad cleanup must run as part of a real CMS folder delete.
+     * Homepage pad cleanup must run as part of CMS folder deletion.
      *
-     * Pads are homepage-owned data tied to the folder id. This guards against
-     * deleting folder-owned rows while leaving live Etherpad metadata behind in
-     * perform mode.
+     * Pads are homepage-owned data tied to the folder id. The provider keeps
+     * perform and dry-run coverage aligned so both modes assert the same
+     * orchestration with only the mode-specific call changing.
      *
+     * @param bool $perform
+     * @param list<string> $expectedCalls
      * @return void
      */
-    public function testDeleteChunkRunsHomepageCleanupInPerformMode(): void
+    #[DataProvider('providerDeleteChunkHomepageCleanup')]
+    public function testDeleteChunkRunsHomepageCleanup(bool $perform, array $expectedCalls): void
     {
-        ['strategy' => $strategy, 'state' => $state] = $this->strategy([], [], [], [], [], [], true);
+        ['strategy' => $strategy, 'state' => $state] = $this->strategy([], [], [], [], [], [], $perform);
 
         $this->delete($strategy, [
             ['id' => 10, 'table' => 'folder'],
         ]);
 
-        $this->assertSame([
-            'cleanupHomepagePads:10:do',
-            'deleteBlogComments',
-            'deleteBlogImages',
-            'deleteBlog',
-            'deleteForumPosts',
-            'deleteForumThreads',
-            'deletePollLogs',
-            'deletePolls',
-            'setWikiLatestRevisionNull',
-            'deleteWikiRevisions',
-            'deleteWikis',
-            'deleteComponentConfigInstances',
-            'deleteComponentInstances',
-            'deleteFolderOwnedRows',
-            'deleteHomepageUserAccess',
-            'deleteFolders',
-        ], $state->calls);
+        $this->assertSame($expectedCalls, $state->calls);
         $this->assertSame([10], $state->deletedHomepageUserAccessFolderIds);
     }
 
     /**
-     * Dry-run mode must still exercise homepage cleanup paths for accurate counts.
+     * Data provider for testDeleteChunkRunsHomepageCleanup.
      *
-     * The transaction is rolled back by Base::process(), but the strategy still
-     * needs to report what would be cleaned so administrators can trust dry-run
-     * output before enabling deletion.
-     *
-     * @return void
+     * @return array<string, array{bool, list<string>}>
      */
-    public function testDeleteChunkRunsHomepageCleanupInDryRunMode(): void
+    public static function providerDeleteChunkHomepageCleanup(): array
     {
-        ['strategy' => $strategy, 'state' => $state] = $this->strategy([], [], [], [], [], [], false);
+        return [
+            'perform mode' => [
+                true,
+                [
+                    'cleanupHomepagePads:10:do',
+                    'deleteBlogComments',
+                    'deleteBlogImages',
+                    'deleteBlog',
+                    'deleteForumPosts',
+                    'deleteForumThreads',
+                    'deletePollLogs',
+                    'deletePolls',
+                    'setWikiLatestRevisionNull',
+                    'deleteWikiRevisions',
+                    'deleteWikis',
+                    'deleteComponentConfigInstances',
+                    'deleteComponentInstances',
+                    'deleteFolderOwnedRows',
+                    'deleteHomepageUserAccess',
+                    'deleteFolders',
+                ],
+            ],
 
-        $this->delete($strategy, [
-            ['id' => 10, 'table' => 'folder'],
-        ]);
-
-        $this->assertSame([
-            'cleanupHomepagePads:10:dry',
-            'deleteBlogComments',
-            'deleteBlogImages',
-            'deleteBlog',
-            'deleteForumPosts',
-            'deleteForumThreads',
-            'deletePollLogs',
-            'deletePolls',
-            'setWikiLatestRevisionNull',
-            'deleteWikiRevisions',
-            'deleteWikis',
-            'deleteComponentConfigInstances',
-            'deleteComponentInstances',
-            'deleteFolderOwnedRows',
-            'deleteHomepageUserAccess',
-            'deleteFolders',
-        ], $state->calls);
-        $this->assertSame([10], $state->deletedHomepageUserAccessFolderIds);
+            'dry-run mode' => [
+                false,
+                [
+                    'cleanupHomepagePads:10:dry',
+                    'deleteBlogComments',
+                    'deleteBlogImages',
+                    'deleteBlog',
+                    'deleteForumPosts',
+                    'deleteForumThreads',
+                    'deletePollLogs',
+                    'deletePolls',
+                    'setWikiLatestRevisionNull',
+                    'deleteWikiRevisions',
+                    'deleteWikis',
+                    'deleteComponentConfigInstances',
+                    'deleteComponentInstances',
+                    'deleteFolderOwnedRows',
+                    'deleteHomepageUserAccess',
+                    'deleteFolders',
+                ],
+            ],
+        ];
     }
 
     /**
@@ -1315,95 +1318,102 @@ class CmsStrategyTest extends TestCase
     }
 
     /**
-     * Dry-run homepage cleanup should expose the same pad metadata path as perform mode.
+     * Homepage cleanup should report pad and metadata outcomes consistently.
      *
-     * The strategy relies on transaction rollback for dry-run safety, so this test
-     * keeps the observable summary aligned with what a real run would process.
+     * The provider mirrors the example validation-test shape: each named case
+     * supplies the mode, source records, external delete result, and expected
+     * summary for one cleanup scenario.
      *
+     * @param bool $perform
+     * @param array<int, array<int, array<string, mixed>>> $homepagePadRecords
+     * @param array<string, bool> $padDeleteResults
+     * @param array{padsFound: int, padsDeleted: int, dbRowsDeleted: int} $expectedSummary
+     * @param list<string> $expectedCalls
      * @return void
      */
-    public function testHomepageCleanupDryRunDoesNotDeletePadsOrMetadata(): void
-    {
+    #[DataProvider('providerHomepageCleanup')]
+    public function testHomepageCleanup(
+        bool $perform,
+        array $homepagePadRecords,
+        array $padDeleteResults,
+        array $expectedSummary,
+        array $expectedCalls,
+    ): void {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
-            [],
-            [],
-            [],
-            [
-                123 => [
-                    ['id' => 1, 'pad_id' => 'g.test123'],
-                ],
-            ],
-            ['g.test123' => true],
-            [],
-            false,
+            homepagePadRecords: $homepagePadRecords,
+            padDeleteResults: $padDeleteResults,
+            perform: $perform,
         );
 
         $summary = $strategy->cleanupHomepagePads(123);
 
-        $this->assertSame(1, $summary['padsFound']);
-        $this->assertSame(1, $summary['padsDeleted']);
-        $this->assertSame(1, $summary['dbRowsDeleted']);
-        $this->assertSame(['cleanupHomepagePads:123:dry', 'deletePadFromEtherpad:g.test123', 'hardDeleteEtherpadPad'], $state->calls);
+        $this->assertSame($expectedSummary['padsFound'], $summary['padsFound']);
+        $this->assertSame($expectedSummary['padsDeleted'], $summary['padsDeleted']);
+        $this->assertSame($expectedSummary['dbRowsDeleted'], $summary['dbRowsDeleted']);
+        $this->assertSame($expectedCalls, $state->calls);
     }
 
     /**
-     * Successful Etherpad deletion must be followed by local metadata cleanup.
+     * Data provider for testHomepageCleanup.
      *
-     * External pad deletion alone is not enough: the local row would otherwise be
-     * rediscovered by later retention runs for the same homepage.
-     *
-     * @return void
+     * @return array<string, array{
+     *     bool,
+     *     array<int, array<int, array<string, mixed>>>,
+     *     array<string, bool>,
+     *     array{padsFound: int, padsDeleted: int, dbRowsDeleted: int},
+     *     list<string>
+     * }>
      */
-    public function testHomepageCleanupSoftDeletesMetadataWhenPadDeleted(): void
+    public static function providerHomepageCleanup(): array
     {
-        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
-            [],
-            [],
-            [],
-            [
-                123 => [
-                    ['id' => 2, 'pad_id' => 'g.softdelete'],
+        return [
+            'dry-run mode reports would-be cleanup' => [
+                false,
+                [
+                    123 => [
+                        ['id' => 1, 'pad_id' => 'g.test123'],
+                    ],
                 ],
-            ],
-            ['g.softdelete' => true],
-        );
-
-        $summary = $strategy->cleanupHomepagePads(123);
-
-        $this->assertSame(1, $summary['padsFound']);
-        $this->assertSame(1, $summary['padsDeleted']);
-        $this->assertSame(1, $summary['dbRowsDeleted']);
-        $this->assertSame(['cleanupHomepagePads:123:do', 'deletePadFromEtherpad:g.softdelete', 'hardDeleteEtherpadPad'], $state->calls);
-    }
-
-    /**
-     * Failed external pad deletion should still remove local metadata in retention.
-     *
-     * CMS folder hard deletion is authoritative for retained data. This guards the
-     * decision to clean local rows even when Etherpad reports that the pad was not
-     * deleted externally.
-     *
-     * @return void
-     */
-    public function testHomepageCleanupTriggersRedisCleanupWhenEnabled(): void
-    {
-        ['strategy' => $strategy, 'state' => $state] = $this->strategy(
-            [],
-            [],
-            [],
-            [
-                123 => [
-                    ['id' => 3, 'pad_id' => 'g.redisclean'],
+                ['g.test123' => true],
+                [
+                    'padsFound' => 1,
+                    'padsDeleted' => 1,
+                    'dbRowsDeleted' => 1,
                 ],
+                ['cleanupHomepagePads:123:dry', 'deletePadFromEtherpad:g.test123', 'hardDeleteEtherpadPad'],
             ],
-            ['g.redisclean' => false],
-        );
 
-        $summary = $strategy->cleanupHomepagePads(123);
+            'successful Etherpad delete removes metadata' => [
+                true,
+                [
+                    123 => [
+                        ['id' => 2, 'pad_id' => 'g.softdelete'],
+                    ],
+                ],
+                ['g.softdelete' => true],
+                [
+                    'padsFound' => 1,
+                    'padsDeleted' => 1,
+                    'dbRowsDeleted' => 1,
+                ],
+                ['cleanupHomepagePads:123:do', 'deletePadFromEtherpad:g.softdelete', 'hardDeleteEtherpadPad'],
+            ],
 
-        $this->assertSame(1, $summary['padsFound']);
-        $this->assertSame(0, $summary['padsDeleted']);
-        $this->assertSame(1, $summary['dbRowsDeleted']);
-        $this->assertSame(['cleanupHomepagePads:123:do', 'deletePadFromEtherpad:g.redisclean', 'hardDeleteEtherpadPad'], $state->calls);
+            'failed Etherpad delete still removes metadata' => [
+                true,
+                [
+                    123 => [
+                        ['id' => 3, 'pad_id' => 'g.redisclean'],
+                    ],
+                ],
+                ['g.redisclean' => false],
+                [
+                    'padsFound' => 1,
+                    'padsDeleted' => 0,
+                    'dbRowsDeleted' => 1,
+                ],
+                ['cleanupHomepagePads:123:do', 'deletePadFromEtherpad:g.redisclean', 'hardDeleteEtherpadPad'],
+            ],
+        ];
     }
 }
