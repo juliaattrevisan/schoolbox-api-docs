@@ -416,22 +416,7 @@
 
                     // If we've decided to update the capability mark, then do so
                     if (shouldUpdateCapabilityMark) {
-                        switch (markType) {
-                            case 'letter':
-                                assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-scaled-mark')), $groupSummary.find("[data-group-mark]").val(scaledGroupMark));
-                                break;
-
-                            case 'percent':
-                                $groupSummary.find("[data-group-mark]").val(getPercentage($groupSummary, $groupSummary.attr('data-scaled-mark')));
-                                break;
-
-                            case 'raw':
-                            case 'none':
-                            default:
-                                $groupSummary.find("[data-group-mark]").val(scaledGroupMark);
-                                break;
-                        }
-
+                        // TODO: theoretically equivalent to useDerivedMark(), but on trigger of a descriptor change rather than manually
                     }
                 }
 
@@ -522,40 +507,7 @@
         // Overwrite any custom mark in the capability mark field with the scaled mark calculated from descriptor values
         $("[data-use-descriptor-values]").on('click', function(e) {
             var $button               = $(this),
-                $gradeInput           = $button.siblings('[data-group-mark]'),
-                rubricId              = $button.closest('[data-group-summary]').attr('data-rubric-id'),
-                groupId               = $button.closest('[data-group-summary]').attr('data-group-id'),
-                rowSelector           = '[data-group="rb-' + rubricId + '-' + groupId + '"]',
-                $groupRows            = $(rowSelector),
-                groupSummarySelector  = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]',
-                $groupSummary         = $rb.find(groupSummarySelector),
-                $descriptorCheckboxes = $groupRows.find('input'),
-                scaledGroupMark       = scale($groupSummary, summateDescriptors($descriptorCheckboxes));
-
-            $groupSummary.attr('data-scaled-mark', scaledGroupMark);
-
-            switch (markType) {
-                case 'letter':
-                    assignLetterGrade(getPercentage($groupSummary, scaledGroupMark), $gradeInput.val(scaledGroupMark));
-                    break;
-
-                case 'percent':
-                    $gradeInput.val(getPercentage($groupSummary, scaledGroupMark));
-                    break;
-
-                case 'raw':
-                case 'none':
-                default:
-                    $gradeInput.val(scaledGroupMark);
-                    break;
-            }
-
-            // The grade input has changed: trigger save draft
-            $gradeInput.trigger('change');
-
-            // Up for discussion, but I'd imagine the user would like the marks to update automatically
-            // with descriptor changes once they've clicked this button
-            $groupSummary.removeAttr('data-customised');
+                rubricId              = $button.closest('[data-group-summary]').attr('data-rubric-id');
 
             var rubricTotalMark       = getTotalMark(),
                 rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]',
@@ -567,45 +519,6 @@
             disableEnableAssignFromDescs();
             revalidateCapMarks();
         });
-
-
-        // Get an array of letter grade {value : letter} pairs
-        function getLetterGrades($dropdown) {
-            var grades = [];
-            $dropdown.find("option[data-letter]").each(function(index, option) {
-                let $option = $(option);
-                grades.push({
-                    value:      $option.prop("value"),
-                    lowerBound: $option.attr('data-lower-bound'),
-                    letter:     $option.attr('data-letter'),
-                });
-            });
-
-            return grades;
-        }
-
-
-        // Given a percentage mark, set a capability dropdown to its corresponding letter grade
-        function assignLetterGrade(numericMark, $dropdown) {
-            // Numeric mark is null? select the first option (empty grade)
-            var optionIndex = 0;
-            if (numericMark !== null) {
-                var grades     = getLetterGrades($dropdown),
-                    numberMark = Number(numericMark);
-                for (var i = 0; i < grades.length; i++) {
-                    // TODO assumes values are always descending which might not be the case?
-                    if (numberMark >= Number(grades[i].lowerBound)) {
-                        // Offset the selected option by +1, to take into account empty grade
-                        optionIndex = i + 1;
-                        break;
-                    }
-                }
-            }
-
-            $dropdown.find('option').prop('selected', function(i) {
-                return i === optionIndex;
-            });
-        }
 
         // Hide or display the descriptor range input depending on whether it's needed or not
         function showHideRangeInput($changedCell) {

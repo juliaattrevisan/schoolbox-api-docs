@@ -121,40 +121,53 @@ function getPercentage(value: string | number | null): string | null {
  * @param value scaled mark value
  * @returns the human readable form of the mark to display
  */
-function getHumanReadableMark(value: string | number | null): string | null {
+function applyMarkScheme(value: string | number | null): {
+    value: string | null;
+    humanReadableMark: string | null;
+} {
     const markScheme = props.capabilityMarkScheme;
-
     if (markScheme.template === "" || markScheme.template === "TotalMarkFractional") {
-        return value !== null ? String(value) : null;
+        const stringValue = value !== null ? String(value) : null;
+        return {
+            value: stringValue,
+            humanReadableMark:
+                markScheme.template === "TotalMarkFractional"
+                    ? `${stringValue} / ${props.capability.maxValue}`
+                    : stringValue,
+        };
     }
 
     // turn whatever the value currently is into a percentage
     const percentage = getPercentage(value);
 
     if (markScheme.template === "Percentage") {
-        return `${percentage}%`;
+        return {
+            value: percentage,
+            humanReadableMark: `${percentage}%`,
+        };
     }
 
     if (markScheme.template === "LetterGrade") {
-        if (value === null || value === undefined || value === "") {
-            return "(no grade)";
-        }
-
         const grades = markScheme.context.conf;
+        if (percentage === null || percentage === "") {
+            return { value: null, humanReadableMark: null };
+        }
+
         if (grades.length === 0) {
-            return "";
+            // some strange stuff going on here from the old logic, not really sure if it matters anymore
+            return { value: "", humanReadableMark: "" };
         }
 
-        const numericValue = parseFloat(String(value)); // yikes.
-        for (const grade of grades) {
-            // TODO: (from old logic) assumes values are always descending which might not be the case?
-            if (numericValue >= grade.lowerBound) {
-                return grade.caption;
-            }
-        }
+        const numericValue = parseFloat(percentage); // yikes.
 
-        // fell through all the grades, return the last one
-        return grades[grades.length - 1].caption;
+        // TODO: (from old logic) assumes values are always descending which might not be the case?
+        // default to the last grade if nothing matches
+        const defaultGrade = grades[grades.length - 1];
+        const relevantGrade = grades.find((grade) => numericValue >= grade.lowerBound) ?? defaultGrade;
+        return {
+            value: relevantGrade.caption,
+            humanReadableMark: relevantGrade.caption,
+        };
     }
 
     assertUnreachable(markScheme);
@@ -166,9 +179,13 @@ function getHumanReadableMark(value: string | number | null): string | null {
 const derivedCapabilityMark = window.Vue.computed(() => {
     const sum = indicatorMarkSum.value;
     const scaledMark = scaleMark(sum);
-    const hrMark = getHumanReadableMark(scaledMark) satisfies RubricMarkedGridCapability["humanReadableMark"];
+    const { value, humanReadableMark } = applyMarkScheme(scaledMark);
 
-    return { scaled: scaledMark, humanReadable: hrMark };
+    return {
+        scaled: scaledMark,
+        value: value satisfies RubricMarkedGridCapability["value"],
+        humanReadableMark: humanReadableMark satisfies RubricMarkedGridCapability["humanReadableMark"],
+    };
 });
 
 const hasSelectedDescriptor = window.Vue.computed<boolean>(() =>
@@ -182,7 +199,7 @@ const capabilityHasValuedDescriptors = window.Vue.computed<boolean>(() =>
 );
 
 const markIsDifferent = window.Vue.computed<boolean>(() => {
-    const derivedMark = derivedCapabilityMark.value.humanReadable;
+    const derivedMark = derivedCapabilityMark.value.value;
     const customMark = capabilityMark.value.value;
 
     if (props.capabilityMarkScheme.template === "LetterGrade") {
@@ -214,6 +231,18 @@ const showAssignFromButton = window.Vue.computed<boolean>(() => {
     // Otherwise, show it if the mark is different
     return markIsDifferent.value;
 });
+
+/**
+ * Set the capability mark to the derived value based on the indicators
+ */
+function useDerivedMark(): void {
+    capabilityMark.value.value = derivedCapabilityMark.value.value;
+    capabilityMark.value.humanReadableMark = derivedCapabilityMark.value.humanReadableMark;
+
+    // once you've clicked this button, the mark is no longer treated as customised
+    // and should update automatically with indicator changes
+    // TODO: set data-customised to false
+}
 
 // TODO data-customised logic
 </script>
@@ -273,14 +302,18 @@ const showAssignFromButton = window.Vue.computed<boolean>(() => {
                 </template>
             </span>
 
-            <a v-if="showAssignFromButton" class="fieldAssign" data-use-descriptor-values>
+            <a
+                v-if="showAssignFromButton"
+                class="fieldAssign"
+                data-use-descriptor-values
+                @click.prevent="useDerivedMark"
+            >
                 <!-- avoid showing "assign null from ...", only show if there's a meaningful value -->
                 <!-- TODO: confirm if this works, otherwise (hasSelectedDescriptor && hasSelectedValuedDescriptor && capabilityHasValuedDescriptors) is the old logic -->
                 <template v-if="derivedCapabilityMark.scaled !== null">
                     Assign
-                    <!-- TODO: conditionally render this span instead? -->
                     <!-- TODO: data-group-descriptor-sum -->
-                    <span class="descriptor-sum">{{ derivedCapabilityMark.humanReadable }}</span>
+                    <span class="descriptor-sum">{{ derivedCapabilityMark.value }}</span>
                     from {{ locale.rubricCriterion.plural() }}
                 </template>
                 <template v-else>
