@@ -231,39 +231,8 @@
             return selectedDescriptor[0] || null;
         }
 
-        // Disable Assign From Descriptors if value hasn't changed
-        function disableEnableAssignFromDescs() {
-            var $groups = $rb.find("[data-group-summary]");
-            $groups.each(function() {
-                var $this         = $(this),
-                    customMark    = $this.find("[data-group-mark]").val();
-
-                const capabilityHasValuedDescriptors = findAllDescriptorsInCapability($this.attr('data-group-id'))
-                    .filter(descriptor => descriptor.state.value !== null).length > 0;
-
-                // TODO: customised logic, showAssignFromButton has been moved over already
-                if (showAssignFromButton) {
-                    $this.attr('data-customised', true);
-                } else {
-                    // Only remove data-customised if at least one descriptor has a value AND data-scaled-mark is not empty
-                    // We do this as when all descriptors are valueless, the only way a scaled mark can be set is manually
-                    // But we don't want to show the descriptor values button in this case as it'd never have a useful value
-                    if (capabilityHasValuedDescriptors && $this.attr('data-scaled-mark') !== '') {
-                        $this.removeAttr('data-customised');
-                    }
-
-                    // Or, if the capability mark input is actually empty, then we should remove the data-customised attribute
-                    if (customMark === "") {
-                        $this.removeAttr('data-customised');
-                    }
-                }
-            });
-        }
-
         // initialise dynamic mark display
         $rb.dynagrade(dynagrade);
-
-        disableEnableAssignFromDescs();
 
         // Update the per-capability and overall marks when descriptor selection is changed
         $rb.on('change change.preload', '[data-rubric], [data-rubric-group]', function (e) {
@@ -284,8 +253,6 @@
             if (! $groupSummary.attr('data-customised')) {
                 parseFraction(rubricSummary, e.namespace);
             }
-
-            disableEnableAssignFromDescs();
         });
 
 
@@ -319,7 +286,6 @@
             rubricSummary.attr('data-scaled-mark', rubricTotalMark);
 
             parseFraction(rubricSummary, e.namespace);
-            disableEnableAssignFromDescs();
         });
 
         // Custom marks reach us as either a scaled numeric mark or a percentage. Turn them into an unscaled raw mark for data-mark
@@ -363,7 +329,6 @@
             rubricSummary.attr('data-scaled-mark', rubricTotalMark);
 
             parseFraction(rubricSummary, e.namespace);
-            disableEnableAssignFromDescs();
             revalidateCapMarks();
         });
 

@@ -274,13 +274,35 @@ function onIndicatorMarkUpdated(): void {
 
 window.Vue.onMounted(() => {
     // Track the initial customised state based on:
-    // - if the actual scaled mark differs from the derived one on page load
+    // - if the actual scaled mark differs from the derived one on page load (equivalent to if the assign from button is showing)
     // - OR if there's a value, but all the descriptors in this capability are valueless (the only way to get a mark is to manually set it)
-    const initialMarkDiffers = capabilityMark.value.scaledMark !== derivedCapabilityMark.value.scaledMark;
-    if (initialMarkDiffers || !capabilityHasValuedDescriptors.value) {
+    if (showAssignFromButton.value || !capabilityHasValuedDescriptors.value) {
         isCustomised.value = true;
     }
 });
+
+/** When the capability mark changes (either from user input or automatically via descriptor updates) */
+window.Vue.watch(
+    () => capabilityMark.value.value,
+    () => {
+        // if the mark now differs to the derived mark (aka assign from is showing), consider it customised
+        if (showAssignFromButton.value) {
+            isCustomised.value = true;
+        } else {
+            // remove the customised flag if at least one descriptor has a value AND the scaled mark is not empty.
+            // We do this as when all descriptors are valueless, the only way a scaled mark can be set is manually
+            // But we don't want to show the descriptor values button in this case as it'd never have a useful value
+            if (capabilityHasValuedDescriptors.value && derivedCapabilityMark.value.scaledMark !== null) {
+                isCustomised.value = false;
+            }
+
+            // or, if the capability mark input is actually empty then we should remove the customised flag
+            if (capabilityMark.value.value === null || capabilityMark.value.value.trim() === "") {
+                isCustomised.value = false;
+            }
+        }
+    },
+);
 </script>
 
 <template>
