@@ -4,6 +4,7 @@ import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import SearchSelectModal from "@schoolboxVue/components/searchSelect/modal/search-select-modal.vue";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import type {
+    IBClassCode,
     IBLanguage,
     IBLanguageListResponse,
     IBSubject,
@@ -44,6 +45,8 @@ const props = defineProps<{
     saveEndpoint: string;
     ibSubjects: IBSubject[];
     searchLanguagesEndpoint: string | null;
+    searchClassCodesEndpoint: string | null;
+    studentCountEndpoint: string | null;
 }>();
 
 const isSaving = window.Vue.ref<boolean>(false);
@@ -57,11 +60,19 @@ const modalDefaultResults = window.Vue.ref<SearchSelectItem[]>([]);
 const modalSearchResults = window.Vue.ref<SearchSelectItem[]>([]);
 const cachedLanguageNames = window.Vue.ref<Record<number, string>>({});
 
+const isClassCodeModalOpen = window.Vue.ref<boolean>(false);
+const classCodeEditingRowId = window.Vue.ref<string | null>(null);
+const classCodeModalSelected = window.Vue.ref<SearchSelectItem[]>([]);
+const classCodeSearchResults = window.Vue.ref<SearchSelectItem[]>([]);
+const classCodeDefaultResults = window.Vue.ref<SearchSelectItem[]>([]);
+
 const isCoreCategory = window.Vue.computed(() => {
     return props.categoryName.toLowerCase() === "core";
 });
 
 const canEditLanguages = window.Vue.computed<boolean>(() => Boolean(props.searchLanguagesEndpoint));
+
+const canEditClassCodes = window.Vue.computed<boolean>(() => Boolean(props.searchClassCodesEndpoint));
 
 const defaultLanguageId = window.Vue.computed<number | null>(() => props.defaultLanguage?.id ?? null);
 
@@ -214,6 +225,7 @@ window.Vue.watch(
     () => {
         refreshCachedLanguageNames();
         initializeSubjectRows();
+        void refreshStudentCounts();
     },
     { deep: true, immediate: true },
 );
@@ -337,22 +349,6 @@ function applySelectedLanguages(selectedItems: SearchSelectItem[]): void {
     }
 }
 
-/**
- * Update a field on a subject row.
- * @param rowId The row identifier to update.
- * @param field The row field being changed.
- * @param value The updated value for the field.
- */
-function updateRowField(rowId: string, field: keyof SubjectRow, value: string | number): void {
-    const row = subjectRows.value.find((r) => r.id === rowId);
-    if (row && field in row) {
-        (row as Record<string, unknown>)[field] = value;
-
-        if (field === "classCode") {
-            updateStudentCount(rowId);
-        }
-    }
-}
 
 /**
  * Get the language display text for a subject row.
@@ -425,34 +421,128 @@ function onModalNextSearchResponse(json: unknown, isActive: boolean): void {
 }
 
 /**
- * Update the displayed student count for a row.
- * @param rowId The row identifier to update.
+ * Get the display text for the class code field.
+ * @param row The subject row being displayed.
+ * @returns Comma-joined class codes or empty string.
  */
-function updateStudentCount(rowId: string): void {
+function getClassCodeDisplayText(row: SubjectRow): string {
+    if (!row.classCode.trim()) return "";
+    return row.classCode
+        .split(",")
+        .map((c) => c.trim())
+        .filter(Boolean)
+        .join(", ");
+}
+
+/**
+ * Open the class code selection modal for a row.
+ * @param rowId The row identifier to edit.
+ */
+function openClassCodeModal(rowId: string): void {
+    if (!props.searchClassCodesEndpoint) return;
     const row = subjectRows.value.find((r) => r.id === rowId);
     if (!row) return;
+    classCodeEditingRowId.value = rowId;
+    // Class codes are strings; cast is safe because SearchSelectModal only does === comparisons on id.
+    classCodeModalSelected.value = row.classCode
+        .split(",")
+        .map((c) => c.trim())
+        .filter(Boolean)
+        .map((code) => ({ id: code, name: code })) as unknown as SearchSelectItem[];
+    isClassCodeModalOpen.value = true;
+}
 
-    try {
-        if (isCoreCategory.value) {
-            const mockStudentCount = Math.floor(Math.random() * 150) + 50;
-            row.studentCount = mockStudentCount;
-        } else {
-            if (!row.classCode.trim()) {
-                row.studentCount = 0;
-                return;
+/**
+ * Update class code modal results from search or default response.
+ * @param json The API response.
+ * @param results The results ref to update.
+ * @param isMoreResults Whether to append.
+ */
+function updateClassCodeModalResults(
+    json: unknown,
+    results: typeof classCodeDefaultResults,
+    isMoreResults: boolean,
+): void {
+    if (typeof json !== "object" || json === null || !("data" in json) || !Array.isArray(json.data)) {
+        return;
+    }
+
+    // Class codes are strings; cast is safe because SearchSelectModal only does === comparisons on id.
+    const formattedResults = (json.data as IBClassCode[]).map((item) => ({
+        id: item.code,
+        name: `${item.name} (${item.code})`,
+    })) as unknown as SearchSelectItem[];
+
+    if (isMoreResults) {
+        results.value = [...results.value, ...formattedResults];
+        return;
+    }
+
+    results.value = [...formattedResults];
+}
+
+/**
+ * Handle the initial class code search/default-results response.
+ * @param json The returned json.
+ * @param isActive Whether the search is active.
+ */
+function onClassCodeModalSearchResponse(json: unknown, isActive: boolean): void {
+    updateClassCodeModalResults(json, isActive ? classCodeSearchResults : classCodeDefaultResults, false);
+}
+
+/**
+ * Handle a paginated class code modal response.
+ * @param json The returned json.
+ * @param isActive Whether the search is active.
+ */
+function onClassCodeModalNextSearchResponse(json: unknown, isActive: boolean): void {
+    updateClassCodeModalResults(json, isActive ? classCodeSearchResults : classCodeDefaultResults, true);
+}
+
+window.Vue.watch(isClassCodeModalOpen, (isOpen, wasOpen) => {
+    if (isOpen || !wasOpen || !classCodeEditingRowId.value) {
+        return;
+    }
+
+    const row = subjectRows.value.find((r) => r.id === classCodeEditingRowId.value);
+    if (row) {
+        row.classCode = classCodeModalSelected.value.map((item) => String(item.id)).join(", ");
+    }
+
+    classCodeEditingRowId.value = null;
+});
+
+/**
+ * Refresh student counts for all rows in the current category after a save.
+ */
+async function refreshStudentCounts(): Promise<void> {
+    if (!props.studentCountEndpoint || isCoreCategory.value) return;
+
+    const groupSubjectIds = [...new Set(subjectRows.value.map((r) => r.groupSubjectId))];
+
+    if (groupSubjectIds.length === 0) return;
+
+    const params = groupSubjectIds.map((id) => `groupSubjectId[]=${id}`).join("&");
+    const response = await apiRequest<
+        Array<{ groupSubjectId: number; total: number; byLanguage: Array<{ languageId: number; count: number }> }>
+    >({
+        url: `${props.studentCountEndpoint}?${params}`,
+        method: "GET",
+    });
+
+    if (!response.success || !Array.isArray(response.data)) return;
+
+    for (const entry of response.data) {
+        for (const row of subjectRows.value) {
+            if (row.groupSubjectId !== entry.groupSubjectId) continue;
+
+            if (!row.isLanguageRow) {
+                row.studentCount = entry.total;
+            } else {
+                const langEntry = entry.byLanguage.find((l) => l.languageId === row.languages[0]);
+                row.studentCount = langEntry?.count ?? 0;
             }
-
-            const classCodes = row.classCode
-                .split(",")
-                .map((code) => code.trim())
-                .filter((code) => code);
-            const mockStudentCount = classCodes.length * Math.floor(Math.random() * 25) + 5;
-
-            row.studentCount = mockStudentCount;
         }
-    } catch (error) {
-        console.error("Failed to fetch student count:", error);
-        row.studentCount = 0;
     }
 }
 
@@ -521,6 +611,7 @@ async function saveSubjectConfiguration(): Promise<void> {
 
         const toast = window.sbProps.toastActivate(`${props.categoryTitle} configuration saved successfully`);
         toast.timeout({ text: "Saved" });
+        await refreshStudentCounts();
     } catch (error) {
         saveError.value = "Failed to save configuration";
         const toast = window.sbProps.toastActivate("Save failed");
@@ -547,7 +638,6 @@ async function saveSubjectConfiguration(): Promise<void> {
                         <tr>
                             <th>Subject</th>
                             <th>Languages</th>
-                            <th>Current Student Count</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -579,9 +669,6 @@ async function saveSubjectConfiguration(): Promise<void> {
                                         </button>
                                     </div>
                                 </td>
-                                <td>
-                                    <span class="student-count-display">{{ row.studentCount }}</span>
-                                </td>
                             </tr>
                         </template>
                     </tbody>
@@ -593,7 +680,6 @@ async function saveSubjectConfiguration(): Promise<void> {
                         <tr>
                             <th>Subject</th>
                             <th>Languages</th>
-                            <th>Current Student Count</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -624,9 +710,6 @@ async function saveSubjectConfiguration(): Promise<void> {
                                             <sbx-icon name="modify"></sbx-icon>
                                         </button>
                                     </div>
-                                </td>
-                                <td>
-                                    <span class="student-count-display">{{ row.studentCount }}</span>
                                 </td>
                             </tr>
                         </template>
@@ -684,38 +767,29 @@ async function saveSubjectConfiguration(): Promise<void> {
                                     </span>
                                 </td>
                                 <td>
-                                    <input
-                                        v-if="row.isLanguageRow || row.languages.length <= 1"
-                                        :value="row.classCode"
-                                        class="table-input"
-                                        placeholder="Enter class codes (comma separated)"
-                                        @input="
-                                            (event) =>
-                                                updateRowField(
-                                                    row.id,
-                                                    'classCode',
-                                                    (event.target as HTMLInputElement).value,
-                                                )
-                                        "
-                                    />
-                                    <span v-else class="field-moved">Moved to language rows below</span>
+                                    <div v-if="row.isLanguageRow || row.languages.length <= 1" class="l-flex l-gap-xs">
+                                        <input
+                                            type="text"
+                                            :value="getClassCodeDisplayText(row)"
+                                            class="table-input l-flex__item--1"
+                                            placeholder="Add class codes"
+                                            readonly
+                                        />
+                                        <button
+                                            type="button"
+                                            class="sbx-icon-only-button f-no-margins"
+                                            aria-label="Edit class codes"
+                                            title="Edit class codes"
+                                            :disabled="!canEditClassCodes"
+                                            :data-test="`ib-class-code-edit-${row.id}`"
+                                            @click="openClassCodeModal(row.id)"
+                                        >
+                                            <sbx-icon name="modify"></sbx-icon>
+                                        </button>
+                                    </div>
                                 </td>
                                 <td>
-                                    <input
-                                        v-if="row.isLanguageRow || row.languages.length <= 1"
-                                        :value="row.studentCount"
-                                        class="table-input"
-                                        type="text"
-                                        @input="
-                                            (event) =>
-                                                updateRowField(
-                                                    row.id,
-                                                    'studentCount',
-                                                    parseInt((event.target as HTMLInputElement).value) || 0,
-                                                )
-                                        "
-                                    />
-                                    <span v-else class="field-moved">Moved to language rows below</span>
+                                    <span class="student-count-display">{{ row.studentCount }}</span>
                                 </td>
                             </tr>
                         </template>
@@ -749,6 +823,23 @@ async function saveSubjectConfiguration(): Promise<void> {
             :allow-partial-matches="true"
             @search-response="onModalSearchResponse"
             @next-search-response="onModalNextSearchResponse"
+        />
+
+        <search-select-modal
+            v-model:selected="classCodeModalSelected"
+            v-model:is-open="isClassCodeModalOpen"
+            v-model:results="classCodeSearchResults"
+            :default-results="classCodeDefaultResults"
+            show-selected
+            label="Search"
+            label-id="ib-class-code-modal-search"
+            placeholder="Search for class codes..."
+            title="Select Class Codes"
+            :endpoint="props.searchClassCodesEndpoint ?? ''"
+            :manage-search-response="true"
+            :allow-partial-matches="true"
+            @search-response="onClassCodeModalSearchResponse"
+            @next-search-response="onClassCodeModalNextSearchResponse"
         />
     </div>
 </template>

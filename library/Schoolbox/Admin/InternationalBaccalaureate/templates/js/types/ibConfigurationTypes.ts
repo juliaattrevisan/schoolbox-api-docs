@@ -43,6 +43,12 @@ export type IBLanguageListResponse = {
     };
 };
 
+export type IBClassCode = {
+    id: string;
+    code: string;
+    name: string;
+};
+
 export type IBSubject = {
     id: number;
     subject: string;
@@ -52,4 +58,6 @@ export type IBSubject = {
 
 export type IBRoutes = {
     searchLanguages: string | null;
+    searchClassCodes: string | null;
+    studentCount: string | null;
 };
