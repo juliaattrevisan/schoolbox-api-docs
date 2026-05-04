@@ -609,7 +609,9 @@ class Cms extends Base
     // wiki functions
 
     /**
-     * Sets wiki revisions to NUll... becasue.... good question....
+     * Sets wiki revisions to NUll, due to foreign key constraints,
+     * we need to do this before we can delete the revisions and wikis. No checks, just update.
+     *
      * @param array $ids
      * @return int Number of rows updated
      */
