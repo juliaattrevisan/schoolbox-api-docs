@@ -126,14 +126,15 @@ function applyMarkScheme(value: string | number | null): {
     humanReadableMark: string | null;
 } {
     const markScheme = props.capabilityMarkScheme;
-    if (markScheme.template === "" || markScheme.template === "TotalMarkFractional") {
+    if (markScheme.template === "") {
+        return { value: null, humanReadableMark: null };
+    }
+
+    if (markScheme.template === "TotalMarkFractional") {
         const stringValue = value !== null ? String(value) : null;
         return {
             value: stringValue,
-            humanReadableMark:
-                markScheme.template === "TotalMarkFractional"
-                    ? `${stringValue} / ${props.capability.maxValue}`
-                    : stringValue,
+            humanReadableMark: `${stringValue} / ${props.capability.maxValue}`,
         };
     }
 
