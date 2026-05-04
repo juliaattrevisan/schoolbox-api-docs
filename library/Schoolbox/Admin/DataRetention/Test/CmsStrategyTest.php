@@ -1042,9 +1042,9 @@ class CmsStrategyTest extends TestCase
         $summary = $strategy->cleanupHomepagePads(123);
 
         $this->assertSame(1, $summary['padsFound']);
-        $this->assertSame(0, $summary['padsDeleted']);
+        $this->assertSame(1, $summary['padsDeleted']);
         $this->assertSame(1, $summary['dbRowsDeleted']);
-        $this->assertSame(['cleanupHomepagePads:123:dry', 'hardDeleteEtherpadPad'], $state->calls);
+        $this->assertSame(['cleanupHomepagePads:123:dry', 'deletePadFromEtherpad:g.test123', 'hardDeleteEtherpadPad'], $state->calls);
     }
 
     public function testHomepageCleanupSoftDeletesMetadataWhenPadDeleted(): void
