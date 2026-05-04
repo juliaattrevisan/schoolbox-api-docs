@@ -79,7 +79,8 @@ async function onSubmit(): Promise<void> {
 
     if (!response.success) {
         const backendMessage = (response.data as Record<string, unknown>)?.message;
-        submitError.value = typeof backendMessage === "string" ? backendMessage : "An error occurred. Please try again.";
+        submitError.value =
+            typeof backendMessage === "string" ? backendMessage : "An error occurred. Please try again.";
         return;
     }
 
