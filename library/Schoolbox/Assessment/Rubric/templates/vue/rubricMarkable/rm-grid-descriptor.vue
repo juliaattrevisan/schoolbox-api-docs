@@ -108,83 +108,85 @@ window.Vue.onMounted(() => {
 
 <template>
     <td :class="{ 'rb-selected': isDescriptorSelected }">
-        <!-- TODO: data-value="{{ descriptor.maxValue }}" -->
-        <!-- TODO: data-rubric="{{ rubricGrid.assessment.id }}" -->
-        <!-- TODO: data-rubric-group="{{ groupUsage.capability.id }}" -->
-        <!-- TODO: data-rubric-descriptor="{{ descriptor.id }}" -->
-        <!-- TODO: data-rubric-indicator="{{ indicatorId }}" -->
-        <input
-            :id="`descriptor-${props.descriptor.id}-${componentId}`"
-            v-model="isDescriptorSelected"
-            type="checkbox"
-        />
+        <div class="rb-descriptor-cell">
+            <!-- TODO: data-value="{{ descriptor.maxValue }}" -->
+            <!-- TODO: data-rubric="{{ rubricGrid.assessment.id }}" -->
+            <!-- TODO: data-rubric-group="{{ groupUsage.capability.id }}" -->
+            <!-- TODO: data-rubric-descriptor="{{ descriptor.id }}" -->
+            <!-- TODO: data-rubric-indicator="{{ indicatorId }}" -->
+            <input
+                :id="`descriptor-${props.descriptor.id}-${componentId}`"
+                v-model="isDescriptorSelected"
+                type="checkbox"
+            />
 
-        <label :for="`descriptor-${props.descriptor.id}-${componentId}`">
-            <div class="hide-for-large-up l-pad-m hide-on-print">
-                <!-- display rubric levels for the mobile view. -->
-                <p>
-                    <!-- TODO: should be scrubbed (markdown) and output as html -->
-                    <b>{{ level.name }}</b>
-                </p>
-            </div>
-
-            <span class="rb-description markdown">
-                <!-- Self-Assessment  -->
-                <template
-                    v-if="
-                        props.selfAssessmentIndicatorMark &&
-                        props.selfAssessmentIndicatorMark.descriptorId === props.descriptor.id
-                    "
-                >
-                    <p
-                        v-if="props.participantId === null"
-                        class="rb-self-reflection-choice blind-mode"
-                        :title="selfAssessmentTooltip"
-                    >
-                        <!-- blind mode-->
+            <label :for="`descriptor-${props.descriptor.id}-${componentId}`">
+                <div class="hide-for-large-up l-pad-m hide-on-print">
+                    <!-- display rubric levels for the mobile view. -->
+                    <p>
+                        <!-- TODO: should be scrubbed (markdown) and output as html -->
+                        <b>{{ level.name }}</b>
                     </p>
-                    <user-photo
-                        v-else
-                        :user-id="props.participantId"
-                        class="rb-self-reflection-choice"
-                        render="tiny"
-                        :description="selfAssessmentTooltip"
-                    />
-                </template>
+                </div>
 
-                <!-- TODO: should be scrubbed (markdown) and output as html -->
-                {{ props.descriptor.description?.trim() }}
-            </span>
+                <span class="rb-description markdown">
+                    <!-- Self-Assessment  -->
+                    <template
+                        v-if="
+                            props.selfAssessmentIndicatorMark &&
+                            props.selfAssessmentIndicatorMark.descriptorId === props.descriptor.id
+                        "
+                    >
+                        <p
+                            v-if="props.participantId === null"
+                            class="rb-self-reflection-choice blind-mode"
+                            :title="selfAssessmentTooltip"
+                        >
+                            <!-- blind mode-->
+                        </p>
+                        <user-photo
+                            v-else
+                            :user-id="props.participantId"
+                            class="rb-self-reflection-choice"
+                            render="tiny"
+                            :description="selfAssessmentTooltip"
+                        />
+                    </template>
 
-            <!-- Just show a text value if the descriptor is not selected -->
-            <span
-                v-if="props.descriptor.value !== null && (!hasMarkRange || !isDescriptorSelected) && !isSelfReflect"
-                class="rb-value"
-                :class="{ used: !hasMarkRange }"
+                    <!-- TODO: should be scrubbed (markdown) and output as html -->
+                    {{ props.descriptor.description?.trim() }}
+                </span>
+
+                <!-- Just show a text value if the descriptor is not selected -->
+                <span
+                    v-if="props.descriptor.value !== null && (!hasMarkRange || !isDescriptorSelected) && !isSelfReflect"
+                    class="rb-value"
+                    :class="{ used: !hasMarkRange }"
+                >
+                    <template v-if="'left' in props.descriptor.value">
+                        <!-- mark range -->
+                        {{ props.descriptor.value.left }}–{{ props.descriptor.value.right }}
+                    </template>
+                    <template v-else>
+                        {{ props.descriptor.value.max }}
+                    </template>
+                </span>
+            </label>
+
+            <!-- Render a dropdown to select a value from the range -->
+            <!-- TODO: this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox -->
+            <!-- TODO: data-rubric="{{ rubricGrid.id }}" -->
+            <!-- TODO: data-rubric-group="{{ groupUsage.capability.id }}" -->
+            <!-- TODO: data-rubric-descriptor="{{ descriptor.id }}" -->
+            <!-- TODO: data-rubric-indicator="{{ indicatorId }}" -->
+            <select
+                v-if="isDescriptorSelected && hasMarkRange && (!isStudentView || isSelfAssess)"
+                :id="`descriptor-${props.descriptor.id}-rangeDropdown-${componentId}`"
+                v-model="descriptorValue"
+                :class="{ used: hasMarkRange }"
             >
-                <template v-if="'left' in props.descriptor.value">
-                    <!-- mark range -->
-                    {{ props.descriptor.value.left }}–{{ props.descriptor.value.right }}
-                </template>
-                <template v-else>
-                    {{ props.descriptor.value.max }}
-                </template>
-            </span>
-        </label>
-
-        <!-- Render a dropdown to select a value from the range -->
-        <!-- TODO: this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox -->
-        <!-- TODO: data-rubric="{{ rubricGrid.id }}" -->
-        <!-- TODO: data-rubric-group="{{ groupUsage.capability.id }}" -->
-        <!-- TODO: data-rubric-descriptor="{{ descriptor.id }}" -->
-        <!-- TODO: data-rubric-indicator="{{ indicatorId }}" -->
-        <select
-            v-if="isDescriptorSelected && hasMarkRange && (!isStudentView || isSelfAssess)"
-            :id="`descriptor-${props.descriptor.id}-rangeDropdown-${componentId}`"
-            v-model="descriptorValue"
-            :class="{ used: hasMarkRange }"
-        >
-            <option v-for="option in markRangeValues" :key="option" :value="option">{{ option }}</option>
-        </select>
+                <option v-for="option in markRangeValues" :key="option" :value="option">{{ option }}</option>
+            </select>
+        </div>
     </td>
 </template>

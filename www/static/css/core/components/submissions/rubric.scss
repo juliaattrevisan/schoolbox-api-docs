@@ -32,6 +32,12 @@ table.rb {
 
         tr.rb-indicator-row {
             height: 100%;
+
+            .rb-descriptor-cell {
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+            }
         }
 
         td {
