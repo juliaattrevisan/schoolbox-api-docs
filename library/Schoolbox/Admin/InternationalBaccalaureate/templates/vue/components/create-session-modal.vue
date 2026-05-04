@@ -49,6 +49,9 @@ async function onSubmit(): Promise<void> {
     if (academicYear.value.trim() === "") {
         academicYearError.value = "Please enter an academic year.";
         isValid = false;
+    } else if (academicYear.value.trim().length > 4) {
+        academicYearError.value = "Academic year must be 4 characters or fewer, for example 2026.";
+        isValid = false;
     }
 
     if (examSession.value === null) {
@@ -75,7 +78,9 @@ async function onSubmit(): Promise<void> {
     isSubmitting.value = false;
 
     if (!response.success) {
-        submitError.value = response.message ?? "An error occurred. Please try again.";
+        const backendMessage = (response.data as Record<string, unknown>)?.message;
+        submitError.value =
+            typeof backendMessage === "string" ? backendMessage : "An error occurred. Please try again.";
         return;
     }
 
@@ -106,6 +111,7 @@ async function onSubmit(): Promise<void> {
                     type="text"
                     name="academic-year"
                     placeholder="e.g. 2026"
+                    maxlength="4"
                 />
                 <label v-if="academicYearError" class="error">{{ academicYearError }}</label>
             </div>
