@@ -109,45 +109,45 @@ window.Vue.onMounted(() => {
                 </a>
             </span>
 
-            <input
-                :id="`rb-indicator-${componentId}`"
-                v-model="hasUsage"
-                type="checkbox"
-                value="1"
-                data-criterion-name
-            />
-
-            <label
-                v-if="props.indicator.inUseExcludingAssessment"
-                class="checkbox-label rb-criterion rb-readonly rb-indicator-name"
-                :for="`rb-indicator-${componentId}`"
-                data-test="rubric-indicator-toggle"
-            >
-                {{ indicatorName }}
-                <span
-                    data-tooltip
-                    class="hint has-tip tip-right"
-                    data-width="200"
-                    :title="`This ${locale.rubricCriterion.singular()} cannot be modified because it is in use elsewhere`"
+            <div class="l-flex l-flex--align-center l-gap-s">
+                <input
+                    :id="`rb-indicator-${componentId}`"
+                    v-model="hasUsage"
+                    type="checkbox"
+                    value="1"
+                    data-criterion-name
+                />
+                <label
+                    v-if="props.indicator.inUseExcludingAssessment"
+                    class="checkbox-label rb-criterion rb-readonly rb-indicator-name"
+                    :for="`rb-indicator-${componentId}`"
+                    data-test="rubric-indicator-toggle"
                 >
-                    ?
-                </span>
-            </label>
-
-            <label
-                v-else
-                class="checkbox-label rb-criterion rb-editable"
-                :for="`rb-indicator-${componentId}`"
-                data-test="rubric-indicator-toggle"
-            >
-                <textarea
-                    :id="`rb-indicator-textarea-${componentId}`"
-                    v-model.trim.lazy="indicatorName"
-                    :maxlength="indicatorNameHasChanged ? MAX_INDICATOR_LENGTH : undefined"
-                    :placeholder="`${locale.rubricCriterion.proper()} name`"
-                    @change.once="indicatorNameHasChanged = true"
-                ></textarea>
-            </label>
+                    {{ indicatorName }}
+                    <span
+                        data-tooltip
+                        class="hint has-tip tip-right"
+                        data-width="200"
+                        :title="`This ${locale.rubricCriterion.singular()} cannot be modified because it is in use elsewhere`"
+                    >
+                        ?
+                    </span>
+                </label>
+                <label
+                    v-else
+                    class="checkbox-label rb-criterion rb-editable"
+                    :for="`rb-indicator-${componentId}`"
+                    data-test="rubric-indicator-toggle"
+                >
+                    <textarea
+                        :id="`rb-indicator-textarea-${componentId}`"
+                        v-model.trim.lazy="indicatorName"
+                        :maxlength="indicatorNameHasChanged ? MAX_INDICATOR_LENGTH : undefined"
+                        :placeholder="`${locale.rubricCriterion.proper()} name`"
+                        @change.once="indicatorNameHasChanged = true"
+                    ></textarea>
+                </label>
+            </div>
         </th>
 
         <rb-grid-descriptor
