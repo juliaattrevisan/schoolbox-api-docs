@@ -76,12 +76,12 @@ These scripts wrap around `docker compose`:
 * `docker/up` builds a set of environment variables required for starting the environment, before starting it
 * `docker/provision` loads the initial data set and applies any updates required in `updates/`
 
-### Frontend
-
-These commands should be run within the Docker environment's CLI:
+Run frontend and backend tooling from the shell opened by `docker/ssh` unless otherwise noted:
 ```bash
 docker/ssh
 ```
+
+### Frontend
 
 ```bash
 npm run build           # dev build (Rspack)
@@ -105,11 +105,6 @@ npm test                       # verify all unit tests still pass, not just thos
 
 ### Backend
 
-These commands should be run within the Docker environment's CLI:
-```bash
-docker/ssh
-```
-
 ```bash
 ./vendor/bin/phpcs      # PSR-12 style check
 ./vendor/bin/phpcbf     # auto-fix style issues
@@ -124,6 +119,9 @@ In order to ensure backend code quality, these commands should be run with the l
 ./vendor/bin/phpstan analyze [FILE]... # ensure that files pass static analysis
 ./vendor/bin/phpunit                   # verify all unit tests still pass, not just those changed
 ```
+
+For backend work, run final verification inside `docker/ssh`, including the full PHP test suite. Host-shell PHP commands
+may be useful for quick checks, but should not be treated as authoritative final verification when Docker is available.
 
 For read-only local database queries, use:
 ```bash
@@ -257,9 +255,13 @@ Co-Authored-By: <agent>
 
 ### Pull requests
 
+- `upstream` is the canonical `alaress/schoolbox` repository and `origin` is the developer fork.
+- Push task, bug, and hotfix branches to `origin`, then create pull requests against `upstream`.
+- The pull request base branch should match the branch suffix: `*-develop/*` targets `develop`, and `*-master/*` targets `master`.
 - Features usually require only a `develop` PR: occasionally they will also require a `master` PR
   - There's no set rule for whether a feature is to be released to `master`: this will have been determined by stakeholders
-- Bug fixes usually require two PRs (one for `develop`, one for `master`)
+- Bug fixes usually require two PRs: prepare the `develop` PR first, then replay the same scoped change onto a matching
+  `master` branch and open a separate `master` PR.
 - PRs must be reviewed by a different developer before merge
 
 ---
