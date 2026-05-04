@@ -13,6 +13,7 @@ use DateTime;
 use DateInterval;
 use Alaress\Date\Interval;
 use PHPUnit\Framework\MockObject\Exception;
+use PHPUnit\Framework\MockObject\MockObject;
 use Schoolbox\Collection;
 use Schoolbox\Config\Loader;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -87,7 +88,7 @@ class ValidationTest extends TestCase
                                   ->disableOriginalConstructor()
                                   ->getMock();
 
-        /** @var External_Timetable $externalTimetable */
+        /** @var External_Timetable&MockObject $externalTimetable */
         $mockValidation = $this->getMockBuilder(Validation::Class)
                                ->setConstructorArgs([$user, $bookingMapper, $statusMapper, $termMapper, $externalTimetable, $campusMapper, $mockConfig, $externalEventMapper])
                                ->onlyMethods(['getTimetableRoomEvents']) // we need this to be a stub
