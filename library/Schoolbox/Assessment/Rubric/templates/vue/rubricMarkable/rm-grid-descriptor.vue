@@ -39,6 +39,8 @@ const selfAssessmentTooltip = window.Vue.computed(() => {
 
     return `${locale.selfReflection.proper()} choice`;
 });
+
+const hasMarkRange = window.Vue.computed(() => props.descriptor.value !== null && "left" in props.descriptor.value);
 </script>
 
 <template>
@@ -91,20 +93,16 @@ const selfAssessmentTooltip = window.Vue.computed(() => {
                 {{ props.descriptor.description?.trim() }}
             </span>
 
-            <span v-if="props.descriptor.value !== null" class="rb-value used">
+            <!-- Just show a text value if the descriptor is not selected -->
+            <!-- TODO: hide for self review (the only condition where showDescriptorValue is false) -->
+            <span
+                v-if="props.descriptor.value !== null && (!hasMarkRange || !isDescriptorSelected)"
+                class="rb-value"
+                :class="{ used: !hasMarkRange }"
+            >
                 <template v-if="'left' in props.descriptor.value">
-                    <!-- show indicator mark if available -->
-                    <span
-                        v-if="isDescriptorSelected && indicatorMark && indicatorMark.humanReadableMark !== null"
-                        class="range-selection-value"
-                    >
-                        {{ indicatorMark.humanReadableMark }}
-                    </span>
-
                     <!-- mark range -->
-                    <span class="range" :class="{ selected: isDescriptorSelected }">
-                        {{ props.descriptor.value.left }}–{{ props.descriptor.value.right }}
-                    </span>
+                    {{ props.descriptor.value.left }}–{{ props.descriptor.value.right }}
                 </template>
                 <template v-else>
                     {{ props.descriptor.value.max }}
