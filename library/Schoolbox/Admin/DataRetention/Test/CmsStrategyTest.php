@@ -194,6 +194,22 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * @param array<int, int> $parentIds
+             * @return array<int, int>
+             */
+            protected function findActiveChildFolderIds(array $parentIds): array
+            {
+                if ($this->softDeletedFolderIds === null) {
+                    return [];
+                }
+
+                return array_values(array_filter(
+                    $this->findChildFolderIds($parentIds),
+                    fn(int $folderId): bool => !isset($this->softDeletedFolderIds[$folderId]),
+                ));
+            }
+
+            /**
              * @param array<int, int> $folderIds
              * @return array<int, int>
              */
@@ -771,7 +787,7 @@ class CmsStrategyTest extends TestCase
     }
 
     /**
-     * A retained parent must not pull active child folders into the purge set.
+     * A retained parent must not be hard-deleted when it has an active child.
      */
     public function testDeleteChunkDoesNotDeleteActiveChildFolders(): void
     {
@@ -788,8 +804,53 @@ class CmsStrategyTest extends TestCase
             ['id' => 10, 'table' => 'folder'],
         ]);
 
-        $this->assertSame([11, 10], $state->deletedFolders);
-        $this->assertNotContains(12, $state->deletedFolders);
+        $this->assertSame([], $state->deletedFolders);
+    }
+
+    public function testExpandFolderCascadeSkipsParentsWithActiveChildren(): void
+    {
+        $state = new class {
+            public array $warnings = [];
+        };
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->method('debug');
+        $logger->method('info');
+        $logger->method('notice');
+        $logger->method('warning')->willReturnCallback(
+            function (string $message) use ($state): void {
+                $state->warnings[] = $message;
+            }
+        );
+
+        ['strategy' => $strategy] = $this->strategy(
+            [
+                10 => [11],
+                11 => [],
+            ],
+            [],
+            [],
+            [],
+            [],
+            [],
+            true,
+            $logger,
+            0,
+            [10],
+        );
+
+        $call = \Closure::bind(
+            function (array $folderIds): array {
+                return $this->expandFolderCascade($folderIds);
+            },
+            $strategy,
+            Cms::class,
+        );
+
+        $this->assertSame([], $call([10]));
+        $this->assertSame([
+            'Skipping deletion of folder 10 because it has active child folder 11',
+        ], $state->warnings);
     }
 
     /**

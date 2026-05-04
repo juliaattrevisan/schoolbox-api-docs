@@ -338,6 +338,19 @@ class Cms extends Base
 
             $visited[$folderId] = true;
 
+            $activeChildFolderIds = $this->findActiveChildFolderIds([$folderId]);
+            if ($activeChildFolderIds !== []) {
+                foreach ($activeChildFolderIds as $activeChildFolderId) {
+                    $this->log->warning(sprintf(
+                        "Skipping deletion of folder %s because it has active child folder %s",
+                        $folderId,
+                        $activeChildFolderId,
+                    ));
+                }
+
+                continue;
+            }
+
             // Re-queue the folder after its eligible children so parents are deleted last.
             $pending[] = ['id' => $folderId, 'expanded' => true];
 
@@ -425,6 +438,33 @@ class Cms extends Base
         $placeholders = Builder::getArrayPlaceholders($parentIds, 'parent');
         $statement = $this->getPreparedStatement(
             "SELECT id FROM " . self::TABLE_FOLDER . " WHERE parent IN {$placeholders} AND deleted_at IS NOT NULL"
+        );
+        $statement->execute(Builder::getArrayParameters($parentIds, 'parent'));
+
+        return array_map(
+            static fn(array $row): int => (int) $row['id'],
+            $statement->fetchAll(\PDO::FETCH_ASSOC),
+        );
+    }
+
+    /**
+     * Find only active (non-deleted) direct child folders.
+     *
+     * This helper allows cascade expansion to reject any parent that still has
+     * visible child folders, keeping the delete plan safe.
+     *
+     * @param array<int, int> $parentIds
+     * @return array<int, int>
+     */
+    protected function findActiveChildFolderIds(array $parentIds): array
+    {
+        if ($parentIds === []) {
+            return [];
+        }
+
+        $placeholders = Builder::getArrayPlaceholders($parentIds, 'parent');
+        $statement = $this->getPreparedStatement(
+            "SELECT id FROM " . self::TABLE_FOLDER . " WHERE parent IN {$placeholders} AND deleted_at IS NULL"
         );
         $statement->execute(Builder::getArrayParameters($parentIds, 'parent'));
 
