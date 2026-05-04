@@ -151,7 +151,8 @@ class Migration extends CliTool\App
         $countAll = count($files);
         if ($this->workerCount > 1) {
             $this->migrateFilesParallel($files, $countAll);
-        } else {
+        }
+        if ($this->workerCount <= 1) {
             foreach ($files as $file) {
                 $count++;
                 $baseName = "{$file['filename']}.{$file['ext']}";
@@ -223,13 +224,6 @@ class Migration extends CliTool\App
         if (!function_exists('pcntl_fork')) {
             $this->getLogger()->warning("pcntl extension not available, falling back to serial migration");
             $this->workerCount = 1;
-            $count = 0;
-            foreach ($files as $file) {
-                $count++;
-                $baseName = "{$file['filename']}.{$file['ext']}";
-                $this->getLogger()->notice("Checking file $count/$countAll  {$file['hash']}, '$baseName'");
-                $this->migrateFile($file['hash']);
-            }
             return;
         }
 
