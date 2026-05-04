@@ -40,10 +40,8 @@ class Cms extends Base
         RetentionPeriod $retentionPeriod,
         int $chunkLoops = self::DEFAULT_CHUNK_LOOPS,
         int $chunkSize = self::DEFAULT_CHUNK_SIZE,
-        ?ClientInterface $redisClient = null,
     ) {
         parent::__construct($log, $perform, $database, $lock, $config, $endTime, $retentionPeriod, $chunkLoops, $chunkSize);
-        unset($redisClient);
     }
 
     public function getRetentionLabel(): string
