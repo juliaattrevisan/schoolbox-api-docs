@@ -73,6 +73,12 @@ class Migration extends CliTool\App
     /** @var array */
     private array $failedPaths = [];
 
+    /** @var int */
+    private int $workerCount = 1;
+
+    /** @var string */
+    private string $s3Bucket = '';
+
 
     /** @inheritDoc */
     public function getShortOpts(): array
@@ -84,7 +90,7 @@ class Migration extends CliTool\App
     /** @inheritDoc */
     public function getLongOpts(): array
     {
-        return ['help', 'delete', 'quiet'];
+        return ['help', 'delete', 'quiet', 'workers:'];
     }
 
     /** @var Filesystem */
@@ -118,6 +124,8 @@ class Migration extends CliTool\App
         $s3Bucket = trim($this->getConfig()->get('otfs_s3_bucket') ?? "");
         $finalBucket = !empty($s3AltHost) && !empty($s3AltBucket) ? $s3AltBucket : $s3Bucket;
 
+        $this->workerCount     = max(1, $this->getOptAsInt('workers:', 1) ?? 1);
+        $this->s3Bucket        = $finalBucket;
         $this->filesInS3       = $this->getFilesInS3($this->getLogger(), $client, $finalBucket);
         $this->fileSystemAwsS3 = new Filesystem(new AwsS3Adapter($client, $finalBucket, FilesystemFactory::PREFIX_STORAGE));
 
@@ -519,6 +527,9 @@ Options:
         Don't derive or print file system usage (faster tool execution)
     -p, --perform
         Without this flag, tool will not persist files to S3 or delete from local storage
+    --workers=N
+        Number of parallel upload workers (default: 1). Each worker uploads its own chunk
+        of files concurrently. Per-file counts are logged per worker rather than aggregated.
 ";
     }
 }
