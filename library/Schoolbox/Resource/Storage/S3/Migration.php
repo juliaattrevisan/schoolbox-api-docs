@@ -150,7 +150,7 @@ class Migration extends CliTool\App
         $files    = $this->getDatabaseInternal()->executeQuery("SELECT hash, filename, ext FROM storage")->fetchAll(\PDO::FETCH_ASSOC);
         $countAll = count($files);
         if ($this->workerCount > 1) {
-            $this->migrateFilesParallel($files, $countAll);
+            $countFilesInS3 = $this->migrateFilesParallel($files, $countAll);
         }
         if ($this->workerCount <= 1) {
             foreach ($files as $file) {
@@ -195,11 +195,9 @@ class Migration extends CliTool\App
             $this->getLogger()->notice(sprintf("Storage before transfer:    %s", $this->byteFormat::bytesToString($storageBeforeTransfer)));
             $this->getLogger()->notice(sprintf("Storage after transfer:     %s", $this->byteFormat::bytesToString($storageAfterTransfer)));
         }
-        if ($this->workerCount <= 1) {
-            $this->getLogger()->notice(sprintf("Storage files in S3:        %d", $countFilesInS3));
-            $countNotInS3 = $countAll - $countFilesInS3;
-            $this->getLogger()->log($countNotInS3 ? Logger::WARNING : Logger::NOTICE, sprintf("Storage files not in S3:    %d", $countNotInS3));
-        }
+        $this->getLogger()->notice(sprintf("Storage files in S3:        %d", $countFilesInS3));
+        $countNotInS3 = $countAll - $countFilesInS3;
+        $this->getLogger()->log($countNotInS3 ? Logger::WARNING : Logger::NOTICE, sprintf("Storage files not in S3:    %d", $countNotInS3));
         if (!$this->quiet) {
             $this->getLogger()->log(count($remainingFiles) ? Logger::WARNING : Logger::NOTICE, sprintf("Files in local storage but not in S3: %d", count($remainingFiles)));
             foreach ($remainingFiles as $remainingFile) {
@@ -215,28 +213,34 @@ class Migration extends CliTool\App
      * @param array $files All files from the storage table
      * @param int $countAll Total file count for logging
      */
-    private function migrateFilesParallel(array $files, int $countAll): void
+    private function migrateFilesParallel(array $files, int $countAll): int
     {
         if ($countAll === 0) {
-            return;
+            return 0;
         }
 
         if (!function_exists('pcntl_fork')) {
             $this->getLogger()->warning("pcntl extension not available, falling back to serial migration");
             $this->workerCount = 1;
-            return;
+            return 0;
         }
 
-        $chunks = array_chunk($files, (int) ceil($countAll / $this->workerCount));
-        $pids   = [];
+        $chunks         = array_chunk($files, (int) ceil($countAll / $this->workerCount));
+        $pids           = [];
+        $tempFiles      = [];
+        $countFilesInS3 = 0;
 
         foreach ($chunks as $workerIndex => $chunk) {
-            $pid = pcntl_fork();
+            $tempFile = tempnam(sys_get_temp_dir(), 's3mig_');
+            $pid      = pcntl_fork();
             if ($pid === -1) {
                 $this->getLogger()->error("Failed to fork worker $workerIndex, processing its chunk serially in parent");
                 foreach ($chunk as $file) {
-                    $this->migrateFile($file['hash']);
+                    if ($this->migrateFile($file['hash'])) {
+                        $countFilesInS3++;
+                    }
                 }
+                unlink($tempFile);
                 continue;
             }
             if ($pid === 0) {
@@ -244,14 +248,18 @@ class Migration extends CliTool\App
                 $childClient           = $this->buildS3ClientOrExit($this->getLogger(), $this->getConfig());
                 $this->fileSystemAwsS3 = new Filesystem(new AwsS3Adapter($childClient, $this->s3Bucket, FilesystemFactory::PREFIX_STORAGE));
 
-                $count     = 0;
-                $chunkSize = count($chunk);
+                $count               = 0;
+                $chunkSize           = count($chunk);
+                $childCountFilesInS3 = 0;
                 foreach ($chunk as $file) {
                     $count++;
                     $baseName = "{$file['filename']}.{$file['ext']}";
                     $this->getLogger()->notice("Worker {$workerIndex}: $count/$chunkSize  {$file['hash']}, '$baseName'");
-                    $this->migrateFile($file['hash']);
+                    if ($this->migrateFile($file['hash'])) {
+                        $childCountFilesInS3++;
+                    }
                 }
+                file_put_contents($tempFile, $childCountFilesInS3);
                 $this->getLogger()->notice(sprintf(
                     "Worker %d complete — storage: %d, transcode: %d, data: %s, failed: %d",
                     $workerIndex,
@@ -263,7 +271,8 @@ class Migration extends CliTool\App
                 $this->listFailedMigrationPaths();
                 exit(0);
             }
-            $pids[$workerIndex] = $pid;
+            $pids[$workerIndex]      = $pid;
+            $tempFiles[$workerIndex] = $tempFile;
         }
 
         foreach ($pids as $workerIndex => $pid) {
@@ -271,7 +280,11 @@ class Migration extends CliTool\App
             if (pcntl_wifexited($status) && pcntl_wexitstatus($status) !== 0) {
                 $this->getLogger()->error("Worker $workerIndex exited with status " . pcntl_wexitstatus($status));
             }
+            $countFilesInS3 += (int) file_get_contents($tempFiles[$workerIndex]);
+            unlink($tempFiles[$workerIndex]);
         }
+
+        return $countFilesInS3;
     }
 
 
