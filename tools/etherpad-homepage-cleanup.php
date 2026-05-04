@@ -81,7 +81,7 @@ HELP;
         $dryRun = !$this->perform();
 
         $logger->info(sprintf('Starting Etherpad homepage cleanup for homepage %d', $homepageId));
-        $logger->info(sprintf('Mode: %s', $dryRun ? 'dry-run' : 'perform'));
+        $logger->notice(sprintf('Mode: %s', $dryRun ? 'dry-run' : 'perform'));
 
         $etherpadClient = $this->createEtherpadClient($logger);
         if (!$dryRun && $etherpadClient === null) {
