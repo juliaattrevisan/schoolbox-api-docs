@@ -49,112 +49,11 @@ class Cms extends Base
         return ValidStrats::CMS;
     }
 
-    /**
-     * Load all active Etherpad pads for a homepage.
-     *
-     * @param int $homepageId
-     * @return array<int, array<string, mixed>>
-     */
-    protected function getHomepagePadRecords(int $homepageId): array
-    {
-        $query = "
-            SELECT id, pad_id
-            FROM etherpad_pad
-            WHERE homepage_id = :homepageId AND deleted_at IS NULL
-        ";
-
-        $statement = $this->getPreparedStatement($query);
-        $statement->execute(['homepageId' => $homepageId]);
-
-        return $statement->fetchAll(\PDO::FETCH_ASSOC) ?: [];
-    }
+    // ---------------
+    // inherit functions
 
     /**
-     * Perform homepage-scoped Etherpad pad cleanup.
-     *
-     * @param int  $homepageId
-     * @return array<string, int|bool>
-     */
-    public function cleanupHomepagePads(int $homepageId): array
-    {
-        $padRows = $this->getHomepagePadRecords($homepageId);
-        $this->log->info(sprintf("Found '%s' Etherpad pads for homepage %s", count($padRows), $homepageId));
-
-        $summary = [
-            'homepageId' => $homepageId,
-            'padsFound' => count($padRows),
-            'padsDeleted' => 0,
-            'redisKeysDeleted' => 0,
-            'dbRowsDeleted' => 0,
-        ];
-
-        foreach ($padRows as $padRow) {
-            $padId       = (string)($padRow['pad_id'] ?? '');
-            $padRecordId = isset($padRow['id']) ? (int)$padRow['id'] : 0;
-
-            if ($padId === '' || $padRecordId <= 0) {
-                $this->log->warning(sprintf('Skipping malformed Etherpad pad record for homepage %s: %s', $homepageId, json_encode($padRow)));
-                continue;
-            }
-
-            $padDeleted = $this->deletePadFromEtherpad($padId);
-            if ($padDeleted) {
-                $summary['padsDeleted']++;
-            }
-
-            $summary['dbRowsDeleted'] += $this->hardDeleteEtherpadPad($padRecordId);
-        }
-
-        return $summary;
-    }
-
-    /**
-     * Delete an Etherpad pad via the EtherpadLite API.
-     *
-     * @param string $padId
-     * @return bool True if the pad was successfully deleted or did not exist, false if an error occurred during deletion
-     */
-    protected function deletePadFromEtherpad(string $padId): bool
-    {
-        try {
-            $client = $this->getEtherpadClient();
-            if ($this->perform) {
-                $response = $client->deletePad($padId);
-            } else {
-                $response = $client->getRevisionsCount($padId);
-            }
-
-            $code = $response->getCode();
-            if ($code !== null && (string)$code === (string)EtherpadResponse::CODE_OK) {
-                $this->log->notice(sprintf("Deleted Etherpad pad '%s'", $padId));
-                return true;
-            }
-
-            $this->log->warning(sprintf("Etherpad API returned unexpected code '%s' for pad '%s': %s", $code, $padId, $response->getMessage()));
-            return false;
-        } catch (\Throwable $e) {
-            $this->log->warning(sprintf("Failed to delete Etherpad pad '%s': %s", $padId, $e->getMessage()));
-            return false;
-        }
-    }
-
-    /**
-     * Hard-delete a local Etherpad metadata row.
-     * @param int $id
-     * @return int Number of rows deleted
-     */
-    protected function hardDeleteEtherpadPad(int $id): int
-    {
-        $statement = $this->getPreparedStatement(
-            $this->deleteStatement('etherpad_pad') . " FROM etherpad_pad WHERE id = :id"
-        );
-        $statement->execute(['id' => $id]);
-
-        return $statement->rowCount();
-    }
-
-    /**
-     * Get a Redis storage client for optional Etherpad cleanup.
+     * @inheritDoc
      */
     protected function hasDataToDelete(): bool
     {
@@ -216,7 +115,7 @@ class Cms extends Base
     }
 
     /**
-     * @param array<int, array{id: int|string}> $chunk
+     * @inheritDoc
      */
     protected function deleteChunk(array $chunk): void
     {
@@ -278,6 +177,96 @@ class Cms extends Base
         ));
     }
 
+    // ------------
+    // end inherit
+
+    // ------------
+    // start helper functions
+
+    /**
+     * Delete homepage user access rows for the given folder ids
+     * @param array<int, int> $folderIds
+     * @return int Number of rows deleted
+     */
+    protected function deleteHomepageUserAccess(array $folderIds): int
+    {
+        if ($folderIds === []) {
+            return 0;
+        }
+
+        $placeholders = Builder::getArrayPlaceholders($folderIds, 'folder');
+        $statement = $this->getPreparedStatement(
+            $this->deleteStatement('userAccess')
+            . " FROM userAccess WHERE service = :service AND sid IN {$placeholders}"
+        );
+        $params = Builder::getArrayParameters($folderIds, 'folder');
+        $params['service'] = UserAccess::SERVICE_HOMEPAGE;
+        $statement->execute($params);
+
+        return $statement->rowCount();
+    }
+
+    /**
+     * Delete rows in various tables that reference the deleted folders, based on the map in
+     * @see self::folderOwnedTables()
+     * @param array<int, int> $folderIds
+     * @return int Number of rows deleted
+     */
+    protected function deleteFolderOwnedRows(array $folderIds): int
+    {
+        $count = 0;
+        foreach ($this->folderOwnedTables() as $table => $column) {
+            $count += $this->deleteByFolderIds($table, $column, $folderIds);
+        }
+
+        return $count;
+    }
+
+    /**
+     * Delete folders by id, without any additional checks or cascading
+     * @param array<int, int> $folderIds
+     * @return int Number of rows deleted
+     */
+    protected function deleteFolders(array $folderIds): int
+    {
+        $rowsDeleted = 0;
+        foreach ($folderIds as $folderId) {
+            $rowsDeleted += $this->deleteByIds(self::TABLE_FOLDER, 'id', [$folderId]);
+        }
+
+        return $rowsDeleted;
+    }
+
+    /**
+     * Map of tables with foreign keys into folder ids, for feature-specific cleanup during folder deletion.
+     * @return array<string, string>
+     */
+    private function folderOwnedTables(): array
+    {
+        return [
+            'chat' => 'category_id',
+            'chat_poll' => 'category_id',
+            'etherpad_pad' => 'homepage_id',
+            'event_folder' => 'folder_id',
+            'file' => 'category',
+            'folder_code' => 'folder_id',
+            'folder_year_level' => 'folder_id',
+            'google_file' => 'folder_id',
+            'homepage_config' => 'cid',
+            'homepage_log' => 'folder_id',
+            'homepage_visits' => 'category_id',
+            'link' => 'category',
+            'moment_folder' => 'folder_id',
+            'perms' => 'cid',
+            'reportcard_comment' => 'category_id',
+            'search_index' => 'folder_id',
+            'socialstream_post' => 'homepage_id',
+            'textbox' => 'folder_id',
+            'tile_layout_for_folder' => 'folder_id',
+            'userGroups' => 'cid',
+        ];
+    }
+
     /**
      * Canonicalise ids before building SQL placeholders or delete plans.
      *
@@ -297,6 +286,56 @@ class Cms extends Base
 
         return $normalized;
     }
+
+    /**
+     * For a given table, delete rows by id with a single query, using the provided column and id list to build placeholders.
+     * @param string          $table
+     * @param string          $column
+     * @param array<int, int> $ids
+     * @return int
+     */
+    protected function deleteByIds(string $table, string $column, array $ids): int
+    {
+        if ($ids === []) {
+            return 0;
+        }
+
+        $placeholders = Builder::getArrayPlaceholders($ids, 'id');
+        $statement = $this->getPreparedStatement(
+            $this->deleteStatement($table) . " FROM {$table} WHERE {$column} IN {$placeholders}"
+        );
+        $statement->execute(Builder::getArrayParameters($ids, 'id'));
+
+        return $statement->rowCount();
+    }
+
+    /**
+     * For a given table, delete entries that are for the specified folder (based on $column)
+     * @param string $table
+     * @param string $column
+     * @param array  $folderIds
+     * @return int
+     */
+    protected function deleteByFolderIds(string $table, string $column, array $folderIds): int
+    {
+        if ($folderIds === []) {
+            return 0;
+        }
+
+        $placeholders = Builder::getArrayPlaceholders($folderIds, 'folder');
+        $statement = $this->getPreparedStatement(
+            $this->deleteStatement($table) . " FROM {$table} WHERE {$column} IN {$placeholders}"
+        );
+        $statement->execute(Builder::getArrayParameters($folderIds, 'folder'));
+
+        return $statement->rowCount();
+    }
+
+    //---------------
+    // end helper functions
+
+    // ---------------
+    // start tree functions
 
     /**
      * Expand retained root folders to a leaf-first hard-delete order.
@@ -358,38 +397,16 @@ class Cms extends Base
         return array_values($folderIds);
     }
 
-    /**
-     * Clean homepage Etherpad data before folder-owned rows are deleted.
-     *
-     * Etherpad pads are discovered from homepage ids, which are represented by
-     * CMS folder ids. This wrapper keeps that homepage-specific cleanup inside
-     * the same folder purge plan and returns a count for the chunk summary.
-     *
-     * @param array<int, int> $folderIds
-     */
-    protected function cleanupHomepagePadsForFolders(array $folderIds): int
-    {
-        $totalPads = 0;
-
-        foreach ($folderIds as $folderId) {
-            $this->log->notice(sprintf(
-                "Homepage Etherpad cleanup for homepage %s",
-                $folderId,
-            ));
-
-            $summary = $this->cleanupHomepagePads($folderId);
-            $totalPads += (int)$summary['padsFound'];
-        }
-        return $totalPads;
-    }
 
     /**
      * Find every direct child folder for callers that need the actual tree.
      *
      * This deliberately does not filter by deletion state. Some safety checks
      * need to know whether active children exist, while the hard-delete cascade
-     * uses findSoftDeletedChildFolderIds() to avoid deleting those active
+     * uses self::findSoftDeletedChildFolderIds() to avoid deleting those active
      * children.
+     *
+     * @see self::findSoftDeletedChildFolderIds()
      * @param array<int, int> $parentIds
      * @return array<int, int>
      */
@@ -552,7 +569,10 @@ class Cms extends Base
      * lookup explicit at each call site makes the delete order reviewable while
      * avoiding repetitive placeholder code.
      *
-     * @param array<int, int> $folderIds
+     * @param string $table
+     * @param string $idColumn
+     * @param string $folderColumn
+     * @param array  $folderIds
      * @return array<int, int>
      */
     protected function findIdsByFolder(string $table, string $idColumn, string $folderColumn, array $folderIds): array
@@ -582,8 +602,16 @@ class Cms extends Base
         );
     }
 
+    // --------------
+    // end tree functions
+
+    // --------------
+    // wiki functions
+
     /**
-     * @param array<int, int> $ids
+     * Sets wiki revisions to NUll... becasue.... good question....
+     * @param array $ids
+     * @return int Number of rows updated
      */
     protected function setWikiLatestRevisionNull(array $ids): int
     {
@@ -602,81 +630,9 @@ class Cms extends Base
     }
 
     /**
-     * @param array<int, int> $ids
-     */
-    protected function deleteByIds(string $table, string $column, array $ids): int
-    {
-        if ($ids === []) {
-            return 0;
-        }
-
-        $placeholders = Builder::getArrayPlaceholders($ids, 'id');
-        $statement = $this->getPreparedStatement(
-            $this->deleteStatement($table) . " FROM {$table} WHERE {$column} IN {$placeholders}"
-        );
-        $statement->execute(Builder::getArrayParameters($ids, 'id'));
-
-        return $statement->rowCount();
-    }
-
-    /**
-     * @param array<int, int> $ids
-     */
-    protected function deleteBlogComments(array $ids): int
-    {
-        return $this->deleteByIds('blog_comment', 'blog_id', $ids);
-    }
-
-    /**
-     * @param array<int, int> $ids
-     */
-    protected function deleteBlogImages(array $ids): int
-    {
-        return $this->deleteByIds('blog_image', 'blog_id', $ids);
-    }
-
-    /**
-     * @param array<int, int> $ids
-     */
-    protected function deleteBlog(array $ids): int
-    {
-        return $this->deleteByIds('blog', 'id', $ids);
-    }
-
-    /**
-     * @param array<int, int> $ids
-     */
-    protected function deleteForumPosts(array $ids): int
-    {
-        return $this->deleteByIds('forumPost', 'threadID', $ids);
-    }
-
-    /**
-     * @param array<int, int> $ids
-     */
-    protected function deleteForumThreads(array $ids): int
-    {
-        return $this->deleteByIds('forumThread', 'threadID', $ids);
-    }
-
-    /**
-     * @param array<int, int> $ids
-     */
-    protected function deletePollLogs(array $ids): int
-    {
-        return $this->deleteByIds('pollLog', 'poll_id', $ids);
-    }
-
-    /**
-     * @param array<int, int> $ids
-     */
-    protected function deletePolls(array $ids): int
-    {
-        return $this->deleteByIds('poll', 'id', $ids);
-    }
-
-    /**
-     * @param array<int, int> $ids
+     * Deletes wiki revisions by wikiID, no checks, just delete
+     * @param array $ids
+     * @return int Number of rows deleted
      */
     protected function deleteWikiRevisions(array $ids): int
     {
@@ -684,15 +640,113 @@ class Cms extends Base
     }
 
     /**
-     * @param array<int, int> $ids
+     * Deletes wikis by wikiID, no checks, just delete
+     * @param array $ids
+     * @return int Number of rows deleted
      */
     protected function deleteWikis(array $ids): int
     {
         return $this->deleteByIds('wiki', 'wikiID', $ids);
     }
 
+    // --------------------------
+    // end wiki functions
+
+    // ---------------
+    // blog functions
+
     /**
-     * @param array<int, int> $ids
+     * Deletes blog comments identified by blog ID, no checks, just delete
+     * @param array $ids
+     * @return int Number of rows deleted
+     */
+    protected function deleteBlogComments(array $ids): int
+    {
+        return $this->deleteByIds('blog_comment', 'blog_id', $ids);
+    }
+
+    /**
+     * Deletes blog images identified by blog ID, no checks, just delete
+     * @param array $ids
+     * @return int Number of rows deleted
+     */
+    protected function deleteBlogImages(array $ids): int
+    {
+        return $this->deleteByIds('blog_image', 'blog_id', $ids);
+    }
+
+    /**
+     * Deletes blogs identified by blog ID, no checks, just delete
+     * @param array $ids
+     * @return int Number of rows deleted
+     */
+    protected function deleteBlog(array $ids): int
+    {
+        return $this->deleteByIds('blog', 'id', $ids);
+    }
+
+    // ---------------
+    // end blog
+
+    // ---------------
+    // forum functions
+
+    /**
+     * Deletes Forum Posts identified by thread ID, no checks, just delete
+     * @param array $ids
+     * @return int Number of rows deleted
+     */
+    protected function deleteForumPosts(array $ids): int
+    {
+        return $this->deleteByIds('forumPost', 'threadID', $ids);
+    }
+
+    /**
+     * Deletes Forum Threads identified by thread ID, no checks, just delete
+     * @param array $ids
+     * @return int Number of rows deleted
+     */
+    protected function deleteForumThreads(array $ids): int
+    {
+        return $this->deleteByIds('forumThread', 'threadID', $ids);
+    }
+
+    // ---------------
+    // end forum
+
+    // ---------------
+    // poll functions
+
+    /**
+     * Deletes Poll Logs identified by poll ID, no checks, just delete
+     * @param array $ids
+     * @return int Number of rows deleted
+     */
+    protected function deletePollLogs(array $ids): int
+    {
+        return $this->deleteByIds('pollLog', 'poll_id', $ids);
+    }
+
+    /**
+     * Deletes polls identified by poll ID, no checks, just delete
+     * @param array $ids
+     * @return int Number of rows deleted
+     */
+    protected function deletePolls(array $ids): int
+    {
+        return $this->deleteByIds('poll', 'id', $ids);
+    }
+
+    // ---------------
+    // end poll
+
+    // ---------------
+    // component functions
+
+    /**
+     * Deletes component configs identified by component instance ID, no checks, just delete
+     * @param array $ids
+     * @return int Number of rows deleted
      */
     protected function deleteComponentConfigInstances(array $ids): int
     {
@@ -729,109 +783,152 @@ class Cms extends Base
     }
 
     /**
-     * @param array<int, int> $ids
+     * Deletes components identified by component instance ID, no checks, just delete
+     * @param array $ids
+     * @return int Number of rows deleted
      */
     protected function deleteComponentInstances(array $ids): int
     {
         return $this->deleteByIds('component_instance', 'id', $ids);
     }
 
+    // -----------
+    // end components
+
+    //---------------------------
+    // Etherpad functions
+
     /**
-     * @param array<int, int> $folderIds
+     * Finds all active Etherpad pads for a homepage.
+     *
+     * @param int $homepageId
+     * @return array<int, array<string, mixed>>
      */
-    protected function deleteByFolderIds(string $table, string $column, array $folderIds): int
+    protected function getHomepagePadRecords(int $homepageId): array
     {
-        if ($folderIds === []) {
-            return 0;
-        }
+        $query = "
+            SELECT id, pad_id
+            FROM etherpad_pad
+            WHERE homepage_id = :homepageId AND deleted_at IS NULL
+        ";
 
-        $placeholders = Builder::getArrayPlaceholders($folderIds, 'folder');
-        $statement = $this->getPreparedStatement(
-            $this->deleteStatement($table) . " FROM {$table} WHERE {$column} IN {$placeholders}"
-        );
-        $statement->execute(Builder::getArrayParameters($folderIds, 'folder'));
+        $statement = $this->getPreparedStatement($query);
+        $statement->execute(['homepageId' => $homepageId]);
 
-        return $statement->rowCount();
+        return $statement->fetchAll(\PDO::FETCH_ASSOC) ?: [];
     }
 
     /**
-     * @param array<int, int> $folderIds
+     * Perform Etherpad pad cleanup for the specified homepage.
+     *
+     * @param int  $homepageId
+     * @return array<string, int|bool>
      */
-    protected function deleteHomepageUserAccess(array $folderIds): int
+    public function cleanupHomepagePads(int $homepageId): array
     {
-        if ($folderIds === []) {
-            return 0;
-        }
+        $padRows = $this->getHomepagePadRecords($homepageId);
+        $this->log->info(sprintf("Found '%s' Etherpad pads for homepage %s", count($padRows), $homepageId));
 
-        $placeholders = Builder::getArrayPlaceholders($folderIds, 'folder');
-        $statement = $this->getPreparedStatement(
-            $this->deleteStatement('userAccess')
-            . " FROM userAccess WHERE service = :service AND sid IN {$placeholders}"
-        );
-        $params = Builder::getArrayParameters($folderIds, 'folder');
-        $params['service'] = UserAccess::SERVICE_HOMEPAGE;
-        $statement->execute($params);
-
-        return $statement->rowCount();
-    }
-
-    /**
-     * @param array<int, int> $folderIds
-     */
-    protected function deleteFolderOwnedRows(array $folderIds): int
-    {
-        $count = 0;
-        foreach ($this->folderOwnedTables() as $table => $column) {
-            $count += $this->deleteByFolderIds($table, $column, $folderIds);
-        }
-
-        return $count;
-    }
-
-    /**
-     * @param array<int, int> $folderIds
-     */
-    protected function deleteFolders(array $folderIds): int
-    {
-        $rowsDeleted = 0;
-        foreach ($folderIds as $folderId) {
-            $rowsDeleted += $this->deleteByIds(self::TABLE_FOLDER, 'id', [$folderId]);
-        }
-
-        return $rowsDeleted;
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private function folderOwnedTables(): array
-    {
-        return [
-            'chat' => 'category_id',
-            'chat_poll' => 'category_id',
-            'etherpad_pad' => 'homepage_id',
-            'event_folder' => 'folder_id',
-            'file' => 'category',
-            'folder_code' => 'folder_id',
-            'folder_year_level' => 'folder_id',
-            'google_file' => 'folder_id',
-            'homepage_config' => 'cid',
-            'homepage_log' => 'folder_id',
-            'homepage_visits' => 'category_id',
-            'link' => 'category',
-            'moment_folder' => 'folder_id',
-            'perms' => 'cid',
-            'reportcard_comment' => 'category_id',
-            'search_index' => 'folder_id',
-            'socialstream_post' => 'homepage_id',
-            'textbox' => 'folder_id',
-            'tile_layout_for_folder' => 'folder_id',
-            'userGroups' => 'cid',
+        $summary = [
+            'homepageId' => $homepageId,
+            'padsFound' => count($padRows),
+            'padsDeleted' => 0,
+            'redisKeysDeleted' => 0,
+            'dbRowsDeleted' => 0,
         ];
+
+        foreach ($padRows as $padRow) {
+            $padId       = (string)($padRow['pad_id'] ?? '');
+            $padRecordId = isset($padRow['id']) ? (int)$padRow['id'] : 0;
+
+            if ($padId === '' || $padRecordId <= 0) {
+                $this->log->warning(sprintf('Skipping malformed Etherpad pad record for homepage %s: %s', $homepageId, json_encode($padRow)));
+                continue;
+            }
+
+            $padDeleted = $this->deletePadFromEtherpad($padId);
+            if ($padDeleted) {
+                $summary['padsDeleted']++;
+            }
+
+            $summary['dbRowsDeleted'] += $this->hardDeleteEtherpadPad($padRecordId);
+        }
+
+        return $summary;
     }
 
+    /**
+     * Delete an Etherpad pad via the EtherpadLite API.
+     *
+     * @param string $padId
+     * @return bool True if the pad was successfully deleted or did not exist, false if an error occurred during deletion
+     */
+    protected function deletePadFromEtherpad(string $padId): bool
+    {
+        try {
+            $client = $this->getEtherpadClient();
+            if ($this->perform) {
+                $response = $client->deletePad($padId);
+            } else {
+                $response = $client->getRevisionsCount($padId);
+            }
 
-    /** Get an Etherpad client if credentials are configured, or false if not.
+            $code = $response->getCode();
+            if ($code !== null && (string)$code === (string)EtherpadResponse::CODE_OK) {
+                $this->log->notice(sprintf("Deleted Etherpad pad '%s'", $padId));
+                return true;
+            }
+
+            $this->log->warning(sprintf("Etherpad API returned unexpected code '%s' for pad '%s': %s", $code, $padId, $response->getMessage()));
+            return false;
+        } catch (\Throwable $e) {
+            $this->log->warning(sprintf("Failed to delete Etherpad pad '%s': %s", $padId, $e->getMessage()));
+            return false;
+        }
+    }
+
+    /**
+     * Hard-delete a local Etherpad metadata row.
+     * @param int $id
+     * @return int Number of rows deleted
+     */
+    protected function hardDeleteEtherpadPad(int $id): int
+    {
+        $statement = $this->getPreparedStatement(
+            $this->deleteStatement('etherpad_pad') . " FROM etherpad_pad WHERE id = :id"
+        );
+        $statement->execute(['id' => $id]);
+
+        return $statement->rowCount();
+    }
+
+    /**
+     * Clean homepage Etherpad data before folder-owned rows are deleted.
+     *
+     * Etherpad pads are discovered from homepage ids, which are represented by
+     * CMS folder ids. This wrapper keeps that homepage-specific cleanup inside
+     * the same folder purge plan and returns a count for the chunk summary.
+     *
+     * @param array $folderIds
+     * @return int Number of pads deleted
+     */
+    protected function cleanupHomepagePadsForFolders(array $folderIds): int
+    {
+        $totalPads = 0;
+
+        foreach ($folderIds as $folderId) {
+            $this->log->debug(sprintf(
+                "Homepage Etherpad cleanup for homepage %s",
+                $folderId,
+            ));
+
+            $summary = $this->cleanupHomepagePads($folderId);
+            $totalPads += (int)$summary['padsFound'];
+        }
+        return $totalPads;
+    }
+
+    /** Get a cached Etherpad client if credentials are configured, or false if not.
      *
      * @return EtherpadClient|false
      */
@@ -849,4 +946,7 @@ class Cms extends Base
         }
         return $this->etherpadClient;
     }
+
+    //---------------------------
+    // end etherpad
 }
