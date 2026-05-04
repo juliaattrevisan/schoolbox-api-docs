@@ -10,21 +10,12 @@ import RmGridDescriptor from "./rm-grid-descriptor.vue";
 
 interface Props {
     indicator: RubricGridIndicator;
-    indicatorMark: RubricMarkedGridIndicator | null;
     selfAssessmentIndicatorMark: RubricMarkedGridIndicator | null;
     levels: RubricGridLevel[];
     participantId: UserAuthor["id"] | null;
 }
 const props = defineProps<Props>();
-
-// TODO: this should actually be a model, also is it possible for props.indicatorMark to be null? it really shouldn't be for this to work properly...
-const indicatorMark = window.Vue.ref<RubricMarkedGridIndicator>(
-    props.indicatorMark ?? {
-        id: props.indicator.id,
-        descriptorId: null,
-        value: null,
-    },
-);
+const indicatorMark = defineModel<RubricMarkedGridIndicator>("indicatorMark", { required: true });
 </script>
 
 <template>

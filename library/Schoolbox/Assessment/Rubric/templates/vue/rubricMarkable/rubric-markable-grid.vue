@@ -12,7 +12,8 @@ import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import type { MarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
 import RmGridCapability from "./rm-grid-capability.vue";
-import type { RubricGrid, RubricMarkedGrid, RubricMarkedGridCapability } from "./types";
+import type { RubricGrid, RubricMarkedGrid, RubricMarkedGridCapability, RubricMarkedGridIndicator } from "./types";
+import { cloneDeep } from "es-toolkit";
 
 interface Props {
     rubric: RubricGrid;
@@ -42,21 +43,50 @@ const props = defineProps<Props>();
 /** Supress level headings if none have names */
 const hasLevels = window.Vue.computed(() => props.rubric.levels.some((level) => level.name.trim().length > 0));
 
-/**
- * Find a capability mark for a specific capability in a RubricMarkedGrid
- * @param capabilityId the id of the capability to find the mark for
- * @param markedGrid the RubricMarkedGrid to find the mark in
- * @returns the capability mark, or null if not found
- */
-function findCapabilityMark(
-    capabilityId: number,
-    markedGrid: RubricMarkedGrid | null,
-): RubricMarkedGridCapability | null {
-    if (!markedGrid) {
-        return null;
-    }
-    return markedGrid.capabilities.find((cap) => cap.id === capabilityId) ?? null;
-}
+/** A blank marked grid which will be used if one isn't provided */
+const blankMarkedGrid: RubricMarkedGrid = {
+    gridId: props.rubric.id,
+    capabilities: props.rubric.capabilities.map((capability): RubricMarkedGridCapability => {
+        return {
+            id: capability.id,
+            humanReadableMark: null,
+            value: null,
+            indicators: capability.indicators.map((indicator): RubricMarkedGridIndicator => {
+                return {
+                    id: indicator.id,
+                    descriptorId: null,
+                    value: null,
+                };
+            }),
+        };
+    }),
+    humanReadableMark: null,
+};
+
+/** local mutable props.rubricMarkedGrid copy */
+const markedGridData = window.Vue.ref<RubricMarkedGrid>(
+    cloneDeep(props.rubricMarkedGrid !== null ? props.rubricMarkedGrid : blankMarkedGrid),
+);
+
+/** All capabilities, with their associated mark data */
+const capabilities = window.Vue.computed(() => {
+    return props.rubric.capabilities.map((capability) => {
+        const capabilityMark = markedGridData.value.capabilities.find((cap) => cap.id === capability.id) ?? null;
+        const selfAssessmentCapabilityMark =
+            props.selfAssessmentFeedback?.capabilities.find((cap) => cap.id === capability.id) ?? null;
+
+        // if a capability exists in the rubric, it must always exist in the marked grid
+        if (!capabilityMark) {
+            throw new Error(`Unable to find capability mark for capability "${capability.id}"`);
+        }
+
+        return {
+            capability: capability,
+            mark: capabilityMark,
+            selfAssessmentMark: selfAssessmentCapabilityMark,
+        };
+    });
+});
 </script>
 
 <template>
@@ -71,31 +101,25 @@ function findCapabilityMark(
             </thead>
             <tbody>
                 <rm-grid-capability
-                    v-for="capability in props.rubric.capabilities"
-                    :key="capability.id"
-                    :capability="capability"
-                    :capability-mark="findCapabilityMark(capability.id, props.rubricMarkedGrid)"
-                    :self-assessment-capability-mark="findCapabilityMark(capability.id, props.selfAssessmentFeedback)"
+                    v-for="capability in capabilities"
+                    :key="capability.capability.id"
+                    v-model:capability-mark="capability.mark"
+                    :capability="capability.capability"
+                    :self-assessment-capability-mark="capability.selfAssessmentMark"
                     :capability-mark-scheme="props.rubric.capabilityMarkScheme"
                     :levels="props.rubric.levels"
                     :participant-id="props.participantId"
-                    :show-summary-capability="props.showGroupTotal && !!props.rubricMarkedGrid"
+                    :show-summary-capability="props.showGroupTotal"
                 />
 
                 <!-- Overall Mark -->
-                <tr
-                    v-if="
-                        props.showRubricTotal &&
-                        props.rubricMarkedGrid &&
-                        props.assessmentMarkScheme.context.mode !== MarkTypeSlug.NONE
-                    "
-                >
+                <tr v-if="props.showRubricTotal && props.assessmentMarkScheme.context.mode !== MarkTypeSlug.NONE">
                     <th class="rb-final-summary" :colspan="props.rubric.levels.length + 2">
                         <!-- TODO data-final-summary="{{ rubricId }}" -->
                         <!-- TODO data-scaled-mark="{{ rubricScaledMark }}" -->
                         <!-- TODO data-max="{{ rubricMax }}" -->
                         <!-- TODO data-mark-type="{{ markType.mode }}" -->
-                        {{ props.rubricMarkedGrid.humanReadableMark }}
+                        {{ markedGridData.humanReadableMark }}
 
                         <!-- Self-Assessment -->
                         <template v-if="props.selfAssessmentFeedback?.humanReadableMark">
@@ -105,9 +129,9 @@ function findCapabilityMark(
                             we show it here using the input mark type so that it matches what the instructor
                             is currently entering so it can be easily compared.
                             -->
-                            {{ props.selfAssessmentFeedback.humanReadableMark }}
+                            ({{ props.selfAssessmentFeedback.humanReadableMark }}
                             given in
-                            {{ locale.selfAssessment.singular() }}
+                            {{ locale.selfAssessment.singular() }})
                         </template>
                     </th>
                 </tr>

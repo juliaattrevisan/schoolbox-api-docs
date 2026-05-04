@@ -8,17 +8,11 @@ import locale from "@js/terminology/rosettaStone";
 import MarkScheme from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/mark-scheme.vue";
 import type { MarkScheme as CapabilityMarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
-import type {
-    RubricGridCapability,
-    RubricGridLevel,
-    RubricMarkedGridCapability,
-    RubricMarkedGridIndicator,
-} from "./types";
+import type { RubricGridCapability, RubricGridLevel, RubricMarkedGridCapability } from "./types";
 import RmGridIndicator from "./rm-grid-indicator.vue";
 
 interface Props {
     capability: RubricGridCapability;
-    capabilityMark: RubricMarkedGridCapability | null;
     selfAssessmentCapabilityMark: RubricMarkedGridCapability | null;
     capabilityMarkScheme: CapabilityMarkScheme;
     levels: RubricGridLevel[];
@@ -26,41 +20,40 @@ interface Props {
     showSummaryCapability: boolean;
 }
 const props = defineProps<Props>();
+const capabilityMark = defineModel<RubricMarkedGridCapability>("capabilityMark", { required: true });
 
 const componentId = window.Vue.useId();
-
-const capabilityMarkValue = window.Vue.ref<string | null>(null);
 
 const showSummaryForThisCapability = window.Vue.computed(() => {
     return props.showSummaryCapability && props.capability.showCapabilityMark;
 });
 
-/**
- * Find an indicator mark for a specific indicator in a RubricMarkedGridCapability
- * @param indicatorId the id of the indicator to find the mark for
- * @param markedGridCapability the RubricMarkedGridCapability to find the mark in
- * @returns the indicator mark, or null if not found
- */
-function findIndicatorMark(
-    indicatorId: number,
-    markedGridCapability: RubricMarkedGridCapability | null,
-): RubricMarkedGridIndicator | null {
-    if (!markedGridCapability) {
-        return null;
-    }
-    return markedGridCapability.indicators.find((indicator) => indicator.id === indicatorId) ?? null;
-}
+/** All indicators, with their associated mark data */
+const indicators = window.Vue.computed(() => {
+    return props.capability.indicators.map((indicator) => {
+        const indicatorMark = capabilityMark.value.indicators.find((cap) => cap.id === indicator.id) ?? null;
+        const selfAssessmentIndicatorMark =
+            props.selfAssessmentCapabilityMark?.indicators.find((cap) => cap.id === indicator.id) ?? null;
 
-window.Vue.onMounted(() => {
-    capabilityMarkValue.value = props.capabilityMark?.value ?? null;
+        // if an indicator exists in the rubric, it must always exist in the marked grid
+        if (!indicatorMark) {
+            throw new Error(`Unable to find indicator mark for indicator "${indicator.id}"`);
+        }
+
+        return {
+            indicator: indicator,
+            mark: indicatorMark,
+            selfAssessmentMark: selfAssessmentIndicatorMark,
+        };
+    });
 });
 </script>
 
 <template>
-    <tr v-if="props.capability.indicators.length">
+    <tr v-if="indicators.length">
         <th
             class="rb-group-name markdown"
-            :rowspan="props.capability.indicators.length + (showSummaryForThisCapability ? 2 : 1) /* header+summary */"
+            :rowspan="indicators.length + (showSummaryForThisCapability ? 2 : 1) /* header+summary */"
         >
             <span>
                 <!-- TODO: should be scrubbed (markdown) and output as html -->
@@ -70,11 +63,11 @@ window.Vue.onMounted(() => {
     </tr>
 
     <rm-grid-indicator
-        v-for="indicator in props.capability.indicators"
-        :key="indicator.id"
-        :indicator="indicator"
-        :indicator-mark="findIndicatorMark(indicator.id, props.capabilityMark)"
-        :self-assessment-indicator-mark="findIndicatorMark(indicator.id, props.selfAssessmentCapabilityMark)"
+        v-for="indicator in indicators"
+        :key="indicator.indicator.id"
+        v-model:indicator-mark="indicator.mark"
+        :indicator="indicator.indicator"
+        :self-assessment-indicator-mark="indicator.selfAssessmentMark"
         :levels="props.levels"
         :participant-id="props.participantId"
     />
@@ -98,7 +91,7 @@ window.Vue.onMounted(() => {
                 <!-- TODO: data-group-mark -->
                 <mark-scheme
                     :id="`capability-${props.capability.id}-mark-${componentId}`"
-                    v-model:mark="capabilityMarkValue"
+                    v-model:mark="capabilityMark.value"
                     :mark-scheme="props.capabilityMarkScheme"
                     :submission-error-states="[] /** no error states here */"
                     :limit="capability.maxValue ?? undefined"
