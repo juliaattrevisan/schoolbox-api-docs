@@ -564,6 +564,10 @@ class Migration extends CliTool\App
             if (!$this->isDirectoryEmpty($dirname)) {
                 break;
             }
+            if (!is_writable($dirname)) {
+                $this->getLogger()->warning("Cannot remove directory '$dirname': permission denied");
+                break;
+            }
             $this->getLogger()->debug("Removing directory '$dirname'");
             rmdir($dirname);
             if ($dirname === $this->storageDir) {
