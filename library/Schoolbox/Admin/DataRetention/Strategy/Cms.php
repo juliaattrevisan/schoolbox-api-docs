@@ -435,23 +435,38 @@ class Cms extends Base
             return [];
         }
 
-        $placeholders = Builder::getArrayPlaceholders($parentIds, 'parent');
-        $statement = $this->getPreparedStatement(
-            "SELECT id FROM " . self::TABLE_FOLDER . " WHERE parent IN {$placeholders} AND deleted_at IS NOT NULL"
-        );
-        $statement->execute(Builder::getArrayParameters($parentIds, 'parent'));
+        $pending = $this->normalizeIds($parentIds);
+        $visited = [];
+        $softDeletedFolderIds = [];
 
-        return array_map(
-            static fn(array $row): int => (int) $row['id'],
-            $statement->fetchAll(\PDO::FETCH_ASSOC),
-        );
+        while ($pending !== []) {
+            $placeholders = Builder::getArrayPlaceholders($pending, 'parent');
+            $statement = $this->getPreparedStatement(
+                "SELECT id FROM " . self::TABLE_FOLDER . " WHERE parent IN {$placeholders} AND deleted_at IS NOT NULL"
+            );
+            $statement->execute(Builder::getArrayParameters($pending, 'parent'));
+
+            $pending = [];
+            foreach ($statement->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+                $folderId = (int)$row['id'];
+                if (isset($visited[$folderId])) {
+                    continue;
+                }
+
+                $visited[$folderId] = true;
+                $softDeletedFolderIds[$folderId] = $folderId;
+                $pending[] = $folderId;
+            }
+        }
+
+        return array_values($softDeletedFolderIds);
     }
 
     /**
-     * Find only active (non-deleted) direct child folders.
+     * Find only active (non-deleted) descendant folders.
      *
      * This helper allows cascade expansion to reject any parent that still has
-     * visible child folders, keeping the delete plan safe.
+     * visible child folders anywhere in its descendant tree.
      *
      * @param array<int, int> $parentIds
      * @return array<int, int>
@@ -462,16 +477,34 @@ class Cms extends Base
             return [];
         }
 
-        $placeholders = Builder::getArrayPlaceholders($parentIds, 'parent');
-        $statement = $this->getPreparedStatement(
-            "SELECT id FROM " . self::TABLE_FOLDER . " WHERE parent IN {$placeholders} AND deleted_at IS NULL"
-        );
-        $statement->execute(Builder::getArrayParameters($parentIds, 'parent'));
+        $pending = $this->normalizeIds($parentIds);
+        $visited = [];
+        $activeFolderIds = [];
 
-        return array_map(
-            static fn(array $row): int => (int) $row['id'],
-            $statement->fetchAll(\PDO::FETCH_ASSOC),
-        );
+        while ($pending !== []) {
+            $placeholders = Builder::getArrayPlaceholders($pending, 'parent');
+            $statement = $this->getPreparedStatement(
+                "SELECT id, deleted_at FROM " . self::TABLE_FOLDER . " WHERE parent IN {$placeholders}"
+            );
+            $statement->execute(Builder::getArrayParameters($pending, 'parent'));
+
+            $pending = [];
+            foreach ($statement->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+                $folderId = (int)$row['id'];
+                if (isset($visited[$folderId])) {
+                    continue;
+                }
+
+                $visited[$folderId] = true;
+                $pending[] = $folderId;
+
+                if ($row['deleted_at'] === null) {
+                    $activeFolderIds[$folderId] = $folderId;
+                }
+            }
+        }
+
+        return array_values($activeFolderIds);
     }
 
     /**

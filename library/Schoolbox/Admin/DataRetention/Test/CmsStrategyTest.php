@@ -187,10 +187,32 @@ class CmsStrategyTest extends TestCase
                     return $this->findChildFolderIds($parentIds);
                 }
 
-                return array_values(array_filter(
-                    $this->findChildFolderIds($parentIds),
-                    fn(int $folderId): bool => isset($this->softDeletedFolderIds[$folderId]),
-                ));
+                $visited = [];
+                $softDeletedFolderIds = [];
+                $pending = $this->findChildFolderIds($parentIds);
+
+                while ($pending !== []) {
+                    $nextPending = [];
+                    foreach ($pending as $folderId) {
+                        if (isset($visited[$folderId])) {
+                            continue;
+                        }
+
+                        $visited[$folderId] = true;
+                        if (!isset($this->softDeletedFolderIds[$folderId])) {
+                            continue;
+                        }
+
+                        $softDeletedFolderIds[$folderId] = $folderId;
+                        foreach ($this->folderChildren[$folderId] ?? [] as $childId) {
+                            $nextPending[] = $childId;
+                        }
+                    }
+
+                    $pending = $nextPending;
+                }
+
+                return array_values($softDeletedFolderIds);
             }
 
             /**
@@ -203,10 +225,31 @@ class CmsStrategyTest extends TestCase
                     return [];
                 }
 
-                return array_values(array_filter(
-                    $this->findChildFolderIds($parentIds),
-                    fn(int $folderId): bool => !isset($this->softDeletedFolderIds[$folderId]),
-                ));
+                $visited = [];
+                $activeFolderIds = [];
+                $pending = $this->findChildFolderIds($parentIds);
+
+                while ($pending !== []) {
+                    $nextPending = [];
+                    foreach ($pending as $folderId) {
+                        if (isset($visited[$folderId])) {
+                            continue;
+                        }
+
+                        $visited[$folderId] = true;
+                        if (!isset($this->softDeletedFolderIds[$folderId])) {
+                            $activeFolderIds[$folderId] = $folderId;
+                        }
+
+                        foreach ($this->findChildFolderIds([$folderId]) as $childId) {
+                            $nextPending[] = $childId;
+                        }
+                    }
+
+                    $pending = $nextPending;
+                }
+
+                return array_values($activeFolderIds);
             }
 
             /**
@@ -851,6 +894,50 @@ class CmsStrategyTest extends TestCase
         $this->assertSame([
             'Skipping deletion of folder 10 because it has active child folder 11',
         ], $state->warnings);
+    }
+
+    public function testFindActiveChildFolderIdsReturnsRecursiveDescendants(): void
+    {
+        ['strategy' => $strategy] = $this->strategy(
+            [
+                10 => [11],
+                11 => [12],
+                12 => [],
+            ],
+            softDeletedFolderIds: [10, 11],
+        );
+
+        $call = \Closure::bind(
+            function (array $parentIds): array {
+                return $this->findActiveChildFolderIds($parentIds);
+            },
+            $strategy,
+            Cms::class,
+        );
+
+        $this->assertSame([12], $call([10]));
+    }
+
+    public function testFindSoftDeletedChildFolderIdsReturnsRecursiveDescendants(): void
+    {
+        ['strategy' => $strategy] = $this->strategy(
+            [
+                10 => [11],
+                11 => [12],
+                12 => [],
+            ],
+            softDeletedFolderIds: [10, 11, 12],
+        );
+
+        $call = \Closure::bind(
+            function (array $parentIds): array {
+                return $this->findSoftDeletedChildFolderIds($parentIds);
+            },
+            $strategy,
+            Cms::class,
+        );
+
+        $this->assertSame([11, 12], $call([10]));
     }
 
     /**
