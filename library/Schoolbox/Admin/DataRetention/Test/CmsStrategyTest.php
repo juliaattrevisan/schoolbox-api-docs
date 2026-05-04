@@ -19,6 +19,13 @@ use Symfony\Component\Lock\LockInterface;
 class CmsStrategyTest extends TestCase
 {
     /**
+     * Build a CMS strategy test double whose protected database/Etherpad hooks are observable.
+     *
+     * The retention strategy has to coordinate folder traversal, blocker checks,
+     * homepage cleanup, and delete ordering. This fixture keeps those behaviours
+     * testable without a real database or Etherpad service, while still running
+     * the production orchestration in Cms::deleteChunk().
+     *
      * @param array<int, list<int>> $folderChildren
      * @param list<int> $blockedFolderIds
      * @param array<string, array<int, list<int>>> $lookupIds
@@ -116,6 +123,12 @@ class CmsStrategyTest extends TestCase
             private ?array $softDeletedFolderIds;
 
             /**
+             * Store the in-memory graph and lookup tables used by this strategy double.
+             *
+             * The constructor mirrors Cms enough for parent behaviour to run, then
+             * replaces external dependencies with arrays so tests can model active
+             * children, blocked folders, and related row ids precisely.
+             *
              * @param array<int, list<int>> $folderChildren
              * @param list<int> $blockedFolderIds
              * @param array<string, array<int, list<int>>> $lookupIds
@@ -157,10 +170,11 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
-             * Return only soft-deleted children for tests that need active children excluded.
+             * Return the raw child graph so tests can model both active and deleted children.
              *
-             * When no soft-delete map is supplied, this preserves existing tests
-             * that model all child folders as retention-eligible.
+             * Cms has separate child lookups for broad tree checks and retention-safe
+             * cascade expansion. Keeping this override unfiltered lets the active-child
+             * tests prove the narrower helper is doing the exclusion.
              *
              * @param array<int, int> $parentIds
              * @return array<int, int>
@@ -178,6 +192,13 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Return retention-eligible descendants from the in-memory folder graph.
+             *
+             * The production helper asks the database for soft-deleted children. This
+             * recursive array implementation lets tests prove the cascade can still
+             * reach soft-deleted descendants without letting active folders into the
+             * delete plan.
+             *
              * @param array<int, int> $parentIds
              * @return array<int, int>
              */
@@ -216,6 +237,12 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Find active descendants in the in-memory graph for parent safety checks.
+             *
+             * Active descendants are what prevent a retained ancestor from being
+             * hard-deleted. The test double computes them recursively so tests cover
+             * active grandchildren as well as direct children.
+             *
              * @param array<int, int> $parentIds
              * @return array<int, int>
              */
@@ -253,6 +280,12 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Simulate excluded assessment/course relations without real FK tables.
+             *
+             * The production strategy skips chunks that still belong to out-of-scope
+             * relations. This override lets tests exercise that branch by supplying
+             * just the blocked folder ids.
+             *
              * @param array<int, int> $folderIds
              * @return array<int, int>
              */
@@ -262,6 +295,12 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Resolve related row ids from in-memory lookup tables.
+             *
+             * CMS has many related tables with different id and folder column names.
+             * Tests only need to prove the orchestration asks for the right related
+             * ids before deletion, so this avoids database fixtures.
+             *
              * @param array<int, int> $folderIds
              * @return array<int, int>
              */
@@ -278,6 +317,12 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Provide homepage Etherpad rows without querying the database.
+             *
+             * Homepage cleanup is part of CMS folder deletion, and tests need to
+             * exercise that path while controlling malformed and successful pad
+             * records deterministically.
+             *
              * @param int $homepageId
              * @return array<int, array<string, mixed>>
              */
@@ -286,12 +331,18 @@ class CmsStrategyTest extends TestCase
                 return $this->homepagePadRecords[$homepageId] ?? [];
             }
 
+            /**
+             * Record Etherpad delete attempts instead of contacting an Etherpad server.
+             */
             protected function deletePadFromEtherpad(string $padId): bool
             {
                 $this->state->calls[] = 'deletePadFromEtherpad:' . $padId;
                 return $this->padDeleteResults[$padId] ?? false;
             }
 
+            /**
+             * Keep legacy soft-delete behaviour observable if a test exercises it.
+             */
             protected function softDeleteEtherpadPad(int $id): int
             {
                 $this->state->calls[] = 'softDeleteEtherpadPad';
@@ -299,6 +350,9 @@ class CmsStrategyTest extends TestCase
                 return 1;
             }
 
+            /**
+             * Record local Etherpad metadata deletion without touching the database.
+             */
             protected function hardDeleteEtherpadPad(int $id): int
             {
                 $this->state->calls[] = 'hardDeleteEtherpadPad';
@@ -306,6 +360,9 @@ class CmsStrategyTest extends TestCase
                 return 1;
             }
 
+            /**
+             * Record Redis cleanup attempts without requiring Redis in unit tests.
+             */
             protected function deleteEtherpadRedisKeys(string $padId, int $homepageId, bool $dryRun): int
             {
                 $this->state->calls[] = 'deleteEtherpadRedisKeys:' . $padId;
@@ -314,6 +371,12 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Keep homepage cleanup in the call log so folder traversal order is visible.
+             *
+             * Etherpad cleanup must run for every folder selected for deletion. The
+             * call log proves the cleanup follows the same leaf-first order as the
+             * eventual folder deletion.
+             *
              * @param int $homepageId
              */
             public function cleanupHomepagePads(int $homepageId): array
@@ -324,6 +387,12 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Record wiki unlinking so tests can assert it happens before wiki deletion.
+             *
+             * The production strategy clears latestRevision to satisfy wiki foreign
+             * keys. Unit tests do not need the database update, only evidence that
+             * the ordered step ran.
+             *
              * @param array<int, int> $ids
              */
             protected function setWikiLatestRevisionNull(array $ids): int
@@ -334,6 +403,8 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Record blog comment cleanup to verify child rows are deleted first.
+             *
              * @param array<int, int> $ids
              */
             protected function deleteBlogComments(array $ids): int
@@ -344,6 +415,8 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Record blog image cleanup to verify child rows are deleted first.
+             *
              * @param array<int, int> $ids
              */
             protected function deleteBlogImages(array $ids): int
@@ -354,6 +427,8 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Record blog deletion after its dependent rows have been handled.
+             *
              * @param array<int, int> $ids
              */
             protected function deleteBlog(array $ids): int
@@ -364,6 +439,8 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Record forum post cleanup to verify posts are removed before threads.
+             *
              * @param array<int, int> $ids
              */
             protected function deleteForumPosts(array $ids): int
@@ -374,6 +451,8 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Record forum thread deletion after posts have been handled.
+             *
              * @param array<int, int> $ids
              */
             protected function deleteForumThreads(array $ids): int
@@ -384,6 +463,8 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Record poll log cleanup to verify logs are removed before polls.
+             *
              * @param array<int, int> $ids
              */
             protected function deletePollLogs(array $ids): int
@@ -394,6 +475,8 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Record poll deletion after poll logs have been handled.
+             *
              * @param array<int, int> $ids
              */
             protected function deletePolls(array $ids): int
@@ -404,6 +487,8 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Record wiki revision cleanup to verify revisions are removed before wikis.
+             *
              * @param array<int, int> $ids
              */
             protected function deleteWikiRevisions(array $ids): int
@@ -414,6 +499,8 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Record wiki deletion after latestRevision and revisions have been handled.
+             *
              * @param array<int, int> $ids
              */
             protected function deleteWikis(array $ids): int
@@ -424,6 +511,8 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Record component config cleanup before component instance deletion.
+             *
              * @param array<int, int> $ids
              */
             protected function deleteComponentConfigInstances(array $ids): int
@@ -434,6 +523,8 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Record homepage component instance deletion after config cleanup.
+             *
              * @param array<int, int> $ids
              */
             protected function deleteComponentInstances(array $ids): int
@@ -444,6 +535,8 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Capture the full folder-owned row purge set for ordering assertions.
+             *
              * @param array<int, int> $folderIds
              */
             protected function deleteFolderOwnedRows(array $folderIds): int
@@ -455,6 +548,8 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Capture homepage userAccess cleanup because those ACL rows block folders.
+             *
              * @param array<int, int> $folderIds
              */
             protected function deleteHomepageUserAccess(array $folderIds): int
@@ -466,6 +561,8 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Capture final folder ids so tests can assert leaf-first deletion.
+             *
              * @param array<int, int> $folderIds
              */
             protected function deleteFolders(array $folderIds): int
@@ -483,6 +580,13 @@ class CmsStrategyTest extends TestCase
         ];
     }
 
+    /**
+     * Homepage pad cleanup must run as part of a real CMS folder delete.
+     *
+     * Pads are homepage-owned data tied to the folder id. This guards against
+     * deleting folder-owned rows while leaving live Etherpad metadata behind in
+     * perform mode.
+     */
     public function testDeleteChunkRunsHomepageCleanupInPerformMode(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy([], [], [], [], [], [], true);
@@ -512,6 +616,13 @@ class CmsStrategyTest extends TestCase
         $this->assertSame([10], $state->deletedHomepageUserAccessFolderIds);
     }
 
+    /**
+     * Dry-run mode must still exercise homepage cleanup paths for accurate counts.
+     *
+     * The transaction is rolled back by Base::process(), but the strategy still
+     * needs to report what would be cleaned so administrators can trust dry-run
+     * output before enabling deletion.
+     */
     public function testDeleteChunkRunsHomepageCleanupInDryRunMode(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy([], [], [], [], [], [], false);
@@ -542,6 +653,12 @@ class CmsStrategyTest extends TestCase
     }
 
     /**
+     * Invoke deleteChunk() directly so tests can focus on one chunk's orchestration.
+     *
+     * Base::process() covers transactions, lock refresh, and chunk iteration.
+     * These tests need the smaller unit where CMS-specific cascade and delete
+     * ordering decisions happen.
+     *
      * @param Cms $strategy
      * @param array<int, array{id: int, table: string}> $chunk
      */
@@ -559,6 +676,11 @@ class CmsStrategyTest extends TestCase
     }
 
     /**
+     * Call homepage cleanup through the protected folder wrapper.
+     *
+     * The wrapper is where folder ids are treated as homepage ids, so tests bind
+     * into the class to verify the CMS-specific count aggregation directly.
+     *
      * @param Cms $strategy
      * @param array<int, int> $folderIds
      */
@@ -576,6 +698,11 @@ class CmsStrategyTest extends TestCase
     }
 
     /**
+     * Call the protected homepage ACL cleanup helper for SQL-shape assertions.
+     *
+     * This is the narrowest way to prove dry-run mode still targets homepage
+     * service ACL rows without running a full chunk.
+     *
      * @param Cms $strategy
      * @param array<int, int> $folderIds
      */
@@ -595,6 +722,9 @@ class CmsStrategyTest extends TestCase
     /**
      * Call the protected CMS candidate loader so query shape can be asserted.
      *
+     * The active-child guard lives in SQL, not only in PHP traversal, so this
+     * helper exposes the protected query builder to lock that behaviour down.
+     *
      * @return array<int, array{id: int}>
      */
     private function getIdsToDelete(Cms $strategy): array
@@ -610,6 +740,12 @@ class CmsStrategyTest extends TestCase
         return $call();
     }
 
+    /**
+     * Folder-level homepage cleanup should report pads found, not only pads deleted.
+     *
+     * The chunk notice uses this count to explain the scope of Etherpad work even
+     * when an external Etherpad delete fails for a specific pad.
+     */
     public function testCleanupHomepagePadsForFoldersCountsPadsFound(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
@@ -637,6 +773,12 @@ class CmsStrategyTest extends TestCase
         ], $state->calls);
     }
 
+    /**
+     * Chunk logging must include Etherpad pad counts for auditability.
+     *
+     * Data retention runs are destructive, so the summary log needs to show that
+     * homepage pad metadata was considered alongside the SQL table counts.
+     */
     public function testDeleteChunkIncludesEtherpadPadsCountInNotice(): void
     {
         $state = new class {
@@ -676,6 +818,12 @@ class CmsStrategyTest extends TestCase
         $this->assertStringContainsString('etherpad_pads=2', implode(' | ', $state->notices));
     }
 
+    /**
+     * Chunk logging must include homepage ACL cleanup counts.
+     *
+     * userAccess rows are not obvious CMS content, but they can block folder
+     * deletion. Logging their count makes that hidden cleanup visible.
+     */
     public function testDeleteChunkIncludesHomepageUserAccessCountInNotice(): void
     {
         $state = new class {
@@ -704,6 +852,12 @@ class CmsStrategyTest extends TestCase
         $this->assertStringContainsString('userAccess=3', implode(' | ', $state->notices));
     }
 
+    /**
+     * Homepage ACL cleanup must use dry-run SELECTs and the homepage service id.
+     *
+     * This protects two non-obvious requirements: dry-run must not mutate ACL
+     * rows, and only homepage permissions for the folder sid should be targeted.
+     */
     public function testDeleteHomepageUserAccessUsesDryRunSelectAndHomepageService(): void
     {
         $state = new class {
@@ -714,10 +868,16 @@ class CmsStrategyTest extends TestCase
         };
 
         $statement = new class ($state) extends \PDOStatement {
+            /**
+             * Keep captured SQL state with the PDOStatement stub.
+             */
             public function __construct(private object $state)
             {
             }
 
+            /**
+             * Capture bound parameters so the test can verify homepage ACL targeting.
+             */
             public function execute(?array $params = null): bool
             {
                 $this->state->executeParams = $params;
@@ -725,6 +885,9 @@ class CmsStrategyTest extends TestCase
                 return true;
             }
 
+            /**
+             * Return a fixed count because this test is about SQL shape, not row matching.
+             */
             public function rowCount(): int
             {
                 return 3;
@@ -764,6 +927,12 @@ class CmsStrategyTest extends TestCase
         ], $state->executeParams);
     }
 
+    /**
+     * Strategy identity must match the CLI/admin configuration contract.
+     *
+     * The strategy name is how command-line filtering selects CMS retention, and
+     * the label is what administrators see when reviewing retention settings.
+     */
     public function testUsesCmsStrategyNameAndLabel(): void
     {
         $strategy = new Cms(
@@ -780,6 +949,13 @@ class CmsStrategyTest extends TestCase
         $this->assertSame('Resources (CMS) Retention', $strategy->getRetentionLabel());
     }
 
+    /**
+     * CMS folder trees must delete child folders before parents.
+     *
+     * The folder table is self-referential, so parent-first hard deletes can fail
+     * FK checks. This test also proves related homepage cleanup follows the same
+     * leaf-first folder order.
+     */
     public function testDeletesCmsFolderTreeInLeafFirstOrder(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
@@ -850,6 +1026,12 @@ class CmsStrategyTest extends TestCase
         $this->assertSame([], $state->deletedFolders);
     }
 
+    /**
+     * Active descendants must stop the ancestor from entering the delete plan.
+     *
+     * This protects the bottom-up retention rule even when the candidate root is
+     * already soft-deleted and old enough to be considered for hard deletion.
+     */
     public function testExpandFolderCascadeSkipsParentsWithActiveChildren(): void
     {
         $state = new class {
@@ -896,6 +1078,12 @@ class CmsStrategyTest extends TestCase
         ], $state->warnings);
     }
 
+    /**
+     * Active descendant detection must be recursive, not only direct-child based.
+     *
+     * Otherwise a soft-deleted parent could be hard-deleted while an active
+     * grandchild still exists below a soft-deleted child folder.
+     */
     public function testFindActiveChildFolderIdsReturnsRecursiveDescendants(): void
     {
         ['strategy' => $strategy] = $this->strategy(
@@ -918,6 +1106,12 @@ class CmsStrategyTest extends TestCase
         $this->assertSame([12], $call([10]));
     }
 
+    /**
+     * Soft-deleted descendant discovery must be recursive for leaf-first cleanup.
+     *
+     * This proves the test double models the production cascade closely enough to
+     * catch parent/child ordering regressions across more than one folder level.
+     */
     public function testFindSoftDeletedChildFolderIdsReturnsRecursiveDescendants(): void
     {
         ['strategy' => $strategy] = $this->strategy(
@@ -953,10 +1147,16 @@ class CmsStrategyTest extends TestCase
         };
 
         $statement = new class ($state) extends \PDOStatement {
+            /**
+             * Keep captured SQL state with the PDOStatement stub.
+             */
             public function __construct(private object $state)
             {
             }
 
+            /**
+             * Capture candidate-query parameters so the cutoff binding is asserted.
+             */
             public function execute(?array $params = null): bool
             {
                 $this->state->executeParams = $params;
@@ -965,6 +1165,8 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Return one candidate row because this test is about the guard in SQL.
+             *
              * @return array<int, array{id: int}>
              */
             public function fetchAll(int $mode = \PDO::FETCH_DEFAULT, mixed ...$args): array
@@ -1004,6 +1206,13 @@ class CmsStrategyTest extends TestCase
         $this->assertNotEmpty($state->executeParams['old']);
     }
 
+    /**
+     * Excluded assessment/course relationships should skip a chunk before deletes.
+     *
+     * Those domains are intentionally out of scope for CMS retention, so this
+     * guards against partially deleting folder-owned CMS rows before hitting a
+     * foreign-key failure on an excluded relation.
+     */
     public function testSkipsBlockedCmsFolderChunks(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
@@ -1023,6 +1232,12 @@ class CmsStrategyTest extends TestCase
         $this->assertSame([], $state->calls);
     }
 
+    /**
+     * Dry-run homepage cleanup should expose the same pad metadata path as perform mode.
+     *
+     * The strategy relies on transaction rollback for dry-run safety, so this test
+     * keeps the observable summary aligned with what a real run would process.
+     */
     public function testHomepageCleanupDryRunDoesNotDeletePadsOrMetadata(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
@@ -1047,6 +1262,12 @@ class CmsStrategyTest extends TestCase
         $this->assertSame(['cleanupHomepagePads:123:dry', 'deletePadFromEtherpad:g.test123', 'hardDeleteEtherpadPad'], $state->calls);
     }
 
+    /**
+     * Successful Etherpad deletion must be followed by local metadata cleanup.
+     *
+     * External pad deletion alone is not enough: the local row would otherwise be
+     * rediscovered by later retention runs for the same homepage.
+     */
     public function testHomepageCleanupSoftDeletesMetadataWhenPadDeleted(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
@@ -1069,6 +1290,13 @@ class CmsStrategyTest extends TestCase
         $this->assertSame(['cleanupHomepagePads:123:do', 'deletePadFromEtherpad:g.softdelete', 'hardDeleteEtherpadPad'], $state->calls);
     }
 
+    /**
+     * Failed external pad deletion should still remove local metadata in retention.
+     *
+     * CMS folder hard deletion is authoritative for retained data. This guards the
+     * decision to clean local rows even when Etherpad reports that the pad was not
+     * deleted externally.
+     */
     public function testHomepageCleanupTriggersRedisCleanupWhenEnabled(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
