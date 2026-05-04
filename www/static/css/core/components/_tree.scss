@@ -20,7 +20,15 @@ $tree-favorite-icon-color: darkorange;
         color: $tree-folder-icon-color;
     }
 
+    sbx-icon[name="folder"] {
+        color: $tree-folder-icon-color;
+    }
+
     .icon-home:before {
+        color: $tree-homepage-icon-color;
+    }
+
+    sbx-icon[name="home"] {
         color: $tree-homepage-icon-color;
     }
 
@@ -31,7 +39,15 @@ $tree-favorite-icon-color: darkorange;
         }
     }
 
+    sbx-icon[name="course-builder"] {
+        color: $tree-course-icon-color;
+    }
+
     .icon-favourite:before {
+        color: $tree-favorite-icon-color;
+    }
+
+    sbx-icon.icon-favourite {
         color: $tree-favorite-icon-color;
     }
 }
@@ -147,6 +163,12 @@ ul.jstree-default {
 
         .meta-preview {
             @extend %browser-icon-colors;
+
+            > .resource-browser-preview-icon {
+                float: left;
+                margin: -0.5rem 1rem 0 -1rem;
+                padding: 0.5rem 0 0 1rem;
+            }
         }
 
         .card {
