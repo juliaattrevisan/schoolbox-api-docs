@@ -349,7 +349,6 @@ function applySelectedLanguages(selectedItems: SearchSelectItem[]): void {
     }
 }
 
-
 /**
  * Get the language display text for a subject row.
  * @param row The subject row being displayed.
