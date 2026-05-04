@@ -199,6 +199,72 @@ class Migration extends CliTool\App
 
 
     /**
+     * Migrates files using multiple forked worker processes
+     *
+     * @param array $files All files from the storage table
+     * @param int $countAll Total file count for logging
+     */
+    private function migrateFilesParallel(array $files, int $countAll): void
+    {
+        if (!function_exists('pcntl_fork')) {
+            $this->getLogger()->warning("pcntl extension not available, falling back to serial migration");
+            $this->workerCount = 1;
+            $count = 0;
+            foreach ($files as $file) {
+                $count++;
+                $baseName = "{$file['filename']}.{$file['ext']}";
+                $this->getLogger()->notice("Checking file $count/$countAll  {$file['hash']}, '$baseName'");
+                $this->migrateFile($file['hash']);
+            }
+            return;
+        }
+
+        $chunks = array_chunk($files, (int) ceil($countAll / $this->workerCount));
+        $pids   = [];
+
+        foreach ($chunks as $workerIndex => $chunk) {
+            $pid = pcntl_fork();
+            if ($pid === -1) {
+                $this->getLogger()->error("Failed to fork worker $workerIndex");
+                continue;
+            }
+            if ($pid === 0) {
+                // Child: create a fresh S3 client+filesystem to avoid sharing connections with siblings
+                $childClient           = $this->buildS3ClientOrExit($this->getLogger(), $this->getConfig());
+                $this->fileSystemAwsS3 = new Filesystem(new AwsS3Adapter($childClient, $this->s3Bucket, FilesystemFactory::PREFIX_STORAGE));
+
+                $count     = 0;
+                $chunkSize = count($chunk);
+                foreach ($chunk as $file) {
+                    $count++;
+                    $baseName = "{$file['filename']}.{$file['ext']}";
+                    $this->getLogger()->notice("Worker {$workerIndex}: $count/$chunkSize  {$file['hash']}, '$baseName'");
+                    $this->migrateFile($file['hash']);
+                }
+                $this->getLogger()->notice(sprintf(
+                    "Worker %d complete — storage: %d, transcode: %d, data: %s, failed: %d",
+                    $workerIndex,
+                    $this->countStorageFilesUploaded,
+                    $this->countTranscodeFilesUploaded,
+                    $this->byteFormat::bytesToString($this->countBytesUploaded),
+                    $this->countUploadsFailed,
+                ));
+                $this->listFailedMigrationPaths();
+                exit(0);
+            }
+            $pids[$workerIndex] = $pid;
+        }
+
+        foreach ($pids as $workerIndex => $pid) {
+            pcntl_waitpid($pid, $status);
+            if (pcntl_wifexited($status) && pcntl_wexitstatus($status) !== 0) {
+                $this->getLogger()->error("Worker $workerIndex exited with status " . pcntl_wexitstatus($status));
+            }
+        }
+    }
+
+
+    /**
      * Adds all directories between storage root and specified file path
      *
      * @param bool[] $directories Indexed by directory name
