@@ -239,7 +239,10 @@ class Migration extends CliTool\App
         foreach ($chunks as $workerIndex => $chunk) {
             $pid = pcntl_fork();
             if ($pid === -1) {
-                $this->getLogger()->error("Failed to fork worker $workerIndex");
+                $this->getLogger()->error("Failed to fork worker $workerIndex, processing its chunk serially in parent");
+                foreach ($chunk as $file) {
+                    $this->migrateFile($file['hash']);
+                }
                 continue;
             }
             if ($pid === 0) {
