@@ -431,13 +431,6 @@
                 parseFraction(rubricSummary, e.namespace);
             }
 
-            // What cell was actually changed?
-            if ($changed.is(':checkbox')) {
-                showHideRangeInput($changed);
-            } else {
-                showHideRangeInput($changed.siblings(':checkbox'));
-            }
-
             disableEnableAssignFromDescs();
         });
 
@@ -520,33 +513,6 @@
             revalidateCapMarks();
         });
 
-        // Hide or display the descriptor range input depending on whether it's needed or not
-        function showHideRangeInput($changedCell) {
-            var $allCellsInRow = $changedCell.parents("tr").find("[data-rubric], [data-rubric-group]");
-
-            // Hide dropdowns on all cells in the same row
-            $allCellsInRow.siblings("select").addClass("hide");
-
-            // Disable all dropdowns so they don't get POSTed
-            $allCellsInRow.siblings("select").prop("disabled", true);
-
-            // Show text labels on all cells in the same row
-            $allCellsInRow.siblings("label").find(".rb-value").removeClass("hide");
-
-            if ($changedCell.prop('checked')) {
-                // Hide the text label on the selected cell
-                $changedCell.siblings("label").find(".rb-value").addClass("hide");
-
-                // This will only un-hide an element if that element is the one we need to use on that cell:
-                // - Dropdowns are only used on cells with a range
-                // - Cells with a single value just get a text label
-
-                $changedCell.siblings("select.used").removeClass("hide");
-                $changedCell.siblings("select.used").prop("disabled", false); // Re-enable so we can use it and it gets POSTed
-                $changedCell.siblings("label").find(".rb-value.used").removeClass("hide");
-            }
-        }
-
         // Calculate the overall rubric mark from the scaled group marks
         function getTotalMark()
         {
@@ -578,25 +544,6 @@
 
             return totalMark;
         }
-
-        // If not multi-select, simulate radio behaviour per row (simpler to do this than intercept radio checked event!)
-        {# TODO I have no idea what multiSelect is, and AFAICT it's always false #}
-        {#{% if not rubric.multiSelect %}#}
-        // Can't delegate this, as auto-mark will run before it can un-check siblings
-        $('[data-rubric-descriptor]').on('change', function(event){
-
-            var $descriptorInput = $(this);
-            var $checkboxGroup   = $descriptorInput.closest('[data-group]');
-            var $descriptors     = $checkboxGroup.find('[data-rubric-descriptor]');
-
-            $descriptors.each(function(idx, elem){
-                var $otherDescriptor = $(elem);
-                if($otherDescriptor.attr('data-rubric-descriptor') != $descriptorInput.attr('data-rubric-descriptor')){
-                    $otherDescriptor.prop('checked', false);
-                }
-            });
-        });
-        {#{% endif %}#}
 
         /**
          *
