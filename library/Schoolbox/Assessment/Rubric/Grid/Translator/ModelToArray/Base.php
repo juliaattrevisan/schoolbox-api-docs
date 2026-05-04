@@ -82,6 +82,7 @@ class Base
             'id' => $capability->getId(),
             'name' => $capability->getName(),
             'maxValue' => $capabilityUsage->getMaxValue(), // TODO: rubric-markable only, and check if it matters for perms
+            'derivedMaxValue' => $capabilityUsage->calculateMaxValueFromIndicators(), // TODO: rubric-markable only, and check if it matters for perms
             'showCapabilityMark' => $rubricGrid->isCapabilityMarkShown($capability), // TODO: rubric-markable only, and check if it matters for perms
             'indicators' => $indicators,
         ];

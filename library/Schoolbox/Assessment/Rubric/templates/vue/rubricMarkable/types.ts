@@ -23,6 +23,8 @@ export type RubricGridCapability = {
     id: number;
     name: string;
     maxValue: number | null;
+    /** A derived maximum value for the capability, calculated from its indicators */
+    derivedMaxValue: number;
     /**
      * Should capability marks show for the given capability usage?
      *
@@ -39,7 +41,7 @@ export type RubricGridCapability = {
 export type RubricGridIndicator = {
     id: number;
     name: string;
-    descriptors: RubricGridDescriptor[];
+    descriptors: (RubricGridDescriptor | null)[];
 };
 
 export type RubricGridDescriptor = {

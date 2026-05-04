@@ -235,74 +235,16 @@
         function disableEnableAssignFromDescs() {
             var $groups = $rb.find("[data-group-summary]");
             $groups.each(function() {
-                var markIsDifferent = false;
-
                 var $this         = $(this),
-                    displayedMark = $this.find("[data-group-descriptor-sum]").text().replace(/%/, '').trim(),
                     customMark    = $this.find("[data-group-mark]").val();
 
-                const hasSelectedDescriptor = findAllSelectedDescriptorsInCapability($this.attr('data-group-id')).length > 0;
-                const hasSelectedOnlyValuelessDescriptors = findAllSelectedDescriptorsInCapability($this.attr('data-group-id'))
-                    .filter(descriptor => descriptor.state.value !== null).length === 0;
                 const capabilityHasValuedDescriptors = findAllDescriptorsInCapability($this.attr('data-group-id'))
                     .filter(descriptor => descriptor.state.value !== null).length > 0;
 
-
-                if (markType === 'letter') {
-                    // Compare letter grades by their string value (easier since we're dealing with brackets)
-
-                    var grades = getLetterGrades($this);
-                    customMark = getLetterGradeFromNumeric($this.find("[data-group-mark] :selected").attr('data-raw-grade'), grades);
-                    if (displayedMark !== customMark) {
-                        markIsDifferent = true;
-                    }
-                } else {
-                    // Compare percentage and total marks by their numeric value
-
-                    var diff = Math.abs(parseFloat(displayedMark) - parseFloat(customMark));
-                    // Allow for precision errors when diffing
-                    if (diff >= 0.01 || (isNaN(diff) && hasSelectedDescriptor && capabilityHasValuedDescriptors)) {
-                        markIsDifferent = true;
-                    }
-                }
-
-                // Determine if we should show the "Assign XXX from indicators" message
-                // Start by assuming we should show it if the mark is different
-                let showAssignFromButton = markIsDifferent;
-
-                // If no descriptors are selected, and the customMark is not empty, show the button (as it must be customised)
-                if (!hasSelectedDescriptor && customMark !== "") {
-                    showAssignFromButton = true;
-                }
-
-                // Otherwise, if only valueless descriptors are selected, and the customMark is already empty, never show the button (as it'll say null)
-                if (hasSelectedDescriptor && hasSelectedOnlyValuelessDescriptors && customMark === "") {
-                    showAssignFromButton = false;
-                }
-
-                // If we have selected any descriptor, then show the "assign XXX from descriptors" text
+                // TODO: customised logic, showAssignFromButton has been moved over already
                 if (showAssignFromButton) {
-                    // Check if the customMark is not "", as we don't want to show "assign null..."
-                    if (hasSelectedDescriptor && !hasSelectedOnlyValuelessDescriptors && capabilityHasValuedDescriptors) {
-                        $this.find("[data-descriptor-assign='has-selected-descriptor']").show();
-                        $this.find("[data-descriptor-assign='no-selected-descriptor']").hide();
-                    }
-                    // Otherwise, show the "remove grade based on descriptors" text
-                    else {
-                        $this.find("[data-descriptor-assign='has-selected-descriptor']").hide();
-                        $this.find("[data-descriptor-assign='no-selected-descriptor']").show();
-                    }
-
-                    $this.find("[data-use-descriptor-values]").show();
                     $this.attr('data-customised', true);
-                }
-                // Otherwise, hide the "assign XXX from indicators" text
-                else {
-                    $this.find("[data-use-descriptor-values]").hide();
-
-                    const capabilityHasValuedDescriptors = findAllDescriptorsInCapability($this.attr('data-group-id'))
-                        .filter(descriptor => descriptor.state.value !== null).length > 0;
-
+                } else {
                     // Only remove data-customised if at least one descriptor has a value AND data-scaled-mark is not empty
                     // We do this as when all descriptors are valueless, the only way a scaled mark can be set is manually
                     // But we don't want to show the descriptor values button in this case as it'd never have a useful value
@@ -330,26 +272,6 @@
             if (groupRows.length) {
                 let descriptorCheckboxes = groupRows.find('input');
                 let scaledGroupMark = scale($(element), summateDescriptors(descriptorCheckboxes));
-
-                // Set the data-group-descriptor-sum so that the initial enableAssignFromDescs can run correctly
-
-                // Update button text with mark calculated from descriptors
-                switch (markType) {
-                    case 'letter':
-                        var grades = getLetterGrades($(element).find("[data-group-mark]"));
-                        $(element).find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(getPercentage($(element), scaledGroupMark), grades));
-                        break;
-
-                    case 'percent':
-                        $(element).find("[data-group-descriptor-sum]").text(getPercentage($(element), scaledGroupMark) + "%");
-                        break;
-
-                    case 'raw':
-                    case 'none':
-                    default:
-                        $(element).find("[data-group-descriptor-sum]").text(scaledGroupMark);
-                        break;
-                }
 
                 // The raw mark value that should correlate to the initial human-readable value in the <input>
                 // If this doesn't match scaledGroupMark (the descriptors), then treat it as customised
@@ -409,24 +331,6 @@
 
                 if (capabilityHasValuedDescriptors) {
                     $groupSummary.attr('data-scaled-mark', scaledGroupMark, summateDescriptors($descriptorCheckboxes));
-                }
-
-                // Update button text with mark calculated from descriptors
-                switch (markType) {
-                    case 'letter':
-                        var grades = getLetterGrades($groupSummary.find("[data-group-mark]"));
-                        $groupSummary.find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(getPercentage($groupSummary, scaledGroupMark), grades));
-                        break;
-
-                    case 'percent':
-                        $groupSummary.find("[data-group-descriptor-sum]").text(getPercentage($groupSummary, scaledGroupMark) + "%");
-                        break;
-
-                    case 'raw':
-                    case 'none':
-                    default:
-                        $groupSummary.find("[data-group-descriptor-sum]").text(scaledGroupMark);
-                        break;
                 }
 
                 if ($groupSummary.length) {
@@ -703,43 +607,6 @@
             });
         }
 
-        // Given a percentage mark, find the letter grade that corresponds to its bracket in the marking scheme
-        // TODO this function seems to not be calculating brackets the same way twig is; who is wrong?
-        function getLetterGradeFromNumeric(numericMark, grades) {
-            if (numericMark === null || numericMark === undefined || numericMark === '') {
-                return '(no grade)';
-            }
-            var gradesLength = grades.length,
-                numberMark   = Number(numericMark);
-            for (var i = 0; i < gradesLength; i++) {
-                // TODO assumes values are always descending which might not be the case?
-                if (numberMark >= Number(grades[i].lowerBound)) {
-                    return grades[i].letter;
-                }
-            }
-
-            // Did I fall through to here? Use the last grade
-            return gradesLength > 0 ? grades[gradesLength-1].letter : '';
-        }
-
-        // Turn a specified value into a percentage of the max marks for a group
-        function getPercentage($groupSummary, value) {
-            var floatValue = parseFloat(value).toFixed(2),
-                percentage;
-            if (!isNaN(floatValue)) {
-                percentage = $groupSummary.attr('data-max') > 0 ? floatValue * (100 / $groupSummary.attr('data-max')) : 0;
-            } else {
-                return null;
-            }
-
-            // Known bug: due to javascript rounding errors, with some values the percentage will wrongly be identified as not divisible by 1
-            if (percentage % 1 !== 0) {
-                percentage = percentage.toFixed(2);
-            }
-            return percentage;
-        }
-
-
         // Hide or display the descriptor range input depending on whether it's needed or not
         function showHideRangeInput($changedCell) {
             var $allCellsInRow = $changedCell.parents("tr").find("[data-rubric], [data-rubric-group]");
@@ -765,71 +632,6 @@
                 $changedCell.siblings("select.used").prop("disabled", false); // Re-enable so we can use it and it gets POSTed
                 $changedCell.siblings("label").find(".rb-value.used").removeClass("hide");
             }
-        }
-
-        // Scale an unscaled mark based on a group's max mark
-        function scale($groupSummary, value) {
-            if (value === null) {
-                return null;
-            }
-
-            var groupMax = $groupSummary.attr('data-max'),
-                groupRowMaxSum = $groupSummary.attr('data-row-max-sum'),
-                scaledGroupSum;
-
-            if (groupRowMaxSum > 0) {
-                scaledGroupSum = value * (groupMax / groupRowMaxSum);
-            } else {
-                scaledGroupSum = value;
-            }
-
-            if (scaledGroupSum % 1 !== 0) {
-                scaledGroupSum = scaledGroupSum.toFixed(2);
-            }
-
-            return parseFloat(scaledGroupSum); // Ensure we get a float back
-        }
-
-        /**
-         * Get the value of a specified descriptor
-         * @param {jQuery} $descriptorCheckbox - the descriptor checkbox to get the value of
-         * @returns {number|null} - the value of the descriptor, or null if it has no value
-         */
-        function getDescriptorValue($descriptorCheckbox) {
-            const descriptorId = $descriptorCheckbox.attr('data-rubric-descriptor');
-            const $select = $rb.find('#rangeDropdown-'+String(descriptorId));
-            let descriptorValue;
-
-            if ($select.length) {
-                descriptorValue = parseFloat($select.val());
-            } else {
-                descriptorValue = parseFloat($descriptorCheckbox.attr('data-value'));
-            }
-
-            if (isNaN(descriptorValue)) {
-                return null;
-            }
-
-            return descriptorValue;
-        }
-
-        // Get the raw unscaled sum of selected descriptor values from the collection of descriptors passed in
-        function summateDescriptors($descriptorCheckboxes) {
-            var descriptorSummation = null;
-
-            $descriptorCheckboxes.each(function () {
-                var $descriptorCheckbox = $(this);
-
-                if ($descriptorCheckbox.prop('checked')) {
-                    const descriptorValue = getDescriptorValue($descriptorCheckbox);
-
-                    if (descriptorValue !== null) {
-                        descriptorSummation = (descriptorSummation || 0) + descriptorValue;
-                    }
-                }
-            });
-
-            return descriptorSummation;
         }
 
         // Calculate the overall rubric mark from the scaled group marks
