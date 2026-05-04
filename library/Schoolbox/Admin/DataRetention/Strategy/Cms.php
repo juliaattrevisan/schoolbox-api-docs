@@ -15,7 +15,6 @@ namespace Schoolbox\Admin\DataRetention\Strategy;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Connector\IConnector;
 use EtherpadLite\Client as EtherpadClient;
-use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\DataRetention\RetentionPeriod;
 use Schoolbox\Admin\DataRetention\ValidStrats;
@@ -29,6 +28,8 @@ class Cms extends Base
     protected string $retentionConfigKey = ConfigMapper::NAME_DATA_RETENTION_CMS;
 
     private const string TABLE_FOLDER = 'folder';
+
+    private ?EtherpadClient $etherpadClient = null;
 
     public function __construct(
         LoggerInterface $log,
@@ -120,16 +121,8 @@ class Cms extends Base
      */
     protected function deletePadFromEtherpad(string $padId): bool
     {
-        $apiToken = (string)$this->config->get('etherpad_api_token');
-        $etherpadHost = (string)$this->config->get(ConfigMapper::NAME_ETHERPAD_HOST);
-
-        if ($apiToken === '' || $etherpadHost === '') {
-            $this->log->warning('Etherpad API credentials are not configured; cannot delete pad ' . $padId);
-            return false;
-        }
-
         try {
-            $client = new EtherpadClient($apiToken, $etherpadHost);
+            $client = $this->getEtherpadClient();
             $response = $client->deletePad($padId);
             $code = $response->getCode();
             if ($code !== null && (string)$code === '0') {
@@ -833,5 +826,25 @@ class Cms extends Base
             'tile_layout_for_folder' => 'folder_id',
             'userGroups' => 'cid',
         ];
+    }
+
+
+    /** Get an Etherpad client if credentials are configured, or false if not.
+     *
+     * @return EtherpadClient|false
+     */
+    private function getEtherpadClient(): EtherpadClient|false
+    {
+        if (null === $this->etherpadClient) {
+            $apiToken = (string)$this->config->get('etherpad_api_token');
+            $etherpadHost = (string)$this->config->get(ConfigMapper::NAME_ETHERPAD_HOST);
+
+            if ($apiToken === '' || $etherpadHost === '') {
+                $this->log->warning('Etherpad API credentials are not configured; cannot delete pads');
+                return false;
+            }
+            $this->etherpadClient = new EtherpadClient($apiToken, $etherpadHost);
+        }
+        return $this->etherpadClient;
     }
 }
