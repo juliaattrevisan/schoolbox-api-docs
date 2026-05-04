@@ -216,6 +216,10 @@ class Migration extends CliTool\App
      */
     private function migrateFilesParallel(array $files, int $countAll): void
     {
+        if ($countAll === 0) {
+            return;
+        }
+
         if (!function_exists('pcntl_fork')) {
             $this->getLogger()->warning("pcntl extension not available, falling back to serial migration");
             $this->workerCount = 1;
