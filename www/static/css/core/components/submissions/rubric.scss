@@ -27,6 +27,13 @@ table.rb {
         border-right-width: 0 !important;
     }
     &.markable {
+        // for descriptor labels to take up the full height
+        height: 100%;
+
+        tr.rb-indicator-row {
+            height: 100%;
+        }
+
         td {
             padding: 0;
             position: relative;
