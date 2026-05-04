@@ -149,12 +149,16 @@ class Migration extends CliTool\App
         $this->getLogger()->notice("Fetching storage models from database, this may take a while on large datasets...");
         $files    = $this->getDatabaseInternal()->executeQuery("SELECT hash, filename, ext FROM storage")->fetchAll(\PDO::FETCH_ASSOC);
         $countAll = count($files);
-        foreach ($files as $file) {
-            $count++;
-            $baseName = "{$file['filename']}.{$file['ext']}";
-            $this->getLogger()->notice("Checking file $count/$countAll  {$file['hash']}, '$baseName'");
-            if ($this->migrateFile($file['hash'])) {
-                $countFilesInS3++;
+        if ($this->workerCount > 1) {
+            $this->migrateFilesParallel($files, $countAll);
+        } else {
+            foreach ($files as $file) {
+                $count++;
+                $baseName = "{$file['filename']}.{$file['ext']}";
+                $this->getLogger()->notice("Checking file $count/$countAll  {$file['hash']}, '$baseName'");
+                if ($this->migrateFile($file['hash'])) {
+                    $countFilesInS3++;
+                }
             }
         }
 
@@ -177,18 +181,24 @@ class Migration extends CliTool\App
         }
         $this->getLogger()->notice(sprintf("Files in storage table:     %d", $countAll));
         $this->getLogger()->notice(sprintf("Files in s3 storage:        %d", count($this->filesInS3)));
-        $this->getLogger()->notice(sprintf("Storage files uploaded:     %d", $this->countStorageFilesUploaded));
-        $this->getLogger()->notice(sprintf("Transcode files uploaded:   %d", $this->countTranscodeFilesUploaded));
-        $message = "Count failed uploads:       {$this->countUploadsFailed}";
-        $this->countUploadsFailed ? $this->getLogger()->error($message) : $this->getLogger()->notice($message);
-        $this->getLogger()->notice(sprintf("Data transferred:           %s", $this->byteFormat::bytesToString($this->countBytesUploaded)));
+        if ($this->workerCount <= 1) {
+            $this->getLogger()->notice(sprintf("Storage files uploaded:     %d", $this->countStorageFilesUploaded));
+            $this->getLogger()->notice(sprintf("Transcode files uploaded:   %d", $this->countTranscodeFilesUploaded));
+            $message = "Count failed uploads:       {$this->countUploadsFailed}";
+            $this->countUploadsFailed ? $this->getLogger()->error($message) : $this->getLogger()->notice($message);
+            $this->getLogger()->notice(sprintf("Data transferred:           %s", $this->byteFormat::bytesToString($this->countBytesUploaded)));
+        } else {
+            $this->getLogger()->notice("Upload counts available in worker logs above");
+        }
         if (!$this->quiet) {
             $this->getLogger()->notice(sprintf("Storage before transfer:    %s", $this->byteFormat::bytesToString($storageBeforeTransfer)));
             $this->getLogger()->notice(sprintf("Storage after transfer:     %s", $this->byteFormat::bytesToString($storageAfterTransfer)));
         }
-        $this->getLogger()->notice(sprintf("Storage files in S3:        %d", $countFilesInS3));
-        $countNotInS3 = $countAll - $countFilesInS3;
-        $this->getLogger()->log($countNotInS3 ? Logger::WARNING : Logger::NOTICE, sprintf("Storage files not in S3:    %d", $countNotInS3));
+        if ($this->workerCount <= 1) {
+            $this->getLogger()->notice(sprintf("Storage files in S3:        %d", $countFilesInS3));
+            $countNotInS3 = $countAll - $countFilesInS3;
+            $this->getLogger()->log($countNotInS3 ? Logger::WARNING : Logger::NOTICE, sprintf("Storage files not in S3:    %d", $countNotInS3));
+        }
         if (!$this->quiet) {
             $this->getLogger()->log(count($remainingFiles) ? Logger::WARNING : Logger::NOTICE, sprintf("Files in local storage but not in S3: %d", count($remainingFiles)));
             foreach ($remainingFiles as $remainingFile) {
