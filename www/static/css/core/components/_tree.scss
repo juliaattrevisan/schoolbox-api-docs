@@ -164,10 +164,22 @@ ul.jstree-default {
         .meta-preview {
             @extend %browser-icon-colors;
 
+            > .resource-browser-preview-link {
+                color: inherit;
+                float: left;
+                margin: -0.5rem 1rem 0 -1rem;
+                padding: 0.5rem 0 0 1rem;
+                text-decoration: none;
+            }
+
             > .resource-browser-preview-icon {
                 float: left;
                 margin: -0.5rem 1rem 0 -1rem;
                 padding: 0.5rem 0 0 1rem;
+            }
+
+            > .resource-browser-preview-link > .resource-browser-preview-icon {
+                display: block;
             }
         }
 

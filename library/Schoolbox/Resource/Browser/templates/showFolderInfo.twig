@@ -23,7 +23,7 @@
 <div class="row">
     <div class="card small-12 column meta-preview">
         {% if hasHomepage %}
-            <a title="View Homepage - {{ folder.name }}" href="/homepage/{{ folder.id }}">
+            <a class="resource-browser-preview-link" title="View Homepage - {{ folder.name }}" href="/homepage/{{ folder.id }}">
         {% endif %}
         {% if folder.hasCoverImage ?? false %}
             <img class="folder-cover" src="/storage/image.php?hash={{ folder.coverImage.hash }}&size=square64" alt="{{ folder.name }}" {{ colouring }} />
