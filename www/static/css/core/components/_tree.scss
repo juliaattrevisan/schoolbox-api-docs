@@ -47,7 +47,7 @@ $tree-favorite-icon-color: darkorange;
         color: $tree-favorite-icon-color;
     }
 
-    sbx-icon.icon-favourite {
+    sbx-icon[name="favourite"] {
         color: $tree-favorite-icon-color;
     }
 }
