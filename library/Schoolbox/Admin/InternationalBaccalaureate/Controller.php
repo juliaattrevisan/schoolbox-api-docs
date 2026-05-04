@@ -287,22 +287,7 @@ class Controller extends ConfigController
 
         $db = $this->groupSubjectLanguageMapper->getDatabase();
 
-        // Single query: per-code distinct student counts
-        $countByCode = [];
-        $codePlaceholders = implode(',', array_fill(0, count($allUniqueCodes), '?'));
-        $stmt = $db->prepare(
-            "SELECT sc.code, COUNT(DISTINCT scu.external_id) AS cnt
-             FROM sis_class_user scu
-             INNER JOIN sis_class sc ON scu.class_id = sc.id
-             WHERE sc.code IN ($codePlaceholders)
-             GROUP BY sc.code"
-        );
-        $stmt->execute($allUniqueCodes);
-        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-            $countByCode[$row['code']] = (int) $row['cnt'];
-        }
-
-        // Single query: per-subject distinct totals via inline code-to-subject mapping
+        // Query 1: per-subject distinct student totals via code-to-subject mapping
         $totalBySubjectId = array_fill_keys($groupSubjectIds, 0);
         $unionParts = [];
         $unionParams = [];
@@ -327,15 +312,52 @@ class Controller extends ConfigController
             $totalBySubjectId[(int) $row['gid']] = (int) $row['cnt'];
         }
 
+        // Query 2: per-(subject, language) distinct student counts to avoid over-counting
+        // students enrolled in multiple class codes for the same language.
+        $languageCountBySubjectId = [];
+        $languageUnionParts = [];
+        $languageUnionParams = [];
+        $seenLanguageCodeMappings = [];
+        foreach ($subjectLanguageData as $gsId => $languages) {
+            foreach ($languages as $language) {
+                foreach ($language['codes'] as $code) {
+                    $mappingKey = $gsId . ':' . $language['languageId'] . ':' . $code;
+                    if (isset($seenLanguageCodeMappings[$mappingKey])) {
+                        continue;
+                    }
+                    $seenLanguageCodeMappings[$mappingKey] = true;
+                    $languageUnionParts[] = 'SELECT ? AS gid, ? AS language_id, ? AS code';
+                    $languageUnionParams[] = $gsId;
+                    $languageUnionParams[] = $language['languageId'];
+                    $languageUnionParams[] = $code;
+                }
+            }
+        }
+
+        if ($languageUnionParts !== []) {
+            $languageUnionSql = implode(' UNION ALL ', $languageUnionParts);
+            $stmt = $db->prepare(
+                "SELECT cl.gid, cl.language_id, COUNT(DISTINCT scu.external_id) AS cnt
+                 FROM sis_class_user scu
+                 INNER JOIN sis_class sc ON scu.class_id = sc.id
+                 INNER JOIN ($languageUnionSql) cl ON sc.code = cl.code
+                 GROUP BY cl.gid, cl.language_id"
+            );
+            $stmt->execute($languageUnionParams);
+            while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+                $languageCountBySubjectId[(int) $row['gid']][(int) $row['language_id']] = (int) $row['cnt'];
+            }
+        }
+
         // Build response
         $results = [];
         foreach ($groupSubjectIds as $gsId) {
             $byLanguage = [];
             foreach ($subjectLanguageData[$gsId] as $language) {
-                $langCount = (int) array_sum(
-                    array_map(fn(string $code) => $countByCode[$code] ?? 0, $language['codes'])
-                );
-                $byLanguage[] = ['languageId' => $language['languageId'], 'count' => $langCount];
+                $byLanguage[] = [
+                    'languageId' => $language['languageId'],
+                    'count' => $languageCountBySubjectId[$gsId][$language['languageId']] ?? 0,
+                ];
             }
             $results[] = [
                 'groupSubjectId' => $gsId,
