@@ -29,8 +29,12 @@ class Cms extends Base
 
     private const string TABLE_FOLDER = 'folder';
 
+    // cache this, so we don't keep needing to re create this connection for every pad we want to delete
     private ?EtherpadClient $etherpadClient = null;
 
+    /**
+     * @inheritDoc
+     */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
@@ -45,11 +49,17 @@ class Cms extends Base
         parent::__construct($log, $perform, $database, $lock, $config, $endTime, $retentionPeriod, $chunkLoops, $chunkSize);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getRetentionLabel(): string
     {
         return 'Resources (CMS) Retention';
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getStrategyName(): string
     {
         return ValidStrats::CMS;
