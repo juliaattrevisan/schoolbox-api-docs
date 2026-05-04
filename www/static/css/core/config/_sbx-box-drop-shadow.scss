@@ -22,9 +22,13 @@ body.sbx-body {
         box-shadow: var(--sbx-config-box-drop-shadow);
     }
 
-    // Undo unintended shadows on some elements
+    // Undo unintended shadows on some elements, typically when the elements are
+    // inside an element that already has a shadow
+    .island section,
     .island section section,
-    #permissions .scrollable {
+    #permissions .scrollable,
+    .content-overlay .empty-state-flex-centered,
+    .off-canvas-list section {
         box-shadow: none;
     }
 
