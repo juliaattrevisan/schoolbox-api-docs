@@ -19,6 +19,9 @@ interface Props {
     rubricMarkedGrid: RubricMarkedGrid | null;
     selfAssessmentFeedback: RubricMarkedGrid | null;
     assessmentMarkScheme: MarkScheme;
+    /**
+     * The ID of the participant being assessed, or null if blind marking
+     */
     participantId: UserAuthor["id"] | null;
     /**
      * Whether to show the totals at the bottom of overall rubric

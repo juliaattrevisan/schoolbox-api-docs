@@ -1,47 +1,10 @@
 
-<input id="{{ inputId }}"
-       name="{{ formField }}[descriptors][{{ descriptor.id }}][selected]"
-       value="1"
-       type="checkbox"
-       data-value="{{ descriptor.maxValue }}"
-       data-rubric="{{ rubricGrid.assessment.id }}"
-       data-rubric-group="{{ groupUsage.capability.id }}"
-       data-rubric-descriptor="{{ descriptor.id }}"
-       data-rubric-indicator="{{ indicatorId }}"
-       {% if isDescriptorSelected %}checked="checked"{% endif %}
-/>
-
-{# Set up self-assessment student choice tooltip #}
-{% if selfAssessmentFeedback and selfAssessmentIndicatorMark and selfAssessmentFeedback.isSelfGrading %}
-    {% set tooltip = '(' ~ selfAssessmentIndicatorMark.value ~ ') ' ~ locale.selfAssessment.proper %}
-{% else %}
-    {% set tooltip = locale.selfReflection.proper %}
-{% endif %}
-
 <label for="{{ inputId }}">
-    <span class="rb-description markdown">
-        {# Self assessment student icon #}
-        {% if selfAssessmentIndicatorMark and selfAssessmentIndicatorMark.descriptor.id == descriptor.id %}
-            {% if blindMode %}
-                <p class="rb-self-reflection-choice blind-mode" title="{{ tooltip }} choice"></p>
-            {% else %}
-                {% include 'include/portrait.twig' with {
-                    user: learner,
-                    render: 'tiny',
-                    class: 'rb-self-reflection-choice',
-                    description: tooltip ~ ' choice'
-                } only %}
-            {% endif %}
-        {% endif %}
-
-        {{- descriptor.description | markdown -}}
-    </span>
-
     {% set descriptorHasMarkRange = rubricGrid.assessment.useMarkRange and descriptor.hasRange %}
 
     {# Just show a text value if the descriptor is not selected #}
     {% if descriptor.hasValue and (showDescriptorValue ?? true) %}
-        <span class="rb-value">
+        <span class="rb-value {% if not descriptorHasMarkRange %}used {% elseif isDescriptorSelected %}hide{% endif %}">
             {% if descriptorHasMarkRange %}
                 {{ descriptor.retrieveLeftValue }}–{{ descriptor.retrieveRightValue }}
             {% else %}

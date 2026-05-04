@@ -12,7 +12,7 @@ interface Props {
     descriptor: RubricGridDescriptor;
     selfAssessmentIndicatorMark: RubricMarkedGridIndicator | null;
     level: RubricGridLevel;
-    participantId: UserAuthor["id"];
+    participantId: UserAuthor["id"] | null;
 }
 const props = defineProps<Props>();
 const indicatorMark = defineModel<RubricMarkedGridIndicator>("indicatorMark", { required: true });
@@ -26,6 +26,18 @@ const isDescriptorSelected = window.Vue.computed({
     set: (value: boolean) => {
         indicatorMark.value.descriptorId = value ? props.descriptor.id : null;
     },
+});
+
+const selfAssessmentTooltip = window.Vue.computed(() => {
+    if (
+        isSelfGrading &&
+        props.selfAssessmentIndicatorMark &&
+        props.selfAssessmentIndicatorMark.descriptorId === props.descriptor.id
+    ) {
+        return `(${props.selfAssessmentIndicatorMark.humanReadableMark}) ${locale.selfAssessment.proper()} choice`;
+    }
+
+    return `${locale.selfReflection.proper()} choice`;
 });
 </script>
 
@@ -53,21 +65,27 @@ const isDescriptorSelected = window.Vue.computed({
 
             <span class="rb-description markdown">
                 <!-- Self-Assessment  -->
-                <user-photo
+                <template
                     v-if="
                         props.selfAssessmentIndicatorMark &&
-                        props.selfAssessmentIndicatorMark.descriptorId === props.descriptor.id &&
-                        props.participantId !== null
+                        props.selfAssessmentIndicatorMark.descriptorId === props.descriptor.id
                     "
-                    :user-id="props.participantId"
-                    class="rb-self-reflection-choice"
-                    render="tiny"
-                    :description="
-                        isSelfGrading
-                            ? `(${props.selfAssessmentIndicatorMark.humanReadableMark}) ${locale.selfAssessment.proper()} choice`
-                            : `${locale.selfReflection.proper()} choice`
-                    "
-                />
+                >
+                    <p
+                        v-if="props.participantId === null"
+                        class="rb-self-reflection-choice blind-mode"
+                        :title="selfAssessmentTooltip"
+                    >
+                        <!-- blind mode-->
+                    </p>
+                    <user-photo
+                        v-else
+                        :user-id="props.participantId"
+                        class="rb-self-reflection-choice"
+                        render="tiny"
+                        :description="selfAssessmentTooltip"
+                    />
+                </template>
 
                 <!-- TODO: should be scrubbed (markdown) and output as html -->
                 {{ props.descriptor.description?.trim() }}

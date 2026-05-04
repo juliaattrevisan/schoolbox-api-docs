@@ -13,7 +13,7 @@ interface Props {
     indicatorMark: RubricMarkedGridIndicator | null;
     selfAssessmentIndicatorMark: RubricMarkedGridIndicator | null;
     levels: RubricGridLevel[];
-    participantId: UserAuthor["id"];
+    participantId: UserAuthor["id"] | null;
 }
 const props = defineProps<Props>();
 

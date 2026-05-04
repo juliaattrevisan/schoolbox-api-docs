@@ -27,7 +27,7 @@
             template: {{ markScheme.template|json_encode }},
             context: {{ markScheme.generateContext|json_encode }}
         }"
-        :participant-id="{{ learner.id ?? 'null' }}"
+        :participant-id="{{ not blindMode and learner.id ? learner.id : 'null' }}"
         {# TODO: these are signs of likely permission issues #}
         {% if showRubricTotal ?? false %}show-rubric-total{% endif %}
         {% if showGroupTotal ?? false %}show-group-total{% endif %}

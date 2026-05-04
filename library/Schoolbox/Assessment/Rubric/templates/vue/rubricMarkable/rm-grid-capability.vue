@@ -22,7 +22,7 @@ interface Props {
     selfAssessmentCapabilityMark: RubricMarkedGridCapability | null;
     capabilityMarkScheme: CapabilityMarkScheme;
     levels: RubricGridLevel[];
-    participantId: UserAuthor["id"];
+    participantId: UserAuthor["id"] | null;
     showSummaryCapability: boolean;
 }
 const props = defineProps<Props>();
