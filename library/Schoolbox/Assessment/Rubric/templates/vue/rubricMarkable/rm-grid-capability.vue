@@ -183,7 +183,7 @@ const derivedCapabilityMark = window.Vue.computed(() => {
     const { value, humanReadableMark } = applyMarkScheme(scaledMark);
 
     return {
-        scaled: scaledMark,
+        scaledMark,
         value: value satisfies RubricMarkedGridCapability["value"],
         humanReadableMark: humanReadableMark satisfies RubricMarkedGridCapability["humanReadableMark"],
     };
@@ -234,18 +234,30 @@ const showAssignFromButton = window.Vue.computed<boolean>(() => {
 });
 
 /**
+ * Whether this capability mark has been manually "customised".
+ * When customised, changing the underlying descriptor selection will not change the capability mark.
+ */
+const isCustomised = window.Vue.ref<boolean>(false);
+
+/**
  * Set the capability mark to the derived value based on the indicators
  */
 function useDerivedMark(): void {
     capabilityMark.value.value = derivedCapabilityMark.value.value;
+    capabilityMark.value.scaledMark = derivedCapabilityMark.value.scaledMark;
     capabilityMark.value.humanReadableMark = derivedCapabilityMark.value.humanReadableMark;
 
     // once you've clicked this button, the mark is no longer treated as customised
-    // and should update automatically with indicator changes
-    // TODO: set data-customised to false
+    // and should update automatically with indicator changes again
+    isCustomised.value = false;
 }
 
-// TODO data-customised logic
+window.Vue.onMounted(() => {
+    // Track the initial customised state based on if the actual scaled mark differs from the derived one on page load
+    if (capabilityMark.value.scaledMark !== derivedCapabilityMark.value.scaledMark) {
+        isCustomised.value = true;
+    }
+});
 </script>
 
 <template>
@@ -275,8 +287,6 @@ function useDerivedMark(): void {
         <th class="rb-group-summary" :colspan="props.levels.length + 1 /* descriptors + indicator column */">
             <!-- TODO: this span wrapper is probably unnecessary and solely for the old data attrs -->
             <!-- TODO: data-group-summary="{{ rubricId }}-{{ capabilityId }}" -->
-            <!-- TODO: data-initial-configured-mark="{{ capabilityMark ? capabilityMark.value : null }}" -->
-            <!-- TODO: data-scaled-mark="{{ capabilityScaledMark }}" -->
             <!-- TODO: data-max="{{ capabilityMaxValue }}" -->
             <!-- TODO: data-row-max-sum="{{ capabilityMaxFromIndicators }}" -->
             <!-- TODO: data-group-id="{{ capabilityId }}" -->
@@ -311,7 +321,7 @@ function useDerivedMark(): void {
             >
                 <!-- avoid showing "assign null from ...", only show if there's a meaningful value -->
                 <!-- TODO: confirm if this works, otherwise (hasSelectedDescriptor && hasSelectedValuedDescriptor && capabilityHasValuedDescriptors) is the old logic -->
-                <template v-if="derivedCapabilityMark.scaled !== null">
+                <template v-if="derivedCapabilityMark.scaledMark !== null">
                     Assign
                     <!-- TODO: data-group-descriptor-sum -->
                     <span class="descriptor-sum">{{ derivedCapabilityMark.value }}</span>

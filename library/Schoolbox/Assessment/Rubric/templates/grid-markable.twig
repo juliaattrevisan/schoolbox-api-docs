@@ -263,30 +263,6 @@
         // initialise dynamic mark display
         $rb.dynagrade(dynagrade);
 
-        /* Initially set scaled marks for everything
-         */
-        $('[data-group-summary]').each(function(index, element) {
-            let groupIdentifier = $(element).attr('data-group-summary');
-            let groupRows = $('[data-group="' + groupIdentifier + '"]');
-
-            if (groupRows.length) {
-                let descriptorCheckboxes = groupRows.find('input');
-                let scaledGroupMark = scale($(element), summateDescriptors(descriptorCheckboxes));
-
-                // The raw mark value that should correlate to the initial human-readable value in the <input>
-                // If this doesn't match scaledGroupMark (the descriptors), then treat it as customised
-                let initialConfiguredMark = scale($(element), parseFloat($(element).attr('data-initial-configured-mark')));
-                if (isNaN(initialConfiguredMark)) { initialConfiguredMark = null; }
-
-                if (initialConfiguredMark !== scaledGroupMark) {
-                    $(element).attr('data-customised', true);
-                    $(element).attr('data-scaled-mark', initialConfiguredMark);
-                } else {
-                    $(element).attr('data-scaled-mark', scaledGroupMark);
-                }
-            }
-        });
-
         disableEnableAssignFromDescs();
 
         // Update the per-capability and overall marks when descriptor selection is changed

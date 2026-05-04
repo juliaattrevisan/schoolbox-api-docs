@@ -85,6 +85,7 @@ class ModelToArray
             'id' => $capabilityUsage->getCapability()->getId(),
             'humanReadableMark' => $capabilityMark?->getHumanReadableValue(),
             'value' => $capabilityMark?->retrieveHumanReadableValueAsFormInput(),
+            'scaledMark' => $capabilityMark?->calculateScaledMark(),
             'indicators' => $indicators,
         ];
     }

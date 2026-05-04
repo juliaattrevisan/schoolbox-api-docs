@@ -70,6 +70,7 @@ export type RubricMarkedGridCapability = {
     id: RubricGridCapability["id"];
     humanReadableMark: string | null;
     value: string | null; // Form value (capabilityMark.retrieveHumanReadableValueAsFormInput)
+    scaledMark: number | null;
     indicators: RubricMarkedGridIndicator[];
 };
 
