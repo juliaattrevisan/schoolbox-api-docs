@@ -188,6 +188,15 @@ class Cms extends Base
         return true;
     }
 
+    /**
+     * Load soft-deleted CMS folder ids that are old enough and safe to hard-delete.
+     *
+     * A retained folder is not safe while it still has active direct children,
+     * because deleting it would also remove children that have not been
+     * soft-deleted.
+     *
+     * @return array<int, array{id: int|string}>
+     */
     protected function getIdsToDelete(): array
     {
         $this->log->info('Deleting Resources (CMS) folders older than ' . $this->calculateDate());
@@ -196,6 +205,7 @@ class Cms extends Base
             SELECT id
             FROM " . self::TABLE_FOLDER . "
             WHERE deleted_at IS NOT NULL AND deleted_at < :old
+                -- Keep active child folders in place; their parent can be retried after the children are deleted.
                 AND NOT EXISTS (
                     SELECT 1
                     FROM " . self::TABLE_FOLDER . " child
@@ -290,6 +300,12 @@ class Cms extends Base
     }
 
     /**
+     * Expand retained root folders to a leaf-first hard-delete order.
+     *
+     * Only soft-deleted descendants are followed. Active descendants must stay
+     * out of the purge set so CMS retention cannot hard-delete visible child
+     * folders by cascading through a retained parent.
+     *
      * @param array<int, int> $rootFolderIds
      * @return array<int, int>
      */
@@ -348,6 +364,12 @@ class Cms extends Base
     }
 
     /**
+     * Find soft-deleted child folders for the next cascade level.
+     *
+     * The general child lookup intentionally remains broader for callers that
+     * need the full tree, while retention expansion uses this narrower lookup
+     * to avoid active folders.
+     *
      * @param array<int, int> $parentIds
      * @return array<int, int>
      */

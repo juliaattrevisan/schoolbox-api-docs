@@ -26,6 +26,7 @@ class CmsStrategyTest extends TestCase
      * @param array<string, bool> $padDeleteResults
      * @param array<string, int> $redisDeleteCounts
      * @param null|(LoggerInterface&MockObject) $logger
+     * @param null|list<int> $softDeletedFolderIds
      * @return array{strategy: Cms, state: object{
      *     calls: list<string>,
      *     deletedFolderOwnedRowIds: list<int>,
@@ -114,6 +115,15 @@ class CmsStrategyTest extends TestCase
             /** @var null|array<int, true> */
             private ?array $softDeletedFolderIds;
 
+            /**
+             * @param array<int, list<int>> $folderChildren
+             * @param list<int> $blockedFolderIds
+             * @param array<string, array<int, list<int>>> $lookupIds
+             * @param array<int, array<int, array<string, mixed>>> $homepagePadRecords
+             * @param array<string, bool> $padDeleteResults
+             * @param array<string, int> $redisDeleteCounts
+             * @param null|list<int> $softDeletedFolderIds
+             */
             public function __construct(
                 LoggerInterface $logger,
                 bool $perform,
@@ -147,6 +157,11 @@ class CmsStrategyTest extends TestCase
             }
 
             /**
+             * Return only soft-deleted children for tests that need active children excluded.
+             *
+             * When no soft-delete map is supplied, this preserves existing tests
+             * that model all child folders as retention-eligible.
+             *
              * @param array<int, int> $parentIds
              * @return array<int, int>
              */
@@ -519,6 +534,8 @@ class CmsStrategyTest extends TestCase
     }
 
     /**
+     * Call the protected CMS candidate loader so query shape can be asserted.
+     *
      * @return array<int, array{id: int}>
      */
     private function getIdsToDelete(Cms $strategy): array
@@ -753,6 +770,9 @@ class CmsStrategyTest extends TestCase
         ], $state->calls);
     }
 
+    /**
+     * A retained parent must not pull active child folders into the purge set.
+     */
     public function testDeleteChunkDoesNotDeleteActiveChildFolders(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
@@ -772,6 +792,9 @@ class CmsStrategyTest extends TestCase
         $this->assertNotContains(12, $state->deletedFolders);
     }
 
+    /**
+     * Candidate SQL must leave parents alone while they still have active children.
+     */
     public function testGetIdsToDeleteSkipsFoldersWithActiveChildren(): void
     {
         $state = new class {
