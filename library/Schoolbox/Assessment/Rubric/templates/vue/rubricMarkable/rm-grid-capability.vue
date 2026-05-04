@@ -252,9 +252,32 @@ function useDerivedMark(): void {
     isCustomised.value = false;
 }
 
+/**
+ * When an indicator mark is updated, update the capability mark under certain conditions
+ */
+function onIndicatorMarkUpdated(): void {
+    // Figure out if we should update the capability mark, based on the logic in SA-17198
+    // The capability mark should always be kept in sync if:
+    const shouldUpdateCapabilityMark =
+        // - the capability mark is NOT customised
+        !isCustomised.value ||
+        // - or if there are no longer any selected descriptors in the capability (the user *just* deselected all descriptors)
+        !hasSelectedDescriptor.value ||
+        // - or if the capability mark is currently empty (has never been set, or was cleared by the user at some point)
+        capabilityMark.value.value === null ||
+        capabilityMark.value.value.trim() === "";
+
+    if (shouldUpdateCapabilityMark) {
+        useDerivedMark();
+    }
+}
+
 window.Vue.onMounted(() => {
-    // Track the initial customised state based on if the actual scaled mark differs from the derived one on page load
-    if (capabilityMark.value.scaledMark !== derivedCapabilityMark.value.scaledMark) {
+    // Track the initial customised state based on:
+    // - if the actual scaled mark differs from the derived one on page load
+    // - OR if there's a value, but all the descriptors in this capability are valueless (the only way to get a mark is to manually set it)
+    const initialMarkDiffers = capabilityMark.value.scaledMark !== derivedCapabilityMark.value.scaledMark;
+    if (initialMarkDiffers || !capabilityHasValuedDescriptors.value) {
         isCustomised.value = true;
     }
 });
@@ -281,6 +304,7 @@ window.Vue.onMounted(() => {
         :self-assessment-indicator-mark="indicator.selfAssessmentMark"
         :levels="props.levels"
         :participant-id="props.participantId"
+        @indicator-mark-updated="onIndicatorMarkUpdated"
     />
 
     <tr v-if="showSummaryForThisCapability">

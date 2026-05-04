@@ -15,7 +15,14 @@ interface Props {
     participantId: UserAuthor["id"] | null;
 }
 const props = defineProps<Props>();
+const emit = defineEmits<{ (e: "indicatorMarkUpdated"): void }>();
+
 const indicatorMark = defineModel<RubricMarkedGridIndicator>("indicatorMark", { required: true });
+
+window.Vue.watch(
+    () => [indicatorMark.value.value, indicatorMark.value.descriptorId],
+    () => emit("indicatorMarkUpdated"),
+);
 </script>
 
 <template>
