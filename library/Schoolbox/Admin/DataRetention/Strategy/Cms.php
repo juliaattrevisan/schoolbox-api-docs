@@ -286,6 +286,12 @@ class Cms extends Base
     }
 
     /**
+     * Canonicalise ids before building SQL placeholders or delete plans.
+     *
+     * Retention chunks may contain duplicate or string-cast ids from PDO. This
+     * keeps later cascade and blocker checks deterministic, which matters for
+     * predictable logging and leaf-first deletion order.
+     *
      * @param array<int, int|string> $ids
      * @return array<int, int>
      */
@@ -331,6 +337,8 @@ class Cms extends Base
             }
 
             $visited[$folderId] = true;
+
+            // Re-queue the folder after its eligible children so parents are deleted last.
             $pending[] = ['id' => $folderId, 'expanded' => true];
 
             $childFolderIds = array_reverse($this->findSoftDeletedChildFolderIds([$folderId]));
@@ -345,6 +353,12 @@ class Cms extends Base
     }
 
     /**
+     * Clean homepage Etherpad data before folder-owned rows are deleted.
+     *
+     * Etherpad pads are discovered from homepage ids, which are represented by
+     * CMS folder ids. This wrapper keeps that homepage-specific cleanup inside
+     * the same folder purge plan and returns a count for the chunk summary.
+     *
      * @param array<int, int> $folderIds
      */
     protected function cleanupHomepagePadsForFolders(array $folderIds): int
@@ -364,12 +378,12 @@ class Cms extends Base
     }
 
     /**
-     * Find soft-deleted child folders for the next cascade level.
+     * Find every direct child folder for callers that need the actual tree.
      *
-     * The general child lookup intentionally remains broader for callers that
-     * need the full tree, while retention expansion uses this narrower lookup
-     * to avoid active folders.
-     *
+     * This deliberately does not filter by deletion state. Some safety checks
+     * need to know whether active children exist, while the hard-delete cascade
+     * uses findSoftDeletedChildFolderIds() to avoid deleting those active
+     * children.
      * @param array<int, int> $parentIds
      * @return array<int, int>
      */
@@ -392,6 +406,13 @@ class Cms extends Base
     }
 
     /**
+     * Find only child folders that have already been soft-deleted.
+     *
+     * CMS retention must be bottom-up: active children are still valid content,
+     * so they must not be pulled into a hard-delete just because an ancestor is
+     * past retention. This helper is the boundary that enforces that rule during
+     * cascade expansion.
+     *
      * @param array<int, int> $parentIds
      * @return array<int, int>
      */
@@ -414,6 +435,13 @@ class Cms extends Base
     }
 
     /**
+     * Find folders that belong to out-of-scope assessment/course relationships.
+     *
+     * These relations still hold foreign keys into folder, but deleting their
+     * domain data is not part of CMS retention. Detecting them up front lets the
+     * strategy skip the chunk intentionally instead of relying on a database
+     * constraint failure part way through the transaction.
+     *
      * @param array<int, int> $folderIds
      * @return array<int, int>
      */
@@ -452,6 +480,12 @@ class Cms extends Base
     }
 
     /**
+     * Resolve feature-specific row ids owned by the folder purge set.
+     *
+     * The CMS tables use different id and folder column names. Keeping this
+     * lookup explicit at each call site makes the delete order reviewable while
+     * avoiding repetitive placeholder code.
+     *
      * @param array<int, int> $folderIds
      * @return array<int, int>
      */
