@@ -445,6 +445,7 @@ class Migration extends CliTool\App
             } catch (InvalidArgumentException $e) {
                 $this->failedPaths[] = $relativeLocalPath;
                 $this->getLogger()->error("Cannot write file to S3, skipping: '{$e->getMessage()}'");
+                fclose($fp);
                 return false;
             }
         } else {
