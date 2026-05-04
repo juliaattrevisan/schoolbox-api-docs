@@ -89,7 +89,7 @@ HELP;
             exit(1);
         }
 
-        $pads = $this->loadHomepagePads($homepageId);
+        $pads = $this->fetchPads($homepageId);
         $padCount = count($pads);
         $logger->info(sprintf('Found %d active Etherpad pad(s) for homepage %d', $padCount, $homepageId));
 
@@ -116,16 +116,14 @@ HELP;
 
             $logger->info(sprintf('[%d/%d] Processing pad %s', $index + 1, $padCount, $padId));
 
-            if ($dryRun) {
-                $logger->notice(sprintf("Dry-run: would delete Etherpad pad '%s'", $padId));
-            } else {
-                $padDeleted = $this->deleteEtherpadPad($etherpadClient, $padId, $logger);
-                if ($padDeleted) {
-                    $summary['padsDeleted']++;
+            $padDeleted = $this->deleteEtherpadPad($etherpadClient, $padId, $logger);
+            if ($padDeleted) {
+                $summary['padsDeleted']++;
+                if (!$dryRun) {
                     $summary['metaRowsDeleted'] += $this->hardDeletePadMeta($padRecordId);
-                } else {
-                    $summary['padDeleteFailures']++;
                 }
+            } else {
+                $summary['padDeleteFailures']++;
             }
         }
 
@@ -141,9 +139,11 @@ HELP;
     }
 
     /**
+     * Fetch Etherpad's (from the db) associated with the given homepage ID.
+     * @param int $homepageId
      * @return array<int, array<string, mixed>>
      */
-    private function loadHomepagePads(int $homepageId): array
+    private function fetchPads(int $homepageId): array
     {
         $query = "SELECT id, pad_id FROM etherpad_pad WHERE homepage_id = :homepageId AND deleted_at IS NULL";
         $statement = $this->getDatabaseInternal()->prepare($query);
@@ -187,7 +187,11 @@ HELP;
     private function deleteEtherpadPad(EtherpadClient $client, string $padId, LoggerInterface $logger): bool
     {
         try {
-            $result = $client->deletePad($padId);
+            if ($this->perform()) {
+                $result = $client->deletePad($padId);
+            } else {
+                $result = $client->getRevisionsCount($padId);
+            }
         } catch (\Throwable $e) {
             $logger->warning(sprintf("Failed to delete Etherpad pad '%s': %s", $padId, $e->getMessage()));
             return false;
