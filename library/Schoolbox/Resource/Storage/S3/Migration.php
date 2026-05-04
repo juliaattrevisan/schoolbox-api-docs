@@ -259,7 +259,10 @@ class Migration extends CliTool\App
                         $childCountFilesInS3++;
                     }
                 }
-                file_put_contents($tempFile, $childCountFilesInS3);
+                file_put_contents($tempFile, json_encode([
+                    'filesInS3'   => $childCountFilesInS3,
+                    'failedPaths' => $this->failedPaths,
+                ]));
                 $this->getLogger()->notice(sprintf(
                     "Worker %d complete — storage: %d, transcode: %d, data: %s, failed: %d",
                     $workerIndex,
@@ -282,7 +285,9 @@ class Migration extends CliTool\App
             } elseif (pcntl_wifexited($status) && pcntl_wexitstatus($status) !== 0) {
                 $this->getLogger()->error("Worker $workerIndex exited with status " . pcntl_wexitstatus($status));
             }
-            $countFilesInS3 += (int) file_get_contents($tempFiles[$workerIndex]);
+            $result             = json_decode(file_get_contents($tempFiles[$workerIndex]), true) ?? [];
+            $countFilesInS3    += (int) ($result['filesInS3'] ?? 0);
+            $this->failedPaths  = array_merge($this->failedPaths, $result['failedPaths'] ?? []);
             unlink($tempFiles[$workerIndex]);
         }
 
