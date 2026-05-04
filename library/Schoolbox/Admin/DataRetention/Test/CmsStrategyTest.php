@@ -627,7 +627,7 @@ class CmsStrategyTest extends TestCase
      * @return void
      */
     #[DataProvider('providerDeleteChunkHomepageCleanup')]
-    public function testDeleteChunkRunsHomepageCleanup(bool $perform, array $expectedCalls): void
+    public function testDeleteChunkHomepageCleanup(bool $perform, array $expectedCalls): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy([], [], [], [], [], [], $perform);
 
@@ -640,7 +640,7 @@ class CmsStrategyTest extends TestCase
     }
 
     /**
-     * Data provider for testDeleteChunkRunsHomepageCleanup.
+     * Data provider for testDeleteChunkHomepageCleanup.
      *
      * @return array<string, array{bool, list<string>}>
      */
@@ -793,7 +793,7 @@ class CmsStrategyTest extends TestCase
      *
      * @return void
      */
-    public function testCleanupHomepagePadsForFoldersCountsPadsFound(): void
+    public function testCleanupHomepagePad(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
             [],
@@ -828,7 +828,7 @@ class CmsStrategyTest extends TestCase
      *
      * @return void
      */
-    public function testDeleteChunkIncludesEtherpadPadsCountInNotice(): void
+    public function testDeleteChunkLogsEtherpadPads(): void
     {
         $state = new class {
             public array $notices = [];
@@ -875,7 +875,7 @@ class CmsStrategyTest extends TestCase
      *
      * @return void
      */
-    public function testDeleteChunkIncludesHomepageUserAccessCountInNotice(): void
+    public function testDeleteChunkLogsUserAccess(): void
     {
         $state = new class {
             public array $notices = [];
@@ -911,7 +911,7 @@ class CmsStrategyTest extends TestCase
      *
      * @return void
      */
-    public function testDeleteHomepageUserAccessUsesDryRunSelectAndHomepageService(): void
+    public function testDeleteHomepageUserAccessDryRun(): void
     {
         $state = new class {
             public string $preparedSql = '';
@@ -996,7 +996,7 @@ class CmsStrategyTest extends TestCase
      *
      * @return void
      */
-    public function testUsesCmsStrategyNameAndLabel(): void
+    public function testUsesStrategyIdentity(): void
     {
         $strategy = new Cms(
             $this->createMock(LoggerInterface::class),
@@ -1021,7 +1021,7 @@ class CmsStrategyTest extends TestCase
      *
      * @return void
      */
-    public function testDeletesCmsFolderTreeInLeafFirstOrder(): void
+    public function testDeletesFolderTree(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
             [
@@ -1075,7 +1075,7 @@ class CmsStrategyTest extends TestCase
      *
      * @return void
      */
-    public function testDeleteChunkDoesNotDeleteActiveChildFolders(): void
+    public function testDeleteChunkSkipsActiveChildren(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
             [
@@ -1101,7 +1101,7 @@ class CmsStrategyTest extends TestCase
      *
      * @return void
      */
-    public function testExpandFolderCascadeSkipsParentsWithActiveChildren(): void
+    public function testExpandFolderCascadeSkipsActiveParents(): void
     {
         $state = new class {
             public array $warnings = [];
@@ -1155,7 +1155,7 @@ class CmsStrategyTest extends TestCase
      *
      * @return void
      */
-    public function testFindActiveChildFolderIdsReturnsRecursiveDescendants(): void
+    public function testFindActiveChildFolderIds(): void
     {
         ['strategy' => $strategy] = $this->strategy(
             [
@@ -1185,7 +1185,7 @@ class CmsStrategyTest extends TestCase
      *
      * @return void
      */
-    public function testFindSoftDeletedChildFolderIdsReturnsRecursiveDescendants(): void
+    public function testFindSoftDeletedChildFolderIds(): void
     {
         ['strategy' => $strategy] = $this->strategy(
             [
@@ -1212,7 +1212,7 @@ class CmsStrategyTest extends TestCase
      *
      * @return void
      */
-    public function testGetIdsToDeleteSkipsFoldersWithActiveChildren(): void
+    public function testGetIdsToDelete(): void
     {
         $state = new class {
             public string $preparedSql = '';
@@ -1298,7 +1298,7 @@ class CmsStrategyTest extends TestCase
      *
      * @return void
      */
-    public function testSkipsBlockedCmsFolderChunks(): void
+    public function testSkipsBlockedChunks(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy(
             [
