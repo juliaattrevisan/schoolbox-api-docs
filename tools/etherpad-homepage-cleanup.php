@@ -61,7 +61,7 @@ Options:
   --help                   Show this help message
 
 HELP;
-            
+
             exit(0);
         }
 
@@ -78,13 +78,12 @@ HELP;
             exit(1);
         }
 
-        $verbose = (bool)$this->getOpt(self::OPT_LONG_VERBOSE);
         $dryRun = !$this->perform();
 
         $logger->info(sprintf('Starting Etherpad homepage cleanup for homepage %d', $homepageId));
         $logger->info(sprintf('Mode: %s', $dryRun ? 'dry-run' : 'perform'));
 
-        $etherpadClient = $this->createEtherpadClient($logger, $dryRun);
+        $etherpadClient = $this->createEtherpadClient($logger);
         if (!$dryRun && $etherpadClient === null) {
             $logger->error('Etherpad API is not configured; cannot perform deletions.');
             exit(1);
