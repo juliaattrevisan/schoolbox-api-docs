@@ -277,7 +277,9 @@ class Migration extends CliTool\App
 
         foreach ($pids as $workerIndex => $pid) {
             pcntl_waitpid($pid, $status);
-            if (pcntl_wifexited($status) && pcntl_wexitstatus($status) !== 0) {
+            if (pcntl_wifsignaled($status)) {
+                $this->getLogger()->error("Worker $workerIndex killed by signal " . pcntl_wtermsig($status) . ", its chunk may be incomplete");
+            } elseif (pcntl_wifexited($status) && pcntl_wexitstatus($status) !== 0) {
                 $this->getLogger()->error("Worker $workerIndex exited with status " . pcntl_wexitstatus($status));
             }
             $countFilesInS3 += (int) file_get_contents($tempFiles[$workerIndex]);
