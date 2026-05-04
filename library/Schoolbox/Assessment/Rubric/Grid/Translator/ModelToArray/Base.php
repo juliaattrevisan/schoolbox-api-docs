@@ -118,8 +118,8 @@ class Base
                 $rubricGrid->showDescriptorValue() &&
                 $this->showPoints
             ) {
-                $value = $rubricGrid->isUseMarkRange()
-                    ? [ 'left' => $descriptor->getMinValue(), 'right' => $descriptor->getMaxValue() ]
+                $value = $rubricGrid->isUseMarkRange() && $descriptor->hasRange()
+                    ? [ 'left' => $descriptor->retrieveLeftValue(), 'right' => $descriptor->retrieveRightValue() ]
                     : [ 'max' => $descriptor->getMaxValue() ];
             }
 

@@ -11,8 +11,6 @@
  #                              Also depends if this is a self-reflection
  #}
 
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; background: var(--sbx-config-color-body-background, var(--body-background))"><div> {# TODO TEMP #}
-
 {% set showPoints = true %}
 {% set selfAssessmentMarkedGrid = selfAssessmentFeedback ? selfAssessmentFeedback.rubricMarkedGrid : null %}
 {% set markScheme = selfAssess or studentView ? rubricGrid.assessment.markScheme : rubricGrid.assessment.instructorMarkScheme %}
@@ -35,80 +33,12 @@
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricMarkable.js?v={{ config.site_version }}"></script>
 
-</div><div> {# TODO TEMP #}
-
-{% import '@learningMarkScheme/macro/limitDecimal.twig' as limit_decimal %}
-
-{% set formField = 'rubric' %}
 {% set rubricId = 'rb-' ~ rubricGrid.assessment.id %}
 {% set markScheme = selfAssess or studentView ? rubricGrid.assessment.markScheme : rubricGrid.assessment.instructorMarkScheme %}
 {% set markType = markScheme.generateContext %}
-{% set showDescriptorValue = not selfReflect %}
-{% set showGroupTotal = showGroupTotal ? true : false %}
-{% set showRubricTotal = showRubricTotal ? true : false %}
 
-<div class="scrollable">
-    <table class="rb markable" id="{{ rubricId }}">
-        <tbody>
-            {% for groupIndex, groupUsage in rubricGrid.capabilityUsages %}
-                {# Use rowspans when group total is visible, otherwise don't need it
-                 # This is only off when self-reflecting with a grid that doesn't show descriptor points
-                 # and groups - here, it never shows the group subtotal, and rowspan calcs are off
-                 #}
-                {% set capabilityMark = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
-
-                {% for critIndex, critUsage in groupUsage.indicatorUsages %}
-                    {% set indicatorId   = critUsage.indicator.id %}
-                    <tr
-                        data-group="{{ rubricId }}-{{ groupUsage.capability.id }}"
-                        data-capability-id="{{ groupUsage.capability.id }}"
-                        data-indicator-id="{{ indicatorId }}"
-                    >
-                        <th class="rb-criterion-name markdown">{{ critUsage.indicator.name | markdown }}</th>
-
-                        {% set indicatorMark = rubricMarkedGrid
-                            ? rubricMarkedGrid.retrieveIndicatorMark(critUsage)
-                            : null %}
-                        {% set indicatorMarkDescriptor = indicatorMark
-                            ? indicatorMark.descriptor
-                            : null %}
-                        {% set selfAssessmentIndicatorMark = selfAssessmentFeedback
-                            ? selfAssessmentFeedback.rubricMarkedGrid.retrieveIndicatorMark(critUsage)
-                            : null %}
-
-                        {% for levelIndex, level in rubricGrid.levels %}
-
-                            {% set descriptor = critUsage.retrieveDescriptor(levelIndex) %}
-
-                            {% if descriptor %}
-
-                                {% set inputId %}{{ formField }}[{{ indicatorId }}][{{ level.id }}]{% endset %}
-                                {% set isDescriptorSelected = indicatorMarkDescriptor == descriptor %}
-                                {% set isMarkDisplayed      = isDescriptorSelected and rubricGrid.assessment.isFeedbackVisibleToUser(USER) %}
-                                {% set blindMode            = blindMode %}
-
-                                <td>
-                                    {# This container displays rubric levels for the mobile view. #}
-                                    <div class="hide-for-large-up l-pad-m hide-on-print"><p><b>{{ level.name | markdown }}</b></p></div>
-                                    {% include '@rubric/descriptor-markable.twig' %}
-                                </td>
-
-                            {% else %}
-                                <td class="rb-blank hide-for-medium-down">&nbsp;</td>
-                            {% endif %}
-
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
 {# js specific to the rubric we just injected to...wherever we injected it #}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.dynagrade.js?v={{ config.site_version }}"></script>
-
-</div></div> {# TODO TEMP #}
 
 {% autoescape 'js' %}
 <script type="text/javascript">

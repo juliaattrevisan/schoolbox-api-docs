@@ -109,16 +109,15 @@ class ModelToArray
             return [
                 'id' => $indicatorId,
                 'descriptorId' => null,
-                'humanReadableMark' => null,
+                'value' => null,
             ];
         }
 
-        $humanReadableMark = $indicatorMark->getValue();
+        $value = $indicatorMark->getValue();
         $descriptorId = $indicatorMark->getDescriptor()?->getId();
 
         $feedback = $markedGrid->getFeedback();
-        $feedbackAssessable = $feedback->getAssessable();
-        if ($feedbackAssessable instanceof ISelfAssessableFeedback && $feedbackAssessable->isSelfAssessment()) {
+        if ($feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment()) {
             // Self-Assessment:
 
             return [
@@ -127,8 +126,8 @@ class ModelToArray
                 'descriptorId' => $descriptorId,
                 // however, the mark is only shown for self grading
                 // TODO: remove instanceof
-                'humanReadableMark' => ($feedback instanceof DueWorkFeedback && $feedback->isSelfGrading())
-                    ? $humanReadableMark
+                'value' => ($feedback instanceof DueWorkFeedback && $feedback->isSelfGrading())
+                    ? $value
                     : null,
             ];
         }
@@ -141,7 +140,7 @@ class ModelToArray
             return [
                 'id' => $indicatorId,
                 'descriptorId' => null,
-                'humanReadableMark' => null,
+                'value' => null,
             ];
         }
 
@@ -150,11 +149,11 @@ class ModelToArray
             // at this point, you always know which descriptor was selected
             'descriptorId' => $descriptorId,
             // the mark is only shown if the viewer has permission (essentially the same config check in the rubric grid translator)
-            'humanReadableMark' => (
+            'value' => (
                 $indicatorMark->getDescriptor()?->hasValue() &&
                 $markedGrid->getGrid()->showDescriptorValue() &&
                 $this->showPoints
-            ) ? $humanReadableMark : null,
+            ) ? $value : null,
         ];
     }
 }

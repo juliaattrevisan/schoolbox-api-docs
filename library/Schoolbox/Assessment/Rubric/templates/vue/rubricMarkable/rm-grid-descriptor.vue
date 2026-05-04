@@ -19,14 +19,10 @@ const indicatorMark = defineModel<RubricMarkedGridIndicator>("indicatorMark", { 
 
 const componentId = window.Vue.useId();
 
-const isSelfGrading = false; // TODO: selfAssessmentFeedback.isSelfGrading
-
-const isDescriptorSelected = window.Vue.computed({
-    get: () => indicatorMark.value.descriptorId === props.descriptor.id,
-    set: (value: boolean) => {
-        indicatorMark.value.descriptorId = value ? props.descriptor.id : null;
-    },
-});
+const isSelfGrading = false; // TODO: from 'selfAssessmentFeedback.isSelfGrading'
+const isSelfReflect = false; // TODO: from 'showDescriptorValue'
+const isSelfAssess = false; // TODO: from 'selfAssess'
+const isStudentView = false; // TODO: from 'studentView'
 
 const selfAssessmentTooltip = window.Vue.computed(() => {
     if (
@@ -34,13 +30,80 @@ const selfAssessmentTooltip = window.Vue.computed(() => {
         props.selfAssessmentIndicatorMark &&
         props.selfAssessmentIndicatorMark.descriptorId === props.descriptor.id
     ) {
-        return `(${props.selfAssessmentIndicatorMark.humanReadableMark}) ${locale.selfAssessment.proper()} choice`;
+        return `(${props.selfAssessmentIndicatorMark.value}) ${locale.selfAssessment.proper()} choice`;
     }
 
     return `${locale.selfReflection.proper()} choice`;
 });
 
+const markRangeValues = window.Vue.computed<number[]>(() => {
+    if (props.descriptor.value === null) {
+        return [];
+    }
+
+    if ("max" in props.descriptor.value) {
+        return [props.descriptor.value.max];
+    }
+
+    let { left, right } = props.descriptor.value;
+    const inverted = left > right;
+    if (inverted) {
+        [left, right] = [right, left];
+    }
+
+    const range = [];
+    for (let i = left; i <= right; i++) {
+        range.push(i);
+    }
+    return inverted ? range.reverse() : range;
+});
+
 const hasMarkRange = window.Vue.computed(() => props.descriptor.value !== null && "left" in props.descriptor.value);
+
+/**
+ * Internal cache of the selected value for this descriptor
+ * default to the max value (unless it can be derived from the indicator mark, see onMounted)
+ */
+const descriptorValue = window.Vue.ref<number>(
+    props.descriptor.value !== null
+        ? "max" in props.descriptor.value
+            ? props.descriptor.value.max
+            : Math.max(props.descriptor.value.left, props.descriptor.value.right)
+        : 0,
+);
+
+const isDescriptorSelected = window.Vue.computed({
+    get: () => indicatorMark.value.descriptorId === props.descriptor.id,
+    set: (value: boolean) => {
+        if (!value) {
+            // deselected; so clear the descriptorId and value
+
+            // shouldn't have a race condition as the setter only runs
+            // when this specific component was responsible for the change
+            indicatorMark.value.descriptorId = null;
+            indicatorMark.value.value = null;
+            return;
+        }
+
+        // selected; update the indicator mark
+        indicatorMark.value.descriptorId = props.descriptor.id;
+        indicatorMark.value.value = descriptorValue.value;
+    },
+});
+
+window.Vue.onMounted(() => {
+    /* if initially selected, then the indicator mark is responsible for the value */
+    if (isDescriptorSelected.value && indicatorMark.value.value !== null) {
+        descriptorValue.value = indicatorMark.value.value;
+    }
+
+    /* and reflect further updates to descriptorValue (from the range dropdown) back to the indicator mark */
+    window.Vue.watch(descriptorValue, (newValue) => {
+        if (isDescriptorSelected.value) {
+            indicatorMark.value.value = newValue;
+        }
+    });
+});
 </script>
 
 <template>
@@ -94,9 +157,8 @@ const hasMarkRange = window.Vue.computed(() => props.descriptor.value !== null &
             </span>
 
             <!-- Just show a text value if the descriptor is not selected -->
-            <!-- TODO: hide for self review (the only condition where showDescriptorValue is false) -->
             <span
-                v-if="props.descriptor.value !== null && (!hasMarkRange || !isDescriptorSelected)"
+                v-if="props.descriptor.value !== null && (!hasMarkRange || !isDescriptorSelected) && !isSelfReflect"
                 class="rb-value"
                 :class="{ used: !hasMarkRange }"
             >
@@ -109,5 +171,20 @@ const hasMarkRange = window.Vue.computed(() => props.descriptor.value !== null &
                 </template>
             </span>
         </label>
+
+        <!-- Render a dropdown to select a value from the range -->
+        <!-- TODO: this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox -->
+        <!-- TODO: data-rubric="{{ rubricGrid.id }}" -->
+        <!-- TODO: data-rubric-group="{{ groupUsage.capability.id }}" -->
+        <!-- TODO: data-rubric-descriptor="{{ descriptor.id }}" -->
+        <!-- TODO: data-rubric-indicator="{{ indicatorId }}" -->
+        <select
+            v-if="isDescriptorSelected && hasMarkRange && (!isStudentView || isSelfAssess)"
+            :id="`descriptor-${props.descriptor.id}-rangeDropdown-${componentId}`"
+            v-model="descriptorValue"
+            :class="{ used: hasMarkRange }"
+        >
+            <option v-for="option in markRangeValues" :key="option" :value="option">{{ option }}</option>
+        </select>
     </td>
 </template>

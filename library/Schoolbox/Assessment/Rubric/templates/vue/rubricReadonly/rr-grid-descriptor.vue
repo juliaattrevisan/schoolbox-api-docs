@@ -48,7 +48,7 @@ const isDescriptorSelected = window.Vue.computed(
                     render="tiny"
                     :description="
                         isSelfGrading
-                            ? `(${props.selfAssessmentIndicatorMark.humanReadableMark}) ${locale.selfAssessment.proper()} choice`
+                            ? `(${props.selfAssessmentIndicatorMark.value}) ${locale.selfAssessment.proper()} choice`
                             : `${locale.selfReflection.proper()} choice`
                     "
                 />
@@ -61,14 +61,10 @@ const isDescriptorSelected = window.Vue.computed(
                 <template v-if="'left' in props.descriptor.value">
                     <!-- show indicator mark if available -->
                     <span
-                        v-if="
-                            isDescriptorSelected &&
-                            props.indicatorMark &&
-                            props.indicatorMark.humanReadableMark !== null
-                        "
+                        v-if="isDescriptorSelected && props.indicatorMark && props.indicatorMark.value !== null"
                         class="range-selection-value"
                     >
-                        {{ props.indicatorMark.humanReadableMark }}
+                        {{ props.indicatorMark.value }}
                     </span>
 
                     <!-- mark range -->

@@ -22,7 +22,7 @@ const indicatorMark = window.Vue.ref<RubricMarkedGridIndicator>(
     props.indicatorMark ?? {
         id: props.indicator.id,
         descriptorId: null,
-        humanReadableMark: null,
+        value: null,
     },
 );
 </script>
