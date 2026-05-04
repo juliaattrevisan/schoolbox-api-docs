@@ -36,23 +36,6 @@ class Cms extends Base
     /**
      * @inheritDoc
      */
-    public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        IConnector $database,
-        LockInterface $lock,
-        IConfigLoader $config,
-        int $endTime,
-        RetentionPeriod $retentionPeriod,
-        int $chunkLoops = self::DEFAULT_CHUNK_LOOPS,
-        int $chunkSize = self::DEFAULT_CHUNK_SIZE,
-    ) {
-        parent::__construct($log, $perform, $database, $lock, $config, $endTime, $retentionPeriod, $chunkLoops, $chunkSize);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getRetentionLabel(): string
     {
         return 'Resources (CMS) Retention';
