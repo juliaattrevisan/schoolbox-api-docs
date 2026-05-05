@@ -18,6 +18,7 @@ use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Error;
 use Schoolbox\Error\Mapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\RubricTrait;
 use Schoolbox\Learning\Assessment\DueWork\Decorator\CourseManagedDecorator as DueWorkCourseManagedDecorator;
 use Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator as DueWorkDecorator;
 use Schoolbox\Learning\Assessment\DueWork\Decorator\DueWorkTrait;
@@ -64,6 +65,7 @@ class Factory
     use LtiTrait;
     use LessonPlanTrait;
     use ReportingTrait;
+    use RubricTrait;
 
     /**
      * Unique identifier
@@ -571,10 +573,6 @@ class Factory
                     $this->getInstructorMarkType(),
                     $this->getGradingScheme(),
                     $this->getInstructorGradingScheme(),
-                    $this->getUseRubric(),
-                    $this->getCapabilityMarkType(),
-                    $this->getCapabilityGradeGroup(),
-                    $this->getUseMarkRange(),
                     $this->getMaxMark(),
                     $this->getInstructorMaxMark(),
                     $this->getRubricData(),
@@ -594,10 +592,6 @@ class Factory
                     $this->getInstructorMarkType(),
                     $this->getGradingScheme(),
                     $this->getInstructorGradingScheme(),
-                    $this->getUseRubric(),
-                    $this->getCapabilityMarkType(),
-                    $this->getCapabilityGradeGroup(),
-                    $this->getUseMarkRange(),
                     $this->getMaxMark(),
                     $this->getInstructorMaxMark(),
                     $this->getRubricData(),
