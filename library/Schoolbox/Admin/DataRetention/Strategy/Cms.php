@@ -869,6 +869,12 @@ class Cms extends Base
     {
         try {
             $client = $this->getEtherpadClient();
+
+            if ($client === false) {
+                $this->log->warning('Cannot delete Etherpad pad because API client is not configured');
+                return false;
+            }
+
             if ($this->perform) {
                 $response = $client->deletePad($padId);
             } else {
