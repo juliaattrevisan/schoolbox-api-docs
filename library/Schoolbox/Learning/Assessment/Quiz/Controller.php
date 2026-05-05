@@ -21,6 +21,7 @@ use PDOException;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -87,6 +88,8 @@ class Controller extends Assessment\Controller
      * @param Access $access
      * @param Transactor $transactor
      * @param BreadcrumbFactory $bakery
+     * @param \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper
+     * @param RubricDataSource $rubricMapper
      * @param QuizMapper $quizMapper
      * @param QuizSectionMapper $quizSectionMapper
      * @param QuizAttemptMapper $quizAttemptMapper
@@ -125,6 +128,8 @@ class Controller extends Assessment\Controller
         Access $access,
         Transactor $transactor,
         BreadcrumbFactory $bakery,
+        protected \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper,
+        protected \Schoolbox\Assessment\Rubric\DataModel\DataSource $rubricMapper,
         private QuizMapper $quizMapper,
         private QuizSectionMapper $quizSectionMapper,
         private QuizAttemptMapper $quizAttemptMapper,
@@ -163,6 +168,8 @@ class Controller extends Assessment\Controller
             $access,
             $transactor,
             $bakery,
+            $resultSetMapper,
+            $rubricMapper,
             $termMapper,
             $participantDataSource,
             $courseSpecificationMapper,

@@ -12,6 +12,7 @@ use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Cyberhound\Url\Translator;
 use Schoolbox\Error;
 use Schoolbox\Error\Mapper;
@@ -71,6 +72,8 @@ class Controller extends Assessment\Controller
      * @param Access $access
      * @param Transactor $transactor
      * @param Factory $bakery
+     * @param \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper
+     * @param RubricDataSource $rubricMapper
      * @param TaskResponseDataSource $taskResponseDataSource
      * @param Term\Mapper $termMapper
      * @param DataSource $participantDataSource
@@ -99,6 +102,8 @@ class Controller extends Assessment\Controller
         Access $access,
         Transactor $transactor,
         Assessment\Breadcrumb\Factory $bakery,
+        protected \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper,
+        protected \Schoolbox\Assessment\Rubric\DataModel\DataSource $rubricMapper,
         TaskResponseDataSource $taskResponseDataSource,
         Term\Mapper $termMapper,
         Participant\DataSource $participantDataSource,
@@ -127,6 +132,8 @@ class Controller extends Assessment\Controller
             $access,
             $transactor,
             $bakery,
+            $resultSetMapper,
+            $rubricMapper,
             $termMapper,
             $participantDataSource,
             $courseSpecificationMapper,

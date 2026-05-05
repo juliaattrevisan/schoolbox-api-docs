@@ -14,6 +14,7 @@ use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error;
 use Schoolbox\Error\Mapper;
@@ -97,6 +98,8 @@ class Controller extends Assessment\Controller
      * @param Access $access
      * @param Transactor $transactor
      * @param Factory $bakery
+     * @param \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper
+     * @param RubricDataSource $rubricMapper
      * @param Term\Mapper $termMapper
      * @param DataSource $participantDataSource
      * @param CourseSpecificationMapper $courseSpecificationMapper
@@ -130,6 +133,8 @@ class Controller extends Assessment\Controller
         Access $access,
         Transactor $transactor,
         Assessment\Breadcrumb\Factory $bakery,
+        protected \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper,
+        protected \Schoolbox\Assessment\Rubric\DataModel\DataSource $rubricMapper,
         Term\Mapper $termMapper,
         Participant\DataSource $participantDataSource,
         CourseSpecificationMapper $courseSpecificationMapper,
@@ -163,6 +168,8 @@ class Controller extends Assessment\Controller
             $access,
             $transactor,
             $bakery,
+            $resultSetMapper,
+            $rubricMapper,
             $termMapper,
             $participantDataSource,
             $courseSpecificationMapper,

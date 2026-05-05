@@ -726,6 +726,8 @@ class Module extends BaseModule
         $aiLogMapper                = $this->getMapperFactory()->get(AILogMapper::class);
         $dialogAgentDataModelMapper = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class);
         $dialogAgentScenarioMapper  = $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Mapper::class);
+        $rubricResultSetMapper      = $this->getMapperFactory()->get(\Schoolbox\Assessment\Rubric\DataModel\Result\Mapper::class);
+        $rubricMapper               = $this->getMapperFactory()->get(\Schoolbox\Assessment\Rubric\DataModel\DataSource::class);
         $linkedAssessmentsMapper    = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper::class);
         $courseImplementationMapper = $this->getMapperFactory()->get(CourseImplementationMapper::class);
         $unitImplementationMapper   = $this->getMapperFactory()->get(UnitImplementationMapper::class);
@@ -790,8 +792,8 @@ class Module extends BaseModule
                     $this->getAccess(),
                     $transactor,
                     $bakery,
-                    $this->getMapperFactory()->get(RubricDataSource::class),
-                    $this->getMapperFactory()->get(RubricResultSetMapper::class),
+                    $rubricResultSetMapper,
+                    $rubricMapper,
                     $this->injector->get('submissionDataSource'),
                     $participantDataSource,
                     $termMapper,
@@ -844,6 +846,8 @@ class Module extends BaseModule
                     $this->getAccess(),
                     $transactor,
                     $bakery,
+                    $rubricResultSetMapper,
+                    $rubricMapper,
                     $termMapper,
                     $participantDataSource,
                     $courseSpecMapper,
@@ -877,6 +881,8 @@ class Module extends BaseModule
                     $this->getAccess(),
                     $transactor,
                     $bakery,
+                    $rubricResultSetMapper,
+                    $rubricMapper,
                     $this->getMapperFactory()->get(QuizMapper::class),
                     $this->getMapperFactory()->get(QuizSectionMapper::class),
                     $this->getMapperFactory()->get(QuizAttemptMapper::class),
@@ -925,6 +931,8 @@ class Module extends BaseModule
                     $this->getAccess(),
                     $transactor,
                     $bakery,
+                    $rubricResultSetMapper,
+                    $rubricMapper,
                     new TaskResponseDataSource($this->getMapperFactory()->get(TaskResponseMapper::class)),
                     $termMapper,
                     $participantDataSource,
@@ -959,6 +967,8 @@ class Module extends BaseModule
                     $this->getAccess(),
                     $transactor,
                     $bakery,
+                    $rubricResultSetMapper,
+                    $rubricMapper,
                     $termMapper,
                     $participantDataSource,
                     $courseSpecMapper,
@@ -998,6 +1008,8 @@ class Module extends BaseModule
                     $this->getAccess(),
                     $transactor,
                     $bakery,
+                    $rubricResultSetMapper,
+                    $rubricMapper,
                     $termMapper,
                     $participantDataSource,
                     $courseSpecMapper,
@@ -1023,6 +1035,8 @@ class Module extends BaseModule
                     $this->getAccess(),
                     $transactor,
                     $bakery,
+                    $rubricResultSetMapper,
+                    $rubricMapper,
                     $termMapper,
                     $participantDataSource,
                     $courseSpecMapper,
@@ -1059,6 +1073,8 @@ class Module extends BaseModule
                     $this->getAccess(),
                     $transactor,
                     $bakery,
+                    $rubricResultSetMapper,
+                    $rubricMapper,
                     $termMapper,
                     $participantDataSource,
                     $courseSpecMapper,

@@ -14,8 +14,13 @@ use InvalidArgumentException;
 use LogicException;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\External\User as ExternalUser;
+use Schoolbox\Filter\CompositeFactoryFactory;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\GenericCollection;
 use Schoolbox\Filter;
 use Schoolbox\L10n\RosettaStone;
@@ -23,8 +28,10 @@ use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
@@ -57,6 +64,32 @@ class Controller extends Assessment\Controller
     /**
      * Controller constructor.
      *
+     * @param UserMapper $userMapper
+     * @param ErrorMapper $errorMapper
+     * @param MapperProxy $assessmentMapper
+     * @param WorkTypeMapper $workTypeMapper
+     * @param Access $access
+     * @param Transactor $transactor
+     * @param BreadcrumbFactory $bakery
+     * @param \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper
+     * @param RubricDataSource $rubricMapper
+     * @param Mapper $termMapper
+     * @param DataSource $participantDataSource
+     * @param CourseSpecificationMapper $courseSpecificationMapper
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @param RosettaStone $rosettaStone
+     * @param Replicator $replicator
+     * @param LatestViewMapper $latestViewMapper
+     * @param ResultCache\Mapper $projectResultCacheMapper
+     * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param \Schoolbox\Admin\DialogAgent\Scenario\Mapper $dialogAgentScenarioMapper
+     * @param IdFinder|null $filtersAssessmentIdFinder
+     * @param CompositeFactoryFactory|null $filtersFactoryFactory
+     * @param Filter\Mapper|null $filterMapper
+     * @param Filter\Selection\Mapper|null $filterSelectionMapper
+     * @param CourseImplementationMapper|null $courseImplementationMapper
+     * @param UnitImplementationMapper|null $unitImplementationMapper
      * @param EditorTemplateHelper|null $editorTemplateHelper
      */
     public function __construct(
@@ -67,6 +100,8 @@ class Controller extends Assessment\Controller
         Access $access,
         Transactor $transactor,
         BreadcrumbFactory $bakery,
+        protected \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper,
+        protected \Schoolbox\Assessment\Rubric\DataModel\DataSource $rubricMapper,
         Term\Mapper $termMapper,
         Participant\DataSource $participantDataSource,
         CourseSpecificationMapper $courseSpecificationMapper,
@@ -94,6 +129,8 @@ class Controller extends Assessment\Controller
             $access,
             $transactor,
             $bakery,
+            $resultSetMapper,
+            $rubricMapper,
             $termMapper,
             $participantDataSource,
             $courseSpecificationMapper,
@@ -111,7 +148,6 @@ class Controller extends Assessment\Controller
             $filterSelectionMapper,
             $courseImplementationMapper,
             $unitImplementationMapper,
-            null,
             null,
             null,
             null,
