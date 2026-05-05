@@ -28,7 +28,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
-use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\InlineGrader\Kami\Model as KamiModel;
 use Schoolbox\Learning\Quiz;
@@ -46,7 +45,7 @@ use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
  *
  * @method Model createModel($id=null)
  * @method Model findById($id)
- * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
+ * @method GenericCollection<Model> findByColumn($columnName, $columnValue, $options = [])
  * @method Model findOneByColumnList($columnList, array $options = [])
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
