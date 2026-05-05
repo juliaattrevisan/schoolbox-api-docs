@@ -52,13 +52,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
-use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as RubricDescriptorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorMark\Mapper as RubricIndicatorMarkMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Result\Mapper as RubricResultSetMapper;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
-use Schoolbox\Assessment\Rubric\Grid\Level;
-use Schoolbox\Assessment\Rubric\Grid\Translator\ModelToArray as RubricGridTranslator;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Error;
@@ -88,7 +83,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\User;
@@ -129,6 +123,8 @@ class Controller extends Assessment\Controller
 
 
     /**
+     * Constructor.
+     *
      * @param UserMapper $userMapper
      * @param Mapper $errorMapper
      * @param AssessmentDataSource $assessmentMapper
@@ -136,8 +132,8 @@ class Controller extends Assessment\Controller
      * @param Access $access
      * @param Transactor $transactor
      * @param Factory $bakery
+     * @param \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper
      * @param RubricDataSource $rubricMapper
-     * @param RubricResultSetMapper $resultSetMapper
      * @param DueWorkResponseMapper $dueWorkResponseMapper
      * @param ParticipantMapper $participantMapper
      * @param Term\Mapper $termMapper
@@ -148,8 +144,7 @@ class Controller extends Assessment\Controller
      * @param CourseSpecificationMapper $courseSpecificationMapper
      * @param UnitSpecificationMapper $unitSpecificationMapper
      * @param Replicator $replicator
-     * @param Producer $producer for sending the message created by `$messageFactory` to
-     *                                                                  taskd
+     * @param Producer $producer for sending the message created by `$messageFactory` to taskd
      * @param Turnitin\File\Mapper $turnitinFileMapper - for generating the Similarity Report.
      * @param IFeedbackDataSource $feedbackDataSource
      * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
@@ -181,8 +176,8 @@ class Controller extends Assessment\Controller
         Access $access,
         Transactor $transactor,
         Assessment\Breadcrumb\Factory $bakery,
-        private RubricDataSource $rubricMapper,
-        private RubricResultSetMapper $resultSetMapper,
+        protected \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper,
+        protected \Schoolbox\Assessment\Rubric\DataModel\DataSource $rubricMapper,
         private DueWorkResponseMapper $dueWorkResponseMapper,
         private ParticipantMapper $participantMapper,
         Term\Mapper $termMapper,
@@ -225,6 +220,8 @@ class Controller extends Assessment\Controller
             $access,
             $transactor,
             $bakery,
+            $resultSetMapper,
+            $rubricMapper,
             $termMapper,
             $participantDataSource,
             $courseSpecificationMapper,
@@ -247,7 +244,6 @@ class Controller extends Assessment\Controller
             null,
             null,
             $mimeTypeMapper,
-            $this->rubricDataSource,
             $activityTemplateHelper,
         );
     }
@@ -1988,93 +1984,7 @@ class Controller extends Assessment\Controller
             ],
         ];
 
-        if ($assessment instanceof Model) {
-            // ...append rubric-related data...
-            $data = array_merge($data, $this->generateRubricTwigData($assessment));
-        }
-
         // ...and scene.
-        return $data;
-    }
-
-
-    /**
-     * Common logic when generating Rubrics
-     *
-     * @param Model $dueWork
-     * @return array
-     * @throws MapperException
-     */
-    private function generateRubricTwigData(Model $dueWork): array
-    {
-        $data = [];
-
-        $rubricZone = new Zone('rubric');
-        // JS file.type isn't set reliably enough to use text/csv mime filter
-        $rubricZone
-            ->setFileVar('rb_attach[]')
-            ->setAttachPrompt('Import a rubric')
-            ->useImportExpiryDate();
-        //->setMimeFilter('text/csv');
-        $data['rubricAttachZone'] = $rubricZone->getTwigContext();
-
-        $resultSets = $this->resultSetMapper->findAll();
-
-        $rs = [];
-        foreach ($resultSets as $result) {
-            if (!isset($rs[$result->getResultSetId()])) {
-                $rs[$result->getResultSetId()] = [
-                    'id' => $result->getResultSetId(),
-                    'results' => [],
-                ];
-            }
-
-            $rs[$result->getResultSetId()]['results'][] = [
-                'value' => $result->getValue(),
-                'label' => $result->getLabel(),
-            ];
-        }
-
-        $data['rubricResultSets'] = array_values($rs);
-
-        // Do any students have marks for this rubric?
-        $levelIds      = RubricLevelMapper::getInstance()->findIdsByColumn('ri.assessment_id', $dueWork->getId());
-        $descriptorIds = RubricDescriptorMapper::getInstance()->findIdsByColumn('level_id', $levelIds);
-        $countMarkIds  = RubricIndicatorMarkMapper::getInstance()->countByColumnList(
-            [
-                'descriptor_id' => $descriptorIds,
-                'valid'         => true,
-            ]
-        );
-
-        // The rubric grid can be used as is without Twig-wrangling
-        $rubricGrid = $this->rubricMapper->retrieveGrid($dueWork, true);
-        if (count($rubricGrid->getLevels()) === 0) {
-            // Two fake levels
-            $rubricGrid->getLevels()
-                       ->add(new Level())
-                       ->add(new Level());
-        }
-        $data['rubricGrid'] = $rubricGrid; // TODO: remove legacy individual rubric grid, this will prevent the other spots from breaking until we get around to them
-
-        /**
-         * list of all rubric grids for this assessment
-         * @see also in /library/Schoolbox/Learning/Assessment/Controller.php:getCloneAssessmentForm
-         */
-        $data['rubricGrids'] = [];
-        $data['rubricGridsPayload'] = [];
-
-        // TODO: for now just one grid support, in the format of multiple
-        $rubricGridTranslator = new RubricGridTranslator();
-        if ($dueWork->getUseRubric()) {
-            $data['rubricGrids'][] = $rubricGrid;
-            $data['rubricGridsPayload'][] = $rubricGridTranslator($rubricGrid, $dueWork);
-        }
-
-        // for multiple rubrics, this allows the frontend to add another one
-        // TODO: this probably needs to be an endpoint of its own as I expect it would change if you changed the original rubric? there's some nuance around how capabilities/indicators are deduped
-        $data['rubricBlankGrid'] = $rubricGridTranslator($this->rubricMapper->retrieveBlankGrid($dueWork, true), $dueWork);
-
         return $data;
     }
 
