@@ -1962,11 +1962,6 @@ parameters:
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
 
-		-
-			message: '#^Method Schoolbox\\Assessment\\Rubric\\DataModel\\Result\\Model\:\:getLabel\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Result/Model.php
 
 		-
 			message: '#^Method Schoolbox\\Assessment\\Rubric\\DataModel\\Result\\Model\:\:getValue\(\) should return string but returns int\.$#'
