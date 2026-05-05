@@ -1179,6 +1179,4 @@ class UserMapper extends Mapper
 
         return true;
     }
-
-
 }
