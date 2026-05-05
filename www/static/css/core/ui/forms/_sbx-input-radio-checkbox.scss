@@ -280,6 +280,12 @@ body.sbx-body {
         margin-top: var(--sbx-size-xs);
     }
 
+    // add some extra brething space, as we remove the margin which was used for spacing instead previously
+    .selector:has(input[type="checkbox"]) {
+        padding-top: var(--sbx-size-s);
+        padding-bottom: var(--sbx-size-s);
+    }
+
     // make the switches more in line with the new styling
     .switch {
         label {
