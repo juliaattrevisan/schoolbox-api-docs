@@ -15,7 +15,6 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\Factory;
 
 trait DueWorkTrait
 {
@@ -45,32 +44,6 @@ trait DueWorkTrait
      */
     protected $instructorGradingScheme;
 
-    /**
-     * @var bool
-     */
-    protected $useRubric = false;
-
-    /**
-     * @var array|null
-     */
-    protected $rubricData;
-
-    /**
-     * @var int|null
-     */
-    protected $capabilityMarkType;
-
-
-    /**
-     * @var int|null
-     */
-    protected $capabilityGradeGroup;
-
-
-    /**
-     * @var bool
-     */
-    protected $useMarkRange = false;
 
     /**
      * @var array|string[]
@@ -222,78 +195,6 @@ trait DueWorkTrait
         return $this;
     }
 
-    /**
-     * @return boolean
-     */
-    protected function getUseRubric()
-    {
-        return $this->useRubric;
-    }
-
-    /**
-     * @param boolean $usesRubric
-     * @return $this
-     */
-    protected function setUseRubric($usesRubric)
-    {
-        $this->useRubric = $usesRubric;
-        return $this;
-    }
-
-    /**
-     * @return int|null
-     */
-    protected function getCapabilityMarkType(): ?int
-    {
-        return $this->capabilityMarkType;
-    }
-
-    /**
-     * @param int|null $capabilityMarkType
-     * @return $this
-     */
-    protected function setCapabilityMarkType(?int $capabilityMarkType): self
-    {
-        $this->capabilityMarkType = $capabilityMarkType;
-        return $this;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getCapabilityGradeGroup(): ?int
-    {
-        return $this->capabilityGradeGroup;
-    }
-
-    /**
-     * @param int|null $capabilityGradeGroup
-     * @return $this
-     */
-    public function setCapabilityGradeGroup(?int $capabilityGradeGroup): self
-    {
-        $this->capabilityGradeGroup = $capabilityGradeGroup;
-        return $this;
-    }
-
-
-    /**
-     * @return boolean
-     */
-    protected function getUseMarkRange()
-    {
-        return $this->useMarkRange;
-    }
-
-    /**
-     * @param boolean $useMarkRange
-     * @return $this
-     */
-    protected function setUseMarkRange($useMarkRange)
-    {
-        $this->useMarkRange = $useMarkRange;
-        return $this;
-    }
 
     /**
      * @return float|null
@@ -327,23 +228,6 @@ trait DueWorkTrait
         $this->instructorMaxMark = $instructorMaxMark;
     }
 
-    /**
-     * @return array|null $rubricData
-     */
-    protected function getRubricData()
-    {
-        return $this->rubricData;
-    }
-
-    /**
-     * @param array|null $rubricData
-     * @return static
-     */
-    protected function setRubricData(?array $rubricData = null)
-    {
-        $this->rubricData = $rubricData;
-        return $this;
-    }
 
     /**
      * @return null|string
