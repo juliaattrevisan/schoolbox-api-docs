@@ -79,17 +79,6 @@ body.sbx-body {
         align-items: flex-start !important; // override legacy styles
     }
 
-    .option-list {
-        li {
-            display: flex;
-            &:has(input[type="radio"] + label) {
-                align-items: flex-start;
-                white-space: normal;
-                margin-top: 0.5rem;
-            }
-        }
-    }
-
     // Remove extra margin/padding added to radio labels in forms.scss
     input[type="radio"]:not(.plain) + label:not(.block) {
         margin: 0 !important;
@@ -109,13 +98,13 @@ body.sbx-body {
         padding: var(--sbx-size-m);
     }
 
-    input[type="radio"] + .block i {
-        color: var(--sbx-config-color-accent);
-    }
-
     input[type="radio"]:checked + .block {
         background-color: var(--sbx-config-color-accent);
         color: var(--sbx-config-color-accent-text);
+    }
+
+    input[type="radio"] + .block i {
+        color: var(--sbx-config-color-accent);
     }
 
     input[type="radio"]:checked + .block i {
@@ -226,16 +215,12 @@ body.sbx-body {
     }
 
     // Hide labels for checkboxes used as selectors
-    .card-selectable .selector input[type="checkbox"] + label {
-        display: none;
-    }
-
-    // Hide labels for checkboxes in buttons container
+    .card-selectable .selector input[type="checkbox"] + label,
     .buttons-container .checklist input[type="checkbox"] + label {
         display: none;
     }
 
-    // Add vertical spacing between checkboxes that aren't already using flex
+    // Add vertical spacing between checkboxes that aren't already using flex, and don't apply to option lists that have nested options
     .option-list:not([class*="l-flex"]):not(:has(.option-list)) {
         display: flex;
         flex-direction: column;
@@ -248,10 +233,16 @@ body.sbx-body {
         align-items: flex-start;
         display: flex;
         gap: var(--sbx-size-xs);
-    }
-
-    .option-list input[type="checkbox"] {
-        flex: 0 0 auto;
+        // Ensure radio buttons are aligned to the top of the label text
+        &:has(input[type="radio"] + label) {
+            align-items: flex-start;
+            margin-top: 0.5rem;
+            white-space: normal;
+        }
+        // Ensure checkboxes don't shrink if the label text is long
+        input[type="checkbox"] {
+            flex: 0 0 auto;
+        }
     }
 
     // Remove extra margin/padding added to checkbox labels in forms.scss
