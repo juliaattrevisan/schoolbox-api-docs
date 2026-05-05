@@ -239,6 +239,10 @@ body.sbx-body {
         input[type="radio"] {
             flex: 0 0 auto;
         }
+        // remove the margin for better flex alignment
+        .hint {
+            margin: 0;
+        }
     }
 
     // special case, where there's an <article> in the row as well, so prevent the flex
