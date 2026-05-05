@@ -21,13 +21,13 @@ const props = withDefaults(
 <template>
     <tbody v-if="props.onlyBody" class="skeleton" data-test="loading-table">
         <tr v-for="(row, index) in props.rows" :key="index" :style="{ height: props.rowHeight }">
-            <td colspan="100%"></td>
+            <td colspan="100"></td>
         </tr>
     </tbody>
     <table v-else class="skeleton l-mar--0-bottom" data-test="loading-table">
         <tbody>
             <tr v-for="(row, index) in props.rows" :key="index" :style="{ height: props.rowHeight }">
-                <td colspan="100%"></td>
+                <td colspan="100"></td>
             </tr>
         </tbody>
     </table>

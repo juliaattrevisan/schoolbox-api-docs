@@ -4,6 +4,7 @@
  */
 
 import type { Header } from "../../cell/cellTypes/BasicType";
+import LoadingTable from "../../loading/loading-table.vue";
 
 const props = defineProps<{
     header: Header[];
@@ -79,6 +80,7 @@ function onSortSelected(key: string): void {
                 </td>
             </tr>
         </tbody>
+        <loading-table v-else :only-body="true" :rows="5" row-height="3rem" />
     </table>
 </template>
 
