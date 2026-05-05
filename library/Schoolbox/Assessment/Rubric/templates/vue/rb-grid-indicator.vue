@@ -126,7 +126,7 @@ window.Vue.onMounted(() => {
                     {{ indicatorName }}
                     <span
                         data-tooltip
-                        class="hint has-tip tip-right"
+                        class="hint has-tip tip-right f-no-margins"
                         data-width="200"
                         :title="`This ${locale.rubricCriterion.singular()} cannot be modified because it is in use elsewhere`"
                     >
