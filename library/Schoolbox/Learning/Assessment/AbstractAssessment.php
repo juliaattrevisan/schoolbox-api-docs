@@ -30,7 +30,6 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStoneFactory;
 use TypeError;
-use UnexpectedValueException;
 
 abstract class AbstractAssessment implements IAssessable
 {
@@ -192,13 +191,23 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
+     * A set of rubric_instance records which contain the settings for each grid associated with this learning activity
+     * (if applicable) - actual grid contents need to be obtained separately.
+     *
+     * @var GenericCollection<\Schoolbox\Assessment\Rubric\Instance\Model>|null
+     */
+    private ?GenericCollection $rubricInstances;
+
+
+    /**
      * Assessable constructor.
      */
     public function __construct()
     {
         $this->curriculumNodes = new GenericCollection(Node\Model::class);
-        $this->plans           = new GenericCollection(Plan::class);
-        $this->customisedAssessments           = new GenericCollection(IAssessable::class);
+        $this->plans = new GenericCollection(Plan::class);
+        $this->customisedAssessments = new GenericCollection(IAssessable::class);
+        $this->rubricInstances = new GenericCollection(\Schoolbox\Assessment\Rubric\Instance\Model::class);
     }
 
 
@@ -299,6 +308,7 @@ abstract class AbstractAssessment implements IAssessable
         $this->title           = $source->getTitle();
         $this->weight          = $source->getWeight();
         $this->workType        = $source->getWorkType();
+        $this->rubricInstances = $source->getRubricInstances();
 
         // Dates are cloned
         $this->publishAt = $source->getPublishAt() ? clone $source->getPublishAt() : null;
@@ -1340,6 +1350,29 @@ abstract class AbstractAssessment implements IAssessable
     public function setCurriculumNodes(GenericCollection $curriculumNodes): IAssessable
     {
         $this->curriculumNodes->replaceWith($curriculumNodes);
+        return $this;
+    }
+
+
+    /**
+     * @return GenericCollection<\Schoolbox\Assessment\Rubric\Instance\Model>|null
+     */
+    public function getRubricInstances(): ?GenericCollection
+    {
+        return $this->rubricInstances;
+    }
+
+
+    /**
+     * This variant of a setters also checks/asserts the contents of $rubricInstances supplied here to ensure they're
+     * the same type as what it originally was.
+     *
+     * @param GenericCollection<\Schoolbox\Assessment\Rubric\Instance\Model>|null $rubricInstances
+     * @return $this
+     */
+    public function setRubricInstances(?GenericCollection $rubricInstances): self
+    {
+        $this->rubricInstances->replaceWith($rubricInstances);
         return $this;
     }
 

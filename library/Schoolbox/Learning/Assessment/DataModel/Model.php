@@ -280,6 +280,13 @@ class Model implements ISoftDeletable
     /** @var Plan\Model[]|GenericCollection */
     private $plans;
 
+
+    /**
+     * @var null|GenericCollection<\Schoolbox\Assessment\Rubric\Instance\Model> $rubricInstances
+     */
+    private ?GenericCollection $rubricInstances;
+
+
     /**
      * Constructor
      */
@@ -288,6 +295,11 @@ class Model implements ISoftDeletable
     }
 
 
+    /**
+     * Runs when you do $x = clone $y
+     *
+     * @return void
+     */
     public function __clone()
     {
         $this->id = null;
@@ -324,6 +336,7 @@ class Model implements ISoftDeletable
             $this->reporting = clone $this->reporting;
         }
     }
+
 
     /**
      * Helper method for getting this assessment data model's context.
@@ -1037,6 +1050,28 @@ class Model implements ISoftDeletable
         $this->curriculumNodes = $curriculumNodes;
         return $this;
     }
+
+
+    /**
+     * @return GenericCollection<\Schoolbox\Assessment\Rubric\Instance\Model>|null
+     */
+    public function getRubricInstances(): ?GenericCollection
+    {
+        return $this->rubricInstances;
+    }
+
+
+    /**
+     * @param GenericCollection<\Schoolbox\Assessment\Rubric\Instance\Model>|null $rubricInstances
+     * @return $this
+     */
+    public function setRubricInstances(?GenericCollection $rubricInstances): self
+    {
+        $rubricInstances->assertCollectionOf(\Schoolbox\Assessment\Rubric\Instance\Model::class);
+        $this->rubricInstances = $rubricInstances;
+        return $this;
+    }
+
 
     /**
      * Returns just the Curriculum nodes that do not have an empty code.
