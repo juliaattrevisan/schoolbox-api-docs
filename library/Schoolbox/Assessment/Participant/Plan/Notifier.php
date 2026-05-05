@@ -708,7 +708,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     ->addTopic("$topicStub.$topicSuffix")
                     ->setSeverity(Logger::NOTICE);
         $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
-                    ->setBody($participant->getDescription())
                     ->setByline("Due {$participant->getDueDate()->getCalendarDateTime()}");
         $envelope->targetToUser($participant->getUser(), $bob->build());
     }
@@ -760,8 +759,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             // build for student
             $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                         ->setTitle(self::PATTERN_UPCOMING_STUDENT_TITLE)
-                        ->setParam('when', new Param($when))
-                        ->setBody($participant->getDescription());
+                        ->setParam('when', new Param($when));
             $envelope->targetToUser($participant->getUser(), $bob->build());
 
             // build for parent, only if they're allowed
@@ -825,8 +823,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                         ->setTitle(self::PATTERN_OVERDUE_STUDENT_TITLE)
                         ->setParam('overdue', new SimpleParam($overdue))
-                        ->unsetParam('submit')
-                        ->setBody($participant->getDescription());
+                        ->unsetParam('submit');
             $envelope->targetToUser($participant->getUser(), $bob->build());
 
             // build for parent, only if they're allowed
