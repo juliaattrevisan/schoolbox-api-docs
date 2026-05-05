@@ -341,8 +341,6 @@ class Factory
          * - There will eventually be multiple rubrics, however at the moment $rubricId would only ever be the assessment ID
          * - "Use Rubric" was previously a distinct option to choose, now it's just based on the existence of a rubric
          */
-        // TODO what should this be?
-        $this->setUseRubric(false);
         // TODO TEMP: useMarkRange/capabilityMarkType/capabilityGradeGroup should be against the rubric, but need defaults
         $this->setUseMarkRange(false);
         $this->setCapabilityMarkType(MarkType::TYPE_NONE);
@@ -355,7 +353,6 @@ class Factory
 
             if (\count($rubrics) > 0) {
                 // TODO Will this have a side effect of turning on rubrics for existing assessments if you re-save one that had a rubric but turned off...?
-                $this->setUseRubric(true);
                 $this->setRubricData($rubrics);
 
                 // TODO TEMP: useMarkRange/capabilityMarkType/capabilityGradeGroup should be against the rubric
