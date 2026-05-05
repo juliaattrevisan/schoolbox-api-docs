@@ -280,6 +280,11 @@ body.sbx-body {
         width: 1rem;
     }
 
+    // this checkbox sits by itself before a <select>, and rather than make a more wide spread structure change, we'll just add the margin that typically gets removed
+    .resubmission-required {
+        margin-top: var(--sbx-size-xs);
+    }
+
     // make the switches more in line with the new styling
     .switch {
         label {
