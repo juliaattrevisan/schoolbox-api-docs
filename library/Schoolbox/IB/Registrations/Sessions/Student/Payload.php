@@ -11,11 +11,18 @@ declare(strict_types=1);
 
 namespace Schoolbox\IB\Registrations\Sessions\Student;
 
+use Schoolbox\GenericCollection;
+use Schoolbox\IB\Group\Subject\Language\Model as GroupSubjectLanguageModel;
+use Schoolbox\IB\Group\Subject\Model as GroupSubjectModel;
 use Schoolbox\Language\Model as LanguageModel;
 use Schoolbox\Nationality\Model as NationalityModel;
 
 class Payload
 {
+    private const LEVEL_HL = 'HL';
+    private const LEVEL_SL = 'SL';
+    private const LEVEL_CORE = 'Core';
+
     private const REQUIRED_FIELDS = [
         'userName',
         'firstName',
@@ -63,6 +70,7 @@ class Payload
             'userName' => $userName,
             'hasMissingDetails' => $missingFields !== [],
             'missingFields' => $missingFields,
+            'ibGroupSubjects' => $this->buildIbGroupSubjects($student->getIbGroupSubjects()),
         ];
     }
 
@@ -150,6 +158,55 @@ class Payload
     private function normalise(mixed $value): string
     {
         return trim((string) ($value ?? ''));
+    }
+
+    /**
+     * @param GenericCollection|GroupSubjectModel[] $groupSubjects
+     * @return array<string, array<int, array<string, mixed>>>
+     */
+    private function buildIbGroupSubjects(GenericCollection $groupSubjects): array
+    {
+        $subjectsByLevel = $groupSubjects->groupByCallback(
+            fn(GroupSubjectModel $groupSubject): string => $this->getGroupSubjectLevel($groupSubject)
+        );
+        $payload = [];
+
+        foreach ([self::LEVEL_HL, self::LEVEL_SL, self::LEVEL_CORE] as $level) {
+            $payload[$level] = ($subjectsByLevel[$level] ?? new GenericCollection(GroupSubjectModel::class))
+                ->map(fn(GroupSubjectModel $groupSubject): array => $this->buildIbGroupSubject($groupSubject))
+                ->reindex()
+                ->getAll();
+        }
+
+        return $payload;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function buildIbGroupSubject(GroupSubjectModel $groupSubject): array
+    {
+        return [
+            'id' => $groupSubject->getId(),
+            'groupId' => $groupSubject->getGroupId(),
+            'subject' => $groupSubject->getSubject()?->getName() ?? '',
+            'level' => $this->getGroupSubjectLevel($groupSubject),
+            'languages' => $groupSubject->getLanguages()
+                ->map(
+                    fn(GroupSubjectLanguageModel $language): array => [
+                        'languageId' => $language->getLanguage()?->getId(),
+                        'languageName' => $language->getLanguage()?->getName() ?? '',
+                        'classCode' => $language->getClassCode() ?? '',
+                    ]
+                )
+                ->reindex()
+                ->getAll(),
+        ];
+    }
+
+    private function getGroupSubjectLevel(GroupSubjectModel $groupSubject): string
+    {
+        return $groupSubject->getLevel() ?: self::LEVEL_CORE;
     }
 
     /**

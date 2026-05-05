@@ -11,12 +11,20 @@ declare(strict_types=1);
 
 namespace Schoolbox\IB\Registrations\Sessions\Student;
 
+use Alaress\Database\Predicate;
 use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\External\SubjectMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\IB\Group\Model as IBGroupModel;
+use Schoolbox\IB\Group\Subject\Language\Model as GroupSubjectLanguageModel;
+use Schoolbox\IB\Group\Subject\Model as GroupSubjectModel;
 use Schoolbox\IB\Registrations\Sessions\Mapper as SessionMapper;
+use Schoolbox\IB\Subject\Model as IBSubjectModel;
+use Schoolbox\Language\Model as LanguageModel;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -29,6 +37,8 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
+    private const CORE_GROUP_NAME = 'Core';
+
     /**
      * @inheritdoc
      */
@@ -222,6 +232,7 @@ class Mapper extends BaseMapper
             $usersById[$user->getId()] = $user;
         }
 
+        $ibGroupSubjectsByUserId = $this->findIbGroupSubjectsForUsers($usersById);
         $students = $this->createCollection();
 
         foreach ($rows as $row) {
@@ -234,6 +245,10 @@ class Mapper extends BaseMapper
                 $student->setUser($usersById[$userId]);
             }
 
+            $student->setIbGroupSubjects(
+                $ibGroupSubjectsByUserId[$userId] ?? new GenericCollection(GroupSubjectModel::class)
+            );
+
             if (!$student->getId()) {
                 $student->setStatus(0);
             }
@@ -242,5 +257,212 @@ class Mapper extends BaseMapper
         }
 
         return $students;
+    }
+
+    /**
+     * @param array<int, User> $usersById
+     * @return array<int, GenericCollection>
+     */
+    private function findIbGroupSubjectsForUsers(array $usersById): array
+    {
+        if (empty($usersById)) {
+            return [];
+        }
+
+        $classCodesByUserId = $this->findMatchedFolderCodesForUsers($usersById);
+        $classCodes = [];
+
+        foreach ($classCodesByUserId as $userClassCodes) {
+            foreach ($userClassCodes as $classCode) {
+                $classCodes[$classCode] = $classCode;
+            }
+        }
+
+        $rowsByClassCode = !empty($classCodes)
+            ? $this->findIbGroupSubjectRowsByClassCode(array_values($classCodes))
+            : [];
+        $coreRows = $this->findCoreIbGroupSubjectRows();
+        $groupSubjectsByUserId = [];
+
+        foreach (array_keys($usersById) as $userId) {
+            $groupSubjects = new GenericCollection(GroupSubjectModel::class);
+
+            foreach ($coreRows as $row) {
+                $this->addIbGroupSubjectRow($groupSubjects, $row);
+            }
+
+            $userClassCodes = $classCodesByUserId[$userId] ?? [];
+
+            foreach ($userClassCodes as $classCode) {
+                foreach ($rowsByClassCode[$classCode] ?? [] as $row) {
+                    $this->addIbGroupSubjectRow($groupSubjects, $row);
+                }
+            }
+
+            if ($groupSubjects->count() > 0) {
+                $groupSubjectsByUserId[$userId] = $groupSubjects->reindex();
+            }
+        }
+
+        return $groupSubjectsByUserId;
+    }
+
+    /**
+     * @param array<int, User> $usersById
+     * @return array<int, string[]>
+     */
+    private function findMatchedFolderCodesForUsers(array $usersById): array
+    {
+        $subjectMapper = new SubjectMapper();
+        $classCodesByUserId = [];
+
+        foreach ($usersById as $userId => $user) {
+            foreach ($subjectMapper->findAllForUser($user, null) as $subject) {
+                $classCode = trim((string) ($subject['matchedCode'] ?? $subject['code'] ?? ''));
+
+                if ($classCode !== '') {
+                    $classCodesByUserId[$userId][$classCode] = $classCode;
+                }
+            }
+        }
+
+        return $classCodesByUserId;
+    }
+
+    /**
+     * @param string[] $classCodes
+     * @return array<string, array<int, array<string, mixed>>>
+     */
+    private function findIbGroupSubjectRowsByClassCode(array $classCodes): array
+    {
+        $bindings = Predicate\Builder::getBindings($classCodes, 'classCode');
+        $statement = $this->getDatabase()->query(
+            "
+                SELECT
+                    gsl.id AS group_subject_language_id,
+                    gsl.class_code,
+                    gs.id AS group_subject_id,
+                    gs.group_id,
+                    gs.level,
+                    g.name AS group_name,
+                    g.sequence AS group_sequence,
+                    s.id AS subject_id,
+                    s.name AS subject_name,
+                    l.id AS language_id,
+                    l.code AS language_code,
+                    l.name AS language_name
+                FROM ib_group_subject_languages gsl
+                INNER JOIN ib_group_subjects gs
+                    ON gs.id = gsl.group_subject_id
+                INNER JOIN lu_ib_groups g
+                    ON g.id = gs.group_id
+                INNER JOIN lu_ib_subjects s
+                    ON s.id = gs.subject_id
+                INNER JOIN lu_language l
+                    ON l.id = gsl.language_id
+                WHERE gsl.class_code IN ({$bindings->getPlaceholder()})
+                ORDER BY g.sequence ASC, s.name ASC, gs.level ASC, l.name ASC, gsl.class_code ASC
+            ",
+            $bindings->getParams()
+        );
+        $rowsByClassCode = [];
+
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $rowsByClassCode[(string) $row['class_code']][] = $row;
+        }
+
+        return $rowsByClassCode;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function findCoreIbGroupSubjectRows(): array
+    {
+        $statement = $this->getDatabase()->query(
+            "
+                SELECT
+                    gsl.id AS group_subject_language_id,
+                    gsl.class_code,
+                    gs.id AS group_subject_id,
+                    gs.group_id,
+                    gs.level,
+                    g.name AS group_name,
+                    g.sequence AS group_sequence,
+                    s.id AS subject_id,
+                    s.name AS subject_name,
+                    l.id AS language_id,
+                    l.code AS language_code,
+                    l.name AS language_name
+                FROM ib_group_subjects gs
+                INNER JOIN lu_ib_groups g
+                    ON g.id = gs.group_id
+                INNER JOIN lu_ib_subjects s
+                    ON s.id = gs.subject_id
+                LEFT JOIN ib_group_subject_languages gsl
+                    ON gsl.group_subject_id = gs.id
+                LEFT JOIN lu_language l
+                    ON l.id = gsl.language_id
+                WHERE g.name = :groupName
+                ORDER BY g.sequence ASC, s.name ASC, l.name ASC, gsl.class_code ASC
+            ",
+            [
+                'groupName' => self::CORE_GROUP_NAME,
+            ]
+        );
+
+        /** @var array<int, array<string, mixed>> $rows */
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        return $rows;
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function addIbGroupSubjectRow(GenericCollection $groupSubjects, array $row): void
+    {
+        $groupSubjectId = (int) $row['group_subject_id'];
+
+        if (!$groupSubjects->offsetExists($groupSubjectId)) {
+            $groupSubject = (new GroupSubjectModel())
+                ->setId($groupSubjectId)
+                ->setGroupId((int) $row['group_id'])
+                ->setLevel($row['level'] !== null ? (string) $row['level'] : null)
+                ->setGroup(
+                    (new IBGroupModel())
+                        ->setId((int) $row['group_id'])
+                        ->setName((string) $row['group_name'])
+                        ->setSequence((int) $row['group_sequence'])
+                )
+                ->setSubject(
+                    (new IBSubjectModel())
+                        ->setId((int) $row['subject_id'])
+                        ->setName((string) $row['subject_name'])
+                )
+                ->setLanguages(new GenericCollection(GroupSubjectLanguageModel::class));
+
+            $groupSubjects[$groupSubjectId] = $groupSubject;
+        }
+
+        /** @var GroupSubjectModel $groupSubject */
+        $groupSubject = $groupSubjects[$groupSubjectId];
+
+        if ($row['group_subject_language_id'] === null) {
+            return;
+        }
+
+        $groupSubject->getLanguages()->add(
+            (new GroupSubjectLanguageModel())
+                ->setId((int) $row['group_subject_language_id'])
+                ->setGroupSubject($groupSubject)
+                ->setLanguage(
+                    (new LanguageModel())
+                        ->setId((int) $row['language_id'])
+                        ->setCode((string) $row['language_code'])
+                        ->setName((string) $row['language_name'])
+                )
+                ->setClassCode((string) $row['class_code'])
+        );
     }
 }

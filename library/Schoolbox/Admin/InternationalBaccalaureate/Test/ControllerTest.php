@@ -87,6 +87,11 @@ class ControllerTest extends TestCase
                     'userName' => 'Alex, Nguyen',
                     'hasMissingDetails' => false,
                     'missingFields' => [],
+                    'ibGroupSubjects' => [
+                        'HL' => [],
+                        'SL' => [],
+                        'Core' => [],
+                    ],
                 ],
             ],
             $payload['students'][RegistrationSessionStudentModel::STATUS_CONFIRMED]
@@ -100,6 +105,11 @@ class ControllerTest extends TestCase
                     'userName' => 'Sam, Patel',
                     'hasMissingDetails' => false,
                     'missingFields' => [],
+                    'ibGroupSubjects' => [
+                        'HL' => [],
+                        'SL' => [],
+                        'Core' => [],
+                    ],
                 ],
             ],
             $payload['students'][RegistrationSessionStudentModel::STATUS_FAILED]

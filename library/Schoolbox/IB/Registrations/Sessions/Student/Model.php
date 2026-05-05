@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\IB\Registrations\Sessions\Student;
 
+use Schoolbox\GenericCollection;
+use Schoolbox\IB\Group\Subject\Model as GroupSubjectModel;
 use Schoolbox\IB\Registrations\Sessions\Model as SessionModel;
 use Schoolbox\Mapper\Traits\Model as ModelTraits;
 use Schoolbox\User;
@@ -84,6 +86,12 @@ class Model
     private ?User $user = null;
 
     /**
+     * IB group subjects matched through the student's class registrations.
+     * @var GenericCollection|GroupSubjectModel[]|null
+     */
+    private ?GenericCollection $ibGroupSubjects = null;
+
+    /**
      * @return SessionModel|null
      */
     public function getRegistrationSession(): ?SessionModel
@@ -134,6 +142,25 @@ class Model
     public function setUser(?User $user): self
     {
         $this->user = $user;
+        return $this;
+    }
+
+    /**
+     * @return GenericCollection|GroupSubjectModel[]
+     */
+    public function getIbGroupSubjects(): GenericCollection
+    {
+        return $this->ibGroupSubjects ?? new GenericCollection(GroupSubjectModel::class);
+    }
+
+    /**
+     * @param GenericCollection|GroupSubjectModel[] $ibGroupSubjects
+     * @return self
+     */
+    public function setIbGroupSubjects(GenericCollection $ibGroupSubjects): self
+    {
+        $ibGroupSubjects->assertCollectionOf(GroupSubjectModel::class);
+        $this->ibGroupSubjects = $ibGroupSubjects;
         return $this;
     }
 }

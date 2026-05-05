@@ -13,6 +13,10 @@ namespace Schoolbox\IB\Registrations\Sessions\Student\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\GenericCollection;
+use Schoolbox\IB\Group\Model as IBGroupModel;
+use Schoolbox\IB\Group\Subject\Language\Model as GroupSubjectLanguageModel;
+use Schoolbox\IB\Group\Subject\Model as IBGroupSubjectModel;
+use Schoolbox\IB\Subject\Model as IBSubjectModel;
 use Schoolbox\IB\Registrations\Sessions\Student\Model as RegistrationSessionStudentModel;
 use Schoolbox\IB\Registrations\Sessions\Student\Payload;
 use Schoolbox\Language\Model as LanguageModel;
@@ -38,6 +42,14 @@ class PayloadTest extends TestCase
         $this->assertSame('Alex, Nguyen', $payload['userName']);
         $this->assertFalse($payload['hasMissingDetails']);
         $this->assertSame([], $payload['missingFields']);
+        $this->assertSame(
+            [
+                'HL' => [],
+                'SL' => [],
+                'Core' => [],
+            ],
+            $payload['ibGroupSubjects']
+        );
         $this->assertArrayNotHasKey('firstName', $payload);
         $this->assertArrayNotHasKey('lastName', $payload);
         $this->assertArrayNotHasKey('dateOfBirth', $payload);
@@ -82,6 +94,76 @@ class PayloadTest extends TestCase
                 'schoolName',
             ],
             $payload['missingFields']
+        );
+    }
+
+    public function testBuildsIbGroupSubjectPayload(): void
+    {
+        $student = $this->buildStudent()
+            ->setIbGroupSubjects(
+                new GenericCollection(IBGroupSubjectModel::class, [
+                    (new IBGroupSubjectModel())
+                        ->setId(321)
+                        ->setGroupId(7)
+                        ->setGroup((new IBGroupModel())->setId(7)->setName('Language Acquisition'))
+                        ->setSubject((new IBSubjectModel())->setId(8)->setName('French'))
+                        ->setLevel('HL')
+                        ->setLanguages(
+                            new GenericCollection(GroupSubjectLanguageModel::class, [
+                                (new GroupSubjectLanguageModel())
+                                    ->setId(654)
+                                    ->setLanguage((new LanguageModel())->setId(9)->setCode('FRA')->setName('French'))
+                                    ->setClassCode('FRE-HL'),
+                            ])
+                        ),
+                    (new IBGroupSubjectModel())
+                        ->setId(322)
+                        ->setGroupId(8)
+                        ->setGroup((new IBGroupModel())->setId(8)->setName('Core'))
+                        ->setSubject((new IBSubjectModel())->setId(10)->setName('Theory of Knowledge (TOK)'))
+                        ->setLevel(null)
+                        ->setLanguages(new GenericCollection(GroupSubjectLanguageModel::class)),
+                ])
+            );
+
+        $payload = (new Payload())->build(
+            $student,
+            [
+                'StudentBirthDate' => '2009-04-12',
+                'StudentGender' => 'F',
+            ],
+            'Example School'
+        );
+
+        $this->assertSame(
+            [
+                'HL' => [
+                    [
+                        'id' => 321,
+                        'groupId' => 7,
+                        'subject' => 'French',
+                        'level' => 'HL',
+                        'languages' => [
+                            [
+                                'languageId' => 9,
+                                'languageName' => 'French',
+                                'classCode' => 'FRE-HL',
+                            ],
+                        ],
+                    ],
+                ],
+                'SL' => [],
+                'Core' => [
+                    [
+                        'id' => 322,
+                        'groupId' => 8,
+                        'subject' => 'Theory of Knowledge (TOK)',
+                        'level' => 'Core',
+                        'languages' => [],
+                    ],
+                ],
+            ],
+            $payload['ibGroupSubjects']
         );
     }
 
