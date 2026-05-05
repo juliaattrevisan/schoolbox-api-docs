@@ -248,9 +248,8 @@ export default {
 .menu-item {
     flex-grow: 1;
     flex-basis: 0;
-    border: 1px solid var(--sbx-color-text-secondary, #ededed);
+    border: 1px solid var(--sbx-config-color-accent, #ededed);
     margin-right: 1rem;
-    margin-top: 1rem;
     padding: 20px;
     background: var(--sbx-color-foreground-primary, #fff);
     &:last-child {
