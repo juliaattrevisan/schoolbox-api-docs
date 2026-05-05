@@ -1175,8 +1175,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'parentFolderId'           => $parentFolderId,
         ];
 
-        $data = array_merge($data, $this->getAssessmentTwigData($assessment));
-        $data = array_merge($data, $this->generateRubricTwigData($assessment));
+        $data = array_merge($data, $this->getAssessmentTwigData($assessment), $this->generateRubricTwigData($assessment));
 
         return $data;
     }
