@@ -665,49 +665,71 @@ abstract class Controller extends ListController implements IAssessmentControlle
     public function getUpdateAssessmentForm(IAssessable $assessment): void
     {
         $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
+
+        /* Assemble generic breadcrumb trail
+         */
+        $data['breadcrumbs'] = $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
+
+        /* These are used in ckeditor
+         */
         $data['editorTemplates'] = $this->editorTemplateHelper !== null
             ? $this->editorTemplateHelper->getTemplatesForCategory()
             : [];
 
-        $breadcrumbs = $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
-
-        /* Quizzes have two parts to change
+        /* Redirection urls
          */
-        if ($assessment instanceof Quiz\Model) {
-            $breadcrumbs->add([
-                'Modify Settings',
-                null
-            ]);
-        }
-
-        /* Dialog Agents have two parts to change
-         */
-        if ($assessment instanceof DialogAgent\Model) {
-            $breadcrumbs->add([
-                'Modify Settings',
-                null
-            ]);
-        }
-
-        $data['breadcrumbs'] = $breadcrumbs;
         $data['returnUrlName'] = Redirect::RETURN_URL;
         $data['returnUrl'] = $this->requestQuery->get(Redirect::RETURN_URL);
 
-        /* Curriculum Codes prefilled from those associated with the assessment itself
-         hide nodes with no codes
+        /* Curriculum Codes prefilled from those associated with the assessment itself hide nodes with no codes
          */
         $data['curriculumNodes'] = $assessment->getViewableCurriculumNodes()->reindex();
 
-        $data['custom_assessment_participation'] = $this->getConfigLoader()->get('custom_assessment_participation');
-        $data['selfAssessmentEnabled'] = $this->getConfigLoader()->get('self_assessment_enabled');
-
+        /* Grade Groups (used with Letter Grade) use this setting as a default to save users always having to change it
+         */
         $data['defaultGradeGroup'] = $this->getConfigLoader()->get('default_grade_group');
 
+        /* Specification assessments can be moved between locations in the resource browser
+         * Implementations cannot
+         */
         $data['canRelocate'] = $assessment->isSpecification();
+
+        /* The participants of an assessment
+         */
+        $data['participants'] = $assessment
+            ->getAllParticipants()
+            ->filter(fn($participant) => !$participant->isExcluded())
+            ->map(fn(Participant $participant) => $this->getParticipantObject($participant, $assessment->getOriginalAssessmentId()))
+            ->reindex();
 
         /* Course Managed Field and associated checkbox in the ui
          */
         $courseManagedFields = new CourseManagedFields($this->getUser(), $assessment);
+
+        $data['courseManaged'] = [
+            'isVisible' => $courseManagedFields->isVisible(),
+            'isMutable' => $courseManagedFields->isMutable(),
+            'isReadonly' => $courseManagedFields->isReadonly(),
+        ];
+
+        /* Find out if Differentiation Profiles are enabled
+         * This might lead to students having customised versions of an assessment
+         */
+        $data['differentiationEnabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED);
+        $data['custom_assessment_participation'] = $this->getConfigLoader()->get('custom_assessment_participation');
+
+        if (null !== $assessment->getOriginalAssessmentId()) {
+            $data['customisedFor'] = $assessment->getOriginalAssessmentId();
+        }
+
+        /* Quizzes have two parts to change: append breadcrumbs
+         */
+        if ($assessment instanceof Quiz\Model) {
+            $data['breadcrumbs']->add([
+                'Modify Settings',
+                null
+            ]);
+        }
 
         /* Lesson Plan Template metadata, used to construct forms
          */
@@ -758,6 +780,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
          * These need their chosen scenario supplied
          */
         if ($assessment instanceof DialogAgent\Model) {
+            /* Dialog Agents have two parts to change: append breadcrumbs
+             */
+            $data['breadcrumbs']->add([
+                'Modify Settings',
+                null
+            ]);
+
             $dialogAgentMapper = \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::getInstance();
             $dialogAgentScenarioMapper = \Schoolbox\Admin\DialogAgent\Scenario\Mapper::getInstance();
 
@@ -788,15 +817,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $data['reporting']['availableRangeOptions'] = Range::lookup();
         }
 
-        $data['courseManaged'] = [
-            'isVisible' => $courseManagedFields->isVisible(),
-            'isMutable' => $courseManagedFields->isMutable(),
-            'isReadonly' => $courseManagedFields->isReadonly(),
-        ];
-
-        $data['differentiationEnabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED);
-
+        /* Due Work
+         * Kami, some policy stuff and worksheets are due work specific
+         */
         if ($assessment instanceof DueWork\Model) {
+            /* At the moment only due works have self-reflection and self-assessment abilities
+             */
+            $data['selfAssessmentEnabled'] = $this->getConfigLoader()->get('self_assessment_enabled');
+
             // To be able to view the current student policy if enabling within the submission type
             $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
 
@@ -821,16 +849,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 $zone = $zone->attachFiles([$assessment->getWorksheetTemplate()]);
             }
             $data['attachzoneWorksheet'] = $zone->getTwigContext();
-        }
-
-        $data['participants'] = $assessment
-            ->getAllParticipants()
-            ->filter(fn($participant) => !$participant->isExcluded())
-            ->map(fn(Participant $participant) => $this->getParticipantObject($participant, $assessment->getOriginalAssessmentId()))
-            ->reindex();
-
-        if (null !== $assessment->getOriginalAssessmentId()) {
-            $data['customisedFor'] = $assessment->getOriginalAssessmentId();
         }
 
         $this->response = $this->responseFromTemplate("@learningAssessment/update.twig", $data);
