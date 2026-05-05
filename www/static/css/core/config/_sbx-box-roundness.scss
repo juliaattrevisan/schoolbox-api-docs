@@ -39,8 +39,14 @@ body.sbx-body {
     .side-nav,
     .side-nav .flyout,
     .cover-photo,
-    .cr-results-grid {
+    .cr-results-grid,
+    .introjs-whatsnewmodal {
         border-radius: var(--sbx-config-box-roundness);
+    }
+
+    // so the image at the top of the whats new modal respects the rounded corners
+    .introjs-whatsnewmodal {
+        overflow: hidden;
     }
 
     // this is to round an svg rect element
