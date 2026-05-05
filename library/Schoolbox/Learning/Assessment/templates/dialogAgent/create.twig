@@ -120,27 +120,28 @@
         <legend class="required">Select scenario</legend>
         {# Scenarios #}
         <div class="radiolist">
-            <ul class="option-list l-flex l-flex-col l-gap-m">
+            <ul class="option-list scenarios-list l-flex l-flex-col l-gap-m">
                 {% for scenario in dialogAgent.scenarios %}
                     <li data-test="dialog-agent-scenario-select-{{ scenario.id }}">
-                        <input type="radio" id="scenario-{{ scenario.id }}" name="scenarioId" value="{{ scenario.id }}" required />
-                        <label
-                            for="scenario-{{ scenario.id }}"
-                            data-test="dialog-agent-scenario-select-label"
-                        >
-                            <strong>{{ scenario.title }}</strong>
-                        </label>
+                        <div class="l-flex l-flex--align-center l-gap-s f-no-margins">
+                            <input type="radio" id="scenario-{{ scenario.id }}" name="scenarioId" value="{{ scenario.id }}" required />
+                            <label
+                                for="scenario-{{ scenario.id }}"
+                                data-test="dialog-agent-scenario-select-label"
+                            >
+                                <strong>{{ scenario.title }}</strong>
+                            </label>
 
-                        {% set scenarioModalId = 'scenario-info-' ~ scenario.id %}
-                        {% include '@learningAssessment/dialogAgent/scenarioInfo.twig' with {
-                            modalId: scenarioModalId,
-                            scenario: scenario
-                        } only %}
+                            {% set scenarioModalId = 'scenario-info-' ~ scenario.id %}
+                            {% include '@learningAssessment/dialogAgent/scenarioInfo.twig' with {
+                                modalId: scenarioModalId,
+                                scenario: scenario
+                            } only %}
 
-                        <button class="sbx-icon-only-button" type="button" data-reveal-id="{{ scenarioModalId }}">
-                            <sbx-icon name="view" size="m" color="currentColor"></sbx-icon>
-                        </button>
-
+                            <button class="sbx-icon-only-button" type="button" data-reveal-id="{{ scenarioModalId }}">
+                                <sbx-icon name="view" size="m" color="currentColor"></sbx-icon>
+                            </button>
+                        </div>
                         <article class="l-mar-xl--left">
                             {{ scenario.description }}
                         </article>

@@ -233,16 +233,17 @@ body.sbx-body {
         align-items: flex-start;
         display: flex;
         gap: var(--sbx-size-xs);
-        // Ensure radio buttons are aligned to the top of the label text
-        &:has(input[type="radio"] + label) {
-            align-items: flex-start;
-            margin-top: 0.5rem;
-            white-space: normal;
-        }
-        // Ensure checkboxes don't shrink if the label text is long
-        input[type="checkbox"] {
+        white-space: normal;
+        // Ensure checkboxes and radio buttons don't shrink if the label text is long
+        input[type="checkbox"],
+        input[type="radio"] {
             flex: 0 0 auto;
         }
+    }
+
+    // special case, where there's an <article> in the row as well, so prevent the flex
+    .scenarios-list li {
+        display: inline-block;
     }
 
     // Remove extra margin/padding added to checkbox labels in forms.scss
