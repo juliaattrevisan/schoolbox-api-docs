@@ -284,7 +284,7 @@ class Model implements ISoftDeletable
     /**
      * @var null|GenericCollection<\Schoolbox\Assessment\Rubric\Instance\Model> $rubricInstances
      */
-    private ?GenericCollection $rubricInstances;
+    private ?GenericCollection $rubricInstances = null;
 
 
     /**

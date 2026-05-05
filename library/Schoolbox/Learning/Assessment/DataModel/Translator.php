@@ -290,7 +290,8 @@ class Translator
             ->setCreatedAt($domainObject->getCreatedAt())
             ->setUpdatedAt($domainObject->getUpdatedAt())
             ->setDeletedAt($domainObject->getDeletedAt())
-            ->setCurriculumNodes($domainObject->getCurriculumNodes());
+            ->setCurriculumNodes($domainObject->getCurriculumNodes())
+            ->setRubricInstances($domainObject->getRubricInstances());
 
         $dataModel->setAssessmentModel($assessmentModel);
 
@@ -476,6 +477,10 @@ class Translator
 
         if ($assessmentModel->getCurriculumNodes() !== null) {
             $domainObject->setCurriculumNodes($assessmentModel->getCurriculumNodes());
+        }
+
+        if ($assessmentModel->getRubricInstances() !== null) {
+            $domainObject->setRubricInstances($assessmentModel->getRubricInstances());
         }
 
         // Translate specification assessment if there is one

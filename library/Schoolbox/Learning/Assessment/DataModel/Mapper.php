@@ -86,6 +86,22 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        /* Any learning activity can have zero or more rubric instances associated here
+         *
+         * The actual grid contents are obtained separately, but we retain knowledge of each grid's existence via their
+         * corresponding rubric_instance record.
+         */
+        $this->hasJoin(
+            'rubricInstances',
+            [
+                'mapper'    => \Schoolbox\Assessment\Rubric\Instance\Mapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'assessment_id',
+                'multiple'  => true,
+            ]
+        );
+
         // Type joins (what type of assessment is this?)
         // * task
         // * due work
@@ -834,6 +850,20 @@ class Mapper extends BaseMapper
         }
 //        // Lesson Plan Linked Assessments
 //        $modelList = $this->augmentWithLessonPlanAssessments($modelList, $lessonPlanIds);
+
+        /* Any learning activity can have zero or more rubric instances associated here
+         *
+         * The actual grid contents are obtained separately, but we retain knowledge of each grid's existence via their
+         * corresponding rubric_instance record.
+         *
+         * Note: I'm not sure why a whole bunch of stuff is listed here, but commented out; it has something to do with
+         * a query optimisation by @armatronic, but would have been helpful to know here in a docblock instead of having
+         * to dig through the pits of jira. I have to infer that these are optional pieces for the purpose of the
+         * Course Outline component which were being fulfilled but never used. In the spirit of maybe-completeness I've
+         * left what *would* have been here.
+         */
+        // $modelList = $this->augmentListWithRubricInstances($modelList);
+
         return $modelList;
     }
 
@@ -1248,6 +1278,13 @@ class Mapper extends BaseMapper
         // Lesson Plan Linked Assessments
         $modelList = $this->augmentWithLessonPlanAssessments($modelList, $lessonPlanIds);
 
+        /* Any learning activity can have zero or more rubric instances associated here
+         *
+         * The actual grid contents are obtained separately, but we retain knowledge of each grid's existence via their
+         * corresponding rubric_instance record.
+         */
+        $modelList = $this->augmentListWithRubricInstances($modelList);
+
         return $modelList;
     }
 
@@ -1655,6 +1692,45 @@ class Mapper extends BaseMapper
             fn ($row) => $mapper->hydrate($row),
         );
     }
+
+
+    /**
+     * Adds any associated rubric instances to $modelList
+     *
+     * @param GenericCollection $modelList
+     * @return GenericCollection
+     */
+    private function augmentListWithRubricInstances(GenericCollection $modelList): GenericCollection
+    {
+        $assessmentIds = $modelList->getPropertyValues($this->getIdentifierProperty());
+
+        $rubricInstanceMapper = $this->getJoinMapper('rubricInstances');
+
+        /* Find all the rubric instances associated with $assessmentIds
+         */
+        $rubricInstances = $rubricInstanceMapper->findByColumn('assessment_id', $assessmentIds);
+
+        /* Assemble them in situ into the assessment stack
+         * (This feels like we should have done this already, somewhere else, but I felt like I was doing it uniquely
+         * for the very first time, which seems a bit weird. Surely we've done something like this before?)
+         */
+        foreach ($rubricInstances as $rubricInstance) {
+            $assessment = $modelList->getBy('id', $rubricInstance->getAssessmentModel()->getId());
+
+            /* Init a GenericCollection in situ
+             */
+            if (null === $assessment->getRubricInstances()) {
+                $assessment->setRubricInstances($rubricInstanceMapper->createCollection());
+            }
+
+            $modelList->getBy('id', $rubricInstance->getAssessmentModel()->getId())
+                ->getRubricInstances()
+                ->add($rubricInstance);
+        }
+
+        return $modelList;
+    }
+
 
     /**
      * For any assessments in `$modelList`: fetch and add their corresponding
