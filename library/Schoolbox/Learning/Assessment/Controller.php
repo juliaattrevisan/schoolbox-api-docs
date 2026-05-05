@@ -636,7 +636,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 // TODO: for now, just one grid support, in the format of multiple
                 $rubricGridTranslator = new RubricGridTranslator();
                 $data['rubricGrids'] = [$rubricGrid];
-                $data['rubricGridsPayload'] = [$rubricGridTranslator($rubricGrid, $assessment)];
+                $data['rubricGridsPayload'] = [$rubricGridTranslator($rubricGrid)];
             }
         }
 
@@ -1277,12 +1277,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
             }
 
             $data['rubricGrids'][] = $rubricGrid;
-            $data['rubricGridsPayload'][] = $rubricGridTranslator($rubricGrid, $assessment);
+            $data['rubricGridsPayload'][] = $rubricGridTranslator($rubricGrid);
         }
 
         // for multiple rubrics, this allows the frontend to add another one
-//        // TODO: this probably needs to be an endpoint of its own as I expect it would change if you changed the original rubric? there's some nuance around how capabilities/indicators are deduped
-        $data['rubricBlankGrid'] = $rubricGridTranslator($this->rubricMapper->retrieveBlankGrid($assessment, true), $assessment);
+        // TODO: this probably needs to be an endpoint of its own as I expect it would change if you changed the original rubric? there's some nuance around how capabilities/indicators are deduped
+        $data['rubricBlankGrid'] = $rubricGridTranslator($this->rubricMapper->retrieveBlankGrid($assessment, true));
 
         return $data;
     }

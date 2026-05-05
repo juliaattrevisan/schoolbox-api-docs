@@ -14,7 +14,6 @@ use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Level;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\RowSet\Indicator;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 
 /**
  * Translator for converting a Rubric Grid into an array representation,
@@ -26,23 +25,25 @@ class ModelToArray
 {
     /**
      * @param Grid $rubricGrid
-     * @param DueWork $assessment TODO: Temp, shouldn't need this after moving capability mark type/scheme to the grid
      * @return array
      */
-    public function __invoke(Grid $rubricGrid, DueWork $assessment): array
+    public function __invoke(Grid $rubricGrid): array
     {
         $capabilities = [];
+
         foreach ($rubricGrid->iterateCapabilities() as $capability) {
             $capabilities[] = $this->translateCapability($rubricGrid, $capability);
         }
 
         return [
-            'id' => $rubricGrid->getId(),
+            'id' => $rubricGrid->getRubricInstance()->getId(),
             'title' => '(backend unimplemented)', // TODO: rubric title, string (not null)
             'weight' => null, // TODO: rubric weight, number|null
-            'useMarkRange' => $rubricGrid->isUseMarkRange(),
-            'capabilityMarkType' => $assessment->getCapabilityMarkType()?->getSlug(),
-            'capabilityGradeGroup' => $assessment->getCapabilityGradeGroup()?->getId(),
+            /* Ask a manufactured rubric grid about its settings, which came from its corresponding rubric_instance
+             */
+            'useMarkRange' => $rubricGrid->getRubricInstance()->getMarkedUsingRange(),
+            'capabilityMarkType' => $rubricGrid->getRubricInstance()->getCapabilityMarkType()?->getSlug(),
+            'capabilityGradeGroup' => $rubricGrid->getRubricInstance()->getCapabilityGradeGroup()?->getId(),
             'levels' => $rubricGrid->getLevels()->map(fn(Level $level) => [
                 'id' => $level->getId(),
                 'name' => $level->getName(),
