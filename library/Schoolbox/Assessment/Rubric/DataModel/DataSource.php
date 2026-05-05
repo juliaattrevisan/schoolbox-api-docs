@@ -461,30 +461,42 @@ class DataSource
      * Retrieve a blank grid for the given assessment (aka, the default rubric)
      * equivalent to what would be used if an assessment hasn't been persisted yet
      *
-     * @param DueWorkModel $assessment
+     * @param IAssessable $assessment
      * @param bool $getUsages
      * @return Grid
      * @throws MapperException
      */
-    public function retrieveBlankGrid(DueWorkModel $assessment, bool $getUsages): Grid
+    public function retrieveBlankGrid(IAssessable $assessment, bool $getUsages): Grid
     {
-        return new Grid($assessment, $this->retrieveRowSet($assessment->getContext(), $getUsages));
+        /* This $rubricInstance used to inform some default settings of a blank grid.
+         *
+         * That's kind of weird in the case of a blank grid because createModel() doesn't instantiate something with
+         * meaningful default values; they're just null. It relies on swamp to set the meaningful defaults, but that
+         * occurs elsewhere. Anyway, for our usages, it's sane enough to assume that "null" equates to "false" which
+         * ultimately means "this setting is off"
+         */
+        $rubricInstance = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance()->createModel();
+
+        return new Grid($assessment, $rubricInstance, $this->retrieveRowSet($assessment->getContext(), $getUsages));
     }
 
 
     /**
-     * Retrieve a grid for the given assessment.
+     * Retrieves the grid contents of a particular rubric instance, $rubricInstance.
      *
-     * @param DueWorkModel $assessment
-     * @param bool         $getUsages
-     * @param bool $cloneNewRubric if true, it should then return a copy of the rubric grid
-     *                             without the identifier, and can be used to create a clone assessment
-     *
+     * @param $assessment
+     * @param \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance
+     * @param bool $getUsages
+     * @param bool $cloneNewRubric
      * @return Grid
      * @throws MapperException
      */
-    public function retrieveGrid(DueWorkModel $assessment, bool $getUsages, bool $cloneNewRubric = false): Grid
-    {
+    public function retrieveOneGrid(
+        $assessment,
+        \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance,
+        bool $getUsages,
+        bool $cloneNewRubric = false
+    ): Grid {
         // Build the rowset first
         $grid = $this->retrieveBlankGrid($assessment, $getUsages);
 
@@ -493,30 +505,26 @@ class DataSource
             return $grid;
         }
 
-        /* Rubric instance ids used by $assessment
-         */
-        $rubricInstanceIds = $this->rubricInstanceMapper->findByColumn('assessment_id', $assessment->getId())->indexBy('id')->keys();
-
-        // Load the levels, selected capabilities+indicators, descriptors for the assessment
+        // Load the levels, selected capabilities+indicators, descriptors for the rubric instance
         $capabilityUsageModels = $this->capabilityUsageMapper->findByColumn(
             'rubric_instance_id',
-            $rubricInstanceIds,
+            $rubricInstance->getId(),
             ['order' => ['sequence' => 'asc',]]
-        )->indexByCallback(function (CapabilityUsageModel $gu) {
-            return $gu->getCapability()->getId();
+        )->indexByCallback(function (CapabilityUsageModel $capabilityUsage) {
+            return $capabilityUsage->getCapability()->getId();
         });
 
         $indicatorUsageModels = $this->indicatorUsageMapper->findByColumn(
             'rubric_instance_id',
-            $rubricInstanceIds,
+            $rubricInstance->getId(),
             ['order' => ['sequence' => 'asc',]]
-        )->indexByCallback(function (IndicatorUsageModel $cu) {
-            return $cu->getIndicator()->getId();
+        )->indexByCallback(function (IndicatorUsageModel $indicatorUsage) {
+            return $indicatorUsage->getIndicator()->getId();
         });
 
         $levelModels = $this->levelMapper->findByColumn(
             'rubric_instance_id',
-            $rubricInstanceIds,
+            $rubricInstance->getId(),
             ['order' => ['sequence' => 'asc',]]
         )->indexByCallback(function (LevelModel $l) {
             return $l->getId();
@@ -524,19 +532,19 @@ class DataSource
 
         $descriptorModels = $this->descriptorMapper->findByColumnList([
             'rubric_indicator_id' => $indicatorUsageModels->keys(),
-            'level_id'            => $levelModels->keys(),
+            'level_id' => $levelModels->keys(),
         ]);
 
         $groupedIndicatorUsageModels = $indicatorUsageModels->groupByCallback(
-            function (IndicatorUsageModel $cu) {
-                return $cu->getIndicator()->getCapability()->getId();
+            function (IndicatorUsageModel $indicatorUsage) {
+                return $indicatorUsage->getIndicator()->getCapability()->getId();
             }
         );
-
 
         // Create descriptor models
         $descriptorsByLevel     = [];
         $descriptorsByIndicator = [];
+
         foreach ($descriptorModels as $descriptorModel) {
             $levelId     = $descriptorModel->getLevel()->getId();
             $indicatorId = $descriptorModel->getIndicator()->getId();
@@ -613,9 +621,7 @@ class DataSource
 
             // Max value is derived from indicators, if mark-per-cap is off
             $capabilityUsage->setMaxValue(
-                $assessment->isMarkPerCapability()
-                    ? $capabilityUsageModel->getMaxValue()
-                    : $capabilityUsage->calculateMaxValueFromIndicators()
+                $rubricInstance->isMarkPerCapability() ? $capabilityUsageModel->getMaxValue() : $capabilityUsage->calculateMaxValueFromIndicators()
             );
 
             $grid->getCapabilityUsages()[$capabilityId] = $capabilityUsage;
@@ -631,6 +637,34 @@ class DataSource
         }
 
         return $grid;
+    }
+
+
+    /**
+     * Retrieve a grid for the given assessment.
+     *
+     * @param DueWorkModel $assessment
+     * @param bool         $getUsages
+     * @param bool $cloneNewRubric if true, it should then return a copy of the rubric grid
+     *                             without the identifier, and can be used to create a clone assessment
+     *
+     * @return Grid
+     * @throws MapperException
+     */
+    public function retrieveGrid(DueWorkModel $assessment, bool $getUsages, bool $cloneNewRubric = false): Grid
+    {
+        /* TODO this place will snap loudly by intent
+         *  This will probably become retrieveGrids(), iteratively fetching each grid of an $assessment and returning
+         *  a set of associated rubric grids.
+         *
+         * $stack = [];
+         *
+         * foreach ($assessment->getRubricInstances() as $rubricInstance()) {
+         *     $stack[] = $this->retrieveOneGrid($assessment, $rubricInstance, ...);
+         * }
+         *
+         * return $stack;
+         */
     }
 
 
