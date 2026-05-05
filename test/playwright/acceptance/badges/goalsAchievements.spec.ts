@@ -222,7 +222,8 @@ test.describe("Goals and Achievements tests", () => {
             "Award the goal as achievement and check if it is presented on the achievements tab on the profile page",
         );
         await badges.clickConfirm();
-        await expect(page.locator('[class="icon-achievement"]')).toBeVisible();
+        const achievedMeta = page.locator(".meta li").filter({ hasText: "Goal has been achieved" }).first();
+        await expect(achievedMeta.locator('sbx-icon[name="achievement"]')).toBeVisible();
         await profilePage.goto(studentId);
         await profilePage.clickTab("achievements");
         await expect(page.locator("#achievement-feed")).toContainText(badgeNameGoal);

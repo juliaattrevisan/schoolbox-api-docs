@@ -1,6 +1,15 @@
 import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
+const RESOURCE_ACTION_TEST_IDS = {
+    home: "resource-action-homepage",
+    files: "resource-action-files",
+    folder: "resource-action-folder",
+    delete: "resource-action-delete",
+} as const;
+
+type ResourceAction = keyof typeof RESOURCE_ACTION_TEST_IDS;
+
 export default class Resources {
     private page: Page;
 
@@ -59,11 +68,14 @@ export default class Resources {
 
     /**
      * clicks on the right side menu options to a folder:
-     * home, modify, drop-box, files, folder, link, download, upload, delete
+     * home, files, folder and delete
      * @param menuItem - The menu item to click
      */
-    async clickMenuItem(menuItem: string): Promise<void> {
-        await this.page.locator(`${Resources.RESOURCE_BROWSER} #meta a:has(sbx-icon[name='${menuItem}'])`).click();
+    async clickMenuItem(menuItem: ResourceAction): Promise<void> {
+        await this.page
+            .locator(`${Resources.RESOURCE_BROWSER} #meta`)
+            .getByTestId(RESOURCE_ACTION_TEST_IDS[menuItem])
+            .click();
     }
 
     /**
