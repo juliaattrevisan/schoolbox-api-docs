@@ -18,7 +18,8 @@ body.sbx-body {
     .side-nav,
     .scrollable,
     .cover-photo,
-    .cr-results-grid {
+    .cr-results-grid,
+    .component-container {
         box-shadow: var(--sbx-config-box-drop-shadow);
     }
 
@@ -27,6 +28,7 @@ body.sbx-body {
     .reveal-modal section,
     .island section section,
     #permissions .scrollable,
+    .component-container .island section,
     .sortable .empty-state,
     .content-overlay .empty-state-flex-centered,
     .off-canvas-list section {
