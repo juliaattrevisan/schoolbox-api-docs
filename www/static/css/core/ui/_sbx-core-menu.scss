@@ -283,7 +283,7 @@ body.sbx-body {
                     text-transform: none;
                     &:before {
                         content: "\e655"; /* The icon character */
-                        font-family: "sbx-icons" !important; /* Forces the icon font */
+                        font-family: var(--sbx-icon-font-family) !important; /* Forces the icon font */
                     }
                 }
             }
