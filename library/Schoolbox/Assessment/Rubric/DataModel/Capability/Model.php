@@ -78,7 +78,7 @@ class Model implements ISoftDeletable
     /**
      * @var null|GenericCollection<IndicatorModel>
      */
-    private ?GenericCollection $indicators;
+    private ?GenericCollection $indicators = null;
 
 
     /**
