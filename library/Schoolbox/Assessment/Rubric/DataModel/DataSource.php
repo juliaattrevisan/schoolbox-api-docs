@@ -1803,8 +1803,8 @@ class DataSource
             // Descriptor
             $dstDescriptor = clone $srcDescriptor;
 
-            $dstDescriptor->setId(null)
-                ->setOffset($srcDescriptor->getId(), $dstDescriptor);
+            $dstDescriptor->setId(null);
+            $dstDescriptors->setOffset($srcDescriptor->getId(), $dstDescriptor);
 
             // Link Descriptor + Level
             /** @var LevelModel $dstLevel */
