@@ -15,7 +15,7 @@ use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -26,41 +26,23 @@ use Schoolbox\Resource\Folder\Model as Folder;
  * This is a representation of the rubric grid as assigned to an assessment.
  *
  * It contains:
- * * an assessment to which this is assigned (in practise, always a due work)
- * * a row set
- * * a set of group usages
- * * a set of levels
+ *     - an assessment to which this is assigned
+ *     - a set of levels
+ *     - a set of capability usages
+ *     - a row set
  *
- * The grid's descriptors are able to be inferred from the grid's level set and
- * group usage set.
+ * The grid's descriptors are able to be inferred from the grid's level set and capability usage set.
  */
 class Grid
 {
-    /**
-     * The assessment for which the grid exists.
-     * Rubric Grids only exist for DueWork instances, for now.
-     *
-     * @var DueWork
-     */
-    private $assessment;
-
-
-    /**
-     * The row set for the grid.
-     *
-     * @var RowSet
-     */
-    private $rowSet;
-
-
     /**
      * The capabilities that are actually in use on the rubric grid.
      *
      * Each group's indicator usage is a row on the rubric grid.
      *
-     * @var CapabilityUsage[]|GenericCollection
+     * @var GenericCollection<CapabilityUsage>
      */
-    private $capabilityUsages;
+    private GenericCollection $capabilityUsages;
 
 
     /**
@@ -68,9 +50,9 @@ class Grid
      *
      * Each level is a column on the rubric grid.
      *
-     * @var Level[]|GenericCollection
+     * @var GenericCollection<Level>
      */
-    private $levels;
+    private GenericCollection $levels;
 
 
     /**
@@ -78,31 +60,24 @@ class Grid
      *
      * @var MarkSchemeFactory
      */
-    private $markSchemeFactory;
-
-
-    /**
-     * Does this rubric use mark ranges?
-     *
-     * @var bool
-     */
-    private bool $useMarkRange;
+    private MarkSchemeFactory $markSchemeFactory;
 
 
     /**
      * Constructor
      *
-     * @param DueWork $assessment
-     * @param RowSet  $rowSet
+     * @param IAssessable $assessment The assessment for which the grid exists.
+     * @param \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance Corresponds to a partricular grid of $assessment
+     * @param RowSet $rowSet The row set for the grid.
      */
-    public function __construct(DueWork $assessment, RowSet $rowSet)
-    {
-        $this->assessment        = $assessment;
-        $this->rowSet            = $rowSet;
+    public function __construct(
+        private IAssessable $assessment,
+        private \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance,
+        private RowSet $rowSet
+    ) {
         $this->capabilityUsages  = new GenericCollection(CapabilityUsage::class);
         $this->levels            = new GenericCollection(Level::class);
         $this->markSchemeFactory = new MarkSchemeFactory();
-        $this->useMarkRange      = $assessment->getUseMarkRange(); // TODO: useMarkRange should be against a rubric
     }
 
 
@@ -149,12 +124,13 @@ class Grid
      * Does this rubric grid use mark-per-capability?
      *
      * If your mark type is None, or not set, then you're not using Mark per Capability.
+     * Each rubric grid has its own settings, so you have to interrogate a rubric instance specifically.
      *
      * @return bool
      */
     public function isMarkPerCapability(): bool
     {
-        return $this->assessment instanceof DueWork && $this->assessment->isMarkPerCapability();
+        return $this->rubricInstance->isMarkPerCapability();
     }
 
     /**
@@ -163,14 +139,14 @@ class Grid
      */
     public function showDescriptorValue(): bool
     {
-        if (!$this->assessment instanceof DueWork) {
-            return false;
-        }
         $folder = $this->assessment->getContext()->getFolder();
+
         if (!($folder instanceof Folder) || !$folder->getYearLevels() || $folder->getYearLevels()->count() === 0) {
             return true;
         }
+
         $showDescriptorValue = array_unique($folder->getYearLevels()->getPropertyValues('showRubricPoints'));
+
         return count($showDescriptorValue) > 1 ? true : (bool)$showDescriptorValue[0];
     }
 
@@ -265,6 +241,7 @@ class Grid
     public function iterateIndicators(Capability $capability): iterable
     {
         $capabilityUsage = $this->retrieveCapabilityUsage($capability);
+
         return $capabilityUsage ? $capabilityUsage->iterateIndicators() : $capability->getIndicators();
     }
 
@@ -281,11 +258,12 @@ class Grid
      */
     public function isCapabilityMarkShown(Capability $capability): bool
     {
-        if (!($this->assessment instanceof DueWork && $this->assessment->isMarkPerCapability())) {
+        if (!$this->rubricInstance->isMarkPerCapability()) {
             return false;
         }
 
         $capabilityUsage = $this->retrieveCapabilityUsage($capability);
+
         if (!$capabilityUsage instanceof CapabilityUsage) {
             return false;
         }
@@ -360,31 +338,59 @@ class Grid
 
 
     /**
+     * Asks the grid's corresponding rubric instance about its Use Mark Range setting.
+     *
      * @return bool
      */
     public function isUseMarkRange(): bool
     {
-        return $this->useMarkRange;
+        return $this->rubricInstance->getMarkedUsingRange() ?? false;
     }
 
 
-    /**
-     * @return DueWork
+    /* Getters/Setters
      */
-    public function getAssessment(): DueWork
+
+
+    /**
+     * @return IAssessable
+     */
+    public function getAssessment(): IAssessable
     {
         return $this->assessment;
     }
 
+
     /**
-     * @param DueWork $assessment
+     * @param IAssessable $assessment
      * @return $this
      */
-    public function setAssessment(DueWork $assessment): self
+    public function setAssessment(IAssessable $assessment): self
     {
         $this->assessment = $assessment;
         return $this;
     }
+
+
+    /**
+     * @return \Schoolbox\Assessment\Rubric\Instance\Model
+     */
+    public function getRubricInstance(): \Schoolbox\Assessment\Rubric\Instance\Model
+    {
+        return $this->rubricInstance;
+    }
+
+
+    /**
+     * @param \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance
+     * @return $this
+     */
+    public function setRubricInstance(\Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance): self
+    {
+        $this->rubricInstance = $rubricInstance;
+        return $this;
+    }
+
 
 
     /**
@@ -397,7 +403,7 @@ class Grid
 
 
     /**
-     * @return CapabilityUsage[]|GenericCollection
+     * @return GenericCollection<CapabilityUsage>
      */
     public function getCapabilityUsages(): GenericCollection
     {
@@ -406,8 +412,8 @@ class Grid
 
 
     /**
-     * @param CapabilityUsage[]|GenericCollection $capabilityUsages
-     * @return static
+     * @param GenericCollection<CapabilityUsage> $capabilityUsages
+     * @return $this
      */
     public function setCapabilityUsages(GenericCollection $capabilityUsages): self
     {
@@ -417,7 +423,7 @@ class Grid
 
 
     /**
-     * @return Level[]|GenericCollection
+     * @return GenericCollection<Level>
      */
     public function getLevels(): GenericCollection
     {
@@ -426,8 +432,8 @@ class Grid
 
 
     /**
-     * @param Level[]|GenericCollection $levels
-     * @return static
+     * @param GenericCollection<Level> $levels
+     * @return $this
      */
     public function setLevels(GenericCollection $levels): self
     {
