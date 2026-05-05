@@ -35,6 +35,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Language\Model as LanguageModel;
 use Schoolbox\Mapper\Exception\NotFound as MapperNotFound;
+use Schoolbox\Resource\Folder\Code\Model as FolderCodeModel;
 
 class Controller extends ConfigController
 {
@@ -257,10 +258,12 @@ class Controller extends ConfigController
                 continue;
             }
 
-            $codes = array_values(
-                array_filter(array_map('trim', explode(',', $languageRow->getClassCode() ?? '')))
-            );
-            $subjectLanguageData[$gsId][] = ['languageId' => $languageId, 'codes' => $codes];
+            $codes = $this->getClassCodeValues($languageRow);
+            $subjectLanguageData[$gsId][$languageId]['languageId'] = $languageId;
+            $subjectLanguageData[$gsId][$languageId]['codes'] = array_values(array_unique([
+                ...($subjectLanguageData[$gsId][$languageId]['codes'] ?? []),
+                ...$codes,
+            ]));
 
             foreach ($codes as $code) {
                 $codeToSubjectIds[$code][$gsId] = true;
@@ -274,10 +277,10 @@ class Controller extends ConfigController
                 fn(int $gsId) => [
                     'groupSubjectId' => $gsId,
                     'total' => 0,
-                    'byLanguage' => array_map(
+                    'byLanguage' => array_values(array_map(
                         fn(array $lang) => ['languageId' => $lang['languageId'], 'count' => 0],
                         $subjectLanguageData[$gsId]
-                    ),
+                    )),
                 ],
                 $groupSubjectIds
             );
@@ -423,20 +426,35 @@ class Controller extends ConfigController
             $subjects = [];
             /** @var IBGroupSubjectModel $groupSubject */
             foreach ($groupSubjects as $groupSubject) {
+                $languages = [];
+
+                foreach ($groupSubject->getLanguages() as $language) {
+                    $languageId = $language->getLanguage()?->getId();
+
+                    if ($languageId === null) {
+                        continue;
+                    }
+
+                    $languages[$languageId]['languageId'] = $languageId;
+                    $languages[$languageId]['languageName'] = $language->getLanguage()?->getName();
+                    $languages[$languageId]['classCodes'] = [
+                        ...($languages[$languageId]['classCodes'] ?? []),
+                        ...$this->getClassCodeValues($language),
+                    ];
+                }
+
                 $subjects[] = [
                     'id' => $groupSubject->getId(),
                     'subject' => $groupSubject->getSubject()->getName(),
                     'level' => $groupSubject->getLevel() ?: '',
-                    'languages' => $groupSubject->getLanguages()
-                        ->map(
-                            fn(GroupSubjectLanguageModel $language) => [
-                                'languageId' => $language->getLanguage()?->getId(),
-                                'languageName' => $language->getLanguage()?->getName(),
-                                'classCode' => $language->getClassCode() ?? '',
-                            ]
-                        )
-                        ->reindex()
-                        ->getAll(),
+                    'languages' => array_values(array_map(
+                        static fn(array $language) => [
+                            'languageId' => $language['languageId'],
+                            'languageName' => $language['languageName'],
+                            'classCode' => implode(', ', array_unique($language['classCodes'])),
+                        ],
+                        $languages
+                    )),
                 ];
             }
 
@@ -563,6 +581,19 @@ class Controller extends ConfigController
         return $this->getConfigMapper()
                     ->getPredicateBuilder()
                     ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_IB);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getClassCodeValues(GroupSubjectLanguageModel $language): array
+    {
+        return array_values(array_filter(
+            $language->getClassCode()->map(
+                static fn(FolderCodeModel $classCode) => trim((string) $classCode->getCode())
+            )->getAll(),
+            static fn(string $classCode): bool => $classCode !== ''
+        ));
     }
 
     /**
