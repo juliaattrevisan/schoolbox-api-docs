@@ -193,7 +193,7 @@ window.Vue.onBeforeUnmount((): void => {
 <style lang="scss">
 .bottom-drawer-container {
     background: var(--sbx-color-foreground-primary, #fff);
-    border-radius: var(--sbx-config-field-roundness, 0) var(--sbx-config-field-roundness, 0) 0 0;
+    border-radius: var(--sbx-config-box-roundness, 0) var(--sbx-config-box-roundness, 0) 0 0;
     bottom: 0px;
     box-shadow: 0px -2px 6px 0px rgba(0, 0, 0, 0.1);
     height: auto;
