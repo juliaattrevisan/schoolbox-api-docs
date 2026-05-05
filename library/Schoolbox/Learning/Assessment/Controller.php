@@ -16,6 +16,10 @@ use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Participant\Model;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as RubricDescriptorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\IndicatorMark\Mapper as RubricIndicatorMarkMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
+use Schoolbox\Assessment\Rubric\Grid\Level;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter;
 use Schoolbox\Filter\CompositeFactoryFactory;
@@ -100,6 +104,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param Access $access
      * @param Transactor $transactor
      * @param BreadcrumbFactory $bakery
+     * @param \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper
+     * @param RubricDataSource $rubricMapper
      * @param Mapper $termMapper
      * @param DataSource $participantDataSource
      * @param CourseSpecificationMapper $courseSpecificationMapper
@@ -122,7 +128,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param null|string $learnosityConsumerKey
      * @param null|string $learnosityConsumerSecret
      * @param MimetypeMapper|null $mimetypeMapper
-     * @param RubricDataSource|null $rubricDataSource
      * @param EditorTemplateHelper|null $editorTemplateHelper
      */
     public function __construct(
@@ -133,6 +138,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
         Access $access,
         Transactor $transactor,
         protected BreadcrumbFactory $bakery,
+        protected \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper,
+        protected \Schoolbox\Assessment\Rubric\DataModel\DataSource $rubricMapper,
         private Term\Mapper $termMapper,
         Participant\DataSource $participantDataSource,
         private CourseSpecificationMapper $courseSpecificationMapper,
@@ -155,7 +162,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
         #[\SensitiveParameter] ?string $learnosityConsumerKey = null,
         #[\SensitiveParameter] ?string $learnosityConsumerSecret = null,
         protected ?MimetypeMapper $mimetypeMapper = null,
-        protected ?RubricDataSource $rubricDataSource = null,
         private ?EditorTemplateHelper $editorTemplateHelper = null,
     ) {
         parent::__construct(
@@ -1152,6 +1158,113 @@ abstract class Controller extends ListController implements IAssessmentControlle
         ];
 
         $data = array_merge($data, $this->getAssessmentTwigData($assessment));
+        $data = array_merge($data, $this->generateRubricTwigData($assessment));
+
+        return $data;
+    }
+
+
+    /**
+     * Common logic when generating Rubrics
+     *
+     * Every learning activity can have 0 or more rubric grids associated with it, making this method common to all.
+     * (It was originally in the Due Work controller for historical reasons; I transplanted it here)
+     *
+     * @param IAssessable $assessment
+     * @return array
+     * @throws MapperException
+     */
+    private function generateRubricTwigData(IAssessable $assessment): array
+    {
+        $data = [];
+
+        $rubricZone = (new Zone('rubric'))
+            ->setFileVar('rb_attach[]')
+            ->setAttachPrompt('Import a rubric')
+            ->useImportExpiryDate();
+            // JS file.type isn't set reliably enough to use text/csv mime filter
+            //->setMimeFilter('text/csv');
+
+        $data['rubricAttachZone'] = $rubricZone->getTwigContext();
+
+        /* This allows users to quickly mass-produce a set of descriptors from a predefined set
+         * They're found in rubric_result
+         */
+        $resultSets = $this->resultSetMapper->findAll();
+
+        $rs = [];
+
+        foreach ($resultSets as $result) {
+            /* Only initialise the result set tuple once, so you can accumulate structs in the results node here.
+             */
+            if (!isset($rs[$result->getResultSetId()])) {
+                $rs[$result->getResultSetId()] = [
+                    'id' => $result->getResultSetId(),
+                    'results' => [],
+                ];
+            }
+
+            $rs[$result->getResultSetId()]['results'][] = [
+                'value' => $result->getValue(),
+                'label' => $result->getLabel(),
+            ];
+        }
+
+        $data['rubricResultSets'] = array_values($rs);
+
+        // Do any students have marks for this rubric?
+        /* TODO Find out what this meant.
+         *  I think it was for detecting changes to the grid, prompting users with "this will invalidate marks already
+         *  given", because the grid structure changed somehow (or, detecting this scenario, maybe)
+         */
+//        $levelIds      = RubricLevelMapper::getInstance()->findIdsByColumn('b.assessment_id', $dueWork->getId());
+//        $descriptorIds = RubricDescriptorMapper::getInstance()->findIdsByColumn('level_id', $levelIds);
+//        $countMarkIds  = RubricIndicatorMarkMapper::getInstance()->countByColumnList(
+//            [
+//                'descriptor_id' => $descriptorIds,
+//                'valid'         => true,
+//            ]
+//        );
+
+
+        /**
+         * list of all rubric grids for this assessment
+         * (Two representations of the same rubric data)
+         *
+         * @see also in /library/Schoolbox/Learning/Assessment/Controller.php:getCloneAssessmentForm
+         */
+        $data['rubricGrids'] = [];
+        $data['rubricGridsPayload'] = [];
+
+        /* Converts an object to a frontend-friendly payload
+         */
+        $rubricGridTranslator = new RubricGridTranslator();
+
+        /* Assemble each rubric grid via its instance, separately, for now. Maybe there's a shortcut to all this that
+         * is cheaper, but this will be the simplest for the time being.
+         */
+        foreach ($assessment->getRubricInstances() as $rubricInstance) {
+            /* Obtain the levels, caps/ind/desc data for a given rubric instance, compiling them into a struct that you
+             * can render in the vue component in the frontend
+             */
+            $rubricGrid = $this->rubricMapper->retrieveOneGrid($assessment, $rubricInstance, true);
+
+            /* Arbitrarily supply two placeholder levels if the grid never had any, such as when you're making a whole new
+             * grid from scratch for the first time. This prompts users to fill them in.
+             */
+            if (count($rubricGrid->getLevels()) === 0) {
+                $rubricGrid->getLevels()
+                    ->add(new Level())
+                    ->add(new Level());
+            }
+
+            $data['rubricGrids'][] = $rubricGrid;
+            $data['rubricGridsPayload'][] = $rubricGridTranslator($rubricGrid, $assessment);
+        }
+
+        // for multiple rubrics, this allows the frontend to add another one
+//        // TODO: this probably needs to be an endpoint of its own as I expect it would change if you changed the original rubric? there's some nuance around how capabilities/indicators are deduped
+        $data['rubricBlankGrid'] = $rubricGridTranslator($this->rubricMapper->retrieveBlankGrid($assessment, true), $assessment);
 
         return $data;
     }
