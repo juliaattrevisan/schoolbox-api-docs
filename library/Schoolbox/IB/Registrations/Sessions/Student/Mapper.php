@@ -250,7 +250,7 @@ class Mapper extends BaseMapper
             );
 
             if (!$student->getId()) {
-                $student->setStatus(0);
+                $student->setStatus(Model::STATUS_PREPARATION);
             }
 
             $students->add($student);
