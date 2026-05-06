@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Socs\Results;
 
+use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
 use Schoolbox\Fixtures\Matchup\Model as MatchupModel;
@@ -55,10 +56,10 @@ class Import implements IStrategy
             'enddate'   => $endDate,
         ];
 
-        $response = $this->httpClient->get(self::RESULTS_PATH, $query, $this->log);
-
-        if (null === $response) {
-            $this->log->info('SOCS results no response; skipping');
+        try {
+            $response = $this->httpClient->get(self::RESULTS_PATH, $query, $this->log);
+        } catch (GuzzleException $e) {
+            $this->log->warning(sprintf('Failed to contact SOCS results endpoint: %s', $e->getMessage()));
             return;
         }
 
