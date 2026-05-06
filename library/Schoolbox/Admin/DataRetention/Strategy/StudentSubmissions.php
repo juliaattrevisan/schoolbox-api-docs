@@ -27,10 +27,7 @@ class StudentSubmissions extends Base
     private const string TABLE_NAME_KAMI_DOCUMENT = 'kami_document';
 
     /**
-     * Labels this strategy with the matching admin setting so CLI output is
-     * understandable when multiple retention strategies run in sequence.
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getRetentionLabel(): string
     {
@@ -38,9 +35,7 @@ class StudentSubmissions extends Base
     }
 
     /**
-     * Returns the CLI strategy identifier accepted by ValidStrats.
-     *
-     * @return string
+     * @inheritDoc
      */
     public function getStrategyName(): string
     {
@@ -48,11 +43,7 @@ class StudentSubmissions extends Base
     }
 
     /**
-     * Counts the parent and dependent rows up front so the process can skip the
-     * chunk loop when there are no eligible soft-deleted submissions.
-     *
-     * @return bool
-     * @throws \PDOException
+     * @inheritDoc
      */
     protected function hasDataToDelete(): bool
     {
@@ -97,11 +88,7 @@ class StudentSubmissions extends Base
     }
 
     /**
-     * Selects only soft-deleted parent submissions because related file rows
-     * are removed due to parent eligibility, not their own deleted_at value.
-     *
-     * @return array<int, array{id: int|string}>
-     * @throws \PDOException
+     * @inheritDoc
      */
     protected function getIdsToDelete(): array
     {
@@ -122,13 +109,7 @@ class StudentSubmissions extends Base
     }
 
     /**
-     * Deletes a chunk in dependency order so integration records cannot block
-     * deletion of submission files, and submission files cannot block parents.
-     *
-     * @param array<int, array{id: int|string}> $chunk
-     * @return void
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
+     * @inheritDoc
      */
     protected function deleteChunk(array $chunk): void
     {
