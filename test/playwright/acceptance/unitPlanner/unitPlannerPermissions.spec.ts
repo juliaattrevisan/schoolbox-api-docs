@@ -11,10 +11,15 @@ import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/Unit
 test.describe("Unit Planner Permissions", () => {
     test.beforeAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo(
-            "update perms table to give read permission to teacher for Persuasion and the Media unit and none permission for To Kill a Mockingbird unit",
+            "update perms and userAccess tables to set course, unit and CMS permissions for the unit planner permission tests",
         );
+        await db.updateInDatabase("perms", { type: 1 }, { cid: 16, gid: 2 }); // Year 9 French - Read access
+        await db.updateInDatabase("perms", { type: 0 }, { cid: 65, gid: 2 }); // ELC - None access
         await db.updateInDatabase("perms", { type: 1 }, { cid: 102, gid: 2 }); // Persuasion and the Media - Read access
         await db.updateInDatabase("perms", { type: 0 }, { cid: 89, gid: 2 }); // To Kill a Mockingbird unit - None access
+        await db.haveInDatabase("userAccess", { uid: 43, service: 5, type: 1 }); // Alisson Chan - Read access
+        await db.haveInDatabase("userAccess", { uid: 66, service: 5, type: 2 }); // Staff 2 - Write access
+        await db.haveInDatabase("userAccess", { uid: 67, service: 5, type: 3 }); // Staff 3 - Admin access
         // Romeo and Juliet unit has Write access for the teacher by provision
     });
 
@@ -81,8 +86,13 @@ test.describe("Unit Planner Permissions", () => {
     });
 
     test.afterAll(async ({ baseTester, db }) => {
-        baseTester.isGoingTo("update perms table to restore original permissions as per provision");
+        baseTester.isGoingTo("update perms and userAccess tables to restore original permissions as per provision");
+        await db.updateInDatabase("perms", { type: 2 }, { cid: 16, gid: 2 }); // Year 9 French - set back to write access
+        await db.updateInDatabase("perms", { type: 2 }, { cid: 65, gid: 2 }); // ELC - set back to write access
         await db.updateInDatabase("perms", { type: 2 }, { cid: 102, gid: 2 }); // Persuasion and the Media - set back to write access
         await db.updateInDatabase("perms", { type: 2 }, { cid: 89, gid: 2 }); // To Kill a Mockingbird unit - set back to write access
+        await db.dontHaveInDatabase("userAccess", { uid: 43, service: 5, type: 1 });
+        await db.dontHaveInDatabase("userAccess", { uid: 66, service: 5, type: 2 });
+        await db.dontHaveInDatabase("userAccess", { uid: 67, service: 5, type: 3 });
     });
 });
