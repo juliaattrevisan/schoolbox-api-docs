@@ -739,14 +739,6 @@ class Controller extends ConfigController
     public function getRegistrationSessionStudents(int $id): void
     {
         try {
-            if (!$this->registrationSessionMapper->findById($id) instanceof RegistrationSessionModel) {
-                $this->response = $this->responseAsJson([
-                    'success' => false,
-                    'message' => 'Registration session not found',
-                ])->withStatus(404);
-                return;
-            }
-
             $schoolName = (string) ($this->getConfigLoader()->get(ConfigMapper::NAME_IB_SCHOOL_NAME) ?? '');
             $payloadBuilder = new RegistrationSessionStudentPayload();
             $students = $this->registrationSessionStudentMapper->findStudentsForSession($id);
@@ -769,12 +761,12 @@ class Controller extends ConfigController
         } catch (MapperNotFound) {
             $this->response = $this->responseAsJson([
                 'success' => false,
-                'message' => 'Registration session not found',
+                'message' => 'Registration session not found.',
             ])->withStatus(404);
         } catch (Exception $e) {
             $this->response = $this->responseAsJson([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Something has gone wrong. Please try again later.',
             ])->withStatus(500);
         }
     }
