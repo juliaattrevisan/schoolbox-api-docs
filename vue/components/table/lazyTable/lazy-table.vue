@@ -60,8 +60,8 @@ function onSortSelected(key: string): void {
                 </th>
             </tr>
         </thead>
-
-        <tbody v-if="!props.isLoading">
+        <loading-table v-if="props.isLoading" :only-body="true" :rows="5" row-height="3rem" />
+        <tbody v-else>
             <tr
                 v-for="(row, rowIndex) in props.rows"
                 :key="rowIndex"
@@ -80,7 +80,6 @@ function onSortSelected(key: string): void {
                 </td>
             </tr>
         </tbody>
-        <loading-table v-else :only-body="true" :rows="5" row-height="3rem" />
     </table>
 </template>
 
