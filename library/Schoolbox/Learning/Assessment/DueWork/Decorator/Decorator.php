@@ -12,9 +12,11 @@ namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
 use DomainException;
 use InvalidArgumentException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
@@ -24,6 +26,7 @@ use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
 use Schoolbox\Collection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\AttachedFilesTrait;
+use Schoolbox\Learning\Assessment\DataModel\RubricTrait;
 use Schoolbox\Learning\Assessment\DecoratorInterface;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -44,9 +47,32 @@ class Decorator implements DecoratorInterface
 {
     use DueWorkTrait;
     use AttachedFilesTrait;
+    use RubricTrait;
 
-    /** @var DueWork|null $original */
-    private $original;
+
+    /**
+     * @var MarkTypeMapper
+     */
+    private MarkTypeMapper $markTypeMapper;
+
+
+    /**
+     * @var GradeLevel\Group\Mapper
+     */
+    private GradeLevel\Group\Mapper $gradeGroupMapper;
+
+
+    /**
+     * @var UnitSpecificationMapper
+     */
+    private UnitSpecificationMapper $unitSpecificationMapper;
+
+
+    /**
+     * @var RosettaStone|mixed
+     */
+    private RosettaStone $l10n;
+
 
     /**
      * Decorator constructor.
@@ -56,10 +82,6 @@ class Decorator implements DecoratorInterface
      * @param int          $instructorMarkType
      * @param int|null     $gradingScheme
      * @param int|null     $instructorGradingScheme
-     * @param bool         $useRubric
-     * @param int          $capabilityMarkType
-     * @param int|null     $capabilityGradeGroup
-     * @param bool         $useMarkRange
      * @param float|null   $maxMark
      * @param float|null   $instructorMaxMark
      * @param array|null   $rubricData
@@ -80,10 +102,6 @@ class Decorator implements DecoratorInterface
         int $instructorMarkType,
         ?int $gradingScheme,
         ?int $instructorGradingScheme,
-        bool $useRubric,
-        int $capabilityMarkType,
-        ?int $capabilityGradeGroup,
-        bool $useMarkRange,
         ?float $maxMark,
         ?float $instructorMaxMark,
         ?array $rubricData,
@@ -96,17 +114,13 @@ class Decorator implements DecoratorInterface
         bool $enableText,
         bool $enableFiles,
         bool $enablePolicy,
-        ?DueWork $original
+        private ?DueWork $original
     ) {
         $this->setAcceptOnline($acceptOnline);
         $this->setMarkType($markType);
         $this->setInstructorMarkType($instructorMarkType);
         $this->setGradingScheme($gradingScheme);
         $this->setInstructorGradingScheme($instructorGradingScheme);
-        $this->setUseRubric($useRubric);
-        $this->setCapabilityMarkType($capabilityMarkType);
-        $this->setCapabilityGradeGroup($capabilityGradeGroup);
-        $this->setUseMarkRange($useMarkRange);
         $this->setMaxMark($maxMark);
         $this->setInstructorMaxMark($instructorMaxMark);
         $this->setRubricData($rubricData);
@@ -119,16 +133,24 @@ class Decorator implements DecoratorInterface
         $this->setEnableText($enableText);
         $this->setEnableFiles($enableFiles);
         $this->setEnablePolicy($enablePolicy);
-        $this->original = $original;
+
+        /* TODO Inject these, one day
+         */
+        $this->markTypeMapper = MarkTypeMapper::getInstance();
+        $this->gradeGroupMapper = GradeLevel\Group\Mapper::getInstance();
+        $this->unitSpecificationMapper = UnitSpecificationMapper::getInstance();
+
+        // (Forgive me too for perpetuating this)
+        /** @var RosettaStone $l10n */
+        $this->l10n = \Schoolbox\Mapper::getDi()->get('l10n');
     }
+
 
     /**
      * @param DueWork $assessment
-     * @throws DomainException
-     * @throws InvalidArgumentException
-     * @throws RangeException
      * @throws Exception
-     * @throws UnexpectedValueException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function decorate($assessment)
     {
@@ -145,23 +167,22 @@ class Decorator implements DecoratorInterface
          * Ideally these would be hydrated like everything else, but for some reason,
          * I end up drowning in the Swamp if I try
          */
-        $markType = MarkTypeMapper::getInstance()->createModel()->setId($this->getMarkType());
-        $instructorMarkType = MarkTypeMapper::getInstance()->createModel()->setId($this->getInstructorMarkType());
-        $gradingGroup = Mapper::getInstance()->createModel()->setId($this->getGradingScheme());
-        $instructorGradingGroup = Mapper::getInstance()->createModel()->setId($this->getInstructorGradingScheme());
+        $markType = $this->markTypeMapper->createModel()->setId($this->getMarkType());
+        $instructorMarkType = $this->markTypeMapper->createModel()->setId($this->getInstructorMarkType());
+        $gradingGroup = $this->gradeGroupMapper->createModel()->setId($this->getGradingScheme());
+        $instructorGradingGroup = $this->gradeGroupMapper->createModel()->setId($this->getInstructorGradingScheme());
 
-        $capabilityMarkType = MarkTypeMapper::getInstance()->createModel()->setId($this->getCapabilityMarkType());
-        /** @var SubmissionBox\GradeLevel\Group\Model $capabilityGradeGroup */
-        $capabilityGradeGroup = Mapper::getInstance()->createModel()->setId($this->getCapabilityGradeGroup());
+        $assessment->setMarkType($markType)
+            ->setInstructorMarkType($instructorMarkType)
+            ->setGradeGroup($gradingGroup)
+            ->setInstructorGradeGroup($instructorGradingGroup);
 
-        $assessment->setMarkType($markType);
-        $assessment->setInstructorMarkType($instructorMarkType);
-        $assessment->setGradeGroup($gradingGroup);
-        $assessment->setInstructorGradeGroup($instructorGradingGroup);
-        $assessment->setUseRubric($this->getUseRubric());
-        $assessment->setCapabilityMarkType($capabilityMarkType);
-        $assessment->setCapabilityGradeGroup($capabilityGradeGroup);
-        $assessment->setUseMarkRange($this->getUseMarkRange());
+        //        $capabilityMarkType = MarkTypeMapper::getInstance()->createModel()->setId($this->getCapabilityMarkType());
+        //        /** @var SubmissionBox\GradeLevel\Group\Model $capabilityGradeGroup */
+        //        $capabilityGradeGroup = Mapper::getInstance()->createModel()->setId($this->getCapabilityGradeGroup());
+        //
+        //        $assessment->setCapabilityMarkType($capabilityMarkType);
+        //        $assessment->setCapabilityGradeGroup($capabilityGradeGroup);
 
         if ($this->getSelfReviewable() !== null) {
             // Something has come through from post, set to that
@@ -171,68 +192,93 @@ class Decorator implements DecoratorInterface
             $assessment->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
         } // Otherwise let the existing setting persist
 
-        if ($this->getUseRubric() && $this->original) {
-            // relocating
+        /* If there are any rubric grids, we need to process each one for this assessment.
+         * We also assign the assessment's maximum available marks as the summation of all the grids' maxima.
+         */
+        if ($assessment->getRubricInstances()->count()) {
+            /* Populate rubric_instance records with settings from the rubricData payload
+             */
             $rubricMapper = RubricDataSource::getInstance();
             $gridFactory  = new GridFactory();
 
-            $rowSetBeforeMove = $rubricMapper->retrieveRowSet($this->original->getBaseContext(), true);
-            $existingGrid     = new Grid($this->original, $rowSetBeforeMove);
-            $existingGrid     = $gridFactory->buildFromPostData($existingGrid, $this->rubricData, false);
+            /* An assessment's maxMark is the largest possibility, defined by the aggregation of all rubric
+             * grids. I'm sure there's a case to be made where some grids aren't supposed to contribute to an
+             * assessment's maximum marks but we'll just not entertain that theory for now
+             */
+            $maxMark = 0;
 
-            $importer = new GenericImporter(
-                $existingGrid,
-                $assessment->getUseMarkRange(),
-                $assessment->getCapabilityMarkType()->getId(),
-                $assessment->getCapabilityGradeGroup()->getId()
-            );
+            foreach ($assessment->getRubricInstances() as $rubricInstance) {
+                $existingGrid = new Grid(
+                    $assessment,
+                    $rubricInstance,
+                    $rubricMapper->retrieveRowSet($assessment->getBaseContext(), true)
+                );
 
-            // Now new assessment should have new grid
-            $rubricMapper->importGrid($assessment, $importer);
-            $markMax = $assessment->getRubricGrid()->calculateMaxValueFromCapabilities();
-            $assessment->setMaxMark($markMax);
-            $assessment->setInstructorMaxMark($markMax);
-        } elseif ($this->getUseRubric()) {
-            $rubricMapper = RubricDataSource::getInstance();
-            $gridFactory  = new GridFactory();
-            $existingGrid = new Grid(
-                $assessment,
-                $rubricMapper->retrieveRowSet($assessment->getBaseContext(), true)
-            );
-            $newGrid = $gridFactory->buildFromPostData($existingGrid, $this->getRubricData());
+                $newGrid = $gridFactory->buildFromPostData($existingGrid, $this->getRubricData()[$rubricInstance->getId()]);
 
-            // (Forgive me too for perpetuating this)
-            /** @var RosettaStone $l10n */
-            // TODO this should be a part of buildFromPostData, but I don't feel like injecting all its dependencies
-            $l10n = \Schoolbox\Mapper::getDi()->get('l10n');
-            $spec = new ValidRowSet(
-                $l10n,
-                UnitSpecificationMapper::getInstance(),
-                $rubricMapper,
-                $existingGrid->getRowSet(),
-                false,
-                $newGrid->getAssessment()
-            );
+                // TODO this should be a part of buildFromPostData, but I don't feel like injecting all its dependencies
+                $spec = new ValidRowSet(
+                    $this->l10n,
+                    $this->unitSpecificationMapper,
+                    $rubricMapper,
+                    $existingGrid->getRowSet(),
+                    false,
+                    $newGrid->getAssessment()
+                );
 
-            // `isSatisfiedBy` needs to raise an exception instead of just
-            // returning false.
-            // If it does just return false: that's a logic exception, fix it
-            if (!$spec->isSatisfiedBy($newGrid->getRowSet())) {
-                throw new InvalidArgumentException("Save of row set failed for unknown reason");
+                // `isSatisfiedBy` needs to raise an exception instead of just
+                // returning false.
+                // If it does just return false: that's a logic exception, fix it
+                if (!$spec->isSatisfiedBy($newGrid->getRowSet())) {
+                    throw new InvalidArgumentException("Save of row set failed for unknown reason");
+                }
+
+                /* Aggregate maximum mark of this grid
+                 */
+                $maxMark += $newGrid->calculateMaxValueFromCapabilities();
             }
 
-            $assessment->setRubricGrid($newGrid);
-
-            // The max mark for a rubric-using assessment is always the same as
-            // the max mark from its capabilities
-            $markMax = $newGrid->calculateMaxValueFromCapabilities();
-            $assessment->setMaxMark($markMax);
-            $assessment->setInstructorMaxMark($markMax);
+            /* The max mark is the aggregation of each grid's maximum
+             */
+            $assessment
+                ->setMaxMark($maxMark)
+                ->setInstructorMaxMark($maxMark);
         } else {
-            // The max mark is always whatever got sent in the form
-            $assessment->setMaxMark($this->getMaxMark());
-            $assessment->setInstructorMaxMark($this->getInstructorMaxMark());
+            /* The max mark is always whatever got sent in the form; it was entered by a human
+             */
+            $assessment
+                ->setMaxMark($this->getMaxMark())
+                ->setInstructorMaxMark($this->getInstructorMaxMark());
         }
+
+        /* TODO reimplement somehow
+         */
+//        if ($this->getUseRubric() && $this->original) {
+//            // relocating
+//            $rubricMapper = RubricDataSource::getInstance();
+//            $gridFactory  = new GridFactory();
+//
+//            $rowSetBeforeMove = $rubricMapper->retrieveRowSet($this->original->getBaseContext(), true);
+//            $existingGrid     = new Grid($this->original, $rowSetBeforeMove);
+//            $existingGrid     = $gridFactory->buildFromPostData($existingGrid, $this->rubricData, false);
+//
+//            $importer = new GenericImporter(
+//                $existingGrid,
+//                $assessment->getUseMarkRange(),
+//                $assessment->getCapabilityMarkType()->getId(),
+//                $assessment->getCapabilityGradeGroup()->getId()
+//            );
+//
+//            // Now new assessment should have new grid
+//            $rubricMapper->importGrid($assessment, $importer);
+//            $markMax = $assessment->getRubricGrid()->calculateMaxValueFromCapabilities();
+//            $assessment->setMaxMark($markMax);
+//            $assessment->setInstructorMaxMark($markMax);
+//        } elseif ($this->getUseRubric()) {
+//            Already reimplemented above
+//        } else {
+//            Already reimplemented above
+//        }
 
         // Only spawn the mark scheme after the max mark is finalized
         // (as it might have changed from what was submitted to the form)
