@@ -65,6 +65,8 @@ export default class UnitPlanner {
 
     static readonly DATA_TEST_VIEW_MORE = "unit-planner-view-more-button-{unitId}-{columType}";
 
+    static readonly DATA_TEST_UNIT_PLANNER_CONTAINER = "unit-planner-container";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -170,7 +172,7 @@ export default class UnitPlanner {
         await unitDragHandle.hover();
         await this.page.mouse.down();
 
-        const unitPlannerContainer = this.page.getByTestId("unit-planner-container");
+        const unitPlannerContainer = this.page.getByTestId(UnitPlanner.DATA_TEST_UNIT_PLANNER_CONTAINER);
 
         // Move mouse to top of container, then wait for the reorder to happen
         await unitPlannerContainer.hover({ position: { x: 0, y: 0 } });
@@ -240,6 +242,7 @@ export default class UnitPlanner {
      */
     async navigateAndCheckCreateUnitsButton(courseId: number, shouldBeVisible: boolean): Promise<void> {
         await this.goto(courseId);
+        await expect(this.page.getByTestId("unit-planner-container")).toBeVisible();
         await this.checkCreateUnitsButtonVisibility(shouldBeVisible);
     }
 
