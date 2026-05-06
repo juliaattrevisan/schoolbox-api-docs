@@ -798,7 +798,6 @@ async function saveSubjectConfiguration(): Promise<void> {
                     </tbody>
                 </table>
             </template>
-
         </div>
 
         <search-select-modal
