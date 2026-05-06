@@ -313,16 +313,36 @@ class Mapper extends BaseMapper
      */
     private function findMatchedFolderCodesForUsers(array $usersById): array
     {
-        $subjectMapper = new SubjectMapper();
+        /** @var array<int, array<string, string>> $cachedClassCodesByUserId */
+        static $cachedClassCodesByUserId = [];
+
         $classCodesByUserId = [];
+        $uncachedUsersById = [];
 
         foreach ($usersById as $userId => $user) {
-            foreach ($subjectMapper->findAllForUser($user, null) as $subject) {
-                $classCode = trim((string) ($subject['matchedCode'] ?? $subject['code'] ?? ''));
+            if (array_key_exists($userId, $cachedClassCodesByUserId)) {
+                $classCodesByUserId[$userId] = $cachedClassCodesByUserId[$userId];
+                continue;
+            }
 
-                if ($classCode !== '') {
-                    $classCodesByUserId[$userId][$classCode] = $classCode;
+            $uncachedUsersById[$userId] = $user;
+        }
+
+        if (!empty($uncachedUsersById)) {
+            $subjectMapper = new SubjectMapper();
+
+            foreach ($uncachedUsersById as $userId => $user) {
+                $cachedClassCodesByUserId[$userId] = [];
+
+                foreach ($subjectMapper->findAllForUser($user, null) as $subject) {
+                    $classCode = trim((string) ($subject['matchedCode'] ?? $subject['code'] ?? ''));
+
+                    if ($classCode !== '') {
+                        $cachedClassCodesByUserId[$userId][$classCode] = $classCode;
+                    }
                 }
+
+                $classCodesByUserId[$userId] = $cachedClassCodesByUserId[$userId];
             }
         }
 
