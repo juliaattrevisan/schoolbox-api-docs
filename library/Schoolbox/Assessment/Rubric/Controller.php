@@ -103,7 +103,8 @@ class Controller extends BaseController
         Indicator\Mapper $indicatorMapper,
         RosettaStone $rosettaStone,
         MarkTypeMapper $markTypeMapper,
-        Group\Mapper $gradeGroupMapper
+        Group\Mapper $gradeGroupMapper,
+        private \Schoolbox\Assessment\Rubric\Instance\Mapper $rubricInstanceMapper
     ) {
         $this->mapper               = $mapper;
         $this->assessmentDataSource = $assessmentDataSource;
@@ -452,10 +453,6 @@ class Controller extends BaseController
         $jsonDecorator = new PropertyDecorator();
         $linkDecorator = new LinkDecorator($this->routeGenerator, $this->authorizer);
 
-        /* TODO dependency inject this mapper
-         */
-        $rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
-
         /* foreach rubric instance, check if it's compatible with the proposed grid.
          *
          * If it is *not* compatible, $response['compatible'] can be set to false then return early...I don't *think*
@@ -495,7 +492,7 @@ class Controller extends BaseController
              * node, so we have to supply it here, even though $proposedRubricInstance is a whole new spawn to prevent
              * object-by-reference conflicts. Wild.
              */
-            $proposedRubricInstance = $rubricInstanceMapper->createModel()
+            $proposedRubricInstance = $this->rubricInstanceMapper->createModel()
                 ->setId($rubricInstance->getId())
                 ->setCapabilityMarkType($capabilityMarkType)
                 ->setMarkedUsingRange($useMarkRange);

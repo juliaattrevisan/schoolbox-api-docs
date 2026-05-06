@@ -83,6 +83,7 @@ class Module extends BaseModule
             $this->injector->get('l10n'),
             $this->getMapperFactory()->get(MarkTypeMapper::class),
             $this->getMapperFactory()->get(GradeGroupMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Assessment\Rubric\Instance\Mapper::class)
         );
     }
 }
