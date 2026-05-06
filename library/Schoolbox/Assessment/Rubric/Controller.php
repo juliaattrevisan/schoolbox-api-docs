@@ -469,13 +469,11 @@ class Controller extends BaseController
         foreach ($currentAssessment->getRubricInstances() as $rubricInstance) {
             $currentGrid = $this->mapper->retrieveOneGrid($currentAssessment, $rubricInstance, false);
 
-            $encodedData = $post[$rubricInstance->getId()];
-
             /* This should knowingly throw an exception if you couldn't decode it. This normally shouldn't be the case.
              * I'm not entirely sure how we'd construct an exception-throwing payload though. Arguably this should throw
              * on error: I can't tell why it didn't when I got here.
              */
-            $rubricData = json_decode($encodedData, true);
+            $rubricData = json_decode($post[$rubricInstance->getId()] ?? '[]', true);
 
             /* Manufacture new capability mark type and mark range settings, in situ
              *
