@@ -27,6 +27,22 @@ class Model implements IAssessableDataModel, ISoftDeletable
 
 
     /**
+     * An optional name for the rubric grid; existing grids pre-26.1 won't have a name.
+     *
+     * @var string|null
+     */
+    private ?string $title = null;
+
+
+    /**
+     * All the grids in an assessment get aggregated similar to Projects, like a weighted average
+     *
+     * @var float|null
+     */
+    private ?float $weight = null;
+
+
+    /**
      * Each capability optionally has a mark type
      *
      * @var SubmissionBox\MarkType|null
@@ -65,6 +81,46 @@ class Model implements IAssessableDataModel, ISoftDeletable
 
     /* Getters/Setters
      */
+
+    /**
+     * @return string|null
+     */
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+
+    /**
+     * @param string|null $title
+     * @return $this
+     */
+    public function setTitle(?string $title): self
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+
+    /**
+     * @return float|null
+     */
+    public function getWeight(): ?float
+    {
+        return $this->weight;
+    }
+
+
+    /**
+     * @param float|null $weight
+     * @return $this
+     */
+    public function setWeight(?float $weight): self
+    {
+        $this->weight = $weight;
+        return $this;
+    }
+
 
     /**
      * @return SubmissionBox\MarkType|null

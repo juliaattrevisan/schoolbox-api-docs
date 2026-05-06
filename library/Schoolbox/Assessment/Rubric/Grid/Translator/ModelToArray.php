@@ -37,8 +37,8 @@ class ModelToArray
 
         return [
             'id' => $rubricGrid->getRubricInstance()->getId(),
-            'title' => '(backend unimplemented)', // TODO: rubric title, string (not null)
-            'weight' => null, // TODO: rubric weight, number|null
+            'title' => $rubricGrid->getRubricInstance()->getTitle(),
+            'weight' => $rubricGrid->getRubricInstance()->getWeight(),
             /* Ask a manufactured rubric grid about its settings, which came from its corresponding rubric_instance
              */
             'useMarkRange' => $rubricGrid->getRubricInstance()->getMarkedUsingRange(),

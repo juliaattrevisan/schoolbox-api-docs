@@ -6,6 +6,8 @@ CREATE TABLE rubric_instance
 (
     `id`                               INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `assessment_id`                    INT UNSIGNED NOT NULL,
+    `title`                            VARCHAR(255),
+    `weight`                           DECIMAL(12,2),
     `rubric_capability_mark_type_id`   INT,
     `rubric_capability_grade_group_id` INT,
     `rubric_mark_range`                INT UNSIGNED,
