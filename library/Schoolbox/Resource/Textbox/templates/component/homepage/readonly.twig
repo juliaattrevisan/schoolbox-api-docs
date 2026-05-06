@@ -27,6 +27,7 @@
         </script>
         <div class='immersive-reader-button' data-immersive-reader="button"></div>
     {% endif %}
+    <span id="textbox-{{ component.instance.id }}-{{ textbox.id }}"></span>
     <div class="content">
         <article id="textBoxBody{{ textbox.id }}">{{ textbox.body | purify }}</article>
     </div>

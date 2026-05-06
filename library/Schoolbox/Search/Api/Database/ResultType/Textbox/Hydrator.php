@@ -32,6 +32,8 @@ use Schoolbox\User;
  */
 class Hydrator extends BaseHydrator
 {
+    private const CONFIG_KEY_COMPACT_MODE = 'compactMode';
+
     /**
      * Base type for this type of result.
      */
@@ -120,6 +122,7 @@ class Hydrator extends BaseHydrator
             //  * Component_Config_Collapse::KEY,
             //  * Component_Config_ShowComponentTitle::KEY
             //  * Component_Config_Componentname::KEY
+            //  * self::CONFIG_KEY_COMPACT_MODE
             $componentConfig = $configByComponentInstanceId[$componentInstanceId] ?? null;
 
             // Get relevant component config values.
@@ -127,6 +130,7 @@ class Hydrator extends BaseHydrator
             // To confirm, go to a homepage, and edit the configuration of a textbox component.  The checkbox label is 'Show Title to Read-Only Users'.
             $componentIsCollapsed = (bool)($componentConfig[Component_Config_Collapse::KEY] ?? 0); // Default is not collapsed.
             $showTitleToReadOnlyUsers = (bool)($componentConfig[Component_Config_ShowComponentTitle::KEY] ?? 1); // Default is to show title.
+            $compactMode = (bool)($componentConfig[self::CONFIG_KEY_COMPACT_MODE] ?? 0); // Default is not compact.
             $componentName = (
                 // If value is null or blank string, set to null.
                 empty($componentConfig[Component_Config_Componentname::KEY])
@@ -209,7 +213,15 @@ class Hydrator extends BaseHydrator
                 ),
                 $this->buildBaseUrl()
                     ->withPath('/homepage/' . $folderId)
-                    ->withFragment("textbox-$componentInstanceId-" . $textbox->getId())
+                    ->withFragment(
+                        $this->buildHomepageTextboxFragment(
+                            $componentInstanceId,
+                            $textbox->getId(),
+                            $textboxAccess,
+                            $showTitleToReadOnlyUsers,
+                            $compactMode
+                        )
+                    )
                     ->__toString(),
                 $match->type,
                 'Textbox',
@@ -258,6 +270,31 @@ class Hydrator extends BaseHydrator
     }
 
     /**
+     * Build the fragment for the homepage URL that will link to the textbox.
+     * @return string The fragment will be in one of the following formats:
+     *  If the titlebar is rendered (ie. not in compact mode) because the viewer has
+     *  write access or the title is shown to read-only users:
+     *  "component-title-$componentInstanceId"
+     *  Otherwise: "textbox-$componentInstanceId-$textboxId"
+     */
+    private function buildHomepageTextboxFragment(
+        int $componentInstanceId,
+        int $textboxId,
+        int $textboxAccess,
+        bool $showTitleToReadOnlyUsers,
+        bool $compactMode
+    ): string {
+        $titlebarIsRendered = !$compactMode
+            && ($textboxAccess >= UserAccess::ACCESS_WRITE || $showTitleToReadOnlyUsers);
+
+        if ($titlebarIsRendered) {
+            return "component-title-$componentInstanceId";
+        }
+
+        return "textbox-$componentInstanceId-$textboxId";
+    }
+
+    /**
      * @param array $componentInstanceIds
      * @return array
      */
@@ -270,11 +307,12 @@ class Hydrator extends BaseHydrator
             FROM component_config_instance cci
             LEFT JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
             WHERE cci.component_instance_id IN (' . implode(',', array_map('intval', $componentInstanceIds)) . ')
-            AND ccd.key IN (:configCollapseKey, :showComponentTitleKey, :componentNameKey)',
+            AND ccd.key IN (:configCollapseKey, :showComponentTitleKey, :componentNameKey, :compactModeKey)',
             [
                 ':configCollapseKey' => Component_Config_Collapse::KEY,
                 ':showComponentTitleKey' => Component_Config_ShowComponentTitle::KEY,
-                ':componentNameKey' => Component_Config_Componentname::KEY
+                ':componentNameKey' => Component_Config_Componentname::KEY,
+                ':compactModeKey' => self::CONFIG_KEY_COMPACT_MODE,
             ]
         )->fetchAll();
 

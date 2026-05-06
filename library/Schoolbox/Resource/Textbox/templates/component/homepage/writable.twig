@@ -10,11 +10,6 @@
 {% set textboxExists = textbox is not null and textbox.id is not null %}
 
 {% if textboxExists %}
-    <script type="text/javascript">
-        $(function () {
-            $('#component{{ component.instance.id }} .component-titlebar').attr('id', 'textbox-{{ component.instance.id}}-{{ textbox.id }}');
-        });
-    </script>
     {% if routeLookupIfAuthorized('immersiveReader.getTokenAndSubdomain') %}
         <script src="{{ CDN_PREFIX }}/js/immersive-reader/jquery.immersive-reader.js?v={{ config.site_version }}" type="text/javascript"></script>
         <script type="text/javascript">
@@ -24,6 +19,7 @@
         </script>
         <div class='immersive-reader-button' data-immersive-reader="button"></div>
     {% endif %}
+    <span id="textbox-{{ component.instance.id }}-{{ textbox.id }}"></span>
     <div class="content" data-textbox-exists>
         <article data-content
                  data-textbox-heading="{{ textbox.heading }}"
