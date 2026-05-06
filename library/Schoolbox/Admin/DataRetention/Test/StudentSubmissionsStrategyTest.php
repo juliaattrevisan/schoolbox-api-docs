@@ -119,48 +119,6 @@ class StudentSubmissionsStrategyTest extends TestCase
             }
 
             /**
-             * Records the intended Turnitin delete call because this table must
-             * be cleared before submission files to avoid foreign-key failures.
-             *
-             * @param array<int, int> $fileIds
-             * @return int
-             */
-            protected function deleteTurnitinReports(array $fileIds): int
-            {
-                $this->state->calls[] = ['turnitin_report', $fileIds];
-
-                return count($fileIds);
-            }
-
-            /**
-             * Records the intended PlagScan delete call because it blocks the
-             * hard delete of related student submission files.
-             *
-             * @param array<int, int> $fileIds
-             * @return int
-             */
-            protected function deletePlagscanDocuments(array $fileIds): int
-            {
-                $this->state->calls[] = ['plagscan_document', $fileIds];
-
-                return count($fileIds);
-            }
-
-            /**
-             * Records the intended Kami delete call even though some schemas
-             * cascade it, preserving explicit dry-run counts and ordering.
-             *
-             * @param array<int, int> $fileIds
-             * @return int
-             */
-            protected function deleteKamiDocuments(array $fileIds): int
-            {
-                $this->state->calls[] = ['kami_document', $fileIds];
-
-                return count($fileIds);
-            }
-
-            /**
              * Records the student submission file delete call after all
              * integration rows have been cleared.
              *

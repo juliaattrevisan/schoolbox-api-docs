@@ -131,9 +131,9 @@ class StudentSubmissions extends Base
         $submissionFilesDeleted = 0;
 
         if ($submissionFileIds !== []) {
-            $turnitinReportsDeleted = $this->deleteTurnitinReports($submissionFileIds);
-            $plagscanDocumentsDeleted = $this->deletePlagscanDocuments($submissionFileIds);
-            $kamiDocumentsDeleted = $this->deleteKamiDocuments($submissionFileIds);
+            $turnitinReportsDeleted = $this->deleteRowsByStudentSubmissionFileId(self::TABLE_NAME_TURNITIN_REPORT, $submissionFileIds);
+            $plagscanDocumentsDeleted = $this->deleteRowsByStudentSubmissionFileId(self::TABLE_NAME_PLAGSCAN_DOCUMENT, $submissionFileIds);
+            $kamiDocumentsDeleted = $this->deleteRowsByStudentSubmissionFileId(self::TABLE_NAME_KAMI_DOCUMENT, $submissionFileIds);
             $submissionFilesDeleted = $this->deleteSubmissionFiles($submissionFileIds);
         }
 
@@ -202,45 +202,6 @@ class StudentSubmissions extends Base
         $statement->execute(Builder::getArrayParameters($submissionIds, 'student_submission_id'));
 
         return array_column($statement->fetchAll(\PDO::FETCH_ASSOC), 'id');
-    }
-
-    /**
-     * Deletes Turnitin rows before submission files because the schema holds a
-     * direct foreign key from reports to student_submission_file.id.
-     *
-     * @param array<int, int> $fileIds
-     * @return int
-     * @throws \PDOException
-     */
-    protected function deleteTurnitinReports(array $fileIds): int
-    {
-        return $this->deleteRowsByStudentSubmissionFileId(self::TABLE_NAME_TURNITIN_REPORT, $fileIds);
-    }
-
-    /**
-     * Deletes PlagScan rows before submission files because this table also
-     * references student_submission_file.id directly.
-     *
-     * @param array<int, int> $fileIds
-     * @return int
-     * @throws \PDOException
-     */
-    protected function deletePlagscanDocuments(array $fileIds): int
-    {
-        return $this->deleteRowsByStudentSubmissionFileId(self::TABLE_NAME_PLAGSCAN_DOCUMENT, $fileIds);
-    }
-
-    /**
-     * Deletes Kami rows explicitly so dry-run mode reports the same dependency
-     * chain even on schemas where the database would cascade the delete.
-     *
-     * @param array<int, int> $fileIds
-     * @return int
-     * @throws \PDOException
-     */
-    protected function deleteKamiDocuments(array $fileIds): int
-    {
-        return $this->deleteRowsByStudentSubmissionFileId(self::TABLE_NAME_KAMI_DOCUMENT, $fileIds);
     }
 
     /**
