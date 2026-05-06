@@ -1,7 +1,6 @@
 <?php
 
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -15,7 +14,7 @@ use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
-use Schoolbox\Assessment\Rubric\Grid\Factory;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
 use Schoolbox\Assessment\Rubric\DataModel\Capability;
@@ -36,84 +35,29 @@ use Url;
 class Controller extends BaseController
 {
     /**
-     * @var RubricDataSource
-     */
-    private $mapper;
-
-
-    /**
-     * @var AssessmentDataSource
-     */
-    private $assessmentDataSource;
-
-
-    /**
-     * @var FolderMapper
-     */
-    private $folderMapper;
-
-
-    /**
-     * @var Capability\Mapper
-     */
-    private $capabilityMapper;
-
-
-    /**
-     * @var Indicator\Mapper
-     */
-    private $indicatorMapper;
-
-
-    /**
-     * @var RosettaStone
-     */
-    private $rosettaStone;
-
-
-    /**
-     * @var MarkTypeMapper
-     */
-    private $markTypeMapper;
-
-
-    /**
-     * @var Group\Mapper
-     */
-    private $gradeGroupMapper;
-
-
-    /**
      * Constructor
      *
-     * @param RubricDataSource     $mapper
+     * @param RubricDataSource $mapper
      * @param AssessmentDataSource $assessmentDataSource
-     * @param FolderMapper         $folderMapper
-     * @param Capability\Mapper    $capabilityMapper
-     * @param Indicator\Mapper     $indicatorMapper
-     * @param RosettaStone         $rosettaStone
-     * @param MarkTypeMapper       $markTypeMapper
-     * @param Group\Mapper         $gradeGroupMapper
+     * @param FolderMapper $folderMapper
+     * @param Mapper $capabilityMapper
+     * @param Indicator\Mapper $indicatorMapper
+     * @param RosettaStone $rosettaStone
+     * @param MarkTypeMapper $markTypeMapper
+     * @param Group\Mapper $gradeGroupMapper
+     * @param Instance\Mapper $rubricInstanceMapper
      */
     public function __construct(
-        RubricDataSource $mapper,
-        AssessmentDataSource $assessmentDataSource,
-        FolderMapper $folderMapper,
-        Capability\Mapper $capabilityMapper,
-        Indicator\Mapper $indicatorMapper,
-        RosettaStone $rosettaStone,
-        MarkTypeMapper $markTypeMapper,
-        Group\Mapper $gradeGroupMapper,
+        private RubricDataSource $mapper,
+        private AssessmentDataSource $assessmentDataSource,
+        private FolderMapper $folderMapper,
+        private Capability\Mapper $capabilityMapper,
+        private Indicator\Mapper $indicatorMapper,
+        private RosettaStone $rosettaStone,
+        private MarkTypeMapper $markTypeMapper,
+        private Group\Mapper $gradeGroupMapper,
         private \Schoolbox\Assessment\Rubric\Instance\Mapper $rubricInstanceMapper
     ) {
-        $this->mapper               = $mapper;
-        $this->assessmentDataSource = $assessmentDataSource;
-        $this->folderMapper         = $folderMapper;
-        $this->capabilityMapper     = $capabilityMapper;
-        $this->indicatorMapper      = $indicatorMapper;
-        $this->rosettaStone         = $rosettaStone;
-        $this->markTypeMapper       = $markTypeMapper;
-        $this->gradeGroupMapper     = $gradeGroupMapper;
     }
 
 
@@ -139,6 +83,10 @@ class Controller extends BaseController
         // Build a rubric grid
         $assessmentId = $post->getInt('rubricId', 0);
         $rubricRowSet = $this->mapper->retrieveRowSet($folder, false);
+
+        /* TODO Research this
+         *  This was missing a third arg, but it's never been repaired. Why are we still succeeding?
+         */
         $rubricGrid   = new Grid((new DueWork())->setId($assessmentId), $rubricRowSet);
 
         // Fill in each level
