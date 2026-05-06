@@ -361,18 +361,26 @@ class Controller extends BaseController
         /* This $_POST['rubric'] node is a set of json-encoded grid(s), indexed by rubric_instance.id
          */
         $post = $this->requestPost->get('rubric');
+
         $response = [
             'compatible' => true,
             'affectedUsers' => [],
         ];
 
         // TODO: no rubric data? always compatible?
+        /* This scenario is  a special circumstance: you can't turn them off anymore, you can only delete rubric grids.
+         * That means you either have no usages or at least 1 usage, and no usages means your previously-rubric-oriented
+         * feedback is mostly irrelevant. I'm not really sure what happens to such feedbacks that used rubric grids, but
+         * said rubric grids are no longer existing. I guess that means it passes validation.
+         */
         if (null === $post) {
             $this->response = $this->responseAsJson($response)->withStatus(200);
             return;
         }
 
-        // TODO: multi rubrics; this whole route should really be against an assessment id in the params and then figure out if *any rubric* changed
+        /* This assessment gets fetched along with all its rubric instances. We inspect each rubric instance to see if
+         * the new grid is compatible with the existing, exiting early if -any- of the grids are incompatible.
+         */
         $assessmentId = $this->requestPost->getInt('id');
 
         // Load the current assessment and grid
