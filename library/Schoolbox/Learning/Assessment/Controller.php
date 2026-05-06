@@ -1163,8 +1163,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'allWorkTypes'             => $this->workTypeMapper->findAll(['order' => ['sequence' => 'asc']]),
 
             /* Capabilities happen to have the same mark types as its DueWork IAssessable container,
-            * so we don't need a different method than the existing getAllMarkTypes
-            */
+             * so we don't need a different method than the existing getAllMarkTypes
+             */
             'capabilityMarkTypes'      => $markTypes,
             'capabilityGradingSchemes' => $this->getAllGradeSchemes()->map(fn(GradeScheme $scheme) => [
                 'id' => $scheme->getId(),
@@ -1177,9 +1177,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'parentFolderId'           => $parentFolderId,
         ];
 
-        $data = array_merge($data, $this->getAssessmentTwigData($assessment), $this->generateRubricTwigData($assessment));
-
-        return $data;
+        /* Always look for rubric data regardless of the activity type; everything could potentially have it now.
+         */
+        return array_merge($data, $this->getAssessmentTwigData($assessment), $this->generateRubricTwigData($assessment));
     }
 
 
