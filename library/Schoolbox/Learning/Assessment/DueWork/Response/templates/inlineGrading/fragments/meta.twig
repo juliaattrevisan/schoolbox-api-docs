@@ -21,13 +21,13 @@
         <div class="small-12 columns">
             <h1 data-test="assessment-response-meta-title">{{ title }} {{ assessment.title }}</h1>
             <ul class="meta">
-                <li class="sbx-meta-item--with-icon"><sbx-icon name="calendar"></sbx-icon> {{ dueDate.forParticipant(participant) }}</li>
-                <li class="sbx-meta-item--with-icon"><sbx-icon name="due-work"></sbx-icon> <a href="/homepage/{{ assessment.context.folder.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}</li>
+                <li><sbx-icon name="calendar"></sbx-icon> {{ dueDate.forParticipant(participant) }}</li>
+                <li><sbx-icon name="due-work"></sbx-icon> <a href="/homepage/{{ assessment.context.folder.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}</li>
                 {% if responseList|length == 1 %}
-                    <li class="sbx-meta-item--with-icon"><sbx-icon name="calendar"></sbx-icon> Submitted {{ response.submittedAt.short }}</li>
+                    <li><sbx-icon name="calendar"></sbx-icon> Submitted {{ response.submittedAt.short }}</li>
                 {% endif %}
                 {% if readonly %}
-                    <li class="sbx-meta-item--with-icon"><sbx-icon name="archive"></sbx-icon> {{ locale.term.proper }} has been archived</li>
+                    <li><sbx-icon name="archive"></sbx-icon> {{ locale.term.proper }} has been archived</li>
                 {% endif %}
             </ul>
         </div>

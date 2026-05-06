@@ -10,7 +10,7 @@
     {% include '@learning/fragments/meta/curriculumCodes.twig' %}
 
     {# (optional) Allowed time #}
-    <li class="sbx-meta-item--with-icon" title="Allowed Time"><sbx-icon name="time-value"></sbx-icon> {% apply spaceless %}
+    <li title="Allowed Time"><sbx-icon name="time-value"></sbx-icon> {% apply spaceless %}
         {% if not canAttempt %}
             You cannot attempt this quiz
         {% else %}
@@ -20,7 +20,7 @@
 
     {# (optional) Reading time #}
     {% if assessment.readingTimeDuration and canAttempt %}
-    <li class="sbx-meta-item--with-icon" title="Reading Time"><sbx-icon name="time-value"></sbx-icon> {% apply spaceless %}
+    <li title="Reading Time"><sbx-icon name="time-value"></sbx-icon> {% apply spaceless %}
         Reading time: <time>{{ duration.secondsToHoursAndMinutes(assessment.readingTimeDuration) }}</time>
     {% endapply %}</li>
     {% endif %}
@@ -29,7 +29,7 @@
 
     {# joining student name with lastView data #}
     {% if student.id != USER.id %}
-        <li class="sbx-meta-item--with-icon" title="{% if lastViews.student.date is defined and lastViews.student.date is not null %}{{ lastViews.student.date }}{% endif %}"><sbx-icon name="staff-students"></sbx-icon> {% apply spaceless %}
+        <li title="{% if lastViews.student.date is defined and lastViews.student.date is not null %}{{ lastViews.student.date }}{% endif %}"><sbx-icon name="staff-students"></sbx-icon> {% apply spaceless %}
             <a href="/search/user/{{ student.id }}">{{ student.fullname }}</a>
             {% if lastViews is not empty %}
                 {{ lastViews.student.status }}
@@ -40,7 +40,7 @@
     {% if lastViews is not empty %}
         {% for parent in lastViews.parents %}
             {% if parent.date is not null %}
-                <li class="sbx-meta-item--with-icon" title="{{ parent.date }}"><sbx-icon name="staff"></sbx-icon> {% apply spaceless %}
+                <li title="{{ parent.date }}"><sbx-icon name="staff"></sbx-icon> {% apply spaceless %}
                     <a href="/search/user/{{ parent.id }}">{{ parent.name }}</a>
                     {{ parent.status }} {% if 'assessment' is same as(parent.object) %} this {{ locale.activity }}{% else %} the feedback {% endif %}
                 {% endapply %}</li>

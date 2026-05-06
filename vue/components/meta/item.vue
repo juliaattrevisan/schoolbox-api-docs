@@ -1,5 +1,5 @@
 <template>
-    <li :class="{ 'sbx-meta-item--with-icon': icon }">
+    <li>
         <sbx-icon v-if="icon" :name="icon"></sbx-icon>
         <slot></slot>
     </li>

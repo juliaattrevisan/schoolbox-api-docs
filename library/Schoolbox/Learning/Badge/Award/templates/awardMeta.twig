@@ -26,7 +26,7 @@
     <div class="list-item">
         <div class="small-12 column">
             <ul class="meta">
-                <li class="sbx-meta-item--with-icon"><sbx-icon name="{{ award.status|trim }}"></sbx-icon> This badge was {{ award.status == 'goal' ? 'set as a goal' : 'awarded' }}
+                <li><sbx-icon name="{{ award.status|trim }}"></sbx-icon> This badge was {{ award.status == 'goal' ? 'set as a goal' : 'awarded' }}
                     to <a href="{{ profile }}">{{ award.recipient.fullname }}</a>, <time title="{{ award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time>
                     by
                     {% if awardedByRoute %}
@@ -36,7 +36,7 @@
                     {% endif %}
                 </li>
                 {% if award.status == 'goal' and award.award %}
-                    <li class="sbx-meta-item--with-icon"><sbx-icon name="achievement"></sbx-icon> Goal has been achieved <time title="{{ award.award.awardedAt.local }}">{{ award.award.awardedAt.relativeTime }}</time></li>
+                    <li><sbx-icon name="achievement"></sbx-icon> Goal has been achieved <time title="{{ award.award.awardedAt.local }}">{{ award.award.awardedAt.relativeTime }}</time></li>
                 {% endif %}
             </ul>
         </div>

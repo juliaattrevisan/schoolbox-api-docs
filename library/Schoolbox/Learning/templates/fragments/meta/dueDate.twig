@@ -2,9 +2,9 @@
 {% if assessment.dueAt %}
     {% apply spaceless %}
     {% if student is defined and assessment.participantIfExtant(student) and assessment.participantIfExtant(student).isResubmissionRequired %}
-        <li class="sbx-meta-item--with-icon"><sbx-icon name="alert"></sbx-icon> Resubmission required</li>
+        <li><sbx-icon name="alert"></sbx-icon> Resubmission required</li>
     {% endif %}
-    <li class="sbx-meta-item--with-icon"><sbx-icon name="calendar"></sbx-icon>
+    <li><sbx-icon name="calendar"></sbx-icon>
         {% if student is defined %}
             {{ dueDate.dueDate(assessment, student) }}
         {% else %}
