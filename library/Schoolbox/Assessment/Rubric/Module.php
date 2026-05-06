@@ -40,6 +40,8 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF)
+                /* TODO Replace with Learning/Authorizer/Rule/IsInstructorOrHasHomepageAccess() I suppose
+                 */
                 // TODO: instructors (non-staff) mangaging rubrics they have acess to? otherwise they hit a 403
             )
         );
