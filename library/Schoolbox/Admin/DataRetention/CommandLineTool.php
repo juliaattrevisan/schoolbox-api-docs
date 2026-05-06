@@ -213,6 +213,19 @@ class CommandLineTool extends CliTool\App
                 $chunkSize,
             );
         }
+        if ($validStrats->isStratEnabled(ValidStrats::STUDENTSUBMISSIONS)) {
+            $bus[] = new Strategy\StudentSubmissions(
+                $logger,
+                $this->perform(),
+                $this->getDatabaseInternal(),
+                $lock,
+                $this->getConfig(),
+                $endTime,
+                clone $retentionPeriod,
+                $loopCount,
+                $chunkSize,
+            );
+        }
 
         // log the settings we are running with
         $logger->notice(sprintf("Running %s:", $this->perform() ? "with perform" : "in dry-run mode"));
