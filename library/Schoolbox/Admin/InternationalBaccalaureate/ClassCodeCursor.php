@@ -17,7 +17,7 @@ use Alaress\Database\Predicate\Builder;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\Collection;
-use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use ValueError;
 
 class ClassCodeCursor implements ICursor
@@ -29,7 +29,7 @@ class ClassCodeCursor implements ICursor
     private ICodec $codec;
 
     public function __construct(
-        private ClassEntryMapper $classEntryMapper,
+        private FolderCodeMapper $classCodeMapper,
         private ?string $search,
         private int $limit,
         ?ICodec $codec = null
@@ -69,7 +69,23 @@ class ClassCodeCursor implements ICursor
 
     public function retrieveResultCount(): ?int
     {
-        return $this->buildCursor()->retrieveResultCount();
+        $sql = '
+            SELECT COUNT(*)
+            FROM folder_code
+            WHERE deleted_at IS NULL
+        ';
+        $params = [];
+        $search = trim((string) $this->search);
+
+        if ($search !== '') {
+            $sql .= ' AND code LIKE :search';
+            $params['search'] = '%' . $this->classCodeMapper->getDatabase()->getQuoter()->escapeForLike($search) . '%';
+        }
+
+        $statement = $this->classCodeMapper->getDatabase()->prepare($sql);
+        $statement->execute($params);
+
+        return (int) $statement->fetchColumn();
     }
 
     public function retrieveResults(?string $encodedCursor): Collection
@@ -80,10 +96,10 @@ class ClassCodeCursor implements ICursor
     private function buildCursor(): MapperCursor
     {
         return new MapperCursor(
-            $this->classEntryMapper,
+            $this->classCodeMapper,
             $this->limit,
             [
-                'code' => $this->classEntryMapper::SORT_ORDER_ASC,
+                'code' => $this->classCodeMapper::SORT_ORDER_ASC,
             ],
             $this->buildPredicateBuilder(),
             $this->codec
@@ -92,19 +108,18 @@ class ClassCodeCursor implements ICursor
 
     private function buildPredicateBuilder(): Builder
     {
-        $predicateBuilder = $this->classEntryMapper->getPredicateBuilder();
+        $predicateBuilder = $this->classCodeMapper->getPredicateBuilder();
         $search = trim((string) $this->search);
 
         if ($search === '') {
             return $predicateBuilder;
         }
 
-        $searchLike = '%' . $this->classEntryMapper->getDatabase()->getQuoter()->escapeForLike($search) . '%';
+        $searchLike = '%' . $this->classCodeMapper->getDatabase()->getQuoter()->escapeForLike($search) . '%';
 
         return $predicateBuilder->any(
             $predicateBuilder
                 ->emptyClone()
-                ->like('name', $searchLike)
                 ->like('code', $searchLike)
         );
     }

@@ -30,11 +30,10 @@ use Schoolbox\IB\Group\Mapper as IBGroupMapper;
 use Schoolbox\IB\Group\Model as IBGroupModel;
 use Schoolbox\IB\Registrations\Sessions\Mapper as RegistrationSessionMapper;
 use Schoolbox\IB\Registrations\Sessions\Model as RegistrationSessionModel;
-use Schoolbox\External\ClassEntry;
-use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Language\Model as LanguageModel;
 use Schoolbox\Mapper\Exception\NotFound as MapperNotFound;
+use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use Schoolbox\Resource\Folder\Code\Model as FolderCodeModel;
 
 class Controller extends ConfigController
@@ -52,7 +51,7 @@ class Controller extends ConfigController
         private IBGroupSubjectMapper $groupSubjectMapper,
         private GroupSubjectLanguageMapper $groupSubjectLanguageMapper,
         private LanguageMapper $languageMapper,
-        private ClassEntryMapper $classEntryMapper,
+        private FolderCodeMapper $classCodeMapper,
         private RegistrationSessionMapper $registrationSessionMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
@@ -168,7 +167,7 @@ class Controller extends ConfigController
     }
 
     /**
-     * Search timetable class codes from sis_class.
+     * Search class codes from folder_code.
      *
      * @api GET /adminv2/international-baccalaureate/configuration/api/class-codes
      */
@@ -188,7 +187,7 @@ class Controller extends ConfigController
 
         try {
             $cursor = new ClassCodeCursor(
-                $this->classEntryMapper,
+                $this->classCodeMapper,
                 $search,
                 $limit
             );
@@ -202,12 +201,12 @@ class Controller extends ConfigController
         }
 
         $data = $results
-            ->filter(fn(ClassEntry $class) => !empty($class->getCode()))
+            ->filter(fn(FolderCodeModel $classCode) => !empty($classCode->getCode()))
             ->map(
-                fn(ClassEntry $class) => [
-                    'id' => $class->getCode(),
-                    'code' => $class->getCode(),
-                    'name' => $class->getName(),
+                fn(FolderCodeModel $classCode) => [
+                    'id' => $classCode->getCode(),
+                    'code' => $classCode->getCode(),
+                    'name' => $classCode->getCode(),
                 ]
             );
 

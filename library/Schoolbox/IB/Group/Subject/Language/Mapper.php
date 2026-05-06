@@ -17,6 +17,7 @@ use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use Schoolbox\Resource\Folder\Code\Model as FolderCodeModel;
+use UnexpectedValueException;
 
 use function array_filter;
 use function array_unique;
@@ -112,10 +113,10 @@ class Mapper extends BaseMapper
             "
             SELECT
                 gslcc.group_subject_language_id,
-                gslcc.class_code,
                 {$folderCodeMapper->getColumnString('fc')}
             FROM ib_group_subject_language_class_codes gslcc
-            LEFT JOIN folder_code fc ON fc.code = gslcc.class_code
+            INNER JOIN folder_code fc ON fc.folder_id = gslcc.folder_id
+                AND fc.code = gslcc.class_code
                 AND fc.deleted_at IS NULL
             WHERE gslcc.group_subject_language_id IN {$this->getArrayPlaceholders($ids, 'id')}
             ORDER BY fc.code ASC
@@ -128,11 +129,7 @@ class Mapper extends BaseMapper
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $languageId = (int) $row['group_subject_language_id'];
             $classCodes[$languageId] ??= $folderCodeMapper->createCollection();
-            $classCodes[$languageId]->add(
-                $row['fc.code'] === null
-                    ? (new FolderCodeModel())->setCode($row['class_code'])
-                    : $folderCodeMapper->hydrate($row, 'fc')
-            );
+            $classCodes[$languageId]->add($folderCodeMapper->hydrate($row, 'fc'));
         }
 
         foreach ($collection as $model) {
@@ -168,12 +165,21 @@ class Mapper extends BaseMapper
 
         $statement = $this->database->prepare(
             'INSERT IGNORE INTO ib_group_subject_language_class_codes
-                (group_subject_language_id, class_code)
-                VALUES (?, ?)'
+                (group_subject_language_id, folder_id, class_code)
+                SELECT ?, fc.folder_id, fc.code
+                FROM folder_code fc
+                WHERE fc.code = ?
+                    AND fc.deleted_at IS NULL
+                ORDER BY fc.folder_id ASC
+                LIMIT 1'
         );
 
         foreach ($classCodes as $classCode) {
             $statement->execute([$model->getId(), $classCode]);
+
+            if ($statement->rowCount() === 0) {
+                throw new UnexpectedValueException("Class code '{$classCode}' is not an active folder code");
+            }
         }
     }
 }
