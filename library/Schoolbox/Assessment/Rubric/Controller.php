@@ -398,9 +398,11 @@ class Controller extends BaseController
      */
     public function determineMarkInvalidation(): void
     {
-        $post         = $this->requestPost->get('rubric');
+        /* This $_POST['rubric'] node is a set of json-encoded grid(s), indexed by rubric_instance.id
+         */
+        $post = $this->requestPost->get('rubric');
         $response = [
-            'compatible'    => true,
+            'compatible' => true,
             'affectedUsers' => [],
         ];
 
@@ -423,10 +425,7 @@ class Controller extends BaseController
             );
             return;
         }
-        if (!$currentAssessment instanceof DueWork) {
-            $this->sendError('Can only determine mark invalidation for due work');
-            return;
-        }
+
         $currentGrid = $this->mapper->retrieveGrid($currentAssessment, false);
 
 
