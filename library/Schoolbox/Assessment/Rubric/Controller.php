@@ -393,6 +393,13 @@ class Controller extends BaseController
     /**
      * Determines whether a rubric submitted via POST will invalidate marks.
      *
+     * This basically means that if a student received feedback using a rubric grid, but later that rubric grid's
+     * configuration or structure somehow changed, the student will have an obsolete version of the rubric that isn't
+     * indicative of what they would be getting now.
+     *
+     * Users might not be aware that someone's received feedback already, when they try to change the grid: they get
+     * a warning in the ui that changing the grid when someone has received a feedback will require it to be re-marked.
+     *
      * @api POST /rubric/determineMarkInvalidation
      * @since 181
      */
@@ -425,6 +432,7 @@ class Controller extends BaseController
             );
             return;
         }
+
 
         $currentGrid = $this->mapper->retrieveGrid($currentAssessment, false);
 
