@@ -15,6 +15,7 @@ use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
+use Schoolbox\Assessment\Rubric\Grid\Factory;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
 use Schoolbox\Assessment\Rubric\DataModel\Capability;
@@ -468,9 +469,13 @@ class Controller extends BaseController
         foreach ($currentAssessment->getRubricInstances() as $rubricInstance) {
             $currentGrid = $this->mapper->retrieveOneGrid($currentAssessment, $rubricInstance, false);
 
-            /* The post payload is indexed by rubric instance id
+            $encodedData = $post[$rubricInstance->getId()];
+
+            /* This should knowingly throw an exception if you couldn't decode it. This normally shouldn't be the case.
+             * I'm not entirely sure how we'd construct an exception-throwing payload though. Arguably this should throw
+             * on error: I can't tell why it didn't when I got here.
              */
-            $rubricData = json_decode($post[$rubricInstance->getId()] ?? '[]', true);
+            $rubricData = json_decode($encodedData, true);
 
             /* Manufacture new capability mark type and mark range settings, in situ
              *
@@ -499,7 +504,7 @@ class Controller extends BaseController
 
             $proposedGrid = $gridFactory->buildFromPostData(
                 $this->mapper->retrieveOneGrid($proposedAssessment, $proposedRubricInstance, false),
-                [ $assessmentId => $rubricData ],
+                $rubricData,
                 false
             );
 

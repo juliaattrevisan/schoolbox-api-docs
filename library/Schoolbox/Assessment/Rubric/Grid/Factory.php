@@ -11,13 +11,19 @@ namespace Schoolbox\Assessment\Rubric\Grid;
 
 use Alaress\Specification\NotEmpty;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 
 /**
  * Class Factory
  */
 class Factory
 {
+    /**
+     * Frontend encodes a rubric grid into a json string and sends multiple grids at a time, in each $_POST request.
+     * You can get to each grid's payload via its rubric_instance.id but you have to manufacture the index itself.
+     */
+    public const string RUBRIC_PAYLOAD_INDEX = 'rubric[%d]';
+
+
     /**
      * Port of `\Schoolbox\Assessment\Rubric\Factory::buildFromPostData`,
      * but builds a `Grid` object instead.
@@ -32,30 +38,37 @@ class Factory
      * @throws \InvalidArgumentException
      * @see /library/Schoolbox/Assessment/Rubric/templates/vue/payload.ts
      */
-    public function buildFromPostData(Grid $grid, array $postData, bool $validate = true): Grid
-    {
-        // we're only going to take the first one... this could be converted to foreach easily enough
-        $rubricData   = reset($postData);
-
-        $assessment    = $grid->getAssessment();
-        $levels        = $rubricData['level']      ?? [];
-        $capabilities  = $rubricData['group']      ?? [];
-        $indicators    = $rubricData['criterion']  ?? [];
-        $descriptors   = $rubricData['descriptor'] ?? [];
+    public function buildFromPostData(
+        Grid $grid,
+        array $rubricData,
+        bool $validate = true
+    ): Grid {
+        /* The post payload contains all the rubric grids associated with an assessment but we only need to look at one
+         * grid for now since we've decided that any of the N grids could cause invalidation and thus exit early.
+         *
+         * These are the new settings that came from the ui
+         */
+        $levels = $rubricData['level'] ?? [];
+        $capabilities = $rubricData['group'] ?? [];
+        $indicators = $rubricData['criterion'] ?? [];
+        $descriptors = $rubricData['descriptor'] ?? [];
         $usesMarkRange = $rubricData['useMarkRange'] ?? false;
-        $markPerCap    = false;
 
-        if ($assessment instanceof DueWork) {
-            $markPerCap    = $assessment->isMarkPerCapability();
-        }
+        /* This was originally an assessment property but it's actually on the rubric instance now and isn't part of
+         * the $_POST['rubric'] node, which is a bit interesting
+         */
+        $markPerCap = $grid->getRubricInstance()->isMarkPerCapability() ?? false;
 
         // Rebuild the set of levels from scratch each time
         $newLevels = $grid->getLevels()->emptyClone();
+
         foreach ($levels as $levelSequence => $level) {
             $levelName = $level['name'];
-            $levelId   = filter_var($level['id'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+            $levelId = filter_var($level['id'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+
             $newLevels->add((new Level())->setName($levelName)->setId($levelId));
         }
+
         $grid->setLevels($newLevels);
 
         // Must assume that all capabilities in formdata exist:
@@ -65,6 +78,7 @@ class Factory
 
         // Which capabilities are actually in use?
         $capabilityIdsInUse = [];
+
         foreach ($indicators as $indicator) {
             if (isset($indicator['on'])) {
                 $capabilityIdsInUse[$indicator['groupId']] = true;
@@ -76,13 +90,16 @@ class Factory
         /** @var Capability[] $capabilityCache */
         $capabilityCache     = [];
         $newCapabilityUsages = $grid->getCapabilityUsages()->emptyClone();
+
         foreach ($capabilities as $capabilityData) {
             // This capability must exist and be in use in order for it to be saved
             $capabilityId   = (int)$capabilityData['id'];
             $capabilityName = $capabilityData['name'];
+
             if (!$capabilityId) {
                 continue;
             }
+
             if (empty($capabilityIdsInUse[$capabilityId])) {
                 continue;
             }
@@ -92,12 +109,13 @@ class Factory
 
             if ($validate) {
                 $capabilityMaxSpec = new ValidCapabilityMax($markPerCap);
+
                 if (!$capabilityMaxSpec->isSatisfiedBy($capabilityMaxValue)) {
                     throw new \InvalidArgumentException('Please provide capability maximum points that are numeric and equal to or greater than 0');
                 }
             }
 
-            $capability         = $grid->getRowSet()->retrieveCapability($capabilityId);
+            $capability = $grid->getRowSet()->retrieveCapability($capabilityId);
 
             // If $group is null, then that's a problem; we're trying to save
             // usage for a group which doesn't exist
@@ -112,6 +130,7 @@ class Factory
             $capabilityCache[$capabilityId]     = $capability;
             $newCapabilityUsages[$capabilityId] = $capabilityUsage;
         }
+
         $grid->setCapabilityUsages($newCapabilityUsages);
 
 
@@ -121,6 +140,7 @@ class Factory
             $indicatorId      = (int)$indicatorData['id'];
             $indicatorName    = $indicatorData['name'];
             $indicatorEnabled = isset($indicatorData['on']) && $indicatorData['on'];
+
             if (!$indicatorEnabled) {
                 continue;
             }
@@ -152,15 +172,15 @@ class Factory
                 $descriptorValue = $descriptor['points'];
 
                 if ('' !== $descriptorText || '' !== $descriptorValue) {
-                    $indicatorUsage->getDescriptors()[$levelSequence] =
-                        (new Descriptor())
-                            ->setId($descriptorId)
-                            ->setDescription($descriptorText);
+                    $indicatorUsage->getDescriptors()[$levelSequence] = (new Descriptor())
+                        ->setId($descriptorId)
+                        ->setDescription($descriptorText);
 
                     // Validate descriptor
                     if ($validate) {
                         $descriptorSpec = new ValidDescriptor($usesMarkRange);
-                        if (! $descriptorSpec->isSatisfiedBy($descriptorValue)) {
+
+                        if (!$descriptorSpec->isSatisfiedBy($descriptorValue)) {
                             throw new \InvalidArgumentException('Please use positive numbers only, and disable Mark Range to use decimal places in descriptor point values');
                         }
                     }
@@ -173,16 +193,19 @@ class Factory
             // Validate sequence of descriptor points
             if ($validate) {
                 $notEmptySpec = new NotEmpty();
+
                 if (!$notEmptySpec->isSatisfiedBy($indicatorUsage->getDescriptors())) {
                     throw new \InvalidArgumentException('You require at least one non-empty descriptor in each selected indicator');
                 }
+
                 $monotonicDescriptorRowSpec = new ValidMonotonicDescriptorRow($usesMarkRange);
+
                 if (!$monotonicDescriptorRowSpec->isSatisfiedBy($indicatorUsage->getDescriptors())) {
                     throw new \InvalidArgumentException('Please only use descriptor values that form an ascending or descending sequence within a row');
                 }
             }
 
-            $capabilityUsage                                     = $grid->retrieveCapabilityUsage($capability);
+            $capabilityUsage = $grid->retrieveCapabilityUsage($capability);
             $capabilityUsage->getIndicatorUsages()[$indicatorId] = $indicatorUsage;
         }
 
@@ -190,6 +213,7 @@ class Factory
         // Validate if an indicator is used
         if ($validate) {
             $gridSpec = new ValidRubricGrid();
+
             if (!$gridSpec->isSatisfiedBy($grid)) {
                 throw new \InvalidArgumentException('Please have at least one selected indicator if using a rubric');
             }
@@ -200,6 +224,7 @@ class Factory
         // If no value was passed: use calculated value
         foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
             $capabilityMaxValue = $capabilityUsage->getMaxValue();
+
             if (null === $capabilityMaxValue) {
                 $capabilityUsage->setMaxValue($capabilityUsage->calculateMaxValueFromIndicators());
             }
