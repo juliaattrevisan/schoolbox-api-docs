@@ -722,6 +722,42 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $data['customisedFor'] = $assessment->getOriginalAssessmentId();
         }
 
+        /* Due Work
+         * Kami, some policy stuff and worksheets are due work specific
+         */
+        if ($assessment instanceof DueWork\Model) {
+            /* At the moment only due works have self-reflection and self-assessment abilities
+             */
+            $data['selfAssessmentEnabled'] = $this->getConfigLoader()->get('self_assessment_enabled');
+
+            // To be able to view the current student policy if enabling within the submission type
+            $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
+
+            // To determine whether to display the interactive worksheet option
+            $data['kami_enabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_KAMI_ENABLED);
+
+            $kamiFiles = $this->mimetypeMapper
+                ->findMimeTypesFromExtensions(
+                    array_keys(KamiModel::ALLOWED_FILE_TYPES)
+                );
+
+            $zone = (new Zone('worksheet'))
+                ->setMulti(false)
+                ->setAttachPrompt('Attach a worksheet')
+                ->setAttachmentsLabel('')
+                ->setMimeFilter(implode(",", $kamiFiles))
+                ->setFilesystemContext('worksheet')
+                // Disallow modification of existing worksheet templates.
+                ->setReadOnly($assessment->getWorksheetTemplate() !== null)
+                ->setFileVar('worksheet');
+
+            if ($assessment->getWorksheetTemplate()) {
+                $zone = $zone->attachFiles([$assessment->getWorksheetTemplate()]);
+            }
+
+            $data['attachzoneWorksheet'] = $zone->getTwigContext();
+        }
+
         /* Quizzes have two parts to change: append breadcrumbs
          */
         if ($assessment instanceof Quiz\Model) {
@@ -815,40 +851,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
             /* There are numerous date range options of which numerous could be enabled
              */
             $data['reporting']['availableRangeOptions'] = Range::lookup();
-        }
-
-        /* Due Work
-         * Kami, some policy stuff and worksheets are due work specific
-         */
-        if ($assessment instanceof DueWork\Model) {
-            /* At the moment only due works have self-reflection and self-assessment abilities
-             */
-            $data['selfAssessmentEnabled'] = $this->getConfigLoader()->get('self_assessment_enabled');
-
-            // To be able to view the current student policy if enabling within the submission type
-            $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
-
-            // To determine whether to display the interactive worksheet option
-            $data['kami_enabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_KAMI_ENABLED);
-
-            $kamiFiles = $this->mimetypeMapper
-                ->findMimeTypesFromExtensions(
-                    array_keys(KamiModel::ALLOWED_FILE_TYPES)
-                );
-
-            $zone = (new Zone('worksheet'))
-                ->setMulti(false)
-                ->setAttachPrompt('Attach a worksheet')
-                ->setAttachmentsLabel('')
-                ->setMimeFilter(implode(",", $kamiFiles))
-                ->setFilesystemContext('worksheet')
-                 // Disallow modification of existing worksheet templates.
-                ->setReadOnly($assessment->getWorksheetTemplate() !== null)
-                ->setFileVar('worksheet');
-            if ($assessment->getWorksheetTemplate()) {
-                $zone = $zone->attachFiles([$assessment->getWorksheetTemplate()]);
-            }
-            $data['attachzoneWorksheet'] = $zone->getTwigContext();
         }
 
         $this->response = $this->responseFromTemplate("@learningAssessment/update.twig", $data);
@@ -1266,8 +1268,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
              */
             $rubricGrid = $this->rubricMapper->retrieveOneGrid($assessment, $rubricInstance, true);
 
-            /* Arbitrarily supply two placeholder levels if the grid never had any, such as when you're making a whole new
-             * grid from scratch for the first time. This prompts users to fill them in.
+            /* Arbitrarily supply two placeholder levels if the grid never had any, such as when you're making a whole
+             * new grid from scratch for the first time. This prompts users to fill them in. This is the only place
+             * where this happens: otherwise I would have considered pushing this into retrieveOneGrid()
              */
             if (count($rubricGrid->getLevels()) === 0) {
                 $rubricGrid->getLevels()

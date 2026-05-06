@@ -505,6 +505,13 @@ class DataSource
             return $grid;
         }
 
+        /* This is super important and it's a bit shameful to -need- this...but after the $grid is built, we need to
+         * assign the provided $rubricInstance to it. Otherwise, the $grid->getRubricInstance() will return you a grid
+         * with the _stub_ that was used to manufacture the Blank Grid right at the start of this method in
+         * retrieveBlankGrid() which isn't helpful to you anywhere else in the app.
+         */
+        $grid->setRubricInstance($rubricInstance);
+
         // Load the levels, selected capabilities+indicators, descriptors for the rubric instance
         $capabilityUsageModels = $this->capabilityUsageMapper->findByColumn(
             'rubric_instance_id',
