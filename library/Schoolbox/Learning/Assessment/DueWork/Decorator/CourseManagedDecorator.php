@@ -15,10 +15,10 @@ use InvalidArgumentException;
 use RangeException;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AttachedFilesTrait;
+use Schoolbox\Learning\Assessment\DataModel\RubricTrait;
 use Schoolbox\Learning\Assessment\DecoratorInterface;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use UnexpectedValueException;
 
@@ -35,9 +35,8 @@ class CourseManagedDecorator implements DecoratorInterface
 {
     use DueWorkTrait;
     use AttachedFilesTrait;
+    use RubricTrait;
 
-    /** @var DueWork|null $original */
-    private $original;
 
     /**
      * Decorator constructor.
@@ -46,10 +45,6 @@ class CourseManagedDecorator implements DecoratorInterface
      * @param int          $instructorMarkType
      * @param int|null     $gradingScheme
      * @param int|null     $instructorGradingScheme
-     * @param bool         $useRubric
-     * @param int          $capabilityMarkType
-     * @param int|null     $capabilityGradeGroup
-     * @param bool         $useMarkRange
      * @param float|null   $maxMark
      * @param float|null   $instructorMaxMark
      * @param array|null   $rubricData
@@ -67,10 +62,6 @@ class CourseManagedDecorator implements DecoratorInterface
         int $instructorMarkType,
         ?int $gradingScheme,
         ?int $instructorGradingScheme,
-        bool $useRubric,
-        int $capabilityMarkType,
-        ?int $capabilityGradeGroup,
-        bool $useMarkRange,
         ?float $maxMark,
         ?float $instructorMaxMark,
         ?array $rubricData,
@@ -81,16 +72,12 @@ class CourseManagedDecorator implements DecoratorInterface
         bool $enableText,
         bool $enableFiles,
         bool $enablePolicy,
-        ?DueWork $original
+        private ?DueWork $original
     ) {
         $this->setMarkType($markType);
         $this->setInstructorMarkType($instructorMarkType);
         $this->setGradingScheme($gradingScheme);
         $this->setInstructorGradingScheme($instructorGradingScheme);
-        $this->setUseRubric($useRubric);
-        $this->setCapabilityMarkType($capabilityMarkType);
-        $this->setCapabilityGradeGroup($capabilityGradeGroup);
-        $this->setUseMarkRange($useMarkRange);
         $this->setMaxMark($maxMark);
         $this->setInstructorMaxMark($instructorMaxMark);
         $this->setRubricData($rubricData);
@@ -101,15 +88,14 @@ class CourseManagedDecorator implements DecoratorInterface
         $this->setEnableText($enableText);
         $this->setEnableFiles($enableFiles);
         $this->setEnablePolicy($enablePolicy);
-        $this->original = $original;
     }
+
 
     /**
      * @param DueWork $assessment
      * @throws DomainException
      * @throws InvalidArgumentException
      * @throws RangeException
-     * @throws Exception
      * @throws UnexpectedValueException
      */
     public function decorate($assessment)
