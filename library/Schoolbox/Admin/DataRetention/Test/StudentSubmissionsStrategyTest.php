@@ -134,6 +134,21 @@ class StudentSubmissionsStrategyTest extends TestCase
             }
 
             /**
+             * Records integration-table deletes so tests can verify they occur
+             * before submission files without requiring a PDO test double.
+             *
+             * @param string $table
+             * @param array<int, int> $fileIds
+             * @return int
+             */
+            protected function deleteRowsByStudentSubmissionFileId(string $table, array $fileIds): int
+            {
+                $this->state->calls[] = [$table, $fileIds];
+
+                return count($fileIds);
+            }
+
+            /**
              * Records the final parent delete call so tests can assert that
              * submissions with no files are still purged.
              *

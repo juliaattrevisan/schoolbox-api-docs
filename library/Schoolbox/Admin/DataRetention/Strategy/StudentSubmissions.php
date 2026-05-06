@@ -259,7 +259,7 @@ class StudentSubmissions extends Base
      * @return int
      * @throws \PDOException
      */
-    private function deleteRowsByStudentSubmissionFileId(string $table, array $fileIds): int
+    protected function deleteRowsByStudentSubmissionFileId(string $table, array $fileIds): int
     {
         if ($fileIds === []) {
             return 0;
