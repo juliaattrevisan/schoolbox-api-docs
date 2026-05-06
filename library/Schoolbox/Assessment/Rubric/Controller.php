@@ -402,6 +402,7 @@ class Controller extends BaseController
      * a warning in the ui that changing the grid when someone has received a feedback will require it to be re-marked.
      *
      * @throws Exception
+     * @throws \Alaress\Web\Controller\Exception
      * @since 181
      * @api POST /rubric/determineMarkInvalidation
      */
@@ -486,8 +487,13 @@ class Controller extends BaseController
 
             /* Assemble a rubric instance that can be used to compare grids before and after.
              * We don't need to add $proposedRubricInstance to $proposedAssessment's rubric instance collection atm.
+             *
+             * The original rubric instance id is needed to find the json-encoded $_POST['rubric'][$rubricInstanceId]
+             * node, so we have to supply it here, even though $proposedRubricInstance is a whole new spawn to prevent
+             * object-by-reference conflicts. Wild.
              */
             $proposedRubricInstance = $rubricInstanceMapper->createModel()
+                ->setId($rubricInstance->getId())
                 ->setCapabilityMarkType($capabilityMarkType)
                 ->setMarkedUsingRange($useMarkRange);
 
