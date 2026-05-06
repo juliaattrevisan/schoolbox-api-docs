@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Socs\Teams;
 
+use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
@@ -47,10 +48,10 @@ class Import implements IStrategy
 
         $query = [];
 
-        $response = $this->httpClient->get(self::MSO_SPORT_PATH, $query, $this->log);
-
-        if (null === $response) {
-            $this->log->info('SOCS teams no response; skipping');
+        try {
+            $response = $this->httpClient->get(self::MSO_SPORT_PATH, $query, $this->log);
+        } catch (GuzzleException $e) {
+            $this->log->warning(sprintf('Failed to contact SOCS teams endpoint: %s', $e->getMessage()));
             return;
         }
 
