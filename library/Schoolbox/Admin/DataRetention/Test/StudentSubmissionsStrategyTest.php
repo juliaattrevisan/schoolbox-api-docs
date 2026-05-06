@@ -198,7 +198,7 @@ class StudentSubmissionsStrategyTest extends TestCase
      *
      * @return void
      */
-    public function testDeletesChildRecordsBeforeSubmissionFilesAndSubmissions(): void
+    public function testDeletesChildrenBeforeParents(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy([
             10 => [101, 102],
@@ -225,7 +225,7 @@ class StudentSubmissionsStrategyTest extends TestCase
      *
      * @return void
      */
-    public function testDeletesSubmissionWhenSubmissionHasNoFiles(): void
+    public function testDeletesSubmissionWithoutFiles(): void
     {
         ['strategy' => $strategy, 'state' => $state] = $this->strategy([
             10 => [],
@@ -253,7 +253,7 @@ class StudentSubmissionsStrategyTest extends TestCase
      * @return void
      */
     #[DataProvider('providerNormalizesDeleteSets')]
-    public function testNormalizesDeleteSets(
+    public function testNormalizesDeletes(
         array $chunk,
         array $submissionFiles,
         array $expectedSubmissionIds,
