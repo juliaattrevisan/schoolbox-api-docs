@@ -1131,7 +1131,7 @@ class DataSource
      *                                   constants.
      * @return bool
      */
-    public function hasMarkedGrid(Participant $participant, array $feedbackTypes): bool
+    private function hasMarkedGrid(Participant $participant, array $feedbackTypes): bool
     {
         // Which feedbacks are getting checked?
         $feedbackIds = [];
@@ -1153,7 +1153,7 @@ class DataSource
         // Don't need to check descriptor marks separately, because they cannot
         // exist without capability marks.
         $validCapMarkCount = $this->indicatorMarkMapper->countByColumnList([
-            'r.id'  => $feedbackIds,
+            'cm.feedback_id' => $feedbackIds,
             'valid' => true,
         ]);
 
