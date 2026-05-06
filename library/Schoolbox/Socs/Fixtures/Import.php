@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Socs\Fixtures;
 
+use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
@@ -93,10 +94,10 @@ class Import implements IStrategy
             $query['TS'] = 1;
         }
 
-        $response = $this->httpClient->get(self::FIXTURES_PATH, $query, $this->log);
-
-        if (null === $response) {
-            $this->log->info('SOCS fixtures no response; skipping');
+        try {
+            $response = $this->httpClient->get(self::FIXTURES_PATH, $query, $this->log);
+        } catch (GuzzleException $e) {
+            $this->log->warning(sprintf('Failed to contact SOCS fixtures endpoint: %s', $e->getMessage()));
             return;
         }
 
