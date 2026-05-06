@@ -53,6 +53,8 @@ export default class UnitPlanner {
 
     static readonly DATA_TEST_ADD_UNITS_CREATE_BUTTON = "up-add-units-create";
 
+    static readonly DATA_TEST_CREATE_UNITS_BUTTON = "unit-planner-create-units";
+
     static readonly DATA_TEST_DROPDOWN_MENU = "sbx-pop-out-unit-dropdown-button";
 
     static readonly DATA_TEST_IMPORT_INTO_CLASS_OPTION = "up-header-{courseId}-import-link";
@@ -174,6 +176,30 @@ export default class UnitPlanner {
         } else {
             await expect(createActivityButtonLocator).not.toBeVisible();
         }
+    }
+
+    /**
+     * Check whether the create units button is presented in the unit planner header or not
+     * @param shouldBeVisible - Whether the button should be visible or not
+     */
+    async checkCreateUnitsButtonVisibility(shouldBeVisible: boolean): Promise<void> {
+        const createUnitsButtonLocator = this.page.getByTestId(UnitPlanner.DATA_TEST_CREATE_UNITS_BUTTON);
+        if (shouldBeVisible) {
+            await expect(createUnitsButtonLocator).toBeVisible();
+        } else {
+            await expect(createUnitsButtonLocator).not.toBeVisible();
+        }
+    }
+
+    /**
+     * Navigate to a unit planner page and check whether the create units button is presented in the unit or not
+     * pass true to check it is visible and false to check it is not visible
+     * @param courseId - The ID of the course
+     * @param shouldBeVisible - Whether the button should be visible or not
+     */
+    async navigateAndCheckCreateUnitsButton(courseId: number, shouldBeVisible: boolean): Promise<void> {
+        await this.goto(courseId);
+        await this.checkCreateUnitsButtonVisibility(shouldBeVisible);
     }
 
     /**

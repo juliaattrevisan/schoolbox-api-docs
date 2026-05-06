@@ -1,14 +1,20 @@
 import { test } from "@schoolboxTest/playwright/support/integrations";
+import CourseList from "@schoolboxTest/playwright/support/page/courses/CourseList";
 import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
 
 /**
  * This tests the permissions for the unit planner feature.
+ * 1. Provision sales.tar.gz data
+ * 2. Execute DOCKER=1 npx playwright test unitPlannerPermissions.spec.ts
  * - When the teacher has None access to the unit by navigating to the unit planner then they don't see the unit in the list.
  * - When the teacher has Read access to the unit by navigating to the unit planner then they see the unit in the list but cannot edit it.
  * - When the teacher has Write access to the unit by navigating to the unit planner then they see the unit in the list and can edit it.
+ * - When users visit course unit planners, the create units button follows course folder and CMS permissions.
  */
 
 test.describe("Unit Planner Permissions", () => {
+    test.describe.configure({ mode: "serial" });
+
     test.beforeAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo(
             "update perms and userAccess tables to set course, unit and CMS permissions for the unit planner permission tests",
@@ -25,11 +31,12 @@ test.describe("Unit Planner Permissions", () => {
 
     test.beforeEach(async ({ tester }) => {
         await tester.loginAsAdmin();
-        await tester.impersonateTeacher();
     });
 
     test("Teacher can view and interact with units based on permissions", async ({ tester, page }) => {
         const unitPlannerPage = new UnitPlanner(tester, page);
+
+        await tester.impersonateTeacher();
 
         await unitPlannerPage.goto(6);
         // checking whether the teacher can view or not the units under the course based on the permissions set in the beforeAll hook
@@ -83,6 +90,54 @@ test.describe("Unit Planner Permissions", () => {
         await unitPlannerPage.checkActivityMenuOptionVisibility("export", 59, true);
         await unitPlannerPage.checkActivityMenuOptionVisibility("modify", 59, true);
         await unitPlannerPage.checkActivityMenuOptionVisibility("delete", 59, true);
+    });
+
+    test("Users can view the create units button based on course folder and CMS permissions", async ({
+        tester,
+        page,
+    }) => {
+        const courseList = new CourseList(tester, page);
+        const unitPlannerPage = new UnitPlanner(tester, page);
+
+        await tester.impersonateTeacher();
+
+        tester.isGoingTo(
+            "Jack Coles can view the create units button for Year 9 English, cannot view it for Year 9 French, and cannot view ELC in the course list",
+        );
+        await unitPlannerPage.navigateAndCheckCreateUnitsButton(6, true);
+        await unitPlannerPage.navigateAndCheckCreateUnitsButton(2, false);
+        await courseList.goto();
+        await courseList.verifyCourseNameInList("ELC", false);
+
+        tester.isGoingTo("impersonate Alison Chan who has CMS read permission");
+        await tester.impersonateViaUserProfilePage("Ms Alison Chan");
+
+        tester.isGoingTo(
+            "Alison Chan can view the create units button for Year 9 English, but not for Year 9 French or ELC",
+        );
+        await unitPlannerPage.navigateAndCheckCreateUnitsButton(6, true);
+        await unitPlannerPage.navigateAndCheckCreateUnitsButton(2, false);
+        await unitPlannerPage.navigateAndCheckCreateUnitsButton(4, false);
+
+        tester.isGoingTo("impersonate Schoolbox Staff 2 who has CMS write permission");
+        await tester.impersonateViaUserProfilePage("Schoolbox Staff 2");
+
+        tester.isGoingTo(
+            "Schoolbox Staff 2 can view the create units button for Year 9 English, Year 9 French and ELC",
+        );
+        await unitPlannerPage.navigateAndCheckCreateUnitsButton(6, true);
+        await unitPlannerPage.navigateAndCheckCreateUnitsButton(2, true);
+        await unitPlannerPage.navigateAndCheckCreateUnitsButton(4, true);
+
+        tester.isGoingTo("impersonate Schoolbox Staff 3 who has CMS admin permission");
+        await tester.impersonateViaUserProfilePage("Schoolbox Staff 3");
+
+        tester.isGoingTo(
+            "Schoolbox Staff 3 can view the create units button for Year 9 English, Year 9 French and ELC",
+        );
+        await unitPlannerPage.navigateAndCheckCreateUnitsButton(6, true);
+        await unitPlannerPage.navigateAndCheckCreateUnitsButton(2, true);
+        await unitPlannerPage.navigateAndCheckCreateUnitsButton(4, true);
     });
 
     test.afterAll(async ({ baseTester, db }) => {
