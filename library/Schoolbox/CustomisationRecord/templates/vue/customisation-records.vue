@@ -6,7 +6,6 @@
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
-import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import CursorPagination from "@schoolboxVue/components/pagination/cursor-pagination.vue";
 import LazyTable from "@schoolboxVue/components/table/lazyTable/lazy-table.vue";
 import type { Header, Routes, BasicType } from "@schoolboxVue/components/cell/cellTypes/BasicType";
@@ -70,7 +69,6 @@ const { maxScrollableHeight } = useMaxScrollableHeight(
                     <cell-basic :value="row[columnHeader.key] as BasicType" />
                 </template>
             </lazy-table>
-            <loading-table v-if="rowsStore.isMoreLoading" :rows="5" row-height="3rem" />
             <cursor-pagination
                 :url="rowsStore.url"
                 :metadata="rowsStore.payload.metadata"
