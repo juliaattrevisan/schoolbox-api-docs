@@ -505,13 +505,6 @@ class DataSource
             return $grid;
         }
 
-        /* This is super important and it's a bit shameful to -need- this...but after the $grid is built, we need to
-         * assign the provided $rubricInstance to it. Otherwise, the $grid->getRubricInstance() will return you a grid
-         * with the _stub_ that was used to manufacture the Blank Grid right at the start of this method in
-         * retrieveBlankGrid() which isn't helpful to you anywhere else in the app.
-         */
-        $grid->setRubricInstance($rubricInstance);
-
         // Load the levels, selected capabilities+indicators, descriptors for the rubric instance
         $capabilityUsageModels = $this->capabilityUsageMapper->findByColumn(
             'rubric_instance_id',
@@ -634,6 +627,13 @@ class DataSource
             $grid->getCapabilityUsages()[$capabilityId] = $capabilityUsage;
         }
 
+        /* This is super important and it's a bit shameful to -need- this...but after the $grid is built, we need to
+         * assign the provided $rubricInstance to it. Otherwise, the $grid->getRubricInstance() will return you a grid
+         * with the _stub_ that was used to manufacture the Blank Grid right at the start of this method in
+         * retrieveBlankGrid() which isn't helpful to you anywhere else in the app.
+         */
+        $grid->setRubricInstance($rubricInstance);
+
         /* Reset the assessment id in rubric grid for the cloned copy
          */
         if ($cloneNewRubric) {
@@ -641,6 +641,13 @@ class DataSource
              */
             $cloneAssessment = clone $assessment;
             $grid = $grid->setAssessment($cloneAssessment->setId(null));
+
+            /* TODO MAYBE this is a place where a stub rubric_instance must exist
+             *  That's because the cloned grid shouldn't know anything about its cloned rubric instance, otherwise we
+             *  might end up sharing a rubric_instance across multiple assessments which isn't correct at all.
+             *  You'll find out when you're trying to import courses to test this, anyways.
+             */
+            // $grid->getRubricInstance()->setId(null); ?????????????????
         }
 
         return $grid;
