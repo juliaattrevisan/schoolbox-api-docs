@@ -132,6 +132,7 @@ window.Vue.onUnmounted(() => {
                 <component
                     :is="activityLink !== null ? 'a' : 'span'"
                     :href="activityLink !== null ? getReturnUrl(activityLink) : undefined"
+                    class="l-flex l-gap-s"
                 >
                     <sbx-icon
                         :name="activityIconName"
@@ -236,12 +237,6 @@ li[data-sortable-active="true"] .sortable-holder {
     text-overflow: ellipsis;
     white-space: nowrap;
     flex: 1 1 auto;
-}
-
-.card.compact a,
-.card.compact > span {
-    display: flex;
-    gap: var(--spacing-s);
 }
 
 /* Styles for printing */
