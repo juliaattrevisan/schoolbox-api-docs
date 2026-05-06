@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { apiRequest } from "@js/util/sbx/apiUtils";
-import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import SearchSelectModal from "@schoolboxVue/components/searchSelect/modal/search-select-modal.vue";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import type {
@@ -50,7 +49,6 @@ const props = defineProps<{
 }>();
 
 const isSaving = window.Vue.ref<boolean>(false);
-const saveError = window.Vue.ref<string | null>(null);
 const subjectRows = window.Vue.ref<SubjectRow[]>([]);
 const currentEditingRow = window.Vue.ref<string | null>(null);
 const isLanguageModalOpen = window.Vue.ref<boolean>(false);
@@ -65,6 +63,7 @@ const classCodeEditingRowId = window.Vue.ref<string | null>(null);
 const classCodeModalSelected = window.Vue.ref<SearchSelectItem[]>([]);
 const classCodeSearchResults = window.Vue.ref<SearchSelectItem[]>([]);
 const classCodeDefaultResults = window.Vue.ref<SearchSelectItem[]>([]);
+const classCodeSnapshot = window.Vue.ref<string>("");
 
 const isCoreCategory = window.Vue.computed(() => {
     return props.categoryName.toLowerCase() === "core";
@@ -285,6 +284,7 @@ window.Vue.watch(isLanguageModalOpen, (isOpen, wasOpen) => {
 
     if (hasLanguageSelectionChanged(modalSelectionSnapshot.value, modalSelectedLanguages.value)) {
         applySelectedLanguages(modalSelectedLanguages.value);
+        void saveSubjectConfiguration();
     }
 
     closeLanguageModal();
@@ -442,6 +442,7 @@ function openClassCodeModal(rowId: string): void {
     const row = subjectRows.value.find((r) => r.id === rowId);
     if (!row) return;
     classCodeEditingRowId.value = rowId;
+    classCodeSnapshot.value = row.classCode;
     // Class codes are strings; cast is safe because SearchSelectModal only does === comparisons on id.
     classCodeModalSelected.value = row.classCode
         .split(",")
@@ -505,7 +506,11 @@ window.Vue.watch(isClassCodeModalOpen, (isOpen, wasOpen) => {
 
     const row = subjectRows.value.find((r) => r.id === classCodeEditingRowId.value);
     if (row) {
-        row.classCode = classCodeModalSelected.value.map((item) => String(item.id)).join(", ");
+        const newClassCode = classCodeModalSelected.value.map((item) => String(item.id)).join(", ");
+        row.classCode = newClassCode;
+        if (newClassCode !== classCodeSnapshot.value) {
+            void saveSubjectConfiguration();
+        }
     }
 
     classCodeEditingRowId.value = null;
@@ -590,7 +595,6 @@ async function saveSubjectConfiguration(): Promise<void> {
 
     try {
         isSaving.value = true;
-        saveError.value = null;
 
         const saveData = {
             categoryId: props.categoryId,
@@ -612,7 +616,6 @@ async function saveSubjectConfiguration(): Promise<void> {
         toast.timeout({ text: "Saved" });
         await refreshStudentCounts();
     } catch (error) {
-        saveError.value = "Failed to save configuration";
         const toast = window.sbProps.toastActivate("Save failed");
         toast.timeout({ text: "Save failed", isSuccess: false });
         console.error(error);
@@ -796,15 +799,6 @@ async function saveSubjectConfiguration(): Promise<void> {
                 </table>
             </template>
 
-            <div v-if="saveError" class="l-mar-m--bottom">
-                <request-error :further-info="saveError" />
-            </div>
-
-            <div class="form-actions">
-                <button type="button" class="button submit" @click="saveSubjectConfiguration">
-                    {{ isSaving ? "Saving..." : `Save ${categoryTitle} Configuration` }}
-                </button>
-            </div>
         </div>
 
         <search-select-modal
