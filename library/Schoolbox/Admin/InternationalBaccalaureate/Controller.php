@@ -306,6 +306,8 @@ class Controller extends ConfigController
             "SELECT cg.gid, COUNT(DISTINCT scu.external_id) AS cnt
              FROM sis_class_user scu
              INNER JOIN sis_class sc ON scu.class_id = sc.id
+             INNER JOIN sis_user_profile up ON scu.external_id = up.external_id
+             INNER JOIN sis_user_profile_student sups ON up.id = sups.sis_user_profile_id
              INNER JOIN ($unionSql) cg ON sc.code = cg.code
              GROUP BY cg.gid"
         );
@@ -342,6 +344,8 @@ class Controller extends ConfigController
                 "SELECT cl.gid, cl.language_id, COUNT(DISTINCT scu.external_id) AS cnt
                  FROM sis_class_user scu
                  INNER JOIN sis_class sc ON scu.class_id = sc.id
+                 INNER JOIN sis_user_profile up ON scu.external_id = up.external_id
+                 INNER JOIN sis_user_profile_student sups ON up.id = sups.sis_user_profile_id
                  INNER JOIN ($languageUnionSql) cl ON sc.code = cl.code
                  GROUP BY cl.gid, cl.language_id"
             );
