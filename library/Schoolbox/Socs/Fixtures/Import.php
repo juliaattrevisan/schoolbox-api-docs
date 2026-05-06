@@ -95,7 +95,7 @@ class Import implements IStrategy
         }
 
         try {
-            $response = $this->httpClient->get(self::FIXTURES_PATH, $query, $this->log);
+            $response = $this->httpClient->get(self::FIXTURES_PATH, $query);
         } catch (GuzzleException $e) {
             $this->log->warning(sprintf('Failed to contact SOCS fixtures endpoint: %s', $e->getMessage()));
             return;

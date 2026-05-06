@@ -54,7 +54,7 @@ class HttpClient
      * @return ResponseInterface The HTTP response.
      * @throws GuzzleException
      */
-    public function get(string $path, array $query, LoggerInterface $logger): ResponseInterface
+    public function get(string $path, array $query): ResponseInterface
     {
         $url = $this->buildBaseUrl($path);
         $this->noteUrlUsed($path, $query);

@@ -57,7 +57,7 @@ class Import implements IStrategy
         ];
 
         try {
-            $response = $this->httpClient->get(self::RESULTS_PATH, $query, $this->log);
+            $response = $this->httpClient->get(self::RESULTS_PATH, $query);
         } catch (GuzzleException $e) {
             $this->log->warning(sprintf('Failed to contact SOCS results endpoint: %s', $e->getMessage()));
             return;

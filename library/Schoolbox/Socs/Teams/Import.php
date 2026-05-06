@@ -49,7 +49,7 @@ class Import implements IStrategy
         $query = [];
 
         try {
-            $response = $this->httpClient->get(self::MSO_SPORT_PATH, $query, $this->log);
+            $response = $this->httpClient->get(self::MSO_SPORT_PATH, $query);
         } catch (GuzzleException $e) {
             $this->log->warning(sprintf('Failed to contact SOCS teams endpoint: %s', $e->getMessage()));
             return;

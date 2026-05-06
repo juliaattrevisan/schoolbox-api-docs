@@ -9,7 +9,6 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 use Schoolbox\Socs\HttpClient;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(HttpClient::class)]
@@ -43,7 +42,7 @@ class HttpClientTest extends TestCase
 
         $client = $this->createHttpClient($guzzle);
 
-        $response = $client->get('fixturecalendar.ashx', [], new NullLogger());
+        $response = $client->get('fixturecalendar.ashx', []);
 
         $this->assertSame($expectedResponse, $response);
         $this->assertSame(3, $attempts);
@@ -75,7 +74,7 @@ class HttpClientTest extends TestCase
         $this->expectExceptionMessage('SOCS unavailable');
 
         try {
-            $client->get('fixturecalendar.ashx', [], new NullLogger());
+            $client->get('fixturecalendar.ashx', []);
         } finally {
             $this->assertSame(3, $attempts);
         }
