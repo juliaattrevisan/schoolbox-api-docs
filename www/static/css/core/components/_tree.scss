@@ -16,39 +16,34 @@ $tree-course-icon-color: #008600;
 $tree-favorite-icon-color: darkorange;
 
 %browser-icon-colors {
-    .icon-folder:before {
+    .icon-folder:before,
+    sbx-icon.icon-folder {
         color: $tree-folder-icon-color;
     }
 
-    sbx-icon[name="folder"] {
-        color: $tree-folder-icon-color;
-    }
-
-    .icon-home:before {
+    .icon-home:before,
+    sbx-icon.icon-home {
         color: $tree-homepage-icon-color;
     }
 
-    sbx-icon[name="home"] {
-        color: $tree-homepage-icon-color;
-    }
-
-    .icon-course-builder,
-    .icon-course {
-        &:before {
-            color: $tree-course-icon-color;
-        }
-    }
-
-    sbx-icon[name="course-builder"] {
+    .icon-course-builder:before,
+    .icon-course:before,
+    sbx-icon.icon-course-builder,
+    sbx-icon.icon-course {
         color: $tree-course-icon-color;
     }
 
-    .icon-favourite:before {
+    .icon-favourite:before,
+    sbx-icon.icon-favourite {
         color: $tree-favorite-icon-color;
     }
 
-    sbx-icon[name="favourite"] {
-        color: $tree-favorite-icon-color;
+    sbx-icon.icon-folder:before,
+    sbx-icon.icon-home:before,
+    sbx-icon.icon-course-builder:before,
+    sbx-icon.icon-course:before,
+    sbx-icon.icon-favourite:before {
+        content: none;
     }
 }
 

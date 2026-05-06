@@ -28,7 +28,7 @@
         {% if folder.hasCoverImage ?? false %}
             <img class="folder-cover" src="/storage/image.php?hash={{ folder.coverImage.hash }}&size=square64" alt="{{ folder.name }}" {{ colouring }} />
         {% else %}
-            <sbx-icon name="{{ nodeIcon.sbxIcon(nodeType) }}" class="resource-browser-preview-icon" size="2rem" aria-hidden="true"></sbx-icon>
+            <sbx-icon name="{{ nodeIcon.sbxIcon(nodeType) }}" class="resource-browser-preview-icon {{ nodeIcon.icon(nodeType) }}" size="2rem" aria-hidden="true" color="currentColor"></sbx-icon>
         {% endif %}
         {% if hasHomepage %}
             </a>

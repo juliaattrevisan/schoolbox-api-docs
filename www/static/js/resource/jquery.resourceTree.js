@@ -87,13 +87,7 @@
                     var replacement = $("<sbx-icon></sbx-icon>")
                         .attr("name", iconClassToName(legacyIconClass))
                         .attr("role", icon.attr("role") || "presentation")
-                        .addClass(
-                            classList
-                                .filter(function (className) {
-                                    return className !== legacyIconClass;
-                                })
-                                .join(" "),
-                        );
+                        .addClass(classList.join(" "));
 
                     icon.replaceWith(replacement);
                 });
