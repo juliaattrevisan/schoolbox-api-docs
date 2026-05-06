@@ -19,6 +19,10 @@ export default class UnitPlanner {
 
     static readonly DATA_TEST_UNIT_ROW = "unit-row-{unitId}";
 
+    static readonly DATA_TEST_UNIT_DOT_MENU = "sbx-pop-out-unit-cell-unit-action-{unitId}";
+
+    static readonly DATA_TEST_UNIT_DROPDOWN_OPTION = "up-unit-cell-unit-action-{unitId}-{action}";
+
     static readonly DATA_TEST_CREATE_ACTIVITY_BUTTON =
         "sbx-pop-out-dropdown-activities-list-activity-{unitId}-activities-1-button";
 
@@ -83,9 +87,46 @@ export default class UnitPlanner {
     }
 
     /**
-     * Click the create text box button
+     * Click the 3-dot menu for a unit
      * @param unitId - The ID of the unit
      */
+    async clickUnitDotMenu(unitId: number): Promise<void> {
+        await this.page.getByTestId(UnitPlanner.DATA_TEST_UNIT_DOT_MENU.replace("{unitId}", unitId.toString())).click();
+    }
+
+    /**
+     * Click the unit 3-dot menu
+     * Check whether the 4 options are presented in the unit 3-dot menu: course-link, import-link, modify-link and delete-button
+     * @param unitId - The ID of the unit
+     * @param optionsToBePresent - The list of options that should be present
+     * @param optionsNotToBePresent - The list of options that should not be present
+     */
+    async checkUnitMenuOptionsVisibility(
+        unitId: number,
+        optionsToBePresent: ("course-link" | "import-link" | "modify-link" | "delete-button")[],
+        optionsNotToBePresent: ("course-link" | "import-link" | "modify-link" | "delete-button")[],
+    ): Promise<void> {
+        await this.clickUnitDotMenu(unitId);
+        for (const action of optionsToBePresent) {
+            const unitMenuOptionLocator = this.page.getByTestId(
+                UnitPlanner.DATA_TEST_UNIT_DROPDOWN_OPTION.replace("{unitId}", unitId.toString()).replace(
+                    "{action}",
+                    action,
+                ),
+            );
+            await expect(unitMenuOptionLocator).toBeVisible();
+        }
+        for (const action of optionsNotToBePresent) {
+            const unitMenuOptionLocator = this.page.getByTestId(
+                UnitPlanner.DATA_TEST_UNIT_DROPDOWN_OPTION.replace("{unitId}", unitId.toString()).replace(
+                    "{action}",
+                    action,
+                ),
+            );
+            await expect(unitMenuOptionLocator).not.toBeVisible();
+        }
+    }
+
     async clickCreateTextBoxButton(unitId: number): Promise<void> {
         await this.page
             .getByTestId(UnitPlanner.DATA_TEST_CREATE_TEXT_BOX_BUTTON.replace("{unitId}", unitId.toString()))
