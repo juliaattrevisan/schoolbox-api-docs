@@ -55,7 +55,7 @@ export default class ResourcesMyFilesPicker {
      * @param folderTitle - The sub-folder title
      */
     async clickSubFolders(folderTitle: string): Promise<void> {
-        await this.page.locator(`a[title="${folderTitle}"]:has(sbx-icon[name="folder"])`).click();
+        await this.page.locator(`a[title="${folderTitle}"].icon-folder`).click();
     }
 
     /**
@@ -63,7 +63,7 @@ export default class ResourcesMyFilesPicker {
      * @param homeFolder - The home folder title
      */
     async clickSubHomeFolders(homeFolder: string): Promise<void> {
-        await this.page.locator(`a[title="${homeFolder}"]:has(sbx-icon[name="home"])`).click();
+        await this.page.locator(`a[title="${homeFolder}"].icon-home`).click();
     }
 
     /**
