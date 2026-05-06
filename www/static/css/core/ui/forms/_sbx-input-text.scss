@@ -85,4 +85,9 @@ body.sbx-body {
     input[type="text"].clr-color {
         width: calc(100% - 80px);
     }
+
+    // remove the padding so they align with the checkbox
+    .rb-indicator-textarea {
+        padding: 0;
+    }
 }

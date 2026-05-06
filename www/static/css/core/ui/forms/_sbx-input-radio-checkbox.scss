@@ -240,10 +240,7 @@ body.sbx-body {
         input[type="radio"] {
             flex: 0 0 auto;
         }
-        // remove the margin for better flex alignment
-        // .hint {
-        //     margin: 0;
-        // }
+        // remove the margin for better flex alignment and align the hint to the center of the checkbox if it exists
         &:has(.hint) {
             align-items: center;
             .hint {

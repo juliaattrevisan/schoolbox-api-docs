@@ -169,7 +169,7 @@ table.rb {
         }
     }
     textarea {
-        font-size: 0.625rem;
+        font-size: var(--sbx-font-size-xs, 0.625rem);
         resize: none;
         overflow-y: auto;
         height: 100px; /* yes, I used pixels. wanna fight about it? */

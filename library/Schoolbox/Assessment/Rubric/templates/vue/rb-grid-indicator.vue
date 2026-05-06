@@ -109,7 +109,7 @@ window.Vue.onMounted(() => {
                 </a>
             </span>
 
-            <div class="l-flex l-flex--align-center l-gap-s">
+            <div class="l-flex l-flex--align-start l-gap-s">
                 <input
                     :id="`rb-indicator-${componentId}`"
                     v-model="hasUsage"
@@ -142,6 +142,7 @@ window.Vue.onMounted(() => {
                     <textarea
                         :id="`rb-indicator-textarea-${componentId}`"
                         v-model.trim.lazy="indicatorName"
+                        class="rb-indicator-textarea"
                         :maxlength="indicatorNameHasChanged ? MAX_INDICATOR_LENGTH : undefined"
                         :placeholder="`${locale.rubricCriterion.proper()} name`"
                         @change.once="indicatorNameHasChanged = true"
