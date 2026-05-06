@@ -55,6 +55,7 @@ defineExpose({ isEmpty });
                     <th class="l-flex markdown border-none">
                         <sbx-icon
                             v-if="props.usedCapabilities.includes(capability.id)"
+                            color="var(--sbx-color-text-secondary)"
                             name="submissions"
                             title="Used in a Learning activity"
                         ></sbx-icon>
@@ -66,6 +67,7 @@ defineExpose({ isEmpty });
                     <td class="l-flex border-none">
                         <sbx-icon
                             v-if="props.usedIndicators.includes(indicator.id)"
+                            color="var(--sbx-color-text-secondary)"
                             name="submissions"
                             title="Used in a Learning activity"
                         ></sbx-icon>
@@ -177,11 +179,6 @@ table.rb {
 
     .l-flex {
         gap: var(--spacing-s);
-    }
-
-    sbx-icon {
-        color: var(--sbx-color-text-secondary, inherit);
-        flex: 0 0 auto;
     }
 }
 

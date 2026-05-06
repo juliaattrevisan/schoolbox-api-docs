@@ -1,6 +1,6 @@
 <template>
     <li>
-        <sbx-icon v-if="icon" :name="icon"></sbx-icon>
+        <sbx-icon v-if="icon" :name="icon" color="var(--sbx-color-text-secondary)"></sbx-icon>
         <slot></slot>
     </li>
 </template>

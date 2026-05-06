@@ -133,7 +133,11 @@ window.Vue.onUnmounted(() => {
                     :is="activityLink !== null ? 'a' : 'span'"
                     :href="activityLink !== null ? getReturnUrl(activityLink) : undefined"
                 >
-                    <sbx-icon :name="activityIconName" :title="activityIconTitle"></sbx-icon>
+                    <sbx-icon
+                        :name="activityIconName"
+                        :title="activityIconTitle"
+                        color="var(--sbx-color-text-secondary)"
+                    ></sbx-icon>
                     <p
                         :data-test="`unit-planner-activity-title-${props.activity.title}`"
                         :data-test-activity-id="props.activity.id"
@@ -238,12 +242,6 @@ li[data-sortable-active="true"] .sortable-holder {
 .card.compact > span {
     display: flex;
     gap: var(--spacing-s);
-}
-
-.card.compact a sbx-icon,
-.card.compact > span sbx-icon {
-    color: var(--sbx-color-text-secondary, inherit);
-    flex: 0 0 auto;
 }
 
 /* Styles for printing */

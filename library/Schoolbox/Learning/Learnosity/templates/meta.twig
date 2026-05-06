@@ -4,7 +4,7 @@
 {% import '@learningAssessment/fragments/macro/duration.twig' as duration %}
 
 <ul class="meta">
-    <li title="Submitted Date/Time"><sbx-icon name="calendar"></sbx-icon> {% apply spaceless %}
+    <li title="Submitted Date/Time"><sbx-icon name="calendar" color="var(--sbx-color-text-secondary)"></sbx-icon> {% apply spaceless %}
         {% if attempt.finish %}
             Finished <time>{{ attempt.finish.relativeDayWithoutMidnight }}</time>
         {% else %}
@@ -13,7 +13,7 @@
         {% endapply %}
     </li>
 
-    <li title="Attempt Time Taken"><sbx-icon name="time-value"></sbx-icon> {% apply spaceless %}
+    <li title="Attempt Time Taken"><sbx-icon name="time-value" color="var(--sbx-color-text-secondary)"></sbx-icon> {% apply spaceless %}
         Time taken:
         {% if attempt.finish %}
             {{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(attempt.finish, true)) }}
@@ -24,7 +24,7 @@
     </li>
 
     {% if attempt.reviewed %}
-        <li title="Attempt Time Taken"><sbx-icon name="staff-students"></sbx-icon> {% apply spaceless %}
+        <li title="Attempt Time Taken"><sbx-icon name="staff-students" color="var(--sbx-color-text-secondary)"></sbx-icon> {% apply spaceless %}
             Reviewed by
                 {% if attempt.reviewer.deleted %}
                     {{ attempt.reviewer.fullname }}

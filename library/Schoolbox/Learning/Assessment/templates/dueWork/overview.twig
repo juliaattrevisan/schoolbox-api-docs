@@ -11,8 +11,8 @@
             <h1>Rubric Report for {{ dueWork.title }}</h1>
             <div class="l-flex l-flex--justify-space">
                 <ul class="meta">
-                    <li><sbx-icon name="{{ icon.renderName(dueWork)|trim }}"></sbx-icon> {{ dueWork.typeName }}</li>
-                    <li><sbx-icon name="calendar"></sbx-icon> Due {{ dueWork.dueAt.getRelativeTime }} on {{ dueWork.dueAt.localShort }}</li>
+                    <li><sbx-icon name="{{ icon.renderName(dueWork)|trim }}" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ dueWork.typeName }}</li>
+                    <li><sbx-icon name="calendar" color="var(--sbx-color-text-secondary)"></sbx-icon> Due {{ dueWork.dueAt.getRelativeTime }} on {{ dueWork.dueAt.localShort }}</li>
                 </ul>
                 <div class="l-flex l-flex--align-center l-flex--justify-end l-gap-m l-pad-m--horiz no-pad">
                     <div class="checklist">

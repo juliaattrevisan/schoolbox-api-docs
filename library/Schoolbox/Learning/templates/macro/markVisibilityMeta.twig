@@ -3,10 +3,10 @@
  #}
 {% macro markVisibilityMeta(assessment, plural = false) %}
     {% if assessment.markVisibility == 2 %}
-        <li><sbx-icon name="staff"></sbx-icon> {{ (plural) ? locale.grades.properPlural : locale.grades.proper }} visible to staff, students and parents</li>
+        <li><sbx-icon name="staff" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ (plural) ? locale.grades.properPlural : locale.grades.proper }} visible to staff, students and parents</li>
     {% elseif assessment.markVisibility == 1 %}
-        <li><sbx-icon name="staff-students"></sbx-icon> {{ (plural) ? locale.grades.properPlural : locale.grades.proper }} visible to staff and students</li>
+        <li><sbx-icon name="staff-students" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ (plural) ? locale.grades.properPlural : locale.grades.proper }} visible to staff and students</li>
     {% elseif assessment.markVisibility == 0 %}
-        <li><sbx-icon name="teacher"></sbx-icon> {{ (plural) ? locale.grades.properPlural : locale.grades.proper }} visible to staff</li>
+        <li><sbx-icon name="teacher" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ (plural) ? locale.grades.properPlural : locale.grades.proper }} visible to staff</li>
     {% endif %}
 {% endmacro %}

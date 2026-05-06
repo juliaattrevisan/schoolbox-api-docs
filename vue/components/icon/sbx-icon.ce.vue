@@ -2024,6 +2024,10 @@ function alertInvalidIconName(): false {
 </template>
 
 <style scoped>
+:host {
+    flex: 0 0 auto;
+}
+
 .sbx-icon {
     align-items: center;
     color: v-bind(color);

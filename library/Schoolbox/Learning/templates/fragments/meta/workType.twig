@@ -8,4 +8,4 @@
     {% set selfReflectSuffix = '' %}
 {% endif %}
 
-<li><sbx-icon name="{{ icon.renderName(assessment)|trim }}"></sbx-icon> {{ assessment.typeName }}{{ selfReflectSuffix }}{% if assessment.weight %}, Weighting: {{ assessment.weight }}{% endif %}</li>
+<li><sbx-icon name="{{ icon.renderName(assessment)|trim }}" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ assessment.typeName }}{{ selfReflectSuffix }}{% if assessment.weight %}, Weighting: {{ assessment.weight }}{% endif %}</li>

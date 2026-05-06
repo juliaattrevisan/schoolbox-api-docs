@@ -89,14 +89,14 @@
                         {# Don't render a link if you are unable to view the details #}
                         {% set route = viewRoute.viewRoute(assessment, USER) %}
                         {% if route %}
-                            <a title="{{ title }}" href="{{ route }}" class="course-outline-assessment-title--with-icon" data-test="course-outline-assessment-title-{{ assessment.title }}">
+                            <a title="{{ title }}" href="{{ route }}" class="l-flex l-gap-s" data-test="course-outline-assessment-title-{{ assessment.title }}">
                                 {# Render the icon for the assessment type #}
-                                <sbx-icon name="{{ icon.renderName(assessment)|trim }}"></sbx-icon>
+                                <sbx-icon name="{{ icon.renderName(assessment)|trim }}" color="var(--sbx-color-text-secondary)"></sbx-icon>
                                 <p class="t-break-word">{{ assessment.title }}</p>
                             </a>
                         {% else %}
-                            <div title="{{ title }}" class="course-outline-assessment-title--with-icon">
-                                <sbx-icon name="{{ icon.renderName(assessment)|trim }}"></sbx-icon>
+                            <div title="{{ title }}" class="l-flex l-gap-s">
+                                <sbx-icon name="{{ icon.renderName(assessment)|trim }}" color="var(--sbx-color-text-secondary)"></sbx-icon>
                                 <p class="t-break-word">{{ assessment.title }}</p>
                             </div>
                         {% endif %}

@@ -132,7 +132,7 @@ const exportReportRoute = window.Vue.computed(() => {
         <div class="small-12 column list-item">
             <ul class="meta">
                 <li>
-                    <sbx-icon name="alert"></sbx-icon>
+                    <sbx-icon name="alert" color="var(--sbx-color-text-secondary)"></sbx-icon>
                     This markbook is showing a large number of students; for performance reasons, student portraits have
                     been disabled.
                 </li>
