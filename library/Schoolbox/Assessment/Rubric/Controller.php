@@ -15,6 +15,7 @@ use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
+use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
 use Schoolbox\Assessment\Rubric\DataModel\Capability;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator;
@@ -400,8 +401,9 @@ class Controller extends BaseController
      * Users might not be aware that someone's received feedback already, when they try to change the grid: they get
      * a warning in the ui that changing the grid when someone has received a feedback will require it to be re-marked.
      *
-     * @api POST /rubric/determineMarkInvalidation
+     * @throws Exception
      * @since 181
+     * @api POST /rubric/determineMarkInvalidation
      */
     public function determineMarkInvalidation(): void
     {
@@ -433,65 +435,102 @@ class Controller extends BaseController
             return;
         }
 
-
-        $currentGrid = $this->mapper->retrieveGrid($currentAssessment, false);
-
-
+        /* In 26.1, any activity could have N number of rubric grids associated with it. A change in any of them would
+         * mean that any previously-received feedback would be obsoleted.
+         */
         // Load the proposed assessment and grid
         // Need to load them separately due to object references: if I use the
         // same assessment in both retrieveGrid calls the current grid thinks
         // the current assessment state is the same as the proposed state.
         $proposedAssessment = (clone $currentAssessment);
 
-        // TODO: multi-rubrics support
-        $rubricData = json_decode($post[array_key_first($post)] ?? '[]', true);
+        /* Stuff we'll need later; instead of respawning them in every iteration, just spawn them once.
+         */
+        $gridFactory = new GridFactory();
+        $jsonDecorator = new PropertyDecorator();
+        $linkDecorator = new LinkDecorator($this->routeGenerator, $this->authorizer);
 
-        // TODO: capabilityMarkType & useMarkRange come from the rubric data itself now, they shouldn't be against the assessment anymore
-        $capabilityMarkTypeSlug = $rubricData['capabilityMarkType'] ?? MarkType::SLUG_NONE;
-        $capabilityMarkType = $this->markTypeMapper->createModel()
-            ->setSlug($capabilityMarkTypeSlug)
-            ->setId(MarkType::slugToId($capabilityMarkTypeSlug));
-        $useMarkRange = $rubricData['useMarkRange'] ?? false;
+        /* TODO dependency inject this mapper
+         */
+        $rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
 
-        $proposedAssessment->setCapabilityMarkType($capabilityMarkType);
-        $proposedAssessment->setUseMarkRange($useMarkRange);
+        /* foreach rubric instance, check if it's compatible with the proposed grid.
+         *
+         * If it is *not* compatible, $response['compatible'] can be set to false then return early...I don't *think*
+         * we care about *which grid(s)* caused the invalidation of a feedback; teacher needs to go back and re-mark
+         * all of them anyway.
+         *
+         * I spoke to jeztek about it, and we'll start with something simple with a mind to add nuance to it (and the
+         * corresponding modal) later, as required.
+         */
+        /** @var \Schoolbox\Assessment\Rubric\Instance\Model $rubricInstance */
+        foreach ($currentAssessment->getRubricInstances() as $rubricInstance) {
+            $currentGrid = $this->mapper->retrieveOneGrid($currentAssessment, $rubricInstance, false);
 
-        $proposedGrid = (new GridFactory())->buildFromPostData(
-            $this->mapper->retrieveGrid($proposedAssessment, false),
-            [ $assessmentId => $rubricData ],
-            false
-        );
+            /* The post payload is indexed by rubric instance id
+             */
+            $rubricData = json_decode($post[$rubricInstance->getId()] ?? '[]', true);
 
+            /* Manufacture new capability mark type and mark range settings, in situ
+             *
+             * These become ingredients for the grid we intend to make so we need to ensure they're split (and distinct)
+             * from whence they came, in $currentAssessment's rubric instance. The grid should be standalone.
+             */
+            $capabilityMarkTypeSlug = $rubricInstance->getCapabilityMarkType()->getSlug() ?? MarkType::SLUG_NONE;
 
-        // Is the proposed grid itself not valid?
-        // Doesn't matter for the purpose of this exercise
-        if (!$proposedGrid->isCompatibleWith($currentGrid)) {
-            $response['compatible'] = false;
-            $jsonDecorator = new PropertyDecorator();
-            $linkDecorator = new LinkDecorator($this->routeGenerator, $this->authorizer);
+            $capabilityMarkType = $this->markTypeMapper->createModel()
+                ->setSlug($capabilityMarkTypeSlug)
+                ->setId(MarkType::slugToId($capabilityMarkTypeSlug));
 
-            // Determine who's actually affected?
-            foreach ($currentAssessment->getAllParticipants() as $participant) {
-                $user   = $participant->getUser();
-                $userId = $user->getId();
+            $useMarkRange = $rubricInstance->getMarkedUsingRange() ?? false;
 
-                // Instructor-given feedback
-                if ($this->mapper->hasInstructorMarkedGrid($participant)) {
-                    $response['affectedUsers'][$userId]['instructorGiven'] = true;
+            /* Assemble a rubric instance that can be used to compare grids before and after.
+             * We don't need to add $proposedRubricInstance to $proposedAssessment's rubric instance collection atm.
+             */
+            $proposedRubricInstance = $rubricInstanceMapper->createModel()
+                ->setCapabilityMarkType($capabilityMarkType)
+                ->setMarkedUsingRange($useMarkRange);
+
+            $proposedGrid = $gridFactory->buildFromPostData(
+                $this->mapper->retrieveOneGrid($proposedAssessment, $proposedRubricInstance, false),
+                [ $assessmentId => $rubricData ],
+                false
+            );
+
+            // Is the proposed grid itself not valid?
+            // Doesn't matter for the purpose of this exercise
+            if (!$proposedGrid->isCompatibleWith($currentGrid)) {
+                $response['compatible'] = false;
+
+                // Determine who's actually affected?
+                foreach ($currentAssessment->getAllParticipants() as $participant) {
+                    $user   = $participant->getUser();
+                    $userId = $user->getId();
+
+                    // Instructor-given feedback
+                    if ($this->mapper->hasInstructorMarkedGrid($participant)) {
+                        $response['affectedUsers'][$userId]['instructorGiven'] = true;
+                    }
+
+                    // Self-assessment feedback
+                    if ($currentAssessment->isSelfAssessable() && $this->mapper->hasSelfAssessedMarkedGrid($participant)) {
+                        $response['affectedUsers'][$userId]['selfAssess'] = true;
+                    }
+
+                    // If either type of feedback set: set the user as affected
+                    if (!empty($response['affectedUsers'][$userId])) {
+                        $response['affectedUsers'][$userId]['user'] = $user->jsonSerialize($jsonDecorator, $linkDecorator);
+                    }
                 }
 
-                // Self-assessment feedback
-                if ($currentAssessment->isSelfAssessable() && $this->mapper->hasSelfAssessedMarkedGrid($participant)) {
-                    $response['affectedUsers'][$userId]['selfAssess'] = true;
-                }
-
-                // If either type of feedback set: set the user as affected
-                if (!empty($response['affectedUsers'][$userId])) {
-                    $response['affectedUsers'][$userId]['user'] = $user->jsonSerialize($jsonDecorator, $linkDecorator);
-                }
+                /* Exit early if any of the rubric grids are now different, causing someone's entire feedback to require
+                 * re-marking; maybe later we can revise how this modal communicates *which grid* is invalid instead
+                 */
+                // Response code is always 200:
+                // this is a valid request even if marks would've been invalidated.
+                $this->response = $this->responseAsJson($response)->withStatus(200);
             }
         }
-
 
         // Response code is always 200:
         // this is a valid request even if marks would've been invalidated.
