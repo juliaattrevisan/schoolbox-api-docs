@@ -210,13 +210,14 @@ class Factory
         }
 
 
-        // Validate if an indicator is used
-        if ($validate) {
-            $gridSpec = new ValidRubricGrid();
-
-            if (!$gridSpec->isSatisfiedBy($grid)) {
-                throw new \InvalidArgumentException('Please have at least one selected indicator if using a rubric');
-            }
+        /* If backend validation was requested check that $grid is in a functional state
+         * This mainly involves checking that at least one indicator was selected.
+         *
+         * Note that Andy left a spec pattern inheritance tree that prevents meaningful typesafety; I'm minded to just
+         * delete that entire idea wholesale someday.
+         */
+        if ($validate && !(new ValidRubricGrid())->isSatisfiedBy($grid)) {
+            throw new \InvalidArgumentException('Please have at least one selected indicator if using a rubric');
         }
 
 
