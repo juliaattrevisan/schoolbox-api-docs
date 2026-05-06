@@ -15,6 +15,16 @@ use SensitiveParameter;
  */
 class HttpClient
 {
+    /**
+     * Number of seconds to sleep before retrying a failed SOCS request.
+     */
+    private const int NAP_TIMEOUT = 3;
+
+    /**
+     * Number of times to retry a SOCS request before giving up.
+     */
+    private const int NUM_RETRY = 3;
+
     private Client $client;
 
     private string $baseUrl;
@@ -41,22 +51,31 @@ class HttpClient
      *
      * @param array<string,string> $query Non-secret query parameters; ID and key are added automatically.
      *
-     * @return ResponseInterface|null The HTTP response, or null if the request failed.
+     * @return ResponseInterface The HTTP response.
+     * @throws GuzzleException
      */
-    public function get(string $path, array $query, LoggerInterface $logger): ?ResponseInterface
+    public function get(string $path, array $query, LoggerInterface $logger): ResponseInterface
     {
         $url = $this->buildBaseUrl($path);
         $this->noteUrlUsed($path, $query);
 
         $fullQuery = ['ID' => $this->schoolId, 'key' => $this->token] + $query;
+        $fails = 0;
 
-        try {
-            return $this->client->request('GET', $url, [
-                'query' => $fullQuery,
-            ]);
-        } catch (GuzzleException $e) {
-            $logger->warning(sprintf('Failed to contact SOCS endpoint %s: %s', $url, $e->getMessage()));
-            return null;
+        while (true) {
+            try {
+                return $this->client->request('GET', $url, [
+                    'query' => $fullQuery,
+                ]);
+            } catch (GuzzleException $e) {
+                $fails++;
+
+                if ($fails >= self::NUM_RETRY) {
+                    throw $e;
+                }
+
+                sleep(self::NAP_TIMEOUT);
+            }
         }
     }
 
