@@ -212,6 +212,8 @@ function build_docker_compose_env() {
     PRIMARY_INSTANCE_HOSTNAME=\"${PRIMARY_INSTANCE_HOSTNAME}\"
     SECONDARY_INSTANCE_ID=\"${SECONDARY_INSTANCE_ID}\"
     SECONDARY_INSTANCE_HOSTNAME=\"${SECONDARY_INSTANCE_HOSTNAME}\"
+    AWS_ACCESS_KEY_ID=\"${AWS_ACCESS_KEY_ID:-}\"
+    AWS_SECRET_ACCESS_KEY=\"${AWS_SECRET_ACCESS_KEY:-}\"
     ${aws_credentials}" | sed -e 's/^[ \t]*//' > .docker-compose.env
 }
 
