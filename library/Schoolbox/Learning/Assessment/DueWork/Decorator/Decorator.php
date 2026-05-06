@@ -233,6 +233,11 @@ class Decorator implements DecoratorInterface
                     throw new InvalidArgumentException("Save of row set failed for unknown reason");
                 }
 
+                /* TODO LOL I needed something similar to this
+                 * $assessment->setRubricGrid($newGrid);
+                 */
+
+
                 /* Aggregate maximum mark of this grid
                  */
                 $maxMark += $newGrid->calculateMaxValueFromCapabilities();
