@@ -30,6 +30,8 @@ class EportfolioStrategyTest extends TestCase
 
         $state = new class ($fetchRows) {
             /**
+             * Store queued fetch results for the in-memory strategy test double.
+             *
              * @param list<list<array<string, mixed>>> $fetchRows
              */
             public function __construct(public array $fetchRows)
@@ -59,6 +61,9 @@ class EportfolioStrategyTest extends TestCase
             new RetentionPeriod(30),
             $state,
         ) extends Eportfolio {
+            /**
+             * Wire the in-memory state into the ePortfolio strategy test double.
+             */
             public function __construct(
                 LoggerInterface $logger,
                 bool $perform,
@@ -73,6 +78,8 @@ class EportfolioStrategyTest extends TestCase
             }
 
             /**
+             * Record each query and return the next queued fixture result set.
+             *
              * @param array<string, mixed> $params
              * @return list<array<string, mixed>>
              */
@@ -84,6 +91,8 @@ class EportfolioStrategyTest extends TestCase
             }
 
             /**
+             * Resolve component instance IDs from the in-memory page mapping.
+             *
              * @param list<int> $pageIds
              * @return list<int>
              */
@@ -98,6 +107,8 @@ class EportfolioStrategyTest extends TestCase
             }
 
             /**
+             * Resolve blog IDs from the in-memory page mapping.
+             *
              * @param list<int> $pageIds
              * @return list<int>
              */
@@ -112,6 +123,8 @@ class EportfolioStrategyTest extends TestCase
             }
 
             /**
+             * Record primary-key delete operations without touching a database.
+             *
              * @param array<string, int> $deleted
              * @param list<int> $ids
              */
@@ -130,6 +143,8 @@ class EportfolioStrategyTest extends TestCase
             }
 
             /**
+             * Record foreign-key delete operations without touching a database.
+             *
              * @param array<string, int> $deleted
              * @param list<int> $ids
              * @param list<int> $excludedIds
