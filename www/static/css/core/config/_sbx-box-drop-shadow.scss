@@ -24,7 +24,8 @@ body.sbx-body {
 
     // Undo unintended shadows on some elements, typically when the elements are
     // inside an element that already has a shadow
-    .reveal-modal section,
+    .reveal-modal *,
+    .modal *,
     .island section section,
     #permissions .scrollable,
     .sortable .empty-state,
