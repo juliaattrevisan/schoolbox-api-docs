@@ -10,10 +10,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\DataRetention;
 
-use Alaress\Database\Connector\IConnector;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\IConfigLoader;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockInterface;
 
@@ -233,10 +231,7 @@ class CommandLineTool extends CliTool\App
         $bus = $this->buildStrategies(
             $validStrats,
             $logger,
-            $this->perform(),
-            $this->getDatabaseInternal(),
             $lock,
-            $this->getConfig(),
             $endTime,
             $retentionPeriod,
             $loopCount,
@@ -302,16 +297,16 @@ class CommandLineTool extends CliTool\App
     protected function buildStrategies(
         ValidStrats $validStrats,
         LoggerInterface $logger,
-        bool $perform,
-        IConnector $database,
         LockInterface $lock,
-        IConfigLoader $config,
         int $endTime,
         RetentionPeriod $retentionPeriod,
         int $loopCount,
         int $chunkSize,
     ): array {
         $bus = [];
+        $perform = $this->perform();
+        $database = $this->getDatabaseInternal();
+        $config = $this->getConfig();
 
         if ($validStrats->isStratEnabled(ValidStrats::MOMENTS)) {
             $bus[] = new Strategy\Moments(

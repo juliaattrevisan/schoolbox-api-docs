@@ -25,7 +25,31 @@ class CommandLineToolStrategyBusTest extends TestCase
      */
     private function buildStrategies(string $csvStrats): array
     {
-        $tool = new class extends CommandLineTool {
+        $tool = new class (
+            $this->createStub(IConnector::class),
+            $this->createStub(IConfigLoader::class),
+        ) extends CommandLineTool {
+            public function __construct(
+                private IConnector $database,
+                private IConfigLoader $config,
+            ) {
+            }
+
+            protected function perform(): bool
+            {
+                return false;
+            }
+
+            protected function getDatabaseInternal(): IConnector
+            {
+                return $this->database;
+            }
+
+            protected function getConfig(): IConfigLoader
+            {
+                return $this->config;
+            }
+
             /**
              * Expose the protected strategy builder for this test harness.
              *
@@ -34,10 +58,7 @@ class CommandLineToolStrategyBusTest extends TestCase
             public function exposedBuildStrategies(
                 ValidStrats $validStrats,
                 LoggerInterface $logger,
-                bool $perform,
-                IConnector $database,
                 LockInterface $lock,
-                IConfigLoader $config,
                 int $endTime,
                 RetentionPeriod $retentionPeriod,
                 int $loopCount,
@@ -46,10 +67,7 @@ class CommandLineToolStrategyBusTest extends TestCase
                 return $this->buildStrategies(
                     $validStrats,
                     $logger,
-                    $perform,
-                    $database,
                     $lock,
-                    $config,
                     $endTime,
                     $retentionPeriod,
                     $loopCount,
@@ -61,10 +79,7 @@ class CommandLineToolStrategyBusTest extends TestCase
         return $tool->exposedBuildStrategies(
             new ValidStrats($csvStrats),
             $this->createStub(LoggerInterface::class),
-            false,
-            $this->createStub(IConnector::class),
             $this->createStub(LockInterface::class),
-            $this->createStub(IConfigLoader::class),
             time() + 3600,
             new RetentionPeriod(30),
             3,
