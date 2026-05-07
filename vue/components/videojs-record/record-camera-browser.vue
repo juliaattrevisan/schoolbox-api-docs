@@ -338,7 +338,7 @@ export default {
             <div v-else-if="chooseDevice_hasDeviceChangeError" class="alert-box alert">
                 Sorry, the selected camera cannot be displayed. Please ensure it's functioning properly and try again.
             </div>
-            <div v-else class="alert-box alert">Sorry, an unknown error has occured.</div>
+            <div v-else class="alert-box alert">Sorry, an unknown error has occurred.</div>
             <button @click.prevent="onCloseErrorModalSelected">Close</button>
         </over-media-modal>
     </div>
