@@ -239,7 +239,7 @@ class Decorator implements DecoratorInterface
              */
             $newRubricInstance = $this->rubricInstanceMapper->createModel()
                 ->setId($rubricId)
-                ->setAssessmentModel((new \Schoolbox\Learning\Assessment\DataModel\Model)->setId($assessment->getId()));
+                ->setAssessmentModel((new \Schoolbox\Learning\Assessment\DataModel\Model())->setId($assessment->getId()));
 
             /* "Welcome to the party, pal." --John McClane
              */

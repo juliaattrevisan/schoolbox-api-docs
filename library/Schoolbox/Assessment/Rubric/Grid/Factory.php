@@ -43,7 +43,8 @@ class Factory
     /**
      * Constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->markTypeMapper = MarkTypeMapper::getInstance();
         $this->gradeGroupMapper = GradeLevel\Group\Mapper::getInstance();
     }
