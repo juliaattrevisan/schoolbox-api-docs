@@ -70,6 +70,7 @@ function onClearSearchSelected(): void {
         <label for="search">Search</label>
         <div class="input-group">
             <input
+                id="search"
                 ref="queryInputEl"
                 v-model="searchStore.query"
                 type="text"

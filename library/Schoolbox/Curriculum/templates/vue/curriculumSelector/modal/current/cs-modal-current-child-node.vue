@@ -40,7 +40,7 @@ function onChange($isChecked: boolean): void {
 <template>
     <li v-if="props.isExpanded">
         <div class="node l-gap-xs l-pad-xs--vert">
-            <div v-if="hasCode" class="checklist l-gap-xs l-pad-xs--vert">
+            <div v-if="hasCode" class="checklist l-flex l-gap-s l-pad-xs--vert">
                 <input
                     :id="`checkbox-${props.node.id}__${extraId}`"
                     type="checkbox"
@@ -74,11 +74,11 @@ function onChange($isChecked: boolean): void {
 
 <style scoped>
 .node:not(:last-child) {
-    border-bottom: 1px solid var(--body-background); /* don't add borders on the last nodes for better readability */
+    border-bottom: 1px solid var(--sbx-color-border, var(--body-background)); /* don't add borders on the last nodes for better readability */
 }
 
-.checklist {
-    flex: 2rem 0; /* ensure a long name doesn't impact the checkbox width, which may add dodgy scroll bars on it */
+.checklist input {
+    flex-shrink: 0; /* so the checkbox doesn't shrink when the label is long */
 }
 
 .node__name {

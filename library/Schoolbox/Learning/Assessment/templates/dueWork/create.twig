@@ -154,15 +154,18 @@
             <ul class="option-list">
                 {% if kami_enabled %}
                 <li {% if not config.kami_worksheets_enabled %}style="display:none"{% endif %}>
-                    <input id="worksheet" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableWorksheet ? 'checked' : '' }} name="submissionOptions[]" value="enableWorksheet" data-type-group>
-                    <label for="worksheet" class="checkbox-label" data-test="assessment-form-submission-type-interactive_worksheet">Interactive Worksheet </label>
-                    <span class="hint has-tip tip-top" data-tooltip title="This provides students with one interactive worksheet per {{ locale.dueWork.proper }} that they can interact with online. As a teacher, you can monitor and provide in-line feedback as the student progresses. ">?</span>
-                    <div id="worksheetDropzone" {{ assessment.getEnableWorksheet ? '' : 'style="display:none"' }}>
-                        <p class="meta">You can't edit or replace the template after the {{ locale.dueWork.proper }} has been created and the template has been added.  Please upload only when it's final.</p>
-                        {% include 'sub/attachzone.twig' with {attachzone: attachzoneWorksheet} only %}
-                    </div>
+                    <div class="l-flex-col l-gap-s">
+                        <div class="l-flex l-flex--align-center l-gap-s">
+                            <input id="worksheet" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableWorksheet ? 'checked' : '' }} name="submissionOptions[]" value="enableWorksheet" data-type-group>
+                            <label for="worksheet" class="checkbox-label" data-test="assessment-form-submission-type-interactive_worksheet">Interactive Worksheet </label>
+                            <span class="hint has-tip tip-top" data-tooltip title="This provides students with one interactive worksheet per {{ locale.dueWork.proper }} that they can interact with online. As a teacher, you can monitor and provide in-line feedback as the student progresses. ">?</span>
+                        </div>
+                        <div id="worksheetDropzone" {{ assessment.getEnableWorksheet ? '' : 'style="display:none"' }}>
+                            <p class="meta">You can't edit or replace the template after the {{ locale.dueWork.proper }} has been created and the template has been added.  Please upload only when it's final.</p>
+                            {% include 'sub/attachzone.twig' with {attachzone: attachzoneWorksheet} only %}
+                        </div>
+                        </div>
                     <input type="hidden" name="worksheet-file" id="worksheet-file" />
-
                     {# Forcibly untick this checkbox to fool the validator
                      # Only applies if you have kami worksheets disabled.
                      #}
@@ -193,9 +196,11 @@
             </ul>
             {% if lmsStudentPolicy | length %}
                 <input type="hidden" name="enablePolicy" value="{% if courseManaged.isReadonly and assessment.getEnablePolicy %}on{% else %}0{% endif %}" />
-                <label for="declaration" class="inline-block">Student Authenticity Declaration Terms</label>
-                <span class="hint has-tip tip-top" data-tooltip title="This will require students to agree to the terms of the student authenticity declaration when they submit {{ locale.dueWork.proper }}.">?</span>
-                </br><aside class="meta"><a class="link" data-reveal-id="policyDialog">View Authenticity Declaration Terms</a></aside>
+                <div class="l-flex l-flex--align-center l-gap-s">
+                    <label for="declaration" class="inline-block">Student Authenticity Declaration Terms</label>
+                    <span class="hint has-tip tip-top f-no-margins" data-tooltip title="This will require students to agree to the terms of the student authenticity declaration when they submit {{ locale.dueWork.proper }}.">?</span>
+                </div>
+                <aside class="meta"><a class="link" data-reveal-id="policyDialog">View Authenticity Declaration Terms</a></aside>
                 <div class="switch">
                     <input name="enablePolicy" id="declaration" type="checkbox" {% if assessment.getEnablePolicy %}checked="checked"{% endif %} {% if courseManaged.isReadonly %}disabled{% endif %} />
                     <label for="declaration">

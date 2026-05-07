@@ -57,7 +57,7 @@ body.sbx-body {
     .flex-list.buttons a,
     .flex-list.buttons button,
     .sub-nav li a,
-    .input-group a,
+    .input-group > a,
     .cursor-pagination button,
     .avatar-switch nav a,
     .context-switch nav a,
@@ -176,12 +176,12 @@ body.sbx-body {
      * We need to tweak the rounding of the corners so they align properly
      */
     .input-group {
-        .button,
-        a,
-        button,
-        button[class*="icon-"]:empty,
-        a[class*="icon-"]:empty,
-        button[class^="icon-"]:empty {
+        & > .button,
+        & > a,
+        & > button,
+        & > button[class*="icon-"]:empty,
+        & > a[class*="icon-"]:empty,
+        & > button[class^="icon-"]:empty {
             border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
             border-left: none;
             border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
@@ -193,7 +193,7 @@ body.sbx-body {
             }
         }
         // Additional styles for button in input group
-        button.button.icon-search {
+        & > button.button.icon-search {
             align-items: center;
             display: flex;
             justify-content: center;

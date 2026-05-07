@@ -18,18 +18,20 @@ const resubmissionRequired = defineModel<boolean>("resubmission-required", { req
 </script>
 
 <template>
-    <input
-        :id="`resubmissionRequired-${identifier}`"
-        v-model="resubmissionRequired"
-        type="checkbox"
-        name="resubmissionRequired"
-        :value="1"
-        :tabindex="props.tabIndex"
-        :readonly="props.readonly"
-    />
-    <label :for="`resubmissionRequired-${identifier}`" class="checkbox-label" :style="props.style">
-        Resubmission required
-    </label>
+    <div class="resubmission-required l-flex l-flex--align-center l-gap-s">
+        <input
+            :id="`resubmissionRequired-${identifier}`"
+            v-model="resubmissionRequired"
+            type="checkbox"
+            name="resubmissionRequired"
+            :value="1"
+            :tabindex="props.tabIndex"
+            :readonly="props.readonly"
+        />
+        <label :for="`resubmissionRequired-${identifier}`" class="checkbox-label" :style="props.style">
+            Resubmission required
+        </label>
+    </div>
 </template>
 
 <style scoped></style>

@@ -66,9 +66,8 @@ $cdn-prefix: "/static";
     }
 }
 
-$font-family-icon: "schoolbox";
 .sort-icon {
-    font-family: $font-family-icon;
+    font-family: var(--sbx-icon-font-family);
     font-size: 0.75rem;
 }
 .VueTables .glyphicon-sort:before {

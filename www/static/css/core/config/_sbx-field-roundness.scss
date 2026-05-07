@@ -54,4 +54,9 @@ body.sbx-body {
     .clr-field button {
         border-radius: var(--sbx-config-field-roundness) !important;
     }
+
+    // round just the bottom of the refine options input in the image generator modal
+    .ac-prompt-actions {
+        border-radius: 0 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness);
+    }
 }

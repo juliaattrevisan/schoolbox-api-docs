@@ -1,11 +1,120 @@
 /**
- * checkbox input
+ * Radio and checkbox input styles
  * Scope: UI Uplift
  */
 
 @use "sbx-form";
 
 body.sbx-body {
+    input[type="radio"] {
+        -webkit-appearance: none; // Add if not using autoprefixer
+        appearance: none; // Remove most all native input styles
+        background-color: var(--sbx-color-foreground-primary); // For iOS < 15
+        border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent);
+        border-radius: 50%;
+        color: var(--sbx-config-color-accent);
+        cursor: pointer;
+        display: inline-grid;
+        height: 1.5rem !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
+        margin: 0;
+        min-height: auto !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+        opacity: 1 !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
+        place-content: center;
+        position: static !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+        transform: translateY(-0.075em);
+        width: 1.5rem !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
+
+        &:hover:not(:disabled) {
+            // We don't want the hover effect on input elements, as there's potential for reduced contrast on elements
+            background: var(
+                --sbx-color-foreground-primary
+            ) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+            color: var(
+                --sbx-color-text-primary
+            ) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+            border-color: var(
+                --sbx-config-color-accent
+            ) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+        }
+
+        &::before {
+            background-color: CanvasText; // Windows High Contrast Mode, to ensure the tick is visible https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors
+            border-radius: 50%;
+            box-shadow: inset 1rem 1rem var(--sbx-config-color-accent);
+            content: "";
+            height: 0.85rem;
+            transform: scale(0);
+            transition: var(--sbx-animation-form-input-change) transform ease-in-out;
+            width: 0.85rem;
+        }
+
+        &:checked::before {
+            // When the checkbox is checked, show the radio circle
+            transform: scale(1);
+        }
+
+        &:focus {
+            @include sbx-form.form-input-focus;
+        }
+
+        &:focus:not(:focus-visible) {
+            @include sbx-form.form-input-focus-not-visible;
+        }
+
+        &:disabled,
+        &[readonly] {
+            @include sbx-form.form-input-disabled;
+            cursor: not-allowed;
+            pointer-events: none;
+            &::before {
+                box-shadow: inset 1rem 1rem var(--sbx-color-text-secondary);
+            }
+        }
+
+        & + label {
+            cursor: pointer;
+            font-weight: var(--sbx-font-weight-normal);
+        }
+    }
+
+    // Remove extra margin/padding added to radio labels in forms.scss
+    input[type="radio"]:not(.plain) + label:not(.block) {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    // Keep radio buttons hidden within rubrics, as the label is what's used to trigger the radio selection, and the radio itself is not needed visually
+    .rubric input[type="radio"] {
+        display: none;
+    }
+
+    // the radio buttons that look like buttons, but are single selections
+    input[type="radio"] + .block {
+        background-color: var(--sbx-color-foreground-primary);
+        border: 1px solid var(--sbx-config-color-accent);
+        color: var(--sbx-config-color-accent);
+        padding: var(--sbx-size-m);
+    }
+
+    input[type="radio"]:checked + .block {
+        background-color: var(--sbx-config-color-accent);
+        color: var(--sbx-config-color-accent-text);
+    }
+
+    input[type="radio"] + .block i {
+        color: var(--sbx-config-color-accent);
+    }
+
+    input[type="radio"]:checked + .block i {
+        color: var(--sbx-config-color-accent-text);
+    }
+
+    // the icon only radio - used in notification settings
+    input[type="radio"]:not(.plain):checked + label.input-toggle {
+        background-color: var(--sbx-config-color-accent);
+        color: var(--sbx-config-color-accent-text);
+    }
+
     /* Base */
     input[type="checkbox"],
     .VueTables input[type="checkbox"] {
@@ -36,8 +145,8 @@ body.sbx-body {
 
         /* tick mark */
         &::before {
-            background-color: CanvasText; // high contrast mode
-            box-shadow: inset 1rem 1rem var(--sbx-config-color-accent); // visible when printed
+            background-color: CanvasText;
+            box-shadow: inset 1rem 1rem var(--sbx-config-color-accent);
             content: "";
             clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
             height: 1rem;
@@ -61,6 +170,9 @@ body.sbx-body {
             @include sbx-form.form-input-disabled;
             cursor: not-allowed;
             pointer-events: none;
+            &::before {
+                box-shadow: inset 1rem 1rem var(--sbx-color-text-secondary);
+            }
         }
 
         & + label {
@@ -104,21 +216,17 @@ body.sbx-body {
     }
 
     // Hide labels for checkboxes used as selectors
-    .card-selectable .selector input[type="checkbox"] + label {
-        display: none;
-    }
-
-    // Hide labels for checkboxes in buttons container
+    .card-selectable .selector input[type="checkbox"] + label,
     .buttons-container .checklist input[type="checkbox"] + label {
         display: none;
     }
 
-    // Add vertical spacing between checkboxes that aren't already using flex
+    // Add vertical spacing between checkboxes that aren't already using flex, and don't apply to option lists that have nested options
     .option-list:not([class*="l-flex"]):not(:has(.option-list)) {
         display: flex;
         flex-direction: column;
         gap: var(--sbx-size-xs);
-        margin: 0 0 var(--sbx-size-xs) 0; // add bottom margin to separate from next element
+        margin: 0 0 var(--sbx-size-m) 0; // add bottom margin to separate from next element
     }
 
     // Layout fixes for checkboxes inside option lists
@@ -126,10 +234,24 @@ body.sbx-body {
         align-items: flex-start;
         display: flex;
         gap: var(--sbx-size-xs);
+        white-space: normal;
+        // Ensure checkboxes and radio buttons don't shrink if the label text is long
+        input[type="checkbox"],
+        input[type="radio"] {
+            flex: 0 0 auto;
+        }
+        // remove the margin for better flex alignment and align the hint to the center of the checkbox if it exists
+        &:has(.hint) {
+            align-items: center;
+            .hint {
+                margin: 0;
+            }
+        }
     }
 
-    .option-list input[type="checkbox"] {
-        flex: 0 0 auto;
+    // special case, where there's an <article> in the row as well, so prevent the flex
+    .scenarios-list li {
+        display: inline-block;
     }
 
     // Remove extra margin/padding added to checkbox labels in forms.scss
@@ -160,6 +282,17 @@ body.sbx-body {
         border-radius: 0;
         height: 1rem;
         width: 1rem;
+    }
+
+    // this checkbox sits by itself before a <select>, and rather than make a more wide spread structure change, we'll just add the margin that typically gets removed
+    .resubmission-required {
+        margin-top: var(--sbx-size-xs);
+    }
+
+    // add some extra brething space, as we remove the margin which was used for spacing instead previously
+    .selector:has(input[type="checkbox"]) {
+        padding-top: var(--sbx-size-s);
+        padding-bottom: var(--sbx-size-s);
     }
 
     // make the switches more in line with the new styling

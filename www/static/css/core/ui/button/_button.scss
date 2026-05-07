@@ -336,6 +336,7 @@ button.submit {
     print-color-adjust: exact;
 }
 
+// a button that only contains an SVG icon
 .sbx-icon-only-button {
     align-items: center;
     background: none;
@@ -353,6 +354,11 @@ button.submit {
     &:focus {
         background: none;
     }
+}
+
+// don't wipe the background that is applied in this context
+.sbx-icon-only-button.adtp-btn {
+    background-color: var(--sbx-config-color-active, var(--content-ui-background));
 }
 
 // a button that displays similar to a link

@@ -27,7 +27,8 @@ body.sbx-body {
     .submitted-late.label,
     .alert-box.alert,
     .alert-box.alert-tint,
-    .label--moment-rejected {
+    .label--moment-rejected,
+    .button.alert {
         background-color: var(--sbx-color-alert);
         color: var(--sbx-color-alert-text);
     }

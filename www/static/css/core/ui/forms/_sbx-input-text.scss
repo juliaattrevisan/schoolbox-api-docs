@@ -31,7 +31,6 @@ body.sbx-body {
         border-radius: var(--sbx-config-field-roundness);
         color: var(--sbx-color-text-primary);
         font-family: inherit;
-        height: 2.25rem;
         line-height: 1;
         width: 100%;
         -webkit-font-smoothing: antialiased;
@@ -61,8 +60,9 @@ body.sbx-body {
     }
 
     // When a text input is immediately followed by a button or link, remove the border radius on the right side of the input to visually connect them
-    .input-group {
-        input {
+    .input-group:has(a, button) {
+        input,
+        .selectize-input {
             border-radius: var(--sbx-config-field-roundness) 0 0 var(--sbx-config-field-roundness);
             // this is the same as $small-only, which we can't currently import in this context
             @media only print, screen and (max-width: 40em) {
@@ -71,23 +71,23 @@ body.sbx-body {
         }
     }
 
-    // States
+    // Search page search term field, which sits inline with a button, similar to an .input-group
     .c-filter-search-term input[type="text"].c-filter-search-term__field {
         border-radius: var(--sbx-config-field-roundness) 0 0 var(--sbx-config-field-roundness);
     }
 
-    // Selectize overrides to match input styles
-    .selectize-input {
-        height: auto;
-        line-height: 1.875rem;
-        padding: 3px 0;
-    }
-    .selectize-control.multi .selectize-input.has-items {
-        padding: 0 0 3px 3px;
+    // Give a bit more padding to selectize items due to the increase in font-size
+    .selectize-input .item {
+        padding: 2px;
     }
 
     // color picker input width fix
     input[type="text"].clr-color {
         width: calc(100% - 80px);
+    }
+
+    // remove the padding so they align with the checkbox
+    .rb-indicator-textarea {
+        padding: 0;
     }
 }
