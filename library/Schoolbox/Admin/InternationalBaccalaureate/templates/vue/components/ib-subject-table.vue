@@ -535,6 +535,8 @@ window.Vue.watch(isClassCodeModalOpen, (isOpen, wasOpen) => {
         const newClassCode = classCodeModalSelected.value.map((item) => String(item.id)).join(", ");
         row.classCode = newClassCode;
         if (newClassCode !== classCodeSnapshot.value) {
+            // Assigning a class code confirms the displayed language, even if it was only the default.
+            row.isExplicitlyConfigured = true;
             void saveSubjectConfiguration();
         }
     }
