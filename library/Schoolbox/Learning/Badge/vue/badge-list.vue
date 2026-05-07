@@ -359,7 +359,7 @@ export default {
                                     'card-content': true,
                                 }"
                             >
-                                <div class="list-item">
+                                <div class="list-item sbx-checkbox-radio-container">
                                     <template v-if="allowSelection">
                                         <input
                                             type="checkbox"
