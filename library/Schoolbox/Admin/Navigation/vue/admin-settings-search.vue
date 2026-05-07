@@ -28,7 +28,6 @@ export default window.Vue.defineComponent({
             hasLoadError: false,
             query: "",
             minQueryLength: 2,
-            resultsShownLimit: 6,
             activeIndex: 0, // to track which index is selected
         };
     },
@@ -84,12 +83,17 @@ export default window.Vue.defineComponent({
 
     watch: {
         /**
-         * reset the active index when the list changes as the index may become out of range
-         * @param newValue - the new list of results
-         * @param oldValue - the old list of results
+         * reset the active index when the query changes so the first visible result
+         * is selected again, while preserving no-selection for inactive searches
+         * @param newValue - the new query value
          */
-        resultsList(newValue: SBSettingsListItem[], oldValue: SBSettingsListItem[]) {
-            if (newValue.length !== oldValue.length && this.activeIndex > 0) {
+        query(newValue: string) {
+            if (newValue.length < this.minQueryLength || this.resultsList.length === 0) {
+                this.activeIndex = -1;
+                return;
+            }
+
+            if (this.activeIndex !== 0) {
                 this.activeIndex = 0;
             }
         },
@@ -202,7 +206,8 @@ export default window.Vue.defineComponent({
          */
         scrollActiveResultIntoView() {
             if (this.activeIndex !== -1) {
-                const activeElement = (this.$refs.searchResultListItems as HTMLElement[])[this.activeIndex];
+                const listElement = this.$refs.searchResultList as HTMLElement;
+                const activeElement = listElement.querySelector(`[data-index="${this.activeIndex}"]`) as HTMLElement;
                 activeElement.scrollIntoView({ block: "nearest", behavior: "smooth" });
             }
         },
@@ -298,7 +303,7 @@ export default window.Vue.defineComponent({
             @input="query = ($event.target as HTMLInputElement).value /* Fix Android events SA-12170 */"
         />
         <scroll-fade-wrapper wrapper-tag="div" slotted-element-selector="ul">
-            <ul>
+            <ul ref="searchResultList">
                 <li
                     v-for="(result, index) in resultsList"
                     :key="`${result.name}-${index}`"
@@ -325,7 +330,8 @@ export default window.Vue.defineComponent({
 .admin-search-container {
     position: relative;
     > div {
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        border-radius: var(--sbx-config-field-roundness, 0);
+        box-shadow: var(--sbx-shadow-m, 0 2px 4px rgba(0, 0, 0, 0.2));
         position: absolute;
         top: 40px;
         z-index: var(--sbx-depth-pop-over);
@@ -343,7 +349,7 @@ ul {
     }
 
     li {
-        border-bottom: 1px solid var(--sbx-color-foreground-secondary, $body-bg);
+        border-bottom: 1px solid var(--sbx-color-border, $body-bg);
         border-left: 1px solid var(--sbx-config-color-accent, $navigation-hover);
         border-right: 1px solid var(--sbx-config-color-accent, $navigation-hover);
         transform: none !important;

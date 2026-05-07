@@ -110,11 +110,11 @@ export default {
         @focus="mouseOverResult"
         @click.prevent="selectResult"
     >
-        <show-matches tag="h4" class="result-title" :text="result.title" :query="query" />
+        <show-matches tag="h4" class="result-title f-no-margins" :text="result.title" :query="query" />
         <show-matches
             v-if="result.description"
             tag="p"
-            class="result-description"
+            class="result-description f-no-margins"
             :text="result.description"
             :query="query"
         />
@@ -125,26 +125,24 @@ export default {
 @import "@css/core/base/_variables.scss";
 
 .search-result {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-s);
     padding: 0.75rem;
     background: var(--sbx-color-foreground-primary, #fff);
     transition: background 0.2s;
     &:hover,
     &:focus {
-        background: $content-ui-hover;
-    }
-    h4 {
-        margin-bottom: 0.5rem;
+        background: var(--sbx-config-color-active, $content-ui-hover);
     }
     p {
-        color: #9a9a9a;
-        font-size: 13px;
+        color: var(--sbx-color-text-secondary, #9a9a9a);
+        font-size: var(--sbx-font-size-xs, 13px);
         font-style: italic;
-        margin-bottom: 0;
     }
 }
 
 .searchResultActive {
-    background: $content-ui-hover;
+    background: var(--sbx-config-color-active, $content-ui-hover);
 }
 </style>
