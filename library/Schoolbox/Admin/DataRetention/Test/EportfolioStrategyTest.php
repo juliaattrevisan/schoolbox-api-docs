@@ -216,7 +216,7 @@ class EportfolioStrategyTest extends TestCase
      */
     public function testProcessSafelyExitsWhenRetentionIsOverridden(): void
     {
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = $this->createStub(LoggerInterface::class);
         $database = $this->createMock(IConnector::class);
         $lock = $this->createMock(LockInterface::class);
         $config = $this->createStub(IConfigLoader::class);
