@@ -26,6 +26,7 @@ class Update extends Payload\Request
         $this->setAllowedRole('1', true);
         $this->setAllowedRole('2', true);
         $this->setResourceCat('1');
+        $this->setCapacity('1');
         $moderationType = \Schoolbox\ResourceBooking\Item\ModerationType\Model::TYPE_OPEN;
         $this->setModerationTypeId($moderationType);
     }
@@ -83,6 +84,11 @@ class Update extends Payload\Request
     public function setMaxResTime(string $minute, ?string $hour = null, ?string $day = null)
     {
         $this->setTime('max_reservation_time', $minute, $hour, $day);
+    }
+
+    public function setCapacity(string $capacity): void
+    {
+        $this->setFormParam('capacity', $capacity);
     }
 
     private function setTime(string $timeType, string $minute, ?string $hour = null, ?string $day = null)

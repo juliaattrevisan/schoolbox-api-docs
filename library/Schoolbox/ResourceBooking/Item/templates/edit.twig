@@ -56,6 +56,10 @@
                     resource_category_id: {
                         min: 1
                     },
+                    capacity: {
+                        digits: true,
+                        range: [1,999]
+                    },
                     "min_lead_time[day]": {
                         digits: true
                     },
@@ -92,6 +96,7 @@
                 },
                 messages: {
                     resource_category_id:           "Please select a category.",
+                    capacity:                       "Capacity of resource must be a whole number from 1 to 999.",
                     "min_reservation_time[day]":    "If entered, day count must be a number.",
                     "max_reservation_time[day]":    "If entered, day count must be a number.",
                     "min_lead_time[hour]":          "If entered, hour count must be a number from 0 to 23",
@@ -268,6 +273,12 @@
                                 <span>Off</span>
                             </label>
                         </div>
+                    </div>
+                    <div class="small-4 columns">
+                        <label for="capacity">
+                            Capacity of resource
+                            <input name="capacity" id="capacity" type="number" min="1" max="999" step="1" value="{{ item.capacity|default(1) }}" required />
+                        </label>
                     </div>
                 </fieldset>
 
