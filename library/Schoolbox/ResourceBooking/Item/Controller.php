@@ -319,7 +319,8 @@ class Controller extends Base
             ->setMinReservationTime($this->getDateIntervalFromForm($post['min_reservation_time'] ?? []))
             ->setMaxReservationTime($this->getDateIntervalFromForm($post['max_reservation_time'] ?? []))
             ->setCurrentTermRestriction((bool)($post['current_term_restriction'] ?? false))
-            ->setAllowClashBookings((bool)($post['allow_clash_bookings'] ?? false));
+            ->setAllowClashBookings((bool)($post['allow_clash_bookings'] ?? false))
+            ->setCapacity($this->getCapacityFromForm($post['capacity'] ?? null));
 
         // Rectumize the file that was uploaded
         if (is_array($post['attachment'] ?? null)) {
@@ -371,6 +372,30 @@ class Controller extends Base
                 $model->addRole($resourceRole);
             }
         }
+    }
+
+    protected function getCapacityFromForm(mixed $capacity): int
+    {
+        $validatedCapacity = filter_var(
+            $capacity,
+            FILTER_VALIDATE_INT,
+            [
+                'options' => [
+                    'min_range' => 1,
+                    'max_range' => 999,
+                ],
+            ]
+        );
+
+        if ($validatedCapacity === false) {
+            throw ErrorMapper::getInstance()->generateException(
+                ErrorMapper::ERROR_INFORMATION_MISSING,
+                null,
+                'Capacity of resource must be a whole number from 1 to 999.'
+            );
+        }
+
+        return $validatedCapacity;
     }
 
     /**

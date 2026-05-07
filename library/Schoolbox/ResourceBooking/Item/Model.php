@@ -114,6 +114,8 @@ class Model implements ISoftDeletable, JsonSerializable
      */
     protected bool $allowClashBookings = false;
 
+    protected int $capacity = 1;
+
     public function __construct()
     {
         $this->setImage(new Storage\Model());
@@ -448,6 +450,18 @@ class Model implements ISoftDeletable, JsonSerializable
         return $this;
     }
 
+    public function getCapacity(): int
+    {
+        return $this->capacity;
+    }
+
+    public function setCapacity(int $capacity): self
+    {
+        $this->capacity = $capacity;
+
+        return $this;
+    }
+
     /**
      * @param  RolePermission\Model $role
      * @return $this
@@ -528,6 +542,7 @@ class Model implements ISoftDeletable, JsonSerializable
             'moderator_list'       => $this->getModeratorList(),
             'category'             => $this->getCategory(),
             'bookingIsAuthorized'  => $this->getBookingIsAuthorized(),
+            'capacity'             => $this->getCapacity(),
         );
     }
 }
