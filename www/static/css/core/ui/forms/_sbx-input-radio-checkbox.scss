@@ -229,8 +229,9 @@ body.sbx-body {
         margin: 0 0 var(--sbx-size-m) 0; // add bottom margin to separate from next element
     }
 
-    // Layout fixes for checkboxes inside option lists
-    .option-list li {
+    // Layout fixes for checkboxes/radio containers
+    .option-list li,
+    .sbx-checkbox-radio-container {
         align-items: flex-start;
         display: flex;
         gap: var(--sbx-size-xs);
