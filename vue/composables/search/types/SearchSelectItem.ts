@@ -3,6 +3,6 @@
  * can be both a search result or a selected item
  */
 export type SearchSelectItem = {
-    id: number;
+    id: number | string;
     name: string;
 };

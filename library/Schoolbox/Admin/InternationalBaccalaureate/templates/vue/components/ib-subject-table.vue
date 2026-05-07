@@ -472,12 +472,11 @@ function openClassCodeModal(rowId: string): void {
     if (!row) return;
     classCodeEditingRowId.value = rowId;
     classCodeSnapshot.value = row.classCode;
-    // Class codes are strings; cast is safe because SearchSelectModal only does === comparisons on id.
     classCodeModalSelected.value = row.classCode
         .split(",")
         .map((c) => c.trim())
         .filter(Boolean)
-        .map((code) => ({ id: code, name: code })) as unknown as SearchSelectItem[];
+        .map((code) => ({ id: code, name: code }));
     isClassCodeModalOpen.value = true;
 }
 
@@ -496,11 +495,10 @@ function updateClassCodeModalResults(
         return;
     }
 
-    // Class codes are strings; cast is safe because SearchSelectModal only does === comparisons on id.
     const formattedResults = (json.data as IBClassCode[]).map((item) => ({
         id: item.code,
         name: `${item.name} (${item.code})`,
-    })) as unknown as SearchSelectItem[];
+    }));
 
     if (isMoreResults) {
         results.value = [...results.value, ...formattedResults];
