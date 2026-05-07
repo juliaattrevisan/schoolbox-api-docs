@@ -190,6 +190,18 @@ class Factory
 
 
     /**
+     * @var WorkTypeMapper
+     */
+    private WorkTypeMapper $workTypeMapper;
+
+
+    /**
+     * @var CurriculumNodeMapper
+     */
+    private CurriculumNodeMapper $curriculumNodeMapper;
+
+
+    /**
      * Factory constructor.
      * @param User $creator
      * @param array|\Alaress\Web\Request\Values $post (an array of post vars from the create/update forms)
@@ -205,6 +217,16 @@ class Factory
         ?IAssessable $original,
         private \Schoolbox\Error\Mapper $errorMapper
     ) {
+        /* TODO Inject these one day, somehow
+         */
+        $this->workTypeMapper = WorkTypeMapper::getInstance();
+        $this->curriculumNodeMapper = CurriculumNodeMapper::getInstance();
+
+        /* This is a super-aggregation of all the possible LMS values that could be submitted from a create/udpate form.
+         * Some ideas are activity-specific and are only used in one learning activity. Others are shared ideas, such as
+         * duration, that have a similar meaning but might be exactly the same depending on the contextual usage in the
+         * corresponding learning activity's usage.
+         */
         $this->setAssessmentType(trim($post['assessmentType'] ?? ''));
         $this->setContext($post['context'] ?? '');
         $this->setTitle(trim($post['title'] ?? ''));
@@ -227,7 +249,7 @@ class Factory
         } else {
             try {
                 // If an invalid work type has been supplied by the client, treat as information missing.
-                $this->setWorkType(WorkTypeMapper::getInstance()->findById($post['workType'])->getId());
+                $this->setWorkType($this->workTypeMapper->findById($post['workType'])->getId());
             } catch (MapperException) {
                 throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
             }
@@ -355,7 +377,7 @@ class Factory
                 /* ^^^ activities that had use_rubric = 0 won't be seeded, and won't have rubric_instance records,
                  * essentially disconnecting the assessment from rubrics that you're discussing here. Even if a rubric
                  * grid respawns under some other circumstance, users should just delete them instead of "turning them
-                 * off" because you won't be able to turn them off anymore...except by removing them outright.s
+                 * off" because you won't be able to turn them off anymore...except by removing them outright.
                  */
                 $this->setRubricData($rubrics);
             }
@@ -430,7 +452,7 @@ class Factory
 
         /* Assemble a GenericCollection of supporting data curriculum nodes
          */
-        $supportingCurriculumNodes = CurriculumNodeMapper::getInstance()->createCollection();
+        $supportingCurriculumNodes = $this->curriculumNodeMapper->createCollection();
         $supportingCurriculumNodeIds = null;
 
         /* For some reason this curric node selector sends you back an empty string if you didn't select anything,
@@ -446,7 +468,7 @@ class Factory
         }
 
         if ($supportingCurriculumNodeIds && \count($supportingCurriculumNodeIds)) {
-            $supportingCurriculumNodes = CurriculumNodeMapper::getInstance()->findByColumn('id', $supportingCurriculumNodeIds);
+            $supportingCurriculumNodes = $this->curriculumNodeMapper->findByColumn('id', $supportingCurriculumNodeIds);
         }
 
         $this->setSupportingDataCurriculumNodes($supportingCurriculumNodes);
@@ -454,11 +476,11 @@ class Factory
 
         /* Assemble a GenericCollection of supporting data work types
          */
-        $supportingWorkTypes = WorkTypeMapper::getInstance()->createCollection();
+        $supportingWorkTypes = $this->workTypeMapper->createCollection();
         $supportingWorkTypeIds = $post['reporting']['supporting']['workTypes'] ?? null;
 
         if ($supportingWorkTypeIds && \count($supportingWorkTypeIds)) {
-            $supportingWorkTypes = WorkTypeMapper::getInstance()->findByColumn('id', $supportingWorkTypeIds);
+            $supportingWorkTypes = $this->workTypeMapper->findByColumn('id', $supportingWorkTypeIds);
         }
 
         $this->setSupportingDataWorkTypes($supportingWorkTypes);
@@ -681,6 +703,8 @@ class Factory
 
         /* Start manufacturing
          */
+        $now = Alaress_Date_Format::now();
+
         if ($courseManagedFields->isReadonly()) {
             /* Only these fields can be updated by regular guys editing implementations
              */
@@ -693,8 +717,8 @@ class Factory
                 ->setOpenAt($this->deriveDate($assessment->getBaseContext(), $this->getOpenAt()))
                 ->setDueAt($this->deriveDate($assessment->getBaseContext(), $this->getDueAt()))
                 ->setCloseAt($this->deriveDate($assessment->getBaseContext(), $this->getCloseAt()))
-                ->setCreatedAt(Alaress_Date_Format::now())
-                ->setUpdatedAt(Alaress_Date_Format::now());
+                ->setCreatedAt($now)
+                ->setUpdatedAt($now);
         } else {
             $assessment
                 ->setTitle($this->getTitle())
@@ -710,11 +734,11 @@ class Factory
                 ->setOpenAt($this->deriveDate($assessment->getBaseContext(), $this->getOpenAt()))
                 ->setDueAt($this->deriveDate($assessment->getBaseContext(), $this->getDueAt()))
                 ->setCloseAt($this->deriveDate($assessment->getBaseContext(), $this->getCloseAt()))
-                ->setCreatedAt(Alaress_Date_Format::now())
-                ->setUpdatedAt(Alaress_Date_Format::now());
+                ->setCreatedAt($now)
+                ->setUpdatedAt($now);
 
             if ($this->workType) {
-                $assessment->setWorkType(WorkTypeMapper::getInstance()->createModel()->setId($this->workType));
+                $assessment->setWorkType($this->workTypeMapper->createModel()->setId($this->workType));
             } else {
                 $assessment->setWorkType(null);
             }
@@ -726,7 +750,7 @@ class Factory
             if (isset($selectedNodesCsv[0])) {
                 $selectedNodes = explode(',', $selectedNodesCsv[0]);
 
-                $assessment->setCurriculumNodes(CurriculumNodeMapper::getInstance()->findByColumn('id', $selectedNodes));
+                $assessment->setCurriculumNodes($this->curriculumNodeMapper->findByColumn('id', $selectedNodes));
             }
         }
 
