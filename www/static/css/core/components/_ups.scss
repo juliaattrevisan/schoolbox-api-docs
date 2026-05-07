@@ -12,7 +12,7 @@ $ups-log-window-height: 30rem !default;
         color: var(--sbx-color-text-primary, $ups-debug-color);
     }
     .level-200 {
-        color: var(--sbx-config-color-active, $ups-info-color);
+        color: var(--sbx-color-text-primary, $ups-info-color);
     }
     .level-250 {
         color: var(--sbx-color-success, $ups-notice-color);
