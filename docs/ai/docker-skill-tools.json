@@ -1,0 +1,80 @@
+{
+  "description": "Generic Docker/dev tools adapter generated from docs/ai/docker-skill.yaml. Intended for Claude, OpenAI, or other agent platforms that can execute shell commands.",
+  "working_directory": ".",
+  "tools": [
+    {
+      "name": "start_environment",
+      "description": "Start the local Schoolbox Docker development stack using ./docker/up.",
+      "command": "./docker/up",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "stop_environment",
+      "description": "Stop the local Schoolbox Docker development stack using ./docker/down.",
+      "command": "./docker/down",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "view_docker_logs",
+      "description": "View recent Docker logs via ./docker/logs, optionally for a single service.",
+      "command": "./docker/logs",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "service": {
+            "type": "string",
+            "description": "Optional service name to filter logs (e.g. schoolbox, mariadb). If omitted, shows aggregated logs."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "provision_environment",
+      "description": "Provision the Schoolbox Docker development environment using ./docker/provision (loads initial data and applies updates). Use only when a fresh or updated dataset is required.",
+      "command": "./docker/provision",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "rebuild_and_start_environment",
+      "description": "Rebuild Docker images and start the development stack using ./docker/up --build.",
+      "command": "./docker/up --build",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "exec_in_service",
+      "description": "Run a command inside a running Docker service via ./docker/exec. Host integrations should restrict cmd to an allow-list (e.g. ls, cat, tail, php -v).",
+      "command": "./docker/exec",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "service": {
+            "type": "string",
+            "description": "Target service name (e.g. schoolbox, mariadb)."
+          },
+          "cmd": {
+            "type": "string",
+            "description": "Command to execute inside the container. Should be validated by the host integration."
+          }
+        },
+        "required": ["service", "cmd"]
+      }
+    }
+  ]
+}

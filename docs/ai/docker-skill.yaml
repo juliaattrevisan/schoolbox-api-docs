@@ -1,0 +1,96 @@
+version: 1
+metadata:
+  name: schoolbox-docker-dev
+  description: Neutral Docker/dev environment command spec for AI tools (Copilot, Claude, etc.).
+  working_directory: .
+  # Default timeouts in seconds by category
+  default_timeouts:
+    environment: 600     # start/stop/provision
+    tests: 900           # long-running test suites
+    analysis: 300        # static analysis, linters
+    inspection: 120      # short, read-only checks
+
+  risk_levels:
+    safe: "Non-destructive operations that should be safe in normal dev usage."
+    caution: "Potentially long-running, noisy, or resource-intensive operations."
+    destructive: "Operations that can remove containers/volumes or reprovision data. Use only with explicit intent."
+
+operations:
+  # Environment lifecycle (initial examples)
+  - name: start_environment
+    category: environment
+    risk_level: safe
+    description: "Start the local Schoolbox Docker development stack using ./docker/up."
+    command: "./docker/up"
+    args: []
+    timeout_seconds: 600
+    output_policy:
+      max_lines: 200
+      include_exit_code: true
+
+  - name: stop_environment
+    category: environment
+    risk_level: caution
+    description: "Stop the local Schoolbox Docker development stack using ./docker/down."
+    command: "./docker/down"
+    args: []
+    timeout_seconds: 300
+    output_policy:
+      max_lines: 120
+      include_exit_code: true
+
+  - name: view_docker_logs
+    category: inspection
+    risk_level: safe
+    description: "View recent Docker logs via ./docker/logs, optionally for a single service. Intended for debugging only."
+    command: "./docker/logs"
+    args:
+      - name: service
+        type: string
+        required: false
+        description: "Optional service name to filter logs (e.g. schoolbox, mariadb). If omitted, shows aggregated logs."
+    timeout_seconds: 300
+    output_policy:
+      max_lines: 300
+      include_exit_code: true
+
+  - name: provision_environment
+    category: environment
+    risk_level: destructive
+    description: "Provision the Schoolbox Docker development environment using ./docker/provision (loads initial data and applies updates). Use only when a fresh or updated dataset is required."
+    command: "./docker/provision"
+    args: []
+    timeout_seconds: 900
+    output_policy:
+      max_lines: 300
+      include_exit_code: true
+
+  - name: rebuild_and_start_environment
+    category: environment
+    risk_level: caution
+    description: "Rebuild Docker images and start the development stack using ./docker/up --build."
+    command: "./docker/up --build"
+    args: []
+    timeout_seconds: 900
+    output_policy:
+      max_lines: 300
+      include_exit_code: true
+
+  - name: exec_in_service
+    category: inspection
+    risk_level: destructive
+    description: "Run an arbitrary command inside a running Docker service via ./docker/exec. This is powerful and should be limited or wrapped by platform adapters to an allow-listed set of commands."
+    command: "./docker/exec"
+    args:
+      - name: service
+        type: string
+        required: true
+        description: "Target service name (e.g. schoolbox, mariadb)."
+      - name: cmd
+        type: string
+        required: true
+        description: "Command to execute inside the container. Adapters should restrict this to a safe allow-list (e.g. ls, cat, tail, php -v)."
+    timeout_seconds: 600
+    output_policy:
+      max_lines: 300
+      include_exit_code: true
