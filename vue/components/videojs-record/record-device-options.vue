@@ -57,7 +57,7 @@ export default {
     <div>
         <transition name="slide">
             <div v-if="canDisplay" class="device-options">
-                <fieldset class="fieldset">
+                <fieldset class="fieldset radiolist">
                     <legend class="legend">{{ title }}</legend>
                     <ul class="option-list">
                         <li v-for="device in deviceList" :key="device.deviceId">
