@@ -685,38 +685,49 @@ class DataSource
     /**
      * Saves this grid to the database.
      *
-     * @param Grid      $grid
-     * @param null|Grid $originalGrid If set, this is the state of the
-     *                                assessment's grid pre-save
+     * @param Grid $newGrid
+     * @param null|Grid $originalGrid If set, this is the state of the assessment's grid pre-save
      * @param SubmissionBox $submissionBox
+     * @return void
      * @throws \UnexpectedValueException If a duplicate indicator or capability exists in the folder
      * @throws \UnexpectedValueException If course capability duplicates a unit capability
      * @throws \UnexpectedValueException If a capability or indicator that should not be deleted has been
      * @throws \InvalidArgumentException If an undocumented error occurred whilst persisting
+     * @throws Deleted
+     * @throws MapperException
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function persistGrid(Grid $grid, ?Grid $originalGrid, SubmissionBox $submissionBox): void
+    public function persistGrid(Grid $newGrid, ?Grid $originalGrid, SubmissionBox $submissionBox): void
     {
         // TODO some way to wrap all this in a transaction would be nice... -_-;
         // (The answer exists: merge SA-6405)
+        // TODO figure out this ^^^^^ hideous historical atrocity
 
-        /* Find the rubric instance for the $submissionBox
+        /* This is the corresponding rubric_instance used in the new grid. Note this could contain a negative id,
+         * indicating it has never been persisted before: it's a whole new rubric instance.
          */
-        try {
-            $rubricInstance = $this->rubricInstanceMapper->findOneByColumn('assessment_id', $submissionBox->getAssessmentModel()->getId());
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            /* Couldn't find one, or it's been deleted? Spawn a new one
-             */
-            $rubricInstance = $this->rubricInstanceMapper->createModel()
-                ->setAssessmentModel($submissionBox->getAssessmentModel());
+        $rubricInstance = $newGrid->getRubricInstance();
 
-            $this->rubricInstanceMapper->save($rubricInstance);
+        /* If this rubric instance was never saved before, save it now, so it has an identifier.
+         * Otherwise, save it anyway, in case its title/weight/settings were updated.
+         * lol
+         */
+        if ($rubricInstance->getId() < 0) {
+            $rubricInstance->setId(null);
         }
+
+        /* Note that atm we're wrapped in some kind of transaction: this doesn't save if an error occurs later.
+         * This alludes to the SA-6405 mystery which seems to MAYBE negate the docblock at the top of this method.
+         * jeez
+         */
+        $this->rubricInstanceMapper->save($rubricInstance);
 
         // First, persist the levels
         $levelModels   = $this->levelMapper->createCollection();
         $levelSequence = 1;
 
-        foreach ($grid->getLevels() as $level) {
+        foreach ($newGrid->getLevels() as $level) {
             $levelModel = $this->levelMapper->createModel()
                 ->setId($level->getId())
                 ->setName($level->getName())
@@ -737,7 +748,7 @@ class DataSource
         $indicatorModels  = $this->indicatorMapper->createCollection();
         $capabilityModels = $this->capabilityMapper->createCollection();
 
-        foreach ($grid->getRowSet()->getCapabilities() as $capability) {
+        foreach ($newGrid->getRowSet()->getCapabilities() as $capability) {
             $capabilityId = $capability->getId();
 
             if (!$capabilityId) {
@@ -785,14 +796,14 @@ class DataSource
             $this,
             $originalGrid ? $originalGrid->getRowSet() : null,
             false,
-            $grid->getAssessment()
+            $newGrid->getAssessment()
         );
 
 
         // `isSatisfiedBy` needs to raise an exception instead of just
         // returning false.
         // If it does just return false: that's a logic exception, fix it
-        if (!$spec->isSatisfiedBy($grid->getRowSet())) {
+        if (!$spec->isSatisfiedBy($newGrid->getRowSet())) {
             throw new \InvalidArgumentException("Save of row set failed for unknown reason");
         }
 
@@ -801,14 +812,18 @@ class DataSource
         $indicatorUsageModels  = $this->indicatorUsageMapper->createCollection();
         $capabilityUsageModels = $this->capabilityUsageMapper->createCollection();
         $descriptorModels      = $this->descriptorMapper->createCollection();
-        $capabilitySequence    = CapabilityUsageModel::SEQUENCE_BASE;
 
-        /* TODO this $submissionBox should be replaced by the rubric instance ids instead
+        /* TODO Find out why this is so vitally important to be 1-indexed instead of 0-indexed.
          */
-        $this->indicatorUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
-        $this->capabilityUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
+        $capabilitySequence = CapabilityUsageModel::SEQUENCE_BASE;
 
-        foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
+        /* Clear away any previous usages of caps and indicators via this rubric instance identifier
+         * New grids won't have any, but old grids might.
+         */
+        $this->indicatorUsageMapper->deleteByColumn('rubric_instance_id', $rubricInstance->getId());
+        $this->capabilityUsageMapper->deleteByColumn('rubric_instance_id', $rubricInstance->getId());
+
+        foreach ($newGrid->getCapabilityUsages() as $capabilityUsage) {
             $capabilityMaxValue = $capabilityUsage->getMaxValue();
 
             $capabilityUsageModel = $this->capabilityUsageMapper->createModel()
@@ -835,7 +850,7 @@ class DataSource
                 $indicatorUsageModels->add($indicatorUsageModel);
 
                 // Descriptors
-                foreach ($grid->getLevels() as $levelIndex => $level) {
+                foreach ($newGrid->getLevels() as $levelIndex => $level) {
                     $descriptor = $indicatorUsage->retrieveDescriptor($levelIndex);
 
                     if ($descriptor) {
@@ -864,8 +879,10 @@ class DataSource
 
 
         // Invalidate all marks, if the grid and original grid are incompatible
-        if ($originalGrid && !$grid->isCompatibleWith($originalGrid)) {
-            $this->invalidateMarks($grid->getAssessment()->getId());
+        if ($originalGrid && !$newGrid->isCompatibleWith($originalGrid)) {
+            /* TODO This needs fixing: submission returns are here
+             */
+            $this->invalidateMarks($newGrid->getAssessment()->getId());
         }
 
 
@@ -878,13 +895,13 @@ class DataSource
 
         $seenLevels = array_keys($seenLevels);
 
-        $this->tidyUp($this->levelMapper, ['box_id' => $submissionBox->getId()], $seenLevels);
+        $this->tidyUp($this->levelMapper, ['rubric_instance_id' => $rubricInstance->getId()], $seenLevels);
 
         // remove all descriptors that are on this box, but are not among the descriptors we just saved (it indicates blankness / unused-ness)
         /* This ^^^ probably means: manage the diff between descriptors that -were- here previously, but no longer;
          * this suggests the user deselected them in the user interface
          */
-        $levelIds = $this->levelMapper->findIdsByColumn('box_id', $submissionBox->getId(), ['deleted' => true]);
+        $levelIds = $this->levelMapper->findIdsByColumn('rubric_instance_id', $rubricInstance->getId(), ['deleted' => true]);
         $this->tidyUp($this->descriptorMapper, ['level_id' => $levelIds], $descriptorModels->getPropertyValues('id'));
     }
 
@@ -1391,17 +1408,23 @@ class DataSource
          *  grid becomes invalid once you change something important about its setup. It probably doesn't require you to
          *  update *ALL GRIDS* for a given assessment.
          */
+
+        /* Invalidate rubric grids for due works' submission_return records
+         */
         $query = "
-            UPDATE     rubric_indicator_mark rim
-            INNER JOIN rubric_capability_mark  rcm ON rim.rubric_capability_mark_id = rcm.id
-            INNER JOIN submission_return       sr  ON rcm.return_id                 = sr.id
-            INNER JOIN submission_box          sb  ON sr.box_id                     = sb.id
-            SET        rim.valid = FALSE,
-                       rcm.valid = FALSE
-            WHERE      sb.assessment_id = :assessmentId
+            UPDATE rubric_indicator_mark rim
+            INNER JOIN rubric_capability_mark rcm ON rim.rubric_capability_mark_id = rcm.id
+            INNER JOIN submission_return sr ON rcm.feedback_id  = sr.id AND rcm.feedback_table = 'submission_return'
+            INNER JOIN submission_box sb ON sr.box_id = sb.id
+            SET rim.valid = FALSE,
+                rcm.valid = FALSE
+            WHERE sb.assessment_id = :assessmentId
         ";
 
         $this->database->prepare($query)->execute(['assessmentId' => $assessmentId]);
+
+        /* Repeat for all other assessments' feedback types, such as reporting_feedback et al.
+         */
     }
 
 
