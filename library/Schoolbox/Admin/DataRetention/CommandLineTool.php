@@ -292,6 +292,11 @@ class CommandLineTool extends CliTool\App
     }
 
     /**
+     * Build the ordered list of enabled retention strategies to process.
+     *
+     * This function allows the tests in DataRetention/Test/CommandLineToolStrategyBusTest to be done without having
+     * to call CommandLineTool::run(), as so avoids pulling in many dependencies that are unrelated to the tests.
+     *
      * @return Strategy\IStrategy[]
      */
     protected function buildStrategies(

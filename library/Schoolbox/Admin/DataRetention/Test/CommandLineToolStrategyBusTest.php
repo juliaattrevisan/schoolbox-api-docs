@@ -19,12 +19,16 @@ use Symfony\Component\Lock\LockInterface;
 class CommandLineToolStrategyBusTest extends TestCase
 {
     /**
+     * Build strategies with stubbed dependencies so the test can inspect the CLI bus.
+     *
      * @return list<object>
      */
     private function buildStrategies(string $csvStrats): array
     {
         $tool = new class extends CommandLineTool {
             /**
+             * Expose the protected strategy builder for this test harness.
+             *
              * @return list<object>
              */
             public function exposedBuildStrategies(
@@ -68,6 +72,9 @@ class CommandLineToolStrategyBusTest extends TestCase
         );
     }
 
+    /**
+     * Verify the ePortfolio filter builds only the ePortfolio strategy.
+     */
     public function testBuildsOnlyEportfolioStrategyWhenFilteredToEportfolio(): void
     {
         $strategies = $this->buildStrategies('ePortfolio');
@@ -76,6 +83,9 @@ class CommandLineToolStrategyBusTest extends TestCase
         $this->assertInstanceOf(Eportfolio::class, $strategies[0]);
     }
 
+    /**
+     * Verify the unfiltered CLI bus includes the ePortfolio strategy.
+     */
     public function testBuildsEportfolioStrategyWhenNoFilterProvided(): void
     {
         $strategyClasses = array_map('get_class', $this->buildStrategies(''));
