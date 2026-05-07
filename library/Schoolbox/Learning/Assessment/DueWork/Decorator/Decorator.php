@@ -235,9 +235,11 @@ class Decorator implements DecoratorInterface
              * sound like a bit of a gotcha if you didn't know how this area was made.
              *
              * Its settings are assembled via buildFromPostData() which is essentially "hydrate this grid from an array"
+             * but this is a real weird hydration that I have to do here.
              */
             $newRubricInstance = $this->rubricInstanceMapper->createModel()
-                ->setId($rubricId);
+                ->setId($rubricId)
+                ->setAssessmentModel((new \Schoolbox\Learning\Assessment\DataModel\Model)->setId($assessment->getId()));
 
             /* "Welcome to the party, pal." --John McClane
              */

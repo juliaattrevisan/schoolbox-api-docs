@@ -10,7 +10,11 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid;
 
 use Alaress\Specification\NotEmpty;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Class Factory
@@ -25,17 +29,38 @@ class Factory
 
 
     /**
+     * @var MarkTypeMapper
+     */
+    private MarkTypeMapper $markTypeMapper;
+
+
+    /**
+     * @var GradeLevel\Group\Mapper
+     */
+    private GradeLevel\Group\Mapper $gradeGroupMapper;
+
+
+    /**
+     * Constructor.
+     */
+    public function __construct() {
+        $this->markTypeMapper = MarkTypeMapper::getInstance();
+        $this->gradeGroupMapper = GradeLevel\Group\Mapper::getInstance();
+    }
+
+
+    /**
      * Port of `\Schoolbox\Assessment\Rubric\Factory::buildFromPostData`,
      * but builds a `Grid` object instead.
      *
-     * @param Grid  $grid A grid (which already contains an assessment and rowset)
-     * @param array $postData
+     * @param Grid $grid A grid (which already contains an assessment and rowset)
+     * @param array $rubricData
      * @param bool $validate Whether to run the backend validation on this data
      *                       - should be FALSE for CSV import and export, as
      *                       attempting to import/export an invalid grid should
      *                       still succeed even if saving it will not.
      * @return Grid
-     * @throws \InvalidArgumentException
+     * @throws Exception
      * @see /library/Schoolbox/Assessment/Rubric/templates/vue/payload.ts
      */
     public function buildFromPostData(
@@ -43,6 +68,24 @@ class Factory
         array $rubricData,
         bool $validate = true
     ): Grid {
+        /* The rubric instance corresponding to $grid might be a stub. That means it's a new grid and we actually need
+         * to hydrate it with the settings from the frontend payload.
+         */
+        if ($grid->getRubricInstance()->getId() < 0) {
+            $newCapabilityMarkType = $this->markTypeMapper->createModel()
+                ->setId(MarkType::slugToId($rubricData['capabilityMarkType']));
+
+            $newCapabilityGradeGroup = $this->gradeGroupMapper->createModel()
+                ->setId($rubricData['capabilityGradeGroup']);
+
+            $grid->getRubricInstance()
+                ->setTitle($rubricData['title'])
+                ->setWeight($rubricData['weight'])
+                ->setCapabilityMarkType($newCapabilityMarkType)
+                ->setCapabilityGradeGroup($newCapabilityGradeGroup)
+                ->setMarkedUsingRange($rubricData['useMarkRange'] ?? false);
+        }
+
         /* The post payload contains all the rubric grids associated with an assessment but we only need to look at one
          * grid for now since we've decided that any of the N grids could cause invalidation and thus exit early.
          *
