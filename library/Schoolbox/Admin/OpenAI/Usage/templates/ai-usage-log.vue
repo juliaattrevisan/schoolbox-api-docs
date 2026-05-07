@@ -115,7 +115,7 @@ async function loadUsageLogs(): Promise<void> {
         body: {
             keyword: keywordFilter.value.trim() !== "" ? keywordFilter.value.trim() : null,
             feature: featureFilter.value,
-            user: userFilter.value.length > 0 ? userFilter.value[0].id : null,
+            user: userFilter.value.length > 0 ? Number(userFilter.value[0].id) : null,
             startDate: startDateFilter.value !== EMPTY_DATE ? startDateFilter.value : null,
             endDate: endDateFilter.value !== EMPTY_DATE ? endDateFilter.value : null,
             page: pageInfo.value !== null ? pageInfo.value.pagination.current : 1,

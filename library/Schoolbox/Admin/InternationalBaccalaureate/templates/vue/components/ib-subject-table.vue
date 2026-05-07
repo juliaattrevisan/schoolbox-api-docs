@@ -124,7 +124,7 @@ function createLanguageNameMapFromSubjectLanguages(configurations: IBSubjectLang
  */
 function createLanguageNameMapFromItems(items: SearchSelectItem[]): Record<number, string> {
     return items.reduce<Record<number, string>>((languageNames, item) => {
-        languageNames[item.id] = item.name;
+        languageNames[Number(item.id)] = item.name;
         return languageNames;
     }, {});
 }
@@ -294,8 +294,8 @@ function hasLanguageSelectionChanged(
     previousSelection: SearchSelectItem[],
     nextSelection: SearchSelectItem[],
 ): boolean {
-    const previousIds = previousSelection.map((item) => item.id).sort((left, right) => left - right);
-    const nextIds = nextSelection.map((item) => item.id).sort((left, right) => left - right);
+    const previousIds = previousSelection.map((item) => Number(item.id)).sort((left, right) => left - right);
+    const nextIds = nextSelection.map((item) => Number(item.id)).sort((left, right) => left - right);
     if (previousIds.length !== nextIds.length) {
         return true;
     }
@@ -324,7 +324,7 @@ function applySelectedLanguages(selectedItems: SearchSelectItem[]): void {
 
     cacheSelectedLanguages(selectedItems);
 
-    const selectedLanguages = selectedItems.map((item) => item.id);
+    const selectedLanguages = selectedItems.map((item) => Number(item.id));
     const selectedLanguageNames = createLanguageNameMapFromItems(selectedItems);
 
     const rowIndex = subjectRows.value.findIndex((row) => row.id === currentEditingRow.value);
@@ -354,25 +354,24 @@ function applySelectedLanguages(selectedItems: SearchSelectItem[]): void {
             existingConfigurations.map((configuration) => [configuration.languageId, configuration.classCode]),
         );
 
-        const newLanguageRows: SubjectRow[] = selectedLanguages.map((language, index) => ({
-            id: `${mainRow.id}_lang_${index}`,
-            groupSubjectId: mainRow.groupSubjectId,
-            subject: mainRow.subject,
-            level: mainRow.level,
-            languages: [language],
-            languageNamesById: selectedLanguageNames[language]
-                ? {
-                      [language]: selectedLanguageNames[language],
-                  }
-                : {},
-            classCode: classCodeByLanguage.get(language) ?? "",
-            studentCount: 0,
-            isExplicitlyConfigured: true,
-            systemPurposeId: mainRow.systemPurposeId,
-            isLanguageRow: true,
-            parentRowId: mainRow.id,
-            tableType: mainRow.tableType,
-        }));
+        const newLanguageRows: SubjectRow[] = selectedLanguages.map((language, index) => {
+            const langName = selectedLanguageNames[language];
+            return {
+                id: `${mainRow.id}_lang_${index}`,
+                groupSubjectId: mainRow.groupSubjectId,
+                subject: mainRow.subject,
+                level: mainRow.level,
+                languages: [language],
+                languageNamesById: langName ? { [language]: langName } : {},
+                classCode: classCodeByLanguage.get(language) ?? "",
+                studentCount: 0,
+                isExplicitlyConfigured: true,
+                systemPurposeId: mainRow.systemPurposeId,
+                isLanguageRow: true,
+                parentRowId: mainRow.id,
+                tableType: mainRow.tableType,
+            };
+        });
 
         subjectRows.value.splice(rowIndex + 1, 0, ...newLanguageRows);
     }
