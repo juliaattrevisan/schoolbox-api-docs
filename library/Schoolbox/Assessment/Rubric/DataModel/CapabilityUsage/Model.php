@@ -19,7 +19,7 @@ class Model
     /**
      * Capability sequence is 1-based, not 0-based
      *
-     * (why does this matter tho? The machine doesn't care, so a human must - somewhere...)
+     * TODO why does this matter tho? The machine doesn't care, so a human must - somewhere...but why?????
      */
     public const int SEQUENCE_BASE = 1;
 
