@@ -59,7 +59,7 @@
         "tinycolor2": "~1.6.0",
         "ts-ebml": "~3.0.2",
         "v-tables-3-select-rows": "~0.4.9",
-        "videojs-record": "~4.8.0",
+        "videojs-record-change-image-input": "~4.8.2",
         "vue": "~3.5.28",
         "vuejs-paginate-next": "~1.0.2"
       },
@@ -28938,15 +28938,16 @@
       "resolved": "https://registry.npmjs.org/videojs-font/-/videojs-font-4.2.0.tgz",
       "integrity": "sha512-YPq+wiKoGy2/M7ccjmlvwi58z2xsykkkfNMyIg4xb7EZQQNwB71hcSsB3o75CqQV7/y5lXkXhI/rsGAS7jfEmQ=="
     },
-    "node_modules/videojs-record": {
-      "version": "4.8.0",
-      "resolved": "https://registry.npmjs.org/videojs-record/-/videojs-record-4.8.0.tgz",
-      "integrity": "sha512-RvCaJ1itFUfTUKfXgoZ/z25v+xIC7faG/zbtg4Pb8pB1n74ma3K77wpAIM486qpgjsg9uHTJJAsDokN92Xs3ag==",
+    "node_modules/videojs-record-change-image-input": {
+      "version": "4.8.2",
+      "resolved": "https://registry.npmjs.org/videojs-record-change-image-input/-/videojs-record-change-image-input-4.8.2.tgz",
+      "integrity": "sha512-Sx1D2Q0GFjLicbIimew2GGmkr5XT+akHX/R8ysdzKVo9v+PKFpDWT0+RWU+kdH3SAmlFlyf3Nl1Z7krl7n8CLA==",
+      "license": "MIT",
       "dependencies": {
         "recordrtc": ">=5.6.2",
         "video.js": ">=7.0.5",
         "videojs-wavesurfer": ">=3.10.0",
-        "webrtc-adapter": ">=8.2.3"
+        "webrtc-adapter": ">=9.0.1"
       }
     },
     "node_modules/videojs-vtt.js": {
@@ -50485,15 +50486,15 @@
       "resolved": "https://registry.npmjs.org/videojs-font/-/videojs-font-4.2.0.tgz",
       "integrity": "sha512-YPq+wiKoGy2/M7ccjmlvwi58z2xsykkkfNMyIg4xb7EZQQNwB71hcSsB3o75CqQV7/y5lXkXhI/rsGAS7jfEmQ=="
     },
-    "videojs-record": {
-      "version": "4.8.0",
-      "resolved": "https://registry.npmjs.org/videojs-record/-/videojs-record-4.8.0.tgz",
-      "integrity": "sha512-RvCaJ1itFUfTUKfXgoZ/z25v+xIC7faG/zbtg4Pb8pB1n74ma3K77wpAIM486qpgjsg9uHTJJAsDokN92Xs3ag==",
+    "videojs-record-change-image-input": {
+      "version": "4.8.2",
+      "resolved": "https://registry.npmjs.org/videojs-record-change-image-input/-/videojs-record-change-image-input-4.8.2.tgz",
+      "integrity": "sha512-Sx1D2Q0GFjLicbIimew2GGmkr5XT+akHX/R8ysdzKVo9v+PKFpDWT0+RWU+kdH3SAmlFlyf3Nl1Z7krl7n8CLA==",
       "requires": {
         "recordrtc": ">=5.6.2",
         "video.js": ">=7.0.5",
         "videojs-wavesurfer": ">=3.10.0",
-        "webrtc-adapter": ">=8.2.3"
+        "webrtc-adapter": ">=9.0.1"
       }
     },
     "videojs-vtt.js": {

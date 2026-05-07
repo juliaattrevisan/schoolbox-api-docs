@@ -9,11 +9,12 @@
  */
 
 import "video.js/dist/video-js.css";
-import "videojs-record/dist/css/videojs.record.css";
+import "videojs-record-change-image-input/dist/css/videojs.record.css";
 import videojs from "video.js";
 import "webrtc-adapter";
 import RecordRTC from "recordrtc";
-import Record from "videojs-record/dist/videojs.record.js";
+import Record from "videojs-record-change-image-input/dist/videojs.record.js";
+import RecordDeviceOptions from "@schoolboxVue/components/videojs-record/record-device-options";
 import RecordedMedia from "@schoolboxVue/components/videojs-record/recorded-media";
 import OverMediaModal from "@schoolboxVue/components/videojs-record/over-media-modal";
 import { getRecordPhotoOptions } from "@js/videojs/videojsOptions";
@@ -21,12 +22,16 @@ import recordMediaTypes from "@js/record-media/recordMediaTypes";
 import recordMediaEvents from "@js/record-media/recordMediaEvents";
 import { isDeviceAlreadyInUseError, isPermissionDeniedError } from "@js/record-media/recordMediaErrors";
 import { dataURLtoBlob } from "@js/util/fileUtils";
+import chooseDevice from "@schoolboxVue/mixins/videojs-record/mixinChooseDevice";
 
 export default {
     components: {
+        RecordDeviceOptions,
         RecordedMedia,
         OverMediaModal,
     },
+
+    mixins: [chooseDevice],
 
     props: {
         preRecordedData: {
@@ -105,10 +110,12 @@ export default {
          */
         initVideojsRecordRecordListeners() {
             this.player.on("deviceReady", this.onDeviceReady);
+            this.player.on("enumerateReady", this.chooseDevice_onEnumerateReady);
             this.player.on("startRecord", this.onStartRecord);
             this.player.on("finishRecord", this.onFinishRecord);
             this.player.on("error", this.onError);
             this.player.on("deviceError", this.onDeviceError);
+            this.player.on("enumerateError", this.onEnumerateError);
         },
 
         /**
@@ -116,8 +123,12 @@ export default {
          */
         onDeviceReady() {
             this.isDeviceReady = true;
-            const currentDeviceSettings = this.player.record().stream.getVideoTracks()[0].getSettings();
+            const currentDeviceSettings = this.player.record().stream.getVideoTracks()[0].getSettings(); //to get width, height and the current deviceId
+            this.chooseDevice_currentVideoDeviceId = currentDeviceSettings.deviceId;
             this.$emit(recordMediaEvents.DEVICE_READY, currentDeviceSettings.width, currentDeviceSettings.height);
+            if (!this.chooseDevice_hasEnumeratedDevices) {
+                this.player.record().enumerateDevices();
+            }
         },
 
         /**
@@ -168,6 +179,13 @@ export default {
         },
 
         /**
+         * onEnumerateError - try and manage as many errors as possible
+         */
+        onEnumerateError() {
+            console.warn("enumerate error: " + this.player.enumerateErrorCode);
+        },
+
+        /**
          * ensure everything reset on possible modal re-display
          */
         destroyVideojs() {
@@ -192,6 +210,7 @@ export default {
             this.isOverMediaModalClosing = false;
             this.hasDeviceAlreadyInUseError = false;
             this.hasPermissionDeniedError = false;
+            this.chooseDevice_hasDeviceChangeError = false;
         },
 
         /**
@@ -246,6 +265,13 @@ export default {
             <video ref="recordingVideo" playsinline class="video-js vjs-record-skin"></video>
         </div>
 
+        <record-device-options
+            title="Select a Camera"
+            :current-device-id="chooseDevice_currentVideoDeviceId"
+            :device-list="chooseDevice_videoDeviceList"
+            @on-video-device-change="chooseDevice_onVideoDeviceChange"
+        />
+
         <recorded-media
             v-if="hasPreRecordedData || hasNewRecording"
             class="media-container media-container-playback"
@@ -277,7 +303,10 @@ export default {
                 Sorry, unable to record a photo. It's likely your browser does not support the required features. If
                 possible please upgrade your browser.
             </div>
-            <div v-else class="alert-box alert">Sorry, an unknown error has occured.</div>
+            <div v-else-if="chooseDevice_hasDeviceChangeError" class="alert-box alert">
+                Sorry, the selected camera cannot be displayed. Please ensure it's functioning properly and try again.
+            </div>
+            <div v-else class="alert-box alert">Sorry, an unknown error has occurred.</div>
             <button @click.prevent="onCloseErrorModalSelected">Close</button>
         </over-media-modal>
     </div>

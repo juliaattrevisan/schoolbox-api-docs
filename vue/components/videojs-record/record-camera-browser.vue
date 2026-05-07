@@ -9,12 +9,12 @@
  */
 
 import "video.js/dist/video-js.css";
-import "videojs-record/dist/css/videojs.record.css";
+import "videojs-record-change-image-input/dist/css/videojs.record.css";
 import videojs from "video.js";
 import "webrtc-adapter";
 import RecordRTC from "recordrtc";
-import Record from "videojs-record/dist/videojs.record.js";
-import TsEBMLEngine from "videojs-record/dist/plugins/videojs.record.ts-ebml.js";
+import Record from "videojs-record-change-image-input/dist/videojs.record.js";
+import TsEBMLEngine from "videojs-record-change-image-input/dist/plugins/videojs.record.ts-ebml.js";
 import RecordDeviceOptions from "@schoolboxVue/components/videojs-record/record-device-options";
 import RecordedMedia from "@schoolboxVue/components/videojs-record/recorded-media";
 import OverMediaModal from "@schoolboxVue/components/videojs-record/over-media-modal";
@@ -338,7 +338,7 @@ export default {
             <div v-else-if="chooseDevice_hasDeviceChangeError" class="alert-box alert">
                 Sorry, the selected camera cannot be displayed. Please ensure it's functioning properly and try again.
             </div>
-            <div v-else class="alert-box alert">Sorry, an unknown error has occured.</div>
+            <div v-else class="alert-box alert">Sorry, an unknown error has occurred.</div>
             <button @click.prevent="onCloseErrorModalSelected">Close</button>
         </over-media-modal>
     </div>
