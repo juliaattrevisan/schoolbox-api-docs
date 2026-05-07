@@ -91,10 +91,7 @@ class EportfolioStrategyTest extends TestCase
             {
                 $componentInstanceIds = [];
                 foreach ($pageIds as $pageId) {
-                    $componentInstanceIds = array_merge(
-                        $componentInstanceIds,
-                        $this->state->pageComponentInstanceIds[$pageId] ?? [],
-                    );
+                    array_push($componentInstanceIds, ...($this->state->pageComponentInstanceIds[$pageId] ?? []));
                 }
 
                 return $componentInstanceIds;
@@ -108,7 +105,7 @@ class EportfolioStrategyTest extends TestCase
             {
                 $blogIds = [];
                 foreach ($pageIds as $pageId) {
-                    $blogIds = array_merge($blogIds, $this->state->pageBlogIds[$pageId] ?? []);
+                    array_push($blogIds, ...($this->state->pageBlogIds[$pageId] ?? []));
                 }
 
                 return $blogIds;
