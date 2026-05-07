@@ -92,7 +92,12 @@ class Eportfolio extends Base
         }
 
         $counts = $this->fetchRows(
-            // Note there is one `SELECT COUNT(*)` query for each of the 'direct-delete' tables defined at the top of this class.
+            // Note there is one `SELECT COUNT(*)` query for each of the five tables with `deleted_at` columns.
+            // Each of the five subqueries excludes rows whose parents have already been counted as deletable.
+            // Example:
+            //  * The first subquery counts all TABLE_EPORTFOLIO_PAGE rows whose deleted_at date is older than the limit.
+            //  * The next subquery counts all TABLE_EPORTFOLIO_COMPONENT_BLOG rows whose deleted_at date is older than then limit,
+            //    but excludes rows whose parent TABLE_EPORTFOLIO_PAGE rows have already been counted.
             "
             SELECT
                 (SELECT COUNT(*) FROM " . self::TABLE_EPORTFOLIO_PAGE . " p
