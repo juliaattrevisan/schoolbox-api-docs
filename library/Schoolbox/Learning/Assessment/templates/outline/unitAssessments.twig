@@ -91,12 +91,12 @@
                         {% if route %}
                             <a title="{{ title }}" href="{{ route }}" class="l-flex l-gap-s" data-test="course-outline-assessment-title-{{ assessment.title }}">
                                 {# Render the icon for the assessment type #}
-                                <sbx-icon name="{{ icon.renderName(assessment)|trim }}" color="var(--sbx-color-text-secondary)"></sbx-icon>
+                                <sbx-icon name="{{ icon.renderName(assessment)|trim }}"></sbx-icon>
                                 <p class="t-break-word">{{ assessment.title }}</p>
                             </a>
                         {% else %}
                             <div title="{{ title }}" class="l-flex l-gap-s">
-                                <sbx-icon name="{{ icon.renderName(assessment)|trim }}" color="var(--sbx-color-text-secondary)"></sbx-icon>
+                                <sbx-icon name="{{ icon.renderName(assessment)|trim }}"></sbx-icon>
                                 <p class="t-break-word">{{ assessment.title }}</p>
                             </div>
                         {% endif %}

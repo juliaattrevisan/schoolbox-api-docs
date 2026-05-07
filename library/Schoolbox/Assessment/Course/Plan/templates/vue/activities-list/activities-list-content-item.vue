@@ -134,11 +134,7 @@ window.Vue.onUnmounted(() => {
                     :href="activityLink !== null ? getReturnUrl(activityLink) : undefined"
                     class="l-flex l-gap-s"
                 >
-                    <sbx-icon
-                        :name="activityIconName"
-                        :title="activityIconTitle"
-                        color="var(--sbx-color-text-secondary)"
-                    ></sbx-icon>
+                    <sbx-icon :name="activityIconName" :title="activityIconTitle"></sbx-icon>
                     <p
                         :data-test="`unit-planner-activity-title-${props.activity.title}`"
                         :data-test-activity-id="props.activity.id"

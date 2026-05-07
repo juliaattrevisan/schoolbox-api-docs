@@ -36,6 +36,10 @@ ul.unit-list {
     }
 }
 
+.course-link--meta + .meta {
+    margin-left: 2rem;
+}
+
 #import_assessments {
     .unit {
         background-color: var(--accent-background);
