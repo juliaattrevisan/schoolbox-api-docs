@@ -145,7 +145,7 @@ class Eportfolio extends Base
             ] as $table
         ) {
             $count = (int) ($counts[$table] ?? 0);
-            $this->log->notice(sprintf("Found %s %s rows to delete", $count, $table));
+            $this->log->notice("Found $count $table rows to delete (child rows will also be deleted but are not counted here - see chunk output)");
             $hasData = $hasData || $count > 0;
         }
 
