@@ -272,7 +272,7 @@ const rubricRows = window.Vue.computed(() => {
         >
             <template #legend>
                 Rubric {{ index + 1 }}
-                <span v-if="rubric.id !== 'create' && rubric.title.length"> ({{ rubric.title }}) </span>
+                <span v-if="rubric.id !== 'create' && rubric.title?.length"> ({{ rubric.title }}) </span>
             </template>
 
             <!-- existing rubric content -->
