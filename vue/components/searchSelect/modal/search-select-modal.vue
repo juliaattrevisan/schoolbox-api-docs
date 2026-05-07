@@ -27,12 +27,14 @@ interface Props {
     placeholder?: string; // the query input placeholder text
     defaultResults?: SearchSelectItem[]; // show selection options when the search input is empty
     showSelected?: boolean; // whether to show the selected items
+    validate?: (selected: SearchSelectItem[]) => string | null; // optional validation function; return error string or null
 }
 const props = withDefaults(defineProps<Props>(), {
     placeholder: "Search...",
     defaultResults: undefined,
     queryKey: "query",
     showSelected: false,
+    validate: undefined,
 });
 
 const emit = defineEmits<{
@@ -193,12 +195,15 @@ function onAtResultsBottom(): void {
 
 const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
 
+const validationError = window.Vue.ref<string | null>(null);
+
 /**
  * Rest the modal state
  */
 function close(): void {
     isOpen.value = false;
     query.value = "";
+    validationError.value = null;
 }
 
 /**
@@ -213,6 +218,14 @@ function onCancel(): void {
  * The selection has been confirmed, so close the modal
  */
 function onSelect(): void {
+    if (props.validate) {
+        const error = props.validate(selected.value);
+        if (error) {
+            validationError.value = error;
+            return;
+        }
+    }
+    validationError.value = null;
     close();
 }
 
@@ -273,6 +286,7 @@ window.Vue.watch(isOpen, async (newIsOpen) => {
                         />
                     </div>
                 </div>
+                <p v-if="validationError" class="form-error" role="alert">{{ validationError }}</p>
                 <ssm-footer :saved-selected="savedSelected" @cancel="onCancel" @select="onSelect" />
             </div>
         </basic-modal>

@@ -40,10 +40,10 @@ export const useCohortReportFiltersStore = defineStore("cohortReportFilters", ()
 
         // now apply the new filters and load the first page
         crStore.activeFilters = {
-            userIds: Object.values(studentFilter.value).map((s) => s.id),
-            authorIds: Object.values(authorFilter.value).map((a) => a.id),
-            folderIds: Object.values(folderFilter.value).map((f) => f.id),
-            tagIds: evidenceTagsFilter.value.map((t) => t.id),
+            userIds: Object.values(studentFilter.value).map((s) => Number(s.id)),
+            authorIds: Object.values(authorFilter.value).map((a) => Number(a.id)),
+            folderIds: Object.values(folderFilter.value).map((f) => Number(f.id)),
+            tagIds: evidenceTagsFilter.value.map((t) => Number(t.id)),
             states: [...stateFilter.value],
             from: startDateFilter.value ? window.dayjs(startDateFilter.value).format("YYYY-MM-DD") : undefined,
             to: endDateFilter.value ? window.dayjs(endDateFilter.value).format("YYYY-MM-DD") : undefined,

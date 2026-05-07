@@ -77,6 +77,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(LanguageMapper::class),
             $this->getMapperFactory()->get(FolderCodeMapper::class),
             $this->getMapperFactory()->get(RegistrationSessionMapper::class),
+            $this->injector->get('externalClass'),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
             $this->injector->get('oidc.cache'),

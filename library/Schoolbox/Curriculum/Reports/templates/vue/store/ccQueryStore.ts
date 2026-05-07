@@ -46,9 +46,9 @@ export const useQueryStore = defineStore("ccQuery", () => {
      */
     function getQueryUrls(): string[] {
         const inputStore = useInputStore();
-        return inputStore.courseIds.map((courseId: number) => {
+        return inputStore.courseIds.map((courseId) => {
             const newQueryParams = new URLSearchParams();
-            newQueryParams.append("courseId", courseId.toString());
+            newQueryParams.append("courseId", String(courseId));
             newQueryParams.append("nodeId", useInputStore().nodesValue);
             return `${endpoint}?${newQueryParams.toString()}`;
         });

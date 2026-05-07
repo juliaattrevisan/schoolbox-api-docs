@@ -47,9 +47,10 @@ function onSearchResponse(json: unknown): void {
 
 /**
  * To select a link to the course
- * @param course - the selected course
+ * @param item - the selected course item
  */
-function onCourseNameSelect(course: SearchSelectItem & Partial<Course>): void {
+function onCourseNameSelect(item: SearchSelectItem): void {
+    const course = item as SearchSelectItem & Partial<Course>;
     if (course.folder?._links?.view) {
         window.location.href = course.folder._links.view;
     }

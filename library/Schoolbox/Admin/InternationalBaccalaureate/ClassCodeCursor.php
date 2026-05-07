@@ -22,9 +22,9 @@ use ValueError;
 
 class ClassCodeCursor implements ICursor
 {
-    public const LIMIT_MIN = 1;
-    public const LIMIT_MAX = 100;
-    public const LIMIT_DEFAULT = 50;
+    public const int LIMIT_MIN = 1;
+    public const int LIMIT_MAX = 100;
+    public const int LIMIT_DEFAULT = 50;
 
     private ICodec $codec;
 
@@ -82,8 +82,7 @@ class ClassCodeCursor implements ICursor
             $params['search'] = '%' . $this->classCodeMapper->getDatabase()->getQuoter()->escapeForLike($search) . '%';
         }
 
-        $statement = $this->classCodeMapper->getDatabase()->prepare($sql);
-        $statement->execute($params);
+        $statement = $this->classCodeMapper->getDatabase()->executeQuery($sql, $params);
 
         return (int) $statement->fetchColumn();
     }

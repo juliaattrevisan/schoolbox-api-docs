@@ -30,6 +30,7 @@ export type IBSubjectLanguage = {
     languageId: number;
     languageName: string | null;
     classCode: string;
+    systemPurposeId: number | null;
 };
 
 export type IBLanguageListResponse = {

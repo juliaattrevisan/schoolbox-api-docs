@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { apiRequest } from "@js/util/sbx/apiUtils";
-import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import SearchSelectModal from "@schoolboxVue/components/searchSelect/modal/search-select-modal.vue";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import type {
@@ -10,6 +9,15 @@ import type {
     IBSubject,
     IBSubjectLanguage,
 } from "../../js/types/ibConfigurationTypes";
+
+/**
+ * Maps Core section labels to their ib_system_purposes.id values.
+ * Diploma Programme Year 2 (DIPLOMA) = 1, Diploma Course (COURSE) = 3.
+ */
+const CORE_SECTION_SYSTEM_PURPOSE_ID: Record<string, number> = {
+    "Diploma Program Year 2 [Diploma]": 1,
+    "Diploma Course [Course]": 3,
+};
 
 /**
  * A single row in the table
@@ -23,6 +31,8 @@ type SubjectRow = {
     languageNamesById: Record<number, string>;
     classCode: string;
     studentCount: number;
+    isExplicitlyConfigured: boolean;
+    systemPurposeId: number | null;
     isLanguageRow?: boolean;
     parentRowId?: string;
     tableType?: string;
@@ -35,6 +45,7 @@ type SubjectSavePayload = {
     groupSubjectId: number;
     languageId: number;
     classCode: string;
+    systemPurposeId: number | null;
 };
 
 const props = defineProps<{
@@ -50,7 +61,6 @@ const props = defineProps<{
 }>();
 
 const isSaving = window.Vue.ref<boolean>(false);
-const saveError = window.Vue.ref<string | null>(null);
 const subjectRows = window.Vue.ref<SubjectRow[]>([]);
 const currentEditingRow = window.Vue.ref<string | null>(null);
 const isLanguageModalOpen = window.Vue.ref<boolean>(false);
@@ -65,6 +75,7 @@ const classCodeEditingRowId = window.Vue.ref<string | null>(null);
 const classCodeModalSelected = window.Vue.ref<SearchSelectItem[]>([]);
 const classCodeSearchResults = window.Vue.ref<SearchSelectItem[]>([]);
 const classCodeDefaultResults = window.Vue.ref<SearchSelectItem[]>([]);
+const classCodeSnapshot = window.Vue.ref<string>("");
 
 const isCoreCategory = window.Vue.computed(() => {
     return props.categoryName.toLowerCase() === "core";
@@ -113,7 +124,7 @@ function createLanguageNameMapFromSubjectLanguages(configurations: IBSubjectLang
  */
 function createLanguageNameMapFromItems(items: SearchSelectItem[]): Record<number, string> {
     return items.reduce<Record<number, string>>((languageNames, item) => {
-        languageNames[item.id] = item.name;
+        languageNames[Number(item.id)] = item.name;
         return languageNames;
     }, {});
 }
@@ -156,8 +167,17 @@ function getDefaultLanguages(): number[] {
  * @returns The main subject row and any child language rows.
  */
 function buildRowsForSubject(subjectData: IBSubject, index: number, tableType?: string): SubjectRow[] {
-    const configurations = subjectData.languages;
     const rowId = tableType ? `${tableType}_${subjectData.id}_${index}` : `group_subject_${subjectData.id}`;
+    const sectionSystemPurposeId: number | null =
+        tableType !== undefined ? (CORE_SECTION_SYSTEM_PURPOSE_ID[tableType] ?? null) : null;
+
+    // For Core sections, only use languages that match this section's system purpose.
+    // For non-Core, all languages are relevant (systemPurposeId = null).
+    const configurations =
+        sectionSystemPurposeId !== null
+            ? subjectData.languages.filter((c) => c.systemPurposeId === sectionSystemPurposeId)
+            : subjectData.languages;
+
     const selectedLanguages = configurations.map((configuration) => configuration.languageId);
     const configuredLanguageNames = createLanguageNameMapFromSubjectLanguages(configurations);
     const mainRow: SubjectRow = {
@@ -169,6 +189,8 @@ function buildRowsForSubject(subjectData: IBSubject, index: number, tableType?: 
         languageNamesById: selectedLanguages.length > 0 ? configuredLanguageNames : getDefaultLanguageNameMap(),
         classCode: configurations.length === 1 ? configurations[0].classCode : "",
         studentCount: 0,
+        isExplicitlyConfigured: selectedLanguages.length > 0,
+        systemPurposeId: sectionSystemPurposeId,
         tableType,
     };
 
@@ -193,6 +215,8 @@ function buildRowsForSubject(subjectData: IBSubject, index: number, tableType?: 
                     : {},
             classCode: configuration.classCode,
             studentCount: 0,
+            isExplicitlyConfigured: true,
+            systemPurposeId: sectionSystemPurposeId,
             isLanguageRow: true,
             parentRowId: rowId,
             tableType,
@@ -270,8 +294,8 @@ function hasLanguageSelectionChanged(
     previousSelection: SearchSelectItem[],
     nextSelection: SearchSelectItem[],
 ): boolean {
-    const previousIds = previousSelection.map((item) => item.id).sort((left, right) => left - right);
-    const nextIds = nextSelection.map((item) => item.id).sort((left, right) => left - right);
+    const previousIds = previousSelection.map((item) => Number(item.id)).sort((left, right) => left - right);
+    const nextIds = nextSelection.map((item) => Number(item.id)).sort((left, right) => left - right);
     if (previousIds.length !== nextIds.length) {
         return true;
     }
@@ -285,6 +309,7 @@ window.Vue.watch(isLanguageModalOpen, (isOpen, wasOpen) => {
 
     if (hasLanguageSelectionChanged(modalSelectionSnapshot.value, modalSelectedLanguages.value)) {
         applySelectedLanguages(modalSelectedLanguages.value);
+        void saveSubjectConfiguration();
     }
 
     closeLanguageModal();
@@ -299,7 +324,7 @@ function applySelectedLanguages(selectedItems: SearchSelectItem[]): void {
 
     cacheSelectedLanguages(selectedItems);
 
-    const selectedLanguages = selectedItems.map((item) => item.id);
+    const selectedLanguages = selectedItems.map((item) => Number(item.id));
     const selectedLanguageNames = createLanguageNameMapFromItems(selectedItems);
 
     const rowIndex = subjectRows.value.findIndex((row) => row.id === currentEditingRow.value);
@@ -308,6 +333,8 @@ function applySelectedLanguages(selectedItems: SearchSelectItem[]): void {
     const mainRow = subjectRows.value[rowIndex];
 
     subjectRows.value = subjectRows.value.filter((row) => row.parentRowId !== mainRow.id);
+
+    mainRow.isExplicitlyConfigured = true;
 
     if (selectedLanguages.length === 0) {
         mainRow.languages = [];
@@ -327,23 +354,24 @@ function applySelectedLanguages(selectedItems: SearchSelectItem[]): void {
             existingConfigurations.map((configuration) => [configuration.languageId, configuration.classCode]),
         );
 
-        const newLanguageRows: SubjectRow[] = selectedLanguages.map((language, index) => ({
-            id: `${mainRow.id}_lang_${index}`,
-            groupSubjectId: mainRow.groupSubjectId,
-            subject: mainRow.subject,
-            level: mainRow.level,
-            languages: [language],
-            languageNamesById: selectedLanguageNames[language]
-                ? {
-                      [language]: selectedLanguageNames[language],
-                  }
-                : {},
-            classCode: classCodeByLanguage.get(language) ?? "",
-            studentCount: 0,
-            isLanguageRow: true,
-            parentRowId: mainRow.id,
-            tableType: mainRow.tableType,
-        }));
+        const newLanguageRows: SubjectRow[] = selectedLanguages.map((language, index) => {
+            const langName = selectedLanguageNames[language];
+            return {
+                id: `${mainRow.id}_lang_${index}`,
+                groupSubjectId: mainRow.groupSubjectId,
+                subject: mainRow.subject,
+                level: mainRow.level,
+                languages: [language],
+                languageNamesById: langName ? { [language]: langName } : {},
+                classCode: classCodeByLanguage.get(language) ?? "",
+                studentCount: 0,
+                isExplicitlyConfigured: true,
+                systemPurposeId: mainRow.systemPurposeId,
+                isLanguageRow: true,
+                parentRowId: mainRow.id,
+                tableType: mainRow.tableType,
+            };
+        });
 
         subjectRows.value.splice(rowIndex + 1, 0, ...newLanguageRows);
     }
@@ -442,12 +470,12 @@ function openClassCodeModal(rowId: string): void {
     const row = subjectRows.value.find((r) => r.id === rowId);
     if (!row) return;
     classCodeEditingRowId.value = rowId;
-    // Class codes are strings; cast is safe because SearchSelectModal only does === comparisons on id.
+    classCodeSnapshot.value = row.classCode;
     classCodeModalSelected.value = row.classCode
         .split(",")
         .map((c) => c.trim())
         .filter(Boolean)
-        .map((code) => ({ id: code, name: code })) as unknown as SearchSelectItem[];
+        .map((code) => ({ id: code, name: code }));
     isClassCodeModalOpen.value = true;
 }
 
@@ -466,11 +494,10 @@ function updateClassCodeModalResults(
         return;
     }
 
-    // Class codes are strings; cast is safe because SearchSelectModal only does === comparisons on id.
     const formattedResults = (json.data as IBClassCode[]).map((item) => ({
         id: item.code,
         name: `${item.name} (${item.code})`,
-    })) as unknown as SearchSelectItem[];
+    }));
 
     if (isMoreResults) {
         results.value = [...results.value, ...formattedResults];
@@ -505,7 +532,13 @@ window.Vue.watch(isClassCodeModalOpen, (isOpen, wasOpen) => {
 
     const row = subjectRows.value.find((r) => r.id === classCodeEditingRowId.value);
     if (row) {
-        row.classCode = classCodeModalSelected.value.map((item) => String(item.id)).join(", ");
+        const newClassCode = classCodeModalSelected.value.map((item) => String(item.id)).join(", ");
+        row.classCode = newClassCode;
+        if (newClassCode !== classCodeSnapshot.value) {
+            // Assigning a class code confirms the displayed language, even if it was only the default.
+            row.isExplicitlyConfigured = true;
+            void saveSubjectConfiguration();
+        }
     }
 
     classCodeEditingRowId.value = null;
@@ -551,7 +584,7 @@ async function refreshStudentCounts(): Promise<void> {
  */
 function buildSubjectSavePayload(): SubjectSavePayload[] {
     const payload = subjectRows.value
-        .filter((row) => row.isLanguageRow || row.languages.length <= 1)
+        .filter((row) => row.isExplicitlyConfigured && (row.isLanguageRow || row.languages.length <= 1))
         .flatMap((row) => {
             const languageId = row.languages[0];
 
@@ -564,6 +597,7 @@ function buildSubjectSavePayload(): SubjectSavePayload[] {
                     groupSubjectId: row.groupSubjectId,
                     languageId,
                     classCode: row.classCode.trim(),
+                    systemPurposeId: row.systemPurposeId,
                 },
             ];
         });
@@ -574,7 +608,8 @@ function buildSubjectSavePayload(): SubjectSavePayload[] {
                 return (
                     candidate.groupSubjectId === item.groupSubjectId &&
                     candidate.languageId === item.languageId &&
-                    candidate.classCode === item.classCode
+                    candidate.classCode === item.classCode &&
+                    candidate.systemPurposeId === item.systemPurposeId
                 );
             }) === index
         );
@@ -590,7 +625,6 @@ async function saveSubjectConfiguration(): Promise<void> {
 
     try {
         isSaving.value = true;
-        saveError.value = null;
 
         const saveData = {
             categoryId: props.categoryId,
@@ -612,7 +646,6 @@ async function saveSubjectConfiguration(): Promise<void> {
         toast.timeout({ text: "Saved" });
         await refreshStudentCounts();
     } catch (error) {
-        saveError.value = "Failed to save configuration";
         const toast = window.sbProps.toastActivate("Save failed");
         toast.timeout({ text: "Save failed", isSuccess: false });
         console.error(error);
@@ -795,16 +828,6 @@ async function saveSubjectConfiguration(): Promise<void> {
                     </tbody>
                 </table>
             </template>
-
-            <div v-if="saveError" class="l-mar-m--bottom">
-                <request-error :further-info="saveError" />
-            </div>
-
-            <div class="form-actions">
-                <button type="button" class="button submit" @click="saveSubjectConfiguration">
-                    {{ isSaving ? "Saving..." : `Save ${categoryTitle} Configuration` }}
-                </button>
-            </div>
         </div>
 
         <search-select-modal
@@ -820,6 +843,7 @@ async function saveSubjectConfiguration(): Promise<void> {
             :endpoint="props.searchLanguagesEndpoint ?? ''"
             :manage-search-response="true"
             :allow-partial-matches="true"
+            :validate="(items) => (items.length === 0 ? 'At least one language should be selected' : null)"
             @search-response="onModalSearchResponse"
             @next-search-response="onModalNextSearchResponse"
         />
