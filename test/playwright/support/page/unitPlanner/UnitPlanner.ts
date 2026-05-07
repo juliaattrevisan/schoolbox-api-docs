@@ -19,6 +19,10 @@ export default class UnitPlanner {
 
     static readonly DATA_TEST_UNIT_ROW = "unit-row-{unitId}";
 
+    static readonly DATA_TEST_UNIT_DOT_MENU = "sbx-pop-out-unit-cell-unit-action-{unitId}";
+
+    static readonly DATA_TEST_UNIT_DROPDOWN_OPTION = "up-unit-cell-unit-action-{unitId}-{action}";
+
     static readonly DATA_TEST_CREATE_ACTIVITY_BUTTON =
         "sbx-pop-out-dropdown-activities-list-activity-{unitId}-activities-1-button";
 
@@ -53,11 +57,15 @@ export default class UnitPlanner {
 
     static readonly DATA_TEST_ADD_UNITS_CREATE_BUTTON = "up-add-units-create";
 
+    static readonly DATA_TEST_CREATE_UNITS_BUTTON = "unit-planner-create-units";
+
     static readonly DATA_TEST_DROPDOWN_MENU = "sbx-pop-out-unit-dropdown-button";
 
     static readonly DATA_TEST_IMPORT_INTO_CLASS_OPTION = "up-header-{courseId}-import-link";
 
     static readonly DATA_TEST_VIEW_MORE = "unit-planner-view-more-button-{unitId}-{columType}";
+
+    static readonly DATA_TEST_UNIT_PLANNER_CONTAINER = "unit-planner-container";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -81,9 +89,46 @@ export default class UnitPlanner {
     }
 
     /**
-     * Click the create text box button
+     * Click the 3-dot menu for a unit
      * @param unitId - The ID of the unit
      */
+    async clickUnitDotMenu(unitId: number): Promise<void> {
+        await this.page.getByTestId(UnitPlanner.DATA_TEST_UNIT_DOT_MENU.replace("{unitId}", unitId.toString())).click();
+    }
+
+    /**
+     * Click the unit 3-dot menu
+     * Check whether the 4 options are presented in the unit 3-dot menu: course-link, import-link, modify-link and delete-button
+     * @param unitId - The ID of the unit
+     * @param optionsToBePresent - The list of options that should be present
+     * @param optionsNotToBePresent - The list of options that should not be present
+     */
+    async checkUnitMenuOptionsVisibility(
+        unitId: number,
+        optionsToBePresent: ("course-link" | "import-link" | "modify-link" | "delete-button")[],
+        optionsNotToBePresent: ("course-link" | "import-link" | "modify-link" | "delete-button")[],
+    ): Promise<void> {
+        await this.clickUnitDotMenu(unitId);
+        for (const action of optionsToBePresent) {
+            const unitMenuOptionLocator = this.page.getByTestId(
+                UnitPlanner.DATA_TEST_UNIT_DROPDOWN_OPTION.replace("{unitId}", unitId.toString()).replace(
+                    "{action}",
+                    action,
+                ),
+            );
+            await expect(unitMenuOptionLocator).toBeVisible();
+        }
+        for (const action of optionsNotToBePresent) {
+            const unitMenuOptionLocator = this.page.getByTestId(
+                UnitPlanner.DATA_TEST_UNIT_DROPDOWN_OPTION.replace("{unitId}", unitId.toString()).replace(
+                    "{action}",
+                    action,
+                ),
+            );
+            await expect(unitMenuOptionLocator).not.toBeVisible();
+        }
+    }
+
     async clickCreateTextBoxButton(unitId: number): Promise<void> {
         await this.page
             .getByTestId(UnitPlanner.DATA_TEST_CREATE_TEXT_BOX_BUTTON.replace("{unitId}", unitId.toString()))
@@ -127,7 +172,7 @@ export default class UnitPlanner {
         await unitDragHandle.hover();
         await this.page.mouse.down();
 
-        const unitPlannerContainer = this.page.getByTestId("unit-planner-container");
+        const unitPlannerContainer = this.page.getByTestId(UnitPlanner.DATA_TEST_UNIT_PLANNER_CONTAINER);
 
         // Move mouse to top of container, then wait for the reorder to happen
         await unitPlannerContainer.hover({ position: { x: 0, y: 0 } });
@@ -174,6 +219,31 @@ export default class UnitPlanner {
         } else {
             await expect(createActivityButtonLocator).not.toBeVisible();
         }
+    }
+
+    /**
+     * Check whether the create units button is presented in the unit planner header or not
+     * @param shouldBeVisible - Whether the button should be visible or not
+     */
+    async checkCreateUnitsButtonVisibility(shouldBeVisible: boolean): Promise<void> {
+        const createUnitsButtonLocator = this.page.getByTestId(UnitPlanner.DATA_TEST_CREATE_UNITS_BUTTON);
+        if (shouldBeVisible) {
+            await expect(createUnitsButtonLocator).toBeVisible();
+        } else {
+            await expect(createUnitsButtonLocator).not.toBeVisible();
+        }
+    }
+
+    /**
+     * Navigate to a unit planner page and check whether the create units button is presented in the unit or not
+     * pass true to check it is visible and false to check it is not visible
+     * @param courseId - The ID of the course
+     * @param shouldBeVisible - Whether the button should be visible or not
+     */
+    async navigateAndCheckCreateUnitsButton(courseId: number, shouldBeVisible: boolean): Promise<void> {
+        await this.goto(courseId);
+        await expect(this.page.getByTestId("unit-planner-container")).toBeVisible();
+        await this.checkCreateUnitsButtonVisibility(shouldBeVisible);
     }
 
     /**
