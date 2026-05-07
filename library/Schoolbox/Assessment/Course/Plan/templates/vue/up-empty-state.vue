@@ -22,7 +22,7 @@ function onCreateSelected(): void {
     <div class="row">
         <div class="small-12 island">
             <div class="empty-state-flex-centered">
-                <i class="icon-unit"></i>
+                <sbx-icon name="unit"></sbx-icon>
                 <p>
                     This course currently does not have any {{ locale.unit.translate(true, false) }}. To begin building
                     this course start by

@@ -53,22 +53,24 @@ defineExpose({ isEmpty });
             <template v-for="capability in courseRubric" :key="capability.id">
                 <tr>
                     <th class="l-flex markdown border-none">
-                        <span
+                        <sbx-icon
                             v-if="props.usedCapabilities.includes(capability.id)"
-                            class="icon-submissions"
+                            color="var(--sbx-color-text-secondary)"
+                            name="submissions"
                             title="Used in a Learning activity"
-                        ></span>
+                        ></sbx-icon>
                         <!-- eslint-disable-next-line vue/no-v-html | capability.name is scrubbed on input, and is sent here via Scrub::markdown() (which can add <p></p> tags for example) -->
                         <div v-html="capability.name"></div>
                     </th>
                 </tr>
                 <tr v-for="indicator in capability.indicators" :key="indicator.id">
                     <td class="l-flex border-none">
-                        <span
+                        <sbx-icon
                             v-if="props.usedIndicators.includes(indicator.id)"
-                            class="icon-submissions"
+                            color="var(--sbx-color-text-secondary)"
+                            name="submissions"
                             title="Used in a Learning activity"
-                        ></span>
+                        ></sbx-icon>
                         <!-- eslint-disable-next-line vue/no-v-html | indicator.name is scrubbed on input, and is sent here via Scrub::markdown() (which can add <p></p> tags for example) -->
                         <div v-html="indicator.name"></div>
                     </td>
@@ -103,22 +105,22 @@ defineExpose({ isEmpty });
             <template v-for="capability in unitRubric" :key="capability.id">
                 <tr>
                     <th class="l-flex markdown border-none">
-                        <span
+                        <sbx-icon
                             v-if="props.usedCapabilities.includes(capability.id)"
-                            class="icon-submissions"
+                            name="submissions"
                             title="Used in a Learning activity"
-                        ></span>
+                        ></sbx-icon>
                         <!-- eslint-disable-next-line vue/no-v-html | capability.name is scrubbed on input, and is sent here via Scrub::markdown() (which can add <p></p> tags for example) -->
                         <div v-html="capability.name"></div>
                     </th>
                 </tr>
                 <tr v-for="indicator in capability.indicators" :key="indicator.id">
                     <td class="l-flex border-none">
-                        <span
+                        <sbx-icon
                             v-if="props.usedIndicators.includes(indicator.id)"
-                            class="icon-submissions"
+                            name="submissions"
                             title="Used in a Learning activity"
-                        ></span>
+                        ></sbx-icon>
                         <!-- eslint-disable-next-line vue/no-v-html | indicator.name is scrubbed on input, and is sent here via Scrub::markdown() (which can add <p></p> tags for example) -->
                         <div v-html="indicator.name"></div>
                     </td>
@@ -173,6 +175,10 @@ table.rb {
     td {
         border-bottom: none;
         border-left: none;
+    }
+
+    .l-flex {
+        gap: var(--spacing-s);
     }
 }
 

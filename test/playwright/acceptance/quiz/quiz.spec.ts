@@ -161,7 +161,7 @@ test.describe("Quiz Tests: create, modify, delete quiz, submit and vertical revi
         await homepage.clickAssessmentComponentTitle(quizId);
 
         await expect(page.locator(`ul.breadcrumb`)).toContainText("Quiz Automation Test Updated");
-        await expect(page.locator(`li.icon-quiz`)).toHaveText("Homework");
+        await expect(page.locator(`li:has(sbx-icon[name='quiz'])`)).toHaveText("Homework");
     });
 
     test("Grading a quiz via Quiz Quick Marking page (Status Page)", async ({ tester, page }) => {

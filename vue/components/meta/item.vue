@@ -1,5 +1,6 @@
 <template>
     <li>
+        <sbx-icon v-if="icon" :name="icon" color="var(--sbx-color-text-secondary)"></sbx-icon>
         <slot></slot>
     </li>
 </template>
@@ -11,5 +12,12 @@
 /* eslint-enable vue/no-v-html */
 export default {
     name: "meta-item",
+
+    props: {
+        icon: {
+            type: String,
+            default: "",
+        },
+    },
 };
 </script>

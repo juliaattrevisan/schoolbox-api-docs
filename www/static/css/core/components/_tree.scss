@@ -16,23 +16,34 @@ $tree-course-icon-color: #008600;
 $tree-favorite-icon-color: darkorange;
 
 %browser-icon-colors {
-    .icon-folder:before {
+    .icon-folder:before,
+    sbx-icon.icon-folder {
         color: $tree-folder-icon-color;
     }
 
-    .icon-home:before {
+    .icon-home:before,
+    sbx-icon.icon-home {
         color: $tree-homepage-icon-color;
     }
 
-    .icon-course-builder,
-    .icon-course {
-        &:before {
-            color: $tree-course-icon-color;
-        }
+    .icon-course-builder:before,
+    .icon-course:before,
+    sbx-icon.icon-course-builder,
+    sbx-icon.icon-course {
+        color: $tree-course-icon-color;
     }
 
-    .icon-favourite:before {
+    .icon-favourite:before,
+    sbx-icon.icon-favourite {
         color: $tree-favorite-icon-color;
+    }
+
+    sbx-icon.icon-folder:before,
+    sbx-icon.icon-home:before,
+    sbx-icon.icon-course-builder:before,
+    sbx-icon.icon-course:before,
+    sbx-icon.icon-favourite:before {
+        content: none;
     }
 }
 
@@ -147,6 +158,24 @@ ul.jstree-default {
 
         .meta-preview {
             @extend %browser-icon-colors;
+
+            > .resource-browser-preview-link {
+                color: inherit;
+                float: left;
+                margin: -0.5rem 1rem 0 -1rem;
+                padding: 0.5rem 0 0 1rem;
+                text-decoration: none;
+            }
+
+            > .resource-browser-preview-icon {
+                float: left;
+                margin: -0.5rem 1rem 0 -1rem;
+                padding: 0.5rem 0 0 1rem;
+            }
+
+            > .resource-browser-preview-link > .resource-browser-preview-icon {
+                display: block;
+            }
         }
 
         .card {

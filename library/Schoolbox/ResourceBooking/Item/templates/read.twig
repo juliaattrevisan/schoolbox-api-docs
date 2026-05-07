@@ -20,7 +20,7 @@
 
             <ul class="meta">
                 {% if item.moderatorList is not empty %}
-                    <li class="icon-staff-students">
+                    <li><sbx-icon name="staff-students" color="var(--sbx-color-text-secondary)"></sbx-icon>
                         {% include '@resourceItem/sub/moderated.twig' with {item: item} %}
                         {% include '@resourceItem/sub/moderatorList.twig' with {moderatorList: item.moderatorList} %}
                     </li>

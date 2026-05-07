@@ -51,7 +51,7 @@
 
     {% if not assessmentsToMark|length and not assessmentsToChase|length %}
         <div class="empty-state">
-            <i class="icon-approve"></i>
+            <sbx-icon name="approve"></sbx-icon>
             <p>You have no {{ locale.assessment.plural }} to review or follow up. To view a complete list of past {{ locale.assessment.plural }} visit your <a href="{{ routeLookup('learning.getClasses') }}">class'</a> markbook.</p>
         </div>
     {% endif %}

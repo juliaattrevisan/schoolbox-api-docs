@@ -1,5 +1,5 @@
 {% if config.curriculum_tagging_enabled and (assessment.curriculumNodes | length) > 0 %}
-<li id="curriculum-codes-container" class="icon-curriculum">
+<li id="curriculum-codes-container"><sbx-icon name="curriculum" color="var(--sbx-color-text-secondary)"></sbx-icon>
     <curriculum-codes
         :nodes="{{ assessment.getViewableCurriculumNodes.reindex|json_encode }}"
     />

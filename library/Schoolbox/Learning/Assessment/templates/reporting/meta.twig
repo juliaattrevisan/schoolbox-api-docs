@@ -14,7 +14,7 @@
 
     {# joining student name with lastView data #}
     {% if student.id != USER.id %}
-        <li class="icon-staff-students" title="{% if lastViews.student.date is defined and lastViews.student.date is not null %}{{ lastViews.student.date }}{% endif %}">
+        <li title="{% if lastViews.student.date is defined and lastViews.student.date is not null %}{{ lastViews.student.date }}{% endif %}"><sbx-icon name="staff-students" color="var(--sbx-color-text-secondary)"></sbx-icon>
             <a href="/search/user/{{ student.id }}">{{ student.fullname }}</a>
             {% if lastViews is not empty %}
                 {{ lastViews.student.status }}
@@ -31,13 +31,13 @@
          # needed isNull is same as(false) to test if getExcludedAt() has valid data.
          # I was not able to just test as getExcluedAt() is null, or find a better way
          #}
-        <li class="icon-close">Excluded from {{ locale.activity }}</li>
+        <li><sbx-icon name="close" color="var(--sbx-color-text-secondary)"></sbx-icon> Excluded from {{ locale.activity }}</li>
     {% endif %}
 
     {% if lastViews is not empty %}
         {% for parent in lastViews.parents %}
             {% if parent.date is not null %}
-            <li class="icon-staff" title="{{ parent.date }}">
+            <li title="{{ parent.date }}"><sbx-icon name="staff" color="var(--sbx-color-text-secondary)"></sbx-icon>
                 <a href="/search/user/{{ parent.id }}">{{ parent.name }}</a>
                 {{ parent.status }} {% if 'assessment' is same as(parent.object) %} this {{ locale.activity }}{% else %} the feedback {% endif %}
             </li>

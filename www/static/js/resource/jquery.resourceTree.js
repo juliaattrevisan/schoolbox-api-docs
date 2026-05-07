@@ -65,6 +65,34 @@
      */
     var ResourceTree = function (element, nodeTypeIconMap, options) {
         var self = this;
+        var iconClassToName = function (iconClass) {
+            return (iconClass || "").replace(/^icon-/, "");
+        };
+
+        var replaceThemeIcons = function (scope) {
+            $(scope)
+                .find(".jstree-themeicon-custom")
+                .addBack(".jstree-themeicon-custom")
+                .each(function () {
+                    var icon = $(this);
+                    var classList = (icon.attr("class") || "").split(/\s+/);
+                    var legacyIconClass = classList.find(function (className) {
+                        return className.indexOf("icon-") === 0;
+                    });
+
+                    if (!legacyIconClass || icon.is("sbx-icon")) {
+                        return;
+                    }
+
+                    var replacement = $("<sbx-icon></sbx-icon>")
+                        .attr("name", iconClassToName(legacyIconClass))
+                        .attr("role", icon.attr("role") || "presentation")
+                        .addClass(classList.join(" "));
+
+                    icon.replaceWith(replacement);
+                });
+        };
+
         var defaults = {
             data: {
                 cache: [],
@@ -228,7 +256,30 @@
         self.options = $.extend(true, {}, defaults, options);
         self.cache = self.options.data.cache;
 
+        element.on("ready.jstree loaded.jstree after_open.jstree redraw.jstree", function (event, data) {
+            replaceThemeIcons(data && data.node ? $(this).jstree(true).get_node(data.node, true) : this);
+        });
+
         element.jstree(self.options.jstree);
+
+        window.setTimeout(function () {
+            replaceThemeIcons(element);
+        }, 0);
+
+        if (window.MutationObserver) {
+            new window.MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    mutation.addedNodes.forEach(function (node) {
+                        if (node.nodeType === Node.ELEMENT_NODE) {
+                            replaceThemeIcons(node);
+                        }
+                    });
+                });
+            }).observe(element[0], {
+                childList: true,
+                subtree: true,
+            });
+        }
     };
 
     $.fn.resourceTree = function (nodeTypeIconMap, options) {

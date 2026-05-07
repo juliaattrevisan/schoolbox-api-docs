@@ -20,6 +20,26 @@ ul.unit-list {
     }
 }
 
+.course-link--meta {
+    display: block;
+
+    sbx-icon {
+        float: left;
+        margin: -0.5rem 1rem 0 -1rem;
+        padding: 0.5rem 0 0 1rem;
+    }
+
+    @media #{$small-only} {
+        sbx-icon {
+            margin: -0.25rem 1rem 0 -1rem;
+        }
+    }
+}
+
+.course-link--meta + .meta {
+    margin-left: 2rem;
+}
+
 #import_assessments {
     .unit {
         background-color: var(--accent-background);

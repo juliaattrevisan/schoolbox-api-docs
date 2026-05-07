@@ -33,21 +33,21 @@
             {% if not response %}
                 {# noop; empty state below #}
             {% elseif response.isSubmitted %}
-                <li class="icon-calendar">
+                    <li><sbx-icon name="calendar" color="var(--sbx-color-text-secondary)"></sbx-icon>
                     Submitted <time title="{{ response.submittedAt.local }}">{{ response.submittedAt.relativeDayWithoutMidnight }}</time>
                 </li>
 
-                <li class="icon-time-value">
+                    <li><sbx-icon name="time-value" color="var(--sbx-color-text-secondary)"></sbx-icon>
                     Time taken: {{ duration.secondsToHoursAndMinutes(response.timeTaken) }}
                 </li>
             {% elseif response.startedAt %}
-                <li class="icon-calendar">
+                    <li><sbx-icon name="calendar" color="var(--sbx-color-text-secondary)"></sbx-icon>
                     <em>Response in progress - started <time title="{{ response.startedAt.local }}">{{ response.startedAt.relativeDayWithoutMidnight }}</time></em>
                 </li>
             {% endif %}
 
             {% if interactionLocked %}
-                <li class="icon-archive"> {{ locale.term.proper }} has been archived </li>
+                    <li><sbx-icon name="archive" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ locale.term.proper }} has been archived </li>
             {% endif %}
         </ul>
     </div>

@@ -11,15 +11,15 @@
 <ul class="meta">
     {% include '@learning/fragments/meta/workType.twig' %}
     {% if assessment.baseContext is not unitSpecification %}
-        <li class="icon-calendar">{{ dueDate.dueDate(assessment, student ?? USER) }}</li>
+        <li><sbx-icon name="calendar" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ dueDate.dueDate(assessment, student ?? USER) }}</li>
     {% endif %}
     {% if USER.role.isStaff %}
-        <li class="icon-progress">Mark calculated as {{ assessment.summator.title }}</li>
+        <li><sbx-icon name="progress" color="var(--sbx-color-text-secondary)"></sbx-icon> Mark calculated as {{ assessment.summator.title }}</li>
     {% endif %}
     {% include '@learning/fragments/meta/curriculumCodes.twig' %}
     {# joining student name with lastView data #}
     {% if student is defined and student.id != USER.id %}
-        <li class="icon-staff-students" title="{% if lastViews.student.date is defined and lastViews.student.date is not null %}{{ lastViews.student.date }}{% endif %}"><a href="/search/user/{{ student.id }}">{{ student.fullname }}</a>
+        <li title="{% if lastViews.student.date is defined and lastViews.student.date is not null %}{{ lastViews.student.date }}{% endif %}"><sbx-icon name="staff-students" color="var(--sbx-color-text-secondary)"></sbx-icon> <a href="/search/user/{{ student.id }}">{{ student.fullname }}</a>
             {% if lastViews is not empty %}
                 {{ lastViews.student.status }}
                 {% if 'assessment' is same as(lastViews.student.object) %} this {{ locale.activity }}{% else %} the feedback {% endif %}
@@ -30,7 +30,7 @@
     {% if lastViews is defined and lastViews is not empty %}
         {% for parent in lastViews.parents %}
             {% if parent.date is not null %}
-                <li class="icon-staff" title="{{ parent.date }}">
+                <li title="{{ parent.date }}"><sbx-icon name="staff" color="var(--sbx-color-text-secondary)"></sbx-icon>
                     <a href="/search/user/{{ parent.id }}">{{ parent.name }}</a>
                     {{ parent.status }} {% if 'assessment' is same as(parent.object) %} this {{ locale.activity }}{% else %} the feedback {% endif %}
                 </li>

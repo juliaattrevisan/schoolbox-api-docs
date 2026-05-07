@@ -19,6 +19,18 @@
     {% endif %}
 {% endmacro %}
 
+{% macro renderNameForType(assessmentType) %}
+    {% if assessmentType == 'project' %}project
+    {% elseif assessmentType == 'task' %}task
+    {% elseif assessmentType == 'quiz' %}quiz
+    {% elseif assessmentType == 'dueWork' %}due-work
+    {% elseif assessmentType == 'lti' %}lti
+    {% elseif assessmentType == 'lessonPlan' %}lesson-plan
+    {% elseif assessmentType == 'dialogAgent' %}dialog-agent
+    {% elseif assessmentType == 'reporting' %}reporting
+    {% endif %}
+{% endmacro %}
+
 {# Render an icon corresponding to $assessment.
  #
  # Note that assessment.familiyName isn't always defined:
@@ -30,6 +42,14 @@
     {% apply spaceless %}
         {% if assessment and assessment.familyName is defined %}
             {{ _self.renderClassForType(assessment.familyName) }}
+        {% endif %}
+    {% endapply %}
+{% endmacro %}
+
+{% macro renderName(assessment) %}
+    {% apply spaceless %}
+        {% if assessment and assessment.familyName is defined %}
+            {{ _self.renderNameForType(assessment.familyName)|trim }}
         {% endif %}
     {% endapply %}
 {% endmacro %}

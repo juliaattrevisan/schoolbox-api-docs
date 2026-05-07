@@ -131,7 +131,8 @@ const exportReportRoute = window.Vue.computed(() => {
     <div v-if="mbStore.isDegraded">
         <div class="small-12 column list-item">
             <ul class="meta">
-                <li class="icon-alert">
+                <li>
+                    <sbx-icon name="alert" color="var(--sbx-color-text-secondary)"></sbx-icon>
                     This markbook is showing a large number of students; for performance reasons, student portraits have
                     been disabled.
                 </li>

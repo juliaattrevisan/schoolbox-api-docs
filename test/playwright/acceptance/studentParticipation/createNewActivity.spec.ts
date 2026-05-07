@@ -68,8 +68,8 @@ test.describe("Student Participation Tests: new activity, title validation, chec
         await assessmentForm.setTitle(originalActivityTitle);
         await assessmentForm.setWorkType(5); // select "Essay" work type
         await assessmentForm.clickCreate();
-        await expect(page.locator(`div[class="alert alert-box icon-alert"]`)).toContainText(
-            " Could not save activity. The activity can not have the same title as the original activity.",
+        await expect(page.locator("[data-mage-error]")).toContainText(
+            "Could not save activity. The activity can not have the same title as the original activity.",
         );
 
         tester.isGoingTo("Fill in a valid title and save");

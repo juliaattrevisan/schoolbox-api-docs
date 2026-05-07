@@ -25,6 +25,27 @@
     {%- endapply -%}
 {%- endmacro -%}
 
+{%- macro sbxIcon(nodeType) -%}
+    {%- apply spaceless -%}
+        {% if 'course' == nodeType %}
+            course-builder
+        {% elseif 'unit' == nodeType %}
+            unit
+        {% elseif 'home' == nodeType or 'homepage' == nodeType %}
+            home
+        {% elseif 'noaccess' == nodeType %}
+            locked
+        {% elseif 'file' == nodeType %}
+            document
+        {% elseif 'link' == nodeType %}
+            link
+        {% else %}
+        {# 'default', 'root', 'folder' #}
+            folder
+        {% endif %}
+    {%- endapply -%}
+{%- endmacro -%}
+
 
  {# Renders a JS object suitable for injecting into plugins that require this mapping #}
 {%- macro jsIconMap() -%}

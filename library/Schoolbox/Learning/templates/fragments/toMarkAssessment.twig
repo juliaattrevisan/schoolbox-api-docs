@@ -19,13 +19,29 @@
 {% set isDueWork = isDueWork ?? assessment is dueWork %}
 {% set isDialogAgent = isDialogAgent ?? assessment is dialogAgent %}
 {% set isReporting = isReporting ?? assessment is reporting %}
+{% set assessmentIconName = icon.renderName(assessment)|trim %}
+{% if not assessmentIconName %}
+    {% if isTask %}
+        {% set assessmentIconName = 'task' %}
+    {% elseif isQuiz %}
+        {% set assessmentIconName = 'quiz' %}
+    {% elseif isDueWork %}
+        {% set assessmentIconName = 'due-work' %}
+    {% elseif isDialogAgent %}
+        {% set assessmentIconName = 'dialog-agent' %}
+    {% elseif isReporting %}
+        {% set assessmentIconName = 'reporting' %}
+    {% endif %}
+{% endif %}
 
 <section data-assessment="{{ assessment.id }}" data-due-timestamp="{{ assessment.dueAt ? assessment.dueAt.unixTimeStamp : '' }}">
     <div class="content collapsible">
         <div class="card small-8 medium-6 no-pad">
             {#- Dessicator -#}
             <span data-collapser="to-mark-{{ assessment.id }}" class="icon-down-arrow"></span>
-            <i class="size-32 {{ icon.renderClass(assessment) }}"></i>
+            {% if assessmentIconName %}
+                <sbx-icon name="{{ assessmentIconName }}" size="l"></sbx-icon>
+            {% endif %}
             <div class="card-content">
                 <h3>
                     {#- Dessicator -#}

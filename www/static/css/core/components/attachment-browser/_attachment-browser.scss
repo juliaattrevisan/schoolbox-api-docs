@@ -15,10 +15,6 @@
                 display: inline-flex;
                 gap: 0.5rem;
 
-                sbx-icon {
-                    flex: 0 0 auto;
-                }
-
                 @media #{$medium-down} {
                     padding: 0.5rem !important;
                     max-width: rem-calc(124);

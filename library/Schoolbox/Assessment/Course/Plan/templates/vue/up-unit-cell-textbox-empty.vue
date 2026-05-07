@@ -43,7 +43,7 @@ function onModifyClicked(): void {
 </script>
 
 <template>
-    <i class="icon-textbox"></i>
+    <sbx-icon name="textbox"></sbx-icon>
     <p v-if="emptyStateTemplateMessage">{{ emptyStateTemplateMessage }}</p>
     <p v-if="props.unit.textboxes._routes.createComponent && props.unit.textboxes._routes.createTextbox">
         <a @click.prevent="onModifyClicked">Add content to this text box</a>

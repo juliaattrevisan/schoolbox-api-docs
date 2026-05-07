@@ -337,9 +337,9 @@ export default class StudentParticipation {
         await this.page.goto(`/learning/assessments/${assessmentId}/${userId}`);
 
         this.tester.isGoingTo(`Verify the span within the calendar icon contains '${expectedText}'`);
-        const dueElementText = this.page.locator("li.icon-calendar span span");
+        const dueElementText = this.page.locator("li:has(sbx-icon[name='calendar']) span span");
         await expect(dueElementText).toContainText("Due");
-        const calendarElement = this.page.locator("li.icon-calendar span time").first();
+        const calendarElement = this.page.locator("li:has(sbx-icon[name='calendar']) span time").first();
         await expect(calendarElement).toContainText(expectedText);
     }
 

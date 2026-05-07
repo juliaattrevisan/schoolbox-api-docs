@@ -53,8 +53,8 @@ Usage:
             {% if titleUrl %}
                 {# Importing a course (no Tot) or You have READ permission in the Unit Planner page
                  #}
-                <a href="{{ titleUrl }}" data-course-link data-course-id="{{ courseSpec.id }}" data-course-name="{{ courseSpec.folder.name }}" data-component-id="{{ component ? component.id : 0 }}">
-                    <div class="icon-course"></div>
+                <a href="{{ titleUrl }}" class="course-link--meta" data-course-link data-course-id="{{ courseSpec.id }}" data-course-name="{{ courseSpec.folder.name }}" data-component-id="{{ component ? component.id : 0 }}">
+                    <sbx-icon name="course" color="var(--sbx-color-text-secondary, var(--body-foreground))"></sbx-icon>
                     <h3 data-test="course-list-{{ courseSpec.folder.name }}">{{ courseSpec.folder.name }}</h3>
                 </a>
             {% else %}
@@ -62,8 +62,10 @@ Usage:
                  # Just show a readonly representation of the course so you know it exists
                  # and hide the tot menu option
                  #}
-                <div class="icon-course"></div>
-                <h3>{{ courseSpec.folder.name }}</h3>
+                <div class="course-link--meta">
+                    <sbx-icon name="course" color="var(--sbx-color-text-secondary, var(--body-foreground))"></sbx-icon>
+                    <h3>{{ courseSpec.folder.name }}</h3>
+                </div>
             {% endif %}
 
             <p class="meta">
@@ -81,9 +83,9 @@ Usage:
                 <li>
                     <div class="tiny card small-12">
                         {% if linkToUnits %}
-                    <a title="Visit {{ unit.folder.name }} homepage" href="/homepage/{{ unit.folder.id }}" class="sbx-button--has-icon"><sbx-icon name="unit"></sbx-icon>{{ unit.folder.name }}</a>
+                    <a title="Visit {{ unit.folder.name }} homepage" href="/homepage/{{ unit.folder.id }}" class="sbx-button--has-icon course-unit-link--meta"><sbx-icon name="unit" color="var(--sbx-color-text-secondary, var(--body-foreground))"></sbx-icon>{{ unit.folder.name }}</a>
                         {% else %}
-                            <div class="icon-unit"></div>{{ unit.folder.name }}
+                            <sbx-icon name="unit"></sbx-icon> {{ unit.folder.name }}
                         {% endif %}
                     </div>
                 </li>

@@ -64,7 +64,7 @@
                 {% include '@learning/fragments/meta/workType.twig' %}
                 {% if assessment.isImplementation %}
                     {% if readonly ?? false %}
-                        <li class="icon-archive">{{ locale.term.proper }} has been archived</li>
+                        <li><sbx-icon name="archive" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ locale.term.proper }} has been archived</li>
                     {% endif %}
                 {% endif %}
             </ul>

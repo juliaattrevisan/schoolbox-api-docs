@@ -21,13 +21,13 @@
         <div class="small-12 columns">
             <h1 data-test="assessment-response-meta-title">{{ title }} {{ assessment.title }}</h1>
             <ul class="meta">
-                <li class="icon-calendar">{{ dueDate.forParticipant(participant) }}</li>
-                <li class="icon-due-work"><a href="/homepage/{{ assessment.context.folder.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}</li>
+                <li><sbx-icon name="calendar" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ dueDate.forParticipant(participant) }}</li>
+                <li><sbx-icon name="due-work" color="var(--sbx-color-text-secondary)"></sbx-icon> <a href="/homepage/{{ assessment.context.folder.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}</li>
                 {% if responseList|length == 1 %}
-                    <li class="icon-calendar">Submitted {{ response.submittedAt.short }}</li>
+                    <li><sbx-icon name="calendar" color="var(--sbx-color-text-secondary)"></sbx-icon> Submitted {{ response.submittedAt.short }}</li>
                 {% endif %}
                 {% if readonly %}
-                    <li class="icon-archive">{{ locale.term.proper }} has been archived</li>
+                    <li><sbx-icon name="archive" color="var(--sbx-color-text-secondary)"></sbx-icon> {{ locale.term.proper }} has been archived</li>
                 {% endif %}
             </ul>
         </div>
