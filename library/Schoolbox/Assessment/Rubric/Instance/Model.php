@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Rubric\Instance;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
@@ -65,6 +66,16 @@ class Model implements IAssessableDataModel, ISoftDeletable
      * @var bool|null
      */
     private ?bool $markedUsingRange = null;
+
+
+    /**
+     * A generic place for a manufactured Grid instance, for whatever contextual purpose you needed.
+     * This was primarily to service the learning activities' Decorators which assembled rubric grids, but then needed
+     * it to exist in the $assessment instance for some other method to process once it was spawned by the Factory.
+     *
+     * @var Grid|null
+     */
+    private ?Grid $grid = null;
 
 
     /**
@@ -178,6 +189,26 @@ class Model implements IAssessableDataModel, ISoftDeletable
     public function setMarkedUsingRange(?bool $markedUsingRange): self
     {
         $this->markedUsingRange = $markedUsingRange;
+        return $this;
+    }
+
+
+    /**
+     * @return Grid|null
+     */
+    public function getGrid(): ?Grid
+    {
+        return $this->grid;
+    }
+
+
+    /**
+     * @param Grid|null $grid
+     * @return $this
+     */
+    public function setGrid(?Grid $grid): self
+    {
+        $this->grid = $grid;
         return $this;
     }
 }

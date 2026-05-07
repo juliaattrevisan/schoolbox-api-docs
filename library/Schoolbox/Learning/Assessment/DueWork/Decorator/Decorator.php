@@ -69,6 +69,12 @@ class Decorator implements DecoratorInterface
 
 
     /**
+     * @var RubricDataSource
+     */
+    private RubricDataSource $rubricMapper;
+
+
+    /**
      * @var RosettaStone|mixed
      */
     private RosettaStone $l10n;
@@ -77,24 +83,26 @@ class Decorator implements DecoratorInterface
     /**
      * Decorator constructor.
      *
-     * @param int          $acceptOnline
-     * @param int          $markType
-     * @param int          $instructorMarkType
-     * @param int|null     $gradingScheme
-     * @param int|null     $instructorGradingScheme
-     * @param float|null   $maxMark
-     * @param float|null   $instructorMaxMark
-     * @param array|null   $rubricData
-     * @param array        $attachedFiles
-     * @param string|null  $selfReviewable
-     * @param bool         $similarityCheckEnabled
-     * @param bool         $enableWorksheet
-     * @param string|null  $worksheetTemplate
-     * @param bool         $enableOffline
-     * @param bool         $enableText
-     * @param bool         $enableFiles
-     * @param bool         $enablePolicy
+     * @param int $acceptOnline
+     * @param int $markType
+     * @param int $instructorMarkType
+     * @param int|null $gradingScheme
+     * @param int|null $instructorGradingScheme
+     * @param float|null $maxMark
+     * @param float|null $instructorMaxMark
+     * @param array|null $rubricData
+     * @param array $attachedFiles
+     * @param string|null $selfReviewable
+     * @param bool $similarityCheckEnabled
+     * @param bool $enableWorksheet
+     * @param string|null $worksheetTemplate
+     * @param bool $enableOffline
+     * @param bool $enableText
+     * @param bool $enableFiles
+     * @param bool $enablePolicy
      * @param DueWork|null $original
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function __construct(
         int $acceptOnline,
@@ -139,6 +147,7 @@ class Decorator implements DecoratorInterface
         $this->markTypeMapper = MarkTypeMapper::getInstance();
         $this->gradeGroupMapper = GradeLevel\Group\Mapper::getInstance();
         $this->unitSpecificationMapper = UnitSpecificationMapper::getInstance();
+        $this->rubricMapper = RubricDataSource::getInstance();
 
         // (Forgive me too for perpetuating this)
         /** @var RosettaStone $l10n */
@@ -198,7 +207,7 @@ class Decorator implements DecoratorInterface
         if ($assessment->getRubricInstances()->count()) {
             /* Populate rubric_instance records with settings from the rubricData payload
              */
-            $rubricMapper = RubricDataSource::getInstance();
+            $rubricMapper = $this->rubricMapper;
             $gridFactory  = new GridFactory();
 
             /* An assessment's maxMark is the largest possibility, defined by the aggregation of all rubric
@@ -233,10 +242,17 @@ class Decorator implements DecoratorInterface
                     throw new InvalidArgumentException("Save of row set failed for unknown reason");
                 }
 
-                /* TODO LOL I needed something similar to this
+                /* LOL I needed something similar to this
                  * $assessment->setRubricGrid($newGrid);
+                 *
+                 * This is a bit of a gotcha, unfortunately
+                 * This might be a bit convoluted as you have an existing $rubricInstance that contains a revised version
+                 * of its grid, $newGrid. Out of context this might be difficult to comprehend, but I don't have any real
+                 * sensible storage locations other than this.
+                 *
+                 * Once the $assessment has been manufactured, another place saves it, and needs the revised $newGrid.
                  */
-
+                $rubricInstance->setGrid($newGrid);
 
                 /* Aggregate maximum mark of this grid
                  */
