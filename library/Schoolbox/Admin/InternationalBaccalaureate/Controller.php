@@ -438,10 +438,13 @@ class Controller extends ConfigController
                         continue;
                     }
 
-                    $languages[$languageId]['languageId'] = $languageId;
-                    $languages[$languageId]['languageName'] = $language->getLanguage()?->getName();
-                    $languages[$languageId]['classCodes'] = [
-                        ...($languages[$languageId]['classCodes'] ?? []),
+                    $systemPurposeId = $language->getSystemPurposeId();
+                    $key = $languageId . '_' . ($systemPurposeId ?? 'null');
+                    $languages[$key]['languageId'] = $languageId;
+                    $languages[$key]['languageName'] = $language->getLanguage()?->getName();
+                    $languages[$key]['systemPurposeId'] = $systemPurposeId;
+                    $languages[$key]['classCodes'] = [
+                        ...($languages[$key]['classCodes'] ?? []),
                         ...$this->getClassCodeValues($language),
                     ];
                 }
@@ -455,6 +458,7 @@ class Controller extends ConfigController
                             'languageId' => $language['languageId'],
                             'languageName' => $language['languageName'],
                             'classCode' => implode(', ', array_unique($language['classCodes'])),
+                            'systemPurposeId' => $language['systemPurposeId'],
                         ],
                         $languages
                     )),
@@ -560,11 +564,16 @@ class Controller extends ConfigController
                     continue;
                 }
 
+                $systemPurposeId = isset($subjectLanguage['systemPurposeId'])
+                    ? ((int) $subjectLanguage['systemPurposeId'] ?: null)
+                    : null;
+
                 $modelsToSave[] = $this->groupSubjectLanguageMapper
                     ->createModel()
                     ->setGroupSubject($this->groupSubjectMapper->createModel()->setId($groupSubjectId))
                     ->setLanguage($languagesById[$languageId])
-                    ->setClassCode(trim((string) ($subjectLanguage['classCode'] ?? '')));
+                    ->setClassCode(trim((string) ($subjectLanguage['classCode'] ?? '')))
+                    ->setSystemPurposeId($systemPurposeId);
             }
 
             $this->groupSubjectLanguageMapper->deleteByColumn('group_subject_id', $groupSubjectIds);

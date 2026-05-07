@@ -42,9 +42,32 @@ class Model
     private ?LanguageModel $language = null;
 
     /**
+     * @var int|null
+     */
+    private ?int $systemPurposeId = null;
+
+    /**
      * @var GenericCollection|FolderCodeModel[]|null
      */
     private ?GenericCollection $classCode = null;
+
+    /**
+     * @return int|null
+     */
+    public function getSystemPurposeId(): ?int
+    {
+        return $this->systemPurposeId;
+    }
+
+    /**
+     * @param int|null $systemPurposeId
+     * @return self
+     */
+    public function setSystemPurposeId(?int $systemPurposeId): self
+    {
+        $this->systemPurposeId = $systemPurposeId;
+        return $this;
+    }
 
     /**
      * @return GroupSubjectModel|null

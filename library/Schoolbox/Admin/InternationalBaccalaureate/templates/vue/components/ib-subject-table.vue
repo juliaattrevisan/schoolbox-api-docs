@@ -11,6 +11,15 @@ import type {
 } from "../../js/types/ibConfigurationTypes";
 
 /**
+ * Maps Core section labels to their ib_system_purposes.id values.
+ * Diploma Programme Year 2 (DIPLOMA) = 1, Diploma Course (COURSE) = 3.
+ */
+const CORE_SECTION_SYSTEM_PURPOSE_ID: Record<string, number> = {
+    "Diploma Program Year 2 [Diploma]": 1,
+    "Diploma Course [Course]": 3,
+};
+
+/**
  * A single row in the table
  */
 type SubjectRow = {
@@ -22,6 +31,8 @@ type SubjectRow = {
     languageNamesById: Record<number, string>;
     classCode: string;
     studentCount: number;
+    isExplicitlyConfigured: boolean;
+    systemPurposeId: number | null;
     isLanguageRow?: boolean;
     parentRowId?: string;
     tableType?: string;
@@ -34,6 +45,7 @@ type SubjectSavePayload = {
     groupSubjectId: number;
     languageId: number;
     classCode: string;
+    systemPurposeId: number | null;
 };
 
 const props = defineProps<{
@@ -155,8 +167,17 @@ function getDefaultLanguages(): number[] {
  * @returns The main subject row and any child language rows.
  */
 function buildRowsForSubject(subjectData: IBSubject, index: number, tableType?: string): SubjectRow[] {
-    const configurations = subjectData.languages;
     const rowId = tableType ? `${tableType}_${subjectData.id}_${index}` : `group_subject_${subjectData.id}`;
+    const sectionSystemPurposeId: number | null =
+        tableType !== undefined ? (CORE_SECTION_SYSTEM_PURPOSE_ID[tableType] ?? null) : null;
+
+    // For Core sections, only use languages that match this section's system purpose.
+    // For non-Core, all languages are relevant (systemPurposeId = null).
+    const configurations =
+        sectionSystemPurposeId !== null
+            ? subjectData.languages.filter((c) => c.systemPurposeId === sectionSystemPurposeId)
+            : subjectData.languages;
+
     const selectedLanguages = configurations.map((configuration) => configuration.languageId);
     const configuredLanguageNames = createLanguageNameMapFromSubjectLanguages(configurations);
     const mainRow: SubjectRow = {
@@ -168,6 +189,8 @@ function buildRowsForSubject(subjectData: IBSubject, index: number, tableType?: 
         languageNamesById: selectedLanguages.length > 0 ? configuredLanguageNames : getDefaultLanguageNameMap(),
         classCode: configurations.length === 1 ? configurations[0].classCode : "",
         studentCount: 0,
+        isExplicitlyConfigured: selectedLanguages.length > 0,
+        systemPurposeId: sectionSystemPurposeId,
         tableType,
     };
 
@@ -192,6 +215,8 @@ function buildRowsForSubject(subjectData: IBSubject, index: number, tableType?: 
                     : {},
             classCode: configuration.classCode,
             studentCount: 0,
+            isExplicitlyConfigured: true,
+            systemPurposeId: sectionSystemPurposeId,
             isLanguageRow: true,
             parentRowId: rowId,
             tableType,
@@ -309,6 +334,8 @@ function applySelectedLanguages(selectedItems: SearchSelectItem[]): void {
 
     subjectRows.value = subjectRows.value.filter((row) => row.parentRowId !== mainRow.id);
 
+    mainRow.isExplicitlyConfigured = true;
+
     if (selectedLanguages.length === 0) {
         mainRow.languages = [];
         mainRow.languageNamesById = {};
@@ -340,6 +367,8 @@ function applySelectedLanguages(selectedItems: SearchSelectItem[]): void {
                 : {},
             classCode: classCodeByLanguage.get(language) ?? "",
             studentCount: 0,
+            isExplicitlyConfigured: true,
+            systemPurposeId: mainRow.systemPurposeId,
             isLanguageRow: true,
             parentRowId: mainRow.id,
             tableType: mainRow.tableType,
@@ -556,7 +585,7 @@ async function refreshStudentCounts(): Promise<void> {
  */
 function buildSubjectSavePayload(): SubjectSavePayload[] {
     const payload = subjectRows.value
-        .filter((row) => row.isLanguageRow || row.languages.length <= 1)
+        .filter((row) => row.isExplicitlyConfigured && (row.isLanguageRow || row.languages.length <= 1))
         .flatMap((row) => {
             const languageId = row.languages[0];
 
@@ -569,6 +598,7 @@ function buildSubjectSavePayload(): SubjectSavePayload[] {
                     groupSubjectId: row.groupSubjectId,
                     languageId,
                     classCode: row.classCode.trim(),
+                    systemPurposeId: row.systemPurposeId,
                 },
             ];
         });
@@ -579,7 +609,8 @@ function buildSubjectSavePayload(): SubjectSavePayload[] {
                 return (
                     candidate.groupSubjectId === item.groupSubjectId &&
                     candidate.languageId === item.languageId &&
-                    candidate.classCode === item.classCode
+                    candidate.classCode === item.classCode &&
+                    candidate.systemPurposeId === item.systemPurposeId
                 );
             }) === index
         );

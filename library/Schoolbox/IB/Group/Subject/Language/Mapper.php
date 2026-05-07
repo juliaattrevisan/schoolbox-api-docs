@@ -40,6 +40,7 @@ class Mapper extends BaseMapper
         $this->hasTable('ib_group_subject_languages');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('system_purpose_id', self::TYPE_INTEGER, null, 'systemPurposeId');
         $this->joins('group_subject_id', GroupSubjectMapper::class, 'id', null, null, 'groupSubject', 'group_subject');
         $this->joins('language_id', LanguageMapper::class, 'id', null, null, 'language', 'language');
 
