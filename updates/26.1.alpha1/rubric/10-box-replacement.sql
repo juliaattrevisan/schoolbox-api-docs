@@ -91,7 +91,7 @@ REFERENCES rubric_instance (id);
 -- That's because these tables retained rubric usages even for deleted assessments; presumably, this is for the occasion
 -- where the school wanted to restore these assessments, rubrics and all.
 --
--- We didn't seed rubric_instance with data from deleted assessments. These rows could/should be deleted once we
+-- We didn't seed rubric_instance with data from use_rubric=0 assessments. These rows could/should be deleted once we
 -- are sure that nobody cares for them anymore (I expect this should be the case given they're related to assessments
 -- that no longer functionally exist; the data retention tool that eventually deletes assessments should also eventually
 -- delete rubric usages associated with them, perhaps)
@@ -100,13 +100,52 @@ REFERENCES rubric_instance (id);
 -- could be restored for a raft of reasons (we don't know why they were deleted in the first place)
 
 
+-- Maybe controversial: update foreign keys and int unsigned.
+--
+-- Remove old foreign keys
+-- These were replaced with foreign keys to rubric_instance_id instead.
+
+# -- rcu has a composite primary key: a (rubric_capability_id, rubric_instance_id) tuple
+alter table rubric_capability_usage
+    drop foreign key fk_rubric_group_usage_box_id;
+
+alter table rubric_capability_usage
+    drop primary key;
+
+alter table rubric_capability_usage
+    add primary key (rubric_capability_id, rubric_instance_id);
+
+drop index submission_box_id on rubric_capability_usage;
+
 -- This was previously mandatory (non-null) but it's been discontinued. Saving rows to the db causes crashes because it
 -- expects there to be a value here
+
 ALTER TABLE rubric_capability_usage
-MODIFY _submission_box_id INT UNSIGNED NULL;
+    MODIFY _submission_box_id INT NULL;
+
+-- riu has a composite primary key: a (rubric_indicator_id, rubric_instance_id) tuple
+alter table rubric_indicator_usage
+    drop foreign key fk_rubric_usage_box_id;
+
+alter table rubric_indicator_usage
+    drop primary key;
+
+alter table rubric_indicator_usage
+    add primary key (rubric_indicator_id, rubric_instance_id);
+
+drop index submission_box_id on rubric_indicator_usage;
+
+-- This was previously mandatory (non-null) but it's been discontinued. Saving rows to the db causes crashes because it
+-- expects there to be a value here
 
 ALTER TABLE rubric_indicator_usage
-MODIFY _submission_box_id INT UNSIGNED NULL;
+    MODIFY _submission_box_id INT NULL;
+
+alter table rubric_level
+    drop foreign key fk_rubric_level_box_id;
+
+-- This was previously mandatory (non-null) but it's been discontinued. Saving rows to the db causes crashes because it
+-- expects there to be a value here
 
 ALTER TABLE rubric_level
-MODIFY _box_id INT UNSIGNED NULL;
+MODIFY _box_id INT NULL;
