@@ -179,14 +179,6 @@ class Controller extends ConfigController
         $limit = $this->requestQuery->getInt('limit', ClassCodeCursor::LIMIT_DEFAULT);
         $encodedCursor = $this->requestQuery->get('cursor');
 
-        if (null === $limit) {
-            $problem = (new ApiProblem('Limit must be a positive integer'))
-                ->setStatus(400)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)->withStatus(400);
-            return;
-        }
-
         try {
             $cursor = new ClassCodeCursor(
                 $this->classCodeMapper,

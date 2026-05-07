@@ -47,7 +47,7 @@ function onSearchResponse(json: unknown): void {
 
 /**
  * To select a link to the course
- * @param course - the selected course
+ * @param item - the selected course item
  */
 function onCourseNameSelect(item: SearchSelectItem): void {
     const course = item as SearchSelectItem & Partial<Course>;
