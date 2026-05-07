@@ -70,21 +70,23 @@ class Factory
     ): Grid {
         /* The rubric instance corresponding to $grid might be a stub. That means it's a new grid and we actually need
          * to hydrate it with the settings from the frontend payload.
+         *
+         * Actually
+         * even for rubric_instances that already existed, we still need to potentially update any/all of its settings.
+         * That means we have to do this regardless. Wild.
          */
-        if ($grid->getRubricInstance()->getId() < 0) {
-            $newCapabilityMarkType = $this->markTypeMapper->createModel()
-                ->setId(MarkType::slugToId($rubricData['capabilityMarkType']));
+        $newCapabilityMarkType = $this->markTypeMapper->createModel()
+            ->setId(MarkType::slugToId($rubricData['capabilityMarkType']));
 
-            $newCapabilityGradeGroup = $this->gradeGroupMapper->createModel()
-                ->setId($rubricData['capabilityGradeGroup']);
+        $newCapabilityGradeGroup = $this->gradeGroupMapper->createModel()
+            ->setId($rubricData['capabilityGradeGroup']);
 
-            $grid->getRubricInstance()
-                ->setTitle($rubricData['title'])
-                ->setWeight($rubricData['weight'])
-                ->setCapabilityMarkType($newCapabilityMarkType)
-                ->setCapabilityGradeGroup($newCapabilityGradeGroup)
-                ->setMarkedUsingRange($rubricData['useMarkRange'] ?? false);
-        }
+        $grid->getRubricInstance()
+            ->setTitle($rubricData['title'])
+            ->setWeight($rubricData['weight'])
+            ->setCapabilityMarkType($newCapabilityMarkType)
+            ->setCapabilityGradeGroup($newCapabilityGradeGroup)
+            ->setMarkedUsingRange($rubricData['useMarkRange'] ?? false);
 
         /* The post payload contains all the rubric grids associated with an assessment but we only need to look at one
          * grid for now since we've decided that any of the N grids could cause invalidation and thus exit early.
