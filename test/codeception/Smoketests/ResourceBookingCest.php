@@ -111,11 +111,13 @@ class ResourceBookingCest
         $i->sendRequest($resource);
 
         $ItemMapper = \Schoolbox\ResourceBooking\Item\Mapper::getInstance();
-        $newItemID = $ItemMapper->findOneByColumn('name', $resource_title)->getID();
+        $newItem = $ItemMapper->findOneByColumn('name', $resource_title);
+        $newItemID = $newItem->getID();
 
         #THEN
         $i->seeResponseCodeIs(303);
         $i->seeHttpHeader('location', "/resource-booking/item/" . $newItemID);
+        $i->assertEquals(1, $newItem->getCapacity(), 'Default resource capacity is 1');
     }
 
     /**
@@ -142,12 +144,28 @@ class ResourceBookingCest
         $updatePayload = new Payload\ResourceBooking\Resource\Update($newItem);
         $updatePayload->setResourceName($resource_title);
         $updatePayload->setDescription('<p>Updated this description successfully</p>');
+        $updatePayload->setCapacity('7');
         $i->sendRequest($updatePayload);
         $newItemID = $newItem->getId();
 
         #THEN
         $i->seeResponseCodeIs(303);
         $i->seeHttpHeader('location', "/resource-booking/item/" . $newItemID);
+        $updatedItem = $ItemMapper->findById($newItemID);
+        $i->assertEquals(7, $updatedItem->getCapacity(), 'Updated resource capacity is persisted');
+    }
+
+    public function createResourceRejectsInvalidCapacity(IntegrationTester $i): void
+    {
+        foreach (['0', '1000', 'abc', '1.5', ''] as $capacity) {
+            $resource = new Payload\ResourceBooking\Resource\Create();
+            $resource->setResourceName('Testing Resource Invalid Capacity at ' . microtime(true));
+            $resource->setCapacity($capacity);
+
+            $i->sendRequest($resource);
+
+            $i->seeResponseCodeIs(400);
+        }
     }
 
     /**
