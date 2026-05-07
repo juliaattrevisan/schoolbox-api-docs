@@ -5831,6 +5831,7 @@ CREATE TABLE `resource` (
   `max_reservation_time` mediumint(8) unsigned NOT NULL DEFAULT 86400,
   `current_term_restriction` tinyint(1) NOT NULL DEFAULT 0,
   `allow_clash_bookings` tinyint(1) NOT NULL DEFAULT 0,
+  `capacity` int(11) NOT NULL DEFAULT 1,
   `created_at` datetime NOT NULL,
   `modified_at` datetime NOT NULL,
   `deleted_at` datetime DEFAULT NULL,
