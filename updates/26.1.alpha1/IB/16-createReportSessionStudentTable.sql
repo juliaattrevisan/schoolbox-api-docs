@@ -8,7 +8,7 @@ CREATE TABLE `ib_registration_session_student`
     `updated_at`              DATETIME        NOT NULL DEFAULT current_timestamp(),
     PRIMARY KEY (`id`),
     KEY `idx_ib_registration_session_student_registration_session_id` (`registration_session_id`),
-    UNIQUE KEY `uniq_ib_registration_session_student_registration_session_id_user_id` (`registration_session_id`, `user_id`),
+    UNIQUE KEY `uniq_ib_registration_session_student_id_user_id` (`registration_session_id`, `user_id`),
     CONSTRAINT `fk_ib_registration_session_student_registration_session`
         FOREIGN KEY (`registration_session_id`) REFERENCES `ib_registration_sessions` (`id`),
     CONSTRAINT `fk_ib_registration_session_student_user_id`
