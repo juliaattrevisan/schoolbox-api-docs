@@ -33,6 +33,8 @@ use Schoolbox\IB\Registrations\Sessions\Model as RegistrationSessionModel;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Language\Model as LanguageModel;
 use Schoolbox\Mapper\Exception\NotFound as MapperNotFound;
+use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
+use Schoolbox\Resource\Folder\Code\Model as FolderCodeModel;
 
 class Controller extends ConfigController
 {
@@ -49,6 +51,7 @@ class Controller extends ConfigController
         private IBGroupSubjectMapper $groupSubjectMapper,
         private GroupSubjectLanguageMapper $groupSubjectLanguageMapper,
         private LanguageMapper $languageMapper,
+        private FolderCodeMapper $classCodeMapper,
         private RegistrationSessionMapper $registrationSessionMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
@@ -60,7 +63,7 @@ class Controller extends ConfigController
     /**
      * DP Subject Configuration page
      *
-     * @throws RouteNotFound
+     * @throws RouteNotFound|\Twig\Error\Error
      * @api GET /adminv2/international-baccalaureate/configuration
      */
     public function getConfiguration(): void
@@ -102,6 +105,8 @@ class Controller extends ConfigController
                 ] : null,
                 '_routes' => [
                     'searchLanguages' => $this->getRouteIfAuthorized('internationalBaccalaureate.searchLanguages'),
+                    'searchClassCodes' => $this->getRouteIfAuthorized('internationalBaccalaureate.searchClassCodes'),
+                    'studentCount' => $this->getRouteIfAuthorized('internationalBaccalaureate.getStudentCount'),
                 ],
             ]
         );
@@ -162,6 +167,211 @@ class Controller extends ConfigController
     }
 
     /**
+     * Search class codes from folder_code.
+     *
+     * @api GET /adminv2/international-baccalaureate/configuration/api/class-codes
+     */
+    public function searchClassCodes(): void
+    {
+        $search = trim((string) $this->requestQuery->get('query', ''));
+        $limit = $this->requestQuery->getInt('limit', ClassCodeCursor::LIMIT_DEFAULT);
+        $encodedCursor = $this->requestQuery->get('cursor');
+
+        if (null === $limit) {
+            $problem = (new ApiProblem('Limit must be a positive integer'))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
+
+        try {
+            $cursor = new ClassCodeCursor(
+                $this->classCodeMapper,
+                $search,
+                $limit
+            );
+            $results = $cursor->retrieveResults($encodedCursor);
+        } catch (Exception | \ValueError $e) {
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
+
+        $data = $results
+            ->filter(fn(FolderCodeModel $classCode) => !empty($classCode->getCode()))
+            ->map(
+                fn(FolderCodeModel $classCode) => [
+                    'id' => $classCode->getCode(),
+                    'code' => $classCode->getCode(),
+                    'name' => $classCode->getCode(),
+                ]
+            );
+
+        $this->response = $this->responseAsJson([
+            'data' => $data,
+            'metadata' => [
+                'count' => $cursor->retrieveResultCount(),
+                'cursor' => [
+                    'current' => $encodedCursor ?? $cursor->current($results),
+                    'next' => ($results->count() < $limit) ? null : $cursor->next($results),
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * Get student counts for IB group subjects based on their stored class codes.
+     *
+     * @api GET /adminv2/international-baccalaureate/configuration/api/student-count
+     */
+    public function getStudentCount(): void
+    {
+        $groupSubjectIds = array_map(
+            'intval',
+            (array) $this->requestQuery->get('groupSubjectId', [])
+        );
+        $groupSubjectIds = array_values(array_filter($groupSubjectIds, fn(int $id) => $id > 0));
+
+        if (empty($groupSubjectIds)) {
+            $this->response = $this->responseAsJson([]);
+            return;
+        }
+
+        // Single ORM query for all language rows across all requested subjects
+        $allLanguageRows = $this->groupSubjectLanguageMapper->findByColumn(
+            'group_subject_id',
+            $groupSubjectIds
+        );
+
+        $subjectLanguageData = array_fill_keys($groupSubjectIds, []);
+        $codeToSubjectIds = [];
+
+        foreach ($allLanguageRows as $languageRow) {
+            $gsId = $languageRow->getGroupSubject()?->getId();
+            $languageId = $languageRow->getLanguage()?->getId();
+
+            if ($gsId === null || !array_key_exists($gsId, $subjectLanguageData) || $languageId === null) {
+                continue;
+            }
+
+            $codes = $this->getClassCodeValues($languageRow);
+            $subjectLanguageData[$gsId][$languageId]['languageId'] = $languageId;
+            $subjectLanguageData[$gsId][$languageId]['codes'] = array_values(array_unique([
+                ...($subjectLanguageData[$gsId][$languageId]['codes'] ?? []),
+                ...$codes,
+            ]));
+
+            foreach ($codes as $code) {
+                $codeToSubjectIds[$code][$gsId] = true;
+            }
+        }
+
+        $allUniqueCodes = array_keys($codeToSubjectIds);
+
+        if (empty($allUniqueCodes)) {
+            $results = array_map(
+                fn(int $gsId) => [
+                    'groupSubjectId' => $gsId,
+                    'total' => 0,
+                    'byLanguage' => array_values(array_map(
+                        fn(array $lang) => ['languageId' => $lang['languageId'], 'count' => 0],
+                        $subjectLanguageData[$gsId]
+                    )),
+                ],
+                $groupSubjectIds
+            );
+            $this->response = $this->responseAsJson($results);
+            return;
+        }
+
+        $db = $this->groupSubjectLanguageMapper->getDatabase();
+
+        // Query 1: per-subject distinct student totals via code-to-subject mapping
+        $totalBySubjectId = array_fill_keys($groupSubjectIds, 0);
+        $unionParts = [];
+        $unionParams = [];
+        foreach ($codeToSubjectIds as $code => $subjectIdMap) {
+            foreach (array_keys($subjectIdMap) as $gsId) {
+                $unionParts[] = 'SELECT ? AS code, ? AS gid';
+                $unionParams[] = $code;
+                $unionParams[] = $gsId;
+            }
+        }
+
+        $unionSql = implode(' UNION ALL ', $unionParts);
+        $stmt = $db->prepare(
+            "SELECT cg.gid, COUNT(DISTINCT scu.external_id) AS cnt
+             FROM sis_class_user scu
+             INNER JOIN sis_class sc ON scu.class_id = sc.id
+             INNER JOIN ($unionSql) cg ON sc.code = cg.code
+             GROUP BY cg.gid"
+        );
+        $stmt->execute($unionParams);
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $totalBySubjectId[(int) $row['gid']] = (int) $row['cnt'];
+        }
+
+        // Query 2: per-(subject, language) distinct student counts to avoid over-counting
+        // students enrolled in multiple class codes for the same language.
+        $languageCountBySubjectId = [];
+        $languageUnionParts = [];
+        $languageUnionParams = [];
+        $seenLanguageCodeMappings = [];
+        foreach ($subjectLanguageData as $gsId => $languages) {
+            foreach ($languages as $language) {
+                foreach ($language['codes'] as $code) {
+                    $mappingKey = $gsId . ':' . $language['languageId'] . ':' . $code;
+                    if (isset($seenLanguageCodeMappings[$mappingKey])) {
+                        continue;
+                    }
+                    $seenLanguageCodeMappings[$mappingKey] = true;
+                    $languageUnionParts[] = 'SELECT ? AS gid, ? AS language_id, ? AS code';
+                    $languageUnionParams[] = $gsId;
+                    $languageUnionParams[] = $language['languageId'];
+                    $languageUnionParams[] = $code;
+                }
+            }
+        }
+
+        if ($languageUnionParts !== []) {
+            $languageUnionSql = implode(' UNION ALL ', $languageUnionParts);
+            $stmt = $db->prepare(
+                "SELECT cl.gid, cl.language_id, COUNT(DISTINCT scu.external_id) AS cnt
+                 FROM sis_class_user scu
+                 INNER JOIN sis_class sc ON scu.class_id = sc.id
+                 INNER JOIN ($languageUnionSql) cl ON sc.code = cl.code
+                 GROUP BY cl.gid, cl.language_id"
+            );
+            $stmt->execute($languageUnionParams);
+            while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+                $languageCountBySubjectId[(int) $row['gid']][(int) $row['language_id']] = (int) $row['cnt'];
+            }
+        }
+
+        // Build response
+        $results = [];
+        foreach ($groupSubjectIds as $gsId) {
+            $byLanguage = [];
+            foreach ($subjectLanguageData[$gsId] as $language) {
+                $byLanguage[] = [
+                    'languageId' => $language['languageId'],
+                    'count' => $languageCountBySubjectId[$gsId][$language['languageId']] ?? 0,
+                ];
+            }
+            $results[] = [
+                'groupSubjectId' => $gsId,
+                'total' => $totalBySubjectId[$gsId],
+                'byLanguage' => $byLanguage,
+            ];
+        }
+
+        $this->response = $this->responseAsJson($results);
+    }
+
+    /**
      * Get configuration data for a specific category
      *
      * @api GET /adminv2/international-baccalaureate/configuration/api/{categoryId}
@@ -215,20 +425,35 @@ class Controller extends ConfigController
             $subjects = [];
             /** @var IBGroupSubjectModel $groupSubject */
             foreach ($groupSubjects as $groupSubject) {
+                $languages = [];
+
+                foreach ($groupSubject->getLanguages() as $language) {
+                    $languageId = $language->getLanguage()?->getId();
+
+                    if ($languageId === null) {
+                        continue;
+                    }
+
+                    $languages[$languageId]['languageId'] = $languageId;
+                    $languages[$languageId]['languageName'] = $language->getLanguage()?->getName();
+                    $languages[$languageId]['classCodes'] = [
+                        ...($languages[$languageId]['classCodes'] ?? []),
+                        ...$this->getClassCodeValues($language),
+                    ];
+                }
+
                 $subjects[] = [
                     'id' => $groupSubject->getId(),
                     'subject' => $groupSubject->getSubject()->getName(),
                     'level' => $groupSubject->getLevel() ?: '',
-                    'languages' => $groupSubject->getLanguages()
-                        ->map(
-                            fn(GroupSubjectLanguageModel $language) => [
-                                'languageId' => $language->getLanguage()?->getId(),
-                                'languageName' => $language->getLanguage()?->getName(),
-                                'classCode' => $language->getClassCode() ?? '',
-                            ]
-                        )
-                        ->reindex()
-                        ->getAll(),
+                    'languages' => array_values(array_map(
+                        static fn(array $language) => [
+                            'languageId' => $language['languageId'],
+                            'languageName' => $language['languageName'],
+                            'classCode' => implode(', ', array_unique($language['classCodes'])),
+                        ],
+                        $languages
+                    )),
                 ];
             }
 
@@ -262,7 +487,7 @@ class Controller extends ConfigController
      */
     public function saveConfiguration(): void
     {
-        $data = (array) $this->requestPost;
+        $data = $this->requestPost->getArrayCopy();
 
         if (isset($data['subjectLanguages'])) {
             $this->saveSubjectLanguageConfiguration($data);
@@ -355,6 +580,19 @@ class Controller extends ConfigController
         return $this->getConfigMapper()
                     ->getPredicateBuilder()
                     ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_IB);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getClassCodeValues(GroupSubjectLanguageModel $language): array
+    {
+        return array_values(array_filter(
+            $language->getClassCode()->map(
+                static fn(FolderCodeModel $classCode) => trim((string) $classCode->getCode())
+            )->getAll(),
+            static fn(string $classCode): bool => $classCode !== ''
+        ));
     }
 
     /**

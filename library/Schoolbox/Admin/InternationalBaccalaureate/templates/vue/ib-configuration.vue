@@ -167,6 +167,8 @@ window.Vue.onMounted((): void => {
                     :save-endpoint="saveEndpoint"
                     :ib-subjects="currentSubjectsFromAPI"
                     :search-languages-endpoint="props.routes.searchLanguages"
+                    :search-class-codes-endpoint="props.routes.searchClassCodes"
+                    :student-count-endpoint="props.routes.studentCount"
                 />
             </div>
         </section>

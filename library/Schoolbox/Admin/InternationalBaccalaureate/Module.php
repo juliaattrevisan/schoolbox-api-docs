@@ -25,6 +25,7 @@ use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use Schoolbox\IB\Registrations\Sessions\Mapper as RegistrationSessionMapper;
 
 class Module extends BaseModule
@@ -51,6 +52,8 @@ class Module extends BaseModule
         $this->register('GET', '/configuration/api/subjects/{groupId:\\d+}', 'getCategorySubjects', $ruleIBCoordinatorAccess);
         $this->register('GET', '/configuration/api/categories/{categoryId:\\d+}', 'getConfigurationData', $ruleIBCoordinatorAccess);
         $this->register('GET', '/configuration/api/languages', 'searchLanguages', $ruleIBCoordinatorAccess);
+        $this->register('GET', '/configuration/api/class-codes', 'searchClassCodes', $ruleIBCoordinatorAccess);
+        $this->register('GET', '/configuration/api/student-count', 'getStudentCount', $ruleIBCoordinatorAccess);
         $this->register('POST', '/configuration/api/save', 'saveConfiguration', $ruleIBCoordinatorAccess);
         $this->register('GET', '/registrations', 'getRegistrations', $ruleIBCoordinatorAccess);
 
@@ -72,6 +75,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(IBGroupSubjectMapper::class),
             $this->getMapperFactory()->get(IBGroupSubjectLanguageMapper::class),
             $this->getMapperFactory()->get(LanguageMapper::class),
+            $this->getMapperFactory()->get(FolderCodeMapper::class),
             $this->getMapperFactory()->get(RegistrationSessionMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),

@@ -9,9 +9,17 @@ declare(strict_types=1);
 
 namespace Schoolbox\IB\Group\Subject\Language;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\IB\Group\Subject\Model as GroupSubjectModel;
 use Schoolbox\Language\Model as LanguageModel;
 use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Resource\Folder\Code\Model as FolderCodeModel;
+
+use function array_filter;
+use function array_map;
+use function array_unique;
+use function explode;
+use function is_string;
 
 /**
  * Class Model
@@ -34,9 +42,9 @@ class Model
     private ?LanguageModel $language = null;
 
     /**
-     * @var string|null
+     * @var GenericCollection|FolderCodeModel[]|null
      */
-    private ?string $classCode = null;
+    private ?GenericCollection $classCode = null;
 
     /**
      * @return GroupSubjectModel|null
@@ -75,20 +83,43 @@ class Model
     }
 
     /**
-     * @return string|null
+     * @return GenericCollection|FolderCodeModel[]
      */
-    public function getClassCode(): ?string
+    public function getClassCode(): GenericCollection
     {
+        if ($this->classCode === null) {
+            $this->classCode = new GenericCollection(FolderCodeModel::class);
+        }
+
         return $this->classCode;
     }
 
     /**
-     * @param string|null $classCode
+     * @param GenericCollection|FolderCodeModel[]|string|null $classCode
      * @return self
      */
-    public function setClassCode(?string $classCode): self
+    public function setClassCode(GenericCollection|string|null $classCode): self
     {
-        $this->classCode = $classCode;
+        if ($classCode instanceof GenericCollection) {
+            $classCode->assertCollectionOf(FolderCodeModel::class);
+            $this->classCode = $classCode;
+            return $this;
+        }
+
+        $collection = new GenericCollection(FolderCodeModel::class);
+
+        if (is_string($classCode)) {
+            $codes = array_unique(array_filter(
+                array_map('trim', explode(',', $classCode)),
+                static fn(string $code): bool => $code !== ''
+            ));
+
+            foreach ($codes as $code) {
+                $collection->add((new FolderCodeModel())->setCode($code));
+            }
+        }
+
+        $this->classCode = $collection;
         return $this;
     }
 }

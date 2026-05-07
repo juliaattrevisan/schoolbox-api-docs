@@ -1,0 +1,126 @@
+<?php
+
+/**
+ * Cursor for IB class code search results.
+ *
+ * @copyright Copyright 2026, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Admin\InternationalBaccalaureate;
+
+use Alaress\Codec\ICodec;
+use Alaress\Codec\Json\Base64;
+use Alaress\Database\Predicate\Builder;
+use Schoolbox\API\Cursor\ICursor;
+use Schoolbox\API\Cursor\MapperCursor;
+use Schoolbox\Collection;
+use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
+use ValueError;
+
+class ClassCodeCursor implements ICursor
+{
+    public const LIMIT_MIN = 1;
+    public const LIMIT_MAX = 100;
+    public const LIMIT_DEFAULT = 50;
+
+    private ICodec $codec;
+
+    public function __construct(
+        private FolderCodeMapper $classCodeMapper,
+        private ?string $search,
+        private int $limit,
+        ?ICodec $codec = null
+    ) {
+        $this->codec = $codec ?? new Base64();
+
+        if ($this->limit < self::LIMIT_MIN) {
+            throw new ValueError(
+                sprintf(
+                    'Limit must be at least %d: %d provided',
+                    self::LIMIT_MIN,
+                    $this->limit
+                )
+            );
+        }
+
+        if ($this->limit > self::LIMIT_MAX) {
+            throw new ValueError(
+                sprintf(
+                    'Limit must be at most %d: %d provided',
+                    self::LIMIT_MAX,
+                    $this->limit
+                )
+            );
+        }
+    }
+
+    public function next(Collection $collection): ?string
+    {
+        return $this->buildCursor()->next($collection);
+    }
+
+    public function current(Collection $collection): ?string
+    {
+        return $this->buildCursor()->current($collection);
+    }
+
+    public function retrieveResultCount(): ?int
+    {
+        $sql = '
+            SELECT COUNT(*)
+            FROM folder_code
+            WHERE deleted_at IS NULL
+        ';
+        $params = [];
+        $search = trim((string) $this->search);
+
+        if ($search !== '') {
+            $sql .= ' AND code LIKE :search';
+            $params['search'] = '%' . $this->classCodeMapper->getDatabase()->getQuoter()->escapeForLike($search) . '%';
+        }
+
+        $statement = $this->classCodeMapper->getDatabase()->prepare($sql);
+        $statement->execute($params);
+
+        return (int) $statement->fetchColumn();
+    }
+
+    public function retrieveResults(?string $encodedCursor): Collection
+    {
+        return $this->buildCursor()->retrieveResults($encodedCursor);
+    }
+
+    private function buildCursor(): MapperCursor
+    {
+        return new MapperCursor(
+            $this->classCodeMapper,
+            $this->limit,
+            [
+                'code' => $this->classCodeMapper::SORT_ORDER_ASC,
+            ],
+            $this->buildPredicateBuilder(),
+            $this->codec
+        );
+    }
+
+    private function buildPredicateBuilder(): Builder
+    {
+        $predicateBuilder = $this->classCodeMapper->getPredicateBuilder();
+        $search = trim((string) $this->search);
+
+        if ($search === '') {
+            return $predicateBuilder;
+        }
+
+        $searchLike = '%' . $this->classCodeMapper->getDatabase()->getQuoter()->escapeForLike($search) . '%';
+
+        return $predicateBuilder->any(
+            $predicateBuilder
+                ->emptyClone()
+                ->like('code', $searchLike)
+        );
+    }
+}
