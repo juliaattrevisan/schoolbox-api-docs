@@ -75,6 +75,12 @@ class Decorator implements DecoratorInterface
 
 
     /**
+     * @var \Schoolbox\Assessment\Rubric\Instance\Mapper
+     */
+    private \Schoolbox\Assessment\Rubric\Instance\Mapper $rubricInstanceMapper;
+
+
+    /**
      * @var RosettaStone|mixed
      */
     private RosettaStone $l10n;
@@ -148,6 +154,7 @@ class Decorator implements DecoratorInterface
         $this->gradeGroupMapper = GradeLevel\Group\Mapper::getInstance();
         $this->unitSpecificationMapper = UnitSpecificationMapper::getInstance();
         $this->rubricMapper = RubricDataSource::getInstance();
+        $this->rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
 
         // (Forgive me too for perpetuating this)
         /** @var RosettaStone $l10n */
@@ -201,9 +208,42 @@ class Decorator implements DecoratorInterface
             $assessment->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
         } // Otherwise let the existing setting persist
 
+        /* TODO Move this whole rubric processing chunk into a separate class (Rubric Decorator)
+         *  Other learning activities will end up following the same idea later so we need to make this an
+         *  easily-propagated idea...essentially, a Rubric Decorator. It takes an $assessment and $this->getRubricData()
+         *  to populate the $assessment with rubric instances, grids, and the max marks stuff.
+         */
+
         /* If there are any rubric grids, we need to process each one for this assessment.
          * We also assign the assessment's maximum available marks as the summation of all the grids' maxima.
+         *
+         * Note that you can now spawn multiple grids from the frontend; the all end up here via one mega payload.
+         * This mega payload contains a mix of previously-existing grids and totally new ones.
          */
+        foreach ($this->getRubricData() as $rubricId => $payload) {
+            /* This rubric instance already existed in the assessment; it already has a meaningful identifier.
+             * This builds on the frontend assumption that totally new rubric grids have a negative int identifier,
+             * because you can spawn multiple new grids in a payload here...such identifiers just become more and more
+             * negative, making them signed ints in practice but when they're persisted, they'll be unsigned.
+             */
+            if ($rubricId > 0) {
+                continue;
+            }
+
+            /* This is a new grid: we need to add it to the stack. It won't be there already; it's never been persisted.
+             * persistGrid() will save the rubric instance with a more meaningful identifier later, though this might
+             * sound like a bit of a gotcha if you didn't know how this area was made.
+             *
+             * Its settings are assembled via buildFromPostData() which is essentially "hydrate this grid from an array"
+             */
+            $newRubricInstance = $this->rubricInstanceMapper->createModel()
+                ->setId($rubricId);
+
+            /* "Welcome to the party, pal." --John McClane
+             */
+            $assessment->getRubricInstances()->add($newRubricInstance);
+        }
+
         if ($assessment->getRubricInstances()->count()) {
             /* Populate rubric_instance records with settings from the rubricData payload
              */
