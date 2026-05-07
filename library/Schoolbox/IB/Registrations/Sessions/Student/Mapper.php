@@ -329,7 +329,7 @@ class Mapper extends BaseMapper
         }
 
         if (!empty($uncachedUsersById)) {
-            $subjectMapper = new SubjectMapper();
+            $subjectMapper = SubjectMapper::getInstance();
 
             foreach ($uncachedUsersById as $userId => $user) {
                 $cachedClassCodesByUserId[$userId] = [];
