@@ -198,6 +198,8 @@ class Eportfolio extends Base
         $componentInstanceIds = $this->findComponentInstanceIdsByPageIds($pageIds); // Components that are children of directly targeted pages.
         $pageBlogIds = $this->findBlogIdsByPageIds($pageIds);                       // Blogs that are children of directly targeted pages (temporary variable).
         $pageCascadeBlogIds = array_values(array_diff($pageBlogIds, $blogIds));     // Blogs that are children of directly targeted pages, excluding directly targeted blogs.
+                                                                                    // Note array_values() just ensures that keys start from 0 and are sequential, since
+                                                                                    // array_diff() preserves the keys from the array being diffed.
         $deleted = [];
 
         // Delete rows from all twelve tables covered by this strategy.
