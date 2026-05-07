@@ -32,8 +32,7 @@ use Schoolbox\Config\ConfigMapper;
  *        ├── eportfolio_component_linklist_item     (has no deleted_at)
  *        └── eportfolio_component_textbox_item      (has no deleted_at)
  *
- * Note there are no circular links from child rows back up to parents or grandparents.
- * So the tree will only ever be three levels deep.
+ * Note the tree will only ever be three levels deep, so recursion isn't required here.
  */
 class Eportfolio extends Base
 {
