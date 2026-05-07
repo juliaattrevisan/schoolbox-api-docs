@@ -843,6 +843,7 @@ async function saveSubjectConfiguration(): Promise<void> {
             :endpoint="props.searchLanguagesEndpoint ?? ''"
             :manage-search-response="true"
             :allow-partial-matches="true"
+            :validate="(items) => (items.length === 0 ? 'At least one language should be selected' : null)"
             @search-response="onModalSearchResponse"
             @next-search-response="onModalNextSearchResponse"
         />
