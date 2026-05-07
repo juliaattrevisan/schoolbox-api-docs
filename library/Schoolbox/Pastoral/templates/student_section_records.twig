@@ -145,7 +145,7 @@
 <div id="emptyState" class="row{% if records | length %} hide{% endif %}">
     <div class="small-12 column">
         <div class="empty-state">
-            <i class="icon-pastoral"></i>
+            <sbx-icon name="pastoral" size="2.5rem"></sbx-icon>
             <p>There are no {{ locale.pastoral }} records {% if typeSelected is not empty %}of this type{% endif %} available for {{ student.fullName }}.</p>
             {% set routeRecordInsert = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
             {% if routeRecordInsert %}

@@ -75,7 +75,7 @@
         </section>
     {% else %}
         <div class="empty-state">
-            <i class="icon-group"></i>
+            <sbx-icon name="group" size="2.5rem"></sbx-icon>
             <p>No {{ locale.pastoral }} groups have been created.</p>
             {% if isRouteAuthorized('pastoralManagement.getGroupsModify') %}
                 <p>{{ locale.pastoral.proper }} groups can be used to dynamically audience {{ locale.pastoral }}

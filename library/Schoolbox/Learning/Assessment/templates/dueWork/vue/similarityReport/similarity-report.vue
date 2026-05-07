@@ -474,7 +474,7 @@ export default {
             </v-client-table>
 
             <div v-else-if="hasNoSubmissions" class="empty-state">
-                <i class="icon-staff-students"></i>
+                <sbx-icon name="staff-students" size="2.5rem"></sbx-icon>
                 <p>
                     Students have either not yet submitted any work or any similarity results are yet to be
                     generated.<br />Once work is submitted and results generated, you may return to this page to review

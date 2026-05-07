@@ -66,7 +66,7 @@ async function onResetFilters(): Promise<void> {
         </div>
         <button v-else-if="crStore.nextCursor !== null" @click="crStore.loadNextPage">Load more results</button>
         <div v-else-if="crStore.results.length === 0" class="empty-state-flex-centered">
-            <i class="icon-search"></i>
+            <sbx-icon name="search" size="2.5rem"></sbx-icon>
             <p>
                 There are no learning moments matching the current filters.
                 <button @click="onResetFilters">Reset filters</button> to see all available learning moments.

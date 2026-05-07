@@ -62,7 +62,7 @@
         </section>
         {% else %}
         <div class="empty-state">
-            <i class="icon-division"></i>
+            <sbx-icon name="division" size="2.5rem"></sbx-icon>
             <p>There are no Divisions in {{ sport.name }}.</p>
             <p><a href="{{ routeLookup('sportsfixturesDivision.getCreateForm', {contextId: sport.id}) }}" title="Add a Division">Add a Division</a></p>
         </div>

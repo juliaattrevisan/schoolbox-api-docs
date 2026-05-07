@@ -193,7 +193,7 @@
 <div class="row">
     <div class="small-12">
         <div class="empty-state">
-            <i class="icon-due-work"></i>
+            <sbx-icon name="due-work" size="2.5rem"></sbx-icon>
             <p>There are no activities due in this {{ locale.term }}, maybe try selecting a different {{ locale.term }}.</p>
         </div>
     </div>
@@ -280,13 +280,13 @@
         </section>
         {% elseif 0 == (gradableAssessments | length) %}
         <div class="empty-state">
-            <i class="icon-due-work"></i>
+            <sbx-icon name="due-work" size="2.5rem"></sbx-icon>
             <p>There are no gradable activities due in this {{ locale.term }}, maybe try selecting a different {{ locale.term }}.</p>
             <p>If you expected to see activities here, ensure they are not a Task, have a MarkType of 'None' or a weight of 0.</p>
         </div>
         {% else %}
         <div class="empty-state">
-            <i class="icon-due-work"></i>
+            <sbx-icon name="due-work" size="2.5rem"></sbx-icon>
             <p>There are no activity results that match current submission type filter.</p>
             <p><a href="{{ routeLookup('learningAnalytics.'~route~'WithTerm', routeArgs) }}">Remove filter</a></p>
         </div>
@@ -327,7 +327,7 @@
         </section>
         {% else %}
         <div class="empty-state">
-            <i class="icon-due-work"></i>
+            <sbx-icon name="due-work" size="2.5rem"></sbx-icon>
             <p>There are no gradable activities due in this {{ locale.term }}, maybe try selecting a different {{ locale.term }}.</p>
             <p>If you expected to see activities here, ensure they are not a Task, have a MarkType of 'None' or a weight of 0.</p>
         </div>

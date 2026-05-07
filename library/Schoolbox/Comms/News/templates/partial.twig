@@ -147,7 +147,7 @@
             'cid=' ~ componentId
         ] |join('&') %}
         <div class="empty-state no-margin">
-            <i class="icon-news"></i>
+            <sbx-icon name="news" size="2.5rem"></sbx-icon>
             {% if readonly or not createRoute %}
                 <p>There is no {{ locale.news }} to view at this time.</p>
                 {% if archiveRoute and showArchiveNewsLink %}
@@ -171,7 +171,7 @@
         </div>
     {% else %}
         <div class="empty-state no-margin">
-            <i class="icon-news"></i>
+            <sbx-icon name="news" size="2.5rem"></sbx-icon>
             <p>
                 There is no {{ locale.news }} in this topic to view at this time.
             </p>

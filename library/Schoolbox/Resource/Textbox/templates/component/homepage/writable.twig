@@ -53,7 +53,7 @@
     </div>
 {% else %}
     <div class="empty-state">
-        <i class="icon-textbox"></i>
+        <sbx-icon name="textbox" size="2.5rem"></sbx-icon>
         {% if component.config.emptyStateMessage ?? '' %}
             <p>{{ component.config.emptyStateMessage|nl2br }}
             <p><a href="#" data-reveal-id="addTextboxModal-{{ component.instance.id }}">Add content to this text box</a>.</p>

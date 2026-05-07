@@ -53,7 +53,7 @@
         {% if ltiTools is empty %}
             <input type="hidden" id="lti-tool-id" name="ltiToolId" value="{{ assessment.ltiTool.id ?? '' }}" />
             <div class="empty-state">
-                <i class="icon-lti"></i>
+                <sbx-icon name="lti" size="2.5rem"></sbx-icon>
                 <p>No tools have been made available for use in 3rd party assessments. Please contact your system administrator.</p>
             </div>
         {% else %}

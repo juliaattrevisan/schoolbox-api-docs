@@ -42,7 +42,7 @@ window.Vue.onMounted(() => {
         </section>
     </div>
     <div v-else-if="mbStore.data.classImpls.length === 0" class="empty-state">
-        <i class="icon-curriculum"></i>
+        <sbx-icon name="curriculum" size="2.5rem"></sbx-icon>
         <p>
             This course has not yet been imported to any classes or groups.
             <a
@@ -54,7 +54,7 @@ window.Vue.onMounted(() => {
         </p>
     </div>
     <div v-else-if="mbStore.activityGroups.length === 0" class="empty-state">
-        <i class="icon-curriculum"></i>
+        <sbx-icon name="curriculum" size="2.5rem"></sbx-icon>
         <p>There are no activities that match the selected filters. Try altering the filters to broaden your search.</p>
     </div>
     <markbook-inner v-else :type="props.type" />

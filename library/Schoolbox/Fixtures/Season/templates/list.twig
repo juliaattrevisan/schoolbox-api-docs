@@ -275,7 +275,7 @@
         {% endif %}
 
         <div class="empty-state {% if allSeasons|length %}hide{% endif %}" data-empty-state>
-            <i class="icon-season"></i>
+            <sbx-icon name="season" size="2.5rem"></sbx-icon>
             <p>There are currently no seasons available. You must create a season before divisions can be created.<br/>
                 Start by <a href="{{ routeLookup('sportsfixturesSeason.getCreateForm', {context: match ?? null}) }}" title="Add a Season">adding a new season</a>
                 now.</p>

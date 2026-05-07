@@ -39,7 +39,7 @@
     {% if unImported|length == 0 and imported|length == 0 %}
         <div class="small-12 island">
             <div class="empty-state">
-                <i class="icon-class-list"></i>
+                <sbx-icon name="class-list" size="2.5rem"></sbx-icon>
                 <p>There are no open classes that currently use this  {{ assessmentSpec.context is project ? 'project' : locale.unit }}.</p>
             </div>
         </div>

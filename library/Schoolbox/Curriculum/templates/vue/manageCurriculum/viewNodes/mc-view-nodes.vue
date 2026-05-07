@@ -44,7 +44,7 @@ window.Vue.watch(
             <loading-table />
         </div>
         <div v-else-if="searchStore.hasNoResults" class="empty-state-flex-centered">
-            <i class="icon-curriculum"></i>
+            <sbx-icon name="curriculum" size="2.5rem"></sbx-icon>
             <p>No Curriculum matches your current search.</p>
             <button title="Clear the current search" data-test-clear-search @click.prevent="onClearSearchSelected">
                 Clear search

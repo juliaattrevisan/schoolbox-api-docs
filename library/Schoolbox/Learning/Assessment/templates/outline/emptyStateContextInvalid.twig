@@ -11,7 +11,7 @@ Usage:
 #}
 
 <div class="empty-state" data-empty-state>
-    <sbx-icon name="course"></sbx-icon>
+    <sbx-icon name="course" size="2.5rem"></sbx-icon>
     {% set entity = hasUnitSpec ? (locale.unit.indefiniteArticle ~ ' ' ~ locale.unit ~ ' page') : (hasCourseSpec ? 'a course page' : 'an invalid context') %}
     <p>This component works on class pages to import courses for students to complete. This page is {{ entity }} so the component doesn't work here. <a href="#remove-component" data-target="delete">Remove this component</a>.</p>
 </div>

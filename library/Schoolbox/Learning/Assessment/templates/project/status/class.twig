@@ -26,7 +26,7 @@
 {% else %}
     {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: aImpl.assessment.id, context: aImpl.assessment }) %}
     <div class="empty-state">
-        <i class="icon-group"></i>
+        <sbx-icon name="group" size="2.5rem"></sbx-icon>
         <p>There are no students currently undertaking this {{ locale.project }}.</p>
         <p>As you <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">add {{ locale.activity.plural }}</a>, the participating students will appear here. </p>
     </div>

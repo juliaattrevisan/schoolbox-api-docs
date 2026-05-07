@@ -138,7 +138,7 @@
     </section>
 {% endif %}
 <div class="empty-state {% if lessonPlans|length %}hide{% endif %}">
-    <i class="icon-lesson-plan"></i>
+    <sbx-icon name="lesson-plan" size="2.5rem"></sbx-icon>
     {% if not readOnly and (hasUnitSpec or hasCourseSpec) %}
         <p>
             This component only works on class pages as {{ locale.lessonPlan.plural }} must be connected to a course.

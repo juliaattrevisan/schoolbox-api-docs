@@ -193,7 +193,7 @@
                     </section>
                     {% else %}
                         <div class="empty-state">
-                            <i class="icon-match"></i>
+                            <sbx-icon name="match" size="2.5rem"></sbx-icon>
                             <p>There are no matches scheduled for {{ division.name }} {{ division.sport.name }} in the {{ season.name }} season.</p>
                         {% if division.season.archived %}
                             <p>This season is currently archived. To add a match, you first need to <a href="{{ routeLookup('sportsfixturesSeason.getList') }}">restore it</a> or <a href="{{ routeLookup('sportsfixturesDivision.getModifyForm', { entityId: division.id }) }}">assign the division to a different season</a>.</p>

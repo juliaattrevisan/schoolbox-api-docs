@@ -271,7 +271,7 @@ export default {
         <div ref="emptyState" class="empty-state" v-else-if="eventsLoaded && !hasEvents">
             <!-- Different variants of empty state for dashboard (no folder ID) and homepage -->
             <template v-if="config.folderId">
-                <i class="icon-calendar"></i>
+                <sbx-icon name="calendar" size="2.5rem"></sbx-icon>
                 <p v-if="config.canCreateEvent">
                     <a :href="config.createEventUrl">Add an event</a>
                     or <a :href="config.importEventsUrl">import events in bulk</a>
@@ -280,7 +280,7 @@ export default {
                 <p v-else>There are no upcoming events to display at this time.</p>
             </template>
             <span v-else>
-                <i class="icon-calendar"></i>
+                <sbx-icon name="calendar" size="2.5rem"></sbx-icon>
                 <p>There are no upcoming calendar events</p>
             </span>
         </div>

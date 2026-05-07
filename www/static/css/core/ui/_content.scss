@@ -18,12 +18,14 @@
     [class*=" icon-"] {
         @extend .size-48;
         color: var(--sbx-color-text-secondary, $aluminum);
-        margin-bottom: 0.5rem;
-        display: block;
 
         &:before {
             padding: 0;
         }
+    }
+    sbx-icon {
+        display: block;
+        margin-bottom: 0.5rem;
     }
     img {
         margin-bottom: 1rem;

@@ -258,7 +258,7 @@ export default {
         </div>
 
         <div v-else-if="isDataLoaded && !hasStudents && !hasDataLoadError" class="empty-state">
-            <i class="icon-staff-students"></i>
+            <sbx-icon name="staff-students" size="2.5rem"></sbx-icon>
             <p>There are currently no students within this group.</p>
         </div>
 

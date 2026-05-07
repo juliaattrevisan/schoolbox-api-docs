@@ -17,7 +17,7 @@
 ) }}
 
 <div class="empty-state">
-    <i class="icon-group"></i>
+    <sbx-icon name="group" size="2.5rem"></sbx-icon>
     <p>No {{ locale.pastoral.proper }} Types have been created.</p>
     {% set route = routeLookupIfAuthorized('adminLists.getIndex', {table: 'pastoral-type'}) %}
     {% if route %}

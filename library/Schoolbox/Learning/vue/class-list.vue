@@ -872,7 +872,7 @@ export default {
 
         <div class="small-12 island" v-if="!showSkeletonLoader && !studentsForCurrentClassCode.length">
             <div class="empty-state">
-                <i class="icon-class-list"></i>
+                <sbx-icon name="class-list" size="2.5rem"></sbx-icon>
                 <p>Sorry, the system is unable to find any student in this class.</p>
             </div>
         </div>

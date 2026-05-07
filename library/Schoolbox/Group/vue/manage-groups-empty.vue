@@ -69,7 +69,7 @@ export default {
     <div class="row">
         <div class="column small-12">
             <div class="empty-state">
-                <i class="icon-group"></i>
+                <sbx-icon name="group" size="2.5rem"></sbx-icon>
                 <p>{{ emptyMessage }}</p>
             </div>
         </div>

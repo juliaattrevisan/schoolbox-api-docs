@@ -51,7 +51,7 @@ function onAction(): void {
     </Teleport>
 
     <div v-if="!props.response" class="empty-state">
-        <i class="icon-dialog-agent"></i>
+        <sbx-icon name="dialog-agent" size="2.5rem"></sbx-icon>
         <p>{{ props.student.fullName }} has not started a response for this {{ locale.dialogAgent.singular() }} yet.</p>
     </div>
     <!-- Apparently we _really_ want this to be a centered snowflake -->

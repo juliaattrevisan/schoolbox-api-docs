@@ -75,11 +75,11 @@ const filteredParticipants = window.Vue.computed(() => {
 
 <template>
     <div v-if="participantsData.length === 0" class="empty-state">
-        <i class="icon-dialog-agent"></i>
+        <sbx-icon name="dialog-agent" size="2.5rem"></sbx-icon>
         <p>This {{ locale.activity.singular() }} has no students participating.</p>
     </div>
     <div v-else-if="filteredParticipants.length === 0" class="empty-state">
-        <i class="icon-staff-students"></i>
+        <sbx-icon name="staff-students" size="2.5rem"></sbx-icon>
         <p>
             No students match the current filters. Add another filter or
             <a href="#" @click.prevent="emit('resetFilters')">show everything</a>.

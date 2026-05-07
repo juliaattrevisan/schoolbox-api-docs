@@ -19,7 +19,7 @@ async function onNoFiltersSelected(): Promise<void> {
 
 <template>
     <div class="empty-state-flex-centered" data-test="sp-results-none">
-        <i class="icon-search"></i>
+        <sbx-icon name="search" size="2.5rem"></sbx-icon>
         <p>
             Sorry, but your search did not return any results.
             <template v-if="filtersStore.isActive">
