@@ -96,7 +96,7 @@
                 },
                 messages: {
                     resource_category_id:           "Please select a category.",
-                    capacity:                       "Capacity of resource must be a whole number from 1 to 999.",
+                    capacity:                       "Number of bookable items must be a whole number from 1 to 999.",
                     "min_reservation_time[day]":    "If entered, day count must be a number.",
                     "max_reservation_time[day]":    "If entered, day count must be a number.",
                     "min_lead_time[hour]":          "If entered, hour count must be a number from 0 to 23",
@@ -275,10 +275,11 @@
                         </div>
                     </div>
                     <div class="small-4 columns">
-                        <label for="capacity">
-                            Capacity of resource
-                            <input name="capacity" id="capacity" type="number" min="1" max="999" step="1" value="{{ item.capacity|default(1) }}" required />
+                        <label for="capacity" class="required">
+                            Number of bookable items
+                            <span class="hint has-tip tip-top" data-tooltip title="The maximum number of bookings that can use this resource at the same time. Use 1 when only one booking should be available at a time.">?</span>
                         </label>
+                        <input name="capacity" id="capacity" type="number" min="1" max="999" step="1" value="{{ item.capacity|default(1) }}" required />
                     </div>
                 </fieldset>
 

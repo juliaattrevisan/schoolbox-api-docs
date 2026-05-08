@@ -391,7 +391,7 @@ class Controller extends Base
             throw ErrorMapper::getInstance()->generateException(
                 ErrorMapper::ERROR_INFORMATION_MISSING,
                 null,
-                'Capacity of resource must be a whole number from 1 to 999.'
+                'Number of bookable items must be a whole number from 1 to 999.'
             );
         }
 
