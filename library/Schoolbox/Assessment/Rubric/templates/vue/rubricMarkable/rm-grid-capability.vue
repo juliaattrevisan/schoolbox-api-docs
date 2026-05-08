@@ -288,6 +288,7 @@ window.Vue.watch(
                 <mark-scheme
                     :id="`capability-${props.capability.id}-mark-${componentId}`"
                     v-model:mark="capabilityMark.value"
+                    :name="`capability-${props.capability.id}-mark-${componentId}`"
                     :mark-scheme="props.capabilityMarkScheme"
                     :submission-error-states="[] /** no error states here */"
                     :limit="capability.maxValue ?? undefined"

@@ -17,6 +17,7 @@ const PRECISION = 2;
 
 interface Props {
     id: string | number;
+    name?: string;
     markScheme: MarkSchemeTotalMarkFractional;
     submissionErrorStates: SubmissionErrorStates;
     tabIndex?: number;
@@ -25,10 +26,6 @@ interface Props {
      */
     readonly?: boolean;
     class?: string;
-    /**
-     * The target for alaressValidate, if left blank then it will use the input itself
-     */
-    alaressValidateTarget?: string;
     /**
      * Optional precedence: used for quiz & capability marks only
      * Maximum marks available per attempt, indexed by user id
@@ -62,6 +59,7 @@ const limit = window.Vue.computed(() => {
     <ms-text-input
         :id="props.id"
         v-model:mark="mark"
+        :name="props.name"
         :submission-error-states="props.submissionErrorStates"
         :class="props.class"
         :tab-index="props.tabIndex"
@@ -70,17 +68,10 @@ const limit = window.Vue.computed(() => {
         :max-length="48"
         :input-title="`Maximum Mark: ${limit}`"
         :readonly="props.readonly"
-        :alaress-validate-target="props.alaressValidateTarget"
         :alaress-validate-options="{
-            rules: {
-                mark: {
-                    withinRange: true,
-                },
-            },
+            withinRange: true,
             messages: {
-                mark: {
-                    withinRange: `The grade must be between 0 and ${limit}.`,
-                },
+                withinRange: `The grade must be between 0 and ${limit}.`,
             },
         }"
     />

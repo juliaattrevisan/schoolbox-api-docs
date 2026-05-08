@@ -10,6 +10,7 @@ const LIMIT = 100;
 
 interface Props {
     id: string | number;
+    name?: string;
     submissionErrorStates: SubmissionErrorStates;
     tabIndex?: number;
     /**
@@ -17,10 +18,6 @@ interface Props {
      */
     readonly?: boolean;
     class?: string;
-    /**
-     * The target for alaressValidate, if left blank then it will use the input itself
-     */
-    alaressValidateTarget?: string;
 }
 
 const props = defineProps<Props>();
@@ -31,6 +28,7 @@ const mark = defineModel<string | null>("mark", { required: true });
     <ms-text-input
         :id="props.id"
         v-model:mark="mark"
+        :name="props.name"
         :submission-error-states="props.submissionErrorStates"
         :class="props.class"
         :tab-index="props.tabIndex"
@@ -39,17 +37,10 @@ const mark = defineModel<string | null>("mark", { required: true });
         :max-length="48"
         input-title="Percentage"
         :readonly="props.readonly"
-        :alaress-validate-target="props.alaressValidateTarget"
         :alaress-validate-options="{
-            rules: {
-                mark: {
-                    withinPercentageRange: true,
-                },
-            },
+            withinPercentageRange: true,
             messages: {
-                mark: {
-                    withinPercentageRange: `The grade must be between 0 and ${LIMIT}.`,
-                },
+                withinPercentageRange: `The grade must be between 0 and ${LIMIT}.`,
             },
         }"
     />

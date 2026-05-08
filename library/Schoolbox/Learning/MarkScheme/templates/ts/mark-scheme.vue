@@ -14,6 +14,8 @@ import MsTotalMarkFractional from "./ms-total-mark-fractional.vue";
 interface Props {
     /** A unique identifier for this mark scheme input */
     id: string | number;
+    /** The name to use for this mark scheme's input element */
+    name?: string;
     markScheme: MarkScheme;
     submissionErrorStates: SubmissionErrorStates;
     class?: string;
@@ -39,6 +41,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         v-if="props.markScheme.template === 'LetterGrade'"
         :id="props.id"
         v-model:mark="mark"
+        :name="props.name"
         :mark-scheme="props.markScheme"
         :submission-error-states="props.submissionErrorStates"
         :class="props.class"
@@ -49,6 +52,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         v-else-if="props.markScheme.template === 'Percentage'"
         :id="props.id"
         v-model:mark="mark"
+        :name="props.name"
         :submission-error-states="props.submissionErrorStates"
         :class="props.class"
         :tab-index="props.tabIndex"
@@ -58,6 +62,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         v-else-if="props.markScheme.template === 'TotalMarkFractional'"
         :id="props.id"
         v-model:mark="mark"
+        :name="props.name"
         :mark-scheme="props.markScheme"
         :submission-error-states="props.submissionErrorStates"
         :class="props.class"

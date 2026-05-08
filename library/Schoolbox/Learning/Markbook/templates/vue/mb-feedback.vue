@@ -243,6 +243,7 @@ async function onFeedbackPublish(): Promise<void> {
                     <mark-scheme
                         :id="`mark-${cellInfo.student.id}`"
                         v-model:mark="cellInfo.feedback.data.hrMarkInstructor"
+                        name="mark"
                         :mark-scheme="cellInfo.instructorMarkScheme"
                         :submission-error-states="mbStore.data.submissionErrorStates"
                         :limit="

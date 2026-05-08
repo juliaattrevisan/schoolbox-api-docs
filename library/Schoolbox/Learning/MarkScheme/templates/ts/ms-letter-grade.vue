@@ -11,6 +11,7 @@ const LIMIT = 100;
 
 interface Props {
     id: string | number;
+    name?: string;
     markScheme: MarkSchemeLetterGrade;
     submissionErrorStates: SubmissionErrorStates;
     tabIndex?: number;
@@ -20,10 +21,6 @@ interface Props {
      * Should this form input be rendered as readonly?
      */
     readonly?: boolean;
-    /**
-     * The target for alaressValidate, if left blank then it will use the input itself
-     */
-    alaressValidateTarget?: string;
 }
 
 const props = defineProps<Props>();
@@ -35,6 +32,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         v-if="props.readonly"
         :id="props.id"
         v-model:mark="mark"
+        :name="props.name"
         :submission-error-states="props.submissionErrorStates"
         :class="props.class"
         :tab-index="props.tabIndex"
@@ -42,30 +40,16 @@ const mark = defineModel<string | null>("mark", { required: true });
         :limit="LIMIT"
         :max-length="48"
         input-title=""
-        :readonly="props.readonly"
-        :alaress-validate-target="props.alaressValidateTarget"
-        :alaress-validate-options="{
-            rules: {
-                mark: {
-                    withinLetterGradeRange: true,
-                },
-            },
-            messages: {
-                mark: {
-                    withinLetterGradeRange: `Please select one of the available grade options.`,
-                },
-            },
-        }"
+        readonly
     />
 
-    <!-- TODO: probably need this form field to be renameable -->
     <select
         v-else
         :id="props.id?.toString() ?? undefined"
         class="letter-grade-select"
         :class="props.class"
         :data-test="`assessment-feedback-mark-select-${props.id}`"
-        name="mark"
+        :name="props.name"
         :tabindex="props.tabIndex"
         :title="`Select a ${locale.grades.proper()}`"
         @change="(e) => (mark = (e.target as HTMLSelectElement).value)"

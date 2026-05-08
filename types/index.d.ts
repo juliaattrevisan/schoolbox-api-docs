@@ -158,6 +158,7 @@ declare global {
             destroy(): void;
             form(): boolean;
         };
+        rules(method: "add", rules: Record<string, unknown>): unknown;
         /**
          * From jquery.resourceAttach.js
          */
