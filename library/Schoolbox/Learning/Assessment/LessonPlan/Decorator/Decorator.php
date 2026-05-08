@@ -31,27 +31,30 @@ class Decorator implements DecoratorInterface
 
 
     /**
-     * An arbitrarily chosen prefix for new Field rows in the
-     * create/update screens, which distinguishes new rows
-     * from pre-existing ones since the ui lets you spawn new
-     * rows and mix-and-match them with existing ones in some
+     * An arbitrarily chosen prefix for new Field rows in the create/update screens, which distinguishes new rows from
+     * pre-existing ones since the ui lets you spawn new rows and mix-and-match them with existing ones in some
      * arbitrary user-chosen order.
      */
-    public const NEW_KEYWORD = 'new';
+    public const string NEW_KEYWORD = 'new';
 
 
     /**
      * Decorator constructor.
      *
-     * @param array|string[] $attachedFiles
+     * @param int $lessonPlanTemplateId
+     * @param array $lessonPlanFields
+     * @param string $lessonPlanVisibility
+     * @param null|array|string[] $attachedFiles
+     * @param string $lessonPlanDuration
      */
     public function __construct(
         private int $lessonPlanTemplateId,
         private array $lessonPlanFields,
         private string $lessonPlanVisibility,
-        private array $attachedFiles,
+        ?array $attachedFiles,
         private string $lessonPlanDuration
     ) {
+        $this->setAttachedFiles($attachedFiles);
     }
 
 

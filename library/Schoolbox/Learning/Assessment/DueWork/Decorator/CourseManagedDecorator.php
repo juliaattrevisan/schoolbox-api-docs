@@ -48,7 +48,7 @@ class CourseManagedDecorator implements DecoratorInterface
      * @param float|null   $maxMark
      * @param float|null   $instructorMaxMark
      * @param array|null   $rubricData
-     * @param array        $attachedFiles
+     * @param null|array   $attachedFiles
      * @param bool         $enableWorksheet
      * @param string| null $worksheetTemplate
      * @param bool         $enableOffline
@@ -65,7 +65,7 @@ class CourseManagedDecorator implements DecoratorInterface
         private ?float $maxMark,
         private ?float $instructorMaxMark,
         private ?array $rubricData,
-        private array $attachedFiles,
+        ?array $attachedFiles,
         private bool $enableWorksheet,
         private ?string $worksheetTemplate,
         private bool $enableOffline,
@@ -74,6 +74,7 @@ class CourseManagedDecorator implements DecoratorInterface
         private bool $enablePolicy,
         private ?DueWork $original
     ) {
+        $this->setAttachedFiles($attachedFiles);
     }
 
 
