@@ -103,7 +103,7 @@ class Factory
         /* This was originally an assessment property but it's actually on the rubric instance now and isn't part of
          * the $_POST['rubric'] node, which is a bit interesting
          */
-        $markPerCap = $grid->getRubricInstance()->isMarkPerCapability() ?? false;
+        $markPerCap = $grid->getRubricInstance()->isMarkPerCapability();
 
         // Rebuild the set of levels from scratch each time
         $newLevels = $grid->getLevels()->emptyClone();
