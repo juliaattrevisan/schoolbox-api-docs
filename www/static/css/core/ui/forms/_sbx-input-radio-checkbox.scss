@@ -246,10 +246,11 @@ body.sbx-body {
                 margin: 0;
             }
         }
-        // the error needs to stretch all the way across to avoid it sitting in line with the checkbox/radio
-        &:has(label.error) {
+        // these need to stretch all the way across to avoid it sitting in line with the checkbox/radio
+        &:has(label.error, #search-subject-overview) {
             flex-wrap: wrap;
-            label.error {
+            label.error,
+            #search-subject-overview {
                 flex-basis: 100%;
                 margin: 0;
             }
