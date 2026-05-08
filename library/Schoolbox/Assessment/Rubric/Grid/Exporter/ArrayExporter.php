@@ -11,7 +11,6 @@ namespace Schoolbox\Assessment\Rubric\Grid\Exporter;
 
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 
 /**
  * Exporter for converting a rubric grid to an array.
@@ -48,10 +47,8 @@ class ArrayExporter
         $usingMarkRange       = $grid->isUseMarkRange();
         $assessment           = $grid->getAssessment();
 
-        if ($assessment instanceof DueWork) {
-            $capabilityMarkType   = $assessment->isMarkPerCapability() ? $assessment->getCapabilityMarkType()->getSlug() : MarkType::SLUG_NONE;
-            $capabilityGradeGroup = $assessment->getCapabilityGradeGroup() ? $assessment->getCapabilityGradeGroup()->getId() : null;
-        }
+        $capabilityMarkType   = $grid->isMarkPerCapability() ? $assessment->getCapabilityMarkType()->getSlug() : MarkType::SLUG_NONE;
+        $capabilityGradeGroup = $grid->getRubricInstance()->getCapabilityGradeGroup()?->getId();
 
         if ($capabilityMarkType === MarkType::SLUG_LETTER && isset($capabilityGradeGroup)) {
             $square[0][0] = 'capabilityMarkType: ' . $capabilityMarkType . ':' . $capabilityGradeGroup;
@@ -88,7 +85,7 @@ class ArrayExporter
                 $currentVRow = $currentDRow + 1;
 
                 // Max points per capability (if enabled)
-                if ($assessment->isMarkPerCapability() && !$groupRendered) {
+                if ($grid->isMarkPerCapability() && !$groupRendered) {
                     $square[$currentVRow][0] = $capabilityUsage->getMaxValue();
                 }
 
