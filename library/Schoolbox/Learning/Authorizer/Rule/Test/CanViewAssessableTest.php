@@ -22,8 +22,14 @@ use Schoolbox\Learning\Authorizer\Rule\CanViewAssessable;
 use Schoolbox\Role;
 use Schoolbox\User;
 
+/**
+ * Tests authorization rules for viewing assessable learning items.
+ */
 class CanViewAssessableTest extends TestCase
 {
+    /**
+     * Ensures parent access is checked against the parent user rather than inherited child visibility.
+     */
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
     public function testParentIsNotAuthorizedByChildVisibility(): void
@@ -49,6 +55,9 @@ class CanViewAssessableTest extends TestCase
         $visibility
             ->method('isVisibleToUser')
             ->willReturnCallback(
+                /**
+                 * Records visibility checks and only allows the child user to view the assessment.
+                 */
                 function (
                     IAssessable $assessment,
                     User $viewer,
