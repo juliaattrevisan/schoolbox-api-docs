@@ -97,6 +97,7 @@ body.sbx-body {
     }
 
     // we don't need to show empty buttons
+    .button:disabled:empty,
     .button.disabled:empty {
         display: none;
     }
