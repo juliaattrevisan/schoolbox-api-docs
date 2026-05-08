@@ -81,7 +81,7 @@ class Decorator implements DecoratorInterface
 
 
     /**
-     * @var RosettaStone|mixed
+     * @var RosettaStone
      */
     private RosettaStone $l10n;
 
@@ -148,7 +148,6 @@ class Decorator implements DecoratorInterface
         $this->rubricInstanceMapper = \Schoolbox\Assessment\Rubric\Instance\Mapper::getInstance();
 
         // (Forgive me too for perpetuating this)
-        /** @var RosettaStone $l10n */
         $this->l10n = \Schoolbox\Mapper::getDi()->get('l10n');
     }
 
