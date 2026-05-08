@@ -156,7 +156,6 @@ class Controller extends Assessment\Controller
             null,
             null,
             null,
-            null,
             $editorTemplateHelper
         );
         $this->taskResponseDataSource = $taskResponseDataSource;
