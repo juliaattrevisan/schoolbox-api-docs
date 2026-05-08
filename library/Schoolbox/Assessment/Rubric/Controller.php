@@ -202,7 +202,6 @@ class Controller extends BaseController
 
             // Next step: figure out what gets passed in
             $capability = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
-//                ->setId(rand(1, PHP_INT_MAX))
                 ->setName($capabilityName);
 
             // Ensure the proposed Capability name is not already in use.
