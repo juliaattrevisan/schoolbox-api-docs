@@ -20,12 +20,19 @@ namespace Schoolbox\Learning\Assessment;
 trait AttachedFilesTrait
 {
     /**
+     * @var null|array
+     */
+    private ?array $attachedFiles = null;
+
+
+    /**
      * @return array|string[]
      */
     protected function getAttachedFiles()
     {
         return $this->attachedFiles ?: [];
     }
+
 
     /**
      * @param array|string[] $attachedFiles

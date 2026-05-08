@@ -14,14 +14,12 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-
 trait DueWorkTrait
 {
     /**
      * @var int
      */
-    private int $acceptOnline = DueWork::ACCEPT_ONLINE_NONE;
+    private int $acceptOnline;
 
 
     /**
@@ -37,21 +35,15 @@ trait DueWorkTrait
 
 
     /**
-     * @var int
+     * @var null|int
      */
-    private int $gradingScheme;
+    private ?int $gradingScheme;
 
 
     /**
-     * @var int
+     * @var null|int
      */
-    private int $instructorGradingScheme;
-
-
-    /**
-     * @var array|string[]
-     */
-    private array $attachedFiles;
+    private ?int $instructorGradingScheme;
 
 
     /**
@@ -79,43 +71,43 @@ trait DueWorkTrait
     /**
      * @var bool
      */
-    private bool $similarityCheckEnabled = false;
+    private bool $similarityCheckEnabled;
 
 
     /**
      * @var bool
      */
-    private bool $enableWorksheet = false;
+    private bool $enableWorksheet;
 
 
     /**
      * @var string|null
      */
-    private ?string $worksheetTemplate = null;
+    private ?string $worksheetTemplate;
 
 
     /**
      * @var bool
      */
-    private bool $enableOffline = false;
+    private bool $enableOffline;
 
 
     /**
      * @var bool
      */
-    private bool $enableText = false;
+    private bool $enableText;
 
 
     /**
      * @var bool
      */
-    private bool $enableFiles = false;
+    private bool $enableFiles;
 
 
     /**
      * @var bool
      */
-    private bool $enablePolicy = false;
+    private bool $enablePolicy;
 
 
     /**

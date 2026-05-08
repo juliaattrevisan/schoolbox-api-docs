@@ -22,7 +22,7 @@ trait RubricTrait
      *
      * @var array|null
      */
-    private ?array $rubricData = null;
+    private ?array $rubricData;
 
 
     /**
@@ -40,7 +40,7 @@ trait RubricTrait
      * @param array|null $rubricData
      * @return Factory|RubricTrait|CourseManagedDecorator|Decorator
      */
-    public function setRubricData(?array $rubricData = null): self
+    public function setRubricData(?array $rubricData): self
     {
         $this->rubricData = $rubricData;
         return $this;

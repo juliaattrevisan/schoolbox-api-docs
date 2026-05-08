@@ -25,12 +25,6 @@ trait TaskTrait
 
 
     /**
-     * @var array|string[]
-     */
-    private array $attachedFiles;
-
-
-    /**
      * @return boolean
      */
     public function getHasSelfAssessed()
