@@ -44,6 +44,9 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 
+/**
+ * Tests participant plan notifier behaviour for work type visibility and feed audiences.
+ */
 final class NotifierVisibilityTest extends TestCase implements TriggerBundleInterface
 {
     /** @var array<string,int|callable> */
@@ -82,11 +85,22 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
         'closed',
     ];
 
+    /**
+     * Records a trigger attachment requested by the notifier under test.
+     *
+     * @param string       $label
+     * @param int|callable $timestamp
+     */
     public function attach($label, $timestamp)
     {
         $this->attached[$label] = $timestamp;
     }
 
+    /**
+     * Records a batch of trigger attachments requested by the notifier under test.
+     *
+     * @param array<string,int|callable> $array
+     */
     public function attachEach($array)
     {
         foreach ($array as $label => $timestamp) {
@@ -94,11 +108,21 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
         }
     }
 
+    /**
+     * Records a trigger detachment requested by the notifier under test.
+     *
+     * @param string $label
+     */
     public function detach($label)
     {
         $this->detached[] = $label;
     }
 
+    /**
+     * Records a batch of trigger detachments requested by the notifier under test.
+     *
+     * @param string[] $array
+     */
     public function detachEach($array)
     {
         foreach ($array as $label) {
@@ -106,11 +130,21 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
         }
     }
 
+    /**
+     * Returns the mapper method represented by the fake trigger bundle event.
+     *
+     * @return string
+     */
     public function getMethod()
     {
         return $this->method;
     }
 
+    /**
+     * Returns the event prepared for the fake trigger bundle.
+     *
+     * @return Event
+     */
     public function getEvent()
     {
         self::assertNotNull($this->event);
@@ -118,12 +152,19 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
         return $this->event;
     }
 
+    /**
+     * Returns no existing triggers for this fake trigger bundle.
+     *
+     * @return array<int,mixed>
+     */
     public function getTriggers()
     {
         return [];
     }
 
     /**
+     * Tests trigger bundling for newly created assessments by work type visibility.
+     *
      * @param string[] $expectedAttachedLabels
      * @param string[] $expectedDetachedLabels
      */
@@ -148,6 +189,8 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
     }
 
     /**
+     * Tests trigger bundling when an assessment changes between work type visibility states.
+     *
      * @param string[] $expectedAttachedLabels
      * @param string[] $expectedDetachedLabels
      */
@@ -173,6 +216,8 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
     }
 
     /**
+     * Tests learner and parent upcoming notifications against work type visibility.
+     *
      * @param string[] $expectedDestinations
      */
     #[DataProvider('provideRoleSpecificUpcomingNotifications')]
@@ -192,6 +237,8 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
     }
 
     /**
+     * Tests that callback discovery uses role-specific message source configuration.
+     *
      * @param Source[] $sources
      * @param string[] $expectedMethods
      */
@@ -210,6 +257,8 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
     }
 
     /**
+     * Tests participant-included update notifications against the selected message audience.
+     *
      * @param string[] $expectedDestinations
      */
     #[DataProvider('provideRoleSpecificParticipantIncludedNotifications')]
@@ -235,6 +284,8 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
     }
 
     /**
+     * Tests that feed notification builders only build messages for the requested audience.
+     *
      * @param string[] $expectedDestinations
      */
     #[DataProvider('provideFeedAudienceNotifications')]
@@ -256,6 +307,9 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
         self::assertSame($expectedDestinations, array_keys($envelope->getAll()));
     }
 
+    /**
+     * Tests that feed audience selection checks folder access with a folder ID.
+     */
     #[DataProvider('provideFeedAudienceSelection')]
     public function testFeedAudienceSelectionChecksAccessByFolderId(
         string $roleType,
@@ -289,6 +343,8 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
     }
 
     /**
+     * Provides created assessment work type visibility cases for trigger bundling.
+     *
      * @return array<string,array{int,string[],string[]}>
      */
     public static function provideCreateWorkTypeTransitions(): array
@@ -302,6 +358,8 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
     }
 
     /**
+     * Provides work type visibility transition cases for trigger bundling.
+     *
      * @return array<string,array{int,int,string[],string[]}>
      */
     public static function provideUpdateWorkTypeTransitions(): array
@@ -353,6 +411,8 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
     }
 
     /**
+     * Provides role-specific upcoming notification cases by work type visibility.
+     *
      * @return array<string,array{int,string,string[]}>
      */
     public static function provideRoleSpecificUpcomingNotifications(): array
@@ -402,6 +462,8 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
     }
 
     /**
+     * Provides participant-included update notification cases by message audience.
+     *
      * @return array<string,array{string,string[]}>
      */
     public static function provideRoleSpecificParticipantIncludedNotifications(): array
@@ -419,6 +481,8 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
     }
 
     /**
+     * Provides feed notification cases by work type visibility and feed audience.
+     *
      * @return array<string,array{int,string,string,string[]}>
      */
     public static function provideFeedAudienceNotifications(): array
@@ -512,6 +576,8 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
     }
 
     /**
+     * Provides role and access combinations for feed audience selection.
+     *
      * @return array<string,array{string,int,string}>
      */
     public static function provideFeedAudienceSelection(): array
@@ -531,6 +597,8 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
     }
 
     /**
+     * Provides message source combinations for callback discovery.
+     *
      * @return array<string,array{string,Source[],string[]}>
      */
     public static function provideCallbackDiscovery(): array
@@ -573,6 +641,9 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
         ];
     }
 
+    /**
+     * Builds a message source model with the supplied key and role type.
+     */
     private static function source(string $key, string $roleType): Source
     {
         $source = new Source();
@@ -583,6 +654,8 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
     }
 
     /**
+     * Builds the work type fixtures used by the visibility matrix tests.
+     *
      * @return array<int,WorkType\Model>
      */
     private function workTypes(): array
@@ -595,6 +668,9 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
         ];
     }
 
+    /**
+     * Builds a work type fixture with explicit learner and parent visibility.
+     */
     private function workType(int $id, bool $learners, bool $parents): WorkType\Model
     {
         return (new WorkType\Model())
@@ -605,6 +681,8 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
     }
 
     /**
+     * Builds a notifier with a work type mapper backed by the supplied fixtures.
+     *
      * @param array<int,WorkType\Model> $workTypes
      */
     private function notifierWithWorkTypes(array $workTypes): Notifier
@@ -631,6 +709,8 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
     }
 
     /**
+     * Builds a notifier whose source mapper returns the supplied message sources.
+     *
      * @param Source[] $sources
      */
     private function notifierWithMessageSources(string $label, array $sources): Notifier
@@ -670,6 +750,9 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
         );
     }
 
+    /**
+     * Builds a notifier that retrieves the supplied domain assessment.
+     */
     private function notifierWithDomainAssessment(DomainDueWork $assessment): Notifier
     {
         $assessmentDataSource = $this->createStub(AssessmentDataSource::class);
@@ -703,6 +786,9 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
         );
     }
 
+    /**
+     * Builds a domain due work assessment with one dynamic plan and one participant.
+     */
     private function domainDueWork(WorkType\Model $workType): DomainDueWork
     {
         $now = Alaress_Date_Format::newFromTimestamp(time(), null, new \Alaress_Date_Locale_Static());
@@ -751,6 +837,9 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
         return $assessment;
     }
 
+    /**
+     * Builds a data-model participant plan for the supplied assessment ID.
+     */
     private function dataPlanForAssessment(int $assessmentId): Model
     {
         return (new Model())
@@ -759,6 +848,9 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
             ->setIsDynamic(Mapper::PLAN_TYPE_DYNAMIC);
     }
 
+    /**
+     * Builds a data-model assessment containing the due work component used by notifier routes.
+     */
     private function dataAssessment(int $assessmentId): DataModel\Model
     {
         $dueWork = (new SubmissionBox())
@@ -769,6 +861,9 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
             ->setDueWork($dueWork);
     }
 
+    /**
+     * Builds this test case as a trigger bundle for a work type visibility change.
+     */
     private function bundleForWorkTypeChange(
         string $method,
         WorkType\Model $currentWorkType,
