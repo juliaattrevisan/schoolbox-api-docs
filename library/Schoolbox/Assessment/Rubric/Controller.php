@@ -111,7 +111,7 @@ class Controller extends BaseController
         if ($post->get('type') === 'indicator') {
             $capabilityId = $post->get('capabilityId');
             $capabilityName = $post->get('capabilityName');
-            $critName = $post->get('name');
+            $indicatorName = $post->get('name');
 
             if (!$capabilityName) {
                 $this->sendJSONError(
@@ -142,7 +142,7 @@ class Controller extends BaseController
 
             $indicatorModels = $this->indicatorMapper->findByColumn('rubric_capability_id', $capabilityId);
             $proposedCapabilityName = Util::normalizeName($capabilityName);
-            $proposedName = Util::normalizeName($critName);
+            $proposedName = Util::normalizeName($indicatorName);
             foreach ($indicatorModels as $indicatorModel) {
                 $normCapability = Util::normalizeName($indicatorModel->getCapability()->getName());
                 $normName = Util::normalizeName($indicatorModel->getName());
@@ -159,14 +159,14 @@ class Controller extends BaseController
             // This indicator needs to be created
             $indicatorModel = $this->indicatorMapper->findOrCreateOneForFolderByKey(
                 $folderId,
-                $critName,
+                $indicatorName,
                 isset($capabilityModel) ? $capabilityModel->getName() : $capabilityName
             );
 
             // Don't have to save anything yet
             $indicator = (new \Schoolbox\Assessment\Rubric\RowSet\Indicator())
                 ->setId($indicatorModel->getId())
-                ->setName($critName);
+                ->setName($indicatorName);
 
             $indicatorData = $rubricGridTranslator->translateIndicator($rubricGrid, $indicator);
             $this->response = $this->responseAsJson([
