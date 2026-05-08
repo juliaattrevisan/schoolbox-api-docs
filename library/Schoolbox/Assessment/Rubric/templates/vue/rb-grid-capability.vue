@@ -98,7 +98,7 @@ const derivedMaxValue = window.Vue.computed(() => {
         // Carefully add the numbers instead of concatenating them:
         // https://stackoverflow.com/questions/14496531/adding-two-numbers-concatenates-them-instead-of-calculating-the-sum
         // ^^ That stackoverflow suggests something pretty cryptic: indicatorMaxSum = +indicatorMax + +indicatorMaxSum;
-        indicatorMaxSum = Number(indicatorMaxSum) + Number(indicatorMax);
+        indicatorMaxSum += indicatorMax;
     }
 
     return indicatorMaxSum;

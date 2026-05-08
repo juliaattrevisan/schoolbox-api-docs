@@ -81,9 +81,9 @@ class Model
 
 
     /**
-     * @return string
+     * @return int
      */
-    public function getValue(): string
+    public function getValue(): int
     {
         return $this->value;
     }
