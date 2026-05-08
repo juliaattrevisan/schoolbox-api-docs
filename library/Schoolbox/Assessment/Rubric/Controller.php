@@ -315,13 +315,30 @@ class Controller extends BaseController
                 $assessment->setGradeGroup($this->gradeGroupMapper->findById($gradeGroupId));
             }
 
-            $instructorMarkTypeId = $post->get('instructorMarkTypeId');
-            if ($instructorMarkTypeId) {
-                $assessment->setInstructorMarkType($this->markTypeMapper->findById($instructorMarkTypeId));
-            }
-            $instructorGradeGroupId = $post->get('instructorGradeGroupId');
-            if ($instructorGradeGroupId) {
-                $assessment->setInstructorGradeGroup($this->gradeGroupMapper->findById($instructorGradeGroupId));
+            /* Only SOME learning activities support the idea of an instructor mark type.
+             *
+             * TODO Technical Uplift Candidate
+             *  This is really annoying, and is a swamp deficit, whenever we have to check instanceof to see what an
+             *  $assessment instance can do. Instead of categorising them by their concrete types, we should be
+             *  categorising based on their abilities (via an interface) such as IDualMarking
+             *
+             * TODO Check based on $assessment subclass type.
+             *  According to jez 8/5/2026, regarding having instructor mark type/instructor grade group on other assessments:
+                 "Could I see dual mark types having uses in Projects and Quizzes - yes.
+                 Do I have any plans to make that possible - no."
+             */
+            if ($assessment instanceof DueWork || $assessment instanceof \Schoolbox\Learning\Assessment\Reporting\Model) {
+                $instructorMarkTypeId = $post->get('instructorMarkTypeId');
+
+                if ($instructorMarkTypeId) {
+                    $assessment->setInstructorMarkType($this->markTypeMapper->findById($instructorMarkTypeId));
+                }
+
+                $instructorGradeGroupId = $post->get('instructorGradeGroupId');
+
+                if ($instructorGradeGroupId) {
+                    $assessment->setInstructorGradeGroup($this->gradeGroupMapper->findById($instructorGradeGroupId));
+                }
             }
 
             // attempt to build the grid
