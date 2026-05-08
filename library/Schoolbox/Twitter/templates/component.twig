@@ -1,12 +1,12 @@
 {% if href is null %}
     <div class="empty-state">
-        <span class="icon-twitter"></span>
+        <sbx-icon name="twitter" size="2.5rem"></sbx-icon>
         <p>Enter a Twitter <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">@username</a>, or <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">provide a link</a> to a tweet, list or collection.</p>
     </div>
 {% else %}
     {# The empty state exists here only whilst loading the item. We have a mutation observer set up to remove it. #}
     <div class="empty-state" id="twitter-view-{{ id }}-loading-container">
-        <span class="icon-twitter"></span>
+        <sbx-icon name="twitter" size="2.5rem"></sbx-icon>
         <p id="twitter-view-{{ id }}-loading-message">
             {% block loadingMessage %}
                 {# Child templates should put a simple loading message here. #}

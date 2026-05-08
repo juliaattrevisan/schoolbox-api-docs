@@ -9,7 +9,7 @@
 {% endif %}
 
 <div id="assessment-empty-state-{{ component_id }}" class="empty-state {% if assessables is not empty %}hide{% endif %}">
-    <i class="{{ icon }}"></i>
+    <sbx-icon name="{{ icon|replace({'icon-': ''}) }}" size="2.5rem"></sbx-icon>
     {# if user does not have createRoute(create assessments) they should still be able to view their results for the assessment #}
     {% if readOnly ?? false or not createRoute %}
         <p>
