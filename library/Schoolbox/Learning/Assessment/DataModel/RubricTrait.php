@@ -36,11 +36,12 @@ trait RubricTrait
 
     /**
      * A json-encoded string corresponding to rubric title, weighting and levels (the grid contents)
+     * This return type is so annoying because of mixed locations where traits are used.
      *
      * @param array|null $rubricData
-     * @return Factory|RubricTrait|CourseManagedDecorator|Decorator
+     * @return Factory|CourseManagedDecorator|Decorator
      */
-    public function setRubricData(?array $rubricData): self
+    public function setRubricData(?array $rubricData): Factory|CourseManagedDecorator|Decorator
     {
         $this->rubricData = $rubricData;
         return $this;
