@@ -3,11 +3,14 @@
 
 <script type="text/javascript">
     $(function() {
+        const summarySeries = {{ countSummaryByMonth.series|json_encode|raw }};
+        const chartHeight = Math.min(500, Math.max(200, summarySeries.length * 32 + 100));
 
         Highcharts.chart('graph-countSummaryByMonth-{{ student.id }}', {
             chart: {
                 type: 'column',
-                height: 200
+                height: chartHeight,
+                reflow: true
             },
             credits: {
                 enabled: false
@@ -43,7 +46,7 @@
                     },
                 }
             },
-            series: {{ countSummaryByMonth.series|json_encode|raw }}
+            series: summarySeries
         });
     });
 </script>
