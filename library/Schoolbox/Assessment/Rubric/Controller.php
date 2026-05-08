@@ -232,10 +232,9 @@ class Controller extends BaseController
         try {
             if ($assessmentId = (int)$post->get('assessmentId')) {
                 $assessment = $this->assessmentDataSource->findById($assessmentId);
-                if (!$assessment instanceof DueWork) {
-                    throw new UnexpectedValueException('Assessment is not due work: ' . $assessmentId);
-                }
             } elseif ($folderId = $post->get('folderId')) {
+                /* TODO replace this with a non-due-work instance when applicable
+                 */
                 $assessment = (new DueWork())
                     ->setId(0)
                     ->setContext($this->folderMapper->findById($folderId));
@@ -298,12 +297,6 @@ class Controller extends BaseController
         $assessmentId = $this->requestPost->getInt('assessmentId');
 
         $assessment   = $this->assessmentDataSource->findById($assessmentId);
-        if (!$assessment instanceof DueWork) {
-            // This is an error. How do I generate one?
-            // Note: I can't download rubrics for due works that don't exist yet
-            $this->sendError('Can only download rubrics for due work');
-            return;
-        }
 
         /* Find the MarkType instance associated with whatever was POSTed
          */
