@@ -1,6 +1,6 @@
 <div class="row">
-    <div class="small-12 medium-6 columns">
-        <p>
+    <div class="small-12 medium-6 columns l-flex-col l-gap-s l-pad--0-left">
+        <p class="f-no-margins">
             <em>Subscriptions</em><br />
             <!-- BEGIN calendarfilter_subscribe_link -->
             <a href="/adminv2/calendar/Subscribe">Manage calendar subscriptions</a>
@@ -8,7 +8,7 @@
         </p>
 
         <!-- BEGIN calendarfilter_source -->
-        <div>
+        <div class="sbx-checkbox-radio-container">
             <input id="component{COMPONENT_INSTANCE_ID}-calendarfilter-source-{COMPONENT_CONFIG_CALENDARFILTER_VALUE}" type="checkbox" name="calendarFilter[source][]" value="{COMPONENT_CONFIG_CALENDARFILTER_VALUE}" {COMPONENT_CONFIG_CALENDARFILTER_SELECTED} />
             <label for="component{COMPONENT_INSTANCE_ID}-calendarfilter-source-{COMPONENT_CONFIG_CALENDARFILTER_VALUE}" class="checkbox-label">
                 {COMPONENT_CONFIG_CALENDARFILTER_NAME}
@@ -16,14 +16,14 @@
         </div>
         <!-- END calendarfilter_source -->
     </div>
-    <div class="small-12 medium-6 columns">
+    <div class="small-12 medium-6 columns l-flex-col l-gap-s l-pad--0-left">
         <p><em>Event Type</em></p>
 
         <input type="hidden" name="calendarFilter[eventType][]" />
         <input type="hidden" name="calendarFilter[source][]" />
 
         <!-- BEGIN calendarfilter_eventtype -->
-        <div>
+        <div class="sbx-checkbox-radio-container">
             <input id="component{COMPONENT_INSTANCE_ID}-calendarfilter-eventType-{COMPONENT_CONFIG_CALENDARFILTER_VALUE}" type="checkbox" name="calendarFilter[eventType][]" value="{COMPONENT_CONFIG_CALENDARFILTER_VALUE}" {COMPONENT_CONFIG_CALENDARFILTER_SELECTED} />
             <label for="component{COMPONENT_INSTANCE_ID}-calendarfilter-eventType-{COMPONENT_CONFIG_CALENDARFILTER_VALUE}" class="checkbox-label">
                 {COMPONENT_CONFIG_CALENDARFILTER_NAME}
