@@ -111,43 +111,25 @@ class Decorator implements DecoratorInterface
      * @throws NotFoundExceptionInterface
      */
     public function __construct(
-        int $acceptOnline,
-        int $markType,
-        int $instructorMarkType,
-        ?int $gradingScheme,
-        ?int $instructorGradingScheme,
-        ?float $maxMark,
-        ?float $instructorMaxMark,
-        ?array $rubricData,
-        array $attachedFiles,
-        ?string $selfReviewable,
-        bool $similarityCheckEnabled,
-        bool $enableWorksheet,
-        ?string $worksheetTemplate,
-        bool $enableOffline,
-        bool $enableText,
-        bool $enableFiles,
-        bool $enablePolicy,
+        private int $acceptOnline,
+        private int $markType,
+        private int $instructorMarkType,
+        private ?int $gradingScheme,
+        private ?int $instructorGradingScheme,
+        private ?float $maxMark,
+        private ?float $instructorMaxMark,
+        private ?array $rubricData,
+        private array $attachedFiles,
+        private ?string $selfReviewable,
+        private bool $similarityCheckEnabled,
+        private bool $enableWorksheet,
+        private ?string $worksheetTemplate,
+        private bool $enableOffline,
+        private bool $enableText,
+        private bool $enableFiles,
+        private bool $enablePolicy,
         private ?DueWork $original
     ) {
-        $this->setAcceptOnline($acceptOnline);
-        $this->setMarkType($markType);
-        $this->setInstructorMarkType($instructorMarkType);
-        $this->setGradingScheme($gradingScheme);
-        $this->setInstructorGradingScheme($instructorGradingScheme);
-        $this->setMaxMark($maxMark);
-        $this->setInstructorMaxMark($instructorMaxMark);
-        $this->setRubricData($rubricData);
-        $this->setAttachedFiles($attachedFiles);
-        $this->setSelfReviewable($selfReviewable);
-        $this->setSimilarityCheckEnabled($similarityCheckEnabled);
-        $this->setEnableWorksheet($enableWorksheet);
-        $this->setWorksheetTemplate($worksheetTemplate);
-        $this->setEnableOffline($enableOffline);
-        $this->setEnableText($enableText);
-        $this->setEnableFiles($enableFiles);
-        $this->setEnablePolicy($enablePolicy);
-
         /* TODO Inject these, one day
          */
         $this->markTypeMapper = MarkTypeMapper::getInstance();

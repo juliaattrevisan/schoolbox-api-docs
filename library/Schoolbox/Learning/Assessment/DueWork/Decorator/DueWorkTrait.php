@@ -21,102 +21,117 @@ trait DueWorkTrait
     /**
      * @var int
      */
-    protected $acceptOnline = DueWork::ACCEPT_ONLINE_NONE;
+    private int $acceptOnline = DueWork::ACCEPT_ONLINE_NONE;
 
 
     /**
      * @var int
      */
-    protected $markType;
+    private int $markType;
+
 
     /**
      *@var int
      */
-    protected $instructorMarkType;
+    private int $instructorMarkType;
+
 
     /**
      * @var int
      */
-    protected $gradingScheme;
+    private int $gradingScheme;
+
 
     /**
      * @var int
      */
-    protected $instructorGradingScheme;
+    private int $instructorGradingScheme;
 
 
     /**
      * @var array|string[]
      */
-    protected $attachedFiles;
+    private array $attachedFiles;
+
 
     /**
-     * @var string
+     * @var null|string
      */
-    private $selfReviewable;
+    private ?string $selfReviewable;
 
-    /**
-     * Only relevant if this DueWork's MarkType is 'TotalMark'
-     *
-     * @var float
-     */
-    private $maxMark;
 
     /**
      * Only relevant if this DueWork's MarkType is 'TotalMark'
      *
-     * @var float
+     * @var null|float
      */
-    protected $instructorMaxMark;
+    private ?float $maxMark;
+
+
+    /**
+     * Only relevant if this DueWork's MarkType is 'TotalMark'
+     *
+     * @var null|float
+     */
+    private ?float $instructorMaxMark;
+
 
     /**
      * @var bool
      */
-    private $similarityCheckEnabled = false;
+    private bool $similarityCheckEnabled = false;
+
 
     /**
      * @var bool
      */
-    protected bool $enableWorksheet = false;
+    private bool $enableWorksheet = false;
+
 
     /**
      * @var string|null
      */
-    protected ?string $worksheetTemplate = null;
+    private ?string $worksheetTemplate = null;
+
 
     /**
      * @var bool
      */
-    protected bool $enableOffline = false;
+    private bool $enableOffline = false;
+
 
     /**
      * @var bool
      */
-    protected bool $enableText = false;
+    private bool $enableText = false;
+
 
     /**
      * @var bool
      */
-    protected bool $enableFiles = false;
+    private bool $enableFiles = false;
+
 
     /**
      * @var bool
      */
-    protected bool $enablePolicy = false;
+    private bool $enablePolicy = false;
+
 
     /**
      * @return int
      */
-    protected function getAcceptOnline()
+    public function getAcceptOnline()
     {
         return $this->acceptOnline;
     }
+
 
     /**
      * @param int $acceptOnline
      * @return $this
      */
-    protected function setAcceptOnline($acceptOnline)
+    public function setAcceptOnline($acceptOnline)
     {
         $this->acceptOnline = $acceptOnline;
         return $this;
@@ -126,70 +141,77 @@ trait DueWorkTrait
     /**
      * @return int
      */
-    protected function getMarkType()
+    public function getMarkType()
     {
         return $this->markType;
     }
+
 
     /**
      * @param int $markType
      * @return $this
      */
-    protected function setMarkType($markType)
+    public function setMarkType($markType)
     {
         $this->markType = $markType;
         return $this;
     }
 
+
     /**
      * @return int
      */
-    protected function getInstructorMarkType()
+    public function getInstructorMarkType()
     {
         return $this->instructorMarkType;
     }
+
 
     /**
      * @param int $instructorMarkType
      * @return $this
      */
-    protected function setInstructorMarkType($instructorMarkType)
+    public function setInstructorMarkType($instructorMarkType)
     {
         $this->instructorMarkType = $instructorMarkType;
         return $this;
     }
 
+
     /**
      * @return int|null
      */
-    protected function getGradingScheme(): ?int
+    public function getGradingScheme(): ?int
     {
         return $this->gradingScheme;
     }
+
 
     /**
      * @param int|null $gradingScheme
      * @return static
      */
-    protected function setGradingScheme(?int $gradingScheme): static
+    public function setGradingScheme(?int $gradingScheme): static
     {
         $this->gradingScheme = $gradingScheme;
         return $this;
     }
 
+
     /**
      * @return int|null
      */
-    protected function getInstructorGradingScheme(): ?int
+    public function getInstructorGradingScheme(): ?int
     {
         return $this->instructorGradingScheme;
     }
+
 
     /**
      * @param int|null $instructorGradingScheme
      * @return static
      */
-    protected function setInstructorGradingScheme(?int $instructorGradingScheme): static
+    public function setInstructorGradingScheme(?int $instructorGradingScheme): static
     {
         $this->instructorGradingScheme = $instructorGradingScheme;
         return $this;
@@ -199,31 +221,34 @@ trait DueWorkTrait
     /**
      * @return float|null
      */
-    protected function getMaxMark()
+    public function getMaxMark()
     {
         return $this->maxMark;
     }
 
+
     /**
      * @param float|null $maxMark
      */
-    protected function setMaxMark($maxMark)
+    public function setMaxMark($maxMark)
     {
         $this->maxMark = $maxMark;
     }
 
+
     /**
      * @return float|null
      */
-    protected function getInstructorMaxMark()
+    public function getInstructorMaxMark()
     {
         return $this->instructorMaxMark;
     }
 
+
     /**
      * @param float|null $instructorMaxMark
      */
-    protected function setInstructorMaxMark($instructorMaxMark)
+    public function setInstructorMaxMark($instructorMaxMark)
     {
         $this->instructorMaxMark = $instructorMaxMark;
     }
@@ -237,6 +262,7 @@ trait DueWorkTrait
         return $this->selfReviewable;
     }
 
+
     /**
      * @param null|string $selfReviewable
      * @return $this
@@ -247,6 +273,7 @@ trait DueWorkTrait
         return $this;
     }
 
+
     /**
      * @return bool
      */
@@ -254,6 +281,7 @@ trait DueWorkTrait
     {
         return $this->similarityCheckEnabled;
     }
+
 
     /**
      * @param bool $similarityCheckEnabled
@@ -265,6 +293,7 @@ trait DueWorkTrait
         return $this;
     }
 
+
     /**
      * @param bool $enableWorksheet
      * @return $this
@@ -275,6 +304,7 @@ trait DueWorkTrait
         return $this;
     }
 
+
     /**
      * @return bool
      */
@@ -282,6 +312,7 @@ trait DueWorkTrait
     {
         return $this->enableWorksheet;
     }
+
 
     /**
      * @param string|null $worksheetTemplate
@@ -293,6 +324,7 @@ trait DueWorkTrait
         return $this;
     }
 
+
     /**
      * @return string|null
      */
@@ -300,6 +332,7 @@ trait DueWorkTrait
     {
         return $this->worksheetTemplate;
     }
+
 
     /**
      * @param bool $enableOffline
@@ -311,6 +344,7 @@ trait DueWorkTrait
         return $this;
     }
 
+
     /**
      * @return bool
      */
@@ -318,6 +352,7 @@ trait DueWorkTrait
     {
         return $this->enableOffline;
     }
+
 
     /**
      * @param bool $enableText
@@ -329,6 +364,7 @@ trait DueWorkTrait
         return $this;
     }
 
+
     /**
      * @return bool
      */
@@ -336,6 +372,7 @@ trait DueWorkTrait
     {
         return $this->enableText;
     }
+
 
     /**
      * @param bool $enableFiles
@@ -347,6 +384,7 @@ trait DueWorkTrait
         return $this;
     }
 
+
     /**
      * @return bool
      */
@@ -354,6 +392,7 @@ trait DueWorkTrait
     {
         return $this->enableFiles;
     }
+
 
     /**
      * @param bool $enablePolicy
@@ -364,6 +403,7 @@ trait DueWorkTrait
         $this->enablePolicy = $enablePolicy;
         return $this;
     }
+
 
     /**
      * @return bool

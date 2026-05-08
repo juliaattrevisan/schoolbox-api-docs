@@ -22,13 +22,13 @@ trait RubricTrait
      *
      * @var array|null
      */
-    protected ?array $rubricData = null;
+    private ?array $rubricData = null;
 
 
     /**
      * @return array|null $rubricData
      */
-    protected function getRubricData(): ?array
+    public function getRubricData(): ?array
     {
         return $this->rubricData;
     }
@@ -40,7 +40,7 @@ trait RubricTrait
      * @param array|null $rubricData
      * @return Factory|RubricTrait|CourseManagedDecorator|Decorator
      */
-    protected function setRubricData(?array $rubricData = null): self
+    public function setRubricData(?array $rubricData = null): self
     {
         $this->rubricData = $rubricData;
         return $this;

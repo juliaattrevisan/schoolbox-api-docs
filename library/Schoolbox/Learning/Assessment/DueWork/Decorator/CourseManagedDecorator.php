@@ -58,36 +58,22 @@ class CourseManagedDecorator implements DecoratorInterface
      * @param DueWork|null $original
      */
     public function __construct(
-        int $markType,
-        int $instructorMarkType,
-        ?int $gradingScheme,
-        ?int $instructorGradingScheme,
-        ?float $maxMark,
-        ?float $instructorMaxMark,
-        ?array $rubricData,
-        array $attachedFiles,
-        bool $enableWorksheet,
-        ?string $worksheetTemplate,
-        bool $enableOffline,
-        bool $enableText,
-        bool $enableFiles,
-        bool $enablePolicy,
+        private int $markType,
+        private int $instructorMarkType,
+        private ?int $gradingScheme,
+        private ?int $instructorGradingScheme,
+        private ?float $maxMark,
+        private ?float $instructorMaxMark,
+        private ?array $rubricData,
+        private array $attachedFiles,
+        private bool $enableWorksheet,
+        private ?string $worksheetTemplate,
+        private bool $enableOffline,
+        private bool $enableText,
+        private bool $enableFiles,
+        private bool $enablePolicy,
         private ?DueWork $original
     ) {
-        $this->setMarkType($markType);
-        $this->setInstructorMarkType($instructorMarkType);
-        $this->setGradingScheme($gradingScheme);
-        $this->setInstructorGradingScheme($instructorGradingScheme);
-        $this->setMaxMark($maxMark);
-        $this->setInstructorMaxMark($instructorMaxMark);
-        $this->setRubricData($rubricData);
-        $this->setAttachedFiles($attachedFiles);
-        $this->setEnableWorksheet($enableWorksheet);
-        $this->setWorksheetTemplate($worksheetTemplate);
-        $this->setEnableOffline($enableOffline);
-        $this->setEnableText($enableText);
-        $this->setEnableFiles($enableFiles);
-        $this->setEnablePolicy($enablePolicy);
     }
 
 

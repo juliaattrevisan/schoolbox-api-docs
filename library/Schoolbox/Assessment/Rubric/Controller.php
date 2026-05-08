@@ -79,15 +79,26 @@ class Controller extends BaseController
         }
         $folder = $this->folderMapper->findById($folderId);
 
+        /* We need to specify a rubric instance now, to which we're adding.
+         */
+        $rubricInstanceId = $post->get('rubricId');
+
+        if (!$rubricInstanceId) {
+            $this->sendJSONError('Must supply a rubric instance Id');
+            return;
+        }
+
+        $rubricInstance = $this->rubricInstanceMapper->findById($rubricInstanceId);
 
         // Build a rubric grid
         $assessmentId = $post->getInt('rubricId', 0);
         $rubricRowSet = $this->mapper->retrieveRowSet($folder, false);
 
-        /* TODO Research this
-         *  This was missing a third arg, but it's never been repaired. Why are we still succeeding?
-         */
-        $rubricGrid   = new Grid((new DueWork())->setId($assessmentId), $rubricRowSet);
+        $rubricGrid = new Grid(
+            (new DueWork())->setId($assessmentId),
+            $rubricInstance,
+            $rubricRowSet
+        );
 
         // Fill in each level
         $levelCount = $post->getInt('levelCount', 0);
@@ -98,9 +109,10 @@ class Controller extends BaseController
         $rubricGridTranslator = new RubricGridTranslator();
 
         if ($post->get('type') === 'indicator') {
-            $capabilityId    = $post->get('capabilityId');
-            $capabilityName  = $post->get('capabilityName');
-            $critName   = $post->get('name');
+            $capabilityId = $post->get('capabilityId');
+            $capabilityName = $post->get('capabilityName');
+            $critName = $post->get('name');
+
             if (!$capabilityName) {
                 $this->sendJSONError(
                     $this->rosettaStone->translateSentence(

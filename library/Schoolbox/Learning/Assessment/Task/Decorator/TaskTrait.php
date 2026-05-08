@@ -15,49 +15,55 @@ trait TaskTrait
     /**
      * @var bool
      */
-    protected $hasSelfAssessed = false;
+    private bool $hasSelfAssessed = false;
+
 
     /**
      * @var string
      */
-    protected $url;
+    private string $url;
+
 
     /**
      * @var array|string[]
      */
-    protected $attachedFiles;
+    private array $attachedFiles;
+
 
     /**
      * @return boolean
      */
-    protected function getHasSelfAssessed()
+    public function getHasSelfAssessed()
     {
         return $this->hasSelfAssessed;
     }
+
 
     /**
      * @param boolean $hasSelfAssessed
      * @return $this
      */
-    protected function setHasSelfAssessed($hasSelfAssessed)
+    public function setHasSelfAssessed($hasSelfAssessed)
     {
         $this->hasSelfAssessed = $hasSelfAssessed;
         return $this;
     }
 
+
     /**
      * @return string
      */
-    protected function getUrl()
+    public function getUrl()
     {
         return $this->url;
     }
+
 
     /**
      * @param string $url
      * @return $this
      */
-    protected function setUrl($url)
+    public function setUrl($url)
     {
         $this->url = $url;
         return $this;
