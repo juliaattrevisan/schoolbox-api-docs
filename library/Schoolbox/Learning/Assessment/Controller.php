@@ -626,7 +626,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
              * and only apply it when the rubric is being used in the original assessment
              */
             if ($assessment instanceof DueWork\Model && $assessment->getUseRubric()) {
-                $rubricGrid = $this->rubricDataSource->retrieveGrid($assessment, true, true);
+                $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, true, true);
 
                 /**
                  * list of all rubric grids for this assessment
