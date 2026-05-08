@@ -1962,18 +1962,11 @@ parameters:
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
 
-
 		-
 			message: '#^Method Schoolbox\\Assessment\\Rubric\\DataModel\\Result\\Model\:\:getValue\(\) should return string but returns int\.$#'
 			identifier: return.type
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/DataModel/Result/Model.php
-
-		-
-			message: '#^Instanceof between Schoolbox\\Learning\\Assessment\\DueWork\\Model and Schoolbox\\Learning\\Assessment\\DueWork\\Model will always evaluate to true\.$#'
-			identifier: instanceof.alwaysTrue
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/Grid/Exporter/ArrayExporter.php
 
 		-
 			message: '#^Instanceof between Schoolbox\\Learning\\Assessment\\DueWork\\Model and Schoolbox\\Learning\\Assessment\\DueWork\\Model will always evaluate to true\.$#'
