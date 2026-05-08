@@ -291,6 +291,27 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
     }
 
     /**
+     * Tests parent-specific update notifications that previously inherited learner topics.
+     *
+     * @param array<string,mixed> $diff                 Update diff passed to the notifier.
+     * @param string[]            $expectedDestinations Expected notification destination keys.
+     */
+    #[DataProvider('provideParentUpdatedNotifications')]
+    public function testParentUpdatedNotificationsBuildParentMessagesWithoutLearnerBranch(
+        array $diff,
+        array $expectedDestinations
+    ): void {
+        $workTypes = $this->workTypes();
+        $assessment = $this->domainDueWork($workTypes[self::WORK_TYPE_SIP]);
+        $notifier = $this->notifierWithDomainAssessment($assessment);
+        $plan = $this->dataPlanForAssessment($assessment->getId());
+
+        $envelope = $notifier->notifyParentUpdated($plan, new User(), $diff);
+
+        self::assertSame($expectedDestinations, array_keys($envelope->getAll()));
+    }
+
+    /**
      * Tests that feed notification builders only build messages for the requested audience.
      *
      * @param int      $workTypeId           Work type fixture ID for the assessment.
@@ -493,6 +514,51 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
             'parent update source does not build learner open destination' => [
                 'notifyParentUpdated',
                 [],
+            ],
+        ];
+    }
+
+    /**
+     * Provides parent update notification cases whose topics are set without learner messages.
+     *
+     * @return array<string,array{array<string,mixed>,string[]}>
+     */
+    public static function provideParentUpdatedNotifications(): array
+    {
+        return [
+            'renamed due work' => [
+                [
+                    'assessment' => [
+                        'title' => ['Visibility due work renamed', 'Visibility due work'],
+                    ],
+                ],
+                ['notify.parent.501.duework.101.renamed'],
+            ],
+            'due date changed' => [
+                [
+                    'participants' => [
+                        501 => [
+                            'dueDate' => ['2026-05-09 17:00:00', '2026-05-09 16:00:00'],
+                        ],
+                    ],
+                ],
+                ['notify.parent.501.duework.101.datechanged'],
+            ],
+            'accept online changed' => [
+                [
+                    'assessment' => [
+                        'acceptOnline' => [1, 0],
+                    ],
+                ],
+                ['notify.parent.501.duework.101.updated'],
+            ],
+            'work type changed' => [
+                [
+                    'assessment' => [
+                        'workType' => [self::WORK_TYPE_SIP, self::WORK_TYPE_SI],
+                    ],
+                ],
+                ['notify.parent.501.duework.101.updated'],
             ],
         ];
     }

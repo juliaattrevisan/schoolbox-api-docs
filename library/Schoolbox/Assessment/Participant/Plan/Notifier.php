@@ -1216,11 +1216,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             // renamed
             if (!empty($assessmentDiff['title'])) {
                 [, $oldName] = $assessmentDiff['title'];
+                $suffix = $assessment instanceof Quiz ? 'updated' : 'renamed';
 
                 // Learners
                 // Topic depends on type of assessment
                 if ($this->shouldNotifyLearner($assessment, $audience)) {
-                    $suffix = $assessment instanceof Quiz ? 'updated' : 'renamed';
                     $bob    = $this->targetBuilderToLearner($bob, $assessment, $participant)
                                    ->setTitle(self::PATTERN_RENAMED_STUDENT_TITLE)
                                    ->setParam('oldname', new Param($oldName))
@@ -1233,7 +1233,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 if ($this->shouldNotifyParent($assessment, $audience)) {
                     $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                                 ->setTitle(self::PATTERN_RENAMED_PARENT_TITLE)
-                                ->setParam('boxType', new SimpleParam($parentBoxType));
+                                ->setParam('oldname', new Param($oldName))
+                                ->setParam('boxType', new SimpleParam($parentBoxType))
+                                ->setTopics(["$topicStub.$suffix"]);
                     $envelope->targetToParent($participant->getUser(), $bob->build());
                 }
 
@@ -1275,8 +1277,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
                     // Learners
                     // Topic depends on type of assessment
+                    $suffix = $assessment instanceof Quiz ? 'updated' : 'datechanged';
                     if ($this->shouldNotifyLearner($assessment, $audience)) {
-                        $suffix = $assessment instanceof Quiz ? 'updated' : 'datechanged';
                         $bob    = $this->targetBuilderToLearner($bob, $assessment, $participant)
                                        ->setTitle(self::PATTERN_DATE_CHANGED_STUDENT_TITLE)
                                        ->setParam('date', new Param($dateformat))
@@ -1290,8 +1292,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     if ($this->shouldNotifyParent($assessment, $audience)) {
                         $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                                     ->setTitle(self::PATTERN_DATE_CHANGED_PARENT_TITLE)
+                                    ->setParam('date', new Param($dateformat))
                                     ->setParam('boxType', new Param($parentBoxType))
-                                    ->setParam('verb', new Param($verb, null, Param::STACKING_APPEND));
+                                    ->setParam('verb', new Param($verb, null, Param::STACKING_APPEND))
+                                    ->setTopics(["$topicStub.$suffix"]);
                         $envelope->targetToParent($participant->getUser(), $bob->build());
                     }
 
@@ -1321,7 +1325,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                         ? self::PATTERN_NO_SUBMIT_PARENT_TITLE
                         : self::PATTERN_ACCEPT_ONLINE_PARENT_TITLE;
                     $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                                ->setTitle($m);
+                                ->setTitle($m)
+                                ->setTopics(["$topicStub.updated"]);
                     $envelope->targetToParent($participant->getUser(), $bob->build());
                 }
             }
@@ -1344,7 +1349,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 if ($this->shouldNotifyParent($assessment, $audience)) {
                     $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                                 ->setTitle(self::PATTERN_UPDATE_PARENT_TITLE)
-                                ->setParam('boxType', new Param($parentBoxType));
+                                ->setParam('boxType', new Param($parentBoxType))
+                                ->setTopics(["$topicStub.updated"]);
                     $envelope->targetToParent($participant->getUser(), $bob->build());
                 }
                 $bob->unsetParam('boxType');
