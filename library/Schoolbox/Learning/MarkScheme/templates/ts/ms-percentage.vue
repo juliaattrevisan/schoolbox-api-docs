@@ -19,6 +19,7 @@ interface Props {
     readonly?: boolean;
     class?: string;
     errorPlaceholderSelector?: string;
+    allowInvalidMark?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -45,5 +46,6 @@ const mark = defineModel<string | null>("mark", { required: true });
             },
         }"
         :error-placeholder-selector="props.errorPlaceholderSelector"
+        :allow-invalid-mark="props.allowInvalidMark"
     />
 </template>

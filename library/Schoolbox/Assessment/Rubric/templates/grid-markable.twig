@@ -32,22 +32,3 @@
     />
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricMarkable.js?v={{ config.site_version }}"></script>
-
-{% autoescape 'js' %}
-<script type="text/javascript">
-    $(function () {
-        const markType  = "{{ markScheme.generateContext.mode }}";
-
-        function revalidateCapMarks() {
-            $("[data-group-mark]").each(function() {
-                $(this).valid();
-            });
-        }
-
-        // Overwrite any custom mark in the capability mark field with the scaled mark calculated from descriptor values
-        $("[data-use-descriptor-values]").on('click', function(e) {
-            revalidateCapMarks();
-        });
-    });
-</script>
-{% endautoescape %}

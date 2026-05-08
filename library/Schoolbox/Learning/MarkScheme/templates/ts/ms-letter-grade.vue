@@ -22,6 +22,7 @@ interface Props {
      */
     readonly?: boolean;
     errorPlaceholderSelector?: string;
+    allowInvalidMark?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -42,6 +43,8 @@ const mark = defineModel<string | null>("mark", { required: true });
         :max-length="48"
         input-title=""
         readonly
+        :error-placeholder-selector="props.errorPlaceholderSelector"
+        :allow-invalid-mark="props.allowInvalidMark"
     />
 
     <!-- TODO: at some point add alaressValidate's 'withinLetterGradeRange' rule to this -->

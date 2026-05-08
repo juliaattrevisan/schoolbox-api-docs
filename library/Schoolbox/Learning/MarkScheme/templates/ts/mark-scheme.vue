@@ -34,6 +34,11 @@ interface Props {
      * Should be a selector for an element for the error to be placed within, all inner content gets replaced
      */
     errorPlaceholderSelector?: string;
+    /**
+     * If false, prevents mark from updating until the value is valid
+     * If true, the value of mark will update regardless of validation, but validation messages will still display as normal
+     */
+    allowInvalidMark?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -53,6 +58,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         :tab-index="props.tabIndex"
         :readonly="props.readonly"
         :error-placeholder-selector="props.errorPlaceholderSelector"
+        :allow-invalid-mark="props.allowInvalidMark"
     />
     <ms-percentage
         v-else-if="props.markScheme.template === 'Percentage'"
@@ -64,6 +70,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         :tab-index="props.tabIndex"
         :readonly="props.readonly"
         :error-placeholder-selector="props.errorPlaceholderSelector"
+        :allow-invalid-mark="props.allowInvalidMark"
     />
     <ms-total-mark-fractional
         v-else-if="props.markScheme.template === 'TotalMarkFractional'"
@@ -77,6 +84,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         :readonly="props.readonly"
         :limit="props.limit"
         :error-placeholder-selector="props.errorPlaceholderSelector"
+        :allow-invalid-mark="props.allowInvalidMark"
     />
 </template>
 

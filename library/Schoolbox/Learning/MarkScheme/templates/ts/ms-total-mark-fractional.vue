@@ -32,6 +32,7 @@ interface Props {
      */
     limit?: number;
     errorPlaceholderSelector?: string;
+    allowInvalidMark?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -76,5 +77,6 @@ const limit = window.Vue.computed(() => {
             },
         }"
         :error-placeholder-selector="props.errorPlaceholderSelector"
+        :allow-invalid-mark="props.allowInvalidMark"
     />
 </template>

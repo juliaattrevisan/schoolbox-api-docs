@@ -37,6 +37,7 @@ interface Props {
      */
     alaressValidateOptions?: Record<string, unknown>;
     errorPlaceholderSelector?: string;
+    allowInvalidMark?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -55,21 +56,27 @@ async function onMarkChanged(): Promise<void> {
         return;
     }
 
-    /* only persist the mark if it's valid */
-    if (markInputEl.value && (!props.alaressValidateOptions || window.jQuery(markInputEl.value).valid())) {
-        const newValue = markInputEl.value.value;
-
-        /* ignore if the mark hasn't _meaningfully_ changed */
-        if ((newValue ?? "") === (mark.value ?? "")) {
-            return;
-        }
-
-        updatingFromInput = true;
-        mark.value = newValue;
-
-        await window.Vue.nextTick();
-        updatingFromInput = false;
+    if (!markInputEl.value) {
+        throw new Error("Unable to find mark input element");
     }
+
+    /* only persist the mark if it's valid (and props.allowInvalidMark is false), still always check validity for validation messages */
+    if (props.alaressValidateOptions && !window.jQuery(markInputEl.value).valid() && !props.allowInvalidMark) {
+        return;
+    }
+
+    const newValue = markInputEl.value.value;
+
+    /* ignore if the mark hasn't _meaningfully_ changed */
+    if ((newValue ?? "") === (mark.value ?? "")) {
+        return;
+    }
+
+    updatingFromInput = true;
+    mark.value = newValue;
+
+    await window.Vue.nextTick();
+    updatingFromInput = false;
 }
 
 /**

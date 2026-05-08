@@ -292,6 +292,7 @@ window.Vue.watch(
                     :submission-error-states="[] /** no error states here */"
                     :limit="capability.maxValue ?? undefined"
                     :error-placeholder-selector="`#${markSchemeInputId}-error`"
+                    :allow-invalid-mark="true /** since we want to be able to show the assign from button if invalid */"
                     class="rb-value-input groupMark"
                 />
 
