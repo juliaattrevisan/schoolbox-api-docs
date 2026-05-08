@@ -7,7 +7,7 @@ import type { MarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates
  * @param maxValue the max
  * @returns pecentage
  */
-function getPercentage(value: string | number | null, maxValue: number): string | null {
+function getPercentage(value: string | number | null, maxValue: number): number | null {
     const floatValue = parseFloat(String(value)); // yikes.
     if (Number.isNaN(floatValue)) {
         return null;
@@ -20,7 +20,7 @@ function getPercentage(value: string | number | null, maxValue: number): string 
         percentage = parseFloat(percentage.toFixed(2));
     }
 
-    return percentage.toString();
+    return percentage;
 }
 
 /**
@@ -55,14 +55,14 @@ export function applyMarkScheme(
 
     if (markScheme.template === "Percentage") {
         return {
-            value: percentage,
-            humanReadableMark: `${percentage}%`,
+            value: percentage !== null ? percentage.toString() : null,
+            humanReadableMark: percentage !== null ? `${percentage}%` : null,
         };
     }
 
     if (markScheme.template === "LetterGrade") {
         const grades = markScheme.context.conf;
-        if (percentage === null || percentage === "") {
+        if (percentage === null) {
             return { value: null, humanReadableMark: null };
         }
 
@@ -71,16 +71,60 @@ export function applyMarkScheme(
             return { value: "", humanReadableMark: "" };
         }
 
-        const numericValue = parseFloat(percentage); // yikes.
-
         // TODO: (from old logic) assumes values are always descending which might not be the case?
         // default to the last grade if nothing matches
         const defaultGrade = grades[grades.length - 1];
-        const relevantGrade = grades.find((grade) => numericValue >= grade.lowerBound) ?? defaultGrade;
+        const relevantGrade = grades.find((grade) => percentage >= grade.lowerBound) ?? defaultGrade;
         return {
             value: relevantGrade.caption,
             humanReadableMark: relevantGrade.caption,
         };
+    }
+
+    return assertUnreachable(markScheme);
+}
+
+/**
+ * Derive a scaled mark from a custom mark (essentially the inverse of applyMarkScheme)
+ * @param value the custom mark value
+ * @param maxValue the max value for the mark (irrelevant for no mark scheme)
+ * @param markScheme the mark scheme to use
+ * @returns the scaled mark value
+ */
+export function deriveScaledMark(
+    value: string | number | null,
+    maxValue: number | null,
+    markScheme: MarkScheme,
+): number | null {
+    if (markScheme.template === "") {
+        return null;
+    }
+
+    if (markScheme.template === "TotalMarkFractional") {
+        const floatValue = parseFloat(String(value));
+        if (Number.isNaN(floatValue)) {
+            return null;
+        }
+        return floatValue;
+    }
+
+    if (markScheme.template === "Percentage") {
+        const floatValue = parseFloat(String(value));
+        if (Number.isNaN(floatValue)) {
+            return null;
+        }
+
+        return (floatValue * (maxValue ?? 0)) / 100;
+    }
+
+    if (markScheme.template === "LetterGrade") {
+        const grades = markScheme.context.conf;
+        const relevantGrade = grades.find((grade) => grade.caption === value);
+        if (!relevantGrade) {
+            return null;
+        }
+
+        return (relevantGrade.rawGrade * (maxValue ?? 0)) / 100;
     }
 
     return assertUnreachable(markScheme);

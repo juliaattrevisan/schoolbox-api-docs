@@ -10,7 +10,7 @@ import type { MarkScheme as CapabilityMarkScheme } from "@schoolboxLibrary/Learn
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import type { RubricGridCapability, RubricGridLevel, RubricMarkedGridCapability } from "./types";
 import RmGridIndicator from "./rm-grid-indicator.vue";
-import { applyMarkScheme } from "./rubricUtils";
+import { applyMarkScheme, deriveScaledMark } from "./rubricUtils";
 
 interface Props {
     capability: RubricGridCapability;
@@ -210,14 +210,22 @@ window.Vue.onMounted(() => {
 window.Vue.watch(
     () => capabilityMark.value.value,
     () => {
-        // force sync the humanReadableMark/scaledMark attrs whenever the value changes
+        // force sync the scaledMark/humanReadableMark attrs whenever the value changes
+        // the value we recieve in capabilityMark.value.value here may be a percentage, letter grade, or total mark
+        // depending on the mark type, so first rederive the scaled mark based on the raw value and re-apply the mark scheme
+        const scaledMark = deriveScaledMark(
+            capabilityMark.value.value,
+            props.capability.maxValue,
+            props.capabilityMarkScheme,
+        );
         const { humanReadableMark } = applyMarkScheme(
             capabilityMark.value.value,
             props.capability.maxValue,
             props.capabilityMarkScheme,
         );
+
+        capabilityMark.value.scaledMark = scaledMark;
         capabilityMark.value.humanReadableMark = humanReadableMark;
-        // capabilityMark.value.scaledMark = ; // TODO: this is not a valid way to rederive scaledMark yet...
 
         // if the mark now differs to the derived mark (aka assign from is showing), consider it customised
         if (showAssignFromButton.value) {

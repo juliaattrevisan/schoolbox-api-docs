@@ -33,16 +33,11 @@
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricMarkable.js?v={{ config.site_version }}"></script>
 
-{% set rubricId = 'rb-' ~ rubricGrid.assessment.id %}
-{% set markScheme = selfAssess or studentView ? rubricGrid.assessment.markScheme : rubricGrid.assessment.instructorMarkScheme %}
-{% set markType = markScheme.generateContext %}
-
 {% autoescape 'js' %}
 {% if false %}
 <script type="text/javascript">
     $(function () {
-        var $rb       = $('#{{ rubricId }}'),
-            markType  = $rb.find("[data-mark-type]").attr("data-mark-type");
+        const markType  = "{{ markScheme.generateContext.mode }}";
 
         $("[data-feedback-form]").validate(
             {
@@ -85,72 +80,8 @@
             });
         }
 
-        // Update the per-capability and overall marks when descriptor selection is changed
-        $rb.on('change change.preload', '[data-rubric], [data-rubric-group]', function (e) {
-            // Only update the overall mark if we haven't customised the cap mark
-            if (! $groupSummary.attr('data-customised')) {
-                // TODO: update overall rubric mark
-            }
-        });
-
-
-        // Update the overall rubric mark when the user changes the custom capabilty mark
-        $rb.on('change change.preload', '[data-group-mark]', function (e) {
-            var $changed = $(this);
-            var rubricId = $changed.closest('[data-group-summary]').attr('data-rubric-id');
-            var groupId = $changed.closest('[data-group-summary]').attr('data-group-id');
-
-            var rowSelector = '[data-group="rb-' + rubricId + '-' + groupId + '"]';
-            var $groupRows = $(rowSelector);
-            var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
-            var $groupSummary = $rb.find(groupSummarySelector);
-
-            // The custom mark is on the raw-grade data attribute now
-            var customMark = markType === 'letter'
-                ? $changed.find(':selected').attr('data-raw-grade')
-                : $changed.val();
-
-            if ($groupSummary.length) {
-                var normalisedMark = getNormalisedCustomMark($groupRows, customMark, $groupSummary.attr('data-row-max-sum'), $groupSummary.attr('data-max'));
-                $groupSummary.attr('data-scaled-mark', normalisedMark);
-                $groupSummary.attr('data-customised', true);
-            }
-
-            // TODO: update overall rubric mark
-        });
-
-        // Custom marks reach us as either a scaled numeric mark or a percentage. Turn them into an unscaled raw mark for data-mark
-        function getNormalisedCustomMark($groupRows, customMark, rowMaxSum, capMax) {
-            // The custom mark may be empty. This is null, not zero
-            if (customMark === '') {
-                return null;
-            }
-
-            var normalised = 0;
-
-            if ($groupRows.length) {
-                // var rowCount = $groupRows.length;
-                switch (markType) {
-                    case 'letter':
-                    case 'percent':
-                        // What is x percent of the total possible (unscaled) marks?
-                        normalised = customMark * (capMax / 100);
-                        break;
-
-                    case 'raw':
-                    case 'none':
-                    default:
-                        normalised = customMark;
-                        break;
-                }
-            }
-
-            return normalised;
-        }
-
         // Overwrite any custom mark in the capability mark field with the scaled mark calculated from descriptor values
         $("[data-use-descriptor-values]").on('click', function(e) {
-            // TODO: update overall rubric mark
             revalidateCapMarks();
         });
     });
