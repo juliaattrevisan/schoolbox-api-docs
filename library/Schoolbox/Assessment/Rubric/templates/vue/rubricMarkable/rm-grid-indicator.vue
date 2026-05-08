@@ -26,9 +26,6 @@ window.Vue.watch(
 </script>
 
 <template>
-    <!-- TODO: data-group="{{ rubricId }}-{{ groupUsage.capability.id }}" -->
-    <!-- TODO: data-capability-id="{{ groupUsage.capability.id }}" -->
-    <!-- TODO: data-indicator-id="{{ indicatorId }}" -->
     <tr class="rb-indicator-row">
         <!-- TODO: should be scrubbed (markdown) and output as html -->
         <th class="rb-criterion-name markdown">{{ props.indicator.name }}</th>

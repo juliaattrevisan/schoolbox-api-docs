@@ -82,7 +82,7 @@ function scaleMark(value: number | null): number | null {
         return null;
     }
 
-    const capabilityMax = props.capability.maxValue ?? 0; // TODO: can this actually be null??
+    const capabilityMax = props.capability.maxValue ?? 0;
     const derivedMax = props.capability.derivedMaxValue;
 
     const scale = derivedMax > 0 ? capabilityMax / derivedMax : 1;
@@ -273,17 +273,9 @@ window.Vue.watch(
 
     <tr v-if="showSummaryForThisCapability">
         <th class="rb-group-summary" :colspan="props.levels.length + 1 /* descriptors + indicator column */">
-            <!-- TODO: this span wrapper is probably unnecessary and solely for the old data attrs -->
-            <!-- TODO: data-group-summary="{{ rubricId }}-{{ capabilityId }}" -->
-            <!-- TODO: data-max="{{ capabilityMaxValue }}" -->
-            <!-- TODO: data-row-max-sum="{{ capabilityMaxFromIndicators }}" -->
-            <!-- TODO: data-group-id="{{ capabilityId }}" -->
-            <!-- TODO: data-rubric-id="{{ rubricGrid.id }}" -->
-            <!-- TODO: data-mark-type="{{ capabilityMarkType.mode }}" -->
             <span>
                 <label :for="markSchemeInputId"> {{ locale.rubricGroup.proper() }} mark </label>
 
-                <!-- TODO: data-group-mark -->
                 <mark-scheme
                     :id="markSchemeInputId"
                     v-model:mark="capabilityMark.value"
@@ -309,10 +301,8 @@ window.Vue.watch(
                 @click.prevent="useDerivedMark"
             >
                 <!-- avoid showing "assign null from ...", only show if there's a meaningful value -->
-                <!-- TODO: confirm if this works, otherwise (hasSelectedDescriptor && hasSelectedValuedDescriptor && capabilityHasValuedDescriptors) is the old logic -->
                 <template v-if="derivedCapabilityMark.scaledMark !== null">
                     Assign
-                    <!-- TODO: data-group-descriptor-sum -->
                     <span class="descriptor-sum">{{ derivedCapabilityMark.value }}</span>
                     from {{ locale.rubricCriterion.plural() }}
                 </template>

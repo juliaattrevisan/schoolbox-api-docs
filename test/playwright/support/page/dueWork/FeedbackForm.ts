@@ -24,6 +24,8 @@ export default class FeedbackForm {
 
     static readonly DATA_TEST_ASSESSMENT_SELF_ASSESSMENT_MARK = "assessment-feedback-self-assessment-mark";
 
+    static readonly DATA_TEST_RUBRIC_DESCRIPTOR_INPUT = "rubric-descriptor-input"; // append "-[descriptorId]-[value]"
+
     static readonly DATA_TEST_RUBRIC_FINAL_SUMMARY = "rubric-final-summary";
 
     static readonly DATA_TEST_RUBRIC_SUM = "rubric-sum";
@@ -147,8 +149,9 @@ export default class FeedbackForm {
      * @param value - The value of the indicator
      */
     async selectRubricIndicatorByValue(indicatorId: number, value: string | number): Promise<void> {
+        // TODO: refine this to match descriptor/indicator correctly
         const inputId = await this.page
-            .locator(`input[data-rubric-indicator="${indicatorId}"][data-value="${value}"]`)
+            .getByTestId(`${FeedbackForm.DATA_TEST_RUBRIC_DESCRIPTOR_INPUT}-${indicatorId}-${value}`)
             .getAttribute("id");
         await this.page.locator(`label[for="${inputId}"]`).click();
     }

@@ -64,7 +64,7 @@ export type RubricMarkedGrid = {
      * the overall human-readable mark given
      * null if it shouldn't be displayed / doesn't exist (e.g. for self assessment feedback, if feedback.isSelfGrading is false)
      */
-    humanReadableMark: string | null; // TODO: markable grid uses instructor mark type instead for self assessment feedback
+    humanReadableMark: string | null;
     capabilities: RubricMarkedGridCapability[];
 };
 
