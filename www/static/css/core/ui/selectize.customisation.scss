@@ -191,6 +191,8 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 }
 
 .selectize-dropdown {
+    border-radius: var(--sbx-config-field-roundness, 0);
+    padding: var(--sbx-size-xxs, 0);
     // ¯\_(ツ)_/¯
     // (just has to be > .reveal-modal-bg z-index value)
     z-index: calc(var(--sbx-depth-modal) + 2);

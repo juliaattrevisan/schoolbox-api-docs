@@ -77,7 +77,7 @@ body.sbx-body {
 
     // Give a bit more padding to selectize items due to the increase in font-size
     .selectize-input .item {
-        padding: 2px;
+        padding: var(--sbx-size-xs);
     }
 
     // color picker input width fix
