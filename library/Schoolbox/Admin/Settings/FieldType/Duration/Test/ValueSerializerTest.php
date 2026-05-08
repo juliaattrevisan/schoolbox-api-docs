@@ -49,7 +49,7 @@ class ValueSerializerTest extends IntValueSerializerTest
                     'value' => '',
                     'required' => false
                 ],
-                '0'
+                ''
             ],
             'optional field, zero value' => [
                 [
@@ -57,7 +57,7 @@ class ValueSerializerTest extends IntValueSerializerTest
                     'value' => '0',
                     'required' => false
                 ],
-                '0'
+                ''
             ],
             'optional field, whitespace only' => [
                 [
@@ -65,7 +65,7 @@ class ValueSerializerTest extends IntValueSerializerTest
                     'value' => '   ',
                     'required' => false
                 ],
-                '0'
+                ''
             ],
             'optional field, valid value with min' => [
                 [

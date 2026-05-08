@@ -13,11 +13,20 @@ class ValueSerializer extends IntValueSerializer
      */
     public function serializeValue($value, $config): string
     {
+        // Attempt to parse the value, if it can't be parsed then handle as if it were unset
         $value = trim((string)$value);
+        if (!is_numeric($value)) {
+            $value = '';
+        }
 
-        // 0 represents disabled, only when the field is optional
-        if (!$config->getRequired() && ('' === $value || '0' === $value)) {
-            return '0';
+        // '0' is equivalent to a blank value, as a duration of 0 is the same as no duration at all
+        if ('0' === $value) {
+            $value = '';
+        }
+
+        // Allow the field to be optional if it is not required (otherwise the parent serializer enforces the min/max which isn't the same as optional)
+        if (!$config->getRequired() && '' === $value) {
+            return '';
         }
 
         // otherwise, ensure the value is within the expected range
