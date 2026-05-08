@@ -30,6 +30,7 @@ use Schoolbox\Assessment\Participant\Plan\Model as Plan;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizFeedbackMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception\Deleted as DeletedException;
@@ -67,6 +68,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private const TRIGGER_UPCOMING = 'upcoming';
     private const TRIGGER_OVERDUE  = 'overdue';
     private const TRIGGER_CLOSED   = 'closed';
+
+    private const AUDIENCE_LEARNER = 'learner';
+    private const AUDIENCE_PARENT = 'parent';
+    private const AUDIENCE_STAFF = 'staff';
 
     private const PATTERN_OPEN_STUDENT_TITLE = ':boxType :assessment opened in :cat';
     private const PATTERN_OPEN_PARENT_TITLE = ':boxType :assessment opened in :cat for :child';
@@ -211,21 +216,21 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     }
 
     /**
-     * Copypasted from pastoral comment notifier.
-     *
-     * I prefer this way anyway, it divorces notifiers from role type.
-     *
-     * TODO try to remove this and play within rules of the standard callback system
-     *
      * @param string $label
      *
      * @return array
+     * @throws BaseMapper\Exception
+     * @throws \Schoolbox\Realtime\Schedule\ScheduleException
      */
     public function retrieveCallbacks($label): array
     {
-        return [
-            [$this, "notify" . ucfirst($label)],
-        ];
+        $callbacks = parent::retrieveCallbacks($label);
+        if ($callbacks !== []) {
+            return $callbacks;
+        }
+
+        $method = "notify" . ucfirst($label);
+        return method_exists($this, $method) ? [[$this, $method]] : [];
     }
 
 
@@ -293,19 +298,18 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return;
         }
 
-        /**
-         * Newly created assessment is hidden from learners and parents, or closed
-         */
-        $isCurrentHidden = false;
+        $currentAudienceVisibility = $this->getNotificationAudienceVisibility($assessment->getWorkType());
         try {
             if ($assessment->getWorkType() !== null) {
                 $workType = $this->workTypeMapper->findById($assessment->getWorkType()->getId());
-                $isCurrentHidden = !$workType->isVisibleToLearners() && !$workType->isVisibleToParents();
+                $currentAudienceVisibility = $this->getNotificationAudienceVisibility($workType);
             }
         } catch (BaseMapper\Exception $e) {
             // noop;
         }
-        if ($method === Mapper::METHOD_CREATE && $isCurrentHidden) {
+        $isCurrentVisibleToAnyAudience = $this->isVisibleToAnyNotificationAudience($currentAudienceVisibility);
+
+        if ($method === Mapper::METHOD_CREATE && !$isCurrentVisibleToAnyAudience) {
             return;
         }
         $closeDate = $this->coalesceDates($plan->getCloseDate(), $assessment->getCloseDate());
@@ -314,10 +318,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return;
         }
 
-        /**
-         * Changed to hidden from learners and parents
-         */
-        $isPreviousHidden = false;
+        $previousAudienceVisibility = ['learners' => true, 'parents' => true];
+        $isPreviousVisibleToAnyAudience = true;
         if (
             $method === Mapper::METHOD_UPDATE
             && array_key_exists('assessment', $diff)
@@ -326,9 +328,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             try {
                 if ($diff['assessment']['workType'][1] !== null) {
                     $previousWorkType = $this->workTypeMapper->findById($diff['assessment']['workType'][1]);
-                    $isPreviousHidden = !$previousWorkType->isVisibleToLearners() && !$previousWorkType->isVisibleToParents();
+                    $previousAudienceVisibility = $this->getNotificationAudienceVisibility($previousWorkType);
                 }
-                if ($isPreviousHidden && $isCurrentHidden) {
+                $isPreviousVisibleToAnyAudience = $this->isVisibleToAnyNotificationAudience($previousAudienceVisibility);
+                if (!$isPreviousVisibleToAnyAudience && !$isCurrentVisibleToAnyAudience) {
                     // no notification
                     return;
                 }
@@ -337,7 +340,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             }
         }
 
-        if (!$isCurrentClosed && !$isPreviousHidden && $isCurrentHidden) {
+        if (!$isCurrentClosed && $isPreviousVisibleToAnyAudience && !$isCurrentVisibleToAnyAudience) {
             $bundle->detachEach([
                 self::TRIGGER_OPEN,
                 self::TRIGGER_UPCOMING,
@@ -386,7 +389,13 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         /**
          * Trigger.
          */
-        if (!$isCurrentClosed && ($method === Mapper::METHOD_CREATE || ($isPreviousHidden && !$isCurrentHidden))) {
+        if (
+            !$isCurrentClosed
+            && (
+                $method === Mapper::METHOD_CREATE
+                || (!$isPreviousVisibleToAnyAudience && $isCurrentVisibleToAnyAudience)
+            )
+        ) {
             /**
              * New or just switched from hidden to visible status
              */
@@ -511,11 +520,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 }
 
                 $key = "{$assessment->getId()}.{$domainModelPlan->getId()}";
+                $feedAudience = $this->getFeedAudience($user, $assessment, $access);
                 $notifsForPlans["$key.open"] = $this
-                    ->internalNotifyOpen($assessment, $dataModelPlan, true)
+                    ->internalNotifyOpen($assessment, $dataModelPlan, $feedAudience)
                     ->getAll($openDate?->getUnixTimeStamp());
                 $notifsForPlans["$key.closed"] = $this
-                    ->internalNotifyClosed($assessment, $dataModelPlan, true)
+                    ->internalNotifyClosed($assessment, $dataModelPlan, $feedAudience)
                     ->getAll($dueDate?->getUnixTimeStamp());
             }
         }
@@ -588,7 +598,19 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function notifyOpen(Model $plan): Envelope
     {
-        return $this->internalNotifyOpen($this->retrieveAssessmentDomainModel($plan), $plan, false);
+        return $this->internalNotifyOpen($this->retrieveAssessmentDomainModel($plan), $plan);
+    }
+
+    /**
+     * Learner-scoped callback for the role-specific message source.
+     *
+     * @param Model $plan
+     * @return Envelope
+     * @throws DeletedException
+     */
+    public function notifyStudentOpen(Model $plan): Envelope
+    {
+        return $this->notifyOpen($plan);
     }
 
 
@@ -598,15 +620,16 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      *
      * @param IAssessable $assessment
      * @param Model       $plan
-     * @param bool        $forFeed Is this for the feed? If so, notify parents and staff
+     * @param string|null $feedAudience The feed viewer audience, or null for scheduled notification delivery.
      * @return Envelope
      */
-    private function internalNotifyOpen(IAssessable $assessment, Model $plan, bool $forFeed): Envelope
+    private function internalNotifyOpen(IAssessable $assessment, Model $plan, ?string $feedAudience = null): Envelope
     {
         $envelope = new Envelope();
         if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_OPEN)) {
             return $envelope;
         }
+        $forFeed = $feedAudience !== null;
 
         if ($assessment instanceof DueWork) {
             $topicSuffix = "open";
@@ -638,10 +661,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             $participantCount++;
 
             // build for learner
-            $this->internalNotifyLearnerOpen($envelope, $participant, $topicStub);
+            if (!$forFeed || $feedAudience === self::AUDIENCE_LEARNER) {
+                $this->internalNotifyLearnerOpen($envelope, $participant, $topicStub);
+            }
 
             // For feed only: build for parent
-            if (!($forFeed && $this->isParentNotifiable($assessment))) {
+            if (!($forFeed && $feedAudience === self::AUDIENCE_PARENT && $this->isParentNotifiable($assessment))) {
                 continue;
             }
             $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
@@ -651,7 +676,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         // For feed only: build for staff
-        if ($forFeed && $participantCount > 0) {
+        if ($forFeed && $feedAudience === self::AUDIENCE_STAFF && $participantCount > 0) {
             $title = sprintf(
                 ':assessment has opened for %d student%s',
                 $participantCount,
@@ -729,6 +754,44 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function notifyUpcoming(Model $plan): Envelope
     {
+        return $this->internalNotifyUpcoming($plan);
+    }
+
+    /**
+     * Learner-scoped callback for the role-specific message source.
+     *
+     * @param Model $plan
+     * @return Envelope
+     * @throws DeletedException
+     */
+    public function notifyStudentUpcoming(Model $plan): Envelope
+    {
+        return $this->internalNotifyUpcoming($plan, self::AUDIENCE_LEARNER);
+    }
+
+    /**
+     * Parent-scoped callback for the role-specific message source.
+     *
+     * @param Model $plan
+     * @return Envelope
+     * @throws DeletedException
+     */
+    public function notifyParentUpcoming(Model $plan): Envelope
+    {
+        return $this->internalNotifyUpcoming($plan, self::AUDIENCE_PARENT);
+    }
+
+
+    /**
+     * Internal method for notifying on upcoming.
+     *
+     * @param Model       $plan
+     * @param string|null $audience
+     * @return Envelope
+     * @throws DeletedException
+     */
+    private function internalNotifyUpcoming(Model $plan, ?string $audience = null): Envelope
+    {
         $assessment = $this->retrieveAssessmentDomainModel($plan);
         $envelope   = new Envelope();
         if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_UPCOMING)) {
@@ -762,7 +825,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             $when = $participant->getDueDate()->getRelativeTime(Alaress_Date_Format::now()->addMinutes(-5), true);
 
             // build for student, only if they're allowed
-            if ($this->isLearnerNotifiable($assessment)) {
+            if ($this->shouldNotifyLearner($assessment, $audience)) {
                 $bob = $this->targetBuilderToLearner($bob, $assessment, $participant)
                            ->setTitle(self::PATTERN_UPCOMING_STUDENT_TITLE)
                            ->setParam('when', new Param($when));
@@ -770,7 +833,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             }
 
             // build for parent, only if they're allowed
-            if ($this->isParentNotifiable($assessment)) {
+            if ($this->shouldNotifyParent($assessment, $audience)) {
                 $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                             ->setTitle(self::PATTERN_UPCOMING_PARENT_TITLE)
                             ->setParam('when', new Param($when));
@@ -792,6 +855,44 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @throws DeletedException
      */
     public function notifyOverdue(Model $plan): Envelope
+    {
+        return $this->internalNotifyOverdue($plan);
+    }
+
+    /**
+     * Learner-scoped callback for the role-specific message source.
+     *
+     * @param Model $plan
+     * @return Envelope
+     * @throws DeletedException
+     */
+    public function notifyStudentOverdue(Model $plan): Envelope
+    {
+        return $this->internalNotifyOverdue($plan, self::AUDIENCE_LEARNER);
+    }
+
+    /**
+     * Parent-scoped callback for the role-specific message source.
+     *
+     * @param Model $plan
+     * @return Envelope
+     * @throws DeletedException
+     */
+    public function notifyParentOverdue(Model $plan): Envelope
+    {
+        return $this->internalNotifyOverdue($plan, self::AUDIENCE_PARENT);
+    }
+
+
+    /**
+     * Internal method for notifying on overdue.
+     *
+     * @param Model       $plan
+     * @param string|null $audience
+     * @return Envelope
+     * @throws DeletedException
+     */
+    private function internalNotifyOverdue(Model $plan, ?string $audience = null): Envelope
     {
         $envelope   = new Envelope();
         $assessment = $this->retrieveAssessmentDomainModel($plan);
@@ -826,7 +927,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             }
 
             // build for student, only if they're allowed
-            if ($this->isLearnerNotifiable($assessment)) {
+            if ($this->shouldNotifyLearner($assessment, $audience)) {
                 $bob = $this->targetBuilderToLearner($bob, $assessment, $participant)
                             ->setTitle(self::PATTERN_OVERDUE_STUDENT_TITLE)
                             ->setParam('overdue', new SimpleParam($overdue))
@@ -835,7 +936,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             }
 
             // build for parent, only if they're allowed
-            if ($this->isParentNotifiable($assessment)) {
+            if ($this->shouldNotifyParent($assessment, $audience)) {
                 $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                             ->setTitle(self::PATTERN_OVERDUE_PARENT_TITLE)
                             ->setParam('submit', new SimpleParam($submit))
@@ -859,7 +960,19 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function notifyClosed(Model $plan): Envelope
     {
-        return $this->internalNotifyClosed($this->retrieveAssessmentDomainModel($plan), $plan, false);
+        return $this->internalNotifyClosed($this->retrieveAssessmentDomainModel($plan), $plan);
+    }
+
+    /**
+     * Staff-scoped callback for the role-specific message source.
+     *
+     * @param Model $plan
+     * @return Envelope
+     * @throws DeletedException
+     */
+    public function notifyStaffClosed(Model $plan): Envelope
+    {
+        return $this->notifyClosed($plan);
     }
 
 
@@ -869,15 +982,16 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      *
      * @param IAssessable $assessment
      * @param Model       $plan
-     * @param bool        $forFeed Is this for the feed? If so, notify parents and students
+     * @param string|null $feedAudience The feed viewer audience, or null for scheduled notification delivery.
      * @return Envelope
      */
-    private function internalNotifyClosed(IAssessable $assessment, Model $plan, bool $forFeed): Envelope
+    private function internalNotifyClosed(IAssessable $assessment, Model $plan, ?string $feedAudience = null): Envelope
     {
         $envelope  = new Envelope();
         if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_CLOSED)) {
             return $envelope;
         }
+        $forFeed = $feedAudience !== null;
         $topicStub = $this->retrieveAssessmentTopicStub($assessment);
         if (!$topicStub) {
             return $envelope;
@@ -904,19 +1018,23 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             // Feed only
             if ($forFeed) {
                 // build for student, only if they're allowed
-                if ($this->isLearnerNotifiable($assessment)) {
+                if ($feedAudience === self::AUDIENCE_LEARNER && $this->isLearnerNotifiable($assessment)) {
                     $bob = $this->targetBuilderToLearner($bob, $assessment, $participant)
                                 ->setTitle(":assessment in :cat has closed");
                     $envelope->targetToUser($participant->getUser(), $bob->build());
                 }
 
                 // build for parent, only if they're allowed
-                if ($this->isParentNotifiable($assessment)) {
+                if ($feedAudience === self::AUDIENCE_PARENT && $this->isParentNotifiable($assessment)) {
                     $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                                 ->setTitle(":assessment in :cat has closed for :child");
                     $envelope->targetToParent($participant->getUser(), $bob->build());
                 }
             }
+        }
+
+        if ($forFeed && $feedAudience !== self::AUDIENCE_STAFF) {
+            return $envelope;
         }
 
         // build for staff
@@ -978,6 +1096,57 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function notifyUpdated(Model $plan, User $effector, ?array $diff = null): Envelope
     {
+        return $this->internalNotifyUpdated($plan, $effector, $diff);
+    }
+
+    /**
+     * Learner-scoped callback for the role-specific message source.
+     *
+     * @param Model      $plan
+     * @param User       $effector
+     * @param array|null $diff
+     * @return Envelope
+     * @throws DeletedException
+     * @throws BaseMapper\Exception
+     */
+    public function notifyStudentUpdated(Model $plan, User $effector, ?array $diff = null): Envelope
+    {
+        return $this->internalNotifyUpdated($plan, $effector, $diff, self::AUDIENCE_LEARNER);
+    }
+
+    /**
+     * Parent-scoped callback for the role-specific message source.
+     *
+     * @param Model      $plan
+     * @param User       $effector
+     * @param array|null $diff
+     * @return Envelope
+     * @throws DeletedException
+     * @throws BaseMapper\Exception
+     */
+    public function notifyParentUpdated(Model $plan, User $effector, ?array $diff = null): Envelope
+    {
+        return $this->internalNotifyUpdated($plan, $effector, $diff, self::AUDIENCE_PARENT);
+    }
+
+
+    /**
+     * Internal method for notifying on update.
+     *
+     * @param Model       $plan
+     * @param User        $effector
+     * @param array|null  $diff
+     * @param string|null $audience
+     * @return Envelope
+     * @throws DeletedException
+     * @throws BaseMapper\Exception
+     */
+    private function internalNotifyUpdated(
+        Model $plan,
+        User $effector,
+        ?array $diff = null,
+        ?string $audience = null
+    ): Envelope {
         $assessment = $this->retrieveAssessmentDomainModel($plan);
         $envelope   = new Envelope();
         if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_UPDATED)) {
@@ -1050,7 +1219,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
                 // Learners
                 // Topic depends on type of assessment
-                if ($this->isLearnerNotifiable($assessment)) {
+                if ($this->shouldNotifyLearner($assessment, $audience)) {
                     $suffix = $assessment instanceof Quiz ? 'updated' : 'renamed';
                     $bob    = $this->targetBuilderToLearner($bob, $assessment, $participant)
                                    ->setTitle(self::PATTERN_RENAMED_STUDENT_TITLE)
@@ -1061,7 +1230,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 }
 
                 // Parents
-                if ($this->isParentNotifiable($assessment)) {
+                if ($this->shouldNotifyParent($assessment, $audience)) {
                     $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                                 ->setTitle(self::PATTERN_RENAMED_PARENT_TITLE)
                                 ->setParam('boxType', new SimpleParam($parentBoxType));
@@ -1082,7 +1251,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 [$isExcluded, ] = $participantDiff['excluded'];
                 if (!$isExcluded) {
                     // Same as notifyOpen
-                    if ($this->isParticipantNotifiable($participant, self::TRIGGER_OPEN)) {
+                    if (
+                        $this->shouldNotifyLearner($assessment, $audience)
+                        && $this->isParticipantNotifiable($participant, self::TRIGGER_OPEN)
+                    ) {
                         $this->internalNotifyLearnerOpen($envelope, $participant, $topicStub);
                     }
                 }
@@ -1103,7 +1275,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
                     // Learners
                     // Topic depends on type of assessment
-                    if ($this->isLearnerNotifiable($assessment)) {
+                    if ($this->shouldNotifyLearner($assessment, $audience)) {
                         $suffix = $assessment instanceof Quiz ? 'updated' : 'datechanged';
                         $bob    = $this->targetBuilderToLearner($bob, $assessment, $participant)
                                        ->setTitle(self::PATTERN_DATE_CHANGED_STUDENT_TITLE)
@@ -1115,7 +1287,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     }
 
                     // Parents
-                    if ($this->isParentNotifiable($assessment)) {
+                    if ($this->shouldNotifyParent($assessment, $audience)) {
                         $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                                     ->setTitle(self::PATTERN_DATE_CHANGED_PARENT_TITLE)
                                     ->setParam('boxType', new Param($parentBoxType))
@@ -1133,7 +1305,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             // accept online
             if ($assessment instanceof DueWork && !empty($assessmentDiff['acceptOnline'])) {
                 // Learners
-                if ($this->isLearnerNotifiable($assessment)) {
+                if ($this->shouldNotifyLearner($assessment, $audience)) {
                     $m = $assessment->isAcceptNone()
                         ? self::PATTERN_NO_SUBMIT_STUDENT_TITLE
                         : self::PATTERN_ACCEPT_ONLINE_STUDENT_TITLE;
@@ -1144,7 +1316,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 }
 
                 // Parents
-                if ($this->isParentNotifiable($assessment)) {
+                if ($this->shouldNotifyParent($assessment, $audience)) {
                     $m = $assessment->isAcceptNone()
                         ? self::PATTERN_NO_SUBMIT_PARENT_TITLE
                         : self::PATTERN_ACCEPT_ONLINE_PARENT_TITLE;
@@ -1160,7 +1332,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             // Not sure if there's any point to this notif, but raise it anyway
             if (array_intersect(array_keys($assessmentDiff), ['type', 'weight', 'workType'])) {
                 // Learners
-                if ($this->isLearnerNotifiable($assessment)) {
+                if ($this->shouldNotifyLearner($assessment, $audience)) {
                     $bob = $this->targetBuilderToLearner($bob, $assessment, $participant)
                                 ->setTitle(self::PATTERN_UPDATE_STUDENT_TITLE)
                                 ->setParam('boxType', new Param($boxType))
@@ -1169,7 +1341,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 }
 
                 // Parents
-                if ($this->isParentNotifiable($assessment)) {
+                if ($this->shouldNotifyParent($assessment, $audience)) {
                     $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                                 ->setTitle(self::PATTERN_UPDATE_PARENT_TITLE)
                                 ->setParam('boxType', new Param($parentBoxType));
@@ -1192,6 +1364,28 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         $envelope = new Envelope();
         return $this->retractEventObject($envelope, $plan);
+    }
+
+    /**
+     * System-scoped callback for generic retraction triggers.
+     *
+     * @param Model $plan
+     * @return Envelope
+     */
+    public function notifySystemDeleted(Model $plan): Envelope
+    {
+        return $this->notifyDeleted($plan);
+    }
+
+    /**
+     * Student-scoped callback for existing due work message source configuration.
+     *
+     * @param Model $plan
+     * @return Envelope
+     */
+    public function notifyStudentDeleted(Model $plan): Envelope
+    {
+        return $this->notifyDeleted($plan);
     }
 
     /**
@@ -1350,6 +1544,22 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     }
 
     /**
+     * Determines which audience should be built for feed generation.
+     */
+    private function getFeedAudience(User $user, IAssessable $assessment, Access $access): string
+    {
+        if ($user->getRole()->isParent()) {
+            return self::AUDIENCE_PARENT;
+        }
+
+        if ($access->getFolderAccess($user, $assessment->getBaseContext()->getFolder()->getId()) >= UserAccess::ACCESS_WRITE) {
+            return self::AUDIENCE_STAFF;
+        }
+
+        return self::AUDIENCE_LEARNER;
+    }
+
+    /**
      * Builds a builder with generic parameters set.
      *
      * @param IAssessable $assessment The assessment to build a builder for.
@@ -1450,6 +1660,29 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
 
     /**
+     * Gets learner and parent notification visibility from a work type.
+     *
+     * @return array{learners: bool, parents: bool}
+     */
+    private function getNotificationAudienceVisibility(?WorkType $workType): array
+    {
+        return [
+            'learners' => $workType?->isVisibleToLearners() ?? true,
+            'parents' => $workType?->isVisibleToParents() ?? true,
+        ];
+    }
+
+
+    /**
+     * @param array{learners: bool, parents: bool} $visibility
+     */
+    private function isVisibleToAnyNotificationAudience(array $visibility): bool
+    {
+        return $visibility['learners'] || $visibility['parents'];
+    }
+
+
+    /**
      * Is this participant notifiable for this label?
      *
      * @param Participant $participant
@@ -1503,6 +1736,16 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
 
     /**
+     * Determines whether a learner message may be built for the requested audience.
+     */
+    private function shouldNotifyLearner(IAssessable $assessment, ?string $audience): bool
+    {
+        return ($audience === null || $audience === self::AUDIENCE_LEARNER)
+            && $this->isLearnerNotifiable($assessment);
+    }
+
+
+    /**
      * Determines whether parent notifications may be sent for the assessment's work type and site settings.
      */
     private function isParentNotifiable(IAssessable $assessment): bool
@@ -1511,6 +1754,16 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return false;
         }
         return $assessment->getWorkType()?->isVisibleToParents() ?? true;
+    }
+
+
+    /**
+     * Determines whether a parent message may be built for the requested audience.
+     */
+    private function shouldNotifyParent(IAssessable $assessment, ?string $audience): bool
+    {
+        return ($audience === null || $audience === self::AUDIENCE_PARENT)
+            && $this->isParentNotifiable($assessment);
     }
 
 
