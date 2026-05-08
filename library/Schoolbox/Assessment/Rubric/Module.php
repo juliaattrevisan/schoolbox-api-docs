@@ -54,7 +54,7 @@ class Module extends BaseModule
         $this->register('POST', '', 'create', $permission);
         $this->register('POST', '/csv', 'download', $permission);
         $this->register('POST', '/determineMarkInvalidation', 'determineMarkInvalidation', $permission);
-        $this->register('POST', '/import/{storageTuple}', 'import', $permission, $filePreload);
+        $this->register('POST', '/import/{storageTuple}', 'postImport', $permission, $filePreload);
     }
 
 

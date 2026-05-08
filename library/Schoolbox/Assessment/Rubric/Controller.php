@@ -286,7 +286,7 @@ class Controller extends BaseController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function import(File $file): void
+    public function postImport(File $file): void
     {
         $post = $this->requestPost;
 
