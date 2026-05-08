@@ -145,7 +145,6 @@ window.Vue.onMounted(() => {
         :maxlength="props.maxLength"
         :title="props.inputTitle"
         :data-test="`assessment-feedback-mark-input-${props.id}`"
-        data-mark-input
         data-combobox
         :readonly="props.readonly"
         @change="onMarkChanged"

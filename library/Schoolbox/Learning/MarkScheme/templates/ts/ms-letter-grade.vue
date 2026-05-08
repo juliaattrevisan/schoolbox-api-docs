@@ -58,13 +58,13 @@ const mark = defineModel<string | null>("mark", { required: true });
         }"
     />
 
+    <!-- TODO: probably need this form field to be renameable -->
     <select
         v-else
         :id="props.id?.toString() ?? undefined"
         class="letter-grade-select"
         :class="props.class"
         :data-test="`assessment-feedback-mark-select-${props.id}`"
-        data-mark-input
         name="mark"
         :tabindex="props.tabIndex"
         :title="`Select a ${locale.grades.proper()}`"

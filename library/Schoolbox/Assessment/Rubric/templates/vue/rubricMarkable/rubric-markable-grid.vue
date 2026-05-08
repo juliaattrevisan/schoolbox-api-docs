@@ -117,18 +117,23 @@ const derivedRubricMark = window.Vue.computed(() => {
 });
 
 /**
- * When a capability mark is updated, update the grid total if not customised
+ * When a capability mark is updated, update the grid total
  */
-function onCapabilityMarkUpdated(): void {
-    // alert(JSON.stringify(capabilityMark));
-    const { humanReadableMark } = applyMarkScheme(
-        derivedRubricMark.value,
-        props.rubric.derivedMaxValue,
-        props.assessmentMarkScheme,
-    );
-
+window.Vue.watch(derivedRubricMark, (newValue) => {
+    const { humanReadableMark } = applyMarkScheme(newValue, props.rubric.derivedMaxValue, props.assessmentMarkScheme);
     markedGridData.value.humanReadableMark = humanReadableMark;
-}
+});
+
+/**
+ * When the grid total changes, reflect that in the mark input & overall assign from button
+ * TODO: this is currently outside of Vue, also should factor in multi rubrics
+ */
+window.Vue.watch(
+    () => markedGridData.value.humanReadableMark,
+    () => {
+        document.dispatchEvent(new CustomEvent("RUBRIC__TOTAL_MARK_UPDATED"));
+    },
+);
 </script>
 
 <template>
@@ -152,16 +157,16 @@ function onCapabilityMarkUpdated(): void {
                     :levels="props.rubric.levels"
                     :participant-id="props.participantId"
                     :show-summary-capability="props.showGroupTotal"
-                    @capability-mark-updated="onCapabilityMarkUpdated"
                 />
 
                 <!-- Overall Mark -->
                 <tr v-if="props.showRubricTotal && props.assessmentMarkScheme.context.mode !== MarkTypeSlug.NONE">
-                    <th class="rb-final-summary" :colspan="props.rubric.levels.length + 2">
-                        <!-- TODO data-final-summary="{{ rubricId }}" -->
-                        <!-- TODO data-scaled-mark="{{ rubricScaledMark }}" -->
-                        <!-- TODO data-max="{{ rubricMax }}" -->
-                        <!-- TODO data-mark-type="{{ markType.mode }}" -->
+                    <th
+                        class="rb-final-summary"
+                        :colspan="props.rubric.levels.length + 2"
+                        :data-rubric-sum-value="markedGridData.humanReadableMark"
+                        data-test="rubric-final-summary"
+                    >
                         {{ markedGridData.humanReadableMark }}
 
                         <!-- Self-Assessment -->

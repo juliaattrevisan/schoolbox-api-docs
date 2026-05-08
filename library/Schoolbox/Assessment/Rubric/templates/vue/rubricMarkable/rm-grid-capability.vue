@@ -21,7 +21,6 @@ interface Props {
     showSummaryCapability: boolean;
 }
 const props = defineProps<Props>();
-const emit = defineEmits<{ (e: "capabilityMarkUpdated"): void }>();
 
 const capabilityMark = defineModel<RubricMarkedGridCapability>("capabilityMark", { required: true });
 
@@ -243,9 +242,6 @@ window.Vue.watch(
                 isCustomised.value = false;
             }
         }
-
-        // also let upstairs know about it
-        emit("capabilityMarkUpdated");
     },
 );
 </script>
