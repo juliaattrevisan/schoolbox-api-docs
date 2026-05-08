@@ -14,8 +14,14 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;
 
+/**
+ * Tests for the Assessment Calendar Events API.
+ */
 class ApiTest extends TestCase
 {
+    /**
+     * Verifies that getEvents() filters out assessments not visible to the viewer.
+     */
     public function testGetEventsChecksVisibilityForViewer(): void
     {
         $student = $this->buildUser(10);
@@ -60,6 +66,10 @@ class ApiTest extends TestCase
         self::assertCount(0, $api->getEvents(100, 200));
     }
 
+    /**
+     * Verifies that getEvents() uses the configured visibility viewer rather than the default viewer
+     * when one has been explicitly provided.
+     */
     public function testGetEventsChecksVisibilityForConfiguredVisibilityViewer(): void
     {
         $student = $this->buildUser(10);
@@ -98,6 +108,9 @@ class ApiTest extends TestCase
         self::assertCount(0, $api->getEvents(100, 200));
     }
 
+    /**
+     * Verifies that getEvent() loads student participation data before checking visibility for the viewer.
+     */
     public function testGetEventLoadsStudentParticipationAndChecksVisibilityForViewer(): void
     {
         $student = $this->buildUser(10);
@@ -143,6 +156,10 @@ class ApiTest extends TestCase
         self::assertCount(0, $api->getEvent(123));
     }
 
+    /**
+     * Verifies that getEvent() uses the configured visibility viewer rather than the default viewer
+     * when one has been explicitly provided.
+     */
     public function testGetEventChecksVisibilityForConfiguredVisibilityViewer(): void
     {
         $student = $this->buildUser(10);
@@ -181,6 +198,9 @@ class ApiTest extends TestCase
         self::assertCount(0, $api->getEvent(123));
     }
 
+    /**
+     * Creates a User instance with the given ID for use in tests.
+     */
     private function buildUser(int $id): User
     {
         return (new User())->setId($id);
