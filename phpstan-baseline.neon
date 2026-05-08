@@ -1969,12 +1969,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/DataModel/Result/Model.php
 
 		-
-			message: '#^Instanceof between Schoolbox\\Learning\\Assessment\\DueWork\\Model and Schoolbox\\Learning\\Assessment\\DueWork\\Model will always evaluate to true\.$#'
-			identifier: instanceof.alwaysTrue
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/Grid/Factory.php
-
-		-
 			message: '#^Property Schoolbox\\Assessment\\Rubric\\Grid\\Importer\\GenericImporter\:\:\$capabilities \(array\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
 			count: 1
