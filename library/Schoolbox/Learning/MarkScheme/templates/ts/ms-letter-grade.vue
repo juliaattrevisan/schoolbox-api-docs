@@ -21,6 +21,7 @@ interface Props {
      * Should this form input be rendered as readonly?
      */
     readonly?: boolean;
+    errorPlaceholderSelector?: string;
 }
 
 const props = defineProps<Props>();

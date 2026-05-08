@@ -25,6 +25,7 @@ const props = defineProps<Props>();
 const capabilityMark = defineModel<RubricMarkedGridCapability>("capabilityMark", { required: true });
 
 const componentId = window.Vue.useId();
+const markSchemeInputId = `capability-${props.capability.id}-mark-${componentId}`;
 
 const showSummaryForThisCapability = window.Vue.computed(() => {
     return props.showSummaryCapability && props.capability.showCapabilityMark;
@@ -280,18 +281,17 @@ window.Vue.watch(
             <!-- TODO: data-rubric-id="{{ rubricGrid.id }}" -->
             <!-- TODO: data-mark-type="{{ capabilityMarkType.mode }}" -->
             <span>
-                <label :for="`capability-${props.capability.id}-mark-${componentId}`">
-                    {{ locale.rubricGroup.proper() }} mark
-                </label>
+                <label :for="markSchemeInputId"> {{ locale.rubricGroup.proper() }} mark </label>
 
                 <!-- TODO: data-group-mark -->
                 <mark-scheme
-                    :id="`capability-${props.capability.id}-mark-${componentId}`"
+                    :id="markSchemeInputId"
                     v-model:mark="capabilityMark.value"
-                    :name="`capability-${props.capability.id}-mark-${componentId}`"
+                    :name="markSchemeInputId"
                     :mark-scheme="props.capabilityMarkScheme"
                     :submission-error-states="[] /** no error states here */"
                     :limit="capability.maxValue ?? undefined"
+                    :error-placeholder-selector="`#${markSchemeInputId}-error`"
                     class="rb-value-input groupMark"
                 />
 
@@ -319,6 +319,9 @@ window.Vue.watch(
                     Remove {{ locale.grades.singular() }} based on {{ locale.rubricCriterion.plural() }}
                 </template>
             </a>
+
+            <!-- make sure the error appears after the assign from button -->
+            <div :id="`${markSchemeInputId}-error`"></div>
 
             <!-- Self-Assessment -->
             <p v-if="props.selfAssessmentCapabilityMark?.humanReadableMark" class="meta">

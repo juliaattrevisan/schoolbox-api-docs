@@ -36,6 +36,7 @@ interface Props {
      * Options for alaressValidate
      */
     alaressValidateOptions?: Record<string, unknown>;
+    errorPlaceholderSelector?: string;
 }
 
 const props = defineProps<Props>();
@@ -141,6 +142,7 @@ window.Vue.onMounted(() => {
         :data-test="`assessment-feedback-mark-input-${props.id}`"
         data-combobox
         :readonly="props.readonly"
+        :data-error-placeholder-selector="props.errorPlaceholderSelector"
         @change="onMarkChanged"
         @keypress.enter.prevent="onClickEnter"
     />

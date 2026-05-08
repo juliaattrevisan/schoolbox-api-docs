@@ -31,6 +31,7 @@ interface Props {
      * Maximum marks available per attempt, indexed by user id
      */
     limit?: number;
+    errorPlaceholderSelector?: string;
 }
 
 const props = defineProps<Props>();
@@ -74,5 +75,6 @@ const limit = window.Vue.computed(() => {
                 withinRange: `The grade must be between 0 and ${limit}.`,
             },
         }"
+        :error-placeholder-selector="props.errorPlaceholderSelector"
     />
 </template>

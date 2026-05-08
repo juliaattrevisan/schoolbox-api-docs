@@ -29,6 +29,11 @@ interface Props {
      * Maximum marks available per attempt, indexed by user id
      */
     limit?: number;
+    /**
+     * Optional custom error placement for alaressValidate errors
+     * Should be a selector for an element for the error to be placed within, all inner content gets replaced
+     */
+    errorPlaceholderSelector?: string;
 }
 
 const props = defineProps<Props>();
@@ -47,6 +52,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         :class="props.class"
         :tab-index="props.tabIndex"
         :readonly="props.readonly"
+        :error-placeholder-selector="props.errorPlaceholderSelector"
     />
     <ms-percentage
         v-else-if="props.markScheme.template === 'Percentage'"
@@ -57,6 +63,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         :class="props.class"
         :tab-index="props.tabIndex"
         :readonly="props.readonly"
+        :error-placeholder-selector="props.errorPlaceholderSelector"
     />
     <ms-total-mark-fractional
         v-else-if="props.markScheme.template === 'TotalMarkFractional'"
@@ -69,6 +76,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         :tab-index="props.tabIndex"
         :readonly="props.readonly"
         :limit="props.limit"
+        :error-placeholder-selector="props.errorPlaceholderSelector"
     />
 </template>
 

@@ -18,6 +18,7 @@ interface Props {
      */
     readonly?: boolean;
     class?: string;
+    errorPlaceholderSelector?: string;
 }
 
 const props = defineProps<Props>();
@@ -43,5 +44,6 @@ const mark = defineModel<string | null>("mark", { required: true });
                 withinPercentageRange: `The grade must be between 0 and ${LIMIT}.`,
             },
         }"
+        :error-placeholder-selector="props.errorPlaceholderSelector"
     />
 </template>
