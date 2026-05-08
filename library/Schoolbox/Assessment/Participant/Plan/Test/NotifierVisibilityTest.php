@@ -257,7 +257,17 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
         $notifier = $this->notifierWithMessageSources($label, $sources);
 
         $callbacks = $notifier->retrieveCallbacks($label);
-        $methods = array_map(static fn (array $callback): string => $callback[1], $callbacks);
+        $methods = array_map(
+            /**
+             * Extracts the method name from a notifier callback tuple.
+             *
+             * @param array{0: object, 1: string} $callback Callback tuple returned by callback discovery.
+             */
+            static function (array $callback): string {
+                return $callback[1];
+            },
+            $callbacks
+        );
 
         self::assertSame($expectedMethods, $methods);
     }
@@ -780,7 +790,16 @@ final class NotifierVisibilityTest extends TestCase implements TriggerBundleInte
         $workTypeMapper = $this->createStub(WorkType\Mapper::class);
         $workTypeMapper
             ->method('findById')
-            ->willReturnCallback(static fn (int $id): WorkType\Model => $workTypes[$id]);
+            ->willReturnCallback(
+                /**
+                 * Returns the work type fixture matching the requested ID.
+                 *
+                 * @param int $id Work type ID requested by the mapper.
+                 */
+                static function (int $id) use ($workTypes): WorkType\Model {
+                    return $workTypes[$id];
+                }
+            );
 
         return new Notifier(
             $this->createStub(IConfigLoader::class),
