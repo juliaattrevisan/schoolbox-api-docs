@@ -22,9 +22,9 @@ class ValueSerializerTest extends IntValueSerializerTest
     {
         $intValueSerializer = new \Schoolbox\Admin\Settings\FieldType\Duration\ValueSerializer();
 
-        $config = $this->createMock(Config::class);
-        $config->method('getOptions')->willReturn($input['config']);
-        $config->method('getRequired')->willReturn($input['required'] ?? true);
+        $config = (new Config())
+            ->setOptions($input['config'])
+            ->setRequired($input['required'] ?? true);
 
         $outcome = $intValueSerializer->serializeValue($input['value'], $config);
 
