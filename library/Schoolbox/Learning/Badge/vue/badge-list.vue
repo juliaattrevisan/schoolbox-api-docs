@@ -356,7 +356,7 @@ export default {
                                     '': !showBadgeMenus,
                                     'actions-small-1': showBadgeMenus,
                                     'checkbox-content': !showBadgeMenus,
-                                    'card-content': true,
+                                    'card-content l-flex-col l-gap-s': true,
                                 }"
                             >
                                 <div class="list-item sbx-checkbox-radio-container">
@@ -371,7 +371,7 @@ export default {
                                             {{ badge.name }}
                                         </label>
                                     </template>
-                                    <h3 v-else>
+                                    <h3 v-else class="f-no-margins">
                                         <a @click.prevent="openDetailModal(badge)" :title="badge.name">{{
                                             badge.name
                                         }}</a>
