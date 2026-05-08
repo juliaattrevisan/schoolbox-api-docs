@@ -246,6 +246,14 @@ body.sbx-body {
                 margin: 0;
             }
         }
+        // the error needs to stretch all the way across to avoid it sitting in line with the checkbox/radio
+        &:has(label.error) {
+            flex-wrap: wrap;
+            label.error {
+                flex-basis: 100%;
+                margin: 0;
+            }
+        }
     }
 
     // special case, where there's an <article> in the row as well, so prevent the flex
