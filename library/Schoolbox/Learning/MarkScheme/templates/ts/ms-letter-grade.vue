@@ -44,6 +44,7 @@ const mark = defineModel<string | null>("mark", { required: true });
         readonly
     />
 
+    <!-- TODO: at some point add alaressValidate's 'withinLetterGradeRange' rule to this -->
     <select
         v-else
         :id="props.id?.toString() ?? undefined"
