@@ -80,7 +80,14 @@ class Controller extends BaseController
             return;
         }
 
-        $folder = $this->folderMapper->findById($folderId);
+        /* If your rubric instance suddenly went away e.g. via some other user/tab
+         */
+        try {
+            $folder = $this->folderMapper->findById($folderId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->sendJSONError('Folder not found');
+            return;
+        }
 
         /* We need to specify a rubric instance now, to which we're adding.
          */
@@ -91,7 +98,14 @@ class Controller extends BaseController
             return;
         }
 
-        $rubricInstance = $this->rubricInstanceMapper->findById($rubricInstanceId);
+        /* If your rubric instance suddenly went away e.g. via some other user/tab
+         */
+        try {
+            $rubricInstance = $this->rubricInstanceMapper->findById($rubricInstanceId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->sendJSONError('Rubric instance not found');
+            return;
+        }
 
         // Build a rubric grid
         $assessmentId = $post->getInt('rubricId', 0);
