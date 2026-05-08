@@ -68,7 +68,7 @@ class Controller extends BaseController
      * @api POST /rubric
      * @since 156
      */
-    public function create(): void
+    public function postCreate(): void
     {
         $post = $this->requestPost;
 

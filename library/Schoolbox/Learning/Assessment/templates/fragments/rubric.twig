@@ -47,7 +47,7 @@
                         :default-grade-group="{{ defaultGradeGroup }}"
                         :max-levels="{{ config.rubric_max_levels }}"
                         :folder-id="{{ assessment.context.folder.id }}"
-                        route-rubric-create="{{ routeLookup("rubric.create") }}"
+                        route-rubric-create="{{ routeLookup("rubric.postCreate") }}"
                         route-rubric-import="{{ routeLookup("rubric.postImport") }}"
                         :assessment-id="{{ assessmentId ? assessmentId : 'null' }}"
                         {% if assessmentId %}

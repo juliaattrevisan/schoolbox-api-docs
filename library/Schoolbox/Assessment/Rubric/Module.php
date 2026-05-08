@@ -51,7 +51,7 @@ class Module extends BaseModule
         };
 
         // Download/upload rubric actions
-        $this->register('POST', '', 'create', $permission);
+        $this->register('POST', '', 'postCreate', $permission);
         $this->register('POST', '/csv', 'download', $permission);
         $this->register('POST', '/determineMarkInvalidation', 'determineMarkInvalidation', $permission);
         $this->register('POST', '/import/{storageTuple}', 'postImport', $permission, $filePreload);
