@@ -37,6 +37,16 @@ table.rb {
                 display: flex;
                 flex-direction: column;
                 height: 100%;
+
+                // keep points at the bottom where possible
+                label {
+                    display: flex;
+                    flex-direction: column;
+
+                    .rb-description {
+                        flex-grow: 1;
+                    }
+                }
             }
         }
 
