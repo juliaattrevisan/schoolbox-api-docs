@@ -1269,12 +1269,25 @@ class DataSource
         $capabilityMarkType   = $this->markTypeMapper->createModel()->setId($importer->getCapabilityMarkType());
         $capabilityGradeGroup = $this->gradeGroupMapper->createModel()->setId($importer->getCapabilityGradeGroup());
 
-        $dueWork
+        /* Spawn a rubric instance for this due work.
+         * The rubric instance contains the settings for a grid.
+         *
+         * TODO Technical Uplift Candidate
+         *  This is such a strange in-situ hydration/construction idea, idk why I'm doing it. There must be a more
+         *  convenient way to set this up (@armatronic I'm probably braindead atm, there's probably an obvious answer)
+         */
+        $assessmentModel = \Schoolbox\Learning\Assessment\DataModel\Mapper::getInstance()->createModel()
+            ->setId($dueWork->getId());
+
+        $rubricInstance = $this->rubricInstanceMapper->createModel()
+            ->setAssessmentModel($assessmentModel)
             ->setCapabilityMarkType($capabilityMarkType)
             ->setCapabilityGradeGroup($capabilityGradeGroup)
-            ->setUseMarkRange($importer->isUseMarkRange());
+            ->setMarkedUsingRange($importer->isUseMarkRange());
 
-        $grid = new Grid($dueWork, $rowSet);
+        $this->rubricInstanceMapper->save($rubricInstance);
+
+        $grid = new Grid($dueWork, $rubricInstance, $rowSet);
 
         // Create levels
         foreach ($importer->getLevels() as $i => $levelName) {
