@@ -89,6 +89,12 @@ class ApiTest extends TestCase
         $assessmentDataSource
             ->expects($this->once())
             ->method('findAllBetweenDates')
+            ->with(
+                $this->isInstanceOf(Alaress_Date_Format::class),
+                $this->isInstanceOf(Alaress_Date_Format::class),
+                $student,
+                [123]
+            )
             ->willReturn($assessments);
         $assessmentDataSource
             ->expects($this->once())
@@ -175,6 +181,12 @@ class ApiTest extends TestCase
         $assessmentDataSource
             ->expects($this->once())
             ->method('loadParticipantsIntoAssessmentCollection')
+            ->with(
+                new GenericCollection(IAssessable::class, [$assessment]),
+                $student,
+                true,
+                true
+            )
             ->willReturnArgument(0);
 
         $visibility = $this->createMock(Visibility::class);
