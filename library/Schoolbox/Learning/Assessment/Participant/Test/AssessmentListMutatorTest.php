@@ -153,14 +153,22 @@ class AssessmentListMutatorTest extends TestCase
     }
 
 
+    /**
+     * Ensures parent filtering does not inherit a child's assessment visibility.
+     */
     public function testParentVisibilityIsNotReplacedByChildVisibility(): void
     {
         $mockVisibility = $this->createStub(Visibility::class);
         $mockVisibility
             ->method('isVisibleToUser')
-            ->willReturnCallback(function (IAssessable $assessment, User $viewer) {
-                return $viewer->getId() === $this->student->getId();
-            });
+            ->willReturnCallback(
+                /**
+                 * Allows visibility only when the checked viewer is the child student.
+                 */
+                function (IAssessable $assessment, User $viewer) {
+                    return $viewer->getId() === $this->student->getId();
+                }
+            );
 
         $mutator = new AssessmentListMutator(
             $this->parent,

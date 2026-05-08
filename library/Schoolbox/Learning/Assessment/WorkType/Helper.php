@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\WorkType;
 
+/**
+ * Provides work type visibility helpers that do not require a model instance.
+ */
 class Helper
 {
     /**

@@ -20,9 +20,15 @@ use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Role;
 use Schoolbox\User;
 
+/**
+ * Tests work type filter selections for different pages and viewer roles.
+ */
 #[\PHPUnit\Framework\Attributes\CoversClass(Factory::class)]
 class FactoryTest extends TestCase
 {
+    /**
+     * Ensures parents only see parent-visible work types on due work pages.
+     */
     public function testDueWorkPageShowsParentVisibleWorkTypesToParents(): void
     {
         $context = $this->buildComponentContext(
@@ -35,6 +41,9 @@ class FactoryTest extends TestCase
         self::assertSame([3], $context['roleSelections']->keys());
     }
 
+    /**
+     * Ensures staff see learner-visible work types on due work pages.
+     */
     public function testDueWorkPageShowsLearnerVisibleWorkTypesToStaff(): void
     {
         $context = $this->buildComponentContext(
@@ -47,6 +56,9 @@ class FactoryTest extends TestCase
         self::assertSame([2], $context['roleSelections']->keys());
     }
 
+    /**
+     * Ensures students see learner-visible work types on due work pages.
+     */
     public function testDueWorkPageShowsLearnerVisibleWorkTypesToStudents(): void
     {
         $context = $this->buildComponentContext(
@@ -59,6 +71,9 @@ class FactoryTest extends TestCase
         self::assertSame([2], $context['roleSelections']->keys());
     }
 
+    /**
+     * Ensures staff can select all work types on grades pages.
+     */
     public function testGradesPageShowsAllWorkTypesToStaff(): void
     {
         $context = $this->buildComponentContext(
@@ -71,6 +86,9 @@ class FactoryTest extends TestCase
         self::assertSame([1, 2, 3], $context['roleSelections']->keys());
     }
 
+    /**
+     * Ensures parents only see parent-visible work types on grades pages.
+     */
     public function testGradesPageShowsParentVisibleWorkTypesToParents(): void
     {
         $context = $this->buildComponentContext(
@@ -83,6 +101,9 @@ class FactoryTest extends TestCase
         self::assertSame([3], $context['roleSelections']->keys());
     }
 
+    /**
+     * Ensures students only see learner-visible work types on grades pages.
+     */
     public function testGradesPageShowsLearnerVisibleWorkTypesToStudents(): void
     {
         $context = $this->buildComponentContext(
@@ -95,6 +116,9 @@ class FactoryTest extends TestCase
         self::assertSame([2], $context['roleSelections']->keys());
     }
 
+    /**
+     * Ensures staff-only pages expose every work type.
+     */
     public function testStaffOnlyPagesShowAllWorkTypes(): void
     {
         $context = $this->buildComponentContext(
@@ -142,14 +166,24 @@ class FactoryTest extends TestCase
         $selectionMapper = $this->createStub(Filter\Selection\Mapper::class);
         $selectionMapper
             ->method('createCollection')
-            ->willReturnCallback(static function () {
-                return new GenericCollection(Filter\Selection\Model::class);
-            });
+            ->willReturnCallback(
+                /**
+                 * Creates the empty selection collection used while building the filter component.
+                 */
+                static function () {
+                    return new GenericCollection(Filter\Selection\Model::class);
+                }
+            );
         $selectionMapper
             ->method('createModel')
-            ->willReturnCallback(static function () {
-                return new Filter\Selection\Model();
-            });
+            ->willReturnCallback(
+                /**
+                 * Creates a fresh selection model for generated filter options.
+                 */
+                static function () {
+                    return new Filter\Selection\Model();
+                }
+            );
 
         $factory = new Factory(
             $this->createStub(Filter\Page\Option\Mapper::class),
@@ -228,6 +262,9 @@ class FactoryTest extends TestCase
         return $workTypeMapper;
     }
 
+    /**
+     * Builds a user with the role needed by the filter component tests.
+     */
     private function buildUser(int $id, string $roleType): User
     {
         return (new User())

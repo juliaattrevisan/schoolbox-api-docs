@@ -133,9 +133,14 @@ class ApiTest extends TestCase
             ->expects($this->once())
             ->method('loadParticipantsIntoAssessmentCollection')
             ->with(
-                $this->callback(static function (GenericCollection $assessments) use ($assessment): bool {
-                    return $assessments->count() === 1 && $assessments->first() === $assessment;
-                }),
+                $this->callback(
+                    /**
+                     * Confirms the data source receives a collection containing only the requested assessment.
+                     */
+                    static function (GenericCollection $assessments) use ($assessment): bool {
+                        return $assessments->count() === 1 && $assessments->first() === $assessment;
+                    }
+                ),
                 $student,
                 true,
                 true

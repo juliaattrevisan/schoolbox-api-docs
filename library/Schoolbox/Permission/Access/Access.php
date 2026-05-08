@@ -354,6 +354,9 @@ class Access
         }
 
         return $children->filter(
+            /**
+             * Keeps only child users who are learners in the supplied folder.
+             */
             function (User $child) use ($folder) {
                 return $this->isLearner($child, $folder);
             }

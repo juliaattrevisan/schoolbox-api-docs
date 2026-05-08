@@ -75,6 +75,9 @@ class PaginatorTest extends TestCase
                 ],
                 'cursor-5' => [],
             ],
+            /**
+             * Records each cursor retrieved by the test cursor.
+             */
             static function (?string $cursor) use (&$retrievedCursors): void {
                 $retrievedCursors[] = $cursor;
             }
@@ -152,6 +155,9 @@ class PaginatorTest extends TestCase
      */
     private static function buildCursor(array $pages, ?\Closure $onRetrieve = null): ICursor
     {
+        /**
+         * Cursor test double that serves fixed result pages keyed by cursor value.
+         */
         return new class ($pages, $onRetrieve) implements ICursor {
             /**
              * Constructor.
@@ -226,6 +232,9 @@ class PaginatorTest extends TestCase
      */
     private static function buildHydrator(array $visibleIds): Hydrator
     {
+        /**
+         * Hydrator test double that filters out rows whose IDs are not visible.
+         */
         return new class ($visibleIds) extends Hydrator {
             /**
              * Constructor.

@@ -87,6 +87,9 @@ class VisibilityTest extends TestCase
     }
 
 
+    /**
+     * Ensures learner participants cannot view lesson plans hidden from students.
+     */
     public function testLearnerParticipantCannotSeeLessonPlanHiddenFromStudents(): void
     {
         $now = new Alaress_Date_Format(self::NOW_DATABASE, Alaress_Date_Format::DATABASE_FORMAT);
@@ -114,6 +117,9 @@ class VisibilityTest extends TestCase
     }
 
 
+    /**
+     * Ensures parents cannot view child lesson plans that are hidden from students.
+     */
     public function testParentCannotSeeLessonPlanHiddenFromStudents(): void
     {
         $now = new Alaress_Date_Format(self::NOW_DATABASE, Alaress_Date_Format::DATABASE_FORMAT);
@@ -205,22 +211,32 @@ class VisibilityTest extends TestCase
         $access = $this->createStub(Access::class);
         $access
             ->method('isInstructor')
-            ->willReturnCallback(function () use ($exceptionSource): bool {
-                if ($exceptionSource === 'instructor') {
-                    throw new \UnexpectedValueException('Unable to resolve folder access');
-                }
+            ->willReturnCallback(
+                /**
+                 * Raises the configured instructor lookup failure and otherwise denies instructor status.
+                 */
+                function () use ($exceptionSource): bool {
+                    if ($exceptionSource === 'instructor') {
+                        throw new \UnexpectedValueException('Unable to resolve folder access');
+                    }
 
-                return false;
-            });
+                    return false;
+                }
+            );
         $access
             ->method('isLearner')
-            ->willReturnCallback(function () use ($exceptionSource): bool {
-                if ($exceptionSource === 'learner') {
-                    throw new \UnexpectedValueException('Unable to resolve folder access');
-                }
+            ->willReturnCallback(
+                /**
+                 * Raises the configured learner lookup failure and otherwise denies learner status.
+                 */
+                function () use ($exceptionSource): bool {
+                    if ($exceptionSource === 'learner') {
+                        throw new \UnexpectedValueException('Unable to resolve folder access');
+                    }
 
-                return false;
-            });
+                    return false;
+                }
+            );
 
         $visibility = new Visibility($access);
 
@@ -1472,6 +1488,9 @@ class VisibilityTest extends TestCase
     }
 
 
+    /**
+     * Builds a lesson plan with shared test dates and the supplied lesson visibility.
+     */
     private static function buildLessonPlan(Alaress_Date_Format $now, string $visibility): LessonPlan\Model
     {
         return (new LessonPlan\Model())
@@ -1499,38 +1518,53 @@ class VisibilityTest extends TestCase
         $access = $this->createStub(Access::class);
         $access
             ->method('isInstructor')
-            ->willReturnCallback(function (User $user, Folder\Model $folder) {
-                return match ($user->getId()) {
-                    1 => false,
-                    2 => true,
-                    3 => false,
-                    4 => false,
-                    default => throw new \InvalidArgumentException("No access level defined for user '{$user->getId()}'"),
-                };
-            });
+            ->willReturnCallback(
+                /**
+                 * Returns the fixed instructor access state for the test users.
+                 */
+                function (User $user, Folder\Model $folder) {
+                    return match ($user->getId()) {
+                        1 => false,
+                        2 => true,
+                        3 => false,
+                        4 => false,
+                        default => throw new \InvalidArgumentException("No access level defined for user '{$user->getId()}'"),
+                    };
+                }
+            );
         $access
             ->method('isLearner')
-            ->willReturnCallback(function (User $user, Folder\Model $folder) {
-                return match ($user->getId()) {
-                    1 => false,
-                    2 => false,
-                    3 => true,
-                    4 => false,
-                    default => throw new \InvalidArgumentException("No access level defined for user '{$user->getId()}'"),
-                };
-            });
+            ->willReturnCallback(
+                /**
+                 * Returns the fixed learner access state for the test users.
+                 */
+                function (User $user, Folder\Model $folder) {
+                    return match ($user->getId()) {
+                        1 => false,
+                        2 => false,
+                        3 => true,
+                        4 => false,
+                        default => throw new \InvalidArgumentException("No access level defined for user '{$user->getId()}'"),
+                    };
+                }
+            );
         $access
             ->method('getChildLearnersOfParent')
-            ->willReturnCallback(function (User $user, Folder\Model $folder) {
-                if ($user->getId() !== 4) {
-                    return new GenericCollection(User::class);
+            ->willReturnCallback(
+                /**
+                 * Returns the fixture child learner only for the fixture parent user.
+                 */
+                function (User $user, Folder\Model $folder) {
+                    if ($user->getId() !== 4) {
+                        return new GenericCollection(User::class);
+                    }
+                    $users = $this->buildUsers();
+                    $childLearner = $users[2];
+                    // TODO: Test case where multiple children are returned.
+                    $childLearner->setRole(new Role()->setType(Role::STUDENT));
+                    return new GenericCollection(User::class, [$childLearner]); // Return a collection containing only learner user 'Cath'.
                 }
-                $users = $this->buildUsers();
-                $childLearner = $users[2];
-                // TODO: Test case where multiple children are returned.
-                $childLearner->setRole(new Role()->setType(Role::STUDENT));
-                return new GenericCollection(User::class, [$childLearner]); // Return a collection containing only learner user 'Cath'.
-            });
+            );
         return $access;
     }
 }

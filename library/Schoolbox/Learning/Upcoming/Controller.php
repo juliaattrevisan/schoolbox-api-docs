@@ -208,9 +208,14 @@ class Controller extends Base
             // Student's work
             $workPerFolder = $this->assessmentDataSource
                 ->findAllByStudent($student, true, $term)
-                ->filter(function (IAssessable $assessable) use ($visibility, $visibilityViewer) {
-                    return $visibility->isVisibleToUser($assessable, $visibilityViewer, true);
-                })
+                ->filter(
+                    /**
+                     * Keeps assessments visible to the user whose rules define the student's Upcoming view.
+                     */
+                    function (IAssessable $assessable) use ($visibility, $visibilityViewer) {
+                        return $visibility->isVisibleToUser($assessable, $visibilityViewer, true);
+                    }
+                )
                 ->groupByCallback(function (IAssessable $assessable) {
                     return $assessable->getContext()->getFolder()->getId();
                 });
@@ -286,12 +291,17 @@ class Controller extends Base
             $visibility = new Visibility($this->access);
             /** @var IAssessable[]|GenericCollection $upcomingWork */
             $upcomingWork = $allWork
-                ->filter(static function (IAssessable $assessable) use ($student, $visibilityViewer, $visibility) {
-                    $participation = $assessable->getParticipantIfExtant($student);
-                    return $participation
-                        && ($participation->isResponseRequired() || $participation->isResubmissionRequired())
-                        && $visibility->isVisibleToUser($assessable, $visibilityViewer, false);
-                })
+                ->filter(
+                    /**
+                     * Keeps actionable work for the student that is visible to the selected viewer.
+                     */
+                    static function (IAssessable $assessable) use ($student, $visibilityViewer, $visibility) {
+                        $participation = $assessable->getParticipantIfExtant($student);
+                        return $participation
+                            && ($participation->isResponseRequired() || $participation->isResubmissionRequired())
+                            && $visibility->isVisibleToUser($assessable, $visibilityViewer, false);
+                    }
+                )
                 ->sortByCallback(new DueDateSortStrategy($student))
                 ->limit(self::UPCOMING_WORK_LIMIT);
         } else {

@@ -1493,12 +1493,18 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     }
 
 
+    /**
+     * Determines whether learner notifications may be sent for the assessment's work type.
+     */
     private function isLearnerNotifiable(IAssessable $assessment): bool
     {
         return $assessment->getWorkType()?->isVisibleToLearners() ?? true;
     }
 
 
+    /**
+     * Determines whether parent notifications may be sent for the assessment's work type and site settings.
+     */
     private function isParentNotifiable(IAssessable $assessment): bool
     {
         if (!$this->isParentTargetable()) {

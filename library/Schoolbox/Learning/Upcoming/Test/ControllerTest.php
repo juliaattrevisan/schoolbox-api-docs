@@ -24,8 +24,14 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * Tests Upcoming controller filtering for student due work visibility.
+ */
 class ControllerTest extends TestCase
 {
+    /**
+     * Ensures parent viewers use parent visibility when loading a student's upcoming work.
+     */
     public function testPostUpcomingForStudentChecksVisibilityAsParentForParentViewer(): void
     {
         $this->assertUpcomingWorkCountForViewer(
@@ -36,6 +42,9 @@ class ControllerTest extends TestCase
         );
     }
 
+    /**
+     * Ensures staff viewers use student visibility when loading a student's upcoming work.
+     */
     public function testPostUpcomingForStudentChecksVisibilityAsStudentForStaffViewer(): void
     {
         $this->assertUpcomingWorkCountForViewer(
@@ -46,6 +55,9 @@ class ControllerTest extends TestCase
         );
     }
 
+    /**
+     * Builds controller dependencies and asserts the rendered upcoming work count for the supplied viewer role.
+     */
     private function assertUpcomingWorkCountForViewer(
         string $viewerRoleType,
         bool $isVisibleToLearners,
@@ -75,9 +87,14 @@ class ControllerTest extends TestCase
         $assessment = $this->createStub(IAssessable::class);
         $assessment
             ->method('getParticipantIfExtant')
-            ->willReturnCallback(static function (User $user) use ($student, $participant): ?Participant {
-                return $user->getId() === $student->getId() ? $participant : null;
-            });
+            ->willReturnCallback(
+                /**
+                 * Returns the participant only when the controller asks for the target student.
+                 */
+                static function (User $user) use ($student, $participant): ?Participant {
+                    return $user->getId() === $student->getId() ? $participant : null;
+                }
+            );
         $assessment
             ->method('getBaseContext')
             ->willReturn($folder);
@@ -114,9 +131,14 @@ class ControllerTest extends TestCase
             ->willReturn(false);
         $access
             ->method('isLearner')
-            ->willReturnCallback(static function (User $user) use ($student): bool {
-                return $user->getId() === $student->getId();
-            });
+            ->willReturnCallback(
+                /**
+                 * Treats only the target student as a learner in the access stub.
+                 */
+                static function (User $user) use ($student): bool {
+                    return $user->getId() === $student->getId();
+                }
+            );
         $access
             ->method('getChildLearnersOfParent')
             ->willReturn(new GenericCollection(User::class, [$student]));
@@ -157,6 +179,9 @@ class ControllerTest extends TestCase
         self::assertCount($expectedCount, $controller->getRenderedData()['upcomingWork']);
     }
 
+    /**
+     * Builds a user with the role required by the controller scenario.
+     */
     private function buildUser(int $id, string $roleType): User
     {
         $role = (new Role())->setType($roleType);

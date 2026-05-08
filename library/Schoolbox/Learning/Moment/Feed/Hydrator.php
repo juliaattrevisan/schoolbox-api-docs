@@ -130,9 +130,14 @@ class Hydrator
             ? $this->attemptDataSource->findByColumnList(['attempt_id' => $quizFeedbackIds])->indexBy('id')
             : new GenericCollection(QuizFeedback::class);
 
-        $assessmentIds = $dueWorkFeedbackResults->map(static function (DueWorkFeedback $feedback) {
-            return $feedback->getAssessable()->getId();
-        });
+        $assessmentIds = $dueWorkFeedbackResults->map(
+            /**
+             * Extracts assessment IDs referenced by due work feedback rows.
+             */
+            static function (DueWorkFeedback $feedback) {
+                return $feedback->getAssessable()->getId();
+            }
+        );
 
         /* Add the quiz ones too
          */

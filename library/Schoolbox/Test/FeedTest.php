@@ -17,6 +17,9 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
 use Schoolbox\User;
 
+/**
+ * Tests online assessment feed visibility for roles, participation, and work type visibility.
+ */
 #[CoversClass(\Feed::class)]
 class FeedTest extends TestCase
 {
@@ -40,6 +43,9 @@ class FeedTest extends TestCase
         parent::tearDown();
     }
 
+    /**
+     * Ensures staff with folder read access can see staff-only quizzes when they are not participants.
+     */
     public function testStaffUserWithReadAccessButNoAssessmentParticipationCanSeeStaffAndInstructorOnlyQuiz(): void
     {
         $user = $this->newUser(100, Role::STAFF);
@@ -60,6 +66,9 @@ class FeedTest extends TestCase
         self::assertSame('/assess/intro/77', $result[0]['link']);
     }
 
+    /**
+     * Ensures staff participants do not receive staff-only quizzes through learner feed visibility.
+     */
     public function testStaffUserWithReadAccessAndAssessmentParticipationCannotSeeStaffAndInstructorOnlyQuiz(): void
     {
         $user = $this->newUser(100, Role::STAFF);
@@ -79,6 +88,9 @@ class FeedTest extends TestCase
         self::assertSame([], $result);
     }
 
+    /**
+     * Ensures staff participants can see staff-only quizzes even without folder read access.
+     */
     public function testStaffUserWithAssessmentParticipationButWithoutReadAccessCanSeeStaffAndInstructorOnlyQuiz(): void
     {
         $user = $this->newUser(100, Role::STAFF);
@@ -99,6 +111,9 @@ class FeedTest extends TestCase
         self::assertSame('/assess/intro/77', $result[0]['link']);
     }
 
+    /**
+     * Ensures learners without assessment participation cannot see learner-visible quizzes in the feed.
+     */
     public function testLearnerWithoutAssessmentParticipationCannotSeeStaffInstructorAndLearnerQuiz(): void
     {
         $user = $this->newUser(100, Role::STUDENT);
@@ -117,6 +132,9 @@ class FeedTest extends TestCase
         self::assertSame([], $result);
     }
 
+    /**
+     * Ensures staff with folder read access can see parent-visible quizzes when they are not participants.
+     */
     public function testStaffUserWithReadAccessButNoAssessmentParticipationCanSeeStaffInstructorAndParentQuiz(): void
     {
         $user = $this->newUser(100, Role::STAFF);
@@ -136,6 +154,9 @@ class FeedTest extends TestCase
         self::assertSame('/assess/intro/77', $result[0]['link']);
     }
 
+    /**
+     * Ensures parents can see parent-visible quizzes when their child is an assessment participant.
+     */
     public function testParentOfLearnerParticipantCanSeeStaffInstructorAndParentQuiz(): void
     {
         $child = $this->newUser(200, Role::STUDENT);
@@ -156,6 +177,9 @@ class FeedTest extends TestCase
         self::assertSame('/assess/intro/77', $result[0]['link']);
     }
 
+    /**
+     * Ensures parents cannot see learner-and-parent-visible quizzes without child participation.
+     */
     public function testParentOfLearnerWithoutAssessmentParticipationCannotSeeStaffInstructorAndLearnerAndParentQuiz(): void
     {
         $child = $this->newUser(200, Role::STUDENT);
@@ -175,6 +199,9 @@ class FeedTest extends TestCase
         self::assertSame([], $result);
     }
 
+    /**
+     * Ensures learners cannot see learner-and-parent-visible quizzes without assessment participation.
+     */
     public function testLearnerWithoutAssessmentParticipationCannotSeeStaffInstructorAndLearnerAndParentQuiz(): void
     {
         $user = $this->newUser(100, Role::STUDENT);
@@ -225,7 +252,13 @@ class FeedTest extends TestCase
         User $user,
         MapperProxy $assessmentDataSource
     ): \Feed {
+        /**
+         * Feed test double that returns stable usernames for online assessment rows.
+         */
         return new class ($db, $user, $assessmentDataSource) extends \Feed {
+            /**
+             * Passes injected test dependencies through to the parent feed constructor.
+             */
             public function __construct(
                 IConnector $db,
                 User $user,
@@ -278,14 +311,19 @@ class FeedTest extends TestCase
         $db = $this->createMock(IConnector::class);
         $db->expects($this->exactly(count($rowSets)))
             ->method('executeQuery')
-            ->willReturnCallback(function () use (&$rowSets) {
-                $statement = $this->createMock(IStatement::class);
-                $statement->expects($this->once())
-                    ->method('fetchAll')
-                    ->willReturn(array_shift($rowSets));
+            ->willReturnCallback(
+                /**
+                 * Returns the next configured statement result for each database query.
+                 */
+                function () use (&$rowSets) {
+                    $statement = $this->createMock(IStatement::class);
+                    $statement->expects($this->once())
+                        ->method('fetchAll')
+                        ->willReturn(array_shift($rowSets));
 
-                return $statement;
-            });
+                    return $statement;
+                }
+            );
 
         return $db;
     }
@@ -300,27 +338,42 @@ class FeedTest extends TestCase
     {
         $access = $this->createStub(Access::class);
         $access->method('isInstructorInFolderId')
-            ->willReturnCallback(static function (User $user, int $folderId) use ($instructorUserIds): bool {
-                return $folderId === 22 && in_array($user->getId(), $instructorUserIds, true);
-            });
+            ->willReturnCallback(
+                /**
+                 * Treats configured user IDs as instructors in the feed test folder.
+                 */
+                static function (User $user, int $folderId) use ($instructorUserIds): bool {
+                    return $folderId === 22 && in_array($user->getId(), $instructorUserIds, true);
+                }
+            );
         $access->method('isLearnerInFolderId')
-            ->willReturnCallback(static function (User $user, int $folderId) use ($learnerUserIds): bool {
-                return $folderId === 22 && in_array($user->getId(), $learnerUserIds, true);
-            });
+            ->willReturnCallback(
+                /**
+                 * Treats configured user IDs as learners in the feed test folder.
+                 */
+                static function (User $user, int $folderId) use ($learnerUserIds): bool {
+                    return $folderId === 22 && in_array($user->getId(), $learnerUserIds, true);
+                }
+            );
         $access->method('isParentOfLearnerInFolderId')
-            ->willReturnCallback(function (User $user, int $folderId) use ($learnerUserIds): bool {
-                if ($folderId !== 22 || $user->getChildren() === null) {
+            ->willReturnCallback(
+                /**
+                 * Reports parent access when a child belongs to the configured learner IDs.
+                 */
+                function (User $user, int $folderId) use ($learnerUserIds): bool {
+                    if ($folderId !== 22 || $user->getChildren() === null) {
+                        return false;
+                    }
+
+                    foreach ($user->getChildren() as $child) {
+                        if (in_array($child->getId(), $learnerUserIds, true)) {
+                            return true;
+                        }
+                    }
+
                     return false;
                 }
-
-                foreach ($user->getChildren() as $child) {
-                    if (in_array($child->getId(), $learnerUserIds, true)) {
-                        return true;
-                    }
-                }
-
-                return false;
-            });
+            );
 
         return $access;
     }
@@ -407,9 +460,14 @@ class FeedTest extends TestCase
         $assessment = $this->createStub(IAssessable::class);
         $assessment->method('getId')->willReturn($assessmentId);
         $assessment->method('getParticipantIfExtant')
-            ->willReturnCallback(static function (User $user) use ($participantsByUserId): ?Participant {
-                return $participantsByUserId[$user->getId()] ?? null;
-            });
+            ->willReturnCallback(
+                /**
+                 * Returns the participant stub matching the requested user.
+                 */
+                static function (User $user) use ($participantsByUserId): ?Participant {
+                    return $participantsByUserId[$user->getId()] ?? null;
+                }
+            );
 
         return $assessment;
     }

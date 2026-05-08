@@ -24,10 +24,16 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 
+/**
+ * Tests quiz action visibility decisions.
+ */
 class ActionValidatorTest extends TestCase
 {
     private const string NOW_DATABASE = '2010-01-10 00:00:00';
 
+    /**
+     * Ensures parent quiz visibility is denied when the quiz is not parent-visible.
+     */
     public function testParentCannotSeeQuizWhenParentVisibilityFailsEvenIfChildCanSeeIt(): void
     {
         $now = new Alaress_Date_Format(self::NOW_DATABASE, Alaress_Date_Format::DATABASE_FORMAT);
@@ -67,6 +73,9 @@ class ActionValidatorTest extends TestCase
         $this->assertFalse($validator->canSeeQuiz($parent, $quiz));
     }
 
+    /**
+     * Builds an access stub that treats only the supplied child as a learner.
+     */
     private function getAccessStub(User $child): Access
     {
         $access = $this->createStub(Access::class);
@@ -75,9 +84,14 @@ class ActionValidatorTest extends TestCase
             ->willReturn(false);
         $access
             ->method('isLearner')
-            ->willReturnCallback(static function (User $user) use ($child) {
-                return $user->getId() === $child->getId();
-            });
+            ->willReturnCallback(
+                /**
+                 * Reports learner access only for the configured child user.
+                 */
+                static function (User $user) use ($child) {
+                    return $user->getId() === $child->getId();
+                }
+            );
         $access
             ->method('getChildLearnersOfParent')
             ->willReturn(new GenericCollection(User::class, [$child]));
