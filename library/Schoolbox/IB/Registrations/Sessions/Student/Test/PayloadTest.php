@@ -99,6 +99,11 @@ class PayloadTest extends TestCase
 
     public function testBuildsIbGroupSubjectPayload(): void
     {
+        $frenchLanguage = (new GroupSubjectLanguageModel())
+            ->setId(654)
+            ->setLanguage((new LanguageModel())->setId(9)->setCode('FRA')->setName('French'))
+            ->setClassCode('FRE-HL');
+
         $student = $this->buildStudent()
             ->setIbGroupSubjects(
                 new GenericCollection(IBGroupSubjectModel::class, [
@@ -108,14 +113,7 @@ class PayloadTest extends TestCase
                         ->setGroup((new IBGroupModel())->setId(7)->setName('Language Acquisition'))
                         ->setSubject((new IBSubjectModel())->setId(8)->setName('French'))
                         ->setLevel('HL')
-                        ->setLanguages(
-                            new GenericCollection(GroupSubjectLanguageModel::class, [
-                                (new GroupSubjectLanguageModel())
-                                    ->setId(654)
-                                    ->setLanguage((new LanguageModel())->setId(9)->setCode('FRA')->setName('French'))
-                                    ->setClassCode('FRE-HL'),
-                            ])
-                        ),
+                        ->setLanguages(new GenericCollection(GroupSubjectLanguageModel::class, [$frenchLanguage])),
                     (new IBGroupSubjectModel())
                         ->setId(322)
                         ->setGroupId(8)
@@ -147,7 +145,7 @@ class PayloadTest extends TestCase
                             [
                                 'languageId' => 9,
                                 'languageName' => 'French',
-                                'classCode' => 'FRE-HL',
+                                'classCode' => $frenchLanguage->getClassCode(),
                             ],
                         ],
                     ],
