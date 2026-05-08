@@ -215,7 +215,9 @@ async function onSaveSelected(): Promise<void> {
                                                 v-for="header in (convertObjectToArray(data.headers) as Header[]) || []"
                                                 :key="header.key"
                                             >
-                                                <div :class="`small-12 medium-${header.colSpan} column`">
+                                                <div
+                                                    :class="`small-12 medium-${header.colSpan} column ${header.type === 'checkbox' ? 'sbx-checkbox-radio-container' : ''}`"
+                                                >
                                                     <template v-if="header.type === 'checkbox'">
                                                         <input
                                                             :id="`field-${header.key}-${item.element.id}`"
