@@ -108,11 +108,35 @@ class Controller extends BaseController
         }
 
         // Build a rubric grid
-        $assessmentId = $rubricInstance->getAssessmentModel()->getId();
         $rubricRowSet = $this->mapper->retrieveRowSet($folder, false);
 
+        /* Technically this could still continue with any random subclass of AbstractAssessment, but that would be kind
+         * of confusing to see a Grid for a Reporting Activity contain a DueWork stub. That means we have to find out
+         * what kind of subobject this was...so we might as well have fetched the whole thing. IAssessable instances
+         * don't know anything about their subobjects, and we don't know what kind of IAssessable we have since all we
+         * have is an assessment id.
+         *
+            $rubricGrid = new Grid(
+                (new DueWork())->setId($assessmentId),
+                $rubricInstance,
+                $rubricRowSet
+            );
+         *
+         * Anyway
+         * I guess we might as well take this opportunity to enforce the existence of $assessment since multiplayer
+         * schoolbox might cause it to not be available anymore...and, thus obtain the $assessment we needed.
+         */
+        $assessmentId = $rubricInstance->getAssessmentModel()->getId();
+
+        try {
+            $assessment = $this->assessmentDataSource->findById($assessmentId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->sendJSONError('Learning activity not found (it might have been deleted)');
+            return;
+        }
+
         $rubricGrid = new Grid(
-            (new DueWork())->setId($assessmentId),
+            $assessment,
             $rubricInstance,
             $rubricRowSet
         );
