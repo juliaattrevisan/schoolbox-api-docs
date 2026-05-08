@@ -108,7 +108,7 @@ class Controller extends BaseController
         }
 
         // Build a rubric grid
-        $assessmentId = $post->getInt('rubricId', 0);
+        $assessmentId = $rubricInstance->getAssessmentModel()->getId();
         $rubricRowSet = $this->mapper->retrieveRowSet($folder, false);
 
         $rubricGrid = new Grid(
