@@ -43,9 +43,8 @@ class ArrayExporter
         // Use Mark Range: On/Off
         // TODO markPerCapability should be localized, as should the input
         $usingMarkRange = $grid->isUseMarkRange();
-        $assessment = $grid->getAssessment();
 
-        $capabilityMarkType = $grid->isMarkPerCapability() ? $assessment->getCapabilityMarkType()->getSlug() : MarkType::SLUG_NONE;
+        $capabilityMarkType = $grid->isMarkPerCapability() ? $grid->getRubricInstance()->getCapabilityMarkType()->getSlug() : MarkType::SLUG_NONE;
         $capabilityGradeGroup = $grid->getRubricInstance()->getCapabilityGradeGroup()?->getId();
 
         if ($capabilityMarkType === MarkType::SLUG_LETTER && isset($capabilityGradeGroup)) {
