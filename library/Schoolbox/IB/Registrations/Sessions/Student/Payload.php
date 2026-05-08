@@ -196,7 +196,7 @@ class Payload
                     fn(GroupSubjectLanguageModel $language): array => [
                         'languageId' => $language->getLanguage()?->getId(),
                         'languageName' => $language->getLanguage()?->getName() ?? '',
-                        'classCode' => $language->getClassCode() ?? '',
+                        'classCode' => $language->getClassCode(),
                     ]
                 )
                 ->reindex()

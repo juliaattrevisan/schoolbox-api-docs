@@ -33,6 +33,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Language\Model as LanguageModel;
 use Schoolbox\Nationality\Model as NationalityModel;
+use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use Schoolbox\User;
 use Twig\Environment;
 
@@ -127,7 +128,9 @@ class ControllerTest extends TestCase
             $this->createStub(IBGroupSubjectMapper::class),
             $this->createStub(GroupSubjectLanguageMapper::class),
             $this->createStub(LanguageMapper::class),
+            $this->createStub(FolderCodeMapper::class),
             $registrationSessionMapper,
+            $this->createStub(\External_ClassInterface::class),
             $registrationSessionStudentMapper,
             $externalUser,
             $this->createStub(FieldStrategyFactory::class),
