@@ -60,8 +60,11 @@ class GridTest extends TestCase
         $group3->getIndicators()[$indicator8->getId()] = $indicator8;
         $group3->getIndicators()[$indicator9->getId()] = $indicator9;
 
+        $rubricInstance = new \Schoolbox\Assessment\Rubric\Instance\Model()
+            ->setId(117);
+
         $dueWork = new DueWork();
-        $grid    = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid    = new RubricGrid\Grid($dueWork, $rubricInstance, $rowSet);
 
         // Group and indicator usage
         $groupUsage1                                             = (new RubricGrid\CapabilityUsage($group1))->setMaxValue(15);
@@ -133,8 +136,11 @@ class GridTest extends TestCase
         $group3->getIndicators()[$indicator8->getId()] = $indicator8;
         $group3->getIndicators()[$indicator9->getId()] = $indicator9;
 
+        $rubricInstance = new \Schoolbox\Assessment\Rubric\Instance\Model()
+            ->setId(117);
+
         $dueWork = new DueWork();
-        $grid    = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid    = new RubricGrid\Grid($dueWork, $rubricInstance, $rowSet);
 
         // Group and indicator usage
         $groupUsage1                                             = (new RubricGrid\CapabilityUsage($group1))->setMaxValue(15);
@@ -232,38 +238,46 @@ class GridTest extends TestCase
         $indicatorUsage6->getDescriptors()[1]                    = (new RubricGrid\Descriptor())->setMaxValue(5);
         $indicatorUsage6->getDescriptors()[2]                    = (new RubricGrid\Descriptor())->setMaxValue(5);
 
-        $dueWork1 = (new DueWork())->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_TOTAL));
-        $grid1    = new RubricGrid\Grid($dueWork1, $rowSet);
+        $rubricInstance = new \Schoolbox\Assessment\Rubric\Instance\Model()
+            ->setId(117)
+            ->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_TOTAL));
+
+        $dueWork1 = new DueWork();
+        $grid1    = new RubricGrid\Grid($dueWork1, $rubricInstance, $rowSet);
 
         yield 'mark per capability, empty grid' => [$grid1, 0];
 
 
-        $grid2                                          = new RubricGrid\Grid($dueWork1, $rowSet);
+        $grid2                                          = new RubricGrid\Grid($dueWork1, $rubricInstance, $rowSet);
         $grid2->getCapabilityUsages()[$group1->getId()] = $groupUsage1;
 
         yield 'mark per capability, one group usage' => [$grid2, 15];
 
 
-        $grid3                                          = new RubricGrid\Grid($dueWork1, $rowSet);
+        $grid3                                          = new RubricGrid\Grid($dueWork1, $rubricInstance, $rowSet);
         $grid3->getCapabilityUsages()[$group1->getId()] = $groupUsage1;
         $grid3->getCapabilityUsages()[$group2->getId()] = $groupUsage2;
 
         yield 'mark per capability, two group usages' => [$grid3, 18];
 
 
-        $duework2 = (new DueWork())->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_NONE));
-        $grid4    = new RubricGrid\Grid($duework2, $rowSet);
+        $rubricInstance = new \Schoolbox\Assessment\Rubric\Instance\Model()
+            ->setId(230)
+            ->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_NONE));
+
+        $duework2 = new DueWork();
+        $grid4    = new RubricGrid\Grid($duework2, $rubricInstance, $rowSet);
 
         yield 'no mark per capability, empty grid' => [$grid4, 0];
 
 
-        $grid5                                          = new RubricGrid\Grid($duework2, $rowSet);
+        $grid5                                          = new RubricGrid\Grid($duework2, $rubricInstance, $rowSet);
         $grid5->getCapabilityUsages()[$group1->getId()] = $groupUsage1;
 
         yield 'no mark per capability, one group usage' => [$grid5, 5];
 
 
-        $grid6                                          = new RubricGrid\Grid($duework2, $rowSet);
+        $grid6                                          = new RubricGrid\Grid($duework2, $rubricInstance, $rowSet);
         $grid6->getCapabilityUsages()[$group1->getId()] = $groupUsage1;
         $grid6->getCapabilityUsages()[$group2->getId()] = $groupUsage2;
 
@@ -328,19 +342,23 @@ class GridTest extends TestCase
         $groupUsage2 = new RubricGrid\CapabilityUsage($group2);
         $groupUsage3 = new RubricGrid\CapabilityUsage($group3);
 
+        $rubricInstance = new \Schoolbox\Assessment\Rubric\Instance\Model()
+            ->setId(232)
+            ->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_TOTAL));
+
         $dueWork = new DueWork();
-        $grid1   = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid1   = new RubricGrid\Grid($dueWork, $rubricInstance, $rowSet);
 
         yield 'No capabilities used' => [$grid1, [$group1, $group2, $group3]];
 
 
-        $grid2                                          = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid2                                          = new RubricGrid\Grid($dueWork, $rubricInstance, $rowSet);
         $grid2->getCapabilityUsages()[$group2->getId()] = $groupUsage2;
 
         yield 'Group 2 used' => [$grid2, [$group2, $group1, $group3]];
 
 
-        $grid3                                          = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid3                                          = new RubricGrid\Grid($dueWork, $rubricInstance, $rowSet);
         $grid3->getCapabilityUsages()[$group3->getId()] = $groupUsage3;
         $grid3->getCapabilityUsages()[$group2->getId()] = $groupUsage2;
 
@@ -348,7 +366,7 @@ class GridTest extends TestCase
         yield 'Group 3, 2 used' => [$grid3, [$group3, $group2, $group1]];
 
 
-        $grid4                                          = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid4                                          = new RubricGrid\Grid($dueWork, $rubricInstance, $rowSet);
         $grid4->getCapabilityUsages()[$group1->getId()] = $groupUsage1;
         $grid4->getCapabilityUsages()[$group3->getId()] = $groupUsage3;
         $grid4->getCapabilityUsages()[$group2->getId()] = $groupUsage2;
@@ -356,7 +374,7 @@ class GridTest extends TestCase
         yield 'Group 1, 3, 2 used' => [$grid4, [$group1, $group3, $group2]];
 
 
-        $grid5                                          = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid5                                          = new RubricGrid\Grid($dueWork, $rubricInstance, $rowSet);
         $grid5->getCapabilityUsages()[$group3->getId()] = $groupUsage3;
         $grid5->getCapabilityUsages()[$group2->getId()] = $groupUsage2;
         $grid5->getCapabilityUsages()[$group1->getId()] = $groupUsage1;
@@ -425,25 +443,37 @@ class GridTest extends TestCase
         //        $grid->getCapabilityUsages()[$capability2->getId()] = $capabilityUsage2;
         //        yield 'Not a due work' => [$grid, $capability2, false];
 
+        $rubricInstance = new \Schoolbox\Assessment\Rubric\Instance\Model()
+            ->setId(117)
+            ->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_NONE));
 
         $grid = new RubricGrid\Grid(
-            (new DueWork())->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_NONE)),
+            new DueWork(),
+            $rubricInstance,
             $rowSet
         );
         $grid->getCapabilityUsages()[$capability2->getId()] = $capabilityUsage2;
         yield 'Not mark-per-capability' => [$grid, $capability2, false];
 
+        $rubricInstance = new \Schoolbox\Assessment\Rubric\Instance\Model()
+            ->setId(117)
+            ->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_TOTAL));
 
         $grid = new RubricGrid\Grid(
-            (new DueWork())->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_TOTAL)),
+            new DueWork(),
+            $rubricInstance,
             $rowSet
         );
         $grid->getCapabilityUsages()[$capability2->getId()] = $capabilityUsage1;
         yield 'Capability not in grid' => [$grid, $capability1, false];
 
+        $rubricInstance = new \Schoolbox\Assessment\Rubric\Instance\Model()
+            ->setId(117)
+            ->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_TOTAL));
 
         $grid = new RubricGrid\Grid(
-            (new DueWork())->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_TOTAL)),
+            new DueWork(),
+            $rubricInstance,
             $rowSet
         );
         $grid->getCapabilityUsages()[$capability1->getId()] = $capabilityUsage1;
@@ -477,14 +507,18 @@ class GridTest extends TestCase
     {
         $generator = new Generator();
 
+        $rubricInstance = new \Schoolbox\Assessment\Rubric\Instance\Model()
+            ->setId(117);
 
         // both empty: true
         $grid1 = new RubricGrid\Grid(
             (new DueWork())->setId(1),
+            $rubricInstance,
             new Rowset\RowSet(new Folder())
         );
         $grid2 = new RubricGrid\Grid(
             (new DueWork())->setId(1),
+            $rubricInstance,
             new Rowset\RowSet(new Folder())
         );
         yield "empty with empty" => [$grid1, $grid2, true];
@@ -493,10 +527,12 @@ class GridTest extends TestCase
         // different assessment: false
         $grid1 = new RubricGrid\Grid(
             (new DueWork())->setId(1),
+            $rubricInstance,
             new Rowset\RowSet(new Folder())
         );
         $grid2 = new RubricGrid\Grid(
             (new DueWork())->setId(2),
+            $rubricInstance,
             new Rowset\RowSet(new Folder())
         );
         yield "different assessment" => [$grid1, $grid2, false];
@@ -663,12 +699,35 @@ class GridTest extends TestCase
             Generator::TEST_LEVELS,
             Generator::TEST_CAPABILITY_USAGES
         );
-        $grid1->getAssessment()->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_TOTAL));
-        $grid2->getAssessment()->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_NONE));
+
+
+        /* A rubric instance that used Total Mark cap mark type
+         */
+        $rubricInstanceTotal = new \Schoolbox\Assessment\Rubric\Instance\Model()
+            ->setId(117)
+            ->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_TOTAL));
+
+        /* A rubric instance that used None cap mark type
+         */
+        $rubricInstanceNone = new \Schoolbox\Assessment\Rubric\Instance\Model()
+            ->setId(117)
+            ->setCapabilityMarkType(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_NONE));
+
+        $grid1->setRubricInstance($rubricInstanceTotal);
+        $grid2->setRubricInstance($rubricInstanceNone);
         yield "different mark per capability setting" => [$grid1, $grid2, true];
 
 
         // different mark range on/off: true
+
+        $rubricInstanceTrue = new \Schoolbox\Assessment\Rubric\Instance\Model()
+            ->setId(117)
+            ->setMarkedUsingRange(true);
+
+        $rubricInstanceFalse = new \Schoolbox\Assessment\Rubric\Instance\Model()
+            ->setId(117)
+            ->setMarkedUsingRange(false);
+
         $grid1 = $generator->generateGrid(
             RowSet\Test\Generator::TEST_CAPABILITIES,
             Generator::TEST_LEVELS,
@@ -679,8 +738,8 @@ class GridTest extends TestCase
             Generator::TEST_LEVELS,
             Generator::TEST_CAPABILITY_USAGES
         );
-        $grid1->getAssessment()->setUseMarkRange(true); // TODO: useMarkRange should be against a rubric grid
-        $grid2->getAssessment()->setUseMarkRange(false);
+        $grid1->setRubricInstance($rubricInstanceTrue);
+        $grid1->setRubricInstance($rubricInstanceFalse);
         yield "different mark range" => [$grid1, $grid2, true];
 
 
