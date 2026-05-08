@@ -34,7 +34,7 @@ body.sbx-body {
             color: var(--sbx-config-color-accent); // ^foundation-fixes^ - remove the change of text colour on hover
             filter: brightness(1.1);
         }
-        &:focus {
+        &:focus-visible {
             @include sbx-form.form-input-focus;
             background: var(--sbx-config-color-accent);
             color: var(--sbx-config-color-accent-text);
@@ -81,7 +81,7 @@ body.sbx-body {
             color: var(--sbx-config-color-accent); // ^foundation-fixes^ - remove the change of text colour on hover
             filter: brightness(1.05);
         }
-        &:focus {
+        &:focus-visible {
             @include sbx-form.form-input-focus;
         }
         &:disabled,
