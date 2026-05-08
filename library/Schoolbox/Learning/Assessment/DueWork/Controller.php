@@ -683,7 +683,7 @@ class Controller extends Assessment\Controller
         $basename = (new Url($assessment->getTitle()))->getSlug();
 
         /** @var Model $assessment */
-        $content  = $this->array2csv($this->collateResultSquare($assessment->isMarkPerCapability(), $rubricGrid, $assessment->getAllParticipants()));
+        $content  = $this->array2csv($this->collateResultSquare($rubricGrid->isMarkPerCapability(), $rubricGrid, $assessment->getAllParticipants()));
 
         /* Maybe we set the Show Drafts option
          */
@@ -696,12 +696,11 @@ class Controller extends Assessment\Controller
         }
 
         $this->response = $this->responseFromContent($content)
-                               ->withHeader('Pragma', ' ')
-                               ->withHeader('Cache-Control', ' ')
-                               ->withHeader('Content-Type', 'text/csv')
-                               ->withHeader('Content-Length', strlen($content))
-                               ->withHeader('Content-Disposition', "attachment; filename=\"{$prefix}{$basename}.csv\"")
-        ;
+            ->withHeader('Pragma', ' ')
+            ->withHeader('Cache-Control', ' ')
+            ->withHeader('Content-Type', 'text/csv')
+            ->withHeader('Content-Length', strlen($content))
+            ->withHeader('Content-Disposition', "attachment; filename=\"{$prefix}{$basename}.csv\"");
     }
 
 
