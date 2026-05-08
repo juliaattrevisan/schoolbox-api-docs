@@ -14,6 +14,7 @@ import type { MarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates
 import RmGridCapability from "./rm-grid-capability.vue";
 import type { RubricGrid, RubricMarkedGrid, RubricMarkedGridCapability, RubricMarkedGridIndicator } from "./types";
 import { cloneDeep } from "es-toolkit";
+import { applyMarkScheme } from "./rubricUtils";
 
 interface Props {
     rubric: RubricGrid;
@@ -51,6 +52,7 @@ const blankMarkedGrid: RubricMarkedGrid = {
             id: capability.id,
             humanReadableMark: null,
             value: null,
+            scaledMark: null,
             indicators: capability.indicators.map((indicator): RubricMarkedGridIndicator => {
                 return {
                     id: indicator.id,
@@ -87,6 +89,46 @@ const capabilities = window.Vue.computed(() => {
         };
     });
 });
+
+/**
+ * The mark of this rubric derived from the current scaled capability marks
+ */
+const derivedRubricMark = window.Vue.computed(() => {
+    let total = 0;
+    let hasMeaningfulMark = false;
+
+    for (const capability of markedGridData.value.capabilities) {
+        if (capability.scaledMark !== null) {
+            total += capability.scaledMark;
+            hasMeaningfulMark = true;
+        }
+    }
+
+    if (!hasMeaningfulMark) {
+        return null;
+    }
+
+    // if the total is not a whole number, round to 2dp
+    if (total % 1 !== 0) {
+        total = parseFloat(total.toFixed(2));
+    }
+
+    return total;
+});
+
+/**
+ * When a capability mark is updated, update the grid total if not customised
+ */
+function onCapabilityMarkUpdated(): void {
+    // alert(JSON.stringify(capabilityMark));
+    const { humanReadableMark } = applyMarkScheme(
+        derivedRubricMark.value,
+        props.rubric.derivedMaxValue,
+        props.assessmentMarkScheme,
+    );
+
+    markedGridData.value.humanReadableMark = humanReadableMark;
+}
 </script>
 
 <template>
@@ -110,6 +152,7 @@ const capabilities = window.Vue.computed(() => {
                     :levels="props.rubric.levels"
                     :participant-id="props.participantId"
                     :show-summary-capability="props.showGroupTotal"
+                    @capability-mark-updated="onCapabilityMarkUpdated"
                 />
 
                 <!-- Overall Mark -->

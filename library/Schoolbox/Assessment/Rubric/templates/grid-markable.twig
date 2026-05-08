@@ -37,15 +37,12 @@
 {% set markScheme = selfAssess or studentView ? rubricGrid.assessment.markScheme : rubricGrid.assessment.instructorMarkScheme %}
 {% set markType = markScheme.generateContext %}
 
-{# js specific to the rubric we just injected to...wherever we injected it #}
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.dynagrade.js?v={{ config.site_version }}"></script>
-
 {% autoescape 'js' %}
+{% if false %}
 <script type="text/javascript">
     $(function () {
         var $rb       = $('#{{ rubricId }}'),
-            markType  = $rb.find("[data-mark-type]").attr("data-mark-type"),
-            dynagrade = {{ markType | json_encode | raw }};
+            markType  = $rb.find("[data-mark-type]").attr("data-mark-type");
 
         $("[data-feedback-form]").validate(
             {
@@ -55,7 +52,6 @@
                 }
             }
         );
-
 
         // Add validation rules for per-capability marks
         $("[data-group-mark]").each(function() {
@@ -89,169 +85,11 @@
             });
         }
 
-        {#
-        /**
-         * Various types for future reference
-         * @typedef {string} CapabilityId
-         * @typedef {string} IndicatorId
-         * @typedef {string} DescriptorId
-         */
-
-        /**
-        * An object representing the state of a descriptor
-        * @typedef {Object} DescriptorState
-        * @property {number|null} value - the value of the descriptor
-        * @property {boolean} checked - whether the descriptor is checked
-        * @property {HTMLInputElement} el - the descriptor checkbox element
-        */
-
-        /**
-        * An object with all information about a descriptor, useful when using descriptors as a list
-        * @typedef {Object} DescriptorInfo
-        * @property {DescriptorState} state - the state of the descriptor
-        * @property {DescriptorId} descriptorId - the ID of the descriptor
-        * @property {IndicatorId} indicatorId - the ID of the indicator the descriptor belongs to
-        */
-        #}
-
-        /**
-         * A way to track the current configuration of the entire rubric
-         * This exists rather than using the DOM directly so that we have a far more manageable object to work with
-         * Ideally, we'd just rewrite everything into Vue and things could be a lot simpler...
-         * @var {Object.<CapabilityId, Object.<IndicatorId, Object.<DescriptorId, DescriptorState>>>}
-         */
-        let currentRubricConfiguration = {};
-
-        /**
-         * Initialise the currentRubricConfiguration object with the current state of the rubric
-         */
-        function initialiseCurrentRubricConfiguration() {
-            currentRubricConfiguration = {};
-            $rb[0].querySelectorAll("tr[data-indicator-id]").forEach(indicatorRow => {
-                const capabilityId = indicatorRow.getAttribute("data-capability-id");
-                if (!currentRubricConfiguration[capabilityId]) {
-                    currentRubricConfiguration[capabilityId] = {};
-                }
-
-                const indicatorId = indicatorRow.getAttribute("data-indicator-id");
-                if (!currentRubricConfiguration[capabilityId][indicatorId]) {
-                    currentRubricConfiguration[capabilityId][indicatorId] = {};
-                }
-
-                indicatorRow.querySelectorAll("input[data-rubric-descriptor]").forEach(descriptorCheckbox => {
-                    const descriptorId = descriptorCheckbox.getAttribute("data-rubric-descriptor");
-
-                    let descriptorValue = parseFloat(descriptorCheckbox.getAttribute("data-value"));
-                    if (isNaN(descriptorValue)) {
-                        // parseFloat will return NaN if the attribute doesn't exist or is not a number
-                        // in this case, the descriptor is valueless so we set null here.
-                        descriptorValue = null;
-                    }
-
-                    currentRubricConfiguration[capabilityId][indicatorId][descriptorId] = {
-                        value: descriptorValue,
-                        checked: descriptorCheckbox.checked,
-                        el: descriptorCheckbox,
-                    };
-                });
-            });
-        }
-
-        initialiseCurrentRubricConfiguration();
-
-        /**
-         * Maps all descriptors in a capability to a flat array of descriptor infos for easier processing
-         * @param {CapabilityId} capability
-         * @returns {DescriptorInfo[]} - an array of descriptor infos for all descriptors in the capability
-         */
-        function findAllDescriptorsInCapability(capability) {
-            const capabilityConfiguration = currentRubricConfiguration[capability];
-            if (!capabilityConfiguration) {
-                console.warn("No configuration found for capability", capability);
-                return [];
-            }
-
-            return Object.entries(capabilityConfiguration)
-                .flatMap(([indicatorId, descriptors]) => {
-                    return Object.entries(descriptors)
-                        .map(([descriptorId, descriptor]) => ({
-                            state: descriptor,
-                            descriptorId: descriptorId,
-                            indicatorId: indicatorId, // Keep the indicator ID attached in case we need it later
-                        }));
-                });
-        }
-
-        /**
-         * Finds all selected descriptors in a capability based on currentRubricConfiguration
-         * @param {CapabilityId} capabilityId - the capability to find descriptors for
-         * @returns {DescriptorInfo[]} - an array of descriptor infos for all selected descriptors in the capability
-         */
-        function findAllSelectedDescriptorsInCapability(capabilityId) {
-            const allDescriptors = findAllDescriptorsInCapability(capabilityId);
-            return allDescriptors.filter(descriptor => descriptor.state.checked);
-        }
-
-        /**
-         * Finds the currently selected descriptor for an indicator
-         * @param {CapabilityId} capabilityId - the capability to find the descriptor for
-         * @param {IndicatorId} indicatorId - the indicator to find the descriptor for
-         * @returns {DescriptorInfo|null} - the dselected descriptor information, or null if no selection
-         */
-        function findSelectedDescriptorInIndicator(capabilityId, indicatorId) {
-            const capabilityConfiguration = currentRubricConfiguration[capabilityId];
-            if (!capabilityConfiguration) {
-                console.warn("No configuration found for capability", capabilityId);
-                return null;
-            }
-
-            const indicatorConfiguration = capabilityConfiguration[indicatorId];
-            if (!indicatorConfiguration) {
-                console.warn("No configuration found for indicator", indicatorId);
-                return null;
-            }
-
-            /** @type {DescriptorInfo[]} - All selected descriptors in the indicator, although there should only be one */
-            const selectedDescriptor = Object.entries(indicatorConfiguration)
-                .filter(([descriptorId, descriptor]) => descriptor.checked)
-                .map(([descriptorId, descriptor]) => ({
-                    state: descriptor,
-                    descriptorId: descriptorId,
-                    indicatorId: indicatorId,
-                }));
-
-            if (!selectedDescriptor) {
-                return null;
-            }
-
-            if (selectedDescriptor.length > 1) {
-                console.warn("Multiple descriptors selected for indicator", indicatorId);
-            }
-
-            return selectedDescriptor[0] || null;
-        }
-
-        // initialise dynamic mark display
-        $rb.dynagrade(dynagrade);
-
         // Update the per-capability and overall marks when descriptor selection is changed
         $rb.on('change change.preload', '[data-rubric], [data-rubric-group]', function (e) {
-            var $changed        = $(this),
-                rubricId        = $changed.attr('data-rubric'),
-                rowSelector     = '[data-group="rb-' + rubricId + '-' + groupId + '"]',
-                $groupRows      = $(rowSelector),
-                rubricTotalMark = null;
-
-            if ($groupRows.length) {
-                rubricTotalMark = getTotalMark();
-            }
-            var rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]';
-            var rubricSummary = $rb.find(rubricSummarySelector);
-            rubricSummary.attr('data-scaled-mark', rubricTotalMark);
-
             // Only update the overall mark if we haven't customised the cap mark
             if (! $groupSummary.attr('data-customised')) {
-                parseFraction(rubricSummary, e.namespace);
+                // TODO: update overall rubric mark
             }
         });
 
@@ -278,14 +116,7 @@
                 $groupSummary.attr('data-customised', true);
             }
 
-            var rubricTotalMark = getTotalMark();
-
-            var rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]';
-            var rubricSummary = $rb.find(rubricSummarySelector);
-
-            rubricSummary.attr('data-scaled-mark', rubricTotalMark);
-
-            parseFraction(rubricSummary, e.namespace);
+            // TODO: update overall rubric mark
         });
 
         // Custom marks reach us as either a scaled numeric mark or a percentage. Turn them into an unscaled raw mark for data-mark
@@ -319,66 +150,10 @@
 
         // Overwrite any custom mark in the capability mark field with the scaled mark calculated from descriptor values
         $("[data-use-descriptor-values]").on('click', function(e) {
-            var $button               = $(this),
-                rubricId              = $button.closest('[data-group-summary]').attr('data-rubric-id');
-
-            var rubricTotalMark       = getTotalMark(),
-                rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]',
-                rubricSummary         = $rb.find(rubricSummarySelector);
-
-            rubricSummary.attr('data-scaled-mark', rubricTotalMark);
-
-            parseFraction(rubricSummary, e.namespace);
+            // TODO: update overall rubric mark
             revalidateCapMarks();
         });
-
-        // Calculate the overall rubric mark from the scaled group marks
-        function getTotalMark()
-        {
-            var totalMark = null;
-            var rubricOverallMax = 0;
-
-            var $groupSummary = $rb.find('[data-group-summary]');
-
-            if ($groupSummary.length) {
-                $groupSummary.each(function() {
-                    var groupScaledMark = $(this).attr('data-scaled-mark');
-
-                    if (!isNaN(groupScaledMark)) {
-                        totalMark = (totalMark || 0) + parseFloat(groupScaledMark);
-                    }
-
-                    rubricOverallMax += parseFloat($(this).attr('data-max'));
-                });
-            } else {
-                var $descriptorCheckboxes = $("[data-rubric-descriptor]");
-                totalMark = summateDescriptors($descriptorCheckboxes);
-            }
-
-            // If sum isn't a whole number: round to 2dp
-            if (totalMark !== null && totalMark % 1 !== 0){
-                totalMark = totalMark.toFixed(2);
-            }
-
-
-            return totalMark;
-        }
-
-        /**
-         *
-         * @param {jQuery} $elem
-         * @param {string|null} namespace
-         */
-        function parseFraction($elem, namespace)
-        {
-            var ev = 'dynagrade';
-            if (namespace) {
-                ev = ev + '.' + namespace;
-            }
-
-            $elem.trigger(ev);
-        }
-
     });
 </script>
+{% endif %}
 {% endautoescape %}

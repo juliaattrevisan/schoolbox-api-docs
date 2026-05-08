@@ -10,7 +10,7 @@ import type { MarkScheme as CapabilityMarkScheme } from "@schoolboxLibrary/Learn
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import type { RubricGridCapability, RubricGridLevel, RubricMarkedGridCapability } from "./types";
 import RmGridIndicator from "./rm-grid-indicator.vue";
-import { assertUnreachable } from "@js/util/errorUtils";
+import { applyMarkScheme } from "./rubricUtils";
 
 interface Props {
     capability: RubricGridCapability;
@@ -21,6 +21,8 @@ interface Props {
     showSummaryCapability: boolean;
 }
 const props = defineProps<Props>();
+const emit = defineEmits<{ (e: "capabilityMarkUpdated"): void }>();
+
 const capabilityMark = defineModel<RubricMarkedGridCapability>("capabilityMark", { required: true });
 
 const componentId = window.Vue.useId();
@@ -94,93 +96,16 @@ function scaleMark(value: number | null): number | null {
 }
 
 /**
- * Turn a specified value into a percentage of the max marks for a capability
- * @param value value
- * @returns pecentage
- */
-function getPercentage(value: string | number | null): string | null {
-    let floatValue = parseFloat(String(value)); // yikes.
-    if (Number.isNaN(floatValue)) {
-        return null;
-    }
-
-    const capabilityMax = props.capability.maxValue ?? 0; // TODO: can this actually be null??
-
-    let percentage = capabilityMax > 0 ? (floatValue / capabilityMax) * 100 : 0;
-
-    if (percentage % 1 !== 0) {
-        // only round and show 2dp when necessary
-        percentage = parseFloat(percentage.toFixed(2));
-    }
-
-    return percentage.toString();
-}
-
-/**
- * Determine the text form that a mark should display as based on the mark scheme
- * @param value scaled mark value
- * @returns the human readable form of the mark to display
- */
-function applyMarkScheme(value: string | number | null): {
-    value: string | null;
-    humanReadableMark: string | null;
-} {
-    const markScheme = props.capabilityMarkScheme;
-    if (markScheme.template === "") {
-        return { value: null, humanReadableMark: null };
-    }
-
-    if (markScheme.template === "TotalMarkFractional") {
-        const stringValue = value !== null ? String(value) : null;
-        return {
-            value: stringValue,
-            humanReadableMark: `${stringValue} / ${props.capability.maxValue}`,
-        };
-    }
-
-    // turn whatever the value currently is into a percentage
-    const percentage = getPercentage(value);
-
-    if (markScheme.template === "Percentage") {
-        return {
-            value: percentage,
-            humanReadableMark: `${percentage}%`,
-        };
-    }
-
-    if (markScheme.template === "LetterGrade") {
-        const grades = markScheme.context.conf;
-        if (percentage === null || percentage === "") {
-            return { value: null, humanReadableMark: null };
-        }
-
-        if (grades.length === 0) {
-            // some strange stuff going on here from the old logic, not really sure if it matters anymore
-            return { value: "", humanReadableMark: "" };
-        }
-
-        const numericValue = parseFloat(percentage); // yikes.
-
-        // TODO: (from old logic) assumes values are always descending which might not be the case?
-        // default to the last grade if nothing matches
-        const defaultGrade = grades[grades.length - 1];
-        const relevantGrade = grades.find((grade) => numericValue >= grade.lowerBound) ?? defaultGrade;
-        return {
-            value: relevantGrade.caption,
-            humanReadableMark: relevantGrade.caption,
-        };
-    }
-
-    assertUnreachable(markScheme);
-}
-
-/**
  * The mark of this capability derived from the current indicator marks
  */
 const derivedCapabilityMark = window.Vue.computed(() => {
     const sum = indicatorMarkSum.value;
     const scaledMark = scaleMark(sum);
-    const { value, humanReadableMark } = applyMarkScheme(scaledMark);
+    const { value, humanReadableMark } = applyMarkScheme(
+        scaledMark,
+        props.capability.maxValue,
+        props.capabilityMarkScheme,
+    );
 
     return {
         scaledMark,
@@ -285,6 +210,15 @@ window.Vue.onMounted(() => {
 window.Vue.watch(
     () => capabilityMark.value.value,
     () => {
+        // force sync the humanReadableMark/scaledMark attrs whenever the value changes
+        const { humanReadableMark } = applyMarkScheme(
+            capabilityMark.value.value,
+            props.capability.maxValue,
+            props.capabilityMarkScheme,
+        );
+        capabilityMark.value.humanReadableMark = humanReadableMark;
+        // capabilityMark.value.scaledMark = ; // TODO: this is not a valid way to rederive scaledMark yet...
+
         // if the mark now differs to the derived mark (aka assign from is showing), consider it customised
         if (showAssignFromButton.value) {
             isCustomised.value = true;
@@ -301,6 +235,9 @@ window.Vue.watch(
                 isCustomised.value = false;
             }
         }
+
+        // also let upstairs know about it
+        emit("capabilityMarkUpdated");
     },
 );
 </script>

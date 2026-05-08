@@ -10,6 +10,8 @@ export type RubricGrid = {
     title: string;
     weight: number | null;
     levels: RubricGridLevel[];
+    /** A derived maximum value for the rubric, calculated from its capabilities */
+    derivedMaxValue: number;
     capabilities: RubricGridCapability[];
     capabilityMarkScheme: MarkScheme;
 };
