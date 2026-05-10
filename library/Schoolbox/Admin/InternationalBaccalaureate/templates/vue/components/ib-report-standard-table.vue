@@ -13,17 +13,8 @@ const emit = defineEmits<{
     studentUpdated: [studentId: number, updatedSubjects: SubjectGroup];
 }>();
 
-const menuOpenForId = window.Vue.ref<number | null>(null);
 const isModalOpen = window.Vue.ref<boolean>(false);
 const modalStudent = window.Vue.ref<StudentRow | null>(null);
-
-/**
- * Toggles the actions dropdown for the given student row.
- * @param studentId The id of the student whose menu to toggle.
- */
-function toggleMenu(studentId: number): void {
-    menuOpenForId.value = menuOpenForId.value === studentId ? null : studentId;
-}
 
 /**
  * Opens the update language modal for the given student.
@@ -32,7 +23,6 @@ function toggleMenu(studentId: number): void {
 function openModal(student: StudentRow): void {
     modalStudent.value = student;
     isModalOpen.value = true;
-    menuOpenForId.value = null;
 }
 
 /**
@@ -43,19 +33,6 @@ function openModal(student: StudentRow): void {
 function onSaved(studentId: number, updatedSubjects: SubjectGroup): void {
     emit("studentUpdated", studentId, updatedSubjects);
 }
-
-/** Closes any open row actions dropdown. */
-function closeMenu(): void {
-    menuOpenForId.value = null;
-}
-
-window.Vue.onMounted(() => {
-    document.addEventListener("click", closeMenu);
-});
-
-window.Vue.onUnmounted(() => {
-    document.removeEventListener("click", closeMenu);
-});
 </script>
 
 <template>
@@ -93,21 +70,15 @@ window.Vue.onUnmounted(() => {
                 <td><ib-report-subject-labels :entry="student.subjects.sl" /></td>
                 <td><ib-report-subject-labels :entry="student.subjects.core" /></td>
                 <td>
-                    <div class="ib-report-row-actions" @click.stop>
-                        <button
-                            type="button"
-                            :aria-expanded="menuOpenForId === student.id"
-                            aria-label="More options"
-                            @click.stop="toggleMenu(student.id)"
-                        >
-                            <sbx-icon name="more"></sbx-icon>
-                        </button>
-                        <div v-if="menuOpenForId === student.id" class="ib-report-row-actions__menu">
-                            <button type="button" class="ib-report-row-actions__item" @click="openModal(student)">
-                                Update Language Selection
-                            </button>
-                        </div>
-                    </div>
+                    <sbx-pop-out :content-id="`ib-row-dropdown-${student.id}`"></sbx-pop-out>
+                    <ul
+                        :id="`ib-row-dropdown-${student.id}`"
+                        class="f-dropdown"
+                        data-dropdown-content
+                        aria-hidden="true"
+                    >
+                        <li><a href="#" @click.prevent="openModal(student)">Update Language Selection</a></li>
+                    </ul>
                 </td>
             </tr>
         </tbody>
@@ -119,37 +90,3 @@ window.Vue.onUnmounted(() => {
         @saved="onSaved"
     />
 </template>
-
-<style scoped>
-.ib-report-row-actions {
-    position: relative;
-    display: inline-block;
-}
-
-.ib-report-row-actions__menu {
-    position: absolute;
-    right: 0;
-    top: 100%;
-    z-index: 10;
-    background: var(--sbx-color-background, #fff);
-    border: 1px solid var(--sbx-color-border, #ccc);
-    border-radius: 4px;
-    min-width: 12rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-}
-
-.ib-report-row-actions__item {
-    display: block;
-    width: 100%;
-    padding: 0.5rem 1rem;
-    text-align: left;
-    background: none;
-    border: none;
-    cursor: pointer;
-    white-space: nowrap;
-}
-
-.ib-report-row-actions__item:hover {
-    background: var(--sbx-color-background-hover, #f5f5f5);
-}
-</style>

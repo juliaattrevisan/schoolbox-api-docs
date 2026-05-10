@@ -3,7 +3,7 @@ import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
-import type { StudentRow, FailedRow, SubjectGroup } from "../../js/types/ibReportTypes";
+import type { StudentRow, FailedRow, SubjectGroup, SubjectEntry } from "../../js/types/ibReportTypes";
 
 interface Props {
     student: StudentRow | FailedRow | null;
@@ -29,6 +29,14 @@ const subjectRows = window.Vue.ref<SubjectRowEntry[]>([]);
 const isSaving = window.Vue.ref<boolean>(false);
 const saveError = window.Vue.ref<string | null>(null);
 
+type LevelKey = keyof SubjectGroup;
+type LevelLabel = SubjectRowEntry["level"];
+const LEVEL_KEYS: Array<{ key: LevelKey; label: LevelLabel }> = [
+    { key: "hl", label: "HL" },
+    { key: "sl", label: "SL" },
+    { key: "core", label: "Core" },
+];
+
 /**
  * Flattens a student's subjects into a flat list of rows with pre-filled language selections.
  * @param student The student whose subjects to flatten.
@@ -36,47 +44,21 @@ const saveError = window.Vue.ref<string | null>(null);
  */
 function buildSubjectRows(student: StudentRow | FailedRow): SubjectRowEntry[] {
     const rows: SubjectRowEntry[] = [];
-
-    for (const entry of student.subjects.hl) {
-        const preselected: SearchSelectItem[] =
-            entry.languageId !== null && entry.language !== null
-                ? [{ id: entry.languageId, name: entry.language }]
-                : [];
-        rows.push({
-            level: "HL",
-            subject: entry.subject,
-            selected: preselected,
-            defaultResults: preselected,
-            hasError: false,
-        });
+    for (const { key, label } of LEVEL_KEYS) {
+        for (const entry of student.subjects[key]) {
+            const preselected: SearchSelectItem[] =
+                entry.languageId !== null && entry.language !== null
+                    ? [{ id: entry.languageId, name: entry.language }]
+                    : [];
+            rows.push({
+                level: label,
+                subject: entry.subject,
+                selected: preselected,
+                defaultResults: preselected,
+                hasError: false,
+            });
+        }
     }
-    for (const entry of student.subjects.sl) {
-        const preselected: SearchSelectItem[] =
-            entry.languageId !== null && entry.language !== null
-                ? [{ id: entry.languageId, name: entry.language }]
-                : [];
-        rows.push({
-            level: "SL",
-            subject: entry.subject,
-            selected: preselected,
-            defaultResults: preselected,
-            hasError: false,
-        });
-    }
-    for (const entry of student.subjects.core) {
-        const preselected: SearchSelectItem[] =
-            entry.languageId !== null && entry.language !== null
-                ? [{ id: entry.languageId, name: entry.language }]
-                : [];
-        rows.push({
-            level: "Core",
-            subject: entry.subject,
-            selected: preselected,
-            defaultResults: preselected,
-            hasError: false,
-        });
-    }
-
     return rows;
 }
 
@@ -113,23 +95,24 @@ async function onSave(): Promise<void> {
 
     isSaving.value = false;
 
-    const hlEntries = props.student.subjects.hl;
-    const slEntries = props.student.subjects.sl;
-    const coreEntries = props.student.subjects.core;
+    const { hl: hlEntries, sl: slEntries, core: coreEntries } = props.student.subjects;
 
-    let rowIndex = 0;
-    const updatedHl = hlEntries.map((entry) => {
-        const sel = subjectRows.value[rowIndex++].selected[0];
-        return { ...entry, language: sel.name, languageId: sel.id };
-    });
-    const updatedSl = slEntries.map((entry) => {
-        const sel = subjectRows.value[rowIndex++].selected[0];
-        return { ...entry, language: sel.name, languageId: sel.id };
-    });
-    const updatedCore = coreEntries.map((entry) => {
-        const sel = subjectRows.value[rowIndex++].selected[0];
-        return { ...entry, language: sel.name, languageId: sel.id };
-    });
+    /**
+     * Maps subject entries to updated entries using the current modal selections.
+     * @param entries The subject entries to update.
+     * @param startIndex The index into subjectRows where these entries start.
+     * @returns Updated subject entries with the selected language applied.
+     */
+    function buildUpdatedEntries(entries: SubjectEntry[], startIndex: number): SubjectEntry[] {
+        return entries.map((entry, i) => {
+            const sel = subjectRows.value[startIndex + i].selected[0];
+            return { ...entry, language: sel.name, languageId: Number(sel.id) };
+        });
+    }
+
+    const updatedHl = buildUpdatedEntries(hlEntries, 0);
+    const updatedSl = buildUpdatedEntries(slEntries, hlEntries.length);
+    const updatedCore = buildUpdatedEntries(coreEntries, hlEntries.length + slEntries.length);
 
     const toast = window.sbProps.toastActivate("Saving...");
     toast.timeout({ text: "Languages successfully updated." });
