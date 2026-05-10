@@ -216,8 +216,13 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     }
 
     /**
-     * @param string $label
+     * Copypasted from pastoral comment notifier.
      *
+     * I prefer this way anyway, it divorces notifiers from role type.
+     *
+     * TODO try to remove this and play within rules of the standard callback system
+     *
+     * @param string $label
      * @return array
      * @throws BaseMapper\Exception
      * @throws \Schoolbox\Realtime\Schedule\ScheduleException
