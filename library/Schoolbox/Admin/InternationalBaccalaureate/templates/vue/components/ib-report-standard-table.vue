@@ -6,6 +6,7 @@ import type { ApiRenotifyResponse, StudentRow } from "../../js/types/ibReportTyp
 
 interface Props {
     students: StudentRow[];
+    searchLanguagesEndpoint: string;
 }
 defineProps<Props>();
 const updateLanguageStore = useIbReportUpdateLanguageStore();
