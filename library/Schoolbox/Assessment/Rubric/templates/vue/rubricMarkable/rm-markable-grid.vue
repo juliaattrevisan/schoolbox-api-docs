@@ -84,17 +84,6 @@ window.Vue.watch(derivedRubricMark, (scaledMark) => {
     rubricMarkedGrid.value.humanReadableMark = humanReadableMark;
     rubricMarkedGrid.value.normalisedMark = getPercentage(scaledMark, props.rubric.derivedMaxValue);
 });
-
-/**
- * When the grid total changes, reflect that in the mark input & overall assign from button
- * TODO: this is currently outside of Vue, also should factor in multi rubrics
- */
-window.Vue.watch(
-    () => rubricMarkedGrid.value.humanReadableMark,
-    () => {
-        document.dispatchEvent(new CustomEvent("RUBRIC__TOTAL_MARK_UPDATED"));
-    },
-);
 </script>
 
 <template>

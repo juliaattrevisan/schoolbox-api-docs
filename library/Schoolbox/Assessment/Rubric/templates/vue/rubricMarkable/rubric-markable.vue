@@ -195,8 +195,11 @@ function getScaledRubricWeight(rubric: RubricGrid): number {
  * TODO: this is currently outside of Vue, also should factor in multi rubrics
  */
 window.Vue.watch(
-    () => derivedTotalMark.value,
-    () => document.dispatchEvent(new CustomEvent("RUBRIC__TOTAL_MARK_UPDATED")),
+    () => derivedTotalMark.value?.humanReadableMark,
+    async () => {
+        await window.Vue.nextTick(); // need the form value ot update first
+        document.dispatchEvent(new CustomEvent("RUBRIC__TOTAL_MARK_UPDATED"));
+    },
 );
 </script>
 
