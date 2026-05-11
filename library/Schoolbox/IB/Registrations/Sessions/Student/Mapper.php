@@ -24,6 +24,7 @@ use Schoolbox\IB\Registrations\Sessions\Mapper as SessionMapper;
 use Schoolbox\IB\Subject\Model as IBSubjectModel;
 use Schoolbox\Language\Model as LanguageModel;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Resource\Folder\Code\Model as FolderCodeModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -360,7 +361,7 @@ class Mapper extends BaseMapper
             "
                 SELECT
                     gsl.id AS group_subject_language_id,
-                    gslcc.class_code,
+                    fc.code AS class_code,
                     gs.id AS group_subject_id,
                     gs.group_id,
                     gs.level,
@@ -371,9 +372,13 @@ class Mapper extends BaseMapper
                     l.id AS language_id,
                     l.code AS language_code,
                     l.name AS language_name
-                FROM ib_group_subject_language_class_codes gslcc
-                INNER JOIN ib_group_subject_languages gsl
-                    ON gsl.id = gslcc.group_subject_language_id
+                FROM ib_group_subject_languages gsl
+                INNER JOIN ib_group_subject_language_class_codes gslcc
+                    ON gslcc.group_subject_language_id = gsl.id
+                INNER JOIN folder_code fc
+                    ON fc.folder_id = gslcc.folder_id
+                    AND fc.code = gslcc.class_code
+                    AND fc.deleted_at IS NULL
                 INNER JOIN ib_group_subjects gs
                     ON gs.id = gsl.group_subject_id
                 INNER JOIN lu_ib_groups g
@@ -382,8 +387,8 @@ class Mapper extends BaseMapper
                     ON s.id = gs.subject_id
                 INNER JOIN lu_language l
                     ON l.id = gsl.language_id
-                WHERE gslcc.class_code IN ({$bindings->getPlaceholder()})
-                ORDER BY g.sequence ASC, s.name ASC, gs.level ASC, l.name ASC, gslcc.class_code ASC
+                WHERE fc.code IN ({$bindings->getPlaceholder()})
+                ORDER BY g.sequence ASC, s.name ASC, gs.level ASC, l.name ASC, fc.code ASC
             ",
             $bindings->getParams()
         );
@@ -405,7 +410,7 @@ class Mapper extends BaseMapper
             "
                 SELECT
                     gsl.id AS group_subject_language_id,
-                    gslcc.class_code,
+                    fc.code AS class_code,
                     gs.id AS group_subject_id,
                     gs.group_id,
                     gs.level,
@@ -425,10 +430,14 @@ class Mapper extends BaseMapper
                     ON gsl.group_subject_id = gs.id
                 LEFT JOIN ib_group_subject_language_class_codes gslcc
                     ON gslcc.group_subject_language_id = gsl.id
+                LEFT JOIN folder_code fc
+                    ON fc.folder_id = gslcc.folder_id
+                    AND fc.code = gslcc.class_code
+                    AND fc.deleted_at IS NULL
                 LEFT JOIN lu_language l
                     ON l.id = gsl.language_id
                 WHERE g.name = :groupName
-                ORDER BY g.sequence ASC, s.name ASC, l.name ASC, gslcc.class_code ASC
+                ORDER BY g.sequence ASC, s.name ASC, l.name ASC, fc.code ASC
             ",
             [
                 'groupName' => self::CORE_GROUP_NAME,
@@ -476,9 +485,12 @@ class Mapper extends BaseMapper
             return;
         }
 
-        $groupSubject->getLanguages()->add(
-            (new GroupSubjectLanguageModel())
-                ->setId((int) $row['group_subject_language_id'])
+        $groupSubjectLanguageId = (int) $row['group_subject_language_id'];
+        $languages = $groupSubject->getLanguages();
+
+        if (!$languages->offsetExists($groupSubjectLanguageId)) {
+            $languages[$groupSubjectLanguageId] = (new GroupSubjectLanguageModel())
+                ->setId($groupSubjectLanguageId)
                 ->setGroupSubject($groupSubject)
                 ->setLanguage(
                     (new LanguageModel())
@@ -486,7 +498,20 @@ class Mapper extends BaseMapper
                         ->setCode((string) $row['language_code'])
                         ->setName((string) $row['language_name'])
                 )
-                ->setClassCode((string) $row['class_code'])
-        );
+                ->setClassCode(new GenericCollection(FolderCodeModel::class));
+        }
+
+        if ($row['class_code'] === null) {
+            return;
+        }
+
+        /** @var GroupSubjectLanguageModel $groupSubjectLanguage */
+        $groupSubjectLanguage = $languages[$groupSubjectLanguageId];
+        $classCode = (string) $row['class_code'];
+        $classCodes = $groupSubjectLanguage->getClassCode();
+
+        if (!$classCodes->offsetExists($classCode)) {
+            $classCodes[$classCode] = (new FolderCodeModel())->setCode($classCode);
+        }
     }
 }
