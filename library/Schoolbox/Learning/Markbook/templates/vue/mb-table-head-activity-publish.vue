@@ -195,7 +195,11 @@ async function onPublishAll(): Promise<void> {
         <!-- <h5 :class="{ 'l-pad-s--top': i > 0 }">{{ classImpl.folder.title }}</h5> -->
         <section class="checklist">
             <template v-for="{ participants, classImplId } in participantsWithDrafts" :key="classImplId">
-                <div v-for="participant in participants" :key="participant.student.id">
+                <div
+                    v-for="participant in participants"
+                    :key="participant.student.id"
+                    class="sbx-checkbox-radio-container"
+                >
                     <input
                         :id="`mb-table-head-activity-publish-${props.activity.id}-${participant.student.id}`"
                         v-model="selectedParticipants[participant.student.id]"
