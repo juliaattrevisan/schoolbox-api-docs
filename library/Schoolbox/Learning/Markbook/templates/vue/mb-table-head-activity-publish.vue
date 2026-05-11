@@ -193,7 +193,7 @@ async function onPublishAll(): Promise<void> {
         <p v-else>The following drafts can be published:</p>
 
         <!-- <h5 :class="{ 'l-pad-s--top': i > 0 }">{{ classImpl.folder.title }}</h5> -->
-        <section class="checklist">
+        <section class="checklist l-flex-col l-gap-s">
             <template v-for="{ participants, classImplId } in participantsWithDrafts" :key="classImplId">
                 <div
                     v-for="participant in participants"

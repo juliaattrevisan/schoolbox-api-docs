@@ -131,6 +131,7 @@ function onBackgroundClick(): void {
         border-radius: var(--sbx-config-box-roundness, 0);
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
         margin: 0 auto;
+        overflow: hidden;
         position: relative;
         top: 100px;
     }

@@ -203,30 +203,13 @@ body.sbx-body {
         }
     }
 
-    /**
-     *  Dropdown separators
-     */
+    // dropdown separators, blend them in more with button styles
     #tab-control .separator,
     .f-dropdown .separator {
         background-color: var(--sbx-color-foreground-primary);
         color: var(--sbx-color-text-secondary);
         font-weight: bold;
         text-transform: none;
-    }
-
-    /**
-     * Dropdown list buttons, ensure they use the correct background colour
-     */
-    .f-dropdown,
-    .f-dropdown li,
-    .f-dropdown li > button {
-        background-color: var(--sbx-color-foreground-primary);
-    }
-
-    // Ensure the colour is the accent colour
-    &.f-dropdown li :is(a, button),
-    .f-dropdown li :is(a, button)::before {
-        color: var(--sbx-config-color-accent);
     }
 
     /**
