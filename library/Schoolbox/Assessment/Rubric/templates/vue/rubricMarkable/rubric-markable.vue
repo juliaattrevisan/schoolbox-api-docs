@@ -172,6 +172,25 @@ const derivedTotalMark = window.Vue.computed(() => {
 });
 
 /**
+ * Calculate a scaled rubric weight and round to 2dp if necessary for display
+ * @param rubric the rubric to calculate the scaled weight for
+ * @returns scaled weight, or 0 if it doesn't have a weight
+ */
+function getScaledRubricWeight(rubric: RubricGrid): number {
+    if (totalRubricWeight.value <= 0) {
+        return 0;
+    }
+
+    const weight = ((rubric.weight ?? 0) / totalRubricWeight.value) * 100;
+
+    if (weight % 1 !== 0) {
+        return parseFloat(weight.toFixed(2));
+    }
+
+    return weight;
+}
+
+/**
  * When the combined total mark changes, reflect that in the mark input & overall assign from button
  * TODO: this is currently outside of Vue, also should factor in multi rubrics
  */
@@ -188,7 +207,14 @@ window.Vue.watch(
         initially-expanded
         legend-class="l-pad-m--horiz"
     >
-        <template #legend>{{ rubric.rubric.title.length ? rubric.rubric.title : `Rubric ${index + 1}` }}</template>
+        <template #legend>
+            {{ rubric.rubric.title.length ? rubric.rubric.title : `Rubric ${index + 1}` }}
+            <!-- Append the weighting, if it matters -->
+            <template v-if="rubrics.length > 1 && totalRubricWeight > 0">
+                -
+                {{ getScaledRubricWeight(rubric.rubric) }}% Weighting
+            </template>
+        </template>
 
         <template #content>
             <rm-markable-grid
