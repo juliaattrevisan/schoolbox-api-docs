@@ -19,6 +19,10 @@ interface Props {
     levels: RubricGridLevel[];
     participantId: User["id"] | null;
     showSummaryCapability: boolean;
+    showDescriptorValue: boolean;
+    isSelfGrading: boolean;
+    isSelfAssess: boolean;
+    isStudentView: boolean;
 }
 const props = defineProps<Props>();
 
@@ -266,6 +270,10 @@ window.Vue.watch(
         :self-assessment-indicator-mark="indicator.selfAssessmentMark"
         :levels="props.levels"
         :participant-id="props.participantId"
+        :show-descriptor-value="props.showDescriptorValue"
+        :is-self-grading="props.isSelfGrading"
+        :is-self-assess="props.isSelfAssess"
+        :is-student-view="props.isStudentView"
         @indicator-mark-updated="onIndicatorMarkUpdated"
     />
 

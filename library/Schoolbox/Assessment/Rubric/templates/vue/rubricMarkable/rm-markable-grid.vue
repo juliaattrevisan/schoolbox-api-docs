@@ -23,6 +23,10 @@ interface Props {
     participantId: User["id"] | null;
     showRubricTotal?: boolean;
     showGroupTotal?: boolean;
+    showDescriptorValue: boolean;
+    isSelfGrading: boolean;
+    isSelfAssess: boolean;
+    isStudentView: boolean;
 }
 
 const props = defineProps<Props>();
@@ -113,6 +117,10 @@ const formValue = window.Vue.computed(() => JSON.stringify(translateMarkedGridTo
                     :levels="props.rubric.levels"
                     :participant-id="props.participantId"
                     :show-summary-capability="props.showGroupTotal"
+                    :show-descriptor-value="props.showDescriptorValue"
+                    :is-self-grading="props.isSelfGrading"
+                    :is-self-assess="props.isSelfAssess"
+                    :is-student-view="props.isStudentView"
                 />
 
                 <!-- Overall Rubric Mark -->

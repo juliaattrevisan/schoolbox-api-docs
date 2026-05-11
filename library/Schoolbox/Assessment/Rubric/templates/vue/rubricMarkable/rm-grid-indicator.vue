@@ -13,6 +13,10 @@ interface Props {
     selfAssessmentIndicatorMark: RubricMarkedGridIndicator | null;
     levels: RubricGridLevel[];
     participantId: User["id"] | null;
+    showDescriptorValue: boolean;
+    isSelfGrading: boolean;
+    isSelfAssess: boolean;
+    isStudentView: boolean;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{ (e: "indicatorMarkUpdated"): void }>();
@@ -38,6 +42,10 @@ window.Vue.watch(
                 :self-assessment-indicator-mark="props.selfAssessmentIndicatorMark"
                 :level="level"
                 :participant-id="props.participantId"
+                :show-descriptor-value="props.showDescriptorValue"
+                :is-self-grading="props.isSelfGrading"
+                :is-self-assess="props.isSelfAssess"
+                :is-student-view="props.isStudentView"
             />
             <td v-else class="rb-blank hide-for-medium-down">&nbsp;</td>
         </template>

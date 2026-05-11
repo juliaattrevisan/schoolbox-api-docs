@@ -13,20 +13,19 @@ interface Props {
     selfAssessmentIndicatorMark: RubricMarkedGridIndicator | null;
     level: RubricGridLevel;
     participantId: User["id"] | null;
+    showDescriptorValue: boolean;
+    isSelfGrading: boolean;
+    isSelfAssess: boolean;
+    isStudentView: boolean;
 }
 const props = defineProps<Props>();
 const indicatorMark = defineModel<RubricMarkedGridIndicator>("indicatorMark", { required: true });
 
 const componentId = window.Vue.useId();
 
-const isSelfGrading = false; // TODO: from 'selfAssessmentFeedback.isSelfGrading'
-const isSelfReflect = false; // TODO: from 'showDescriptorValue'
-const isSelfAssess = false; // TODO: from 'selfAssess'
-const isStudentView = false; // TODO: from 'studentView'
-
 const selfAssessmentTooltip = window.Vue.computed(() => {
     if (
-        isSelfGrading &&
+        props.isSelfGrading &&
         props.selfAssessmentIndicatorMark &&
         props.selfAssessmentIndicatorMark.descriptorId === props.descriptor.id
     ) {
@@ -155,7 +154,11 @@ window.Vue.onMounted(() => {
 
                 <!-- Just show a text value if the descriptor is not selected -->
                 <span
-                    v-if="props.descriptor.value !== null && (!hasMarkRange || !isDescriptorSelected) && !isSelfReflect"
+                    v-if="
+                        props.descriptor.value !== null &&
+                        (!hasMarkRange || !isDescriptorSelected) &&
+                        !props.showDescriptorValue
+                    "
                     class="rb-value"
                     :class="{ used: !hasMarkRange }"
                 >

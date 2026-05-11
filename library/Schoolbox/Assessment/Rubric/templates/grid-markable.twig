@@ -30,6 +30,10 @@
         {# TODO: these are signs of likely permission issues #}
         {% if showRubricTotal ?? false %}show-rubric-total{% endif %}
         {% if showGroupTotal ?? false %}show-group-total{% endif %}
+        {% if showDescriptorValue ?? false %}show-descriptor-value{% endif %}
+        {% if selfAssessmentFeedback and selfAssessmentFeedback.isSelfGrading %}is-self-grading{% endif %}
+        {% if selfAssess ?? false %}is-self-assess{% endif %}
+        {% if studentView ?? false %}is-student-view{% endif %}
     />
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/rubricMarkable.js?v={{ config.site_version }}"></script>

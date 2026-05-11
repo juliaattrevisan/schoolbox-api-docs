@@ -38,6 +38,25 @@ interface Props {
      * TODO: this probably needs to be delt with in SelfAssessmentFeedback as otherwise we'd be sending potentially values someone shouldn't normally access
      */
     showGroupTotal?: boolean;
+    /**
+     * TODO: likely a sign of permission issues, but for now pass these thru.
+     */
+    showDescriptorValue: boolean;
+    /**
+     * From "selfAssessmentFeedback.isSelfGrading"
+     * TODO: likely a sign of permission issues, but for now pass these thru.
+     */
+    isSelfGrading: boolean;
+    /**
+     * From "selfAssess"
+     * TODO: likely a sign of permission issues, but for now pass these thru.
+     */
+    isSelfAssess: boolean;
+    /**
+     * From "studentView"
+     * TODO: likely a sign of permission issues, but for now pass these thru.
+     */
+    isStudentView: boolean;
 }
 const props = defineProps<Props>();
 
@@ -231,6 +250,10 @@ window.Vue.watch(
                 :participant-id="props.participantId"
                 :show-rubric-total="props.showRubricTotal"
                 :show-group-total="props.showGroupTotal"
+                :show-descriptor-value="props.showDescriptorValue"
+                :is-self-grading="props.isSelfGrading"
+                :is-self-assess="props.isSelfAssess"
+                :is-student-view="props.isStudentView"
             />
         </template>
     </fieldset-collapsible>
