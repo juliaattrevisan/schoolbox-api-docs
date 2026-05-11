@@ -98,8 +98,6 @@
             const rubricSum = getRubricSum();
             updateGrade(rubricSum);
 
-            console.log('Assign from rubric clicked, rubricSum:', rubricSum);
-
             init();
         });
 
@@ -121,8 +119,9 @@
             if (!wasCustomised()) {
                 const rubricSum = getRubricSum();
                 updateGrade(rubricSum);
-                init();
             }
+
+            init();
         });
     });
 </script>
