@@ -77,7 +77,10 @@ class Factory
          * That means we have to do this regardless. Wild.
          */
         $newCapabilityMarkType = $this->markTypeMapper->createModel()
-            ->setId(MarkType::slugToId($rubricData['capabilityMarkType']));
+            ->setId(MarkType::slugToId($rubricData['capabilityMarkType']))
+            /* Unbelievably, this slug is needed in the Export To CSV functionality. What a secret!
+             */
+            ->setSlug($rubricData['capabilityMarkType']);
 
         $newCapabilityGradeGroup = $this->gradeGroupMapper->createModel()
             ->setId($rubricData['capabilityGradeGroup']);
