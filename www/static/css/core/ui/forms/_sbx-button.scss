@@ -102,40 +102,30 @@ body.sbx-body {
         display: none;
     }
 
-    /**
-     * Make some buttons smaller for better visual hierarchy, can be considered 'tertiary' buttons
-     * currently only used for the 'View more' buttons in Unit planner/ Manage DP page
-     */
+    // Make some buttons smaller for better visual hierarchy, can be considered 'tertiary' buttons
+    // currently only used for the 'View more' buttons in Unit planner/ Manage DP page
     .sbx-button--smaller {
         font-size: var(--sbx-font-size-xs);
     }
 
-    /**
-     * A horizontal list of buttons, adding some gap between them
-     */
+    // A horizontal list of buttons, adding some gap between them
     .sub-nav {
         display: flex;
         flex-wrap: wrap;
         gap: var(--sbx-size-xxs);
     }
 
-    /**
-     * Secondary button active state, just make it bold
-     */
+    //Secondary button active state, just make it bold
     .sub-nav li.active a {
         font-weight: bold;
     }
 
-    /**
-     * An existing flex list of buttons, just add some gap
-     */
+    // An existing flex list of buttons, just add some gap
     .flex-list.buttons {
         gap: var(--sbx-size-xxs);
     }
 
-    /**
-     * Component action section buttons, giving some gap like other button groups
-     */
+    // Component action section buttons, giving some gap like other button groups
     .component-action section {
         background: var(--sbx-color-foreground-primary);
         padding: var(--sbx-size-xs);
@@ -172,10 +162,8 @@ body.sbx-body {
         border: var(--sbx-border-width-normal) solid var(--sbx-config-color-accent); // add border back in for icon and text buttons
     }
 
-    /**
-     * When a button sits next to an input (e.g. search bars)
-     * We need to tweak the rounding of the corners so they align properly
-     */
+    // When a button sits next to an input (e.g. search bars)
+    // We need to tweak the rounding of the corners so they align properly
     .input-group {
         & > .button,
         & > a,
@@ -212,9 +200,7 @@ body.sbx-body {
         text-transform: none;
     }
 
-    /**
-     *  Flatpickr button fixes
-     */
+    // Flatpickr button fixes
     .flatpickr-current-month {
         .numInputWrapper {
             input.numInput {
@@ -231,25 +217,19 @@ body.sbx-body {
         }
     }
 
-    /**
-     *  notification advanced settings buttons alignment fix
-     */
+    // notification advanced settings buttons alignment fix
     .actions-small-6 > nav > [data-perm-container] {
         display: inline-flex;
         align-items: center;
     }
 
-    /**
-     * FullCalendar button hover border radius fix
-     */
+    // FullCalendar button hover border radius fix
     .fc-event,
     .fc-event:hover {
         border-radius: var(--sbx-config-field-roundness) !important;
     }
 
-    /**
-     * Add some gap otherwise the checkbox and text within these buttons are too close together
-     */
+    // Add some gap otherwise the checkbox and text within these buttons are too close together
     .search-result {
         gap: var(--sbx-size-xs);
     }
@@ -271,6 +251,7 @@ body.sbx-body {
         padding: var(--sbx-size-s);
     }
 
+    // Ensure the empty state buttons just look like link buttons
     .empty-state-flex-centered {
         button {
             border: none;
