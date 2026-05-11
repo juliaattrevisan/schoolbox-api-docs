@@ -157,7 +157,7 @@ window.Vue.onMounted(() => {
                     v-if="
                         props.descriptor.value !== null &&
                         (!hasMarkRange || !isDescriptorSelected) &&
-                        !props.showDescriptorValue
+                        props.showDescriptorValue
                     "
                     class="rb-value"
                     :class="{ used: !hasMarkRange }"
