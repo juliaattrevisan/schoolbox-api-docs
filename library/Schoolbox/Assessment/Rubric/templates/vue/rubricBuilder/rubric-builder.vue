@@ -16,7 +16,7 @@ import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import type { GradeScheme } from "@schoolboxLibrary/Learning/Assessment/templates/fragments/vue/mark-type.vue";
 import type { RubricGrid, ResultSet } from "./types";
 import RbRubricFields from "./rb-rubric-fields.vue";
-import RbRubricGrid from "./rb-rubric-grid.vue";
+import RbEditableGrid from "./rb-editable-grid.vue";
 import RbRubricDownload from "./rb-rubric-download.vue";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 
@@ -292,7 +292,7 @@ const rubricRows = window.Vue.computed(() => {
                     :rubric-id="rubric.id"
                 />
 
-                <rb-rubric-grid
+                <rb-editable-grid
                     v-model:rubric-grid-levels="rubric.levels"
                     v-model:rubric-grid-capabilities="rubric.capabilities"
                     :rubric="rubric"

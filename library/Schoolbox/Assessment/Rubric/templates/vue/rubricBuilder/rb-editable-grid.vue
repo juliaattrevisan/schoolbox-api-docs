@@ -271,7 +271,7 @@ window.Vue.onMounted(() => {
         ref="formValueRef"
         type="hidden"
         :name="`rubric[${rubric.id}]`"
-        :value="JSON.stringify(translateGridToFormPayload(rubric))"
+        :value="formValue"
         :data-rubric-form-input="
             hasBeenExpanded || undefined /* delay this until the actual content exists so validate can see it */
         "
