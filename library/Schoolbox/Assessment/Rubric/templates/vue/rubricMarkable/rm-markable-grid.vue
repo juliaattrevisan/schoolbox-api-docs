@@ -14,6 +14,7 @@ import type { User } from "@schoolboxLibrary/types/User";
 import { applyMarkScheme, getPercentage } from "./rubricUtils";
 import type { RubricGrid, RubricMarkedGrid } from "./types";
 import RmGridCapability from "./rm-grid-capability.vue";
+import { translateMarkedGridToFormPayload } from "./payload";
 
 interface Props {
     rubric: RubricGrid;
@@ -84,9 +85,14 @@ window.Vue.watch(derivedRubricMark, (scaledMark) => {
     rubricMarkedGrid.value.humanReadableMark = humanReadableMark;
     rubricMarkedGrid.value.normalisedMark = getPercentage(scaledMark, props.rubric.derivedMaxValue);
 });
+
+const formValue = window.Vue.computed(() => JSON.stringify(translateMarkedGridToFormPayload(rubricMarkedGrid.value)));
 </script>
 
 <template>
+    <!-- hidden input to submit the rubric grid as JSON -->
+    <input type="hidden" :name="`rubric[${rubric.id}]`" :value="formValue" />
+
     <div class="scrollable">
         <table class="rb markable">
             <thead v-if="hasLevels">
