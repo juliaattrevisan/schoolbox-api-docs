@@ -182,7 +182,12 @@ window.Vue.watch(
 </script>
 
 <template>
-    <fieldset-collapsible v-for="(rubric, index) in rubrics" :key="rubric.rubric.id" initially-expanded>
+    <fieldset-collapsible
+        v-for="(rubric, index) in rubrics"
+        :key="rubric.rubric.id"
+        initially-expanded
+        legend-class="l-pad-m--horiz"
+    >
         <template #legend>{{ rubric.rubric.title.length ? rubric.rubric.title : `Rubric ${index + 1}` }}</template>
 
         <template #content>

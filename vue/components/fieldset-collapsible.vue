@@ -11,6 +11,7 @@ interface Props {
      * dimensions correctly.
      */
     delayContentRender?: boolean;
+    legendClass?: string;
 }
 const props = defineProps<Props>();
 
@@ -35,8 +36,11 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <fieldset class="content collapsible">
-        <legend :class="isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'" @click="toggleExpanded">
+    <fieldset class="collapsible">
+        <legend
+            :class="`${isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'} ${props.legendClass || ''}`"
+            @click="toggleExpanded"
+        >
             <slot name="legend"></slot>
         </legend>
 
