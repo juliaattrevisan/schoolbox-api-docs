@@ -89,10 +89,12 @@ function onBackgroundClick(): void {
         <transition>
             <div v-if="isOpen" ref="modalEl" class="modal">
                 <div class="modal__background" @click="onBackgroundClick"></div>
-                <div :class="`modal__container modal__container--${modalSize}`">
-                    <!-- @slot Reveal modal content goes into this slot -->
-                    <div class="modal__container_main"><slot></slot></div>
-                    <slot name="footer"></slot>
+                <div :class="`modal__frame modal__frame--${modalSize}`">
+                    <div class="modal__container">
+                        <!-- @slot Reveal modal content goes into this slot -->
+                        <div class="modal__container_main"><slot></slot></div>
+                        <slot name="footer"></slot>
+                    </div>
                     <button
                         v-if="props.showCloseButton"
                         class="close-modal sbx-icon-only-button"
@@ -127,22 +129,26 @@ function onBackgroundClick(): void {
         width: 100%;
     }
     &__container {
-        background: var(--sbx-color-foreground-primary, #fff);
-        border-radius: var(--sbx-config-box-roundness, 0);
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
-        margin: 0 auto;
         overflow: hidden;
+    }
+    &__frame {
+        margin: 0 auto;
         position: relative;
         top: 100px;
     }
+    &__container {
+        background: var(--sbx-color-foreground-primary, #fff);
+        border-radius: var(--sbx-config-box-roundness, 0);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+    }
     /* set the width and breakpoint based on the existence of the size class */
     /* I feel there should be a better way to do this with v-bind() and loop, but for now this will do */
-    &:has(.modal__container--m) {
-        .modal__container--m {
+    &:has(.modal__frame--m) {
+        .modal__frame--m {
             width: 1000px;
         }
         @media (max-width: 1100px) {
-            .modal__container--m {
+            .modal__frame--m {
                 width: 100%;
             }
             .close-modal {
@@ -151,12 +157,12 @@ function onBackgroundClick(): void {
             }
         }
     }
-    &:has(.modal__container--s) {
-        .modal__container--s {
+    &:has(.modal__frame--s) {
+        .modal__frame--s {
             width: 600px;
         }
         @media (max-width: 700px) {
-            .modal__container--s {
+            .modal__frame--s {
                 width: 100%;
             }
             .close-modal {
@@ -196,7 +202,7 @@ function onBackgroundClick(): void {
         overflow: visible;
         position: absolute;
     }
-    .modal__container {
+    .modal__frame {
         top: 0;
     }
 }
