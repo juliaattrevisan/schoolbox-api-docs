@@ -45,19 +45,22 @@ body.sbx-body {
             }
         }
 
-        #header-search-input {
+        #header-search-input,
+        #notifications #header-search-input {
             & button {
                 border-radius: var(--sbx-config-field-roundness);
             }
         }
 
         // move the search results in so the right side is inline with the search input
-        .c-header-search__results {
+        .c-header-search__results,
+        #notifications .c-header-search__results {
             margin-right: 72px;
         }
 
         // profile icon to trigger the account menu
-        #profile-drop {
+        #profile-drop,
+        #notifications #profile-drop {
             margin-inline-end: 1rem;
             height: 3rem;
             width: 3rem;
@@ -133,31 +136,6 @@ body.sbx-body {
                 &[data-unread="0"] > [data-unread-count],
                 &[data-unread=""] > [data-unread-count] {
                     display: none;
-                }
-            }
-
-            #header-search-input {
-                & button {
-                    border-radius: var(--sbx-config-field-roundness);
-                }
-            }
-
-            // move the search results in so the right side is inline with the search input
-            .c-header-search__results {
-                margin-right: 72px;
-            }
-
-            // profile icon to trigger the account menu
-            #profile-drop {
-                margin-inline-end: 1rem;
-                height: 3rem;
-                width: 3rem;
-                top: 50%;
-                transform: translateY(-50%);
-                border-radius: var(--sbx-config-field-roundness);
-                overflow: hidden;
-                & img {
-                    border-radius: var(--sbx-config-field-roundness);
                 }
             }
 
@@ -269,10 +247,13 @@ body.sbx-body {
             color: var(--sbx-config-color-accent);
             border-radius: var(--sbx-config-field-roundness);
             font-size: var(--sbx-font-size-xs);
+            &:hover {
+                background: var(--sbx-config-color-active);
+            }
         }
         // to help differentiate the heading links from the list below
         .side-menu-heading-link {
-            background: var(--sbx-color-foreground-secondary);
+            // background: var(--sbx-color-foreground-secondary);
             border-bottom: 1px solid var(--sbx-color-border);
             border-radius: var(--sbx-config-field-roundness);
             font-size: var(--sbx-font-size-s);
@@ -312,6 +293,8 @@ body.sbx-body {
 
     // Message list styles
     #message-list {
+        padding: var(--sbx-size-xs);
+
         & #notification-toggle-full {
             background-color: transparent;
             color: var(--sbx-config-color-accent);
@@ -327,6 +310,51 @@ body.sbx-body {
 
         & :where(#right-menu-dock, #notification-toggle-full, .settings-button) {
             color: var(--sbx-config-color-accent);
+        }
+
+        #right-menu-dock,
+        .settings-button {
+            top: var(--sbx-size-l);
+        }
+        #right-menu-dock {
+            left: var(--sbx-size-xs);
+        }
+        .settings-button {
+            right: var(--sbx-size-xs);
+        }
+
+        & #notification-toggle-full {
+            background-color: var(--bg-primary) !important;
+            color: var(--sbx-config-color-accent);
+        }
+
+        #notification-toggle-full {
+            background-color: var(--sbx-color-foreground-primary);
+            color: var(--sbx-color-text-primary);
+            font-weight: var(--sbx-font-weight-active);
+            text-transform: none;
+        }
+
+        // to distinguish the pwa setup from the other parts
+        .pwa-side-panel {
+            background: var(--sbx-color-foreground-secondary);
+            border-radius: var(--sbx-config-box-roundness);
+            margin-bottom: var(--sbx-size-s);
+        }
+
+        // the border is removed in www/static/css/core/ui/navigation/_offcanvas.scss
+        a.install-button,
+        a.enable-notif-button,
+        a.mark-all-read,
+        a[data-msgfooter-action] {
+            border-bottom: 1px solid var(--sbx-config-color-accent) !important;
+        }
+
+        #msg-content {
+            margin-top: var(--sbx-size-s);
+            li {
+                padding: var(--sbx-size-xs);
+            }
         }
     }
 
@@ -355,32 +383,10 @@ body.sbx-body {
                 font-family: var(--ff-primary);
                 padding-block: 0.5rem;
             }
-        }
-    }
 
-    // Notifications menu styles
-    #message-list {
-        padding: var(--sbx-size-xs);
-        #right-menu-dock,
-        .settings-button {
-            border-radius: var(--sbx-config-field-roundness);
-            color: var(--sbx-config-color-accent);
-            padding: var(--sbx-size-xs);
-            top: var(--sbx-size-xs);
-            &:hover {
-                background: var(--sbx-config-color-active);
+            & > a {
+                font-size: var(--sbx-font-size-xs);
             }
-        }
-        #right-menu-dock {
-            left: var(--sbx-size-xs);
-        }
-        .settings-button {
-            right: var(--sbx-size-xs);
-        }
-
-        & #notification-toggle-full {
-            background-color: var(--bg-primary) !important;
-            color: var(--sbx-config-color-accent);
         }
     }
 
@@ -439,82 +445,6 @@ body.sbx-body {
                 li {
                     padding: var(--sbx-size-xs);
                 }
-            }
-        }
-    }
-
-    // Left menu styles when menu is not open
-    .off-canvas-wrap.move-right :not(.left-open) {
-        & #left-menu {
-            border-radius: var(--sbx-config-box-roundness);
-            box-shadow: var(--sbx-shadow-m);
-        }
-    }
-
-    // Notifications menu styles when menu is not open
-    .off-canvas-wrap.move-left :not(.right-open) {
-        & #msgs {
-            border-radius: var(--sbx-config-box-roundness);
-            box-shadow: var(--sbx-shadow-m);
-        }
-    }
-
-    // Notifications menu styles
-    #message-list {
-        padding: var(--sbx-size-xs);
-        #right-menu-dock,
-        .settings-button {
-            border-radius: var(--sbx-config-field-roundness);
-            color: var(--sbx-config-color-accent);
-            padding: var(--sbx-size-xs);
-            top: var(--sbx-size-xs);
-            &:hover {
-                background: var(--sbx-config-color-active);
-            }
-        }
-        #right-menu-dock {
-            left: var(--sbx-size-xs);
-        }
-        .settings-button {
-            right: var(--sbx-size-xs);
-        }
-
-        #notification-toggle-full {
-            background-color: var(--sbx-color-foreground-primary);
-            color: var(--sbx-color-text-primary);
-            font-weight: var(--sbx-font-weight-active);
-            text-transform: none;
-        }
-
-        // to distinguish the pwa setup from the other parts
-        .pwa-side-panel {
-            background: var(--sbx-color-foreground-secondary);
-            border-radius: var(--sbx-config-box-roundness);
-            margin-bottom: var(--sbx-size-s);
-        }
-
-        // the border is removed in www/static/css/core/ui/navigation/_offcanvas.scss
-        a.install-button,
-        a.enable-notif-button,
-        a.mark-all-read,
-        a[data-msgfooter-action] {
-            border-bottom: 1px solid var(--sbx-config-color-accent) !important;
-        }
-
-        #msg-content {
-            margin-top: var(--sbx-size-s);
-            li {
-                padding: var(--sbx-size-xs);
-            }
-        }
-    }
-
-    // side nav used in admin, pastoral settings, news
-    .side-nav {
-        overflow: hidden;
-        & li {
-            & > a {
-                font-size: var(--sbx-font-size-xs);
             }
         }
     }

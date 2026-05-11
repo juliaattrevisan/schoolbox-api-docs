@@ -101,25 +101,11 @@ $allow-notification-stash: $xlarge-up;
     @media #{$allow-notification-stash} {
         .right-menu-dock {
             color: $white;
-            display: block;
-            height: 2.5rem;
-            padding: 0.5rem;
-            position: absolute;
             left: 0;
-            transform: translateY(40%);
-            width: 2.5rem;
-            z-index: calc(var(--sbx-depth-default) + 1); // Safari will not see the icon without this
-
-            &::after {
-                content: "\e915"; //.icon-pin-hollow
-                font-family: $font-family-icon;
-                font-size: 1rem;
-                padding-left: rem-calc(4);
-            }
-        }
-        &[data-unread="0"] {
-            .right-menu-dock {
-                color: var(--sbx-config-color-menu-foreground, $navigation-foreground);
+            position: absolute;
+            top: 1rem;
+            &:hover {
+                color: $navigation-background;
             }
         }
     }
@@ -127,14 +113,12 @@ $allow-notification-stash: $xlarge-up;
     // the link to open the notification settings
     .settings-button {
         color: $white;
-        height: 2.5rem;
-        padding: 0.5rem;
         position: absolute;
-        right: 0.5rem;
-        top: 0;
-        transform: translateY(40%);
-        width: 2rem;
-        z-index: calc(var(--sbx-depth-default) + 1); // Safari will not see the icon without this
+        right: 0;
+        top: 1rem;
+        &:hover {
+            color: $navigation-background;
+        }
     }
 
     /* The button that allows you to view your notifications
@@ -186,11 +170,11 @@ $allow-notification-stash: $xlarge-up;
 }
 
 @media #{$allow-notification-stash} {
-    .right-open {
-        .right-menu-dock::after {
-            content: "\e913"; //.icon-pin
-        }
-    }
+    // .right-open {
+    //     .right-menu-dock::after {
+    //         content: "\e913"; //.icon-pin
+    //     }
+    // }
 }
 
 .pwa-side-panel {

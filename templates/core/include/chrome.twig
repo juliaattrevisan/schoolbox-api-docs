@@ -227,12 +227,14 @@
             <a
                 href="#"
                 title="{{ user.current.getHideSidenav ? dockTitle : undockTitle }}"
-                class="left-menu-dock"
+                class="left-menu-dock sbx-icon-only-button"
                 id="left-menu-dock"
                 data-dock-state="{{ not user.current.getHideSidenav }}"
                 data-title-dock="{{ dockTitle }}"
                 data-title-undock="{{ undockTitle }}"
-            ></a>
+            >
+                <sbx-icon name="pin"></sbx-icon>
+            </a>
             <div class="logo-wrapper">
                 <a href="/" class="logo">
                     <img src="/images/logo.php?logo=skin_logo_large&size=normal" srcset="/images/logo.php?logo=skin_logo_large&size=normal 1x,/images/logo.php?logo=skin_logo_large&size=hidpi 2x" alt="{{ config.school_name }}"/>
@@ -418,12 +420,14 @@
                             <a
                                 href="#"
                                 title="{{ user.current.getHideNotificationsTray ? dockNotifsTitle : undockNotifsTitle }}"
-                                class="right-menu-dock show-for-xlarge-up"
+                                class="right-menu-dock sbx-icon-only-button"
                                 id="right-menu-dock"
                                 data-dock-state="{{ not user.current.getHideNotificationsTray }}"
                                 data-title-dock="{{ dockNotifsTitle }}"
                                 data-title-undock="{{ undockNotifsTitle }}"
-                            ></a>
+                            >
+                                <sbx-icon name="pin"></sbx-icon>
+                            </a>
                             <label id="notification-toggle-full">Notifications</label>
                             <a class="settings-button sbx-icon-only-button" href="{{ routeLookup("notifications.configure") }}" aria-label="Modify notification settings" title="Modify notification settings"><sbx-icon name="settings"></sbx-icon></a>
                         </li>
