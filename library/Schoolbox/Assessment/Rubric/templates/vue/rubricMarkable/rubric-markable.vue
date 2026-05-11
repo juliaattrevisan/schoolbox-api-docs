@@ -126,6 +126,11 @@ const derivedMaxMark = window.Vue.computed(() => {
  * Generally this also represents the final mark for the assessment, assuming it hasn't been customised separately.
  */
 const derivedTotalMark = window.Vue.computed(() => {
+    // When there are no marks to give, we shouldn't start setting the final grade to "0 %"
+    if (derivedMaxMark.value === 0) {
+        return null;
+    }
+
     let totalNormalisedMark = 0;
     let hasMeaningfulMark = false;
 
