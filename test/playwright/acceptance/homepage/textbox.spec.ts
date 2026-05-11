@@ -85,7 +85,7 @@ test.describe("Textbox Tests", () => {
         tester.isGoingTo("Add a new component in the homepage");
         await homepage.addComponent("#tabs-sub-1", "Text Box");
         tester.isGoingTo("Enter content into the new component");
-        await page.waitForSelector("i.icon-textbox");
+        await page.waitForSelector('sbx-icon[name="textbox"]');
         const layout = Homepage.ELEMENT_COMPONENT_LAYOUT_TOP;
         const position = 1;
         await homepage.clickComponentEmptyStateLink(layout, position);
