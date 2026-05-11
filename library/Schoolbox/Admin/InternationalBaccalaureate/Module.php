@@ -21,12 +21,13 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IB\Group\Subject\Language\Mapper as IBGroupSubjectLanguageMapper;
 use Schoolbox\IB\Group\Subject\Mapper as IBGroupSubjectMapper;
 use Schoolbox\IB\Group\Mapper as IBGroupMapper;
+use Schoolbox\IB\Registrations\Sessions\Mapper as RegistrationSessionMapper;
+use Schoolbox\IB\Registrations\Sessions\Student\Mapper as RegistrationSessionStudentMapper;
 use Schoolbox\Language\Mapper as LanguageMapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
-use Schoolbox\IB\Registrations\Sessions\Mapper as RegistrationSessionMapper;
 
 class Module extends BaseModule
 {
@@ -62,6 +63,7 @@ class Module extends BaseModule
         $this->register('GET', '/registrations/sessions', 'getRegistrationSessions', $ruleIBCoordinatorAccess);
         $this->register('POST', '/registrations/sessions', 'createRegistrationSession', $ruleIBCoordinatorAccess);
         $this->register('DELETE', '/registrations/sessions/{sessionId:\d+}', 'deleteRegistrationSession', $ruleIBCoordinatorAccess, $preloadRegistrationSession);
+        $this->register('GET', '/registrations/sessions/{id:\\d+}/candidates', 'getRegistrationSessionStudents', $ruleIBCoordinatorAccess);
     }
 
     /**
@@ -78,6 +80,8 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(FolderCodeMapper::class),
             $this->getMapperFactory()->get(RegistrationSessionMapper::class),
             $this->injector->get('externalClass'),
+            $this->getMapperFactory()->get(RegistrationSessionStudentMapper::class),
+            $this->injector->get('externalUser'),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
             $this->injector->get('oidc.cache'),
