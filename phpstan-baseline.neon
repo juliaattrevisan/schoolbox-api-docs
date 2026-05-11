@@ -1963,12 +1963,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
 
 		-
-			message: '#^Method Schoolbox\\Assessment\\Rubric\\DataModel\\Result\\Model\:\:getValue\(\) should return string but returns int\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Result/Model.php
-
-		-
 			message: '#^Property Schoolbox\\Assessment\\Rubric\\Grid\\Importer\\GenericImporter\:\:\$capabilities \(array\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
 			count: 1
