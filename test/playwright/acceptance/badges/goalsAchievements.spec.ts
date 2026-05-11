@@ -152,7 +152,7 @@ test.describe("Goals and Achievements tests", () => {
         await profilePage.clickBadgeDropdown(badgeIdGoal);
         await badges.clickDropdownOptionLastElement("close");
         await badges.clickConfirm();
-        await expect(page.locator('[class="icon-goal"]')).toBeVisible();
+        await expect(page.locator('[data-test="empty-state-icon"]')).toBeVisible();
         await profilePage.clickTab("activity");
         await expect(page.locator("#activity-feed")).not.toContainText(badgeNameAchievement);
         await expect(page.locator("#activity-feed")).not.toContainText(badgeNameGoal);
