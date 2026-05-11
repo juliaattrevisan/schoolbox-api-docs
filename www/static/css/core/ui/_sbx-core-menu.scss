@@ -257,82 +257,56 @@ body.sbx-body {
                 color: var(--sbx-color-text-secondary);
             }
         }
+    }
 
-        // Left menu styles
-        #left-menu {
-            h3 {
-                color: var(--sbx-color-text-primary);
-                text-transform: none;
-            }
+    // Left menu styles
+    #left-menu {
+        h3 {
+            color: var(--sbx-color-text-primary);
+            text-transform: none;
+        }
+        a {
+            color: var(--sbx-config-color-accent);
+            border-radius: var(--sbx-config-field-roundness);
+            font-size: var(--sbx-font-size-xs);
+        }
+        // to help differentiate the heading links from the list below
+        .side-menu-heading-link {
+            background: var(--sbx-color-foreground-secondary);
+            border-bottom: 1px solid var(--sbx-color-border);
+            border-radius: var(--sbx-config-field-roundness);
+            font-size: var(--sbx-font-size-s);
+            font-weight: var(--sbx-font-weight-active);
+        }
+        /* Ensure the Back link has the icon content and font-family */
+        .back {
             a {
-                color: var(--sbx-config-color-accent);
-                border-radius: var(--sbx-config-field-roundness);
-                font-size: var(--sbx-font-size-xs);
-            }
-            // to help differentiate the heading links from the list below
-            .side-menu-heading-link {
-                background: var(--sbx-color-foreground-secondary);
-                border-bottom: 1px solid var(--sbx-color-border);
-                border-radius: var(--sbx-config-field-roundness);
-                font-size: var(--sbx-font-size-s);
-                font-weight: var(--sbx-font-weight-active);
-            }
-            /* Ensure the Back link has the icon content and font-family */
-            .back {
-                a {
-                    text-transform: none;
-                    &:before {
-                        content: "\e655"; /* The icon character */
-                        font-family: var(--sbx-icon-font-family) !important; /* Forces the icon font */
-                    }
+                text-transform: none;
+                &:before {
+                    content: "\e655"; /* The icon character */
+                    font-family: var(--sbx-icon-font-family) !important; /* Forces the icon font */
                 }
             }
         }
+    }
 
-        // Left menu styles when menu is not open
-        .off-canvas-wrap.move-right :not(.left-open) {
-            & #left-menu {
-                border-radius: var(--sbx-config-box-roundness);
-                box-shadow: var(--sbx-shadow-m);
-                left: 1rem;
-                top: 1rem;
-            }
+    // Left menu styles when menu is not open
+    .off-canvas-wrap.move-right :not(.left-open) {
+        & #left-menu {
+            border-radius: var(--sbx-config-box-roundness);
+            box-shadow: var(--sbx-shadow-m);
+            left: 1rem;
+            top: 1rem;
         }
+    }
 
-        // Notifications menu styles when menu is not open
-        .off-canvas-wrap.move-left :not(.right-open) {
-            & #msgs {
-                border-radius: var(--sbx-config-box-roundness);
-                box-shadow: var(--sbx-shadow-m);
-                right: 1rem;
-                top: 1rem;
-            }
-        }
-
-        // Notifications menu styles
-        #message-list {
-            padding: var(--sbx-size-xs);
-            #right-menu-dock,
-            .settings-button {
-                border-radius: var(--sbx-config-field-roundness);
-                color: var(--sbx-config-color-accent);
-                padding: var(--sbx-size-xs);
-                top: var(--sbx-size-xs);
-                &:hover {
-                    background: var(--sbx-config-color-active);
-                }
-            }
-            #right-menu-dock {
-                left: var(--sbx-size-xs);
-            }
-            .settings-button {
-                right: var(--sbx-size-xs);
-            }
-
-            & #notification-toggle-full {
-                background-color: var(--bg-primary) !important;
-                color: var(--sbx-config-color-accent);
-            }
+    // Notifications menu styles when menu is not open
+    .off-canvas-wrap.move-left :not(.right-open) {
+        & #msgs {
+            border-radius: var(--sbx-config-box-roundness);
+            box-shadow: var(--sbx-shadow-m);
+            right: 1rem;
+            top: 1rem;
         }
     }
 
@@ -381,6 +355,32 @@ body.sbx-body {
                 font-family: var(--ff-primary);
                 padding-block: 0.5rem;
             }
+        }
+    }
+
+    // Notifications menu styles
+    #message-list {
+        padding: var(--sbx-size-xs);
+        #right-menu-dock,
+        .settings-button {
+            border-radius: var(--sbx-config-field-roundness);
+            color: var(--sbx-config-color-accent);
+            padding: var(--sbx-size-xs);
+            top: var(--sbx-size-xs);
+            &:hover {
+                background: var(--sbx-config-color-active);
+            }
+        }
+        #right-menu-dock {
+            left: var(--sbx-size-xs);
+        }
+        .settings-button {
+            right: var(--sbx-size-xs);
+        }
+
+        & #notification-toggle-full {
+            background-color: var(--bg-primary) !important;
+            color: var(--sbx-config-color-accent);
         }
     }
 
