@@ -37,7 +37,7 @@
 
 {% block extraContent %}
     <script>
-    (() => {
+    $(function() {
         const durationUserInput = document.querySelector("[data-duration-field-input='{{ fieldId }}']");
         const durationValueInput = document.querySelector("[data-duration-field-value='{{ fieldId }}']");
         const durationUnit = durationValueInput.dataset.durationFieldUnit;
@@ -187,6 +187,6 @@
                 number: "Please enter a valid duration.",
             },
         });
-    })();
+    });
     </script>
 {% endblock %}
