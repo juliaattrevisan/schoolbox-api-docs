@@ -16,11 +16,12 @@
 {% set markScheme = selfAssess or studentView ? rubricGrid.assessment.markScheme : rubricGrid.assessment.instructorMarkScheme %}
 
 <div data-vue-app="rubric-markable">
-    {# TODO: multiple rubrics, <rubric-markable> #}
-    <rubric-markable-grid
-        :rubric="{{ rubricGrid.toArray(showPoints)|json_encode }}"
-        :rubric-marked-grid="{{ (rubricMarkedGrid ? rubricMarkedGrid.toArray(USER, showPoints) : null)|json_encode }}"
-        :self-assessment-feedback="{{ (selfAssessmentMarkedGrid ? selfAssessmentMarkedGrid.toArray(USER, showPoints) : null)|json_encode }}"
+    <rubric-markable
+        :rubric-marked-grids-payload="[{
+            rubric: {{ rubricGrid.toArray(showPoints)|json_encode }},
+            markedGrid: {{ (rubricMarkedGrid ? rubricMarkedGrid.toArray(USER, showPoints) : null)|json_encode }},
+            selfAssessmentFeedback: {{ (selfAssessmentMarkedGrid ? selfAssessmentMarkedGrid.toArray(USER, showPoints) : null)|json_encode }}
+        }]"
         :assessment-mark-scheme="{
             template: {{ markScheme.template|json_encode }},
             context: {{ markScheme.generateContext|json_encode }}

@@ -56,6 +56,7 @@ class ModelToArray
         return [
             'gridId' => $markedGrid->getGrid()->getId(),
             'humanReadableMark' => $canSeeMark ? $markedGrid->retrieveHumanReadableMark() : null,
+            'normalisedMark' => $canSeeMark ? $markedGrid->retrieveNormalizedMark() : null,
             'capabilities' => $capabilities,
         ];
     }

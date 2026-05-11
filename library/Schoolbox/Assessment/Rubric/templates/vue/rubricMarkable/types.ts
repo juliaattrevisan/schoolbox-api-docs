@@ -65,6 +65,7 @@ export type RubricMarkedGrid = {
      * null if it shouldn't be displayed / doesn't exist (e.g. for self assessment feedback, if feedback.isSelfGrading is false)
      */
     humanReadableMark: string | null;
+    normalisedMark: number | null;
     capabilities: RubricMarkedGridCapability[];
 };
 

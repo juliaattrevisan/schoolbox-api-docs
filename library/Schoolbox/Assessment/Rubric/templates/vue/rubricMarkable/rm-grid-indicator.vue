@@ -4,7 +4,7 @@
  * (also known as a "criterion" in the past)
  */
 
-import type { UserAuthor } from "@schoolboxLibrary/types/User";
+import type { User } from "@schoolboxLibrary/types/User";
 import type { RubricGridIndicator, RubricGridLevel, RubricMarkedGridIndicator } from "./types";
 import RmGridDescriptor from "./rm-grid-descriptor.vue";
 
@@ -12,7 +12,7 @@ interface Props {
     indicator: RubricGridIndicator;
     selfAssessmentIndicatorMark: RubricMarkedGridIndicator | null;
     levels: RubricGridLevel[];
-    participantId: UserAuthor["id"] | null;
+    participantId: User["id"] | null;
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{ (e: "indicatorMarkUpdated"): void }>();

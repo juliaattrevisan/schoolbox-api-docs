@@ -9,71 +9,31 @@
 
 import locale from "@js/terminology/rosettaStone";
 import { MarkTypeSlug } from "@schoolboxAssessment/Types/MarkType";
-import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import type { MarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
+import type { User } from "@schoolboxLibrary/types/User";
+import { applyMarkScheme, getPercentage } from "./rubricUtils";
+import type { RubricGrid, RubricMarkedGrid } from "./types";
 import RmGridCapability from "./rm-grid-capability.vue";
-import type { RubricGrid, RubricMarkedGrid, RubricMarkedGridCapability, RubricMarkedGridIndicator } from "./types";
-import { cloneDeep } from "es-toolkit";
-import { applyMarkScheme } from "./rubricUtils";
 
 interface Props {
     rubric: RubricGrid;
-    rubricMarkedGrid: RubricMarkedGrid | null;
     selfAssessmentFeedback: RubricMarkedGrid | null;
     assessmentMarkScheme: MarkScheme;
-    /**
-     * The ID of the participant being assessed, or null if blind marking
-     */
-    participantId: UserAuthor["id"] | null;
-    /**
-     * Whether to show the totals at the bottom of overall rubric
-     * This is false for student views, but true for staff views
-     * TODO: this probably needs to be delt with in SelfAssessmentFeedback as otherwise we'd be sending potentially values someone shouldn't normally access
-     */
+    participantId: User["id"] | null;
     showRubricTotal?: boolean;
-    /**
-     * Whether to show group totals at the bottom of each capability,
-     * can be inferred from (assessment.markPerCapability)
-     * TODO: this probably needs to be delt with in SelfAssessmentFeedback as otherwise we'd be sending potentially values someone shouldn't normally access
-     */
     showGroupTotal?: boolean;
 }
 
 const props = defineProps<Props>();
+const rubricMarkedGrid = defineModel<RubricMarkedGrid>("rubricMarkedGrid", { required: true });
 
 /** Supress level headings if none have names */
 const hasLevels = window.Vue.computed(() => props.rubric.levels.some((level) => level.name.trim().length > 0));
 
-/** A blank marked grid which will be used if one isn't provided */
-const blankMarkedGrid: RubricMarkedGrid = {
-    gridId: props.rubric.id,
-    capabilities: props.rubric.capabilities.map((capability): RubricMarkedGridCapability => {
-        return {
-            id: capability.id,
-            humanReadableMark: null,
-            value: null,
-            scaledMark: null,
-            indicators: capability.indicators.map((indicator): RubricMarkedGridIndicator => {
-                return {
-                    id: indicator.id,
-                    descriptorId: null,
-                    value: null,
-                };
-            }),
-        };
-    }),
-    humanReadableMark: null,
-};
-
-/** local mutable props.rubricMarkedGrid copy */
-const markedGridData = window.Vue.ref<RubricMarkedGrid>(
-    cloneDeep(props.rubricMarkedGrid !== null ? props.rubricMarkedGrid : blankMarkedGrid),
-);
-
 /** All capabilities, with their associated mark data */
 const capabilities = window.Vue.computed(() => {
     return props.rubric.capabilities.map((capability) => {
-        const capabilityMark = markedGridData.value.capabilities.find((cap) => cap.id === capability.id) ?? null;
+        const capabilityMark = rubricMarkedGrid.value.capabilities.find((cap) => cap.id === capability.id) ?? null;
         const selfAssessmentCapabilityMark =
             props.selfAssessmentFeedback?.capabilities.find((cap) => cap.id === capability.id) ?? null;
 
@@ -97,7 +57,7 @@ const derivedRubricMark = window.Vue.computed(() => {
     let total = 0;
     let hasMeaningfulMark = false;
 
-    for (const capability of markedGridData.value.capabilities) {
+    for (const capability of rubricMarkedGrid.value.capabilities) {
         if (capability.scaledMark !== null) {
             total += capability.scaledMark;
             hasMeaningfulMark = true;
@@ -119,9 +79,10 @@ const derivedRubricMark = window.Vue.computed(() => {
 /**
  * When a capability mark is updated, update the grid total
  */
-window.Vue.watch(derivedRubricMark, (newValue) => {
-    const { humanReadableMark } = applyMarkScheme(newValue, props.rubric.derivedMaxValue, props.assessmentMarkScheme);
-    markedGridData.value.humanReadableMark = humanReadableMark;
+window.Vue.watch(derivedRubricMark, (scaledMark) => {
+    const { humanReadableMark } = applyMarkScheme(scaledMark, props.rubric.derivedMaxValue, props.assessmentMarkScheme);
+    rubricMarkedGrid.value.humanReadableMark = humanReadableMark;
+    rubricMarkedGrid.value.normalisedMark = getPercentage(scaledMark, props.rubric.derivedMaxValue);
 });
 
 /**
@@ -129,7 +90,7 @@ window.Vue.watch(derivedRubricMark, (newValue) => {
  * TODO: this is currently outside of Vue, also should factor in multi rubrics
  */
 window.Vue.watch(
-    () => markedGridData.value.humanReadableMark,
+    () => rubricMarkedGrid.value.humanReadableMark,
     () => {
         document.dispatchEvent(new CustomEvent("RUBRIC__TOTAL_MARK_UPDATED"));
     },
@@ -159,15 +120,15 @@ window.Vue.watch(
                     :show-summary-capability="props.showGroupTotal"
                 />
 
-                <!-- Overall Mark -->
+                <!-- Overall Rubric Mark -->
                 <tr v-if="props.showRubricTotal && props.assessmentMarkScheme.context.mode !== MarkTypeSlug.NONE">
                     <th
                         class="rb-final-summary"
                         :colspan="props.rubric.levels.length + 2"
-                        :data-rubric-sum-value="markedGridData.humanReadableMark"
+                        :data-rubric-sum-value="rubricMarkedGrid.humanReadableMark"
                         data-test="rubric-final-summary"
                     >
-                        {{ markedGridData.humanReadableMark }}
+                        {{ rubricMarkedGrid.humanReadableMark }}
 
                         <!-- Self-Assessment -->
                         <template v-if="props.selfAssessmentFeedback?.humanReadableMark">

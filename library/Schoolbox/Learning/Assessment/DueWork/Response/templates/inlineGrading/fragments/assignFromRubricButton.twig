@@ -19,8 +19,8 @@
          */
         function getRubricSum() {
             // defer this querySelector until needed as the rubric grid loads via JS
-            const rubricSumValueEl = assessmentStatusEl.querySelector('[data-rubric-sum-value]');
-            return rubricSumValueEl.getAttribute('data-rubric-sum-value').trim();
+            const rubricSumValueEl = assessmentStatusEl.querySelector('#rubric-total-mark');
+            return rubricSumValueEl.value.trim();
         }
 
         /**
@@ -121,6 +121,7 @@
             if (!wasCustomised()) {
                 const rubricSum = getRubricSum();
                 updateGrade(rubricSum);
+                init();
             }
         });
     });

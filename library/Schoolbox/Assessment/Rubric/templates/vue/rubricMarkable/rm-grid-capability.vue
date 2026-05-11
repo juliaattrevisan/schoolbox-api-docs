@@ -7,17 +7,17 @@
 import locale from "@js/terminology/rosettaStone";
 import MarkScheme from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/mark-scheme.vue";
 import type { MarkScheme as CapabilityMarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
-import type { UserAuthor } from "@schoolboxLibrary/types/User";
+import type { User } from "@schoolboxLibrary/types/User";
+import { applyMarkScheme, deriveScaledMark } from "./rubricUtils";
 import type { RubricGridCapability, RubricGridLevel, RubricMarkedGridCapability } from "./types";
 import RmGridIndicator from "./rm-grid-indicator.vue";
-import { applyMarkScheme, deriveScaledMark } from "./rubricUtils";
 
 interface Props {
     capability: RubricGridCapability;
     selfAssessmentCapabilityMark: RubricMarkedGridCapability | null;
     capabilityMarkScheme: CapabilityMarkScheme;
     levels: RubricGridLevel[];
-    participantId: UserAuthor["id"] | null;
+    participantId: User["id"] | null;
     showSummaryCapability: boolean;
 }
 const props = defineProps<Props>();
@@ -219,7 +219,7 @@ window.Vue.watch(
             props.capabilityMarkScheme,
         );
         const { humanReadableMark } = applyMarkScheme(
-            capabilityMark.value.value,
+            capabilityMark.value.value, // TODO: is that right?? might need to be scaledMark
             props.capability.maxValue,
             props.capabilityMarkScheme,
         );

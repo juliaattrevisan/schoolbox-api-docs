@@ -5,14 +5,14 @@
 
 import locale from "@js/terminology/rosettaStone";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
-import type { UserAuthor } from "@schoolboxLibrary/types/User";
+import type { User } from "@schoolboxLibrary/types/User";
 import type { RubricGridDescriptor, RubricGridLevel, RubricMarkedGridIndicator } from "./types";
 
 interface Props {
     descriptor: RubricGridDescriptor;
     selfAssessmentIndicatorMark: RubricMarkedGridIndicator | null;
     level: RubricGridLevel;
-    participantId: UserAuthor["id"] | null;
+    participantId: User["id"] | null;
 }
 const props = defineProps<Props>();
 const indicatorMark = defineModel<RubricMarkedGridIndicator>("indicatorMark", { required: true });

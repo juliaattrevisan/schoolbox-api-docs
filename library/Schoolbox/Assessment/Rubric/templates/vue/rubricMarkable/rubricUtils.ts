@@ -5,9 +5,9 @@ import type { MarkScheme } from "@schoolboxLibrary/Learning/MarkScheme/templates
  * Turn a specified value into a percentage of the max marks for a capability or rubric total mark
  * @param value value
  * @param maxValue the max
- * @returns pecentage
+ * @returns pecentage, or null if value is not a number and can't be converted to a number
  */
-function getPercentage(value: string | number | null, maxValue: number): number | null {
+export function getPercentage(value: string | number | null, maxValue: number): number | null {
     const floatValue = parseFloat(String(value)); // yikes.
     if (Number.isNaN(floatValue)) {
         return null;

@@ -1,5 +1,4 @@
-// TODO: there'll eventually be a wrapper around this, like rubric-builder
-import RubricMarkableGrid from "./rubric-markable-grid.vue";
+import RubricMarkable from "./rubric-markable.vue";
 
 document.querySelectorAll<HTMLDivElement>('[data-vue-app="rubric-markable"]').forEach((el) => {
     if (el.dataset.initialised) {
@@ -10,7 +9,7 @@ document.querySelectorAll<HTMLDivElement>('[data-vue-app="rubric-markable"]').fo
 
     window.Vue.createApp({
         components: {
-            RubricMarkableGrid,
+            RubricMarkable,
         },
     }).mount(el);
 });
