@@ -76,6 +76,14 @@ use UnexpectedValueException;
 class DataSource
 {
     /**
+     * Default weight, typically used on fresh csv imports.
+     * The idea being default 100 is so that rubrics "just work" out of the box like they always did; having zero weight
+     * means it doesn't contribute to the aggregated rubric total. It's really similar to how project summation works.
+     */
+    private const int RUBRIC_DEFAULT_WEIGHT = 100;
+
+
+    /**
      * Stores the singleton instance of the mapper
      *
      * @var self[]
@@ -1205,18 +1213,19 @@ class DataSource
         $filesystemProxy = $this->storageMapper->getStorageFilesystemProxy();
 
         $importer = (new CsvImporterFactory($this->markTypeMapper))->build($filesystemProxy->readStream($file), $maxLevels, $dueWork);
-
-        $this->importGrid($dueWork, $importer);
+        $this->importGrid($dueWork, $importer, $file->getFilename());
     }
 
 
     /**
      * Imports a rubric grid using importer into the given due work.
+     *
      * @param DueWorkModel $dueWork
-     * @param IImporter    $importer
+     * @param IImporter $importer
+     * @param string $filename
      * @throws MapperException
      */
-    public function importGrid(DueWorkModel $dueWork, IImporter $importer): void
+    public function importGrid(DueWorkModel $dueWork, IImporter $importer, string $filename): void
     {
         // Add to the rowset as necessary
         $rowSet        = $this->retrieveRowSet($dueWork->getContext(), false);
@@ -1279,7 +1288,11 @@ class DataSource
         $assessmentModel = \Schoolbox\Learning\Assessment\DataModel\Mapper::getInstance()->createModel()
             ->setId($dueWork->getId());
 
+        /* Fulfil rubric settings
+         */
         $rubricInstance = $this->rubricInstanceMapper->createModel()
+            ->setTitle($filename)
+            ->setWeight(self::RUBRIC_DEFAULT_WEIGHT)
             ->setAssessmentModel($assessmentModel)
             ->setCapabilityMarkType($capabilityMarkType)
             ->setCapabilityGradeGroup($capabilityGradeGroup)
